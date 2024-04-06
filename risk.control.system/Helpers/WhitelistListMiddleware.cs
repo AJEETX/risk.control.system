@@ -14,13 +14,13 @@ using System.Net;
 
 namespace risk.control.system.Helpers
 {
-    public class AdminSafeListMiddleware
+    public class WhitelistListMiddleware
     {
         private readonly RequestDelegate _next;
-        private readonly ILogger<AdminSafeListMiddleware> _logger;
+        private readonly ILogger<WhitelistListMiddleware> _logger;
         private readonly IFeatureManager featureManager;
         private byte[][] _safelist;
-        public AdminSafeListMiddleware(RequestDelegate next, ILogger<AdminSafeListMiddleware> logger, string safelist, IFeatureManager featureManager)
+        public WhitelistListMiddleware(RequestDelegate next, ILogger<WhitelistListMiddleware> logger, IFeatureManager featureManager)
         {
             _next = next;
             _logger = logger;

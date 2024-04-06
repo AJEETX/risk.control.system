@@ -1,3 +1,4 @@
+using System;
 using System.Net;
 using System.Reflection;
 using System.Threading.RateLimiting;
@@ -5,12 +6,17 @@ using System.Threading.RateLimiting;
 using AspNetCoreHero.ToastNotification;
 using AspNetCoreHero.ToastNotification.Extensions;
 
+using Highsoft.Web.Mvc.Charts;
+
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Http.Timeouts;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
@@ -74,7 +80,6 @@ builder.Services.Configure<ForwardedHeadersOptions>(options => {
 });
 
 builder.Services.AddFeatureManagement().AddFeatureFilter<TimeWindowFilter>();
-builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IAgentService, AgentService>();
 builder.Services.AddScoped<IClaimsInvestigationService, ClaimsInvestigationService>();
@@ -112,6 +117,7 @@ builder.Services.AddControllersWithViews()
     .AddNewtonsoftJson(options =>
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
 );
+
 builder.Services.AddNotyf(config =>
 {
     config.DurationInSeconds = 2;
@@ -129,9 +135,15 @@ if (prod)
 else
 {
     builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                        options.UseSqlite("Data Source=x-trial-06Apr0300.db"));
+                        options.UseSqlite(builder.Configuration.GetConnectionString("Database")));
 }
 
+builder.Services.Configure<CookiePolicyOptions>(options =>
+{
+    // This lambda determines whether user consent for non-essential cookies is needed for a given request.
+    options.CheckConsentNeeded = context => false;
+    options.MinimumSameSitePolicy = SameSiteMode.None;
+});
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
 {
     options.User.RequireUniqueEmail = true;
@@ -154,21 +166,30 @@ builder.Services.Configure<IdentityOptions>(options =>
     options.User.RequireUniqueEmail = true;
 });
 
-
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
         options.Events.OnRedirectToLogin = (context) =>
         {
-            context.Response.StatusCode = 401;
+            var url = context.RedirectUri;
+            UriHelper.FromAbsolute(url, out var scheme, out var host, out var path, out var query, out var fragment);
+            url = UriHelper.BuildAbsolute(scheme, host, path);
+            context.RedirectUri = url;
             return Task.CompletedTask;
         };
+        options.AccessDeniedPath = "/Account/Login";
         options.Cookie.Name = "AspNetCore.Identity.Application";
         options.SlidingExpiration = true;
         options.LoginPath = "/Account/Login";
-        options.ExpireTimeSpan = TimeSpan.FromSeconds(10);
-        options.Cookie.MaxAge = TimeSpan.FromSeconds(10);
+        options.ExpireTimeSpan = TimeSpan.FromSeconds(double.Parse(builder.Configuration["SESSION_TIMEOUT_SEC"]));
     });
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Account/Login";
+    //sliding expiration doesn't seem to work, nor does expiretimespan
+    options.SlidingExpiration = true;
+    options.ExpireTimeSpan = TimeSpan.FromSeconds(double.Parse(builder.Configuration["SESSION_TIMEOUT_SEC"]));
+});
 
 builder.Services.AddSwaggerGen(c =>
 {
@@ -191,15 +212,28 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 });
+builder.Services.AddMvcCore(config =>
+{
+    var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
+    config.Filters.Add(new AuthorizeFilter(policy));
+});
+builder.Services.AddMvc(config =>
+{
+    var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
+    config.Filters.Add(new AuthorizeFilter(policy));
+});
+builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 app.UseSwagger();
 
-if (!app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
+app.UseMiddleware<SecurityMiddleware>(builder.Configuration["HttpStatusErrorCodes"]);
+
 //app.UseStatusCodePagesWithRedirects("/Home/Error?code={0}");
 app.UseHttpsRedirection();
 
@@ -213,33 +247,12 @@ app.UseSwaggerUI(options =>
 {
     options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
 });
-app.Use(async (context, next) =>
-{
-    context.Response.Headers.Add("X-Frame-Options", "DENY");
-    context.Response.Headers.Add("X-Permitted-Cross-Domain-Policies", "none");
-    context.Response.Headers.Add("X-Xss-Protection", "1; mode=block");
-    context.Response.Headers.Add("X-Content-Type-Options", "nosniff");
-    context.Response.Headers.Add("Referrer-Policy", "no-referrer");
-    context.Response.Headers.Add("Permissions-Policy", "geolocation=(self)");
 
-    context.Response.Headers.Add("Content-Security-Policy",
-        "default-src 'self';" +
-        "connect-src 'self' wss: https://maps.googleapis.com; " +
-        "script-src 'unsafe-inline' 'self' https://maps.googleapis.com https://polyfill.io https://highcharts.com https://export.highcharts.com https://cdnjs.cloudflare.com; " +
-        "style-src 'unsafe-inline' 'self' https://cdnjs.cloudflare.com/ https://fonts.googleapis.com https://stackpath.bootstrapcdn.com; " +
-        "font-src  'self'  https://fonts.gstatic.com https://cdnjs.cloudflare.com https://fonts.googleapis.com https://stackpath.bootstrapcdn.com; " +
-        "img-src 'self'  data: blob: https://maps.gstatic.com https://maps.googleapis.com https://hostedscan.com https://highcharts.com https://export.highcharts.com; " +
-        "frame-src 'none';" +
-        "media-src 'self' blob: https:;" +
-        "object-src 'none';" +
-        "form-action 'self';" +
-        "frame-ancestors 'self' https://maps.googleapis.com;" +
-        "upgrade-insecure-requests;");
 
-    await next();
-});
-app.UseMiddleware<AdminSafeListMiddleware>(builder.Configuration["AdminSafeList"]);
+app.UseMiddleware<WhitelistListMiddleware>();
+
 app.UseCors();
+app.UseCookiePolicy();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseNToastNotify();

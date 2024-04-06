@@ -68,26 +68,24 @@ namespace risk.control.system.Controllers
         [FeatureGate(FeatureFlags.ON)]
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> Login(string returnUrl)
+        public async Task<IActionResult> Login()
         {
             // Clear the existing external cookie to ensure a clean login process
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
-            ViewData["ReturnUrl"] = returnUrl;
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         [AllowAnonymous]
-        public async Task<IActionResult> Login(CancellationToken ct, LoginViewModel model, string returnUrl = null)
+        public async Task<IActionResult> Login(CancellationToken ct, LoginViewModel model)
         {
             var ipAddress = HttpContext.GetServerVariable("HTTP_X_FORWARDED_FOR") ?? HttpContext.Connection.RemoteIpAddress?.ToString();
             var ipAddressWithoutPort = ipAddress?.Split(':')[0];
 
             if (ModelState.IsValid || !model.Email.ValidateEmail())
             {
-                ViewData["ReturnUrl"] = returnUrl == "dashboard";
                 var email = HttpUtility.HtmlEncode(model.Email);
                 var pwd = HttpUtility.HtmlEncode(model.Password);
                 var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
@@ -134,7 +132,7 @@ namespace risk.control.system.Controllers
                             }
 
                             notifyService.Success("Login successful");
-                            return RedirectToLocal(returnUrl);
+                            return Redirect("/");
                         }
                     }
 
