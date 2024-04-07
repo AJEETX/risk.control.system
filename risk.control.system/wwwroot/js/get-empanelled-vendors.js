@@ -57,7 +57,7 @@
                 closeIcon: true,
                 buttons: {
                     confirm: {
-                        text: "Assign <span class='badge badge-light'>manual</span>",
+                        text: "Assign <span class='badge badge-danger'>manual</span>",
                         btnClass: 'btn-danger',
                         action: function () {
                             askConfirmation = false;
@@ -69,7 +69,7 @@
                                 $(".submit-progress").removeClass("hidden");
                             }, 1);
                             $('#allocate-case').attr('disabled', 'disabled');
-                            $('#allocate-case').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Assign <span class='badge badge-light'>manual</span>");
+                            $('#allocate-case').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Assign<span class='badge badge-danger'>manual</span>");
 
                             $('#radioButtons').submit();
                             var nodes = document.getElementById("article").getElementsByTagName('*');

@@ -918,7 +918,6 @@ namespace risk.control.system.Services
                         HopCount = finalHop + 1,
                         UserEmailActioned = userEmail,
                         UserRoleActionedTo = $"{AppRoles.CompanyAdmin.GetEnumDisplayName()} ({claim.PolicyDetail.ClientCompany.Email})",
-                        UserEmailActionedTo = userEmail,
                         ClaimsInvestigationId = claimsInvestigationId,
                         CurrentClaimOwner = claim.CurrentClaimOwner,
                         Created = DateTime.UtcNow,

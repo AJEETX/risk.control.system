@@ -153,7 +153,7 @@
             $(".submit-progress").removeClass("hidden");
         }, 1);
         $('#allocatedcase').attr('disabled', 'disabled');
-        $('#allocatedcase').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Assign <span class='badge badge-light'>manual</span>");
+        $('#allocatedcase').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Assign<span class='badge badge-danger'>manual</span>");
 
         $('#radioButtons').submit();
         var nodes = document.getElementById("body").getElementsByTagName('*');
@@ -161,27 +161,124 @@
             nodes[i].disabled = true;
         }
     });
+    let askFileUploadConfirmation = true;
 
-    $('#UploadFileButton').on('click', function (event) {
-        $("body").addClass("submit-progress-bg");
-        // Wrap in setTimeout so the UI
-        // can update the spinners
-        setTimeout(function () {
-            $(".submit-progress").removeClass("hidden");
-        }, 1);
+    $("#postedFile").on('change', function () {
+        var MaxSizeInBytes = 1097152;
+        //Get count of selected files
+        var countFiles = $(this)[0].files.length;
 
-        $(this).attr('disabled', 'disabled');
-        $(this).html("<i class='fas fa-sync fa-spin'></i> Upload");
+        var imgPath = $(this)[0].value;
+        var extn = imgPath.substring(imgPath.lastIndexOf('.') + 1).toLowerCase();
 
-        $('#upload-claims').submit();
-        $('html *').css('cursor', 'not-allowed');
-        $('html a *, html button *').attr('disabled', 'disabled');
-        $('html a *, html button *').css('pointer-events', 'none')
+        if (extn == "zip") {
+            if (typeof (FileReader) != "undefined") {
 
-        var nodes = document.getElementById("body").getElementsByTagName('*');
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].disabled = true;
+                //loop for each file selected for uploaded.
+                for (var i = 0; i < countFiles; i++) {
+                    var fileSize = $(this)[0].files[i].size;
+                    if (fileSize > MaxSizeInBytes) {
+                        $.alert(
+                            {
+                                title: " UPLOAD issue !",
+                                content: " <i class='fa fa-upload'></i> Upload File size limit exceeded. <br />Max file size is 1 MB!",
+                                icon: 'fas fa-exclamation-triangle',
+                                type: 'red',
+                                closeIcon: true,
+                                buttons: {
+                                    cancel: {
+                                        text: "CLOSE",
+                                        btnClass: 'btn-danger'
+                                    }
+                                }
+                            }
+                        );
+                    }
+                }
+
+            } else {
+                $.alert(
+                    {
+                        title: "Outdated Browser !",
+                        content: "This browser does not support FileReader. Try on modern browser!",
+                        icon: 'fas fa-exclamation-triangle',
+                        columnClass: 'medium',
+                        type: 'red',
+                        closeIcon: true,
+                        buttons: {
+                            cancel: {
+                                text: "CLOSE",
+                                btnClass: 'btn-danger'
+                            }
+                        }
+                    }
+                );
+            }
+        } else {
+            $.alert(
+                {
+                    title: "FILE UPLOAD TYPE !!",
+                    content: "Pls only select file with extension zip ! ",
+                    icon: 'fas fa-exclamation-triangle',
+                    columnClass: 'medium',
+                    type: 'red',
+                    closeIcon: true,
+                    buttons: {
+                        cancel: {
+                            text: "CLOSE",
+                            btnClass: 'btn-danger'
+                        }
+                    }
+                }
+            );
         }
+    });
+    $('#UploadFileButton').on('click', function (event) {
+        if (askFileUploadConfirmation) {
+            event.preventDefault();
+            $.confirm({
+                title: "Confirm File Upload",
+                content: "Are you sure to Upload ?",
+                icon: 'fas fa-upload fa-spin',
+                columnClass: 'medium',
+                type: 'green',
+                closeIcon: true,
+                buttons: {
+                    confirm: {
+                        text: "File Upload",
+                        btnClass: 'btn-success',
+                        action: function () {
+                            askFileUploadConfirmation = false;
+
+                            $("body").addClass("submit-progress-bg");
+                            // Wrap in setTimeout so the UI
+                            // can update the spinners
+                            setTimeout(function () {
+                                $(".submit-progress").removeClass("hidden");
+                            }, 1);
+                            $('#UploadFileButton').attr('disabled', 'disabled');
+                            $('#UploadFileButton').html("<i class='fas fa-sync fa-spin'></i> Uploading");
+
+                            $('#upload-claims').submit();
+                            $('#back').attr('disabled', 'disabled');
+
+                            $('html *').css('cursor', 'not-allowed');
+                            $('html a *, html button *').css('pointer-events', 'none')
+
+                            var nodes = document.getElementById("article").getElementsByTagName('*');
+                            for (var i = 0; i < nodes.length; i++) {
+                                nodes[i].disabled = true;
+                            }
+                        }
+                    },
+                    cancel: {
+                        text: "Cancel",
+                        btnClass: 'btn-default'
+                    }
+                }
+            });
+        }
+
     });
     //initMap("/api/CompanyAssignClaims/GetAssignerMap");
 });

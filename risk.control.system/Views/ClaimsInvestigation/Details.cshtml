@@ -212,20 +212,17 @@
                             {
 
                                 <a id="assign-list" asp-action="Draft" class="btn btn-warning">
-                                    <span class="badge badge-light"> <i class="fas fa-external-link-alt"></i> </span> Assign
-                                    <span class="badge badge-light">auto</span>
+                                    <span class="badge badge-warning"> <i class="fas fa-external-link-alt"></i></span>Assign<span class="badge badge-warning">auto</span>
                                 </a>
                                 <a id="assign-manual-list" asp-action="Assigner" class="btn btn-danger">
-                                    <span class="badge badge-light"> <i class="fas fa-external-link-alt"></i> </span>
-                                    Assign <span class="badge badge-light">manual</span>
+                                    <span class="badge badge-danger"> <i class="fas fa-external-link-alt"></i></span>Assign<span class="badge badge-danger">manual</span>
                                 </a>
                             }
                             else if (customerExist && beneficiaryExist && Model.Assigned || (customerExist && beneficiaryExist && !Model.AutoAllocation))
                             {
 
                                 <a id="assign-manual-list" asp-action="Assigner" class="btn btn-danger">
-                                    <span class="badge badge-light"> <i class="fas fa-external-link-alt"></i> </span>
-                                    Assign <span class="badge badge-light">manual</span>
+                                    <span class="badge badge-danger"> <i class="fas fa-external-link-alt"></i></span>Assign<span class="badge badge-danger">manual</span>
                                 </a>
                             }
                             else
