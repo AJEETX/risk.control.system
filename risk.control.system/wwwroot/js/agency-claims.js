@@ -109,7 +109,7 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += '<a onclick="showdetails()" href="/ClaimsVendor/CaseDetail?Id=' + row.id + '"  class="btn btn-xs btn-danger"><i class="fas fa-undo"></i></i> Withdraw</a>'
+                    buttons += '<a id="details' + row.id + '" onclick="showdetails(`' + row.id + '`)" href="/ClaimsVendor/CaseDetail?Id=' + row.id + '"  class="btn btn-xs btn-danger"><i class="fas fa-undo"></i></i> Withdraw</a>'
                     return buttons;
                 }
             }
@@ -173,15 +173,15 @@
 
 });
 
-function showdetails() {
+function showdetails(id) {
     $("body").addClass("submit-progress-bg");
     // Wrap in setTimeout so the UI
     // can update the spinners
     setTimeout(function () {
         $(".submit-progress").removeClass("hidden");
     }, 1);
-    $('a.btn.btn-danger').attr('disabled', 'disabled');
-    $('a.btn.btn-danger').html("<i class='fas fa-sync fa-spin'></i> Withdraw");
+    $('a.btn *').attr('disabled', 'disabled');
+    $('a#details' + id + '.btn.btn-xs.btn-danger').html("<i class='fas fa-sync fa-spin'></i> Withdraw");
 
     var nodes = document.getElementById("body").getElementsByTagName('*');
     for (var i = 0; i < nodes.length; i++) {
