@@ -223,18 +223,14 @@ namespace risk.control.system.Controllers.Api.Claims
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
 
             var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
-            //var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
             var currentUserEmail = HttpContext.User?.Identity?.Name;
 
             var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == currentUserEmail);
 
-            if (vendorUser != null)
-            {
-                applicationDbContext = applicationDbContext
+            applicationDbContext = applicationDbContext
                     .Include(a => a.PolicyDetail)
                     .ThenInclude(a => a.LineOfBusiness)
                     .Where(i => i.CaseLocations.Any(c => c.VendorId == vendorUser.VendorId));
-            }
             var claims = new List<ClaimsInvestigation>();
 
             if (userRole.Value.Contains(AppRoles.AgencyAdmin.ToString()) || userRole.Value.Contains(AppRoles.Supervisor.ToString()))
@@ -410,25 +406,19 @@ namespace risk.control.system.Controllers.Api.Claims
             var currentUserEmail = HttpContext.User?.Identity?.Name;
 
             var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
+            applicationDbContext = applicationDbContext.Where(i => i.CaseLocations.Any(c => c.VendorId == vendorUser.VendorId));
 
-            if (vendorUser != null)
-            {
-                applicationDbContext = applicationDbContext.Where(i => i.CaseLocations.Any(c => c.VendorId == vendorUser.VendorId));
-            }
             // SHOWING DIFFERRENT PAGES AS PER ROLES
             var claimsSubmitted = new List<ClaimsInvestigation>();
-            if (userRole.Value.Contains(AppRoles.AgencyAdmin.ToString()) || userRole.Value.Contains(AppRoles.Supervisor.ToString()))
+            foreach (var item in applicationDbContext)
             {
-                foreach (var item in applicationDbContext)
+                item.CaseLocations = item.CaseLocations.Where(c => c.VendorId == vendorUser.VendorId
+                    && c.InvestigationCaseSubStatusId == submittedToVendorSupervisorStatus.InvestigationCaseSubStatusId
+                    && !c.IsReviewCaseLocation
+                    )?.ToList();
+                if (item.CaseLocations.Any())
                 {
-                    item.CaseLocations = item.CaseLocations.Where(c => c.VendorId == vendorUser.VendorId
-                        && c.InvestigationCaseSubStatusId == submittedToVendorSupervisorStatus.InvestigationCaseSubStatusId
-                        && !c.IsReviewCaseLocation
-                        )?.ToList();
-                    if (item.CaseLocations.Any())
-                    {
-                        claimsSubmitted.Add(item);
-                    }
+                    claimsSubmitted.Add(item);
                 }
             }
             var response = claimsSubmitted

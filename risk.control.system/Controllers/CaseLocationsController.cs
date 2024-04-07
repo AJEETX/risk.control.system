@@ -95,13 +95,6 @@ namespace risk.control.system.Controllers
             {
                 var claim = _context.ClaimsInvestigation
                                 .Include(i => i.PolicyDetail)
-                                .Include(i => i.CaseLocations)
-                                .ThenInclude(c => c.District)
-                                                .Include(i => i.CaseLocations)
-                                .ThenInclude(c => c.State)
-                                .Include(i => i.CaseLocations)
-                                .ThenInclude(c => c.Country)
-                                                .Include(i => i.CaseLocations)
                                 .FirstOrDefault(v => v.ClaimsInvestigationId == id);
 
                 ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
@@ -138,6 +131,7 @@ namespace risk.control.system.Controllers
                 ViewData["DistrictId"] = new SelectList(districts.OrderBy(s => s.Code), "DistrictId", "Name", model.DistrictId);
                 ViewData["StateId"] = new SelectList(relatedStates.OrderBy(s => s.Code), "StateId", "Name", model.StateId);
                 ViewData["PinCodeId"] = new SelectList(pincodes.OrderBy(s => s.Code), "PinCodeId", "Code", model.PinCodeId);
+                ViewData["BeneficiaryRelationId"] = new SelectList(_context.BeneficiaryRelation, "BeneficiaryRelationId", "Name");
 
                 return View(model);
             }
@@ -158,7 +152,7 @@ namespace risk.control.system.Controllers
             {
                 if(string.IsNullOrWhiteSpace(claimId) || caseLocation is null)
                 {
-                    notifyService.Error("OOPS !!!..Contact IT support");
+                    notifyService.Error("NOT FOUND  !!!..Contact IT support");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
@@ -217,17 +211,16 @@ namespace risk.control.system.Controllers
         {
             try
             {
-
                 if (id == null || _context.CaseLocation == null)
                 {
-                    notifyService.Error("OOPS !!!..Contact IT support");
+                    notifyService.Error("NOT FOUND!!!..Contact IT support");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
                 var caseLocation = await _context.CaseLocation.FindAsync(id);
                 if (caseLocation == null)
                 {
-                    notifyService.Error("OOPS !!!..Contact IT support");
+                    notifyService.Error("NOT FOUND!!!..Contact IT support");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
@@ -270,60 +263,58 @@ namespace risk.control.system.Controllers
             {
                 if (id != ecaseLocation.CaseLocationId)
                 {
-                    notifyService.Error("OOPS !!!..Contact IT support");
+                    notifyService.Error("NOT FOUND!!!..Contact IT support");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                    i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
+                var caseLocation = _context.CaseLocation.FirstOrDefault(c => c.CaseLocationId == ecaseLocation.CaseLocationId);
+                caseLocation.Updated = DateTime.UtcNow;
+                caseLocation.UpdatedBy = HttpContext.User?.Identity?.Name;
+                caseLocation.Addressline = ecaseLocation.Addressline;
+                caseLocation.BeneficiaryContactNumber = ecaseLocation.BeneficiaryContactNumber;
+                caseLocation.BeneficiaryDateOfBirth = ecaseLocation.BeneficiaryDateOfBirth;
+                caseLocation.BeneficiaryIncome = ecaseLocation.BeneficiaryIncome;
+                caseLocation.BeneficiaryName = ecaseLocation.BeneficiaryName;
+                caseLocation.BeneficiaryRelation = ecaseLocation.BeneficiaryRelation;
+                caseLocation.BeneficiaryRelationId = ecaseLocation.BeneficiaryRelationId;
+                caseLocation.ClaimsInvestigationId = ecaseLocation.ClaimsInvestigationId;
+                caseLocation.CountryId = ecaseLocation.CountryId;
+                caseLocation.DistrictId = ecaseLocation.DistrictId;
+                caseLocation.PinCodeId = ecaseLocation.PinCodeId;
+                caseLocation.StateId = ecaseLocation.StateId;
+                var pincode = _context.PinCode.FirstOrDefault(p => p.PinCodeId == caseLocation.PinCodeId);
+                caseLocation.PinCode = pincode;
+                var customerLatLong = pincode.Latitude + "," + pincode.Longitude;
+                var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=8&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key={Applicationsettings.GMAPData}";
+                caseLocation.BeneficiaryLocationMap = url;
+
+                IFormFile? customerDocument = Request.Form?.Files?.FirstOrDefault();
+                if (customerDocument is not null)
                 {
-                    var caseLocation = _context.CaseLocation.FirstOrDefault(c => c.CaseLocationId == ecaseLocation.CaseLocationId);
-                    caseLocation.Updated = DateTime.UtcNow;
-                    caseLocation.UpdatedBy = HttpContext.User?.Identity?.Name;
-                    caseLocation.Addressline = ecaseLocation.Addressline;
-                    caseLocation.BeneficiaryContactNumber = ecaseLocation.BeneficiaryContactNumber;
-                    caseLocation.BeneficiaryDateOfBirth = ecaseLocation.BeneficiaryDateOfBirth;
-                    caseLocation.BeneficiaryIncome = ecaseLocation.BeneficiaryIncome;
-                    caseLocation.BeneficiaryName = ecaseLocation.BeneficiaryName;
-                    caseLocation.BeneficiaryRelation = ecaseLocation.BeneficiaryRelation;
-                    caseLocation.BeneficiaryRelationId = ecaseLocation.BeneficiaryRelationId;
-                    caseLocation.ClaimsInvestigationId = ecaseLocation.ClaimsInvestigationId;
-                    caseLocation.CountryId = ecaseLocation.CountryId;
-                    caseLocation.DistrictId = ecaseLocation.DistrictId;
-                    caseLocation.PinCodeId = ecaseLocation.PinCodeId;
-                    caseLocation.StateId = ecaseLocation.StateId;
-                    var pincode = _context.PinCode.FirstOrDefault(p => p.PinCodeId == caseLocation.PinCodeId);
-                    caseLocation.PinCode = pincode;
-                    var customerLatLong = pincode.Latitude + "," + pincode.Longitude;
-                    var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=8&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key={Applicationsettings.GMAPData}";
-                    caseLocation.BeneficiaryLocationMap = url;
-
-                    IFormFile? customerDocument = Request.Form?.Files?.FirstOrDefault();
-                    if (customerDocument is not null)
-                    {
-                        using var dataStream = new MemoryStream();
-                        customerDocument.CopyTo(dataStream);
-                        caseLocation.ProfilePicture = dataStream.ToArray();
-                    }
-                    else
-                    {
-                        var existingLocation = _context.CaseLocation.AsNoTracking().Where(c =>
-                            c.CaseLocationId == caseLocation.CaseLocationId && c.CaseLocationId == id).FirstOrDefault();
-                        if (existingLocation.ProfilePicture != null || !string.IsNullOrWhiteSpace(existingLocation.ProfilePictureUrl))
-                        {
-                            caseLocation.ProfilePicture = existingLocation.ProfilePicture;
-                            caseLocation.ProfilePictureUrl = existingLocation.ProfilePictureUrl;
-                        }
-                    }
-
-                    var pinCode = _context.PinCode.FirstOrDefault(p => p.PinCodeId == caseLocation.PinCodeId);
-                    caseLocation.PinCode.Latitude = pinCode.Latitude;
-                    caseLocation.PinCode.Longitude = pinCode.Longitude;
-
-                    _context.Update(caseLocation);
-                    await _context.SaveChangesAsync();
-                    notifyService.Custom($"Beneficiary {caseLocation.BeneficiaryName} edited successfully", 3, "orange", "fas fa-user-tie");
-                    return RedirectToAction(nameof(ClaimsInvestigationController.Details), "ClaimsInvestigation", new { id = caseLocation.ClaimsInvestigationId });
+                    using var dataStream = new MemoryStream();
+                    customerDocument.CopyTo(dataStream);
+                    caseLocation.ProfilePicture = dataStream.ToArray();
                 }
+                else
+                {
+                    var existingLocation = _context.CaseLocation.AsNoTracking().Where(c =>
+                        c.CaseLocationId == caseLocation.CaseLocationId && c.CaseLocationId == id).FirstOrDefault();
+                    if (existingLocation.ProfilePicture != null || !string.IsNullOrWhiteSpace(existingLocation.ProfilePictureUrl))
+                    {
+                        caseLocation.ProfilePicture = existingLocation.ProfilePicture;
+                        caseLocation.ProfilePictureUrl = existingLocation.ProfilePictureUrl;
+                    }
+                }
+
+                var pinCode = _context.PinCode.FirstOrDefault(p => p.PinCodeId == caseLocation.PinCodeId);
+                caseLocation.PinCode.Latitude = pinCode.Latitude;
+                caseLocation.PinCode.Longitude = pinCode.Longitude;
+
+                _context.Update(caseLocation);
+                await _context.SaveChangesAsync();
+                notifyService.Custom($"Beneficiary {caseLocation.BeneficiaryName} edited successfully", 3, "orange", "fas fa-user-tie");
+                return RedirectToAction(nameof(ClaimsInvestigationController.Details), "ClaimsInvestigation", new { id = caseLocation.ClaimsInvestigationId });
             }
             catch (Exception)
             {
@@ -343,10 +334,9 @@ namespace risk.control.system.Controllers
         {
             try
             {
-
                 if (id == null || _context.CaseLocation == null)
                 {
-                    notifyService.Error("OOPS !!!..Contact IT support");
+                    notifyService.Error("NOT FOUND!!!..Contact IT support");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
@@ -356,7 +346,7 @@ namespace risk.control.system.Controllers
                     .FirstOrDefaultAsync(m => m.CaseLocationId == id);
                 if (caseLocation == null)
                 {
-                    notifyService.Error("OOPS !!!..Contact IT support");
+                    notifyService.Error("NOT FOUND!!!..Contact IT support");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
@@ -378,13 +368,13 @@ namespace risk.control.system.Controllers
             {
                 if(1> id)
                 {
-                    notifyService.Error("OOPS !!!..Contact IT support");
+                    notifyService.Error("NOT FOUND!!!..Contact IT support");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var caseLocation = await _context.CaseLocation.FindAsync(id);
                 if(caseLocation == null)
                 {
-                    notifyService.Error("OOPS !!!..Contact IT support");
+                    notifyService.Error("NOT FOUND!!!..Contact IT support");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 caseLocation.Updated = DateTime.UtcNow;

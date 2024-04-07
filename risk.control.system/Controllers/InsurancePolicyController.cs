@@ -39,127 +39,220 @@ namespace risk.control.system.Controllers
         [Breadcrumb(title: " Add Policy", FromAction = "Index", FromController = typeof(InsuranceClaimsController))]
         public IActionResult CreatePolicy()
         {
-            var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
-            var model = claimPolicyService.AddClaimPolicy(userEmail.Value);
+            try
+            {
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (string.IsNullOrWhiteSpace(currentUserEmail))
+                {
+                    notifyService.Error("Not Found!!!..Contact IT support");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var model = claimPolicyService.AddClaimPolicy(currentUserEmail);
 
-            ViewBag.ClientCompanyId = model.PolicyDetail.ClientCompanyId;
+                ViewBag.ClientCompanyId = model.PolicyDetail.ClientCompanyId;
 
-            ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name");
-            ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType.Where(i =>
-            i.LineOfBusinessId == model.PolicyDetail.LineOfBusinessId).OrderBy(s => s.Code), "InvestigationServiceTypeId", "Name", model.PolicyDetail.InvestigationServiceTypeId);
-            ViewData["BeneficiaryRelationId"] = new SelectList(_context.BeneficiaryRelation.OrderBy(s => s.Code), "BeneficiaryRelationId", "Name");
-            ViewData["CaseEnablerId"] = new SelectList(_context.CaseEnabler.OrderBy(s => s.Code), "CaseEnablerId", "Name");
-            ViewData["CostCentreId"] = new SelectList(_context.CostCentre.OrderBy(s => s.Code), "CostCentreId", "Name");
-            ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
-            ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name");
-            return View(model);
+                ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name");
+                ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType.Where(i =>
+                i.LineOfBusinessId == model.PolicyDetail.LineOfBusinessId).OrderBy(s => s.Code), "InvestigationServiceTypeId", "Name", model.PolicyDetail.InvestigationServiceTypeId);
+                ViewData["BeneficiaryRelationId"] = new SelectList(_context.BeneficiaryRelation.OrderBy(s => s.Code), "BeneficiaryRelationId", "Name");
+                ViewData["CaseEnablerId"] = new SelectList(_context.CaseEnabler.OrderBy(s => s.Code), "CaseEnablerId", "Name");
+                ViewData["CostCentreId"] = new SelectList(_context.CostCentre.OrderBy(s => s.Code), "CostCentreId", "Name");
+                ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
+                ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name");
+                return View(model);
+            }
+            catch (Exception)
+            {
+                notifyService.Error("OOPS!!!..Contact IT support");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
         }
 
         [Breadcrumb(title: " Edit Policy", FromAction = "Index", FromController = typeof(InsuranceClaimsController))]
         public async Task<IActionResult> EditPolicy(string id)
         {
-            if (id == null || _context.ClaimsInvestigation == null)
+            try
             {
-                return NotFound();
+                if (id == null || _context.ClaimsInvestigation == null)
+                {
+                    notifyService.Error("Not Found!!!..Contact IT support");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+
+                var claimsInvestigation = await _context.ClaimsInvestigation
+                    .Include(c => c.PolicyDetail)
+                    .Include(c => c.CustomerDetail)
+                    .FirstOrDefaultAsync(i => i.ClaimsInvestigationId == id);
+
+                if (claimsInvestigation == null)
+                {
+                    notifyService.Error("Not Found!!!..Contact IT support");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name", claimsInvestigation.PolicyDetail.ClientCompanyId);
+                ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType.Where(i =>
+                i.LineOfBusinessId == claimsInvestigation.PolicyDetail.LineOfBusinessId).OrderBy(s => s.Code), "InvestigationServiceTypeId", "Name", claimsInvestigation.PolicyDetail.InvestigationServiceTypeId);
+                ViewData["CaseEnablerId"] = new SelectList(_context.CaseEnabler.OrderBy(s => s.Code), "CaseEnablerId", "Name", claimsInvestigation.PolicyDetail.CaseEnablerId);
+                ViewData["CostCentreId"] = new SelectList(_context.CostCentre.OrderBy(s => s.Code), "CostCentreId", "Name", claimsInvestigation.PolicyDetail.CostCentreId);
+                ViewData["InvestigationCaseStatusId"] = new SelectList(_context.InvestigationCaseStatus, "InvestigationCaseStatusId", "Name", claimsInvestigation.InvestigationCaseStatusId);
+                ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", claimsInvestigation.PolicyDetail.LineOfBusinessId);
+
+                return View(claimsInvestigation);
             }
-
-            var claimsInvestigation = await _context.ClaimsInvestigation
-                .Include(c => c.PolicyDetail)
-                .Include(c => c.CustomerDetail)
-                .FirstOrDefaultAsync(i => i.ClaimsInvestigationId == id);
-
-            if (claimsInvestigation == null)
+            catch (Exception)
             {
-                return NotFound();
+                notifyService.Error("OOPS!!!..Contact IT support");
+                return RedirectToAction(nameof(Index), "Dashboard");
             }
-            ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name", claimsInvestigation.PolicyDetail.ClientCompanyId);
-            ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType.Where(i =>
-            i.LineOfBusinessId == claimsInvestigation.PolicyDetail.LineOfBusinessId).OrderBy(s => s.Code), "InvestigationServiceTypeId", "Name", claimsInvestigation.PolicyDetail.InvestigationServiceTypeId);
-            ViewData["CaseEnablerId"] = new SelectList(_context.CaseEnabler.OrderBy(s => s.Code), "CaseEnablerId", "Name", claimsInvestigation.PolicyDetail.CaseEnablerId);
-            ViewData["CostCentreId"] = new SelectList(_context.CostCentre.OrderBy(s => s.Code), "CostCentreId", "Name", claimsInvestigation.PolicyDetail.CostCentreId);
-            ViewData["InvestigationCaseStatusId"] = new SelectList(_context.InvestigationCaseStatus, "InvestigationCaseStatusId", "Name", claimsInvestigation.InvestigationCaseStatusId);
-            ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", claimsInvestigation.PolicyDetail.LineOfBusinessId);
-
-            return View(claimsInvestigation);
+            
         }
 
         // GET: ClaimsInvestigation/Delete/5
         [Breadcrumb(title: " Delete", FromAction = "Index", FromController = typeof(InsuranceClaimsController))]
         public async Task<IActionResult> Delete(string id)
         {
-            if (id == null || _context.ClaimsInvestigation == null)
+            try
             {
-                return NotFound();
+                if (id == null || _context.ClaimsInvestigation == null)
+                {
+                    notifyService.Error("Not Found!!!..Contact IT support");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (currentUserEmail == null)
+                {
+                    notifyService.Error("Not Found!!!..Contact IT support");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var model = await investigationReportService.GetClaimDetails(currentUserEmail, id);
+
+                if (model == null)
+                {
+                    notifyService.Error("Not Found!!!..Contact IT support");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+
+                return View(model);
             }
-            var currentUserEmail = HttpContext.User?.Identity?.Name;
-
-            var model = await investigationReportService.GetClaimDetails(currentUserEmail,id);
-
-            if (model == null)
+            catch (Exception)
             {
-                return NotFound();
+                notifyService.Error("OOPS!!!..Contact IT support");
+                return RedirectToAction(nameof(Index), "Dashboard");
             }
-
-            return View(model);
+            
         }
 
         [Breadcrumb(title: " Delete", FromAction = "Index", FromController = typeof(InsuranceClaimsController))]
         public async Task<IActionResult> DeleteManual(string id)
         {
-            if (id == null || _context.ClaimsInvestigation == null)
+            try
             {
-                return NotFound();
+                if (id == null || _context.ClaimsInvestigation == null)
+                {
+                    notifyService.Error("Not Found!!!..Contact IT support");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (currentUserEmail == null)
+                {
+                    notifyService.Error("Not Found!!!..Contact IT support");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var model = await investigationReportService.GetClaimDetails(currentUserEmail, id);
+
+                if (model == null)
+                {
+                    notifyService.Error("Not Found!!!..Contact IT support");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+
+                return View(model);
             }
-            var currentUserEmail = HttpContext.User?.Identity?.Name;
-
-            var model = await investigationReportService.GetClaimDetails(currentUserEmail, id);
-
-            if (model == null)
+            catch (Exception)
             {
-                return NotFound();
+                notifyService.Error("OOPS!!!..Contact IT support");
+                return RedirectToAction(nameof(Index), "Dashboard");
             }
-
-            return View(model);
+            
         }
 
         [HttpPost, ActionName("DeleteManual")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteManualConfirmed(ClaimTransactionModel model)
         {
-            if (model is null)
+            try
             {
-                toastNotification.AddAlertToastMessage(string.Format("<i class='far fa-file-powerpoint'></i> Err to delete !"));
-                return RedirectToAction(nameof(ClaimsInvestigationController.Draft), "ClaimsInvestigation");
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (currentUserEmail == null)
+                {
+                    notifyService.Error("Not Found!!!..Contact IT support");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                if (model is null)
+                {
+                    notifyService.Error("Not Found!!!..Contact IT support");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var claimsInvestigation = await _context.ClaimsInvestigation.FindAsync(model.ClaimsInvestigation.ClaimsInvestigationId);
+                if(claimsInvestigation == null)
+                {
+                    notifyService.Error("Not Found!!!..Contact IT support");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                
+                claimsInvestigation.Updated = DateTime.UtcNow;
+                claimsInvestigation.UpdatedBy = currentUserEmail;
+                claimsInvestigation.Deleted = true;
+                _context.ClaimsInvestigation.Update(claimsInvestigation);
+                await _context.SaveChangesAsync();
+                notifyService.Custom("Claim deleted", 3, "red", "far fa-file-powerpoint");
+                return RedirectToAction(nameof(ClaimsInvestigationController.Assigner), "ClaimsInvestigation");
             }
-            var claimsInvestigation = await _context.ClaimsInvestigation.FindAsync(model.ClaimsInvestigation.ClaimsInvestigationId);
-            string userEmail = HttpContext?.User?.Identity.Name;
-            claimsInvestigation.Updated = DateTime.UtcNow;
-            claimsInvestigation.UpdatedBy = userEmail;
-            claimsInvestigation.Deleted = true;
-            _context.ClaimsInvestigation.Update(claimsInvestigation);
-            await _context.SaveChangesAsync();
-            notifyService.Custom("Claim deleted", 3, "red", "far fa-file-powerpoint");
-            return RedirectToAction(nameof(ClaimsInvestigationController.Assigner), "ClaimsInvestigation");
+            catch (Exception)
+            {
+                notifyService.Error("OOPS!!!..Contact IT support");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+            
         }
         // POST: ClaimsInvestigation/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(ClaimTransactionModel model)
         {
-            if (model is null)
+            try
             {
-                toastNotification.AddAlertToastMessage(string.Format("<i class='far fa-file-powerpoint'></i> Err to delete !"));
-                return RedirectToAction(nameof(ClaimsInvestigationController.Draft), "ClaimsInvestigation");
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (currentUserEmail == null)
+                {
+                    notifyService.Error("Not Found!!!..Contact IT support");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                if (model is null)
+                {
+                    notifyService.Error("Not Found!!!..Contact IT support");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var claimsInvestigation = await _context.ClaimsInvestigation.FindAsync(model.ClaimsInvestigation.ClaimsInvestigationId);
+                if (claimsInvestigation == null)
+                {
+                    notifyService.Error("Not Found!!!..Contact IT support");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+
+                claimsInvestigation.Updated = DateTime.UtcNow;
+                claimsInvestigation.UpdatedBy = currentUserEmail;
+                claimsInvestigation.Deleted = true;
+                _context.ClaimsInvestigation.Update(claimsInvestigation);
+                await _context.SaveChangesAsync();
+                notifyService.Custom("Claim deleted", 3, "red", "far fa-file-powerpoint");
+                return RedirectToAction(nameof(ClaimsInvestigationController.Assigner), "ClaimsInvestigation");
             }
-            var claimsInvestigation = await _context.ClaimsInvestigation.FindAsync(model.ClaimsInvestigation.ClaimsInvestigationId);
-            string userEmail = HttpContext?.User?.Identity.Name;
-            claimsInvestigation.Updated = DateTime.UtcNow;
-            claimsInvestigation.UpdatedBy = userEmail;
-            claimsInvestigation.Deleted = true;
-            _context.ClaimsInvestigation.Update(claimsInvestigation);
-            await _context.SaveChangesAsync();
-            notifyService.Custom("Claim deleted", 3, "red", "far fa-file-powerpoint");
-            return RedirectToAction(nameof(ClaimsInvestigationController.Draft), "ClaimsInvestigation");
+            catch (Exception)
+            {
+                notifyService.Error("OOPS!!!..Contact IT support");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
         }
     }
 }
