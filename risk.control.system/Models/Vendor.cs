@@ -119,6 +119,8 @@ namespace risk.control.system.Models
 
         public virtual ICollection<AgencyRating>? ratings { get; set; }
         public string MobileAppUrl { get; set; } = "https://apkichck.s3.ap-southeast-2.amazonaws.com/ichck/app-release_20242901-002101_dev.apk";
+        public bool CanChangePassword { get; set; } = false;
+
 
     }
 

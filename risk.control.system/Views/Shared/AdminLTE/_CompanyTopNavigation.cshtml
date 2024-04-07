@@ -1,4 +1,4 @@
-﻿@model ApplicationUser
+﻿@model bool
 <!-- Navbar -->
 <nav class="main-header navbar navbar-expand navbar-light bg-light">
     <!-- Left navbar links -->
@@ -52,17 +52,20 @@
                 <i class="fas fa-cog"></i>
             </a>
             <div class="dropdown-menu dropdown-menu dropdown-menu-right">
-                <div class="accent-secondary">
-                    <a class="dropdown-item" href="/companyuserprofile/ChangePassword">
-                        <i class="fas fa-lock-open"></i>   Change Password
-                    </a>
-                </div>
+                @if (Model)
+                {
+                    <div class="accent-secondary">
+                        <a id="password" class="dropdown-item" href="/agencyuserprofile/ChangePassword">
+                            <i class="fas fa-lock-open"></i>   Change Password
+                        </a>
+                    </div>
                 <div class="accent-warning">
                     <a class="dropdown-item" href="/companyuserprofile">
                         <i class="far fa-user-circle"></i>  User Profile
                     </a>
                 </div>
-                
+                }
+
                 <div class="accent-danger">
                     <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
                       <i class="fas fa-sign-out-alt"></i>  Logout

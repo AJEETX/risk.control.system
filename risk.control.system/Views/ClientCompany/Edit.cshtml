@@ -345,8 +345,7 @@
                                         <div class="input-group-prepend">
                                         </div>
                                         <span class="checkbox">
-                                            <input asp-for="AutoAllocation" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-check'></i>  " data-off="<i class='fa fa-times'></i> " data-onstyle="success" data-offstyle="secondary">
-
+                                            <input asp-for="AutoAllocation" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger">
                                         </span>
                                     </div>
                                 </div>
@@ -362,7 +361,7 @@
                                         <div class="input-group-prepend">
                                         </div>
                                         <span class="checkbox">
-                                            <input asp-for="VerifyOcr" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-check'></i>  " data-off="<i class='fa fa-times'></i> " data-onstyle="success" data-offstyle="secondary">
+                                            <input asp-for="VerifyOcr" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger">
                                         </span>
                                     </div>
                                 </div>
@@ -378,7 +377,7 @@
                                         <div class="input-group-prepend">
                                         </div>
                                         <span class="checkbox">
-                                            <input asp-for="SendSMS" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-check'></i>  " data-off="<i class='fa fa-times'></i> " data-onstyle="success" data-offstyle="secondary">
+                                            <input asp-for="SendSMS" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger">
 
                                         </span>
                                     </div>
@@ -394,12 +393,27 @@
                                         <div class="input-group-prepend">
                                         </div>
                                         <span class="checkbox">
-                                            <input asp-for="BulkUpload" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-check'></i>  " data-off="<i class='fa fa-times'></i> " data-onstyle="success" data-offstyle="secondary">
-
+                                            <input asp-for="BulkUpload" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger">
                                         </span>
                                     </div>
                                 </div>
+                                <div class="form-group">
+                                    <span class="input-group-label"> Profile edit:</span>
+                                    <div class="input-group mb-3">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text" id="Addressline"><i class="fa fa-key"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                        </div>
+                                        <div class="input-group-prepend">
+                                        </div>
+                                        <div class="input-group-prepend">
+                                        </div>
+                                        <span class="checkbox">
+                                            <input asp-for="CanChangePassword" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger">
 
+                                        </span>
+                                    </div>
+                                </div>>
+                                </div>
                                 <div class="form-group text-right">
                                     <span class="input-group-label">&nbsp; </span>
 

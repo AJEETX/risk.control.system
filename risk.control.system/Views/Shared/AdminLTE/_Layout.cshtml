@@ -32,21 +32,21 @@
 
             if(companyUser is not null)
             {
-                <partial name="AdminLTE/_CompanyTopNavigation" model="@appUser" />
-
                 var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
+                <partial name="AdminLTE/_CompanyTopNavigation" model="@company.CanChangePassword" />
+
                 <partial name="AdminLTE/_CompanySidebar" model="@company" />
             }
             else if (vendorUser is not null)
             {
-                <partial name="AdminLTE/_AgencyTopNavigation" model="@appUser" />
-
                 var vendor = _context.Vendor.FirstOrDefault(c => c.VendorId == vendorUser.VendorId);
+                <partial name="AdminLTE/_AgencyTopNavigation" model="@vendor.CanChangePassword" />
+
                 <partial name="AdminLTE/_VendorSidebar" model="@vendor"/>
             }
             else
             {
-                <partial name="AdminLTE/_TopNavigation" model="@appUser" />
+                <partial name="AdminLTE/_TopNavigation" />
                 <partial name="AdminLTE/_Sidebar" />
             }
         }

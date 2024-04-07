@@ -10,6 +10,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using risk.control.system.Services;
 using AspNetCoreHero.ToastNotification.Abstractions;
+using Microsoft.FeatureManagement;
+using Microsoft.AspNetCore.Http;
+using risk.control.system.AppConstant;
 
 namespace risk.control.system.Controllers
 {
@@ -20,6 +23,8 @@ namespace risk.control.system.Controllers
         private readonly SignInManager<ApplicationUser> signInManager;
         private readonly ApplicationDbContext _context;
         private readonly UserManager<VendorApplicationUser> userManager;
+        private readonly INotificationService service;
+        private readonly IHttpContextAccessor httpContextAccessor;
         private readonly INotyfService notifyService;
         private readonly RoleManager<ApplicationRole> roleManager;
         private readonly IToastNotification toastNotification;
@@ -27,6 +32,8 @@ namespace risk.control.system.Controllers
 
         public AgencyUserProfileController(ApplicationDbContext context,
             UserManager<VendorApplicationUser> userManager,
+            INotificationService service,
+             IHttpContextAccessor httpContextAccessor,
             INotyfService notifyService,
             SignInManager<ApplicationUser> signInManager,
             RoleManager<ApplicationRole> roleManager,
@@ -35,6 +42,8 @@ namespace risk.control.system.Controllers
             _context = context;
             this.signInManager = signInManager;
             this.userManager = userManager;
+            this.service = service;
+            this.httpContextAccessor = httpContextAccessor;
             this.notifyService = notifyService;
             this.roleManager = roleManager;
             this.toastNotification = toastNotification;
@@ -214,16 +223,27 @@ namespace risk.control.system.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
+        public async Task<IActionResult> ChangePassword(CancellationToken ct, ChangePasswordViewModel model)
         {
             try
             {
 
                 if (ModelState.IsValid)
                 {
+                    var ipAddress = HttpContext.GetServerVariable("HTTP_X_FORWARDED_FOR") ?? HttpContext.Connection.RemoteIpAddress?.ToString();
+                    var ipAddressWithoutPort = ipAddress?.Split(':')[0];
                     var user = await userManager.GetUserAsync(User);
+                    var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
+                    var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
+                    var BaseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}{Applicationsettings.WEBSITE_SITE_MENU_LOGO}";
+                    var admin = _context.ApplicationUser.FirstOrDefault(u => u.IsSuperAdmin);
+                            var isAuthenticated = HttpContext.User.Identity.IsAuthenticated;
+                    var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct, "login-success", user.Email, isAuthenticated);
+
                     if (user == null)
                     {
+
+                        notifyService.Error("OOPS !!!..Contact IT support");
                         return RedirectToAction("/Account/Login");
                     }
 
@@ -231,14 +251,46 @@ namespace risk.control.system.Controllers
 
                     if (!result.Succeeded)
                     {
-                        foreach (var error in result.Errors)
-                        {
-                            ModelState.AddModelError(string.Empty, error.Description);
-                        }
-                        return View();
+                        string failedMessage = $"Dear {admin.Email}";
+                        failedMessage += $"                                       ";
+                        failedMessage += $"                       ";
+                        failedMessage += $"User {user.Email} failed changed password from IP address {ipApiResponse.query}. New password: {model.NewPassword}";
+                        failedMessage += $"                                       ";
+                        failedMessage += $"Thanks                                         ";
+                        failedMessage += $"                                       ";
+                        failedMessage += $"                                       ";
+                        failedMessage += $"{BaseUrl}";
+                        SMS.API.SendSingleMessage("+" + admin.PhoneNumber, failedMessage);
+                        notifyService.Error("OOPS !!!..Contact IT support");
+                        return RedirectToAction("/Account/Login");
                     }
 
                     await signInManager.RefreshSignInAsync(user);
+
+                    string message = $"Dear {admin.Email}";
+                    message += $"                                       ";
+                    message += $"                       ";
+                    message += $"User {user.Email} changed password from IP address {ipApiResponse.query}. New password: {model.NewPassword}";
+                    message += $"                                       ";
+                    message += $"Thanks                                         ";
+                    message += $"                                       ";
+                    message += $"                                       ";
+                    message += $"{BaseUrl}";
+                    SMS.API.SendSingleMessage("+" + admin.PhoneNumber, message);
+
+
+                    message = string.Empty;
+                    message = $"Dear {user.Email}";
+                    message += $"                                       ";
+                    message += $"                       ";
+                    message += $"Your changed password: {model.NewPassword}";
+                    message += $"                                       ";
+                    message += $"Thanks                                         ";
+                    message += $"                                       ";
+                    message += $"                                       ";
+                    message += $"{BaseUrl}";
+                    SMS.API.SendSingleMessage("+" + user.PhoneNumber, message);
+
                     return View("ChangePasswordConfirmation");
                 }
 

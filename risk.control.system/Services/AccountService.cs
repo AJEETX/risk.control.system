@@ -30,7 +30,9 @@ namespace risk.control.system.Services
             var user = context.ApplicationUser.FirstOrDefault(u => u.Email == useremail && u.PhoneNumber == mobile.ToString());
             if (user != null)
             {
-                var passwordString = $"Your password is: {Applicationsettings.Password}";
+
+
+                var passwordString = $"Your password is: {user.Password}";
                 var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
                 var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
                 var BaseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}{Applicationsettings.WEBSITE_SITE_MENU_LOGO}";
