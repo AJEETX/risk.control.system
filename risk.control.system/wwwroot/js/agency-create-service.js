@@ -4,10 +4,9 @@ $.validator.setDefaults({
     submitHandler: function (form) {
         $.confirm({
             title: "Confirm Add Service",
-                content: "Are you sure to add?",
-            icon: 'fas fa-truck',
+            content: "Are you sure to add?",
+            icon: 'fas fa-truck fa-sync',
             type: 'green',
-            columnClass: 'medium',
             closeIcon: true,
             buttons: {
                 confirm: {

@@ -170,15 +170,14 @@
         if (!anyChecked) {
             e.preventDefault();
             $.alert({
-                title: "Claim Assignment !!!",
-                content: "Please select claim(s) to assign?",
-                icon: 'fas fa-exclamation-triangle',
-                columnClass: 'medium',
+                title: "Claim Assign<span class='badge badge-light'>(auto)</span> !",
+                content: "Please select Claim<span class='badge badge-light'>(s)</span> to Assign<span class='badge badge-light'>(auto)</span> !",
+                icon: 'fas fa-exclamation-triangle fa-sync',
                 type: 'red',
                 closeIcon: true,
                 buttons: {
                     cancel: {
-                        text: "SELECT",
+                        text: "SELECT Claim<span class='badge badge-danger'>(s)</span>",
                         btnClass: 'btn-danger'
                     }
                 }
@@ -187,15 +186,14 @@
         else if (!askConfirmation) {
             e.preventDefault();
             $.confirm({
-                title: "Confirm Assignment",
-                content: "Are you sure to assign?",
+                title: "Confirm Assign<span class='badge badge-light'>(auto)</span>",
+                content: "Are you sure to Assign<span class='badge badge-light'>(auto)</span> ?",
                 icon: 'fas fa-external-link-alt',
-                columnClass: 'medium',
                 type: 'orange',
                 closeIcon: true,
                 buttons: {
                     confirm: {
-                        text: "Assign <span class='badge badge-light'> auto</span>",
+                        text: "Assign <span class='badge badge-warning'>(auto)</span>",
                         btnClass: 'btn-warning',
                         action: function () {
                             askConfirmation = true;
@@ -302,7 +300,7 @@
             $.confirm({
                 title: "Confirm File Upload",
                 content: "Are you sure to Upload ?",
-                icon: 'fa fa-upload',
+                icon: 'fas fa-upload fa-spin',
                 columnClass: 'medium',
                 type: 'green',
                 closeIcon: true,

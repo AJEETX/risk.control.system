@@ -25,4 +25,21 @@
     $("#btnMonthlyTat").click(function () {
         //GetMonthly('Claim', 'GetClaimWeeklyTat', 'container-claim-tat');
     })
+
+    $('.details-page').on('click', function () {
+        $("body").addClass("submit-progress-bg");
+        // Wrap in setTimeout so the UI
+        // can update the spinners
+        setTimeout(function () {
+            $(".submit-progress").removeClass("hidden");
+        }, 1);
+
+        $('.details-page').attr('disabled', 'disabled');
+        $('html').css('cursor', 'not-allowed');
+
+        var nodes = document.getElementById("section").getElementsByTagName('*');
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].disabled = true;
+        }
+    });
 });
