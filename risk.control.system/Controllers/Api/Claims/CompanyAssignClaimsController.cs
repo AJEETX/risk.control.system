@@ -44,10 +44,8 @@ namespace risk.control.system.Controllers.Api.Claims
 
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
 
-            applicationDbContext = applicationDbContext.Where(i => i.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId);
-
-            // SHOWING DIFFERRENT PAGES AS PER ROLES
-            applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId == null) &&
+            applicationDbContext = applicationDbContext.Where(a => a.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
+                a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId == null) &&
                 (
                     a.UserEmailActioned == companyUser.Email && 
                     a.UserEmailActionedTo == companyUser.Email && 

@@ -21,15 +21,7 @@
         <partial name="AdminLTE/_CompanySidebarClaimsCreator" />
         <partial name="AdminLTE/_CompanySidebarClaimsAssessor" />
     
-        <li class="nav-item">
-            <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Active" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Active")
-                        @Url.MakeActiveClass("ClaimsInvestigation","ActiveDetail") ">
-                <i class="fa fa-toggle-on nav-icon"></i>
-                <p>
-                    <span class="badge badge-primary">ACTIVE</span>
-                </p>
-            </a>
-        </li>
+        
         <li class="nav-item">
             <a is-active-page asp-controller="Report" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Report","Index")
                                     @Url.MakeActiveClass("Report","Detail") @Url.MakeActiveClass("Report","ShowInvoice")

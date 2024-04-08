@@ -10,6 +10,8 @@ using risk.control.system.Models.ViewModel;
 using System.Globalization;
 using System.Security.Claims;
 
+using static risk.control.system.AppConstant.Applicationsettings;
+
 using ControllerBase = Microsoft.AspNetCore.Mvc.ControllerBase;
 
 namespace risk.control.system.Controllers.Api.Claims
@@ -31,7 +33,7 @@ namespace risk.control.system.Controllers.Api.Claims
             IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
 
-            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
+            var vendorUser = _context.VendorApplicationUser.Include(u=>u.Vendor).FirstOrDefault(c => c.Email == userEmail.Value);
 
             if (vendorUser != null)
             {
@@ -42,16 +44,14 @@ namespace risk.control.system.Controllers.Api.Claims
             var openSubstatusesForSupervisor = _context.InvestigationCaseSubStatus.Where(i =>
             i.Name.Contains(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR) ||
             i.Name.Contains(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT) ||
-            i.Name.Contains(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR) ||
-            i.Name.Contains(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR)
+            i.Name.Contains(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR)
             ).Select(s => s.InvestigationCaseSubStatusId).ToList();
 
             var allocateToVendorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
             var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
-            var submittedToVendorSupervisorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR);
+            
             var submittedToAssesssorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
 
@@ -59,8 +59,7 @@ namespace risk.control.system.Controllers.Api.Claims
             {
                 applicationDbContext = applicationDbContext.Where(a => openSubstatusesForSupervisor.Contains(a.InvestigationCaseSubStatusId) && 
                 ( a.UserEmailActioned == vendorUser.Email && a.InvestigationCaseSubStatus == assignedToAgentStatus) ||
-                ( a.UserEmailActioned == vendorUser.Email && a.InvestigationCaseSubStatus == submittedToAssesssorStatus) ||
-                (a.InvestigationCaseSubStatus == submittedToVendorSupervisorStatus && a.UserRoleActionedTo == AppRoles.Agent.GetEnumDisplayName())
+                ( a.UserEmailActioned == vendorUser.Email && a.InvestigationCaseSubStatus == submittedToAssesssorStatus)
                 );
 
                 var claimsAllocated = new List<ClaimsInvestigation>();
@@ -70,8 +69,7 @@ namespace risk.control.system.Controllers.Api.Claims
                     item.CaseLocations = item.CaseLocations.Where(c => (c.VendorId.HasValue
                         && c.InvestigationCaseSubStatusId == allocateToVendorStatus.InvestigationCaseSubStatusId)
                         || c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId
-                        || c.InvestigationCaseSubStatusId == submittedToAssesssorStatus.InvestigationCaseSubStatusId
-                        || c.InvestigationCaseSubStatusId == submittedToVendorSupervisorStatus.InvestigationCaseSubStatusId)?.ToList();
+                        || c.InvestigationCaseSubStatusId == submittedToAssesssorStatus.InvestigationCaseSubStatusId)?.ToList();
                     if (item.CaseLocations.Any())
                     {
                         claimsAllocated.Add(item);
@@ -248,11 +246,12 @@ namespace risk.control.system.Controllers.Api.Claims
             }
             else if (userRole.Value.Contains(AppRoles.Agent.ToString()))
             {
+                applicationDbContext = applicationDbContext.Where(a => a.UserEmailActionedTo == currentUserEmail 
+                && a.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId);
                 foreach (var item in applicationDbContext)
                 {
                     item.CaseLocations = item.CaseLocations.Where(c => c.VendorId == vendorUser.VendorId
-                        && c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId
-                        && c.AssignedAgentUserEmail == currentUserEmail)?.ToList();
+                        && c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId)?.ToList();
                     if (item.CaseLocations.Any())
                     {
                         claims.Add(item);

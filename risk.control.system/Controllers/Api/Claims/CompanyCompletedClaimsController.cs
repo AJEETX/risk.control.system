@@ -35,12 +35,23 @@ namespace risk.control.system.Controllers.Api.Claims
             var user = HttpContext.User.Identity.Name;
 
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == user);
+            var approvedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR);
+            var finishStatus = _context.InvestigationCaseStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.FINISHED);
+            var claims = applicationDbContext.Where(c => c.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId && 
+                (c.InvestigationCaseSubStatus.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR && c.InvestigationCaseStatusId == finishStatus.InvestigationCaseStatusId)
+                )?.ToList();
+            var claimsSubmitted = new List<ClaimsInvestigation>();
 
-            var claimsSubmitted = await applicationDbContext.Where(c => c.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
-                (c.InvestigationCaseSubStatus.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR
-                ))?
-                 .ToListAsync();
-
+            foreach (var claim in claims)
+            {
+                var userHasClaimLog = _context.InvestigationTransaction.Any(c => c.ClaimsInvestigationId == claim.ClaimsInvestigationId && c.UserEmailActioned == companyUser.Email);
+                if (userHasClaimLog)
+                {
+                    claimsSubmitted.Add(claim);
+                }
+            }
             var response =
                 claimsSubmitted
             .Select(a => new ClaimsInvesgationResponse
