@@ -30,7 +30,7 @@
                         currentBAgeinYrs = (int)age / 365;
                     }
                 }
-                
+
 
                 <article>
                     <div class="bb-blog-inner">
@@ -331,13 +331,12 @@
                 </article>
 
                 <form id="radioButtons" method="post" asp-controller="ClaimsVendorPost" asp-action="AllocateToVendorAgent" enctype="multipart/form-data">
+                    <input type="hidden" id="policyDetailId" value="@Model.ClaimsInvestigation?.PolicyDetail.PolicyDetailId" />
+                    <input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail.CustomerDetailId" />
+                    <input type="hidden" id="caseLocationId" value="@Model.CaseLocation?.CaseLocationId" />
+                    <input type="hidden" id="beneficiaryId" value="@Model.CaseLocation?.CaseLocationId" />
+                    <input type="hidden" id="claimId" value="@Model.ClaimsInvestigation?.ClaimsInvestigationId" />
                     <div class="card-body">
-                        
-                        <input type="hidden" id="policyDetailId" value="@Model.ClaimsInvestigation?.PolicyDetail.PolicyDetailId" />
-                        <input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail.CustomerDetailId" />
-                        <input type="hidden" id="caseLocationId" value="@Model.CaseLocation?.CaseLocationId" />
-                        <input type="hidden" id="beneficiaryId" value="@Model.CaseLocation?.CaseLocationId" />
-                        <input type="hidden" id="claimId" value="@Model.ClaimsInvestigation?.ClaimsInvestigationId" />
                         <div class="submit-progress hidden">
                             <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
                         </div>

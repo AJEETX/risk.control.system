@@ -274,6 +274,7 @@ namespace risk.control.system.Services
 
                 claimsInvestigation.Updated = DateTime.UtcNow;
                 claimsInvestigation.UserEmailActioned = userEmail;
+                claimsInvestigation.UserEmailActionedTo = userEmail;
                 claimsInvestigation.UserRoleActionedTo = $"{AppRoles.Creator.GetEnumDisplayName()} ({currentUser.ClientCompany.Email})";
                 claimsInvestigation.UpdatedBy = userEmail;
                 claimsInvestigation.CurrentUserEmail = userEmail;
@@ -286,6 +287,7 @@ namespace risk.control.system.Services
                 {
                     ClaimsInvestigationId = claimsInvestigation.ClaimsInvestigationId,
                     UserEmailActioned = userEmail,
+                    UserEmailActionedTo = userEmail,
                     UserRoleActionedTo = $"{AppRoles.Creator.GetEnumDisplayName()} ({currentUser.ClientCompany.Email})",
                     CurrentClaimOwner = currentUser.Email,
                     Created = DateTime.UtcNow,
@@ -636,6 +638,7 @@ namespace risk.control.system.Services
                 existinCaseLocation.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR).InvestigationCaseSubStatusId;
                 claimsCaseToAllocateToVendor.UserEmailActioned = userEmail;
+                claimsCaseToAllocateToVendor.UserEmailActionedTo = string.Empty;
                 claimsCaseToAllocateToVendor.UserRoleActionedTo =$" {AppRoles.Supervisor.GetEnumDisplayName()} ({vendor.Email})";
                 claimsCaseToAllocateToVendor.Vendors.Add(vendor);
                 claimsCaseToAllocateToVendor.VendorId = vendorId;

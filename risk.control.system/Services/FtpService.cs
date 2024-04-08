@@ -211,7 +211,7 @@ namespace risk.control.system.Services
                                         IsReviewCase = false,
                                         SelectedToAssign = false,
                                         UserEmailActioned = userEmail,
-                                        UserRoleActionedTo = $"{AppRoles.Creator.GetEnumDisplayName()}({companyUser.ClientCompany.Email})"
+                                        UserEmailActionedTo = userEmail
                                     };
 
                                     var servicetype = _context.InvestigationServiceType.FirstOrDefault(s => s.Code.ToLower() == (rowData[4].Trim().ToLower()));

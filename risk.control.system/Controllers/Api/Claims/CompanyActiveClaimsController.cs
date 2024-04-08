@@ -53,12 +53,18 @@ namespace risk.control.system.Controllers.Api.Claims
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER);
 
             var claimsSubmitted = new List<ClaimsInvestigation>();
-
             if (userRole.Value.Contains(AppRoles.Creator.ToString()))
             {
                 var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
-                applicationDbContext = applicationDbContext.Where(a => openStatusesIds.Contains(a.InvestigationCaseStatusId));
-                claimsSubmitted = await applicationDbContext.ToListAsync();
+                var claims = applicationDbContext.Where(a => openStatusesIds.Contains(a.InvestigationCaseStatusId) && a.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId)?.ToList();
+                foreach (var claim in claims)
+                {
+                    var userHasClaimLog = _context.InvestigationTransaction.Any(c => c.ClaimsInvestigationId == claim.ClaimsInvestigationId && claim.UserEmailActioned == companyUser.Email);
+                    if(userHasClaimLog)
+                    {
+                        claimsSubmitted.Add(claim);
+                    }
+                }
             }
             
             else if (userRole.Value.Contains(AppRoles.Assessor.ToString()))
@@ -69,12 +75,13 @@ namespace risk.control.system.Controllers.Api.Claims
                 a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId != null)
                 );
 
-                foreach (var item in applicationDbContext)
+                foreach (var claim in applicationDbContext)
                 {
-                    if ((item.InvestigationCaseSubStatusId == submittededToAssesssorStatus.InvestigationCaseSubStatusId) ||
-                        (item.IsReviewCase))
+                    var userHasClaimLog = _context.InvestigationTransaction.Any(c => c.ClaimsInvestigationId == claim.ClaimsInvestigationId && claim.UserEmailActioned == companyUser.Email);
+                    if ((claim.InvestigationCaseSubStatusId == submittededToAssesssorStatus.InvestigationCaseSubStatusId) ||
+                        (claim.IsReviewCase && userHasClaimLog))
                     {
-                        claimsSubmitted.Add(item);
+                        claimsSubmitted.Add(claim);
                     }
                 }
             }

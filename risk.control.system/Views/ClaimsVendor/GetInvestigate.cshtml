@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Claim: Report ";
+    Layout = "/Views/Shared/AdminLTE/_FormLayout.cshtml";
 }
 
 <section class="content">
@@ -9,14 +10,8 @@
         <div class="card-header">
             <h3 class="card-title"><i class="fa fa-binoculars"></i> Submit</h3>
         </div>
-        <div class="submit-progress hidden">
-            <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
-        </div>
-        <div id="fullpage">
-            <partial name="_PolicyDetails" model="@Model" />
-
-            <partial name="_PolicyReport" model="@Model" />
-        </div>
+        <partial name="_PolicyDetails" model="@Model" />
+        <partial name="_PolicyReport" model="@Model" />
     </div>
 
 </section>

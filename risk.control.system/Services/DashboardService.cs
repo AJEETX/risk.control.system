@@ -323,7 +323,14 @@ namespace risk.control.system.Services
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
 
             applicationDbContext = applicationDbContext.Where(a => openStatusesIds.Contains(a.InvestigationCaseStatusId) && a.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId);
-            claimsSubmitted = applicationDbContext.ToList();
+            foreach (var claim in applicationDbContext)
+            {
+                var userHasClaimLog = _context.InvestigationTransaction.Any(c => c.ClaimsInvestigationId == claim.ClaimsInvestigationId && claim.UserEmailActioned == companyUser.Email);
+                if (userHasClaimLog)
+                {
+                    claimsSubmitted.Add(claim);
+                }
+            }
             return claimsSubmitted;
         }
         private List<ClaimsInvestigation> GetCreatorAssignManual(string userEmail)
@@ -344,25 +351,22 @@ namespace risk.control.system.Services
             applicationDbContext = applicationDbContext.Where(i => i.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId);
 
             // SHOWING DIFFERRENT PAGES AS PER ROLES
-            applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId == null
-            || c.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId ||
-            (c.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId)
-            ) ||
-            (a.IsReviewCase && a.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId));
+            applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId == null) &&
+                (
+                    a.UserEmailActioned == companyUser.Email &&
+                    a.UserEmailActionedTo == companyUser.Email &&
+                    a.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId
+                    || a.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId
+                )
+                 ||
+                (a.IsReviewCase && a.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId)
+                );
 
             var claimsAssigned = new List<ClaimsInvestigation>();
 
             foreach (var item in applicationDbContext)
             {
-                item.CaseLocations = item.CaseLocations.Where(c => !c.VendorId.HasValue
-                    && c.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId ||
-            (c.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId) ||
-                        (item.IsReviewCase && item.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId)
-                    )?.ToList();
-                if (item.CaseLocations.Any())
-                {
-                    claimsAssigned.Add(item);
-                }
+                claimsAssigned.Add(item);
             }
             return claimsAssigned;
         }
@@ -381,12 +385,16 @@ namespace risk.control.system.Services
             var allocateToVendorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-            applicationDbContext = applicationDbContext.Where(i => i.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId);
+            applicationDbContext = applicationDbContext.Include(c => c.CaseLocations)
+                .Where(i => i.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
+                i.UserEmailActioned == companyUser.Email &&
+                i.UserEmailActionedTo == companyUser.Email);
+
             applicationDbContext = applicationDbContext
                     .Include(c => c.CaseLocations)
                     .Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => (c.VendorId == null
                     && c.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId)
-                    ) || (a.IsReviewCase && a.InvestigationCaseSubStatusId == reAssignedStatus.InvestigationCaseSubStatusId));
+                    ));
 
             var claimsAssigned = new List<ClaimsInvestigation>();
             foreach (var item in applicationDbContext)
@@ -394,8 +402,7 @@ namespace risk.control.system.Services
                 if (item.IsReady2Assign)
                 {
                     item.CaseLocations = item.CaseLocations.Where(c => !c.VendorId.HasValue
-                    && c.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId ||
-                    (item.IsReviewCase && item.InvestigationCaseSubStatusId == reAssignedStatus.InvestigationCaseSubStatusId))?.ToList();
+                    && c.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId)?.ToList();
                     if (item.CaseLocations.Any())
                     {
                         claimsAssigned.Add(item);

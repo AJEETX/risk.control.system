@@ -43,32 +43,28 @@ namespace risk.control.system.Controllers.Api.Claims
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
 
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
-            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
 
             applicationDbContext = applicationDbContext.Where(i => i.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId);
 
             // SHOWING DIFFERRENT PAGES AS PER ROLES
-            applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId == null
-            || c.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId || 
-            (c.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId)
-            ) ||
-            (a.IsReviewCase && a.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId));
+            applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId == null) &&
+                (
+                    a.UserEmailActioned == companyUser.Email && 
+                    a.UserEmailActionedTo == companyUser.Email && 
+                    a.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId 
+                    || a.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId
+                )
+                 ||
+                (a.IsReviewCase && a.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId)
+                );
 
             var claimsAssigned = new List<ClaimsInvestigation>();
 
             foreach (var item in applicationDbContext)
             {
-                item.CaseLocations = item.CaseLocations.Where(c => !c.VendorId.HasValue
-                    && c.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId ||
-            (c.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId) ||
-                        (item.IsReviewCase && item.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId)
-                    )?.ToList();
-                if (item.CaseLocations.Any())
-                {
-                    claimsAssigned.Add(item);
-                }
+                claimsAssigned.Add(item);
             }
-            var response = claimsAssigned
+            var response = applicationDbContext?.ToList()
                     .Select(a => new ClaimsInvesgationResponse
                     {
                         Id = a.ClaimsInvestigationId,
