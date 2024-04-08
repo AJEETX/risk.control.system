@@ -36,7 +36,7 @@ namespace risk.control.system.Controllers
             this.investigationReportService = investigationReportService;
         }
 
-        [Breadcrumb(title: " Add Policy", FromAction = "Index", FromController = typeof(InsuranceClaimsController))]
+        [Breadcrumb(title: " Add Policy", FromAction = "Incomplete", FromController = typeof(ClaimsInvestigationController))]
         public IActionResult CreatePolicy()
         {
             try
@@ -68,7 +68,7 @@ namespace risk.control.system.Controllers
             }
         }
 
-        [Breadcrumb(title: " Edit Policy", FromAction = "Index", FromController = typeof(InsuranceClaimsController))]
+        [Breadcrumb(title: " Edit Policy", FromAction = "Incomplete", FromController = typeof(ClaimsInvestigationController))]
         public async Task<IActionResult> EditPolicy(string id)
         {
             try
@@ -108,7 +108,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: ClaimsInvestigation/Delete/5
-        [Breadcrumb(title: " Delete", FromAction = "Index", FromController = typeof(InsuranceClaimsController))]
+        [Breadcrumb(title: " Delete", FromAction = "Incomplete", FromController = typeof(ClaimsInvestigationController))]
         public async Task<IActionResult> Delete(string id)
         {
             try
@@ -142,7 +142,7 @@ namespace risk.control.system.Controllers
             
         }
 
-        [Breadcrumb(title: " Delete", FromAction = "Index", FromController = typeof(InsuranceClaimsController))]
+        [Breadcrumb(title: " Delete", FromAction = "Incomplete", FromController = typeof(ClaimsInvestigationController))]
         public async Task<IActionResult> DeleteManual(string id)
         {
             try

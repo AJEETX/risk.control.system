@@ -325,6 +325,25 @@ namespace risk.control.system.Controllers
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
+        [Breadcrumb(title: "Draft")]
+        public IActionResult Incomplete()
+        {
+            try
+            {
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (string.IsNullOrWhiteSpace(currentUserEmail))
+                {
+                    notifyService.Error("OOPs !!!..Contact IT support");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                return View();
+            }
+            catch (Exception)
+            {
+                notifyService.Error("OOPs !!!..Contact IT support");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+        }
         [Breadcrumb(title: "Review")]
         public IActionResult Review()
         {

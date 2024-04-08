@@ -30,7 +30,7 @@ namespace risk.control.system.Controllers
             this._context = context;
         }
 
-        [Breadcrumb(title: " Add Customer", FromAction = "Index", FromController = typeof(InsuranceClaimsController))]
+        [Breadcrumb(title: " Add Customer", FromAction = "Incomplete", FromController = typeof(ClaimsInvestigationController))]
         public async Task<IActionResult> CreateCustomer(string id)
         {
             try
@@ -98,7 +98,7 @@ namespace risk.control.system.Controllers
             }
         }
 
-        [Breadcrumb(title: " Edit Customer", FromAction = "Index", FromController = typeof(InsuranceClaimsController))]
+        [Breadcrumb(title: " Edit Customer", FromAction = "Incomplete", FromController = typeof(ClaimsInvestigationController))]
         public async Task<IActionResult> EditCustomer(string id)
         {
             try

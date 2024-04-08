@@ -72,17 +72,17 @@ namespace risk.control.system.Services
         public DashboardData GetCreatorCount(string userEmail, string role)
         {
             
-            var claimsAssignAuto = GetCreatorAssignAuto(userEmail);
+            var claimsIncomplete = GetCreatorIncomplete(userEmail);
             var claimsAssignManual = GetCreatorAssignManual(userEmail);
             var claimsActive = GetCreatorActive(userEmail);
             var claimsCompleted= GetCompanyCompleted(userEmail);
 
             var data = new DashboardData();
-            data.FirstBlockName = "Assign(auto)";
-            data.FirstBlockCount = claimsAssignAuto.Count;
-            data.FirstBlockUrl = "/ClaimsInvestigation/Draft";
+            data.FirstBlockName = "Draft";
+            data.FirstBlockCount = claimsIncomplete.Count;
+            data.FirstBlockUrl = "/ClaimsInvestigation/Incomplete";
 
-            data.SecondBlockName = "Assign(manual)";
+            data.SecondBlockName = "Assign(auto/manual)";
             data.SecondBlockCount = claimsAssignManual.Count;
             data.SecondBlockUrl = "/ClaimsInvestigation/Assigner";
 
@@ -323,7 +323,8 @@ namespace risk.control.system.Services
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
             var openStatuses = _context.InvestigationCaseStatus.Where(i => !i.Name.Contains(CONSTANTS.CASE_STATUS.FINISHED)).ToList();
-           
+            var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
             var claimsSubmitted = new List<ClaimsInvestigation>();
             var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
@@ -332,7 +333,28 @@ namespace risk.control.system.Services
             foreach (var claim in applicationDbContext)
             {
                 var userHasClaimLog = _context.InvestigationTransaction.Any(c => c.ClaimsInvestigationId == claim.ClaimsInvestigationId && c.UserEmailActioned == companyUser.Email);
-                if (userHasClaimLog)
+                if (userHasClaimLog && claim.AssignedToAgency && claim.InvestigationCaseSubStatusId != createdStatus.InvestigationCaseSubStatusId)
+                {
+                    claimsSubmitted.Add(claim);
+                }
+            }
+            return claimsSubmitted;
+        }
+        private List<ClaimsInvestigation> GetCreatorIncomplete(string userEmail)
+        {
+            IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
+            var openStatuses = _context.InvestigationCaseStatus.Where(i => !i.Name.Contains(CONSTANTS.CASE_STATUS.FINISHED)).ToList();
+            var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
+            var claimsSubmitted = new List<ClaimsInvestigation>();
+            var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
+            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+
+            applicationDbContext = applicationDbContext.Where(a => openStatusesIds.Contains(a.InvestigationCaseStatusId) && a.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId);
+            foreach (var claim in applicationDbContext)
+            {
+                var userHasClaimLog = _context.InvestigationTransaction.Any(c => c.ClaimsInvestigationId == claim.ClaimsInvestigationId && c.UserEmailActioned == companyUser.Email);
+                if (userHasClaimLog && !claim.AssignedToAgency && claim.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId)
                 {
                     claimsSubmitted.Add(claim);
                 }

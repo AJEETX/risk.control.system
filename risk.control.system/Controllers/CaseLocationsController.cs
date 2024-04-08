@@ -88,7 +88,7 @@ namespace risk.control.system.Controllers
 
         // GET: CaseLocations/Create
         //[Breadcrumb("Create", FromController = typeof(ClaimsInvestigationController), FromAction = "Details")]
-        [Breadcrumb("Add Beneficiary", FromAction = "Index", FromController = typeof(InsuranceClaimsController))]
+        [Breadcrumb("Add Beneficiary", FromAction = "Incomplete", FromController = typeof(ClaimsInvestigationController))]
         public IActionResult Create(string id)
         {
             try
@@ -206,7 +206,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: CaseLocations/Edit/5
-        [Breadcrumb("Edit Beneficiary", FromAction = "Index", FromController = typeof(InsuranceClaimsController))]
+        [Breadcrumb("Edit Beneficiary", FromAction = "Incomplete", FromController = typeof(ClaimsInvestigationController))]
         public async Task<IActionResult> Edit(long? id)
         {
             try
