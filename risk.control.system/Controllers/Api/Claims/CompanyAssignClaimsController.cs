@@ -49,7 +49,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 (
                     a.UserEmailActioned == companyUser.Email && 
                     a.UserEmailActionedTo == companyUser.Email && 
-                    a.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId 
+                    (a.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId && !a.AssignedToAgency && a.IsReady2Assign)
                     || a.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId
                 )
                  ||

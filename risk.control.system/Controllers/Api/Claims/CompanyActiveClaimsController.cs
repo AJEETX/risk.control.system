@@ -148,7 +148,7 @@ namespace risk.control.system.Controllers.Api.Claims
             foreach (var claim in claims)
             {
                 var userHasClaimLog = _context.InvestigationTransaction.Any(c => c.ClaimsInvestigationId == claim.ClaimsInvestigationId && c.UserEmailActioned == companyUser.Email);
-                if (userHasClaimLog && !claim.AssignedToAgency && claim.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId)
+                if (userHasClaimLog && !claim.AssignedToAgency && claim.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId && !claim.IsReady2Assign)
                 {
                     claimsSubmitted.Add(claim);
                 }

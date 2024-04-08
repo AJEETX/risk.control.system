@@ -45,8 +45,8 @@ namespace risk.control.system.Services
         {
 
             var claimsAllocate = GetAgencyAllocateCount(userEmail);
-            var claimsVerified= GetAgencyVerifiedCount(userEmail);
-            var claimsActive= GetSuperVisorActiveCount(userEmail);
+            var claimsVerified = GetAgencyVerifiedCount(userEmail);
+            var claimsActive = GetSuperVisorActiveCount(userEmail);
 
             var claimsCompleted = GetAgencyyCompleted(userEmail);
 
@@ -71,20 +71,29 @@ namespace risk.control.system.Services
         }
         public DashboardData GetCreatorCount(string userEmail, string role)
         {
-            
+            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+            var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
             var claimsIncomplete = GetCreatorIncomplete(userEmail);
             var claimsAssignManual = GetCreatorAssignManual(userEmail);
             var claimsActive = GetCreatorActive(userEmail);
-            var claimsCompleted= GetCompanyCompleted(userEmail);
+            var claimsCompleted = GetCompanyCompleted(userEmail);
 
             var data = new DashboardData();
             data.FirstBlockName = "Draft";
             data.FirstBlockCount = claimsIncomplete.Count;
             data.FirstBlockUrl = "/ClaimsInvestigation/Incomplete";
 
-            data.SecondBlockName = "Assign(auto/manual)";
+            if (company.AutoAllocation)
+            {
+                data.SecondBlockName = "Assign(auto/manual)";
+                data.SecondBlockUrl = "/ClaimsInvestigation/Draft";
+            }
+            else
+            {
+                data.SecondBlockName = "Assign(manual)";
+                data.SecondBlockUrl = "/ClaimsInvestigation/Assigner";
+            }
             data.SecondBlockCount = claimsAssignManual.Count;
-            data.SecondBlockUrl = "/ClaimsInvestigation/Assigner";
 
             data.ThirdBlockName = "Active";
             data.ThirdBlockCount = claimsActive.Count;
@@ -101,7 +110,7 @@ namespace risk.control.system.Services
         {
 
             var claimsAssessor = GetAssessorAssess(userEmail);
-            var claimsReview= GetAssessorReview(userEmail);
+            var claimsReview = GetAssessorReview(userEmail);
             var claimsCompleted = GetCompanyCompleted(userEmail);
 
             var data = new DashboardData();
@@ -125,7 +134,7 @@ namespace risk.control.system.Services
         }
         private List<ClaimsInvestigation> GetSuperVisorActiveCount(string userEmail)
         {
-            
+
             var openSubstatusesForSupervisor = _context.InvestigationCaseSubStatus.Where(i =>
             i.Name.Contains(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR) ||
             i.Name.Contains(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT) ||
@@ -136,7 +145,7 @@ namespace risk.control.system.Services
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
             var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
-            
+
             var submittedToAssesssorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
 
@@ -151,7 +160,7 @@ namespace risk.control.system.Services
             var claimsAllocated = new List<ClaimsInvestigation>();
 
             var finalQuery = applicationDbContext.ToList();
-            
+
             return finalQuery;
         }
 
@@ -354,7 +363,7 @@ namespace risk.control.system.Services
             foreach (var claim in applicationDbContext)
             {
                 var userHasClaimLog = _context.InvestigationTransaction.Any(c => c.ClaimsInvestigationId == claim.ClaimsInvestigationId && c.UserEmailActioned == companyUser.Email);
-                if (userHasClaimLog && !claim.AssignedToAgency && claim.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId)
+                if (userHasClaimLog && !claim.AssignedToAgency && !claim.IsReady2Assign && claim.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId)
                 {
                     claimsSubmitted.Add(claim);
                 }

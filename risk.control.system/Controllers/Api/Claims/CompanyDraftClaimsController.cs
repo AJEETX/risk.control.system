@@ -52,7 +52,7 @@ namespace risk.control.system.Controllers.Api.Claims
             applicationDbContext = applicationDbContext
                     .Include(c => c.CaseLocations)
                     .Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => (c.VendorId == null
-                    && c.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId)
+                    && c.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId) && a.IsReady2Assign && !a.AssignedToAgency
                     ));
 
             var claimsAssigned = new List<ClaimsInvestigation>();
