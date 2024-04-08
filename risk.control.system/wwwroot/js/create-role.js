@@ -6,7 +6,7 @@ $(document).ready(function () {
             $.confirm({
                 title: "Confirm Add New",
                 content: "Are you sure to add?",
-                columnClass: 'medium',
+    
                 icon: 'fa fa-user',
                 type: 'green',
                 closeIcon: true,

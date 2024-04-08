@@ -37,7 +37,7 @@
             $.confirm({
                 title: "Confirm withdrwal",
                 content: "Are you sure?",
-                columnClass: 'medium',
+    
                 icon: 'fas fa-undo',
                 closeIcon: true,
                 type: 'red',

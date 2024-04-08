@@ -7,7 +7,7 @@
                 title: "Confirm Add New",
                 content: "Are you sure to add ?",
                 icon: 'fas fa-business-time',
-                columnClass: 'medium',
+    
                 type: 'green',
                 closeIcon: true,
                 buttons: {

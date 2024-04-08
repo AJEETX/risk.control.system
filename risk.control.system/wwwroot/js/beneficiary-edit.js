@@ -5,7 +5,7 @@
             e.preventDefault();
             $.confirm({
                 title: "Confirm Edit",
-                columnClass: 'medium',
+    
                 content: "Are you sure to edit?",
                 icon: 'fas fa-user-tie',
                 type: 'orange',

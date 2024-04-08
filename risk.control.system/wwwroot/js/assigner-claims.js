@@ -132,7 +132,7 @@ $(document).ready(function () {
                 title: "Claim Assignment !!!",
                 content: "Please select claim to assign?",
                 icon: 'fas fa-exclamation-triangle',
-                columnClass: 'medium',
+    
                 type: 'red',
                 closeIcon: true,
                 buttons: {

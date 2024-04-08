@@ -7,7 +7,7 @@
                 title: "Confirm Edit",
                 content: "Are you sure to edit ?",
                 icon: 'fa fa-key',
-                columnClass: 'medium',
+    
                 type: 'orange',
                 closeIcon: true,
                 typeAnimated: true,

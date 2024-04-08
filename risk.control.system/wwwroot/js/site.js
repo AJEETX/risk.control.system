@@ -227,7 +227,7 @@ $(document).ready(function () {
         $.confirm({
             type: 'green',
             closeIcon: true,
-            columnClass: 'medium',
+
             buttons: {
                 confirm: {
                     text: "Ok",
@@ -269,7 +269,7 @@ $(document).ready(function () {
         $.confirm({
             type: 'green',
             closeIcon: true,
-            columnClass: 'medium',
+
             buttons: {
                 confirm: {
                     text: "Ok",
@@ -313,7 +313,7 @@ $(document).ready(function () {
         $.confirm({
             type: 'green',
             closeIcon: true,
-            columnClass: 'medium',
+
             buttons: {
                 confirm: {
                     text: "Ok",
@@ -357,7 +357,7 @@ $(document).ready(function () {
         $.confirm({
             type: 'green',
             closeIcon: true,
-            columnClass: 'medium',
+
             buttons: {
                 confirm: {
                     text: "Ok",
@@ -403,7 +403,7 @@ $(document).ready(function () {
         $.confirm({
             type: 'green',
             closeIcon: true,
-            columnClass: 'medium',
+
             buttons: {
                 confirm: {
                     text: "Ok",
@@ -448,7 +448,7 @@ $(document).ready(function () {
         $.confirm({
             type: 'green',
             closeIcon: true,
-            columnClass: 'medium',
+
             buttons: {
                 confirm: {
                     text: "Ok",
@@ -479,10 +479,10 @@ $(document).ready(function () {
 
     $('#policy-detail').click(function () {
         $.confirm({
-            columnClass: 'medium',
+
             title: "Policy details",
             closeIcon: true,
-            columnClass: 'medium',
+
             type: 'blue',
             buttons: {
                 confirm: {
@@ -551,11 +551,11 @@ $(document).ready(function () {
 
     $('#customer-detail').click(function () {
         $.confirm({
-            columnClass: 'medium',
+
             title: "Customer detail",
             icon: 'fa fa-user-plus',
             closeIcon: true,
-            columnClass: 'medium',
+
             type: 'orange',
             buttons: {
                 confirm: {
@@ -595,11 +595,11 @@ $(document).ready(function () {
 
     $('#beneficiary-detail').click(function () {
         $.confirm({
-            columnClass: 'medium',
+
             title: "Beneficiary details",
             icon: 'fas fa-user-tie',
             closeIcon: true,
-            columnClass: 'medium',
+
             type: 'green',
             buttons: {
                 confirm: {

@@ -7,7 +7,7 @@
                 title: "Confirm Edit",
                 content: "Are you sure to edit?",
                 icon: 'fas fa-map-marker-alt',
-                columnClass: 'medium',
+    
                 type: 'orange',
                 closeIcon: true,
                 buttons: {

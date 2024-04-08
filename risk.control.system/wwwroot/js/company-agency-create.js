@@ -5,7 +5,7 @@ $.validator.setDefaults({
         $.confirm({
             title: "Confirm Add Service",
             content: "Are you sure to add?",
-            columnClass: 'medium',
+
             icon: 'fas fa-truck',
             type: 'green',
             closeIcon: true,
@@ -84,7 +84,7 @@ $(document).ready(function () {
                         title: "Outdated Browser !",
                         content: "This browser does not support FileReader. Try on modern browser!",
                         icon: 'fas fa-exclamation-triangle',
-                        columnClass: 'medium',
+            
                         type: 'red',
                         closeIcon: true,
                         buttons: {
@@ -102,7 +102,7 @@ $(document).ready(function () {
                     title: "FILE UPLOAD TYPE !!",
                     content: "Pls select only image with extension jpg, png,gif ! ",
                     icon: 'fas fa-exclamation-triangle',
-                    columnClass: 'medium',
+        
                     type: 'red',
                     closeIcon: true,
                     buttons: {

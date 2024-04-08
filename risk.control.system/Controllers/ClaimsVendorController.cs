@@ -204,7 +204,21 @@ namespace risk.control.system.Controllers
         [Breadcrumb(" Allocate")]
         public ActionResult Allocate()
         {
-            return View();
+            try
+            {
+                var userEmail = HttpContext.User?.Identity?.Name;
+                if (string.IsNullOrWhiteSpace(userEmail))
+                {
+                    notifyService.Error("OOPs !!!..Contact IT support");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                return View();
+            }
+            catch (Exception)
+            {
+                notifyService.Error("OOPs !!!..Contact IT support");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
         }
 
         [Breadcrumb(" Tasks")]

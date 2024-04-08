@@ -133,7 +133,7 @@ $(document).ready(function () {
             $.confirm({
                 title: "Confirm <span class='fas fa-thumbtack'></span> <b> <u><i> Lock </i></u></b> Details",
                 content: "Are you sure?",
-                columnClass: 'medium',
+    
                 closeIcon: true,
                 type: 'red',
                 buttons: {

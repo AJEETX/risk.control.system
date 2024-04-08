@@ -6,7 +6,7 @@ $(document).ready(function () {
             $.confirm({
                 title: "Confirm  Add New",
                 icon: 'fas fa-tools',
-                columnClass: 'medium',
+    
                 content: "Are you sure to add?",
                 type: 'green',
                 closeIcon: true,

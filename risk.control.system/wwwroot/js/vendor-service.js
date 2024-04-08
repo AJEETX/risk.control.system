@@ -5,7 +5,7 @@
             e.preventDefault();
             $.confirm({
                 title: "Confirm  Add New",
-                columnClass: 'medium',
+    
                 content: "Are you sure to add?",
                 type: 'green',
                 closeIcon: true,

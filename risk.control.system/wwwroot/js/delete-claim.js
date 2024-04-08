@@ -7,7 +7,7 @@ $(document).ready(function () {
                 title: "Confirm DELETE",
                 content: "Are you sure to delete?",
                 icon: 'fas fa-trash',
-                columnClass: 'medium',
+    
                 closeIcon: true,
                 type: 'red',
                 buttons: {

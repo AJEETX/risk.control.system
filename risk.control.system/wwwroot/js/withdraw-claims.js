@@ -6,7 +6,7 @@
             $.confirm({
                 title: "Confirm Withdrawl",
                 content: "Are you sure to withdraw?",
-                columnClass: 'medium',
+    
                 icon: 'fa fa-window-close',
                 closeIcon: true,
                 type: 'red',

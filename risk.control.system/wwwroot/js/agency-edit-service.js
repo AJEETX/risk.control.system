@@ -4,7 +4,7 @@
             title: "Confirm Edit Service",
             content: "Are you sure to edit?",
             icon: 'fas fa-truck',
-            columnClass: 'medium',
+
             type: 'orange',
             closeIcon: true,
             buttons: {

@@ -4,9 +4,9 @@
         if (askConfirmation) {
             e.preventDefault();
             $.confirm({
-                title: "Confirm Allocation",
+                title: "Confirm Allocate",
                 content: "Are you sure to allocate?",
-                columnClass: 'medium',
+    
                 icon: 'fas fa-external-link-alt',
                 type: 'red',
                 closeIcon: true,

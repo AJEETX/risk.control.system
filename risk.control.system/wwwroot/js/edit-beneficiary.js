@@ -7,7 +7,7 @@ $.validator.setDefaults({
             title: "Confirm  Edit Beneficiary",
             content: "Are you sure to edit?",
             icon: 'fas fa-user-tie',
-            columnClass: 'medium',
+
             type: 'orange',
             closeIcon: true,
             buttons: {
@@ -88,7 +88,7 @@ $(document).ready(function () {
                         title: "Outdated Browser !",
                         content: "This browser does not support FileReader. Try on modern browser!",
                         icon: 'fas fa-exclamation-triangle',
-                        columnClass: 'medium',
+            
                         type: 'red',
                         closeIcon: true,
                         buttons: {
@@ -106,7 +106,7 @@ $(document).ready(function () {
                     title: "FILE UPLOAD TYPE !!",
                     content: "Pls select only image with extension jpg, png,gif ! ",
                     icon: 'fas fa-exclamation-triangle',
-                    columnClass: 'medium',
+        
                     type: 'red',
                     closeIcon: true,
                     buttons: {

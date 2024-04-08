@@ -67,7 +67,7 @@
                         title: "Outdated Browser !",
                         content: "This browser does not support FileReader. Try on modern browser!",
                         icon: 'fas fa-exclamation-triangle',
-                        columnClass: 'medium',
+            
                         type: 'red',
                         closeIcon: true,
                         buttons: {
@@ -85,7 +85,7 @@
                     title: "FILE UPLOAD TYPE !!",
                     content: "Pls select only image with extension jpg, png,gif ! ",
                     icon: 'fas fa-exclamation-triangle',
-                    columnClass: 'medium',
+        
                     type: 'red',
                     closeIcon: true,
                     buttons: {
@@ -147,7 +147,7 @@
                         title: "Outdated Browser !",
                         content: "This browser does not support FileReader. Try on modern browser!",
                         icon: 'fas fa-exclamation-triangle',
-                        columnClass: 'medium',
+            
                         type: 'red',
                         closeIcon: true,
                         buttons: {
@@ -165,7 +165,7 @@
                     title: "FILE UPLOAD TYPE !!",
                     content: "Pls select only image with extension jpg, png,gif ! ",
                     icon: 'fas fa-exclamation-triangle',
-                    columnClass: 'medium',
+        
                     type: 'red',
                     closeIcon: true,
                     buttons: {
@@ -183,15 +183,15 @@
         if (askFaceUploadConfirmation) {
             e.preventDefault();
             $.confirm({
-                title: "Confirm Photo Image Upload",
+                title: "Confirm Image Upload",
                 content: "Are you sure to upload?",
                 icon: 'fa fa-upload',
-                columnClass: 'medium',
+    
                 type: 'green',
                 closeIcon: true,
                 buttons: {
                     confirm: {
-                        text: "Face Image Upload",
+                        text: "Image Upload",
                         btnClass: 'btn-success',
                         action: function () {
                             askFaceUploadConfirmation = false;
@@ -236,15 +236,15 @@
         if (askPanUploadConfirmation) {
             e.preventDefault();
             $.confirm({
-                title: "Confirm PAN Image Upload",
+                title: "Confirm Image Upload",
                 content: "Are you sure to upload?",
                 icon: 'fa fa-upload',
-                columnClass: 'medium',
+    
                 type: 'green',
                 closeIcon: true,
                 buttons: {
                     confirm: {
-                        text: "PAN Image Upload",
+                        text: "Image Upload",
                         btnClass: 'btn-success',
                         action: function () {
                             askPanUploadConfirmation = false;
@@ -335,7 +335,7 @@
                 title: "Report submission !!!",
                 content: "Please enter remarks ?",
                 icon: 'fas fa-exclamation-triangle',
-                columnClass: 'medium',
+    
                 type: 'red',
                 closeIcon: true,
                 buttons: {
@@ -353,10 +353,10 @@
         else if (!askConfirmation) {
             e.preventDefault();
             $.confirm({
-                title: "Confirm Report submission",
-                content: "Are you sure?",
+                title: "Confirm Submit",
+                content: "Are you sure to Submit?",
                 icon: 'fa fa-binoculars',
-                columnClass: 'medium',
+    
                 type: 'red',
                 closeIcon: true,
                 buttons: {

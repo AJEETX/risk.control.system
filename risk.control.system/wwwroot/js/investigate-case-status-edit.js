@@ -7,7 +7,7 @@ $(document).ready(function () {
                 title: "Confirm Edit",
                 content: "Are you sure to edit?",
                 icon: 'fas fa-tools',
-                columnClass: 'medium',
+    
                 type: 'orange',
                 closeIcon: true,
                 buttons: {

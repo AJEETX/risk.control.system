@@ -263,7 +263,7 @@
                         title: "Outdated Browser !",
                         content: "This browser does not support FileReader. Try on modern browser!",
                         icon: 'fas fa-exclamation-triangle',
-                        columnClass: 'medium',
+            
                         type: 'red',
                         closeIcon: true,
                         buttons: {
@@ -281,7 +281,7 @@
                     title: "FILE UPLOAD TYPE !!",
                     content: "Pls only select file with extension zip ! ",
                     icon: 'fas fa-exclamation-triangle',
-                    columnClass: 'medium',
+        
                     type: 'red',
                     closeIcon: true,
                     buttons: {
@@ -301,7 +301,7 @@
                 title: "Confirm File Upload",
                 content: "Are you sure to Upload ?",
                 icon: 'fas fa-upload fa-spin',
-                columnClass: 'medium',
+    
                 type: 'green',
                 closeIcon: true,
                 buttons: {

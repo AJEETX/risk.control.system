@@ -63,9 +63,9 @@
                     var buttons = "";
                     buttons += '<span class="checkbox">'
                     if (row.active) {
-                        buttons += '<input type="checkbox" checked disabled />'
+                        buttons += '<i class="fa fa-toggle-on"></i>';
                     } else {
-                        buttons += '<input type="checkbox" disabled/>'
+                        buttons += '<i class="fa fa-toggle-off"></i>';
                     }
                     buttons += '</span>'
                     return buttons;

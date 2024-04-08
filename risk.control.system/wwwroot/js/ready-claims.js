@@ -6,7 +6,7 @@ $(document).ready(function () {
             $.confirm({
                 title: "Confirm Set To Ready",
                 content: "Are you sure?",
-                columnClass: 'medium',
+    
                 icon: 'fas fa-thumbtack',
                 closeIcon: true,
                 type: 'red',

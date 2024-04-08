@@ -28,7 +28,7 @@
                 title: "Supervisor Comments !!!",
                 content: "Please enter comments ?",
                 icon: 'fas fa-exclamation-triangle',
-                columnClass: 'medium',
+    
                 type: 'red',
                 closeIcon: true,
                 buttons: {
@@ -49,7 +49,7 @@
                 title: "Confirm Report submission",
                 content: "Are you sure?",
                 icon: 'far fa-file-alt',
-                columnClass: 'medium',
+    
                 type: 'green',
                 closeIcon: true,
                 buttons: {

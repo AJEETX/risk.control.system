@@ -32,7 +32,7 @@ $(document).ready(function () {
                 title: "Claim Assessment !!!",
                 content: "Please enter comments?",
                 icon: 'fas fa-exclamation-triangle',
-                columnClass: 'medium',
+    
                 type: 'red',
                 closeIcon: true,
                 buttons: {
@@ -52,7 +52,7 @@ $(document).ready(function () {
                 title: "Confirm Report approval",
                 content: "Are you sure?",
                 icon: 'far fa-thumbs-up',
-                columnClass: 'medium',
+    
                 type: 'green',
                 closeIcon: true,
                 buttons: {
@@ -92,7 +92,7 @@ $(document).ready(function () {
                 title: "Confirm Report review",
                 content: "Are you sure?",
                 icon: 'fas fa-sync',
-                columnClass: 'medium',
+    
                 type: 'red',
                 closeIcon: true,
                 buttons: {

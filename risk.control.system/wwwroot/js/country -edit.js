@@ -9,7 +9,7 @@
                 icon: 'fas fa-map-marked-alt',
                 type: 'orange',
                 closeIcon: true,
-                columnClass: 'medium',
+    
                 buttons: {
                     confirm: {
                         text: "Edit",

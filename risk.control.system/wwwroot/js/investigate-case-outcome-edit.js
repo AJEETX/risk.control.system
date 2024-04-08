@@ -6,7 +6,7 @@ $(document).ready(function () {
             $.confirm({
                 title: "Confirm Edit",
                 content: "Are you sure to edit?",
-                columnClass: 'medium',
+    
                 type: 'orange',
                 closeIcon: true,
                 buttons: {

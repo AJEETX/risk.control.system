@@ -5,7 +5,7 @@ $(document).ready(function () {
             e.preventDefault();
             $.confirm({
                 title: "Confirm  Add New",
-                columnClass: 'medium',
+    
                 content: "Are you sure to add?",
                 icon: 'fas fa-city',
                 type: 'green',

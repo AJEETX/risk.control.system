@@ -115,7 +115,7 @@
                 title: "Depanel Agency !!!",
                 content: "Please select agency to depanel?",
                 icon: 'fas fa-exclamation-triangle',
-                columnClass: 'medium',
+    
                 type: 'red',
                 closeIcon: true,
                 buttons: {
@@ -132,7 +132,7 @@
                 title: "Confirm Agency Depanel",
                 content: "Are you sure?",
                 icon: 'fas fa-hand-pointer',
-                columnClass: 'medium',
+    
                 type: 'red',
                 closeIcon: true,
                 buttons: {

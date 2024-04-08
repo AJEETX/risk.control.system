@@ -113,7 +113,7 @@
                 title: "Agency Empanelment !!!",
                 content: "Please select agency to empanel?",
                 icon: 'fas fa-exclamation-triangle',
-                columnClass: 'medium',
+    
                 type: 'green',
                 closeIcon: true,
                 buttons: {
@@ -130,7 +130,7 @@
                 title: "Confirm Agency Empanel",
                 content: "Are you sure?",
                 icon: 'fas fa-handshake',
-                columnClass: 'medium',
+    
                 type: 'green',
                 closeIcon: true,
                 buttons: {

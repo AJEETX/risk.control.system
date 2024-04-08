@@ -4,7 +4,7 @@
             title: "Confirm Edit Role",
             content: "Are you sure to edit ?",
             icon: 'fas fa-user-plus',
-            columnClass: 'medium',
+
             type: 'orange',
             closeIcon: true,
             typeAnimated: true,

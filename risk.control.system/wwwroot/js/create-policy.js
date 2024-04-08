@@ -22,7 +22,7 @@ $(document).ready(function () {
             $.confirm({
                 title: "Confirm Add Policy",
                 content: "Are you sure to add ?",
-                columnClass: 'medium',
+    
                 icon: 'fas fa-thumbtack',
                 closeIcon: true,
                 type: 'red',

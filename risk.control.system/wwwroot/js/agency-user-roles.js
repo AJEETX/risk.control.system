@@ -2,7 +2,7 @@
     submitHandler: function (form) {
         $.confirm({
             title: "Confirm Edit Role",
-            columnClass: 'medium',
+
             content: "Are you sure to edit?",
             icon: 'fas fa-user-plus',
             type: 'orange',

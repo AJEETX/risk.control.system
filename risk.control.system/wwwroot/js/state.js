@@ -6,7 +6,7 @@
             $.confirm({
                 title: "Confirm  Add New",
                 content: "Are you sure to add?",
-                columnClass: 'medium',
+    
                 icon: 'fas fa-map-marker-alt',
                 type: 'green',
                 closeIcon: true,
