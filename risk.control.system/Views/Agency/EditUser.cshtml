@@ -3,6 +3,7 @@
 @{
     ViewData["Title"] = @Applicationsettings.EDIT;
     var email = Model.Vendor.Email;
+    Layout = "/Views/Shared/AdminLTE/_FormLayout.cshtml";
 }
 <section class="content">
     <form id="create-form" asp-action="EditUser" enctype="multipart/form-data">

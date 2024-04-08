@@ -1,10 +1,5 @@
-﻿@using risk.control.system.Helpers;
-@inject ApplicationDbContext _context
+﻿@inject ApplicationDbContext _context
 @inject SignInManager<ApplicationUser> SignInManager
-@inject UserManager<ApplicationUser> UserManager
-@{
-    ApplicationUser appUser = (await UserManager.GetUserAsync(User));
-}
 <!DOCTYPE html>
 <html>
 
@@ -16,10 +11,9 @@
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <partial name="AdminLTE/_Styles" />
-    <partial name="AdminLTE/_DataTableStylePartial" />
     <partial name="AdminLTE/_Scripts" />
-    <partial name="AdminLTE/_DataTableScriptPartial" />
- 
+    <partial name="AdminLTE/_FormScriptPartial" />
+
 </head>
 
 <body class="hold-transition sidebar-mini">
@@ -30,42 +24,31 @@
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
             var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
 
-            if(companyUser is not null)
+            if (companyUser is not null)
             {
-                <partial name="AdminLTE/_CompanyTopNavigation" model="@appUser" />
-
                 var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
+                <partial name="AdminLTE/_CompanyTopNavigation" model="@company.CanChangePassword" />
+
                 <partial name="AdminLTE/_CompanySidebar" model="@company" />
             }
             else if (vendorUser is not null)
             {
-                <partial name="AdminLTE/_AgencyTopNavigation" model="@appUser" />
-
                 var vendor = _context.Vendor.FirstOrDefault(c => c.VendorId == vendorUser.VendorId);
-                <partial name="AdminLTE/_VendorSidebar" model="@vendor"/>
+                <partial name="AdminLTE/_AgencyTopNavigation" model="@vendor.CanChangePassword" />
+
+                <partial name="AdminLTE/_VendorSidebar" model="@vendor" />
             }
             else
             {
-                <partial name="AdminLTE/_TopNavigation" model="@appUser" />
+                <partial name="AdminLTE/_TopNavigation" />
                 <partial name="AdminLTE/_Sidebar" />
             }
         }
         <div class="content-wrapper content-wrapper-main">
-@*            <div class="content-header">
-                <div class="container-fluid">
-                    <div class="row mb-2">
-                        <div class="col-sm-12">
-                           @Html.BuildBreadcrumbNavigation((List<BreadcrumbItem>)ViewBag.BreadcrumbExtras)
-                        </div>
-                    </div>
-                </div>
-            </div>*@
-            
-            <breadcrumb></breadcrumb>
+            <breadcrumb class="no-print"></breadcrumb>
             <div id="main-content" class="content">
                 <main>
-                    
-                @RenderBody()
+                    @RenderBody()
                 </main>
             </div>
         </div>
@@ -87,7 +70,7 @@
                         <button class="btn btn-secondary" type="button" data-dismiss="modal"><i class="fa fa-window-close"></i> Cancel</button>
                         <form asp-area="" asp-controller="Account" asp-action="Logout" method="get" id="logoutForm">
                             <div class="pull-right">
-                                <button type="submit" class="btn btn-default btn-flat btn-outline-danger"><i class="fa fa-sign-out"></i> Logout</button>
+                                <button id="logout" type="submit" class="btn btn-default btn-flat btn-outline-danger"><i class="fa fa-sign-out"></i> Logout</button>
                             </div>
                         </form>
                     </div>
