@@ -1,5 +1,5 @@
 $(document).ready(function () {
-
+    $('#receipient-email').focus()
     var currentImage = document.getElementById('documentImage0').src;
 
     $("#document").on('change', function () {
@@ -108,6 +108,29 @@ $(document).ready(function () {
             });
         }
     })
+
+
+    $("#receipient-email").autocomplete({
+        source: function (request, response) {
+            $.ajax({
+                url: "/api/MasterData/GetUserBySearch",
+                type: "GET",
+                data: { search: request.term },
+                success: function (data) {
+                    response($.map(data, function (item) {
+                        return { label: item, value: item };
+                    }))
+                }
+            })
+        },
+        messages: {
+            noResults: "",
+            results: function (r) {
+                return r;
+            }
+        },
+        minLength: 3
+    });
 
 
     $('#RawMessage').summernote({
