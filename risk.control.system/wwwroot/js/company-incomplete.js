@@ -1,5 +1,21 @@
 ﻿$(document).ready(function () {
+    $('a#back').attr("href", "/Dashboard/Index");
+    $('a.create-policy').attr("href", "/InsuranceClaims/Index");
+    $('a.create-policy').on('click', function () {
+        $("body").addClass("submit-progress-bg");
+        // Wrap in setTimeout so the UI
+        // can update the spinners
+        setTimeout(function () {
+            $(".submit-progress").removeClass("hidden");
+        }, 1);
+        $('a.create-policy').attr('disabled', 'disabled');
+        $('a.create-policy').html("<i class='fas fa-sync fa-spin'></i> Add New");
 
+        var nodes = document.getElementById("article").getElementsByTagName('*');
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].disabled = true;
+        }
+    });
     $('#view-type a').on('click', function () {
         var id = this.id;
         if (this.id == 'map-type') {
@@ -105,6 +121,8 @@
                     else {
                         buttons += '<a id="edit' + row.id + '" onclick="showedit(`' + row.id + '`)"  href="Details?Id=' + row.id + '" class="active-claims btn btn-xs btn-warning"><i class="fas fa-pencil-alt"></i> Edit</a>&nbsp;'
                     }
+                    buttons += '<a id="details' + row.id + '" onclick="getdetails(`' + row.id + '`)" href="/InsurancePolicy/Delete?Id=' + row.id + '" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i> Delete </a>'
+
                     if (row.autoAllocated) {
 
                     }

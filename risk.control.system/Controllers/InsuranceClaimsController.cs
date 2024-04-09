@@ -29,7 +29,7 @@ namespace risk.control.system.Controllers
             this.notifyService = notifyService;
         }
 
-        [Breadcrumb(" Add New", FromAction = "Index", FromController = typeof(ClaimsInvestigationController))]
+        [Breadcrumb(" Add New", FromAction = "Incomplete", FromController = typeof(ClaimsInvestigationController))]
         public IActionResult Index()
         {
             var claim = new ClaimsInvestigation

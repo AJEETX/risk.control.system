@@ -420,7 +420,7 @@ namespace risk.control.system.Controllers
         }
 
 
-        [Breadcrumb("Details", FromAction = "Incomplete")]
+        [Breadcrumb("Details", FromAction = "Index", FromController = typeof(InsuranceClaimsController))]
         public async Task<IActionResult> Details(string id)
         {
             try

@@ -36,7 +36,7 @@ namespace risk.control.system.Controllers
             this.investigationReportService = investigationReportService;
         }
 
-        [Breadcrumb(title: " Add Policy", FromAction = "Incomplete", FromController = typeof(ClaimsInvestigationController))]
+        [Breadcrumb(title: " Add Policy", FromAction = "Index", FromController = typeof(InsuranceClaimsController))]
         public IActionResult CreatePolicy()
         {
             try
@@ -68,7 +68,7 @@ namespace risk.control.system.Controllers
             }
         }
 
-        [Breadcrumb(title: " Edit Policy", FromAction = "Incomplete", FromController = typeof(ClaimsInvestigationController))]
+        [Breadcrumb(title: " Edit Policy", FromAction = "Index", FromController = typeof(InsuranceClaimsController))]
         public async Task<IActionResult> EditPolicy(string id)
         {
             try
@@ -142,7 +142,41 @@ namespace risk.control.system.Controllers
             
         }
 
-        [Breadcrumb(title: " Delete", FromAction = "Incomplete", FromController = typeof(ClaimsInvestigationController))]
+        [Breadcrumb(title: " Delete", FromAction = "Draft", FromController = typeof(ClaimsInvestigationController))]
+        public async Task<IActionResult> DeleteAuto(string id)
+        {
+            try
+            {
+                if (id == null || _context.ClaimsInvestigation == null)
+                {
+                    notifyService.Error("Not Found!!!..Contact IT support");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (currentUserEmail == null)
+                {
+                    notifyService.Error("Not Found!!!..Contact IT support");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var model = await investigationReportService.GetClaimDetails(currentUserEmail, id);
+
+                if (model == null)
+                {
+                    notifyService.Error("Not Found!!!..Contact IT support");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+
+                return View(model);
+            }
+            catch (Exception)
+            {
+                notifyService.Error("OOPS!!!..Contact IT support");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+
+        }
+
+        [Breadcrumb(title: " Delete", FromAction = "Assigner", FromController = typeof(ClaimsInvestigationController))]
         public async Task<IActionResult> DeleteManual(string id)
         {
             try
@@ -176,9 +210,9 @@ namespace risk.control.system.Controllers
             
         }
 
-        [HttpPost, ActionName("DeleteManual")]
+        [HttpPost, ActionName("DeleteAuto")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteManualConfirmed(ClaimTransactionModel model)
+        public async Task<IActionResult> DeleteAutoConfirmed(ClaimTransactionModel model)
         {
             try
             {
@@ -206,7 +240,7 @@ namespace risk.control.system.Controllers
                 _context.ClaimsInvestigation.Update(claimsInvestigation);
                 await _context.SaveChangesAsync();
                 notifyService.Custom("Claim deleted", 3, "red", "far fa-file-powerpoint");
-                return RedirectToAction(nameof(ClaimsInvestigationController.Assigner), "ClaimsInvestigation");
+                return RedirectToAction(nameof(ClaimsInvestigationController.Draft), "ClaimsInvestigation");
             }
             catch (Exception)
             {
@@ -214,6 +248,46 @@ namespace risk.control.system.Controllers
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
             
+        }
+
+        [HttpPost, ActionName("DeleteManual")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteManualConfirmed(ClaimTransactionModel model)
+        {
+            try
+            {
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (currentUserEmail == null)
+                {
+                    notifyService.Error("Not Found!!!..Contact IT support");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                if (model is null)
+                {
+                    notifyService.Error("Not Found!!!..Contact IT support");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var claimsInvestigation = await _context.ClaimsInvestigation.FindAsync(model.ClaimsInvestigation.ClaimsInvestigationId);
+                if (claimsInvestigation == null)
+                {
+                    notifyService.Error("Not Found!!!..Contact IT support");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+
+                claimsInvestigation.Updated = DateTime.UtcNow;
+                claimsInvestigation.UpdatedBy = currentUserEmail;
+                claimsInvestigation.Deleted = true;
+                _context.ClaimsInvestigation.Update(claimsInvestigation);
+                await _context.SaveChangesAsync();
+                notifyService.Custom("Claim deleted", 3, "red", "far fa-file-powerpoint");
+                return RedirectToAction(nameof(ClaimsInvestigationController.Assigner), "ClaimsInvestigation");
+            }
+            catch (Exception)
+            {
+                notifyService.Error("OOPS!!!..Contact IT support");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+
         }
         // POST: ClaimsInvestigation/Delete/5
         [HttpPost, ActionName("Delete")]
@@ -246,7 +320,7 @@ namespace risk.control.system.Controllers
                 _context.ClaimsInvestigation.Update(claimsInvestigation);
                 await _context.SaveChangesAsync();
                 notifyService.Custom("Claim deleted", 3, "red", "far fa-file-powerpoint");
-                return RedirectToAction(nameof(ClaimsInvestigationController.Assigner), "ClaimsInvestigation");
+                return RedirectToAction(nameof(ClaimsInvestigationController.Incomplete), "ClaimsInvestigation");
             }
             catch (Exception)
             {
