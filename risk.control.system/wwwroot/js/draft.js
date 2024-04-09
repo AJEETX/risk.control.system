@@ -171,8 +171,8 @@
             e.preventDefault();
             $.alert({
                 title: "Claim Assign<span class='badge badge-light'>(auto)</span> !",
-                content: "Please select Claim<span class='badge badge-light'>(s)</span> to Assign<span class='badge badge-light'>(auto)</span> !",
-                icon: 'fas fa-exclamation-triangle fa-sync',
+                content: "Please select Claim<span class='badge badge-light'>(s)</span> to Assign<span class='badge badge-light'>(auto)</span>!",
+                icon: 'fas fa-random fa-sync',
                 type: 'red',
                 closeIcon: true,
                 buttons: {
@@ -188,7 +188,7 @@
             $.confirm({
                 title: "Confirm Assign<span class='badge badge-light'>(auto)</span>",
                 content: "Are you sure to Assign<span class='badge badge-light'>(auto)</span> ?",
-                icon: 'fas fa-external-link-alt',
+                icon: 'fas fa-random',
                 type: 'orange',
                 closeIcon: true,
                 buttons: {

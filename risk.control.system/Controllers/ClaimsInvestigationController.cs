@@ -105,7 +105,7 @@ namespace risk.control.system.Controllers
 
         }
 
-        [Breadcrumb(" Assign(manual)", FromAction = "Index")]
+        [Breadcrumb(" Assign", FromAction = "Index")]
         public IActionResult Assigner()
         {
             try

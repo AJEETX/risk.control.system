@@ -83,14 +83,13 @@ namespace risk.control.system.Services
             data.FirstBlockCount = claimsIncomplete.Count;
             data.FirstBlockUrl = "/ClaimsInvestigation/Incomplete";
 
+                data.SecondBlockName = "Assign";
             if (company.AutoAllocation)
             {
-                data.SecondBlockName = "Assign(auto/manual)";
                 data.SecondBlockUrl = "/ClaimsInvestigation/Draft";
             }
             else
             {
-                data.SecondBlockName = "Assign(manual)";
                 data.SecondBlockUrl = "/ClaimsInvestigation/Assigner";
             }
             data.SecondBlockCount = claimsAssignManual.Count;
