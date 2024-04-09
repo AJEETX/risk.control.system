@@ -7,221 +7,256 @@
 
 <section class="content">
     <div id="article" class="card card-secondary">
-        <input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail?.CustomerDetailId" />
-        <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
-        <input type="hidden" id="beneficiaryId" value="@Model.Location?.CaseLocationId" />
-        <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-newspaper"></i> Details</h3>
-        </div>
-        @{
-            string address = string.Empty;
-            string baddress = string.Empty;
-            int currentAgeinYrs = 0;
-            int currentBAgeinYrs = 0;
-            bool policyExist = true;
-            bool customerExist = Model.ClaimsInvestigation.CustomerDetail != null;
-            bool beneficiaryExist = Model.Location != null;
-            string customerProgressbarMessage = "add customer";
-            string beneficiaryProgressbarMessage = "beneficiary";
-            if (Model.ClaimsInvestigation != null && Model.ClaimsInvestigation.CustomerDetail != null)
-            {
-                address = @Model.ClaimsInvestigation?.CustomerDetail.Addressline + " " + @Model.ClaimsInvestigation?.CustomerDetail.District.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.State.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.Country.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.PinCode.Code;
-                baddress = @Model.Location != null ? @Model.Location?.Addressline + " " +
-                @Model.Location?.District?.Name + " " + @Model.Location?.State?.Name + " " +
-                @Model.Location?.Country?.Name + " " + @Model.Location?.PinCode?.Code : string.Empty;
-                if (Model.ClaimsInvestigation?.CustomerDetail.CustomerDateOfBirth != null)
+        <form id="create-form" method="post" asp-controller="ClaimsInvestigationPost" asp-action="Assign">
+            <input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail?.CustomerDetailId" />
+            <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
+            <input type="hidden" id="beneficiaryId" value="@Model.Location?.CaseLocationId" />
+            <input type="hidden" name="claims" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-newspaper"></i> Details</h3>
+            </div>
+            @{
+                string address = string.Empty;
+                string baddress = string.Empty;
+                int currentAgeinYrs = 0;
+                int currentBAgeinYrs = 0;
+                bool policyExist = true;
+                bool customerExist = Model.ClaimsInvestigation.CustomerDetail != null;
+                bool beneficiaryExist = Model.Location != null;
+                string customerProgressbarMessage = "add customer";
+                string beneficiaryProgressbarMessage = "beneficiary";
+                if (Model.ClaimsInvestigation != null && Model.ClaimsInvestigation.CustomerDetail != null)
                 {
-                    var age = DateTime.Now.Subtract(Model.ClaimsInvestigation.CustomerDetail.CustomerDateOfBirth).TotalDays;
-                    currentAgeinYrs = (int)age / 365;
+                    address = @Model.ClaimsInvestigation?.CustomerDetail.Addressline + " " + @Model.ClaimsInvestigation?.CustomerDetail.District.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.State.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.Country.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.PinCode.Code;
+                    baddress = @Model.Location != null ? @Model.Location?.Addressline + " " +
+                    @Model.Location?.District?.Name + " " + @Model.Location?.State?.Name + " " +
+                    @Model.Location?.Country?.Name + " " + @Model.Location?.PinCode?.Code : string.Empty;
+                    if (Model.ClaimsInvestigation?.CustomerDetail.CustomerDateOfBirth != null)
+                    {
+                        var age = DateTime.Now.Subtract(Model.ClaimsInvestigation.CustomerDetail.CustomerDateOfBirth).TotalDays;
+                        currentAgeinYrs = (int)age / 365;
+                    }
+                    if (Model.Location?.BeneficiaryDateOfBirth != null)
+                    {
+                        var age = DateTime.Now.Subtract(Model.Location.BeneficiaryDateOfBirth).TotalDays;
+                        currentBAgeinYrs = (int)age / 365;
+                    }
                 }
-                if (Model.Location?.BeneficiaryDateOfBirth != null)
+                if (Model.ClaimsInvestigation.CustomerDetail != null)
                 {
-                    var age = DateTime.Now.Subtract(Model.Location.BeneficiaryDateOfBirth).TotalDays;
-                    currentBAgeinYrs = (int)age / 365;
+                    customerExist = true;
+                    customerProgressbarMessage = "customer";
                 }
-            }
-            if (Model.ClaimsInvestigation.CustomerDetail != null)
-            {
-                customerExist = true;
-                customerProgressbarMessage = "customer";
-            }
-            if (Model.Location?.CaseLocationId > 0)
-            {
-                beneficiaryExist = true;
-                beneficiaryProgressbarMessage = "edit beneficiary";
-            }
-            string customerProgressColor = "steps2";
-            string customerLineColor = "line";
-            if (Model.ClaimsInvestigation.PolicyDetail != null)
-            {
-                customerLineColor = "line0";
-            }
-            if (@customerExist)
-            {
-                customerProgressColor = "steps";
-                customerLineColor = "line1";
-            }
-            string benficiaryProgressColor = "steps3";
-            string beneficiaryLineColor = "line";
+                if (Model.Location?.CaseLocationId > 0)
+                {
+                    beneficiaryExist = true;
+                    beneficiaryProgressbarMessage = "edit beneficiary";
+                }
+                string customerProgressColor = "steps2";
+                string customerLineColor = "line";
+                if (Model.ClaimsInvestigation.PolicyDetail != null)
+                {
+                    customerLineColor = "line0";
+                }
+                if (@customerExist)
+                {
+                    customerProgressColor = "steps";
+                    customerLineColor = "line1";
+                }
+                string benficiaryProgressColor = "steps3";
+                string beneficiaryLineColor = "line";
 
-            if (@customerExist)
-            {
-                benficiaryProgressColor = "steps2";
-                beneficiaryLineColor = "line0";
-            }
-            if (@customerExist && @beneficiaryExist)
-            {
-                benficiaryProgressColor = "steps";
-                beneficiaryLineColor = "line1";
-            }
+                if (@customerExist)
+                {
+                    benficiaryProgressColor = "steps2";
+                    beneficiaryLineColor = "line0";
+                }
+                if (@customerExist && @beneficiaryExist)
+                {
+                    benficiaryProgressColor = "steps";
+                    beneficiaryLineColor = "line1";
+                }
 
-            <div class="container d-flex justify-content-center align-items-center">
-                <div class="progresses">
-                    <div class="steps">
-                        <span> <i class="far fa-file-powerpoint"></i></span>
-                    </div>
-                    <span class="@customerLineColor"></span>
-                    <div class="@customerProgressColor">
-                        <span class="font-weight-bold"><i class="fa fa-user-plus"></i></span>
-                    </div>
-                    <span class="@beneficiaryLineColor"></span>
-                    <div class="@benficiaryProgressColor">
-                        <span class="font-weight-bold"><i class="fas fa-user-tie"></i></span>
+                <div class="container d-flex justify-content-center align-items-center">
+                    <div class="progresses">
+                        <div class="steps">
+                            <span> <i class="far fa-file-powerpoint"></i></span>
+                        </div>
+                        <span class="@customerLineColor"></span>
+                        <div class="@customerProgressColor">
+                            <span class="font-weight-bold"><i class="fa fa-user-plus"></i></span>
+                        </div>
+                        <span class="@beneficiaryLineColor"></span>
+                        <div class="@benficiaryProgressColor">
+                            <span class="font-weight-bold"><i class="fas fa-user-tie"></i></span>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
-                        <div class="card bg-light d-flex flex-fill">
-                            <div class="card-header text-muted border-bottom-0">
-                                <i class="far fa-file-powerpoint"></i> Policy Details
-                            </div>
-                            <div class="progress">
-                                <i class="far fa-bookmark bookmark-green"></i>
-                                <div class="progress-bar" role="progressbar" style="width:100%;background-color:green;">
-                                    <i class="far fa-file-powerpoint"></i>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
+                            <div class="card bg-light d-flex flex-fill">
+                                <div class="card-header text-muted border-bottom-0">
+                                    <i class="far fa-file-powerpoint"></i> Policy Details
                                 </div>
-                            </div>
-                            <div class="card-body">
-                                <div class="submit-progress hidden">
-                                    <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
-                                </div>
-                                <div class="row">
-                                    <div class="col-7">
-                                        <h2 class="lead"><b>@Model.ClaimsInvestigation?.PolicyDetail.ContractNumber</b></h2>
-                                        <p class="text-muted text-sm">
-                                            <b>Policy Type: </b>@Model.ClaimsInvestigation?.PolicyDetail.LineOfBusiness.Name
-                                        </p>
-                                        <ul class="ml-4 mb-0 fa-ul text-muted">
-                                            <li class="small">
-                                                <span class="fa-li">
-                                                    <i class="fas fa-money-bill-wave"></i>
-                                                </span>
-                                                Claim Type: <i class="fas fa-rupee-sign"></i>@Model.ClaimsInvestigation?.PolicyDetail.ClaimType
-                                            </li>
-                                            <li class="small">
-                                                <span class="fa-li">
-                                                    <i class="fas fa-money-bill-wave"></i>
-                                                </span>
-                                                Amount: <i class="fas fa-rupee-sign"></i>@Model.ClaimsInvestigation?.PolicyDetail.SumAssuredValue
-                                            </li>
-                                            <li class="small">
-                                                <span class="fa-li">
-                                                    <i class="fas fa-bolt"></i>
-                                                </span>
-                                                Cause: @Model.ClaimsInvestigation?.PolicyDetail.CauseOfLoss
-                                            </li>
-                                            <li class="small">
-                                                <span class="fa-li">
-                                                    <i class="fas fa-tools"></i>
-                                                </span>
-                                                Service: @Model.ClaimsInvestigation?.PolicyDetail.InvestigationServiceType.Name
-                                            </li>
-                                            <li class="small">
-                                                <span class="fa-li">
-                                                    <i class="fas fa-money-check-alt"></i>
-                                                </span>
-                                                Budget center: @Model.ClaimsInvestigation?.PolicyDetail.CostCentre.Name
-                                            </li>
-                                            <li class="small">
-                                                <span class="fa-li">
-                                                    <i class="fas fa-sun"></i>
-                                                </span>
-                                                Reason: @Model.ClaimsInvestigation?.PolicyDetail.CaseEnabler.Name;
-                                            </li>
-                                            <li class="small">
-                                                <span class="fa-li">
-                                                    <i class="far fa-clock"></i>
-                                                </span>
-                                                Issue Date: @Model.ClaimsInvestigation?.PolicyDetail.ContractIssueDate.ToString("dd-MMM-yyyy")
-                                            </li>
-                                            <li class="small">
-                                                <span class="fa-li">
-                                                    <i class="far fa-clock"></i>
-                                                </span>
-                                                Incidence Date: @Model.ClaimsInvestigation?.PolicyDetail.DateOfIncident.ToString("dd-MMM-yyyy")
-                                            </li>
-                                        </ul>
+                                <div class="progress">
+                                    <i class="far fa-bookmark bookmark-green"></i>
+                                    <div class="progress-bar" role="progressbar" style="width:100%;background-color:green;">
+                                        <i class="far fa-file-powerpoint"></i>
                                     </div>
-                                    <div class="col-5 text-center">
-                                        <p class="text-muted text-sm">
+                                </div>
+                                <div class="card-body">
+                                    <div class="submit-progress hidden">
+                                        <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-7">
+                                            <h2 class="lead"><b>@Model.ClaimsInvestigation?.PolicyDetail.ContractNumber</b></h2>
+                                            <p class="text-muted text-sm">
+                                                <b>Policy Type: </b>@Model.ClaimsInvestigation?.PolicyDetail.LineOfBusiness.Name
+                                            </p>
+                                            <ul class="ml-4 mb-0 fa-ul text-muted">
+                                                <li class="small">
+                                                    <span class="fa-li">
+                                                        <i class="fas fa-money-bill-wave"></i>
+                                                    </span>
+                                                    Claim Type: <i class="fas fa-rupee-sign"></i>@Model.ClaimsInvestigation?.PolicyDetail.ClaimType
+                                                </li>
+                                                <li class="small">
+                                                    <span class="fa-li">
+                                                        <i class="fas fa-money-bill-wave"></i>
+                                                    </span>
+                                                    Amount: <i class="fas fa-rupee-sign"></i>@Model.ClaimsInvestigation?.PolicyDetail.SumAssuredValue
+                                                </li>
+                                                <li class="small">
+                                                    <span class="fa-li">
+                                                        <i class="fas fa-bolt"></i>
+                                                    </span>
+                                                    Cause: @Model.ClaimsInvestigation?.PolicyDetail.CauseOfLoss
+                                                </li>
+                                                <li class="small">
+                                                    <span class="fa-li">
+                                                        <i class="fas fa-tools"></i>
+                                                    </span>
+                                                    Service: @Model.ClaimsInvestigation?.PolicyDetail.InvestigationServiceType.Name
+                                                </li>
+                                                <li class="small">
+                                                    <span class="fa-li">
+                                                        <i class="fas fa-money-check-alt"></i>
+                                                    </span>
+                                                    Budget center: @Model.ClaimsInvestigation?.PolicyDetail.CostCentre.Name
+                                                </li>
+                                                <li class="small">
+                                                    <span class="fa-li">
+                                                        <i class="fas fa-sun"></i>
+                                                    </span>
+                                                    Reason: @Model.ClaimsInvestigation?.PolicyDetail.CaseEnabler.Name;
+                                                </li>
+                                                <li class="small">
+                                                    <span class="fa-li">
+                                                        <i class="far fa-clock"></i>
+                                                    </span>
+                                                    Issue Date: @Model.ClaimsInvestigation?.PolicyDetail.ContractIssueDate.ToString("dd-MMM-yyyy")
+                                                </li>
+                                                <li class="small">
+                                                    <span class="fa-li">
+                                                        <i class="far fa-clock"></i>
+                                                    </span>
+                                                    Incidence Date: @Model.ClaimsInvestigation?.PolicyDetail.DateOfIncident.ToString("dd-MMM-yyyy")
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-5 text-center">
+                                            <p class="text-muted text-sm">
 
-                                        </p>
-                                        <p class="text-muted text-sm">
-                                            @if (Model?.ClaimsInvestigation?.PolicyDetail.DocumentImage is not null)
+                                            </p>
+                                            <p class="text-muted text-sm">
+                                                @if (Model?.ClaimsInvestigation?.PolicyDetail.DocumentImage is not null)
+                                                {
+                                                    <img id="documentImage" class="img-fluid" src="data:image/*;base64,@(Convert.ToBase64String(Model?.ClaimsInvestigation?.PolicyDetail.DocumentImage))">
+                                                }
+                                                else
+                                                {
+                                                    <img id="documentImage" alt="user-avatar"
+                                                         class="img-circle img-fluid form-Image" src=@Applicationsettings.NO_POLICY_IMAGE>
+                                                }
+                                            </p>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-footer">
+                                    <div class="text-right">
+                                        @{
+                                            if (Model.ClaimsInvestigation != null)
                                             {
-                                                <img id="documentImage" class="img-fluid" src="data:image/*;base64,@(Convert.ToBase64String(Model?.ClaimsInvestigation?.PolicyDetail.DocumentImage))">
+                                                <input type="hidden" asp-for="ClaimsInvestigation.ClaimsInvestigationId" />
+                                                <a id="edit-policy" class="btn btn-warning" asp-controller="InsurancePolicy" asp-action="EditPolicy" asp-route-id="@Model.ClaimsInvestigation.ClaimsInvestigationId"><i class="far fa-file-powerpoint"></i>  Edit Policy</a>
                                             }
                                             else
                                             {
-                                                <img id="documentImage" alt="user-avatar"
-                                                     class="img-circle img-fluid form-Image" src=@Applicationsettings.NO_POLICY_IMAGE>
+                                                <a class="btn btn-success" asp-controller="InsurancePolicy" asp-action="CreatePolicy"><i class="far fa-file-powerpoint"></i> Add Policy</a>
                                             }
-                                        </p>
-
+                                        }
                                     </div>
                                 </div>
                             </div>
-                            <div class="card-footer">
-                                <div class="text-right">
-                                    @{
-                                        if (Model.ClaimsInvestigation != null)
-                                        {
-                                            <input type="hidden" asp-for="ClaimsInvestigation.ClaimsInvestigationId" />
-                                            <a id="edit-policy" class="btn btn-warning" asp-controller="InsurancePolicy" asp-action="EditPolicy" asp-route-id="@Model.ClaimsInvestigation.ClaimsInvestigationId"><i class="far fa-file-powerpoint"></i>  Edit Policy</a>
-                                        }
-                                        else
-                                        {
-                                            <a class="btn btn-success" asp-controller="InsurancePolicy" asp-action="CreatePolicy"><i class="far fa-file-powerpoint"></i> Add Policy</a>
-                                        }
-                                    }
+
+                        </div>
+
+                        <partial name="_CustomerBeneficiary" model="@Model" />
+                        @if (customerExist && beneficiaryExist)
+                        {
+                            <div class="col-12  d-flex align-items-stretch flex-colum">
+                                <div class="card bg-light d-flex flex-fill">
+                                    <div class="card-body">
+                                        <i class="far fa-file-powerpoint"></i>
+                                        <span class="badge badge-light"> Details completed now. !!! </span>
+                                        <i class="far fa-thumbs-up"></i>
+                                        <span class="badge badge-light"> <i class="fas fa-random"></i> Assign it now by clicking on the BUTTONS</span>
+                                        <span class="badge badge-light"> Or the claim moves to </span>
+                                        <i class="fas fa-random"></i>
+                                        <span class="badge badge-light">  Assign Section to Action later.</span>
+                                        
+                                        
+                                    </div>
+
                                 </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <div class="card-footer">
+                    <div class="row  float-right">
+
+                        <div class="col-md-12">
+                            <div class="form-input">
+                                <a id="back" asp-action="Incomplete" class="btn btn-outline-secondary"><span class="badge badge-light"> <i class="fas fa-arrow-left"></i> </span> Back </a>
+
+                                @if (customerExist && beneficiaryExist && !Model.Assigned && Model.AutoAllocation)
+                                {
+
+                                    <button type="submit" id="assign-list" class="btn btn-warning">
+                                        <span class="badge badge-warning"> <i class="fas fa-random"></i></span>Assign<span class="badge badge-warning">auto</span>
+                                    </button>
+                                    <a id="assign-manual-list" asp-action="EmpanelledVendors" asp-route-selectedcase="@Model.ClaimsInvestigation.ClaimsInvestigationId" class="btn btn-danger">
+                                        <span class="badge badge-danger"> <i class="fas fa-external-link-alt"></i></span>Assign
+                                    </a>
+                                }
+                                else if (customerExist && beneficiaryExist && Model.Assigned || (customerExist && beneficiaryExist && !Model.AutoAllocation))
+                                {
+                                    <a id="assign-manual-list" asp-action="EmpanelledVendors" asp-route-selectedcase="@Model.ClaimsInvestigation.ClaimsInvestigationId" class="btn btn-danger">
+                                        <span class="badge badge-danger"> <i class="fas fa-external-link-alt"></i></span>Assign
+                                    </a>
+                                }
+
                             </div>
                         </div>
                     </div>
-
-                    <partial name="_CustomerBeneficiary" model="@Model" />
-
                 </div>
-            </div>
-            <div class="card-footer">
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="form-input">
-                            <a id="back" asp-action="Incomplete" class="btn btn-outline-secondary"><span class="badge badge-light"> <i class="fas fa-arrow-left"></i> </span> Back </a>
-                            @if (customerExist && beneficiaryExist)
-                            {
-                                <span class="badge badge-light"> <i class="far fa-thumbs-up"></i> Details completed now</span>
-                                <span class="badge badge-light"> <i class="far fa-file-powerpoint"></i> Claim now moved to <i class="fas fa-random"></i>Assign </span>
-                            }
-                            
-
-                        </div>
-                    </div>
-                </div>
-            </div>
-        }
+            }
+        </form>
     </div>
 </section>
 

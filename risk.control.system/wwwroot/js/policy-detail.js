@@ -79,21 +79,6 @@ $(document).ready(function () {
         }
     });
 
-    $('#assign-list').on('click', function () {
-        $("body").addClass("submit-progress-bg");
-        // Wrap in setTimeout so the UI
-        // can update the spinners
-        setTimeout(function () {
-            $(".submit-progress").removeClass("hidden");
-        }, 1);
-        $('#assign-list').attr('disabled', 'disabled');
-        $('#assign-list').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Assign <span class='badge badge-warning'>auto</span>");
-
-        var nodes = document.getElementById("body").getElementsByTagName('*');
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].disabled = true;
-        }
-    });
     $('#assign-manual-list').on('click', function () {
         $("body").addClass("submit-progress-bg");
         // Wrap in setTimeout so the UI
@@ -110,48 +95,34 @@ $(document).ready(function () {
         }
     });
 
-    $('#active-list').on('click', function () {
-        $("body").addClass("submit-progress-bg");
-        // Wrap in setTimeout so the UI
-        // can update the spinners
-        setTimeout(function () {
-            $(".submit-progress").removeClass("hidden");
-        }, 1);
-        $('#active-list').attr('disabled', 'disabled');
-        $('#active-list').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Active");
-
-        var nodes = document.getElementById("body").getElementsByTagName('*');
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].disabled = true;
-        }
-    });
-
     var askConfirmation = true;
-    $('#create-form').submit(function (e) {
+    $('#assign-list').on('click', function (e) {
         if (askConfirmation) {
             e.preventDefault();
             $.confirm({
-                title: "Confirm <span class='fas fa-thumbtack'></span> <b> <u><i> Lock </i></u></b> Details",
-                content: "Are you sure?",
-    
+                title: "Confirm Assign<span class='badge badge-light'>(auto)</span>",
+                content: "Are you sure to Assign<span class='badge badge-light'>(auto)</span> ?",
+                icon: 'fas fa-random',
+                type: 'orange',
                 closeIcon: true,
-                type: 'red',
                 buttons: {
                     confirm: {
-                        text: "<span class='fas fa-thumbtack'></span> <u><i> Lock </i></u></b> Details",
-                        btnClass: 'btn-danger',
+                        text: "Assign <span class='badge badge-warning'>(auto)</span>",
+                        btnClass: 'btn-warning',
                         action: function () {
                             askConfirmation = false;
+
                             $("body").addClass("submit-progress-bg");
                             // Wrap in setTimeout so the UI
                             // can update the spinners
                             setTimeout(function () {
                                 $(".submit-progress").removeClass("hidden");
                             }, 1);
-                            $('.card-footer a').attr('disabled', 'disabled');
-                            $('.card-footer a').html("<i class='fas fa-sync' aria-hidden='true'></i> .......");
+                            $('#assign-list').attr('disabled', 'disabled');
+                            $('#assign-list').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Assign");
 
-                            var nodes = document.getElementById("article").getElementsByTagName('*');
+                            $('#create-form').submit();
+                            var nodes = document.getElementById("fullpage").getElementsByTagName('*');
                             for (var i = 0; i < nodes.length; i++) {
                                 nodes[i].disabled = true;
                             }

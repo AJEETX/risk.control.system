@@ -7,6 +7,7 @@
 
 <section class="content">
     <div id="article" class="card card-secondary">
+        <form id="create-form" method="post" asp-controller="ClaimsInvestigationPost" asp-action="Assign">
         <input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail?.CustomerDetailId" />
         <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
         <input type="hidden" id="beneficiaryId" value="@Model.Location?.CaseLocationId" />
@@ -74,7 +75,7 @@
                 benficiaryProgressColor = "steps";
                 beneficiaryLineColor = "line1";
             }
-
+            }
             <div class="container d-flex justify-content-center align-items-center">
                 <div class="progresses">
                     <div class="steps">
@@ -205,18 +206,22 @@
                 </div>
             </div>
             <div class="card-footer">
-                <div class="row">
+                <div class="row  float-right">
                     <div class="col-md-12">
                         <div class="form-input">
                             <a id="back" asp-action="Assigner" class="btn btn-outline-secondary"><span class="badge badge-light"> <i class="fas fa-arrow-left"></i> </span> Back </a>
-
-     
-
-                        </div>
+                            @if (customerExist && beneficiaryExist)
+                            {
+                            <a id="assign-manual-list" asp-action="EmpanelledVendors" asp-route-selectedcase="@Model.ClaimsInvestigation.ClaimsInvestigationId" class="btn btn-danger">
+                                <span class="badge badge-danger"> <i class="fas fa-external-link-alt"></i></span>Assign
+                            </a>
+                            }
                     </div>
                 </div>
+                </div>
             </div>
-        }
+                
+        </form>
     </div>
 </section>
 
