@@ -102,7 +102,7 @@ $(document).ready(function () {
             $(".submit-progress").removeClass("hidden");
         }, 1);
         $('#assign-manual-list').attr('disabled', 'disabled');
-        $('#assign-manual-list').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Assign<span class='badge badge-danger'>manual</span>");
+        $('#assign-manual-list').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Assign");
 
         var nodes = document.getElementById("body").getElementsByTagName('*');
         for (var i = 0; i < nodes.length; i++) {

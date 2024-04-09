@@ -107,6 +107,82 @@ namespace risk.control.system.Controllers
             
         }
 
+        [Breadcrumb(title: " Edit Policy", FromAction = "DetailsAuto", FromController = typeof(ClaimsInvestigationController))]
+        public async Task<IActionResult> EditPolicyAuto(string id)
+        {
+            try
+            {
+                if (id == null || _context.ClaimsInvestigation == null)
+                {
+                    notifyService.Error("Not Found!!!..Contact IT support");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+
+                var claimsInvestigation = await _context.ClaimsInvestigation
+                    .Include(c => c.PolicyDetail)
+                    .Include(c => c.CustomerDetail)
+                    .FirstOrDefaultAsync(i => i.ClaimsInvestigationId == id);
+
+                if (claimsInvestigation == null)
+                {
+                    notifyService.Error("Not Found!!!..Contact IT support");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name", claimsInvestigation.PolicyDetail.ClientCompanyId);
+                ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType.Where(i =>
+                i.LineOfBusinessId == claimsInvestigation.PolicyDetail.LineOfBusinessId).OrderBy(s => s.Code), "InvestigationServiceTypeId", "Name", claimsInvestigation.PolicyDetail.InvestigationServiceTypeId);
+                ViewData["CaseEnablerId"] = new SelectList(_context.CaseEnabler.OrderBy(s => s.Code), "CaseEnablerId", "Name", claimsInvestigation.PolicyDetail.CaseEnablerId);
+                ViewData["CostCentreId"] = new SelectList(_context.CostCentre.OrderBy(s => s.Code), "CostCentreId", "Name", claimsInvestigation.PolicyDetail.CostCentreId);
+                ViewData["InvestigationCaseStatusId"] = new SelectList(_context.InvestigationCaseStatus, "InvestigationCaseStatusId", "Name", claimsInvestigation.InvestigationCaseStatusId);
+                ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", claimsInvestigation.PolicyDetail.LineOfBusinessId);
+
+                return View(claimsInvestigation);
+            }
+            catch (Exception)
+            {
+                notifyService.Error("OOPS!!!..Contact IT support");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+
+        }
+        [Breadcrumb(title: " Edit Policy", FromAction = "DetailsManual", FromController = typeof(ClaimsInvestigationController))]
+        public async Task<IActionResult> EditPolicyManual(string id)
+        {
+            try
+            {
+                if (id == null || _context.ClaimsInvestigation == null)
+                {
+                    notifyService.Error("Not Found!!!..Contact IT support");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+
+                var claimsInvestigation = await _context.ClaimsInvestigation
+                    .Include(c => c.PolicyDetail)
+                    .Include(c => c.CustomerDetail)
+                    .FirstOrDefaultAsync(i => i.ClaimsInvestigationId == id);
+
+                if (claimsInvestigation == null)
+                {
+                    notifyService.Error("Not Found!!!..Contact IT support");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name", claimsInvestigation.PolicyDetail.ClientCompanyId);
+                ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType.Where(i =>
+                i.LineOfBusinessId == claimsInvestigation.PolicyDetail.LineOfBusinessId).OrderBy(s => s.Code), "InvestigationServiceTypeId", "Name", claimsInvestigation.PolicyDetail.InvestigationServiceTypeId);
+                ViewData["CaseEnablerId"] = new SelectList(_context.CaseEnabler.OrderBy(s => s.Code), "CaseEnablerId", "Name", claimsInvestigation.PolicyDetail.CaseEnablerId);
+                ViewData["CostCentreId"] = new SelectList(_context.CostCentre.OrderBy(s => s.Code), "CostCentreId", "Name", claimsInvestigation.PolicyDetail.CostCentreId);
+                ViewData["InvestigationCaseStatusId"] = new SelectList(_context.InvestigationCaseStatus, "InvestigationCaseStatusId", "Name", claimsInvestigation.InvestigationCaseStatusId);
+                ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", claimsInvestigation.PolicyDetail.LineOfBusinessId);
+
+                return View(claimsInvestigation);
+            }
+            catch (Exception)
+            {
+                notifyService.Error("OOPS!!!..Contact IT support");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+
+        }
         // GET: ClaimsInvestigation/Delete/5
         [Breadcrumb(title: " Delete", FromAction = "Incomplete", FromController = typeof(ClaimsInvestigationController))]
         public async Task<IActionResult> Delete(string id)

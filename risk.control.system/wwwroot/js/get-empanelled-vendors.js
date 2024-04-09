@@ -49,15 +49,15 @@
         if (askConfirmation) {
             e.preventDefault();
             $.confirm({
-                title: "Confirm Assign<span class='badge badge-light'>manual</span>",
-                content: "Are you sure to assign<span class='badge badge-light'>manual</span>?",
+                title: "Confirm Assign",
+                content: "Are you sure to assign?",
     
                 icon: 'fas fa-external-link-alt',
                 type: 'red',
                 closeIcon: true,
                 buttons: {
                     confirm: {
-                        text: "Assign<span class='badge badge-danger'>manual</span>",
+                        text: "Assign",
                         btnClass: 'btn-danger',
                         action: function () {
                             askConfirmation = false;

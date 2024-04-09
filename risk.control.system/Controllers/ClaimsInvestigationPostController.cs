@@ -275,7 +275,7 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [HttpPost]
-        public async Task<IActionResult> EditPolicy(string claimsInvestigationId, ClaimsInvestigation claimsInvestigation)
+        public async Task<IActionResult> EditPolicy(string claimsInvestigationId, ClaimsInvestigation claimsInvestigation, string claimtype)
         {
             try
             {
@@ -306,8 +306,22 @@ namespace risk.control.system.Controllers
                 var claim = await claimsInvestigationService.EdiPolicy(userEmail, claimsInvestigation, documentFile);
 
                 notifyService.Custom($"Policy #{claim.PolicyDetail.ContractNumber} edited successfully", 3, "orange", "far fa-file-powerpoint");
+                if(string.IsNullOrWhiteSpace(claimtype) || claimtype.Equals("draft", StringComparison.OrdinalIgnoreCase))
+                {
+                    return RedirectToAction(nameof(ClaimsInvestigationController.Details), "ClaimsInvestigation", new { id = claim.ClaimsInvestigationId });
+                }
 
+                else if( claimtype.Equals("auto", StringComparison.OrdinalIgnoreCase))
+                {
+                    return RedirectToAction(nameof(ClaimsInvestigationController.DetailsAuto), "ClaimsInvestigation", new { id = claim.ClaimsInvestigationId });
+
+                }
+                else if (claimtype.Equals("manual", StringComparison.OrdinalIgnoreCase))
+                {
+                    return RedirectToAction(nameof(ClaimsInvestigationController.DetailsManual), "ClaimsInvestigation", new { id = claim.ClaimsInvestigationId });
+                }
                 return RedirectToAction(nameof(ClaimsInvestigationController.Details), "ClaimsInvestigation", new { id = claim.ClaimsInvestigationId });
+
             }
             catch (Exception)
             {
@@ -371,7 +385,7 @@ namespace risk.control.system.Controllers
         [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
         [HttpPost]
-        public async Task<IActionResult> EditCustomer(string claimsInvestigationId, ClaimsInvestigation claimsInvestigation, bool create = true)
+        public async Task<IActionResult> EditCustomer(string claimsInvestigationId, ClaimsInvestigation claimsInvestigation, string claimtype, bool create = true)
         {
             try
             {
@@ -402,7 +416,20 @@ namespace risk.control.system.Controllers
                 var claim = await claimsInvestigationService.EditCustomer(userEmail, claimsInvestigation, profileFile);
 
                 notifyService.Custom($"Customer {claim.CustomerDetail.CustomerName} edited successfully", 3, "orange", "fas fa-user-plus");
+                if(string.IsNullOrWhiteSpace(claimtype) || claimtype.Equals("draft", StringComparison.OrdinalIgnoreCase))
+                {
+                    return RedirectToAction(nameof(ClaimsInvestigationController.Details), "ClaimsInvestigation", new { id = claim.ClaimsInvestigationId });
+                }
+                else if(claimtype.Equals("auto", StringComparison.OrdinalIgnoreCase))
+                {
+                    return RedirectToAction(nameof(ClaimsInvestigationController.DetailsAuto), "ClaimsInvestigation", new { id = claim.ClaimsInvestigationId });
 
+                }
+                else if (claimtype.Equals("manual", StringComparison.OrdinalIgnoreCase))
+                {
+                    return RedirectToAction(nameof(ClaimsInvestigationController.DetailsManual), "ClaimsInvestigation", new { id = claim.ClaimsInvestigationId });
+
+                }
                 return RedirectToAction(nameof(ClaimsInvestigationController.Details), "ClaimsInvestigation", new { id = claim.ClaimsInvestigationId });
             }
             catch (Exception)

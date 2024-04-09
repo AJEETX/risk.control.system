@@ -250,6 +250,95 @@ namespace risk.control.system.Controllers
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
+        [Breadcrumb("Edit Beneficiary", FromAction = "DetailsAuto", FromController = typeof(ClaimsInvestigationController))]
+        public async Task<IActionResult> EditAuto(long? id)
+        {
+            try
+            {
+                if (id == null || _context.CaseLocation == null)
+                {
+                    notifyService.Error("NOT FOUND!!!..Contact IT support");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+
+                var caseLocation = await _context.CaseLocation.FindAsync(id);
+                if (caseLocation == null)
+                {
+                    notifyService.Error("NOT FOUND!!!..Contact IT support");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+
+                var services = _context.CaseLocation
+                    .Include(v => v.ClaimsInvestigation)
+                    .ThenInclude(c => c.PolicyDetail)
+                    .Include(v => v.District)
+                    .First(v => v.CaseLocationId == id);
+
+                var country = _context.Country.OrderBy(o => o.Name);
+                var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == caseLocation.CountryId).OrderBy(d => d.Name);
+                var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == caseLocation.StateId).OrderBy(d => d.Name);
+                var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == caseLocation.DistrictId).OrderBy(d => d.Name);
+
+                ViewData["CountryId"] = new SelectList(country, "CountryId", "Name", caseLocation.CountryId);
+                ViewData["StateId"] = new SelectList(relatedStates, "StateId", "Name", caseLocation.StateId);
+                ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", caseLocation.DistrictId);
+                ViewData["PinCodeId"] = new SelectList(pincodes, "PinCodeId", "Code", caseLocation.PinCodeId);
+
+                ViewData["BeneficiaryRelationId"] = new SelectList(_context.BeneficiaryRelation.OrderBy(s => s.Code), "BeneficiaryRelationId", "Name", caseLocation.BeneficiaryRelationId);
+
+                return View(services);
+            }
+            catch (Exception)
+            {
+                notifyService.Error("OOPS !!!..Contact IT support");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+        }
+
+        [Breadcrumb("Edit Beneficiary", FromAction = "DetailsManual", FromController = typeof(ClaimsInvestigationController))]
+        public async Task<IActionResult> EditManual(long? id)
+        {
+            try
+            {
+                if (id == null || _context.CaseLocation == null)
+                {
+                    notifyService.Error("NOT FOUND!!!..Contact IT support");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+
+                var caseLocation = await _context.CaseLocation.FindAsync(id);
+                if (caseLocation == null)
+                {
+                    notifyService.Error("NOT FOUND!!!..Contact IT support");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+
+                var services = _context.CaseLocation
+                    .Include(v => v.ClaimsInvestigation)
+                    .ThenInclude(c => c.PolicyDetail)
+                    .Include(v => v.District)
+                    .First(v => v.CaseLocationId == id);
+
+                var country = _context.Country.OrderBy(o => o.Name);
+                var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == caseLocation.CountryId).OrderBy(d => d.Name);
+                var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == caseLocation.StateId).OrderBy(d => d.Name);
+                var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == caseLocation.DistrictId).OrderBy(d => d.Name);
+
+                ViewData["CountryId"] = new SelectList(country, "CountryId", "Name", caseLocation.CountryId);
+                ViewData["StateId"] = new SelectList(relatedStates, "StateId", "Name", caseLocation.StateId);
+                ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", caseLocation.DistrictId);
+                ViewData["PinCodeId"] = new SelectList(pincodes, "PinCodeId", "Code", caseLocation.PinCodeId);
+
+                ViewData["BeneficiaryRelationId"] = new SelectList(_context.BeneficiaryRelation.OrderBy(s => s.Code), "BeneficiaryRelationId", "Name", caseLocation.BeneficiaryRelationId);
+
+                return View(services);
+            }
+            catch (Exception)
+            {
+                notifyService.Error("OOPS !!!..Contact IT support");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+        }
 
         // POST: CaseLocations/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
@@ -257,14 +346,18 @@ namespace risk.control.system.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [RequestSizeLimit(2_000_000)] // Checking for 2 MB
-        public async Task<IActionResult> Edit(long id, CaseLocation ecaseLocation)
+        public async Task<IActionResult> Edit(long id, CaseLocation ecaseLocation, string claimtype, long caseLocationId)
         {
             try
             {
-                if (id != ecaseLocation.CaseLocationId)
+                if (id != ecaseLocation.CaseLocationId && caseLocationId != ecaseLocation.CaseLocationId)
                 {
                     notifyService.Error("NOT FOUND!!!..Contact IT support");
                     return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                if(id == 0)
+                {
+                    id = caseLocationId;
                 }
                 var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                    i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
@@ -314,7 +407,23 @@ namespace risk.control.system.Controllers
                 _context.Update(caseLocation);
                 await _context.SaveChangesAsync();
                 notifyService.Custom($"Beneficiary {caseLocation.BeneficiaryName} edited successfully", 3, "orange", "fas fa-user-tie");
+                if (string.IsNullOrWhiteSpace(claimtype) || claimtype.Equals("draft", StringComparison.OrdinalIgnoreCase))
+                {
+                    return RedirectToAction(nameof(ClaimsInvestigationController.Details), "ClaimsInvestigation", new { id = caseLocation.ClaimsInvestigationId });
+                }
+                else if (claimtype.Equals("auto", StringComparison.OrdinalIgnoreCase))
+                {
+                    return RedirectToAction(nameof(ClaimsInvestigationController.DetailsAuto), "ClaimsInvestigation", new { id = caseLocation.ClaimsInvestigationId });
+
+                }
+                else if (claimtype.Equals("manual", StringComparison.OrdinalIgnoreCase))
+                {
+                    return RedirectToAction(nameof(ClaimsInvestigationController.DetailsManual), "ClaimsInvestigation", new { id = caseLocation.ClaimsInvestigationId });
+
+                }
                 return RedirectToAction(nameof(ClaimsInvestigationController.Details), "ClaimsInvestigation", new { id = caseLocation.ClaimsInvestigationId });
+
+
             }
             catch (Exception)
             {

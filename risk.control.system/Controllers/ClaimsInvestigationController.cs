@@ -447,6 +447,60 @@ namespace risk.control.system.Controllers
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
+        [Breadcrumb("Details", FromAction = "Draft", FromController = typeof(ClaimsInvestigationController))]
+        public async Task<IActionResult> DetailsAuto(string id)
+        {
+            try
+            {
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (string.IsNullOrWhiteSpace(currentUserEmail))
+                {
+                    notifyService.Error("OOPs !!!..Contact IT support");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                if (id == null)
+                {
+                    notifyService.Error("NOT FOUND !!!..");
+                    return RedirectToAction(nameof(Index));
+                }
+
+                var model = await investigationReportService.GetClaimDetails(currentUserEmail, id);
+
+                return View(model);
+            }
+            catch (Exception)
+            {
+                notifyService.Error("OOPs !!!..Contact IT support");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+        }
+        [Breadcrumb("Details", FromAction = "Assigner", FromController = typeof(ClaimsInvestigationController))]
+        public async Task<IActionResult> DetailsManual(string id)
+        {
+            try
+            {
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (string.IsNullOrWhiteSpace(currentUserEmail))
+                {
+                    notifyService.Error("OOPs !!!..Contact IT support");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                if (id == null)
+                {
+                    notifyService.Error("NOT FOUND !!!..");
+                    return RedirectToAction(nameof(Index));
+                }
+
+                var model = await investigationReportService.GetClaimDetails(currentUserEmail, id);
+
+                return View(model);
+            }
+            catch (Exception)
+            {
+                notifyService.Error("OOPs !!!..Contact IT support");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+        }
 
         [Breadcrumb(title: " Detail", FromAction = "Assigner")]
         public async Task<IActionResult> Detail(string id)

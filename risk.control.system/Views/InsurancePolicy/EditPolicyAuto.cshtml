@@ -9,7 +9,7 @@
     <form id="create-form" asp-controller="ClaimsInvestigationPost" method="post" asp-action="EditPolicy" enctype="multipart/form-data">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <input type="hidden" asp-for="ClaimsInvestigationId" />
-        <input type="hidden" id="claimtype" name="claimtype" value="draft" />
+        <input type="hidden" id="claimtype" name="claimtype" value="auto" />
         <input type="hidden" asp-for="InvestigationCaseSubStatusId" />
         <input type="hidden" asp-for="PolicyDetail.LineOfBusinessId" value="@Model.PolicyDetail.LineOfBusinessId" />
         <div id="article" class="card  bg-light card-secondary">
@@ -205,7 +205,7 @@
             </div>
             <div class="card-footer">
                 <div class="text-right">
-                    <a id="back" asp-controller="ClaimsInvestigation" asp-action="Details" asp-route-id="@Model.ClaimsInvestigationId" class="btn btn-secondary">
+                    <a id="back" asp-controller="ClaimsInvestigation" asp-action="DetailsAuto" asp-route-id="@Model.ClaimsInvestigationId" class="btn btn-secondary">
                         <i class="fa fa-window-close"></i>
                         @Applicationsettings.CANCEL
                     </a>

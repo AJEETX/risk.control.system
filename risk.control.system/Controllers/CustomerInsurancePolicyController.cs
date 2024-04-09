@@ -30,7 +30,7 @@ namespace risk.control.system.Controllers
             this._context = context;
         }
 
-        [Breadcrumb(title: " Add Customer", FromAction = "Incomplete", FromController = typeof(ClaimsInvestigationController))]
+        [Breadcrumb(title: " Add Customer", FromAction = "Index", FromController = typeof(InsuranceClaimsController))]
         public async Task<IActionResult> CreateCustomer(string id)
         {
             try
@@ -98,7 +98,7 @@ namespace risk.control.system.Controllers
             }
         }
 
-        [Breadcrumb(title: " Edit Customer", FromAction = "Incomplete", FromController = typeof(ClaimsInvestigationController))]
+        [Breadcrumb(title: " Edit Customer", FromAction = "Index", FromController = typeof(InsuranceClaimsController))]
         public async Task<IActionResult> EditCustomer(string id)
         {
             try
@@ -151,6 +151,114 @@ namespace risk.control.system.Controllers
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
             
+        }
+        [Breadcrumb(title: " Edit Customer", FromAction = "DetailsAuto", FromController = typeof(ClaimsInvestigationController))]
+        public async Task<IActionResult> EditCustomerAuto(string id)
+        {
+            try
+            {
+                if (id == null || _context.ClaimsInvestigation == null)
+                {
+                    notifyService.Error("Not Found!!!..Contact IT support");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+
+                var claimsInvestigation = await _context.ClaimsInvestigation
+                    .Include(c => c.PolicyDetail)
+                    .Include(c => c.CustomerDetail)
+                    .ThenInclude(c => c.PinCode)
+                    .Include(c => c.CustomerDetail)
+                    .ThenInclude(c => c.District)
+                    .Include(c => c.CustomerDetail)
+                    .ThenInclude(c => c.State)
+                    .Include(c => c.CustomerDetail)
+                    .ThenInclude(c => c.Country)
+                    .FirstOrDefaultAsync(i => i.ClaimsInvestigationId == id);
+
+                if (claimsInvestigation == null)
+                {
+                    notifyService.Error("Not Found!!!..Contact IT support");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name", claimsInvestigation.PolicyDetail.ClientCompanyId);
+                ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType.OrderBy(s => s.Code), "InvestigationServiceTypeId", "Name", claimsInvestigation.PolicyDetail.InvestigationServiceTypeId);
+                ViewData["CaseEnablerId"] = new SelectList(_context.CaseEnabler.OrderBy(s => s.Code), "CaseEnablerId", "Name", claimsInvestigation.PolicyDetail.CaseEnablerId);
+                ViewData["CostCentreId"] = new SelectList(_context.CostCentre.OrderBy(s => s.Code), "CostCentreId", "Name", claimsInvestigation.PolicyDetail.CostCentreId);
+                ViewData["InvestigationCaseStatusId"] = new SelectList(_context.InvestigationCaseStatus, "InvestigationCaseStatusId", "Name", claimsInvestigation.InvestigationCaseStatusId);
+                ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", claimsInvestigation.PolicyDetail.LineOfBusinessId);
+
+                var country = _context.Country.OrderBy(o => o.Name);
+                var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == claimsInvestigation.CustomerDetail.CountryId).OrderBy(d => d.Name);
+                var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == claimsInvestigation.CustomerDetail.StateId).OrderBy(d => d.Name);
+                var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == claimsInvestigation.CustomerDetail.DistrictId).OrderBy(d => d.Name);
+
+                ViewData["CountryId"] = new SelectList(country, "CountryId", "Name", claimsInvestigation.CustomerDetail.CountryId);
+                ViewData["StateId"] = new SelectList(relatedStates, "StateId", "Name", claimsInvestigation.CustomerDetail.StateId);
+                ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", claimsInvestigation.CustomerDetail.DistrictId);
+                ViewData["PinCodeId"] = new SelectList(pincodes, "PinCodeId", "Code", claimsInvestigation.CustomerDetail.PinCodeId);
+
+                return View(claimsInvestigation);
+            }
+            catch (Exception)
+            {
+                notifyService.Error("OOPS!!!..Contact IT support");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+
+        }
+        [Breadcrumb(title: " Edit Customer", FromAction = "DetailsManual", FromController = typeof(ClaimsInvestigationController))]
+        public async Task<IActionResult> EditCustomerManual(string id)
+        {
+            try
+            {
+                if (id == null || _context.ClaimsInvestigation == null)
+                {
+                    notifyService.Error("Not Found!!!..Contact IT support");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+
+                var claimsInvestigation = await _context.ClaimsInvestigation
+                    .Include(c => c.PolicyDetail)
+                    .Include(c => c.CustomerDetail)
+                    .ThenInclude(c => c.PinCode)
+                    .Include(c => c.CustomerDetail)
+                    .ThenInclude(c => c.District)
+                    .Include(c => c.CustomerDetail)
+                    .ThenInclude(c => c.State)
+                    .Include(c => c.CustomerDetail)
+                    .ThenInclude(c => c.Country)
+                    .FirstOrDefaultAsync(i => i.ClaimsInvestigationId == id);
+
+                if (claimsInvestigation == null)
+                {
+                    notifyService.Error("Not Found!!!..Contact IT support");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name", claimsInvestigation.PolicyDetail.ClientCompanyId);
+                ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType.OrderBy(s => s.Code), "InvestigationServiceTypeId", "Name", claimsInvestigation.PolicyDetail.InvestigationServiceTypeId);
+                ViewData["CaseEnablerId"] = new SelectList(_context.CaseEnabler.OrderBy(s => s.Code), "CaseEnablerId", "Name", claimsInvestigation.PolicyDetail.CaseEnablerId);
+                ViewData["CostCentreId"] = new SelectList(_context.CostCentre.OrderBy(s => s.Code), "CostCentreId", "Name", claimsInvestigation.PolicyDetail.CostCentreId);
+                ViewData["InvestigationCaseStatusId"] = new SelectList(_context.InvestigationCaseStatus, "InvestigationCaseStatusId", "Name", claimsInvestigation.InvestigationCaseStatusId);
+                ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", claimsInvestigation.PolicyDetail.LineOfBusinessId);
+
+                var country = _context.Country.OrderBy(o => o.Name);
+                var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == claimsInvestigation.CustomerDetail.CountryId).OrderBy(d => d.Name);
+                var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == claimsInvestigation.CustomerDetail.StateId).OrderBy(d => d.Name);
+                var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == claimsInvestigation.CustomerDetail.DistrictId).OrderBy(d => d.Name);
+
+                ViewData["CountryId"] = new SelectList(country, "CountryId", "Name", claimsInvestigation.CustomerDetail.CountryId);
+                ViewData["StateId"] = new SelectList(relatedStates, "StateId", "Name", claimsInvestigation.CustomerDetail.StateId);
+                ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", claimsInvestigation.CustomerDetail.DistrictId);
+                ViewData["PinCodeId"] = new SelectList(pincodes, "PinCodeId", "Code", claimsInvestigation.CustomerDetail.PinCodeId);
+
+                return View(claimsInvestigation);
+            }
+            catch (Exception)
+            {
+                notifyService.Error("OOPS!!!..Contact IT support");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+
         }
     }
 }

@@ -189,7 +189,7 @@
                                         if (Model.ClaimsInvestigation != null)
                                         {
                                             <input type="hidden" asp-for="ClaimsInvestigation.ClaimsInvestigationId" />
-                                            <a id="edit-policy" class="btn btn-warning" asp-controller="InsurancePolicy" asp-action="EditPolicy" asp-route-id="@Model.ClaimsInvestigation.ClaimsInvestigationId"><i class="far fa-file-powerpoint"></i>  Edit Policy</a>
+                                            <a id="edit-policy" class="btn btn-warning" asp-controller="InsurancePolicy" asp-action="EditPolicyAuto" asp-route-id="@Model.ClaimsInvestigation.ClaimsInvestigationId"><i class="far fa-file-powerpoint"></i>  Edit Policy</a>
                                         }
                                         else
                                         {
@@ -201,7 +201,7 @@
                         </div>
                     </div>
 
-                    <partial name="_CustomerBeneficiary" model="@Model" />
+                    <partial name="_CustomerBeneficiaryAuto" model="@Model" />
 
                 </div>
             </div>
@@ -209,13 +209,8 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div class="form-input">
-                            <a id="back" asp-action="Incomplete" class="btn btn-outline-secondary"><span class="badge badge-light"> <i class="fas fa-arrow-left"></i> </span> Back </a>
-                            @if (customerExist && beneficiaryExist)
-                            {
-                                <span class="badge badge-light"> <i class="far fa-thumbs-up"></i> Details completed now</span>
-                                <span class="badge badge-light"> <i class="far fa-file-powerpoint"></i> Claim now moved to <i class="fas fa-random"></i>Assign </span>
-                            }
-                            
+                            <a id="back" asp-action="Draft" class="btn btn-outline-secondary"><span class="badge badge-light"> <i class="fas fa-arrow-left"></i> </span> Back </a>
+
 
                         </div>
                     </div>

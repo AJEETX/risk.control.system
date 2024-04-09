@@ -11,7 +11,7 @@
         <div id="article" class="card  bg-light card-secondary">
             <input type="hidden" asp-for="ClaimsInvestigationId" value="@Model.ClaimsInvestigationId" />
             <input type="hidden" asp-for="PolicyDetail.LineOfBusinessId" value="@Model.PolicyDetail.LineOfBusinessId" />
-            <input type="hidden" id="claimtype" name="claimtype" value="draft" />
+            <input type="hidden" id="claimtype" name="claimtype" value="manual" />
             <div class="card-header">
                 <h3 class="card-title"><i class="fa fa-user-plus"></i> Edit Customer </h3>
             </div>
@@ -256,7 +256,7 @@
             </div>
             <div class="card-footer">
                 <div class="text-right">
-                    <a id="back" asp-controller="ClaimsInvestigation" asp-action="Details" asp-route-id="@Model.ClaimsInvestigationId" class="btn btn-secondary">
+                    <a id="back" asp-controller="ClaimsInvestigation" asp-action="DetailsManual" asp-route-id="@Model.ClaimsInvestigationId" class="btn btn-secondary">
                         <i class="fa fa-window-close"></i>
                         @Applicationsettings.CANCEL
                     </a>

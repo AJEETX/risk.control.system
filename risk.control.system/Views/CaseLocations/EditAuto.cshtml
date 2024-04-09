@@ -9,7 +9,10 @@
 <section class="content">
     <form id="create-form" asp-action="Edit" enctype="multipart/form-data">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-        <input type="hidden" id="claimtype" name="claimtype" value="draft" />
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <input type="hidden" asp-for="CaseLocationId" />
+        <input type="hidden" asp-for="ClaimsInvestigationId" />
+        <input type="hidden" id="claimtype" name="claimtype" value="auto" />
         <div id="article" class="card  bg-light card-secondary">
             <div class="card-header">
                 <h3 class="card-title"><i class="fas fa-user-tie"></i> Edit Beneficiary </h3>
@@ -39,9 +42,6 @@
                 </div>
                 <div class="row">
                     <div class="col-md-6">
-                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                        <input type="hidden" asp-for="CaseLocationId" />
-                        <input type="hidden" asp-for="ClaimsInvestigationId" />
                         <div class="form-group">
                             <span class="input-group-label"> Beneficiary Name:</span>
                             <div class="input-group mb-3">
@@ -203,7 +203,7 @@
             </div>
             <div class="card-footer">
                 <div class="text-right">
-                    <a id="back" asp-controller="ClaimsInvestigation" asp-action="Details" asp-route-id="@Model.ClaimsInvestigation.ClaimsInvestigationId" class="btn btn-secondary">
+                    <a id="back" asp-controller="ClaimsInvestigation" asp-action="DetailsAuto" asp-route-id="@Model.ClaimsInvestigation.ClaimsInvestigationId" class="btn btn-secondary">
                         <i class="fa fa-window-close"></i>
                         @Applicationsettings.CANCEL
                     </a>
