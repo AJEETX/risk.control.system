@@ -19,6 +19,7 @@ async function fetchIpInfo() {
         }
         const data = await response.json();
         document.querySelector('#ipAddress .info-data').textContent = data.ipAddress || 'Not available';
+        document.querySelector('#city .info-data').textContent = data.city || 'Not available';
 
     } catch (error) {
         console.error('There has been a problem with your fetch operation:', error);
