@@ -1,6 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
+using Standard.Licensing;
+
 namespace risk.control.system.Models
 {
     public class ClientCompany : BaseEntity
@@ -87,7 +89,11 @@ namespace risk.control.system.Models
         public bool BulkUpload { get; set; } = false;
         public string WhitelistIpAddress { get; set; } = "::1;202.7.251.21;101.115.143.75;101.115.134.238;120.21.2.126";
         public string? WhitelistIpAddressRange { get; set; } = default!;
+        public LicenseType LicenseType { get; set; } = LicenseType.Trial;
+        public string LicenseId { get; set; } = Guid.NewGuid().ToString();
 
+        [DataType(DataType.Date)]
+        public DateTime? ExpiryDate { get; set; } = DateTime.Now;
     }
 
     public enum CompanyStatus

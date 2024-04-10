@@ -70,7 +70,18 @@
                                             </span>
                                             Address:  @Model.Addressline @Model.District.Name @Model.State.Name @Model.PinCode.Code
                                         </li>
-
+                                        <li class="small">
+                                            <span class="fa-li">
+                                                <i class="fas fa-key"></i>
+                                            </span>
+                                            License Type: @Html.DisplayFor(model => model.LicenseType)
+                                        </li>
+                                        <li class="small">
+                                            <span class="fa-li">
+                                                <i class="fas fa-calendar-check"></i>
+                                            </span>
+                                            License Expiry Date: @Html.DisplayFor(model => model.ExpiryDate)
+                                        </li>
                                     </ul>
                                 </div>
                                 <div class="col-5 text-center">
@@ -148,12 +159,7 @@
                                             </span>
                                             Whitelist Ip Addresses : <i class="fas fa-sitemap"></i> <a href="#">  @Model.WhitelistIpAddress</a>
                                         </li>
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fas fa-sitemap"></i>
-                                            </span>
-                                            Whitelist Ip AddressRange : <i class="fas fa-sitemap"></i> <a href="#">  @Model.WhitelistIpAddressRange</a>
-                                        </li>
+                                       
                                         <li class="small">
                                             <span class="fa-li">
                                                 <i class="fas fa-phone"></i>

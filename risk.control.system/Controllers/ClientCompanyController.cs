@@ -151,7 +151,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: ClientCompanies/Details/5
-        [Breadcrumb("Company Detail", FromAction = "Companies")]
+        [Breadcrumb("Company Profile", FromAction = "Companies")]
         public async Task<IActionResult> Details(long id)
         {
             if (id == null || _context.ClientCompany == null)
@@ -252,33 +252,6 @@ namespace risk.control.system.Controllers
                         }
                     }
 
-                    //var assignerRole = roleManager.Roles.FirstOrDefault(r =>
-                    //        r.Name.Contains(AppRoles.Assigner.ToString()));
-                    //var creatorRole = roleManager.Roles.FirstOrDefault(r =>
-                    //        r.Name.Contains(AppRoles.Creator.ToString()));
-
-                    //var companyUsers = _context.ClientCompanyApplicationUser.Where(u => u.ClientCompanyId == clientCompany.ClientCompanyId);
-
-                    //string currentOwner = string.Empty;
-                    //foreach (var companyuser in companyUsers)
-                    //{
-                    //    var isCreator = await userManager.IsInRoleAsync(companyuser, creatorRole?.Name);
-                    //    if (isCreator)
-                    //    {
-                    //        currentOwner = companyuser.Email;
-
-                    //        ClientCompanyApplicationUser user = await userManager.FindByEmailAsync(currentOwner);
-
-                    //        if (clientCompany.AutoAllocation)
-                    //        {
-                    //            var result = await userManager.AddToRoleAsync(user, assignerRole.Name);
-                    //        }
-                    //        else
-                    //        {
-                    //            var result = await userManager.RemoveFromRoleAsync(user, assignerRole.Name);
-                    //        }
-                    //    }
-                    //}
 
                     clientCompany.Updated = DateTime.UtcNow;
                     clientCompany.UpdatedBy = HttpContext.User?.Identity?.Name;

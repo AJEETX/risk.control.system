@@ -482,22 +482,20 @@ namespace risk.control.system.Controllers
                         {
                             var createdUser = await userManager.FindByEmailAsync(user.Email);
                             var lockUser = await userManager.SetLockoutEnabledAsync(createdUser, true);
-                            var lockDate = await userManager.SetLockoutEndDateAsync(user, DateTime.MaxValue);
+                            var lockDate = await userManager.SetLockoutEndDateAsync(createdUser, DateTime.MaxValue);
 
                             if (lockUser.Succeeded && lockDate.Succeeded)
                             {
-                                notifyService.Custom($"User edited and locked.", 3, "orange", "fas fa-user-lock");
                                 var response = SmsService.SendSingleMessage(user.PhoneNumber, "Agency user edited and locked. Email : " + user.Email);
-                                return RedirectToAction(nameof(AgencyController.User), "Agency");
+                                notifyService.Custom($"User edited and locked.", 3, "orange", "fas fa-user-lock");
                             }
                         }
-                        if (user.Active)
+                        else
                         {
                             var createdUser = await userManager.FindByEmailAsync(user.Email);
-                            var lockUser = await userManager.SetLockoutEnabledAsync(createdUser, false);
-                            var lockDate = await userManager.SetLockoutEndDateAsync(user, DateTime.Now);
+                            var lockUser = await userManager.SetLockoutEnabledAsync(createdUser, true);
+                            var lockDate = await userManager.SetLockoutEndDateAsync(createdUser, DateTime.Now);
                             var onboardAgent = roles.Any(r => AppConstant.AppRoles.Agent.ToString().Contains(r)) && string.IsNullOrWhiteSpace(user.MobileUId);
-
                             if (lockUser.Succeeded && lockDate.Succeeded)
                             {
                                 var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == user.VendorId);
@@ -515,6 +513,7 @@ namespace risk.control.system.Controllers
                                 message += $"Thanks";
                                 message += "                                                                                ";
                                 message += $"https://icheckify.co.in";
+
                                 if (onboardAgent)
                                 {
                                     var onboard = SmsService.SendSingleMessage(user.PhoneNumber, message, onboardAgent);
@@ -525,11 +524,8 @@ namespace risk.control.system.Controllers
                                     var response = SmsService.SendSingleMessage(user.PhoneNumber, "Agency user edited and unlocked. Email : " + user.Email);
                                     notifyService.Custom($"User edited.", 3, "green", "fas fa-user-check");
                                 }
-
-                                return RedirectToAction(nameof(AgencyController.User), "Agency");
                             }
                         }
-                        notifyService.Custom($"Agency user edited successfully.", 3, "green", "fas fa-user-check");
                         return RedirectToAction(nameof(AgencyController.User), "Agency");
                     }
                 }

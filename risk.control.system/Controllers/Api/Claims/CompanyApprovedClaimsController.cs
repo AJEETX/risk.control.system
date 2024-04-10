@@ -219,7 +219,7 @@ namespace risk.control.system.Controllers.Api.Claims
                .Include(c => c.CaseLocations)
                .ThenInclude(l => l.PreviousClaimReports)
                 .Where(c => !c.Deleted);
-            return applicationDbContext.OrderBy(o => o.Created);
+            return applicationDbContext.OrderByDescending(o => o.Created);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿@model risk.control.system.Models.ClientCompany
+﻿@using Standard.Licensing
+@model risk.control.system.Models.ClientCompany
 
 @{
     ViewData["Title"] = @Applicationsettings.EDIT;
@@ -261,6 +262,28 @@
                         <div class="card-body pb-0">
                             <div class="row">
                                 <div class="col-sm-8">
+                                    
+                                    
+                                    <div class="form-group">
+                                        <span class="input-group-label"> Add Whitelist IP Address:</span>
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text" id="WhitelistIpAddress"><i class="fas fa-sitemap"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                            </div>
+                                            <input type="text" asp-for="WhitelistIpAddress" class="form-control remarks title-name ipaddress" required placeholder="Add Whitelist IP Address">
+                                            <span asp-validation-for="WhitelistIpAddress" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                   @*  <div class="form-group">
+                                        <span class="input-group-label"> Whitelist IP AddressRange:</span>
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text" id="WhitelistIpAddressRange"><i class="fas fa-sitemap"></i> <i class="fa fa-asterisk asterik-style" style="color:#e9ecef;"></i></span>
+                                            </div>
+                                            <input type="text" asp-for="WhitelistIpAddressRange" class="form-control remarks title-name" placeholder="202.7.251.21/24">
+                                            <span asp-validation-for="WhitelistIpAddressRange" class="text-danger"></span>
+                                        </div>
+                                    </div> *@
                                     <div class="form-group">
                                         <span class="input-group-label"> Pan API:</span>
                                         <div class="input-group mb-3">
@@ -322,30 +345,39 @@
                                             <span asp-validation-for="MobileAppUrl" class="text-danger"></span>
                                         </div>
                                     </div>
-
-                                    <div class="form-group">
-                                        <span class="input-group-label"> Whitelist IP Addresses:</span>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text" id="WhitelistIpAddress"><i class="fas fa-sitemap"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                            </div>
-                                            <input type="text" asp-for="WhitelistIpAddress" class="form-control remarks title-name ipaddress" required placeholder="Whitelist IP Addresses">
-                                            <span asp-validation-for="WhitelistIpAddress" class="text-danger"></span>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <span class="input-group-label"> Whitelist IP AddressRange:</span>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text" id="WhitelistIpAddressRange"><i class="fas fa-sitemap"></i> <i class="fa fa-asterisk asterik-style" style="color:#e9ecef;"></i></span>
-                                            </div>
-                                            <input type="text" asp-for="WhitelistIpAddressRange" class="form-control remarks title-name" placeholder="202.7.251.21/24">
-                                            <span asp-validation-for="WhitelistIpAddressRange" class="text-danger"></span>
-                                        </div>
-                                    </div>
+                                    
 
                                 </div>
                                 <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <span class="input-group-label"> License Type:</span>
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text" asp-for="LicenseType"><i class="nav-icon fas fa-file-invoice"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                            </div>
+                                            <select required asp-for="LicenseType" class="form-control remarks ipaddress" asp-items="Html.GetEnumSelectList<LicenseType>()">
+                                                <option value="">--- SELECT ---</option>
+                                            </select>
+                                            <span asp-validation-for="LicenseType" class="text-danger"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <span class="input-group-label"> Expiry Date:</span>
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text" asp-for="ExpiryDate"><i class="nav-icon far fa-calendar-check"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                            </div>
+                                            @{
+                                                var minDate = @DateTime.Now.ToString("dd-MM-yyyy");
+                                                var maxDate = @DateTime.Now.AddDays(1).ToString("dd-MM-yyyy");
+                                            }
+                                            <input asp-for="ExpiryDate" id="expiryDate" class="form-control remarks date-width" min="@minDate" type="date" />
+                                            <span asp-validation-for="ExpiryDate" class="text-danger"></span>
+                                        </div>
+                                    </div>
+
+
                                     <div class="form-group">
                                         <span class="input-group-label">Auto Allocation:</span>
                                         <div class="input-group mb-3">

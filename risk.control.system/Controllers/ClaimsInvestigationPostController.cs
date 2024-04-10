@@ -118,7 +118,6 @@ namespace risk.control.system.Controllers
 
                         notifyService.Custom($"{notAutoAllocated.Count}/{claims.Count} claim(s) need manual assign", 3, "orange", "far fa-file-powerpoint");
 
-                        return RedirectToAction(nameof(ClaimsInvestigationController.Assigner), "ClaimsInvestigation");
                     }
                 }
                 else
@@ -135,9 +134,8 @@ namespace risk.control.system.Controllers
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
-            
 
-            return RedirectToAction(nameof(ClaimsInvestigationController.Draft), "ClaimsInvestigation");
+            return RedirectToAction(nameof(ClaimsInvestigationController.Active), "ClaimsInvestigation");
         }
 
         [ValidateAntiForgeryToken]
@@ -162,7 +160,7 @@ namespace risk.control.system.Controllers
 
                 notifyService.Custom($"Policy #{policy.PolicyDetail.ContractNumber} assigned to {vendor.Name}", 3, "green", "far fa-file-powerpoint");
 
-                return RedirectToAction(nameof(ClaimsInvestigationController.Assigner), "ClaimsInvestigation");
+                return RedirectToAction(nameof(ClaimsInvestigationController.Active), "ClaimsInvestigation");
             }
             catch (Exception)
             {
