@@ -66,7 +66,7 @@ namespace risk.control.system.Controllers
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
-                    notifyService.Error("User Not Found!!!..Contact IT support");
+                    notifyService.Error("User Not Found!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == currentUserEmail);
@@ -98,7 +98,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                notifyService.Error("OOPs !!!...Contact IT support");
+                notifyService.Error("OOPs !!!...Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
 
@@ -113,13 +113,13 @@ namespace risk.control.system.Controllers
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
-                    notifyService.Error("User Not found!!!..Contact IT support");
+                    notifyService.Error("User Not found!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == currentUserEmail);
                 if (vendorUser == null)
                 {
-                    notifyService.Error("User Not found !!!..Contact IT support");
+                    notifyService.Error("User Not found !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var vendor = await _context.Vendor.FindAsync(vendorUser.VendorId);
@@ -143,7 +143,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
-                notifyService.Error("OOPS !!!..Contact IT support");
+                notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
@@ -166,13 +166,13 @@ namespace risk.control.system.Controllers
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
-                    notifyService.Error("User Not found!!!..Contact IT support");
+                    notifyService.Error("User Not found!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == currentUserEmail);
                 if (vendorUser == null)
                 {
-                    notifyService.Error("User Not found !!!..Contact IT support");
+                    notifyService.Error("User Not found !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 IFormFile? vendorDocument = Request.Form?.Files?.FirstOrDefault();
@@ -215,7 +215,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPS !!!..Contact IT support");
+                notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
 
@@ -229,7 +229,7 @@ namespace risk.control.system.Controllers
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
-                    notifyService.Error("User Not found!!!..Contact IT support");
+                    notifyService.Error("User Not found!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 return View();
@@ -237,7 +237,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPS !!!..Contact IT support");
+                notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
@@ -250,13 +250,13 @@ namespace risk.control.system.Controllers
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
-                    notifyService.Error("User Not found!!!..Contact IT support");
+                    notifyService.Error("User Not found!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == currentUserEmail);
                 if (vendorUser == null)
                 {
-                    notifyService.Error("User Not found !!!..Contact IT support");
+                    notifyService.Error("User Not found !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == vendorUser.VendorId);
@@ -271,7 +271,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPS !!!..Contact IT support");
+                notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
 
@@ -351,7 +351,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPS !!!..Contact IT support");
+                notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
@@ -363,26 +363,26 @@ namespace risk.control.system.Controllers
             {
                 if (userId == null || userId < 1)
                 {
-                    notifyService.Error("User not found!!!..Contact IT support");
+                    notifyService.Error("User not found!!!..Contact Admin");
                     return RedirectToAction(nameof(AgencyController.User), "Agency");
                 }
 
                 var vendorApplicationUser = await _context.VendorApplicationUser.FindAsync(userId);
                 if (vendorApplicationUser == null)
                 {
-                    notifyService.Error("User not found!!!..Contact IT support");
+                    notifyService.Error("User not found!!!..Contact Admin");
                     return RedirectToAction(nameof(AgencyController.User), "Agency");
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
-                    notifyService.Error("User Not found!!!..Contact IT support");
+                    notifyService.Error("User Not found!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == currentUserEmail);
                 if (vendorUser == null)
                 {
-                    notifyService.Error("User Not found !!!..Contact IT support");
+                    notifyService.Error("User Not found !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == vendorUser.VendorId);
@@ -410,7 +410,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPS !!!..Contact IT support");
+                notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
@@ -536,10 +536,10 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPS !!!..Contact IT support");
+                notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
-            notifyService.Error("OOPS !!!..Contact IT support");
+            notifyService.Error("OOPS !!!..Contact Admin");
             return RedirectToAction(nameof(Index), "Dashboard");
         }
 
@@ -654,7 +654,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPS !!!..Contact IT support");
+                notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
@@ -697,12 +697,12 @@ namespace risk.control.system.Controllers
                 ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", vendorInvestigationServiceType.LineOfBusinessId);
                 ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name", vendorInvestigationServiceType.DistrictId);
                 ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name", vendorInvestigationServiceType.StateId);
-                notifyService.Error("OOPS !!!..Contact IT support");
+                notifyService.Error("OOPS !!!..Contact Admin");
                 return View(vendorInvestigationServiceType);
             }
             catch (Exception)
             {
-                notifyService.Error("OOPS !!!..Contact IT support");
+                notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
@@ -756,7 +756,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPS !!!..Contact IT support");
+                notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
             
@@ -774,7 +774,7 @@ namespace risk.control.system.Controllers
             {
                 if (vendorInvestigationServiceTypeId != vendorInvestigationServiceType.VendorInvestigationServiceTypeId)
                 {
-                    notifyService.Error("OOPS !!!..Contact IT support");
+                    notifyService.Error("OOPS !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
@@ -810,7 +810,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPS !!!..Contact IT support");
+                notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
             
@@ -839,7 +839,7 @@ namespace risk.control.system.Controllers
                     .FirstOrDefaultAsync(m => m.VendorInvestigationServiceTypeId == id);
                 if (vendorInvestigationServiceType == null)
                 {
-                    notifyService.Error("OOPS !!!..Contact IT support");
+                    notifyService.Error("OOPS !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
@@ -847,7 +847,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPS !!!..Contact IT support");
+                notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
@@ -877,7 +877,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPS !!!..Contact IT support");
+                notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
@@ -889,7 +889,7 @@ namespace risk.control.system.Controllers
             {
                 if (id == 0 || _context.VendorInvestigationServiceType == null)
                 {
-                    notifyService.Error("NOT FOUND !!!..Contact IT support");
+                    notifyService.Error("NOT FOUND !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
@@ -904,7 +904,7 @@ namespace risk.control.system.Controllers
                     .FirstOrDefaultAsync(m => m.VendorInvestigationServiceTypeId == id);
                 if (vendorInvestigationServiceType == null)
                 {
-                    notifyService.Error("NOT FOUND !!!..Contact IT support");
+                    notifyService.Error("NOT FOUND !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
@@ -912,7 +912,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPS !!!..Contact IT support");
+                notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }

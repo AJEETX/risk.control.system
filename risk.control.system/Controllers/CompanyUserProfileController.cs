@@ -69,7 +69,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPS !!!..Contact IT support");
+                notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
             
@@ -113,7 +113,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPS !!!..Contact IT support");
+                notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
             
@@ -131,7 +131,7 @@ namespace risk.control.system.Controllers
             {
                 if (id != applicationUser.Id.ToString() || applicationUser is null)
                 {
-                    notifyService.Error("OOPS !!!..Contact IT support");
+                    notifyService.Error("OOPS !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var user = await userManager.FindByIdAsync(id);
@@ -189,10 +189,10 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPS !!!..Contact IT support");
+                notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
-            notifyService.Error("OOPS !!!..Contact IT support");
+            notifyService.Error("OOPS !!!..Contact Admin");
             return RedirectToAction(nameof(Index), "Dashboard");
         }
 
@@ -205,13 +205,13 @@ namespace risk.control.system.Controllers
                 var userEmail = HttpContext.User?.Identity?.Name;
                 if(string.IsNullOrEmpty(userEmail))
                 {
-                    notifyService.Error("OOPS !!!..Contact IT support");
+                    notifyService.Error("OOPS !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
                 if (companyUser == null)
                 {
-                    notifyService.Error("OOPS !!!..Contact IT support");
+                    notifyService.Error("OOPS !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 return View();
@@ -219,7 +219,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPS !!!..Contact IT support");
+                notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
@@ -245,7 +245,7 @@ namespace risk.control.system.Controllers
                     if (user == null)
                     {
 
-                        notifyService.Error("OOPS !!!..Contact IT support");
+                        notifyService.Error("OOPS !!!..Contact Admin");
                         return RedirectToAction("/Account/Login");
                     }
 
@@ -263,7 +263,7 @@ namespace risk.control.system.Controllers
                         failedMessage += $"                                       ";
                         failedMessage += $"{BaseUrl}";
                         SMS.API.SendSingleMessage("+" + admin.PhoneNumber, failedMessage);
-                        notifyService.Error("OOPS !!!..Contact IT support");
+                        notifyService.Error("OOPS !!!..Contact Admin");
                         return RedirectToAction("/Account/Login");
                     }
 
@@ -300,7 +300,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPS !!!..Contact IT support");
+                notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }

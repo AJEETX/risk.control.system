@@ -32,7 +32,7 @@ namespace risk.control.system.Controllers.Api
                 var isAuthenticated = HttpContext.User.Identity.IsAuthenticated;
                 var ipAddress = HttpContext.GetServerVariable("HTTP_X_FORWARDED_FOR") ?? HttpContext.Connection.RemoteIpAddress?.ToString();
                 var ipAddressWithoutPort = ipAddress?.Split(':')[0];
-
+                var isWhiteListed = service.IsWhiteListIpAddress(HttpContext.Connection.RemoteIpAddress);
                 var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct, decodedUrl,user, isAuthenticated);
                 var longLatString = ipApiResponse?.lat.GetValueOrDefault().ToString() + "," + ipApiResponse?.lon.GetValueOrDefault().ToString();
                 var mapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={longLatString}&zoom=6&size=560x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{longLatString}&key={Applicationsettings.GMAPData}";
@@ -47,7 +47,8 @@ namespace risk.control.system.Controllers.Api
                     Isp = ipApiResponse?.isp,
                     Longitude = ipApiResponse?.lon.GetValueOrDefault(),
                     Latitude = ipApiResponse?.lat.GetValueOrDefault(),
-                    mapUrl = mapUrl
+                    mapUrl = mapUrl,
+                    whiteListed = false,
                 };
 
                 return Ok(response);

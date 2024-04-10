@@ -67,7 +67,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPS !!!..Contact IT support");
+                notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
@@ -113,7 +113,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPS !!!..Contact IT support");
+                notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
@@ -130,7 +130,7 @@ namespace risk.control.system.Controllers
             {
                 if (id != applicationUser.Id.ToString())
                 {
-                    notifyService.Error("OOPS !!!..Contact IT support");
+                    notifyService.Error("OOPS !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var user = await userManager.FindByIdAsync(id);
@@ -194,7 +194,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPS !!!..Contact IT support");
+                notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
@@ -214,10 +214,10 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPS !!!..Contact IT support");
+                notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
-            notifyService.Error("OOPS !!!..Contact IT support");
+            notifyService.Error("OOPS !!!..Contact Admin");
             return RedirectToAction(nameof(Index), "Dashboard");
         }
 
@@ -243,7 +243,7 @@ namespace risk.control.system.Controllers
                     if (user == null)
                     {
 
-                        notifyService.Error("OOPS !!!..Contact IT support");
+                        notifyService.Error("OOPS !!!..Contact Admin");
                         return RedirectToAction("/Account/Login");
                     }
 
@@ -261,7 +261,7 @@ namespace risk.control.system.Controllers
                         failedMessage += $"                                       ";
                         failedMessage += $"{BaseUrl}";
                         SMS.API.SendSingleMessage("+" + admin.PhoneNumber, failedMessage);
-                        notifyService.Error("OOPS !!!..Contact IT support");
+                        notifyService.Error("OOPS !!!..Contact Admin");
                         return RedirectToAction("/Account/Login");
                     }
 
@@ -298,7 +298,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPS !!!..Contact IT support");
+                notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
@@ -320,7 +320,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPS !!!..Contact IT support");
+                notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
             toastNotification.AddErrorToastMessage("Error to create Agency user!");

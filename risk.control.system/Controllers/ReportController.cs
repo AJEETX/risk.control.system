@@ -55,7 +55,7 @@ namespace risk.control.system.Controllers
 
                 if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
-                    notifyService.Error("OOPs !!!..Contact IT support");
+                    notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
@@ -137,7 +137,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPs !!!..Contact IT support");
+                notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
@@ -150,7 +150,7 @@ namespace risk.control.system.Controllers
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
-                    notifyService.Error("OOPs !!!..Contact IT support");
+                    notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 if (1 > id)
@@ -181,7 +181,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPs !!!..Contact IT support");
+                notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
@@ -220,7 +220,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPs !!!..Contact IT support");
+                notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
 
@@ -240,7 +240,7 @@ namespace risk.control.system.Controllers
 
                 if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
-                    notifyService.Error("OOPs !!!..Contact IT support");
+                    notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var claim = _context.ClaimsInvestigation
@@ -275,7 +275,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPs !!!..Contact IT support");
+                notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
@@ -294,7 +294,7 @@ namespace risk.control.system.Controllers
 
                 if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
-                    notifyService.Error("OOPs !!!..Contact IT support");
+                    notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
@@ -331,7 +331,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPs !!!..Contact IT support");
+                notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }

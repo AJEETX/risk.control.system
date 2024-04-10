@@ -62,20 +62,20 @@ namespace risk.control.system.Controllers
             {
                 if (_context.ClientCompany == null)
                 {
-                    notifyService.Error("OOPs !!!..Contact IT support");
+                    notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
                 var userEmail = HttpContext.User?.Identity?.Name;
                 if(userEmail is null)
                 {
-                    notifyService.Error("OOPs !!!..Contact IT support");
+                    notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
                 if(companyUser is null)
                 {
-                    notifyService.Error("OOPs !!!..Contact IT support");
+                    notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var clientCompany = await _context.ClientCompany
@@ -86,7 +86,7 @@ namespace risk.control.system.Controllers
                     .FirstOrDefaultAsync(m => m.ClientCompanyId == companyUser.ClientCompanyId);
                 if (clientCompany == null)
                 {
-                    notifyService.Error("OOPs !!!..Contact IT support");
+                    notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
@@ -94,7 +94,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPs !!!..Contact IT support");
+                notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
             
@@ -108,13 +108,13 @@ namespace risk.control.system.Controllers
                 var userEmail = HttpContext.User?.Identity?.Name;
                 if (userEmail is null)
                 {
-                    notifyService.Error("OOPs !!!..Contact IT support");
+                    notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
                 if (companyUser is null)
                 {
-                    notifyService.Error("OOPs !!!..Contact IT support");
+                    notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var clientCompany = await _context.ClientCompany
@@ -125,7 +125,7 @@ namespace risk.control.system.Controllers
                     .FirstOrDefaultAsync(m => m.ClientCompanyId == companyUser.ClientCompanyId);
                 if (clientCompany == null)
                 {
-                    notifyService.Error("OOPs !!!..Contact IT support");
+                    notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var country = _context.Country.OrderBy(o => o.Name);
@@ -141,7 +141,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPs !!!..Contact IT support");
+                notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
             
@@ -159,20 +159,20 @@ namespace risk.control.system.Controllers
             {
                 if (clientCompany.ClientCompanyId < 1)
                 {
-                    notifyService.Error("OOPs !!!..Contact IT support");
+                    notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var userEmail = HttpContext.User?.Identity?.Name;
                 if (userEmail is null)
                 {
-                    notifyService.Error("OOPs !!!..Contact IT support");
+                    notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
                 var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
                 if (companyUser is null)
                 {
-                    notifyService.Error("OOPs !!!..Contact IT support");
+                    notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 IFormFile? companyDocument = Request.Form?.Files?.FirstOrDefault();
@@ -218,7 +218,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPs !!!..Contact IT support");
+                notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
             notifyService.Custom($"Company edited successfully.", 3, "orange", "fas fa-building");
@@ -238,20 +238,20 @@ namespace risk.control.system.Controllers
             {
                 var userEmail = HttpContext.User?.Identity?.Name; if (userEmail is null)
                 {
-                    notifyService.Error("OOPs !!!..Contact IT support");
+                    notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
                 var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
                 if (companyUser is null)
                 {
-                    notifyService.Error("OOPs !!!..Contact IT support");
+                    notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var company = _context.ClientCompany.FirstOrDefault(v => v.ClientCompanyId == companyUser.ClientCompanyId);
                 if(company == null)
                 {
-                    notifyService.Error("OOPs !!!..Contact IT support");
+                    notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var model = new ClientCompanyApplicationUser { ClientCompany = company };
@@ -260,7 +260,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPs !!!..Contact IT support");
+                notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
             
@@ -333,12 +333,12 @@ namespace risk.control.system.Controllers
                     notifyService.Custom($"User created successfully.", 3, "green", "fas fa-user-plus");
                     return RedirectToAction(nameof(CompanyController.User), "Company");
                 }
-                notifyService.Error("OOPs !!!..Contact IT support");
+                notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
             catch (Exception)
             {
-                notifyService.Error("OOPs !!!..Contact IT support");
+                notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
             
@@ -351,14 +351,14 @@ namespace risk.control.system.Controllers
             {
                 if (userId == null || _context.ClientCompanyApplicationUser == null)
                 {
-                    notifyService.Error("OOPs !!!..Contact IT support");
+                    notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
                 var clientCompanyApplicationUser = await _context.ClientCompanyApplicationUser.FindAsync(userId);
                 if (clientCompanyApplicationUser == null)
                 {
-                    notifyService.Error("OOPs !!!..Contact IT support");
+                    notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var userEmail = HttpContext.User?.Identity?.Name;
@@ -369,7 +369,7 @@ namespace risk.control.system.Controllers
 
                 if (clientCompany == null)
                 {
-                    notifyService.Error("OOPs !!!..Contact IT support");
+                    notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 clientCompanyApplicationUser.ClientCompany = clientCompany;
@@ -388,7 +388,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPs !!!..Contact IT support");
+                notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
             
@@ -514,19 +514,19 @@ namespace risk.control.system.Controllers
             {
                 if(vendors is null || vendors.Count == 0)
                 {
-                    notifyService.Error("OOPs !!!..Contact IT support");
+                    notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var userEmail = HttpContext.User?.Identity?.Name;
                 if(string.IsNullOrWhiteSpace(userEmail))
                 {
-                    notifyService.Error("OOPs !!!..Contact IT support");
+                    notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
                 if(companyUser == null)
                 {
-                    notifyService.Error("OOPs !!!..Contact IT support");
+                    notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var company = _context.ClientCompany.Include(c => c.CompanyApplicationUser).Include(c => c.EmpanelledVendors)
@@ -534,7 +534,7 @@ namespace risk.control.system.Controllers
 
                 if (company == null)
                 {
-                    notifyService.Error("OOPs !!!..Contact IT support");
+                    notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var vendors2Empanel = _context.Vendor.AsNoTracking().Where(v => vendors.Contains(v.VendorId.ToString()));
@@ -555,7 +555,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPs !!!..Contact IT support");
+                notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
             
@@ -575,19 +575,19 @@ namespace risk.control.system.Controllers
             {
                 if (vendors is null || vendors.Count == 0)
                 {
-                    notifyService.Error("OOPs !!!..Contact IT support");
+                    notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var userEmail = HttpContext.User?.Identity?.Name;
                 if (string.IsNullOrWhiteSpace(userEmail))
                 {
-                    notifyService.Error("OOPs !!!..Contact IT support");
+                    notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
                 if (companyUser == null)
                 {
-                    notifyService.Error("OOPs !!!..Contact IT support");
+                    notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var company = _context.ClientCompany
@@ -596,7 +596,7 @@ namespace risk.control.system.Controllers
                     .FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
                 if (company == null)
                 {
-                    notifyService.Error("OOPs !!!..Contact IT support");
+                    notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var empanelledVendors2Depanel = _context.Vendor.Include(v => v.Clients).AsNoTracking().Where(v => vendors.Contains(v.VendorId.ToString()));
@@ -617,7 +617,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPs !!!..Contact IT support");
+                notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
@@ -660,7 +660,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPs !!!..Contact IT support");
+                notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
@@ -703,7 +703,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPs !!!..Contact IT support");
+                notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }

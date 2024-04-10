@@ -66,14 +66,22 @@ namespace risk.control.system.Controllers
                 var userEmail = HttpContext.User?.Identity?.Name;
                 if (string.IsNullOrWhiteSpace(userEmail))
                 {
-                    toastNotification.AddAlertToastMessage("OOPs !!!..");
-                    notifyService.Error($"OOPs !!!..Err", 3);
-                    return RedirectToAction(nameof(ClaimsVendorController.Index), "ClaimsVendor");
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var vendorAgent = _context.VendorApplicationUser.FirstOrDefault(c => c.Id.ToString() == selectedcase);
+                if(vendorAgent == null)
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
 
                 var claim = await claimsInvestigationService.AssignToVendorAgent(vendorAgent.Email, userEmail, vendorAgent.VendorId.Value, claimId);
-
+                if(claim == null)
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
                 await mailboxService.NotifyClaimAssignmentToVendorAgent(userEmail, claimId, vendorAgent.Email, vendorAgent.VendorId.Value, caseLocationId);
 
                 notifyService.Custom($"Claim #{claim.PolicyDetail.ContractNumber} tasked to {vendorAgent.Email}", 3, "green", "far fa-file-powerpoint");
@@ -82,7 +90,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPs !!!..Contact IT support");
+                notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
@@ -103,8 +111,8 @@ namespace risk.control.system.Controllers
 
                 if (string.IsNullOrWhiteSpace(userEmail))
                 {
-                    toastNotification.AddAlertToastMessage("OOPs !!!..");
-                    return RedirectToAction(nameof(ClaimsVendorController.Index), "ClaimsVendor");
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
                 //END : POST FACE IMAGE AND DOCUMENT
@@ -121,7 +129,11 @@ namespace risk.control.system.Controllers
                     question2 = question2Enum.GetEnumDisplayName();
                 }
                 var claim = await claimsInvestigationService.SubmitToVendorSupervisor(userEmail, caseLocationId, claimId, remarks, question1, question2, question3, question4);
-
+                if(claim == null)
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
                 await mailboxService.NotifyClaimReportSubmitToVendorSupervisor(userEmail, claimId, caseLocationId);
 
                 notifyService.Custom($"Claim #{claim.PolicyDetail.ContractNumber}  report submitted to supervisor", 3, "green", "far fa-file-powerpoint");
@@ -130,7 +142,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPs !!!..Contact IT support");
+                notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
@@ -149,7 +161,7 @@ namespace risk.control.system.Controllers
                 string userEmail = HttpContext?.User?.Identity.Name;
                 if (string.IsNullOrWhiteSpace(userEmail))
                 {
-                    notifyService.Error("OOPs !!!..Contact IT support");
+                    notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
@@ -170,7 +182,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPs !!!..Contact IT support");
+                notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
@@ -189,7 +201,7 @@ namespace risk.control.system.Controllers
                 string userEmail = HttpContext?.User?.Identity.Name;
                 if (string.IsNullOrWhiteSpace(userEmail))
                 {
-                    notifyService.Error("OOPs !!!..Contact IT support");
+                    notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
@@ -210,7 +222,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPs !!!..Contact IT support");
+                notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
@@ -221,10 +233,15 @@ namespace risk.control.system.Controllers
         {
             try
             {
+                if (model == null || string.IsNullOrWhiteSpace(claimId))
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
                 string userEmail = HttpContext?.User?.Identity.Name;
                 if (string.IsNullOrWhiteSpace(userEmail))
                 {
-                    notifyService.Error("OOPs !!!..Contact IT support");
+                    notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 await claimsInvestigationService.WithdrawCase(userEmail, model, claimId);
@@ -237,7 +254,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPs !!!..Contact IT support");
+                notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }

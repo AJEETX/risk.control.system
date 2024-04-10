@@ -150,11 +150,11 @@ builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
     options.User.RequireUniqueEmail = true;
 }).AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
 
-builder.Services.AddIdentityCore<VendorApplicationUser>(o => o.User.RequireUniqueEmail = true)
+builder.Services.AddIdentityCore<VendorApplicationUser>()
     .AddRoles<ApplicationRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
-builder.Services.AddIdentityCore<ClientCompanyApplicationUser>(o => o.User.RequireUniqueEmail = true)
+builder.Services.AddIdentityCore<ClientCompanyApplicationUser>()
     .AddRoles<ApplicationRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
@@ -167,30 +167,14 @@ builder.Services.Configure<IdentityOptions>(options =>
     options.User.RequireUniqueEmail = true;
 });
 
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie(options =>
-    {
-        options.Events.OnRedirectToLogin = (context) =>
-        {
-            var url = context.RedirectUri;
-            UriHelper.FromAbsolute(url, out var scheme, out var host, out var path, out var query, out var fragment);
-            url = UriHelper.BuildAbsolute(scheme, host, path);
-            context.RedirectUri = "/Account/Login";
-            return Task.CompletedTask;
-        };
-        options.AccessDeniedPath = "/Account/Login";
-        options.Cookie.Name = "AspNetCore.Identity.Application";
-        options.SlidingExpiration = true;
-        options.LoginPath = "/Account/Login";
-        options.ExpireTimeSpan = TimeSpan.FromSeconds(double.Parse(builder.Configuration["SESSION_TIMEOUT_SEC"]));
-    });
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.LoginPath = "/Account/Login";
     //sliding expiration doesn't seem to work, nor does expiretimespan
     options.SlidingExpiration = true;
     options.ExpireTimeSpan = TimeSpan.FromSeconds(double.Parse(builder.Configuration["SESSION_TIMEOUT_SEC"]));
-});
+}).AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie();
 
 builder.Services.AddSwaggerGen(c =>
 {
@@ -214,11 +198,6 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 builder.Services.AddMvcCore(config =>
-{
-    var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
-    config.Filters.Add(new AuthorizeFilter(policy));
-});
-builder.Services.AddMvc(config =>
 {
     var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
     config.Filters.Add(new AuthorizeFilter(policy));

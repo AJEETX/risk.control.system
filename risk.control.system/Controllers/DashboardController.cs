@@ -40,7 +40,7 @@ namespace risk.control.system.Controllers
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
-                    notifyService.Error("NOT FOUND!!!..Contact IT support");
+                    notifyService.Error("NOT FOUND!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
@@ -72,7 +72,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPs !!!...Contact IT support");
+                notifyService.Error("OOPs !!!...Contact Admin");
                 await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
                 await signInManager.SignOutAsync();
                 return RedirectToAction(nameof(AccountController.Login), "Account");

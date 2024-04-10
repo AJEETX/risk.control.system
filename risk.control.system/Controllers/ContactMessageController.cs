@@ -141,7 +141,7 @@ namespace risk.control.system.Controllers
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
-                    toastNotification.AddErrorToastMessage("OOPs !!!..Contact IT support");
+                    toastNotification.AddErrorToastMessage("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 contactMessage.Message = HttpUtility.HtmlEncode(contactMessage.RawMessage);
@@ -163,7 +163,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                toastNotification.AddErrorToastMessage("OOPs !!!..Contact IT support");
+                toastNotification.AddErrorToastMessage("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
@@ -332,7 +332,7 @@ namespace risk.control.system.Controllers
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
-                    toastNotification.AddErrorToastMessage("OOPs !!!..Contact IT support");
+                    toastNotification.AddErrorToastMessage("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 contactMessage.Message = HttpUtility.HtmlEncode(contactMessage.RawMessage);
@@ -354,7 +354,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                toastNotification.AddErrorToastMessage("OOPs !!!..Contact IT support");
+                toastNotification.AddErrorToastMessage("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
             
@@ -524,7 +524,7 @@ namespace risk.control.system.Controllers
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
-                    toastNotification.AddErrorToastMessage("OOPs !!!..Contact IT support");
+                    toastNotification.AddErrorToastMessage("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 contactMessage.Message = HttpUtility.HtmlEncode(contactMessage.RawMessage);
@@ -546,7 +546,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                toastNotification.AddErrorToastMessage("OOPs !!!..Contact IT support");
+                toastNotification.AddErrorToastMessage("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
             

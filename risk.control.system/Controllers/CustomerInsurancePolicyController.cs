@@ -21,7 +21,7 @@ namespace risk.control.system.Controllers
         private readonly INotyfService notifyService;
         private readonly ApplicationDbContext _context;
 
-        public CustomerInsurancePolicyController(IClaimPolicyService claimPolicyService, 
+        public CustomerInsurancePolicyController(IClaimPolicyService claimPolicyService,
             INotyfService notifyService,
             ApplicationDbContext context)
         {
@@ -35,9 +35,9 @@ namespace risk.control.system.Controllers
         {
             try
             {
-                if (id == null || _context.ClaimsInvestigation == null)
+                if (id == null || string.IsNullOrWhiteSpace(id))
                 {
-                    notifyService.Error("Not Found!!!..Contact IT support");
+                    notifyService.Error("Not Found!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
@@ -47,7 +47,7 @@ namespace risk.control.system.Controllers
 
                 if (claimsInvestigation == null)
                 {
-                    notifyService.Error("Not Found!!!..Contact IT support");
+                    notifyService.Error("Not Found!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var pinCode = _context.PinCode.Include(p => p.District).FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE2);
@@ -93,7 +93,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPS!!!..Contact IT support");
+                notifyService.Error("OOPS!!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
@@ -103,9 +103,9 @@ namespace risk.control.system.Controllers
         {
             try
             {
-                if (id == null || _context.ClaimsInvestigation == null)
+                if (id == null || string.IsNullOrWhiteSpace(id))
                 {
-                    notifyService.Error("Not Found!!!..Contact IT support");
+                    notifyService.Error("Not Found!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
@@ -123,7 +123,7 @@ namespace risk.control.system.Controllers
 
                 if (claimsInvestigation == null)
                 {
-                    notifyService.Error("Not Found!!!..Contact IT support");
+                    notifyService.Error("Not Found!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name", claimsInvestigation.PolicyDetail.ClientCompanyId);
@@ -147,19 +147,19 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPS!!!..Contact IT support");
+                notifyService.Error("OOPS!!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
-            
+
         }
         [Breadcrumb(title: " Edit Customer", FromAction = "DetailsAuto", FromController = typeof(ClaimsInvestigationController))]
         public async Task<IActionResult> EditCustomerAuto(string id)
         {
             try
             {
-                if (id == null || _context.ClaimsInvestigation == null)
+                if (id == null || string.IsNullOrWhiteSpace(id))
                 {
-                    notifyService.Error("Not Found!!!..Contact IT support");
+                    notifyService.Error("Not Found!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
@@ -177,7 +177,7 @@ namespace risk.control.system.Controllers
 
                 if (claimsInvestigation == null)
                 {
-                    notifyService.Error("Not Found!!!..Contact IT support");
+                    notifyService.Error("Not Found!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name", claimsInvestigation.PolicyDetail.ClientCompanyId);
@@ -201,7 +201,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPS!!!..Contact IT support");
+                notifyService.Error("OOPS!!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
 
@@ -211,9 +211,9 @@ namespace risk.control.system.Controllers
         {
             try
             {
-                if (id == null || _context.ClaimsInvestigation == null)
+                if (id == null || string.IsNullOrWhiteSpace(id))
                 {
-                    notifyService.Error("Not Found!!!..Contact IT support");
+                    notifyService.Error("Not Found!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
@@ -231,7 +231,7 @@ namespace risk.control.system.Controllers
 
                 if (claimsInvestigation == null)
                 {
-                    notifyService.Error("Not Found!!!..Contact IT support");
+                    notifyService.Error("Not Found!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name", claimsInvestigation.PolicyDetail.ClientCompanyId);
@@ -255,10 +255,9 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPS!!!..Contact IT support");
+                notifyService.Error("OOPS!!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
-
         }
     }
 }

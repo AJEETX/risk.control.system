@@ -137,7 +137,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPS !!!..Contact IT support");
+                notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
             
@@ -152,7 +152,7 @@ namespace risk.control.system.Controllers
             {
                 if(string.IsNullOrWhiteSpace(claimId) || caseLocation is null)
                 {
-                    notifyService.Error("NOT FOUND  !!!..Contact IT support");
+                    notifyService.Error("NOT FOUND  !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
@@ -200,7 +200,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPS !!!..Contact IT support");
+                notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
@@ -213,14 +213,14 @@ namespace risk.control.system.Controllers
             {
                 if (id == null || _context.CaseLocation == null)
                 {
-                    notifyService.Error("NOT FOUND!!!..Contact IT support");
+                    notifyService.Error("NOT FOUND!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
                 var caseLocation = await _context.CaseLocation.FindAsync(id);
                 if (caseLocation == null)
                 {
-                    notifyService.Error("NOT FOUND!!!..Contact IT support");
+                    notifyService.Error("NOT FOUND!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
@@ -246,7 +246,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPS !!!..Contact IT support");
+                notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
@@ -257,14 +257,14 @@ namespace risk.control.system.Controllers
             {
                 if (id == null || _context.CaseLocation == null)
                 {
-                    notifyService.Error("NOT FOUND!!!..Contact IT support");
+                    notifyService.Error("NOT FOUND!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
                 var caseLocation = await _context.CaseLocation.FindAsync(id);
                 if (caseLocation == null)
                 {
-                    notifyService.Error("NOT FOUND!!!..Contact IT support");
+                    notifyService.Error("NOT FOUND!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
@@ -290,7 +290,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPS !!!..Contact IT support");
+                notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
@@ -302,14 +302,14 @@ namespace risk.control.system.Controllers
             {
                 if (id == null || _context.CaseLocation == null)
                 {
-                    notifyService.Error("NOT FOUND!!!..Contact IT support");
+                    notifyService.Error("NOT FOUND!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
                 var caseLocation = await _context.CaseLocation.FindAsync(id);
                 if (caseLocation == null)
                 {
-                    notifyService.Error("NOT FOUND!!!..Contact IT support");
+                    notifyService.Error("NOT FOUND!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
@@ -335,7 +335,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPS !!!..Contact IT support");
+                notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
@@ -352,7 +352,7 @@ namespace risk.control.system.Controllers
             {
                 if (id != ecaseLocation.CaseLocationId && caseLocationId != ecaseLocation.CaseLocationId)
                 {
-                    notifyService.Error("NOT FOUND!!!..Contact IT support");
+                    notifyService.Error("NOT FOUND!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 if(id == 0)
@@ -427,7 +427,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPS !!!..Contact IT support");
+                notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
             ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name", ecaseLocation.DistrictId);
@@ -445,7 +445,7 @@ namespace risk.control.system.Controllers
             {
                 if (id == null || _context.CaseLocation == null)
                 {
-                    notifyService.Error("NOT FOUND!!!..Contact IT support");
+                    notifyService.Error("NOT FOUND!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
@@ -455,7 +455,7 @@ namespace risk.control.system.Controllers
                     .FirstOrDefaultAsync(m => m.CaseLocationId == id);
                 if (caseLocation == null)
                 {
-                    notifyService.Error("NOT FOUND!!!..Contact IT support");
+                    notifyService.Error("NOT FOUND!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
@@ -463,7 +463,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPS !!!..Contact IT support");
+                notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
@@ -477,13 +477,13 @@ namespace risk.control.system.Controllers
             {
                 if(1> id)
                 {
-                    notifyService.Error("NOT FOUND!!!..Contact IT support");
+                    notifyService.Error("NOT FOUND!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var caseLocation = await _context.CaseLocation.FindAsync(id);
                 if(caseLocation == null)
                 {
-                    notifyService.Error("NOT FOUND!!!..Contact IT support");
+                    notifyService.Error("NOT FOUND!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 caseLocation.Updated = DateTime.UtcNow;
@@ -496,7 +496,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPS !!!..Contact IT support");
+                notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }

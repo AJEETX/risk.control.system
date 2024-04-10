@@ -179,7 +179,7 @@
         }
     });
     let askFaceUploadConfirmation = true;
-    $('#UploadFaceImageButton').click(function (e) {
+    $('#upload-face').on('submit',function (e) {
         if (askFaceUploadConfirmation) {
             e.preventDefault();
             $.confirm({
@@ -232,7 +232,7 @@
 
     let askPanUploadConfirmation = true;
 
-    $('#UploadPanImageButton').click(function (e) {
+    $('#upload-pan').on('submit',function (e) {
         if (askPanUploadConfirmation) {
             e.preventDefault();
             $.confirm({

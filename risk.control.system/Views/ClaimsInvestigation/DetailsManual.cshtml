@@ -7,10 +7,7 @@
 
 <section class="content">
     <div id="article" class="card card-secondary">
-        <form id="create-form" method="post" asp-controller="ClaimsInvestigationPost" asp-action="Assign">
-        <input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail?.CustomerDetailId" />
-        <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
-        <input type="hidden" id="beneficiaryId" value="@Model.Location?.CaseLocationId" />
+        
         <div class="card-header">
             <h3 class="card-title"><i class="fas fa-newspaper"></i> Details</h3>
         </div>
@@ -205,6 +202,11 @@
                     <partial name="_CustomerBeneficiaryManual" model="@Model" />
                 </div>
             </div>
+
+        <form id="create-form" method="post" asp-controller="ClaimsInvestigationPost" asp-action="Assign">
+            <input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail?.CustomerDetailId" />
+            <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
+            <input type="hidden" id="beneficiaryId" value="@Model.Location?.CaseLocationId" />
             <div class="card-footer">
                 <div class="row  float-right">
                     <div class="col-md-12">

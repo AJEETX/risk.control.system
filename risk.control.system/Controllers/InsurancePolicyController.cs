@@ -44,11 +44,15 @@ namespace risk.control.system.Controllers
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
-                    notifyService.Error("Not Found!!!..Contact IT support");
+                    notifyService.Error("Not Found!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var model = claimPolicyService.AddClaimPolicy(currentUserEmail);
-
+                if(model == null)
+                {
+                    notifyService.Error("OOPS!!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
                 ViewBag.ClientCompanyId = model.PolicyDetail.ClientCompanyId;
 
                 ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name");
@@ -63,7 +67,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPS!!!..Contact IT support");
+                notifyService.Error("OOPS!!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
@@ -73,9 +77,9 @@ namespace risk.control.system.Controllers
         {
             try
             {
-                if (id == null || _context.ClaimsInvestigation == null)
+                if (id == null || string.IsNullOrWhiteSpace(id))
                 {
-                    notifyService.Error("Not Found!!!..Contact IT support");
+                    notifyService.Error("Not Found!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
@@ -86,7 +90,7 @@ namespace risk.control.system.Controllers
 
                 if (claimsInvestigation == null)
                 {
-                    notifyService.Error("Not Found!!!..Contact IT support");
+                    notifyService.Error("Not Found!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name", claimsInvestigation.PolicyDetail.ClientCompanyId);
@@ -101,7 +105,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPS!!!..Contact IT support");
+                notifyService.Error("OOPS!!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
             
@@ -112,9 +116,9 @@ namespace risk.control.system.Controllers
         {
             try
             {
-                if (id == null || _context.ClaimsInvestigation == null)
+                if (id == null || string.IsNullOrWhiteSpace(id))
                 {
-                    notifyService.Error("Not Found!!!..Contact IT support");
+                    notifyService.Error("Not Found!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
@@ -125,7 +129,7 @@ namespace risk.control.system.Controllers
 
                 if (claimsInvestigation == null)
                 {
-                    notifyService.Error("Not Found!!!..Contact IT support");
+                    notifyService.Error("Not Found!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name", claimsInvestigation.PolicyDetail.ClientCompanyId);
@@ -140,7 +144,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPS!!!..Contact IT support");
+                notifyService.Error("OOPS!!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
 
@@ -150,9 +154,9 @@ namespace risk.control.system.Controllers
         {
             try
             {
-                if (id == null || _context.ClaimsInvestigation == null)
+                if (id == null || string.IsNullOrWhiteSpace(id))
                 {
-                    notifyService.Error("Not Found!!!..Contact IT support");
+                    notifyService.Error("Not Found!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
@@ -163,7 +167,7 @@ namespace risk.control.system.Controllers
 
                 if (claimsInvestigation == null)
                 {
-                    notifyService.Error("Not Found!!!..Contact IT support");
+                    notifyService.Error("Not Found!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name", claimsInvestigation.PolicyDetail.ClientCompanyId);
@@ -178,7 +182,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPS!!!..Contact IT support");
+                notifyService.Error("OOPS!!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
 
@@ -189,22 +193,22 @@ namespace risk.control.system.Controllers
         {
             try
             {
-                if (id == null || _context.ClaimsInvestigation == null)
+                if (id == null || string.IsNullOrWhiteSpace(id))
                 {
-                    notifyService.Error("Not Found!!!..Contact IT support");
+                    notifyService.Error("Not Found!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 if (currentUserEmail == null)
                 {
-                    notifyService.Error("Not Found!!!..Contact IT support");
+                    notifyService.Error("Not Found!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var model = await investigationReportService.GetClaimDetails(currentUserEmail, id);
 
                 if (model == null)
                 {
-                    notifyService.Error("Not Found!!!..Contact IT support");
+                    notifyService.Error("Not Found!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
@@ -212,7 +216,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPS!!!..Contact IT support");
+                notifyService.Error("OOPS!!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
             
@@ -223,22 +227,22 @@ namespace risk.control.system.Controllers
         {
             try
             {
-                if (id == null || _context.ClaimsInvestigation == null)
+                if (id == null || string.IsNullOrWhiteSpace(id))
                 {
-                    notifyService.Error("Not Found!!!..Contact IT support");
+                    notifyService.Error("Not Found!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 if (currentUserEmail == null)
                 {
-                    notifyService.Error("Not Found!!!..Contact IT support");
+                    notifyService.Error("Not Found!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var model = await investigationReportService.GetClaimDetails(currentUserEmail, id);
 
                 if (model == null)
                 {
-                    notifyService.Error("Not Found!!!..Contact IT support");
+                    notifyService.Error("Not Found!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
@@ -246,7 +250,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPS!!!..Contact IT support");
+                notifyService.Error("OOPS!!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
 
@@ -257,22 +261,22 @@ namespace risk.control.system.Controllers
         {
             try
             {
-                if (id == null || _context.ClaimsInvestigation == null)
+                if (id == null || string.IsNullOrWhiteSpace(id))
                 {
-                    notifyService.Error("Not Found!!!..Contact IT support");
+                    notifyService.Error("Not Found!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 if (currentUserEmail == null)
                 {
-                    notifyService.Error("Not Found!!!..Contact IT support");
+                    notifyService.Error("Not Found!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var model = await investigationReportService.GetClaimDetails(currentUserEmail, id);
 
                 if (model == null)
                 {
-                    notifyService.Error("Not Found!!!..Contact IT support");
+                    notifyService.Error("Not Found!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
@@ -280,7 +284,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPS!!!..Contact IT support");
+                notifyService.Error("OOPS!!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
             
@@ -295,18 +299,18 @@ namespace risk.control.system.Controllers
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 if (currentUserEmail == null)
                 {
-                    notifyService.Error("Not Found!!!..Contact IT support");
+                    notifyService.Error("Not Found!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 if (model is null)
                 {
-                    notifyService.Error("Not Found!!!..Contact IT support");
+                    notifyService.Error("Not Found!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var claimsInvestigation = await _context.ClaimsInvestigation.FindAsync(model.ClaimsInvestigation.ClaimsInvestigationId);
                 if(claimsInvestigation == null)
                 {
-                    notifyService.Error("Not Found!!!..Contact IT support");
+                    notifyService.Error("Not Found!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 
@@ -320,7 +324,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPS!!!..Contact IT support");
+                notifyService.Error("OOPS!!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
             
@@ -335,18 +339,18 @@ namespace risk.control.system.Controllers
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 if (currentUserEmail == null)
                 {
-                    notifyService.Error("Not Found!!!..Contact IT support");
+                    notifyService.Error("Not Found!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 if (model is null)
                 {
-                    notifyService.Error("Not Found!!!..Contact IT support");
+                    notifyService.Error("Not Found!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var claimsInvestigation = await _context.ClaimsInvestigation.FindAsync(model.ClaimsInvestigation.ClaimsInvestigationId);
                 if (claimsInvestigation == null)
                 {
-                    notifyService.Error("Not Found!!!..Contact IT support");
+                    notifyService.Error("Not Found!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
@@ -360,7 +364,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPS!!!..Contact IT support");
+                notifyService.Error("OOPS!!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
 
@@ -375,18 +379,18 @@ namespace risk.control.system.Controllers
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 if (currentUserEmail == null)
                 {
-                    notifyService.Error("Not Found!!!..Contact IT support");
+                    notifyService.Error("Not Found!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 if (model is null)
                 {
-                    notifyService.Error("Not Found!!!..Contact IT support");
+                    notifyService.Error("Not Found!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var claimsInvestigation = await _context.ClaimsInvestigation.FindAsync(model.ClaimsInvestigation.ClaimsInvestigationId);
                 if (claimsInvestigation == null)
                 {
-                    notifyService.Error("Not Found!!!..Contact IT support");
+                    notifyService.Error("Not Found!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
@@ -400,7 +404,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPS!!!..Contact IT support");
+                notifyService.Error("OOPS!!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }

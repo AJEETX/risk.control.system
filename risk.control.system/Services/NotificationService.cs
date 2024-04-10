@@ -1,10 +1,14 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Net;
+
+using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
 
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
+
+using SkiaSharp;
 
 namespace risk.control.system.Services
 {
@@ -21,6 +25,7 @@ namespace risk.control.system.Services
         string SendSms2Customer(string currentUser, string claimId, string sms);
 
         string SendSms2Beneficiary(string currentUser, string claimId, string sms);
+        bool IsWhiteListIpAddress(IPAddress remoteIp);
     }
 
     public class NotificationService : INotificationService
@@ -65,7 +70,31 @@ namespace risk.control.system.Services
             }
             return response;
         }
+        public bool IsWhiteListIpAddress(IPAddress remoteIp)
+        {
+            var bytes = remoteIp.GetAddressBytes();
+            var whitelistedIp = false;
+            var ipAddresses = context.ClientCompany.Where(c => !string.IsNullOrWhiteSpace(c.WhitelistIpAddress)).Select(c => c.WhitelistIpAddress).ToList();
 
+            if (ipAddresses.Any())
+            {
+                var safelist = string.Join(";", ipAddresses);
+                var ips = safelist.Split(';');
+                var _safelist = new byte[ips.Length][];
+                for (var i = 0; i < ips.Length; i++)
+                {
+                    _safelist[i] = IPAddress.Parse(ips[i]).GetAddressBytes();
+                }
+                foreach (var address in _safelist)
+                {
+                    if (address.SequenceEqual(bytes))
+                    {
+                        return true;
+                    }
+                }
+            }
+            return whitelistedIp;
+        }
         public async Task<ClaimsInvestigation> SendVerifySchedule(ClientSchedulingMessage message)
         {
             var claim = context.ClaimsInvestigation

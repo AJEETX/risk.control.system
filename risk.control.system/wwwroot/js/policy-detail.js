@@ -96,7 +96,7 @@ $(document).ready(function () {
     });
 
     var askConfirmation = true;
-    $('#assign-list').on('click', function (e) {
+    $('#create-form').on('submit', function (e) {
         if (askConfirmation) {
             e.preventDefault();
             $.confirm({

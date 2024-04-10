@@ -89,20 +89,19 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> FaceUpload(string selectedcase, IFormFile digitalImage, string digitalIdLatitude, string digitalIdLongitude)
         {
+            var userEmail = HttpContext.User?.Identity?.Name;
+
+            if (string.IsNullOrWhiteSpace(userEmail))
+            {
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
             if (string.IsNullOrWhiteSpace(selectedcase))
             {
                 notifyService.Custom($"No claim selected!!!. ", 3, "orange", "fas fa-portrait");
                 return Redirect("/ClaimsVendor/GetInvestigate?selectedcase=" + selectedcase);
             }
-
-            var userEmail = HttpContext.User?.Identity?.Name;
-
-            if (string.IsNullOrWhiteSpace(userEmail))
-            {
-                notifyService.Custom($"Ftp Downloaded Claims ready", 3, "green", "fas fa-portrait");
-                toastNotification.AddAlertToastMessage("OOPs !!!..");
-                return RedirectToAction(nameof(ClaimsVendorController.Agent), "ClaimsVendor");
-            }
+            
             using (var ds = new MemoryStream())
             {
                 digitalImage.CopyTo(ds);
@@ -119,19 +118,17 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> PanUpload(string selectedclaim, IFormFile panImage, string documentIdLatitude, string documentIdLongitude)
         {
-            if (string.IsNullOrWhiteSpace(selectedclaim))
-            {
-                notifyService.Custom($"No claim selected!!!. ", 3, "orange", "fas fa-mobile-alt");
-                return Redirect("/ClaimsVendor/GetInvestigate?selectedcase=" + selectedclaim);
-            }
-
             var userEmail = HttpContext.User?.Identity?.Name;
 
             if (string.IsNullOrWhiteSpace(userEmail))
             {
-                notifyService.Custom($"Ftp Downloaded Claims ready", 3, "green", "fas fa-mobile-alt");
-                toastNotification.AddAlertToastMessage("OOPs !!!..");
-                return RedirectToAction(nameof(ClaimsVendorController.Agent), "ClaimsVendor");
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+            if (string.IsNullOrWhiteSpace(selectedclaim))
+            {
+                notifyService.Custom($"No claim selected!!!. ", 3, "orange", "fas fa-mobile-alt");
+                return Redirect("/ClaimsVendor/GetInvestigate?selectedcase=" + selectedclaim);
             }
 
             using (var ds = new MemoryStream())
@@ -150,7 +147,13 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> FileUpload(IFormFile postedFile, string uploadtype)
         {
-            var userEmail = HttpContext.User.Identity.Name;
+            var userEmail = HttpContext.User?.Identity?.Name;
+
+            if (string.IsNullOrWhiteSpace(userEmail))
+            {
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
             if (postedFile != null && !string.IsNullOrWhiteSpace(userEmail))
             {
                 UploadType uploadType = (UploadType)Enum.Parse(typeof(UploadType), uploadtype, true);
@@ -181,7 +184,7 @@ namespace risk.control.system.Controllers
                 }
             }
 
-            notifyService.Custom($"Upload Error. Contact IT support", 3, "red", "far fa-file-powerpoint");
+            notifyService.Custom($"Upload Error. Contact Admin", 3, "red", "far fa-file-powerpoint");
 
             return RedirectToAction("Draft", "ClaimsInvestigation");
         }

@@ -12,6 +12,7 @@ using risk.control.system.Data;
 using risk.control.system.Models;
 using risk.control.system.Services;
 
+using System.Security.Claims;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
@@ -131,7 +132,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPs !!!..Contact IT support");
+                notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
             
@@ -143,6 +144,11 @@ namespace risk.control.system.Controllers
         [HttpPost]
         public async Task<IActionResult> CaseAllocatedToVendor(long selectedcase, string claimId, long caseLocationId)
         {
+            if (selectedcase < 1 || caseLocationId < 1 || string.IsNullOrWhiteSpace(claimId))
+            {
+                notifyService.Custom($"Error!!! Try again", 3, "red", "far fa-file-powerpoint");
+                return RedirectToAction(nameof(ClaimsInvestigationController.Draft), "ClaimsInvestigation");
+            }
             //set claim as manual assigned
             try
             {
@@ -160,7 +166,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPs !!!..Contact IT support");
+                notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
             
@@ -170,6 +176,11 @@ namespace risk.control.system.Controllers
         [HttpPost]
         public async Task<IActionResult> ProcessCaseReport(string assessorRemarks, string assessorRemarkType, string claimId, long caseLocationId)
         {
+            if (string.IsNullOrWhiteSpace(assessorRemarks) || caseLocationId < 1 || string.IsNullOrWhiteSpace(claimId))
+            {
+                notifyService.Custom($"Error!!! Try again", 3, "red", "far fa-file-powerpoint");
+                return RedirectToAction(nameof(ClaimsInvestigationController.Assessor), nameof(ClaimsInvestigationController));
+            }
             try
             {
                 string userEmail = HttpContext?.User?.Identity.Name;
@@ -193,7 +204,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPs !!!..Contact IT support");
+                notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
             
@@ -203,6 +214,11 @@ namespace risk.control.system.Controllers
         [HttpPost]
         public async Task<IActionResult> ReProcessCaseReport(string assessorRemarks, string assessorRemarkType, string claimId, long caseLocationId)
         {
+            if (string.IsNullOrWhiteSpace(assessorRemarks) || caseLocationId < 1 || string.IsNullOrWhiteSpace(claimId))
+            {
+                notifyService.Custom($"Error!!! Try again", 3, "red", "far fa-file-powerpoint");
+                return RedirectToAction(nameof(ClaimsInvestigationController.Assessor), nameof(ClaimsInvestigationController));
+            }
             try
             {
                 string userEmail = HttpContext?.User?.Identity.Name;
@@ -221,7 +237,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPs !!!..Contact IT support");
+                notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
             
@@ -234,10 +250,24 @@ namespace risk.control.system.Controllers
         {
             try
             {
+                if (claimsInvestigation == null)
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
                 var userEmail = HttpContext.User.Identity.Name;
+                if(string.IsNullOrWhiteSpace(userEmail))
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
 
                 var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-
+                if (companyUser == null)
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
                 claimsInvestigation.PolicyDetail.ClientCompanyId = companyUser?.ClientCompanyId;
 
                 IFormFile documentFile = null;
@@ -259,7 +289,11 @@ namespace risk.control.system.Controllers
                 }
 
                 var claim = await claimsInvestigationService.CreatePolicy(userEmail, claimsInvestigation, documentFile, profileFile);
-
+                if(claim == null )
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
                 notifyService.Custom($"Policy #{claim.PolicyDetail.ContractNumber} created successfully", 3, "green", "far fa-file-powerpoint");
 
                 return RedirectToAction(nameof(ClaimsInvestigationController.Details), "ClaimsInvestigation", new { id = claim.ClaimsInvestigationId });
@@ -267,7 +301,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPs !!!..Contact IT support");
+                notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
@@ -279,9 +313,24 @@ namespace risk.control.system.Controllers
         {
             try
             {
+                if (claimsInvestigation == null || string.IsNullOrWhiteSpace(claimsInvestigationId) || claimtype == null)
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
                 var userEmail = HttpContext.User.Identity.Name;
+                if (string.IsNullOrWhiteSpace(userEmail))
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
 
                 var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+                if (companyUser == null)
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
 
                 claimsInvestigation.PolicyDetail.ClientCompanyId = companyUser?.ClientCompanyId;
 
@@ -325,7 +374,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPs !!!..Contact IT support");
+                notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
@@ -337,13 +386,26 @@ namespace risk.control.system.Controllers
         {
             try
             {
-
-                var status = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.INITIATED));
-                var subStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR));
-
+                if (claimsInvestigation == null || string.IsNullOrWhiteSpace(claimsInvestigationId))
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
                 var userEmail = HttpContext.User.Identity.Name;
+                if (string.IsNullOrWhiteSpace(userEmail))
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
 
                 var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+                if (companyUser == null)
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var status = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.INITIATED));
+                var subStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR));
 
                 claimsInvestigation.InvestigationCaseStatusId = status.InvestigationCaseStatusId;
                 claimsInvestigation.InvestigationCaseStatus = status;
@@ -370,14 +432,18 @@ namespace risk.control.system.Controllers
                 }
 
                 var claim = await claimsInvestigationService.CreateCustomer(userEmail, claimsInvestigation, documentFile, profileFile, create);
-
+                if (claim == null)
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
                 notifyService.Custom($"Customer {claim.CustomerDetail.CustomerName} added successfully", 3, "green", "fas fa-user-plus");
 
                 return RedirectToAction(nameof(ClaimsInvestigationController.Details), "ClaimsInvestigation", new { id = claim.ClaimsInvestigationId });
             }
             catch (Exception)
             {
-                notifyService.Error("OOPs !!!..Contact IT support");
+                notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
@@ -389,9 +455,24 @@ namespace risk.control.system.Controllers
         {
             try
             {
+                if (claimsInvestigation == null || string.IsNullOrWhiteSpace(claimsInvestigationId) || claimtype ==null || string.IsNullOrWhiteSpace(claimtype))
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
                 var userEmail = HttpContext.User.Identity.Name;
+                if (string.IsNullOrWhiteSpace(userEmail))
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
 
                 var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+                if (companyUser == null)
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
 
                 claimsInvestigation.PolicyDetail.ClientCompanyId = companyUser?.ClientCompanyId;
 
@@ -414,7 +495,11 @@ namespace risk.control.system.Controllers
                 }
 
                 var claim = await claimsInvestigationService.EditCustomer(userEmail, claimsInvestigation, profileFile);
-
+                if (claim == null)
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
                 notifyService.Custom($"Customer {claim.CustomerDetail.CustomerName} edited successfully", 3, "orange", "fas fa-user-plus");
                 if(string.IsNullOrWhiteSpace(claimtype) || claimtype.Equals("draft", StringComparison.OrdinalIgnoreCase))
                 {
@@ -434,10 +519,9 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPs !!!..Contact IT support");
+                notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
-            
         }
     }
 }
