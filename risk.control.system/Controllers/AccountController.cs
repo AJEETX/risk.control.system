@@ -309,11 +309,5 @@ namespace risk.control.system.Controllers
             }
         }
 
-        [HttpGet]
-        [AllowAnonymous]
-        public IActionResult Lockout()
-        {
-            return View();
-        }
     }
 }

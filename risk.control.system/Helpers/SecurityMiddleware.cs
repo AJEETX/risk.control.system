@@ -43,10 +43,6 @@ namespace risk.control.system.Helpers
                     "frame-ancestors 'self' https://maps.googleapis.com;" +
                     "upgrade-insecure-requests;");
             }
-            //if (errStatusCodes.Any(e=>int.Parse(e) == context.Response.StatusCode))
-            //{
-            //    context.Response.Redirect("/Account/Login", true);
-            //}
             await _next(context).ConfigureAwait(false); 
         }
     }

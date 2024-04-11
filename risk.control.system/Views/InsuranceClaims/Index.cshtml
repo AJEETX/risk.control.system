@@ -210,6 +210,33 @@
 
                 </div>
             </div>
+            <div class="card-footer">
+                <div class="row float-right">
+
+                    <div class="col-md-12">
+                        <div class="form-input">
+                            <a id="back" asp-controller="ClaimsInvestigation" asp-action="Incomplete" class="btn btn-outline-secondary"><span class="badge badge-light"> <i class="fas fa-arrow-left"></i> </span> Draft </a>
+
+                            @if (Model.AutoAllocation)
+                            {
+                                <button disabled type="submit" id="assign-list" class="btn btn-warning disabled">
+                                    <span class="badge badge-warning"> <i class="fas fa-random"></i></span>Assign<span class="badge badge-warning">auto</span>
+                                </button>
+                                <button disabled id="assign-manual-list" class="btn btn-danger disabled">
+                                    <span class="badge badge-danger"> <i class="fas fa-external-link-alt"></i></span>Assign
+                                </button>
+                            }
+                            else
+                            {
+                                <button disabled id="assign-manual-list" class="btn btn-danger disabled">
+                                    <span class="badge badge-danger"> <i class="fas fa-external-link-alt"></i></span>Assign
+                                </button>
+                            }
+
+                        </div>
+                    </div>
+                </div>
+            </div>
         }
     </div>
 </section>

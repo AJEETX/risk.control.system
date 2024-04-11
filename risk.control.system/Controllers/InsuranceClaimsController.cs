@@ -7,6 +7,7 @@ using risk.control.system.Data;
 using AspNetCoreHero.ToastNotification.Notyf;
 using risk.control.system.Services;
 using AspNetCoreHero.ToastNotification.Abstractions;
+using Microsoft.EntityFrameworkCore;
 
 namespace risk.control.system.Controllers
 {
@@ -32,6 +33,12 @@ namespace risk.control.system.Controllers
         [Breadcrumb(" Add New", FromAction = "Incomplete", FromController = typeof(ClaimsInvestigationController))]
         public IActionResult Index()
         {
+            var currentUserEmail = HttpContext.User?.Identity?.Name;
+            if (string.IsNullOrWhiteSpace(currentUserEmail))
+            {
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
             var claim = new ClaimsInvestigation
             {
                 PolicyDetail = new PolicyDetail
@@ -39,11 +46,14 @@ namespace risk.control.system.Controllers
                     LineOfBusinessId = context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == "claims").LineOfBusinessId
                 }
             };
+            var companyUser = context.ClientCompanyApplicationUser.Include(c=>c.ClientCompany).FirstOrDefault(c=>c.Email == currentUserEmail);
+
 
             var model = new ClaimTransactionModel
             {
                 ClaimsInvestigation = claim,
                 Log = null,
+                AutoAllocation = companyUser.ClientCompany.AutoAllocation,
                 Location = new CaseLocation { }
             };
 
