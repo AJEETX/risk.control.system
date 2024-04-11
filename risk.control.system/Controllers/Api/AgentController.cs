@@ -695,5 +695,27 @@ namespace risk.control.system.Controllers.Api
             }
             
         }
+
+        [AllowAnonymous]
+        [HttpPost("ip")]
+        public async Task<IActionResult> SetIp(string url, string domain, string ipaddress)
+        {
+            if(string.IsNullOrWhiteSpace(domain) || string.IsNullOrWhiteSpace(ipaddress))
+            {
+                return BadRequest($"EMPTY INPUT(s)");
+
+            }
+            var company = _context.ClientCompany.FirstOrDefault(c=>c.Email.Equals(domain, StringComparison.OrdinalIgnoreCase));
+            if(company == null)
+            {
+                return NotFound($"{domain} NOT FOUND");
+            }
+
+            company.WhitelistIpAddress += ipaddress;
+            _context.ClientCompany.Update(company);
+            await _context.SaveChangesAsync();
+            return Ok();
+        }
+
     }
 }
