@@ -47,7 +47,7 @@ namespace risk.control.system.Helpers
                         {
                             if(userCompany.Status == Models.CompanyStatus.ACTIVE )
                             {
-                                if(userCompany.ExpiryDate < TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, Applicationsettings.INDIAN_TIME_ZONE))
+                                if(userCompany.ExpiryDate < DateTime.Now)
                                 {
 
                                 }

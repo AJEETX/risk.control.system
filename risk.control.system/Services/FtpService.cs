@@ -200,7 +200,7 @@ namespace risk.control.system.Services
                                         InvestigationCaseStatus = status,
                                         InvestigationCaseSubStatusId = subStatus.InvestigationCaseSubStatusId,
                                         InvestigationCaseSubStatus = subStatus,
-                                        Updated = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, Applicationsettings.INDIAN_TIME_ZONE),
+                                        Updated = DateTime.Now,
                                         UpdatedBy = userEmail,
                                         CurrentUserEmail = userEmail,
                                         CurrentClaimOwner = userEmail,

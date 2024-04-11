@@ -72,7 +72,7 @@ namespace risk.control.system.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Login()
         {
-            var timer = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, Applicationsettings.INDIAN_TIME_ZONE);
+            var timer = DateTime.Now;
             // Clear the existing external cookie to ensure a clean login process
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             await _signInManager.SignOutAsync();

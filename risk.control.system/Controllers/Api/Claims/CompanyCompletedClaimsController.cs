@@ -86,7 +86,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>" :
                         a.CaseLocations.FirstOrDefault().BeneficiaryName,
                 Agency = a.Vendor?.Name,
-                       TimeElapsed = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, Applicationsettings.INDIAN_TIME_ZONE).Subtract(a.Created).TotalSeconds
+                       TimeElapsed = DateTime.Now.Subtract(a.Created).TotalSeconds
             })?.ToList();
 
             return Ok(response);

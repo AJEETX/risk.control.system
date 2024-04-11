@@ -272,7 +272,7 @@ namespace risk.control.system.Services
                     claimsInvestigation.PolicyDetail.DocumentImage = dataStream.ToArray();
                 }
 
-                claimsInvestigation.Updated = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, Applicationsettings.INDIAN_TIME_ZONE);
+                claimsInvestigation.Updated = DateTime.Now;
                 claimsInvestigation.UserEmailActioned = userEmail;
                 claimsInvestigation.UserEmailActionedTo = userEmail;
                 claimsInvestigation.UserRoleActionedTo = $"{AppRoles.Creator.GetEnumDisplayName()} ({currentUser.ClientCompany.Email})";
@@ -323,7 +323,7 @@ namespace risk.control.system.Services
                 existingPolicy.PolicyDetail.ContractNumber = claimsInvestigation.PolicyDetail.ContractNumber;
                 existingPolicy.PolicyDetail.SumAssuredValue = claimsInvestigation.PolicyDetail.SumAssuredValue;
                 existingPolicy.PolicyDetail.CauseOfLoss = claimsInvestigation.PolicyDetail.CauseOfLoss;
-                existingPolicy.Updated = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, Applicationsettings.INDIAN_TIME_ZONE);
+                existingPolicy.Updated = DateTime.Now;
                 existingPolicy.UpdatedBy = userEmail;
                 existingPolicy.CurrentUserEmail = userEmail;
                 existingPolicy.CurrentClaimOwner = userEmail;
@@ -370,7 +370,7 @@ namespace risk.control.system.Services
                 existingPolicy.CustomerDetail.PinCodeId = claimsInvestigation.CustomerDetail.PinCodeId;
                 existingPolicy.CustomerDetail.StateId = claimsInvestigation.CustomerDetail.StateId;
 
-                existingPolicy.Updated = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, Applicationsettings.INDIAN_TIME_ZONE);
+                existingPolicy.Updated = DateTime.Now;
                 existingPolicy.UpdatedBy = userEmail;
                 existingPolicy.CurrentUserEmail = userEmail;
                 existingPolicy.CurrentClaimOwner = userEmail;
@@ -415,7 +415,7 @@ namespace risk.control.system.Services
                             .FirstOrDefaultAsync(c => c.ClaimsInvestigationId == claimsInvestigation.ClaimsInvestigationId);
                     if (existingPolicy != null)
                     {
-                        existingPolicy.Updated = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, Applicationsettings.INDIAN_TIME_ZONE);
+                        existingPolicy.Updated = DateTime.Now;
                         existingPolicy.UpdatedBy = userEmail;
                         existingPolicy.CurrentUserEmail = userEmail;
                         existingPolicy.CurrentClaimOwner = userEmail;
@@ -484,7 +484,7 @@ namespace risk.control.system.Services
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER);
                 foreach (var claimsInvestigation in cases2Assign)
                 {
-                    claimsInvestigation.Updated = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, Applicationsettings.INDIAN_TIME_ZONE);
+                    claimsInvestigation.Updated = DateTime.Now;
                     claimsInvestigation.UpdatedBy = currentUser.FirstName + " " + currentUser.LastName + "( " + currentUser.Email + ")";
                     claimsInvestigation.CurrentUserEmail = userEmail;
                     claimsInvestigation.UserEmailActioned = userEmail;
@@ -512,7 +512,7 @@ namespace risk.control.system.Services
                         HopCount = lastLogHop + 1,
                         UserEmailActioned = userEmail,
                         UserRoleActionedTo = $"{AppRoles.Creator.GetEnumDisplayName()} ({currentUser.ClientCompany.Email})",
-                        Time2Update = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, Applicationsettings.INDIAN_TIME_ZONE).Subtract(lastLog.Created).Days,
+                        Time2Update = DateTime.Now.Subtract(lastLog.Created).Days,
                         CurrentClaimOwner = currentOwner,
                         ClaimsInvestigationId = claimsInvestigation.ClaimsInvestigationId,
                         InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS).InvestigationCaseStatusId,
@@ -553,7 +553,7 @@ namespace risk.control.system.Services
                 }
             }
             claimsInvestigation.PolicyDetail.Comments = model.ClaimsInvestigation.PolicyDetail.Comments;
-            claimsInvestigation.Updated = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, Applicationsettings.INDIAN_TIME_ZONE);
+            claimsInvestigation.Updated = DateTime.Now;
             claimsInvestigation.UpdatedBy = currentUser.FirstName + " " + currentUser.LastName + "( " + currentUser.Email + ")";
             claimsInvestigation.CurrentUserEmail = userEmail;
             claimsInvestigation.CurrentClaimOwner = currentOwner;
@@ -581,7 +581,7 @@ namespace risk.control.system.Services
                 HopCount = lastLogHop + 1,
                 UserEmailActioned = userEmail,
                 UserRoleActionedTo = $"{AppRoles.Creator.GetEnumDisplayName()} ({company.Email})",
-                Time2Update = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, Applicationsettings.INDIAN_TIME_ZONE).Subtract(lastLog.Created).Days,
+                Time2Update = DateTime.Now.Subtract(lastLog.Created).Days,
                 CurrentClaimOwner = currentOwner,
                 ClaimsInvestigationId = claimsInvestigation.ClaimsInvestigationId,
                 InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS).InvestigationCaseStatusId,
@@ -623,7 +623,7 @@ namespace risk.control.system.Services
                     .Include(c => c.PolicyDetail)
                     .FirstOrDefault(v => v.ClaimsInvestigationId == claimsInvestigationId);
                 claimsCaseToAllocateToVendor.AssignedToAgency = true;
-                claimsCaseToAllocateToVendor.Updated = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, Applicationsettings.INDIAN_TIME_ZONE);
+                claimsCaseToAllocateToVendor.Updated = DateTime.Now;
                 claimsCaseToAllocateToVendor.UpdatedBy = currentUser.FirstName + " " + currentUser.LastName + " (" + currentUser.Email + ")";
                 claimsCaseToAllocateToVendor.CurrentUserEmail = userEmail;
                 claimsCaseToAllocateToVendor.CurrentClaimOwner = supervisor.Email;
@@ -656,7 +656,7 @@ namespace risk.control.system.Services
                     HopCount = lastLogHop + 1,
                     ClaimsInvestigationId = claimsCaseToAllocateToVendor.ClaimsInvestigationId,
                     CurrentClaimOwner = claimsCaseToAllocateToVendor.CurrentClaimOwner,
-                    Time2Update = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, Applicationsettings.INDIAN_TIME_ZONE).Subtract(lastLog.Created).Days,
+                    Time2Update = DateTime.Now.Subtract(lastLog.Created).Days,
                     InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS).InvestigationCaseStatusId,
                     InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR).InvestigationCaseSubStatusId,
                     UpdatedBy = currentUser.Email
@@ -714,7 +714,7 @@ namespace risk.control.system.Services
                 claim.UserEmailActioned = currentUser;
                 claim.UserEmailActionedTo = agentUser.Email;
                 claim.UserRoleActionedTo = $"{AppRoles.Agent.GetEnumDisplayName()} ({agentUser.Vendor.Email})";
-                claim.Updated = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, Applicationsettings.INDIAN_TIME_ZONE);
+                claim.Updated = DateTime.Now;
                 claim.UpdatedBy = supervisor.Email;
                 claim.CurrentUserEmail = currentUser;
                 claim.CurrentClaimOwner = agentUser.Email;
@@ -736,7 +736,7 @@ namespace risk.control.system.Services
                     HopCount = lastLogHop + 1,
                     ClaimsInvestigationId = claim.ClaimsInvestigationId,
                     CurrentClaimOwner = claim.CurrentClaimOwner,
-                    Time2Update = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, Applicationsettings.INDIAN_TIME_ZONE).Subtract(lastLog.Created).Days,
+                    Time2Update = DateTime.Now.Subtract(lastLog.Created).Days,
                     InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS).InvestigationCaseStatusId,
                     InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT).InvestigationCaseSubStatusId,
                     UpdatedBy = supervisor.FirstName + " " + supervisor.LastName + " (" + supervisor.Email + ")"
@@ -761,7 +761,7 @@ namespace risk.control.system.Services
             claim.UserEmailActioned = userEmail;
             claim.UserEmailActionedTo = string.Empty;
             claim.UserRoleActionedTo = $"{AppRoles.Supervisor.GetEnumDisplayName()} ({agent.Vendor.Email})";
-            claim.Updated = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, Applicationsettings.INDIAN_TIME_ZONE);
+            claim.Updated = DateTime.Now;
             claim.UpdatedBy = agent.FirstName + " " + agent.LastName + "(" + agent.Email + ")";
             claim.CurrentUserEmail = userEmail;
             claim.CurrentClaimOwner = supervisor.Email;
@@ -800,7 +800,7 @@ namespace risk.control.system.Services
 
             caseLocation.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus
                 .FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR).InvestigationCaseSubStatusId;
-            caseLocation.Updated = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, Applicationsettings.INDIAN_TIME_ZONE);
+            caseLocation.Updated = DateTime.Now;
             caseLocation.UpdatedBy = userEmail;
             caseLocation.AssignedAgentUserEmail = supervisor.Email;
             caseLocation.IsReviewCaseLocation = false;
@@ -820,7 +820,7 @@ namespace risk.control.system.Services
                 UserRoleActionedTo = $"{AppRoles.Supervisor.GetEnumDisplayName()} ({agent.Vendor.Email})",
                 HopCount = lastLogHop + 1,
                 CurrentClaimOwner = supervisor.Email,
-                Time2Update = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, Applicationsettings.INDIAN_TIME_ZONE).Subtract(lastLog.Created).Days,
+                Time2Update = DateTime.Now.Subtract(lastLog.Created).Days,
                 InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS).InvestigationCaseStatusId,
                 InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR).InvestigationCaseSubStatusId,
                 UpdatedBy = agent.Email
@@ -882,7 +882,7 @@ namespace risk.control.system.Services
 
             caseLocation.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus
                 .FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR).InvestigationCaseSubStatusId;
-            caseLocation.Updated = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, Applicationsettings.INDIAN_TIME_ZONE);
+            caseLocation.Updated = DateTime.Now;
             caseLocation.UpdatedBy = userEmail;
             _context.CaseLocation.Update(caseLocation);
             try
@@ -900,7 +900,7 @@ namespace risk.control.system.Services
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.FINISHED).InvestigationCaseStatusId;
                     claim.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR).InvestigationCaseSubStatusId;
-                    claim.Updated = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, Applicationsettings.INDIAN_TIME_ZONE);
+                    claim.Updated = DateTime.Now;
                     claim.UserEmailActioned = userEmail;
                     claim.UserRoleActionedTo = $"{AppRoles.CompanyAdmin.GetEnumDisplayName()} ({claim.PolicyDetail.ClientCompany.Email})";
                     claim.UserEmailActionedTo = userEmail;
@@ -917,8 +917,8 @@ namespace risk.control.system.Services
                         UserRoleActionedTo = $"{AppRoles.CompanyAdmin.GetEnumDisplayName()} ({claim.PolicyDetail.ClientCompany.Email})",
                         ClaimsInvestigationId = claimsInvestigationId,
                         CurrentClaimOwner = claim.CurrentClaimOwner,
-                        Created = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, Applicationsettings.INDIAN_TIME_ZONE),
-                        Time2Update = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, Applicationsettings.INDIAN_TIME_ZONE).Subtract(claim.Created).Days,
+                        Created = DateTime.Now,
+                        Time2Update = DateTime.Now.Subtract(claim.Created).Days,
                         InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.FINISHED).InvestigationCaseStatusId,
                         InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                         i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR).InvestigationCaseSubStatusId,
@@ -1025,7 +1025,7 @@ namespace risk.control.system.Services
 
             claimsCaseLocation.ClaimReport.AssessorRemarkType = assessorRemarkType;
             claimsCaseLocation.ClaimReport.AssessorRemarks = assessorRemarks;
-            claimsCaseLocation.ClaimReport.AssessorRemarksUpdated = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, Applicationsettings.INDIAN_TIME_ZONE);
+            claimsCaseLocation.ClaimReport.AssessorRemarksUpdated = DateTime.Now;
             claimsCaseLocation.ClaimReport.AssessorEmail = userEmail;
 
             var saveReport = new PreviousClaimReport
@@ -1075,7 +1075,7 @@ namespace risk.control.system.Services
             claimsCaseToReassign.UserEmailActioned = userEmail;
             claimsCaseToReassign.UserEmailActionedTo = string.Empty;
             claimsCaseToReassign.UserRoleActionedTo = $"{AppRoles.Creator.GetEnumDisplayName()} ( {currentUser.ClientCompany.Email})";
-            claimsCaseToReassign.Updated = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, Applicationsettings.INDIAN_TIME_ZONE);
+            claimsCaseToReassign.Updated = DateTime.Now;
             claimsCaseToReassign.UpdatedBy = userEmail;
             claimsCaseToReassign.CurrentUserEmail = userEmail;
             claimsCaseToReassign.IsReviewCase = true;
@@ -1097,8 +1097,8 @@ namespace risk.control.system.Services
                 UserEmailActioned = userEmail,
                 UserRoleActionedTo = $"{AppRoles.Creator.GetEnumDisplayName()} ( {currentUser.ClientCompany.Email})",
                 ClaimsInvestigationId = claimsCaseToReassign.ClaimsInvestigationId,
-                Created = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, Applicationsettings.INDIAN_TIME_ZONE),
-                Time2Update = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, Applicationsettings.INDIAN_TIME_ZONE).Subtract(lastLog.Created).Days,
+                Created = DateTime.Now,
+                Time2Update = DateTime.Now.Subtract(lastLog.Created).Days,
                 InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS).InvestigationCaseStatusId,
                 InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER).InvestigationCaseSubStatusId,
                 UpdatedBy = userEmail,
@@ -1153,7 +1153,7 @@ namespace risk.control.system.Services
             claim.UserEmailActionedTo = string.Empty;
             claim.UserRoleActionedTo = $"{AppRoles.Assessor.GetEnumDisplayName()} ( {clientCompany.Email})";
             claim.UserEmailActionedTo = string.Empty;
-            claim.Updated = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, Applicationsettings.INDIAN_TIME_ZONE);
+            claim.Updated = DateTime.Now;
             claim.UpdatedBy = supervisorUser;
             claim.CurrentUserEmail = userEmail;
             claim.CurrentClaimOwner = currentOwner;
@@ -1164,14 +1164,14 @@ namespace risk.control.system.Services
             var report = _context.ClaimReport.FirstOrDefault(c => c.ClaimReportId == caseLocation.ClaimReport.ClaimReportId);
             report.SupervisorRemarkType = reportUpdateStatus;
             report.SupervisorRemarks = supervisorRemarks;
-            report.SupervisorRemarksUpdated = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, Applicationsettings.INDIAN_TIME_ZONE);
+            report.SupervisorRemarksUpdated = DateTime.Now;
             report.SupervisorEmail = userEmail;
             report.Vendor = claim.Vendor;
             _context.ClaimReport.Update(report);
             caseLocation.ClaimReport = report;
             caseLocation.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus
                 .FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR).InvestigationCaseSubStatusId;
-            caseLocation.Updated = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, Applicationsettings.INDIAN_TIME_ZONE);
+            caseLocation.Updated = DateTime.Now;
             caseLocation.UpdatedBy = userEmail;
             caseLocation.AssignedAgentUserEmail = string.Empty;
             _context.CaseLocation.Update(caseLocation);
@@ -1187,8 +1187,8 @@ namespace risk.control.system.Services
                 UserEmailActioned = userEmail,
                 UserRoleActionedTo = $"{AppRoles.Assessor.GetEnumDisplayName()} ( {clientCompany.Email})",
                 CurrentClaimOwner = currentOwner,
-                Created = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, Applicationsettings.INDIAN_TIME_ZONE),
-                Time2Update = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, Applicationsettings.INDIAN_TIME_ZONE).Subtract(lastLog.Created).Days,
+                Created = DateTime.Now,
+                Time2Update = DateTime.Now.Subtract(lastLog.Created).Days,
                 InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS).InvestigationCaseStatusId,
                 InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR).InvestigationCaseSubStatusId,
                 UpdatedBy = supervisorUser
@@ -1235,7 +1235,7 @@ namespace risk.control.system.Services
                 .FirstOrDefault(v => v.ClaimsInvestigationId == claimsInvestigationId);
             claimsCaseToAllocateToVendor.UserEmailActioned = userEmail;
             claimsCaseToAllocateToVendor.UserRoleActionedTo = $"{AppRoles.Creator.GetEnumDisplayName()} ({claimsCaseToAllocateToVendor.PolicyDetail.ClientCompany.Email})";
-            claimsCaseToAllocateToVendor.Updated = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, Applicationsettings.INDIAN_TIME_ZONE);
+            claimsCaseToAllocateToVendor.Updated = DateTime.Now;
             claimsCaseToAllocateToVendor.UpdatedBy = userEmail;
             claimsCaseToAllocateToVendor.CurrentUserEmail = userEmail;
             claimsCaseToAllocateToVendor.IsReviewCase = true;
@@ -1259,8 +1259,8 @@ namespace risk.control.system.Services
                 UserEmailActioned = userEmail,
                 UserRoleActionedTo= $"{AppRoles.Creator.GetEnumDisplayName()} ({claimsCaseToAllocateToVendor.PolicyDetail.ClientCompany.Email})",
                 ClaimsInvestigationId = claimsInvestigationId,
-                Created = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, Applicationsettings.INDIAN_TIME_ZONE),
-                Time2Update = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, Applicationsettings.INDIAN_TIME_ZONE).Subtract(lastLog.Created).Days,
+                Created = DateTime.Now,
+                Time2Update = DateTime.Now.Subtract(lastLog.Created).Days,
                 InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS).InvestigationCaseStatusId,
                 InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR).InvestigationCaseSubStatusId,
                 UpdatedBy = userEmail
