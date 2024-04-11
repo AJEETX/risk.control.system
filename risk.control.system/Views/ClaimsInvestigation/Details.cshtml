@@ -203,25 +203,27 @@
                     <partial name="_CustomerBeneficiary" model="@Model" />
                     
                 </div>
-                <div class="container d-flex justify-content-center align-items-center">
-                    @if (customerExist && beneficiaryExist)
-                    {
+                @if (customerExist && beneficiaryExist)
+                {
+                <div class="card-footer">
+                <div class="row">
+
+                            <div class="col-12d-flex align-items-stretch flex-column">
+
 
                         <span class="badge badge-light"><i class="far fa-file-powerpoint"></i> Details completed now. !!! </span>
                         <i class="far fa-thumbs-up"></i>
 
                         <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
                         <span class="badge badge-warning">
-                            <i class="fas fa-random"></i> Assign  <span class="badge badge-warning">auto</span>
-                        </span><span class="badge badge-light"> / </span>
+                            <i class="fas fa-random"></i> Assign <span class="badge badge-warning">auto</span>
+                        </span><span class="badge badge-light">/</span>
                         <span class="badge badge-danger">
-                            <i class="fas fa-external-link-alt"></i>Assign
+                            <i class="fas fa-external-link-alt"></i> Assign
                         </span>
                         <span class="badge badge-light">
-                            it now.
+                            it now. Or
                         </span>
-
-                            <span class="badge badge-light"> The claim can also be </span>
 
                         <span class="badge badge-warning">
                             <i class="fas fa-random"></i>
@@ -231,9 +233,13 @@
                         <span class="badge badge-danger">
                             <i class="fas fa-external-link-alt"></i>Assign
                         </span>
-                        <span class="badge badge-light">later  from Assign section(s).</span>
-                    }
+                        <span class="badge badge-light">  from Assign section(s).</span>
+
+
+                            </div>
+                        </div>
                 </div>
+                }
             </div>
             <form id="create-form" method="post" asp-controller="ClaimsInvestigationPost" asp-action="Assign">
                 <input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail?.CustomerDetailId" />

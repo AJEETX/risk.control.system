@@ -48,27 +48,35 @@ namespace risk.control.system.Services
 
         public async Task<IpApiResponse?> GetClientIp(string? ipAddress, CancellationToken ct, string page, string userEmail = "", bool isAuthenticated = false)
         {
-            var curTimeZone = TimeZone.CurrentTimeZone;
-
-            var route = $"{IP_BASE_URL}/json/{ipAddress}";
-            page = page == "/" ? "dashboard" : page;
-            var response = await _httpClient.GetFromJsonAsync<IpApiResponse>(route, ct);
-            var longLatString = response?.lat.GetValueOrDefault().ToString() + "," + response?.lon.GetValueOrDefault().ToString();
-            var mapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={longLatString}&zoom=6&size=560x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{longLatString}&key={Applicationsettings.GMAPData}";
-
-            if (response != null && (await featureManager.IsEnabledAsync(FeatureFlags.IPTracking)))
+            try
             {
-                if ((isAuthenticated && !string.IsNullOrWhiteSpace(userEmail) && !userEmail.StartsWith("admin")) || !isAuthenticated)
+                var curTimeZone = TimeZone.CurrentTimeZone;
+
+                var route = $"{IP_BASE_URL}/json/{ipAddress}";
+                page = page == "/" ? "dashboard" : page;
+                var response = await _httpClient.GetFromJsonAsync<IpApiResponse>(route, ct);
+                var longLatString = response?.lat.GetValueOrDefault().ToString() + "," + response?.lon.GetValueOrDefault().ToString();
+                var mapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={longLatString}&zoom=6&size=560x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{longLatString}&key={Applicationsettings.GMAPData}";
+
+                if (response != null && (await featureManager.IsEnabledAsync(FeatureFlags.IPTracking)))
                 {
-                    response.page = page;
-                    response.user = userEmail;
-                    response.isAuthenticated = isAuthenticated;
-                    response.MapUrl = mapUrl;
-                    context.IpApiResponse.Add(response);
-                    await context.SaveChangesAsync();
+                    if ((isAuthenticated && !string.IsNullOrWhiteSpace(userEmail) && !userEmail.StartsWith("admin")) || !isAuthenticated)
+                    {
+                        response.page = page;
+                        response.user = userEmail;
+                        response.isAuthenticated = isAuthenticated;
+                        response.MapUrl = mapUrl;
+                        context.IpApiResponse.Add(response);
+                        await context.SaveChangesAsync();
+                    }
                 }
+                return response;
             }
-            return response;
+            catch (Exception)
+            {
+                return null!;
+            }
+            
         }
         public bool IsWhiteListIpAddress(IPAddress remoteIp)
         {
