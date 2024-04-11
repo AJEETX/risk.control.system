@@ -107,7 +107,7 @@ namespace risk.control.system.Controllers.Api.Claims
                        BeneficiaryName = a.CaseLocations.Count == 0 ?
                         "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>" :
                         a.CaseLocations.FirstOrDefault().BeneficiaryName,
-                       TimeElapsed = DateTime.UtcNow.Subtract(a.Created).TotalSeconds
+                       TimeElapsed = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, Applicationsettings.INDIAN_TIME_ZONE).Subtract(a.Created).TotalSeconds
                    })?
                    .ToList();
 
@@ -287,7 +287,7 @@ namespace risk.control.system.Controllers.Api.Claims
                        BeneficiaryName = a.CaseLocations.Count == 0 ?
                         "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>" :
                         a.CaseLocations.FirstOrDefault().BeneficiaryName,
-                       TimeElapsed = DateTime.UtcNow.Subtract(a.Created).TotalSeconds
+                       TimeElapsed = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, Applicationsettings.INDIAN_TIME_ZONE).Subtract(a.Created).TotalSeconds
                    })
                     ?.ToList();
 
@@ -449,7 +449,7 @@ namespace risk.control.system.Controllers.Api.Claims
                        BeneficiaryName = a.CaseLocations.Count == 0 ?
                         "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>" :
                         a.CaseLocations.FirstOrDefault().BeneficiaryName,
-                       TimeElapsed = DateTime.UtcNow.Subtract(a.Created).TotalSeconds
+                       TimeElapsed = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, Applicationsettings.INDIAN_TIME_ZONE).Subtract(a.Created).TotalSeconds
                    })
                     ?.ToList();
 

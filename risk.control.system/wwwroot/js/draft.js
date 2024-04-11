@@ -43,7 +43,7 @@
                 return '<input type="checkbox" name="id[]" value="' + $('<div/>').text(data).html() + '">';
             }
         }],
-        order: [[12, 'asc']],
+        order: [[12, 'desc']],
         fixedHeader: true,
         processing: true,
         paging: true,

@@ -105,7 +105,7 @@ namespace risk.control.system.Controllers.Api.Claims
                     BeneficiaryName = a.CaseLocations.Count == 0 ?
                     "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>" :
                     a.CaseLocations.FirstOrDefault().BeneficiaryName,
-                    TimeElapsed = DateTime.UtcNow.Subtract(a.Created).TotalSeconds
+                       TimeElapsed = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, Applicationsettings.INDIAN_TIME_ZONE).Subtract(a.Created).TotalSeconds
                 })?
                 .ToList();
 
