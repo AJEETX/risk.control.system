@@ -209,7 +209,50 @@
                     </div>
 
                 </div>
+                <div class="container d-flex justify-content-center align-items-center">
+                    <div class="row">
+                        @if (Model.AutoAllocation)
+                        {
+                            <div class="col-12">
+
+                                <span class="badge badge-light"><i class="far fa-file-powerpoint"></i> Please Complete details . !!! </span>
+                                <i class="far fa-thumbs-up"></i>
+
+                                <span> to </span>
+                                <span class="badge badge-warning">
+                                    <i class="fas fa-random"></i> Assign <span class="badge badge-warning">auto</span>
+                                </span><span class="badge badge-light">/</span>
+                                <span class="badge badge-danger">
+                                    <i class="fas fa-external-link-alt"></i> Assign
+                                </span>
+
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="col-12">
+
+
+                                <span class="badge badge-light"><i class="far fa-file-powerpoint"></i> Please Complete details . !!! </span>
+                                <i class="far fa-thumbs-up"></i>
+
+                                <span>to</span>
+
+                                <span class="badge badge-danger">
+                                    <i class="fas fa-external-link-alt"></i> Assign
+                                </span>
+
+
+
+                            </div>
+                        }
+
+                    </div>
+                </div>
             </div>
+
+
+
             <div class="card-footer">
                 <div class="row float-right">
 
