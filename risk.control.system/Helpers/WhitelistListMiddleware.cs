@@ -29,18 +29,19 @@ namespace risk.control.system.Helpers
 
         public async Task Invoke(HttpContext context)
         {
-            if(await featureManager.IsEnabledAsync(FeatureFlags.IPRestrict))
+            var ipAddress = context.GetServerVariable("HTTP_X_FORWARDED_FOR") ?? context.Connection.RemoteIpAddress?.ToString();
+            var remoteIp = IPAddress.Parse(ipAddress);
+
+            if (await featureManager.IsEnabledAsync(FeatureFlags.IPRestrict))
             {
                 if (!context.Request.Path.Value.Contains("api/agent") && !context.Request.Path.Value.Contains("api/Notification/GetClientIp"))
                 {
-                    var remoteIp = context.Connection.RemoteIpAddress;
                     _logger.LogDebug("Request from Remote IP address: {RemoteIp}", remoteIp);
-
                     var bytes = remoteIp.GetAddressBytes();
                     var badIp = true;
                     var ipRange = IPAddressRange.Parse("202.7.251.21/255.255.255.0");
                     ipRange.Contains(remoteIp); // is True.
-                    
+
                     var dbContext = context.RequestServices.GetRequiredService<ApplicationDbContext>();
                     var ipAddressRanges = dbContext.ClientCompany.Where(c => !string.IsNullOrWhiteSpace(c.WhitelistIpAddressRange)).Select(c => c.WhitelistIpAddressRange).ToList();
                     if (ipAddressRanges.Any())
@@ -69,8 +70,8 @@ namespace risk.control.system.Helpers
                             return;
                         }
                     }
-                    var ipAddresses = dbContext.ClientCompany.Where(c=>!string.IsNullOrWhiteSpace(c.WhitelistIpAddress)).Select(c=>c.WhitelistIpAddress).ToList();
-                    
+                    var ipAddresses = dbContext.ClientCompany.Where(c => !string.IsNullOrWhiteSpace(c.WhitelistIpAddress)).Select(c => c.WhitelistIpAddress).ToList();
+
                     if (ipAddresses.Any())
                     {
                         var safelist = string.Join(";", ipAddresses);
@@ -88,6 +89,7 @@ namespace risk.control.system.Helpers
                                 break;
                             }
                         }
+                        
                         var userAuthenticated = context.Request.HttpContext.User?.Identity?.IsAuthenticated ?? false;
                         if (badIp && userAuthenticated)
                         {
@@ -103,9 +105,13 @@ namespace risk.control.system.Helpers
                         }
                     }
                 }
+
             }
+            context.Request.Headers["X-IPAddress"] = remoteIp.ToString();
 
             await _next.Invoke(context);
+
+            context.Request.Headers.Remove("X-IPAddress");
         }
     }
 

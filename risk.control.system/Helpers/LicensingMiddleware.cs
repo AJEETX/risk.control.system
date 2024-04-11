@@ -5,6 +5,7 @@ using Microsoft.FeatureManagement;
 
 using NetTools;
 
+using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
@@ -29,7 +30,38 @@ namespace risk.control.system.Helpers
 
         public async Task Invoke(HttpContext context)
         {
-            
+            if(await featureManager.IsEnabledAsync(FeatureFlags.LICENSE))
+            {
+                var dbContext = context.RequestServices.GetRequiredService<ApplicationDbContext>();
+
+                var remoteIp = context.Request.Headers["X-IPAddress"];
+                if(context.User.Identity.IsAuthenticated)
+                {
+                    var userEmail = context.User.Identity.Name;
+
+                    var userCompany = dbContext.ClientCompany.FirstOrDefault(c=>c.Email == userEmail.Substring(userEmail.IndexOf("@")));
+
+                    if(userCompany != null)
+                    {
+                        if(userCompany.LicenseType == Standard.Licensing.LicenseType.Trial)
+                        {
+                            if(userCompany.Status == Models.CompanyStatus.ACTIVE )
+                            {
+                                if(userCompany.ExpiryDate < TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, Applicationsettings.INDIAN_TIME_ZONE))
+                                {
+
+                                }
+                            }
+                        }
+                    }
+                }
+                //else
+                //{
+                //    _logger.LogWarning("Forbidden Request from Remote IP address: {RemoteIp}", remoteIp);
+                //    context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                //    return;
+                //}
+            }
             await _next.Invoke(context);
         }
     }

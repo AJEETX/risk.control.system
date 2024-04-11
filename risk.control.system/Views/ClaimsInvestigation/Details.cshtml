@@ -201,44 +201,73 @@
                     </div>
 
                     <partial name="_CustomerBeneficiary" model="@Model" />
-                    
+
                 </div>
                 @if (customerExist && beneficiaryExist)
                 {
-                <div class="card-footer">
-                <div class="row">
-
-                            <div class="col-12d-flex align-items-stretch flex-column">
-
-
-                        <span class="badge badge-light"><i class="far fa-file-powerpoint"></i> Details completed now. !!! </span>
-                        <i class="far fa-thumbs-up"></i>
-
-                        <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                        <span class="badge badge-warning">
-                            <i class="fas fa-random"></i> Assign <span class="badge badge-warning">auto</span>
-                        </span><span class="badge badge-light">/</span>
-                        <span class="badge badge-danger">
-                            <i class="fas fa-external-link-alt"></i> Assign
-                        </span>
-                        <span class="badge badge-light">
-                            it now. Or
-                        </span>
-
-                        <span class="badge badge-warning">
-                            <i class="fas fa-random"></i>
-                            Assign
-                        </span>
-                        <span class="badge badge-light"> / </span>
-                        <span class="badge badge-danger">
-                            <i class="fas fa-external-link-alt"></i>Assign
-                        </span>
-                        <span class="badge badge-light">  from Assign section(s).</span>
+                    <div class="container d-flex justify-content-center align-items-center">
+                        <div class="row">
+                        @if(Model.AutoAllocation)
+                            {
+                                <div class="col-12">
 
 
-                            </div>
+                                    <span class="badge badge-light"><i class="far fa-file-powerpoint"></i> Details completed now. !!! </span>
+                                    <i class="far fa-thumbs-up"></i>
+
+                                    <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                    <span class="badge badge-warning">
+                                        <i class="fas fa-random"></i> Assign <span class="badge badge-warning">auto</span>
+                                    </span><span class="badge badge-light">/</span>
+                                    <span class="badge badge-danger">
+                                        <i class="fas fa-external-link-alt"></i> Assign
+                                    </span>
+                                    <span class="badge badge-light">
+                                        it now. Or
+                                    </span>
+
+                                    <span class="badge badge-warning">
+                                        <i class="fas fa-random"></i>
+                                        Assign
+                                    </span>
+                                    <span class="badge badge-light"> / </span>
+                                    <span class="badge badge-danger">
+                                        <i class="fas fa-external-link-alt"></i> Assign
+                                    </span>
+                                    <span class="badge badge-light">  from Assign section(s).</span>
+
+
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="col-12">
+
+
+                                    <span class="badge badge-light"><i class="far fa-file-powerpoint"></i> Details completed now. !!! </span>
+                                    <i class="far fa-thumbs-up"></i>
+
+                                    <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                   
+                                    <span class="badge badge-danger">
+                                        <i class="fas fa-external-link-alt"></i> Assign
+                                    </span>
+                                    <span class="badge badge-light">
+                                        it now. Or
+                                    </span>
+
+                                    
+                                    <span class="badge badge-danger">
+                                        <i class="fas fa-external-link-alt"></i> Assign
+                                    </span>
+                                    <span class="badge badge-light">  from Assign section.</span>
+
+
+                                </div>
+                            }
+
                         </div>
-                </div>
+                    </div>
                 }
             </div>
             <form id="create-form" method="post" asp-controller="ClaimsInvestigationPost" asp-action="Assign">
@@ -251,30 +280,46 @@
 
                         <div class="col-md-12">
                             <div class="form-input">
-                            @if(!customerExist || !beneficiaryExist)
+                                <a id="back" asp-action="Incomplete" class="btn btn-outline-secondary"><span class="badge badge-light"> <i class="fas fa-arrow-left"></i> </span> Draft </a>
+
+
+                                @if (!customerExist || !beneficiaryExist)
                                 {
-                                    <a id="back" asp-action="Incomplete" class="btn btn-outline-secondary"><span class="badge badge-light"> <i class="fas fa-arrow-left"></i> </span> Back </a>
-
+                                    @if (Model.AutoAllocation)
+                                    {
+                                        <button disabled type="submit" id="assign-list" class="btn btn-warning disabled">
+                                            <span class="badge badge-warning"> <i class="fas fa-random"></i></span>Assign<span class="badge badge-warning">auto</span>
+                                        </button>
+                                        <button disabled id="assign-manual-list" class="btn btn-danger disabled">
+                                            <span class="badge badge-danger"> <i class="fas fa-external-link-alt"></i></span>Assign
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <button disabled id="assign-manual-list" class="btn btn-danger disabled">
+                                            <span class="badge badge-danger"> <i class="fas fa-external-link-alt"></i></span>Assign
+                                        </button>
+                                    }
                                 }
-
-                                @if (customerExist && beneficiaryExist && !Model.Assigned && Model.AutoAllocation)
+                                else
                                 {
-
-                                    <button type="submit" id="assign-list" class="btn btn-warning">
-                                        <span class="badge badge-warning"> <i class="fas fa-random"></i></span>Assign<span class="badge badge-warning">auto</span>
-                                    </button>
-                                    <a id="assign-manual-list" asp-action="EmpanelledVendors" asp-route-selectedcase="@Model.ClaimsInvestigation.ClaimsInvestigationId" class="btn btn-danger">
-                                        <span class="badge badge-danger"> <i class="fas fa-external-link-alt"></i></span>Assign
-                                    </a>
+                                    @if (!Model.Assigned && Model.AutoAllocation)
+                                    {
+                                        <button type="submit" id="assign-list" class="btn btn-warning">
+                                            <span class="badge badge-warning"> <i class="fas fa-random"></i></span>Assign<span class="badge badge-warning">auto</span>
+                                        </button>
+                                        <a id="assign-manual-list" asp-action="EmpanelledVendors" asp-route-selectedcase="@Model.ClaimsInvestigation.ClaimsInvestigationId" class="btn btn-danger">
+                                            <span class="badge badge-danger"> <i class="fas fa-external-link-alt"></i></span>Assign
+                                        </a>
+                                    }
+                                    else if (Model.Assigned || (!Model.AutoAllocation))
+                                    {
+                                        <a id="assign-manual-list" asp-action="EmpanelledVendors" asp-route-selectedcase="@Model.ClaimsInvestigation.ClaimsInvestigationId" class="btn btn-danger">
+                                            <span class="badge badge-danger"> <i class="fas fa-external-link-alt"></i></span>Assign
+                                        </a>
+                                    }
                                 }
-                                else if (customerExist && beneficiaryExist && Model.Assigned || (customerExist && beneficiaryExist && !Model.AutoAllocation))
-                                {
-                                    <a id="assign-manual-list" asp-action="EmpanelledVendors" asp-route-selectedcase="@Model.ClaimsInvestigation.ClaimsInvestigationId" class="btn btn-danger">
-                                        <span class="badge badge-danger"> <i class="fas fa-external-link-alt"></i></span>Assign
-                                    </a>
-                                }
-
-
+                                
                             </div>
                         </div>
                     </div>

@@ -170,7 +170,6 @@ builder.Services.Configure<IdentityOptions>(options =>
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.LoginPath = "/Account/Login";
-    //sliding expiration doesn't seem to work, nor does expiretimespan
     options.SlidingExpiration = true;
     options.ExpireTimeSpan = TimeSpan.FromSeconds(double.Parse(builder.Configuration["SESSION_TIMEOUT_SEC"]));
 }).AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
