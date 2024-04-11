@@ -15,8 +15,8 @@
         public static readonly string GMAPData = "AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
         public static readonly string SGKData = "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";
         public const string APP_URL = "https://apkichck.s3.ap-southeast-2.amazonaws.com/ichck/app-release_20242901-002101_dev.apk";
-        public static TimeZoneInfo INDIAN_TIME_ZONE = TimeZoneInfo.FindSystemTimeZoneById("Asia/Kolkata");
-        public static DateTime IndianTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, INDIAN_TIME_ZONE);
+        //public static TimeZoneInfo INDIAN_TIME_ZONE = TimeZoneInfo.FindSystemTimeZoneById("Asia/Kolkata");
+        //public static DateTime IndianTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, INDIAN_TIME_ZONE);
         //WEBSITE SETTINGS
 
         public const string WEBSITE_SITE_MENU_BRAND = "aby";
