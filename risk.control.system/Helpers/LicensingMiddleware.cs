@@ -12,6 +12,7 @@ using risk.control.system.Services;
 
 using System.Collections.Generic;
 using System.Net;
+using System.Security.Claims;
 
 namespace risk.control.system.Helpers
 {
@@ -30,31 +31,55 @@ namespace risk.control.system.Helpers
 
         public async Task Invoke(HttpContext context)
         {
-            if(await featureManager.IsEnabledAsync(FeatureFlags.LICENSE))
+            if (await featureManager.IsEnabledAsync(FeatureFlags.LICENSE))
             {
-                var dbContext = context.RequestServices.GetRequiredService<ApplicationDbContext>();
 
-                var remoteIp = context.Request.Headers["X-IPAddress"];
-                if(context.User.Identity.IsAuthenticated)
+                if (context.User.Identity.IsAuthenticated)
                 {
-                    var userEmail = context.User.Identity.Name;
 
-                    var userCompany = dbContext.ClientCompany.FirstOrDefault(c=>c.Email == userEmail.Substring(userEmail.IndexOf("@")));
-
-                    if(userCompany != null)
+                    var remoteIp = context.Request.Headers["x-ipaddress"];
+                    var user = context.User.Identity.Name;
+                    var userRole = context.User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
+                    if (userRole == null)
                     {
-                        if(userCompany.LicenseType == Standard.Licensing.LicenseType.Trial)
+                        context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                        return;
+                    }
+                    var adminUser = userRole.Value.Contains(AppRoles.PortalAdmin.ToString());
+                    if (!adminUser)
+                    {
+                        var isCompanyUser = userRole.Value.Contains(AppRoles.CompanyAdmin.ToString())
+                                                || userRole.Value.Contains(AppRoles.Creator.ToString()) ||
+                                                userRole.Value.Contains(AppRoles.Assessor.ToString());
+                        if (isCompanyUser)
                         {
-                            if(userCompany.Status == Models.CompanyStatus.ACTIVE )
-                            {
-                                if(userCompany.ExpiryDate < DateTime.Now)
-                                {
+                            var dbContext = context.RequestServices.GetRequiredService<ApplicationDbContext>();
+                            var companyUser = dbContext.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == user);
+                            var companyWithCurrentRequestIpAddress = dbContext.ClientCompany.FirstOrDefault(c =>
+                                !string.IsNullOrWhiteSpace(c.WhitelistIpAddress) &&
+                                c.WhitelistIpAddress.Contains(remoteIp) && companyUser.ClientCompanyId == c.ClientCompanyId);
 
-                                }
+                            if (companyWithCurrentRequestIpAddress == null)
+                            {
+                                context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                                context.Response.Redirect("/page/error.html");
+                                return;
+                            }
+                            if (companyWithCurrentRequestIpAddress.LicenseType == Standard.Licensing.LicenseType.Trial && companyWithCurrentRequestIpAddress.ExpiryDate < DateTime.Now)
+                            {
+                                context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                                context.Response.Redirect("/page/error.html");
+                                return;
                             }
                         }
+
                     }
+
+                    //var isAgencyUser = AgencyRole.AgencyAdmin.Equals(userRole) || AgencyRole.Supervisor.Equals(userRole) || AgencyRole.Agent.Equals(userRole);
+
                 }
+
+
                 //else
                 //{
                 //    _logger.LogWarning("Forbidden Request from Remote IP address: {RemoteIp}", remoteIp);

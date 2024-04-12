@@ -216,7 +216,7 @@ namespace risk.control.system.Controllers
 
                 var response = SmsService.SendSingleMessage(clientCompany.PhoneNumber, "Company edited. Domain : " + clientCompany.Email);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");

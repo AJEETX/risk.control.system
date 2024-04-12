@@ -229,12 +229,13 @@ app.UseSwaggerUI(options =>
 
 
 app.UseMiddleware<WhitelistListMiddleware>();
-//app.UseMiddleware<LicensingMiddleware>();
 
 app.UseCors();
 app.UseCookiePolicy();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseMiddleware<LicensingMiddleware>();
+
 app.UseNToastNotify();
 app.UseNotyf();
 app.UseFileServer();

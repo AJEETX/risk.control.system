@@ -29,11 +29,13 @@ namespace risk.control.system.Helpers
 
         public async Task Invoke(HttpContext context)
         {
+            var ipAddress = context.GetServerVariable("HTTP_X_FORWARDED_FOR") ?? context.Connection.RemoteIpAddress?.ToString();
+            context.Request.Headers["x-ipaddress"] = ipAddress;
             if (await featureManager.IsEnabledAsync(FeatureFlags.IPRestrict))
             {
                 if (!context.Request.Path.Value.Contains("api/agent") && !context.Request.Path.Value.Contains("api/Notification/GetClientIp"))
                 {
-                    var remoteIp = context.Connection.RemoteIpAddress;
+                    var remoteIp = IPAddress.Parse(ipAddress);
                     _logger.LogDebug("Request from Remote IP address: {RemoteIp}", remoteIp);
 
                     var bytes = remoteIp.GetAddressBytes();
@@ -106,6 +108,7 @@ namespace risk.control.system.Helpers
             }
 
             await _next.Invoke(context);
+            context.Request.Headers.Remove("x-ipaddress");
         }
     }
 
@@ -151,6 +154,8 @@ namespace risk.control.system.Helpers
             CookieValidatePrincipalContext context)
         {
             context.RejectPrincipal();
+            await context.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
             await context.HttpContext.SignOutAsync();
         }
     }
