@@ -217,10 +217,10 @@
 
                                     <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
                                     <span class="badge badge-warning">
-                                        <i class="fas fa-random"></i> Assign <span class="badge badge-warning">auto</span>
+                                        <i class="fas fa-random"></i> ASSIGN <span class="badge badge-warning">auto</span>
                                     </span><span class="badge badge-light">/</span>
                                     <span class="badge badge-danger">
-                                        <i class="fas fa-external-link-alt"></i> Assign
+                                        <i class="fas fa-external-link-alt"></i> ASSIGN
                                     </span>
                                     <span class="badge badge-light">
                                         it now. Or
@@ -228,13 +228,13 @@
 
                                     <span class="badge badge-warning">
                                         <i class="fas fa-random"></i>
-                                        Assign
+                                        ASSIGN
                                     </span>
                                     <span class="badge badge-light"> / </span>
                                     <span class="badge badge-danger">
-                                        <i class="fas fa-external-link-alt"></i> Assign
+                                        <i class="fas fa-external-link-alt"></i> ASSIGN
                                     </span>
-                                    <span class="badge badge-light">  from Assign section(s).</span>
+                                    <span class="badge badge-light">  from ASSIGN section(s).</span>
 
 
                                 </div>
@@ -250,7 +250,7 @@
                                     <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
                                    
                                     <span class="badge badge-danger">
-                                        <i class="fas fa-external-link-alt"></i> Assign
+                                        <i class="fas fa-external-link-alt"></i> ASSIGN
                                     </span>
                                     <span class="badge badge-light">
                                         it now. Or
@@ -258,9 +258,9 @@
 
                                     
                                     <span class="badge badge-danger">
-                                        <i class="fas fa-external-link-alt"></i> Assign
+                                        <i class="fas fa-external-link-alt"></i> ASSIGN
                                     </span>
-                                    <span class="badge badge-light">  from Assign section.</span>
+                                    <span class="badge badge-light">  from ASSIGN section.</span>
 
 
                                 </div>
@@ -282,10 +282,10 @@
 
                                     <span> to </span>
                                     <span class="badge badge-warning">
-                                        <i class="fas fa-random"></i> Assign <span class="badge badge-warning">auto</span>
+                                        <i class="fas fa-random"></i> ASSIGN <span class="badge badge-warning">auto</span>
                                     </span><span class="badge badge-light">/</span>
                                     <span class="badge badge-danger">
-                                        <i class="fas fa-external-link-alt"></i> Assign
+                                        <i class="fas fa-external-link-alt"></i> ASSIGN
                                     </span>
                                    
                                 </div>
@@ -301,7 +301,7 @@
                                     <span>to</span>
 
                                     <span class="badge badge-danger">
-                                        <i class="fas fa-external-link-alt"></i> Assign
+                                        <i class="fas fa-external-link-alt"></i> ASSIGN
                                     </span>
                                     
 
@@ -335,13 +335,13 @@
                                             <span class="badge badge-warning"> <i class="fas fa-random"></i></span>Assign<span class="badge badge-warning">auto</span>
                                         </button>
                                         <button disabled id="assign-manual-list" class="btn btn-danger disabled">
-                                            <span class="badge badge-danger"> <i class="fas fa-external-link-alt"></i></span>Assign
+                                            <span class="badge badge-danger"> <i class="fas fa-external-link-alt"></i></span>ASSIGN
                                         </button>
                                     }
                                     else
                                     {
                                         <button disabled id="assign-manual-list" class="btn btn-danger disabled">
-                                            <span class="badge badge-danger"> <i class="fas fa-external-link-alt"></i></span>Assign
+                                            <span class="badge badge-danger"> <i class="fas fa-external-link-alt"></i></span>ASSIGN
                                         </button>
                                     }
                                 }
@@ -350,16 +350,16 @@
                                     @if (!Model.Assigned && Model.AutoAllocation)
                                     {
                                         <button type="submit" id="assign-list" class="btn btn-warning">
-                                            <span class="badge badge-warning"> <i class="fas fa-random"></i></span>Assign<span class="badge badge-warning">auto</span>
+                                            <span class="badge badge-warning"> <i class="fas fa-random"></i></span>ASSIGN<span class="badge badge-warning">auto</span>
                                         </button>
                                         <a id="assign-manual-list" asp-action="EmpanelledVendors" asp-route-selectedcase="@Model.ClaimsInvestigation.ClaimsInvestigationId" class="btn btn-danger">
-                                            <span class="badge badge-danger"> <i class="fas fa-external-link-alt"></i></span>Assign
+                                            <span class="badge badge-danger"> <i class="fas fa-external-link-alt"></i></span>ASSIGN
                                         </a>
                                     }
                                     else if (Model.Assigned || (!Model.AutoAllocation))
                                     {
                                         <a id="assign-manual-list" asp-action="EmpanelledVendors" asp-route-selectedcase="@Model.ClaimsInvestigation.ClaimsInvestigationId" class="btn btn-danger">
-                                            <span class="badge badge-danger"> <i class="fas fa-external-link-alt"></i></span>Assign
+                                            <span class="badge badge-danger"> <i class="fas fa-external-link-alt"></i></span>ASSIGN
                                         </a>
                                     }
                                 }
