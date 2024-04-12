@@ -10,5 +10,6 @@
         public bool Assigned { get; set; } = false;
         public bool AutoAllocation { get; set; } = false;
         public bool NotWithdrawable { get; set; }
+        public bool AllowedToCreate { get; set; } = false ;
     }
 }

@@ -41,7 +41,7 @@ namespace risk.control.system.Services
         public async Task<IEnumerable<InboxMessage>> GetInboxMessages(string userEmail)
         {
             var userMailbox = _context.Mailbox.Include(m => m.Inbox).FirstOrDefault(c => c.Name == userEmail);
-            return userMailbox.Inbox.OrderBy(o => o.SendDate).ToList();
+            return userMailbox.Inbox.OrderByDescending(o => o.SendDate).ToList();
         }
 
         public async Task<InboxMessage> GetInboxMessagedetail(long messageId, string userEmail)

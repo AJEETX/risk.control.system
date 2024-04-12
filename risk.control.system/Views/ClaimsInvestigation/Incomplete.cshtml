@@ -1,4 +1,5 @@
-﻿@{
+﻿@model bool
+@{
     ViewData["Title"] = "Claim: Active ";
 }
 
@@ -50,8 +51,16 @@
                 <div class="col-md-12">
                     <div class="form-group">
                         <a id="back" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
+                        @if(Model)
+                        {
+                            <a class="create-policy btn btn-success" href='#'><i class="fas fa-pen-alt "></i> @Applicationsettings.CREATE New</a>
+                        }
+                        else
+                        {
+                            <button disabled class="btn btn-secondary"><i class="fas fa-pen-alt "></i> @Applicationsettings.CREATE New</button>
 
-                        <a class="create-policy btn btn-success" href='#'><i class="fas fa-pen-alt "></i> @Applicationsettings.CREATE New</a>
+                            <span class="badge badge-danger"> MAX</span> <span class="badge badge-light">allowed claim created !!!</span>
+                        }
                     </div>
                 </div>
             </div>

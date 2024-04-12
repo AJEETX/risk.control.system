@@ -1,22 +1,17 @@
 ﻿@using Microsoft.EntityFrameworkCore;
 @using risk.control.system.Helpers;
 @using risk.control.system.Models;
-@inject SignInManager<ApplicationUser> SignInManager
 @inject ApplicationDbContext context
-@inject UserManager<ApplicationUser> UserManager
 @model ClientCompany
 @{
-    if (User.IsInRole(AppRoles.Creator.ToString()) || User.IsInRole(AppRoles.Assessor.ToString()))
-    {
-        if (User.IsInRole(AppRoles.Creator.ToString()))
 
-        {
-            <partial name="AdminLTE/_CompanySidebarClaimsCreator" />
-        }
-        if (User.IsInRole(AppRoles.Assessor.ToString()))
-        {
-            <partial name="AdminLTE/_CompanySidebarClaimsAssessor" />
-        }
+    if (User.IsInRole(AppRoles.Creator.ToString()))
+    {
+        <partial name="AdminLTE/_CompanySidebarClaimsCreator" />
+    }
+    if (User.IsInRole(AppRoles.Assessor.ToString()))
+    {
+        <partial name="AdminLTE/_CompanySidebarClaimsAssessor" />
     }
 
 

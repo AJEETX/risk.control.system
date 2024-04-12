@@ -346,7 +346,14 @@ namespace risk.control.system.Controllers
                     notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                return View();
+                var companyUser = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(c => c.Email == currentUserEmail);
+                var totalClaimsCreated = _context.ClaimsInvestigation.Include(c => c.PolicyDetail).Where(c => c.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId)?.ToList();
+                bool userCanCreate = true;
+                if (totalClaimsCreated?.Count >= companyUser.ClientCompany.TotalCreatedClaimAllowed)
+                {
+                    userCanCreate = false;
+                }
+                return View(userCanCreate);
             }
             catch (Exception)
             {

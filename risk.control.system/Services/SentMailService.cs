@@ -79,7 +79,7 @@ namespace risk.control.system.Services
         public async Task<IEnumerable<SentMessage>> GetSentMessages(string userEmail)
         {
             var userMailbox = _context.Mailbox.Include(m => m.Sent).FirstOrDefault(c => c.Name == userEmail);
-            return userMailbox.Sent.OrderBy(o => o.SendDate)?.ToList();
+            return userMailbox.Sent.OrderByDescending(o => o.SendDate)?.ToList();
         }
 
         public async Task<int> SentDelete(List<long> messages, long userId)

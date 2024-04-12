@@ -141,7 +141,7 @@ namespace risk.control.system.Helpers
             var ticketIssuedUtc =
                 new DateTimeOffset(ticketIssuedTicks, TimeSpan.FromHours(0));
 
-            if (DateTimeOffset.UtcNow - ticketIssuedUtc > TimeSpan.FromMinutes(1))
+            if (DateTimeOffset.Now - ticketIssuedUtc > TimeSpan.FromMinutes(1))
             {
                 await RejectPrincipalAsync(context);
                 return;

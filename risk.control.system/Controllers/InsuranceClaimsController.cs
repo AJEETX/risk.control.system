@@ -47,12 +47,17 @@ namespace risk.control.system.Controllers
                 }
             };
             var companyUser = context.ClientCompanyApplicationUser.Include(c=>c.ClientCompany).FirstOrDefault(c=>c.Email == currentUserEmail);
-
-
+            var totalClaimsCreated = context.ClaimsInvestigation.Include(c => c.PolicyDetail).Where(c => c.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId)?.ToList();
+            bool userCanCreate = true;
+            if(totalClaimsCreated?.Count >= companyUser.ClientCompany.TotalCreatedClaimAllowed)
+            {
+                userCanCreate= false;
+            }
             var model = new ClaimTransactionModel
             {
                 ClaimsInvestigation = claim,
                 Log = null,
+                AllowedToCreate = userCanCreate,
                 AutoAllocation = companyUser.ClientCompany.AutoAllocation,
                 Location = new CaseLocation { }
             };

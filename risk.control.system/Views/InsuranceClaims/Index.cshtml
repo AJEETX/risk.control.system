@@ -98,8 +98,14 @@
                             </div>
                             <div class="card-footer">
                                 <div class="text-right">
-                                    <a id="create-policy" class="btn btn-success" asp-controller="InsurancePolicy" asp-action="CreatePolicy"><i class="far fa-file-powerpoint"></i> Add Policy</a>
-
+                                @if(Model.AllowedToCreate)
+                                    {
+                                        <a id="create-policy" class="btn btn-success" asp-controller="InsurancePolicy" asp-action="CreatePolicy"><i class="far fa-file-powerpoint"></i> Add Policy</a>
+                                    }
+                                    else
+                                    {
+                                        <button disabled id="create-policy" class="btn btn-secondary"><i class="far fa-file-powerpoint"></i> Add Policy</button>
+                                    }
                                 </div>
                             </div>
                         </div>
@@ -225,14 +231,11 @@
                                 <span class="badge badge-danger">
                                     <i class="fas fa-external-link-alt"></i> ASSIGN
                                 </span>
-
                             </div>
                         }
                         else
                         {
                             <div class="col-12">
-
-
                                 <span class="badge badge-light"><i class="far fa-file-powerpoint"></i> Please Complete details . !!! </span>
                                 <i class="far fa-thumbs-up"></i>
 
@@ -241,18 +244,11 @@
                                 <span class="badge badge-danger">
                                     <i class="fas fa-external-link-alt"></i> ASSIGN
                                 </span>
-
-
-
                             </div>
                         }
-
                     </div>
                 </div>
             </div>
-
-
-
             <div class="card-footer">
                 <div class="row float-right">
 

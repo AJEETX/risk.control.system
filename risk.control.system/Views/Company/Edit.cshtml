@@ -348,34 +348,7 @@
 
                                 </div>
                                 <div class="col-sm-4">
-                                    <div class="form-group">
-                                        <span class="input-group-label"> License Type:</span>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text" asp-for="LicenseType"><i class="nav-icon fas fa-file-invoice"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                            </div>
-                                            <select required asp-for="LicenseType" class="form-control remarks ipaddress" asp-items="Html.GetEnumSelectList<LicenseType>()">
-                                                <option value="">--- SELECT ---</option>
-                                            </select>
-                                            <span asp-validation-for="LicenseType" class="text-danger"></span>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <span class="input-group-label"> Expiry Date:</span>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text" asp-for="ExpiryDate"><i class="nav-icon far fa-calendar-check"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                            </div>
-                                            @{
-                                                var minDate = @DateTime.Now.ToString("dd-MM-yyyy");
-                                                var maxDate = @DateTime.Now.AddDays(1).ToString("dd-MM-yyyy");
-                                            }
-                                            <input asp-for="ExpiryDate" id="ExpiryDate" class="form-control remarks date-width" min="@minDate" type="date" />
-                                            <span asp-validation-for="ExpiryDate" class="text-danger"></span>
-                                        </div>
-                                    </div>
-
+                                    
                                     <div class="form-group">
                                         <span class="input-group-label">Auto Allocation:</span>
                                         <div class="input-group mb-3">
@@ -455,7 +428,43 @@
                                             </span>
                                         </div>
                                     </div>
+                                    <div class="form-group">
+                                        <span class="input-group-label"> License Type:</span>
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text" asp-for="LicenseType"><i class="nav-icon fas fa-file-invoice"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                            </div>
+                                            <select required asp-for="LicenseType" class="form-control remarks ipaddress" asp-items="Html.GetEnumSelectList<LicenseType>()">
+                                                <option value="">--- SELECT ---</option>
+                                            </select>
+                                            <span asp-validation-for="LicenseType" class="text-danger"></span>
+                                        </div>
+                                    </div>
 
+                                    <div class="form-group">
+                                        <span class="input-group-label"> Expiry Date:</span>
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text" asp-for="ExpiryDate"><i class="nav-icon far fa-calendar-check"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                            </div>
+                                            @{
+                                                var minDate = @DateTime.Now.ToString("dd-MM-yyyy");
+                                                var maxDate = @DateTime.Now.AddDays(1).ToString("dd-MM-yyyy");
+                                            }
+                                            <input asp-for="ExpiryDate" id="ExpiryDate" class="form-control remarks date-width" min="@minDate" type="date" />
+                                            <span asp-validation-for="ExpiryDate" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <span class="input-group-label"> Max Allowed Claim [ max 50]:</span>
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text" asp-for="SumAssuredValue"><i class="fas fa-coins"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
+                                            </div>
+                                            <input required asp-for="TotalCreatedClaimAllowed" class="form-control remarks" type="text" placeholder="Max Allowed Claim" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" min="5" maxlength="50" />
+                                            <span asp-validation-for="TotalCreatedClaimAllowed" class="text-danger"></span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>

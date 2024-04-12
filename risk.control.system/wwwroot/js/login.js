@@ -33,8 +33,8 @@ $(document).ready(function () {
         $('#login').html('<span class="fas fa-sync fa-spin" aria-hidden="true"></span> Login');
 
         $('#login-form').submit();
-        $('html *').css('cursor', 'not-allowed');
-        $('html input *').attr('disabled', 'disabled');
+        $('html a *').css('cursor', 'not-allowed');
+        $('html input *, html a *').attr('disabled', 'disabled');
         $('html a *, html button *').attr('disabled', 'disabled');
         $('html a *, html button *').css('pointer-events', 'none')
 

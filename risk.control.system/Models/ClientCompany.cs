@@ -94,6 +94,8 @@ namespace risk.control.system.Models
 
         [DataType(DataType.DateTime)]
         public DateTime? ExpiryDate { get; set; } = DateTime.Now.AddDays(5);
+        [Range(5, 50)]
+        public int TotalCreatedClaimAllowed { get; set; } = 10;
     }
 
     public enum CompanyStatus

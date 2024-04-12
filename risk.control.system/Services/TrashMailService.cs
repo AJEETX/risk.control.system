@@ -49,7 +49,7 @@ namespace risk.control.system.Services
         public async Task<IEnumerable<TrashMessage>> GetTrashMessages(string userEmail)
         {
             var userMailbox = _context.Mailbox.Include(m => m.Trash).FirstOrDefault(c => c.Name == userEmail);
-            return userMailbox.Trash.OrderBy(o => o.SendDate).ToList();
+            return userMailbox.Trash.OrderByDescending(o => o.SendDate).ToList();
         }
 
         public async Task<int> TrashDelete(List<long> messages, long userId)

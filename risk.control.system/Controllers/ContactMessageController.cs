@@ -405,7 +405,7 @@ namespace risk.control.system.Controllers
             }
             var userMailbox = _context.Mailbox.Include(m => m.Outbox).FirstOrDefault(c => c.Name == applicationUser.Email);
 
-            return View(userMailbox.Outbox.OrderBy(o => o.SendDate).ToList());
+            return View(userMailbox.Outbox.OrderByDescending(o => o.SendDate).ToList());
         }
 
         [Breadcrumb("Delete", FromAction = "Outbox")]
