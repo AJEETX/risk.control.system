@@ -230,6 +230,7 @@ namespace risk.control.system.Seeds
                 Email = Applicationsettings.INSURERDOMAIN,
                 DocumentUrl = Applicationsettings.INSURERLOGO,
                 PhoneNumber = "9988004739",
+                ExpiryDate = DateTime.Now.AddDays(5),
                 EmpanelledVendors = new List<Vendor> { checker, verify, investigate }
             };
 

@@ -67,10 +67,10 @@ namespace risk.control.system.Helpers
                                 context.Response.Redirect("/page/oops.html");
                                 return;
                             }
-                            if (company.LicenseType == Standard.Licensing.LicenseType.Trial && company.ExpiryDate < DateTime.Now)
+                            if (company.LicenseType == Standard.Licensing.LicenseType.Trial && company.ExpiryDate.HasValue && DateTime.Now.Subtract(company.ExpiryDate.Value).Ticks > 0)
                             {
                                 context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
-                                context.Response.Redirect("/page/error.html");
+                                context.Response.Redirect("/page/trial.html");
                                 return;
                             }
                         }

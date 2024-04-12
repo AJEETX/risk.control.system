@@ -189,14 +189,13 @@ namespace risk.control.system.Controllers
                     var upload = Path.Combine(webHostEnvironment.WebRootPath, "company", newFileName);
                     companyDocument.CopyTo(new FileStream(upload, FileMode.Create));
                     clientCompany.DocumentUrl = "/company/" + newFileName;
-                    clientCompany.Document = companyDocument;
                     using var dataStream = new MemoryStream();
                     companyDocument.CopyTo(dataStream);
                     clientCompany.DocumentImage = dataStream.ToArray();
                 }
                 else
                 {
-                    var existingClientCompany = await _context.ClientCompany.AsNoTracking().FirstOrDefaultAsync(c => c.ClientCompanyId == companyUser.ClientCompanyId);
+                    var existingClientCompany = _context.ClientCompany.AsNoTracking().FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
                     if (existingClientCompany.DocumentUrl != null || existingClientCompany.DocumentUrl != null)
                     {
                         clientCompany.DocumentImage = existingClientCompany.DocumentImage;
@@ -204,17 +203,17 @@ namespace risk.control.system.Controllers
                     }
                 }
 
-                var currentUser = await userManager.FindByEmailAsync(userEmail);
-                await signInManager.RefreshSignInAsync(currentUser);
-
-                var pinCode = _context.PinCode.FirstOrDefault(p => p.PinCodeId == clientCompany.PinCodeId);
-
                 clientCompany.Updated = DateTime.UtcNow;
                 clientCompany.UpdatedBy = HttpContext.User?.Identity?.Name;
+                _context.ChangeTracker.Clear();
                 _context.ClientCompany.Update(clientCompany);
                 await _context.SaveChangesAsync();
 
                 var response = SmsService.SendSingleMessage(clientCompany.PhoneNumber, "Company edited. Domain : " + clientCompany.Email);
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                throw;
             }
             catch (Exception ex)
             {

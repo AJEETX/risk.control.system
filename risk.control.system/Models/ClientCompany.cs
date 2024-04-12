@@ -93,7 +93,7 @@ namespace risk.control.system.Models
         public string LicenseId { get; set; } = Guid.NewGuid().ToString();
 
         [DataType(DataType.DateTime)]
-        public DateTime? ExpiryDate { get; set; } = DateTime.Now;
+        public DateTime? ExpiryDate { get; set; } = DateTime.Now.AddDays(5);
     }
 
     public enum CompanyStatus

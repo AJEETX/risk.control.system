@@ -119,4 +119,4 @@ $(document).ready(function () {
         }
     });
 });
-expiryDate.min = new Date().toISOString().split("T")[0];
+ExpiryDate.min = new Date().toISOString().split("T")[0];

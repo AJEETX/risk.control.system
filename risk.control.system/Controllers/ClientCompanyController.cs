@@ -87,7 +87,7 @@ namespace risk.control.system.Controllers
 
                 var response = SmsService.SendSingleMessage(clientCompany.PhoneNumber, "Company account created. Domain : " + clientCompany.Email);
 
-                clientCompany.Updated = DateTime.UtcNow;
+                clientCompany.Updated = DateTime.Now;
                 clientCompany.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Add(clientCompany);
                 await _context.SaveChangesAsync();
@@ -135,7 +135,7 @@ namespace risk.control.system.Controllers
             var clientCompany = await _context.ClientCompany.FindAsync(ClientCompanyId);
             if (clientCompany != null)
             {
-                clientCompany.Updated = DateTime.UtcNow;
+                clientCompany.Updated = DateTime.Now;
                 clientCompany.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.ClientCompany.Remove(clientCompany);
                 await _context.SaveChangesAsync();
@@ -213,69 +213,76 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(ClientCompany clientCompany)
         {
-            if (clientCompany is null || clientCompany.ClientCompanyId == 0)
+            try
             {
-                toastNotification.AddErrorToastMessage("client company not found!");
-                return RedirectToAction("Index");
-            }
-
-            if (clientCompany is not null)
-            {
-                try
+                if (clientCompany.ClientCompanyId < 1)
                 {
-                    IFormFile? companyDocument = Request.Form?.Files?.FirstOrDefault();
-                    if (companyDocument is not null)
-                    {
-                        string newFileName = clientCompany.Email + Guid.NewGuid().ToString();
-                        string fileExtension = Path.GetExtension(companyDocument.FileName);
-                        newFileName += fileExtension;
-                        string path = Path.Combine(webHostEnvironment.WebRootPath, "company");
-                        if (!Directory.Exists(path))
-                        {
-                            Directory.CreateDirectory(path);
-                        }
-                        var upload = Path.Combine(webHostEnvironment.WebRootPath, "company", newFileName);
-
-                        using var dataStream = new MemoryStream();
-                        companyDocument.CopyTo(dataStream);
-                        clientCompany.DocumentImage = dataStream.ToArray();
-                        companyDocument.CopyTo(new FileStream(upload, FileMode.Create));
-                        clientCompany.DocumentUrl = "/company/" + newFileName;
-                    }
-                    else
-                    {
-                        var existingClientCompany = await _context.ClientCompany.AsNoTracking().FirstOrDefaultAsync(c => c.ClientCompanyId == clientCompany.ClientCompanyId);
-                        if (existingClientCompany.DocumentUrl != null || existingClientCompany.DocumentUrl != null)
-                        {
-                            clientCompany.DocumentImage = existingClientCompany.DocumentImage;
-                            clientCompany.DocumentUrl = existingClientCompany.DocumentUrl;
-                        }
-                    }
-
-
-                    clientCompany.Updated = DateTime.UtcNow;
-                    clientCompany.UpdatedBy = HttpContext.User?.Identity?.Name;
-                    _context.ClientCompany.Update(clientCompany);
-                    await _context.SaveChangesAsync();
-
-                    var response = SmsService.SendSingleMessage(clientCompany.PhoneNumber, "Company account edited. Domain : " + clientCompany.Email);
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                catch (DbUpdateConcurrencyException)
+                var userEmail = HttpContext.User?.Identity?.Name;
+                if (userEmail is null)
                 {
-                    if (!ClientCompanyExists(clientCompany.ClientCompanyId))
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+
+                var companyUser = _context.ApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+                if (companyUser is null)
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                IFormFile? companyDocument = Request.Form?.Files?.FirstOrDefault();
+                if (companyDocument is not null)
+                {
+                    string newFileName = clientCompany.Email + Guid.NewGuid().ToString();
+                    string fileExtension = Path.GetExtension(companyDocument.FileName);
+                    newFileName += fileExtension;
+                    string path = Path.Combine(webHostEnvironment.WebRootPath, "company");
+                    if (!Directory.Exists(path))
                     {
-                        return NotFound();
+                        Directory.CreateDirectory(path);
                     }
-                    else
+                    var upload = Path.Combine(webHostEnvironment.WebRootPath, "company", newFileName);
+
+                    using var dataStream = new MemoryStream();
+                    companyDocument.CopyTo(dataStream);
+                    clientCompany.DocumentImage = dataStream.ToArray();
+                    companyDocument.CopyTo(new FileStream(upload, FileMode.Create));
+                    clientCompany.DocumentUrl = "/company/" + newFileName;
+                }
+                else
+                {
+                    var existingClientCompany = await _context.ClientCompany.AsNoTracking().FirstOrDefaultAsync(c => c.ClientCompanyId == clientCompany.ClientCompanyId);
+                    if (existingClientCompany.DocumentUrl != null || existingClientCompany.DocumentUrl != null)
                     {
-                        throw;
+                        clientCompany.DocumentImage = existingClientCompany.DocumentImage;
+                        clientCompany.DocumentUrl = existingClientCompany.DocumentUrl;
                     }
                 }
-                notifyService.Custom($"Company edited successfully.", 3, "orange", "fas fa-building");
-                return RedirectToAction(nameof(ClientCompanyController.Details), "ClientCompany", new { id = clientCompany.ClientCompanyId });
+
+
+                clientCompany.Updated = DateTime.Now;
+                clientCompany.UpdatedBy = HttpContext.User?.Identity?.Name;
+                _context.ClientCompany.Update(clientCompany);
+                await _context.SaveChangesAsync();
+
+                var response = SmsService.SendSingleMessage(clientCompany.PhoneNumber, "Company account edited. Domain : " + clientCompany.Email);
             }
-            toastNotification.AddErrorToastMessage("Error to edit Company!");
-            return Problem();
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!ClientCompanyExists(clientCompany.ClientCompanyId))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            notifyService.Custom($"Company edited successfully.", 3, "orange", "fas fa-building");
+            return RedirectToAction(nameof(ClientCompanyController.Details), "ClientCompany", new { id = clientCompany.ClientCompanyId });
         }
 
         // GET: ClientCompanies
@@ -379,7 +386,7 @@ namespace risk.control.system.Controllers
                         empanelledVendor.Clients.Add(company);
                         _context.Vendor.Update(empanelledVendor);
                     }
-                    company.Updated = DateTime.UtcNow;
+                    company.Updated = DateTime.Now;
                     company.UpdatedBy = HttpContext.User?.Identity?.Name;
                     _context.ClientCompany.Update(company);
                     var savedRows = await _context.SaveChangesAsync();
@@ -428,7 +435,7 @@ namespace risk.control.system.Controllers
                         _context.Vendor.Update(v);
                     }
                     _context.ClientCompany.Update(company);
-                    company.Updated = DateTime.UtcNow;
+                    company.Updated = DateTime.Now;
                     company.UpdatedBy = HttpContext.User?.Identity?.Name;
                     var savedRows = await _context.SaveChangesAsync();
                     notifyService.Custom($"Agency(s) de-panelled.", 3, "red", "fas fa-thumbs-down");
