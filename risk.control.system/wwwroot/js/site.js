@@ -70,6 +70,7 @@ $(document).ready(function () {
         }, 1);
 
         $('#back').attr('disabled', 'disabled');
+        $('html a *, html button *').css('pointer-events', 'none');
         $('html').css('cursor', 'not-allowed');
 
         var nodes = document.getElementById("section").getElementsByTagName('*');
@@ -87,6 +88,7 @@ $(document).ready(function () {
         }, 1);
         $('#back-button').attr('disabled', 'disabled');
         $('html').css('cursor', 'not-allowed');
+        $('html a *, html button *').css('pointer-events', 'none');
 
         var nodes = document.getElementById("section").getElementsByTagName('*');
         for (var i = 0; i < nodes.length; i++) {
@@ -106,7 +108,7 @@ $(document).ready(function () {
 
         $('html *').css('cursor', 'not-allowed');
         $('html a *, html button *').attr('disabled', 'disabled');
-        $('html a *, html button *').css('pointer-events', 'none')
+        $('html a *, html button *').css('pointer-events', 'none');
 
         var nodes = document.getElementById("body").getElementsByTagName('*');
         for (var i = 0; i < nodes.length; i++) {

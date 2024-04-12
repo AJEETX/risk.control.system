@@ -51,41 +51,31 @@ namespace risk.control.system.Helpers
                         var isCompanyUser = userRole.Value.Contains(AppRoles.CompanyAdmin.ToString())
                                                 || userRole.Value.Contains(AppRoles.Creator.ToString()) ||
                                                 userRole.Value.Contains(AppRoles.Assessor.ToString());
+
+                        var isAgencyUser = userRole.Value.Contains(AppRoles.AgencyAdmin.ToString())
+                                                || userRole.Value.Contains(AppRoles.Supervisor.ToString()) ||
+                                                userRole.Value.Contains(AppRoles.Agent.ToString());
+                        var dbContext = context.RequestServices.GetRequiredService<ApplicationDbContext>();
                         if (isCompanyUser)
                         {
-                            var dbContext = context.RequestServices.GetRequiredService<ApplicationDbContext>();
                             var companyUser = dbContext.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == user);
-                            var companyWithCurrentRequestIpAddress = dbContext.ClientCompany.FirstOrDefault(c =>
-                                !string.IsNullOrWhiteSpace(c.WhitelistIpAddress) &&
-                                c.WhitelistIpAddress.Contains(remoteIp) && companyUser.ClientCompanyId == c.ClientCompanyId);
+                            var company = dbContext.ClientCompany.FirstOrDefault(c => companyUser.ClientCompanyId == c.ClientCompanyId);
 
-                            if (companyWithCurrentRequestIpAddress == null)
+                            if (company == null)
                             {
                                 context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
-                                context.Response.Redirect("/page/error.html");
+                                context.Response.Redirect("/page/oops.html");
                                 return;
                             }
-                            if (companyWithCurrentRequestIpAddress.LicenseType == Standard.Licensing.LicenseType.Trial && companyWithCurrentRequestIpAddress.ExpiryDate < DateTime.Now)
+                            if (company.LicenseType == Standard.Licensing.LicenseType.Trial && company.ExpiryDate < DateTime.Now)
                             {
                                 context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
                                 context.Response.Redirect("/page/error.html");
                                 return;
                             }
                         }
-
                     }
-
-                    //var isAgencyUser = AgencyRole.AgencyAdmin.Equals(userRole) || AgencyRole.Supervisor.Equals(userRole) || AgencyRole.Agent.Equals(userRole);
-
                 }
-
-
-                //else
-                //{
-                //    _logger.LogWarning("Forbidden Request from Remote IP address: {RemoteIp}", remoteIp);
-                //    context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
-                //    return;
-                //}
             }
             await _next.Invoke(context);
         }

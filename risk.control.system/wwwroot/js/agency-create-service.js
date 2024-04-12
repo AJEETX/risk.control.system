@@ -19,6 +19,7 @@ $.validator.setDefaults({
                         setTimeout(function () {
                             $(".submit-progress").removeClass("hidden");
                         }, 1);
+                        $('html a *, html button *').css('pointer-events', 'none');
                         $('#create-pincode').attr('disabled', 'disabled');
                         $('#create-pincode').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Add Service");
 

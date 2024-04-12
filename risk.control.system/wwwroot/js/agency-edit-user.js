@@ -20,6 +20,7 @@
                         }, 1);
                         $('.btn').attr('disabled', 'disabled');
                         $('button#edituser.btn.btn-warning').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Edit User");
+                        $('html a *, html button *').css('pointer-events', 'none');
 
                         form.submit();
                         var nodes = document.getElementById("create-form").getElementsByTagName('*');

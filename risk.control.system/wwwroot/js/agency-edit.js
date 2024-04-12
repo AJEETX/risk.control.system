@@ -25,6 +25,7 @@
                             }, 1);
                             $('.btn.btn-warning').attr('disabled', 'disabled');
                             $('.btn.btn-warning').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Edit Agency");
+                            $('html a *, html button *').css('pointer-events', 'none');
 
                             $('#create-form').submit();
                             var nodes = document.getElementById("create-form").getElementsByTagName('*');

@@ -22,6 +22,7 @@
                         $('#create-user').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Add User");
                         $('button#create-agency').attr('disabled', 'disabled');
                         $('button#create-agency').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Add User");
+                        $('html a *, html button *').css('pointer-events', 'none');
 
 
                         form.submit();

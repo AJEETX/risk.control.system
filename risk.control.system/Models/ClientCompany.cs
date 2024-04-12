@@ -92,7 +92,7 @@ namespace risk.control.system.Models
         public LicenseType LicenseType { get; set; } = LicenseType.Trial;
         public string LicenseId { get; set; } = Guid.NewGuid().ToString();
 
-        [DataType(DataType.Date)]
+        [DataType(DataType.DateTime)]
         public DateTime? ExpiryDate { get; set; } = DateTime.Now;
     }
 

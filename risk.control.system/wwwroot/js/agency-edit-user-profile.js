@@ -12,7 +12,20 @@
                     text: "Edit",
                     btnClass: 'btn-warning',
                     action: function () {
+                        $("body").addClass("submit-progress-bg");
+                        // Wrap in setTimeout so the UI
+                        // can update the spinners
+                        setTimeout(function () {
+                            $(".submit-progress").removeClass("hidden");
+                        }, 1);
+                        $('.btn').attr('disabled', 'disabled');
+                        $('html a *, html button *').css('pointer-events', 'none');
+
                         form.submit();
+                        var nodes = document.getElementById("form").getElementsByTagName('*');
+                        for (var i = 0; i < nodes.length; i++) {
+                            nodes[i].disabled = true;
+                        }
                     }
                 },
                 cancel: {
