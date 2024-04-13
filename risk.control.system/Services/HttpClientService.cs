@@ -27,6 +27,7 @@ namespace risk.control.system.Services
         Task<RootObject> GetAddress(string lat, string lon);
 
         Task<LocationDetails_IpApi> GetAddressFromIp(string ipAddress);
+        Task<bool> WhitelistIP(string url, string domain, string ipaddress);
     }
 
     public class HttpClientService : IHttpClientService
@@ -148,7 +149,7 @@ namespace risk.control.system.Services
                 httpClient.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
                 // Pass API address to get the Geolocation details
                 httpClient.BaseAddress = new Uri(Ip_Api_Url);
-                HttpResponseMessage httpResponse = httpClient.GetAsync(Ip_Api_Url).GetAwaiter().GetResult();
+                HttpResponseMessage httpResponse = await httpClient.GetAsync(Ip_Api_Url);
                 // If API is success and receive the response, then get the location details
                 if (httpResponse.IsSuccessStatusCode)
                 {
@@ -164,7 +165,31 @@ namespace risk.control.system.Services
                     }
                 }
             }
-            return null;
+            return null!;
+        }
+
+        public async Task<bool> WhitelistIP(string url, string domain, string ipaddress)
+        {
+            string relativeUrl = "api/agent/setip";
+            try
+            {
+                httpClient.DefaultRequestHeaders.Accept.Clear();
+                httpClient.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+                httpClient.BaseAddress = new Uri(url);
+                HttpResponseMessage httpResponse = await httpClient.PostAsJsonAsync(relativeUrl,new IPWhitelistRequest { Domain = domain, IpAddress = ipaddress, Url = url });
+
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+            
         }
     }
 }

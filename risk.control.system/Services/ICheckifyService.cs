@@ -21,6 +21,7 @@ namespace risk.control.system.Services
         Task GetAudio(AudioData data);
 
         Task GetVideo(VideoData data);
+        Task<bool> WhitelistIP(IPWhitelistRequest request);
     }
 
     public class ICheckifyService : IICheckifyService
@@ -37,7 +38,19 @@ namespace risk.control.system.Services
             this.httpClientService = httpClientService;
             this.webHostEnvironment = webHostEnvironment;
         }
+        public async Task<bool> WhitelistIP(IPWhitelistRequest request)
+        {
+            var company = _context.ClientCompany.FirstOrDefault(c => c.Email == request.Domain);
+            if (company == null)
+            {
+                return false;
+            }
 
+            company.WhitelistIpAddress += ";"+ request.IpAddress;
+            _context.ClientCompany.Update(company);
+            await _context.SaveChangesAsync();
+            return true;
+        }
         public async Task<AppiCheckifyResponse> GetFaceId(FaceData data)
         {
             var claimCase = _context.CaseLocation

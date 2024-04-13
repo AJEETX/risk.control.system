@@ -698,23 +698,41 @@ namespace risk.control.system.Controllers.Api
 
         [AllowAnonymous]
         [HttpPost("ip")]
-        public async Task<IActionResult> SetIp(string url, string domain, string ipaddress)
+        public async Task<IActionResult> WhitelistIP(string domain = "insurer.com", string ipaddress = "222.222.222.222", string url = "https://localhost:5001/")
         {
-            if(string.IsNullOrWhiteSpace(domain) || string.IsNullOrWhiteSpace(ipaddress))
+            try
             {
-                return BadRequest($"EMPTY INPUT(s)");
+                if (string.IsNullOrWhiteSpace(domain) || string.IsNullOrWhiteSpace(ipaddress) || string.IsNullOrWhiteSpace(url))
+                {
+                    return BadRequest($"EMPTY INPUT(s)");
 
+                }
+                var ipSet = await httpClientService.WhitelistIP(url, domain, ipaddress);
+
+                return Ok(ipSet);
             }
-            var company = _context.ClientCompany.FirstOrDefault(c=>c.Email.Equals(domain, StringComparison.OrdinalIgnoreCase));
-            if(company == null)
+            catch (Exception)
             {
-                return NotFound($"{domain} NOT FOUND");
-            }
 
-            company.WhitelistIpAddress += ipaddress;
-            _context.ClientCompany.Update(company);
-            await _context.SaveChangesAsync();
-            return Ok();
+                throw;
+            }
+        }
+        [AllowAnonymous]
+        [HttpPost("setip")]
+        public async Task<IActionResult> SetWhitelistIP(IPWhitelistRequest request)
+        {
+            try
+            {
+                
+                var ipSet = await iCheckifyService.WhitelistIP(request);
+
+                return Ok(ipSet);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
 
     }
