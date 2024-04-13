@@ -347,12 +347,16 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var companyUser = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(c => c.Email == currentUserEmail);
-                var totalClaimsCreated = _context.ClaimsInvestigation.Include(c => c.PolicyDetail).Where(c => c.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId)?.ToList();
                 bool userCanCreate = true;
-                if (totalClaimsCreated?.Count >= companyUser.ClientCompany.TotalCreatedClaimAllowed)
+                if (companyUser.ClientCompany.LicenseType == Standard.Licensing.LicenseType.Trial)
                 {
-                    userCanCreate = false;
+                    var totalClaimsCreated = _context.PolicyDetail.Where(c => c.ClientCompanyId == companyUser.ClientCompanyId)?.ToList();
+                    if (totalClaimsCreated?.Count >= companyUser.ClientCompany.TotalCreatedClaimAllowed)
+                    {
+                        userCanCreate = false;
+                    }
                 }
+                
                 return View(userCanCreate);
             }
             catch (Exception)
