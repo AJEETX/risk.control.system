@@ -1197,3 +1197,8 @@ a#back-button {
 .disabled-now{
     pointer-events:none;
 }
+.footer-item {
+    border: 1px solid #ccc;
+    margin: .1rem 0;
+    padding: 0 .4rem;
+}

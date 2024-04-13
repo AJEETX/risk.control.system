@@ -30,10 +30,14 @@ namespace risk.control.system.Helpers
         public async Task Invoke(HttpContext context)
         {
             var ipAddress = context.GetServerVariable("HTTP_X_FORWARDED_FOR") ?? context.Connection.RemoteIpAddress?.ToString();
+            ipAddress = "202.7.251.23";
             context.Request.Headers["x-ipaddress"] = ipAddress;
             if (await featureManager.IsEnabledAsync(FeatureFlags.IPRestrict))
             {
-                if (!context.Request.Path.Value.Contains("api/agent") && !context.Request.Path.Value.Contains("api/Notification/GetClientIp"))
+                if (!context.Request.Path.Value.StartsWith("/api/") &&
+                    !context.Request.Path.Value.StartsWith("/Dashboard/Get") &&
+                    !context.Request.Path.Value.StartsWith("/js") &&
+                    !context.Request.Path.Value.Contains("api/Notification/GetClientIp"))
                 {
                     var remoteIp = IPAddress.Parse(ipAddress);
                     _logger.LogDebug("Request from Remote IP address: {RemoteIp}", remoteIp);

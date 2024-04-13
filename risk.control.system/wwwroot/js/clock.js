@@ -37,6 +37,7 @@ function startTimer(duration, display) {
 								btnClass: 'btn-default',
 								action: function () {
 									window.location.href = "/account/login";
+									return;
 								}
 							}
 						}

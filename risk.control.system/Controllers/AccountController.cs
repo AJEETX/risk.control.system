@@ -135,7 +135,7 @@ namespace risk.control.system.Controllers
                             }
 
                             notifyService.Success("Login successful");
-                            return Redirect("/");
+                            return RedirectToAction("Index","Dashboard");
                         }
                     }
 
