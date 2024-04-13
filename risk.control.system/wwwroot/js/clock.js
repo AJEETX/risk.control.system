@@ -1,7 +1,7 @@
 var askConfirmation = true;
 var alertTimeInSeconds = 15;
 var alertImeMilliSeconds = alertTimeInSeconds * 1000;
-var idleTimeDuration = 300;
+var idleTimeDuration = 60;
 
 function startTimer(duration, display) {
 	var timer = duration, minutes, seconds;
@@ -30,13 +30,14 @@ function startTimer(duration, display) {
 								btnClass: 'btn-warning',
 								action: function () {
 									window.location.href = window.location.pathname;
+									return;
 								}
 							},
 							cancel: {
 								text: "LOGOUT",
 								btnClass: 'btn-default',
 								action: function () {
-									window.location.href = "/account/login";
+									window.location.href = "/account/logout";
 									return;
 								}
 							}
@@ -47,7 +48,7 @@ function startTimer(duration, display) {
 				
 		} else if (timer < 0) {
 			timer = duration;
-			window.location.href = "/account/login";
+			window.location.href = "/account/logout";
 		}
 		
 	}, 1000);

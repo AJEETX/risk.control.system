@@ -68,7 +68,6 @@ async function fetchIpInfo() {
         document.querySelector('#country .info-data').textContent = data.country || 'Not available';
         document.querySelector('#region .info-data').textContent = data.region || 'Not available';
         document.querySelector('#city .info-data').textContent = data.city || 'Not available';
-        document.querySelector('#district .info-data').textContent = data.district || 'Not available';
         document.querySelector('#postCode .info-data').textContent = data.postCode || 'Not available';
         document.querySelector('#isp .info-data').textContent = data.isp || 'Not available';
         document.querySelector('#latLong .info-data').textContent = data.longitude ? data.latitude + "/" + data.longitude : 'Not available';

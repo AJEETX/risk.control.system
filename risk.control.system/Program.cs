@@ -102,7 +102,7 @@ builder.Services.AddScoped<ITrashMailService, TrashMailService>();
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
 builder.Services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
-builder.Services.AddTransient<CustomCookieAuthenticationEvents>();
+//builder.Services.AddTransient<CustomCookieAuthenticationEvents>();
 builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
 //builder.Services.AddTransient<IMailService, MailService>();
 // Add services to the container.
