@@ -54,7 +54,7 @@ namespace risk.control.system.Controllers
                     notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                return RedirectToAction("Draft");
+                return RedirectToAction("Incomplete");
             }
             catch (Exception)
             {
@@ -165,7 +165,7 @@ namespace risk.control.system.Controllers
             {
                 notifyService.Custom($"Upload Error. Pls try again", 3, "red", "far fa-file-powerpoint");
             }
-            return RedirectToAction("Draft", "ClaimsInvestigation");
+            return RedirectToAction(nameof(ClaimsInvestigationController.Incomplete), "ClaimsInvestigation");
         }
         [Breadcrumb(" Assign(auto)", FromAction = "Index")]
         public IActionResult Draft()

@@ -8,6 +8,7 @@ using AspNetCoreHero.ToastNotification.Notyf;
 using risk.control.system.Services;
 using AspNetCoreHero.ToastNotification.Abstractions;
 using Microsoft.EntityFrameworkCore;
+using SkiaSharp;
 
 namespace risk.control.system.Controllers
 {
@@ -46,12 +47,15 @@ namespace risk.control.system.Controllers
                     LineOfBusinessId = context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == "claims").LineOfBusinessId
                 }
             };
-            var companyUser = context.ClientCompanyApplicationUser.Include(c=>c.ClientCompany).FirstOrDefault(c=>c.Email == currentUserEmail);
-            var totalClaimsCreated = context.ClaimsInvestigation.Include(c => c.PolicyDetail).Where(c => c.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId)?.ToList();
+            var companyUser = context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(c => c.Email == currentUserEmail);
             bool userCanCreate = true;
-            if(totalClaimsCreated?.Count >= companyUser.ClientCompany.TotalCreatedClaimAllowed)
+            if (companyUser.ClientCompany.LicenseType == Standard.Licensing.LicenseType.Trial)
             {
-                userCanCreate= false;
+                var totalClaimsCreated = context.PolicyDetail.Where(c => c.ClientCompanyId == companyUser.ClientCompanyId)?.ToList();
+                if (totalClaimsCreated?.Count >= companyUser.ClientCompany.TotalCreatedClaimAllowed)
+                {
+                    userCanCreate = false;
+                }
             }
             var model = new ClaimTransactionModel
             {
