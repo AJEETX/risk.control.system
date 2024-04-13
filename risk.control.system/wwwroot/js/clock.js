@@ -1,7 +1,7 @@
 var askConfirmation = true;
 var alertTimeInSeconds = 15;
 var alertImeMilliSeconds = alertTimeInSeconds * 1000;
-var idleTimeDuration = 60;
+var idleTimeDuration = 300;
 
 function startTimer(duration, display) {
 	var timer = duration, minutes, seconds;

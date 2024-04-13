@@ -102,7 +102,7 @@ builder.Services.AddScoped<ITrashMailService, TrashMailService>();
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
 builder.Services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
-//builder.Services.AddTransient<CustomCookieAuthenticationEvents>();
+builder.Services.AddTransient<CustomCookieAuthenticationEvents>();
 builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
 //builder.Services.AddTransient<IMailService, MailService>();
 // Add services to the container.
@@ -170,6 +170,8 @@ builder.Services.Configure<IdentityOptions>(options =>
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.LoginPath = "/Account/Login";
+    options.LogoutPath = "/Account/Logout";
+    options.AccessDeniedPath = "/Account/Logout";
     options.SlidingExpiration = true;
     options.ExpireTimeSpan = TimeSpan.FromSeconds(double.Parse(builder.Configuration["SESSION_TIMEOUT_SEC"]));
 }).AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

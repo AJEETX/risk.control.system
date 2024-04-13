@@ -29,8 +29,6 @@ namespace risk.control.system.Helpers
 
         public async Task Invoke(HttpContext context)
         {
-            var ipAddress = context.GetServerVariable("HTTP_X_FORWARDED_FOR") ?? context.Connection.RemoteIpAddress?.ToString();
-            context.Request.Headers["x-ipaddress"] = ipAddress;
             if (await featureManager.IsEnabledAsync(FeatureFlags.IPRestrict))
             {
                 if (!context.Request.Path.Value.StartsWith("/api/") &&
@@ -43,7 +41,7 @@ namespace risk.control.system.Helpers
                     !context.Request.Query.Any(q => q.Value.Contains("js"))
                     ))
                 {
-                    var remoteIp = IPAddress.Parse(ipAddress);
+                    var remoteIp = context.Connection.RemoteIpAddress;
                     _logger.LogDebug("Request from Remote IP address: {RemoteIp}", remoteIp);
 
                     var bytes = remoteIp.GetAddressBytes();
@@ -84,28 +82,16 @@ namespace risk.control.system.Helpers
                                 }
                             }
                         }
-                        
-                    }
-                    
-
-                    var userAuthenticated = context.Request.HttpContext.User?.Identity?.IsAuthenticated ?? false;
-                    if (badIp && userAuthenticated)
-                    {
-                        _logger.LogWarning("Forbidden Request from Remote IP address: {RemoteIp}", remoteIp);
-                        context.Response.StatusCode = (int)HttpStatusCode.Forbidden;
-                        context.Response.Redirect("/page/ip.html");
-                        return;
-                    }
-                    else if (badIp && !userAuthenticated)
-                    {
-                        context.Response.Redirect("/page/oops.html");
-                        return;
+                       if (badIp)
+                        {
+                            context.Response.Redirect("/page/oops.html");
+                            return;
+                        }
                     }
                 }
             }
 
             await _next.Invoke(context);
-            context.Request.Headers.Remove("x-ipaddress");
         }
     }
 

@@ -36,8 +36,6 @@ namespace risk.control.system.Helpers
 
                 if (context.User.Identity.IsAuthenticated)
                 {
-
-                    var remoteIp = context.Request.Headers["x-ipaddress"];
                     var user = context.User.Identity.Name;
                     var userRole = context.User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
                     if (userRole == null)
