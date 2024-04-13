@@ -41,8 +41,7 @@ namespace risk.control.system.Helpers
                     !context.Request.Query.Any(q => q.Value.Contains("js"))
                     ))
                 {
-                    var ipAddress = context.GetServerVariable("HTTP_X_FORWARDED_FOR") ?? context.Connection.RemoteIpAddress?.ToString();
-                    var remoteIp = IPAddress.Parse(ipAddress);
+                    var remoteIp = context.Connection.RemoteIpAddress;
                     _logger.LogDebug("Request from Remote IP address: {RemoteIp}", remoteIp);
 
                     var bytes = remoteIp.GetAddressBytes();
@@ -70,20 +69,20 @@ namespace risk.control.system.Helpers
                                 break;
                             }
                         }
-                        if (badIp)
-                        {
-                            foreach (var ip in ips)
-                            {
-                                var ipRange = IPAddressRange.Parse($"{ip}/255.255.255.0");
-                                var isInRange = ipRange.Contains(remoteIp); // is True.
-                                if (isInRange)
-                                {
-                                    badIp = false;
-                                    break;
-                                }
-                            }
-                        }
-                        if (badIp)
+                        //if(badIp)
+                        //{
+                        //    foreach (var ip in ips)
+                        //    {
+                        //        var ipRange = IPAddressRange.Parse($"{ip}/255.255.255.0");
+                        //        var isInRange = ipRange.Contains(remoteIp); // is True.
+                        //        if (isInRange)
+                        //        {
+                        //            badIp = false;
+                        //            break;
+                        //        }
+                        //    }
+                        //}
+                       if (badIp)
                         {
                             context.Response.Redirect("/page/oops.html");
                             return;
