@@ -36,19 +36,20 @@ namespace risk.control.system.Helpers
                     !context.Request.Path.Value.StartsWith("/js") &&
                     !context.Request.Path.Value.Contains("api/Notification/GetClientIp") &&
                     (
-                    !context.Request.Path.Value.StartsWith("/Account/Login") && 
+                    !context.Request.Path.Value.StartsWith("/Account/Login") &&
                     !context.Request.Query.Any(q => q.Key == "ReturnUrl") &&
                     !context.Request.Query.Any(q => q.Value.Contains("js"))
                     ))
                 {
-                    var remoteIp = context.Connection.RemoteIpAddress;
+                    var ipAddress = context.GetServerVariable("HTTP_X_FORWARDED_FOR") ?? context.Connection.RemoteIpAddress?.ToString();
+                    var remoteIp = IPAddress.Parse(ipAddress);
                     _logger.LogDebug("Request from Remote IP address: {RemoteIp}", remoteIp);
 
                     var bytes = remoteIp.GetAddressBytes();
                     var badIp = true;
 
                     var dbContext = context.RequestServices.GetRequiredService<ApplicationDbContext>();
-                    
+
                     var ipAddresses = dbContext.ClientCompany.Where(c => !string.IsNullOrWhiteSpace(c.WhitelistIpAddress)).Select(c => c.WhitelistIpAddress).ToList();
 
                     if (ipAddresses.Any())
@@ -69,7 +70,7 @@ namespace risk.control.system.Helpers
                                 break;
                             }
                         }
-                        if(badIp)
+                        if (badIp)
                         {
                             foreach (var ip in ips)
                             {
@@ -82,7 +83,7 @@ namespace risk.control.system.Helpers
                                 }
                             }
                         }
-                       if (badIp)
+                        if (badIp)
                         {
                             context.Response.Redirect("/page/oops.html");
                             return;
