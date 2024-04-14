@@ -215,49 +215,15 @@
                     </div>
 
                 </div>
-                <div class="container d-flex justify-content-center align-items-center">
+                <div class="card-footer container d-flex  justify-content-center align-items-center">
                     <div class="row">
-                        @if (Model.AutoAllocation)
-                        {
-                            <div class="col-12">
 
-                                <span class="badge badge-light"><i class="far fa-file-powerpoint"></i> Please Complete details . !!! </span>
-                                <i class="far fa-thumbs-up"></i>
-
-                                <span> to </span>
-                                <span class="badge badge-warning">
-                                    <i class="fas fa-random"></i> ASSIGN <span class="badge badge-warning">auto</span>
-                                </span><span class="badge badge-light">/</span>
-                                <span class="badge badge-danger">
-                                    <i class="fas fa-external-link-alt"></i> ASSIGN
-                                </span>
-                            </div>
-                        }
-                        else
-                        {
-                            <div class="col-12">
-                                <span class="badge badge-light"><i class="far fa-file-powerpoint"></i> Please Complete details . !!! </span>
-                                <i class="far fa-thumbs-up"></i>
-
-                                <span>to</span>
-
-                                <span class="badge badge-danger">
-                                    <i class="fas fa-external-link-alt"></i> ASSIGN
-                                </span>
-                            </div>
-                        }
-                    </div>
-                </div>
-            </div>
-            <div class="card-footer">
-                <div class="row float-right">
-
-                    <div class="col-md-12">
-                        <div class="form-input">
+                        <div class="col-md-12">
                             <a id="back" asp-controller="ClaimsInvestigation" asp-action="Incomplete" class="btn btn-outline-secondary"><span class="badge badge-light"> <i class="fas fa-arrow-left"></i> </span> Draft </a>
-
+                            <span>Complete details to <b> Assign</b>.</span>
                             @if (Model.AutoAllocation)
                             {
+                                <i class="far fa-hand-point-right"></i>
                                 <button disabled type="submit" id="assign-list" class="btn btn-warning disabled">
                                     <span class="badge badge-warning"> <i class="fas fa-random"></i></span>Assign<span class="badge badge-warning">auto</span>
                                 </button>
@@ -267,15 +233,16 @@
                             }
                             else
                             {
+                                <i class="far fa-hand-point-right"></i>
                                 <button disabled id="assign-manual-list" class="btn btn-danger disabled">
                                     <span class="badge badge-danger"> <i class="fas fa-external-link-alt"></i></span>ASSIGN
                                 </button>
                             }
-
                         </div>
                     </div>
                 </div>
             </div>
+            
         }
     </div>
 </section>
