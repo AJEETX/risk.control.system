@@ -51,7 +51,7 @@ namespace risk.control.system.Controllers
             bool userCanCreate = true;
             if (companyUser.ClientCompany.LicenseType == Standard.Licensing.LicenseType.Trial)
             {
-                var totalClaimsCreated = context.PolicyDetail.Where(c => c.ClientCompanyId == companyUser.ClientCompanyId)?.ToList();
+                var totalClaimsCreated = context.ClaimsInvestigation.Include(c => c.PolicyDetail).Where(c => !c.Deleted && c.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId)?.ToList();
                 if (totalClaimsCreated?.Count >= companyUser.ClientCompany.TotalCreatedClaimAllowed)
                 {
                     userCanCreate = false;
