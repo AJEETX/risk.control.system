@@ -115,6 +115,14 @@
                 }
             }
         ],
+        "drawCallback": function (settings, start, end, max, total, pre) {
+            console.log(this.fnSettings().json); /* for json response you can use it also*/
+            var rowCount = (this.fnSettings().fnRecordsTotal()); // total number of rows
+            console.log(this.fnSettings().fnRecordsTotal()); // total number of rows
+            if (rowCount > 0) {
+                $('#allocatedcase').prop('disabled', false);
+            }
+        },
         error: function (xhr, status, error) { alert('err ' + error) }
     });
 
@@ -341,7 +349,7 @@
         }
         
     });
-
+    var length = table.data().count();
 
     //initMap("/api/CompanyDraftClaims/GetAssignMap");
 

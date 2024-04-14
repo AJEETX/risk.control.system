@@ -37,7 +37,7 @@
             url: '/api/CompanyActiveClaims/GetIncomplete',
             dataSrc: ''
         },
-        order: [[11, 'asc']],
+        order: [[10, 'asc']],
         fixedHeader: true,
         processing: true,
         paging: true,
@@ -90,26 +90,6 @@
             { "data": "created" },
             { "data": "timePending" },
             { "data": "agent" },
-            {
-                "sDefaultContent": "",
-                "bSortable": false,
-                "mRender": function (data, type, row) {
-                    var buttons = "";
-                    if (row.assignedToAgency) {
-                        buttons += '<span class="checkbox">';
-                        if (row.autoAllocated) {
-                            buttons += '<i class="fa fa-toggle-on"></i>';
-                        } else {
-                            buttons += '<i class="fa fa-toggle-off"></i>';
-                        }
-                        buttons += '</span>';
-                    } else {
-                        buttons += '<span class="badge badge-light">...</span>';
-                    }
-                    
-                    return buttons;
-                }
-            },
             {
                 "sDefaultContent": "",
                 "bSortable": false,
