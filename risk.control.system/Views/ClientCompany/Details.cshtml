@@ -87,7 +87,7 @@
                                         @{
                                             if (Model.LicenseType == Standard.Licensing.LicenseType.Trial)
                                             {
-                                                var expiryDate = Model.ExpiryDate.Value.ToString("ddMMMyyyy");
+                                                var expiryDate = Model.ExpiryDate.Value.ToString("dd-MMM-yyyy");
 
                                                 <li class="small">
                                                     <span class="fa-li">
@@ -99,7 +99,7 @@
                                                     <span class="fa-li">
                                                         <i class="fas fa-coins"></i>
                                                     </span>
-                                                    MAX Claim Create: <b>@Html.DisplayFor(model => model.TotalCreatedClaimAllowed)</b>
+                                                    MAX Claims: <b>@Html.DisplayFor(model => model.TotalCreatedClaimAllowed)</b>
                                                 </li>
                                             }
                                         }

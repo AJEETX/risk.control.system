@@ -556,7 +556,7 @@ namespace risk.control.system.Services
             {
                 var pendinClaims = _context.ClaimsInvestigation
                     .Include(c => c.PolicyDetail)
-                    .Where(c => c.CurrentClaimOwner == userEmail && openStatusesIds.Contains(c.InvestigationCaseStatusId) &&
+                    .Where(c => c.CurrentClaimOwner == userEmail && openStatusesIds.Contains(c.InvestigationCaseStatusId) && !c.Deleted &&
                     c.PolicyDetail.ClientCompanyId == companyUser.ClientCompany.ClientCompanyId).ToList();
 
                 var approvedClaims = _context.ClaimsInvestigation
@@ -575,7 +575,7 @@ namespace risk.control.system.Services
                 {
                     var creatorActiveClaims = _context.ClaimsInvestigation
                     .Include(c => c.PolicyDetail)
-                    .Where(c => openStatusesIds.Contains(c.InvestigationCaseStatusId) &&
+                    .Where(c => openStatusesIds.Contains(c.InvestigationCaseStatusId) && !c.Deleted &&
                     c.PolicyDetail.ClientCompanyId == companyUser.ClientCompany.ClientCompanyId)?.ToList();
                     activeCount = creatorActiveClaims.Count;
                 }
@@ -593,7 +593,7 @@ namespace risk.control.system.Services
                 {
                     var creatorActiveClaims = _context.ClaimsInvestigation
                     .Include(c => c.PolicyDetail)
-                    .Where(c => openStatusesIds.Contains(c.InvestigationCaseStatusId) &&
+                    .Where(c => openStatusesIds.Contains(c.InvestigationCaseStatusId) && !c.Deleted &&
                     c.PolicyDetail.ClientCompanyId == companyUser.ClientCompany.ClientCompanyId &&
                     c.InvestigationCaseSubStatusId == submittededToAssesssorStatus.InvestigationCaseSubStatusId
                     )?.ToList();
@@ -614,15 +614,15 @@ namespace risk.control.system.Services
             }
             else if (vendorUser != null)
             {
-                var activeClaims = _context.ClaimsInvestigation.Include(c => c.CaseLocations)
-                    .Where(c => openStatusesIds.Contains(c.InvestigationCaseStatusId))?.ToList();
+                var activeClaims = _context.ClaimsInvestigation.Include(c => c.CaseLocations) 
+                    .Where(c => openStatusesIds.Contains(c.InvestigationCaseStatusId) && !c.Deleted)?.ToList();
                 var agencyActiveClaims = activeClaims.Where(c =>
                 (c.CaseLocations?.Count() > 0 && c.CaseLocations.Any(l => l.VendorId == vendorUser.VendorId)) &&
                 (c.InvestigationCaseSubStatusId == allocateToVendorStatus.InvestigationCaseSubStatusId ||
                 c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId ||
                 c.InvestigationCaseSubStatusId == submittededToSupervisorStatus.InvestigationCaseSubStatusId))?.ToList();
 
-                data.FirstBlockName = "Active Claims";
+                data.FirstBlockName = "Draft Claims";
                 data.FirstBlockCount = agencyActiveClaims.Count;
 
                 var pendinClaims = _context.ClaimsInvestigation
@@ -633,14 +633,14 @@ namespace risk.control.system.Services
 
                 var agentActiveClaims = _context.ClaimsInvestigation.Include(c => c.CaseLocations).Where(c =>
                 (c.CaseLocations.Count() > 0 && c.CaseLocations.Any(l => l.VendorId == vendorUser.VendorId)) &&
-                c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId)?.ToList();
+                c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId && !c.Deleted)?.ToList();
 
                 data.ThirdBlockName = "Allocated Claims";
                 data.ThirdBlockCount = agentActiveClaims.Count;
 
                 var submitClaims = _context.ClaimsInvestigation.Include(c => c.CaseLocations).Where(c =>
                 (c.CaseLocations.Count() > 0 && c.CaseLocations.Any(l => l.VendorId == vendorUser.VendorId)) &&
-                    c.InvestigationCaseSubStatusId == submittededToAssesssorStatus.InvestigationCaseSubStatusId)?.ToList();
+                    c.InvestigationCaseSubStatusId == submittededToAssesssorStatus.InvestigationCaseSubStatusId && !c.Deleted)?.ToList();
                 data.LastBlockName = "Submitted Claims";
                 data.LastBlockCount = submitClaims.Count;
             }
@@ -648,7 +648,7 @@ namespace risk.control.system.Services
             return data;
         }
 
-        public Dictionary<string, int> CalculateAgencyCaseStatus(string userEmail)
+        public Dictionary<string, int> CalculateAgencyCaseStatus(string userEmail) 
         {
             var vendorCaseCount = new Dictionary<string, int>();
 
