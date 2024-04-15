@@ -70,7 +70,7 @@ namespace risk.control.system.Controllers
                 }
                
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 notifyService.Error("OOPs !!!...Contact Admin");
                 await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);

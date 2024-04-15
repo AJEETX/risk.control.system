@@ -12,6 +12,7 @@ using risk.control.system.Models.ViewModel;
 using ControllerBase = Microsoft.AspNetCore.Mvc.ControllerBase;
 using risk.control.system.Services;
 using System.Globalization;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace risk.control.system.Controllers.Api.Claims
 {
@@ -39,19 +40,23 @@ namespace risk.control.system.Controllers.Api.Claims
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER);
             var submittedToAssessorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
+            var withdrawnByAgency = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                      i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY);
             var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
 
-            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
+            var companyUser = _context.ClientCompanyApplicationUser.Include(c=>c.ClientCompany).FirstOrDefault(c => c.Email == userEmail.Value);
 
             applicationDbContext = applicationDbContext.Where(a => a.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
-                a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId == null) &&
                 (
-                    a.UserEmailActioned == companyUser.Email && 
-                    a.UserEmailActionedTo == companyUser.Email && 
-                    (a.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId && !a.AssignedToAgency && a.IsReady2Assign)
-                    || a.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId
-                )
+                    a.IsReady2Assign && !a.AssignedToAgency && (a.UserEmailActioned == companyUser.Email &&
+                        a.UserEmailActionedTo == companyUser.Email &&
+                        a.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId
+                        || a.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId)
+                ) ||
+                 (a.InvestigationCaseSubStatusId == withdrawnByAgency.InvestigationCaseSubStatusId &&
+                        a.UserEmailActionedTo == string.Empty &&
+                        a.UserRoleActionedTo == $"{AppRoles.Creator.GetEnumDisplayName()} ({companyUser.ClientCompany.Email})")
                  ||
                 (a.IsReviewCase && a.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId)
                 );

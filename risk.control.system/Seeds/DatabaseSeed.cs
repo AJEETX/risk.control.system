@@ -214,6 +214,16 @@ namespace risk.control.system.Seeds
 
             var allocatedSubStatus = await context.InvestigationCaseSubStatus.AddAsync(allocated);
 
+            var withdrawn = new InvestigationCaseSubStatus
+            {
+                Name = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY,
+                Code = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY,
+                MasterData = true,
+                InvestigationCaseStatus = inProgressStatus.Entity
+            };
+
+            var withdrawnSubStatus = await context.InvestigationCaseSubStatus.AddAsync(withdrawn);
+
             var assignedToAgent = new InvestigationCaseSubStatus
             {
                 Name = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT,

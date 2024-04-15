@@ -49,23 +49,15 @@ namespace risk.control.system.Controllers.Api.Claims
                 i.UserEmailActioned == companyUser.Email &&
                 i.UserEmailActionedTo == companyUser.Email);
 
-            applicationDbContext = applicationDbContext
-                    .Include(c => c.CaseLocations)
-                    .Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => (c.VendorId == null
-                    && c.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId) && a.IsReady2Assign && !a.AssignedToAgency
-                    ));
+            applicationDbContext = applicationDbContext.Where(a => a.VendorId == 0 &&
+            a.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId && a.IsReady2Assign && !a.AssignedToAgency);
 
             var claimsAssigned = new List<ClaimsInvestigation>();
             foreach (var item in applicationDbContext)
             {
                 if (item.IsReady2Assign)
                 {
-                    item.CaseLocations = item.CaseLocations.Where(c => !c.VendorId.HasValue
-                    && c.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId)?.ToList();
-                    if (item.CaseLocations.Any())
-                    {
-                        claimsAssigned.Add(item);
-                    }
+                    claimsAssigned.Add(item);
                 }
             }
             var response = claimsAssigned
