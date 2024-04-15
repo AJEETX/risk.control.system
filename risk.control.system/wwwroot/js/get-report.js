@@ -15,12 +15,14 @@ $(document).ready(function () {
     $('#approve-case').click(function () {
         //If the checkbox is checked.
         var report = $('#assessorRemarks').val();
-        var checked = $('#flexRadioDefault2').is(':checked');
-        if (report != '' && !checked) {
+        var reviewChecked = $('#flexRadioDefault2').is(':checked');
+        var approvedChecked = $('#flexRadioDefault3').is(':checked');
+        if (report != '' && reviewChecked) {
+            $('#assessorRemarkType').val('REVIEW');
+            review = true;
+        } else if (report != '' && approvedChecked){
             review = false;
             $('#assessorRemarkType').val('OK');
-        } else {
-            review = true;
         }
     });
 

@@ -1,9 +1,9 @@
 ﻿@model DashboardData;
 
 <div class="row">
-    <div class="col-lg-3 col-6">
+    <div class="col-lg-4 col-6">
 
-        <div class="small-box bg-info">
+        <div class="small-box bg-danger">
             <div class="inner">
                 <h3 id="new-claims">@Model.FirstBlockCount</h3>
                 <p>@Model.FirstBlockName</p>
@@ -15,9 +15,9 @@
         </div>
     </div>
 
-    <div class="col-lg-3 col-6">
+    <div class="col-lg-4 col-6">
 
-        <div class="small-box bg-success">
+        <div class="small-box bg-warning">
             <div class="inner">
                 <h3 id="active-claims">@Model.SecondBlockCount</h3>
                 <p>@Model.SecondBlockName</p>
@@ -29,9 +29,9 @@
         </div>
     </div>
 
-    <div class="col-lg-3 col-6">
+    <div class="col-lg-4 col-6">
 
-        <div class="small-box bg-warning">
+        <div class="small-box bg-info">
             <div class="inner">
                 <h3 id="submit-claims">@Model.ThirdBlockCount</h3>
                 <p>@Model.ThirdBlockName</p>
@@ -43,7 +43,7 @@
         </div>
     </div>
 
-    <div class="col-lg-3 col-6">
+   @*  <div class="col-lg-3 col-6">
 
         <div class="small-box bg-danger">
             <div class="inner">
@@ -55,7 +55,7 @@
             </div>
             <a href="@Model.LastBlockUrl" class="details-page small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
         </div>
-    </div>
+    </div> *@
 
 </div>
 

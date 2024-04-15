@@ -72,32 +72,31 @@
                         </div>
                     </div>
                     <div class="col-sm-6 d-flex align-items-stretch flex-column">
-
-                     
-
                         <div class="card bg-light d-flex flex-fill">
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="form-group">
-                                        <span class="input-group-label"> Remarks :</span>
-                                        <div class="input-group mb-8">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text" asp-for="Location.ClaimReport.AgentRemarks"><i class="far fa-comment"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
-                                            </div>
-                                            <input required maxlength="100" name="assessorRemarks" id="assessorRemarks" type="text" class="form-control remarks" autocomplete="off" required />
-
-                                            <span asp-validation-for="Location.ClaimReport.SupervisorRemarks" class="text-danger"></span>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                <div class="form-group">
+                                    <span class="input-group-label"> Remarks :</span>
+                                    <div class="input-group mb-8">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text" asp-for="Location.ClaimReport.AgentRemarks"><i class="far fa-comment"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
                                         </div>
+                                        <input required maxlength="100" name="assessorRemarks" id="assessorRemarks" type="text" class="form-control remarks" autocomplete="off" required />
+
+                                        <span asp-validation-for="Location.ClaimReport.SupervisorRemarks" class="text-danger"></span>
+                                    </div>
                                     </div>
                                 </div>
                             </div>
+                        </div>
                         </div>
                     </div>
                 </div>
                 <div class="card-footer">
 
-                    <div class="row">
-                        <div class="col-md-12 float-right">
+                    <div class="row  float-right">
+                        <div class="col-md-12">
                             <a id="back" asp-controller="ClaimsInvestigation" class="btn btn-outline-secondary" asp-action="Assessor">
                                 <i class="fas fa-arrow-left" aria-hidden="true"></i> Back
                             </a>
