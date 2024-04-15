@@ -44,13 +44,12 @@ namespace risk.control.system.Controllers.Api.Claims
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
 
-            applicationDbContext = applicationDbContext.Include(c => c.CaseLocations)
-                .Where(i => i.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
-                i.UserEmailActioned == companyUser.Email &&
-                i.UserEmailActionedTo == companyUser.Email);
-
-            applicationDbContext = applicationDbContext.Where(a => a.VendorId == 0 &&
-            a.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId && a.IsReady2Assign && !a.AssignedToAgency);
+            applicationDbContext = applicationDbContext.Where(a => a.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
+                 (
+                     a.IsReady2Assign && !a.AssignedToAgency && (a.UserEmailActioned == companyUser.Email &&
+                         a.UserEmailActionedTo == companyUser.Email &&
+                         a.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId)
+                 ));
 
             var claimsAssigned = new List<ClaimsInvestigation>();
             foreach (var item in applicationDbContext)

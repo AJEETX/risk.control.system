@@ -74,6 +74,7 @@ namespace risk.control.system.Services
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
             var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
             var claimsIncomplete = GetCreatorIncomplete(userEmail);
+            var claimsAssignAuto = GetCreatorAssignAuto(userEmail);
             var claimsAssignManual = GetCreatorAssignManual(userEmail);
             var claimsActive = GetCreatorActive(userEmail);
             var claimsCompleted = GetCompanyCompleted(userEmail);
@@ -83,16 +84,18 @@ namespace risk.control.system.Services
             data.FirstBlockCount = claimsIncomplete.Count;
             data.FirstBlockUrl = "/ClaimsInvestigation/Incomplete";
 
-                data.SecondBlockName = "Assign";
             if (company.AutoAllocation)
             {
+                data.SecondBlockName = "Assign(auto/manual)";
                 data.SecondBlockUrl = "/ClaimsInvestigation/Draft";
+                data.SecondBlockCount = claimsAssignAuto.Count;
             }
             else
             {
+                data.SecondBlockName = "Assign";
                 data.SecondBlockUrl = "/ClaimsInvestigation/Assigner";
+                data.SecondBlockCount = claimsAssignManual.Count;
             }
-            data.SecondBlockCount = claimsAssignManual.Count;
 
             data.ThirdBlockName = "Active";
             data.ThirdBlockCount = claimsActive.Count;
@@ -413,7 +416,9 @@ namespace risk.control.system.Services
                         a.UserEmailActionedTo == string.Empty &&
                         a.UserRoleActionedTo == $"{AppRoles.Creator.GetEnumDisplayName()} ({companyUser.ClientCompany.Email})")
                  ||
-                (a.IsReviewCase && a.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId)
+                (a.IsReviewCase && a.InvestigationCaseSubStatusId == reAssignedStatus.InvestigationCaseSubStatusId && 
+                a.UserEmailActionedTo == string.Empty &&
+                a.UserRoleActionedTo == $"{AppRoles.Creator.GetEnumDisplayName()} ( {companyUser.ClientCompany.Email})")
                 );
 
             var claimsAssigned = new List<ClaimsInvestigation>();
@@ -439,14 +444,15 @@ namespace risk.control.system.Services
             var allocateToVendorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-            applicationDbContext = applicationDbContext.Where(i => i.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
-                i.UserEmailActioned == companyUser.Email &&
-                i.UserEmailActionedTo == companyUser.Email);
-
-            applicationDbContext = applicationDbContext.Where(a => a.VendorId == 0 &&
-           a.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId && a.IsReady2Assign && !a.AssignedToAgency);
+            applicationDbContext = applicationDbContext.Where(a => a.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
+                (
+                    a.IsReady2Assign && !a.AssignedToAgency && (a.UserEmailActioned == companyUser.Email &&
+                        a.UserEmailActionedTo == companyUser.Email &&
+                        a.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId)
+                ));
 
             var claimsAssigned = new List<ClaimsInvestigation>();
+
             foreach (var item in applicationDbContext)
             {
                 claimsAssigned.Add(item);

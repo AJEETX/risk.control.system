@@ -58,7 +58,9 @@ namespace risk.control.system.Controllers.Api.Claims
                         a.UserEmailActionedTo == string.Empty &&
                         a.UserRoleActionedTo == $"{AppRoles.Creator.GetEnumDisplayName()} ({companyUser.ClientCompany.Email})")
                  ||
-                (a.IsReviewCase && a.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId)
+                (a.IsReviewCase && a.InvestigationCaseSubStatusId == reAssignedStatus.InvestigationCaseSubStatusId &&
+                a.UserEmailActionedTo == string.Empty &&
+                a.UserRoleActionedTo == $"{AppRoles.Creator.GetEnumDisplayName()} ( {companyUser.ClientCompany.Email})")
                 );
 
             var claimsAssigned = new List<ClaimsInvestigation>();
