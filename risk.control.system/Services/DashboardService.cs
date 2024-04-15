@@ -79,16 +79,32 @@ namespace risk.control.system.Services
             var claimsActive = GetCreatorActive(userEmail);
             var claimsCompleted = GetCompanyCompleted(userEmail);
 
-            var data = new DashboardData();
+            var data = new DashboardData
+            {
+                AutoAllocation = company.AutoAllocation,
+                BulkUpload = company.BulkUpload
+            };
             data.FirstBlockName = "Draft";
             data.FirstBlockCount = claimsIncomplete.Count;
             data.FirstBlockUrl = "/ClaimsInvestigation/Incomplete";
 
             if (company.AutoAllocation)
             {
-                data.SecondBlockName = "Assign(auto/manual)";
+                data.SecondBlockName = "Assign(auto)";
                 data.SecondBlockUrl = "/ClaimsInvestigation/Draft";
                 data.SecondBlockCount = claimsAssignAuto.Count;
+
+                data.SecondBBlockName = "Assign";
+                data.SecondBBlockUrl = "/ClaimsInvestigation/Assigner";
+                data.SecondBBlockCount = claimsAssignManual.Count;
+
+                if(company.BulkUpload)
+                {
+                    var files = _context.FilesOnFileSystem.Where(f => f.CompanyId == company.ClientCompanyId).ToList();
+                    data.BulkUploadBlockName = "Upload Count";
+                    data.BulkUploadBlockUrl = "Report";
+                    data.BulkUploadBlockCount = files.Count;
+                }
             }
             else
             {

@@ -1145,6 +1145,7 @@ namespace risk.control.system.Services
             var lastLog = _context.InvestigationTransaction.Where(i =>
                 i.ClaimsInvestigationId == claimsInvestigationId).OrderByDescending(o => o.Created)?.FirstOrDefault();
             claim.AssignedToAgency = false;
+            claim.IsReviewCase = false;
             claim.UserEmailActioned = userEmail;
             claim.UserEmailActionedTo = string.Empty;
             claim.UserRoleActionedTo = $"{AppRoles.Assessor.GetEnumDisplayName()} ( {clientCompany.Email})";

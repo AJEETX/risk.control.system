@@ -5,6 +5,7 @@
         public ClaimsInvestigation ClaimsInvestigation { get; set; }
         public CaseLocation Location { get; set; }
         public List<VendorCaseModel> Vendors { get; set; }
+        public AssessorRemarkType AssessorRemarkType { get; set; }
     }
 
     public class VendorCaseModel

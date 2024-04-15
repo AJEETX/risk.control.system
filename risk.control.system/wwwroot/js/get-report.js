@@ -15,7 +15,8 @@ $(document).ready(function () {
     $('#approve-case').click(function () {
         //If the checkbox is checked.
         var report = $('#assessorRemarks').val();
-        if (report != '') {
+        var checked = $('#flexRadioDefault2').is(':checked');
+        if (report != '' && !checked) {
             review = false;
             $('#assessorRemarkType').val('OK');
         } else {
@@ -29,8 +30,8 @@ $(document).ready(function () {
         if (report == '') {
             e.preventDefault();
             $.alert({
-                title: "Claim Assessment !!!",
-                content: "Please enter comments?",
+                title: "Claim Remarks !!!",
+                content: "Please enter remarks?",
                 icon: 'fas fa-exclamation-triangle',
     
                 type: 'red',
@@ -49,7 +50,7 @@ $(document).ready(function () {
         else if (!askConfirmation && !review) {
             e.preventDefault();
             $.confirm({
-                title: "Confirm Report approval",
+                title: "Confirm Approve",
                 content: "Are you sure?",
                 icon: 'far fa-thumbs-up',
     
@@ -89,7 +90,7 @@ $(document).ready(function () {
         else if (!askConfirmation && review) {
             e.preventDefault();
             $.confirm({
-                title: "Confirm Report review",
+                title: "Confirm review",
                 content: "Are you sure?",
                 icon: 'fas fa-sync',
     
