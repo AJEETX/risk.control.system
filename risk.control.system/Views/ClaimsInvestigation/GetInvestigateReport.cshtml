@@ -56,31 +56,24 @@
                                         @if(Model.TrialVersion)
                                             {
                                                 <div class="form-check">
-                                                    <input disabled class="form-check-input selected-case" type="radio" name="flexRadioDefault" id="flexRadioDefault1">
-                                                    <label class="form-check-label" for="flexRadioDefault1">
-                                                        REJECT  <span class="badge badge-light"> (disabled in trial version)</span>
-                                                    </label>
-                                                </div>
-                                                <div class="form-check">
                                                     <input disabled class="form-check-input selected-case" type="radio" name="flexRadioDefault" id="flexRadioDefault2">
                                                     <label class="form-check-label" for="flexRadioDefault2">
                                                         REVIEW <span class="badge badge-light"> (disabled in trial version)</span>
                                                     </label>
                                                 </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input selected-case" type="radio" name="flexRadioDefault" id="flexRadioDefault1">
+                                                    <label class="form-check-label" for="flexRadioDefault1">
+                                                        REJECT  <span class="badge badge-light"> reject details </span>
+                                                    </label>
+                                                </div>
+                                               
                                             }
 
                                             else
                                             {
-                                                <div class="form-check">
-                                                    <input class="form-check-input selected-case" type="radio" name="flexRadioDefault" id="flexRadioDefault1">
-                                                    <label class="form-check-label" for="flexRadioDefault1">
-                                                        REJECT
-                                                    </label>
-                                                </div>
-                                                if(Model.ClaimsInvestigation.ReviewCount > 1)
+                                                if (Model.ClaimsInvestigation.ReviewCount > 1)
                                                 {
-
-
                                                     <div class="form-check">
                                                         <input disabled class="form-check-input selected-case" type="radio" name="flexRadioDefault" id="flexRadioDefault2">
                                                         <label class="form-check-label" for="flexRadioDefault2">
@@ -97,6 +90,13 @@
                                                         </label>
                                                     </div>
                                                 }
+                                                <div class="form-check">
+                                                    <input class="form-check-input selected-case" type="radio" name="flexRadioDefault" id="flexRadioDefault1">
+                                                    <label class="form-check-label" for="flexRadioDefault1">
+                                                        REJECT
+                                                    </label>
+                                                </div>
+                                                
                                                 
                                             }
                                             <div class="form-check">

@@ -435,9 +435,7 @@ namespace risk.control.system.Controllers.Api.Claims
                        Status = string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseStatus.Name + "</span>"),
                        ServiceType = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail?.ClaimType.GetEnumDisplayName() + "</span>"),
                        Service = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail.InvestigationServiceType.Name + "</span>"),
-                       Location = a.CaseLocations.Count == 0 ?
-                        "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>" :
-                        string.Join("", a.CaseLocations.Select(c => "<span class='badge badge-light'>" + c.InvestigationCaseSubStatus.Name + "</span> ")),
+                       Location = string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseSubStatus.Name + "</span>"),
                        Created = string.Join("", "<span class='badge badge-light'>" + a.Created.ToString("dd-MM-yyyy") + "</span>"),
                        timePending = a.GetTimePending(),
                        PolicyNum = a.PolicyDetail.ContractNumber,
@@ -551,29 +549,22 @@ namespace risk.control.system.Controllers.Api.Claims
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
             var currentUserEmail = HttpContext.User?.Identity?.Name;
 
-            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
+            var agencyUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == currentUserEmail);
+            var submittedToAssessorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
+            var userAttendedClaims = _context.InvestigationTransaction.Where(t => (t.UserEmailActioned == agencyUser.Email &&
+            t.InvestigationCaseSubStatusId == submittedToAssessorStatus.InvestigationCaseSubStatusId))?.Select(c => c.ClaimsInvestigationId);
 
-            if (vendorUser != null)
-            {
-                applicationDbContext = applicationDbContext.Where(i => i.CaseLocations.Any(c => c.VendorId == vendorUser.VendorId));
-            }
-            var userAttendedClaims = _context.InvestigationTransaction.Where(t => (t.UserEmailActioned == vendorUser.Email))?.Select(c => c.ClaimsInvestigationId);
-
-            // SHOWING DIFFERRENT PAGES AS PER ROLES
             var claimsSubmitted = new List<ClaimsInvestigation>();
-            if (userRole.Value.Contains(AppRoles.AgencyAdmin.ToString()) || userRole.Value.Contains(AppRoles.Supervisor.ToString()))
+            foreach (var item in applicationDbContext)
             {
-
-                foreach (var item in applicationDbContext)
+                if ((item.InvestigationCaseStatus.Name == CONSTANTS.CASE_STATUS.FINISHED &&
+                    item.InvestigationCaseSubStatus.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR) ||
+                    (item.InvestigationCaseSubStatus.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR))
                 {
-                    if ((item.InvestigationCaseStatus.Name == CONSTANTS.CASE_STATUS.FINISHED && 
-                        item.InvestigationCaseSubStatus.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR) ||
-                        (item.InvestigationCaseSubStatus.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER) && item.IsReviewCase)
+                    if (userAttendedClaims.Contains(item.ClaimsInvestigationId))
                     {
-                        if(userAttendedClaims.Contains(item.ClaimsInvestigationId))
-                        {
-                            claimsSubmitted.Add(item);
-                        }
+                        claimsSubmitted.Add(item);
                     }
                 }
             }
@@ -594,9 +585,7 @@ namespace risk.control.system.Controllers.Api.Claims
                        Status = string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseStatus.Name + "</span>"),
                        ServiceType = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail?.ClaimType.GetEnumDisplayName() + "</span>"),
                        Service = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail.InvestigationServiceType.Name + "</span>"),
-                       Location = a.CaseLocations.Count == 0 ?
-                        "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>" :
-                        string.Join("", a.CaseLocations.Select(c => "<span class='badge badge-light'>" + c.InvestigationCaseSubStatus.Name + "</span> ")),
+                       Location = string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseSubStatus.Name + "</span>"),
                        Created = string.Join("", "<span class='badge badge-light'>" + a.Created.ToString("dd-MM-yyyy") + "</span>"),
                        timePending = a.GetTimePending(),
                        PolicyNum = a.PolicyDetail.ContractNumber,

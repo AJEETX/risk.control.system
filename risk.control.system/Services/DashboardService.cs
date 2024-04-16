@@ -108,7 +108,7 @@ namespace risk.control.system.Services
             }
             else
             {
-                data.SecondBlockName = "Assign";
+                data.SecondBlockName = "Re / Assign";
                 data.SecondBlockUrl = "/ClaimsInvestigation/Assigner";
                 data.SecondBlockCount = claimsAssignManual.Count;
             }
@@ -444,8 +444,8 @@ namespace risk.control.system.Services
             var claims = applicationDbContext.Where(a => openStatusesIds.Contains(a.InvestigationCaseStatusId) &&
             a.InvestigationCaseStatusId != _context.InvestigationCaseSubStatus
                 .FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR).InvestigationCaseSubStatusId &&
-            a.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId)?.ToList();
-            foreach (var claim in applicationDbContext)
+            a.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId);
+            foreach (var claim in claims)
             {
                 var userHasReviewClaimLogs = _context.InvestigationTransaction.Where(c => c.ClaimsInvestigationId == claim.ClaimsInvestigationId && c.IsReviewCase && 
                 c.UserRoleActionedTo == $"{AppRoles.Creator.GetEnumDisplayName()} ( {companyUser.ClientCompany.Email})")?.ToList();

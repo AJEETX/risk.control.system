@@ -44,16 +44,16 @@ namespace risk.control.system.Controllers.Api.Claims
             var claims = applicationDbContext.Where(c => c.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
                 (c.InvestigationCaseSubStatus.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR && c.InvestigationCaseStatusId == finishStatus.InvestigationCaseStatusId)
                 || c.InvestigationCaseSubStatusId == rejectdStatus.InvestigationCaseSubStatusId
-                )?.ToList();
+                );
             var claimsSubmitted = new List<ClaimsInvestigation>();
             if (companyUser.UserRole == CompanyRole.Creator)
             {
                 claims = claims.Where(c => c.InvestigationCaseSubStatusId == approvedStatus.InvestigationCaseSubStatusId 
-                || c.InvestigationCaseSubStatusId == rejectdStatus.InvestigationCaseSubStatusId)?.ToList();
+                || c.InvestigationCaseSubStatusId == rejectdStatus.InvestigationCaseSubStatusId);
             }
             else
             {
-                claims = claims.Where(c => c.InvestigationCaseSubStatusId == approvedStatus.InvestigationCaseSubStatusId)?.ToList();
+                claims = claims.Where(c => c.InvestigationCaseSubStatusId == approvedStatus.InvestigationCaseSubStatusId);
             }
 
 
@@ -98,9 +98,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 Status = string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseStatus.Name + "</span>"),
                 ServiceType = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail?.ClaimType.GetEnumDisplayName() + "</span>"),
                 Service = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail.InvestigationServiceType.Name + "</span>"),
-                Location = a.CaseLocations.Count == 0 ?
-                        "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>" :
-                        string.Join("", a.CaseLocations.Select(c => "<span class='badge badge-light'>" + c.InvestigationCaseSubStatus.Name + "</span> ")),
+                Location = string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseSubStatus.Name + "</span>"),
                 Created = string.Join("", "<span class='badge badge-light'>" + a.Created.ToString("dd-MM-yyyy") + "</span>"),
                 timePending = a.GetTimePending(),
                 PolicyNum = a.GetPolicyNum(),
@@ -122,28 +120,22 @@ namespace risk.control.system.Controllers.Api.Claims
             IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims().Where(c =>
                 c.CustomerDetail != null && c.CaseLocations.Count > 0 &&
                 c.CaseLocations.All(c => c.ClaimReport != null));
-            var user = HttpContext.User.Identity.Name;
+            var userEmail = HttpContext.User.Identity.Name;
 
-            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == user);
+            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+
             var approvedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR);
             var rejectdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR);
+                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR);
+
             var finishStatus = _context.InvestigationCaseStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.FINISHED);
+
             var claims = applicationDbContext.Where(c => c.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
                 c.InvestigationCaseSubStatusId == rejectdStatus.InvestigationCaseSubStatusId
                 )?.ToList();
             var claimsSubmitted = new List<ClaimsInvestigation>();
-            if (companyUser.UserRole == CompanyRole.Creator)
-            {
-                claims = claims.Where(c => c.InvestigationCaseSubStatusId == rejectdStatus.InvestigationCaseSubStatusId)?.ToList();
-            }
-            else
-            {
-                claims = claims.Where(c => c.InvestigationCaseSubStatusId == approvedStatus.InvestigationCaseSubStatusId)?.ToList();
-            }
-
 
             foreach (var claim in claims)
             {
@@ -185,9 +177,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 Status = string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseStatus.Name + "</span>"),
                 ServiceType = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail?.ClaimType.GetEnumDisplayName() + "</span>"),
                 Service = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail.InvestigationServiceType.Name + "</span>"),
-                Location = a.CaseLocations.Count == 0 ?
-                        "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>" :
-                        string.Join("", a.CaseLocations.Select(c => "<span class='badge badge-light'>" + c.InvestigationCaseSubStatus.Name + "</span> ")),
+                Location = string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseSubStatus.Name + "</span>"),
                 Created = string.Join("", "<span class='badge badge-light'>" + a.Created.ToString("dd-MM-yyyy") + "</span>"),
                 timePending = a.GetTimePending(),
                 PolicyNum = a.GetPolicyNum(),

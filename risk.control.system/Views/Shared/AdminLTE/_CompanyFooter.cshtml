@@ -4,12 +4,11 @@
     @if (Model.LicenseType == Standard.Licensing.LicenseType.Trial)
     {
         var expires = Model.ExpiryDate.Value.Subtract(DateTime.Now).Days;
-        <marquee class="info-item" behavior="scroll" direction="left">
-            Trial Version with limited features!
-            <span class="badge badge-light"> MAX Allowed Claim Creation</span>
-            <b>[@Model.TotalCreatedClaimAllowed]</b>
-            <span class="badge badge-light">.</span>
-            <span class="badge badge-light"> Expire in @expires days </span>
+        <marquee behavior="scroll" direction="left">
+            <span class="trial-banner"> Trial Version with limited features</span> !
+            <i> { MAX Allowed Claim Creation = @Model.TotalCreatedClaimAllowed].</i>
+            <span class="badge badge-light"></span>
+            <b> Expire in @expires days </b>
         </marquee>
     }
 

@@ -1202,3 +1202,8 @@ a#back-button {
     margin: .1rem 0;
     padding: 0 .4rem;
 }
+.trial-banner{
+    font:1rem;
+    color:brown;
+    text-decoration:underline;
+}
