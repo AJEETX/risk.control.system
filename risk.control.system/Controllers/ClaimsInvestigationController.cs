@@ -63,7 +63,7 @@ namespace risk.control.system.Controllers
             }
         }
 
-        [Breadcrumb(" Assign", FromAction = "Index")]
+        [Breadcrumb("Re / Assign", FromAction = "Index")]
         public IActionResult Assign()
         {
             try

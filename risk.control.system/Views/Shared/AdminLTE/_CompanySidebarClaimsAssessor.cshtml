@@ -25,7 +25,8 @@
         </a>
     </li>
     <li class="nav-item">
-        <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Review" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Review")">
+        <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Review" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Review")
+                @Url.MakeActiveClass("ClaimsInvestigation","ReviewDetail")">
             <i class="fas fa-random nav-icon"></i>
             <p>
                 <span class="badge badge-warning">REVIEW</span>
@@ -44,7 +45,7 @@
     </li>
     <li class="nav-item">
         <a is-active-page asp-controller="Report" asp-action="Rejected" class="actual-link nav-link @Url.MakeActiveClass("Report","Rejected")
-                                                       @Url.MakeActiveClass("Report","GetRejectedReport") ">
+                                                           @Url.MakeActiveClass("Report","RejectDetail") ">
            <i class="far fa-thumbs-down nav-icon"></i>
            <p>
                <span class="badge badge-secondary">REJECTED</span>

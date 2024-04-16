@@ -404,10 +404,8 @@ namespace risk.control.system.Controllers.Api.Claims
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
             var currentUserEmail = HttpContext.User?.Identity?.Name;
 
-            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
+            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == currentUserEmail);
             applicationDbContext = applicationDbContext.Where(i => i.CaseLocations.Any(c => c.VendorId == vendorUser.VendorId));
-
-            // SHOWING DIFFERRENT PAGES AS PER ROLES
             var claimsSubmitted = new List<ClaimsInvestigation>();
             foreach (var item in applicationDbContext)
             {

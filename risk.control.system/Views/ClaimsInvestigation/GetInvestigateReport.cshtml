@@ -58,13 +58,13 @@
                                                 <div class="form-check">
                                                     <input disabled class="form-check-input selected-case" type="radio" name="flexRadioDefault" id="flexRadioDefault1">
                                                     <label class="form-check-label" for="flexRadioDefault1">
-                                                        REJECT
+                                                        REJECT (disabled in trial version)
                                                     </label>
                                                 </div>
                                                 <div class="form-check">
                                                     <input disabled class="form-check-input selected-case" type="radio" name="flexRadioDefault" id="flexRadioDefault2">
                                                     <label class="form-check-label" for="flexRadioDefault2">
-                                                        REVIEW
+                                                        REVIEW (disabled in trial version)
                                                     </label>
                                                 </div>
                                             }
@@ -77,12 +77,27 @@
                                                         REJECT
                                                     </label>
                                                 </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input selected-case" type="radio" name="flexRadioDefault" id="flexRadioDefault2">
-                                                    <label class="form-check-label" for="flexRadioDefault2">
-                                                        REVIEW
-                                                    </label>
-                                                </div>
+                                                if(Model.ClaimsInvestigation.ReviewCount > 1)
+                                                {
+
+
+                                                    <div class="form-check">
+                                                        <input disabled class="form-check-input selected-case" type="radio" name="flexRadioDefault" id="flexRadioDefault2">
+                                                        <label class="form-check-label" for="flexRadioDefault2">
+                                                            REVIEW (already reviewed)
+                                                        </label>
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <div class="form-check">
+                                                        <input class="form-check-input selected-case" type="radio" name="flexRadioDefault" id="flexRadioDefault2">
+                                                        <label class="form-check-label" for="flexRadioDefault2">
+                                                            REVIEW
+                                                        </label>
+                                                    </div>
+                                                }
+                                                
                                             }
                                             <div class="form-check">
                                             <input class="form-check-input selected-case" type="radio" name="flexRadioDefault" id="flexRadioDefault3" checked>

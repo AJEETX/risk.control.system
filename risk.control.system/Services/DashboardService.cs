@@ -94,7 +94,7 @@ namespace risk.control.system.Services
                 data.SecondBlockUrl = "/ClaimsInvestigation/Draft";
                 data.SecondBlockCount = claimsAssignAuto.Count;
 
-                data.SecondBBlockName = "Assign";
+                data.SecondBBlockName = "Re / Assign";
                 data.SecondBBlockUrl = "/ClaimsInvestigation/Assigner";
                 data.SecondBBlockCount = claimsAssignManual.Count;
 
@@ -267,14 +267,17 @@ namespace risk.control.system.Services
                 c.CustomerDetail != null && c.CaseLocations.Count > 0 &&
                 c.CaseLocations.All(c => c.ClaimReport != null));
             var agencyUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-            var userAttendedClaims = _context.InvestigationTransaction.Where(t => (t.UserEmailActioned == agencyUser.Email))?.Select(c => c.ClaimsInvestigationId);
+            var submittedToAssessorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
+            var userAttendedClaims = _context.InvestigationTransaction.Where(t => (t.UserEmailActioned == agencyUser.Email && 
+            t.InvestigationCaseSubStatusId == submittedToAssessorStatus.InvestigationCaseSubStatusId))?.Select(c => c.ClaimsInvestigationId);
 
             var claimsSubmitted = new List<ClaimsInvestigation>();
             foreach (var item in applicationDbContext)
             {
                 if ((item.InvestigationCaseStatus.Name == CONSTANTS.CASE_STATUS.FINISHED &&
                     item.InvestigationCaseSubStatus.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR) ||
-                    (item.InvestigationCaseSubStatus.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER) && item.IsReviewCase)
+                    (item.InvestigationCaseSubStatus.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR))
                 {
                     if (userAttendedClaims.Contains(item.ClaimsInvestigationId))
                     {

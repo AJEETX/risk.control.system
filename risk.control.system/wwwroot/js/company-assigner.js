@@ -153,7 +153,7 @@
             $(".submit-progress").removeClass("hidden");
         }, 1);
         $('#allocatedcase').attr('disabled', 'disabled');
-        $('#allocatedcase').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Assign");
+        $('#allocatedcase').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Re / Assign");
 
         $('#radioButtons').submit();
         var nodes = document.getElementById("body").getElementsByTagName('*');
