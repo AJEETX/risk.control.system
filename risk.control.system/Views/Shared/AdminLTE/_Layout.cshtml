@@ -24,10 +24,10 @@
             var userEmail = User?.Identity?.Name;
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
             var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-
+            ClientCompany company = null!;
             if (companyUser is not null)
             {
-                var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
+                company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
                 <partial name="AdminLTE/_CompanyTopNavigation" model="@company.CanChangePassword" />
 
                 <partial name="AdminLTE/_CompanySidebar" model="@company" />
@@ -44,16 +44,24 @@
                 <partial name="AdminLTE/_TopNavigation" />
                 <partial name="AdminLTE/_Sidebar" />
             }
-        }
-        <div class="content-wrapper content-wrapper-main">
-            <breadcrumb class="no-print"></breadcrumb>
-            <div id="main-content" class="content">
-                <main>
-                    @RenderBody()
-                </main>
+            <div class="content-wrapper content-wrapper-main">
+                <breadcrumb class="no-print"></breadcrumb>
+                <div id="main-content" class="content">
+                    <main>
+                        @RenderBody()
+                    </main>
+                </div>
             </div>
-        </div>
-        <partial name="AdminLTE/_Footer" />
+            if(company is not null)
+            {
+                <partial name="AdminLTE/_CompanyFooter" model="@company"/>
+            }
+            else
+            {
+                <partial name="AdminLTE/_Footer" />
+
+            }
+        }
 
         <!-- Logout Modal-->
         <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"

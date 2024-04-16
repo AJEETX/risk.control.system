@@ -193,9 +193,13 @@ namespace risk.control.system.Controllers
                 {
                     notifyService.Custom($"Policy #{claim.PolicyDetail.ContractNumber} report approved", 3, "green", "far fa-file-powerpoint");
                 }
+                else if(reportUpdateStatus == AssessorRemarkType.REJECT)
+                {
+                    notifyService.Custom($"Policy #{claim.PolicyDetail.ContractNumber} rejected", 3, "red", "far fa-file-powerpoint");
+                }
                 else
                 {
-                    notifyService.Custom($"Policy #{claim.PolicyDetail.ContractNumber} reassigned", 3, "red", "far fa-file-powerpoint");
+                    notifyService.Custom($"Policy #{claim.PolicyDetail.ContractNumber} reassigned", 3, "yellow", "far fa-file-powerpoint");
                 }
 
                 return RedirectToAction(nameof(ClaimsInvestigationController.Assessor), "ClaimsInvestigation");

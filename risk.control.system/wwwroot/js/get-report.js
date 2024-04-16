@@ -1,18 +1,9 @@
 $(document).ready(function () {
     let askConfirmation = false;
+    let approve= false;
     let review = false;
     let reject = false;
 
-    $('#review-case').click(function () {
-        //If the checkbox is checked.
-        var report = $('#assessorRemarks').val();
-        if (report != '') {
-            review = true;
-            $('#assessorRemarkType').val('REVIEW');
-        } else {
-            review = false;
-        }
-    });
     $('#approve-case').click(function () {
         //If the checkbox is checked.
         var report = $('#assessorRemarks').val();
@@ -20,11 +11,13 @@ $(document).ready(function () {
         var reviewChecked = $('#flexRadioDefault2').is(':checked');
         var approvedChecked = $('#flexRadioDefault3').is(':checked');
 
-        if (report != '' && reviewChecked) {
+        if (report != '' && approvedChecked) {
+            $('#assessorRemarkType').val('OK');
+            approve = true;
+        }
+        else if (report != '' && reviewChecked) {
             $('#assessorRemarkType').val('REVIEW');
             review = true;
-        } else if (report != '' && approvedChecked){
-            $('#assessorRemarkType').val('OK');
         }
         else if (report != '' && rejectChecked) {
             reject = true;
@@ -55,7 +48,7 @@ $(document).ready(function () {
                 }
             });
         }
-        else if (!askConfirmation && !review && !reject) {
+        else if (!askConfirmation && approve && $('#assessorRemarkType').val() == 'OK') {
             e.preventDefault();
             $.confirm({
                 title: "Confirm Approve",
@@ -70,7 +63,7 @@ $(document).ready(function () {
                         btnClass: 'btn-success',
                         action: function () {
                             askConfirmation = true;
-
+                            approve = false;
                             $("body").addClass("submit-progress-bg");
                             // Wrap in setTimeout so the UI
                             // can update the spinners
@@ -95,7 +88,7 @@ $(document).ready(function () {
                 }
             });
         }
-        else if (!askConfirmation && review && !reject) {
+        else if (!askConfirmation && review && $('#assessorRemarkType').val() == 'REVIEW') {
             e.preventDefault();
             $.confirm({
                 title: "Confirm review",
@@ -135,7 +128,7 @@ $(document).ready(function () {
                 }
             });
         }
-        else if (!askConfirmation && reject && !review) {
+        else if (!askConfirmation && reject && $('#assessorRemarkType').val() == 'REJECT') {
             e.preventDefault();
             $.confirm({
                 title: "Confirm reject",
@@ -150,7 +143,7 @@ $(document).ready(function () {
                         btnClass: 'btn-danger',
                         action: function () {
                             askConfirmation = true;
-                            review = false;
+                            reject = false;
                             $("body").addClass("submit-progress-bg");
                             // Wrap in setTimeout so the UI
                             // can update the spinners

@@ -862,6 +862,11 @@ namespace risk.control.system.Services
             {
                 return await ApproveCaseReport(userEmail, assessorRemarks, caseLocationId, claimsInvestigationId, reportUpdateStatus);
             }
+            else if (reportUpdateStatus == AssessorRemarkType.REJECT)
+            {
+                //PUT th case back in review list :: Assign back to Agent
+                return await RejectCaseReport(userEmail, assessorRemarks, caseLocationId, claimsInvestigationId, reportUpdateStatus);
+            }
             else
             {
                 //PUT th case back in review list :: Assign back to Agent
@@ -869,6 +874,103 @@ namespace risk.control.system.Services
             }
         }
 
+        private async Task<ClaimsInvestigation> RejectCaseReport(string userEmail, string assessorRemarks, long caseLocationId, string claimsInvestigationId, AssessorRemarkType assessorRemarkType)
+        {
+            var caseLocation = _context.CaseLocation
+                .Include(c => c.ClaimReport)
+                .FirstOrDefault(c => c.CaseLocationId == caseLocationId && c.ClaimsInvestigationId == claimsInvestigationId);
+
+            caseLocation.ClaimReport.AssessorRemarkType = assessorRemarkType;
+            caseLocation.ClaimReport.AssessorRemarks = assessorRemarks;
+            caseLocation.ClaimReport.AssessorRemarksUpdated = DateTime.UtcNow;
+            caseLocation.ClaimReport.AssessorEmail = userEmail;
+
+            caseLocation.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus
+                .FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR).InvestigationCaseSubStatusId;
+            caseLocation.Updated = DateTime.Now;
+            caseLocation.UpdatedBy = userEmail;
+            _context.CaseLocation.Update(caseLocation);
+            try
+            {
+                await _context.SaveChangesAsync();
+                var claim = _context.ClaimsInvestigation
+                    .Include(c => c.PolicyDetail)
+                    .ThenInclude(p => p.ClientCompany)
+                .FirstOrDefault(c => c.ClaimsInvestigationId == claimsInvestigationId);
+                claim.InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.FINISHED).InvestigationCaseStatusId;
+                claim.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                    i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR).InvestigationCaseSubStatusId;
+                claim.Updated = DateTime.Now;
+                claim.UserEmailActioned = userEmail;
+                claim.UserRoleActionedTo = $"{AppRoles.CompanyAdmin.GetEnumDisplayName()} ({claim.PolicyDetail.ClientCompany.Email})";
+                claim.UserEmailActionedTo = userEmail;
+                _context.ClaimsInvestigation.Update(claim);
+
+                var finalHop = _context.InvestigationTransaction
+                                   .Where(i => i.ClaimsInvestigationId == claimsInvestigationId)
+                                    .AsNoTracking().Max(s => s.HopCount);
+
+                var finalLog = new InvestigationTransaction
+                {
+                    HopCount = finalHop + 1,
+                    UserEmailActioned = userEmail,
+                    UserRoleActionedTo = $"{AppRoles.CompanyAdmin.GetEnumDisplayName()} ({claim.PolicyDetail.ClientCompany.Email})",
+                    ClaimsInvestigationId = claimsInvestigationId,
+                    CurrentClaimOwner = claim.CurrentClaimOwner,
+                    Created = DateTime.Now,
+                    Time2Update = DateTime.Now.Subtract(claim.Created).Days,
+                    InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.FINISHED).InvestigationCaseStatusId,
+                    InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                    i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR).InvestigationCaseSubStatusId,
+                    UpdatedBy = userEmail
+                };
+
+                _context.InvestigationTransaction.Add(finalLog);
+
+                //create invoice
+
+                var vendor = _context.Vendor.Include(s => s.VendorInvestigationServiceTypes).FirstOrDefault(v => v.VendorId == caseLocation.VendorId);
+                var currentUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
+                var investigationServiced = vendor.VendorInvestigationServiceTypes.FirstOrDefault(s => s.InvestigationServiceTypeId == claim.PolicyDetail.InvestigationServiceTypeId);
+
+                //THIS SHOULD NOT HAPPEN IN PROD : demo purpose
+                if (investigationServiced == null)
+                {
+                    investigationServiced = vendor.VendorInvestigationServiceTypes.FirstOrDefault();
+                }
+                //END
+                var investigatService = _context.InvestigationServiceType.FirstOrDefault(i => i.InvestigationServiceTypeId == claim.PolicyDetail.InvestigationServiceTypeId);
+
+                var invoice = new VendorInvoice
+                {
+                    ClientCompanyId = currentUser.ClientCompany.ClientCompanyId,
+                    GrandTotal = investigationServiced.Price + investigationServiced.Price * 10,
+                    NoteToRecipient = "Auto generated Invoice",
+                    Updated = DateTime.UtcNow,
+                    Vendor = vendor,
+                    ClientCompany = currentUser.ClientCompany,
+                    UpdatedBy = userEmail,
+                    VendorId = vendor.VendorId,
+                    ClaimReportId = caseLocation.ClaimReport?.ClaimReportId,
+                    SubTotal = investigationServiced.Price,
+                    TaxAmount = investigationServiced.Price * 10,
+                    InvestigationServiceType = investigatService,
+                    ClaimId = claimsInvestigationId
+                };
+
+                _context.VendorInvoice.Add(invoice);
+
+                var saveCount = await _context.SaveChangesAsync();
+
+                return saveCount > 0 ? claim : null!;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            return null!;
+        }
         private async Task<ClaimsInvestigation> ApproveCaseReport(string userEmail, string assessorRemarks, long caseLocationId, string claimsInvestigationId, AssessorRemarkType assessorRemarkType)
         {
             var caseLocation = _context.CaseLocation

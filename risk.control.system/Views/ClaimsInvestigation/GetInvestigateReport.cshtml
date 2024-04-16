@@ -22,7 +22,10 @@
             <partial name="_AgencyReport" model="@Model" />
             @{
                 var lastReport = Model.Location?.PreviousClaimReports.FirstOrDefault();
-                <a class="btn btn-default btn-sm" href="@Url.Action("PreviousReports", new { id = lastReport.PreviousClaimReportId })"> <i class="fas fa-newspaper"></i> Previous Report</a>
+                if(lastReport is not null)
+                {
+                    <a class="btn btn-default btn-sm" href="@Url.Action("PreviousReports", new { id = lastReport.PreviousClaimReportId })"> <i class="fas fa-newspaper"></i> Previous Report</a>
+                }
 
             }
             <div class="submit-progress hidden">
