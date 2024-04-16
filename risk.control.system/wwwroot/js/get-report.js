@@ -1,6 +1,7 @@
 $(document).ready(function () {
     let askConfirmation = false;
     let review = false;
+    let reject = false;
 
     $('#review-case').click(function () {
         //If the checkbox is checked.
@@ -15,14 +16,19 @@ $(document).ready(function () {
     $('#approve-case').click(function () {
         //If the checkbox is checked.
         var report = $('#assessorRemarks').val();
+        var rejectChecked = $('#flexRadioDefault1').is(':checked');
         var reviewChecked = $('#flexRadioDefault2').is(':checked');
         var approvedChecked = $('#flexRadioDefault3').is(':checked');
+
         if (report != '' && reviewChecked) {
             $('#assessorRemarkType').val('REVIEW');
             review = true;
         } else if (report != '' && approvedChecked){
-            review = false;
             $('#assessorRemarkType').val('OK');
+        }
+        else if (report != '' && rejectChecked) {
+            reject = true;
+            $('#assessorRemarkType').val('REJECT');
         }
     });
 
@@ -49,7 +55,7 @@ $(document).ready(function () {
                 }
             });
         }
-        else if (!askConfirmation && !review) {
+        else if (!askConfirmation && !review && !reject) {
             e.preventDefault();
             $.confirm({
                 title: "Confirm Approve",
@@ -89,7 +95,7 @@ $(document).ready(function () {
                 }
             });
         }
-        else if (!askConfirmation && review) {
+        else if (!askConfirmation && review && !reject) {
             e.preventDefault();
             $.confirm({
                 title: "Confirm review",
@@ -112,8 +118,48 @@ $(document).ready(function () {
                                 $(".submit-progress").removeClass("hidden");
                             }, 1);
 
-                            $('#review-case.btn.btn-danger').attr('disabled', 'disabled');
-                            $('#review-case.btn.btn-danger').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Review");
+                            $('#approve-case.btn.btn-success').attr('disabled', 'disabled');
+                            $('#approve-case.btn.btn-success').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i>  Review");
+                            $('#create-form').submit();
+
+                            var nodes = document.getElementById("create-form").getElementsByTagName('*');
+                            for (var i = 0; i < nodes.length; i++) {
+                                nodes[i].disabled = true;
+                            }
+                        }
+                    },
+                    cancel: {
+                        text: "Cancel",
+                        btnClass: 'btn-default'
+                    }
+                }
+            });
+        }
+        else if (!askConfirmation && reject && !review) {
+            e.preventDefault();
+            $.confirm({
+                title: "Confirm reject",
+                content: "Are you sure?",
+                icon: 'far fa-thumbs-down',
+
+                type: 'red',
+                closeIcon: true,
+                buttons: {
+                    confirm: {
+                        text: "Reject",
+                        btnClass: 'btn-danger',
+                        action: function () {
+                            askConfirmation = true;
+                            review = false;
+                            $("body").addClass("submit-progress-bg");
+                            // Wrap in setTimeout so the UI
+                            // can update the spinners
+                            setTimeout(function () {
+                                $(".submit-progress").removeClass("hidden");
+                            }, 1);
+
+                            $('#approve-case.btn.btn-success').attr('disabled', 'disabled');
+                            $('#approve-case.btn.btn-success').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i>  Reject");
                             $('#create-form').submit();
 
                             var nodes = document.getElementById("create-form").getElementsByTagName('*');

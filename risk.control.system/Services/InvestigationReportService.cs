@@ -276,12 +276,13 @@ namespace risk.control.system.Services
                 .FirstOrDefault(c => c.ClaimsInvestigationId == selectedcase
                 && c.InvestigationCaseSubStatusId == submittedToAssessorStatus.InvestigationCaseSubStatusId
             );
+            var companyUser = _context.ClientCompanyApplicationUser.Include(u=>u.ClientCompany).FirstOrDefault(u => u.Email == currentUserEmail);
 
             if (claimsInvestigation.IsReviewCase)
             {
                 claimCase.ClaimReport.AssessorRemarks = null;
             }
-            return (new ClaimsInvestigationVendorsModel { Location = claimCase, ClaimsInvestigation = claimsInvestigation });
+            return (new ClaimsInvestigationVendorsModel { Location = claimCase, ClaimsInvestigation = claimsInvestigation, TrialVersion = companyUser.ClientCompany.LicenseType == Standard.Licensing.LicenseType.Trial });
         }
 
         public PreviousClaimReport GetPreviousReport(long id)

@@ -6,6 +6,7 @@
         public CaseLocation Location { get; set; }
         public List<VendorCaseModel> Vendors { get; set; }
         public AssessorRemarkType AssessorRemarkType { get; set; }
+        public bool TrialVersion { get; set; }
     }
 
     public class VendorCaseModel

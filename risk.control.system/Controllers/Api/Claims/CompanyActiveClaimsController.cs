@@ -56,7 +56,17 @@ namespace risk.control.system.Controllers.Api.Claims
             a.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId)?.ToList();
             foreach (var claim in applicationDbContext)
             {
-                var userHasClaimLog = _context.InvestigationTransaction.Any(c => c.ClaimsInvestigationId == claim.ClaimsInvestigationId && c.UserEmailActioned == companyUser.Email);
+                var userHasReviewClaimLogs = _context.InvestigationTransaction.Where(c => c.ClaimsInvestigationId == claim.ClaimsInvestigationId && c.IsReviewCase &&
+                c.UserRoleActionedTo == $"{AppRoles.Creator.GetEnumDisplayName()} ( {companyUser.ClientCompany.Email})")?.ToList();
+
+                int? reviewLogCount = 0;
+                if (userHasReviewClaimLogs != null && userHasReviewClaimLogs.Count > 0)
+                {
+                    reviewLogCount = userHasReviewClaimLogs.OrderByDescending(o=>o.HopCount).First().HopCount;
+                }
+                var userHasClaimLog = _context.InvestigationTransaction.Any(c => c.ClaimsInvestigationId == claim.ClaimsInvestigationId && 
+                c.UserEmailActioned == companyUser.Email && c.HopCount >= reviewLogCount);
+
                 if (userHasClaimLog && claim.InvestigationCaseSubStatusId != createdStatus.InvestigationCaseSubStatusId &&
                     claim.InvestigationCaseSubStatusId != withdrawnByAgency.InvestigationCaseSubStatusId
                     &&
@@ -235,7 +245,17 @@ namespace risk.control.system.Controllers.Api.Claims
                 var claims = applicationDbContext.Where(a => openStatusesIds.Contains(a.InvestigationCaseStatusId) && a.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId)?.ToList();
                 foreach (var claim in claims)
                 {
-                    var userHasClaimLog = _context.InvestigationTransaction.Any(c => c.ClaimsInvestigationId == claim.ClaimsInvestigationId && c.UserEmailActioned == companyUser.Email);
+                    var userHasReviewClaimLogs = _context.InvestigationTransaction.Where(c => c.ClaimsInvestigationId == claim.ClaimsInvestigationId && c.IsReviewCase &&
+                        c.UserEmailActioned == companyUser.Email)?.ToList();
+
+                    int? reviewLogCount = 0;
+                    if (userHasReviewClaimLogs != null && userHasReviewClaimLogs.Count > 0)
+                    {
+                        reviewLogCount = userHasReviewClaimLogs.OrderByDescending(o => o.HopCount).First().HopCount;
+                    }
+                    var userHasClaimLog = _context.InvestigationTransaction.Any(c => c.ClaimsInvestigationId == claim.ClaimsInvestigationId && c.UserEmailActioned == companyUser.Email &&
+                    c.HopCount >= reviewLogCount);
+
                     if (userHasClaimLog)
                     {
                         claimsSubmitted.Add(claim);
@@ -253,7 +273,16 @@ namespace risk.control.system.Controllers.Api.Claims
 
                 foreach (var claim in applicationDbContext)
                 {
-                    var userHasClaimLog = _context.InvestigationTransaction.Any(c => c.ClaimsInvestigationId == claim.ClaimsInvestigationId && claim.UserEmailActioned == companyUser.Email);
+                    var userHasReviewClaimLogs = _context.InvestigationTransaction.Where(c => c.ClaimsInvestigationId == claim.ClaimsInvestigationId && c.IsReviewCase &&
+                        c.UserEmailActioned == companyUser.Email)?.ToList();
+
+                    int? reviewLogCount = 0;
+                    if (userHasReviewClaimLogs != null && userHasReviewClaimLogs.Count > 0)
+                    {
+                        reviewLogCount = userHasReviewClaimLogs.OrderByDescending(o=>o.HopCount).First().HopCount;
+                    }
+                    var userHasClaimLog = _context.InvestigationTransaction.Any(c => c.ClaimsInvestigationId == claim.ClaimsInvestigationId && c.UserEmailActioned == companyUser.Email && c.HopCount >= reviewLogCount);
+
                     if (claim.IsReviewCase && userHasClaimLog)
                     {
                         claimsSubmitted.Add(claim);

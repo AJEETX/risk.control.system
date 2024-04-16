@@ -59,6 +59,7 @@ namespace risk.control.system.Models
         public string? UserEmailActioned { get; set; }
         public string? UserRoleActionedTo { get; set; }
         public string? UserEmailActionedTo { get; set; }
+        public int ReviewCount { get; set; } = 0;
     }
 
     public enum Income

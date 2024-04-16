@@ -385,6 +385,34 @@ namespace risk.control.system.Controllers
             }
         }
 
+        [Breadcrumb(title: " Detail", FromAction = "Review")]
+        public async Task<IActionResult> ReviewDetail(string id)
+        {
+            try
+            {
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (string.IsNullOrWhiteSpace(currentUserEmail))
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                if (id == null)
+                {
+                    notifyService.Error("NOT FOUND !!!..");
+                    return RedirectToAction(nameof(Index));
+                }
+
+                var model = await claimPolicyService.GetClaimDetail(id);
+
+                return View(model);
+            }
+            catch (Exception)
+            {
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+        }
+
         [Breadcrumb(title: "Report", FromAction = "Assessor")]
         public IActionResult GetInvestigateReport(string selectedcase)
         {

@@ -21,10 +21,9 @@
 
             <partial name="_AgencyReport" model="@Model" />
             @{
-                foreach (var item in Model.Location?.PreviousClaimReports)
-                {
-                    <a class="btn btn-default btn-sm" href="@Url.Action("PreviousReports", new { id = item.PreviousClaimReportId })"> <i class="fas fa-newspaper"></i> Previous Report</a>
-                }
+                var lastReport = Model.Location?.PreviousClaimReports.FirstOrDefault();
+                <a class="btn btn-default btn-sm" href="@Url.Action("PreviousReports", new { id = lastReport.PreviousClaimReportId })"> <i class="fas fa-newspaper"></i> Previous Report</a>
+
             }
             <div class="submit-progress hidden">
                 <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
@@ -47,25 +46,48 @@
                             </div>
                             <div class="card-body">
                                 <div class="row">
+                                    <div class="col-sm-6 d-flex align-items-stretch flex-column">
+
                                     <div class="form-group">
-                                        <div class="form-check">
-                                            <input class="form-check-input selected-case" type="radio" name="flexRadioDefault" id="flexRadioDefault1" disabled>
-                                            <label class="form-check-label" for="flexRadioDefault1">
-                                                Reject
-                                            </label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input selected-case" type="radio" name="flexRadioDefault" id="flexRadioDefault2">
-                                            <label class="form-check-label" for="flexRadioDefault2">
-                                                Review
-                                            </label>
-                                        </div>
-                                        <div class="form-check">
+
+                                        @if(Model.TrialVersion)
+                                            {
+                                                <div class="form-check">
+                                                    <input disabled class="form-check-input selected-case" type="radio" name="flexRadioDefault" id="flexRadioDefault1">
+                                                    <label class="form-check-label" for="flexRadioDefault1">
+                                                        REJECT
+                                                    </label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input disabled class="form-check-input selected-case" type="radio" name="flexRadioDefault" id="flexRadioDefault2">
+                                                    <label class="form-check-label" for="flexRadioDefault2">
+                                                        REVIEW
+                                                    </label>
+                                                </div>
+                                            }
+
+                                            else
+                                            {
+                                                <div class="form-check">
+                                                    <input class="form-check-input selected-case" type="radio" name="flexRadioDefault" id="flexRadioDefault1">
+                                                    <label class="form-check-label" for="flexRadioDefault1">
+                                                        REJECT
+                                                    </label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input selected-case" type="radio" name="flexRadioDefault" id="flexRadioDefault2">
+                                                    <label class="form-check-label" for="flexRadioDefault2">
+                                                        REVIEW
+                                                    </label>
+                                                </div>
+                                            }
+                                            <div class="form-check">
                                             <input class="form-check-input selected-case" type="radio" name="flexRadioDefault" id="flexRadioDefault3" checked>
                                             <label class="form-check-label" for="flexRadioDefault3">
-                                                Approve
+                                                APPROVE
                                             </label>
                                         </div>
+                                    </div>
                                     </div>
                                 </div>
                             </div>
@@ -82,33 +104,34 @@
                                         <div class="input-group-prepend">
                                             <span class="input-group-text" asp-for="Location.ClaimReport.AgentRemarks"><i class="far fa-comment"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
                                         </div>
-                                        <input required maxlength="100" name="assessorRemarks" id="assessorRemarks" type="text" class="form-control remarks" autocomplete="off" required />
+                                        <input required maxlength="100" name="assessorRemarks" id="assessorRemarks" type="text" class="form-control remarks" autocomplete="off" required placeholder="enter remarks to submit"/>
 
                                         <span asp-validation-for="Location.ClaimReport.SupervisorRemarks" class="text-danger"></span>
                                     </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-footer">
+                                <div class="card-footer">
 
-                    <div class="row  float-right">
-                        <div class="col-md-12">
-                            <a id="back" asp-controller="ClaimsInvestigation" class="btn btn-outline-secondary" asp-action="Assessor">
-                                <i class="fas fa-arrow-left" aria-hidden="true"></i> Back
-                            </a>
-                            @*  <button id="review-case" type="submit" class="btn btn-danger">
-                            <i class="fas fa-sync" aria-hidden="true"></i> REVIEW
-                            </button> *@
-                            <button id="approve-case" type="submit" class="btn btn-success">
-                                <i class="far fa-thumbs-up" aria-hidden="true"></i> SUBMIT
-                            </button>
+                                    <div class="row  float-right">
+                                        <div class="col-md-12">
+                                            <a id="back" asp-controller="ClaimsInvestigation" class="btn btn-outline-secondary" asp-action="Assessor">
+                                                <i class="fas fa-arrow-left" aria-hidden="true"></i> Back
+                                            </a>
+                                            @*  <button id="review-case" type="submit" class="btn btn-danger">
+                                            <i class="fas fa-sync" aria-hidden="true"></i> REVIEW
+                                            </button> *@
+                                            <button id="approve-case" type="submit" class="btn btn-success">
+                                                <i class="far fa-thumbs-up" aria-hidden="true"></i> SUBMIT
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                        </div>
                         </div>
                     </div>
                 </div>
+                
             </div>
     </form>
 </section>

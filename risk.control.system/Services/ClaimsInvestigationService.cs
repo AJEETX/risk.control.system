@@ -1068,6 +1068,7 @@ namespace risk.control.system.Services
                 .Include(c => c.PolicyDetail)
                 .FirstOrDefault(v => v.ClaimsInvestigationId == claimsInvestigationId);
             claimsCaseToReassign.AssignedToAgency = false;
+            claimsCaseToReassign.ReviewCount += 1;
             claimsCaseToReassign.UserEmailActioned = userEmail;
             claimsCaseToReassign.UserEmailActionedTo = string.Empty;
             claimsCaseToReassign.UserRoleActionedTo = $"{AppRoles.Creator.GetEnumDisplayName()} ( {currentUser.ClientCompany.Email})";
@@ -1089,6 +1090,7 @@ namespace risk.control.system.Services
 
             var log = new InvestigationTransaction
             {
+                IsReviewCase = true,
                 HopCount = lastLogHop + 1,
                 UserEmailActioned = userEmail,
                 UserRoleActionedTo = $"{AppRoles.Creator.GetEnumDisplayName()} ( {currentUser.ClientCompany.Email})",

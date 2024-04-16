@@ -35,20 +35,20 @@
     <li class="nav-item">
         <a is-active-page asp-controller="Report" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Report","Index")
                                                 @Url.MakeActiveClass("Report","Detail") @Url.MakeActiveClass("Report","ShowInvoice")
-                                                                        @Url.MakeActiveClass("Report","PrintInvoice")">
+                                                                      @Url.MakeActiveClass("Report","PrintInvoice")">
             <i class="fas fa-print nav-icon"></i>
             <p>
-                <span class="badge badge-info"> COMPLETED </span>
+                <span class="badge badge-info"> APPROVED </span>
             </p>
         </a>
     </li>
-    //<li class="nav-item">
-    //    <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Approved" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Approved")
-    //                                                @Url.MakeActiveClass("ClaimsInvestigation","GetApprovedReport") ">
-    //        <i class="fas fa-thumbs-up nav-icon"></i>
-    //        <p>
-    //            <span class="badge badge-success">ASSESSED</span>
-    //        </p>
-    //    </a>
-    //</li>
+    <li class="nav-item">
+        <a is-active-page asp-controller="Report" asp-action="Rejected" class="actual-link nav-link @Url.MakeActiveClass("Report","Rejected")
+                                                       @Url.MakeActiveClass("Report","GetRejectedReport") ">
+           <i class="far fa-thumbs-down nav-icon"></i>
+           <p>
+               <span class="badge badge-secondary">REJECTED</span>
+           </p>
+       </a>
+    </li>
 }
