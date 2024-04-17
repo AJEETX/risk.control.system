@@ -4,7 +4,7 @@
 
 @if(Model.AutoAllocation)
 {
-        <div class="col-lg-3 col-6">
+        <div class="col">
 
             <div class="small-box bg-success">
                 <div class="inner">
@@ -18,7 +18,7 @@
             </div>
         </div>
 
-        <div class="col-lg-3 col-6">
+        <div class="col">
 
             <div class="small-box bg-warning">
                 <div class="inner">
@@ -31,7 +31,7 @@
                 <a href="@Model.SecondBlockUrl" class="details-page small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
             </div>
         </div>
-        <div class="col-lg-3 col-6">
+        <div class="col">
 
             <div class="small-box bg-danger">
                 <div class="inner">
@@ -44,7 +44,7 @@
                 <a href="@Model.SecondBBlockUrl" class="details-page small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
             </div>
         </div>
-        <div class="col-lg-3 col-6">
+        <div class="col">
 
             <div class="small-box bg-primary">
                 <div class="inner">
@@ -73,14 +73,14 @@
         </div> *@
         @if (Model.BulkUpload)
         {
-        <div class="col-lg-3 col-6">
+        <div class="col">
                 <div class="small-box bg-secondary">
                     <div class="inner">
                         <h3 id="upload-claims">@Model.BulkUploadBlockCount</h3>
                         <p>@Model.BulkUploadBlockName</p>
                     </div>
                     <div class="icon">
-                        <i class="ion ion-pie-graph"></i>
+                        <i class="fa fa-upload"></i>
                     </div>
                     <a href="@Model.BulkUploadBlockUrl" class="details-page small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
                 </div>
@@ -89,7 +89,7 @@
 }
 else
 {
-        <div class="col-lg-4 col-6">
+        <div class="col">
 
             <div class="small-box bg-success">
                 <div class="inner">
@@ -103,7 +103,7 @@ else
             </div>
         </div>
 
-        <div class="col-lg-4 col-6">
+        <div class="col">
 
             <div class="small-box bg-danger">
                 <div class="inner">
@@ -117,7 +117,7 @@ else
             </div>
         </div>
 
-        <div class="col-lg-4 col-6">
+        <div class="col">
 
             <div class="small-box bg-primary">
                 <div class="inner">

@@ -54,7 +54,7 @@ async function fetchIpInfo() {
         document.querySelector('#city .info-data').textContent = data.city || 'Not available';
         document.querySelector('#browser .info-data').textContent = result.browser.name.toLowerCase() + '' + result.browser.major || 'Not available';
         document.querySelector('#device .info-data').textContent = getDeviceType() || 'Not available';
-        document.querySelector('#os .info-data').textContent = result.os.name.toLowerCase() + '' + result.os.version + '/' + result.cpu.architecture || 'Not available';
+        document.querySelector('#os .info-data').textContent = result.os.name.toLowerCase() + '' + result.os.version || 'Not available';
 
     } catch (error) {
         console.error('There has been a problem with your fetch operation:', error);

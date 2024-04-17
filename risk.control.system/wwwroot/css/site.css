@@ -1220,3 +1220,13 @@ a#back-button {
 .detail-wizard-complete {
     margin: 10px 0;
 }
+.process-case {
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    color: #ff0000;
+    margin: 1rem;
+    padding: 1rem;
+    text-shadow: 1px 1px #ff0000;
+}
+.trial-case {
+    color: darkgoldenrod;
+}
