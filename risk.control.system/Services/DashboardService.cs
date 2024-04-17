@@ -102,7 +102,7 @@ namespace risk.control.system.Services
                 {
                     var files = _context.FilesOnFileSystem.Where(f => f.CompanyId == company.ClientCompanyId).ToList();
                     data.BulkUploadBlockName = "Upload Count";
-                    data.BulkUploadBlockUrl = "Report";
+                    data.BulkUploadBlockUrl = "/Uploads/Uploads";
                     data.BulkUploadBlockCount = files.Count;
                 }
             }

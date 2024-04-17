@@ -1209,5 +1209,14 @@ a#back-button {
 }
 .small-suffix {
     font-size: x-small;
+    font-weight:bold;
     color:black;
+}
+.detail-wizard{
+    padding:10px 0;
+    margin:10px 0px;
+    border-radius:4px;
+}
+.detail-wizard-complete {
+    margin: 10px 0;
 }
