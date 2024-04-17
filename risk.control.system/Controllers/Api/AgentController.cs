@@ -698,7 +698,7 @@ namespace risk.control.system.Controllers.Api
 
         [AllowAnonymous]
         [HttpPost("ip")]
-        public async Task<IActionResult> WhitelistIP(string domain = "insurer.com", string ipaddress = "222.222.222.222", string url = "https://localhost:5001/")
+        public async Task<IActionResult> WhitelistIP(string domain = "insurer.com", string ipaddress = "222.222.222.222", string url = "https://icheckify.azurewebsites.net/")
         {
             try
             {
