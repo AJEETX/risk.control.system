@@ -9,10 +9,42 @@ var showLocationMap = false;
 var showOcrMap = false;
 const image =
     "/images/beachflag.png";
+
+
+function getDeviceType() {
+    const ua = navigator.userAgent;
+    if (/(tablet|ipad|playbook|silk)|(android(?!.*mobi))/i.test(ua)) {
+        return "tablet";
+    }
+    if (
+        /Mobile|iP(hone|od)|Android|BlackBerry|IEMobile|Kindle|Silk-Accelerated|(hpw|web)OS|Opera M(obi|ini)/.test(
+            ua
+        )
+    ) {
+        return getMobileType();
+    }
+    return "desktop";
+};
+function getMobileType() {
+    if (/Android/i.test(navigator.userAgent)) {
+        return 'android';
+    } else if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+        return 'iOS';
+    } else if (/Windows Phone/i.test(navigator.userAgent)) {
+        return 'windows phone';
+    } else {
+        return 'other';
+    }
+}
+
 async function fetchIpInfo() {
     try {
         const url = "/api/Notification/GetClientIp?url=" + encodeURIComponent(window.location.pathname);
-        //const url = "/api/Notification/GetClientIp/";
+
+        var parser = new UAParser();
+        var result = parser.getResult();
+
+       
         const response = await fetch(url);
         if (!response.ok) {
             throw new Error('Network response was not ok');
@@ -20,6 +52,9 @@ async function fetchIpInfo() {
         const data = await response.json();
         document.querySelector('#ipAddress .info-data').textContent = data.ipAddress || 'Not available';
         document.querySelector('#city .info-data').textContent = data.city || 'Not available';
+        document.querySelector('#browser .info-data').textContent = result.browser.name.toLowerCase() + '' + result.browser.major || 'Not available';
+        document.querySelector('#device .info-data').textContent = getDeviceType() || 'Not available';
+        document.querySelector('#os .info-data').textContent = result.os.name.toLowerCase() + '' + result.os.version + '/' + result.cpu.architecture || 'Not available';
 
     } catch (error) {
         console.error('There has been a problem with your fetch operation:', error);

@@ -1207,3 +1207,7 @@ a#back-button {
     color:brown;
     text-decoration:underline;
 }
+.small-suffix {
+    font-size: x-small;
+    color:black;
+}
