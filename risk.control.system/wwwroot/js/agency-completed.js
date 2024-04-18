@@ -20,7 +20,7 @@
             url: '/api/ClaimsVendor/GetCompleted',
             dataSrc: ''
         },
-        order: [[11, 'asc']],
+        order: [[11, 'desc']],
         fixedHeader: true,
         processing: true,
         paging: true,

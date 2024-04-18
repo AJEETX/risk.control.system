@@ -224,12 +224,14 @@ namespace risk.control.system.Services
                                             CurrentClaimOwner = userEmail,
                                             Deleted = false,
                                             HasClientCompany = true,
+                                            AssignedToAgency = false,
                                             IsReady2Assign = true,
                                             IsReviewCase = false,
                                             SelectedToAssign = false,
                                             UserEmailActioned = userEmail,
-                                            UserEmailActionedTo = userEmail
-                                        };
+                                            UserEmailActionedTo = userEmail,
+                                            UserRoleActionedTo = $"{AppRoles.Creator.GetEnumDisplayName()} ({companyUser.ClientCompany.Email})"
+                                    };
 
                                         var servicetype = _context.InvestigationServiceType.FirstOrDefault(s => s.Code.ToLower() == (rowData[4].Trim().ToLower()));
 
@@ -285,7 +287,7 @@ namespace risk.control.system.Services
                                                     CustomerName = rowData[10]?.Trim(),
                                                     CustomerType = (CustomerType)Enum.Parse(typeof(CustomerType), rowData[11]?.Trim()),
                                                     Gender = (Gender)Enum.Parse(typeof(Gender), rowData[12]?.Trim()),
-                                                    CustomerDateOfBirth = DateTime.UtcNow.AddYears(-20),
+                                                    CustomerDateOfBirth = DateTime.Now.AddYears(-20),
                                                     ContactNumber = Convert.ToInt64(rowData[14]?.Trim()),
                                                     CustomerEducation = (Education)Enum.Parse(typeof(Education), rowData[15]?.Trim()),
                                                     CustomerOccupation = (Occupation)Enum.Parse(typeof(Occupation), rowData[16]?.Trim()),
@@ -348,9 +350,8 @@ namespace risk.control.system.Services
                                                 CountryId = beneCountry.CountryId,
                                                 InvestigationCaseSubStatusId = subStatus.InvestigationCaseSubStatusId,
                                                 ProfilePicture = beneficiaryNewImage,
-                                                Updated = DateTime.UtcNow,
-                                                UpdatedBy = userEmail,
-                                                Created = DateTime.UtcNow,
+                                                Updated = DateTime.Now,
+                                                UpdatedBy = userEmail
                                             };
 
                                             beneficairy.ClaimsInvestigationId = claim.ClaimsInvestigationId;
@@ -390,6 +391,7 @@ namespace risk.control.system.Services
                         }
                         var dataObject = ConvertDataTable<UploadClaim>(dt);
                         _context.UploadClaim.AddRange(dataObject);
+                        _context.SaveChanges();
                         return true;
                     }
                     return false;

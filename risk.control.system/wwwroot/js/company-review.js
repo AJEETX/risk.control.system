@@ -21,7 +21,7 @@
             url: '/api/CompanyActiveClaims/GetReview',
             dataSrc: ''
         },
-        order: [[11, 'asc']],
+        order: [[12, 'desc']],
         fixedHeader: true,
         processing: true,
         paging: true,
