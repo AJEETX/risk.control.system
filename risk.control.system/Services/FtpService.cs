@@ -116,7 +116,7 @@ namespace risk.control.system.Services
                 Directory.CreateDirectory(path);
             }
 
-            string filePath = Path.Combine(path, Path.GetFileName(postedFile.FileName));
+            string filePath = Path.Combine(path, Path.GetTempFileName());
 
             using (FileStream stream = new FileStream(filePath, FileMode.Create))
             {

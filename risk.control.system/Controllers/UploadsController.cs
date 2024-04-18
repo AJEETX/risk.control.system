@@ -147,6 +147,17 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> FileUpload(IFormFile postedFile, string uploadtype)
         {
+            if(postedFile == null || string.IsNullOrWhiteSpace(uploadtype) || 
+                string.IsNullOrWhiteSpace(Path.GetFileName(postedFile.FileName)) ||
+                (Path.GetInvalidFileNameChars() == null) ||
+                string.IsNullOrWhiteSpace(Path.GetExtension(postedFile.FileName)) ||
+                Path.GetExtension(postedFile.FileName) !="zip"
+                )
+            {
+                notifyService.Custom($"Upload Error. Contact Admin", 3, "red", "far fa-file-powerpoint");
+
+                return RedirectToAction("Draft", "ClaimsInvestigation");
+            }
             var userEmail = HttpContext.User?.Identity?.Name;
 
             if (string.IsNullOrWhiteSpace(userEmail))
