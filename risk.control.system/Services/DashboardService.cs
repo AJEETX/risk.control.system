@@ -90,7 +90,7 @@ namespace risk.control.system.Services
 
             if (company.AutoAllocation)
             {
-                data.SecondBlockName = "Assign(auto)";
+                data.SecondBlockName = "Assign (auto)";
                 data.SecondBlockUrl = "/ClaimsInvestigation/Draft";
                 data.SecondBlockCount = claimsAssignAuto.Count;
 

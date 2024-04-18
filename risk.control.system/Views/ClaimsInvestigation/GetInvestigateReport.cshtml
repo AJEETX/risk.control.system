@@ -55,13 +55,13 @@
 
                                         @if(Model.TrialVersion)
                                             {
-                                                <div class="form-check">
+                                                <div class="form-check form-switch">
                                                     <input disabled class="form-check-input selected-case" type="radio" name="flexRadioDefault" id="flexRadioDefault2">
                                                     <label class="form-check-label" for="flexRadioDefault2">
                                                         <b> REVIEW </b> <span class="trial-case"> { disabled in trial version }</span>
                                                     </label>
                                                 </div>
-                                                <div class="form-check">
+                                                <div class="form-check form-switch">
                                                     <input class="form-check-input selected-case" type="radio" name="flexRadioDefault" id="flexRadioDefault1">
                                                     <label class="form-check-label" for="flexRadioDefault1">
                                                         <b>  REJECT </b> <span class="process-case"> [analyse the report and reject]</span>
@@ -74,7 +74,7 @@
                                             {
                                                 if (Model.ClaimsInvestigation.ReviewCount > 1)
                                                 {
-                                                    <div class="form-check">
+                                                    <div class="form-check form-switch">
                                                         <input disabled class="form-check-input selected-case" type="radio" name="flexRadioDefault" id="flexRadioDefault2">
                                                         <label class="form-check-label" for="flexRadioDefault2">
                                                             <b> REVIEW </b> <span class="process-case"> [ Reviewed once ]</span>
@@ -83,14 +83,14 @@
                                                 }
                                                 else
                                                 {
-                                                    <div class="form-check">
+                                                    <div class="form-check form-switch">
                                                         <input class="form-check-input selected-case" type="radio" name="flexRadioDefault" id="flexRadioDefault2">
                                                         <label class="form-check-label" for="flexRadioDefault2">
                                                             <b> REVIEW </b> <span class="process-case">[ No previous review ]</span>
                                                         </label>
                                                     </div>
                                                 }
-                                                <div class="form-check">
+                                                <div class="form-check form-switch">
                                                     <input class="form-check-input selected-case" type="radio" name="flexRadioDefault" id="flexRadioDefault1">
                                                     <label class="form-check-label" for="flexRadioDefault1">
                                                         <b>  REJECT </b> <span class="process-case"> [ Analyse then reject ]</span>
@@ -99,7 +99,7 @@
                                                 
                                                 
                                             }
-                                            <div class="form-check">
+                                            <div class="form-check form-switch">
                                             <input class="form-check-input selected-case" type="radio" name="flexRadioDefault" id="flexRadioDefault3" checked>
                                             <label class="form-check-label" for="flexRadioDefault3">
                                                     <b> APPROVE </b>
