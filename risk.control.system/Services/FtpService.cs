@@ -173,10 +173,10 @@ namespace risk.control.system.Services
         {
             var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(c => c.Email == userEmail);
             bool userCanCreate = true;
-            var totalClaimsCreated = _context.PolicyDetail.Where(c => c.ClientCompanyId == companyUser.ClientCompanyId)?.ToList();
+            var totalClaimsCreated = _context.ClaimsInvestigation.Include(c=>c.PolicyDetail).Where(c => !c.Deleted && c.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId)?.ToList();
             if (companyUser.ClientCompany.LicenseType == Standard.Licensing.LicenseType.Trial)
             {
-                if (totalClaimsCreated?.Count >= companyUser.ClientCompany.TotalCreatedClaimAllowed)
+                if (totalClaimsCreated?.Count > companyUser.ClientCompany.TotalCreatedClaimAllowed)
                 {
                     userCanCreate = false;
                 }
@@ -200,7 +200,7 @@ namespace risk.control.system.Services
                     DataTable dt = new DataTable();
                     bool firstRow = true;
                     var dataRows = csvData.Split('\n');
-                    if(totalClaimsCreated?.Count + dataRows.Length <= companyUser.ClientCompany.TotalCreatedClaimAllowed)
+                    if(totalClaimsCreated?.Count + dataRows.Length < companyUser.ClientCompany.TotalCreatedClaimAllowed)
                     {
                         foreach (string row in dataRows)
                         {

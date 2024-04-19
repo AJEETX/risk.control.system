@@ -105,7 +105,7 @@ namespace risk.control.system.Controllers
 
         }
 
-        [Breadcrumb(" Assign", FromAction = "Index")]
+        [Breadcrumb(" Re + Assign", FromAction = "Index")]
         public IActionResult Assigner()
         {
             try
@@ -365,6 +365,7 @@ namespace risk.control.system.Controllers
         {
             try
             {
+                bool userCanCreate = true;
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
@@ -372,16 +373,25 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var companyUser = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(c => c.Email == currentUserEmail);
-                bool userCanCreate = true;
+                if (companyUser == null || companyUser.UserRole != AppConstant.CompanyRole.Creator)
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
                 if (companyUser.ClientCompany.LicenseType == Standard.Licensing.LicenseType.Trial)
                 {
-                    var totalClaimsCreated = _context.ClaimsInvestigation.Include(c=>c.PolicyDetail).Where(c => !c.Deleted && c.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId)?.ToList();
-                    if (totalClaimsCreated?.Count >= companyUser.ClientCompany.TotalCreatedClaimAllowed)
+                    var totalClaimsCreated = _context.ClaimsInvestigation.Include(c => c.PolicyDetail).Where(c => !c.Deleted && c.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId)?.ToList();
+                    if (totalClaimsCreated?.Count > companyUser.ClientCompany.TotalCreatedClaimAllowed)
                     {
                         userCanCreate = false;
                     }
                 }
-                
+
+                if (!userCanCreate)
+                {
+                    notifyService.Information("Max limit reached ");
+                }
+
                 return View(userCanCreate);
             }
             catch (Exception)

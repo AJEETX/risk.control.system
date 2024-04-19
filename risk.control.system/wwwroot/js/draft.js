@@ -178,7 +178,7 @@
         if (!anyChecked) {
             e.preventDefault();
             $.alert({
-                title: "Claim Assign<span class='badge badge-light'>(auto)</span> !",
+                title: "Assign<span class='badge badge-light'>(auto)</span> !",
                 content: "Please select Claim<span class='badge badge-light'>(s)</span> to Assign<span class='badge badge-light'>(auto)</span>!",
                 icon: 'fas fa-random fa-sync',
                 type: 'red',
@@ -308,7 +308,7 @@
             $.confirm({
                 title: "Confirm File Upload",
                 content: "Are you sure to Upload ?",
-                icon: 'fas fa-upload fa-spin',
+                icon: 'fas fa-upload',
     
                 type: 'green',
                 closeIcon: true,

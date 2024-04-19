@@ -13,6 +13,7 @@
         public string SecondBlockUrl { get; set; } = string.Empty;
         public string SecondBBlockName { get; set; }
         public int SecondBBlockCount { get; set; }
+        public string SecondBBlockCountBoth { get; set; }
         public string SecondBBlockUrl { get; set; } = string.Empty;
         public string ThirdBlockName { get; set; }
         public int ThirdBlockCount { get; set; }
