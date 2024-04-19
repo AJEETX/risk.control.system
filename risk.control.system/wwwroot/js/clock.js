@@ -47,7 +47,7 @@ function startTimer(duration, display) {
 			}
 				
 		} else if (timer < 0) {
-			timer = duration;
+			timer = 0;
 			window.location.href = "/account/logout";
 		}
 		

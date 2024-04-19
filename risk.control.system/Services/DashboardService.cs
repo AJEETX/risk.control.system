@@ -98,13 +98,7 @@ namespace risk.control.system.Services
                 data.SecondBBlockUrl = "/ClaimsInvestigation/Assigner";
                 data.SecondBBlockCount = claimsAssignManual.Count;
 
-                if(company.BulkUpload)
-                {
-                    var files = _context.FilesOnFileSystem.Where(f => f.CompanyId == company.ClientCompanyId && f.UploadedBy== companyUser.Email).ToList();
-                    data.BulkUploadBlockName = "Upload Log";
-                    data.BulkUploadBlockUrl = "/Uploads/Uploads";
-                    data.BulkUploadBlockCount = files.Count;
-                }
+                
             }
             else
             {
@@ -112,7 +106,13 @@ namespace risk.control.system.Services
                 data.SecondBlockUrl = "/ClaimsInvestigation/Assigner";
                 data.SecondBlockCount = claimsAssignManual.Count;
             }
-
+            if (company.BulkUpload)
+            {
+                var files = _context.FilesOnFileSystem.Where(f => f.CompanyId == company.ClientCompanyId && f.UploadedBy == companyUser.Email).ToList();
+                data.BulkUploadBlockName = "Upload Log";
+                data.BulkUploadBlockUrl = "/Uploads/Uploads";
+                data.BulkUploadBlockCount = files.Count;
+            }
             data.ThirdBlockName = "Active";
             data.ThirdBlockCount = claimsActive.Count;
             data.ThirdBlockUrl = "/ClaimsInvestigation/Active";

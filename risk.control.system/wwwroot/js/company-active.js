@@ -21,7 +21,7 @@
             url: '/api/CompanyActiveClaims/GetActive',
             dataSrc: ''
         },
-        order: [[11, 'desc']],
+        order: [[10, 'desc']],
         fixedHeader: true,
         processing: true,
         paging: true,
@@ -63,7 +63,6 @@
             },
             { "data": "beneficiaryName" },
             { "data": "serviceType" },
-            { "data": "service" },
             {
                 "data": "pincode",
                 "mRender": function (data, type, row) {
