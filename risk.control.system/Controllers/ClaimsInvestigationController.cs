@@ -150,11 +150,11 @@ namespace risk.control.system.Controllers
                         var processed = await ftpService.DownloadFtpFile(userEmail, postedFile);
                         if(processed)
                         {
-                            notifyService.Custom($"Ftp download complete ", 3, "green", "far fa-file-powerpoint");
+                            notifyService.Custom($"FTP download complete ", 3, "green", "fa fa-upload");
                         }
                         else
                         {
-                            notifyService.Custom($"Upload Error. Pls try again", 3, "red", "far fa-file-powerpoint");
+                            notifyService.Custom($"FTP Upload Error. Check limit", 3, "#001680", "fa fa-upload");
                         }
                     }
 
@@ -163,11 +163,11 @@ namespace risk.control.system.Controllers
                         var processed = await ftpService.UploadFile(userEmail, postedFile);
                         if(processed)
                         {
-                            notifyService.Custom($"File upload complete", 3, "green", "far fa-file-powerpoint");
+                            notifyService.Custom($"File upload complete", 3, "green", "fa fa-upload");
                         }
                         else
                         {
-                            notifyService.Custom($"Upload Error. Pls try again", 3, "red", "far fa-file-powerpoint");
+                            notifyService.Custom($"File Upload Error. Check limit", 3, "#001680", "fa fa-upload");
                         }
                     }
                     return RedirectToAction("Assigner", "ClaimsInvestigation");
@@ -175,7 +175,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Custom($"Upload Error. Pls try again", 3, "red", "far fa-file-powerpoint");
+                notifyService.Custom($"Upload Error. Pls try again", 3, "red", "fa fa-upload");
             }
             return RedirectToAction(nameof(ClaimsInvestigationController.Incomplete), "ClaimsInvestigation");
         }
@@ -225,11 +225,11 @@ namespace risk.control.system.Controllers
                         var processed = await ftpService.DownloadFtpFile(userEmail, postedFile);
                         if(processed)
                         {
-                            notifyService.Custom($"Ftp download complete ", 3, "green", "far fa-file-powerpoint");
+                            notifyService.Custom($"FTP download complete ", 3, "green", "fa fa-upload");
                         }
                         else
                         {
-                            notifyService.Custom($"Download Error. Pls try again", 3, "red", "far fa-file-powerpoint");
+                            notifyService.Information($"FTP Upload Error. Check limit <i class='fa fa-upload' ></i>", 3);
                         }
                     }
 
@@ -239,11 +239,11 @@ namespace risk.control.system.Controllers
                         var processed = await ftpService.UploadFile(userEmail, postedFile);
                         if(processed)
                         {
-                            notifyService.Custom($"File upload complete", 3, "green", "far fa-file-powerpoint");
+                            notifyService.Custom($"File upload complete", 3, "green", "fa fa-upload");
                         }
                         else
                         {
-                            notifyService.Custom($"Upload Error. Pls try again", 3, "red", "far fa-file-powerpoint");
+                            notifyService.Custom($"File Upload Error. Check limit", 3, "red", "fa fa-upload");
                         }
 
                     }
@@ -381,7 +381,7 @@ namespace risk.control.system.Controllers
                 if (companyUser.ClientCompany.LicenseType == Standard.Licensing.LicenseType.Trial)
                 {
                     var totalClaimsCreated = _context.ClaimsInvestigation.Include(c => c.PolicyDetail).Where(c => !c.Deleted && c.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId)?.ToList();
-                    if (totalClaimsCreated?.Count > companyUser.ClientCompany.TotalCreatedClaimAllowed)
+                    if (totalClaimsCreated?.Count >= companyUser.ClientCompany.TotalCreatedClaimAllowed)
                     {
                         userCanCreate = false;
                     }

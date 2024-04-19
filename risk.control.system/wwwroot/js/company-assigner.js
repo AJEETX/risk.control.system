@@ -239,7 +239,7 @@
             $.confirm({
                 title: "Confirm File Upload",
                 content: "Are you sure to Upload ?",
-                icon: 'fas fa-upload fa-spin',
+                icon: 'fas fa-upload',
     
                 type: 'green',
                 closeIcon: true,

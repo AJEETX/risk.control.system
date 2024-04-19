@@ -176,7 +176,7 @@ namespace risk.control.system.Services
             var totalClaimsCreated = _context.ClaimsInvestigation.Include(c=>c.PolicyDetail).Where(c => !c.Deleted && c.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId)?.ToList();
             if (companyUser.ClientCompany.LicenseType == Standard.Licensing.LicenseType.Trial)
             {
-                if (totalClaimsCreated?.Count > companyUser.ClientCompany.TotalCreatedClaimAllowed)
+                if (totalClaimsCreated?.Count >= companyUser.ClientCompany.TotalCreatedClaimAllowed)
                 {
                     userCanCreate = false;
                 }
@@ -200,7 +200,7 @@ namespace risk.control.system.Services
                     DataTable dt = new DataTable();
                     bool firstRow = true;
                     var dataRows = csvData.Split('\n');
-                    if(totalClaimsCreated?.Count + dataRows.Length < companyUser.ClientCompany.TotalCreatedClaimAllowed)
+                    if(totalClaimsCreated?.Count + dataRows.Length - 1  <= companyUser.ClientCompany.TotalCreatedClaimAllowed)
                     {
                         foreach (string row in dataRows)
                         {

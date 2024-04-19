@@ -6,9 +6,9 @@
         var expires = Model.ExpiryDate.Value.Subtract(DateTime.Now).Days;
         <marquee behavior="scroll" direction="left">
             <span class="trial-banner"> Trial Version with limited features</span> !
-            <i> { MAX Allowed Claim Creation = @Model.TotalCreatedClaimAllowed].</i>
+            <b> MAX Allowed Claim Creation = @Model.TotalCreatedClaimAllowed.</b>
             <span class="badge badge-light"></span>
-            <b> Expire in @expires days </b>
+            <span class="badge badge-light"> Expire in @expires days. </span>
         </marquee>
     }
 
