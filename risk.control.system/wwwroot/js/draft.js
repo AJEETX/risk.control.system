@@ -302,7 +302,7 @@
             );
         }
     });
-    $('#UploadFileButton').on('click', function (event) {
+    $('#upload-claims').on('submit', function (event) {
         if (askFileUploadConfirmation) {
             event.preventDefault();
             $.confirm({
@@ -349,7 +349,6 @@
         }
         
     });
-    var length = table.data().count();
 
     //initMap("/api/CompanyDraftClaims/GetAssignMap");
 

@@ -11,6 +11,9 @@
         <div class="card-header">
             <h3 class="card-title"><i class="fas fa-newspaper"></i> Details</h3>
         </div>
+        <div class="submit-progress hidden">
+            <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+        </div>
         @{
             string address = string.Empty;
             string baddress = string.Empty;
@@ -89,6 +92,7 @@
                 </div>
             </div>
             <div class="card-body">
+                
                 <div class="row">
                     <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
                         <div class="card bg-light d-flex flex-fill">
@@ -102,9 +106,7 @@
                                 </div>
                             </div>
                             <div class="card-body">
-                                <div class="submit-progress hidden">
-                                    <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
-                                </div>
+                               
                                 <div class="row">
                                     <div class="col-7">
                                         <h2 class="lead"><b>@Model.ClaimsInvestigation?.PolicyDetail.ContractNumber</b></h2>
@@ -204,64 +206,60 @@
 
                 </div>
 
-                <form id="create-form" method="post" asp-controller="ClaimsInvestigationPost" asp-action="Assign">
-                    <input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail?.CustomerDetailId" />
-                    <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
-                    <input type="hidden" id="beneficiaryId" value="@Model.Location?.CaseLocationId" />
-                    <input type="hidden" name="claims" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
-                    <div class="card-footer  d-flex  justify-content-center align-items-center">
-                        <div class="row">
-                            <div class="col-md-12 ">
-                                
+            </div>
+            <form id="create-form" method="post" asp-controller="ClaimsInvestigationPost" asp-action="Assign">
+                <input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail?.CustomerDetailId" />
+                <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
+                <input type="hidden" id="beneficiaryId" value="@Model.Location?.CaseLocationId" />
+                <input type="hidden" name="claims" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
+                <div class="card-footer  d-flex  justify-content-center align-items-center">
+                    <div class="row">
+                        <div class="col-md-12 ">
+                            @if (!customerExist || !beneficiaryExist)
+                            {
+                                <div class="d-flex justify-content-center align-items-center">
+                                    <span class="detail-wizard"> Complete details <i class="far fa-hand-point-up"></i>  to <b> ASSIGN </b> <i class="far fa-hand-point-down"></i></span>
+                                </div>
+                                <div>
+                                    <a id="back" asp-action="Incomplete" class="btn btn-outline-secondary"><span class="badge badge-light"> <i class="fas fa-arrow-left"></i> </span> Draft </a>
+                                    @if (Model.AutoAllocation)
+                                    {
 
-
-                                @if (!customerExist || !beneficiaryExist)
-                                {
-                                    <div class="d-flex justify-content-center align-items-center">
-                                        <span class="detail-wizard"> Complete details <i class="far fa-hand-point-up"></i>  to <b> ASSIGN </b> <i class="far fa-hand-point-down"></i></span>
-                                    </div>
-                                    <div>
-                                        <a id="back" asp-action="Incomplete" class="btn btn-outline-secondary"><span class="badge badge-light"> <i class="fas fa-arrow-left"></i> </span> Draft </a>
-                                        @if (Model.AutoAllocation)
-                                        {
-                                            
-                                            <button disabled type="submit" id="assign-list" class="btn btn-warning disabled">
-                                                <span class="badge badge-warning"> <i class="fas fa-random"></i></span><b> ASSIGN </b> <i class="small-suffix"> auto</i>
-                                            </button>
-                                        }
-                                        <button disabled id="assign-manual-list" class="btn btn-danger disabled">
-                                            <span class="badge badge-danger"> <i class="fas fa-external-link-alt"></i></span><b> ASSIGN </b>
+                                        <button disabled type="submit" id="assign-list" class="btn btn-warning disabled">
+                                            <span class="badge badge-warning"> <i class="fas fa-random"></i></span><b> ASSIGN </b> <i class="small-suffix"> auto</i>
                                         </button>
-                                    </div>
-                                }
-                                else
-                                {
-                                    <div class="d-flex justify-content-center align-items-center">
-                                        <span class="detail-wizard-complete"> Detail complete <i class="far fa-thumbs-up"></i> <b> ASSIGN </b> now <i class="far fa-hand-point-down"></i> or later </span>
-                                    </div>
+                                    }
+                                    <button disabled id="assign-manual-list" class="btn btn-danger disabled">
+                                        <span class="badge badge-danger"> <i class="fas fa-external-link-alt"></i></span><b> ASSIGN </b>
+                                    </button>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="d-flex justify-content-center align-items-center">
+                                    <span class="detail-wizard-complete"> Detail complete <i class="far fa-thumbs-up"></i> <b> ASSIGN </b> now <i class="far fa-hand-point-down"></i> or later </span>
+                                </div>
 
-                                    <div>
-                                        <a id="back" asp-action="Incomplete" class="btn btn-outline-secondary"><span class="badge badge-light"> <i class="fas fa-arrow-left"></i> </span> Draft </a>
+                                <div>
+                                    <a id="back" asp-action="Incomplete" class="btn btn-outline-secondary"><span class="badge badge-light"> <i class="fas fa-arrow-left"></i> </span> Draft </a>
 
-                                        @if (Model.AutoAllocation)
-                                        {
+                                    @if (Model.AutoAllocation)
+                                    {
 
-                                            <button type="submit" id="assign-list" class="btn btn-warning">
-                                                <span class="badge badge-warning"> <i class="fas fa-random"></i></span><b> ASSIGN </b> <i class="small-suffix"> auto</i>
-                                            </button>
-                                            
-                                        }
-                                        <a id="assign-manual-list" asp-action="EmpanelledVendors" asp-route-selectedcase="@Model.ClaimsInvestigation.ClaimsInvestigationId" class="btn btn-danger">
-                                            <span class="badge badge-danger"> <i class="fas fa-external-link-alt"></i></span><b> ASSIGN </b>
-                                        </a>
-                                    </div>
-                                }
-                            </div>
+                                        <button type="submit" id="assign-list" class="btn btn-warning">
+                                            <span class="badge badge-warning"> <i class="fas fa-random"></i></span><b> ASSIGN </b> <i class="small-suffix"> auto</i>
+                                        </button>
+
+                                    }
+                                    <a id="assign-manual-list" asp-action="EmpanelledVendors" asp-route-selectedcase="@Model.ClaimsInvestigation.ClaimsInvestigationId" class="btn btn-danger">
+                                        <span class="badge badge-danger"> <i class="fas fa-external-link-alt"></i></span><b> ASSIGN </b>
+                                    </a>
+                                </div>
+                            }
                         </div>
                     </div>
-                </form>
-            </div>
-
+                </div>
+            </form>
         }
     </div>
 </section>
