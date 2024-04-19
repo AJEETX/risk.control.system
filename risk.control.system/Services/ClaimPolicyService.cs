@@ -18,25 +18,18 @@ namespace risk.control.system.Services
     public class ClaimPolicyService : IClaimPolicyService
     {
         private readonly ApplicationDbContext _context;
+        private readonly INumberSequenceService numberService;
 
-        public ClaimPolicyService(ApplicationDbContext context)
+        public ClaimPolicyService(ApplicationDbContext context, INumberSequenceService numberService)
         {
             this._context = context;
+            this.numberService = numberService;
         }
 
         public ClaimsInvestigation AddClaimPolicy(string userEmail)
         {
             var lineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == "claims").LineOfBusinessId;
-
-            var random = new Random();
-            var cNumber = random.Next(3333, 9999);
-            var contractNumber = "POLX" + cNumber;
-
-            var existingContractNumber = _context.PolicyDetail.Any(p => p.ContractNumber == contractNumber);
-            if (existingContractNumber)
-            {
-                cNumber = cNumber + random.Next(3333, 9999);
-            }
+            var contractNumber = numberService.GetNumberSequence("PX");
             var model = new ClaimsInvestigation
             {
                 PolicyDetail = new PolicyDetail
@@ -50,8 +43,8 @@ namespace risk.control.system.Services
                     DateOfIncident = DateTime.UtcNow.AddDays(-3),
                     InvestigationServiceTypeId = _context.InvestigationServiceType.FirstOrDefault(i => i.Code == "COMP").InvestigationServiceTypeId,
                     Comments = "SOMETHING FISHY",
-                    SumAssuredValue = random.Next(100000, 9999999),
-                    ContractNumber = "POLX" + cNumber,
+                    SumAssuredValue = new Random().Next(100000, 9999999),
+                    ContractNumber = contractNumber,
                 }
             };
 

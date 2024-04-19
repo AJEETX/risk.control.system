@@ -100,7 +100,7 @@ namespace risk.control.system.Services
 
                 if(company.BulkUpload)
                 {
-                    var files = _context.FilesOnFileSystem.Where(f => f.CompanyId == company.ClientCompanyId).ToList();
+                    var files = _context.FilesOnFileSystem.Where(f => f.CompanyId == company.ClientCompanyId && f.UploadedBy== companyUser.Email).ToList();
                     data.BulkUploadBlockName = "Upload Log";
                     data.BulkUploadBlockUrl = "/Uploads/Uploads";
                     data.BulkUploadBlockCount = files.Count;

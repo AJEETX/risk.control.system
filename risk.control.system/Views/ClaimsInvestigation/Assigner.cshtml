@@ -9,12 +9,9 @@
 }
 
 <section class="content">
-    <div id="fullpage" class="card card-secondary">
+    <div id="article" class="card card-secondary">
         <div class="card-header">
             <h3 class="card-title"><i class="fas fa-external-link-alt"></i> Re / Assign</h3>
-            <div class="submit-progress hidden">
-                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
-            </div>
         </div>
         <article style="display:@display">
             <div class="bb-blog-inner">
@@ -73,7 +70,9 @@
             </div>
         </article>
         <div class="card-body">
-            
+            <div class="submit-progress hidden">
+                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+            </div>
             <form id="radioButtons" asp-action="EmpanelledVendors" method="get" enctype="multipart/form-data">
                 <div class="table-responsive mailbox-messages">
                     <table id="customerTable" class="table table-bordered table-hover dt-responsive nowrap w-100">

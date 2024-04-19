@@ -18,9 +18,9 @@ namespace risk.control.system.Services
 {
     public interface IFtpService
     {
-        Task UploadFile(string userEmail, IFormFile postedFile);
+        Task<bool> UploadFile(string userEmail, IFormFile postedFile);
 
-        Task DownloadFtpFile(string userEmail, IFormFile postedFile);
+        Task<bool> DownloadFtpFile(string userEmail, IFormFile postedFile);
     }
 
     public class FtpService : IFtpService
@@ -41,7 +41,7 @@ namespace risk.control.system.Services
             this.webHostEnvironment = webHostEnvironment;
         }
 
-        public async Task DownloadFtpFile(string userEmail, IFormFile postedFile)
+        public async Task<bool> DownloadFtpFile(string userEmail, IFormFile postedFile)
         {
             try
             {
@@ -62,9 +62,14 @@ namespace risk.control.system.Services
 
                 var data = Encoding.UTF8.GetString(response);
 
-                DownloadFtp(userEmail);
+                var processed =await DownloadFtp(userEmail);
+                if(!processed)
+                {
+                    return false;
+                }
 
                 SaveUpload(postedFile, filePath, "Ftp download", userEmail);
+                return true;
             }
             catch (Exception ex)
             {
@@ -73,7 +78,7 @@ namespace risk.control.system.Services
             }
         }
 
-        private async Task DownloadFtp(string userEmail)
+        private async Task <bool> DownloadFtp(string userEmail)
         {
             string path = Path.Combine(webHostEnvironment.WebRootPath, "download-ftp");
             if (!Directory.Exists(path))
@@ -92,7 +97,11 @@ namespace risk.control.system.Services
                 client.DownloadFile(ftpPath, filePath);
                 using (var archive = ZipFile.OpenRead(filePath))
                 {
-                    await ProcessFile(userEmail, archive);
+                    var processed = await ProcessFile(userEmail, archive);
+                    if(!processed)
+                    {
+                        return false;
+                    }
                 }
             }
             var rows = _context.SaveChanges();
@@ -106,9 +115,10 @@ namespace risk.control.system.Services
 
                 FtpWebResponse responseFileDelete = (FtpWebResponse)requestFileDelete.GetResponse();
             }
+            return true;
         }
 
-        public async Task UploadFile(string userEmail, IFormFile postedFile)
+        public async Task<bool> UploadFile(string userEmail, IFormFile postedFile)
         {
             string path = Path.Combine(webHostEnvironment.WebRootPath, "upload-file");
             if (!Directory.Exists(path))
@@ -128,10 +138,15 @@ namespace risk.control.system.Services
             {
                 using (var archive = new ZipArchive(stream))
                 {
-                    await ProcessFile(userEmail, archive);
+                    var processed = await ProcessFile(userEmail, archive);
+                    if(!processed)
+                    {
+                        return false;
+                    }
                 }
             }
             await SaveUpload(postedFile, filePath, "File upload", userEmail);
+            return true;
         }
 
         private async Task SaveUpload(IFormFile file, string filePath, string description, string uploadedBy)

@@ -81,6 +81,7 @@ builder.Services.Configure<ForwardedHeadersOptions>(options => {
 });
 
 builder.Services.AddFeatureManagement().AddFeatureFilter<TimeWindowFilter>();
+builder.Services.AddScoped<INumberSequenceService, NumberSequenceService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IAgentService, AgentService>();
 builder.Services.AddScoped<IClaimsInvestigationService, ClaimsInvestigationService>();

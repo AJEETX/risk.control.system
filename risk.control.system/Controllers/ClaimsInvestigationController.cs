@@ -147,16 +147,28 @@ namespace risk.control.system.Controllers
 
                     if (uploadType == UploadType.FTP)
                     {
-                        await ftpService.DownloadFtpFile(userEmail, postedFile);
-
-                        notifyService.Custom($"Ftp download complete ", 3, "green", "far fa-file-powerpoint");
+                        var processed = await ftpService.DownloadFtpFile(userEmail, postedFile);
+                        if(processed)
+                        {
+                            notifyService.Custom($"Ftp download complete ", 3, "green", "far fa-file-powerpoint");
+                        }
+                        else
+                        {
+                            notifyService.Custom($"Upload Error. Pls try again", 3, "red", "far fa-file-powerpoint");
+                        }
                     }
 
                     if (uploadType == UploadType.FILE && Path.GetExtension(postedFile.FileName) == ".zip")
                     {
-                        await ftpService.UploadFile(userEmail, postedFile);
-
-                        notifyService.Custom($"File upload complete", 3, "green", "far fa-file-powerpoint");
+                        var processed = await ftpService.UploadFile(userEmail, postedFile);
+                        if(processed)
+                        {
+                            notifyService.Custom($"File upload complete", 3, "green", "far fa-file-powerpoint");
+                        }
+                        else
+                        {
+                            notifyService.Custom($"Upload Error. Pls try again", 3, "red", "far fa-file-powerpoint");
+                        }
                     }
                     return RedirectToAction("Assigner", "ClaimsInvestigation");
                 }
@@ -210,17 +222,30 @@ namespace risk.control.system.Controllers
 
                     if (uploadType == UploadType.FTP)
                     {
-                        await ftpService.DownloadFtpFile(userEmail, postedFile);
-
-                        notifyService.Custom($"Ftp download complete ", 3, "green", "far fa-file-powerpoint");
+                        var processed = await ftpService.DownloadFtpFile(userEmail, postedFile);
+                        if(processed)
+                        {
+                            notifyService.Custom($"Ftp download complete ", 3, "green", "far fa-file-powerpoint");
+                        }
+                        else
+                        {
+                            notifyService.Custom($"Download Error. Pls try again", 3, "red", "far fa-file-powerpoint");
+                        }
                     }
 
                     if (uploadType == UploadType.FILE && Path.GetExtension(postedFile.FileName) == ".zip")
                     {
 
-                        await ftpService.UploadFile(userEmail, postedFile);
+                        var processed = await ftpService.UploadFile(userEmail, postedFile);
+                        if(processed)
+                        {
+                            notifyService.Custom($"File upload complete", 3, "green", "far fa-file-powerpoint");
+                        }
+                        else
+                        {
+                            notifyService.Custom($"Upload Error. Pls try again", 3, "red", "far fa-file-powerpoint");
+                        }
 
-                        notifyService.Custom($"File upload complete", 3, "green", "far fa-file-powerpoint");
                     }
                 }
                 return RedirectToAction("Draft", "ClaimsInvestigation");

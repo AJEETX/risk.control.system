@@ -16,6 +16,7 @@ namespace risk.control.system.Data
             base.OnModelCreating(builder);
         }
 
+        public virtual DbSet<NumberSequence> NumberSequence { get; set; }
         public virtual DbSet<IpAddress> IpAddress { get; set; }
         public virtual DbSet<IpApiResponse> IpApiResponse { get; set; }
         public virtual DbSet<AgencyRating> Ratings { get; set; }

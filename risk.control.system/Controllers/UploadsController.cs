@@ -50,24 +50,57 @@ namespace risk.control.system.Controllers
         [Breadcrumb(" Upload Log", FromController = typeof(ClaimsInvestigationController))]
         public async Task<IActionResult> Uploads()
         {
-            var userEmail = HttpContext.User.Identity.Name;
-            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == userEmail);
-            var files = await _context.FilesOnFileSystem.Where(f => f.CompanyId == companyUser.ClientCompanyId).ToListAsync();
-            ViewBag.Message = TempData["Message"];
-            return View(new FileUploadViewModel { FilesOnFileSystem = files });
+            try
+            {
+                var userEmail = HttpContext.User.Identity.Name;
+                if (string.IsNullOrWhiteSpace(userEmail))
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == userEmail);
+                if (companyUser == null)
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var files = await _context.FilesOnFileSystem.Where(f => f.CompanyId == companyUser.ClientCompanyId && f.UploadedBy == userEmail).ToListAsync();
+                ViewBag.Message = TempData["Message"];
+                return View(new FileUploadViewModel { FilesOnFileSystem = files });
+            }
+            catch (Exception)
+            {
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+            
         }
 
         public async Task<IActionResult> DownloadLog(long id)
         {
-            var file = await _context.FilesOnFileSystem.Where(x => x.Id == id).FirstOrDefaultAsync();
-            if (file == null) return null;
-            var memory = new MemoryStream();
-            using (var stream = new FileStream(file.FilePath, FileMode.Open))
+            try
             {
-                await stream.CopyToAsync(memory);
+                var userEmail = HttpContext.User.Identity.Name;
+                if (string.IsNullOrWhiteSpace(userEmail))
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var file = await _context.FilesOnFileSystem.Where(x => x.Id == id).FirstOrDefaultAsync();
+                if (file == null) return null!;
+                var memory = new MemoryStream();
+                using (var stream = new FileStream(file.FilePath, FileMode.Open))
+                {
+                    await stream.CopyToAsync(memory);
+                }
+                memory.Position = 0;
+                return File(memory, file.FileType, file.Name + file.Extension);
             }
-            memory.Position = 0;
-            return File(memory, file.FileType, file.Name + file.Extension);
+            catch (Exception)
+            {
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
         }
 
         public async Task<IActionResult> DeleteLog(long id)
@@ -89,27 +122,35 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> FaceUpload(string selectedcase, IFormFile digitalImage, string digitalIdLatitude, string digitalIdLongitude)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            try
+            {
+                var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrWhiteSpace(userEmail))
+                if (string.IsNullOrWhiteSpace(userEmail))
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                if (string.IsNullOrWhiteSpace(selectedcase))
+                {
+                    notifyService.Custom($"No claim selected!!!. ", 3, "orange", "fas fa-portrait");
+                    return Redirect("/ClaimsVendor/GetInvestigate?selectedcase=" + selectedcase);
+                }
+
+                using (var ds = new MemoryStream())
+                {
+                    digitalImage.CopyTo(ds);
+                    var imageByte = ds.ToArray();
+                    await vendorService.PostFaceId(userEmail, selectedcase, digitalIdLatitude, digitalIdLongitude, imageByte);
+
+                    notifyService.Custom($"Digital Id Image Uploaded", 3, "green", "fas fa-portrait");
+                    return Redirect("/ClaimsVendor/GetInvestigate?selectedcase=" + selectedcase);
+                }
+            }
+            catch (Exception)
             {
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
-            }
-            if (string.IsNullOrWhiteSpace(selectedcase))
-            {
-                notifyService.Custom($"No claim selected!!!. ", 3, "orange", "fas fa-portrait");
-                return Redirect("/ClaimsVendor/GetInvestigate?selectedcase=" + selectedcase);
-            }
-            
-            using (var ds = new MemoryStream())
-            {
-                digitalImage.CopyTo(ds);
-                var imageByte = ds.ToArray();
-                await vendorService.PostFaceId(userEmail, selectedcase, digitalIdLatitude, digitalIdLongitude, imageByte);
-
-                notifyService.Custom($"Digital Id Image Uploaded", 3, "green", "fas fa-portrait");
-                return Redirect("/ClaimsVendor/GetInvestigate?selectedcase=" + selectedcase);
             }
         }
 
@@ -118,27 +159,36 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> PanUpload(string selectedclaim, IFormFile panImage, string documentIdLatitude, string documentIdLongitude)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            try
+            {
 
-            if (string.IsNullOrWhiteSpace(userEmail))
+                var userEmail = HttpContext.User?.Identity?.Name;
+
+                if (string.IsNullOrWhiteSpace(userEmail))
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                if (string.IsNullOrWhiteSpace(selectedclaim))
+                {
+                    notifyService.Custom($"No claim selected!!!. ", 3, "orange", "fas fa-mobile-alt");
+                    return Redirect("/ClaimsVendor/GetInvestigate?selectedcase=" + selectedclaim);
+                }
+
+                using (var ds = new MemoryStream())
+                {
+                    panImage.CopyTo(ds);
+                    var imageByte = ds.ToArray();
+                    await vendorService.PostDocumentId(userEmail, selectedclaim, documentIdLatitude, documentIdLongitude, imageByte);
+
+                    notifyService.Custom($"Digital Id Image Uploaded", 3, "green", "fas fa-mobile-alt");
+                    return Redirect("/ClaimsVendor/GetInvestigate?selectedcase=" + selectedclaim);
+                }
+            }
+            catch (Exception)
             {
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
-            }
-            if (string.IsNullOrWhiteSpace(selectedclaim))
-            {
-                notifyService.Custom($"No claim selected!!!. ", 3, "orange", "fas fa-mobile-alt");
-                return Redirect("/ClaimsVendor/GetInvestigate?selectedcase=" + selectedclaim);
-            }
-
-            using (var ds = new MemoryStream())
-            {
-                panImage.CopyTo(ds);
-                var imageByte = ds.ToArray();
-                await vendorService.PostDocumentId(userEmail, selectedclaim, documentIdLatitude, documentIdLongitude, imageByte);
-
-                notifyService.Custom($"Digital Id Image Uploaded", 3, "green", "fas fa-mobile-alt");
-                return Redirect("/ClaimsVendor/GetInvestigate?selectedcase=" + selectedclaim);
             }
         }
 
@@ -165,39 +215,47 @@ namespace risk.control.system.Controllers
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
-            if (postedFile != null && !string.IsNullOrWhiteSpace(userEmail))
+            try
             {
-                UploadType uploadType = (UploadType)Enum.Parse(typeof(UploadType), uploadtype, true);
-
-                if (uploadType == UploadType.FTP)
+                if (postedFile != null && !string.IsNullOrWhiteSpace(userEmail))
                 {
-                    await ftpService.DownloadFtpFile(userEmail, postedFile);
+                    UploadType uploadType = (UploadType)Enum.Parse(typeof(UploadType), uploadtype, true);
 
-                    notifyService.Custom($"Ftp download complete ", 3, "green", "far fa-file-powerpoint");
-
-                    return RedirectToAction("Draft", "ClaimsInvestigation");
-                }
-
-                if (uploadType == UploadType.FILE && Path.GetExtension(postedFile.FileName) == ".zip")
-                {
-                    try
+                    if (uploadType == UploadType.FTP)
                     {
-                        await ftpService.UploadFile(userEmail, postedFile);
+                        await ftpService.DownloadFtpFile(userEmail, postedFile);
 
-                        notifyService.Custom($"File upload complete", 3, "green", "far fa-file-powerpoint");
+                        notifyService.Custom($"Ftp download complete ", 3, "green", "far fa-file-powerpoint");
 
                         return RedirectToAction("Draft", "ClaimsInvestigation");
                     }
-                    catch (Exception ex)
+
+                    if (uploadType == UploadType.FILE && Path.GetExtension(postedFile.FileName) == ".zip")
                     {
-                        Console.WriteLine(ex.Message);
+                        try
+                        {
+                            await ftpService.UploadFile(userEmail, postedFile);
+
+                            notifyService.Custom($"File upload complete", 3, "green", "far fa-file-powerpoint");
+
+                            return RedirectToAction("Draft", "ClaimsInvestigation");
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine(ex.Message);
+                        }
                     }
                 }
+
+                notifyService.Custom($"Upload Error. Contact Admin", 3, "red", "far fa-file-powerpoint");
+
+                return RedirectToAction("Draft", "ClaimsInvestigation");
             }
-
-            notifyService.Custom($"Upload Error. Contact Admin", 3, "red", "far fa-file-powerpoint");
-
-            return RedirectToAction("Draft", "ClaimsInvestigation");
+            catch (Exception)
+            {
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
         }
     }
 }

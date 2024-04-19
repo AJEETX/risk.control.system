@@ -23,7 +23,7 @@
                         $('#edit-company.btn.btn-warning').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Edit Company");
 
                         form.submit();
-                        var nodes = document.getElementById("article").getElementsByTagName('*');
+                        var nodes = document.getElementById("create-form").getElementsByTagName('*');
                         for (var i = 0; i < nodes.length; i++) {
                             nodes[i].disabled = true;
                         }

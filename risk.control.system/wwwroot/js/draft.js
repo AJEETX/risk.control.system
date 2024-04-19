@@ -216,7 +216,7 @@
                             $('#managevendors').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Assign");
 
                             $('#checkboxes').submit();
-                            var nodes = document.getElementById("fullpage").getElementsByTagName('*');
+                            var nodes = document.getElementById("article").getElementsByTagName('*');
                             for (var i = 0; i < nodes.length; i++) {
                                 nodes[i].disabled = true;
                             }

@@ -24,10 +24,10 @@ $(document).ready(function () {
                                 $(".submit-progress").removeClass("hidden");
                             }, 1);
                             $('#assign-list').attr('disabled', 'disabled');
-                            $('#assign-list').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Assign");
+                            $('#assign-list').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Assign<span class='badge badge-light'>(auto)</span>");
 
                             $('#create-form').submit();
-                            var nodes = document.getElementById("fullpage").getElementsByTagName('*');
+                            var nodes = document.getElementById("article").getElementsByTagName('*');
                             for (var i = 0; i < nodes.length; i++) {
                                 nodes[i].disabled = true;
                             }
