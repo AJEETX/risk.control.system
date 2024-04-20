@@ -614,7 +614,7 @@ namespace risk.control.system.Services
             claimsInvestigation.AgencyDeclineComment = model.ClaimsInvestigation.AgencyDeclineComment;
             claimsInvestigation.ActiveView = 0;
             claimsInvestigation.AllocateView = 0;
-            claimsInvestigation.ReAssignUploadView = 0;
+            claimsInvestigation.AssignAutoUploadView = 0;
             claimsInvestigation.VendorId = null;
             claimsInvestigation.UserRoleActionedTo = $"{AppRoles.Creator.GetEnumDisplayName()} ({company.Email})";
             claimsInvestigation.InvestigationCaseStatusId = inProgress.InvestigationCaseStatusId;
