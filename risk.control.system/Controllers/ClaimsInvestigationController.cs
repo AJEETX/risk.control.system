@@ -2,6 +2,7 @@
 
 using CsvHelper;
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
@@ -44,6 +45,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(" Claims")]
+        [Authorize(Roles ="Creator")]
         public IActionResult Index()
         {
             try
@@ -63,7 +65,8 @@ namespace risk.control.system.Controllers
             }
         }
 
-        [Breadcrumb("Re / Assign", FromAction = "Index")]
+        [Breadcrumb("Re + Assign")]
+        [Authorize(Roles ="Creator")]
         public IActionResult Assign()
         {
             try
@@ -105,7 +108,8 @@ namespace risk.control.system.Controllers
 
         }
 
-        [Breadcrumb(" Re + Assign", FromAction = "Index")]
+        [Breadcrumb(" Re + Assign")]
+        [Authorize(Roles = "Creator")]
         public IActionResult Assigner()
         {
             try
@@ -179,7 +183,8 @@ namespace risk.control.system.Controllers
             }
             return RedirectToAction(nameof(ClaimsInvestigationController.Incomplete), "ClaimsInvestigation");
         }
-        [Breadcrumb(" Assign(auto)", FromAction = "Index")]
+        [Breadcrumb(" Assign(auto)")]
+        [Authorize(Roles = "Creator")]
         public IActionResult Draft()
         {
             try
@@ -206,6 +211,7 @@ namespace risk.control.system.Controllers
         [HttpPost]
         [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Creator")]
         public async Task<IActionResult> Draft(IFormFile postedFile, string uploadtype)
         {
             try
@@ -259,6 +265,7 @@ namespace risk.control.system.Controllers
 
         [HttpGet]
         [Breadcrumb(" Empanelled Agencies", FromAction = "Assigner")]
+        [Authorize(Roles ="Creator")]
         public async Task<IActionResult> EmpanelledVendors(string selectedcase)
         {
             try
@@ -289,6 +296,7 @@ namespace risk.control.system.Controllers
 
         [HttpGet]
         [Breadcrumb(" Allocate (to agency)")]
+        [Authorize(Roles = "Creator")]
         public async Task<IActionResult> AllocateToVendor(string selectedcase)
         {
             try
@@ -342,6 +350,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(title: "Active")]
+        [Authorize(Roles = "Creator")]
         public IActionResult Active()
         {
             try
@@ -361,6 +370,7 @@ namespace risk.control.system.Controllers
             }
         }
         [Breadcrumb(title: "Draft")]
+        [Authorize(Roles = "Creator")]
         public IActionResult Incomplete()
         {
             try
@@ -505,6 +515,7 @@ namespace risk.control.system.Controllers
 
 
         [Breadcrumb("Details", FromAction = "Index", FromController = typeof(InsuranceClaimsController))]
+        [Authorize(Roles = "Creator")]
         public async Task<IActionResult> Details(string id)
         {
             try
@@ -532,6 +543,7 @@ namespace risk.control.system.Controllers
             }
         }
         [Breadcrumb("Details", FromAction = "Draft", FromController = typeof(ClaimsInvestigationController))]
+        [Authorize(Roles = "Creator")]
         public async Task<IActionResult> DetailsAuto(string id)
         {
             try
@@ -559,6 +571,7 @@ namespace risk.control.system.Controllers
             }
         }
         [Breadcrumb("Details", FromAction = "Assigner", FromController = typeof(ClaimsInvestigationController))]
+        [Authorize(Roles = "Creator")]
         public async Task<IActionResult> DetailsManual(string id)
         {
             try
@@ -587,6 +600,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(title: " Detail", FromAction = "Assigner")]
+        [Authorize(Roles ="Creator")]
         public async Task<IActionResult> Detail(string id)
         {
             try
@@ -615,6 +629,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(title: " Detail", FromAction = "Active")]
+        [Authorize(Roles = "Creator")]
         public async Task<IActionResult> ActiveDetail(string id)
         {
             try
@@ -642,7 +657,8 @@ namespace risk.control.system.Controllers
             }
         }
 
-        [Breadcrumb(title: " Detail", FromAction = "Index")]
+        [Breadcrumb(title: " Detail")]
+        [Authorize(Roles = "Creator")]
         public async Task<IActionResult> ReadyDetail(string id)
         {
             try
@@ -670,6 +686,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(title: " Detail", FromAction = "Assign")]
+        [Authorize(Roles ="Creator")]
         public async Task<IActionResult> AssignDetail(string id)
         {
             try
@@ -704,6 +721,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(title: " Agency detail", FromAction = "Draft")]
+        [Authorize(Roles ="Creator")]
         public async Task<IActionResult> VendorDetail(string companyId, long id, string backurl, string selectedcase)
         {
             try

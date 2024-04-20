@@ -175,7 +175,7 @@
         //public const string CURRENT_STATE = "VIC";
 
         public const string INSURER = "Insurer life";
-        public const string INSURERCODE = "ini";
+        public const string INSURERCODE = "ili";
         public const string INSURERDOMAIN = "insurer.com";
         public const string INSURERLOGO = "/img/insurer.jpg";
         public const string INSURER_CREATOR = "creator@" + INSURERDOMAIN;

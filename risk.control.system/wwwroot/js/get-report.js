@@ -51,7 +51,7 @@ $(document).ready(function () {
         else if (!askConfirmation && approve && $('#assessorRemarkType').val() == 'OK') {
             e.preventDefault();
             $.confirm({
-                title: "Confirm Approve",
+                title: "Confirm APPROVE",
                 content: "Are you sure?",
                 icon: 'far fa-thumbs-up',
     
@@ -59,7 +59,7 @@ $(document).ready(function () {
                 closeIcon: true,
                 buttons: {
                     confirm: {
-                        text: "Approve",
+                        text: "APPROVE",
                         btnClass: 'btn-success',
                         action: function () {
                             askConfirmation = true;
@@ -71,8 +71,8 @@ $(document).ready(function () {
                                 $(".submit-progress").removeClass("hidden");
                             }, 1);
 
-                            $('#approve-case.btn.btn-success').attr('disabled', 'disabled');
-                            $('#approve-case.btn.btn-success').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Approve");
+                            $('#approve-case').attr('disabled', 'disabled');
+                            $('#approve-case').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> APPROVE");
                             $('#create-form').submit();
 
                             var nodes = document.getElementById("create-form").getElementsByTagName('*');
@@ -91,16 +91,16 @@ $(document).ready(function () {
         else if (!askConfirmation && review && $('#assessorRemarkType').val() == 'REVIEW') {
             e.preventDefault();
             $.confirm({
-                title: "Confirm review",
+                title: "Confirm REVIEW",
                 content: "Are you sure?",
                 icon: 'fas fa-sync',
     
-                type: 'red',
+                type: 'orange',
                 closeIcon: true,
                 buttons: {
                     confirm: {
-                        text: "Review",
-                        btnClass: 'btn-danger',
+                        text: "REVIEW",
+                        btnClass: 'btn-warning',
                         action: function () {
                             askConfirmation = true;
                             review = false;
@@ -111,8 +111,8 @@ $(document).ready(function () {
                                 $(".submit-progress").removeClass("hidden");
                             }, 1);
 
-                            $('#approve-case.btn.btn-success').attr('disabled', 'disabled');
-                            $('#approve-case.btn.btn-success').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i>  Review");
+                            $('#approve-case').attr('disabled', 'disabled');
+                            $('#approve-case').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i>  REVIEW");
                             $('#create-form').submit();
 
                             var nodes = document.getElementById("create-form").getElementsByTagName('*');
@@ -131,7 +131,7 @@ $(document).ready(function () {
         else if (!askConfirmation && reject && $('#assessorRemarkType').val() == 'REJECT') {
             e.preventDefault();
             $.confirm({
-                title: "Confirm reject",
+                title: "Confirm REJECT",
                 content: "Are you sure?",
                 icon: 'far fa-thumbs-down',
 
@@ -139,7 +139,7 @@ $(document).ready(function () {
                 closeIcon: true,
                 buttons: {
                     confirm: {
-                        text: "Reject",
+                        text: "REJECT",
                         btnClass: 'btn-danger',
                         action: function () {
                             askConfirmation = true;
@@ -151,8 +151,8 @@ $(document).ready(function () {
                                 $(".submit-progress").removeClass("hidden");
                             }, 1);
 
-                            $('#approve-case.btn.btn-success').attr('disabled', 'disabled');
-                            $('#approve-case.btn.btn-success').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i>  Reject");
+                            $('#approve-case').attr('disabled', 'disabled');
+                            $('#approve-case').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i>  REJECT");
                             $('#create-form').submit();
 
                             var nodes = document.getElementById("create-form").getElementsByTagName('*');

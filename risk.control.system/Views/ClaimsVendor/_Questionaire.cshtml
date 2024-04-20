@@ -1,41 +1,36 @@
 ﻿@model ClaimsInvestigationVendorsModel
-                                
+
 @{
     var questionTime = @Model.Location.ClaimReport.AgentRemarksUpdated != null ? @Model.Location.ClaimReport.AgentRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt") : null;
-       
+
     string questionaire = "grey";
     if (Model.Location.ClaimReport.AgentRemarks != null)
     {
         questionaire = "green";
     }
-        <div class="col-12 col-sm-4 d-flex align-items-stretch flex-column">
+    <div class="col-12 col-sm-4 d-flex align-items-stretch flex-column">
         <div id="questionaire-border" class="card bg-light d-flex flex-fill">
-                <div class="card-header text-muted border-bottom-0">
-                    <i class="far fa-comment"></i> Questionnaire <span class="badge badge-light">checkify</span> <span class="badge badge-light" style="float:right;"><i class="nav-icon fas fa-clock"></i> @questionTime </span>
-                </div>
-                <div class="card-footer text-muted border-bottom-0">
-                    <i class="fas fa-user-shield"></i>  Agent :<span class="badge badge-light">  @Model.Location.ClaimReport.AgentEmail </span>
-                </div>
+            <div class="card-header text-muted border-bottom-0">
+                <i class="far fa-comment"></i> Questionnaire <span class="badge badge-light">checkify</span> <span class="badge badge-light" style="float:right;"><i class="nav-icon fas fa-clock"></i> @questionTime </span>
+            </div>
+            <div class="card-footer text-muted border-bottom-0">
+                <i class="fas fa-user-shield"></i>  Agent :<span class="badge badge-light">  @Model.Location.ClaimReport.AgentEmail </span>
+            </div>
             <div class="progress">
                 <i class="far fa-bookmark bookmark-green"></i>
                 <div id="questionaire" class="progress-bar" role="progressbar" style="width:100%;background-color:@questionaire;">
                     questionaire
                 </div>
             </div>
-                 <form id="create-form" asp-controller="ClaimsVendorPost" asp-action="SubmitReport" method="post">
-                    <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
-                    <input type="hidden" id="CaseLocationId" name="CaseLocationId" value="@Model.Location.CaseLocationId" />
-                    <input type="hidden" id="policyDetailId" value="@Model.ClaimsInvestigation?.PolicyDetail.PolicyDetailId" />
-                    <input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail.CustomerDetailId" />
-                    <input type="hidden" id="beneficiaryId" value="@Model.Location?.CaseLocationId" />  
-
-                    
-                        <div class="card-body">
-
-                            <div class="row">
-
-                                <div class="col-12">
-
+            <form id="create-form" asp-controller="ClaimsVendorPost" asp-action="SubmitReport" method="post">
+                <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
+                <input type="hidden" id="CaseLocationId" name="CaseLocationId" value="@Model.Location.CaseLocationId" />
+                <input type="hidden" id="policyDetailId" value="@Model.ClaimsInvestigation?.PolicyDetail.PolicyDetailId" />
+                <input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail.CustomerDetailId" />
+                <input type="hidden" id="beneficiaryId" value="@Model.Location?.CaseLocationId" />
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-12">
                             <div class="form-group">
                                 <span class="input-group-label"> Ownership of residence ?</span>
                                 <div class="input-group mb-3">
@@ -70,7 +65,6 @@
                                     <span asp-validation-for="Location.ClaimReport.ReportQuestionaire.Answer3" class="text-danger"></span>
                                 </div>
                             </div>
-
                             <div class="form-group">
                                 <span class="input-group-label"> Date met with neighbour ?:</span>
                                 <div class="input-group mb-3">
@@ -94,41 +88,45 @@
                                     <span asp-validation-for="Location.ClaimReport.AgentRemarks" class="text-danger"></span>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 d-flex justify-content-center align-items-center">
+                            <div class="ml-4 mb-0 fa-ul text-muted">
 
-                                    <div class="ml-4 mb-0 fa-ul text-muted">
-                                       
-                                        <li class="form-group">
-                                            <input type="checkbox" id="terms_and_conditions" value="1" />
-                                            <label class="account" for="terms_and_conditions"> I agree to the <a href="#">Terms & Conditions</a></label>
-                                        </li>
-                                    </div>
-                                </div>
+                                <li class="form-group">
+                                    <input type="checkbox" id="terms_and_conditions" value="1" />
+                                    <label class="account" for="terms_and_conditions"> I agree to the <a href="#">Terms & Conditions</a></label>
+                                </li>
                             </div>
                         </div>
-            
-                        <div class="card-footer">
-                            <div class="text-right">
-                                <a asp-action="Agent" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a> &nbsp;
-                                @if (@Model.Location?.ClaimReport?.DigitalIdReport?.DigitalIdImageLocationUrl != null && @Model.Location?.ClaimReport?.DocumentIdReport?.DocumentIdImageLocationUrl != null)
-                                {
-                                    <button disabled id="submit-case" type="submit" class="btn btn-danger">
-                                        <i class="fa fa-binoculars" aria-hidden="true"></i> Submit
-                                    </button>
-                                }
-                                else
+                    </div>
+                </div>
+
+                <div class="card-footer">
+
+                    <div class="text-right">
+                        <a id="back" asp-action="Agent" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a> &nbsp;
+                        @if (@Model.Location?.ClaimReport?.DigitalIdReport?.DigitalIdImageLocationUrl != null && @Model.Location?.ClaimReport?.DocumentIdReport?.DocumentIdImageLocationUrl != null)
+                        {
+                            <button disabled id="submit-case" type="submit" class="btn btn-danger">
+                                <i class="fa fa-binoculars" aria-hidden="true"></i> SUBMIT
+                            </button>
+                        }
+                        else
                         {
                             <button disabled id="incomplete-case" type="submit" class="btn btn-danger">
                                 <i class="fa fa-binoculars" aria-hidden="true"></i> SUBMIT
                             </button>
                         }
 
-                            </div>
-                        </div>
+                    </div>
+                </div>
 
-                    
-                </form>
 
-            </div>
+            </form>
+
         </div>
+    </div>
 
 }

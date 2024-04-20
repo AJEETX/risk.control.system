@@ -7,7 +7,7 @@
             $(".submit-progress").removeClass("hidden");
         }, 1);
         $('body').attr('disabled', 'disabled');
-        $(this).html("<i class='fas fa-sync fa-spin'></i> Review");
+        $(this).html("<i class='fas fa-sync fa-spin'></i> REVIEW");
 
         $('html *').css('cursor', 'not-allowed');
         $('html a *, html button *').css('pointer-events', 'none');
@@ -25,7 +25,7 @@
         if (report == '') {
             e.preventDefault();
             $.alert({
-                title: "Supervisor Comments !!!",
+                title: "Comments !!!",
                 content: "Please enter comments ?",
                 icon: 'fas fa-exclamation-triangle',
     
@@ -46,7 +46,7 @@
         else if (!askConfirmation) {
             e.preventDefault();
             $.confirm({
-                title: "Confirm Report submission",
+                title: "Confirm Submit",
                 content: "Are you sure?",
                 icon: 'far fa-file-alt',
     
@@ -54,7 +54,7 @@
                 closeIcon: true,
                 buttons: {
                     confirm: {
-                        text: "Submit",
+                        text: "SUBMIT",
                         btnClass: 'btn-success',
                         action: function () {
                             askConfirmation = true;
@@ -66,7 +66,7 @@
                                 $(".submit-progress").removeClass("hidden");
                             }, 1);
                             $('#allocate-case').attr('disabled', 'disabled');
-                            $('#allocate-case').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Submit");
+                            $('#allocate-case').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> SUBMIT");
 
                             $('#create-form').submit();
 

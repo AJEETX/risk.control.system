@@ -353,15 +353,15 @@
         else if (!askConfirmation) {
             e.preventDefault();
             $.confirm({
-                title: "Confirm Submit",
-                content: "Are you sure to Submit?",
+                title: "Confirm SUBMIT",
+                content: "Are you sure?",
                 icon: 'fa fa-binoculars',
     
                 type: 'red',
                 closeIcon: true,
                 buttons: {
                     confirm: {
-                        text: "Submit",
+                        text: "SUBMIT",
                         btnClass: 'btn-danger',
                         action: function () {
                             askConfirmation = true;
@@ -374,7 +374,7 @@
                             }, 1);
 
                             $('#submit-case').attr('disabled', 'disabled');
-                            $('#submit-case').html("<i class='fas fa-sync fa-spin'></i> Submit");
+                            $('#submit-case').html("<i class='fas fa-sync fa-spin'></i> SUBMIT");
                             $('#create-form').submit();
 
                             var nodes = document.getElementById("article").getElementsByTagName('*');

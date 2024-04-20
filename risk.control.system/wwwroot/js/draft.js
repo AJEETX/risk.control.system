@@ -178,8 +178,8 @@
         if (!anyChecked) {
             e.preventDefault();
             $.alert({
-                title: "Assign<span class='badge badge-light'>(auto)</span> !",
-                content: "Please select Claim<span class='badge badge-light'>(s)</span> to Assign<span class='badge badge-light'>(auto)</span>!",
+                title: "ASSIGN<span class='badge badge-light'>(auto)</span> !",
+                content: "Please select Claim<span class='badge badge-light'>(s)</span> to ASSIGN<span class='badge badge-light'>(auto)</span>!",
                 icon: 'fas fa-random fa-sync',
                 type: 'red',
                 closeIcon: true,
@@ -194,14 +194,14 @@
         else if (!askConfirmation) {
             e.preventDefault();
             $.confirm({
-                title: "Confirm Assign<span class='badge badge-light'>(auto)</span>",
-                content: "Are you sure to Assign<span class='badge badge-light'>(auto)</span> ?",
+                title: "Confirm ASSIGN<span class='badge badge-light'>(auto)</span>",
+                content: "Are you sure to ASSIGN<span class='badge badge-light'>(auto)</span> ?",
                 icon: 'fas fa-random',
                 type: 'orange',
                 closeIcon: true,
                 buttons: {
                     confirm: {
-                        text: "Assign <span class='badge badge-warning'>(auto)</span>",
+                        text: "ASSIGN <span class='badge badge-warning'>(auto)</span>",
                         btnClass: 'btn-warning',
                         action: function () {
                             askConfirmation = true;
@@ -212,8 +212,8 @@
                             setTimeout(function () {
                                 $(".submit-progress").removeClass("hidden");
                             }, 1);
-                            $('#managevendors').attr('disabled', 'disabled');
-                            $('#managevendors').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Assign");
+                            $('#allocatedcase').attr('disabled', 'disabled');
+                            $('#allocatedcase').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> ASSIGN<span class='badge badge-warning'>(auto)</span>");
 
                             $('#checkboxes').submit();
                             var nodes = document.getElementById("article").getElementsByTagName('*');
@@ -362,7 +362,7 @@ function showedit(id) {
         $(".submit-progress").removeClass("hidden");
     }, 1);
     $('a.btn *').attr('disabled', 'disabled');
-    $('a#edit' + id + '.btn.btn-xs.btn-warning').html("<i class='fas fa-sync fa-spin'></i> Edit");
+    $('a#edit' + id + '.btn.btn-xs.btn-warning').html("<i class='fas fa-sync fa-spin'></i> EDIT");
 
     var nodes = document.getElementById("body").getElementsByTagName('*');
     for (var i = 0; i < nodes.length; i++) {

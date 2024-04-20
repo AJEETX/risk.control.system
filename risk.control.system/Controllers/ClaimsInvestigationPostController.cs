@@ -94,7 +94,7 @@ namespace risk.control.system.Controllers
                     .FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompany.ClientCompanyId);
 
                 //IF AUTO ALLOCATION TRUE
-                if (company is not null && company.AutoAllocation)
+                if (company.AutoAllocation)
                 {
                     var autoAllocatedClaims = await claimsInvestigationService.ProcessAutoAllocation(claims, company, userEmail);
 
