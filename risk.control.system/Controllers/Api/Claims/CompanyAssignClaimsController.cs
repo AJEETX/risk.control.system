@@ -47,7 +47,7 @@ namespace risk.control.system.Controllers.Api.Claims
             var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
 
-            var companyUser = _context.ClientCompanyApplicationUser.Include(c=>c.ClientCompany).FirstOrDefault(c => c.Email == userEmail.Value);
+            var companyUser = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(c => c.Email == userEmail.Value);
 
             applicationDbContext = applicationDbContext.Where(a => a.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
                 (
@@ -71,10 +71,21 @@ namespace risk.control.system.Controllers.Api.Claims
                 );
 
             var claimsAssigned = new List<ClaimsInvestigation>();
+            var newClaimsAssigned = new List<ClaimsInvestigation>();
 
             foreach (var item in applicationDbContext)
             {
+                item.AssignAutoUploadView += 1;
+                if (item.AssignAutoUploadView <= 1)
+                {
+                    newClaimsAssigned.Add(item);
+                }
                 claimsAssigned.Add(item);
+            }
+            if (newClaimsAssigned.Count > 0)
+            {
+                _context.ClaimsInvestigation.UpdateRange(newClaimsAssigned);
+                _context.SaveChanges();
             }
             var response = applicationDbContext?.ToList()
                     .Select(a => new ClaimsInvesgationResponse
@@ -106,7 +117,8 @@ namespace risk.control.system.Controllers.Api.Claims
                         BeneficiaryName = a.CaseLocations.Count == 0 ?
                         "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>" :
                         a.CaseLocations.FirstOrDefault().BeneficiaryName,
-                        TimeElapsed = DateTime.Now.Subtract(a.Created).TotalSeconds
+                        TimeElapsed = DateTime.Now.Subtract(a.Created).TotalSeconds,
+                        IsNewAssigned = a.AssignAutoUploadView <= 1
                     })
                     ?.ToList();
 

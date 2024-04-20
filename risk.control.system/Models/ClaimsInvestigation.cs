@@ -62,18 +62,14 @@ namespace risk.control.system.Models
         public string? UserRoleActionedTo { get; set; }
         public string? UserEmailActionedTo { get; set; }
         public int ReviewCount { get; set; } = 0;
-        public int ActiveView { get; set; } = 0;
         public int DraftView { get; set; } = 0;
-        public int ReadyView { get; set; } = 0;
+        public int AssignAutoUploadView { get; set; } = 0;
+        public int ReAssignUploadView { get; set; } = 0;
+        public int ActiveView { get; set; } = 0;
         public int AllocateView { get; set; } = 0;
         public int InvestigateView { get; set; } = 0;
         public int VerifyView { get; set; } = 0;
-        public int ReVerifyView { get; set; } = 0;
         public int AssessView { get; set; } = 0;
-        public int RejectView { get; set; } = 0;
-        public int ReviewView { get; set; } = 0;
-        public int ApprovedView { get; set; } = 0;
-        public int CompletedView { get; set; } = 0;
     }
 
     public enum Income

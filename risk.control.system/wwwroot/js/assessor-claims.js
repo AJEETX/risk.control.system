@@ -115,7 +115,7 @@ $(document).ready(function () {
     });
 
     $('#customerTable tbody').hide();
-    $('#customerTable tbody').fadeIn(1000);
+    $('#customerTable tbody').fadeIn(2000);
     $('#allocatedcase').on('click', function (event) {
         $("body").addClass("submit-progress-bg");
 

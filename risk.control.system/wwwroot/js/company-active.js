@@ -117,7 +117,7 @@
         $('[data-toggle="tooltip"]').tooltip();
     });
     $('#customerTable tbody').hide();
-    $('#customerTable tbody').fadeIn(1000);
+    $('#customerTable tbody').fadeIn(2000);
 
 
     //initMap("/api/CompanyActiveClaims/GetActiveMap");

@@ -131,7 +131,7 @@ $(document).ready(function () {
         }
     });
 
-    $('.nav-item a.actual-link').on('click', function (e) {
+    $('.nav-item a.actual-link,.nav-item a.navlink-border').on('click', function (e) {
         if (!window.matchMedia("(max-width: 767px)").matches) {
             $("body").addClass("submit-progress-bg");
             // Wrap in setTimeout so the UI

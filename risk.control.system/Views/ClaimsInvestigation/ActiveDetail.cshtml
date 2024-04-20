@@ -378,6 +378,7 @@
                     <form id="withdraw-form" method="post" asp-action="WithdrawCase" asp-controller="ClaimsInvestigationPost">
                         <div class="row">
                             <input type="hidden" name="claimId" asp-for="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
+                            <input type="hidden" name="policyNumber" asp-for="@Model.ClaimsInvestigation.PolicyDetail.ContractNumber" />
                             <div class="col-md-12">
                                 <div class="form-group">
                                     Withdrawl Remarks

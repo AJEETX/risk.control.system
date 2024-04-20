@@ -535,11 +535,15 @@ namespace risk.control.system.Services
             claimsInvestigation.CurrentClaimOwner = userEmail;
             claimsInvestigation.UserEmailActioned = userEmail;
             claimsInvestigation.UserEmailActionedTo = userEmail;
+            claimsInvestigation.UserRoleActionedTo = $"{AppRoles.Creator.GetEnumDisplayName()} ({company.Email})";
             claimsInvestigation.CompanyWithdrawlComment = model.ClaimsInvestigation.CompanyWithdrawlComment;
             claimsInvestigation.ActiveView = 0;
+            claimsInvestigation.ReAssignUploadView = 0;
             claimsInvestigation.AllocateView = 0;
             claimsInvestigation.VendorId = null;
-            claimsInvestigation.UserRoleActionedTo = $"{AppRoles.Creator.GetEnumDisplayName()} ({company.Email})";
+            claimsInvestigation.Vendor = null;
+            //var currentVendor = claimsInvestigation.Vendors.FirstOrDefault(v => v.VendorId == claimsInvestigation.VendorId);
+            //currentVendor.SelectedByCompany = false;
             claimsInvestigation.InvestigationCaseStatusId = inProgress.InvestigationCaseStatusId;
             claimsInvestigation.InvestigationCaseSubStatusId = withdrawnByCompany.InvestigationCaseSubStatusId;
             foreach (var caseLocation in claimsInvestigation.CaseLocations)
@@ -592,9 +596,7 @@ namespace risk.control.system.Services
                 .Include(c => c.PolicyDetail)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimId);
             var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claimsInvestigation.PolicyDetail.ClientCompanyId);
-            var companyUsers = _context.ClientCompanyApplicationUser.Where(u => u.ClientCompanyId == claimsInvestigation.PolicyDetail.ClientCompanyId);
 
-            var creatorRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Creator.ToString()));
             var inProgress = _context.InvestigationCaseStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS);
             var assigned = _context.InvestigationCaseSubStatus.FirstOrDefault(
@@ -612,6 +614,7 @@ namespace risk.control.system.Services
             claimsInvestigation.AgencyDeclineComment = model.ClaimsInvestigation.AgencyDeclineComment;
             claimsInvestigation.ActiveView = 0;
             claimsInvestigation.AllocateView = 0;
+            claimsInvestigation.ReAssignUploadView = 0;
             claimsInvestigation.VendorId = null;
             claimsInvestigation.UserRoleActionedTo = $"{AppRoles.Creator.GetEnumDisplayName()} ({company.Email})";
             claimsInvestigation.InvestigationCaseStatusId = inProgress.InvestigationCaseStatusId;
@@ -1226,6 +1229,7 @@ namespace risk.control.system.Services
             claimsCaseToReassign.AllocateView = 0;
             claimsCaseToReassign.VerifyView = 0;
             claimsCaseToReassign.AssessView = 0;
+            claimsCaseToReassign.ReAssignUploadView = 0;
             claimsCaseToReassign.CurrentClaimOwner = currentUser.Email;
             claimsCaseToReassign.InvestigationCaseSubStatusId = reAssigned.InvestigationCaseSubStatusId;
 

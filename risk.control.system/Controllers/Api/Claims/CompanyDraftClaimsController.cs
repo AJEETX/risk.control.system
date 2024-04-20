@@ -52,13 +52,26 @@ namespace risk.control.system.Controllers.Api.Claims
                  ));
 
             var claimsAssigned = new List<ClaimsInvestigation>();
+            var newClaimsAssigned = new List<ClaimsInvestigation>();
             foreach (var item in applicationDbContext)
             {
                 if (item.IsReady2Assign)
                 {
+                    item.AssignAutoUploadView += 1;
+                    if(item.AssignAutoUploadView <= 1)
+                    {
+                        newClaimsAssigned.Add(item);
+                    }
                     claimsAssigned.Add(item);
                 }
             }
+
+            if(newClaimsAssigned.Count > 0)
+            {
+                _context.ClaimsInvestigation.UpdateRange(newClaimsAssigned);
+                _context.SaveChanges();
+            }
+
             var response = claimsAssigned
                 .Select(a => new ClaimsInvesgationResponse
                 {
@@ -94,12 +107,12 @@ namespace risk.control.system.Controllers.Api.Claims
                     BeneficiaryName = a.CaseLocations.Count == 0 ?
                     "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>" :
                     a.CaseLocations.FirstOrDefault().BeneficiaryName,
-                       TimeElapsed = DateTime.Now.Subtract(a.Created).TotalSeconds
+                       TimeElapsed = DateTime.Now.Subtract(a.Created).TotalSeconds,
+                       IsNewAssigned = a.AssignAutoUploadView <= 1
                 })?
                 .ToList();
 
             return Ok(response);
-            return Ok(null);
         }
 
         [HttpGet("GetAssignMap")]

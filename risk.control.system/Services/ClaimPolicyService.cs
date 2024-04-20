@@ -108,6 +108,7 @@ namespace risk.control.system.Services
             var location = claimsInvestigation.CaseLocations.FirstOrDefault();
             var allocatedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
+            claimsInvestigation.CompanyWithdrawlComment = string.Empty;
             var model = new ClaimTransactionModel
             {
                 ClaimsInvestigation = claimsInvestigation,

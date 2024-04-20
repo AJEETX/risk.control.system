@@ -122,7 +122,7 @@
         error: function (xhr, status, error) { alert('err ' + error) }
     });
     $('#customerTable tbody').hide();
-    $('#customerTable tbody').fadeIn(1000);
+    $('#customerTable tbody').fadeIn(2000);
     $('#customerTable').on('draw.dt', function () {
         $('[data-toggle="tooltip"]').tooltip();
     });

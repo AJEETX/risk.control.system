@@ -113,12 +113,21 @@
                 }
             }
         ],
+        "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+            if (aData.isNewAssigned) {
+                $('td', nRow).css('background-color', '#ffa');
+            }
+        },
         error: function (xhr, status, error) { alert('err ' + error) }
     });
 
     $('#customerTable').on('draw.dt', function () {
         $('[data-toggle="tooltip"]').tooltip();
     });
+
+    $('#customerTable tbody').hide();
+    $('#customerTable tbody').fadeIn(2000);
+
     if ($("input[type='radio'].selected-case:checked").length) {
         $("#allocatedcase").prop('disabled', false);
     }

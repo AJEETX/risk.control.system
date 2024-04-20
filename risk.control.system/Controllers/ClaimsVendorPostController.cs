@@ -19,33 +19,24 @@ namespace risk.control.system.Controllers
     {
         public List<UsersViewModel> UserList;
         private readonly IClaimsInvestigationService claimsInvestigationService;
-        private readonly UserManager<VendorApplicationUser> userManager;
-        private readonly IDashboardService dashboardService;
         private readonly INotyfService notifyService;
         private readonly IClaimsVendorService vendorService;
         private readonly IMailboxService mailboxService;
-        private readonly IToastNotification toastNotification;
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment webHostEnvironment;
 
         public ClaimsVendorPostController(
             IClaimsInvestigationService claimsInvestigationService,
-            UserManager<VendorApplicationUser> userManager,
             IWebHostEnvironment webHostEnvironment,
-            IDashboardService dashboardService,
             INotyfService notifyService,
             IClaimsVendorService vendorService,
             IMailboxService mailboxService,
-            IToastNotification toastNotification,
             ApplicationDbContext context)
         {
             this.claimsInvestigationService = claimsInvestigationService;
-            this.userManager = userManager;
-            this.dashboardService = dashboardService;
             this.notifyService = notifyService;
             this.vendorService = vendorService;
             this.mailboxService = mailboxService;
-            this.toastNotification = toastNotification;
             this._context = context;
             this.webHostEnvironment = webHostEnvironment;
             UserList = new List<UsersViewModel>();
@@ -229,7 +220,7 @@ namespace risk.control.system.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> WithdrawCase(ClaimTransactionModel model, string claimId)
+        public async Task<IActionResult> WithdrawCase(ClaimTransactionModel model, string claimId, string policyNumber)
         {
             try
             {
@@ -248,7 +239,7 @@ namespace risk.control.system.Controllers
 
                 await mailboxService.NotifyClaimWithdrawlToCompany(userEmail, claimId);
 
-                notifyService.Custom($"Claim #{model.ClaimsInvestigation.PolicyDetail.ContractNumber}  withdrawn successfully", 3, "green", "far fa-file-powerpoint");
+                notifyService.Custom($"Claim #{policyNumber}  declined successfully", 3, "blue", "far fa-file-powerpoint");
 
                 return RedirectToAction(nameof(ClaimsVendorController.Index), "ClaimsVendor");
             }

@@ -507,6 +507,7 @@ namespace risk.control.system.Controllers
             return View();
         }
 
+        [Authorize(Roles = "Supervisor")]
         [Breadcrumb(title: " Detail", FromAction = "Allocate")]
         public async Task<IActionResult> CaseDetail(string id)
         {

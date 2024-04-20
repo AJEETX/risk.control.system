@@ -513,9 +513,10 @@ namespace risk.control.system.Services
                     return null!;
                 }
             }
-
+            claimsInvestigation.AgencyDeclineComment = string.Empty;
             if(caseLogs.Any(l=>l.UserEmailActioned == agencyUser.Email || 
-            ( claimsInvestigation.InvestigationCaseSubStatusId == assignedToAgency.InvestigationCaseSubStatusId)  && claimsInvestigation.CaseLocations.Any(l=>l.VendorId == agencyUser.VendorId)))
+            ( claimsInvestigation.InvestigationCaseSubStatusId == assignedToAgency.InvestigationCaseSubStatusId)  
+            && claimsInvestigation.CaseLocations.Any(l=>l.VendorId == agencyUser.VendorId)))
             {
                 return new ClaimTransactionModel
                 {

@@ -21,7 +21,7 @@
                 public const string REJECTED_BY_ASSESSOR = "REJECTED";
                 public const string REASSIGNED_TO_ASSIGNER = "REASSIGNED";
                 public const string WITHDRAWN_BY_COMPANY = "WITHDRAWN";
-                public const string WITHDRAWN_BY_AGENCY= "WITHDRAWN_BY_AGENCY";
+                public const string WITHDRAWN_BY_AGENCY= "DECLINED";
             }
         }
     }

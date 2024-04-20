@@ -116,11 +116,14 @@
             }
         ],
         "drawCallback": function (settings, start, end, max, total, pre) {
-            console.log(this.fnSettings().json); /* for json response you can use it also*/
             var rowCount = (this.fnSettings().fnRecordsTotal()); // total number of rows
-            console.log(this.fnSettings().fnRecordsTotal()); // total number of rows
             if (rowCount > 0) {
                 $('#allocatedcase').prop('disabled', false);
+            }
+        },
+        "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+            if (aData.isNewAssigned) {
+                $('td', nRow).css('background-color', '#ffa');
             }
         },
         error: function (xhr, status, error) { alert('err ' + error) }
@@ -129,6 +132,10 @@
     $('#customerTable').on('draw.dt', function () {
         $('[data-toggle="tooltip"]').tooltip();
     });
+
+    $('#customerTable tbody').hide();
+    $('#customerTable tbody').fadeIn(2000);
+
     // Handle click on "Select all" control
     $('#checkall').on('click', function () {
         // Get all rows with search applied

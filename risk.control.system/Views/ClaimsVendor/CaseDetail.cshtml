@@ -25,9 +25,10 @@
                 <form id="create-form" method="post" asp-action="WithdrawCase" asp-controller="ClaimsVendorPost">
                     <div class="row">
                         <input type="hidden" name="claimId" asp-for="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
+                        <input type="hidden" name="policyNumber" asp-for="@Model.ClaimsInvestigation.PolicyDetail.ContractNumber" />
                         <div class="col-md-12">
                             <div class="form-group">
-                                Withdrawl Remarks
+                                Decline Remarks
                                 <input id="remarks" asp-for="@Model.ClaimsInvestigation.AgencyDeclineComment" class="form-control remarks" required />
                                 <span asp-validation-for="@Model.ClaimsInvestigation.AgencyDeclineComment" class="text-danger"></span>
                             </div>

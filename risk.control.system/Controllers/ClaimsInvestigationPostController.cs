@@ -529,7 +529,7 @@ namespace risk.control.system.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> WithdrawCase(ClaimTransactionModel model, string claimId)
+        public async Task<IActionResult> WithdrawCase(ClaimTransactionModel model, string claimId, string policyNumber)
         {
             try
             {
@@ -548,7 +548,7 @@ namespace risk.control.system.Controllers
 
                 await mailboxService.NotifyClaimWithdrawlToCompany(userEmail, claimId);
 
-                notifyService.Custom($"Claim #{model.ClaimsInvestigation.PolicyDetail.ContractNumber}  withdrawn successfully", 3, "green", "far fa-file-powerpoint");
+                notifyService.Custom($"Claim #{policyNumber}  withdrawn successfully", 3, "green", "far fa-file-powerpoint");
 
                 return RedirectToAction(nameof(ClaimsInvestigationController.Active), "ClaimsInvestigation");
             }

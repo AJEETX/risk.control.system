@@ -170,6 +170,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER);
 
             var claimsSubmitted = new List<ClaimsInvestigation>();
+            var newClaims = new List<ClaimsInvestigation>();
             var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
             var claims = applicationDbContext.Where(a => openStatusesIds.Contains(a.InvestigationCaseStatusId) && a.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId)?.ToList();
             foreach (var claim in claims)
@@ -177,8 +178,18 @@ namespace risk.control.system.Controllers.Api.Claims
                 var userHasClaimLog = _context.InvestigationTransaction.Any(c => c.ClaimsInvestigationId == claim.ClaimsInvestigationId && c.UserEmailActioned == companyUser.Email);
                 if (userHasClaimLog && !claim.AssignedToAgency && claim.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId && !claim.IsReady2Assign)
                 {
+                    claim.DraftView += 1;
+                    if(claim.DraftView <=1)
+                    {
+                        newClaims.Add(claim);
+                    }
                     claimsSubmitted.Add(claim);
                 }
+            }
+            if(newClaims.Count > 0)
+            {
+                _context.ClaimsInvestigation.UpdateRange(newClaims);
+                _context.SaveChanges();
             }
             var response = claimsSubmitted
                     .Select(a => new ClaimsInvesgationResponse
@@ -218,7 +229,8 @@ namespace risk.control.system.Controllers.Api.Claims
                         BeneficiaryName = a.CaseLocations.Count == 0 ?
                         "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>" :
                         a.CaseLocations.FirstOrDefault().BeneficiaryName,
-                        TimeElapsed = DateTime.Now.Subtract(a.Created).TotalSeconds
+                        TimeElapsed = DateTime.Now.Subtract(a.Created).TotalSeconds,
+                        IsNewAssigned = a.DraftView <= 1
                     })?
                     .ToList();
 
