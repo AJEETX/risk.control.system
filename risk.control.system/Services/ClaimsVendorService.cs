@@ -498,7 +498,8 @@ namespace risk.control.system.Services
             var userIsAgent = agencyUser.Active && agencyUser.UserRole == AgencyRole.Agent;
             if(userIsAgent)
             {
-                if(!string.IsNullOrWhiteSpace(claimsInvestigation.UserEmailActionedTo) && claimsInvestigation.UserEmailActionedTo.Equals(agencyUser.Email, StringComparison.OrdinalIgnoreCase))
+                if(!string.IsNullOrWhiteSpace(claimsInvestigation.UserEmailActionedTo) 
+                    && claimsInvestigation.UserEmailActionedTo.Equals(agencyUser.Email, StringComparison.OrdinalIgnoreCase))
                 {
                     return new ClaimTransactionModel
                     {

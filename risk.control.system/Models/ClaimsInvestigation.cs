@@ -56,6 +56,8 @@ namespace risk.control.system.Models
         public bool IsReady2Assign { get; set; } = false;
         public bool AutoAllocated { get; set; } = true;
         public bool Deleted { get; set; } = false;
+        public string? CompanyWithdrawlComment { get; set; }
+        public string? AgencyDeclineComment { get; set; }
         public string? UserEmailActioned { get; set; }
         public string? UserRoleActionedTo { get; set; }
         public string? UserEmailActionedTo { get; set; }

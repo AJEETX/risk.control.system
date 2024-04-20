@@ -35,7 +35,7 @@
         if (askConfirmation) {
             e.preventDefault();
             $.confirm({
-                title: "Confirm withdrwal",
+                title: "Confirm DECLINE",
                 content: "Are you sure?",
     
                 icon: 'fas fa-undo',
@@ -43,7 +43,7 @@
                 type: 'red',
                 buttons: {
                     confirm: {
-                        text: "Withdraw case",
+                        text: "DECLINE ",
                         btnClass: 'btn-danger',
                         action: function () {
                             askConfirmation = false;
@@ -55,10 +55,10 @@
                                 $(".submit-progress").removeClass("hidden");
                             }, 1);
                             $('#submit-case').attr('disabled', 'disabled');
-                            $('#submit-case').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Withdraw");
+                            $('#submit-case').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> DECLINE");
 
                             $('#create-form').submit();
-                            var nodes = document.getElementById("body").getElementsByTagName('*');
+                            var nodes = document.getElementById("article").getElementsByTagName('*');
                             for (var i = 0; i < nodes.length; i++) {
                                 nodes[i].disabled = true;
                             }

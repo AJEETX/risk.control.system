@@ -109,7 +109,7 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += '<a id="details' + row.id + '" onclick="showdetails(`' + row.id + '`)" href="/ClaimsVendor/CaseDetail?Id=' + row.id + '"  class="btn btn-xs btn-danger"><i class="fas fa-undo"></i></i> Withdraw</a>'
+                    buttons += '<a id="details' + row.id + '" onclick="showdetails(`' + row.id + '`)" href="/ClaimsVendor/CaseDetail?Id=' + row.id + '"  class="btn btn-xs btn-danger"><i class="fas fa-undo"></i></i> DECLINE</a>'
                     return buttons;
                 }
             }
@@ -187,7 +187,7 @@ function showdetails(id) {
         $(".submit-progress").removeClass("hidden");
     }, 1);
     $('a.btn *').attr('disabled', 'disabled');
-    $('a#details' + id + '.btn.btn-xs.btn-danger').html("<i class='fas fa-sync fa-spin'></i> Withdraw");
+    $('a#details' + id + '.btn.btn-xs.btn-danger').html("<i class='fas fa-sync fa-spin'></i> DECLINE");
 
     var nodes = document.getElementById("body").getElementsByTagName('*');
     for (var i = 0; i < nodes.length; i++) {

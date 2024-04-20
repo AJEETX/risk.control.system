@@ -42,6 +42,8 @@ namespace risk.control.system.Controllers.Api.Claims
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
             var withdrawnByAgency = _context.InvestigationCaseSubStatus.FirstOrDefault(
                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY);
+            var withdrawnByCompany = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY);
             var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
 
@@ -56,6 +58,11 @@ namespace risk.control.system.Controllers.Api.Claims
                 ) ||
                  (a.InvestigationCaseSubStatusId == withdrawnByAgency.InvestigationCaseSubStatusId &&
                         a.UserEmailActionedTo == string.Empty &&
+                        a.UserRoleActionedTo == $"{AppRoles.Creator.GetEnumDisplayName()} ({companyUser.ClientCompany.Email})")
+                 ||
+                 (a.InvestigationCaseSubStatusId == withdrawnByCompany.InvestigationCaseSubStatusId &&
+                        a.UserEmailActionedTo == companyUser.Email &&
+                        a.UserEmailActioned == companyUser.Email &&
                         a.UserRoleActionedTo == $"{AppRoles.Creator.GetEnumDisplayName()} ({companyUser.ClientCompany.Email})")
                  ||
                 (a.IsReviewCase && a.InvestigationCaseSubStatusId == reAssignedStatus.InvestigationCaseSubStatusId &&

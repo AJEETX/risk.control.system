@@ -10,6 +10,7 @@ using NToastNotify;
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
+using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
 
 using System.Security.Claims;
@@ -518,6 +519,38 @@ namespace risk.control.system.Controllers
 
                 }
                 return RedirectToAction(nameof(ClaimsInvestigationController.Details), "ClaimsInvestigation", new { id = claim.ClaimsInvestigationId });
+            }
+            catch (Exception)
+            {
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> WithdrawCase(ClaimTransactionModel model, string claimId)
+        {
+            try
+            {
+                if (model == null || string.IsNullOrWhiteSpace(claimId))
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                string userEmail = HttpContext?.User?.Identity.Name;
+                if (string.IsNullOrWhiteSpace(userEmail))
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                await claimsInvestigationService.WithdrawCaseByCompany(userEmail, model, claimId);
+
+                await mailboxService.NotifyClaimWithdrawlToCompany(userEmail, claimId);
+
+                notifyService.Custom($"Claim #{model.ClaimsInvestigation.PolicyDetail.ContractNumber}  withdrawn successfully", 3, "green", "far fa-file-powerpoint");
+
+                return RedirectToAction(nameof(ClaimsInvestigationController.Active), "ClaimsInvestigation");
             }
             catch (Exception)
             {

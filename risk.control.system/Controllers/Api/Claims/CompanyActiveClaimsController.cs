@@ -43,6 +43,8 @@ namespace risk.control.system.Controllers.Api.Claims
                          i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
             var withdrawnByAgency = _context.InvestigationCaseSubStatus.FirstOrDefault(
                      i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY);
+            var withdrawnByCompany = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY);
             var reAssignedToAssignerStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                          i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER);
             var approvedStatus = _context.InvestigationCaseSubStatus
@@ -51,8 +53,7 @@ namespace risk.control.system.Controllers.Api.Claims
             var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
 
             var claims = applicationDbContext.Where(a => openStatusesIds.Contains(a.InvestigationCaseStatusId) &&
-            a.InvestigationCaseStatusId != _context.InvestigationCaseSubStatus
-                .FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR).InvestigationCaseSubStatusId &&
+            a.InvestigationCaseStatusId != approvedStatus.InvestigationCaseSubStatusId &&
             a.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId);
             List<ClaimsInvestigation> newClaims = new List<ClaimsInvestigation>();
             foreach (var claim in claims)
@@ -74,6 +75,8 @@ namespace risk.control.system.Controllers.Api.Claims
                     claim.InvestigationCaseSubStatusId != reAssignedToAssignerStatus.InvestigationCaseSubStatusId
                     &&
                     claim.InvestigationCaseSubStatusId != approvedStatus.InvestigationCaseSubStatusId
+                    &&
+                    claim.InvestigationCaseSubStatusId != withdrawnByCompany.InvestigationCaseSubStatusId
                     &&
                     claim.InvestigationCaseSubStatusId != approvedStatus.InvestigationCaseSubStatusId
                     )

@@ -106,12 +106,14 @@ namespace risk.control.system.Services
                 .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == id);
 
             var location = claimsInvestigation.CaseLocations.FirstOrDefault();
-
+            var allocatedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
             var model = new ClaimTransactionModel
             {
                 ClaimsInvestigation = claimsInvestigation,
                 Log = caseLogs,
                 Location = location,
+                NotWithdrawable = claimsInvestigation.InvestigationCaseSubStatusId != allocatedStatus.InvestigationCaseSubStatusId,
                 TimeTaken = GetElapsedTime(caseLogs)
             };
             return model;

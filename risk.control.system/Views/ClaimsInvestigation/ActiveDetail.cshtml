@@ -371,20 +371,58 @@
 
             <partial name="_TimelineReport" model="@Model" />
 
-            <div class="card-footer">
-                <div class="row">
-                    <div class="col-md-12">
+            @if(!Model.NotWithdrawable)
+            {
+                <div class="card-footer">
 
-                        <form id="create-form">
-
-                            <a id="active-list" asp-action="Active" class="btn btn-outline-secondary">
-                                <i class="fas fa-arrow-left"></i>
-                                <span class="badge badge-light"> <i class="fa fa-toggle-on"></i> </span> Back
-                            </a>
-                        </form>
-                    </div>
+                    <form id="withdraw-form" method="post" asp-action="WithdrawCase" asp-controller="ClaimsInvestigationPost">
+                        <div class="row">
+                            <input type="hidden" name="claimId" asp-for="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    Withdrawl Remarks
+                                    <input id="remarks" asp-for="@Model.ClaimsInvestigation.CompanyWithdrawlComment" class="form-control remarks" required autocomplete="off" />
+                                    <span asp-validation-for="@Model.ClaimsInvestigation.CompanyWithdrawlComment" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <a id="back" asp-action="Active" class="btn btn-outline-secondary">
+                                    <i class="fas fa-arrow-left"></i>
+                                    <span class="badge badge-light"> <i class="fa fa-toggle-on"></i> </span> Back
+                                </a>
+                                <button id="submit-case" disabled type="submit" class="btn btn-danger"><i class="fas fa-undo"></i> Withdraw</button>
+                            </div>
+                        </div>
+                    </form>
                 </div>
-            </div>
+            }
+            else
+            {
+                <div class="card-footer">
+                    <form id="withdraw-form">
+                        <div class="row">
+                            <input type="hidden" name="claimId" asp-for="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    The case has been tasked to agent, can not be withdrawn !!!
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <a id="back" asp-action="Active" class="btn btn-outline-secondary">
+                                    <i class="fas fa-arrow-left"></i>
+                                    <span class="badge badge-light"> <i class="fa fa-toggle-on"></i> </span> Back
+                                </a>
+                                <button disabled class="btn btn-danger"><i class="fas fa-undo"></i> Withdraw</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            }
+            
         }
     </div>
 </section>

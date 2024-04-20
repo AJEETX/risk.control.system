@@ -156,7 +156,7 @@
         $('#allocatedcase').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> RE + ASSIGN");
 
         $('#radioButtons').submit();
-        var nodes = document.getElementById("body").getElementsByTagName('*');
+        var nodes = document.getElementById("article").getElementsByTagName('*');
         for (var i = 0; i < nodes.length; i++) {
             nodes[i].disabled = true;
         }
@@ -294,7 +294,7 @@ function showedit(id) {
     $('a.btn *').attr('disabled', 'disabled');
     $('a#edit' + id + '.btn.btn-xs.btn-warning').html("<i class='fas fa-sync fa-spin'></i> Edit");
 
-    var nodes = document.getElementById("body").getElementsByTagName('*');
+    var nodes = document.getElementById("article").getElementsByTagName('*');
     for (var i = 0; i < nodes.length; i++) {
         nodes[i].disabled = true;
     }
@@ -309,7 +309,7 @@ function getdetails(id) {
     $('a.btn *').attr('disabled', 'disabled');
     $('a#details' + id + '.btn.btn-xs.btn-danger').html("<i class='fas fa-sync fa-spin'></i> Delete");
 
-    var nodes = document.getElementById("body").getElementsByTagName('*');
+    var nodes = document.getElementById("article").getElementsByTagName('*');
     for (var i = 0; i < nodes.length; i++) {
         nodes[i].disabled = true;
     }

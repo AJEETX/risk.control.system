@@ -436,6 +436,8 @@ namespace risk.control.system.Services
                      i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY);
             var reAssignedToAssignerStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                          i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER);
+            var withdrawnByCompany = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY);
             var approvedStatus = _context.InvestigationCaseSubStatus
                 .FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR);
             var claimsSubmitted = new List<ClaimsInvestigation>();
@@ -443,8 +445,7 @@ namespace risk.control.system.Services
             var companyUser = _context.ClientCompanyApplicationUser.Include(u=>u.ClientCompany).FirstOrDefault(c => c.Email == userEmail);
 
             var claims = applicationDbContext.Where(a => openStatusesIds.Contains(a.InvestigationCaseStatusId) &&
-            a.InvestigationCaseStatusId != _context.InvestigationCaseSubStatus
-                .FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR).InvestigationCaseSubStatusId &&
+            a.InvestigationCaseStatusId != approvedStatus.InvestigationCaseSubStatusId &&
             a.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId);
             foreach (var claim in claims)
             {
@@ -462,6 +463,8 @@ namespace risk.control.system.Services
                     claim.InvestigationCaseSubStatusId != withdrawnByAgency.InvestigationCaseSubStatusId
                     &&
                     claim.InvestigationCaseSubStatusId != reAssignedToAssignerStatus.InvestigationCaseSubStatusId
+                    &&
+                    claim.InvestigationCaseSubStatusId != withdrawnByCompany.InvestigationCaseSubStatusId
                     &&
                     claim.InvestigationCaseSubStatusId != approvedStatus.InvestigationCaseSubStatusId
                     )
@@ -506,7 +509,8 @@ namespace risk.control.system.Services
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
             var withdrawnByAgency = _context.InvestigationCaseSubStatus.FirstOrDefault(
                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY);
-
+            var withdrawnByCompany = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY);
             var companyUser = _context.ClientCompanyApplicationUser.Include(u=>u.ClientCompany).FirstOrDefault(c => c.Email == userEmail);
 
             // SHOWING DIFFERRENT PAGES AS PER ROLES
@@ -517,6 +521,10 @@ namespace risk.control.system.Services
                         a.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId
                         || a.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId)
                 ) ||
+                 (a.InvestigationCaseSubStatusId == withdrawnByCompany.InvestigationCaseSubStatusId &&
+                        a.UserEmailActionedTo == companyUser.Email &&
+                        a.UserEmailActioned == companyUser.Email &&
+                        a.UserRoleActionedTo == $"{AppRoles.Creator.GetEnumDisplayName()} ({companyUser.ClientCompany.Email})") ||
                  (a.InvestigationCaseSubStatusId == withdrawnByAgency.InvestigationCaseSubStatusId &&
                         a.UserEmailActionedTo == string.Empty &&
                         a.UserRoleActionedTo == $"{AppRoles.Creator.GetEnumDisplayName()} ({companyUser.ClientCompany.Email})")
