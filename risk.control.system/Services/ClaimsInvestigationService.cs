@@ -195,13 +195,14 @@ namespace risk.control.system.Services
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR);
 
             var claimsCases = _context.ClaimsInvestigation
+                .Include(c => c.CaseLocations)
                 .Include(c => c.Vendors)
-                .Include(c => c.CaseLocations.Where(c =>
+                .Where(c =>
                 c.VendorId.HasValue &&
                 (c.InvestigationCaseSubStatusId == allocatedStatus.InvestigationCaseSubStatusId ||
                                     c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId ||
                                     c.InvestigationCaseSubStatusId == submitted2SuperStatus.InvestigationCaseSubStatusId)
-                ));
+                );
 
             var vendorCaseCount = new Dictionary<long, int>();
 
@@ -210,25 +211,22 @@ namespace risk.control.system.Services
             {
                 if (claimsCase.CaseLocations.Count > 0)
                 {
-                    foreach (var CaseLocation in claimsCase.CaseLocations)
+                    if (claimsCase.VendorId.HasValue)
                     {
-                        if (CaseLocation.VendorId.HasValue)
+                        if (claimsCase.InvestigationCaseSubStatusId == allocatedStatus.InvestigationCaseSubStatusId ||
+                                claimsCase.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId ||
+                                claimsCase.InvestigationCaseSubStatusId == submitted2SuperStatus.InvestigationCaseSubStatusId
+                                )
                         {
-                            if (CaseLocation.InvestigationCaseSubStatusId == allocatedStatus.InvestigationCaseSubStatusId ||
-                                    CaseLocation.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId ||
-                                    CaseLocation.InvestigationCaseSubStatusId == submitted2SuperStatus.InvestigationCaseSubStatusId
-                                    )
+                            if (!vendorCaseCount.TryGetValue(claimsCase.VendorId.Value, out countOfCases))
                             {
-                                if (!vendorCaseCount.TryGetValue(CaseLocation.VendorId.Value, out countOfCases))
-                                {
-                                    vendorCaseCount.Add(CaseLocation.VendorId.Value, 1);
-                                }
-                                else
-                                {
-                                    int currentCount = vendorCaseCount[CaseLocation.VendorId.Value];
-                                    ++currentCount;
-                                    vendorCaseCount[CaseLocation.VendorId.Value] = currentCount;
-                                }
+                                vendorCaseCount.Add(claimsCase.VendorId.Value, 1);
+                            }
+                            else
+                            {
+                                int currentCount = vendorCaseCount[claimsCase.VendorId.Value];
+                                ++currentCount;
+                                vendorCaseCount[claimsCase.VendorId.Value] = currentCount;
                             }
                         }
                     }

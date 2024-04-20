@@ -40,21 +40,30 @@ namespace risk.control.system.Controllers.Api.Claims
             var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
 
-            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
-            applicationDbContext = applicationDbContext.Where(i => i.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId);
+            var companyUser = _context.ClientCompanyApplicationUser.Include(u=>u.ClientCompany).FirstOrDefault(c => c.Email == userEmail.Value);
+            applicationDbContext = applicationDbContext.Where(i => i.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
+            i.InvestigationCaseSubStatusId == submittedToAssessorStatus.InvestigationCaseSubStatusId && 
+            i.UserEmailActionedTo == string.Empty &&
+             i.UserRoleActionedTo == $"{AppRoles.Assessor.GetEnumDisplayName()} ( {companyUser.ClientCompany.Email})");
 
+            var newClaimsAssigned = new List<ClaimsInvestigation>();
             var claimsAssigned = new List<ClaimsInvestigation>();
-            applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId != null));
 
-            foreach (var item in applicationDbContext)
+            foreach (var claim in applicationDbContext)
             {
-                item.CaseLocations = item.CaseLocations.Where(c => c.InvestigationCaseSubStatusId == submittedToAssessorStatus.InvestigationCaseSubStatusId)?.ToList();
-                if (item.CaseLocations.Any())
+                claim.AssessView += 1;
+                if( claim.AssessView <= 1 )
                 {
-                    claimsAssigned.Add(item);
+                    newClaimsAssigned.Add(claim);
                 }
-            }
+                claimsAssigned.Add(claim);
 
+            }
+            if(newClaimsAssigned.Count > 0)
+            {
+                _context.ClaimsInvestigation.UpdateRange(newClaimsAssigned);
+                _context.SaveChanges();
+            }
             var response = claimsAssigned
             .Select(a => new ClaimsInvesgationResponse
             {
@@ -82,7 +91,8 @@ namespace risk.control.system.Controllers.Api.Claims
                 BeneficiaryName = a.CaseLocations.Count == 0 ?
                         "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>" :
                         a.CaseLocations.FirstOrDefault().BeneficiaryName,
-                       TimeElapsed = DateTime.Now.Subtract(a.Created).TotalSeconds
+                       TimeElapsed = DateTime.Now.Subtract(a.Created).TotalSeconds,
+                IsNewAssigned = a.AssessView <= 1
             })?.ToList();
 
             return Ok(response);

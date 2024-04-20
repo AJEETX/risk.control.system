@@ -31,6 +31,7 @@
         public double TimeElapsed { get; set; }
         public string? Company { get; set; }
         public bool AutoAllocated { get; set; }
+        public bool? IsNewAssigned { get; set; }
 
     }
 }

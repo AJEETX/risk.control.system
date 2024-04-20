@@ -11,6 +11,7 @@ using System.Globalization;
 using System.Security.Claims;
 
 using static risk.control.system.AppConstant.Applicationsettings;
+using static risk.control.system.Helpers.Permissions;
 
 using ControllerBase = Microsoft.AspNetCore.Mvc.ControllerBase;
 
@@ -33,7 +34,7 @@ namespace risk.control.system.Controllers.Api.Claims
             IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
 
-            var vendorUser = _context.VendorApplicationUser.Include(u=>u.Vendor).FirstOrDefault(c => c.Email == userEmail.Value);
+            var vendorUser = _context.VendorApplicationUser.Include(u => u.Vendor).FirstOrDefault(c => c.Email == userEmail.Value);
 
             if (vendorUser != null)
             {
@@ -51,15 +52,15 @@ namespace risk.control.system.Controllers.Api.Claims
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
             var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
-            
+
             var submittedToAssesssorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
 
             if (userRole.Value.Contains(AppRoles.AgencyAdmin.ToString()) || userRole.Value.Contains(AppRoles.Supervisor.ToString()))
             {
-                applicationDbContext = applicationDbContext.Where(a => openSubstatusesForSupervisor.Contains(a.InvestigationCaseSubStatusId) && 
-                ( a.UserEmailActioned == vendorUser.Email && a.InvestigationCaseSubStatus == assignedToAgentStatus) ||
-                ( a.UserEmailActioned == vendorUser.Email && a.InvestigationCaseSubStatus == submittedToAssesssorStatus)
+                applicationDbContext = applicationDbContext.Where(a => openSubstatusesForSupervisor.Contains(a.InvestigationCaseSubStatusId) &&
+                (a.UserEmailActioned == vendorUser.Email && a.InvestigationCaseSubStatus == assignedToAgentStatus) ||
+                (a.UserEmailActioned == vendorUser.Email && a.InvestigationCaseSubStatus == submittedToAssesssorStatus)
                 );
 
                 var claimsAllocated = new List<ClaimsInvestigation>();
@@ -228,36 +229,51 @@ namespace risk.control.system.Controllers.Api.Claims
             applicationDbContext = applicationDbContext
                     .Include(a => a.PolicyDetail)
                     .ThenInclude(a => a.LineOfBusiness)
-                    .Where(i => i.CaseLocations.Any(c => c.VendorId == vendorUser.VendorId));
+                    .Where(i => i.VendorId == vendorUser.VendorId);
             var claims = new List<ClaimsInvestigation>();
-
-            if (userRole.Value.Contains(AppRoles.AgencyAdmin.ToString()) || userRole.Value.Contains(AppRoles.Supervisor.ToString()))
+            List<ClaimsInvestigation> newAllocateClaims = new List<ClaimsInvestigation>();
+            var userAdminOrSuperVisor = userRole.Value.Contains(AppRoles.AgencyAdmin.ToString()) || userRole.Value.Contains(AppRoles.Supervisor.ToString());
+            if (userAdminOrSuperVisor)
             {
-                applicationDbContext = applicationDbContext.Where(a =>
-                a.InvestigationCaseSubStatusId == allocatedStatus.InvestigationCaseSubStatusId);
-                foreach (var item in applicationDbContext)
+                var allocatedClaims =  applicationDbContext.Where(a =>
+                a.InvestigationCaseSubStatusId == allocatedStatus.InvestigationCaseSubStatusId)?.ToList();
+                foreach (var claim in allocatedClaims)
                 {
-                    item.CaseLocations = item.CaseLocations.Where(c => c.VendorId == vendorUser.VendorId)?.ToList();
-                    if (item.CaseLocations.Any())
+                    claim.AllocateView += 1;
+                    if (claim.AllocateView <= 1)
                     {
-                        claims.Add(item);
+                        newAllocateClaims.Add(claim);
                     }
+                    claims.Add(claim);
+                }
+                if (newAllocateClaims.Count > 0)
+                {
+                    _context.ClaimsInvestigation.UpdateRange(newAllocateClaims);
+                    _context.SaveChanges();
                 }
             }
             else if (userRole.Value.Contains(AppRoles.Agent.ToString()))
             {
-                applicationDbContext = applicationDbContext.Where(a => a.UserEmailActionedTo == currentUserEmail 
-                && a.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId);
-                foreach (var item in applicationDbContext)
+            List<ClaimsInvestigation> newInvestigateClaims = new List<ClaimsInvestigation>();
+                var allocatedClaims = applicationDbContext.Where(a => a.UserEmailActionedTo == currentUserEmail
+                && a.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId)?.ToList();
+                foreach (var claim in allocatedClaims)
                 {
-                    item.CaseLocations = item.CaseLocations.Where(c => c.VendorId == vendorUser.VendorId
-                        && c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId)?.ToList();
-                    if (item.CaseLocations.Any())
+                    claim.InvestigateView += 1;
+                    if (claim.InvestigateView <= 1)
                     {
-                        claims.Add(item);
+                        newInvestigateClaims.Add(claim);
                     }
+                    claims.Add(claim);
+                }
+                if (newInvestigateClaims.Count > 0)
+                {
+                    _context.ClaimsInvestigation.UpdateRange(newInvestigateClaims);
+                    _context.SaveChanges();
                 }
             }
+            
+            
             var response = claims
                    .Select(a => new ClaimsInvesgationResponse
                    {
@@ -287,7 +303,8 @@ namespace risk.control.system.Controllers.Api.Claims
                        BeneficiaryName = a.CaseLocations.Count == 0 ?
                         "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>" :
                         a.CaseLocations.FirstOrDefault().BeneficiaryName,
-                       TimeElapsed = DateTime.Now.Subtract(a.Created).TotalSeconds
+                       TimeElapsed = DateTime.Now.Subtract(a.Created).TotalSeconds,
+                       IsNewAssigned = userAdminOrSuperVisor ? a.AllocateView <= 1 :a.InvestigateView <= 1,
                    })
                     ?.ToList();
 
@@ -404,19 +421,27 @@ namespace risk.control.system.Controllers.Api.Claims
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
             var currentUserEmail = HttpContext.User?.Identity?.Name;
 
-            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == currentUserEmail);
-            applicationDbContext = applicationDbContext.Where(i => i.CaseLocations.Any(c => c.VendorId == vendorUser.VendorId));
+            var vendorUser = _context.VendorApplicationUser.Include(u=>u.Vendor).FirstOrDefault(c => c.Email == currentUserEmail);
+            var claims= applicationDbContext.Where(i => i.VendorId == vendorUser.VendorId && 
+            i.UserEmailActionedTo == string.Empty &&
+            i.UserRoleActionedTo == $"{AppRoles.Supervisor.GetEnumDisplayName()} ({vendorUser.Vendor.Email})" &&
+            i.InvestigationCaseSubStatusId == submittedToVendorSupervisorStatus.InvestigationCaseSubStatusId)?.ToList();
+
             var claimsSubmitted = new List<ClaimsInvestigation>();
-            foreach (var item in applicationDbContext)
+            List<ClaimsInvestigation> newVerifyClaims = new List<ClaimsInvestigation>();
+            foreach (var claim in claims)
             {
-                item.CaseLocations = item.CaseLocations.Where(c => c.VendorId == vendorUser.VendorId
-                    && c.InvestigationCaseSubStatusId == submittedToVendorSupervisorStatus.InvestigationCaseSubStatusId
-                    && !c.IsReviewCaseLocation
-                    )?.ToList();
-                if (item.CaseLocations.Any())
+                claim.VerifyView += 1;
+                if (claim.VerifyView <= 1)
                 {
-                    claimsSubmitted.Add(item);
+                    newVerifyClaims.Add(claim);
                 }
+                claimsSubmitted.Add(claim);
+            }
+            if(newVerifyClaims.Count > 0)
+            {
+                _context.ClaimsInvestigation.UpdateRange(newVerifyClaims);
+                _context.SaveChanges();
             }
             var response = claimsSubmitted
                    .Select(a => new ClaimsInvesgationResponse
@@ -445,7 +470,8 @@ namespace risk.control.system.Controllers.Api.Claims
                        BeneficiaryName = a.CaseLocations.Count == 0 ?
                         "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>" :
                         a.CaseLocations.FirstOrDefault().BeneficiaryName,
-                       TimeElapsed = DateTime.Now.Subtract(a.Created).TotalSeconds
+                       TimeElapsed = DateTime.Now.Subtract(a.Created).TotalSeconds,
+                       IsNewAssigned = a.VerifyView <= 1
                    })
                     ?.ToList();
 

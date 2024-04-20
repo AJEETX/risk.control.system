@@ -32,7 +32,7 @@
         }
     });
 
-    $("#customerTable").DataTable({
+    var table = $("#customerTable").DataTable({
         ajax: {
             url: '/api/CompanyActiveClaims/GetIncomplete',
             dataSrc: ''
@@ -115,11 +115,9 @@
         ],
         error: function (xhr, status, error) { alert('err ' + error) }
     });
-    $('#customerTable').on('draw.dt', function () {
+    table.on('draw.dt', function () {
         $('[data-toggle="tooltip"]').tooltip();
     });
-
-
 
     //initMap("/api/CompanyActiveClaims/GetActiveMap");
 });

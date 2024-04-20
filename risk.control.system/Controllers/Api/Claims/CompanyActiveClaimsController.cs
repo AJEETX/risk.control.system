@@ -54,6 +54,7 @@ namespace risk.control.system.Controllers.Api.Claims
             a.InvestigationCaseStatusId != _context.InvestigationCaseSubStatus
                 .FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR).InvestigationCaseSubStatusId &&
             a.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId);
+            List<ClaimsInvestigation> newClaims = new List<ClaimsInvestigation>();
             foreach (var claim in claims)
             {
                 var userHasReviewClaimLogs = _context.InvestigationTransaction.Where(c => c.ClaimsInvestigationId == claim.ClaimsInvestigationId && c.IsReviewCase &&
@@ -77,11 +78,20 @@ namespace risk.control.system.Controllers.Api.Claims
                     claim.InvestigationCaseSubStatusId != approvedStatus.InvestigationCaseSubStatusId
                     )
                 {
+                    claim.ActiveView += 1;
+                    if(claim.ActiveView <= 1)
+                    {
+                        newClaims.Add(claim);
+                    }
                     claimsSubmitted.Add(claim);
                 }
             }
-
-
+            if(newClaims.Count > 0)
+            {
+                _context.ClaimsInvestigation.UpdateRange(newClaims);
+                _context.SaveChanges();
+            }
+            
             var response = claimsSubmitted
                     .Select(a => new ClaimsInvesgationResponse
                     {
@@ -120,7 +130,8 @@ namespace risk.control.system.Controllers.Api.Claims
                         BeneficiaryName = a.CaseLocations.Count == 0 ?
                         "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>" :
                         a.CaseLocations.FirstOrDefault().BeneficiaryName,
-                        TimeElapsed = DateTime.Now.Subtract(a.Created).TotalSeconds
+                        TimeElapsed = DateTime.Now.Subtract(a.Created).TotalSeconds,
+                        IsNewAssigned = a.ActiveView <= 1
                     })?
                     .ToList();
 

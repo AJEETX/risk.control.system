@@ -104,6 +104,36 @@ namespace risk.control.system.Controllers.Api.Agency
 
             return Ok(result?.ToArray());
         }
+        [HttpGet("GetEmpannelled")]
+        public async Task<IActionResult> GetEmpannelled()
+        {
+            var agencies = _context.Vendor
+                .Include(v => v.Country)
+                .Include(v => v.PinCode)
+                .Include(v => v.District)
+                .Include(v => v.State)
+                .Include(v => v.VendorInvestigationServiceTypes)
+                .Where(v => !v.Deleted);
+            var result =
+                agencies
+                ?.Select(u =>
+                new
+                {
+                    Id = u.VendorId,
+                    Document = string.IsNullOrEmpty(u.DocumentUrl) ? noDataImagefilePath : u.DocumentUrl,
+                    Domain = "<a href=''>" + u.Email + "</a>",
+                    Name = u.Name,
+                    Code = u.Code,
+                    Phone = u.PhoneNumber,
+                    Address = u.Addressline,
+                    District = u.District.Name,
+                    State = u.State.Name,
+                    Country = u.Country.Name
+                })
+                ?.OrderBy(a => a.Name);
+
+            return Ok(result?.ToArray());
+        }
 
         [HttpGet("AllServices")]
         public async Task<IActionResult> AllServices()
