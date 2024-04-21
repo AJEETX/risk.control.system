@@ -11,52 +11,57 @@
 
     <div class="user-panel mt-3 pb-3 mb-3 d-flex">
 
-        @if (UserManager.GetUserAsync(User).Result?.ProfilePictureUrl != null)
-        {
-            <div class="image">
+        <div class="image">
+            @if (UserManager.GetUserAsync(User).Result?.ProfilePictureUrl != null)
+
+            {
                 <img class="elevation-2 sidebar-profile img-circle" src="@UserManager.GetUserAsync(User).Result.ProfilePictureUrl" alt="user image">
-            </div>
-        }
-        else
-        {
-            <div class="image">
+            }
+            else
+            {
                 <img class="elevation-0 sidebar-profile img-circle" src="@Applicationsettings.NO_USER" alt="user image">
-            </div>
-        }
+
+            }
+        </div>
         <a href="/companyuserprofile" class="d-block">
             @UserManager.GetUserAsync(User).Result?.FirstName
-            @if (User.IsInRole(AppRoles.PortalAdmin.ToString()))
+            @if (User.IsInRole(AppRoles.PORTAL_ADMIN.ToString()))
             {
                 roleCode = @Applicationsettings.PORTAL_ADMIN.CODE;
                 <span class="badge badge-danger">@roleCode</span>
             }
-            else if (User.IsInRole(AppRoles.CompanyAdmin.ToString()))
+            else if (User.IsInRole(AppRoles.ADMIN.ToString()))
             {
                 roleCode = @Applicationsettings.ADMIN.CODE;
                 <span class="badge badge-warning">@roleCode</span>
             }
-            else if (User.IsInRole(AppRoles.AgencyAdmin.ToString()))
+            else if (User.IsInRole(AppRoles.AGENCY_ADMIN.ToString()))
             {
                 roleCode = @Applicationsettings.AGENCY_ADMIN.CODE;
                 <span class="badge badge-info">@roleCode</span>
             }
-            else if (User.IsInRole(AppRoles.Creator.ToString()))
+            else if (User.IsInRole(AppRoles.CREATOR.ToString()))
             {
                 roleCode = @Applicationsettings.CREATOR.CODE;
                 <span class="badge badge-primary">@roleCode</span>
             }
            
-            else if (User.IsInRole(AppRoles.Assessor.ToString()))
+            else if (User.IsInRole(AppRoles.ASSESSOR.ToString()))
             {
                 roleCode = @Applicationsettings.ASSESSOR.CODE;
                 <span class="badge badge-secondary">@roleCode</span>
             }
-            else if (User.IsInRole(AppRoles.Supervisor.ToString()))
+            else if (User.IsInRole(AppRoles.MANAGER.ToString()))
+            {
+                roleCode = @Applicationsettings.MANAGER.CODE;
+                <span class="badge badge-secondary">@roleCode</span>
+            }
+            else if (User.IsInRole(AppRoles.SUPERVISOR.ToString()))
             {
                 roleCode = @Applicationsettings.SUPERVISOR.CODE;
                 <span class="badge badge-dark">@roleCode</span>
             }
-            else if (User.IsInRole(AppRoles.Agent.ToString()))
+            else if (User.IsInRole(AppRoles.AGENT.ToString()))
             {
                 roleCode = @Applicationsettings.AGENT.CODE;
                 <span class="badge badge-dark">@roleCode</span>

@@ -59,7 +59,7 @@ namespace risk.control.system.Seeds
                 PinCodeId = pinCode?.PinCodeId ?? default!,
                 ProfilePictureUrl = ADMIN.PROFILE_IMAGE,
                 ProfilePicture = adminImage,
-                UserRole = CompanyRole.CompanyAdmin,
+                UserRole = CompanyRole.ADMIN,
             };
             if (userManager.Users.All(u => u.Id != clientAdmin.Id))
             {
@@ -67,20 +67,20 @@ namespace risk.control.system.Seeds
                 if (user == null)
                 {
                     await userManager.CreateAsync(clientAdmin, Password);
-                    await userManager.AddToRoleAsync(clientAdmin, AppRoles.CompanyAdmin.ToString());
-                    //var clientAdminRole = new ApplicationRole(AppRoles.CompanyAdmin.ToString(), AppRoles.CompanyAdmin.ToString());
+                    await userManager.AddToRoleAsync(clientAdmin, AppRoles.ADMIN.ToString());
+                    //var clientAdminRole = new ApplicationRole(AppRoles.ADMIN.ToString(), AppRoles.ADMIN.ToString());
                     //clientAdmin.ApplicationRoles.Add(clientAdminRole);
 
-                    //await userManager.AddToRoleAsync(clientAdmin, AppRoles.Creator.ToString());
-                    //var clientCreatorRole = new ApplicationRole(AppRoles.Creator.ToString(), AppRoles.Creator.ToString());
+                    //await userManager.AddToRoleAsync(clientAdmin, AppRoles.CREATOR.ToString());
+                    //var clientCreatorRole = new ApplicationRole(AppRoles.CREATOR.ToString(), AppRoles.CREATOR.ToString());
                     //clientAdmin.ApplicationRoles.Add(clientCreatorRole);
 
                     //await userManager.AddToRoleAsync(clientAdmin, AppRoles.Assigner.ToString());
                     //var clientAssignerRole = new ApplicationRole(AppRoles.Assigner.ToString(), AppRoles.Assigner.ToString());
                     //clientAdmin.ApplicationRoles.Add(clientAssignerRole);
 
-                    //await userManager.AddToRoleAsync(clientAdmin, AppRoles.Assessor.ToString());
-                    //var clientAssessorRole = new ApplicationRole(AppRoles.Assessor.ToString(), AppRoles.Assessor.ToString());
+                    //await userManager.AddToRoleAsync(clientAdmin, AppRoles.ASSESSOR.ToString());
+                    //var clientAssessorRole = new ApplicationRole(AppRoles.ASSESSOR.ToString(), AppRoles.ASSESSOR.ToString());
                     //clientAdmin.ApplicationRoles.Add(clientAssessorRole);
                 }
             }
@@ -123,7 +123,7 @@ namespace risk.control.system.Seeds
                 PinCodeId = pinCode?.PinCodeId ?? default!,
                 ProfilePictureUrl = CREATOR.PROFILE_IMAGE,
                 ProfilePicture = creatorImage,
-                UserRole = CompanyRole.Creator,
+                UserRole = CompanyRole.CREATOR,
             };
             if (userManager.Users.All(u => u.Id != clientCreator.Id))
             {
@@ -131,62 +131,63 @@ namespace risk.control.system.Seeds
                 if (user == null)
                 {
                     await userManager.CreateAsync(clientCreator, Password);
-                    await userManager.AddToRoleAsync(clientCreator, AppRoles.Creator.ToString());
-                    //var clientCreatorRole = new ApplicationRole(AppRoles.Creator.ToString(), AppRoles.Creator.ToString());
+                    await userManager.AddToRoleAsync(clientCreator, AppRoles.CREATOR.ToString());
+                    //var clientCreatorRole = new ApplicationRole(AppRoles.CREATOR.ToString(), AppRoles.CREATOR.ToString());
                     //clientCreator.ApplicationRoles.Add(clientCreatorRole);
                 }
             }
 
             //Seed client assigner
-            //string assignerEmailwithSuffix = Applicationsettings.ASSIGNER.CODE + "@" + company.Email;
-            //var asMailBox = new Mailbox
-            //{
-            //    Name = assignerEmailwithSuffix
-            //};
-            //string assignerImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "assigner.jpeg");
+            string managererEmailwithSuffix = Applicationsettings.MANAGER.CODE + "@" + company.Email;
+            var asMailBox = new Mailbox
+            {
+                Name = managererEmailwithSuffix
+            };
+            string managerImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "assigner.jpeg");
 
-            //var assignerImage = File.ReadAllBytes(assignerImagePath);
+            var managerImage = File.ReadAllBytes(managerImagePath);
 
-            //if (assignerImage == null)
-            //{
-            //    assignerImage = File.ReadAllBytes(noUserImagePath);
-            //}
+            if (managerImage == null)
+            {
+                managerImage = File.ReadAllBytes(noUserImagePath);
+            }
 
-            //var clientAssigner = new ClientCompanyApplicationUser()
-            //{
-            //    Mailbox = asMailBox,
-            //    UserName = assignerEmailwithSuffix,
-            //    Email = assignerEmailwithSuffix,
-            //    FirstName = ASSIGNER.FIRST_NAME,
-            //    LastName = ASSIGNER.LAST_NAME,
-            //    Active = true,
-            //    EmailConfirmed = true,
-            //    ClientCompany = clientCompany,
-            //    PhoneNumberConfirmed = true,
-            //    Password = Password,
-            //    IsSuperAdmin = false,
-            //    IsClientAdmin = false,
-            //    Addressline = "453 Main Road",
-            //    PhoneNumber = Applicationsettings.MOBILE,
-            //    IsVendorAdmin = false,
-            //    CountryId = countryId,
-            //    DistrictId = district?.DistrictId ?? default!,
-            //    StateId = state?.StateId ?? default!,
-            //    PinCodeId = pinCode?.PinCodeId ?? default!,
-            //    ProfilePictureUrl = ASSIGNER.PROFILE_IMAGE,
-            //    ProfilePicture = assignerImage
-            //};
-            //if (userManager.Users.All(u => u.Id != clientAssigner.Id))
-            //{
-            //    var user = await userManager.FindByEmailAsync(clientAssigner.Email);
-            //    if (user == null)
-            //    {
-            //        await userManager.CreateAsync(clientAssigner, Password);
-            //        await userManager.AddToRoleAsync(clientAssigner, AppRoles.Assigner.ToString());
-            //        //var clientAssignerRole = new ApplicationRole(AppRoles.Assigner.ToString(), AppRoles.Assigner.ToString());
-            //        //clientAssigner.ApplicationRoles.Add(clientAssignerRole);
-            //    }
-            //}
+            var manager = new ClientCompanyApplicationUser()
+            {
+                Mailbox = asMailBox,
+                UserName = managererEmailwithSuffix,
+                Email = managererEmailwithSuffix,
+                FirstName = MANAGER.FIRST_NAME,
+                LastName = MANAGER.LAST_NAME,
+                Active = true,
+                EmailConfirmed = true,
+                ClientCompany = clientCompany,
+                PhoneNumberConfirmed = true,
+                Password = Password,
+                IsSuperAdmin = false,
+                IsClientAdmin = false,
+                Addressline = "453 Main Road",
+                PhoneNumber = Applicationsettings.PORTAL_ADMIN_MOBILE,
+                IsVendorAdmin = false,
+                CountryId = countryId,
+                DistrictId = district?.DistrictId ?? default!,
+                StateId = state?.StateId ?? default!,
+                PinCodeId = pinCode?.PinCodeId ?? default!,
+                ProfilePictureUrl = MANAGER.PROFILE_IMAGE,
+                ProfilePicture = managerImage,
+                UserRole = CompanyRole.MANAGER,
+            };
+            if (userManager.Users.All(u => u.Id != manager.Id))
+            {
+                var user = await userManager.FindByEmailAsync(manager.Email);
+                if (user == null)
+                {
+                    await userManager.CreateAsync(manager, Password);
+                    await userManager.AddToRoleAsync(manager, AppRoles.MANAGER.ToString());
+                    //var clientAssignerRole = new ApplicationRole(AppRoles.Assigner.ToString(), AppRoles.Assigner.ToString());
+                    //clientAssigner.ApplicationRoles.Add(clientAssignerRole);
+                }
+            }
 
             //Seed client assessor
             string assessorEmailwithSuffix = Applicationsettings.ASSESSOR.CODE + "@" + company.Email;
@@ -218,6 +219,7 @@ namespace risk.control.system.Seeds
                 IsSuperAdmin = false,
                 IsClientAdmin = false,
                 IsVendorAdmin = false,
+                IsClientManager = true,
                 Addressline = "11 Nurlendi Street",
                 PhoneNumber = Applicationsettings.PORTAL_ADMIN_MOBILE,
                 CountryId = countryId,
@@ -226,7 +228,7 @@ namespace risk.control.system.Seeds
                 PinCodeId = pinCode?.PinCodeId ?? default!,
                 ProfilePictureUrl = ASSESSOR.PROFILE_IMAGE,
                 ProfilePicture = assessorImage,
-                UserRole = CompanyRole.Assessor,
+                UserRole = CompanyRole.ASSESSOR,
             };
             if (userManager.Users.All(u => u.Id != clientAssessor.Id))
             {
@@ -234,8 +236,8 @@ namespace risk.control.system.Seeds
                 if (user == null)
                 {
                     await userManager.CreateAsync(clientAssessor, Password);
-                    await userManager.AddToRoleAsync(clientAssessor, AppRoles.Assessor.ToString());
-                    //var clientAssessorRole = new ApplicationRole(AppRoles.Assessor.ToString(), AppRoles.Assessor.ToString());
+                    await userManager.AddToRoleAsync(clientAssessor, AppRoles.ASSESSOR.ToString());
+                    //var clientAssessorRole = new ApplicationRole(AppRoles.ASSESSOR.ToString(), AppRoles.ASSESSOR.ToString());
                     //clientAssigner.ApplicationRoles.Add(clientAssessorRole);
                 }
             }

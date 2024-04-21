@@ -495,7 +495,7 @@ namespace risk.control.system.Controllers
                             var createdUser = await userManager.FindByEmailAsync(user.Email);
                             var lockUser = await userManager.SetLockoutEnabledAsync(createdUser, true);
                             var lockDate = await userManager.SetLockoutEndDateAsync(createdUser, DateTime.Now);
-                            var onboardAgent = roles.Any(r => AppConstant.AppRoles.Agent.ToString().Contains(r)) && string.IsNullOrWhiteSpace(user.MobileUId);
+                            var onboardAgent = roles.Any(r => AppConstant.AppRoles.AGENT.ToString().Contains(r)) && string.IsNullOrWhiteSpace(user.MobileUId);
                             if (lockUser.Succeeded && lockDate.Succeeded)
                             {
                                 var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == user.VendorId);
@@ -550,9 +550,9 @@ namespace risk.control.system.Controllers
                 return RedirectToAction(nameof(AgencyController.User), "Agency");
             }
             foreach (var role in roleManager.Roles.Where(r =>
-                r.Name.Contains(AppRoles.AgencyAdmin.ToString()) ||
-                r.Name.Contains(AppRoles.Supervisor.ToString()) ||
-                r.Name.Contains(AppRoles.Agent.ToString())))
+                r.Name.Contains(AppRoles.AGENCY_ADMIN.ToString()) ||
+                r.Name.Contains(AppRoles.SUPERVISOR.ToString()) ||
+                r.Name.Contains(AppRoles.AGENT.ToString())))
             {
                 var userRoleViewModel = new VendorUserRoleViewModel
                 {
@@ -600,7 +600,7 @@ namespace risk.control.system.Controllers
             var currentUser = await userManager.GetUserAsync(HttpContext.User);
             await signInManager.RefreshSignInAsync(currentUser);
 
-            var onboardAgent = newRoles.Any(r => AppConstant.AppRoles.Agent.ToString().Contains(r)) && string.IsNullOrWhiteSpace(user.MobileUId) && user.Active;
+            var onboardAgent = newRoles.Any(r => AppConstant.AppRoles.AGENT.ToString().Contains(r)) && string.IsNullOrWhiteSpace(user.MobileUId) && user.Active;
             var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == user.VendorId);
 
             System.Uri address = new System.Uri("http://tinyurl.com/api-create.php?url=" + vendor.MobileAppUrl);

@@ -70,6 +70,10 @@ namespace risk.control.system.Models
         public int InvestigateView { get; set; } = 0;
         public int VerifyView { get; set; } = 0;
         public int AssessView { get; set; } = 0;
+        public int ManagerActiveView { get; set; } = 0;
+        public int ManagerReviewView { get; set; } = 0;
+        public int ManagerApproveView { get; set; } = 0;
+        public int ManagerRejectView { get; set; } = 0;
     }
 
     public enum Income

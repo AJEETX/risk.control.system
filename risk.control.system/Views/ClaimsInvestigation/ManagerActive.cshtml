@@ -1,14 +1,11 @@
-﻿@model bool
-@{
+﻿@{
     ViewData["Title"] = "Claim: Active ";
 }
 
 <section class="content">
     <div id="fullpage" class="card card-secondary">
         <div class="card-header">
-            <h3 class="card-title"><i class="far fa-edit"></i> Draft
-               
-            </h3>
+            <h3 class="card-title"><i class="fa fa-toggle-on"></i> Active</h3>
             @* <h3 id="view-type" class="card-title">
             <a href="#" id="map-type" class="input-group-label"> <i class="far fa-map"></i> Map</a>
             <a href="#" id="list-type" class="input-group-label"> <i class="fas fa-server"></i> List</a>
@@ -30,7 +27,6 @@
                             <th><img class="action-image" src="~/headers/portrait.gif" title="Beneficiary Photo" alt="Beneficiary Photo" /></th>
                             <th><img class="action-image" src="~/headers/customer.gif" title="Beneficiary Name" alt="Beneficiary Name" /></th>
                             <th><img class="action-image" src="~/headers/claim-type.gif" title="Claim Type" alt="Claim Type" /></th>
-                            <th><img class="action-image" src="~/headers/service.gif" title="Service" alt="Service" /></th>
                             <th><img class="action-image" src="~/headers/pincode.gif" title="Pincode" alt="Pincode" /></th>
                             <th><img class="action-image" src="~/headers/status.gif" title="Status" alt="Status" /></th>
                             <th><img class="action-image" src="~/headers/created.gif" title="Created date" alt="Created Date" /></th>
@@ -38,6 +34,7 @@
                                 <img class="action-image" src="~/headers/timer.gif" title="Days since Active" alt="Days since Active" />
                             </th>
                             <th><img class="action-image" src="~/headers/owner.gif" title="Owner" /></th>
+                            <th><img class="action-image" src="~/headers/auto.gif" title="Allocated(Auto)" /></th>
                             <th><img class="action-image" src="~/headers/action.gif" title="Action" /></th>
                         </tr>
                     </thead>
@@ -47,31 +44,12 @@
                 <div id="map"></div>
             </div>
         </div>
-        <div class="card-footer">
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <a id="back" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
-                        @if(Model)
-                        {
-                            <a class="create-policy btn btn-success" href='#'><i class="fas fa-pen-alt "></i> @Applicationsettings.CREATE New</a>
-                        }
-                        else
-                        {
-                            <button disabled class="btn btn-outline-secondary"><i class="fas fa-pen-alt "></i> @Applicationsettings.CREATE New</button>
-
-                            
-                        }
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 </section>
 @section Scripts    {
     @* <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
     <script src="~/js/all.js"></script>
     <script src="~/js/map-list.js"></script> *@
-    <script src="~/js/company-incomplete.js"></script>
+    <script src="~/js/company-manager-active.js"></script>
 
 }

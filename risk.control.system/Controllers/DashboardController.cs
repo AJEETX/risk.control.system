@@ -44,19 +44,19 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
-                if(userRole.Value.Contains(AppRoles.Creator.ToString()))
+                if(userRole.Value.Contains(AppRoles.CREATOR.ToString()))
                 {
                     var model = dashboardService.GetCreatorCount(currentUserEmail, userRole.Value);
                     return View(model);
 
                 }
-                else if (userRole.Value.Contains(AppRoles.Assessor.ToString()))
+                else if (userRole.Value.Contains(AppRoles.ASSESSOR.ToString()))
                 {
                     var model = dashboardService.GetAssessorCount(currentUserEmail, userRole.Value);
                     return View(model);
 
                 }
-                else if (userRole.Value.Contains(AppRoles.Supervisor.ToString()))
+                else if (userRole.Value.Contains(AppRoles.SUPERVISOR.ToString()))
                 {
                     var model = dashboardService.GetSupervisorCount(currentUserEmail, userRole.Value);
                     return View(model);
@@ -85,15 +85,15 @@ namespace risk.control.system.Controllers
             var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
             if (userRole != null)
             {
-                if (userRole.Value.Contains(AppRoles.PortalAdmin.ToString())
-                                || userRole.Value.Contains(AppRoles.CompanyAdmin.ToString())
-                                || userRole.Value.Contains(AppRoles.Creator.ToString())
+                if (userRole.Value.Contains(AppRoles.PORTAL_ADMIN.ToString())
+                                || userRole.Value.Contains(AppRoles.ADMIN.ToString())
+                                || userRole.Value.Contains(AppRoles.CREATOR.ToString())
                                 )
                 {
                     Dictionary<string, int> monthlyExpense = dashboardService.CalculateAgencyCaseStatus(userEmail);
                     return new JsonResult(monthlyExpense);
                 }
-                else if (userRole.Value.Contains(AppRoles.AgencyAdmin.ToString()) || userRole.Value.Contains(AppRoles.Supervisor.ToString()))
+                else if (userRole.Value.Contains(AppRoles.AGENCY_ADMIN.ToString()) || userRole.Value.Contains(AppRoles.SUPERVISOR.ToString()))
                 {
                     Dictionary<string, int> monthlyExpense = dashboardService.CalculateAgentCaseStatus(userEmail);
                     return new JsonResult(monthlyExpense);

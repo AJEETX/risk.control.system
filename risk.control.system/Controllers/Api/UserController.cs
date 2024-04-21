@@ -8,13 +8,15 @@ using risk.control.system.Data;
 using risk.control.system.Models;
 
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers.Api
 {
     [ApiExplorerSettings(IgnoreApi = true)]
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "PortalAdmin,CompanyAdmin")]
+    [Authorize(Roles = PORTAL_ADMIN.DISPLAY_NAME)]
+    [Authorize(Roles = ADMIN.DISPLAY_NAME)]
     public class UserController : ControllerBase
     {
         private readonly ApplicationDbContext _context;

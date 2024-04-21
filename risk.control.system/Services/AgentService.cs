@@ -30,7 +30,7 @@ namespace risk.control.system.Services
 
         public async Task<VendorApplicationUser> GetAgent(string mobile, bool sendSMS = false)
         {
-            var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Agent.ToString()));
+            var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.AGENT.ToString()));
 
             var user2Onboard = _context.VendorApplicationUser.FirstOrDefault(
                 u => u.PhoneNumber == mobile && !string.IsNullOrWhiteSpace(u.MobileUId));
@@ -43,7 +43,7 @@ namespace risk.control.system.Services
 
         public async Task<VendorApplicationUser> ResetUid(string mobile, bool sendSMS = false)
         {
-            var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Agent.ToString()));
+            var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.AGENT.ToString()));
 
             var user2Onboard = _context.VendorApplicationUser.FirstOrDefault(
                 u => u.PhoneNumber == mobile && !string.IsNullOrWhiteSpace(u.MobileUId));
@@ -64,7 +64,7 @@ namespace risk.control.system.Services
             {
                 var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
                 var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
-                var BaseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}{Applicationsettings.WEBSITE_SITE_MENU_LOGO}";
+                var BaseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
                 //SEND SMS
                 string message = $"Dear {user2Onboard.Email}";
                 message += $"Uid reset for mobile: {user2Onboard.PhoneNumber}";

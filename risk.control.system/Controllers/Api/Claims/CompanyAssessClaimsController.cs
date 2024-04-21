@@ -13,12 +13,12 @@ using ControllerBase = Microsoft.AspNetCore.Mvc.ControllerBase;
 using risk.control.system.Services;
 using System.Globalization;
 using Microsoft.AspNetCore.Authorization;
+using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers.Api.Claims
 {
     [ApiExplorerSettings(IgnoreApi = true)]
     [Route("api/[controller]")]
-    [Authorize(Roles = "Assessor")]
     [ApiController]
     public class CompanyAssessClaimsController : ControllerBase
     {
@@ -29,6 +29,7 @@ namespace risk.control.system.Controllers.Api.Claims
             _context = context;
         }
 
+        [Authorize(Roles = ASSESSOR.DISPLAY_NAME)]
         [HttpGet("GetAssessor")]
         public async Task<IActionResult> GetAssessor()
         {
@@ -47,7 +48,7 @@ namespace risk.control.system.Controllers.Api.Claims
             applicationDbContext = applicationDbContext.Where(i => i.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
             i.InvestigationCaseSubStatusId == submittedToAssessorStatus.InvestigationCaseSubStatusId && 
             i.UserEmailActionedTo == string.Empty &&
-             i.UserRoleActionedTo == $"{AppRoles.Assessor.GetEnumDisplayName()} ( {companyUser.ClientCompany.Email})");
+             i.UserRoleActionedTo == $"{AppRoles.ASSESSOR.GetEnumDisplayName()} ( {companyUser.ClientCompany.Email})");
 
             var newClaimsAssigned = new List<ClaimsInvestigation>();
             var claimsAssigned = new List<ClaimsInvestigation>();
@@ -100,6 +101,77 @@ namespace risk.control.system.Controllers.Api.Claims
 
             return Ok(response);
         }
+        [HttpGet("GetManager")]
+        public async Task<IActionResult> GetManager()
+        {
+            IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
+
+            var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
+            var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
+            var submittedToAssessorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
+            var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
+            var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
+
+            var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(c => c.Email == userEmail.Value);
+            applicationDbContext = applicationDbContext.Where(i => i.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
+            i.InvestigationCaseSubStatusId == submittedToAssessorStatus.InvestigationCaseSubStatusId &&
+            i.UserEmailActionedTo == string.Empty &&
+             i.UserRoleActionedTo == $"{AppRoles.ASSESSOR.GetEnumDisplayName()} ( {companyUser.ClientCompany.Email})");
+
+            var newClaimsAssigned = new List<ClaimsInvestigation>();
+            var claimsAssigned = new List<ClaimsInvestigation>();
+
+            foreach (var claim in applicationDbContext)
+            {
+                claim.AssessView += 1;
+                if (claim.AssessView <= 1)
+                {
+                    newClaimsAssigned.Add(claim);
+                }
+                claimsAssigned.Add(claim);
+
+            }
+            if (newClaimsAssigned.Count > 0)
+            {
+                _context.ClaimsInvestigation.UpdateRange(newClaimsAssigned);
+                _context.SaveChanges();
+            }
+            var response = claimsAssigned
+            .Select(a => new ClaimsInvesgationResponse
+            {
+                Id = a.ClaimsInvestigationId,
+                AutoAllocated = a.AutoAllocated,
+                PolicyId = a.PolicyDetail.ContractNumber,
+                Amount = String.Format(new CultureInfo("hi-IN"), "{0:C}", a.PolicyDetail.SumAssuredValue),
+                AssignedToAgency = a.AssignedToAgency,
+                Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
+                PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
+                Document = a.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : Applicationsettings.NO_POLICY_IMAGE,
+                Customer = a.CustomerDetail?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail.ProfilePicture)) : Applicationsettings.NO_USER,
+                Name = a.CustomerDetail?.CustomerName != null ? a.CustomerDetail?.CustomerName : "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/user.png\" /> </span>",
+                Policy = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail?.LineOfBusiness.Name + "</span>"),
+                Status = string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseStatus.Name + "</span>"),
+                ServiceType = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail?.ClaimType.GetEnumDisplayName() + "</span>"),
+                Service = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail.InvestigationServiceType.Name + "</span>"),
+                Location = string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseSubStatus.Name + "</span>"),
+                Created = string.Join("", "<span class='badge badge-light'>" + a.Created.ToString("dd-MM-yyyy") + "</span>"),
+                timePending = a.GetTimePending(),
+                PolicyNum = a.GetPolicyNum(),
+                BeneficiaryPhoto = a.CaseLocations.Count != 0 && a.CaseLocations.FirstOrDefault().ProfilePicture != null ?
+                                       string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CaseLocations.FirstOrDefault().ProfilePicture)) :
+                                      @Applicationsettings.NO_USER,
+                BeneficiaryName = a.CaseLocations.Count == 0 ?
+                        "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>" :
+                        a.CaseLocations.FirstOrDefault().BeneficiaryName,
+                TimeElapsed = DateTime.Now.Subtract(a.Created).TotalSeconds,
+                IsNewAssigned = a.AssessView <= 1
+            })?.ToList();
+
+            return Ok(response);
+        }
 
         [HttpGet("GetAssessorMap")]
         public IActionResult GetAssessorMap()
@@ -128,7 +200,7 @@ namespace risk.control.system.Controllers.Api.Claims
             }
 
             var claimsAssigned = new List<ClaimsInvestigation>();
-            if (userRole.Value.Contains(AppRoles.PortalAdmin.ToString()) || userRole.Value.Contains(AppRoles.CompanyAdmin.ToString()) || userRole.Value.Contains(AppRoles.Creator.ToString()))
+            if (userRole.Value.Contains(AppRoles.PORTAL_ADMIN.ToString()) || userRole.Value.Contains(AppRoles.ADMIN.ToString()) || userRole.Value.Contains(AppRoles.CREATOR.ToString()))
             {
                 applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId == null && c.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId));
 
@@ -143,7 +215,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 }
             }
 
-            else if (userRole.Value.Contains(AppRoles.Assessor.ToString()))
+            else if (userRole.Value.Contains(AppRoles.ASSESSOR.ToString()))
             {
                 applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId != null));
 

@@ -1,0 +1,61 @@
+﻿@using risk.control.system.Helpers;
+@using risk.control.system.Models;
+@model ClientCompany
+
+@{
+    <li class="nav-item">
+        <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("ClaimsInvestigation","")">
+            <i class="nav-icon fa fa-user-secret"></i>
+            <p class="sidebar-menu-header-label">
+                @Applicationsettings.INVESTIGATION_CLAIM
+                <i class="right fas fa-angle-right"></i>
+            </p>
+        </a>
+    </li>
+    <li class="nav-item">
+        <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Manager" class="actual-link nav-link
+                    @Url.MakeActiveClass("ClaimsInvestigation","Manager")">
+            <i class="fas fa-glasses nav-icon"></i>
+            <p>
+                <span class="badge badge-danger">SUBMITTED</span>
+            </p>
+        </a>
+    </li>
+    <li class="nav-item">
+        <a is-active-page asp-controller="ClaimsInvestigation" asp-action="ManagerReview" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","ManagerReview")
+                        @Url.MakeActiveClass("ClaimsInvestigation","ManagerReviewDetail")">
+            <i class="fas fa-random nav-icon"></i>
+            <p>
+                <span class="badge badge-warning">REVIEW</span>
+            </p>
+        </a>
+    </li>
+    <li class="nav-item">
+        <a is-active-page asp-controller="ClaimsInvestigation" asp-action="ManagerReview" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","ManagerReview")
+                    @Url.MakeActiveClass("ClaimsInvestigation","ManagerReviewDetail")">
+            <i class="fas fa-random nav-icon"></i>
+            <p>
+                <span class="badge badge-warning">REVIEW</span>
+            </p>
+        </a>
+    </li>
+    <li class="nav-item">
+        <a is-active-page asp-controller="Report" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Report","Index")
+                                                @Url.MakeActiveClass("Report","Detail") @Url.MakeActiveClass("Report","ShowInvoice")
+                                                                      @Url.MakeActiveClass("Report","PrintInvoice")">
+            <i class="far fa-thumbs-up nav-icon"></i>
+            <p>
+                <span class="badge badge-info"> APPROVED </span>
+            </p>
+        </a>
+    </li>
+    <li class="nav-item">
+        <a is-active-page asp-controller="Report" asp-action="Rejected" class="actual-link nav-link @Url.MakeActiveClass("Report","Rejected")
+                                                           @Url.MakeActiveClass("Report","RejectDetail") ">
+           <i class="far fa-thumbs-down nav-icon"></i>
+           <p>
+               <span class="badge badge-secondary">REJECTED</span>
+           </p>
+       </a>
+    </li>
+}

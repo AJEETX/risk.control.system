@@ -29,14 +29,14 @@ namespace risk.control.system.Seeds
             }
 
             //CREATE ROLES
-            await roleManager.CreateAsync(new ApplicationRole(AppRoles.PortalAdmin.ToString().Substring(0, 2).ToUpper(), AppRoles.PortalAdmin.ToString()));
-            await roleManager.CreateAsync(new ApplicationRole(AppRoles.CompanyAdmin.ToString().Substring(0, 2).ToUpper(), AppRoles.CompanyAdmin.ToString()));
-            await roleManager.CreateAsync(new ApplicationRole(AppRoles.AgencyAdmin.ToString().Substring(0, 2).ToUpper(), AppRoles.AgencyAdmin.ToString()));
-            await roleManager.CreateAsync(new ApplicationRole(AppRoles.Creator.ToString().Substring(0, 2).ToUpper(), AppRoles.Creator.ToString()));
-            //await roleManager.CreateAsync(new ApplicationRole(AppRoles.Assigner.ToString().Substring(0, 2).ToUpper(), AppRoles.Assigner.ToString()));
-            await roleManager.CreateAsync(new ApplicationRole(AppRoles.Assessor.ToString().Substring(0, 2).ToUpper(), AppRoles.Assessor.ToString()));
-            await roleManager.CreateAsync(new ApplicationRole(AppRoles.Supervisor.ToString().Substring(0, 2).ToUpper(), AppRoles.Supervisor.ToString()));
-            await roleManager.CreateAsync(new ApplicationRole(AppRoles.Agent.ToString().Substring(0, 2).ToUpper(), AppRoles.Agent.ToString()));
+            await roleManager.CreateAsync(new ApplicationRole(AppRoles.PORTAL_ADMIN.ToString().Substring(0, 2).ToUpper(), AppRoles.PORTAL_ADMIN.ToString()));
+            await roleManager.CreateAsync(new ApplicationRole(AppRoles.ADMIN.ToString().Substring(0, 2).ToUpper(), AppRoles.ADMIN.ToString()));
+            await roleManager.CreateAsync(new ApplicationRole(AppRoles.AGENCY_ADMIN.ToString().Substring(0, 2).ToUpper(), AppRoles.AGENCY_ADMIN.ToString()));
+            await roleManager.CreateAsync(new ApplicationRole(AppRoles.CREATOR.ToString().Substring(0, 2).ToUpper(), AppRoles.CREATOR.ToString()));
+            await roleManager.CreateAsync(new ApplicationRole(AppRoles.MANAGER.ToString().Substring(0, 2).ToUpper(), AppRoles.MANAGER.ToString()));
+            await roleManager.CreateAsync(new ApplicationRole(AppRoles.ASSESSOR.ToString().Substring(0, 2).ToUpper(), AppRoles.ASSESSOR.ToString()));
+            await roleManager.CreateAsync(new ApplicationRole(AppRoles.SUPERVISOR.ToString().Substring(0, 2).ToUpper(), AppRoles.SUPERVISOR.ToString()));
+            await roleManager.CreateAsync(new ApplicationRole(AppRoles.AGENT.ToString().Substring(0, 2).ToUpper(), AppRoles.AGENT.ToString()));
 
             var australia = new Country
             {

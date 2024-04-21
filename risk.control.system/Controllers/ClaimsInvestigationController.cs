@@ -15,6 +15,8 @@ using risk.control.system.Services;
 
 using SmartBreadcrumbs.Attributes;
 
+using static risk.control.system.AppConstant.Applicationsettings;
+
 namespace risk.control.system.Controllers
 {
     public class ClaimsInvestigationController : Controller
@@ -45,7 +47,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(" Claims")]
-        [Authorize(Roles = "Creator")]
+        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
         public IActionResult Index()
         {
             try
@@ -66,7 +68,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb("Re + Assign")]
-        [Authorize(Roles = "Creator")]
+        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
         public IActionResult Assign()
         {
             try
@@ -88,7 +90,29 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(" Assess", FromAction = "Index")]
+        [Authorize(Roles = ASSESSOR.DISPLAY_NAME)]
         public IActionResult Assessor()
+        {
+            try
+            {
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (string.IsNullOrWhiteSpace(currentUserEmail))
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                return View();
+            }
+            catch (Exception)
+            {
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+
+        }
+        [Breadcrumb(" Submitted", FromAction = "Index")]
+        [Authorize(Roles = MANAGER.DISPLAY_NAME)]
+        public IActionResult Manager()
         {
             try
             {
@@ -109,7 +133,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(" Re + Assign")]
-        [Authorize(Roles = "Creator")]
+        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
         public IActionResult Assigner()
         {
             try
@@ -128,8 +152,10 @@ namespace risk.control.system.Controllers
                     if (totalClaimsCreated?.Count >= companyUser.ClientCompany.TotalCreatedClaimAllowed)
                     {
                         userCanUpload = false;
+                        notifyService.Information($"Version limit = {totalClaimsCreated?.Count}");
                     }
                 }
+                
                 return View(companyUser.ClientCompany.BulkUpload && userCanUpload);
             }
             catch (Exception)
@@ -191,7 +217,7 @@ namespace risk.control.system.Controllers
             return RedirectToAction(nameof(ClaimsInvestigationController.Incomplete), "ClaimsInvestigation");
         }
         [Breadcrumb(" Assign(auto)")]
-        [Authorize(Roles = "Creator")]
+        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
         public IActionResult Draft()
         {
             try
@@ -211,8 +237,10 @@ namespace risk.control.system.Controllers
                     if (totalClaimsCreated?.Count >= companyUser.ClientCompany.TotalCreatedClaimAllowed)
                     {
                         userCanUpload = false;
+                        notifyService.Information($"Version limit = {totalClaimsCreated?.Count}");
                     }
                 }
+                
                 return View(companyUser.ClientCompany.BulkUpload && userCanUpload);
             }
             catch (Exception)
@@ -225,7 +253,7 @@ namespace risk.control.system.Controllers
         [HttpPost]
         [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Creator")]
+        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
         public async Task<IActionResult> Draft(IFormFile postedFile, string uploadtype)
         {
             try
@@ -279,7 +307,7 @@ namespace risk.control.system.Controllers
 
         [HttpGet]
         [Breadcrumb(" Empanelled Agencies", FromAction = "Assigner")]
-        [Authorize(Roles = "Creator")]
+        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
         public async Task<IActionResult> EmpanelledVendors(string selectedcase)
         {
             try
@@ -310,7 +338,7 @@ namespace risk.control.system.Controllers
 
         [HttpGet]
         [Breadcrumb(" Allocate (to agency)")]
-        [Authorize(Roles = "Creator")]
+        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
         public async Task<IActionResult> AllocateToVendor(string selectedcase)
         {
             try
@@ -344,7 +372,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(" Assessed")]
-        [Authorize(Roles = "Assessor")]
+        [Authorize(Roles = ASSESSOR.DISPLAY_NAME)]
         public IActionResult Approved()
         {
             try
@@ -366,7 +394,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(title: "Active")]
-        [Authorize(Roles = "Creator")]
+        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
         public IActionResult Active()
         {
             try
@@ -385,8 +413,29 @@ namespace risk.control.system.Controllers
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
+
+        [Breadcrumb(title: "Active")]
+        [Authorize(Roles = MANAGER.DISPLAY_NAME)]
+        public IActionResult ManagerActive()
+        {
+            try
+            {
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (string.IsNullOrWhiteSpace(currentUserEmail))
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                return View();
+            }
+            catch (Exception)
+            {
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+        }
         [Breadcrumb(title: "Draft")]
-        [Authorize(Roles = "Creator")]
+        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
         public IActionResult Incomplete()
         {
             try
@@ -399,7 +448,7 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var companyUser = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(c => c.Email == currentUserEmail);
-                if (companyUser == null || companyUser.UserRole != AppConstant.CompanyRole.Creator)
+                if (companyUser == null || companyUser.UserRole != AppConstant.CompanyRole.CREATOR)
                 {
                     notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
@@ -410,12 +459,8 @@ namespace risk.control.system.Controllers
                     if (totalClaimsCreated?.Count >= companyUser.ClientCompany.TotalCreatedClaimAllowed)
                     {
                         userCanCreate = false;
+                        notifyService.Information($"Version limit = {totalClaimsCreated?.Count}");
                     }
-                }
-
-                if (!userCanCreate)
-                {
-                    notifyService.Information("Max limit reached ");
                 }
 
                 return View(userCanCreate);
@@ -427,8 +472,28 @@ namespace risk.control.system.Controllers
             }
         }
         [Breadcrumb(title: "Review")]
-        [Authorize(Roles = "Assessor")]
+        [Authorize(Roles = ASSESSOR.DISPLAY_NAME)]
         public IActionResult Review()
+        {
+            try
+            {
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (string.IsNullOrWhiteSpace(currentUserEmail))
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                return View();
+            }
+            catch (Exception)
+            {
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+        }
+        [Breadcrumb(title: "Review")]
+        [Authorize(Roles = MANAGER.DISPLAY_NAME)]
+        public IActionResult ManagerReview()
         {
             try
             {
@@ -448,7 +513,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(title: " Detail", FromAction = "Review")]
-        [Authorize(Roles = "Assessor")]
+        [Authorize(Roles = ASSESSOR.DISPLAY_NAME)]
         public async Task<IActionResult> ReviewDetail(string id)
         {
             try
@@ -477,7 +542,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(title: "Report", FromAction = "Assessor")]
-        [Authorize(Roles = "Assessor")]
+        [Authorize(Roles = ASSESSOR.DISPLAY_NAME)]
         public IActionResult GetInvestigateReport(string selectedcase)
         {
             try
@@ -505,7 +570,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(title: "Previous Reports", FromAction = "GetInvestigateReport")]
-        [Authorize(Roles = "Assessor")]
+        [Authorize(Roles = ASSESSOR.DISPLAY_NAME)]
         public IActionResult PreviousReports(long id)
         {
             try
@@ -535,7 +600,7 @@ namespace risk.control.system.Controllers
 
 
         [Breadcrumb("Details", FromAction = "Index", FromController = typeof(InsuranceClaimsController))]
-        [Authorize(Roles = "Creator")]
+        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
         public async Task<IActionResult> Details(string id)
         {
             try
@@ -563,7 +628,7 @@ namespace risk.control.system.Controllers
             }
         }
         [Breadcrumb("Details", FromAction = "Draft", FromController = typeof(ClaimsInvestigationController))]
-        [Authorize(Roles = "Creator")]
+        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
         public async Task<IActionResult> DetailsAuto(string id)
         {
             try
@@ -591,7 +656,7 @@ namespace risk.control.system.Controllers
             }
         }
         [Breadcrumb("Details", FromAction = "Assigner", FromController = typeof(ClaimsInvestigationController))]
-        [Authorize(Roles = "Creator")]
+        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
         public async Task<IActionResult> DetailsManual(string id)
         {
             try
@@ -620,7 +685,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(title: " Detail", FromAction = "Assigner")]
-        [Authorize(Roles = "Creator")]
+        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
         public async Task<IActionResult> Detail(string id)
         {
             try
@@ -649,7 +714,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(title: " Detail", FromAction = "Active")]
-        [Authorize(Roles = "Creator")]
+        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
         public async Task<IActionResult> ActiveDetail(string id)
         {
             try
@@ -678,7 +743,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(title: " Detail")]
-        [Authorize(Roles = "Creator")]
+        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
         public async Task<IActionResult> ReadyDetail(string id)
         {
             try
@@ -706,7 +771,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(title: " Detail", FromAction = "Assign")]
-        [Authorize(Roles = "Creator")]
+        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
         public async Task<IActionResult> AssignDetail(string id)
         {
             try
@@ -741,7 +806,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(title: " Agency detail", FromAction = "Draft")]
-        [Authorize(Roles = "Creator")]
+        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
         public async Task<IActionResult> VendorDetail(string companyId, long id, string backurl, string selectedcase)
         {
             try

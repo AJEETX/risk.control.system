@@ -10,11 +10,14 @@ using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 
+using static risk.control.system.AppConstant.Applicationsettings;
+
 namespace risk.control.system.Controllers.Api.Company
 {
     [ApiExplorerSettings(IgnoreApi = true)]
     [Route("api/[controller]")]
-    [Authorize(Roles = "PortalAdmin,CompanyAdmin")]
+    [Authorize(Roles = PORTAL_ADMIN.DISPLAY_NAME)]
+    [Authorize(Roles = ADMIN.DISPLAY_NAME)]
     [ApiController]
     public class CompanyController : ControllerBase
     {
@@ -136,7 +139,7 @@ namespace risk.control.system.Controllers.Api.Company
                     District = u.District.Name,
                     State = u.State.Name,
                     Country = u.Country.Name,
-                    Roles = u.UserRole != null ? $"<span class=\"badge badge-light\">{u.UserRole.GetEnumDisplayName()}</span>": "<span class=\"badge badge-light\">...</span>",
+                    Roles = u.UserRole != null ? $"<span class=\"badge badge-light\">{u.UserRole.GetEnumDisplayName()}</span>" : "<span class=\"badge badge-light\">...</span>",
                     Pincode = u.PinCode.Code,
                 })?.ToArray();
             return Ok(result);

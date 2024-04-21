@@ -12,10 +12,11 @@ using NToastNotify;
 using AspNetCoreHero.ToastNotification.Notyf;
 using AspNetCoreHero.ToastNotification.Abstractions;
 using Microsoft.AspNetCore.Authorization;
+using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers
 {
-    [Authorize(Roles = "Assessor")]
+    [Authorize(Roles = ASSESSOR.DISPLAY_NAME)]
     public class ReportController : Controller
     {
         private readonly ApplicationDbContext _context;

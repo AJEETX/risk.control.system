@@ -6,7 +6,7 @@
 @inject UserManager<ApplicationUser> UserManager
 @model ClientCompany
 @{
-    if (User.IsInRole(AppRoles.CompanyAdmin.ToString()))
+    if (User.IsInRole(AppRoles.ADMIN.ToString()))
     {
         <partial name="AdminLTE/_CompanySidebarAdminManageCompany" />
         <partial name="AdminLTE/_CompanySidebarAdminManageAgency" />

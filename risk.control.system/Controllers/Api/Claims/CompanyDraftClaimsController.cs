@@ -13,13 +13,14 @@ using ControllerBase = Microsoft.AspNetCore.Mvc.ControllerBase;
 using risk.control.system.Services;
 using System.Globalization;
 using Microsoft.AspNetCore.Authorization;
+using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers.Api.Claims
 {
     [ApiExplorerSettings(IgnoreApi = true)]
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Creator")]
+    [Authorize(Roles = CREATOR.DISPLAY_NAME)]
     public class CompanyDraftClaimsController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
@@ -147,7 +148,7 @@ namespace risk.control.system.Controllers.Api.Claims
             }
 
             // SHOWING DIFFERRENT PAGES AS PER ROLES
-            if (userRole.Value.Contains(AppRoles.PortalAdmin.ToString()) || userRole.Value.Contains(AppRoles.CompanyAdmin.ToString()) || userRole.Value.Contains(AppRoles.Creator.ToString()))
+            if (userRole.Value.Contains(AppRoles.PORTAL_ADMIN.ToString()) || userRole.Value.Contains(AppRoles.ADMIN.ToString()) || userRole.Value.Contains(AppRoles.CREATOR.ToString()))
             {
                 applicationDbContext = applicationDbContext
                     .Include(c => c.CaseLocations)

@@ -23,7 +23,9 @@ namespace risk.control.system.Controllers.Api.Claims
     [ApiExplorerSettings(IgnoreApi = true)]
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "AgencyAdmin,Supervisor,Agent")]
+    [Authorize(Roles = AGENCY_ADMIN.DISPLAY_NAME)]
+    [Authorize(Roles = SUPERVISOR.DISPLAY_NAME)]
+    [Authorize(Roles = AGENT.DISPLAY_NAME)]
     public class ClaimsVendorController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
@@ -38,7 +40,8 @@ namespace risk.control.system.Controllers.Api.Claims
         }
 
         [HttpGet("GetOpen")]
-        [Authorize(Roles = "AgencyAdmin,Supervisor")]
+        [Authorize(Roles = AGENCY_ADMIN.DISPLAY_NAME)]
+        [Authorize(Roles = SUPERVISOR.DISPLAY_NAME)]
         public async Task<IActionResult> GetOpen()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
@@ -66,7 +69,7 @@ namespace risk.control.system.Controllers.Api.Claims
             var submittedToAssesssorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
 
-            if (userRole.Value.Contains(AppRoles.AgencyAdmin.ToString()) || userRole.Value.Contains(AppRoles.Supervisor.ToString()))
+            if (userRole.Value.Contains(AppRoles.AGENCY_ADMIN.ToString()) || userRole.Value.Contains(AppRoles.SUPERVISOR.ToString()))
             {
                 applicationDbContext = applicationDbContext.Where(a => openSubstatusesForSupervisor.Contains(a.InvestigationCaseSubStatusId) &&
                 (a.UserEmailActioned == vendorUser.Email && a.InvestigationCaseSubStatus == assignedToAgentStatus) ||
@@ -157,7 +160,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR);
 
             var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
-            if (userRole.Value.Contains(AppRoles.AgencyAdmin.ToString()) || userRole.Value.Contains(AppRoles.Supervisor.ToString()))
+            if (userRole.Value.Contains(AppRoles.AGENCY_ADMIN.ToString()) || userRole.Value.Contains(AppRoles.SUPERVISOR.ToString()))
             {
                 applicationDbContext = applicationDbContext.Where(a => openSubstatusesForSupervisor.Contains(a.InvestigationCaseSubStatusId));
 
@@ -222,6 +225,8 @@ namespace risk.control.system.Controllers.Api.Claims
         }
 
         [HttpGet("GetNew")]
+        [Authorize(Roles = AGENCY_ADMIN.DISPLAY_NAME)]
+        [Authorize(Roles = SUPERVISOR.DISPLAY_NAME)]
         public async Task<IActionResult> GetNew()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
@@ -242,7 +247,7 @@ namespace risk.control.system.Controllers.Api.Claims
                     .Where(i => i.VendorId == vendorUser.VendorId);
             var claims = new List<ClaimsInvestigation>();
             List<ClaimsInvestigation> newAllocateClaims = new List<ClaimsInvestigation>();
-            var userAdminOrSuperVisor = userRole.Value.Contains(AppRoles.AgencyAdmin.ToString()) || userRole.Value.Contains(AppRoles.Supervisor.ToString());
+            var userAdminOrSuperVisor = userRole.Value.Contains(AppRoles.AGENCY_ADMIN.ToString()) || userRole.Value.Contains(AppRoles.SUPERVISOR.ToString());
             if (userAdminOrSuperVisor)
             {
                 var allocatedClaims = applicationDbContext.Where(a =>
@@ -262,7 +267,7 @@ namespace risk.control.system.Controllers.Api.Claims
                     _context.SaveChanges();
                 }
             }
-            else if (userRole.Value.Contains(AppRoles.Agent.ToString()))
+            else if (userRole.Value.Contains(AppRoles.AGENT.ToString()))
             {
                 List<ClaimsInvestigation> newInvestigateClaims = new List<ClaimsInvestigation>();
                 var allocatedClaims = applicationDbContext.Where(a => a.UserEmailActionedTo == currentUserEmail
@@ -346,7 +351,7 @@ namespace risk.control.system.Controllers.Api.Claims
             }
             var claims = new List<ClaimsInvestigation>();
 
-            if (userRole.Value.Contains(AppRoles.AgencyAdmin.ToString()) || userRole.Value.Contains(AppRoles.Supervisor.ToString()))
+            if (userRole.Value.Contains(AppRoles.AGENCY_ADMIN.ToString()) || userRole.Value.Contains(AppRoles.SUPERVISOR.ToString()))
             {
                 applicationDbContext = applicationDbContext.Where(a =>
                 a.InvestigationCaseSubStatusId == allocatedStatus.InvestigationCaseSubStatusId);
@@ -359,7 +364,7 @@ namespace risk.control.system.Controllers.Api.Claims
                     }
                 }
             }
-            else if (userRole.Value.Contains(AppRoles.Agent.ToString()))
+            else if (userRole.Value.Contains(AppRoles.AGENT.ToString()))
             {
                 foreach (var item in applicationDbContext)
                 {
@@ -416,7 +421,8 @@ namespace risk.control.system.Controllers.Api.Claims
         }
 
         [HttpGet("GetReport")]
-        [Authorize(Roles = "AgencyAdmin,Supervisor")]
+        [Authorize(Roles = AGENCY_ADMIN.DISPLAY_NAME)]
+        [Authorize(Roles = SUPERVISOR.DISPLAY_NAME)]
         public async Task<IActionResult> GetReport()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
@@ -435,7 +441,7 @@ namespace risk.control.system.Controllers.Api.Claims
             var vendorUser = _context.VendorApplicationUser.Include(u => u.Vendor).FirstOrDefault(c => c.Email == currentUserEmail);
             var claims = applicationDbContext.Where(i => i.VendorId == vendorUser.VendorId &&
             i.UserEmailActionedTo == string.Empty &&
-            i.UserRoleActionedTo == $"{AppRoles.Supervisor.GetEnumDisplayName()} ({vendorUser.Vendor.Email})" &&
+            i.UserRoleActionedTo == $"{AppRoles.SUPERVISOR.GetEnumDisplayName()} ({vendorUser.Vendor.Email})" &&
             i.InvestigationCaseSubStatusId == submittedToVendorSupervisorStatus.InvestigationCaseSubStatusId)?.ToList();
 
             var claimsSubmitted = new List<ClaimsInvestigation>();
@@ -513,7 +519,7 @@ namespace risk.control.system.Controllers.Api.Claims
             }
             // SHOWING DIFFERRENT PAGES AS PER ROLES
             var claimsSubmitted = new List<ClaimsInvestigation>();
-            if (userRole.Value.Contains(AppRoles.AgencyAdmin.ToString()) || userRole.Value.Contains(AppRoles.Supervisor.ToString()))
+            if (userRole.Value.Contains(AppRoles.AGENCY_ADMIN.ToString()) || userRole.Value.Contains(AppRoles.SUPERVISOR.ToString()))
             {
                 foreach (var item in applicationDbContext)
                 {
@@ -571,7 +577,8 @@ namespace risk.control.system.Controllers.Api.Claims
         }
 
         [HttpGet("GetCompleted")]
-        [Authorize(Roles = "AgencyAdmin,Supervisor")]
+        [Authorize(Roles = AGENCY_ADMIN.DISPLAY_NAME)]
+        [Authorize(Roles = SUPERVISOR.DISPLAY_NAME)]
         public async Task<IActionResult> GetCompleted()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();

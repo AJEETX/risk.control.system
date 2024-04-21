@@ -58,7 +58,7 @@ namespace risk.control.system.Seeds
                 PinCodeId = pinCode?.PinCodeId ?? default!,
                 ProfilePictureUrl = AGENCY_ADMIN.PROFILE_IMAGE,
                 ProfilePicture = adminImage,
-                UserRole = AgencyRole.AgencyAdmin,
+                UserRole = AgencyRole.AGENCY_ADMIN,
             };
             if (userManager.Users.All(u => u.Id != vendorAdmin.Id))
             {
@@ -66,16 +66,16 @@ namespace risk.control.system.Seeds
                 if (user == null)
                 {
                     await userManager.CreateAsync(vendorAdmin, Password);
-                    await userManager.AddToRoleAsync(vendorAdmin, AppRoles.AgencyAdmin.ToString());
-                    //var vendorAdminRole = new ApplicationRole(AppRoles.AgencyAdmin.ToString(), AppRoles.AgencyAdmin.ToString());
+                    await userManager.AddToRoleAsync(vendorAdmin, AppRoles.AGENCY_ADMIN.ToString());
+                    //var vendorAdminRole = new ApplicationRole(AppRoles.AGENCY_ADMIN.ToString(), AppRoles.AGENCY_ADMIN.ToString());
                     //vendorAdmin.ApplicationRoles.Add(vendorAdminRole);
 
-                    //await userManager.AddToRoleAsync(vendorAdmin, AppRoles.Supervisor.ToString());
-                    //var vendorSuperVisorRole = new ApplicationRole(AppRoles.Supervisor.ToString(), AppRoles.Supervisor.ToString());
+                    //await userManager.AddToRoleAsync(vendorAdmin, AppRoles.SUPERVISOR.ToString());
+                    //var vendorSuperVisorRole = new ApplicationRole(AppRoles.SUPERVISOR.ToString(), AppRoles.SUPERVISOR.ToString());
                     //vendorAdmin.ApplicationRoles.Add(vendorSuperVisorRole);
 
-                    //await userManager.AddToRoleAsync(vendorAdmin, AppRoles.Agent.ToString());
-                    //var vendorAgentRole = new ApplicationRole(AppRoles.Agent.ToString(), AppRoles.Agent.ToString());
+                    //await userManager.AddToRoleAsync(vendorAdmin, AppRoles.AGENT.ToString());
+                    //var vendorAgentRole = new ApplicationRole(AppRoles.AGENT.ToString(), AppRoles.AGENT.ToString());
                     //vendorAdmin.ApplicationRoles.Add(vendorAgentRole);
                 }
             }
@@ -119,7 +119,7 @@ namespace risk.control.system.Seeds
                 PinCodeId = pinCode?.PinCodeId ?? default!,
                 ProfilePictureUrl = SUPERVISOR.PROFILE_IMAGE,
                 ProfilePicture = supervisorImage,
-                UserRole = AgencyRole.Supervisor
+                UserRole = AgencyRole.SUPERVISOR
             };
             if (userManager.Users.All(u => u.Id != vendorSupervisor.Id))
             {
@@ -127,12 +127,12 @@ namespace risk.control.system.Seeds
                 if (user == null)
                 {
                     await userManager.CreateAsync(vendorSupervisor, Password);
-                    await userManager.AddToRoleAsync(vendorSupervisor, AppRoles.Supervisor.ToString());
-                    //var vendorSuperVisorRole = new ApplicationRole(AppRoles.Supervisor.ToString(), AppRoles.Supervisor.ToString());
+                    await userManager.AddToRoleAsync(vendorSupervisor, AppRoles.SUPERVISOR.ToString());
+                    //var vendorSuperVisorRole = new ApplicationRole(AppRoles.SUPERVISOR.ToString(), AppRoles.Supervisor.ToString());
                     //vendorSupervisor.ApplicationRoles.Add(vendorSuperVisorRole);
 
-                    //await userManager.AddToRoleAsync(vendorSupervisor, AppRoles.Agent.ToString());
-                    //var vendorAgentRole = new ApplicationRole(AppRoles.Agent.ToString(), AppRoles.Agent.ToString());
+                    //await userManager.AddToRoleAsync(vendorSupervisor, AppRoles.AGENT.ToString());
+                    //var vendorAgentRole = new ApplicationRole(AppRoles.AGENT.ToString(), AppRoles.AGENT.ToString());
                     //vendorSupervisor.ApplicationRoles.Add(vendorAgentRole);
                 }
             }
@@ -174,7 +174,7 @@ namespace risk.control.system.Seeds
                 PinCodeId = pinCode?.PinCodeId ?? default!,
                 ProfilePictureUrl = AGENT.PROFILE_IMAGE,
                 ProfilePicture = agentImage,
-                UserRole = AgencyRole.Agent,
+                UserRole = AgencyRole.AGENT,
             };
             if (userManager.Users.All(u => u.Id != vendorAgent.Id))
             {
@@ -182,8 +182,8 @@ namespace risk.control.system.Seeds
                 if (user == null)
                 {
                     await userManager.CreateAsync(vendorAgent, Password);
-                    await userManager.AddToRoleAsync(vendorAgent, AppRoles.Agent.ToString());
-                    //var vendorAgentRole = new ApplicationRole(AppRoles.Agent.ToString(), AppRoles.Agent.ToString());
+                    await userManager.AddToRoleAsync(vendorAgent, AppRoles.AGENT.ToString());
+                    //var vendorAgentRole = new ApplicationRole(AppRoles.AGENT.ToString(), AppRoles.AGENT.ToString());
                     //vendorAgent.ApplicationRoles.Add(vendorAgentRole);
                 }
             }

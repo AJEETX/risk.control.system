@@ -15,31 +15,31 @@
             <div class="submit-progress hidden">
                 <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
             </div>
-            @if (userRole.Value.Contains(AppRoles.PortalAdmin.ToString()))
+            @if (userRole.Value.Contains(AppRoles.PORTAL_ADMIN.ToString()))
             {
                 <partial name="_PortalAdmin" model="@Model" />
             }
-            else if (userRole.Value.Contains(AppRoles.CompanyAdmin.ToString()))
+            else if (userRole.Value.Contains(AppRoles.ADMIN.ToString()))
             {
                 <partial name="_CompanyAdmin" model="@Model" />
             }
-            else if (userRole.Value.Contains(AppRoles.AgencyAdmin.ToString()))
+            else if (userRole.Value.Contains(AppRoles.AGENCY_ADMIN.ToString()))
             {
                 <partial name="_AgencyAdmin" model="@Model" />
             }
-            else if (userRole.Value.Contains(AppRoles.Creator.ToString()))
+            else if (userRole.Value.Contains(AppRoles.CREATOR.ToString()))
             {
                 <partial name="_Creator" model="@Model" />
             }
-            else if (userRole.Value.Contains(AppRoles.Assessor.ToString()))
+            else if (userRole.Value.Contains(AppRoles.ASSESSOR.ToString()))
             {
                 <partial name="_Assessor" model="@Model" />
             }
-            else if (userRole.Value.Contains(AppRoles.Supervisor.ToString()))
+            else if (userRole.Value.Contains(AppRoles.SUPERVISOR.ToString()))
             {
                 <partial name="_Supervisor" model="@Model" />
             }
-            else if (userRole.Value.Contains(AppRoles.Agent.ToString()))
+            else if (userRole.Value.Contains(AppRoles.AGENT.ToString()))
             {
                 <partial name="_Agent" model="@Model" />
             }

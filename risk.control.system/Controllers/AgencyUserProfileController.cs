@@ -235,7 +235,7 @@ namespace risk.control.system.Controllers
                     var user = await userManager.GetUserAsync(User);
                     var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
                     var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
-                    var BaseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}{Applicationsettings.WEBSITE_SITE_MENU_LOGO}";
+                    var BaseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
                     var admin = _context.ApplicationUser.FirstOrDefault(u => u.IsSuperAdmin);
                             var isAuthenticated = HttpContext.User.Identity.IsAuthenticated;
                     var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct, "login-success", user.Email, isAuthenticated);

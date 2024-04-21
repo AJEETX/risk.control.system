@@ -4,24 +4,26 @@ namespace risk.control.system.AppConstant
 {
     public enum AppRoles
     {
-        [Display(Name = Applicationsettings.PORTAL_ADMIN.DISPLAY_NAME)] PortalAdmin,
-        [Display(Name = Applicationsettings.ADMIN.DISPLAY_NAME)] CompanyAdmin,
-        [Display(Name = Applicationsettings.AGENCY_ADMIN.DISPLAY_NAME)] AgencyAdmin,
-        [Display(Name = Applicationsettings.CREATOR.DISPLAY_NAME)] Creator,
-        [Display(Name = Applicationsettings.ASSESSOR.DISPLAY_NAME)] Assessor,
-        [Display(Name = Applicationsettings.SUPERVISOR.DISPLAY_NAME)] Supervisor,
-        [Display(Name = Applicationsettings.AGENT.DISPLAY_NAME)] Agent
+        [Display(Name = Applicationsettings.PORTAL_ADMIN.DISPLAY_NAME)] PORTAL_ADMIN,
+        [Display(Name = Applicationsettings.ADMIN.DISPLAY_NAME)] ADMIN,
+        [Display(Name = Applicationsettings.AGENCY_ADMIN.DISPLAY_NAME)] AGENCY_ADMIN,
+        [Display(Name = Applicationsettings.CREATOR.DISPLAY_NAME)] CREATOR,
+        [Display(Name = Applicationsettings.ASSESSOR.DISPLAY_NAME)] ASSESSOR,
+        [Display(Name = Applicationsettings.MANAGER.DISPLAY_NAME)] MANAGER,
+        [Display(Name = Applicationsettings.SUPERVISOR.DISPLAY_NAME)] SUPERVISOR,
+        [Display(Name = Applicationsettings.AGENT.DISPLAY_NAME)] AGENT
     }
     public enum CompanyRole
     {
-        [Display(Name = Applicationsettings.ADMIN.DISPLAY_NAME)] CompanyAdmin,
-        [Display(Name = Applicationsettings.CREATOR.DISPLAY_NAME)] Creator,
-        [Display(Name = Applicationsettings.ASSESSOR.DISPLAY_NAME)] Assessor,
+        [Display(Name = Applicationsettings.ADMIN.DISPLAY_NAME)] ADMIN,
+        [Display(Name = Applicationsettings.CREATOR.DISPLAY_NAME)] CREATOR,
+        [Display(Name = Applicationsettings.ASSESSOR.DISPLAY_NAME)] ASSESSOR,
+        [Display(Name = Applicationsettings.MANAGER.DISPLAY_NAME)] MANAGER,
     }
     public enum AgencyRole
     {
-        [Display(Name = Applicationsettings.AGENCY_ADMIN.DISPLAY_NAME)] AgencyAdmin,
-        [Display(Name = Applicationsettings.SUPERVISOR.DISPLAY_NAME)] Supervisor,
-        [Display(Name = Applicationsettings.AGENT.DISPLAY_NAME)] Agent
+        [Display(Name = Applicationsettings.AGENCY_ADMIN.DISPLAY_NAME)] AGENCY_ADMIN,
+        [Display(Name = Applicationsettings.SUPERVISOR.DISPLAY_NAME)] SUPERVISOR,
+        [Display(Name = Applicationsettings.AGENT.DISPLAY_NAME)] AGENT
     }
 }

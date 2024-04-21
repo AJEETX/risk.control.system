@@ -2,6 +2,7 @@
 using System.Text.RegularExpressions;
 
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -27,6 +28,7 @@ namespace risk.control.system.Controllers.Api
         private readonly ApplicationDbContext _context;
         private readonly IHttpClientService httpClientService;
         private readonly UserManager<VendorApplicationUser> userVendorManager;
+        private readonly IHttpContextAccessor httpContextAccessor;
         private readonly IAgentService agentService;
         private readonly IClaimsInvestigationService claimsInvestigationService;
         private readonly IMailboxService mailboxService;
@@ -34,10 +36,11 @@ namespace risk.control.system.Controllers.Api
         private readonly IICheckifyService iCheckifyService;
         private static string FaceMatchBaseUrl = "https://2j2sgigd3l.execute-api.ap-southeast-2.amazonaws.com/Development/icheckify";
         private static Random randomNumber = new Random();
-
+        private string portal_base_url= string.Empty;
         //test PAN FNLPM8635N
         public AgentController(ApplicationDbContext context, IHttpClientService httpClientService,
             UserManager<VendorApplicationUser> userVendorManager,
+             IHttpContextAccessor httpContextAccessor,
             IAgentService agentService,
             IClaimsInvestigationService claimsInvestigationService, IMailboxService mailboxService,
             IWebHostEnvironment webHostEnvironment, IICheckifyService iCheckifyService)
@@ -50,6 +53,9 @@ namespace risk.control.system.Controllers.Api
             this.mailboxService = mailboxService;
             this.webHostEnvironment = webHostEnvironment;
             this.iCheckifyService = iCheckifyService;
+            var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
+            var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
+            portal_base_url = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
         }
 
         [AllowAnonymous]
@@ -93,7 +99,7 @@ namespace risk.control.system.Controllers.Api
                     }
                 }
 
-                var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Agent.ToString()));
+                var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.AGENT.ToString()));
                 var user2Onboards = _context.VendorApplicationUser.Where(
                     u => u.PhoneNumber == request.Mobile);
                 foreach (var user2Onboard in user2Onboards)

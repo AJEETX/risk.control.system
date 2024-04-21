@@ -10,6 +10,7 @@ using AspNetCoreHero.ToastNotification.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using SkiaSharp;
 using Microsoft.AspNetCore.Authorization;
+using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers
 {
@@ -33,7 +34,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(" Add New", FromAction = "Incomplete", FromController = typeof(ClaimsInvestigationController))]
-        [Authorize(Roles = "Creator")]
+        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
         public IActionResult Index()
         {
             var currentUserEmail = HttpContext.User?.Identity?.Name;

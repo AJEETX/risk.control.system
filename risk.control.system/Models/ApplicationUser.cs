@@ -11,6 +11,7 @@ namespace risk.control.system.Models
         public string? ProfilePictureUrl { get; set; }
 
         public bool IsSuperAdmin { get; set; } = false;
+        public bool IsClientManager { get; set; } = false;
         public bool IsClientAdmin { get; set; } = false;
         public bool IsVendorAdmin { get; set; } = false;
         public byte[]? ProfilePicture { get; set; }

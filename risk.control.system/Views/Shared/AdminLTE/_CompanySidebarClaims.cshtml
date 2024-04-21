@@ -4,18 +4,20 @@
 @inject ApplicationDbContext context
 @model ClientCompany
 @{
-
-    if (User.IsInRole(AppRoles.Creator.ToString()))
+    if (User.IsInRole(AppRoles.CREATOR.ToString()))
     {
         <partial name="AdminLTE/_CompanySidebarClaimsCreator" />
     }
-    if (User.IsInRole(AppRoles.Assessor.ToString()))
+    else if (User.IsInRole(AppRoles.ASSESSOR.ToString()))
     {
         <partial name="AdminLTE/_CompanySidebarClaimsAssessor" />
     }
+    else if (User.IsInRole(AppRoles.MANAGER.ToString()))
+    {
+        <partial name="AdminLTE/_CompanySidebarClaimsManager" />
+    }
 
-
-    if (User.IsInRole(AppRoles.PortalAdmin.ToString()))
+    else if (User.IsInRole(AppRoles.PORTAL_ADMIN.ToString()))
     {
         <li class="nav-item">
             <a is-active-page asp-controller="Claim" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Claim","")">

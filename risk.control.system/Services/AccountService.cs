@@ -35,7 +35,7 @@ namespace risk.control.system.Services
                 var passwordString = $"Your password is: {user.Password}";
                 var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
                 var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
-                var BaseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}{Applicationsettings.WEBSITE_SITE_MENU_LOGO}";
+                var BaseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
 
                 string message = $"Dear {useremail}";
                 message += $"                                          ";

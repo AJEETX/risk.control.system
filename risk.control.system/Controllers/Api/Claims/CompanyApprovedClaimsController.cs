@@ -13,12 +13,13 @@ using ControllerBase = Microsoft.AspNetCore.Mvc.ControllerBase;
 using risk.control.system.Services;
 using System.Globalization;
 using Microsoft.AspNetCore.Authorization;
+using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers.Api.Claims
 {
     [ApiExplorerSettings(IgnoreApi = true)]
     [Route("api/[controller]")]
-    [Authorize(Roles = "Assessor")]
+    [Authorize(Roles = ASSESSOR.DISPLAY_NAME)]
     [ApiController]
     public class CompanyApprovedClaimsController : ControllerBase
     {
@@ -52,7 +53,7 @@ namespace risk.control.system.Controllers.Api.Claims
 
             var claimsSubmitted = new List<ClaimsInvestigation>();
 
-            if (userRole.Value.Contains(AppRoles.Assessor.ToString()))
+            if (userRole.Value.Contains(AppRoles.ASSESSOR.ToString()))
             {
                 applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId != null));
 
@@ -128,7 +129,7 @@ namespace risk.control.system.Controllers.Api.Claims
             }
             var claimsSubmitted = new List<ClaimsInvestigation>();
 
-            if (userRole.Value.Contains(AppRoles.Assessor.ToString()))
+            if (userRole.Value.Contains(AppRoles.ASSESSOR.ToString()))
             {
                 applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId != null));
 

@@ -340,9 +340,9 @@ namespace risk.control.system.Controllers
             }
             //ViewBag.UserName = user.UserName;
             foreach (var role in roleManager.Roles.Where(r =>
-                r.Name.Contains(AppRoles.AgencyAdmin.ToString()) ||
-                r.Name.Contains(AppRoles.Supervisor.ToString()) ||
-                r.Name.Contains(AppRoles.Agent.ToString())))
+                r.Name.Contains(AppRoles.AGENCY_ADMIN.ToString()) ||
+                r.Name.Contains(AppRoles.SUPERVISOR.ToString()) ||
+                r.Name.Contains(AppRoles.AGENT.ToString())))
             {
                 var userRoleViewModel = new VendorUserRoleViewModel
                 {

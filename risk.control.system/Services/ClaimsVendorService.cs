@@ -194,7 +194,7 @@ namespace risk.control.system.Services
                 .FirstOrDefault(c => c.CaseLocationId == claimsCaseToAllocateToVendorAgent.CaseLocations.FirstOrDefault().CaseLocationId &&
                 c.InvestigationCaseSubStatusId == allocatedStatus.InvestigationCaseSubStatusId);
 
-            var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Agent.ToString()));
+            var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.AGENT.ToString()));
 
             var vendorUsers = _context.VendorApplicationUser
                 .Include(u => u.District)
@@ -495,7 +495,7 @@ namespace risk.control.system.Services
 
             var assignedToAgency = _context.InvestigationCaseSubStatus.FirstOrDefault(
                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
-            var userIsAgent = agencyUser.Active && agencyUser.UserRole == AgencyRole.Agent;
+            var userIsAgent = agencyUser.Active && agencyUser.UserRole == AgencyRole.AGENT;
             if(userIsAgent)
             {
                 if(!string.IsNullOrWhiteSpace(claimsInvestigation.UserEmailActionedTo) 
@@ -531,7 +531,7 @@ namespace risk.control.system.Services
         public async Task<List<VendorUserClaim>> GetAgentLoad(string userEmail)
         {
             var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-            var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Agent.ToString()));
+            var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.AGENT.ToString()));
             List<VendorUserClaim> agents = new List<VendorUserClaim>();
 
             var vendor = _context.Vendor
@@ -617,7 +617,7 @@ namespace risk.control.system.Services
                 .FirstOrDefault(c => c.CaseLocationId == location.CaseLocationId &&
                 c.InvestigationCaseSubStatusId == submittedStatus.InvestigationCaseSubStatusId);
 
-            var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Agent.ToString()));
+            var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.AGENT.ToString()));
 
             var vendorUsers = _context.VendorApplicationUser
                 .Include(u => u.District)
@@ -716,7 +716,7 @@ namespace risk.control.system.Services
                 .FirstOrDefault(c => (c.ClaimsInvestigationId == selectedcase
                 && c.InvestigationCaseSubStatusId == submittedToSupervisortStatus.InvestigationCaseSubStatusId) || c.IsReviewCaseLocation
                     );
-            var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Agent.ToString()));
+            var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.AGENT.ToString()));
 
             var vendorUsers = _context.VendorApplicationUser.Where(u => u.VendorId == claimCase.VendorId);
 

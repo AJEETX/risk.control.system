@@ -21,9 +21,13 @@ using SmartBreadcrumbs.Nodes;
 
 using System.Security.Claims;
 
+using static risk.control.system.AppConstant.Applicationsettings;
+
 namespace risk.control.system.Controllers
 {
-    [Authorize(Roles = "AgencyAdmin,Supervisor,Agent")]
+    [Authorize(Roles = AGENCY_ADMIN.DISPLAY_NAME)]
+    [Authorize(Roles = SUPERVISOR.DISPLAY_NAME)]
+    [Authorize(Roles = AGENT.DISPLAY_NAME)]
     public class ClaimsVendorController : Controller
     {
         private readonly IClaimsInvestigationService claimsInvestigationService;
@@ -59,7 +63,8 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(" Allocate To Agent")]
-        [Authorize(Roles = "AgencyAdmin,Supervisor")]
+        [Authorize(Roles = AGENCY_ADMIN.DISPLAY_NAME)]
+        [Authorize(Roles = SUPERVISOR.DISPLAY_NAME)]
         public async Task<IActionResult> AllocateToVendorAgent(string selectedcase)
         {
             try
@@ -95,7 +100,8 @@ namespace risk.control.system.Controllers
 
         [HttpGet]
         [Breadcrumb("Agents", FromAction = "Allocate")]
-        [Authorize(Roles = "AgencyAdmin,Supervisor")]
+        [Authorize(Roles = AGENCY_ADMIN.DISPLAY_NAME)]
+        [Authorize(Roles = SUPERVISOR.DISPLAY_NAME)]
         public async Task<IActionResult> SelectVendorAgent(string selectedcase)
         {
             try
@@ -127,7 +133,8 @@ namespace risk.control.system.Controllers
 
         [HttpGet]
         [Breadcrumb("ReAllocate", FromAction = "ClaimReport")]
-        [Authorize(Roles = "AgencyAdmin,Supervisor")]
+        [Authorize(Roles = AGENCY_ADMIN.DISPLAY_NAME)]
+        [Authorize(Roles = SUPERVISOR.DISPLAY_NAME)]
         public async Task<IActionResult> ReSelectVendorAgent(string selectedcase)
         {
             try
@@ -157,7 +164,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb("Agency Workload")]
-        [Authorize(Roles = "AgencyAdmin")]
+        [Authorize(Roles = AGENCY_ADMIN.DISPLAY_NAME)]
         public async Task<IActionResult> AgentLoad()
         {
             try
@@ -192,7 +199,7 @@ namespace risk.control.system.Controllers
                 }
 
                 var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
-                if (userRole.Value.Contains(AppRoles.Agent.ToString()))
+                if (userRole.Value.Contains(AppRoles.AGENT.ToString()))
                 {
                     return RedirectToAction("Agent");
                 }
@@ -207,7 +214,8 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(" Allocate")]
-        [Authorize(Roles = "AgencyAdmin,Supervisor")]
+        [Authorize(Roles = AGENCY_ADMIN.DISPLAY_NAME)]
+        [Authorize(Roles = SUPERVISOR.DISPLAY_NAME)]
         public ActionResult Allocate()
         {
             try
@@ -228,21 +236,23 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(" Tasks")]
-        [Authorize(Roles = "Agent")]
+        [Authorize(Roles = AGENT.DISPLAY_NAME)]
         public ActionResult Agent()
         {
             return View();
         }
 
         [Breadcrumb(title: " Completed")]
-        [Authorize(Roles = "AgencyAdmin,Supervisor")]
+        [Authorize(Roles = AGENCY_ADMIN.DISPLAY_NAME)]
+        [Authorize(Roles = SUPERVISOR.DISPLAY_NAME)]
         public IActionResult Completed()
         {
             return View();
         }
 
         [Breadcrumb(" Detail", FromAction = "Completed")]
-        [Authorize(Roles = "AgencyAdmin,Supervisor")]
+        [Authorize(Roles = AGENCY_ADMIN.DISPLAY_NAME)]
+        [Authorize(Roles = SUPERVISOR.DISPLAY_NAME)]
         public async Task<IActionResult> CompletedDetail(string id)
         {
             if (id == null)
@@ -336,7 +346,8 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(title: "Invoice", FromAction = "CompletedDetail")]
-        [Authorize(Roles = "AgencyAdmin,Supervisor")]
+        [Authorize(Roles = AGENCY_ADMIN.DISPLAY_NAME)]
+        [Authorize(Roles = SUPERVISOR.DISPLAY_NAME)]
         public async Task<IActionResult> ShowInvoice(long id)
         {
             try
@@ -382,7 +393,8 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(title: "Print", FromAction = "ShowInvoice")]
-        [Authorize(Roles = "AgencyAdmin,Supervisor")]
+        [Authorize(Roles = AGENCY_ADMIN.DISPLAY_NAME)]
+        [Authorize(Roles = SUPERVISOR.DISPLAY_NAME)]
         public async Task<IActionResult> PrintInvoice(long id)
         {
             try
@@ -422,7 +434,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb("Submit", FromAction = "Agent")]
-        [Authorize(Roles = "Agent")]
+        [Authorize(Roles = AGENT.DISPLAY_NAME)]
         public async Task<IActionResult> GetInvestigate(string selectedcase, bool uploaded = false)
         {
             try
@@ -482,7 +494,8 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb("Submit", FromAction= "ClaimReport")]
-        [Authorize(Roles = "AgencyAdmin,Supervisor")]
+        [Authorize(Roles = AGENCY_ADMIN.DISPLAY_NAME)]
+        [Authorize(Roles = SUPERVISOR.DISPLAY_NAME)]
         public async Task<IActionResult> GetInvestigateReport(string selectedcase)
         {
             try
@@ -514,13 +527,15 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(" Active")]
-        [Authorize(Roles = "AgencyAdmin,Supervisor")]
+        [Authorize(Roles = AGENCY_ADMIN.DISPLAY_NAME)]
+        [Authorize(Roles = SUPERVISOR.DISPLAY_NAME)]
         public IActionResult Open()
         {
             return View();
         }
 
-        [Authorize(Roles = "AgencyAdmin,Supervisor")]
+        [Authorize(Roles = AGENCY_ADMIN.DISPLAY_NAME)]
+        [Authorize(Roles = SUPERVISOR.DISPLAY_NAME)]
         [Breadcrumb(title: " Detail", FromAction = "Allocate")]
         public async Task<IActionResult> CaseDetail(string id)
         {
@@ -549,7 +564,8 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(title: " Detail", FromAction = "Open")]
-        [Authorize(Roles = "AgencyAdmin,Supervisor")]
+        [Authorize(Roles = AGENCY_ADMIN.DISPLAY_NAME)]
+        [Authorize(Roles = SUPERVISOR.DISPLAY_NAME)]
         public async Task<IActionResult> Detail(string id)
         {
             try
@@ -577,14 +593,16 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb("Verify(report)")]
-        [Authorize(Roles = "AgencyAdmin,Supervisor")]
+        [Authorize(Roles = AGENCY_ADMIN.DISPLAY_NAME)]
+        [Authorize(Roles = SUPERVISOR.DISPLAY_NAME)]
         public IActionResult ClaimReport()
         {
             return View();
         }
 
         [Breadcrumb(" Re Allocate")]
-        [Authorize(Roles = "AgencyAdmin,Supervisor")]
+        [Authorize(Roles = AGENCY_ADMIN.DISPLAY_NAME)]
+        [Authorize(Roles = SUPERVISOR.DISPLAY_NAME)]
         public IActionResult ClaimReportReview()
         {
             return View();

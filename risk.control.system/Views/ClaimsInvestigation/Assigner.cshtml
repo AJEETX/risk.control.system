@@ -1,19 +1,14 @@
 ﻿@model bool
 @{
     ViewData["Title"] = "Assign(manual)";
-    var display = "none";
-    if (Model)
-    {
-        display = "block";
-    }
 }
 
 <section class="content">
     <div id="article" class="card card-secondary">
         <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-external-link-alt"></i> Re + Assign</h3>
+            <h3 class="card-title"><i class="fas fa-external-link-alt"></i> Re + Assign </h3>
         </div>
-        <article style="display:@display">
+        <article>
             <div class="bb-blog-inner">
                 <div class="card card-light collapsed-card">
                     <div class="card-header">
@@ -29,6 +24,7 @@
                                     <i class="nav-icon fa fa-download"></i> 2 claims
                                 </a>
                             </span>
+                           
                         </h3>
                         <div class="card-tools">
                             <span data-toggle="tooltip" title="Upload File" class="badge badge-light">  </span>
@@ -47,9 +43,18 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text"><i class="fa fa-file-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
-                                            <select name="uploadtype" id="uploadtype" required class="form-control remarks" asp-items="Html.GetEnumSelectList<UploadType>()">
-                                                <option value="">--- SELECT---</option>
-                                            </select>
+                                            @if (Model)
+                                            {
+                                                <select name="uploadtype" id="uploadtype" required class="form-control remarks" asp-items="Html.GetEnumSelectList<UploadType>()">
+                                                    <option value="">--- SELECT---</option>
+                                                </select>
+                                            }
+                                            else
+                                            {
+                                                <select disabled class="form-control remarks">
+                                                    <option value="">--- SELECT---</option>
+                                                </select>
+                                            }
                                         </div>
                                     </div>
                                 </div>
@@ -58,8 +63,17 @@
                                         <span class="input-group-label"> Perform Upload: </span>
                                         <div class="input-group mb-3">
                                             <img class="form-Image" id="ftpImage" src="/img/upload.png">
-                                            <input accept=".zip" type="file" class="form-control remarks" name="postedFile" id="postedFile" />
-                                            <button id="UploadFileButton" disabled type="submit" class="btn btn-info" asp-controller="Uploads" asp-action="FileUpload"><i class="nav-icon fa fa-upload"></i> Upload</button>
+
+                                            @if (Model)
+                                            {
+                                                <input accept=".zip" type="file" class="form-control remarks" name="postedFile" id="postedFile" />
+                                                <button id="UploadFileButton" disabled type="submit" class="btn btn-info" asp-controller="Uploads" asp-action="FileUpload"><i class="nav-icon fa fa-upload"></i> Upload</button>
+                                            }
+                                            else
+                                            {
+                                                <input disabled type="file" class="form-control remarks" name="postedFile" id="postedFile" />
+                                                <button disabled class="btn btn-info"><i class="nav-icon fa fa-upload"></i> Upload</button>
+                                            }
                                         </div>
                                     </div>
                                 </div>

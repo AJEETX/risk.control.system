@@ -272,6 +272,16 @@
             public const string LAST_NAME = "Patrick";
             public const string PROFILE_IMAGE = "/img/assessor.jpeg";
         }
+        public static class MANAGER
+        {
+            public const string DISPLAY_NAME = "MANAGER";
+            public const string CODE = "manager";
+            public const string USERNAME = "manager@" + CANARADOMAIN;
+            public const string EMAIL = USERNAME;
+            public const string FIRST_NAME = "Samy";
+            public const string LAST_NAME = "Patrick";
+            public const string PROFILE_IMAGE = "/img/assessor.jpeg";
+        }
 
         public static class AGENCY_ADMIN
         {

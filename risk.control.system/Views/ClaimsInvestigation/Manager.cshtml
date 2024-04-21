@@ -1,0 +1,69 @@
+﻿@{
+    ViewData["Title"] = "Index";
+}
+<section class="content">
+    <div class="card card-secondary">
+        <div class="card-header">
+            <h3 class="card-title"><i class="fas fa-glasses"></i> Submitted</h3>
+            @* <h3 id="view-type" class="card-title">
+            <a href="#" id="map-type" class="input-group-label"> <i class="far fa-map"></i> Map</a>
+            <a href="#" id="list-type" class="input-group-label"> <i class="fas fa-server"></i> List</a>
+            </h3> *@
+        </div>
+        <div class="card-body">
+            <div class="submit-progress hidden">
+                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+            </div>
+            <form id="checkboxes" asp-action="GetInvestigateReport" method="get" enctype="multipart/form-data">
+                <div class="table-responsive mailbox-messages">
+
+                    <table id="customerTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
+                        <thead>
+                            <tr>
+                            <tr>
+                                <th></th>
+                                <th><img class="action-image" src="~/headers/policy-doc.gif" title="Policy Document" alt="Policy Document" /></th>
+                                <th><img class="action-image" src="~/headers/policy-num.gif" title="Policy Number" alt="Policy Number" /></th>
+                                <th><img class="action-image" src="~/headers/amount.gif" title="Insured Amount" alt="Insured Amount" /></th>
+                                <th><img class="action-image" src="~/headers/portrait.gif" title="Customer Photo" alt="Customer Photo" /></th>
+                                <th><img class="action-image" src="~/headers/customer.gif" title="Customer Name" alt="Customer Name" /></th>
+                                <th><img class="action-image" src="~/headers/portrait.gif" title="Beneficiary Photo" alt="Beneficiary Photo" /></th>
+                                <th><img class="action-image" src="~/headers/customer.gif" title="Beneficiary Name" alt="Beneficiary Name" /></th>
+                                <th><img class="action-image" src="~/headers/claim-type.gif" title="Claim Type" alt="Claim Type" /></th>
+                                <th><img class="action-image" src="~/headers/service.gif" title="Service" alt="Service" /></th>
+
+                                <th><img class="action-image" src="~/headers/pincode.gif" title="Pincode" alt="Pincode" /></th>
+                                <th><img class="action-image" src="~/headers/status.gif" title="Status" alt="Status" /></th>
+                                <th><img class="action-image" src="~/headers/created.gif" title="Created date" alt="Created Date" /></th>
+                                <th><img class="action-image" src="~/headers/auto.gif" title="Allocated(Auto)" /></th>
+                                <th>
+                                    <img class="action-image" src="~/headers/timer.gif" title="Days since Submitted" />
+                                </th>
+                            </tr>
+                        </thead>
+                    </table>
+
+                    <div class="card-footer">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <a id="back" asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </form>
+            <div id="maps" class="col-md-12">
+                <div id="map"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    @* <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+    <script src="~/js/all.js"></script> *@
+    <script src="~/js/manager-claims.js"></script>
+    @* <script src="~/js/map-list.js"></script> *@
+}

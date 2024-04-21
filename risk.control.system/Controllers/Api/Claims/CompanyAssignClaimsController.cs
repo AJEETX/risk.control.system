@@ -14,12 +14,13 @@ using risk.control.system.Services;
 using System.Globalization;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 using Microsoft.AspNetCore.Authorization;
+using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers.Api.Claims
 {
     [ApiExplorerSettings(IgnoreApi = true)]
     [Route("api/[controller]")]
-    [Authorize(Roles = "Creator")]
+    [Authorize(Roles = CREATOR.DISPLAY_NAME)]
     [ApiController]
     public class CompanyAssignClaimsController : ControllerBase
     {
@@ -61,16 +62,16 @@ namespace risk.control.system.Controllers.Api.Claims
                 ) ||
                  (a.InvestigationCaseSubStatusId == withdrawnByAgency.InvestigationCaseSubStatusId &&
                         a.UserEmailActionedTo == string.Empty &&
-                        a.UserRoleActionedTo == $"{AppRoles.Creator.GetEnumDisplayName()} ({companyUser.ClientCompany.Email})")
+                        a.UserRoleActionedTo == $"{AppRoles.CREATOR.GetEnumDisplayName()} ({companyUser.ClientCompany.Email})")
                  ||
                  (a.InvestigationCaseSubStatusId == withdrawnByCompany.InvestigationCaseSubStatusId &&
                         a.UserEmailActionedTo == companyUser.Email &&
                         a.UserEmailActioned == companyUser.Email &&
-                        a.UserRoleActionedTo == $"{AppRoles.Creator.GetEnumDisplayName()} ({companyUser.ClientCompany.Email})")
+                        a.UserRoleActionedTo == $"{AppRoles.CREATOR.GetEnumDisplayName()} ({companyUser.ClientCompany.Email})")
                  ||
                 (a.IsReviewCase && a.InvestigationCaseSubStatusId == reAssignedStatus.InvestigationCaseSubStatusId &&
                 a.UserEmailActionedTo == string.Empty &&
-                a.UserRoleActionedTo == $"{AppRoles.Creator.GetEnumDisplayName()} ( {companyUser.ClientCompany.Email})")
+                a.UserRoleActionedTo == $"{AppRoles.CREATOR.GetEnumDisplayName()} ( {companyUser.ClientCompany.Email})")
                 );
 
             var claimsAssigned = new List<ClaimsInvestigation>();

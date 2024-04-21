@@ -11,12 +11,17 @@ using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
 
+using static risk.control.system.AppConstant.Applicationsettings;
+
 namespace risk.control.system.Controllers.Api.Agency
 {
     [ApiExplorerSettings(IgnoreApi = true)]
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "PortalAdmin,CompanyAdmin,AgencyAdmin,Supervisor")]
+    [Authorize(Roles = PORTAL_ADMIN.DISPLAY_NAME)]
+    [Authorize(Roles = ADMIN.DISPLAY_NAME)]
+    [Authorize(Roles = AGENCY_ADMIN.DISPLAY_NAME)]
+    [Authorize(Roles = SUPERVISOR.DISPLAY_NAME)]
     public class AgencyController : ControllerBase
     {
         private readonly string noUserImagefilePath = string.Empty;
@@ -227,7 +232,7 @@ namespace risk.control.system.Controllers.Api.Agency
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-            var adminRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.AgencyAdmin.ToString()));
+            var adminRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.AGENCY_ADMIN.ToString()));
             List<VendorUserClaim> agents = new List<VendorUserClaim>();
 
             var vendor = _context.Vendor

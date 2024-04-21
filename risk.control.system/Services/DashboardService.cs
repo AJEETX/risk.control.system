@@ -308,7 +308,7 @@ namespace risk.control.system.Services
                 || c.InvestigationCaseSubStatusId == rejectdStatus.InvestigationCaseSubStatusId
                 )?.ToList();
             var claimsSubmitted = new List<ClaimsInvestigation>();
-            if (companyUser.UserRole == CompanyRole.Creator)
+            if (companyUser.UserRole == CompanyRole.CREATOR)
             {
                 claims = claims.Where(c => c.InvestigationCaseSubStatusId == approvedStatus.InvestigationCaseSubStatusId || c.InvestigationCaseSubStatusId == rejectdStatus.InvestigationCaseSubStatusId)?.ToList();
             }
@@ -450,7 +450,7 @@ namespace risk.control.system.Services
             foreach (var claim in claims)
             {
                 var userHasReviewClaimLogs = _context.InvestigationTransaction.Where(c => c.ClaimsInvestigationId == claim.ClaimsInvestigationId && c.IsReviewCase && 
-                c.UserRoleActionedTo == $"{AppRoles.Creator.GetEnumDisplayName()} ( {companyUser.ClientCompany.Email})")?.ToList();
+                c.UserRoleActionedTo == $"{AppRoles.CREATOR.GetEnumDisplayName()} ( {companyUser.ClientCompany.Email})")?.ToList();
 
                 int? reviewLogCount = 0;
                 if(userHasReviewClaimLogs !=null && userHasReviewClaimLogs.Count >0)
@@ -524,14 +524,14 @@ namespace risk.control.system.Services
                  (a.InvestigationCaseSubStatusId == withdrawnByCompany.InvestigationCaseSubStatusId &&
                         a.UserEmailActionedTo == companyUser.Email &&
                         a.UserEmailActioned == companyUser.Email &&
-                        a.UserRoleActionedTo == $"{AppRoles.Creator.GetEnumDisplayName()} ({companyUser.ClientCompany.Email})") ||
+                        a.UserRoleActionedTo == $"{AppRoles.CREATOR.GetEnumDisplayName()} ({companyUser.ClientCompany.Email})") ||
                  (a.InvestigationCaseSubStatusId == withdrawnByAgency.InvestigationCaseSubStatusId &&
                         a.UserEmailActionedTo == string.Empty &&
-                        a.UserRoleActionedTo == $"{AppRoles.Creator.GetEnumDisplayName()} ({companyUser.ClientCompany.Email})")
+                        a.UserRoleActionedTo == $"{AppRoles.CREATOR.GetEnumDisplayName()} ({companyUser.ClientCompany.Email})")
                  ||
                 (a.IsReviewCase && a.InvestigationCaseSubStatusId == reAssignedStatus.InvestigationCaseSubStatusId && 
                 a.UserEmailActionedTo == string.Empty &&
-                a.UserRoleActionedTo == $"{AppRoles.Creator.GetEnumDisplayName()} ( {companyUser.ClientCompany.Email})")
+                a.UserRoleActionedTo == $"{AppRoles.CREATOR.GetEnumDisplayName()} ( {companyUser.ClientCompany.Email})")
                 );
 
             var claimsAssigned = new List<ClaimsInvestigation>();
@@ -696,7 +696,7 @@ namespace risk.control.system.Services
 
                 var activeCount = 0;
 
-                if (role.Contains(AppRoles.CompanyAdmin.ToString()) || role.Contains(AppRoles.Creator.ToString()))
+                if (role.Contains(AppRoles.ADMIN.ToString()) || role.Contains(AppRoles.CREATOR.ToString()))
                 {
                     var creatorActiveClaims = _context.ClaimsInvestigation
                     .Include(c => c.PolicyDetail)
@@ -705,7 +705,7 @@ namespace risk.control.system.Services
                     activeCount = creatorActiveClaims.Count;
                 }
 
-                //if (role.Contains(AppRoles.Assigner.ToString()) && !role.Contains(AppRoles.Creator.ToString()))
+                //if (role.Contains(AppRoles.Assigner.ToString()) && !role.Contains(AppRoles.CREATOR.ToString()))
                 //{
                 //    var creatorActiveClaims = _context.ClaimsInvestigation
                 //    .Include(c => c.PolicyDetail)
@@ -714,7 +714,7 @@ namespace risk.control.system.Services
                 //    c.PolicyDetail.ClientCompanyId == companyUser.ClientCompany.ClientCompanyId)?.ToList();
                 //    activeCount = creatorActiveClaims.Count;
                 //}
-                if (role.Contains(AppRoles.Assessor.ToString()))
+                if (role.Contains(AppRoles.ASSESSOR.ToString()))
                 {
                     var creatorActiveClaims = _context.ClaimsInvestigation
                     .Include(c => c.PolicyDetail)
