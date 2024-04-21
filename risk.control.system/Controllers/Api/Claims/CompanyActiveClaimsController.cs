@@ -21,8 +21,6 @@ namespace risk.control.system.Controllers.Api.Claims
     [ApiExplorerSettings(IgnoreApi = true)]
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = CREATOR.DISPLAY_NAME)]
-    [Authorize(Roles = MANAGER.DISPLAY_NAME)]
     public class CompanyActiveClaimsController : ControllerBase
     {
         private readonly ApplicationDbContext _context;

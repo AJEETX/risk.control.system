@@ -19,7 +19,6 @@ namespace risk.control.system.Controllers.Api.Claims
 {
     [ApiExplorerSettings(IgnoreApi = true)]
     [Route("api/[controller]")]
-    [Authorize(Roles = ASSESSOR.DISPLAY_NAME)]
     [ApiController]
     public class CompanyCompletedClaimsController : ControllerBase
     {
@@ -31,6 +30,7 @@ namespace risk.control.system.Controllers.Api.Claims
         }
 
         [HttpGet("GetReport")]
+    [Authorize(Roles = ASSESSOR.DISPLAY_NAME)]
         public async Task<IActionResult> GetReport()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims().Where(c =>
@@ -109,6 +109,7 @@ namespace risk.control.system.Controllers.Api.Claims
 
             return Ok(response);
         }
+        [Authorize(Roles = MANAGER.DISPLAY_NAME)]
         [HttpGet("GetManagerReport")]
         public async Task<IActionResult> GetManagerReport()
         {
@@ -174,6 +175,7 @@ namespace risk.control.system.Controllers.Api.Claims
             return Ok(response);
         }
         [HttpGet("GetReject")]
+    [Authorize(Roles = ASSESSOR.DISPLAY_NAME)]
         public async Task<IActionResult> GetReject()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims().Where(c =>

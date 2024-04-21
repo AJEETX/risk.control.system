@@ -23,9 +23,7 @@ namespace risk.control.system.Controllers.Api.Claims
     [ApiExplorerSettings(IgnoreApi = true)]
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = AGENCY_ADMIN.DISPLAY_NAME)]
-    [Authorize(Roles = SUPERVISOR.DISPLAY_NAME)]
-    [Authorize(Roles = AGENT.DISPLAY_NAME)]
+    [Authorize(Roles = "AGENCY_ADMIN,SUPERVISOR,AGENT")]
     public class ClaimsVendorController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
@@ -40,8 +38,7 @@ namespace risk.control.system.Controllers.Api.Claims
         }
 
         [HttpGet("GetOpen")]
-        [Authorize(Roles = AGENCY_ADMIN.DISPLAY_NAME)]
-        [Authorize(Roles = SUPERVISOR.DISPLAY_NAME)]
+        [Authorize(Roles = "AGENCY_ADMIN,SUPERVISOR")]
         public async Task<IActionResult> GetOpen()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
@@ -225,8 +222,6 @@ namespace risk.control.system.Controllers.Api.Claims
         }
 
         [HttpGet("GetNew")]
-        [Authorize(Roles = AGENCY_ADMIN.DISPLAY_NAME)]
-        [Authorize(Roles = SUPERVISOR.DISPLAY_NAME)]
         public async Task<IActionResult> GetNew()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
@@ -421,8 +416,7 @@ namespace risk.control.system.Controllers.Api.Claims
         }
 
         [HttpGet("GetReport")]
-        [Authorize(Roles = AGENCY_ADMIN.DISPLAY_NAME)]
-        [Authorize(Roles = SUPERVISOR.DISPLAY_NAME)]
+        [Authorize(Roles = "AGENCY_ADMIN,SUPERVISOR")]
         public async Task<IActionResult> GetReport()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
@@ -577,8 +571,7 @@ namespace risk.control.system.Controllers.Api.Claims
         }
 
         [HttpGet("GetCompleted")]
-        [Authorize(Roles = AGENCY_ADMIN.DISPLAY_NAME)]
-        [Authorize(Roles = SUPERVISOR.DISPLAY_NAME)]
+        [Authorize(Roles = "AGENCY_ADMIN,SUPERVISOR")]
         public async Task<IActionResult> GetCompleted()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();

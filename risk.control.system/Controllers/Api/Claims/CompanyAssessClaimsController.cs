@@ -102,6 +102,7 @@ namespace risk.control.system.Controllers.Api.Claims
             return Ok(response);
         }
         [HttpGet("GetManager")]
+        [Authorize(Roles = MANAGER.DISPLAY_NAME)]
         public async Task<IActionResult> GetManager()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
