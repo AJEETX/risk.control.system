@@ -18,7 +18,7 @@ namespace risk.control.system.Controllers.Api.Claims
     [ApiExplorerSettings(IgnoreApi = true)]
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "PORTAL_ADMIN,ADMIN,AGENCY_ADMIN,CREATOR,ASSESSOR,MANAGER,SUPERVISOR,AGENT")]
+    [Authorize(Roles = "PORTAL_ADMIN,COMPANY_ADMIN,AGENCY_ADMIN,CREATOR,ASSESSOR,MANAGER,SUPERVISOR,AGENT")]
     public class ClaimsInvestigationController : ControllerBase
     {
         private readonly ApplicationDbContext _context;

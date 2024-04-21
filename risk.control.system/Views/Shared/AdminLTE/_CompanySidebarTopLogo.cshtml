@@ -30,10 +30,10 @@
                 roleCode = @Applicationsettings.PORTAL_ADMIN.CODE;
                 <span class="badge badge-danger">@roleCode</span>
             }
-            else if (User.IsInRole(AppRoles.ADMIN.ToString()))
+            else if (User.IsInRole(AppRoles.COMPANY_ADMIN.ToString()))
             {
-                roleCode = @Applicationsettings.ADMIN.CODE;
-                <span class="badge badge-warning">@roleCode</span>
+                roleCode = @Applicationsettings.COMPANY_ADMIN.CODE;
+                <span clasCOMPANY_s="badge badge-warning">@roleCode</span>
             }
             else if (User.IsInRole(AppRoles.AGENCY_ADMIN.ToString()))
             {

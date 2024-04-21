@@ -965,7 +965,7 @@ namespace risk.control.system.Services
                 claim.InvestigationCaseSubStatusId = rejected.InvestigationCaseSubStatusId;
                 claim.Updated = DateTime.Now;
                 claim.UserEmailActioned = userEmail;
-                claim.UserRoleActionedTo = $"{AppRoles.ADMIN.GetEnumDisplayName()} ({claim.PolicyDetail.ClientCompany.Email})";
+                claim.UserRoleActionedTo = $"{AppRoles.COMPANY_ADMIN.GetEnumDisplayName()} ({claim.PolicyDetail.ClientCompany.Email})";
                 claim.UserEmailActionedTo = userEmail;
                 _context.ClaimsInvestigation.Update(claim);
 
@@ -977,7 +977,7 @@ namespace risk.control.system.Services
                 {
                     HopCount = finalHop + 1,
                     UserEmailActioned = userEmail,
-                    UserRoleActionedTo = $"{AppRoles.ADMIN.GetEnumDisplayName()} ({claim.PolicyDetail.ClientCompany.Email})",
+                    UserRoleActionedTo = $"{AppRoles.COMPANY_ADMIN.GetEnumDisplayName()} ({claim.PolicyDetail.ClientCompany.Email})",
                     ClaimsInvestigationId = claimsInvestigationId,
                     CurrentClaimOwner = claim.CurrentClaimOwner,
                     Created = DateTime.Now,
@@ -1060,7 +1060,7 @@ namespace risk.control.system.Services
                 claim.InvestigationCaseSubStatusId = approved.InvestigationCaseSubStatusId;
                 claim.Updated = DateTime.Now;
                 claim.UserEmailActioned = userEmail;
-                claim.UserRoleActionedTo = $"{AppRoles.ADMIN.GetEnumDisplayName()} ({claim.PolicyDetail.ClientCompany.Email})";
+                claim.UserRoleActionedTo = $"{AppRoles.COMPANY_ADMIN.GetEnumDisplayName()} ({claim.PolicyDetail.ClientCompany.Email})";
                 claim.UserEmailActionedTo = userEmail;
                 _context.ClaimsInvestigation.Update(claim);
 
@@ -1072,7 +1072,7 @@ namespace risk.control.system.Services
                 {
                     HopCount = finalHop + 1,
                     UserEmailActioned = userEmail,
-                    UserRoleActionedTo = $"{AppRoles.ADMIN.GetEnumDisplayName()} ({claim.PolicyDetail.ClientCompany.Email})",
+                    UserRoleActionedTo = $"{AppRoles.COMPANY_ADMIN.GetEnumDisplayName()} ({claim.PolicyDetail.ClientCompany.Email})",
                     ClaimsInvestigationId = claimsInvestigationId,
                     CurrentClaimOwner = claim.CurrentClaimOwner,
                     Created = DateTime.Now,

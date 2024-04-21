@@ -19,13 +19,17 @@
             {
                 <partial name="_PortalAdmin" model="@Model" />
             }
-            else if (userRole.Value.Contains(AppRoles.ADMIN.ToString()))
+            else if (userRole.Value.Contains(AppRoles.COMPANY_ADMIN.ToString()))
             {
                 <partial name="_CompanyAdmin" model="@Model" />
             }
             else if (userRole.Value.Contains(AppRoles.AGENCY_ADMIN.ToString()))
             {
                 <partial name="_AgencyAdmin" model="@Model" />
+            }
+            else if (userRole.Value.Contains(AppRoles.MANAGER.ToString()))
+            {
+                <partial name="_Manager" model="@Model" />
             }
             else if (userRole.Value.Contains(AppRoles.CREATOR.ToString()))
             {

@@ -19,7 +19,7 @@ namespace risk.control.system.Seeds
             var company = context.ClientCompany.FirstOrDefault(c => c.Email == clientCompany.Email);
             string noUserImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", @Applicationsettings.NO_USER);
 
-            string adminEmailwithSuffix = Applicationsettings.ADMIN.CODE + "@" + company.Email;
+            string adminEmailwithSuffix = Applicationsettings.COMPANY_ADMIN.CODE + "@" + company.Email;
             var caMailBox = new Mailbox
             {
                 Name = adminEmailwithSuffix
@@ -41,8 +41,8 @@ namespace risk.control.system.Seeds
                 Mailbox = caMailBox,
                 UserName = adminEmailwithSuffix,
                 Email = adminEmailwithSuffix,
-                FirstName = ADMIN.FIRST_NAME,
-                LastName = ADMIN.LAST_NAME,
+                FirstName = COMPANY_ADMIN.FIRST_NAME,
+                LastName = COMPANY_ADMIN.LAST_NAME,
                 EmailConfirmed = true,
                 PhoneNumberConfirmed = true,
                 Password = Password,
@@ -57,9 +57,9 @@ namespace risk.control.system.Seeds
                 DistrictId = district?.DistrictId ?? default!,
                 StateId = state?.StateId ?? default!,
                 PinCodeId = pinCode?.PinCodeId ?? default!,
-                ProfilePictureUrl = ADMIN.PROFILE_IMAGE,
+                ProfilePictureUrl = COMPANY_ADMIN.PROFILE_IMAGE,
                 ProfilePicture = adminImage,
-                UserRole = CompanyRole.ADMIN,
+                UserRole = CompanyRole.COMPANY_ADMIN,
             };
             if (userManager.Users.All(u => u.Id != clientAdmin.Id))
             {
@@ -67,8 +67,8 @@ namespace risk.control.system.Seeds
                 if (user == null)
                 {
                     await userManager.CreateAsync(clientAdmin, Password);
-                    await userManager.AddToRoleAsync(clientAdmin, AppRoles.ADMIN.ToString());
-                    //var clientAdminRole = new ApplicationRole(AppRoles.ADMIN.ToString(), AppRoles.ADMIN.ToString());
+                    await userManager.AddToRoleAsync(clientAdmin, AppRoles.COMPANY_ADMIN.ToString());
+                    //var clientAdminRole = new ApplicationRole(AppRoles.COMPANY_ADMIN.ToString(), AppRoles.COMPANY_ADMIN.ToString());
                     //clientAdmin.ApplicationRoles.Add(clientAdminRole);
 
                     //await userManager.AddToRoleAsync(clientAdmin, AppRoles.CREATOR.ToString());

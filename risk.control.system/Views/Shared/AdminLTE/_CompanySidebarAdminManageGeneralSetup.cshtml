@@ -6,7 +6,7 @@
 @inject UserManager<ApplicationUser> UserManager
 @model ClientCompany
 @{
-    if (User.IsInRole(AppRoles.ADMIN.ToString()))
+    if (User.IsInRole(AppRoles.COMPANY_ADMIN.ToString()))
     {
         <li class="nav-item">
             <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("Country","") @Url.MakeActiveClass("State","") @Url.MakeActiveClass("District","") @Url.MakeActiveClass("PinCodes","") @Url.MakeActiveClass("File","") @Url.MakeActiveClass("Uploads","") @Url.MakeActiveClass("Audit","")">

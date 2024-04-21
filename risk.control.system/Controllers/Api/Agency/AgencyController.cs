@@ -18,7 +18,7 @@ namespace risk.control.system.Controllers.Api.Agency
     [ApiExplorerSettings(IgnoreApi = true)]
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "PORTAL_ADMIN,ADMIN,AGENCY_ADMIN,SUPERVISOR")]
+    [Authorize(Roles = "PORTAL_ADMIN,COMPANY_ADMIN,AGENCY_ADMIN,SUPERVISOR")]
     public class AgencyController : ControllerBase
     {
         private readonly string noUserImagefilePath = string.Empty;

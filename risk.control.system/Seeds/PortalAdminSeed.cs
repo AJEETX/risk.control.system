@@ -68,8 +68,8 @@ namespace risk.control.system.Seeds
                     //var portalAdminRole = new ApplicationRole(AppRoles.PORTALADMIN.ToString(), AppRoles.PORTALADMIN.ToString());
                     //portalAdmin.ApplicationRoles.Add(portalAdminRole);
 
-                    //await userManager.AddToRoleAsync(portalAdmin, AppRoles.ADMIN.ToString());
-                    ////var clientAdminRole = new ApplicationRole(AppRoles.ADMIN.ToString(), AppRoles.ADMIN.ToString());
+                    //await userManager.AddToRoleAsync(portalAdmin, AppRoles.COMPANY_ADMIN.ToString());
+                    ////var clientAdminRole = new ApplicationRole(AppRoles.COMPANY_ADMIN.ToString(), AppRoles.COMPANY_ADMIN.ToString());
                     ////portalAdmin.ApplicationRoles.Add(clientAdminRole);
                     //await userManager.AddToRoleAsync(portalAdmin, AppRoles.CREATOR.ToString());
                     ////context.ApplicationRole.Add(new ApplicationRole(AppRoles.CREATOR.ToString(), AppRoles.CREATOR.ToString()));

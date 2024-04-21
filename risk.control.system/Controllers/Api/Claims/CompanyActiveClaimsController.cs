@@ -578,7 +578,7 @@ namespace risk.control.system.Controllers.Api.Claims
 
             var claimsSubmitted = new List<ClaimsInvestigation>();
 
-            if (userRole.Value.Contains(AppRoles.CREATOR.ToString()) || userRole.Value.Contains(AppRoles.ADMIN.ToString()))
+            if (userRole.Value.Contains(AppRoles.CREATOR.ToString()) || userRole.Value.Contains(AppRoles.COMPANY_ADMIN.ToString()))
             {
                 var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
                 applicationDbContext = applicationDbContext.Where(a => openStatusesIds.Contains(a.InvestigationCaseStatusId));

@@ -62,6 +62,12 @@ namespace risk.control.system.Controllers
                     return View(model);
 
                 }
+                else if (userRole.Value.Contains(AppRoles.MANAGER.ToString()))
+                {
+                    var model = dashboardService.GetManagerCount(currentUserEmail, userRole.Value);
+                    return View(model);
+
+                }
                 else
                 {
                     var model = dashboardService.GetClaimsCount(currentUserEmail, userRole.Value);
@@ -86,7 +92,7 @@ namespace risk.control.system.Controllers
             if (userRole != null)
             {
                 if (userRole.Value.Contains(AppRoles.PORTAL_ADMIN.ToString())
-                                || userRole.Value.Contains(AppRoles.ADMIN.ToString())
+                                || userRole.Value.Contains(AppRoles.COMPANY_ADMIN.ToString())
                                 || userRole.Value.Contains(AppRoles.CREATOR.ToString())
                                 )
                 {

@@ -72,9 +72,9 @@
                         roleCode = @Applicationsettings.PORTAL_ADMIN.CODE;
                         <span class="badge badge-danger">@roleCode</span>
                     }
-                    else if (User.IsInRole(AppRoles.ADMIN.ToString()))
+                    else if (User.IsInRole(AppRoles.COMPANY_ADMIN.ToString()))
                     {
-                        roleCode = @Applicationsettings.ADMIN.CODE;
+                        roleCode = @Applicationsettings.COMPANY_ADMIN.CODE;
                         <span class="badge badge-warning">@roleCode</span>
                     }
                     else if (User.IsInRole(AppRoles.AGENCY_ADMIN.ToString()))
@@ -173,7 +173,7 @@
               
                 @{
                     
-                    if (User.IsInRole(AppRoles.PORTAL_ADMIN.ToString()) || User.IsInRole(AppRoles.ADMIN.ToString()))
+                    if (User.IsInRole(AppRoles.PORTAL_ADMIN.ToString()) || User.IsInRole(AppRoles.COMPANY_ADMIN.ToString()))
                     {
                         <li class="nav-item">
                             <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("ClientCompany","") @Url.MakeActiveClass("Vendors","") @Url.MakeActiveClass("CompanyUser","") @Url.MakeActiveClass("CompanyUserRoles","") @Url.MakeActiveClass("VendorUser","") @Url.MakeActiveClass("VendorService","")">
@@ -342,7 +342,7 @@
                     </a>
                 </li>
                 @{
-                    if (User.IsInRole(AppRoles.PORTAL_ADMIN.ToString()) || User.IsInRole(AppRoles.ADMIN.ToString()))
+                    if (User.IsInRole(AppRoles.PORTAL_ADMIN.ToString()) || User.IsInRole(AppRoles.COMPANY_ADMIN.ToString()))
                     {
                         if (User.IsInRole(AppRoles.PORTAL_ADMIN.ToString()))
                         {

@@ -231,9 +231,9 @@
             public const string PROFILE_IMAGE = "/img/portal-admin.jpeg";
         }
 
-        public static class ADMIN
+        public static class COMPANY_ADMIN
         {
-            public const string DISPLAY_NAME = "ADMIN";
+            public const string DISPLAY_NAME = "COMPANY_ADMIN";
             public const string CODE = "admin";
             public const string FIRST_NAME = "Andy";
             public const string LAST_NAME = "Murrey";

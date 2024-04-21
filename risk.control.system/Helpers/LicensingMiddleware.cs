@@ -37,6 +37,8 @@ namespace risk.control.system.Helpers
                 if (context.User.Identity.IsAuthenticated)
                 {
                     var user = context.User.Identity.Name;
+                    var dbContext = context.RequestServices.GetRequiredService<ApplicationDbContext>();
+                    var appUser = dbContext.ApplicationUser.FirstOrDefault(u => u.Email == user);
                     var userRole = context.User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
                     if (userRole == null)
                     {
@@ -46,14 +48,14 @@ namespace risk.control.system.Helpers
                     var adminUser = userRole.Value.Contains(AppRoles.PORTAL_ADMIN.ToString());
                     if (!adminUser)
                     {
-                        var isCompanyUser = userRole.Value.Contains(AppRoles.ADMIN.ToString())
-                                                || userRole.Value.Contains(AppRoles.CREATOR.ToString()) ||
+                        var isCompanyUser = userRole.Value.Contains(AppRoles.COMPANY_ADMIN.ToString()) ||
+                                                userRole.Value.Contains(AppRoles.CREATOR.ToString()) ||
+                                                userRole.Value.Contains(AppRoles.MANAGER.ToString()) ||
                                                 userRole.Value.Contains(AppRoles.ASSESSOR.ToString());
 
                         var isAgencyUser = userRole.Value.Contains(AppRoles.AGENCY_ADMIN.ToString())
                                                 || userRole.Value.Contains(AppRoles.SUPERVISOR.ToString()) ||
                                                 userRole.Value.Contains(AppRoles.AGENT.ToString());
-                        var dbContext = context.RequestServices.GetRequiredService<ApplicationDbContext>();
                         if (isCompanyUser)
                         {
                             var companyUser = dbContext.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == user);

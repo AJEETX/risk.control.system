@@ -148,7 +148,7 @@ namespace risk.control.system.Controllers.Api.Claims
             }
 
             // SHOWING DIFFERRENT PAGES AS PER ROLES
-            if (userRole.Value.Contains(AppRoles.PORTAL_ADMIN.ToString()) || userRole.Value.Contains(AppRoles.ADMIN.ToString()) || userRole.Value.Contains(AppRoles.CREATOR.ToString()))
+            if (userRole.Value.Contains(AppRoles.PORTAL_ADMIN.ToString()) || userRole.Value.Contains(AppRoles.COMPANY_ADMIN.ToString()) || userRole.Value.Contains(AppRoles.CREATOR.ToString()))
             {
                 applicationDbContext = applicationDbContext
                     .Include(c => c.CaseLocations)

@@ -22,7 +22,6 @@ namespace risk.control.system.Controllers
     public class ClaimsInvestigationController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private readonly IToastNotification toastNotification;
         private readonly IEmpanelledAgencyService empanelledAgencyService;
         private readonly IFtpService ftpService;
         private readonly INotyfService notifyService;
@@ -34,8 +33,7 @@ namespace risk.control.system.Controllers
             IFtpService ftpService,
             INotyfService notifyService,
             IInvestigationReportService investigationReportService,
-            IClaimPolicyService claimPolicyService,
-            IToastNotification toastNotification)
+            IClaimPolicyService claimPolicyService)
         {
             _context = context;
             this.claimPolicyService = claimPolicyService;
@@ -43,7 +41,6 @@ namespace risk.control.system.Controllers
             this.ftpService = ftpService;
             this.notifyService = notifyService;
             this.investigationReportService = investigationReportService;
-            this.toastNotification = toastNotification;
         }
 
         [Breadcrumb(" Claims")]
@@ -65,28 +62,6 @@ namespace risk.control.system.Controllers
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
-        }
-
-        [Breadcrumb("Re + Assign")]
-        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
-        public IActionResult Assign()
-        {
-            try
-            {
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (string.IsNullOrWhiteSpace(currentUserEmail))
-                {
-                    notifyService.Error("OOPs !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-                return View();
-            }
-            catch (Exception)
-            {
-                notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
-            }
-
         }
 
         [Breadcrumb(" Assess", FromAction = "Index")]
@@ -742,9 +717,9 @@ namespace risk.control.system.Controllers
             }
         }
 
-        [Breadcrumb(title: " Detail")]
-        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
-        public async Task<IActionResult> ReadyDetail(string id)
+        [Breadcrumb(title: " Detail", FromAction = "Active")]
+        [Authorize(Roles = MANAGER.DISPLAY_NAME)]
+        public async Task<IActionResult> ManagerActiveDetail(string id)
         {
             try
             {
@@ -759,6 +734,7 @@ namespace risk.control.system.Controllers
                     notifyService.Error("NOT FOUND !!!..");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
+
                 var model = await claimPolicyService.GetClaimDetail(id);
 
                 return View(model);
@@ -769,42 +745,6 @@ namespace risk.control.system.Controllers
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
-
-        [Breadcrumb(title: " Detail", FromAction = "Assign")]
-        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
-        public async Task<IActionResult> AssignDetail(string id)
-        {
-            try
-            {
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (string.IsNullOrWhiteSpace(currentUserEmail))
-                {
-                    notifyService.Error("OOPs !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-                if (id == null)
-                {
-                    notifyService.Error("NOT FOUND !!!..");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-
-                var claimsInvestigation = await investigationReportService.GetAssignDetails(id);
-
-                if (claimsInvestigation == null)
-                {
-                    notifyService.Error("NOT FOUND !!!..");
-                    return RedirectToAction(nameof(Index));
-                }
-
-                return View(claimsInvestigation);
-            }
-            catch (Exception)
-            {
-                notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
-            }
-        }
-
         [Breadcrumb(title: " Agency detail", FromAction = "Draft")]
         [Authorize(Roles = CREATOR.DISPLAY_NAME)]
         public async Task<IActionResult> VendorDetail(string companyId, long id, string backurl, string selectedcase)

@@ -1,0 +1,55 @@
+﻿@model ClaimTransactionModel
+<article>
+    <div class="bb-blog-inner">
+        <div class="card card-light expanded-card">
+
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-money-check-alt"></i> Billing Info: </h3>
+                <div class="card-tools">
+                    <span data-toggle="tooltip" title="Billing Info: @Model.Location.ClaimReport.AssessorEmail" class="badge badge-light"><i class="nav-icon fas fa-clock"></i> @Model.Location.ClaimReport?.AssessorRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt")</span>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <div class="submit-progress hidden">
+                    <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+                </div>
+                <div class="row">
+                    <div class="col-7">
+                        <h2 class="lead"><b>Insurance Type: </b>@Model.ClaimsInvestigation?.PolicyDetail.LineOfBusiness.Name</h2>
+                        <p class="text-muted text-sm">
+                            <b>Claim Type: </b>@Model.ClaimsInvestigation?.PolicyDetail.ClaimType
+                        </p>
+                        <ul class="ml-4 mb-0 fa-ul text-muted">
+                            <li class="small">
+                                <span class="fa-li">
+                                    <i class="fas fa-tools"></i>
+                                </span>
+                                Service: @Model.ClaimsInvestigation?.PolicyDetail.InvestigationServiceType.Name
+                            </li>
+
+                            <li class="small">
+                                <span class="fa-li">
+                                    <i class="fas fa-sun"></i>
+                                </span>
+                                Reason: @Model.ClaimsInvestigation?.PolicyDetail.CaseEnabler.Name;
+                            </li>
+                            <li class="small">
+                                <span class="fa-li">
+                                    <i class="fas fa-sun"></i>
+                                </span>
+                                Total Amount Rs: @Model.VendorInvoice.GrandTotal;
+                            </li>
+
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="row">
+                    <a id="back" asp-controller="Report" asp-action="ManagerRejected" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</article>

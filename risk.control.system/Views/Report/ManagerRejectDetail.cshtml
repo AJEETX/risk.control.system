@@ -1,0 +1,31 @@
+﻿@model ClaimTransactionModel
+
+@{
+    ViewData["Title"] = "Claim: Report ";
+    
+}
+
+<section class="content">
+    <input type="hidden" id="policyDetailId" value="@Model.ClaimsInvestigation?.PolicyDetail.PolicyDetailId" />
+    <input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail.CustomerDetailId" />
+    <input type="hidden" id="beneficiaryId" value="@Model.Location?.CaseLocationId" />
+    <input type="hidden" id="claimId" value="@Model.ClaimsInvestigation?.ClaimsInvestigationId" />
+    <div id="article" class="card card-secondary">
+        <div class="card-header">
+            <h3 class="card-title"><i class="fas fa-newspaper"></i> Detail</h3>
+        </div>
+
+        <partial name="_ApprovedPolicyDetails" model="@Model" />
+
+        <partial name="_TimelineReport" model="@Model" />
+
+        <partial name="_ManagerInvoiceReject" model="@Model" />
+
+    </div>
+</section>
+
+@section Scripts {
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDH8T9FvJ8n2LNwxkppRAeOq3Mx7I3qi1E&callback=initReportMap">
+    </script>
+    <script src="~/js/map.js"></script>
+}

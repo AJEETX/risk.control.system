@@ -29,6 +29,7 @@ namespace risk.control.system.Services
         DashboardData GetClaimsCount(string userEmail, string role);
         DashboardData GetCreatorCount(string userEmail, string role);
         DashboardData GetAssessorCount(string userEmail, string role);
+        DashboardData GetManagerCount(string userEmail, string role);
         DashboardData GetSupervisorCount(string userEmail, string role);
     }
 
@@ -125,6 +126,39 @@ namespace risk.control.system.Services
             return data;
         }
 
+        public DashboardData GetManagerCount(string userEmail, string role)
+        {
+
+            var claimsAssessor = GetManagerAssess(userEmail);
+            var claimsReview = GetManagerReview(userEmail);
+            var claimsReject = GetManagerReject(userEmail);
+            var claimsCompleted = GetCompanyManagerCompleted(userEmail);
+            var actives = GetManagerActive(userEmail);
+
+            var data = new DashboardData();
+            data.FirstBlockName = "Assess";
+            data.FirstBlockCount = claimsAssessor.Count;
+            data.FirstBlockUrl = "/ClaimsInvestigation/Manager";
+
+            data.SecondBlockName = "Review";
+            data.SecondBlockCount = claimsReview.Count;
+            data.SecondBlockUrl = "/ClaimsInvestigation/ManagerReview";
+
+            data.SecondBBlockName = "Active";
+            data.SecondBBlockUrl = "/ClaimsInvestigation/ManagerActive";
+            data.SecondBBlockCount = actives.Count;
+
+
+            data.ThirdBlockName = "Approved";
+            data.ThirdBlockCount = claimsCompleted.Count;
+            data.ThirdBlockUrl = "/Report/ManagerIndex";
+
+            data.LastBlockName = "Rejected";
+            data.LastBlockCount = claimsReject.Count;
+            data.LastBlockUrl = "/Report/ManagerRejected";
+
+            return data;
+        }
         public DashboardData GetAssessorCount(string userEmail, string role)
         {
 
@@ -262,6 +296,25 @@ namespace risk.control.system.Services
             }
             return claimsSubmitted;
         }
+        private List<ClaimsInvestigation> GetManagerAssess(string userEmail)
+        {
+            IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
+            var submittedToAssessorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
+            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+            applicationDbContext = applicationDbContext.Where(i => i.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId);
+
+            var claimsSubmitted = new List<ClaimsInvestigation>();
+
+            foreach (var item in applicationDbContext)
+            {
+                if (item.InvestigationCaseSubStatusId == submittedToAssessorStatus.InvestigationCaseSubStatusId)
+                {
+                    claimsSubmitted.Add(item);
+                }
+            }
+            return claimsSubmitted;
+        }
         private List<ClaimsInvestigation> GetAgencyyCompleted(string userEmail)
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = GetAgencyClaims().Where(c =>
@@ -288,6 +341,36 @@ namespace risk.control.system.Services
             }
             return claimsSubmitted;
         }
+        private List<ClaimsInvestigation> GetCompanyManagerCompleted(string userEmail)
+        {
+            IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims().Where(c =>
+                c.CustomerDetail != null && c.CaseLocations.Count > 0 &&
+                c.CaseLocations.All(c => c.ClaimReport != null));
+            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+
+            var approvedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR);
+            var rejectdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR);
+
+            var finishStatus = _context.InvestigationCaseStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.FINISHED);
+
+            var claims = applicationDbContext.Where(c => c.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
+                (c.InvestigationCaseSubStatus.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR && c.InvestigationCaseStatusId == finishStatus.InvestigationCaseStatusId)
+                || c.InvestigationCaseSubStatusId == rejectdStatus.InvestigationCaseSubStatusId
+                )?.ToList();
+            var claimsSubmitted = new List<ClaimsInvestigation>();
+            claims = claims.Where(c => c.InvestigationCaseSubStatusId == approvedStatus.InvestigationCaseSubStatusId)?.ToList();
+
+            foreach (var claim in claims)
+            {
+                claimsSubmitted.Add(claim);
+
+            }
+            return claimsSubmitted;
+        }
+
         private List<ClaimsInvestigation> GetCompanyCompleted(string userEmail)
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims().Where(c =>
@@ -379,6 +462,33 @@ namespace risk.control.system.Services
             }
             return claimsSubmitted;
         }
+        private List<ClaimsInvestigation> GetManagerReject(string userEmail)
+        {
+            IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims().Where(c =>
+                c.CustomerDetail != null && c.CaseLocations.Count > 0 &&
+                c.CaseLocations.All(c => c.ClaimReport != null));
+            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+
+            var approvedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR);
+            var rejectdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR);
+
+            var finishStatus = _context.InvestigationCaseStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.FINISHED);
+
+            var claims = applicationDbContext.Where(c => c.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
+                c.InvestigationCaseSubStatusId == rejectdStatus.InvestigationCaseSubStatusId
+                )?.ToList();
+            var claimsSubmitted = new List<ClaimsInvestigation>();
+
+            foreach (var claim in claims)
+            {
+                claimsSubmitted.Add(claim);
+            }
+            return claimsSubmitted;
+        }
+
         private List<ClaimsInvestigation> GetAssessorReview(string userEmail)
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
@@ -426,6 +536,43 @@ namespace risk.control.system.Services
             }
             return claimsSubmitted;
         }
+        private List<ClaimsInvestigation> GetManagerReview(string userEmail)
+        {
+            IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
+            var openStatuses = _context.InvestigationCaseStatus.Where(i => !i.Name.Contains(CONSTANTS.CASE_STATUS.FINISHED)).ToList();
+            var assignedToAssignerStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
+            var allocateToVendorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
+            var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
+
+            var submittededToSupervisorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR);
+
+            var submittededToAssesssorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
+
+            var reAssigned2AssignerStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER);
+            var claimsSubmitted = new List<ClaimsInvestigation>();
+            var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
+            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+            applicationDbContext = applicationDbContext.Where(a => a.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
+            openStatusesIds.Contains(a.InvestigationCaseStatusId) &&
+            a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId != null)
+            );
+
+            foreach (var claim in applicationDbContext)
+            {
+                if (claim.IsReviewCase)
+                {
+                    claimsSubmitted.Add(claim);
+                }
+            }
+            return claimsSubmitted;
+        }
+
         private List<ClaimsInvestigation> GetCreatorActive(string userEmail)
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
@@ -460,6 +607,44 @@ namespace risk.control.system.Services
                 var userHasClaimLog = _context.InvestigationTransaction.Any(c => c.ClaimsInvestigationId == claim.ClaimsInvestigationId && 
                 c.UserEmailActioned == companyUser.Email && c.HopCount >= reviewLogCount);
                 if (userHasClaimLog && claim.InvestigationCaseSubStatusId != createdStatus.InvestigationCaseSubStatusId &&
+                    claim.InvestigationCaseSubStatusId != withdrawnByAgency.InvestigationCaseSubStatusId
+                    &&
+                    claim.InvestigationCaseSubStatusId != reAssignedToAssignerStatus.InvestigationCaseSubStatusId
+                    &&
+                    claim.InvestigationCaseSubStatusId != withdrawnByCompany.InvestigationCaseSubStatusId
+                    &&
+                    claim.InvestigationCaseSubStatusId != approvedStatus.InvestigationCaseSubStatusId
+                    )
+                {
+                    claimsSubmitted.Add(claim);
+                }
+            }
+            return claimsSubmitted;
+        }
+        private List<ClaimsInvestigation> GetManagerActive(string userEmail)
+        {
+            IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
+            var openStatuses = _context.InvestigationCaseStatus.Where(i => !i.Name.Contains(CONSTANTS.CASE_STATUS.FINISHED)).ToList();
+            var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
+            var withdrawnByAgency = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                     i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY);
+            var reAssignedToAssignerStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER);
+            var withdrawnByCompany = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY);
+            var approvedStatus = _context.InvestigationCaseSubStatus
+                .FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR);
+            var claimsSubmitted = new List<ClaimsInvestigation>();
+            var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
+            var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(c => c.Email == userEmail);
+
+            var claims = applicationDbContext.Where(a => openStatusesIds.Contains(a.InvestigationCaseStatusId) &&
+            a.InvestigationCaseStatusId != approvedStatus.InvestigationCaseSubStatusId &&
+            a.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId);
+            foreach (var claim in claims)
+            {
+                if (claim.InvestigationCaseSubStatusId != createdStatus.InvestigationCaseSubStatusId &&
                     claim.InvestigationCaseSubStatusId != withdrawnByAgency.InvestigationCaseSubStatusId
                     &&
                     claim.InvestigationCaseSubStatusId != reAssignedToAssignerStatus.InvestigationCaseSubStatusId
@@ -696,7 +881,7 @@ namespace risk.control.system.Services
 
                 var activeCount = 0;
 
-                if (role.Contains(AppRoles.ADMIN.ToString()) || role.Contains(AppRoles.CREATOR.ToString()))
+                if (role.Contains(AppRoles.COMPANY_ADMIN.ToString()) || role.Contains(AppRoles.CREATOR.ToString()))
                 {
                     var creatorActiveClaims = _context.ClaimsInvestigation
                     .Include(c => c.PolicyDetail)
