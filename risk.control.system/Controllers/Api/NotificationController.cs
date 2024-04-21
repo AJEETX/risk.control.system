@@ -10,6 +10,7 @@ using risk.control.system.Services;
 
 namespace risk.control.system.Controllers.Api
 {
+    [ApiExplorerSettings(IgnoreApi = true)]
     [Route("api/[controller]")]
     [ApiController]
     public class NotificationController : ControllerBase

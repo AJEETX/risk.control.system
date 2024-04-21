@@ -1,96 +1,96 @@
 ﻿$(function () {
 
-    var table = $("#customerTable").DataTable({
-        ajax: {
-            url: '/api/Agency/GetEmpannelled',
-            dataSrc: ''
-        },
-        columnDefs: [{
-            'targets': 0,
-            'searchable': false,
-            'orderable': false,
-            'className': 'dt-body-center',
-            'render': function (data, type, full, meta) {
-                return '<input type="checkbox" name="selectedcase[]" value="' + $('<div/>').text(data).html() + '">';
-            }
-        }],
-        order: [[11, 'asc']],
-        fixedHeader: true,
-        processing: true,
-        paging: true,
-        language: {
-            loadingRecords: '&nbsp;',
-            processing: '<i class="fas fa-sync fa-spin fa-4x fa-fw"></i><span class="sr-only">Loading...</span>'
-        },
-        columns: [
-            /* Name of the keys from
-            data file source */
-            {
-                "sDefaultContent": "",
-                "bSortable": false,
-                "mRender": function (data, type, row) {
-                    var img = '<input name="selectedcase" class="selected-case" type="radio" id="' + row.id + '"  value="' + row.id + '"  />';
-                    return img;
-                }
-            },
-            {
-                "sDefaultContent": "",
-                "bSortable": false,
-                "mRender": function (data, type, row) {
-                    var img = '<img alt="' + row.policyId + '" title="' + row.policyId + '" src="' + row.document + '"class="doc-profile-image" data-toggle="tooltip"/>';
-                    return img;
-                }
-            },
-            { "data": "policyNum", "bSortable": false },
-            {
-                "data": "amount"
-            },
-            {
-                "sDefaultContent": "",
-                "bSortable": false,
-                "mRender": function (data, type, row) {
-                    var img = '<img alt="' + row.name + '" title="' + row.name + '" src="' + row.customer + '" class="table-profile-image" data-toggle="tooltip"/>';
-                    return img;
-                }
-            },
-            { "data": "name" },
-            {
-                "sDefaultContent": "",
-                "bSortable": false,
-                "mRender": function (data, type, row) {
-                    var img = '<img alt="' + row.beneficiaryName + '" title="' + row.beneficiaryName + '" src="' + row.beneficiaryPhoto + '" class="table-profile-image" data-toggle="tooltip"/>';
-                    return img;
-                }
-            },
-            { "data": "beneficiaryName" },
-            { "data": "serviceType" },
-            { "data": "service" },
-            {
-                "data": "pincode",
-                "mRender": function (data, type, row) {
-                    return '<span title="' + row.pincodeName + '" data-toggle="tooltip">' + data + '</span>'
-                }
-            },
-            { "data": "location" },
-            { "data": "created" },
-            { "data": "timePending" },
-            {
-                "sDefaultContent": "",
-                "bSortable": false,
-                "mRender": function (data, type, row) {
-                    var buttons = "";
-                    buttons += '<a id="edit' + row.id + '" onclick="showedit(`' + row.id + '`)" href="DetailsManual?Id=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-pencil-alt"></i> Edit</a>&nbsp;'
-                    buttons += '<a id="details' + row.id + '" onclick="getdetails(`' + row.id + '`)" href="/InsurancePolicy/DeleteManual?Id=' + row.id + '" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i> Delete </a>'
-                    return buttons;
-                }
-            }
-        ],
-        error: function (xhr, status, error) { alert('err ' + error) }
-    });
+    //var table = $("#customerTable").DataTable({
+    //    ajax: {
+    //        url: '/api/Agency/GetEmpannelled',
+    //        dataSrc: ''
+    //    },
+    //    columnDefs: [{
+    //        'targets': 0,
+    //        'searchable': false,
+    //        'orderable': false,
+    //        'className': 'dt-body-center',
+    //        'render': function (data, type, full, meta) {
+    //            return '<input type="checkbox" name="selectedcase[]" value="' + $('<div/>').text(data).html() + '">';
+    //        }
+    //    }],
+    //    order: [[11, 'asc']],
+    //    fixedHeader: true,
+    //    processing: true,
+    //    paging: true,
+    //    language: {
+    //        loadingRecords: '&nbsp;',
+    //        processing: '<i class="fas fa-sync fa-spin fa-4x fa-fw"></i><span class="sr-only">Loading...</span>'
+    //    },
+    //    columns: [
+    //        /* Name of the keys from
+    //        data file source */
+    //        {
+    //            "sDefaultContent": "",
+    //            "bSortable": false,
+    //            "mRender": function (data, type, row) {
+    //                var img = '<input name="selectedcase" class="selected-case" type="radio" id="' + row.id + '"  value="' + row.id + '"  />';
+    //                return img;
+    //            }
+    //        },
+    //        {
+    //            "sDefaultContent": "",
+    //            "bSortable": false,
+    //            "mRender": function (data, type, row) {
+    //                var img = '<img alt="' + row.policyId + '" title="' + row.policyId + '" src="' + row.document + '"class="doc-profile-image" data-toggle="tooltip"/>';
+    //                return img;
+    //            }
+    //        },
+    //        { "data": "policyNum", "bSortable": false },
+    //        {
+    //            "data": "amount"
+    //        },
+    //        {
+    //            "sDefaultContent": "",
+    //            "bSortable": false,
+    //            "mRender": function (data, type, row) {
+    //                var img = '<img alt="' + row.name + '" title="' + row.name + '" src="' + row.customer + '" class="table-profile-image" data-toggle="tooltip"/>';
+    //                return img;
+    //            }
+    //        },
+    //        { "data": "name" },
+    //        {
+    //            "sDefaultContent": "",
+    //            "bSortable": false,
+    //            "mRender": function (data, type, row) {
+    //                var img = '<img alt="' + row.beneficiaryName + '" title="' + row.beneficiaryName + '" src="' + row.beneficiaryPhoto + '" class="table-profile-image" data-toggle="tooltip"/>';
+    //                return img;
+    //            }
+    //        },
+    //        { "data": "beneficiaryName" },
+    //        { "data": "serviceType" },
+    //        { "data": "service" },
+    //        {
+    //            "data": "pincode",
+    //            "mRender": function (data, type, row) {
+    //                return '<span title="' + row.pincodeName + '" data-toggle="tooltip">' + data + '</span>'
+    //            }
+    //        },
+    //        { "data": "location" },
+    //        { "data": "created" },
+    //        { "data": "timePending" },
+    //        {
+    //            "sDefaultContent": "",
+    //            "bSortable": false,
+    //            "mRender": function (data, type, row) {
+    //                var buttons = "";
+    //                buttons += '<a id="edit' + row.id + '" onclick="showedit(`' + row.id + '`)" href="DetailsManual?Id=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-pencil-alt"></i> Edit</a>&nbsp;'
+    //                buttons += '<a id="details' + row.id + '" onclick="getdetails(`' + row.id + '`)" href="/InsurancePolicy/DeleteManual?Id=' + row.id + '" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i> Delete </a>'
+    //                return buttons;
+    //            }
+    //        }
+    //    ],
+    //    error: function (xhr, status, error) { alert('err ' + error) }
+    //});
 
-    $('#customerTable').on('draw.dt', function () {
-        $('[data-toggle="tooltip"]').tooltip();
-    });
+    //$('#customerTable').on('draw.dt', function () {
+    //    $('[data-toggle="tooltip"]').tooltip();
+    //});
 
 
     $('#empanelled.btn.btn-info').on('click', function () {

@@ -1,5 +1,6 @@
 ﻿using AspNetCoreHero.ToastNotification.Abstractions;
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
@@ -73,6 +74,7 @@ namespace risk.control.system.Controllers
 
         [ValidateAntiForgeryToken]
         [HttpPost]
+        [Authorize(Roles = "Creator")]
         public async Task<IActionResult> Assign(List<string> claims)
         {
             if (claims == null || claims.Count == 0)
@@ -141,6 +143,7 @@ namespace risk.control.system.Controllers
 
         [ValidateAntiForgeryToken]
         [HttpPost]
+        [Authorize(Roles = "Creator")]
         public async Task<IActionResult> CaseAllocatedToVendor(long selectedcase, string claimId, long caseLocationId)
         {
             if (selectedcase < 1 || caseLocationId < 1 || string.IsNullOrWhiteSpace(claimId))
@@ -173,6 +176,7 @@ namespace risk.control.system.Controllers
 
         [ValidateAntiForgeryToken]
         [HttpPost]
+        [Authorize(Roles = "Assessor")]
         public async Task<IActionResult> ProcessCaseReport(string assessorRemarks, string assessorRemarkType, string claimId, long caseLocationId)
         {
             if (string.IsNullOrWhiteSpace(assessorRemarks) || caseLocationId < 1 || string.IsNullOrWhiteSpace(claimId))
@@ -215,6 +219,7 @@ namespace risk.control.system.Controllers
 
         [ValidateAntiForgeryToken]
         [HttpPost]
+        [Authorize(Roles = "Assessor")]
         public async Task<IActionResult> ReProcessCaseReport(string assessorRemarks, string assessorRemarkType, string claimId, long caseLocationId)
         {
             if (string.IsNullOrWhiteSpace(assessorRemarks) || caseLocationId < 1 || string.IsNullOrWhiteSpace(claimId))
@@ -249,6 +254,7 @@ namespace risk.control.system.Controllers
         [HttpPost]
         [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Creator")]
         public async Task<IActionResult> CreatePolicy(ClaimsInvestigation claimsInvestigation)
         {
             try
@@ -312,6 +318,7 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [HttpPost]
+        [Authorize(Roles = "Creator")]
         public async Task<IActionResult> EditPolicy(string claimsInvestigationId, ClaimsInvestigation claimsInvestigation, string claimtype)
         {
             try
@@ -385,6 +392,7 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         [HttpPost]
         [RequestSizeLimit(2_000_000)] // Checking for 2 MB
+        [Authorize(Roles = "Creator")]
         public async Task<IActionResult> CreateCustomer(string claimsInvestigationId, ClaimsInvestigation claimsInvestigation, bool create = true)
         {
             try
@@ -453,6 +461,7 @@ namespace risk.control.system.Controllers
 
         [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Creator")]
         [HttpPost]
         public async Task<IActionResult> EditCustomer(string claimsInvestigationId, ClaimsInvestigation claimsInvestigation, string claimtype, bool create = true)
         {
@@ -529,6 +538,7 @@ namespace risk.control.system.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Creator")]
         public async Task<IActionResult> WithdrawCase(ClaimTransactionModel model, string claimId, string policyNumber)
         {
             try

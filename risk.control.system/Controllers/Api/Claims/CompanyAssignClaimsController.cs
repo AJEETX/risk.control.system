@@ -13,10 +13,13 @@ using ControllerBase = Microsoft.AspNetCore.Mvc.ControllerBase;
 using risk.control.system.Services;
 using System.Globalization;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+using Microsoft.AspNetCore.Authorization;
 
 namespace risk.control.system.Controllers.Api.Claims
 {
+    [ApiExplorerSettings(IgnoreApi = true)]
     [Route("api/[controller]")]
+    [Authorize(Roles = "Creator")]
     [ApiController]
     public class CompanyAssignClaimsController : ControllerBase
     {

@@ -7,6 +7,7 @@ using risk.control.system.Models;
 
 namespace risk.control.system.Controllers.Api
 {
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class DownloadController : ControllerBase
     {
         private readonly ApplicationDbContext _context;

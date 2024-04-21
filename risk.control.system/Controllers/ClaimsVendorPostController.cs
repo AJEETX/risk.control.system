@@ -51,7 +51,7 @@ namespace risk.control.system.Controllers
                 if (string.IsNullOrWhiteSpace(selectedcase) || string.IsNullOrWhiteSpace(claimId) || caseLocationId < 1)
                 {
                     notifyService.Error($"No case selected!!!. Please select case to be allocate.", 3);
-                    return RedirectToAction(nameof(ClaimsVendorController.Index), "ClaimsVendor");
+                    return RedirectToAction(nameof(ClaimsVendorController.Allocate), "ClaimsVendor");
                 }
 
                 var userEmail = HttpContext.User?.Identity?.Name;
@@ -77,7 +77,7 @@ namespace risk.control.system.Controllers
 
                 notifyService.Custom($"Claim #{claim.PolicyDetail.ContractNumber} tasked to {vendorAgent.Email}", 3, "green", "far fa-file-powerpoint");
 
-                return RedirectToAction(nameof(ClaimsVendorController.Index), "ClaimsVendor");
+                return RedirectToAction(nameof(ClaimsVendorController.Allocate), "ClaimsVendor");
             }
             catch (Exception)
             {
@@ -180,46 +180,6 @@ namespace risk.control.system.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ReAllocateReport(string supervisorRemarks, string supervisorRemarkType, string claimId, long caseLocationId)
-        {
-            try
-            {
-                if (string.IsNullOrWhiteSpace(supervisorRemarks) || string.IsNullOrWhiteSpace(claimId) || caseLocationId < 1)
-                {
-                    notifyService.Error("No remarks entered!!!. Please enter remarks.");
-                    return RedirectToAction(nameof(ClaimsVendorController.GetInvestigate), new { selectedcase = claimId });
-                }
-                string userEmail = HttpContext?.User?.Identity.Name;
-                if (string.IsNullOrWhiteSpace(userEmail))
-                {
-                    notifyService.Error("OOPs !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-
-                var reportUpdateStatus = SupervisorRemarkType.REVIEW;
-
-                var success = await claimsInvestigationService.ProcessAgentReport(userEmail, supervisorRemarks, caseLocationId, claimId, reportUpdateStatus);
-
-                if (success != null)
-                {
-                    await mailboxService.NotifyClaimReportSubmitToCompany(userEmail, claimId, caseLocationId);
-                    notifyService.Custom($"Claim #{success.PolicyDetail.ContractNumber}  report sent to review", 3, "green", "far fa-file-powerpoint");
-                }
-                else
-                {
-                    notifyService.Custom($"Claim #{success.PolicyDetail.ContractNumber}  report sent to review", 3, "orange", "far fa-file-powerpoint");
-                }
-                return RedirectToAction(nameof(ClaimsVendorController.Index), "ClaimsVendor");
-            }
-            catch (Exception)
-            {
-                notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
-            }
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> WithdrawCase(ClaimTransactionModel model, string claimId, string policyNumber)
         {
             try
@@ -241,7 +201,7 @@ namespace risk.control.system.Controllers
 
                 notifyService.Custom($"Claim #{policyNumber}  declined successfully", 3, "blue", "far fa-file-powerpoint");
 
-                return RedirectToAction(nameof(ClaimsVendorController.Index), "ClaimsVendor");
+                return RedirectToAction(nameof(ClaimsVendorController.Allocate), "ClaimsVendor");
             }
             catch (Exception)
             {

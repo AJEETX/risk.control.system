@@ -45,7 +45,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(" Claims")]
-        [Authorize(Roles ="Creator")]
+        [Authorize(Roles = "Creator")]
         public IActionResult Index()
         {
             try
@@ -66,7 +66,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb("Re + Assign")]
-        [Authorize(Roles ="Creator")]
+        [Authorize(Roles = "Creator")]
         public IActionResult Assign()
         {
             try
@@ -114,16 +114,23 @@ namespace risk.control.system.Controllers
         {
             try
             {
+                bool userCanUpload = true;
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
                     notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == currentUserEmail);
-                var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
-
-                return View(company.BulkUpload);
+                var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == currentUserEmail);
+                if (companyUser.ClientCompany.LicenseType == Standard.Licensing.LicenseType.Trial)
+                {
+                    var totalClaimsCreated = _context.ClaimsInvestigation.Include(c => c.PolicyDetail).Where(c => !c.Deleted && c.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId)?.ToList();
+                    if (totalClaimsCreated?.Count >= companyUser.ClientCompany.TotalCreatedClaimAllowed)
+                    {
+                        userCanUpload = false;
+                    }
+                }
+                return View(companyUser.ClientCompany.BulkUpload && userCanUpload);
             }
             catch (Exception)
             {
@@ -152,7 +159,7 @@ namespace risk.control.system.Controllers
                     if (uploadType == UploadType.FTP)
                     {
                         var processed = await ftpService.DownloadFtpFile(userEmail, postedFile);
-                        if(processed)
+                        if (processed)
                         {
                             notifyService.Custom($"FTP download complete ", 3, "green", "fa fa-upload");
                         }
@@ -165,7 +172,7 @@ namespace risk.control.system.Controllers
                     if (uploadType == UploadType.FILE && Path.GetExtension(postedFile.FileName) == ".zip")
                     {
                         var processed = await ftpService.UploadFile(userEmail, postedFile);
-                        if(processed)
+                        if (processed)
                         {
                             notifyService.Custom($"File upload complete", 3, "green", "fa fa-upload");
                         }
@@ -189,6 +196,7 @@ namespace risk.control.system.Controllers
         {
             try
             {
+                bool userCanUpload = true;
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
@@ -196,10 +204,16 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == currentUserEmail);
-                var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
-
-                return View(company.BulkUpload);
+                var companyUser = _context.ClientCompanyApplicationUser.Include(u=>u.ClientCompany).FirstOrDefault(u => u.Email == currentUserEmail);
+                if (companyUser.ClientCompany.LicenseType == Standard.Licensing.LicenseType.Trial)
+                {
+                    var totalClaimsCreated = _context.ClaimsInvestigation.Include(c => c.PolicyDetail).Where(c => !c.Deleted && c.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId)?.ToList();
+                    if (totalClaimsCreated?.Count >= companyUser.ClientCompany.TotalCreatedClaimAllowed)
+                    {
+                        userCanUpload = false;
+                    }
+                }
+                return View(companyUser.ClientCompany.BulkUpload && userCanUpload);
             }
             catch (Exception)
             {
@@ -229,7 +243,7 @@ namespace risk.control.system.Controllers
                     if (uploadType == UploadType.FTP)
                     {
                         var processed = await ftpService.DownloadFtpFile(userEmail, postedFile);
-                        if(processed)
+                        if (processed)
                         {
                             notifyService.Custom($"FTP download complete ", 3, "green", "fa fa-upload");
                         }
@@ -243,7 +257,7 @@ namespace risk.control.system.Controllers
                     {
 
                         var processed = await ftpService.UploadFile(userEmail, postedFile);
-                        if(processed)
+                        if (processed)
                         {
                             notifyService.Custom($"File upload complete", 3, "green", "fa fa-upload");
                         }
@@ -265,7 +279,7 @@ namespace risk.control.system.Controllers
 
         [HttpGet]
         [Breadcrumb(" Empanelled Agencies", FromAction = "Assigner")]
-        [Authorize(Roles ="Creator")]
+        [Authorize(Roles = "Creator")]
         public async Task<IActionResult> EmpanelledVendors(string selectedcase)
         {
             try
@@ -316,7 +330,8 @@ namespace risk.control.system.Controllers
                 var claimsInvestigation = await empanelledAgencyService.GetAllocateToVendor(selectedcase);
                 if (claimsInvestigation == null)
                 {
-                    return NotFound();
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
                 return View(claimsInvestigation);
@@ -329,6 +344,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(" Assessed")]
+        [Authorize(Roles = "Assessor")]
         public IActionResult Approved()
         {
             try
@@ -346,7 +362,7 @@ namespace risk.control.system.Controllers
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
-            
+
         }
 
         [Breadcrumb(title: "Active")]
@@ -411,6 +427,7 @@ namespace risk.control.system.Controllers
             }
         }
         [Breadcrumb(title: "Review")]
+        [Authorize(Roles = "Assessor")]
         public IActionResult Review()
         {
             try
@@ -431,6 +448,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(title: " Detail", FromAction = "Review")]
+        [Authorize(Roles = "Assessor")]
         public async Task<IActionResult> ReviewDetail(string id)
         {
             try
@@ -444,7 +462,7 @@ namespace risk.control.system.Controllers
                 if (id == null)
                 {
                     notifyService.Error("NOT FOUND !!!..");
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
                 var model = await claimPolicyService.GetClaimDetail(id);
@@ -459,6 +477,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(title: "Report", FromAction = "Assessor")]
+        [Authorize(Roles = "Assessor")]
         public IActionResult GetInvestigateReport(string selectedcase)
         {
             try
@@ -486,6 +505,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(title: "Previous Reports", FromAction = "GetInvestigateReport")]
+        [Authorize(Roles = "Assessor")]
         public IActionResult PreviousReports(long id)
         {
             try
@@ -499,7 +519,7 @@ namespace risk.control.system.Controllers
                 if (id == 0)
                 {
                     notifyService.Error("NOT FOUND !!!..");
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
                 var model = investigationReportService.GetPreviousReport(id);
@@ -529,7 +549,7 @@ namespace risk.control.system.Controllers
                 if (id == null)
                 {
                     notifyService.Error("NOT FOUND !!!..");
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
                 var model = await investigationReportService.GetClaimDetails(currentUserEmail, id);
@@ -557,7 +577,7 @@ namespace risk.control.system.Controllers
                 if (id == null)
                 {
                     notifyService.Error("NOT FOUND !!!..");
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
                 var model = await investigationReportService.GetClaimDetails(currentUserEmail, id);
@@ -585,7 +605,7 @@ namespace risk.control.system.Controllers
                 if (id == null)
                 {
                     notifyService.Error("NOT FOUND !!!..");
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
                 var model = await investigationReportService.GetClaimDetails(currentUserEmail, id);
@@ -600,7 +620,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(title: " Detail", FromAction = "Assigner")]
-        [Authorize(Roles ="Creator")]
+        [Authorize(Roles = "Creator")]
         public async Task<IActionResult> Detail(string id)
         {
             try
@@ -614,7 +634,7 @@ namespace risk.control.system.Controllers
                 if (id == null)
                 {
                     notifyService.Error("NOT FOUND !!!..");
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
                 var model = await claimPolicyService.GetClaimDetail(id);
@@ -643,7 +663,7 @@ namespace risk.control.system.Controllers
                 if (id == null)
                 {
                     notifyService.Error("NOT FOUND !!!..");
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
                 var model = await claimPolicyService.GetClaimDetail(id);
@@ -672,7 +692,7 @@ namespace risk.control.system.Controllers
                 if (id == null)
                 {
                     notifyService.Error("NOT FOUND !!!..");
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var model = await claimPolicyService.GetClaimDetail(id);
 
@@ -686,7 +706,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(title: " Detail", FromAction = "Assign")]
-        [Authorize(Roles ="Creator")]
+        [Authorize(Roles = "Creator")]
         public async Task<IActionResult> AssignDetail(string id)
         {
             try
@@ -700,7 +720,7 @@ namespace risk.control.system.Controllers
                 if (id == null)
                 {
                     notifyService.Error("NOT FOUND !!!..");
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
                 var claimsInvestigation = await investigationReportService.GetAssignDetails(id);
@@ -721,7 +741,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(title: " Agency detail", FromAction = "Draft")]
-        [Authorize(Roles ="Creator")]
+        [Authorize(Roles = "Creator")]
         public async Task<IActionResult> VendorDetail(string companyId, long id, string backurl, string selectedcase)
         {
             try

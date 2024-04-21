@@ -1,5 +1,6 @@
 ﻿using System.Data;
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -11,7 +12,9 @@ using risk.control.system.Models;
 
 namespace risk.control.system.Controllers.Api.Company
 {
+    [ApiExplorerSettings(IgnoreApi = true)]
     [Route("api/[controller]")]
+    [Authorize(Roles = "PortalAdmin,CompanyAdmin")]
     [ApiController]
     public class CompanyController : ControllerBase
     {

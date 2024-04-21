@@ -12,11 +12,14 @@ using risk.control.system.Models.ViewModel;
 using ControllerBase = Microsoft.AspNetCore.Mvc.ControllerBase;
 using risk.control.system.Services;
 using System.Globalization;
+using Microsoft.AspNetCore.Authorization;
 
 namespace risk.control.system.Controllers.Api.Claims
 {
+    [ApiExplorerSettings(IgnoreApi = true)]
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Creator")]
     public class CompanyDraftClaimsController : ControllerBase
     {
         private readonly ApplicationDbContext _context;

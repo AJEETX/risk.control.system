@@ -23,6 +23,7 @@ using System.Security.Claims;
 
 namespace risk.control.system.Controllers
 {
+    [Authorize(Roles = "AgencyAdmin,Supervisor,Agent")]
     public class ClaimsVendorController : Controller
     {
         private readonly IClaimsInvestigationService claimsInvestigationService;
@@ -58,6 +59,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(" Allocate To Agent")]
+        [Authorize(Roles = "AgencyAdmin,Supervisor")]
         public async Task<IActionResult> AllocateToVendorAgent(string selectedcase)
         {
             try
@@ -65,7 +67,7 @@ namespace risk.control.system.Controllers
                 if (string.IsNullOrWhiteSpace(selectedcase))
                 {
                     notifyService.Error("No case selected!!!. Please select case to be allocate.");
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction(nameof(AllocateToVendorAgent));
                 }
 
                 var userEmail = HttpContext.User?.Identity?.Name;
@@ -79,7 +81,7 @@ namespace risk.control.system.Controllers
                 if (claimsInvestigation == null)
                 {
                     notifyService.Error("OOPs !!!..NOT FOUND");
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 return View(claimsInvestigation);
             }
@@ -93,6 +95,7 @@ namespace risk.control.system.Controllers
 
         [HttpGet]
         [Breadcrumb("Agents", FromAction = "Allocate")]
+        [Authorize(Roles = "AgencyAdmin,Supervisor")]
         public async Task<IActionResult> SelectVendorAgent(string selectedcase)
         {
             try
@@ -100,7 +103,7 @@ namespace risk.control.system.Controllers
                 if (string.IsNullOrWhiteSpace(selectedcase))
                 {
                     notifyService.Error("No case selected!!!. Please select case to be allocate.");
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction(nameof(SelectVendorAgent),new { selectedcase = selectedcase });
                 }
 
                 var userEmail = HttpContext.User?.Identity?.Name;
@@ -124,6 +127,7 @@ namespace risk.control.system.Controllers
 
         [HttpGet]
         [Breadcrumb("ReAllocate", FromAction = "ClaimReport")]
+        [Authorize(Roles = "AgencyAdmin,Supervisor")]
         public async Task<IActionResult> ReSelectVendorAgent(string selectedcase)
         {
             try
@@ -131,7 +135,7 @@ namespace risk.control.system.Controllers
                 if (string.IsNullOrWhiteSpace(selectedcase))
                 {
                     notifyService.Error("No case selected!!!. Please select case to be allocate.");
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction(nameof(SelectVendorAgent), new { selectedcase = selectedcase });
                 }
 
                 var userEmail = HttpContext.User?.Identity?.Name;
@@ -153,6 +157,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb("Agency Workload")]
+        [Authorize(Roles = "AgencyAdmin")]
         public async Task<IActionResult> AgentLoad()
         {
             try
@@ -202,6 +207,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(" Allocate")]
+        [Authorize(Roles = "AgencyAdmin,Supervisor")]
         public ActionResult Allocate()
         {
             try
@@ -222,18 +228,21 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(" Tasks")]
+        [Authorize(Roles = "Agent")]
         public ActionResult Agent()
         {
             return View();
         }
 
         [Breadcrumb(title: " Completed")]
+        [Authorize(Roles = "AgencyAdmin,Supervisor")]
         public IActionResult Completed()
         {
             return View();
         }
 
         [Breadcrumb(" Detail", FromAction = "Completed")]
+        [Authorize(Roles = "AgencyAdmin,Supervisor")]
         public async Task<IActionResult> CompletedDetail(string id)
         {
             if (id == null)
@@ -327,6 +336,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(title: "Invoice", FromAction = "CompletedDetail")]
+        [Authorize(Roles = "AgencyAdmin,Supervisor")]
         public async Task<IActionResult> ShowInvoice(long id)
         {
             try
@@ -372,6 +382,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(title: "Print", FromAction = "ShowInvoice")]
+        [Authorize(Roles = "AgencyAdmin,Supervisor")]
         public async Task<IActionResult> PrintInvoice(long id)
         {
             try
@@ -411,6 +422,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb("Submit", FromAction = "Agent")]
+        [Authorize(Roles = "Agent")]
         public async Task<IActionResult> GetInvestigate(string selectedcase, bool uploaded = false)
         {
             try
@@ -418,7 +430,7 @@ namespace risk.control.system.Controllers
                 if (string.IsNullOrWhiteSpace(selectedcase))
                 {
                     notifyService.Error("No case selected!!!. Please select case to be investigate.");
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
                 var userEmail = HttpContext.User?.Identity?.Name;
@@ -449,7 +461,7 @@ namespace risk.control.system.Controllers
                 if (string.IsNullOrWhiteSpace(selectedcase))
                 {
                     notifyService.Error("No case selected!!!. Please select case to be review.");
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
@@ -470,6 +482,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb("Submit", FromAction= "ClaimReport")]
+        [Authorize(Roles = "AgencyAdmin,Supervisor")]
         public async Task<IActionResult> GetInvestigateReport(string selectedcase)
         {
             try
@@ -477,7 +490,7 @@ namespace risk.control.system.Controllers
                 if (string.IsNullOrWhiteSpace(selectedcase))
                 {
                     notifyService.Error("No case selected!!!. Please select case.");
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction(nameof(ClaimReport));
                 }
 
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
@@ -501,13 +514,13 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(" Active")]
-        [Authorize(Roles = "Supervisor")]
+        [Authorize(Roles = "AgencyAdmin,Supervisor")]
         public IActionResult Open()
         {
             return View();
         }
 
-        [Authorize(Roles = "Supervisor")]
+        [Authorize(Roles = "AgencyAdmin,Supervisor")]
         [Breadcrumb(title: " Detail", FromAction = "Allocate")]
         public async Task<IActionResult> CaseDetail(string id)
         {
@@ -536,6 +549,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(title: " Detail", FromAction = "Open")]
+        [Authorize(Roles = "AgencyAdmin,Supervisor")]
         public async Task<IActionResult> Detail(string id)
         {
             try
@@ -563,12 +577,14 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb("Verify(report)")]
+        [Authorize(Roles = "AgencyAdmin,Supervisor")]
         public IActionResult ClaimReport()
         {
             return View();
         }
 
         [Breadcrumb(" Re Allocate")]
+        [Authorize(Roles = "AgencyAdmin,Supervisor")]
         public IActionResult ClaimReportReview()
         {
             return View();

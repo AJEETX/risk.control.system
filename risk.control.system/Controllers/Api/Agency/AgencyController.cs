@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,8 +13,10 @@ using risk.control.system.Services;
 
 namespace risk.control.system.Controllers.Api.Agency
 {
+    [ApiExplorerSettings(IgnoreApi = true)]
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "PortalAdmin,CompanyAdmin,AgencyAdmin,Supervisor")]
     public class AgencyController : ControllerBase
     {
         private readonly string noUserImagefilePath = string.Empty;

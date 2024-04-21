@@ -10,11 +10,14 @@ using risk.control.system.Models.ViewModel;
 
 using ControllerBase = Microsoft.AspNetCore.Mvc.ControllerBase;
 using risk.control.system.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace risk.control.system.Controllers.Api.Claims
 {
+    [ApiExplorerSettings(IgnoreApi = true)]
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "PortalAdmin,CompanyAdmin,AgencyAdmin,Creator,Assessor,Supervisor,Agent")]
     public class ClaimsInvestigationController : ControllerBase
     {
         private readonly ApplicationDbContext _context;

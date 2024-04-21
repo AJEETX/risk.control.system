@@ -86,8 +86,6 @@ namespace risk.control.system.Controllers
             return View(caseLocation);
         }
 
-        // GET: CaseLocations/Create
-        //[Breadcrumb("Create", FromController = typeof(ClaimsInvestigationController), FromAction = "Details")]
         [Breadcrumb("Add Beneficiary", FromAction = "Index", FromController = typeof(InsuranceClaimsController))]
         public IActionResult Create(string id)
         {
