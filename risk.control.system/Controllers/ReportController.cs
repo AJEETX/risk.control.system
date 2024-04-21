@@ -16,7 +16,6 @@ using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers
 {
-    [Authorize(Roles = ASSESSOR.DISPLAY_NAME)]
     public class ReportController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -39,16 +38,32 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(title: " Approved", FromController = typeof(ClaimsInvestigationController))]
+        [Authorize(Roles = ASSESSOR.DISPLAY_NAME)]
         public IActionResult Index()
         {
             return View();
         }
+
+        [Breadcrumb(title: " Approved", FromController = typeof(ClaimsInvestigationController))]
+        [Authorize(Roles = MANAGER.DISPLAY_NAME)]
+        public IActionResult ManagerIndex()
+        {
+            return View();
+        }
+
         [Breadcrumb(title: " Rejected", FromController = typeof(ClaimsInvestigationController))]
+        [Authorize(Roles = ASSESSOR.DISPLAY_NAME)]
         public IActionResult Rejected()
         {
             return View();
         }
 
+        [Breadcrumb(title: " Rejected", FromController = typeof(ClaimsInvestigationController))]
+        [Authorize(Roles = MANAGER.DISPLAY_NAME)]
+        public IActionResult ManagerRejected()
+        {
+            return View();
+        }
         [Breadcrumb(" Detail")]
         public async Task<IActionResult> Detail(string id)
         {

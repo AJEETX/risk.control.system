@@ -31,17 +31,17 @@
         </a>
     </li>
     <li class="nav-item">
-        <a is-active-page asp-controller="ClaimsInvestigation" asp-action="ManagerReview" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","ManagerReview")
-                    @Url.MakeActiveClass("ClaimsInvestigation","ManagerReviewDetail")">
-            <i class="fas fa-random nav-icon"></i>
+        <a is-active-page asp-controller="ClaimsInvestigation" asp-action="ManagerActive" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","ManagerActive")
+                    @Url.MakeActiveClass("ClaimsInvestigation","ManagerActiveDetail")">
+            <i class="fa fa-toggle-on nav-icon"></i>
             <p>
-                <span class="badge badge-warning">REVIEW</span>
+                <span class="badge badge-primary">ACTIVE</span>
             </p>
         </a>
     </li>
     <li class="nav-item">
-        <a is-active-page asp-controller="Report" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Report","Index")
-                                                @Url.MakeActiveClass("Report","Detail") @Url.MakeActiveClass("Report","ShowInvoice")
+        <a is-active-page asp-controller="Report" asp-action="ManagerIndex" class="actual-link nav-link @Url.MakeActiveClass("Report","ManagerIndex")
+                                                    @Url.MakeActiveClass("Report","ManagerDetail") @Url.MakeActiveClass("Report","ShowInvoice")
                                                                       @Url.MakeActiveClass("Report","PrintInvoice")">
             <i class="far fa-thumbs-up nav-icon"></i>
             <p>
@@ -50,8 +50,8 @@
         </a>
     </li>
     <li class="nav-item">
-        <a is-active-page asp-controller="Report" asp-action="Rejected" class="actual-link nav-link @Url.MakeActiveClass("Report","Rejected")
-                                                           @Url.MakeActiveClass("Report","RejectDetail") ">
+        <a is-active-page asp-controller="Report" asp-action="ManagerRejected" class="actual-link nav-link @Url.MakeActiveClass("Report","ManagerRejected")
+                                                               @Url.MakeActiveClass("Report","ManagerRejectDetail") ">
            <i class="far fa-thumbs-down nav-icon"></i>
            <p>
                <span class="badge badge-secondary">REJECTED</span>

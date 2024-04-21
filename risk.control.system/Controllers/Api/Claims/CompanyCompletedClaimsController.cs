@@ -30,7 +30,7 @@ namespace risk.control.system.Controllers.Api.Claims
         }
 
         [HttpGet("GetReport")]
-    [Authorize(Roles = ASSESSOR.DISPLAY_NAME)]
+        [Authorize(Roles = ASSESSOR.DISPLAY_NAME)]
         public async Task<IActionResult> GetReport()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims().Where(c =>
@@ -64,8 +64,8 @@ namespace risk.control.system.Controllers.Api.Claims
                     reviewLogCount = userHasReviewClaimLogs.OrderByDescending(o => o.HopCount).First().HopCount;
                 }
 
-                var userHasClaimLog = _context.InvestigationTransaction.Any(c => c.ClaimsInvestigationId == claim.ClaimsInvestigationId && 
-                c.HopCount >= reviewLogCount && 
+                var userHasClaimLog = _context.InvestigationTransaction.Any(c => c.ClaimsInvestigationId == claim.ClaimsInvestigationId &&
+                c.HopCount >= reviewLogCount &&
                 c.UserEmailActioned == companyUser.Email);
                 if (userHasClaimLog)
                 {
@@ -104,7 +104,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>" :
                         a.CaseLocations.FirstOrDefault().BeneficiaryName,
                 Agency = a.Vendor?.Name,
-                       TimeElapsed = DateTime.Now.Subtract(a.Created).TotalSeconds
+                TimeElapsed = DateTime.Now.Subtract(a.Created).TotalSeconds
             })?.ToList();
 
             return Ok(response);
@@ -175,7 +175,7 @@ namespace risk.control.system.Controllers.Api.Claims
             return Ok(response);
         }
         [HttpGet("GetReject")]
-    [Authorize(Roles = ASSESSOR.DISPLAY_NAME)]
+        [Authorize(Roles = ASSESSOR.DISPLAY_NAME)]
         public async Task<IActionResult> GetReject()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims().Where(c =>
@@ -255,6 +255,71 @@ namespace risk.control.system.Controllers.Api.Claims
             return Ok(response);
         }
 
+        [HttpGet("GetManagerReject")]
+        [Authorize(Roles = MANAGER.DISPLAY_NAME)]
+        public async Task<IActionResult> GetManagerReject()
+        {
+            IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims().Where(c =>
+                c.CustomerDetail != null && c.CaseLocations.Count > 0 &&
+                c.CaseLocations.All(c => c.ClaimReport != null));
+            var userEmail = HttpContext.User.Identity.Name;
+
+            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+
+            var approvedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR);
+            var rejectdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR);
+
+            var finishStatus = _context.InvestigationCaseStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.FINISHED);
+
+            var claims = applicationDbContext.Where(c => c.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
+                c.InvestigationCaseSubStatusId == rejectdStatus.InvestigationCaseSubStatusId
+                )?.ToList();
+            var claimsSubmitted = new List<ClaimsInvestigation>();
+
+            foreach (var claim in claims)
+            {
+                claimsSubmitted.Add(claim);
+            }
+            var response =
+                claimsSubmitted
+            .Select(a => new ClaimsInvesgationResponse
+            {
+                Id = a.ClaimsInvestigationId,
+                AutoAllocated = a.AutoAllocated,
+                PolicyId = a.PolicyDetail.ContractNumber,
+                Amount = String.Format(new CultureInfo("hi-IN"), "{0:C}", a.PolicyDetail.SumAssuredValue),
+                AssignedToAgency = a.AssignedToAgency,
+                Agent = !string.IsNullOrWhiteSpace(a.UserEmailActionedTo) ?
+                        string.Join("", "<span class='badge badge-light'>" + a.UserEmailActionedTo + "</span>") :
+                        string.Join("", "<span class='badge badge-light'>" + a.UserRoleActionedTo + "</span>"),
+                Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
+                PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
+                Document = a.PolicyDetail?.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : Applicationsettings.NO_POLICY_IMAGE,
+                Customer = a.CustomerDetail?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail.ProfilePicture)) : Applicationsettings.NO_USER,
+                Name = a.CustomerDetail?.CustomerName != null ? a.CustomerDetail?.CustomerName : "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/user.png\" /> </span>",
+                Policy = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail?.LineOfBusiness.Name + "</span>"),
+                Status = string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseStatus.Name + "</span>"),
+                ServiceType = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail?.ClaimType.GetEnumDisplayName() + "</span>"),
+                Service = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail.InvestigationServiceType.Name + "</span>"),
+                Location = string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseSubStatus.Name + "</span>"),
+                Created = string.Join("", "<span class='badge badge-light'>" + a.Created.ToString("dd-MM-yyyy") + "</span>"),
+                timePending = a.GetTimePending(),
+                PolicyNum = a.GetPolicyNum(),
+                BeneficiaryPhoto = a.CaseLocations.Count != 0 && a.CaseLocations.FirstOrDefault().ProfilePicture != null ?
+                                       string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CaseLocations.FirstOrDefault().ProfilePicture)) :
+                                      @Applicationsettings.NO_USER,
+                BeneficiaryName = a.CaseLocations.Count == 0 ?
+                        "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>" :
+                        a.CaseLocations.FirstOrDefault().BeneficiaryName,
+                Agency = a.Vendor?.Name,
+                TimeElapsed = DateTime.Now.Subtract(a.Created).TotalSeconds
+            })?.ToList();
+
+            return Ok(response);
+        }
         [HttpGet("GetReportMap")]
         public async Task<IActionResult> GetReportMap()
         {
