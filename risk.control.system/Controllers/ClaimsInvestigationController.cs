@@ -515,6 +515,34 @@ namespace risk.control.system.Controllers
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
+        [Breadcrumb(title: " Detail", FromAction = "ManagerReview")]
+        [Authorize(Roles = MANAGER.DISPLAY_NAME)]
+        public async Task<IActionResult> ManagerReviewDetail(string id)
+        {
+            try
+            {
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (string.IsNullOrWhiteSpace(currentUserEmail))
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                if (id == null)
+                {
+                    notifyService.Error("NOT FOUND !!!..");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+
+                var model = await claimPolicyService.GetClaimDetail(id);
+
+                return View(model);
+            }
+            catch (Exception)
+            {
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+        }
 
         [Breadcrumb(title: "Report", FromAction = "Assessor")]
         [Authorize(Roles = ASSESSOR.DISPLAY_NAME)]
@@ -745,7 +773,7 @@ namespace risk.control.system.Controllers
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
-        [Breadcrumb(title: " Agency detail", FromAction = "Draft")]
+        [Breadcrumb(title: " Agency detail", FromAction = "ManagerActive")]
         [Authorize(Roles = CREATOR.DISPLAY_NAME)]
         public async Task<IActionResult> VendorDetail(string companyId, long id, string backurl, string selectedcase)
         {
