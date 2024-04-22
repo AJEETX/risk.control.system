@@ -41,7 +41,7 @@ namespace risk.control.system.Services
                     ContractIssueDate = DateTime.Now.AddDays(-10),
                     CostCentreId = _context.CostCentre.FirstOrDefault().CostCentreId,
                     DateOfIncident = DateTime.Now.AddDays(-3),
-                    InvestigationServiceTypeId = _context.InvestigationServiceType.FirstOrDefault(i => i.Code == "COMP").InvestigationServiceTypeId,
+                    InvestigationServiceTypeId = _context.InvestigationServiceType.FirstOrDefault(i=>i.LineOfBusinessId == lineOfBusinessId).InvestigationServiceTypeId,
                     Comments = "SOMETHING FISHY",
                     SumAssuredValue = new Random().Next(100000, 9999999),
                     ContractNumber = contractNumber,

@@ -1,14 +1,23 @@
-﻿@model bool
+﻿@model ClaimTransactionModel
 @{
-    ViewData["Title"] = "Claim: Active ";
+    ViewData["Title"] = "Claim: New  ";
 }
 
 <section class="content">
     <div id="fullpage" class="card card-secondary">
         <div class="card-header">
-            <h3 class="card-title"><i class="far fa-edit"></i> Draft
-               
+            <input type="hidden" id="total-count" value="@Model.AvailableCount" />
+            <input type="hidden" id="max-count" value="@Model.TotalCount" />
+            <h3 class="card-title"><i class="far fa-edit"></i> New & Draft
+                @if (Model.Trial)
+                {
+                    <span class="badge badge-secondary"> &nbsp;&nbsp;&nbsp;</span>
+                    <span class="badge badge-secondary">
+                        <i id="information" class="fas fa-info"></i>
+                    </span>
+                }
             </h3>
+            
             @* <h3 id="view-type" class="card-title">
             <a href="#" id="map-type" class="input-group-label"> <i class="far fa-map"></i> Map</a>
             <a href="#" id="list-type" class="input-group-label"> <i class="fas fa-server"></i> List</a>
@@ -52,7 +61,7 @@
                 <div class="col-md-12">
                     <div class="form-group">
                         <a id="back" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
-                        @if(Model)
+                        @if(Model.AllowedToCreate)
                         {
                             <a class="create-policy btn btn-success" href='#'><i class="fas fa-pen-alt "></i> @Applicationsettings.CREATE New</a>
                         }

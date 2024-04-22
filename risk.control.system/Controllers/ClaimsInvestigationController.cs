@@ -11,6 +11,7 @@ using NToastNotify;
 
 using risk.control.system.Data;
 using risk.control.system.Models;
+using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
 
 using SmartBreadcrumbs.Attributes;
@@ -107,13 +108,14 @@ namespace risk.control.system.Controllers
 
         }
 
-        [Breadcrumb(" Re + Assign")]
+        [Breadcrumb(" Re & Assign")]
         [Authorize(Roles = CREATOR.DISPLAY_NAME)]
         public IActionResult Assigner()
         {
             try
             {
                 bool userCanUpload = true;
+                int availableCount = 0;
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
@@ -124,13 +126,15 @@ namespace risk.control.system.Controllers
                 if (companyUser.ClientCompany.LicenseType == Standard.Licensing.LicenseType.Trial)
                 {
                     var totalClaimsCreated = _context.ClaimsInvestigation.Include(c => c.PolicyDetail).Where(c => !c.Deleted && c.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId)?.ToList();
+                    availableCount = companyUser.ClientCompany.TotalCreatedClaimAllowed - totalClaimsCreated.Count;
+                    notifyService.Information($"MAX Claim creation available ={availableCount}.");
                     if (totalClaimsCreated?.Count >= companyUser.ClientCompany.TotalCreatedClaimAllowed)
                     {
                         userCanUpload = false;
                         notifyService.Information($"MAX Claim creation limit={companyUser.ClientCompany.TotalCreatedClaimAllowed} reached.");
                     }
                 }
-                
+
                 return View(companyUser.ClientCompany.BulkUpload && userCanUpload);
             }
             catch (Exception)
@@ -198,6 +202,7 @@ namespace risk.control.system.Controllers
             try
             {
                 bool userCanUpload = true;
+                int availableCount = 0;
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
@@ -205,17 +210,19 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                var companyUser = _context.ClientCompanyApplicationUser.Include(u=>u.ClientCompany).FirstOrDefault(u => u.Email == currentUserEmail);
+                var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == currentUserEmail);
                 if (companyUser.ClientCompany.LicenseType == Standard.Licensing.LicenseType.Trial)
                 {
                     var totalClaimsCreated = _context.ClaimsInvestigation.Include(c => c.PolicyDetail).Where(c => !c.Deleted && c.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId)?.ToList();
+                    availableCount = companyUser.ClientCompany.TotalCreatedClaimAllowed - totalClaimsCreated.Count;
+                    notifyService.Information($"MAX Claim creation available ={availableCount}.");
                     if (totalClaimsCreated?.Count >= companyUser.ClientCompany.TotalCreatedClaimAllowed)
                     {
                         userCanUpload = false;
                         notifyService.Information($"MAX Claim creation limit={companyUser.ClientCompany.TotalCreatedClaimAllowed} reached.");
                     }
                 }
-                
+
                 return View(companyUser.ClientCompany.BulkUpload && userCanUpload);
             }
             catch (Exception)
@@ -409,13 +416,14 @@ namespace risk.control.system.Controllers
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
-        [Breadcrumb(title: "Draft")]
+        [Breadcrumb(title: "New & Draft")]
         [Authorize(Roles = CREATOR.DISPLAY_NAME)]
         public IActionResult Incomplete()
         {
             try
             {
                 bool userCanCreate = true;
+                int availableCount = 0;
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
@@ -428,17 +436,32 @@ namespace risk.control.system.Controllers
                     notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                if (companyUser.ClientCompany.LicenseType == Standard.Licensing.LicenseType.Trial)
+                var trial = companyUser.ClientCompany.LicenseType == Standard.Licensing.LicenseType.Trial;
+                if (trial)
                 {
                     var totalClaimsCreated = _context.ClaimsInvestigation.Include(c => c.PolicyDetail).Where(c => !c.Deleted && c.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId)?.ToList();
+                    availableCount = companyUser.ClientCompany.TotalCreatedClaimAllowed - totalClaimsCreated.Count;
+
+                    notifyService.Information($"MAX Claim creation available ={availableCount}.");
                     if (totalClaimsCreated?.Count >= companyUser.ClientCompany.TotalCreatedClaimAllowed)
                     {
                         userCanCreate = false;
                         notifyService.Information($"MAX Claim creation limit={companyUser.ClientCompany.TotalCreatedClaimAllowed} reached.");
                     }
                 }
+                var model = new ClaimTransactionModel
+                {
+                    ClaimsInvestigation = null,
+                    Log = null,
+                    AllowedToCreate = userCanCreate,
+                    AutoAllocation = companyUser.ClientCompany.AutoAllocation,
+                    Location = new CaseLocation { },
+                    AvailableCount = availableCount,
+                    TotalCount = companyUser.ClientCompany.TotalCreatedClaimAllowed,
+                    Trial = trial
+                };
 
-                return View(userCanCreate);
+                return View(model);
             }
             catch (Exception)
             {

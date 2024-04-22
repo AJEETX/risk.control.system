@@ -85,7 +85,7 @@ namespace risk.control.system.Services
                 AutoAllocation = company.AutoAllocation,
                 BulkUpload = company.BulkUpload
             };
-            data.FirstBlockName = "Draft";
+            data.FirstBlockName = "New & Draft";
             data.FirstBlockCount = claimsIncomplete.Count;
             data.FirstBlockUrl = "/ClaimsInvestigation/Incomplete";
 
@@ -95,7 +95,7 @@ namespace risk.control.system.Services
                 data.SecondBlockUrl = "/ClaimsInvestigation/Draft";
                 data.SecondBlockCount = claimsAssignAuto.Count;
 
-                data.SecondBBlockName = "Re + Assign";
+                data.SecondBBlockName = "Re & Assign";
                 data.SecondBBlockUrl = "/ClaimsInvestigation/Assigner";
                 data.SecondBBlockCount = claimsAssignManual.Count;
                 data.SecondBBlockCountBoth = ""+ (claimsAssignManual.Count - claimsAssignAuto.Count) +" + " + (claimsAssignAuto.Count) + "";
@@ -104,7 +104,7 @@ namespace risk.control.system.Services
             }
             else
             {
-                data.SecondBlockName = "Re + Assign";
+                data.SecondBlockName = "Re & Assign";
                 data.SecondBlockUrl = "/ClaimsInvestigation/Assigner";
                 data.SecondBlockCount = claimsAssignManual.Count;
             }

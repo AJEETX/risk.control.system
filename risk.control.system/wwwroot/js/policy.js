@@ -37,6 +37,8 @@ $.validator.setDefaults({
     }
 });
 $(document).ready(function () {
+
+    
     $("#create-form").validate();
     $("#documentImageInput").on('change', function () {
         var MaxSizeInBytes = 2097152;
@@ -113,6 +115,8 @@ $(document).ready(function () {
     $("#ContractNumber").focus();
 
 });
-
+function resetForm() {
+    $("#create-form")[0].reset();
+}
 dateContractId.max = new Date().toISOString().split("T")[0];
 dateIncidentId.max = new Date().toISOString().split("T")[0];

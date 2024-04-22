@@ -62,6 +62,27 @@ async function fetchIpInfo() {
 }
 $(document).ready(function () {
     fetchIpInfo();
+
+    $('#information').on('click', function (e) {
+        var count = $('#total-count').val();
+        var max = $('#max-count').val();
+        $.alert(
+            {
+                title: " Trial version limit !",
+                content: " <i class='fas fa-less-than-equal'></i> Trial version limit =" + max + " . <br />Available count = " + count + "!",
+                icon: 'fas fa-exclamation-triangle',
+                type: 'blue',
+                closeIcon: true,
+                buttons: {
+                    cancel: {
+                        text: "CLOSE",
+                        btnClass: 'btn-primary'
+                    }
+                }
+            }
+        );
+    });
+
     $('#password').on('click', function () {
         $("body").addClass("submit-progress-bg");
         // Wrap in setTimeout so the UI

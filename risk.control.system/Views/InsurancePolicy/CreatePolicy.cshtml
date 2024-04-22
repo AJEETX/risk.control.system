@@ -47,7 +47,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text" asp-for="ContractNumber"><i class="far fa-file-powerpoint"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <input id="ContractNumber" required asp-for="PolicyDetail.ContractNumber" class="form-control remarks" type="text" placeholder="Policy #" maxlength="20" />
+                                <input id="ContractNumber" required asp-for="PolicyDetail.ContractNumber" class="form-control remarks" type="text" placeholder="Policy #" maxlength="20"/>
                                 <span asp-validation-for="PolicyDetail.ContractNumber" class="text-danger"></span>
                             </div>
                         </div>
@@ -92,7 +92,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text" asp-for="InvestigationServiceTypeId"><i class="nav-icon fas fa-tools"></i> <i class="fa fa-asterisk asterik-style"></i> </span>
                                 </div>
-                                <select id="InvestigationServiceTypeId" required asp-for="PolicyDetail.InvestigationServiceTypeId" class="form-control remarks" asp-items="ViewBag.InvestigationServiceTypeId">
+                                <select required asp-for="PolicyDetail.InvestigationServiceTypeId" class="form-control remarks" asp-items="ViewBag.InvestigationServiceTypeId">
                                     <option value="">--- SELECT ---</option>
                                 </select>
                                 <span asp-validation-for="PolicyDetail.InvestigationServiceTypeId" class="text-danger"></span>
@@ -108,14 +108,10 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text" asp-for="DateOfIncident"><i class="nav-icon far fa-calendar-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <input required asp-for="PolicyDetail.DateOfIncident" id="dateIncidentId" class="form-control remarks" type="date" />
+                                <input required asp-for="PolicyDetail.DateOfIncident" id="dateIncidentId" class="form-control remarks" min="2000-01-01" max="@maxDate" type="date" />
                                 <span asp-validation-for="PolicyDetail.DateOfIncident" class="text-danger"></span>
                             </div>
                         </div>
-
-
-
-
                         <div class="form-group">
                             <span class="input-group-label"> Cause Of Incident:</span>
                             <div class="input-group mb-3">
@@ -165,7 +161,7 @@
             </div>
             <div class="card-footer">
                 <div class="text-right">
-                    @* <button type="reset" class="btn btn-outline-secondary">
+                    @* <button type="reset" onclick="resetForm()" class="btn btn-outline-secondary">
                         <i class="fas fa-undo"></i> RESET
                     </button> *@
                     <a id="back" asp-controller="InsuranceClaims" asp-action="Index" class="btn btn-secondary">

@@ -8,7 +8,21 @@
 <section class="content">
     <div id="article" class="card card-secondary">
         <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-pen-alt"></i> Add New</h3>
+            <input type="hidden" id="total-count" value="@Model.AvailableCount" />
+            <input type="hidden" id="max-count" value="@Model.TotalCount" />
+            <h3 class="card-title">
+                <i class="fas fa-pen-alt"></i> Add New
+                @if (Model.Trial)
+                {
+                    <span class="badge badge-secondary"> &nbsp;&nbsp;&nbsp;</span>
+                    <span class="badge badge-secondary">
+                        <i id="information" class="fas fa-info"></i>
+                    </span>
+                }
+
+            </h3>
+
+
         </div>
         @{
             string address = string.Empty;
@@ -16,6 +30,7 @@
             int currentAgeinYrs = 0;
 
             <div class="container d-flex justify-content-center align-items-center">
+
                 <div class="progresses">
                     <div class="steps2">
                         <span> <i class="far fa-file-powerpoint"></i></span>
@@ -82,7 +97,7 @@
                                                 </span>
                                                 Incident Date: dd-MMM-yyyy
                                             </li>
-                                            
+
                                             <li class="small">
                                                 <span class="fa-li">
                                                     <i class="fas far fa-flag"></i>
@@ -234,7 +249,7 @@
                     </div>
 
                 </div>
-              
+
             </div>
             <div class="card-footer d-flex justify-content-center align-items-center">
                 <div class="row">

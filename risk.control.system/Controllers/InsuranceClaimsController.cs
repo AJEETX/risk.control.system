@@ -52,9 +52,15 @@ namespace risk.control.system.Controllers
             };
             var companyUser = context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(c => c.Email == currentUserEmail);
             bool userCanCreate = true;
-            if (companyUser.ClientCompany.LicenseType == Standard.Licensing.LicenseType.Trial)
+            int availableCount = 0;
+            var trial = companyUser.ClientCompany.LicenseType == Standard.Licensing.LicenseType.Trial;
+            if (trial)
             {
                 var totalClaimsCreated = context.ClaimsInvestigation.Include(c => c.PolicyDetail).Where(c => !c.Deleted && c.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId)?.ToList();
+                availableCount = companyUser.ClientCompany.TotalCreatedClaimAllowed - totalClaimsCreated.Count;
+                
+                notifyService.Information($"MAX Claim creation available ={availableCount}.");
+
                 if (totalClaimsCreated?.Count >= companyUser.ClientCompany.TotalCreatedClaimAllowed)
                 {
                     userCanCreate = false;
@@ -66,7 +72,10 @@ namespace risk.control.system.Controllers
                 Log = null,
                 AllowedToCreate = userCanCreate,
                 AutoAllocation = companyUser.ClientCompany.AutoAllocation,
-                Location = new CaseLocation { }
+                Location = new CaseLocation { },
+                AvailableCount = availableCount,
+                TotalCount = companyUser.ClientCompany.TotalCreatedClaimAllowed,
+                Trial = trial
             };
 
             return View(model);
