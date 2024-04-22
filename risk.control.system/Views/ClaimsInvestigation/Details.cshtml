@@ -75,6 +75,9 @@
                 benficiaryProgressColor = "steps";
                 beneficiaryLineColor = "line1";
             }
+            <input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail?.CustomerDetailId" />
+            <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
+            <input type="hidden" id="beneficiaryId" value="@Model.Location?.CaseLocationId" />
 
             <div class="container d-flex justify-content-center align-items-center">
                 <div class="progresses">
@@ -238,7 +241,7 @@
                                 </div>
 
                                 <div>
-                                    <a id="back" asp-action="Incomplete" class="btn btn-outline-secondary"><span class="badge badge-light"> <i class="fas fa-arrow-left"></i> </span> Draft </a>
+                                    <button id="back" disabled class="btn btn-outline-secondary"><span class="badge badge-light"> <i class="fas fa-arrow-left"></i> </span> Draft </button>
 
                                     @if (Model.AutoAllocation)
                                     {
