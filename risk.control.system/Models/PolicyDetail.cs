@@ -34,7 +34,7 @@ namespace risk.control.system.Models
         [Required]
         [Display(Name = "Case issue date")]
         [DataType(DataType.Date)]
-        public DateTime ContractIssueDate { get; set; } = DateTime.Now;
+        public DateTime ContractIssueDate { get; set; }
 
         [Display(Name = "Claim type")]
         public ClaimType? ClaimType { get; set; }
@@ -42,7 +42,7 @@ namespace risk.control.system.Models
         [Required]
         [Display(Name = "Date of incident")]
         [DataType(DataType.Date)]
-        public DateTime DateOfIncident { get; set; } = DateTime.Now;
+        public DateTime DateOfIncident { get; set; }
 
         [Required]
         [Display(Name = "Cause of loss")]

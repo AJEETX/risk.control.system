@@ -151,9 +151,8 @@
                         <div class="form-group">
                             <span class="input-group-label"> Policy Document:</span>
                             <div class="input-group mb-3">
-
                                 <img class="form-Image" id="policyImage" src=@Applicationsettings.NO_POLICY_IMAGE>
-                                <input accept="image/*" asp-for="PolicyDetail.Document" type="file" class="form-control remarks" id="documentImageInput" onchange="document.getElementById('policyImage').src = window.URL.createObjectURL(this.files[0])" />
+                                <input accept="image/*" asp-for="PolicyDetail.Document" type="file" class="form-control remarks" id="documentImageInput" />
                             </div>
                         </div>
                     </div>
@@ -161,9 +160,9 @@
             </div>
             <div class="card-footer">
                 <div class="text-right">
-                    @* <button type="reset" onclick="resetForm()" class="btn btn-outline-secondary">
+                    <button type="submit" onclick="clearAllInputs()" class="btn btn-outline-secondary">
                         <i class="fas fa-undo"></i> RESET
-                    </button> *@
+                    </button>
                     <a id="back" asp-controller="InsuranceClaims" asp-action="Index" class="btn btn-secondary">
                         <i class="fa fa-window-close"></i>
                         @Applicationsettings.CANCEL

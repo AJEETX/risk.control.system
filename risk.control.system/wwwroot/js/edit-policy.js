@@ -54,8 +54,8 @@ $(document).ready(function () {
                 for (var i = 0; i < countFiles; i++) {
                     var fileSize = $(this)[0].files[i].size;
                     if (fileSize > MaxSizeInBytes) {
-                        if (currentImage.startsWith('https://') && currentImage.endsWith('/img/no-policy.jpg')) {
-                            document.getElementById('policyImage').src = '/img/no-policy.jpg';
+                        if (currentImage.startsWith('https://') && currentImage.endsWith('/img/no-image.png')) {
+                            document.getElementById('policyImage').src = '/img/no-image.png';
                             document.getElementById('documentImageInput').value = '';
                         }
                         

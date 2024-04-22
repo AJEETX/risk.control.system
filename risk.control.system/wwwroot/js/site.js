@@ -10,7 +10,19 @@ var showOcrMap = false;
 const image =
     "/images/beachflag.png";
 
-
+function clearAllInputs(event) {
+    var allInputs = document.querySelectorAll('input');
+    allInputs.forEach(singleInput => singleInput.value = '');
+    $("option:selected").prop("selected", false);
+    var policyImage = document.getElementById('policyImage');
+    var profileImage = document.getElementById('profileImage');
+    if (policyImage) {
+        policyImage.src = '/img/no-image.png';
+    }
+    if (profileImage) {
+        profileImage.src = '/img/no-user.png';
+    }
+}
 function getDeviceType() {
     const ua = navigator.userAgent;
     if (/(tablet|ipad|playbook|silk)|(android(?!.*mobi))/i.test(ua)) {

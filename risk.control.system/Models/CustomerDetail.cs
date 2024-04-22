@@ -16,7 +16,7 @@ namespace risk.control.system.Models
         [Required]
         [Display(Name = "Date of birth")]
         [DataType(DataType.Date)]
-        public DateTime CustomerDateOfBirth { get; set; } = DateTime.Now;
+        public DateTime CustomerDateOfBirth { get; set; }
 
         public Gender? Gender { get; set; }
 

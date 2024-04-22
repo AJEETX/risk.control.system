@@ -37,8 +37,6 @@ $.validator.setDefaults({
     }
 });
 $(document).ready(function () {
-
-    
     $("#create-form").validate();
     $("#documentImageInput").on('change', function () {
         var MaxSizeInBytes = 2097152;
@@ -55,7 +53,7 @@ $(document).ready(function () {
                 for (var i = 0; i < countFiles; i++) {
                     var fileSize = $(this)[0].files[i].size;
                     if (fileSize > MaxSizeInBytes) {
-                        document.getElementById('policyImage').src = '/img/no-policy.jpg';
+                        document.getElementById('policyImage').src = '/img/no-image.png';
                         document.getElementById('documentImageInput').value = '';
                         $.alert(
                             {
@@ -72,6 +70,9 @@ $(document).ready(function () {
                                 }
                             }
                         );
+                    }
+                    else {
+                        document.getElementById('policyImage').src = window.URL.createObjectURL(this.files[0])
                     }
                 }
 
@@ -115,8 +116,6 @@ $(document).ready(function () {
     $("#ContractNumber").focus();
 
 });
-function resetForm() {
-    $("#create-form")[0].reset();
-}
+
 dateContractId.max = new Date().toISOString().split("T")[0];
 dateIncidentId.max = new Date().toISOString().split("T")[0];
