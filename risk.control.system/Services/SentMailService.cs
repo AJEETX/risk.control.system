@@ -115,7 +115,7 @@ namespace risk.control.system.Services
 
             var recepientMailbox = _context.Mailbox.FirstOrDefault(c => c.Name == contactMessage.ReceipientEmail);
             contactMessage.SenderEmail = userEmail;
-            contactMessage.SendDate = DateTime.UtcNow;
+            contactMessage.SendDate = DateTime.Now;
             contactMessage.Read = false;
             contactMessage.Document = null;
 
@@ -138,7 +138,7 @@ namespace risk.control.system.Services
                     sentMessage.Extension = extension;
                     sentMessage.AttachmentName = messageDocumentFileName;
                 }
-                sentMessage.SendDate = DateTime.UtcNow;
+                sentMessage.SendDate = DateTime.Now;
                 userMailbox.Sent.Add(sentMessage);
                 _context.Mailbox.Attach(userMailbox);
                 _context.Mailbox.Update(userMailbox);
@@ -156,7 +156,7 @@ namespace risk.control.system.Services
                     inboxMessage.Extension = extension;
                     inboxMessage.AttachmentName = messageDocumentFileName;
                 }
-                inboxMessage.SendDate = DateTime.UtcNow;
+                inboxMessage.SendDate = DateTime.Now;
                 recepientMailbox.Inbox.Add(inboxMessage);
                 _context.Mailbox.Attach(recepientMailbox);
                 _context.Mailbox.Update(recepientMailbox);

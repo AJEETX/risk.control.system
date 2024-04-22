@@ -171,8 +171,8 @@ namespace risk.control.system.Services
             var recepientMailbox = _context.Mailbox.FirstOrDefault(c => c.Name == contactMessage.ReceipientEmail);
 
             contactMessage.Read = false;
-            contactMessage.SendDate = DateTime.UtcNow;
-            contactMessage.Updated = DateTime.UtcNow;
+            contactMessage.SendDate = DateTime.Now;
+            contactMessage.Updated = DateTime.Now;
             contactMessage.UpdatedBy = userEmail;
             contactMessage.SenderEmail = userEmail;
             contactMessage.Document =null;

@@ -132,7 +132,7 @@ namespace risk.control.system.Controllers
             user.EmailConfirmed = true;
             user.UserName = userFullEmail;
             user.Mailbox = new Mailbox { Name = userFullEmail };
-            user.Updated = DateTime.UtcNow;
+            user.Updated = DateTime.Now;
             user.UpdatedBy = HttpContext.User?.Identity?.Name;
             IdentityResult result = await userManager.CreateAsync(user, user.Password);
 
@@ -272,11 +272,11 @@ namespace risk.control.system.Controllers
                         user.StateId = applicationUser.StateId;
                         user.PinCode = applicationUser.PinCode;
                         user.PinCodeId = applicationUser.PinCodeId;
-                        user.Updated = DateTime.UtcNow;
+                        user.Updated = DateTime.Now;
                         user.Comments = applicationUser.Comments;
                         user.PhoneNumber = applicationUser.PhoneNumber;
                         user.UpdatedBy = HttpContext.User?.Identity?.Name;
-                        user.SecurityStamp = DateTime.UtcNow.ToString();
+                        user.SecurityStamp = DateTime.Now.ToString();
                         var result = await userManager.UpdateAsync(user);
                         if (result.Succeeded)
                         {
@@ -384,7 +384,7 @@ namespace risk.control.system.Controllers
                 return NotFound();
             }
             user.SecurityStamp = Guid.NewGuid().ToString();
-            user.Updated = DateTime.UtcNow;
+            user.Updated = DateTime.Now;
             user.UpdatedBy = HttpContext.User?.Identity?.Name;
             var roles = await userManager.GetRolesAsync(user);
             var result = await userManager.RemoveFromRolesAsync(user, roles);
@@ -435,7 +435,7 @@ namespace risk.control.system.Controllers
             var vendorApplicationUser = await _context.VendorApplicationUser.FindAsync(id);
             if (vendorApplicationUser != null)
             {
-                vendorApplicationUser.Updated = DateTime.UtcNow;
+                vendorApplicationUser.Updated = DateTime.Now;
                 vendorApplicationUser.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.VendorApplicationUser.Remove(vendorApplicationUser);
                 notifyService.Error($"User deleted successfully.", 3);

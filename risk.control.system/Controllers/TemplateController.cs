@@ -70,7 +70,7 @@ namespace risk.control.system.Controllers
             if (ModelState.IsValid)
             {
                 var userEmail = HttpContext?.User?.Identity?.Name;
-                reportTemplate.Updated = DateTime.UtcNow;
+                reportTemplate.Updated = DateTime.Now;
                 reportTemplate.UpdatedBy = userEmail;
                 var user = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
                 reportTemplate.ClientCompanyId = user.ClientCompanyId;
@@ -120,7 +120,7 @@ namespace risk.control.system.Controllers
                 try
                 {
                     var userEmail = HttpContext?.User?.Identity?.Name;
-                    reportTemplate.Updated = DateTime.UtcNow;
+                    reportTemplate.Updated = DateTime.Now;
                     reportTemplate.UpdatedBy = userEmail;
                     var user = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
                     reportTemplate.ClientCompanyId = user.ClientCompanyId;

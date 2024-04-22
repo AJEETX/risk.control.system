@@ -63,7 +63,7 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(InvestigationCaseStatus investigationCaseStatus)
         {
-            investigationCaseStatus.Updated = DateTime.UtcNow;
+            investigationCaseStatus.Updated = DateTime.Now;
             investigationCaseStatus.UpdatedBy = HttpContext.User?.Identity?.Name;
             _context.Add(investigationCaseStatus);
             await _context.SaveChangesAsync();
@@ -107,7 +107,7 @@ namespace risk.control.system.Controllers
             {
                 try
                 {
-                    investigationCaseStatus.Updated = DateTime.UtcNow;
+                    investigationCaseStatus.Updated = DateTime.Now;
                     investigationCaseStatus.UpdatedBy = HttpContext.User?.Identity?.Name;
                     _context.Update(investigationCaseStatus);
                     await _context.SaveChangesAsync();
@@ -164,7 +164,7 @@ namespace risk.control.system.Controllers
             var investigationCaseStatus = await _context.InvestigationCaseStatus.FindAsync(id);
             if (investigationCaseStatus != null)
             {
-                investigationCaseStatus.Updated = DateTime.UtcNow;
+                investigationCaseStatus.Updated = DateTime.Now;
                 investigationCaseStatus.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.InvestigationCaseStatus.Remove(investigationCaseStatus);
             }

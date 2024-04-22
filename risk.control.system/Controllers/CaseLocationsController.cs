@@ -156,7 +156,7 @@ namespace risk.control.system.Controllers
                 var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                    i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
 
-                caseLocation.Updated = DateTime.UtcNow;
+                caseLocation.Updated = DateTime.Now;
                 caseLocation.UpdatedBy = HttpContext.User?.Identity?.Name;
                 caseLocation.InvestigationCaseSubStatusId = createdStatus.InvestigationCaseSubStatusId;
 
@@ -360,7 +360,7 @@ namespace risk.control.system.Controllers
                 var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                    i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
                 var caseLocation = _context.CaseLocation.FirstOrDefault(c => c.CaseLocationId == ecaseLocation.CaseLocationId);
-                caseLocation.Updated = DateTime.UtcNow;
+                caseLocation.Updated = DateTime.Now;
                 caseLocation.UpdatedBy = HttpContext.User?.Identity?.Name;
                 caseLocation.Addressline = ecaseLocation.Addressline;
                 caseLocation.BeneficiaryContactNumber = ecaseLocation.BeneficiaryContactNumber;
@@ -484,7 +484,7 @@ namespace risk.control.system.Controllers
                     notifyService.Error("NOT FOUND!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                caseLocation.Updated = DateTime.UtcNow;
+                caseLocation.Updated = DateTime.Now;
                 caseLocation.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.CaseLocation.Remove(caseLocation);
 

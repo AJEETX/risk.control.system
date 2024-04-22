@@ -114,7 +114,7 @@ namespace risk.control.system.Controllers
             {
                 try
                 {
-                    beneficiaryRelation.Updated = DateTime.UtcNow;
+                    beneficiaryRelation.Updated = DateTime.Now;
                     beneficiaryRelation.UpdatedBy = HttpContext.User?.Identity?.Name;
                     _context.Update(beneficiaryRelation);
                     await _context.SaveChangesAsync();
@@ -167,7 +167,7 @@ namespace risk.control.system.Controllers
             var beneficiaryRelation = await _context.BeneficiaryRelation.FindAsync(id);
             if (beneficiaryRelation != null)
             {
-                beneficiaryRelation.Updated = DateTime.UtcNow;
+                beneficiaryRelation.Updated = DateTime.Now;
                 beneficiaryRelation.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.BeneficiaryRelation.Remove(beneficiaryRelation);
             }

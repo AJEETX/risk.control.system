@@ -417,13 +417,7 @@ namespace risk.control.system.Controllers
                     notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var status = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.INITIATED));
-                var subStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR));
-
-                claimsInvestigation.InvestigationCaseStatusId = status.InvestigationCaseStatusId;
-                claimsInvestigation.InvestigationCaseStatus = status;
-                claimsInvestigation.InvestigationCaseSubStatusId = subStatus.InvestigationCaseSubStatusId;
-                claimsInvestigation.InvestigationCaseSubStatus = subStatus;
+                
                 claimsInvestigation.PolicyDetail.ClientCompanyId = companyUser?.ClientCompanyId;
 
                 IFormFile documentFile = null;

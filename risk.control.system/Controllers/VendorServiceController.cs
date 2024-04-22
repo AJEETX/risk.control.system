@@ -109,9 +109,9 @@ namespace risk.control.system.Controllers
                     VendorInvestigationServiceType = vendorInvestigationServiceType,
                 }).ToList();
                 vendorInvestigationServiceType.PincodeServices = servicePinCodes;
-                vendorInvestigationServiceType.Updated = DateTime.UtcNow;
+                vendorInvestigationServiceType.Updated = DateTime.Now;
                 vendorInvestigationServiceType.UpdatedBy = HttpContext.User?.Identity?.Name;
-                vendorInvestigationServiceType.Created = DateTime.UtcNow;
+                vendorInvestigationServiceType.Created = DateTime.Now;
                 _context.Add(vendorInvestigationServiceType);
                 await _context.SaveChangesAsync();
                 notifyService.Custom($"Service created successfully.", 3, "green", "fas fa-truck");
@@ -211,7 +211,7 @@ namespace risk.control.system.Controllers
                         _context.ServicedPinCode.AddRange(pinCodesWithId);
 
                         vendorInvestigationServiceType.PincodeServices = pinCodesWithId;
-                        vendorInvestigationServiceType.Updated = DateTime.UtcNow;
+                        vendorInvestigationServiceType.Updated = DateTime.Now;
                         vendorInvestigationServiceType.UpdatedBy = HttpContext.User?.Identity?.Name;
                         _context.Update(vendorInvestigationServiceType);
                         await _context.SaveChangesAsync();
@@ -283,7 +283,7 @@ namespace risk.control.system.Controllers
             var vendorInvestigationServiceType = await _context.VendorInvestigationServiceType.FindAsync(id);
             if (vendorInvestigationServiceType != null)
             {
-                vendorInvestigationServiceType.Updated = DateTime.UtcNow;
+                vendorInvestigationServiceType.Updated = DateTime.Now;
                 vendorInvestigationServiceType.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.VendorInvestigationServiceType.Remove(vendorInvestigationServiceType);
                 await _context.SaveChangesAsync();

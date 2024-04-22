@@ -203,7 +203,7 @@ namespace risk.control.system.Controllers
                         vendor.DocumentUrl = existingVendor.DocumentUrl;
                     }
                 }
-                vendor.Updated = DateTime.UtcNow;
+                vendor.Updated = DateTime.Now;
                 vendor.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Vendor.Update(vendor);
                 await _context.SaveChangesAsync();
@@ -309,7 +309,7 @@ namespace risk.control.system.Controllers
                 user.EmailConfirmed = true;
                 user.UserName = userFullEmail;
                 user.Mailbox = new Mailbox { Name = userFullEmail };
-                user.Updated = DateTime.UtcNow;
+                user.Updated = DateTime.Now;
                 user.UpdatedBy = HttpContext.User?.Identity?.Name;
                 IdentityResult result = await userManager.CreateAsync(user, user.Password);
                 if (result.Succeeded)
@@ -467,11 +467,11 @@ namespace risk.control.system.Controllers
                     user.StateId = applicationUser.StateId;
                     user.PinCode = applicationUser.PinCode;
                     user.PinCodeId = applicationUser.PinCodeId;
-                    user.Updated = DateTime.UtcNow;
+                    user.Updated = DateTime.Now;
                     user.Comments = applicationUser.Comments;
                     user.PhoneNumber = applicationUser.PhoneNumber;
                     user.UpdatedBy = HttpContext.User?.Identity?.Name;
-                    user.SecurityStamp = DateTime.UtcNow.ToString();
+                    user.SecurityStamp = DateTime.Now.ToString();
                     var result = await userManager.UpdateAsync(user);
                     if (result.Succeeded)
                     {
@@ -590,7 +590,7 @@ namespace risk.control.system.Controllers
                 return NotFound();
             }
             user.SecurityStamp = Guid.NewGuid().ToString();
-            user.Updated = DateTime.UtcNow;
+            user.Updated = DateTime.Now;
             user.UpdatedBy = HttpContext.User?.Identity?.Name;
             var roles = await userManager.GetRolesAsync(user);
             var result = await userManager.RemoveFromRolesAsync(user, roles);
@@ -679,9 +679,9 @@ namespace risk.control.system.Controllers
                         VendorInvestigationServiceType = vendorInvestigationServiceType,
                     }).ToList();
                     vendorInvestigationServiceType.PincodeServices = servicePinCodes;
-                    vendorInvestigationServiceType.Updated = DateTime.UtcNow;
+                    vendorInvestigationServiceType.Updated = DateTime.Now;
                     vendorInvestigationServiceType.UpdatedBy = HttpContext.User?.Identity?.Name;
-                    vendorInvestigationServiceType.Created = DateTime.UtcNow;
+                    vendorInvestigationServiceType.Created = DateTime.Now;
                     vendorInvestigationServiceType.VendorId = vendor.VendorId;
                     _context.Add(vendorInvestigationServiceType);
                     await _context.SaveChangesAsync();
@@ -790,7 +790,7 @@ namespace risk.control.system.Controllers
                     _context.ServicedPinCode.AddRange(pinCodesWithId);
 
                     vendorInvestigationServiceType.PincodeServices = pinCodesWithId;
-                    vendorInvestigationServiceType.Updated = DateTime.UtcNow;
+                    vendorInvestigationServiceType.Updated = DateTime.Now;
                     vendorInvestigationServiceType.UpdatedBy = HttpContext.User?.Identity?.Name;
                     _context.Update(vendorInvestigationServiceType);
                     await _context.SaveChangesAsync();
@@ -862,7 +862,7 @@ namespace risk.control.system.Controllers
                 var vendorInvestigationServiceType = await _context.VendorInvestigationServiceType.FindAsync(id);
                 if (vendorInvestigationServiceType != null)
                 {
-                    vendorInvestigationServiceType.Updated = DateTime.UtcNow;
+                    vendorInvestigationServiceType.Updated = DateTime.Now;
                     vendorInvestigationServiceType.UpdatedBy = HttpContext.User?.Identity?.Name;
                     _context.VendorInvestigationServiceType.Remove(vendorInvestigationServiceType);
                 }

@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Net;
 using System.Text.RegularExpressions;
 
 using Microsoft.AspNetCore.Authorization;
@@ -60,10 +61,14 @@ namespace risk.control.system.Controllers.Api
 
         [AllowAnonymous]
         [HttpPost("ResetUid")]
-        public async Task<IActionResult> ResetUid(string mobile, bool sendSMS = false)
+        public async Task<IActionResult> ResetUid([Required]string mobile, bool sendSMS = false)
         {
             try
             {
+                if(string.IsNullOrWhiteSpace(mobile))
+                {
+                    return BadRequest($"Empty mobile number");
+                }
                 var user2Onboard = await agentService.ResetUid(mobile, sendSMS);
 
                 if (user2Onboard == null)
@@ -79,6 +84,7 @@ namespace risk.control.system.Controllers.Api
             }
         }
 
+    [ApiExplorerSettings(IgnoreApi = true)]
         [AllowAnonymous]
         [HttpPost("VerifyMobile")]
         public async Task<IActionResult> VerifyMobile(VerifyMobileRequest request)
@@ -137,6 +143,7 @@ namespace risk.control.system.Controllers.Api
         }
         [AllowAnonymous]
         [HttpPost("VerifyId")]
+    [ApiExplorerSettings(IgnoreApi = true)]
         public async Task<IActionResult> VerifyId(VerifyIdRequest request)
         {
             try
@@ -166,7 +173,7 @@ namespace risk.control.system.Controllers.Api
 
                 //using MemoryStream stream = new MemoryStream(image);
 
-                //var filePath = Path.Combine(path, $"face{DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss")}.jpg");
+                //var filePath = Path.Combine(path, $"face{DateTime.Now.ToString("dd-MMM-yyyy-HH-mm-ss")}.jpg");
                 //CompressImage.CompressimageWindows(stream, filePath);
 
                 //var savedImage = await System.IO.File.ReadAllBytesAsync(filePath);
@@ -190,6 +197,7 @@ namespace risk.control.system.Controllers.Api
         }
 
         [AllowAnonymous]
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpPost("VerifyDocument")]
         public async Task<IActionResult> VerifyDocument(VerifyDocumentRequest request)
         {
@@ -236,6 +244,7 @@ namespace risk.control.system.Controllers.Api
                 return BadRequest("document verify issue");
             }
         }
+        [ApiExplorerSettings(IgnoreApi = true)]
 
         [AllowAnonymous]
         [HttpGet("GetImage")]
@@ -289,6 +298,7 @@ namespace risk.control.system.Controllers.Api
 
             return Ok();
         }
+        [ApiExplorerSettings(IgnoreApi = true)]
 
         [AllowAnonymous]
         [HttpGet("agent")]
@@ -401,6 +411,7 @@ namespace risk.control.system.Controllers.Api
             }
             return Unauthorized("UnAuthenticated User !!!");
         }
+        [ApiExplorerSettings(IgnoreApi = true)]
 
         [AllowAnonymous]
         [HttpGet("agent-map")]
@@ -492,6 +503,7 @@ namespace risk.control.system.Controllers.Api
             return Unauthorized();
         }
 
+    [ApiExplorerSettings(IgnoreApi = true)]
         [AllowAnonymous]
         [HttpGet("get")]
         public async Task<IActionResult> Get(string claimId)
@@ -593,6 +605,7 @@ namespace risk.control.system.Controllers.Api
                     Remarks = claimCase?.ClaimReport?.AgentRemarks
                 });
         }
+        [ApiExplorerSettings(IgnoreApi = true)]
 
         [AllowAnonymous]
         [HttpPost("faceid")]
@@ -618,6 +631,7 @@ namespace risk.control.system.Controllers.Api
                 return StatusCode(500, ex.Message);
             }
         }
+        [ApiExplorerSettings(IgnoreApi = true)]
 
         [AllowAnonymous]
         [HttpPost("documentid")]
@@ -645,6 +659,7 @@ namespace risk.control.system.Controllers.Api
             }
         }
 
+    [ApiExplorerSettings(IgnoreApi = true)]
         [AllowAnonymous]
         [HttpPost("audio")]
         public async Task<IActionResult> Audio(AudioData data)
@@ -659,6 +674,7 @@ namespace risk.control.system.Controllers.Api
             return Ok(data.Name);
         }
 
+        [ApiExplorerSettings(IgnoreApi = true)]
         [AllowAnonymous]
         [HttpPost("video")]
         public async Task<IActionResult> Video(VideoData data)
@@ -674,6 +690,7 @@ namespace risk.control.system.Controllers.Api
             return Ok(data.Name);
         }
 
+        [ApiExplorerSettings(IgnoreApi = true)]
         [AllowAnonymous]
         [HttpPost("submit")]
         public async Task<IActionResult> Submit(SubmitData data)
@@ -722,6 +739,8 @@ namespace risk.control.system.Controllers.Api
                 throw;
             }
         }
+
+        [ApiExplorerSettings(IgnoreApi = true)]
         [AllowAnonymous]
         [HttpPost("setip")]
         public async Task<IActionResult> SetWhitelistIP(IPWhitelistRequest request)

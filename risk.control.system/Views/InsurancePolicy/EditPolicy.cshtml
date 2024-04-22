@@ -91,7 +91,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text" asp-for="SumAssuredValue"><i class="fas fa-rupee-sign"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <input required asp-for="PolicyDetail.SumAssuredValue" class="form-control remarks" type="text" placeholder="Enter Insured Amount" min="1" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" />
+                                <input required asp-for="PolicyDetail.SumAssuredValue" class="form-control remarks" type="text" placeholder="Sum Assured" min="1" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" />
                                 <span asp-validation-for="PolicyDetail.SumAssuredValue" class="text-danger"></span>
                             </div>
                         </div>
@@ -152,7 +152,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text" asp-for="CauseOfLoss"><i class="nav-icon far fa-flag"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <input required asp-for="PolicyDetail.CauseOfLoss" class="form-control remarks" type="text" placeholder="Cause Of Incident" maxlength="20" />
+                                <input required asp-for="PolicyDetail.CauseOfLoss" class="form-control remarks" type="text" placeholder="Cause Of Incident" maxlength="70" />
                                 <span asp-validation-for="PolicyDetail.CauseOfLoss" class="text-danger"></span>
                             </div>
                         </div>
@@ -195,7 +195,7 @@
                                 {
                                     <img id="policyImage" class="form-Image" src=@Applicationsettings.NO_POLICY_IMAGE>
                                 }
-                                <input accept="image/*" asp-for="PolicyDetail.Document" type="file" class="form-control remarks" id="documentImageInput" onchange="" />
+                                <input accept="image/*" asp-for="PolicyDetail.Document" type="file" class="form-control remarks" id="documentImageInput" />
                             </div>
                         </div>
 

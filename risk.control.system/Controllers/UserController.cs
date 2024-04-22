@@ -79,7 +79,7 @@ namespace risk.control.system.Controllers
             user.Email = user.Email.Trim().ToLower();
             user.UserName = user.Email;
             user.Mailbox = new Mailbox { Name = user.Email };
-            user.Updated = DateTime.UtcNow;
+            user.Updated = DateTime.Now;
             user.UpdatedBy = HttpContext.User?.Identity?.Name;
             IdentityResult result = await userManager.CreateAsync(user, user.Password);
 
@@ -141,7 +141,7 @@ namespace risk.control.system.Controllers
             var user = await context.ApplicationUser.FirstOrDefaultAsync(a => a.Id.ToString() == id);
             if (user is not null)
             {
-                user.Updated = DateTime.UtcNow;
+                user.Updated = DateTime.Now;
                 user.UpdatedBy = HttpContext.User?.Identity?.Name;
                 user.ProfilePictureUrl = null;
                 await context.SaveChangesAsync();
@@ -202,10 +202,10 @@ namespace risk.control.system.Controllers
                         user.StateId = applicationUser.StateId;
                         user.PinCode = applicationUser.PinCode;
                         user.PinCodeId = applicationUser.PinCodeId;
-                        user.Updated = DateTime.UtcNow;
+                        user.Updated = DateTime.Now;
                         user.PhoneNumber = applicationUser.PhoneNumber;
                         user.UpdatedBy = HttpContext.User?.Identity?.Name;
-                        user.SecurityStamp = DateTime.UtcNow.ToString();
+                        user.SecurityStamp = DateTime.Now.ToString();
                         var result = await userManager.UpdateAsync(user);
                         if (result.Succeeded)
                         {

@@ -32,7 +32,7 @@
         //    Dictionary<string, object> message3 = SMS.API.SendSingleMessage(mobile, message, "1|0");
 
         //    // Send scheduled message using the primary device.
-        //    long timestamp = (long)DateTime.UtcNow.AddMinutes(2).Subtract(DateTime.UtcNow).TotalSeconds;
+        //    long timestamp = (long)DateTime.Now.AddMinutes(2).Subtract(DateTime.Now).TotalSeconds;
         //    Dictionary<string, object> message4 = SMS.API.SendSingleMessage(mobile, message, null, timestamp);
         //}
 

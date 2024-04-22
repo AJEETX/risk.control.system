@@ -68,7 +68,7 @@ namespace risk.control.system.Controllers
         {
             if (investigationCaseSubStatus is not null)
             {
-                investigationCaseSubStatus.Updated = DateTime.UtcNow;
+                investigationCaseSubStatus.Updated = DateTime.Now;
                 investigationCaseSubStatus.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Add(investigationCaseSubStatus);
                 await _context.SaveChangesAsync();
@@ -114,7 +114,7 @@ namespace risk.control.system.Controllers
             {
                 try
                 {
-                    investigationCaseSubStatus.Updated = DateTime.UtcNow;
+                    investigationCaseSubStatus.Updated = DateTime.Now;
                     investigationCaseSubStatus.UpdatedBy = HttpContext.User?.Identity?.Name;
                     _context.Update(investigationCaseSubStatus);
                     await _context.SaveChangesAsync();
@@ -169,7 +169,7 @@ namespace risk.control.system.Controllers
             var investigationCaseSubStatus = await _context.InvestigationCaseSubStatus.FindAsync(id);
             if (investigationCaseSubStatus != null)
             {
-                investigationCaseSubStatus.Updated = DateTime.UtcNow;
+                investigationCaseSubStatus.Updated = DateTime.Now;
                 investigationCaseSubStatus.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.InvestigationCaseSubStatus.Remove(investigationCaseSubStatus);
             }

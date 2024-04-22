@@ -160,7 +160,7 @@ namespace risk.control.system.Controllers
             user.EmailConfirmed = true;
             user.UserName = userFullEmail;
             user.Mailbox = new Mailbox { Name = userFullEmail };
-            user.Updated = DateTime.UtcNow;
+            user.Updated = DateTime.Now;
             user.UpdatedBy = HttpContext.User?.Identity?.Name;
             user.Id = 0;
             IdentityResult result = await userManager.CreateAsync(user, user.Password);
@@ -283,11 +283,11 @@ namespace risk.control.system.Controllers
                         user.StateId = applicationUser.StateId;
                         user.PinCode = applicationUser.PinCode;
                         user.PinCodeId = applicationUser.PinCodeId;
-                        user.Updated = DateTime.UtcNow;
+                        user.Updated = DateTime.Now;
                         user.Comments = applicationUser.Comments;
                         user.PhoneNumber = applicationUser.PhoneNumber;
                         user.UpdatedBy = HttpContext.User?.Identity?.Name;
-                        user.SecurityStamp = DateTime.UtcNow.ToString();
+                        user.SecurityStamp = DateTime.Now.ToString();
                         var result = await userManager.UpdateAsync(user);
                         if (result.Succeeded)
                         {
@@ -359,7 +359,7 @@ namespace risk.control.system.Controllers
             var clientCompanyApplicationUser = await _context.ClientCompanyApplicationUser.FindAsync(id);
             if (clientCompanyApplicationUser != null)
             {
-                clientCompanyApplicationUser.Updated = DateTime.UtcNow;
+                clientCompanyApplicationUser.Updated = DateTime.Now;
                 clientCompanyApplicationUser.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.ClientCompanyApplicationUser.Remove(clientCompanyApplicationUser);
             }

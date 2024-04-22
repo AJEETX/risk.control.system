@@ -174,7 +174,7 @@ namespace risk.control.system.Controllers
                 user.EmailConfirmed = true;
                 user.UserName = userFullEmail;
                 user.Mailbox = new Mailbox { Name = userFullEmail };
-                user.Updated = DateTime.UtcNow;
+                user.Updated = DateTime.Now;
                 user.UpdatedBy = HttpContext.User?.Identity?.Name;
                 IdentityResult result = await userManager.CreateAsync(user, user.Password);
 
@@ -341,11 +341,11 @@ namespace risk.control.system.Controllers
                 user.StateId = applicationUser.StateId;
                 user.PinCode = applicationUser.PinCode;
                 user.PinCodeId = applicationUser.PinCodeId;
-                user.Updated = DateTime.UtcNow;
+                user.Updated = DateTime.Now;
                 user.Comments = applicationUser.Comments;
                 user.PhoneNumber = applicationUser.PhoneNumber;
                 user.UpdatedBy = HttpContext.User?.Identity?.Name;
-                user.SecurityStamp = DateTime.UtcNow.ToString();
+                user.SecurityStamp = DateTime.Now.ToString();
                 var result = await userManager.UpdateAsync(user);
                 if (result.Succeeded)
                 {
@@ -469,7 +469,7 @@ namespace risk.control.system.Controllers
                 return NotFound();
             }
             user.SecurityStamp = Guid.NewGuid().ToString();
-            user.Updated = DateTime.UtcNow;
+            user.Updated = DateTime.Now;
             user.UpdatedBy = HttpContext.User?.Identity?.Name;
             var roles = await userManager.GetRolesAsync(user);
             var result = await userManager.RemoveFromRolesAsync(user, roles);
@@ -560,9 +560,9 @@ namespace risk.control.system.Controllers
                     vendor.DocumentImage = dataStream.ToArray();
                 }
                 vendor.Status = VendorStatus.ACTIVE;
-                vendor.ActivatedDate = DateTime.UtcNow;
+                vendor.ActivatedDate = DateTime.Now;
                 vendor.DomainName = domainData;
-                vendor.Updated = DateTime.UtcNow;
+                vendor.Updated = DateTime.Now;
                 vendor.UpdatedBy = HttpContext.User?.Identity?.Name;
 
                 _context.Add(vendor);
@@ -659,7 +659,7 @@ namespace risk.control.system.Controllers
                         vendor.DocumentUrl = existingVendor.DocumentUrl;
                     }
                 }
-                vendor.Updated = DateTime.UtcNow;
+                vendor.Updated = DateTime.Now;
                 vendor.UpdatedBy = HttpContext.User?.Identity?.Name;
 
                 _context.Vendor.Update(vendor);
@@ -730,7 +730,7 @@ namespace risk.control.system.Controllers
                     notifyService.Error("OOPS !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                vendor.Updated = DateTime.UtcNow;
+                vendor.Updated = DateTime.Now;
                 vendor.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Vendor.Remove(vendor);
                 await _context.SaveChangesAsync();

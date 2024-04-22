@@ -633,7 +633,7 @@ namespace risk.control.system.Controllers.Api.Claims
                        BeneficiaryName = a.CaseLocations.Count == 0 ?
                         "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>" :
                         a.CaseLocations.FirstOrDefault().BeneficiaryName,
-                       TimeElapsed = DateTime.UtcNow.Subtract(a.Created).TotalSeconds
+                       TimeElapsed = DateTime.Now.Subtract(a.Created).TotalSeconds
                    })
                     ?.ToList();
 

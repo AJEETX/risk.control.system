@@ -173,11 +173,11 @@ namespace risk.control.system.Controllers
                     user.StateId = applicationUser.StateId;
                     user.PinCode = applicationUser.PinCode;
                     user.PinCodeId = applicationUser.PinCodeId;
-                    user.Updated = DateTime.UtcNow;
+                    user.Updated = DateTime.Now;
                     user.Comments = applicationUser.Comments;
                     user.PhoneNumber = applicationUser.PhoneNumber;
                     user.UpdatedBy = HttpContext.User?.Identity?.Name;
-                    user.SecurityStamp = DateTime.UtcNow.ToString();
+                    user.SecurityStamp = DateTime.Now.ToString();
                     var result = await userManager.UpdateAsync(user);
                     if (result.Succeeded)
                     {

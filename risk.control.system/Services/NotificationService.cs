@@ -209,7 +209,7 @@ namespace risk.control.system.Services
                 RecepicientEmail = recepientName,
                 SenderEmail = claim.CurrentClaimOwner,
                 UpdatedBy = claim.CurrentClaimOwner,
-                Updated = DateTime.UtcNow,
+                Updated = DateTime.Now,
                 ScheduleTime = meetingTime,
                 SenderPhone = senderDetail.PhoneNumber,
                 RecepicientPhone = recepientPhone
@@ -265,7 +265,7 @@ namespace risk.control.system.Services
 
             var finalMessage = $"{agentMessage}";
             finalMessage += "                               ";
-            finalMessage += $"Dated: {DateTime.UtcNow.ToString("dd-MMM-yyyy HH:mm")}";
+            finalMessage += $"Dated: {DateTime.Now.ToString("dd-MMM-yyyy HH:mm")}";
             finalMessage += "                               ";
             finalMessage += $"{logo}";
             bool priority = true;
@@ -282,7 +282,7 @@ namespace risk.control.system.Services
                 RecepicientEmail = claim.CurrentClaimOwner,
                 SenderEmail = recepientName,
                 UpdatedBy = recepientName,
-                Updated = DateTime.UtcNow,
+                Updated = DateTime.Now,
                 ScheduleTime = previousMessage.ScheduleTime,
                 SenderPhone = recepientPhone,
                 RecepicientPhone = agent.PhoneNumber,
@@ -428,7 +428,7 @@ namespace risk.control.system.Services
                 RecepicientEmail = claim.CurrentClaimOwner,
                 SenderEmail = user.Email,
                 UpdatedBy = user.Email,
-                Updated = DateTime.UtcNow
+                Updated = DateTime.Now
             };
             claim.ClaimMessages.Add(scheduleMessage);
             context.SaveChanges();
@@ -485,7 +485,7 @@ namespace risk.control.system.Services
                 RecepicientEmail = beneficiary.BeneficiaryName,
                 SenderEmail = user.Email,
                 UpdatedBy = user.Email,
-                Updated = DateTime.UtcNow
+                Updated = DateTime.Now
             };
             var claim = context.ClaimsInvestigation
             .Include(c => c.ClaimMessages)

@@ -74,7 +74,7 @@ namespace risk.control.system.Controllers
         {
             if (investigationServiceType is not null)
             {
-                investigationServiceType.Updated = DateTime.UtcNow;
+                investigationServiceType.Updated = DateTime.Now;
                 investigationServiceType.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Add(investigationServiceType);
                 await _context.SaveChangesAsync();
@@ -123,7 +123,7 @@ namespace risk.control.system.Controllers
             {
                 try
                 {
-                    investigationServiceType.Updated = DateTime.UtcNow;
+                    investigationServiceType.Updated = DateTime.Now;
                     investigationServiceType.UpdatedBy = HttpContext.User?.Identity?.Name;
 
                     _context.Update(investigationServiceType);
@@ -183,7 +183,7 @@ namespace risk.control.system.Controllers
             var investigationServiceType = await _context.InvestigationServiceType.FindAsync(id);
             if (investigationServiceType != null)
             {
-                investigationServiceType.Updated = DateTime.UtcNow;
+                investigationServiceType.Updated = DateTime.Now;
                 investigationServiceType.UpdatedBy = HttpContext.User?.Identity?.Name;
 
                 _context.InvestigationServiceType.Remove(investigationServiceType);

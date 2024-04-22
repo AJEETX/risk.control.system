@@ -156,7 +156,7 @@ namespace risk.control.system.Services
             var company = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == uploadedBy);
             var fileModel = new FileOnFileSystemModel
             {
-                CreatedOn = DateTime.UtcNow,
+                CreatedOn = DateTime.Now,
                 FileType = file.ContentType,
                 Extension = extension,
                 Name = fileName,
@@ -262,10 +262,10 @@ namespace risk.control.system.Services
                                                 {
                                                     ContractNumber = rowData[0]?.Trim(),
                                                     SumAssuredValue = Convert.ToDecimal(rowData[1]?.Trim()),
-                                                    ContractIssueDate = DateTime.UtcNow.AddDays(-20),
+                                                    ContractIssueDate = DateTime.Now.AddDays(-20),
                                                     ClaimType = (ClaimType)Enum.Parse(typeof(ClaimType), rowData[3]?.Trim()),
                                                     InvestigationServiceTypeId = servicetype?.InvestigationServiceTypeId,
-                                                    DateOfIncident = DateTime.UtcNow.AddDays(-5),
+                                                    DateOfIncident = DateTime.Now.AddDays(-5),
                                                     CauseOfLoss = rowData[6]?.Trim(),
                                                     CaseEnablerId = _context.CaseEnabler.FirstOrDefault(c => c.Code.ToLower() == rowData[7].Trim().ToLower()).CaseEnablerId,
                                                     CostCentreId = _context.CostCentre.FirstOrDefault(c => c.Code.ToLower() == rowData[8].Trim().ToLower()).CostCentreId,
@@ -355,7 +355,7 @@ namespace risk.control.system.Services
                                             {
                                                 BeneficiaryName = rowData[22]?.Trim(),
                                                 BeneficiaryRelationId = relation.BeneficiaryRelationId,
-                                                BeneficiaryDateOfBirth = DateTime.UtcNow.AddYears(-22),
+                                                BeneficiaryDateOfBirth = DateTime.Now.AddYears(-22),
                                                 BeneficiaryIncome = (Income)Enum.Parse(typeof(Income), rowData[25]?.Trim()),
                                                 BeneficiaryContactNumber = Convert.ToInt64(rowData[26]?.Trim()),
                                                 Addressline = rowData[27]?.Trim(),

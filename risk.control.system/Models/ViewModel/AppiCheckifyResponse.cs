@@ -5,10 +5,10 @@
         public long BeneficiaryId { get; set; }
         public string? LocationImage { get; set; }
         public string? LocationLongLat { get; set; }
-        public DateTime? LocationTime { get; set; } = DateTime.UtcNow;
+        public DateTime? LocationTime { get; set; } = DateTime.Now;
         public string? OcrImage { get; set; }
         public string? OcrLongLat { get; set; }
-        public DateTime? OcrTime { get; set; } = DateTime.UtcNow;
+        public DateTime? OcrTime { get; set; } = DateTime.Now;
         public string? FacePercent { get; set; }
         public bool? PanValid { get; set; }
     }

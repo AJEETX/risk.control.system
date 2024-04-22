@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using NToastNotify;
 
 using risk.control.system.Data;
+using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
 
@@ -47,13 +48,13 @@ namespace risk.control.system.Controllers
                     notifyService.Error("Not Found!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var model = claimPolicyService.AddClaimPolicy(currentUserEmail);
-                if(model == null)
+                var (model, trial) = claimPolicyService.AddClaimPolicy(currentUserEmail);
+                
+                if (model == null)
                 {
                     notifyService.Error("OOPS!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                ViewBag.ClientCompanyId = model.PolicyDetail.ClientCompanyId;
 
                 ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name");
                 ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType.Where(i =>
@@ -63,7 +64,10 @@ namespace risk.control.system.Controllers
                 ViewData["CostCentreId"] = new SelectList(_context.CostCentre.OrderBy(s => s.Code), "CostCentreId", "Name");
                 ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
                 ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name");
-                return View(model);
+                trial = false;
+                return trial? 
+                    View(new ClaimsInvestigation { PolicyDetail=new PolicyDetail { LineOfBusinessId = model.PolicyDetail.LineOfBusinessId } }): 
+                    View(model);
             }
             catch (Exception)
             {
@@ -314,7 +318,7 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 
-                claimsInvestigation.Updated = DateTime.UtcNow;
+                claimsInvestigation.Updated = DateTime.Now;
                 claimsInvestigation.UpdatedBy = currentUserEmail;
                 claimsInvestigation.Deleted = true;
                 _context.ClaimsInvestigation.Update(claimsInvestigation);
@@ -354,7 +358,7 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                claimsInvestigation.Updated = DateTime.UtcNow;
+                claimsInvestigation.Updated = DateTime.Now;
                 claimsInvestigation.UpdatedBy = currentUserEmail;
                 claimsInvestigation.Deleted = true;
                 _context.ClaimsInvestigation.Update(claimsInvestigation);
@@ -394,7 +398,7 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                claimsInvestigation.Updated = DateTime.UtcNow;
+                claimsInvestigation.Updated = DateTime.Now;
                 claimsInvestigation.UpdatedBy = currentUserEmail;
                 claimsInvestigation.Deleted = true;
                 _context.ClaimsInvestigation.Update(claimsInvestigation);

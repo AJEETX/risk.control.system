@@ -127,7 +127,7 @@ namespace risk.control.system.Controllers
                     if (totalClaimsCreated?.Count >= companyUser.ClientCompany.TotalCreatedClaimAllowed)
                     {
                         userCanUpload = false;
-                        notifyService.Information($"Version limit = {companyUser.ClientCompany.TotalCreatedClaimAllowed}");
+                        notifyService.Information($"MAX Claim creation limit={companyUser.ClientCompany.TotalCreatedClaimAllowed} reached.");
                     }
                 }
                 
@@ -212,7 +212,7 @@ namespace risk.control.system.Controllers
                     if (totalClaimsCreated?.Count >= companyUser.ClientCompany.TotalCreatedClaimAllowed)
                     {
                         userCanUpload = false;
-                        notifyService.Information($"Version limit = {companyUser.ClientCompany.TotalCreatedClaimAllowed}");
+                        notifyService.Information($"MAX Claim creation limit={companyUser.ClientCompany.TotalCreatedClaimAllowed} reached.");
                     }
                 }
                 
@@ -434,7 +434,7 @@ namespace risk.control.system.Controllers
                     if (totalClaimsCreated?.Count >= companyUser.ClientCompany.TotalCreatedClaimAllowed)
                     {
                         userCanCreate = false;
-                        notifyService.Information($"Version limit = {companyUser.ClientCompany.TotalCreatedClaimAllowed}");
+                        notifyService.Information($"MAX Claim creation limit={companyUser.ClientCompany.TotalCreatedClaimAllowed} reached.");
                     }
                 }
 

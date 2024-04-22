@@ -4,6 +4,7 @@ using risk.control.system.Models.ViewModel;
 
 namespace risk.control.system.Controllers.Api
 {
+    [ApiExplorerSettings(IgnoreApi = true)]
     [Route("api/[controller]")]
     [ApiController]
     public class CspController : ControllerBase

@@ -2,6 +2,8 @@
 using System.Reflection;
 using System.Text.RegularExpressions;
 
+using Microsoft.AspNetCore.Mvc.Rendering;
+
 namespace risk.control.system.Helpers
 {
     public static class Extensions
@@ -37,6 +39,16 @@ namespace risk.control.system.Helpers
         {
             Span<byte> buffer = new Span<byte>(new byte[base64.Length]);
             return Convert.TryFromBase64String(base64, buffer, out int bytesParsed);
+        }
+    }
+    public static class HtmlHelperExtensions
+    {
+        public static IEnumerable<SelectListItem> GetEnumSelectListWithDefaultValue<TEnum>(this IHtmlHelper htmlHelper, TEnum defaultValue)
+            where TEnum : struct
+        {
+            var selectList = htmlHelper.GetEnumSelectList<TEnum>().ToList();
+            selectList.Single(x => x.Value == $"{(int)(object)defaultValue}").Selected = true;
+            return selectList;
         }
     }
 }

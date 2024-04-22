@@ -110,6 +110,8 @@ $(document).ready(function () {
             );
         }
     });
+    $("#ContractNumber").focus();
+
 });
 
 dateContractId.max = new Date().toISOString().split("T")[0];

@@ -83,7 +83,7 @@ namespace risk.control.system.Controllers
                 var userEmail = HttpContext?.User?.Identity?.Name;
                 var user = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
                 serviceReportTemplate.ClientCompanyId = user.ClientCompanyId;
-                serviceReportTemplate.Updated = DateTime.UtcNow;
+                serviceReportTemplate.Updated = DateTime.Now;
                 serviceReportTemplate.UpdatedBy = userEmail;
                 _context.Add(serviceReportTemplate);
                 await _context.SaveChangesAsync();
@@ -137,7 +137,7 @@ namespace risk.control.system.Controllers
                     var userEmail = HttpContext?.User?.Identity?.Name;
                     var user = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
                     serviceReportTemplate.ClientCompanyId = user.ClientCompanyId;
-                    serviceReportTemplate.Updated = DateTime.UtcNow;
+                    serviceReportTemplate.Updated = DateTime.Now;
                     serviceReportTemplate.UpdatedBy = userEmail;
                     _context.Update(serviceReportTemplate);
                     await _context.SaveChangesAsync();

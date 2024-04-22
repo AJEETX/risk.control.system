@@ -71,7 +71,7 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(LineOfBusiness lineOfBusiness)
         {
-            lineOfBusiness.Updated = DateTime.UtcNow;
+            lineOfBusiness.Updated = DateTime.Now;
             lineOfBusiness.UpdatedBy = HttpContext.User?.Identity?.Name;
 
             _context.Add(lineOfBusiness);
@@ -116,7 +116,7 @@ namespace risk.control.system.Controllers
             {
                 try
                 {
-                    lineOfBusiness.Updated = DateTime.UtcNow;
+                    lineOfBusiness.Updated = DateTime.Now;
                     lineOfBusiness.UpdatedBy = HttpContext.User?.Identity?.Name;
 
                     _context.Update(lineOfBusiness);
@@ -174,7 +174,7 @@ namespace risk.control.system.Controllers
             var lineOfBusiness = await _context.LineOfBusiness.FindAsync(id);
             if (lineOfBusiness != null)
             {
-                lineOfBusiness.Updated = DateTime.UtcNow;
+                lineOfBusiness.Updated = DateTime.Now;
                 lineOfBusiness.UpdatedBy = HttpContext.User?.Identity?.Name;
 
                 _context.LineOfBusiness.Remove(lineOfBusiness);

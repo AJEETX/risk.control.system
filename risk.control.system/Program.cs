@@ -19,6 +19,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.FeatureManagement;
 using Microsoft.FeatureManagement.FeatureFilters;
 using Microsoft.OpenApi.Models;
@@ -180,6 +181,16 @@ builder.Services.ConfigureApplicationCookie(options =>
 
 builder.Services.AddSwaggerGen(c =>
 {
+    c.OperationFilter<AddRequiredHeaderParameter>();
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description =@"JWT Authorization header. \r\n\r\n Enter the token in the text input below.",
+    });
     c.SwaggerDoc("v1", new OpenApiInfo
     {
         Version = "v1",

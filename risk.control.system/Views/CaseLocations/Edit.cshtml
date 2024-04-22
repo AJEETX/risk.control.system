@@ -48,7 +48,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text" asp-for="BeneficiaryName"><i class="fas fa-user-tie"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <input id="BeneficiaryName" required asp-for="BeneficiaryName" class="form-control remarks" type="text" placeholder="Beneficiary Name" maxlength="20" />
+                                <input id="BeneficiaryName" required asp-for="BeneficiaryName" class="form-control remarks" type="text" placeholder="Beneficiary Name" maxlength="30" />
                                 <span asp-validation-for="BeneficiaryName" class="text-danger"></span>
                             </div>
                         </div>
@@ -192,7 +192,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text" id="Addressline"><i class="fa fa-home"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <input required type="text" asp-for="Addressline" class="form-control remarks" placeholder="Address" maxlength="20" />
+                                <input required type="text" asp-for="Addressline" class="form-control remarks" placeholder="Address" maxlength="50" />
                                 <span asp-validation-for="Addressline" class="text-danger"></span>
                             </div>
                         </div>

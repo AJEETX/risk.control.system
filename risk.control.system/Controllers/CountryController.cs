@@ -67,7 +67,7 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Country country)
         {
-            country.Updated = DateTime.UtcNow;
+            country.Updated = DateTime.Now;
             country.UpdatedBy = HttpContext.User?.Identity?.Name;
             _context.Add(country);
             await _context.SaveChangesAsync();
@@ -111,7 +111,7 @@ namespace risk.control.system.Controllers
             {
                 try
                 {
-                    country.Updated = DateTime.UtcNow;
+                    country.Updated = DateTime.Now;
                     country.UpdatedBy = HttpContext.User?.Identity?.Name;
                     _context.Update(country);
                     await _context.SaveChangesAsync();
@@ -168,7 +168,7 @@ namespace risk.control.system.Controllers
             var country = await _context.Country.FindAsync(id);
             if (country != null)
             {
-                country.Updated = DateTime.UtcNow;
+                country.Updated = DateTime.Now;
                 country.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Country.Remove(country);
             }

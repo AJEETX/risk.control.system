@@ -412,16 +412,6 @@ namespace risk.control.system.Services
                         .ThenInclude(c => c.PinCode)
                         .AsNoTracking()
                             .FirstOrDefaultAsync(c => c.ClaimsInvestigationId == claimsInvestigation.ClaimsInvestigationId);
-                    if (existingPolicy != null)
-                    {
-                        existingPolicy.Updated = DateTime.Now;
-                        existingPolicy.UpdatedBy = userEmail;
-                        existingPolicy.CurrentUserEmail = userEmail;
-                        existingPolicy.CurrentClaimOwner = userEmail;
-                        existingPolicy.InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INITIATED).InvestigationCaseStatusId;
-                        existingPolicy.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR).InvestigationCaseSubStatusId;
-                    }
-
                     if (customerDocument is not null)
                     {
                         using var dataStream = new MemoryStream();
@@ -858,7 +848,7 @@ namespace risk.control.system.Services
             claimReport.ReportQuestionaire.Answer3 = answer3;
             claimReport.ReportQuestionaire.Answer4 = answer4;
             claimReport.AgentRemarks = remarks;
-            claimReport.AgentRemarksUpdated = DateTime.UtcNow;
+            claimReport.AgentRemarksUpdated = DateTime.Now;
             claimReport.AgentEmail = userEmail;
             _context.ClaimReport.Update(claimReport);
 
@@ -947,7 +937,7 @@ namespace risk.control.system.Services
             var finished = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.FINISHED);
             caseLocation.ClaimReport.AssessorRemarkType = assessorRemarkType;
             caseLocation.ClaimReport.AssessorRemarks = assessorRemarks;
-            caseLocation.ClaimReport.AssessorRemarksUpdated = DateTime.UtcNow;
+            caseLocation.ClaimReport.AssessorRemarksUpdated = DateTime.Now;
             caseLocation.ClaimReport.AssessorEmail = userEmail;
 
             caseLocation.InvestigationCaseSubStatusId = rejected.InvestigationCaseSubStatusId;
@@ -1008,7 +998,7 @@ namespace risk.control.system.Services
                     ClientCompanyId = currentUser.ClientCompany.ClientCompanyId,
                     GrandTotal = investigationServiced.Price + investigationServiced.Price * 10,
                     NoteToRecipient = "Auto generated Invoice",
-                    Updated = DateTime.UtcNow,
+                    Updated = DateTime.Now,
                     Vendor = vendor,
                     ClientCompany = currentUser.ClientCompany,
                     UpdatedBy = userEmail,
@@ -1042,7 +1032,7 @@ namespace risk.control.system.Services
             var finished = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.FINISHED);
             caseLocation.ClaimReport.AssessorRemarkType = assessorRemarkType;
             caseLocation.ClaimReport.AssessorRemarks = assessorRemarks;
-            caseLocation.ClaimReport.AssessorRemarksUpdated = DateTime.UtcNow;
+            caseLocation.ClaimReport.AssessorRemarksUpdated = DateTime.Now;
             caseLocation.ClaimReport.AssessorEmail = userEmail;
 
             caseLocation.InvestigationCaseSubStatusId = approved.InvestigationCaseSubStatusId;
@@ -1103,7 +1093,7 @@ namespace risk.control.system.Services
                     ClientCompanyId = currentUser.ClientCompany.ClientCompanyId,
                     GrandTotal = investigationServiced.Price + investigationServiced.Price * 10,
                     NoteToRecipient = "Auto generated Invoice",
-                    Updated = DateTime.UtcNow,
+                    Updated = DateTime.Now,
                     Vendor = vendor,
                     ClientCompany = currentUser.ClientCompany,
                     UpdatedBy = userEmail,

@@ -203,7 +203,7 @@ namespace risk.control.system.Controllers
                     }
                 }
 
-                clientCompany.Updated = DateTime.UtcNow;
+                clientCompany.Updated = DateTime.Now;
                 clientCompany.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.ChangeTracker.Clear();
                 _context.ClientCompany.Update(clientCompany);
@@ -298,7 +298,7 @@ namespace risk.control.system.Controllers
                 user.EmailConfirmed = true;
                 user.UserName = userFullEmail;
                 user.Mailbox = new Mailbox { Name = userFullEmail };
-                user.Updated = DateTime.UtcNow;
+                user.Updated = DateTime.Now;
                 user.UpdatedBy = HttpContext.User?.Identity?.Name;
                 IdentityResult result = await userManager.CreateAsync(user, user.Password);
 
@@ -445,12 +445,12 @@ namespace risk.control.system.Controllers
                     user.StateId = applicationUser.StateId;
                     user.PinCode = applicationUser.PinCode;
                     user.PinCodeId = applicationUser.PinCodeId;
-                    user.Updated = DateTime.UtcNow;
+                    user.Updated = DateTime.Now;
                     user.Comments = applicationUser.Comments;
                     user.PhoneNumber = applicationUser.PhoneNumber;
                     user.UserRole = applicationUser.UserRole;
                     user.UpdatedBy = HttpContext.User?.Identity?.Name;
-                    user.SecurityStamp = DateTime.UtcNow.ToString();
+                    user.SecurityStamp = DateTime.Now.ToString();
                     var result = await userManager.UpdateAsync(user);
                     if (result.Succeeded)
                     {
@@ -539,7 +539,7 @@ namespace risk.control.system.Controllers
                 var vendors2Empanel = _context.Vendor.AsNoTracking().Where(v => vendors.Contains(v.VendorId.ToString()));
                 company.EmpanelledVendors.AddRange(vendors2Empanel.ToList());
 
-                company.Updated = DateTime.UtcNow;
+                company.Updated = DateTime.Now;
                 company.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.ClientCompany.Update(company);
                 var savedRows = await _context.SaveChangesAsync();
@@ -607,7 +607,7 @@ namespace risk.control.system.Controllers
 
                     empanelledVendor2Depanel.Clients.Remove(clientCompany);
                 }
-                company.Updated = DateTime.UtcNow;
+                company.Updated = DateTime.Now;
                 company.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.ClientCompany.Update(company);
                 var savedRows = await _context.SaveChangesAsync();
@@ -770,7 +770,7 @@ namespace risk.control.system.Controllers
                 return RedirectToAction(nameof(CompanyController.User), "Company");
             }
             user.SecurityStamp = Guid.NewGuid().ToString();
-            user.Updated = DateTime.UtcNow;
+            user.Updated = DateTime.Now;
             user.UpdatedBy = HttpContext.User?.Identity?.Name;
             var roles = await userManager.GetRolesAsync(user);
             var result = await userManager.RemoveFromRolesAsync(user, roles);

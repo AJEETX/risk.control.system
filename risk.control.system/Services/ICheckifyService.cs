@@ -109,7 +109,7 @@ namespace risk.control.system.Services
                         //{
                         //    Directory.CreateDirectory(path);
                         //}
-                        //var filePath = Path.Combine(webHostEnvironment.WebRootPath, "verify", $"face{DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss")}.jpg");
+                        //var filePath = Path.Combine(webHostEnvironment.WebRootPath, "verify", $"face{DateTime.Now.ToString("dd-MMM-yyyy-HH-mm-ss")}.jpg");
                         //CompressImage.CompressimageWindows(stream, filePath);
 
                         //claimCase.ClaimReport.DigitalIdReport.DigitalIdImagePath = filePath;
@@ -120,7 +120,7 @@ namespace risk.control.system.Services
 
                         var saveImageBase64String = Convert.ToBase64String(savedImage);
 
-                        claimCase.ClaimReport.DigitalIdReport.DigitalIdImageLongLatTime = DateTime.UtcNow;
+                        claimCase.ClaimReport.DigitalIdReport.DigitalIdImageLongLatTime = DateTime.Now;
 
                         var base64Image = Convert.ToBase64String(registeredImage);
 
@@ -156,7 +156,7 @@ namespace risk.control.system.Services
 
             if (!string.IsNullOrWhiteSpace(data.LocationLongLat))
             {
-                claimCase.ClaimReport.DigitalIdReport.DigitalIdImageLongLatTime = DateTime.UtcNow;
+                claimCase.ClaimReport.DigitalIdReport.DigitalIdImageLongLatTime = DateTime.Now;
                 claimCase.ClaimReport.DigitalIdReport.DigitalIdImageLongLat = data.LocationLongLat;
             }
 
@@ -195,7 +195,7 @@ namespace risk.control.system.Services
                 var address = rootObject.display_name;
 
                 claimCase.ClaimReport.DigitalIdReport.DigitalIdImageLocationAddress = string.IsNullOrWhiteSpace(rootObject.display_name) ? "12 Heathcote Drive Forest Hill VIC 3131" : address;
-                claimCase.ClaimReport.DigitalIdReport.Updated = DateTime.UtcNow;
+                claimCase.ClaimReport.DigitalIdReport.Updated = DateTime.Now;
                 claimCase.ClaimReport.DigitalIdReport.UpdatedBy = claimCase.ClaimReport.AgentEmail;
             }
 
@@ -272,7 +272,7 @@ namespace risk.control.system.Services
                 //{
                 //    Directory.CreateDirectory(path);
                 //}
-                //var mfilePath = Path.Combine(webHostEnvironment.WebRootPath, "verify", $"pan{DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss")}.jpg");
+                //var mfilePath = Path.Combine(webHostEnvironment.WebRootPath, "verify", $"pan{DateTime.Now.ToString("dd-MMM-yyyy-HH-mm-ss")}.jpg");
                 //CompressImage.CompressimageWindows(stream, mfilePath);
 
                 //claimCase.ClaimReport.DocumentIdReport.DocumentIdImagePath = mfilePath;
@@ -331,7 +331,7 @@ namespace risk.control.system.Services
 
                         claimCase.ClaimReport.DocumentIdReport.DocumentIdImage = savedMaskedImage;
 
-                        claimCase.ClaimReport.DocumentIdReport.DocumentIdImageLongLatTime = DateTime.UtcNow;
+                        claimCase.ClaimReport.DocumentIdReport.DocumentIdImageLongLatTime = DateTime.Now;
                         claimCase.ClaimReport.DocumentIdReport.DocumentIdImageType = maskedImage.DocType;
                         claimCase.ClaimReport.DocumentIdReport.DocumentIdImageData = maskedImage.DocType + " data: ";
 
@@ -347,7 +347,7 @@ namespace risk.control.system.Services
 
                         claimCase.ClaimReport.DocumentIdReport.DocumentIdImage = image;
 
-                        claimCase.ClaimReport.DocumentIdReport.DocumentIdImageLongLatTime = DateTime.UtcNow;
+                        claimCase.ClaimReport.DocumentIdReport.DocumentIdImageLongLatTime = DateTime.Now;
                     }
                 }
                 else
@@ -356,7 +356,7 @@ namespace risk.control.system.Services
 
                     claimCase.ClaimReport.DocumentIdReport.DocumentIdImage = image;
 
-                    claimCase.ClaimReport.DocumentIdReport.DocumentIdImageLongLatTime = DateTime.UtcNow;
+                    claimCase.ClaimReport.DocumentIdReport.DocumentIdImageLongLatTime = DateTime.Now;
                     claimCase.ClaimReport.DocumentIdReport.DocumentIdImageData = "no data: ";
                 }
             }
@@ -366,7 +366,7 @@ namespace risk.control.system.Services
             if (!string.IsNullOrWhiteSpace(data.OcrLongLat))
             {
                 claimCase.ClaimReport.DocumentIdReport.DocumentIdImageLongLat = data.OcrLongLat;
-                claimCase.ClaimReport.DocumentIdReport.DocumentIdImageLongLatTime = DateTime.UtcNow;
+                claimCase.ClaimReport.DocumentIdReport.DocumentIdImageLongLatTime = DateTime.Now;
                 var longLat = claimCase.ClaimReport.DocumentIdReport.DocumentIdImageLongLat.IndexOf("/");
                 var latitude = claimCase.ClaimReport.DocumentIdReport.DocumentIdImageLongLat.Substring(0, longLat)?.Trim();
                 var longitude = claimCase.ClaimReport.DocumentIdReport.DocumentIdImageLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
@@ -387,7 +387,7 @@ namespace risk.control.system.Services
 
                 claimCase.ClaimReport.DocumentIdReport.DocumentIdImageLocationAddress = string.IsNullOrWhiteSpace(rootObject.display_name) ? "12 Heathcote Drive Forest Hill VIC 3131" : address;
             }
-            claimCase.ClaimReport.DocumentIdReport.Updated = DateTime.UtcNow;
+            claimCase.ClaimReport.DocumentIdReport.Updated = DateTime.Now;
             claimCase.ClaimReport.DocumentIdReport.UpdatedBy = claimCase.ClaimReport.AgentEmail;
             _context.CaseLocation.Update(claimCase);
 

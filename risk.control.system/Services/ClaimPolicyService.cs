@@ -9,7 +9,7 @@ namespace risk.control.system.Services
 {
     public interface IClaimPolicyService
     {
-        ClaimsInvestigation AddClaimPolicy(string userEmail);
+        (ClaimsInvestigation claim, bool trial) AddClaimPolicy(string userEmail);
 
         Task<ClaimTransactionModel> GetClaimDetail(string id);
         Task<ClaimTransactionModel> GetClaimSummary(string userEmail, string id);
@@ -26,7 +26,7 @@ namespace risk.control.system.Services
             this.numberService = numberService;
         }
 
-        public ClaimsInvestigation AddClaimPolicy(string userEmail)
+        public (ClaimsInvestigation claim,bool trial) AddClaimPolicy(string userEmail)
         {
             var lineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == "claims").LineOfBusinessId;
             var contractNumber = numberService.GetNumberSequence("PX");
@@ -38,9 +38,9 @@ namespace risk.control.system.Services
                     CaseEnablerId = _context.CaseEnabler.FirstOrDefault().CaseEnablerId,
                     CauseOfLoss = "LOST IN ACCIDENT",
                     ClaimType = ClaimType.HEALTH,
-                    ContractIssueDate = DateTime.UtcNow.AddDays(-10),
+                    ContractIssueDate = DateTime.Now.AddDays(-10),
                     CostCentreId = _context.CostCentre.FirstOrDefault().CostCentreId,
-                    DateOfIncident = DateTime.UtcNow.AddDays(-3),
+                    DateOfIncident = DateTime.Now.AddDays(-3),
                     InvestigationServiceTypeId = _context.InvestigationServiceType.FirstOrDefault(i => i.Code == "COMP").InvestigationServiceTypeId,
                     Comments = "SOMETHING FISHY",
                     SumAssuredValue = new Random().Next(100000, 9999999),
@@ -48,10 +48,10 @@ namespace risk.control.system.Services
                 }
             };
 
-            var clientCompanyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+            var clientCompanyUser = _context.ClientCompanyApplicationUser.Include(u=>u.ClientCompany).FirstOrDefault(c => c.Email == userEmail);
 
             model.PolicyDetail.ClientCompanyId = clientCompanyUser.ClientCompanyId;
-            return model;
+            return (model,clientCompanyUser.ClientCompany.LicenseType == Standard.Licensing.LicenseType.Trial);
         }
 
         public async Task<ClaimTransactionModel> GetClaimDetail(string id)

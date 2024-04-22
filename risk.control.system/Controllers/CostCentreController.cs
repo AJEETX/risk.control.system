@@ -71,7 +71,7 @@ namespace risk.control.system.Controllers
         {
             if (costCentre is not null)
             {
-                costCentre.Updated = DateTime.UtcNow;
+                costCentre.Updated = DateTime.Now;
                 costCentre.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Add(costCentre);
                 await _context.SaveChangesAsync();
@@ -114,7 +114,7 @@ namespace risk.control.system.Controllers
             {
                 try
                 {
-                    costCentre.Updated = DateTime.UtcNow;
+                    costCentre.Updated = DateTime.Now;
                     costCentre.UpdatedBy = HttpContext.User?.Identity?.Name;
                     _context.Update(costCentre);
                     await _context.SaveChangesAsync();
@@ -167,7 +167,7 @@ namespace risk.control.system.Controllers
             var costCentre = await _context.CostCentre.FindAsync(id);
             if (costCentre != null)
             {
-                costCentre.Updated = DateTime.UtcNow;
+                costCentre.Updated = DateTime.Now;
                 costCentre.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.CostCentre.Remove(costCentre);
             }
