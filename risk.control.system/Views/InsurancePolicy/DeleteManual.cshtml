@@ -1,13 +1,16 @@
 ﻿@model ClaimTransactionModel
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Delete";
     
 }
 <section class="content">
     <div id="article" class="card card-secondary">
         <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-newspaper"></i> Delete</h3>
+            <h3 class="card-title"><i class="fas fa-newspaper"></i> Delete
+                <i id="delete-policy-information" class="fas fa-info-circle"></i>
+
+            </h3>
         </div>
         @{
             string address = string.Empty;

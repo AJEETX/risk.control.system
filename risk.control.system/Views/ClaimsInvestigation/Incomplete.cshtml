@@ -9,12 +9,14 @@
             <input type="hidden" id="total-count" value="@Model.AvailableCount" />
             <input type="hidden" id="max-count" value="@Model.TotalCount" />
             <h3 class="card-title"><i class="far fa-edit"></i> New & Draft
+                <i id="information" class="fas fa-info-circle"></i>
+            </h3>
+            <div class="card-tools">
                 @if (Model.Trial)
                 {
-                    <i id="information" class="fas fa-info-circle"></i>
+                    <span data-toggle="tooltip" title="TRIAL VERSION. Max limit = @Model.TotalCount"> <i class="fa fa-question-circle" aria-hidden="true"></i> </span>
                 }
-            </h3>
-            
+            </div>
             @* <h3 id="view-type" class="card-title">
             <a href="#" id="map-type" class="input-group-label"> <i class="far fa-map"></i> Map</a>
             <a href="#" id="list-type" class="input-group-label"> <i class="fas fa-server"></i> List</a>
