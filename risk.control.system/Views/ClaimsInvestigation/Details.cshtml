@@ -241,7 +241,11 @@
                                 </div>
 
                                 <div>
-                                    <button id="back" disabled class="btn btn-outline-secondary"><span class="badge badge-light"> <i class="fas fa-arrow-left"></i> </span> Draft </button>
+                                    <button id="back" disabled class="btn btn-outline-secondary">
+                                        <span class="badge badge-light"> <i class="fas fa-arrow-left"></i> </span> Draft <span class="badge badge-secondary">
+                                            <i id="information-popup" class="fas fa-info"></i>
+                                        </span>
+                                    </button>
 
                                     @if (Model.AutoAllocation)
                                     {

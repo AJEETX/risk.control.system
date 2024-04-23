@@ -127,11 +127,14 @@ namespace risk.control.system.Controllers
                 {
                     var totalClaimsCreated = _context.ClaimsInvestigation.Include(c => c.PolicyDetail).Where(c => !c.Deleted && c.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId)?.ToList();
                     availableCount = companyUser.ClientCompany.TotalCreatedClaimAllowed - totalClaimsCreated.Count;
-                    notifyService.Information($"MAX Claim creation available ={availableCount}.");
                     if (totalClaimsCreated?.Count >= companyUser.ClientCompany.TotalCreatedClaimAllowed)
                     {
                         userCanUpload = false;
-                        notifyService.Information($"MAX Claim creation limit={companyUser.ClientCompany.TotalCreatedClaimAllowed} reached.");
+                        notifyService.Information($"MAX Claim limit = <b>{companyUser.ClientCompany.TotalCreatedClaimAllowed}</b> reached.");
+                    }
+                    else
+                    {
+                        notifyService.Information($"MAX Claim available = <b>{availableCount}</b>.");
                     }
                 }
 
@@ -215,11 +218,14 @@ namespace risk.control.system.Controllers
                 {
                     var totalClaimsCreated = _context.ClaimsInvestigation.Include(c => c.PolicyDetail).Where(c => !c.Deleted && c.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId)?.ToList();
                     availableCount = companyUser.ClientCompany.TotalCreatedClaimAllowed - totalClaimsCreated.Count;
-                    notifyService.Information($"MAX Claim creation available ={availableCount}.");
                     if (totalClaimsCreated?.Count >= companyUser.ClientCompany.TotalCreatedClaimAllowed)
                     {
                         userCanUpload = false;
-                        notifyService.Information($"MAX Claim creation limit={companyUser.ClientCompany.TotalCreatedClaimAllowed} reached.");
+                        notifyService.Information($"MAX Claim limit = <b>{companyUser.ClientCompany.TotalCreatedClaimAllowed}</b> reached.");
+                    }
+                    else
+                    {
+                        notifyService.Information($"MAX Claim available = <b>{availableCount}</b>.");
                     }
                 }
 
@@ -442,11 +448,14 @@ namespace risk.control.system.Controllers
                     var totalClaimsCreated = _context.ClaimsInvestigation.Include(c => c.PolicyDetail).Where(c => !c.Deleted && c.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId)?.ToList();
                     availableCount = companyUser.ClientCompany.TotalCreatedClaimAllowed - totalClaimsCreated.Count;
 
-                    notifyService.Information($"MAX Claim creation available ={availableCount}.");
                     if (totalClaimsCreated?.Count >= companyUser.ClientCompany.TotalCreatedClaimAllowed)
                     {
                         userCanCreate = false;
-                        notifyService.Information($"MAX Claim creation limit={companyUser.ClientCompany.TotalCreatedClaimAllowed} reached.");
+                        notifyService.Information($"MAX Claim limit = <b>{companyUser.ClientCompany.TotalCreatedClaimAllowed}</b> reached.");
+                    }
+                    else
+                    {
+                        notifyService.Information($"MAX Claim available ={availableCount}.");
                     }
                 }
                 var model = new ClaimTransactionModel

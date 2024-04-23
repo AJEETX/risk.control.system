@@ -288,7 +288,12 @@ namespace risk.control.system.Controllers
                 if (files != null && files.Count > 0)
                 {
                     var file = files.FirstOrDefault(f => f.FileName == claimsInvestigation.PolicyDetail?.Document?.FileName && f.Name == claimsInvestigation.PolicyDetail?.Document?.Name);
-                    if (file != null)
+                    if (file != null && file.Length > 2000000)
+                    {
+                        notifyService.Warning("Uploaded File size morer than 2MB !!! ");
+                        return RedirectToAction(nameof(InsurancePolicyController.CreatePolicy), "InsurancePolicy",new { claimsInvestigation = claimsInvestigation });
+                    }
+                        if (file != null)
                     {
                         documentFile = file;
                     }
@@ -426,12 +431,17 @@ namespace risk.control.system.Controllers
 
                 if (files != null && files.Count > 0)
                 {
-                    var file = files.FirstOrDefault(f => f.FileName == claimsInvestigation.PolicyDetail?.Document?.FileName && f.Name == claimsInvestigation.PolicyDetail?.Document?.Name);
-                    if (file != null)
+                    //var file = files.FirstOrDefault(f => f.FileName == claimsInvestigation.PolicyDetail?.Document?.FileName && f.Name == claimsInvestigation.PolicyDetail?.Document?.Name);
+                    //if (file != null)
+                    //{
+                    //    documentFile = file;
+                    //}
+                    var file = files.FirstOrDefault(f => f.FileName == claimsInvestigation.CustomerDetail?.ProfileImage?.FileName && f.Name == claimsInvestigation.CustomerDetail?.ProfileImage?.Name);
+                    if (file != null && file.Length > 2000000)
                     {
-                        documentFile = file;
+                        notifyService.Warning("Uploaded File size morer than 2MB !!! ");
+                        return RedirectToAction(nameof(InsurancePolicyController.CreatePolicy), "InsurancePolicy", new { claimsInvestigation = claimsInvestigation });
                     }
-                    file = files.FirstOrDefault(f => f.FileName == claimsInvestigation.CustomerDetail?.ProfileImage?.FileName && f.Name == claimsInvestigation.CustomerDetail?.ProfileImage?.Name);
                     if (file != null)
                     {
                         profileFile = file;

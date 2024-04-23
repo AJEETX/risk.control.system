@@ -75,13 +75,33 @@ async function fetchIpInfo() {
 $(document).ready(function () {
     fetchIpInfo();
 
-    $('#information').on('click', function (e) {
+    $('#information').on('mouseover', function (e) {
         var count = $('#total-count').val();
         var max = $('#max-count').val();
         $.alert(
             {
                 title: " Trial version limit !",
-                content: " <i class='fas fa-less-than-equal'></i> Trial version limit =" + max + " . <br />Available count = " + count + "!",
+                content: " Trial version limit <i class='fas fa-less-than-equal'></i> <b>" + max + "</b> . <br />Available count = <b>" + count + "</b>",
+                icon: 'fas fa-exclamation-triangle',
+                type: 'blue',
+                closeIcon: true,
+                buttons: {
+                    cancel: {
+                        text: "CLOSE",
+                        btnClass: 'btn-primary'
+                    }
+                }
+            }
+        );
+    });
+
+    $('#information-popup').on('mouseover', function (e) {
+        var count = $('#total-count').val();
+        var max = $('#max-count').val();
+        $.alert(
+            {
+                title: " Detail Complete !",
+                content: " <i class='far fa-thumbs-up'></i> Detail is complete. <br /> The claim shall move from Draft to Assign!",
                 icon: 'fas fa-exclamation-triangle',
                 type: 'blue',
                 closeIcon: true,
