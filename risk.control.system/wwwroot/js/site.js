@@ -84,6 +84,7 @@ $(document).ready(function () {
                 content: " Trial version limit <i class='fas fa-less-than-equal'></i> <b>" + max + "</b> . <br />Available count = <b>" + count + "</b>",
                 icon: 'fas fa-exclamation-triangle',
                 type: 'blue',
+                 animationBounce: 2.5,
                 closeIcon: true,
                 buttons: {
                     cancel: {
@@ -95,14 +96,33 @@ $(document).ready(function () {
         );
     });
 
+    $('#new-draft-information').on('mouseover', function (e) {
+         $.alert(
+            {
+                title: " New & Draft !",
+                 content: " <i class='far fa-file-powerpoint'></i> Create new claim through wizard. <br /> Completed claim move to Assign!",
+                 icon: 'fas fa-info',
+                type: 'dark',
+                 closeIcon: true,
+                 animationBounce: 2.5,
+                buttons: {
+                    cancel: {
+                        text: "CLOSE",
+                        btnClass: 'btn-secondary'
+                    }
+                }
+            }
+        );
+    });
     $('#information-popup').on('mouseover', function (e) {
         var count = $('#total-count').val();
         var max = $('#max-count').val();
         $.alert(
             {
                 title: " Detail Complete !",
-                content: " <i class='far fa-thumbs-up'></i> Detail is complete. <br /> The claim shall move from Draft to Assign!",
-                icon: 'fas fa-exclamation-triangle',
+                content: "Detail completed <i class='far fa-thumbs-up'></i><br /> <b>Assign</b> now or later",
+                icon: 'fas fa-info',
+                 animationBounce: 2.5,
                 type: 'blue',
                 closeIcon: true,
                 buttons: {
