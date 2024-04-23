@@ -75,7 +75,7 @@ async function fetchIpInfo() {
 $(document).ready(function () {
     fetchIpInfo();
 
-    $('#information').on('mouseover', function (e) {
+    $('#information').on('click', function (e) {
         var count = $('#total-count').val();
         var max = $('#max-count').val();
         $.alert(
@@ -96,7 +96,7 @@ $(document).ready(function () {
         );
     });
 
-    $('#claim-information').on('mouseover', function (e) {
+    $('#claim-information').on('click', function (e) {
         $.alert(
             {
                 title: "Claim Details",
@@ -114,7 +114,7 @@ $(document).ready(function () {
             }
         );
     });
-    $('#policy-information').on('mouseover', function (e) {
+    $('#policy-information').on('click', function (e) {
         $.alert(
             {
                 title: "Add Policy",
@@ -132,7 +132,7 @@ $(document).ready(function () {
             }
         );
     });
-    $('#customer-information').on('mouseover', function (e) {
+    $('#customer-information').on('click', function (e) {
         $.alert(
             {
                 title: "Add Customer",
@@ -150,7 +150,7 @@ $(document).ready(function () {
             }
         );
     });
-    $('#beneficiary-information').on('mouseover', function (e) {
+    $('#beneficiary-information').on('click', function (e) {
         $.alert(
             {
                 title: "Add Beneficiary",
@@ -172,7 +172,7 @@ $(document).ready(function () {
          $.alert(
             {
                 title: " Getting Started Tips",
-                 content: " <i class='far fa-hand-point-right'></i> Start from <button class='badge badge-success btn'>NEW & DRAFT </button> link<br /><i class='far fa-thumbs-up'></i> Complete detail through wizard. <br /><b> <i class='fa fa-hand-peace-o'></i> ASSIGN</b> to Agency ",
+                 content: " <i class='far fa-hand-point-right'></i> Start from <button class='badge badge-success btn'><i class='far fa-edit'></i>  NEW & DRAFT </button> link<br /><i class='far fa-thumbs-up'></i> Complete detail through wizard. <br /><b> <i class='fa fa-hand-peace-o'></i> ASSIGN</b> to Agency ",
                  icon: 'fas fa-info',
                  type: 'dark',
                  closeIcon: true,
@@ -187,7 +187,7 @@ $(document).ready(function () {
         );
     });
 
-    $('#assign-auto-information').on('mouseover', function (e) {
+    $('#assign-auto-information').on('click', function (e) {
         $.alert(
             {
                 title: " Assign (auto))",
@@ -205,7 +205,7 @@ $(document).ready(function () {
             }
         );
     });
-    $('#re-assign-information').on('mouseover', function (e) {
+    $('#re-assign-information').on('click', function (e) {
         $.alert(
             {
                 title: " Assign & Re-assign",
@@ -223,7 +223,7 @@ $(document).ready(function () {
             }
         );
     });
-    $('#empanelled-agencies').on('mouseover', function (e) {
+    $('#empanelled-agencies').on('click', function (e) {
         $.alert(
             {
                 title: " Assign & Re-assign",
@@ -242,7 +242,7 @@ $(document).ready(function () {
         );
     });
 
-    $('#delete-policy-information').on('mouseover', function (e) {
+    $('#delete-policy-information').on('click', function (e) {
         $.alert(
             {
                 title: " Delete Claim",
@@ -261,7 +261,7 @@ $(document).ready(function () {
         );
     });
 
-    $('#creator-active-claims').on('mouseover', function (e) {
+    $('#creator-active-claims').on('click', function (e) {
         $.alert(
             {
                 title: " Active Claims",
@@ -280,8 +280,6 @@ $(document).ready(function () {
         );
     });
     $('#information-popup').on('mouseover', function (e) {
-        var count = $('#total-count').val();
-        var max = $('#max-count').val();
         $.alert(
             {
                 title: " Detail Complete !",
@@ -300,9 +298,7 @@ $(document).ready(function () {
         );
     });
 
-    $('#upload-information').on('mouseover', function (e) {
-        var count = $('#total-count').val();
-        var max = $('#max-count').val();
+    $('#upload-information').on('click', function (e) {
         $.alert(
             {
                 title: " Upload Claim !",

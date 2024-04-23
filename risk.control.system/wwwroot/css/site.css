@@ -1235,3 +1235,6 @@ a#back-button {
     cursor: default;
     text-decoration: none;
 }
+.fas.fa-info-circle:hover, .fas.fa-info:hover{
+    cursor: pointer;
+}
