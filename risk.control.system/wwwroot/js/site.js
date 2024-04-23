@@ -17,7 +17,7 @@ function clearAllInputs(event) {
     var policyImage = document.getElementById('policyImage');
     var profileImage = document.getElementById('profileImage');
     if (policyImage) {
-        policyImage.src = '/img/no-image.png';
+        policyImage.src = '/img/no-policy.jpg';
     }
     if (profileImage) {
         profileImage.src = '/img/no-user.png';
@@ -95,14 +95,67 @@ $(document).ready(function () {
             }
         );
     });
-
+    $('#policy-information').on('mouseover', function (e) {
+        $.alert(
+            {
+                title: "Add Policy",
+                content: " <i class='far fa-hand-point-right'></i> Add Policy details.<br /><i class='far fa-thumbs-up'></i> Complete detail through wizard. <br /><b> <i class='fa fa-hand-peace-o'></i> ASSIGN</b> to Agency ",
+                icon: 'fas fa-info',
+                type: 'blue',
+                closeIcon: true,
+                animationBounce: 2.5,
+                buttons: {
+                    cancel: {
+                        text: "CLOSE",
+                        btnClass: 'btn-secondary'
+                    }
+                }
+            }
+        );
+    });
+    $('#customer-information').on('mouseover', function (e) {
+        $.alert(
+            {
+                title: "Add Customer",
+                content: " <i class='far fa-hand-point-right'></i> Add Customer details.<br /><i class='far fa-thumbs-up'></i> Complete detail through wizard. <br /><b> <i class='fa fa-hand-peace-o'></i> ASSIGN</b> to Agency ",
+                icon: 'fas fa-info',
+                type: 'blue',
+                closeIcon: true,
+                animationBounce: 2.5,
+                buttons: {
+                    cancel: {
+                        text: "CLOSE",
+                        btnClass: 'btn-secondary'
+                    }
+                }
+            }
+        );
+    });
+    $('#beneficiary-information').on('mouseover', function (e) {
+        $.alert(
+            {
+                title: "Add Beneficiary",
+                content: " <i class='far fa-hand-point-right'></i> Add Beneficiary details.<br /><i class='far fa-thumbs-up'></i> Wizard should complete. <br /><b> <i class='fa fa-hand-peace-o'></i> ASSIGN</b> to Agency ",
+                icon: 'fas fa-info',
+                type: 'blue',
+                closeIcon: true,
+                animationBounce: 2.5,
+                buttons: {
+                    cancel: {
+                        text: "CLOSE",
+                        btnClass: 'btn-secondary'
+                    }
+                }
+            }
+        );
+    });
     $('#new-draft-information').on('mouseover', function (e) {
          $.alert(
             {
-                title: " New & Draft !",
-                 content: " <i class='far fa-file-powerpoint'></i> Create new claim through wizard. <br /> Completed claim move to Assign!",
+                title: " Getting Started Tips",
+                 content: " <i class='far fa-hand-point-right'></i> Start from <button class='badge badge-success btn'>NEW & DRAFT </button> link<br /><i class='far fa-thumbs-up'></i> Complete detail through wizard. <br /><b> <i class='fa fa-hand-peace-o'></i> ASSIGN</b> to Agency ",
                  icon: 'fas fa-info',
-                type: 'dark',
+                 type: 'blue',
                  closeIcon: true,
                  animationBounce: 2.5,
                 buttons: {

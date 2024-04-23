@@ -29,8 +29,8 @@
         public static readonly string FTP_SITE_DATA = "C0##ect10n";
 
         public static readonly string IP_SITE = "http://ip-api.com/json/";
-        public static readonly string NO_POLICY_IMAGE = "/img/no-image.png";
-        public static readonly string POLICY_IMAGE = "/img/policy-design.png";
+        public static readonly string NO_POLICY_IMAGE = "/img/no-policy.jpg";
+        public static readonly string POLICY_BLANK_IMAGE = "/img/blank-document.png";
         public static readonly string NO_PHOTO_IMAGE = "/img/no-photo.png";
 
         //LOGIN

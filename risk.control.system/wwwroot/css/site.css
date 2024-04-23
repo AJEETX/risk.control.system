@@ -1230,3 +1230,8 @@ a#back-button {
 .trial-case {
     color: darkgoldenrod;
 }
+
+.navlink-border.nav-link {
+    cursor: default;
+    text-decoration: none;
+}

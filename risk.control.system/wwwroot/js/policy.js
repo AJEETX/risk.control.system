@@ -53,7 +53,7 @@ $(document).ready(function () {
                 for (var i = 0; i < countFiles; i++) {
                     var fileSize = $(this)[0].files[i].size;
                     if (fileSize > MaxSizeInBytes) {
-                        document.getElementById('policyImage').src = '/img/no-image.png';
+                        document.getElementById('policyImage').src = '/img/no-policy.jpg';
                         document.getElementById('documentImageInput').value = '';
                         $.alert(
                             {
