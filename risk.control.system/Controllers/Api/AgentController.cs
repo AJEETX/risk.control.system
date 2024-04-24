@@ -37,7 +37,7 @@ namespace risk.control.system.Controllers.Api
         private readonly IICheckifyService iCheckifyService;
         private static string FaceMatchBaseUrl = "https://2j2sgigd3l.execute-api.ap-southeast-2.amazonaws.com/Development/icheckify";
         private static Random randomNumber = new Random();
-        private string portal_base_url= string.Empty;
+        private string portal_base_url = string.Empty;
         //test PAN FNLPM8635N
         public AgentController(ApplicationDbContext context, IHttpClientService httpClientService,
             UserManager<VendorApplicationUser> userVendorManager,
@@ -61,11 +61,11 @@ namespace risk.control.system.Controllers.Api
 
         [AllowAnonymous]
         [HttpPost("ResetUid")]
-        public async Task<IActionResult> ResetUid([Required]string mobile, bool sendSMS = false)
+        public async Task<IActionResult> ResetUid([Required] string mobile, bool sendSMS = false)
         {
             try
             {
-                if(string.IsNullOrWhiteSpace(mobile))
+                if (string.IsNullOrWhiteSpace(mobile))
                 {
                     return BadRequest($"Empty mobile number");
                 }
@@ -341,8 +341,8 @@ namespace risk.control.system.Controllers.Api
             var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
 
-            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => 
-            c.Email == email && 
+            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c =>
+            c.Email == email &&
             c.Active
             );
 
@@ -471,7 +471,7 @@ namespace risk.control.system.Controllers.Api
                         claimsAssigned.Add(item);
                     }
                 }
-                var filePath = Path.Combine(webHostEnvironment.WebRootPath,  Applicationsettings.NO_POLICY_IMAGE);
+                var filePath = Path.Combine(webHostEnvironment.WebRootPath, Applicationsettings.NO_POLICY_IMAGE);
 
                 var noDocumentimage = await System.IO.File.ReadAllBytesAsync(filePath);
 
@@ -531,7 +531,7 @@ namespace risk.control.system.Controllers.Api
                 .Include(c => c.Country)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimId);
 
-            var filePath = Path.Combine(webHostEnvironment.WebRootPath,  Applicationsettings.NO_POLICY_IMAGE);
+            var filePath = Path.Combine(webHostEnvironment.WebRootPath, Applicationsettings.NO_POLICY_IMAGE);
 
             var noDocumentimage = await System.IO.File.ReadAllBytesAsync(filePath);
 
@@ -652,7 +652,7 @@ namespace risk.control.system.Controllers.Api
             }
         }
 
-    [ApiExplorerSettings(IgnoreApi = true)]
+        [ApiExplorerSettings(IgnoreApi = true)]
         [AllowAnonymous]
         [HttpPost("audio")]
         public async Task<IActionResult> Audio(AudioData data)
@@ -707,7 +707,7 @@ namespace risk.control.system.Controllers.Api
             {
                 return StatusCode(500, ex.Message);
             }
-            
+
         }
 
         [AllowAnonymous]
@@ -739,7 +739,7 @@ namespace risk.control.system.Controllers.Api
         {
             try
             {
-                
+
                 var ipSet = await iCheckifyService.WhitelistIP(request);
 
                 return Ok(ipSet);

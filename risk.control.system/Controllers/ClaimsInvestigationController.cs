@@ -108,7 +108,7 @@ namespace risk.control.system.Controllers
 
         }
 
-        [Breadcrumb(" Re & Assign")]
+        [Breadcrumb(" Assign & Re")]
         [Authorize(Roles = CREATOR.DISPLAY_NAME)]
         public IActionResult Assigner()
         {

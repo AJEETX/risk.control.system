@@ -398,11 +398,11 @@ $(document).ready(function () {
             }, 1);
         }
 
-        $('html *').css('cursor', 'not-allowed');
-        $('html a *, html button *').attr('disabled', 'disabled');
-        $('html a *, html button *').css('pointer-events', 'none');
+        $('a').css('cursor', 'not-allowed');
+        $('button').attr('disabled', 'disabled');
+        $('a , button').css('pointer-events', 'none');
 
-        var nodes = document.getElementById("body").getElementsByTagName('*');
+        var nodes = document.getElementById("section").getElementsByTagName('*');
         for (var i = 0; i < nodes.length; i++) {
             nodes[i].disabled = true;
         }

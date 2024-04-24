@@ -95,16 +95,16 @@ namespace risk.control.system.Services
                 data.SecondBlockUrl = "/ClaimsInvestigation/Draft";
                 data.SecondBlockCount = claimsAssignAuto.Count;
 
-                data.SecondBBlockName = "Re & Assign";
+                data.SecondBBlockName = "Assign & Re";
                 data.SecondBBlockUrl = "/ClaimsInvestigation/Assigner";
                 data.SecondBBlockCount = claimsAssignManual.Count;
-                data.SecondBBlockCountBoth = ""+ (claimsAssignManual.Count - claimsAssignAuto.Count) +" + " + (claimsAssignAuto.Count) + "";
+                data.SecondBBlockCountBoth = "" + (claimsAssignAuto.Count) + " & " + (claimsAssignManual.Count - claimsAssignAuto.Count) + "";
 
                 
             }
             else
             {
-                data.SecondBlockName = "Re & Assign";
+                data.SecondBlockName = "Assign & Re";
                 data.SecondBlockUrl = "/ClaimsInvestigation/Assigner";
                 data.SecondBlockCount = claimsAssignManual.Count;
             }

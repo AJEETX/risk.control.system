@@ -36,7 +36,7 @@ $(document).ready(function () {
         $('html a *').css('cursor', 'not-allowed');
         $('html input *, html a *').attr('disabled', 'disabled');
         $('html a *, html button *').attr('disabled', 'disabled');
-        $('html a *, html button *').css('pointer-events', 'none')
+        $('html a, html button *').css('pointer-events', 'none')
 
         var nodes = document.getElementById("login-form").getElementsByTagName('*');
         for (var i = 0; i < nodes.length; i++) {

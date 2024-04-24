@@ -222,7 +222,7 @@
 
         public static class PORTAL_ADMIN
         {
-            public const string DISPLAY_NAME = "PORTALADMIN";
+            public const string DISPLAY_NAME = "PORTAL_ADMIN";
             public const string CODE = "admin";
             public const string USERNAME = "admin@icheckify.co.in";
             public const string EMAIL = USERNAME;

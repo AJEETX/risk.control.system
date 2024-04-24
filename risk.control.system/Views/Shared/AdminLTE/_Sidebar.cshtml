@@ -122,7 +122,7 @@
                 </li>
                 
                 <li class="nav-item ">
-                    <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("ContactMessage","")">
+                    <a asp-controller="ContactMessage" asp-action="Index" is-active-page class="navlink-border nav-link @Url.MakeActiveClass("ContactMessage","")">
                         <i class="nav-icon fas fa-envelope"></i>
                         <p class="sidebar-menu-header-label">
                             @Applicationsettings.MAILBOX
@@ -176,7 +176,7 @@
                     if (User.IsInRole(AppRoles.PORTAL_ADMIN.ToString()) || User.IsInRole(AppRoles.COMPANY_ADMIN.ToString()))
                     {
                         <li class="nav-item">
-                            <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("ClientCompany","") @Url.MakeActiveClass("Vendors","") @Url.MakeActiveClass("CompanyUser","") @Url.MakeActiveClass("CompanyUserRoles","") @Url.MakeActiveClass("VendorUser","") @Url.MakeActiveClass("VendorService","")">
+                            <a asp-controller="ClientCompany" asp-action="Index" is-active-page class="navlink-border nav-link @Url.MakeActiveClass("ClientCompany","") @Url.MakeActiveClass("Vendors","") @Url.MakeActiveClass("CompanyUser","") @Url.MakeActiveClass("CompanyUserRoles","") @Url.MakeActiveClass("VendorUser","") @Url.MakeActiveClass("VendorService","")">
                                 <i class="nav-icon fas fa-shield-alt"></i>
                                 <p class="sidebar-menu-header-label">
                                     @Applicationsettings.ADMIN_SETTINGS
@@ -237,7 +237,7 @@
                     if (User.IsInRole(AppRoles.PORTAL_ADMIN.ToString()))
                     {
                         <li class="nav-item">
-                            <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("User","") @Url.MakeActiveClass("Roles","")">
+                            <a asp-controller="User" asp-action="Index" is-active-page class="navlink-border nav-link @Url.MakeActiveClass("User","") @Url.MakeActiveClass("Roles","")">
                                 <i class="nav-icon fas fa-user-cog"></i>
                                 <p class="sidebar-menu-header-label">
                                     @Applicationsettings.USER_ROLES
@@ -265,7 +265,7 @@
                     }
                 }
                 <li class="nav-item">
-                    <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("LineOfBusiness","") @Url.MakeActiveClass("InvestigationServiceTypes","") 
+                    <a asp-controller="LineOfBusiness" asp-action="Index" is-active-page class="navlink-border nav-link @Url.MakeActiveClass("LineOfBusiness","") @Url.MakeActiveClass("InvestigationServiceTypes","")
                     @Url.MakeActiveClass("InvestigationCaseStatus","") @Url.MakeActiveClass("CaseEnabler","") @Url.MakeActiveClass("Costcentre","") 
                     @Url.MakeActiveClass("InvestigationCaseOutcome","")
                     @Url.MakeActiveClass("IpAddress","")
@@ -347,7 +347,7 @@
                         if (User.IsInRole(AppRoles.PORTAL_ADMIN.ToString()))
                         {
                             <li class="nav-item">
-                                <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("Country","") @Url.MakeActiveClass("State","") @Url.MakeActiveClass("District","") @Url.MakeActiveClass("PinCodes","") @Url.MakeActiveClass("File","") @Url.MakeActiveClass("Uploads","") @Url.MakeActiveClass("Audit","")">
+                                <a asp-controller="Country" asp-action="Index" is-active-page class="navlink-border nav-link @Url.MakeActiveClass("Country","") @Url.MakeActiveClass("State","") @Url.MakeActiveClass("District","") @Url.MakeActiveClass("PinCodes","") @Url.MakeActiveClass("File","") @Url.MakeActiveClass("Uploads","") @Url.MakeActiveClass("Audit","")">
                                     <i class="nav-icon fas fa-wrench"></i>
                                     <p class="sidebar-menu-header-label">
                                         @Applicationsettings.GENERAL_SETUP
