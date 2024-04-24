@@ -131,7 +131,13 @@ namespace risk.control.system.Controllers
                                 message += $"                                       ";
                                 message += $"                                       ";
                                 message += $"{BaseUrl}";
-                                SMS.API.SendSingleMessage("+" + admin.PhoneNumber, message);
+                                try
+                                {
+                                    SMS.API.SendSingleMessage("+" + admin.PhoneNumber, message);
+                                }
+                                catch (Exception)
+                                {
+                                }
                             }
 
                             notifyService.Success("Login successful");

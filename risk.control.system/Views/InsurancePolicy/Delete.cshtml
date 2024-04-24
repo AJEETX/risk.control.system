@@ -11,7 +11,15 @@
         <input type="hidden" id="beneficiaryId" value="@Model.Location?.CaseLocationId" />
         <div class="card-header">
             <h3 class="card-title"><i class="fas fa-newspaper"></i> Delete
-                <i id="delete-policy-information" class="fas fa-info-circle"></i>
+                <span class="hover-text">
+                    <i class="fas fa-info-circle"></i>
+                    <span class="tooltip-text" id="information">
+                        <span>
+                            <i class='far fa-hand-point-right'></i> Deletes the claim info permanently.
+                            <i class='far fa-thumbs-up'></i> Please make sure before you delete.
+                        </span>
+                    </span>
+                </span>
             </h3>
         </div>
         @{

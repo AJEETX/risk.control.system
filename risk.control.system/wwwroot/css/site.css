@@ -1238,3 +1238,30 @@ a#back-button {
 .fas.fa-info-circle:hover, .fas.fa-info:hover{
     cursor: pointer;
 }
+.tooltip-text {
+    position: relative;
+    right: 0px;
+    z-index: 2000;
+    width:50px;
+    color: white;
+    font-size: 12px;
+    background-color: #192733;
+    border-radius: 10px;
+    padding: 10px 15px 10px 15px;
+}
+
+#information {
+    display: none;
+    transition: opacity 0.5s;
+}
+
+.hover-text:hover #information {
+    display: inline;
+}
+
+.hover-text {
+    position: relative;
+    display: inline-block;
+    font-family: Tahoma;
+    text-align: center;
+}

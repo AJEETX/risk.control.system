@@ -8,7 +8,17 @@
 <section class="content">
     <div id="article" class="card card-secondary">
         <div class="card-header">
-            <h3 class="card-title"><i class="fa fa-binoculars"></i> Submit</h3>
+            <h3 class="card-title"><i class="fa fa-binoculars"></i> Submit
+                <span class="hover-text">
+                    <i class="fas fa-info-circle"></i>
+                    <span class="tooltip-text" id="information">
+                        <span>
+                            <i class='far fa-hand-point-right'></i> ADD & UPDATE THE CLAIM REPORT
+                        </span>
+
+                    </span>
+                </span>
+            </h3>
         </div>
         <partial name="_PolicyDetails" model="@Model" />
         <partial name="_PolicyReport" model="@Model" />

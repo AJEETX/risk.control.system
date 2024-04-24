@@ -9,7 +9,19 @@
     <input type="hidden" id="Longitude" asp-for="@Model.PinCode.Longitude" />
     <div class="card  card-secondary">
         <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-building"></i> Agency Detail</h3>
+            <h3 class="card-title"><i class="fas fa-building"></i> Agency Detail
+                <span class="hover-text">
+                    <i class="fas fa-info-circle"></i>
+                    <span class="tooltip-text" id="information">
+                        <span>
+
+                            <i class='fas fa-building'></i><b> AGENCY DETAILS.</b>
+                            
+                        </span>
+
+                    </span>
+                </span>
+            </h3>
         </div>
         <div class="card-body">
             <div class="submit-progress hidden">

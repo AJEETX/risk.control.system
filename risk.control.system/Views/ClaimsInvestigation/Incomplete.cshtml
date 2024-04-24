@@ -2,21 +2,28 @@
 @{
     ViewData["Title"] = "Claim: New  ";
 }
-
 <section class="content">
     <div id="fullpage" class="card card-secondary">
         <div class="card-header">
             <input type="hidden" id="total-count" value="@Model.AvailableCount" />
             <input type="hidden" id="max-count" value="@Model.TotalCount" />
             <h3 class="card-title"><i class="far fa-edit"></i> New & Draft
-                <i id="information" class="fas fa-info-circle"></i>
+               
+                <span class="hover-text">
+                    <i class="fas fa-info-circle"></i>
+                    <span class="tooltip-text" id="information">
+                        <span>
+                            <i class='far fa-hand-point-right'></i> Start from <button class='badge badge-success btn'><i class='far fa-edit'></i>  NEW & DRAFT </button> link
+                            <i class='far fa-thumbs-up'></i> Complete detail through wizard. <b> <i class='fa fa-hand-peace-o'></i> ASSIGN</b> to Agency
+                        </span>
+
+                    </span>
+                </span>
             </h3>
             <div class="card-tools">
                 @if (Model.Trial)
                 {
-                    <i class='far fa-hand-point-right'></i>
-
-                    <span data-toggle="tooltip" title="TRIAL VERSION. Max limit = @Model.TotalCount"> <i class="fa fa-question-circle" aria-hidden="true"></i> </span>
+                    <span data-toggle="tooltip" title="TRIAL VERSION. Max limit = @Model.TotalCount"> <i class="fas fa-question-circle" aria-hidden="true"></i> </span>
                 }
             </div>
             @* <h3 id="view-type" class="card-title">

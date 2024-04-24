@@ -78,6 +78,8 @@ $(document).ready(function () {
     $('#information').on('click', function (e) {
         var count = $('#total-count').val();
         var max = $('#max-count').val();
+
+
         $.alert(
             {
                 title: " Trial version limit !",

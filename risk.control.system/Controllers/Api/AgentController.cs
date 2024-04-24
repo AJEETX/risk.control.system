@@ -84,7 +84,6 @@ namespace risk.control.system.Controllers.Api
             }
         }
 
-    [ApiExplorerSettings(IgnoreApi = true)]
         [AllowAnonymous]
         [HttpPost("VerifyMobile")]
         public async Task<IActionResult> VerifyMobile(VerifyMobileRequest request)
@@ -143,7 +142,6 @@ namespace risk.control.system.Controllers.Api
         }
         [AllowAnonymous]
         [HttpPost("VerifyId")]
-    [ApiExplorerSettings(IgnoreApi = true)]
         public async Task<IActionResult> VerifyId(VerifyIdRequest request)
         {
             try
@@ -197,7 +195,6 @@ namespace risk.control.system.Controllers.Api
         }
 
         [AllowAnonymous]
-        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpPost("VerifyDocument")]
         public async Task<IActionResult> VerifyDocument(VerifyDocumentRequest request)
         {
@@ -298,7 +295,6 @@ namespace risk.control.system.Controllers.Api
 
             return Ok();
         }
-        [ApiExplorerSettings(IgnoreApi = true)]
 
         [AllowAnonymous]
         [HttpGet("agent")]
@@ -503,7 +499,6 @@ namespace risk.control.system.Controllers.Api
             return Unauthorized();
         }
 
-    [ApiExplorerSettings(IgnoreApi = true)]
         [AllowAnonymous]
         [HttpGet("get")]
         public async Task<IActionResult> Get(string claimId)
@@ -605,7 +600,6 @@ namespace risk.control.system.Controllers.Api
                     Remarks = claimCase?.ClaimReport?.AgentRemarks
                 });
         }
-        [ApiExplorerSettings(IgnoreApi = true)]
 
         [AllowAnonymous]
         [HttpPost("faceid")]
@@ -631,7 +625,6 @@ namespace risk.control.system.Controllers.Api
                 return StatusCode(500, ex.Message);
             }
         }
-        [ApiExplorerSettings(IgnoreApi = true)]
 
         [AllowAnonymous]
         [HttpPost("documentid")]
@@ -690,7 +683,6 @@ namespace risk.control.system.Controllers.Api
             return Ok(data.Name);
         }
 
-        [ApiExplorerSettings(IgnoreApi = true)]
         [AllowAnonymous]
         [HttpPost("submit")]
         public async Task<IActionResult> Submit(SubmitData data)

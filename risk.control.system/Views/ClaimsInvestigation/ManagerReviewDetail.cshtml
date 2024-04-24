@@ -10,7 +10,15 @@
         <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
         <input type="hidden" id="beneficiaryId" value="@Model.Location?.CaseLocationId" />
         <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-newspaper"></i> Detail</h3>
+            <h3 <span class="hover-text">
+                    <i class="fas fa-info-circle"></i>
+                    <span class="tooltip-text" id="information">
+                        <span>
+                            <i class='far fa-hand-point-right'></i> CLAIMS REVIEW DETAIL.
+                        </span>
+                    </span>
+                </span>class="card-title"><i class="fas fa-newspaper"></i> Detail
+                </h3>
         </div>
         @{
             string address = string.Empty;
