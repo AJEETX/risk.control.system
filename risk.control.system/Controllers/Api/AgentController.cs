@@ -121,7 +121,7 @@ namespace risk.control.system.Controllers.Api
                         {
                             //SEND SMS
                             string message = $"Dear {user2Onboard.Email}";
-                            message += $"                                       ";
+                            message += $"                                ";
                             message += $"icheckifyApp Pin:{user2Onboard.SecretPin}";
                             message += $"                                      ";
                             message += $"Thanks                           ";
@@ -361,7 +361,7 @@ namespace risk.control.system.Controllers.Api
                         claimsAssigned.Add(item);
                     }
                 }
-                var filePath = Path.Combine(webHostEnvironment.WebRootPath, Applicationsettings.NO_POLICY_IMAGE);
+                var filePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-policy.jpg");
 
                 var noDocumentimage = await System.IO.File.ReadAllBytesAsync(filePath);
 

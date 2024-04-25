@@ -568,7 +568,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 .breadcrumb {
     font-weight: bold;
-    font-family: 'Arial Narrow';
+    font-family: Verdana;
     border: .5px solid #ccc;
     background: linear-gradient(#fff, #ccc);
     animation: gradient 15s ease infinite;
@@ -688,10 +688,6 @@ footer {
     position: relative;
 }
 
-/**
-     * Copyright 2019 Google LLC. All Rights Reserved.
-     * SPDX-License-Identifier: Apache-2.0
-     */
 :root {
     --building-color: #FF9800;
     --house-color: #0288D1;
@@ -1240,13 +1236,12 @@ a#back-button {
 }
 .tooltip-text {
     position: relative;
-    right: 0px;
+    bottom: -50px;
+    right:25%;
     z-index: 2000;
-    width:50px;
     color: white;
     font-size: 12px;
     background-color: #192733;
-    border-radius: 10px;
     padding: 10px 15px 10px 15px;
 }
 
@@ -1256,12 +1251,18 @@ a#back-button {
 }
 
 .hover-text:hover #information {
-    display: inline;
+    display:inline;
+}
+.hover-text {
+    display: none;
 }
 
-.hover-text {
-    position: relative;
-    display: inline-block;
-    font-family: Tahoma;
-    text-align: center;
+
+@media only screen and (min-width: 768px) {
+    .hover-text {
+        position: relative;
+        display: inline-block;
+        font-family: Tahoma;
+        text-align: center;
+    }
 }

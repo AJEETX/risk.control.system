@@ -31,7 +31,7 @@ namespace risk.control.system.Helpers
         {
             if (await featureManager.IsEnabledAsync(FeatureFlags.IPRestrict))
             {
-                if (!context.Request.Path.Value.StartsWith("/api/") &&
+                if (!context.Request.Path.Value.StartsWith("/api/Agent") &&
                     !context.Request.Path.Value.StartsWith("/Dashboard/Get") &&
                     !context.Request.Path.Value.StartsWith("/js") &&
                     !context.Request.Path.Value.Contains("api/Notification/GetClientIp") &&

@@ -75,7 +75,7 @@ async function fetchIpInfo() {
 $(document).ready(function () {
     fetchIpInfo();
 
-    $('#information').on('click', function (e) {
+    $('#informationx').on('click', function (e) {
         var count = $('#total-count').val();
         var max = $('#max-count').val();
 
