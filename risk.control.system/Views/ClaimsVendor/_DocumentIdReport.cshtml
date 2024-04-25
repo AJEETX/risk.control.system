@@ -24,12 +24,24 @@
     <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
         <div class="card bg-light d-flex flex-fill @borderColor">
             <div class="card-header text-muted border-bottom-0">
+                <h3 class="card-title">
+                    <i class="fas fa-mobile-alt"></i> PAN CARD
+                    <span class="hover-text">
+                        <i class="fas fa-info-circle"></i>
+                        <span class="tooltip-text" id="beneficiary-information">
 
-                <i class="fas fa-mobile-alt"></i> Document <span class="badge badge-light">checkify</span>
-                <span class="badge badge-light" style="float:right;">
-                    <i class="nav-icon fas fa-clock"></i>
-                    @imageCapturedTime
-                </span>
+                            <b> <i class='fas fa-user-tie'></i> Upload PAN CARD Image </b>
+                        </span>
+                    </span>
+                </h3>
+                <div class="card-tools">
+                    <span data-toggle="tooltip" title="Agent report # : @Model.Location.ClaimReport.AgentEmail" class="badge badge-light">
+                        <i class="nav-icon fas fa-clock"></i>
+                        @imageCapturedTime
+                    </span>
+
+                </div>
+                
             </div>
 
             <div class="card-footer text-center">
@@ -51,7 +63,7 @@
             <div class="progress">
                 <i class="far fa-bookmark bookmark-green"></i>
                 <div class="progress-bar" role="progressbar" style="width:100%;background-color:@documentIdColor;">
-                    document-id
+                    pan-card
                 </div>
             </div>
             <div class="card-body">
@@ -110,7 +122,7 @@
                 <div class="card-footer">
 
                     <div class="form-group">
-                        <span class="input-group-label"> Document Id Upload: </span>
+                        <span class="input-group-label"> PAN CARD Upload: </span>
                         <div class="input-group mb-3">
                             <img class="form-Image" id="pan-Image" src="@Applicationsettings.NO_IMAGE" title="PAN card" />
                             <input accept=".jpg,jpeg,png" type="file" class="form-control remarks" name="panImage" id="panImage" />

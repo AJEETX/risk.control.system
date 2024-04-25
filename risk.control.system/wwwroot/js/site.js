@@ -75,7 +75,7 @@ async function fetchIpInfo() {
 $(document).ready(function () {
     fetchIpInfo();
 
-    $('#informationx').on('click', function (e) {
+    $('#information').on('click', function (e) {
         var count = $('#total-count').val();
         var max = $('#max-count').val();
 
@@ -289,6 +289,25 @@ $(document).ready(function () {
                 icon: 'fas fa-info',
                  animationBounce: 2.5,
                 type: 'dark',
+                closeIcon: true,
+                buttons: {
+                    cancel: {
+                        text: "CLOSE",
+                        btnClass: 'btn-secondary'
+                    }
+                }
+            }
+        );
+    });
+
+    $('#withdraw-information-popup').on('mouseover', function (e) {
+        $.alert(
+            {
+                title: " Withdraw Claim !",
+                content: "The case can not be withdrawn. See Timeline section <i class='far fa-hand-point-up'></i> for more info",
+                icon: 'fas fa-info',
+                animationBounce: 2.5,
+                type: 'red',
                 closeIcon: true,
                 buttons: {
                     cancel: {

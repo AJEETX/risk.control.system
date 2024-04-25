@@ -39,6 +39,7 @@ a {
 html {
     font-size: 13px;
     position: relative;
+    min-width:550px;
 }
 
 @media (min-width: 768px) {
@@ -1237,7 +1238,7 @@ a#back-button {
 .tooltip-text {
     position: relative;
     bottom: -50px;
-    right:25%;
+    left:-30%;
     z-index: 2000;
     color: white;
     font-size: 12px;
@@ -1245,7 +1246,7 @@ a#back-button {
     padding: 10px 15px 10px 15px;
 }
 
-#information {
+#information, #policy-information, #customer-information, #beneficiary-information {
     display: none;
     transition: opacity 0.5s;
 }
@@ -1253,16 +1254,29 @@ a#back-button {
 .hover-text:hover #information {
     display:inline;
 }
+
+.hover-text:hover #policy-information {
+    display: inline;
+}
+
+.hover-text:hover #customer-information {
+    display: inline;
+}
+
+.hover-text:hover #beneficiary-information {
+    display: inline;
+}
 .hover-text {
     display: none;
+    position: absolute;
+    margin-left:8px;
+    font-family: Tahoma;
+    text-align: center;
 }
 
 
 @media only screen and (min-width: 768px) {
     .hover-text {
-        position: relative;
-        display: inline-block;
-        font-family: Tahoma;
-        text-align: center;
+        display: inline;
     }
 }

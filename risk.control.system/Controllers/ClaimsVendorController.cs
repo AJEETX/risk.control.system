@@ -525,7 +525,7 @@ namespace risk.control.system.Controllers
         }
 
         [Authorize(Roles = "AGENCY_ADMIN,SUPERVISOR")]
-        [Breadcrumb(title: " Detail", FromAction = "Allocate")]
+        [Breadcrumb(title: " Details", FromAction = "Allocate")]
         public async Task<IActionResult> CaseDetail(string id)
         {
             try
@@ -552,7 +552,7 @@ namespace risk.control.system.Controllers
             }
         }
 
-        [Breadcrumb(title: " Detail", FromAction = "Open")]
+        [Breadcrumb(title: " Details", FromAction = "Open")]
         [Authorize(Roles = "AGENCY_ADMIN,SUPERVISOR")]
         public async Task<IActionResult> Detail(string id)
         {

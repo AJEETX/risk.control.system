@@ -7,7 +7,20 @@
 <section class="content">
     <div id="article" class="card card-secondary">
         <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-newspaper"></i> Detail</h3>
+            <h3 class="card-title"><i class="fas fa-newspaper"></i> Details
+                <span class="hover-text">
+                    <i class="fas fa-info-circle"></i>
+                    <span class="tooltip-text" id="information">
+                        <span>
+
+                            <i class='far fa-file-powerpoint'></i><b> Policy details.</b>
+                            <i class='fa fa-user-plus'></i> <b> Customer Information.</b>
+                            <b> <i class='fas fa-user-tie'></i> Beneficiary Details </b>
+                        </span>
+
+                    </span>
+                </span>
+            </h3>
         </div>
         @{
             var data = new ClaimsInvestigationVendorsModel

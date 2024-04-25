@@ -83,6 +83,12 @@
             <div class="card bg-light d-flex flex-fill">
                 <div class="card-header text-muted border-bottom-0">
                     <i class="fa fa-user-plus"></i> Customer Details
+                    <span class="hover-text">
+                        <i class="fas fa-info-circle"></i>
+                        <span class="tooltip-text" id="customer-information">
+                            <i class='fa fa-user-plus'></i> <b> Customer Information.</b>
+                        </span>
+                    </span>
                 </div>
                 <div class="progress">
                     <i class="far fa-bookmark bookmark-green"></i>
@@ -184,7 +190,12 @@
         <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
             <div class="card bg-light d-flex flex-fill">
                 <div class="card-header text-muted border-bottom-0">
-                    <i class="fa fa-user-plus"></i> Customer Details <i id="customer-information" class="fas fa-info-circle"></i>
+                    <i class="fa fa-user-plus"></i> Customer Details <span class="hover-text">
+                        <i class="fas fa-info-circle"></i>
+                        <span class="tooltip-text" id="customer-information">
+                            <i class='fa fa-user-plus'></i> <b>Add Customer Information.</b>
+                        </span>
+                    </span>
                 </div>
                 <div class="progress">
                     <i class="far fa-bookmark bookmark-green"></i>
@@ -249,6 +260,13 @@
             <div class="card bg-light d-flex flex-fill">
                 <div class="card-header text-muted border-bottom-0">
                     <i class="fas fa-user-tie"></i>  Beneficiary Details
+                    <span class="hover-text">
+                        <i class="fas fa-info-circle"></i>
+                        <span class="tooltip-text" id="information">
+
+                            <b> <i class='fas fa-user-tie'></i> Beneficiary Details </b>
+                        </span>
+                    </span>
                 </div>
                 <div class="progress">
                     <i class="far fa-bookmark bookmark-green"></i>
@@ -337,13 +355,14 @@
         <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
             <div class="card bg-light d-flex flex-fill">
                 <div class="card-header text-muted border-bottom-0">
-                    <i class="fas fa-user-tie"></i>  Beneficiary Details 
-                    @{
-                        if (Model.ClaimsInvestigation?.CaseLocations == null || Model.ClaimsInvestigation?.CaseLocations != null && Model.ClaimsInvestigation?.CaseLocations.Count == 0)
-                        {
-                            <i id="beneficiary-information" class="fas fa-info-circle"></i>
-                        }
-                    }
+                    <i class="fas fa-user-tie"></i>  Beneficiary Details
+                    <span class="hover-text">
+                        <i class="fas fa-info-circle"></i>
+                        <span class="tooltip-text" id="information">
+
+                            <b> <i class='fas fa-user-tie'></i> Add Beneficiary Details </b>
+                        </span>
+                    </span>
                 </div>
                 <div class="progress">
                     <i class="far fa-bookmark bookmark-green"></i>
