@@ -64,7 +64,7 @@ namespace risk.control.system.Controllers
         {
             return View();
         }
-        [Breadcrumb(" Detail")]
+        [Breadcrumb(" Details")]
         public async Task<IActionResult> Detail(string id)
         {
             try
@@ -165,7 +165,7 @@ namespace risk.control.system.Controllers
             }
         }
 
-        [Breadcrumb(" Detail")]
+        [Breadcrumb(" Details")]
         public async Task<IActionResult> ApprovedDetail(string id)
         {
             try
@@ -266,7 +266,7 @@ namespace risk.control.system.Controllers
             }
         }
 
-        [Breadcrumb(" Detail")]
+        [Breadcrumb(" Details")]
         public async Task<IActionResult> ManagerRejectDetail(string id)
         {
             try
@@ -366,7 +366,7 @@ namespace risk.control.system.Controllers
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
-        [Breadcrumb(" Detail")]
+        [Breadcrumb(" Details")]
         public async Task<IActionResult> RejectDetail(string id)
         {
             try
