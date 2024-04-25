@@ -128,7 +128,7 @@ $(document).ready(function () {
 
         $('#checkboxes').submit();
 
-        var nodes = document.getElementById("checkboxes").getElementsByTagName('*');
+        var nodes = document.getElementById("article").getElementsByTagName('*');
         for (var i = 0; i < nodes.length; i++) {
             nodes[i].disabled = true;
         }

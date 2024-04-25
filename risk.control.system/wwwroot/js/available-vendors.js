@@ -154,7 +154,7 @@
                             $('#manage-vendors').attr('disabled', 'disabled');
                             $('#manage-vendors').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Empanel");
 
-                            var nodes = document.getElementById("body").getElementsByTagName('*');
+                            var nodes = document.getElementById("article").getElementsByTagName('*');
                             for (var i = 0; i < nodes.length; i++) {
                                 nodes[i].disabled = true;
                             }

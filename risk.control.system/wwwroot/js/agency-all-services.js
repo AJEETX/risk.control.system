@@ -14,7 +14,7 @@
         $('a.create-agency-service').attr('disabled', 'disabled');
         $('a.create-agency-service').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Add Service");
 
-        var nodes = document.getElementById("body").getElementsByTagName('*');
+        var nodes = document.getElementById("article").getElementsByTagName('*');
         for (var i = 0; i < nodes.length; i++) {
             nodes[i].disabled = true;
         }
@@ -73,7 +73,7 @@ function showdetails(id) {
     var detailbtn = $('a#details' + id + '.btn.btn-xs.btn-info')
     detailbtn.html("<i class='fas fa-sync fa-spin'></i> Detail");
 
-    var nodes = document.getElementById("body").getElementsByTagName('*');
+    var nodes = document.getElementById("article").getElementsByTagName('*');
     for (var i = 0; i < nodes.length; i++) {
         nodes[i].disabled = true;
     }
@@ -89,7 +89,7 @@ function showedit(id) {
     $('a.btn').attr('disabled', 'disabled');
     editbtn.html("<i class='fas fa-sync fa-spin'></i> Edit");
 
-    var nodes = document.getElementById("body").getElementsByTagName('*');
+    var nodes = document.getElementById("article").getElementsByTagName('*');
     for (var i = 0; i < nodes.length; i++) {
         nodes[i].disabled = true;
     }
@@ -105,7 +105,7 @@ function getdetails(id) {
     var _delete = $('a#delete' + id + '.btn.btn-xs.btn-danger');
     _delete.html("<i class='fas fa-sync fa-spin'></i> Delete");
 
-    var nodes = document.getElementById("body").getElementsByTagName('*');
+    var nodes = document.getElementById("article").getElementsByTagName('*');
     for (var i = 0; i < nodes.length; i++) {
         nodes[i].disabled = true;
     }

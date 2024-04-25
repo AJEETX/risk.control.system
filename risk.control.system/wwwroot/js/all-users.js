@@ -77,7 +77,7 @@ function showroles() {
     $('a.btn.btn-info').attr('disabled', 'disabled');
     $('a.btn.btn-info').html("<i class='fas fa-sync fa-spin'></i> Roles");
 
-    var nodes = document.getElementById("body").getElementsByTagName('*');
+    var nodes = document.getElementById("article").getElementsByTagName('*');
     for (var i = 0; i < nodes.length; i++) {
         nodes[i].disabled = true;
     }
@@ -92,7 +92,7 @@ function showedit() {
     $('a.btn.btn-warning').attr('disabled', 'disabled');
     $('a.btn.btn-warning').html("<i class='fas fa-sync fa-spin'></i> Edit");
 
-    var nodes = document.getElementById("body").getElementsByTagName('*');
+    var nodes = document.getElementById("article").getElementsByTagName('*');
     for (var i = 0; i < nodes.length; i++) {
         nodes[i].disabled = true;
     }

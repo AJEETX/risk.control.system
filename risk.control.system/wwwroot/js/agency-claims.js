@@ -9,7 +9,7 @@
         $('#allocatedcase').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> ALLOCATE");
 
         $('#radioButtons').submit();
-        var nodes = document.getElementById("fullpage").getElementsByTagName('*');
+        var nodes = document.getElementById("article").getElementsByTagName('*');
         for (var i = 0; i < nodes.length; i++) {
             nodes[i].disabled = true;
         }
@@ -189,7 +189,7 @@ function showdetails(id) {
     $('a.btn *').attr('disabled', 'disabled');
     $('a#details' + id + '.btn.btn-xs.btn-danger').html("<i class='fas fa-sync fa-spin'></i> DECLINE");
 
-    var nodes = document.getElementById("body").getElementsByTagName('*');
+    var nodes = document.getElementById("article").getElementsByTagName('*');
     for (var i = 0; i < nodes.length; i++) {
         nodes[i].disabled = true;
     }

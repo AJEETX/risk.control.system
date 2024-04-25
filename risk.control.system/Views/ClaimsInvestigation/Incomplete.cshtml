@@ -3,7 +3,7 @@
     ViewData["Title"] = " New  & Draft";
 }
 <section class="content">
-    <div id="fullpage" class="card card-secondary">
+    <div id="article" class="card card-secondary">
         <div class="card-header">
             <input type="hidden" id="total-count" value="@Model.AvailableCount" />
             <input type="hidden" id="max-count" value="@Model.TotalCount" />
@@ -12,8 +12,8 @@
                 <span class="hover-text">
                     <i class="fas fa-info-circle"></i>
                     <span class="tooltip-text" id="information">
-                        <i class='far fa-hand-point-right'></i> Create New Claim from <button class='badge badge-success btn'><i class='far fa-edit'></i>  ADD NEW </button>
-                        <i class='far fa-thumbs-up'></i> Complete detail. <b> <i class='fa fa-hand-peace-o'></i> ASSIGN</b> to Agency
+                        <i class='far fa-hand-point-right'></i> Create Claim <strong><button class='badge badge-success btn'><i class='far fa-edit'></i>  ADD NEW </button></strong>.
+                        <i class='far fa-thumbs-up'></i> Complete detail, <b> ASSIGN</b> to Agency <i class='fa fa-hand-peace-o'></i>
 
                     </span>
                 </span>

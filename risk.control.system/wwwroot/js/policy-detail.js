@@ -132,7 +132,7 @@ $(document).ready(function () {
         $('#assign-manual-list').attr('disabled', 'disabled');
         $('#assign-manual-list').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> ASSIGN");
 
-        var nodes = document.getElementById("body").getElementsByTagName('*');
+        var nodes = document.getElementById("article").getElementsByTagName('*');
         for (var i = 0; i < nodes.length; i++) {
             nodes[i].disabled = true;
         }

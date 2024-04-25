@@ -103,7 +103,7 @@
         $('.btn.btn-info').attr('disabled', 'disabled');
         $(this).html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Details");
 
-        var nodes = document.getElementById("body").getElementsByTagName('*');
+        var nodes = document.getElementById("article").getElementsByTagName('*');
         for (var i = 0; i < nodes.length; i++) {
             nodes[i].disabled = true;
         }
@@ -142,7 +142,7 @@
         if (askConfirmation) {
             e.preventDefault();
             $.confirm({
-                title: "Confirm RE + ASSIGN",
+                title: "Confirm ASSIGN & RE",
                 content: "Are you sure ?",
     
                 icon: 'fas fa-external-link-alt',
@@ -150,7 +150,7 @@
                 closeIcon: true,
                 buttons: {
                     confirm: {
-                        text: "RE + ASSIGN",
+                        text: "ASSIGN & RE",
                         btnClass: 'btn-danger',
                         action: function () {
                             askConfirmation = false;
@@ -162,7 +162,7 @@
                                 $(".submit-progress").removeClass("hidden");
                             }, 1);
                             $('#allocate-case').attr('disabled', 'disabled');
-                            $('#allocate-case').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> RE + ASSIGN");
+                            $('#allocate-case').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> ASSIGN & RE");
 
                             $('#radioButtons').submit();
                             var nodes = document.getElementById("article").getElementsByTagName('*');
