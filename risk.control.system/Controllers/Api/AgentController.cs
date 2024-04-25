@@ -550,7 +550,7 @@ namespace risk.control.system.Controllers.Api
                     .Include(c => c.Country)
                     .FirstOrDefault(c => c.ClaimsInvestigationId == claimId);
 
-                var filePath = Path.Combine(webHostEnvironment.WebRootPath, Applicationsettings.NO_POLICY_IMAGE);
+                var filePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-policy.jpg");
 
                 var noDocumentimage = await System.IO.File.ReadAllBytesAsync(filePath);
 
