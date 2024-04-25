@@ -29,7 +29,7 @@ $(document).ready(function () {
                 return '<input type="checkbox" name="selectedcase[]" value="' + $('<div/>').text(data).html() + '">';
             }
         }],
-        order: [[14, 'asc']],
+        order: [[13, 'asc']],
         fixedHeader: true,
         processing: true,
         paging: true,
@@ -40,14 +40,7 @@ $(document).ready(function () {
         columns: [
             /* Name of the keys from
             data file source */
-            {
-                "sDefaultContent": "",
-                "bSortable": false,
-                "mRender": function (data, type, row) {
-                    var img = '<input name="selectedcase" class="selected-case" type="radio" id="' + row.id + '"  value="' + row.id + '"  />';
-                    return img;
-                }
-            },
+
             {
                 "sDefaultContent": "",
                 "bSortable": false,
@@ -105,6 +98,22 @@ $(document).ready(function () {
                 }
             },
             { "data": "timePending" },
+            {
+                "sDefaultContent": "",
+                "bSortable": false,
+                "mRender": function (data, type, row) {
+                    var buttons = "";
+                    buttons += '<a id="details' + row.id + '" onclick="getdetails(`' + row.id + '`)"  href="ManagerDetail?Id=' + row.id + '" class="active-claims btn btn-xs btn-info"><i class="fa fa-search"></i> Detail</a>&nbsp;'
+
+                    if (row.autoAllocated) {
+
+                    }
+                    //if (row.withdrawable) {
+                    //    buttons += '<a href="withdraw?Id=' + row.id + '" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i> Withdraw</a>&nbsp;'
+                    //}
+                    return buttons;
+                }
+            }
         ],
         "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
             if (aData.isNewAssigned) {

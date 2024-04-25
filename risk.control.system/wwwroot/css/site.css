@@ -37,9 +37,8 @@ a {
 /* Sticky footer styles
 -------------------------------------------------- */
 html {
-    font-size: 13px;
+    font-size: 12px;
     position: relative;
-    min-width:550px;
 }
 
 @media (min-width: 768px) {
@@ -1236,47 +1235,34 @@ a#back-button {
     cursor: pointer;
 }
 .tooltip-text {
-    position: relative;
-    bottom: -50px;
-    left:-30%;
-    z-index: 2000;
+    visibility: hidden;
+    position: absolute;
+    z-index: 2;
+    width: 200px;
     color: white;
     font-size: 12px;
     background-color: #192733;
-    padding: 10px 15px 10px 15px;
-}
-
-#information, #policy-information, #customer-information, #beneficiary-information {
-    display: none;
+    border-radius: 10px;
+    padding: 15px;
     transition: opacity 0.5s;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-.hover-text:hover #information {
-    display:inline;
-}
-
-.hover-text:hover #policy-information {
-    display: inline;
-}
-
-.hover-text:hover #customer-information {
-    display: inline;
-}
-
-.hover-text:hover #beneficiary-information {
-    display: inline;
-}
-.hover-text {
-    display: none;
-    position: absolute;
-    margin-left:8px;
-    font-family: Tahoma;
-    text-align: center;
-}
-
-
-@media only screen and (min-width: 768px) {
-    .hover-text {
-        display: inline;
+    .tooltip-text::before {
+        content: "";
+        position: absolute;
+        transform: rotate(45deg);
+        background-color: #192733;
+        margin: 10px;
+        z-index: 1;
     }
+
+.hover-text:hover .tooltip-text {
+    visibility: visible;
+}
+
+.hover-text {
+    position: relative;
+    margin: 10px;
+    text-align: left;
 }

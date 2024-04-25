@@ -136,7 +136,7 @@ namespace risk.control.system.Services
             var actives = GetManagerActive(userEmail);
 
             var data = new DashboardData();
-            data.FirstBlockName = "Assess";
+            data.FirstBlockName = "To-Assess";
             data.FirstBlockCount = claimsAssessor.Count;
             data.FirstBlockUrl = "/ClaimsInvestigation/Manager";
 

@@ -243,7 +243,7 @@ namespace risk.control.system.Controllers
             return View();
         }
 
-        [Breadcrumb(" Detail", FromAction = "Completed")]
+        [Breadcrumb(" Details", FromAction = "Completed")]
         [Authorize(Roles = "AGENCY_ADMIN,SUPERVISOR")]
 
         public async Task<IActionResult> CompletedDetail(string id)

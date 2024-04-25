@@ -14,10 +14,10 @@
     </li>
     <li class="nav-item">
         <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Manager" class="actual-link nav-link
-                    @Url.MakeActiveClass("ClaimsInvestigation","Manager")">
+                        @Url.MakeActiveClass("ClaimsInvestigation","Manager") @Url.MakeActiveClass("ClaimsInvestigation","ManagerDetail")">
             <i class="fas fa-glasses nav-icon"></i>
             <p>
-                <span class="badge badge-danger">ASSESS</span>
+                <span class="badge badge-danger">TO-ASSESS</span>
             </p>
         </a>
     </li>

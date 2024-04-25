@@ -1,7 +1,7 @@
 ﻿@model ClaimTransactionModel
 
 @{
-    ViewData["Title"] = "Claim: Report ";
+    ViewData["Title"] = "Details";
     
 }
 
@@ -12,15 +12,13 @@
     <input type="hidden" id="claimId" value="@Model.ClaimsInvestigation?.ClaimsInvestigationId" />
     <div id="article" class="card card-secondary">
         <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-newspaper"></i> Detail
+            <h3 class="card-title"><i class="fas fa-newspaper"></i> Details
                 <span class="hover-text">
                     <i class="fas fa-info-circle"></i>
                     <span class="tooltip-text" id="information">
                         <span>
-                            REJECTED CLAIM DETAIL
-                            <i class='far fa-file-powerpoint'></i><b> Policy details.</b>
-                            <i class='fa fa-user-plus'></i> <b> Customer Information.</b>
-                            <b> <i class='fas fa-user-tie'></i> Beneficiary Details </b>
+                            <i class='far fa-hand-point-right'></i> REJECTED CLAIM DETAIL.
+                            Click on<b> <button class='badge badge-info'><i class='fas fa-search'></i>DETAIL</button></b> for more <i class='fa fa-hand-peace-o'></i>
                         </span>
 
                     </span>

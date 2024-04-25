@@ -86,7 +86,7 @@ namespace risk.control.system.Controllers
             }
 
         }
-        [Breadcrumb(" Submitted", FromAction = "Index")]
+        [Breadcrumb(" To-Assess", FromAction = "Index")]
         [Authorize(Roles = MANAGER.DISPLAY_NAME)]
         public IActionResult Manager()
         {
@@ -519,7 +519,7 @@ namespace risk.control.system.Controllers
             }
         }
 
-        [Breadcrumb(title: " Detail", FromAction = "Review")]
+        [Breadcrumb(title: " Details", FromAction = "Review")]
         [Authorize(Roles = ASSESSOR.DISPLAY_NAME)]
         public async Task<IActionResult> ReviewDetail(string id)
         {
@@ -547,7 +547,7 @@ namespace risk.control.system.Controllers
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
-        [Breadcrumb(title: " Detail", FromAction = "ManagerReview")]
+        [Breadcrumb(title: " Details", FromAction = "ManagerReview")]
         [Authorize(Roles = MANAGER.DISPLAY_NAME)]
         public async Task<IActionResult> ManagerReviewDetail(string id)
         {
@@ -719,7 +719,7 @@ namespace risk.control.system.Controllers
             }
         }
 
-        [Breadcrumb(title: " Detail", FromAction = "Assigner")]
+        [Breadcrumb(title: " Details", FromAction = "Assigner")]
         [Authorize(Roles = CREATOR.DISPLAY_NAME)]
         public async Task<IActionResult> Detail(string id)
         {
@@ -748,7 +748,7 @@ namespace risk.control.system.Controllers
             }
         }
 
-        [Breadcrumb(title: " Detail", FromAction = "Active")]
+        [Breadcrumb(title: " Details", FromAction = "Active")]
         [Authorize(Roles = CREATOR.DISPLAY_NAME)]
         public async Task<IActionResult> ActiveDetail(string id)
         {
@@ -777,9 +777,37 @@ namespace risk.control.system.Controllers
             }
         }
 
-        [Breadcrumb(title: " Detail", FromAction = "Active")]
+        [Breadcrumb(title: " Details", FromAction = "Active")]
         [Authorize(Roles = MANAGER.DISPLAY_NAME)]
         public async Task<IActionResult> ManagerActiveDetail(string id)
+        {
+            try
+            {
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (string.IsNullOrWhiteSpace(currentUserEmail))
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                if (id == null)
+                {
+                    notifyService.Error("NOT FOUND !!!..");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+
+                var model = await claimPolicyService.GetClaimDetail(id);
+
+                return View(model);
+            }
+            catch (Exception)
+            {
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+        }
+        [Breadcrumb(title: " Details", FromAction = "Active")]
+        [Authorize(Roles = MANAGER.DISPLAY_NAME)]
+        public async Task<IActionResult> ManagerDetail(string id)
         {
             try
             {
