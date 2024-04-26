@@ -1273,27 +1273,16 @@ a#back-button {
     visibility: hidden;
     position: absolute;
     z-index: 2;
-    width: 300px;
+    top: 40px;
+    left: -60%;
+    width: 250px;
     color: black;
-    font-family:Verdana;
-    font-size: 13px;
+    font-family: Verdana;
+    font-size: 12px;
     background-color: white;
     border: 4px outset #ddd;
-    padding: 15px;
-    transition: opacity 0.5s;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 10px;
 }
-    .tooltip-text i{
-        padding:5px 0;
-    }
-    .tooltip-text::before {
-        content: "";
-        position: absolute;
-        transform: rotate(45deg);
-        background-color: #192733;
-        margin: 10px;
-        z-index: 1;
-    }
 
 .hover-text:hover .tooltip-text {
     visibility: visible;
@@ -1301,6 +1290,21 @@ a#back-button {
 
 .hover-text {
     position: relative;
-    margin: 10px;
     text-align: left;
+}
+@media (max-width: 768px) {
+    .tooltip-text {
+        min-width: 150px;
+        max-width: 200px;
+        border: 1px outset #ddd;
+        padding: 5px;
+    }
+    tooltip-text li {
+        margin: 5px 0px;
+        list-style-type: none;
+    }
+}
+.tooltip-text li{
+    margin:10px 5px;
+    list-style-type:none;
 }

@@ -304,7 +304,7 @@ $(document).ready(function () {
         $.alert(
             {
                 title: " Withdraw Claim !",
-                content: "The case can not be withdrawn. See Timeline section <i class='far fa-hand-point-up'></i> for more info",
+                content: "The case can not be withdrawn. See <i class='fas fa-clock'></i> Timeline section  for more info",
                 icon: 'fas fa-info',
                 animationBounce: 2.5,
                 type: 'red',
@@ -312,7 +312,7 @@ $(document).ready(function () {
                 buttons: {
                     cancel: {
                         text: "CLOSE",
-                        btnClass: 'btn-secondary'
+                        btnClass: 'btn-danger'
                     }
                 }
             }
