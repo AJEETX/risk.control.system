@@ -66,18 +66,22 @@
                         <span class="hover-text">
                             <i class="fas fa-info-circle"></i>
                             <span class="tooltip-text" id="information">
-                                <span>
-                                    <i class='far fa-file-powerpoint'></i><b> Policy details.</b>
-                                    <i class='fa fa-user-plus'></i> <b> Customer Information.</b>
-                                    <b> <i class='fas fa-user-tie'></i> Beneficiary Details </b>
-                                </span>
+                                <li>
+                                    <i class='far fa-file-powerpoint'></i> Policy details.
+                                </li>
+                                <li>
+                                    <i class='fa fa-user-plus'></i> Customer details.
+                                </li>
+                                <li> <i class='fas fa-user-tie'></i> Beneficiary details </li>
 
                             </span>
                         </span>
                     </h3>
 
                     <div class="card-tools">
-                        <span data-toggle="tooltip" title="Claim # :  @Model.ClaimsInvestigation.PolicyDetail.ContractNumber" class="badge badge-light"><i class="far fa-file-powerpoint"></i></span>
+                        <span data-toggle="tooltip" title="Claim # :  @Model.ClaimsInvestigation.PolicyDetail.ContractNumber" class="badge badge-light">
+                            <i class='far fa-hand-point-right'></i>
+                        </span>
                         <button type="button" class="btn btn-tool" data-card-widget="collapse">
                             <i class="fas fa-plus"></i>
                         </button>
@@ -201,7 +205,7 @@
                                     <span class="hover-text">
                                         <i class="fas fa-info-circle"></i>
                                         <span class="tooltip-text" id="customer-information">
-                                            <i class='fa fa-user-plus'></i> <b> Customer Information.</b>
+                                            <i class='fa fa-user-plus'></i> <b> Customer details.</b>
                                         </span>
                                     </span>
                                 </div>
@@ -304,7 +308,7 @@
                                         <i class="fas fa-info-circle"></i>
                                         <span class="tooltip-text" id="beneficiary-information">
 
-                                            <b> <i class='fas fa-user-tie'></i> Beneficiary Details </b>
+                                            <b> <i class='fas fa-user-tie'></i> Beneficiary details </b>
                                         </span>
                                     </span>
                                 </div>
@@ -405,7 +409,7 @@
                         </span>
                     </h3>
                     <div class="card-tools">
-                        <span data-toggle="tooltip" title="Agent report # : @Model.Location.ClaimReport.AgentEmail" class="badge badge-light"><i class="fas fa-user-shield"></i></span>
+                        <span data-toggle="tooltip" title="Agent report # : @Model.Location.ClaimReport.AgentEmail" class="badge badge-light"><i class='far fa-hand-point-right'></i></span>
                         <button type="button" class="btn btn-tool" data-card-widget="collapse">
                             <i class="fas fa-plus"></i>
                         </button>
@@ -812,7 +816,7 @@
                                     </h3>
                                     <div class="card-tools">
                                         <span data-toggle="tooltip" title=" Supervisor :  @Model?.Location.ClaimReport?.SupervisorEmail" class="badge badge-light">
-                                            <i class="nav-icon fas fa-clock"></i> @Model.Location.ClaimReport?.SupervisorRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt")
+                                             @Model.Location.ClaimReport?.SupervisorRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt")
                                         </span>
                                     </div>
 
@@ -864,7 +868,7 @@
                     </h3>
                     <div class="card-tools">
                         <span data-toggle="tooltip" title="Assessor: : @Model.Location.ClaimReport.AssessorEmail" class="badge badge-light">
-                            
+                            <i class='far fa-hand-point-right'></i>
                         </span>
                         <button type="button" class="btn btn-tool" data-card-widget="collapse">
                             <i class="fas fa-plus"></i>

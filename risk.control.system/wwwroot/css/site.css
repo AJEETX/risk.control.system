@@ -1273,16 +1273,19 @@ a#back-button {
     visibility: hidden;
     position: absolute;
     z-index: 2;
-    width: 200px;
-    color: white;
-    font-size: 12px;
-    background-color: #192733;
-    border-radius: 10px;
+    width: 300px;
+    color: black;
+    font-family:Verdana;
+    font-size: 13px;
+    background-color: white;
+    border: 4px outset #ddd;
     padding: 15px;
     transition: opacity 0.5s;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
-
+    .tooltip-text i{
+        padding:5px 0;
+    }
     .tooltip-text::before {
         content: "";
         position: absolute;

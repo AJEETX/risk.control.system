@@ -11,13 +11,16 @@
                 <span class="hover-text">
                     <i class="fas fa-info-circle"></i>
                     <span class="tooltip-text" id="information">
-                        <span>
+                        <li>
 
                             <i class='far fa-file-powerpoint'></i><b> Policy details.</b>
-                            <i class='fa fa-user-plus'></i> <b> Customer Information.</b>
+                        </li>
+                        <li>
+                            <i class='fa fa-user-plus'></i> <b> Customer details.</b>
+                        </li>
+                        <li>
                             <b> <i class='fas fa-user-tie'></i> Beneficiary Details </b>
-                        </span>
-
+                        </li>
                     </span>
                 </span>
             </h3>
@@ -49,7 +52,8 @@
                     </div>
                     <div class="row">
                         <div class="col-md-12">
-                            <a id="back" asp-action="Open" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
+                                <a id="back" asp-action="Open" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i>
+                                <span class="badge badge-light"> <i class="fa fa-toggle-on"></i> </span> @Applicationsettings.BACK</a>
                             <button id="submit-case" disabled type="submit" class="btn btn-danger"><i class="fas fa-undo"></i> Withdraw</button>
                         </div>
                     </div>
@@ -63,7 +67,10 @@
                 <div class="card-footer">
                 <div class="row">
                     <div class="col-md-12">
-                        <a id="back" asp-action="Open" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
+                            <a id="back" asp-action="Open" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left"></i>
+                                <span class="badge badge-light"> <i class="fa fa-toggle-on"></i> </span> Back
+                            </a>
                     </div>
                     </div>
                 </div>

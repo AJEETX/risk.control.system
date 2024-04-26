@@ -11,9 +11,15 @@
                 <span class="hover-text">
                     <i class="fas fa-info-circle"></i>
                     <span class="tooltip-text" id="information">
-                        <i class='far fa-hand-point-right'></i> Create Claim <strong><button class='badge badge-success btn'><i class='far fa-edit'></i>  ADD NEW </button></strong>.
-                        <i class='far fa-thumbs-up'></i> Complete detail, <b> ASSIGN</b> to Agency <i class='fa fa-hand-peace-o'></i>
-
+                        <li>
+                            <i class='far fa-hand-point-right'></i> Create new Claim by <strong><button class='badge badge-success btn-lg'><i class='far fa-edit'></i> <b> ADD NEW </b></button></strong>
+                        </li>
+                        <li>
+                        <i class='far fa-thumbs-up'></i> Complete detail through wizard.
+                        </li>
+                        <li>
+                            <i class='fa fa-hand-peace-o'></i><b> ASSIGN</b> to Agency.
+                        </li>
                     </span>
                 </span>
             </h3>
@@ -68,11 +74,11 @@
                         <a id="back" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
                         @if(Model.AllowedToCreate)
                         {
-                            <a class="create-policy btn btn-success" href='#'><i class="fas fa-pen-alt "></i> @Applicationsettings.CREATE New</a>
+                            <a class="create-policy btn btn-success" href='#'><i class="far fa-edit"></i> @Applicationsettings.CREATE New</a>
                         }
                         else
                         {
-                            <button disabled class="btn btn-outline-secondary"><i class="fas fa-pen-alt "></i> @Applicationsettings.CREATE New</button>
+                            <button disabled class="btn btn-outline-secondary"><i class="far fa-edit"></i> @Applicationsettings.CREATE New</button>
 
                             
                         }
