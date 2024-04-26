@@ -1272,16 +1272,16 @@ a#back-button {
 .tooltip-text {
     visibility: hidden;
     position: absolute;
-    z-index: 2;
-    top: 40px;
-    left: -60%;
-    width: 250px;
+    z-index: 200;
+    top: 2rem;
+    left:-6rem;
+    width: 15rem;
     color: black;
     font-family: Verdana;
-    font-size: 12px;
+    font-size: .8rem;
     background-color: white;
-    border: 4px outset #ddd;
-    padding: 10px;
+    border: 2px outset #ddd;
+    padding: 1rem;
 }
 
 .hover-text:hover .tooltip-text {
@@ -1294,17 +1294,18 @@ a#back-button {
 }
 @media (max-width: 768px) {
     .tooltip-text {
-        min-width: 150px;
+        min-width: 100px;
+        width: 100px;
         max-width: 200px;
         border: 1px outset #ddd;
         padding: 5px;
     }
-    tooltip-text li {
+
+    .tooltip-text li {
         margin: 5px 0px;
         list-style-type: none;
     }
 }
-.tooltip-text li{
-    margin:10px 5px;
-    list-style-type:none;
+.tooltip-text li {
+    margin: 5px 0px;
 }

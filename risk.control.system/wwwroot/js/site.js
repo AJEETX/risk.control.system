@@ -102,7 +102,7 @@ $(document).ready(function () {
         $.alert(
             {
                 title: "Claim Details",
-                content: " <i class='far fa-file-powerpoint'></i><b> Policy details.</b><br /><i class='fa fa-user-plus'></i> <b> Customer Information.</b> <br /><b> <i class='fas fa-user-tie'></i> Beneficiary Details </b>",
+                content: " <i class='far fa-file-powerpoint'></i> Policy details.<br /><i class='fa fa-user-plus'></i> <b> Customer Information.</b> <br /><b> <i class='fas fa-user-tie'></i> Beneficiary Details </b>",
                 icon: 'fas fa-info',
                 type: 'dark',
                 closeIcon: true,
