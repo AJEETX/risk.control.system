@@ -74,17 +74,24 @@ namespace risk.control.system.Services
 
         public async Task<FaceMatchDetail> GetFaceMatch(MatchImage image, string baseUrl)
         {
-            var response = await httpClient.PostAsJsonAsync(baseUrl + "/faceMatch", image);
-
-            if (response.IsSuccessStatusCode)
+            try
             {
-                var maskedImage = await response.Content.ReadAsStringAsync();
+                var response = await httpClient.PostAsJsonAsync(baseUrl + "/faceMatch", image);
 
-                var facematchDetail = JsonConvert.DeserializeObject<FaceMatchDetail>(maskedImage);
+                if (response.IsSuccessStatusCode)
+                {
+                    var maskedImage = await response.Content.ReadAsStringAsync();
 
-                return facematchDetail;
+                    var facematchDetail = JsonConvert.DeserializeObject<FaceMatchDetail>(maskedImage);
+
+                    return facematchDetail;
+                }
             }
-            return null;
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+            }
+            return null!;
         }
 
         public async Task<PanVerifyResponse?> VerifyPan(string pan, string panUrl, string rapidAPIKey, string task_id, string group_id)
@@ -176,7 +183,7 @@ namespace risk.control.system.Services
                 httpClient.DefaultRequestHeaders.Accept.Clear();
                 httpClient.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
                 httpClient.BaseAddress = new Uri(url);
-                HttpResponseMessage httpResponse = await httpClient.PostAsJsonAsync(relativeUrl,new IPWhitelistRequest { Domain = domain, IpAddress = ipaddress, Url = url });
+                HttpResponseMessage httpResponse = await httpClient.PostAsJsonAsync(relativeUrl, new IPWhitelistRequest { Domain = domain, IpAddress = ipaddress, Url = url });
 
                 if (httpResponse.IsSuccessStatusCode)
                 {
@@ -189,7 +196,7 @@ namespace risk.control.system.Services
 
                 throw;
             }
-            
+
         }
     }
 }
