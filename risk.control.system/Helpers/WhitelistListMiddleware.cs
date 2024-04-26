@@ -31,12 +31,13 @@ namespace risk.control.system.Helpers
         {
             if (await featureManager.IsEnabledAsync(FeatureFlags.IPRestrict))
             {
-                if (!context.Request.Path.Value.StartsWith("/api/Agent") &&
+                if (!context.Request.Path.Value.StartsWith("/api/") &&
                     !context.Request.Path.Value.StartsWith("/Dashboard/Get") &&
                     !context.Request.Path.Value.StartsWith("/js") &&
                     !context.Request.Path.Value.Contains("api/Notification/GetClientIp") &&
                     (
                     !context.Request.Path.Value.StartsWith("/Account/Login") &&
+                    !context.Request.Path.Value.StartsWith("/account/login") &&
                     !context.Request.Query.Any(q => q.Key == "ReturnUrl") &&
                     !context.Request.Query.Any(q => q.Value.Contains("js"))
                     ))

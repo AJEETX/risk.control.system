@@ -9,7 +9,7 @@
     if (User.IsInRole(AppRoles.COMPANY_ADMIN.ToString()))
     {
         <li class="nav-item">
-            <a href="/Company/Index" is-active-page class="navlink-border nav-link @Url.MakeActiveClass("Company","") @Url.MakeActiveClass("CompanyUserRoles","") ">
+            <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("Company","") @Url.MakeActiveClass("CompanyUserRoles","") ">
                 <i class="nav-icon fas fa-shield-alt"></i>
                 <p class="sidebar-menu-header-label">
                     MANAGE COMPANY
@@ -18,7 +18,7 @@
             </a>
         </li>
         <li class="nav-item">
-            <a is-active-page asp-controller="Company" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Company","CompanyProfile")
+            <a is-active-page asp-controller="Company" asp-action="CompanyProfile" class="actual-link nav-link @Url.MakeActiveClass("Company","CompanyProfile")
                                                 @Url.MakeActiveClass("Company","Edit") @Url.MakeActiveClass("CompanyUserRoles","")">
                 <i class="nav-icon fas fa-building"></i>
                 <p>
