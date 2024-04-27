@@ -181,10 +181,9 @@ div .error-message {
     outline: none;
     padding: 0 3rem;
     font-size: 16px;
-    font-weight: 500;
+    font-weight: 550;
     border: 1px solid rgba(0,0,0,0.2);
     border-radius: 2px;
-    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
     transition: all 0.3s ease;
 }
 

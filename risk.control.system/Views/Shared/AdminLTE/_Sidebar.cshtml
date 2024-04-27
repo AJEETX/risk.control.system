@@ -72,37 +72,6 @@
                         roleCode = @Applicationsettings.PORTAL_ADMIN.CODE;
                         <span class="badge badge-danger">@roleCode</span>
                     }
-                    else if (User.IsInRole(AppRoles.COMPANY_ADMIN.ToString()))
-                    {
-                        roleCode = @Applicationsettings.COMPANY_ADMIN.CODE;
-                        <span class="badge badge-warning">@roleCode</span>
-                    }
-                    else if (User.IsInRole(AppRoles.AGENCY_ADMIN.ToString()))
-                    {
-                        roleCode = @Applicationsettings.AGENCY_ADMIN.CODE;
-                        <span class="badge badge-info">@roleCode</span>
-                    }
-                    else if (User.IsInRole(AppRoles.CREATOR.ToString()))
-                    {
-                        roleCode = @Applicationsettings.CREATOR.CODE;
-                        <span class="badge badge-primary">@roleCode</span>
-                    }
-                    
-                    else if (User.IsInRole(AppRoles.ASSESSOR.ToString()))
-                    {
-                        roleCode = @Applicationsettings.ASSESSOR.CODE;
-                        <span class="badge badge-secondary">@roleCode</span>
-                    }
-                    else if (User.IsInRole(AppRoles.SUPERVISOR.ToString()))
-                    {
-                        roleCode = @Applicationsettings.SUPERVISOR.CODE;
-                        <span class="badge badge-dark">@roleCode</span>
-                    }
-                    else if (User.IsInRole(AppRoles.AGENT.ToString()))
-                    {
-                        roleCode = @Applicationsettings.AGENT.CODE;
-                        <span class="badge badge-dark">@roleCode</span>
-                    }
                 </a>
             </div>
         }

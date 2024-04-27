@@ -42,7 +42,7 @@ html {
 
 @media (min-width: 768px) {
     html {
-        font-size: 1.1rem;
+        font-size: 1rem;
     }
 }
 
@@ -412,7 +412,7 @@ nav > .mt2 {
     font-family: "Helvetica Neue",Helvetica,Arial,sans-serif !important;
 }
 
-sidebar-light-primary .nav-sidebar > .nav-item > .actual-link.nav-link {
+.sidebar-light-primary .nav-sidebar > .nav-item > .actual-link.nav-link {
     font-family: "Helvetica Neue",Helvetica,Arial,sans-serif !important;
     font-size: 14px;
     padding-left: 2em;
@@ -432,12 +432,15 @@ sidebar-light-primary .nav-sidebar > .nav-item > .actual-link.nav-link {
         font-size: 14px;
         font-weight: bold;
     }
-    .sidebar-light-primary .nav-sidebar > .nav-item > .actual-link.nav-link.active > p.badge {
-        color: black;
+    .sidebar-light-primary .nav-sidebar > .nav-item > .actual-link.nav-link > p > span {
         font-family: "Helvetica Neue",Helvetica,Arial,sans-serif !important;
-        font-size: 14px;
-        font-weight: bold !important;
+        font-size: 12px;
     }
+        .sidebar-light-primary .nav-sidebar > .nav-item > .actual-link.nav-link.active > p > span {
+            font-family: "Helvetica Neue",Helvetica,Arial,sans-serif !important;
+            font-size: 14px !important;
+            font-weight: bold !important;
+        }
 
 
 .content {

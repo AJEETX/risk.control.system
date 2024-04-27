@@ -234,7 +234,7 @@
         public static class COMPANY_ADMIN
         {
             public const string DISPLAY_NAME = "COMPANY_ADMIN";
-            public const string CODE = "admin";
+            public const string CODE = "adminer";
             public const string FIRST_NAME = "Andy";
             public const string LAST_NAME = "Murrey";
             public const string PROFILE_IMAGE = "/img/company-admin.jpeg";
