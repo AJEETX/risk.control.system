@@ -28,10 +28,31 @@
                     <i class="fas fa-mobile-alt"></i> PAN CARD
                     <span class="hover-text">
                         <i class="fas fa-info-circle"></i>
-                        <span class="tooltip-text" id="beneficiary-information">
 
-                            <b> <i class='fas fa-user-tie'></i> Upload PAN CARD Image </b>
-                        </span>
+                        @if (borderColor == "border-danger")
+                        {
+                            <span class="tooltip-text" id="beneficiary-information">
+                                <i class='far fa-thumbs-down'></i> <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i> UnMatched PAN CARD
+                            </span>
+                        }
+                        else if (borderColor == "border-success")
+                        {
+                            <span class="tooltip-text" id="beneficiary-information">
+                                <i class='far fa-thumbs-up'></i> <i style='color:green;' class='fas fa-check-circle'></i> Matched PAN CARD
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="tooltip-text" id="beneficiary-information">
+                                <i class='far fa-hand-point-right'></i>
+                                    <button class='badge badge-info btn-xs'>
+                                        <span class='badge badge-info btn-xs'>
+                                            <i class='fa fa-upload'></i>
+                                        </span> Upload
+                                </button>  <i style='color:grey;' class='fa fa-times' aria-hidden='true'></i> PAN CARD
+                            </span>
+                        }
+
                     </span>
                 </h3>
                 <div class="card-tools">

@@ -12,7 +12,7 @@
                         <span class="tooltip-text" id="information">
                             <span>
 
-                                <i class="fas fa-user-shield"></i><b> @Model.Location.ClaimReport.AgentEmail</b> report.
+                                <i class="fas fa-user-shield"></i><b> @Model.Location.ClaimReport.AgentEmail</b> report
                             </span>
 
                         </span>
@@ -61,10 +61,29 @@
                                             <i class="fas fa-portrait"></i> Photo ID
                                             <span class="hover-text">
                                                 <i class="fas fa-info-circle"></i>
-                                                <span class="tooltip-text" id="beneficiary-information">
-
-                                                    <b> <i class='fas fa-user-tie'></i> Photo ID to verify</b>
-                                                </span>
+                                                @if (borderColor == "")
+                                                {
+                                                    <span class="tooltip-text" id="beneficiary-information">
+                                                        <i class='far fa-hand-point-right'></i>
+                                                        <button class='badge badge-info btn-xs'>
+                                                            <span class='badge badge-info btn-xs'>
+                                                                <i class='fa fa-upload'></i>
+                                                            </span> Upload <i style='color:grey;' class='fa fa-times' aria-hidden='true'></i>
+                                                        </button> Photo ID
+                                                    </span>
+                                                }
+                                                else if (borderColor == "border-danger")
+                                                {
+                                                    <span class="tooltip-text" id="beneficiary-information">
+                                                        <i class='far fa-thumbs-down'></i> Verify <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i> UnMatched Photo ID
+                                                    </span>
+                                                }
+                                                else if (borderColor == "border-success")
+                                                {
+                                                    <span class="tooltip-text" id="beneficiary-information">
+                                                        <i class='far fa-thumbs-up'></i> Verify  <i style='color:green;' class='fas fa-check-circle'></i> Matched Photo ID
+                                                    </span>
+                                                }
                                             </span>
                                         </h3>
                                         <div class="card-tools">
@@ -184,10 +203,29 @@
                                             <i class="fas fa-mobile-alt"></i> PAN CARD
                                             <span class="hover-text">
                                                 <i class="fas fa-info-circle"></i>
-                                                <span class="tooltip-text" id="beneficiary-information">
-
-                                                    <b> <i class='fas fa-user-tie'></i> PAN CARD Image </b>
-                                                </span>
+                                                @if (documentIdBorderColor == "border-danger")
+                                                {
+                                                    <span class="tooltip-text" id="beneficiary-information">
+                                                        <i class='far fa-thumbs-down'></i> Verify <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i> UnMatched PAN CARD
+                                                    </span>
+                                                }
+                                                else if (documentIdBorderColor == "border-success")
+                                                {
+                                                    <span class="tooltip-text" id="beneficiary-information">
+                                                        <i class='far fa-thumbs-up'></i> Verify <i style='color:green;' class='fas fa-check-circle'></i> Matched PAN CARD
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="tooltip-text" id="beneficiary-information">
+                                                        <i class='far fa-hand-point-right'></i>
+                                                        <button class='badge badge-info btn-xs'>
+                                                            <span class='badge badge-info btn-xs'>
+                                                                <i class='fa fa-upload'></i>
+                                                            </span> Upload
+                                                        </button>  <i style='color:grey;' class='fa fa-times' aria-hidden='true'></i> PAN CARD
+                                                    </span>
+                                                }
                                             </span>
                                         </h3>
                                         <div class="card-tools">
@@ -293,7 +331,7 @@
                                         <i class="fas fa-info-circle"></i>
                                         <span class="tooltip-text" id="information">
                                             <span>
-                                                <i class="far fa-comment"></i><b> Questionnaire.</b>
+                                                <i class='far fa-hand-point-right'></i> Review <i class="far fa-comment"></i> Questionnaire
                                             </span>
 
                                         </span>

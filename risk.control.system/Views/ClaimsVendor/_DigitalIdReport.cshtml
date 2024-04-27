@@ -19,19 +19,39 @@
         borderColor = "border-success";
         digitalIdColor = "green";
     }
-    
+
 
     <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
         <div class="card bg-light d-flex flex-fill @borderColor">
 
             <div class="card-header text-muted border-bottom-0">
-                <h3 class="card-title"><i class="fas fa-portrait"></i> Photo ID
+                <h3 class="card-title">
+                    <i class="fas fa-portrait"></i> Photo ID
                     <span class="hover-text">
                         <i class="fas fa-info-circle"></i>
-                        <span class="tooltip-text" id="beneficiary-information">
-
-                            <b> <i class='fas fa-user-tie'></i> Upload Photo ID to verify</b>
-                        </span>
+                        @if (borderColor == "")
+                        {
+                            <span class="tooltip-text" id="beneficiary-information">
+                                <i class='far fa-hand-point-right'></i>
+                                    <button class='badge badge-info btn-xs'>
+                                        <span class='badge badge-info btn-xs'>
+                                            <i class='fa fa-upload'></i>
+                                        <i style='color:grey;' class='fa fa-times' aria-hidden='true'></i>
+                                    </button> Photo ID
+                            </span>
+                        }
+                        else if (borderColor == "border-danger")
+                        {
+                            <span class="tooltip-text" id="beneficiary-information">
+                                <i class='far fa-thumbs-down'></i> <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i> UnMatched Photo ID
+                            </span>
+                        }
+                        else if (borderColor == "border-success")
+                        {
+                            <span class="tooltip-text" id="beneficiary-information">
+                                <i class='far fa-thumbs-up'></i> <i style='color:green;' class='fas fa-check-circle'></i> Matched Photo ID
+                            </span>
+                        }
                     </span>
                 </h3>
                 <div class="card-tools">
@@ -53,7 +73,7 @@
                 {
                     <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i>
                 }
-                
+
                 else
                 {
                     <i style='color:green;' class='fas fa-check-circle'></i>
@@ -112,7 +132,7 @@
                     </div>
                 </div>
             </div>
-            
+
 
             <form id="upload-face" asp-controller="Uploads" asp-action="FaceUpload" method="post" enctype="multipart/form-data">
                 <input type="hidden" id="digitalIdLatitude" name="digitalIdLatitude" />
@@ -124,7 +144,7 @@
                         <span class="input-group-label"> Upload Photo ID : </span>
                         <div class="input-group mb-3">
                             <img class="form-Image" id="face-Image" src="@Applicationsettings.NO_USER" title="Digital Id Image" />
-                            <input accept=".jpg,jpeg,png" type="file" class="form-control remarks" name="digitalImage" id="digitalImage"  />
+                            <input accept=".jpg,jpeg,png" type="file" class="form-control remarks" name="digitalImage" id="digitalImage" />
                             <button id="UploadFaceImageButton" disabled type="submit" class="btn btn-info"><i class="nav-icon fa fa-upload"></i> Upload</button>
                         </div>
                     </div>
