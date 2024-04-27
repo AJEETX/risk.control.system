@@ -28,7 +28,7 @@
             @if (User.IsInRole(AppRoles.COMPANY_ADMIN.ToString()))
             {
                 roleCode = @Applicationsettings.COMPANY_ADMIN.CODE;
-                <span clasCOMPANY_s="badge badge-warning">@roleCode</span>
+                <span class="badge badge-warning">@roleCode</span>
             }
             else if (User.IsInRole(AppRoles.CREATOR.ToString()))
             {

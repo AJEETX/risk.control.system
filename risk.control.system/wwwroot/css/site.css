@@ -423,12 +423,20 @@ sidebar-light-primary .nav-sidebar > .nav-item > .actual-link.nav-link {
     font-family: "Helvetica Neue",Helvetica,Arial,sans-serif !important;
     padding-left: 2em;
     font-size: 14px;
+    font-weight: bold;
 }
 
     .sidebar-light-primary .nav-sidebar > .nav-item > .actual-link.nav-link.active > p {
         color: black;
         font-family: "Helvetica Neue",Helvetica,Arial,sans-serif !important;
         font-size: 14px;
+        font-weight: bold;
+    }
+    .sidebar-light-primary .nav-sidebar > .nav-item > .actual-link.nav-link.active > p.badge {
+        color: black;
+        font-family: "Helvetica Neue",Helvetica,Arial,sans-serif !important;
+        font-size: 14px;
+        font-weight: bold !important;
     }
 
 
