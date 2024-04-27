@@ -1,11 +1,9 @@
 ﻿/* Google Font Link */
-@import url('css3.css');
-
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: "Poppins", sans-serif;
+    font-family: Tahoma;
 }
 
 body {
@@ -186,6 +184,7 @@ div .error-message {
     font-weight: 500;
     border: 1px solid rgba(0,0,0,0.2);
     border-radius: 2px;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
     transition: all 0.3s ease;
 }
 
@@ -196,7 +195,7 @@ div .error-message {
 }
 
 .forms .form-content .text {
-    font-size: 14px;
+    font-size: 17px;
     font-weight: 500;
     color: #333;
 }

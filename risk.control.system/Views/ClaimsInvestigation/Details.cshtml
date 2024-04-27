@@ -320,22 +320,21 @@
 
                                 <div>
                                     <span id="information-popup">
-                                        <button id="back" disabled class="btn btn-outline-secondary">
-                                            <span class="badge badge-light"> <i class="fas fa-arrow-left"></i> </span> Draft <span class="badge badge-secondary">
-                                                <i class="fas fa-info"></i>
-                                            </span>
-                                        </button>
+                                        <div class="btn btn-outline-secondary">
+                                            <i class="fas fa-arrow-left"></i> Draft
+                                            <i class="fas fa-info"></i>
+                                        </div>
                                     </span>
 
                                     @if (Model.AutoAllocation)
                                     {
                                         <button type="submit" id="assign-list" class="btn btn-warning">
-                                            <span class="badge badge-warning"> <i class="fas fa-random"></i></span><b> ASSIGN </b> <i class="small-suffix"> auto</i>
+                                            <i class="fas fa-random"></i><b> ASSIGN </b><i class="small-suffix"> auto</i>
                                         </button>
 
                                     }
                                     <a id="assign-manual-list" asp-action="EmpanelledVendors" asp-route-selectedcase="@Model.ClaimsInvestigation.ClaimsInvestigationId" class="btn btn-danger">
-                                        <span class="badge badge-danger"> <i class="fas fa-external-link-alt"></i></span><b> ASSIGN </b>
+                                        <i class="fas fa-external-link-alt"></i><b> ASSIGN</b>
                                     </a>
                                 </div>
                             }

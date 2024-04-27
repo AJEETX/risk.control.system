@@ -472,6 +472,7 @@ namespace risk.control.system.Controllers
                     user.PhoneNumber = applicationUser.PhoneNumber;
                     user.UpdatedBy = HttpContext.User?.Identity?.Name;
                     user.SecurityStamp = DateTime.Now.ToString();
+                    user.UserRole = applicationUser.UserRole;
                     var result = await userManager.UpdateAsync(user);
                     if (result.Succeeded)
                     {

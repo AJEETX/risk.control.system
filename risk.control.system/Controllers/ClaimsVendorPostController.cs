@@ -199,7 +199,7 @@ namespace risk.control.system.Controllers
 
                 await mailboxService.NotifyClaimWithdrawlToCompany(userEmail, claimId);
 
-                notifyService.Custom($"Claim #{policyNumber}  declined successfully", 3, "blue", "far fa-file-powerpoint");
+                notifyService.Custom($"Claim #{policyNumber}  declined successfully", 3, "red", "far fa-file-powerpoint");
 
                 return RedirectToAction(nameof(ClaimsVendorController.Allocate), "ClaimsVendor");
             }

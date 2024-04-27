@@ -1,7 +1,6 @@
 ﻿/* Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
 for details on configuring this project to bundle and minify static web assets. */
 
-@import url('css2.css');
 
 * {
     margin: 0;
@@ -37,13 +36,13 @@ a {
 /* Sticky footer styles
 -------------------------------------------------- */
 html {
-    font-size: 12px;
+    font-size: .9rem;
     position: relative;
 }
 
 @media (min-width: 768px) {
     html {
-        font-size: 16px;
+        font-size: 1.1rem;
     }
 }
 
@@ -432,10 +431,6 @@ sidebar-light-primary .nav-sidebar > .nav-item > .actual-link.nav-link {
         font-size: 14px;
     }
 
-.nav-item > .actual-link.nav-link {
-    font-size: 14px;
-    padding-left: 2em;
-}
 
 .content {
     font-size: 14px;
@@ -1294,8 +1289,8 @@ a#back-button {
 }
 @media (max-width: 768px) {
     .tooltip-text {
-        min-width: 100px;
-        width: 100px;
+        min-width: 10rem;
+        width: 12rem;
         max-width: 200px;
         border: 1px outset #ddd;
         padding: 5px;

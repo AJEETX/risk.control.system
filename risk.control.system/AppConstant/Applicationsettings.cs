@@ -133,7 +133,7 @@
 
         // MENUS / SUBMENUS
 
-        public const string DASHBOARD = "Dashboard";
+        public const string DASHBOARD = "DASHBOARD";
         public const string INVESTIGATION_CLAIM = "CLAIMS";
         public const string INVESTIGATION_CASE_SETTINGS = "CASE SETTINGS";
         public const string COMPANY_SETTINGS = "COMPANY SETTINGS";
@@ -146,7 +146,7 @@
         public const string INVESTIGATION_CLAIMS_CASE_DETAILS = "Claim case details";
         public const string CUSTOMER_DETAILS = "Customer details";
         public const string BENEFICIARY_DETAILS = "Beneficiary details";
-        public const string MAILBOX = "Mailbox";
+        public const string MAILBOX = "MAILBOX";
         public const string INBOX = "Inbox";
         public const string COMPOSE = "Compose";
         public const string SENT_MAIL = "Sent";

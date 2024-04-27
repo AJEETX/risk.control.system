@@ -75,255 +75,11 @@ async function fetchIpInfo() {
 $(document).ready(function () {
     fetchIpInfo();
 
-    $('#information').on('click', function (e) {
-        var count = $('#total-count').val();
-        var max = $('#max-count').val();
-
-
-        $.alert(
-            {
-                title: " Trial version limit !",
-                content: " Trial version limit <i class='fas fa-less-than-equal'></i> <b>" + max + "</b> . <br />Available count = <b>" + count + "</b>",
-                icon: 'fas fa-exclamation-triangle',
-                type: 'dark',
-                 animationBounce: 2.5,
-                closeIcon: true,
-                buttons: {
-                    cancel: {
-                        text: "CLOSE",
-                        btnClass: 'btn-secondary'
-                    }
-                }
-            }
-        );
-    });
-
-    $('#claim-information').on('click', function (e) {
-        $.alert(
-            {
-                title: "Claim Details",
-                content: " <i class='far fa-file-powerpoint'></i> Policy details.<br /><i class='fa fa-user-plus'></i> <b> Customer Information.</b> <br /><b> <i class='fas fa-user-tie'></i> Beneficiary Details </b>",
-                icon: 'fas fa-info',
-                type: 'dark',
-                closeIcon: true,
-                animationBounce: 2.5,
-                buttons: {
-                    cancel: {
-                        text: "CLOSE",
-                        btnClass: 'btn-secondary'
-                    }
-                }
-            }
-        );
-    });
-    $('#policy-information').on('click', function (e) {
-        $.alert(
-            {
-                title: "Add Policy",
-                content: " <i class='far fa-hand-point-right'></i> Add Policy details.<br /><i class='far fa-thumbs-up'></i> Complete detail through wizard. <br /><b> <i class='fa fa-hand-peace-o'></i> ASSIGN</b> to Agency ",
-                icon: 'fas fa-info',
-                type: 'dark',
-                closeIcon: true,
-                animationBounce: 2.5,
-                buttons: {
-                    cancel: {
-                        text: "CLOSE",
-                        btnClass: 'btn-secondary'
-                    }
-                }
-            }
-        );
-    });
-    $('#customer-information').on('click', function (e) {
-        $.alert(
-            {
-                title: "Add Customer",
-                content: " <i class='far fa-hand-point-right'></i> Add Customer details.<br /><i class='far fa-thumbs-up'></i> Complete detail through wizard. <br /><b> <i class='fa fa-hand-peace-o'></i> ASSIGN</b> to Agency ",
-                icon: 'fas fa-info',
-                type: 'dark',
-                closeIcon: true,
-                animationBounce: 2.5,
-                buttons: {
-                    cancel: {
-                        text: "CLOSE",
-                        btnClass: 'btn-secondary'
-                    }
-                }
-            }
-        );
-    });
-    $('#beneficiary-information').on('click', function (e) {
-        $.alert(
-            {
-                title: "Add Beneficiary",
-                content: " <i class='far fa-hand-point-right'></i> Add Beneficiary details.<br /><i class='far fa-thumbs-up'></i> Wizard should complete. <br /><b> <i class='fa fa-hand-peace-o'></i> ASSIGN</b> to Agency ",
-                icon: 'fas fa-info',
-                type: 'dark',
-                closeIcon: true,
-                animationBounce: 2.5,
-                buttons: {
-                    cancel: {
-                        text: "CLOSE",
-                        btnClass: 'btn-secondary'
-                    }
-                }
-            }
-        );
-    });
-    $('#new-draft-information').on('mouseover', function (e) {
-         $.alert(
-            {
-                title: " Getting Started Tips",
-                 content: " <i class='far fa-hand-point-right'></i> Start from <button class='badge badge-success btn'><i class='far fa-edit'></i>  NEW & DRAFT </button> link<br /><i class='far fa-thumbs-up'></i> Complete detail through wizard. <br /><b> <i class='fa fa-hand-peace-o'></i> ASSIGN</b> to Agency ",
-                 icon: 'fas fa-info',
-                 type: 'dark',
-                 closeIcon: true,
-                 animationBounce: 2.5,
-                buttons: {
-                    cancel: {
-                        text: "CLOSE",
-                        btnClass: 'btn-secondary'
-                    }
-                }
-            }
-        );
-    });
-
-    $('#assign-auto-information').on('click', function (e) {
-        $.alert(
-            {
-                title: " Assign (auto))",
-                content: " <i class='far fa-hand-point-right'></i> Select checkbox(s) button <input type='checkbox' /> to select the <b>CLAIM(s)</b> to <b> <i class='fa fa-hand-peace-o'></i> ASSIGN (auto)</b> to Agency ",
-                icon: 'fas fa-info',
-                type: 'dark',
-                closeIcon: true,
-                animationBounce: 2.5,
-                buttons: {
-                    cancel: {
-                        text: "CLOSE",
-                        btnClass: 'btn-secondary'
-                    }
-                }
-            }
-        );
-    });
-    $('#re-assign-information').on('click', function (e) {
-        $.alert(
-            {
-                title: " Assign & Re-assign",
-                content: " <i class='far fa-hand-point-right'></i> Select Radio button <input type='radio' /> to select the <b>CLAIM</b> to <b> <i class='fa fa-hand-peace-o'></i> ASSIGN</b> to Agency ",
-                icon: 'fas fa-info',
-                type: 'dark',
-                closeIcon: true,
-                animationBounce: 2.5,
-                buttons: {
-                    cancel: {
-                        text: "CLOSE",
-                        btnClass: 'btn-secondary'
-                    }
-                }
-            }
-        );
-    });
-    $('#empanelled-agencies').on('click', function (e) {
-        $.alert(
-            {
-                title: " Assign & Re-assign",
-                content: " <i class='far fa-hand-point-right'></i> Select Radio button <input type='radio' /> to select <b> AGENCY</b> to <b>ASSIGN </b> ",
-                icon: 'fas fa-info',
-                type: 'dark',
-                closeIcon: true,
-                animationBounce: 2.5,
-                buttons: {
-                    cancel: {
-                        text: "CLOSE",
-                        btnClass: 'btn-secondary'
-                    }
-                }
-            }
-        );
-    });
-
-    $('#delete-policy-information').on('click', function (e) {
-        $.alert(
-            {
-                title: " Delete Claim",
-                content: " <i class='far fa-hand-point-right'></i> Deletes the claim info permanently.<br /><i class='far fa-thumbs-up'></i> Please make sure before you delete. <br />",
-                icon: 'fas fa-info',
-                type: 'dark',
-                closeIcon: true,
-                animationBounce: 2.5,
-                buttons: {
-                    cancel: {
-                        text: "CLOSE",
-                        btnClass: 'btn-secondary'
-                    }
-                }
-            }
-        );
-    });
-
-    $('#creator-active-claims').on('click', function (e) {
-        $.alert(
-            {
-                title: " Active Claims",
-                content: " <i class='far fa-hand-point-right'></i> Active claims currently ongoing.<br /><i class='far fa-thumbs-up'></i> Click on <b>DETAIL</b> to see more information. <br />",
-                icon: 'fas fa-info',
-                type: 'dark',
-                closeIcon: true,
-                animationBounce: 2.5,
-                buttons: {
-                    cancel: {
-                        text: "CLOSE",
-                        btnClass: 'btn-secondary'
-                    }
-                }
-            }
-        );
-    });
-    $('#information-popup').on('mouseover', function (e) {
+    $('#information-popup').on('click', function (e) {
         $.alert(
             {
                 title: " Detail Complete !",
                 content: "Detail completed <i class='far fa-thumbs-up'></i><br /> <b>ASSIGN</b> now or later",
-                icon: 'fas fa-info',
-                 animationBounce: 2.5,
-                type: 'dark',
-                closeIcon: true,
-                buttons: {
-                    cancel: {
-                        text: "CLOSE",
-                        btnClass: 'btn-secondary'
-                    }
-                }
-            }
-        );
-    });
-
-    $('#withdraw-information-popup').on('mouseover', function (e) {
-        $.alert(
-            {
-                title: " Withdraw Claim !",
-                content: "The case can not be withdrawn. See <i class='fas fa-clock'></i> Timeline section  for more info",
-                icon: 'fas fa-info',
-                animationBounce: 2.5,
-                type: 'red',
-                closeIcon: true,
-                buttons: {
-                    cancel: {
-                        text: "CLOSE",
-                        btnClass: 'btn-danger'
-                    }
-                }
-            }
-        );
-    });
-
-    $('#upload-information').on('click', function (e) {
-        $.alert(
-            {
-                title: " Upload Claim !",
-                content: "<i class='far fa-thumbs-up'></i> Bulk Upload Claims <br />",
                 icon: 'fas fa-info',
                 animationBounce: 2.5,
                 type: 'dark',
@@ -381,9 +137,9 @@ $(document).ready(function () {
         }, 1);
 
         $('#back').attr('disabled', 'disabled');
-        $('html a *, html button *').css('pointer-events', 'none');
         $('html').css('cursor', 'not-allowed');
-
+        $('a, button').css('cursor', 'not-allowed');
+        $('a, button').attr('disabled', 'disabled');
         var nodes = document.getElementById("section").getElementsByTagName('*');
         for (var i = 0; i < nodes.length; i++) {
             nodes[i].disabled = true;
@@ -399,8 +155,8 @@ $(document).ready(function () {
         }, 1);
         $('#back-button').attr('disabled', 'disabled');
         $('html').css('cursor', 'not-allowed');
-        $('html a *, html button *').css('pointer-events', 'none');
-
+        $('a, button').css('cursor', 'not-allowed');
+        $('a, button').attr('disabled', 'disabled');
         var nodes = document.getElementById("section").getElementsByTagName('*');
         for (var i = 0; i < nodes.length; i++) {
             nodes[i].disabled = true;
@@ -417,9 +173,8 @@ $(document).ready(function () {
             }, 1);
         }
 
-        $('a').css('cursor', 'not-allowed');
-        $('button').attr('disabled', 'disabled');
-        $('a , button').css('pointer-events', 'none');
+        $('a, button').css('cursor', 'not-allowed');
+        $('a, button').attr('disabled', 'disabled');
 
         var nodes = document.getElementById("section").getElementsByTagName('*');
         for (var i = 0; i < nodes.length; i++) {

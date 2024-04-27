@@ -33,17 +33,18 @@
                                     <i class="fas fa-user-tie"></i> Add Beneficiary
                                 </a>
                             </li>
+                            @if (Model.AutoAllocation)
+                                {
                             <li>
                                 <i class='far fa-thumbs-up'></i> 
 
-                                @if (Model.AutoAllocation)
-                                {
+                               
 
                                     <button type="submit" class="btn btn-warning  btn-xs">
                                         <span class="badge badge-warning"> <i class="fas fa-random"></i></span><b> ASSIGN </b> <i class="small-suffix"> auto</i>
                                     </button>
-                                } 
                             </li>
+                            }
                             <li>
                                 <i class='far fa-thumbs-up'></i>
 
