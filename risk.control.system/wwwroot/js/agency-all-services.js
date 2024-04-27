@@ -1,9 +1,4 @@
 ﻿$(document).ready(function () {
-    var vendor = $('#vendorId').val();
-    $('a#back-button').attr("href", "/Vendors/Details/" + vendor + "");
-    $('a#back').attr("href", "/Vendors/Details/" + vendor + "");
-    $('a.create-agency-service').attr("href", "/VendorService/Create?id=" + vendor + "");
-
     $('a.create-agency-service').on('click', function () {
         $("body").addClass("submit-progress-bg");
         // Wrap in setTimeout so the UI

@@ -1,10 +1,5 @@
 ﻿$(document).ready(function () {
-    var vendor = $('#vendorId').val();
-    $('a.create-agency-user').attr("href", "/Vendors/CreateUser?id=" + vendor + "");
-    $('a#back-button').attr("href", "/Vendors/Details/" + vendor + "");
-    $('a#back').attr("href", "/Vendors/Details/" + vendor + "");
-
-
+ 
     $('a.create-agency-user').on('click', function () {
         $("body").addClass("submit-progress-bg");
         // Wrap in setTimeout so the UI

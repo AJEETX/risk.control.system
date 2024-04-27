@@ -37,9 +37,9 @@
             <div class="row">
                 <div class="col-md-12">
                     <div class="form-group">
-                        <a id="back" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
+                        <a id="back" asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
 
-                        <a class="create-user btn btn-success" href='#'><i class="fas fa-user-friends"></i> @Applicationsettings.CREATE User</a>
+                        <a class="create-user btn btn-success" asp-controller="Company" asp-action="CreateUser"><i class="fas fa-user-friends"></i> @Applicationsettings.CREATE User</a>
                     </div>
                 </div>
             </div>

@@ -1,6 +1,4 @@
 ﻿$(document).ready(function () {
-    $('a#back').attr("href", "/Dashboard/Index");
-    $('a.create-policy').attr("href", "/InsuranceClaims/Index");
     $('a.create-policy').on('click', function () {
         $("body").addClass("submit-progress-bg");
         // Wrap in setTimeout so the UI

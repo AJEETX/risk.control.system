@@ -1,7 +1,4 @@
 ﻿$(document).ready(function () {
-    $('a#back-button').attr("href", "/Dashboard/Index");
-    $('a#back').attr("href", "/Dashboard/Index");
-    $('a.create-user').attr("href", "/Company/CreateUser");
 
     $("#customerTable").DataTable({
         ajax: {

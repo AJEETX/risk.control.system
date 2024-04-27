@@ -1,9 +1,4 @@
 ﻿$(document).ready(function () {
-    $('a#back-button').attr("href", "/Dashboard/Index");
-    $('a#back').attr("href", "/Dashboard/Index");
-    $('a.create-agency-user').attr("href", "/Agency/CreateUser");
-
-
     $('a.create-agency-user').on('click', function () {
         $("body").addClass("submit-progress-bg");
         // Wrap in setTimeout so the UI
