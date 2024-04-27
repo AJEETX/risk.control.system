@@ -103,6 +103,12 @@ namespace risk.control.system.Services
                 .ThenInclude(c => c.PinCode)
                 .Include(c => c.CustomerDetail)
                 .ThenInclude(c => c.State)
+                .Include(c=>c.CaseLocations)
+                .ThenInclude(c=>c.ClaimReport.DigitalIdReport)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.ClaimReport.DocumentIdReport)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.ClaimReport.ReportQuestionaire)
                 .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == id);
 
             var location = claimsInvestigation.CaseLocations.FirstOrDefault();

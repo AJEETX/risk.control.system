@@ -6,27 +6,6 @@
 
 <section class="content">
     <div id="article" class="card card-secondary">
-        <div class="card-header">
-            <h3 class="card-title">
-                <i class="fas fa-newspaper"></i> Details
-                <span class="hover-text">
-                    <i class="fas fa-info-circle"></i>
-                    <span class="tooltip-text" id="information">
-                        <li>
-                            <i class='far fa-file-powerpoint'></i> Policy details.
-                        </li>
-                        <li>
-                            <i class='fa fa-user-plus'></i> Customer details.
-                        </li>
-                        <li> <i class='fas fa-user-tie'></i> Beneficiary details </li>
-
-                    </span>
-                </span>
-            </h3>
-        </div>
-        <div class="submit-progress hidden">
-            <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
-        </div>
         @{
             string address = string.Empty;
             string baddress = string.Empty;
@@ -88,6 +67,86 @@
                 benficiaryProgressColor = "steps";
                 beneficiaryLineColor = "line1";
             }
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-newspaper"></i> Details
+                    <span class="hover-text">
+                        <i class="fas fa-info-circle"></i>
+                        <span class="tooltip-text" id="information">
+                            <li>
+                                <i class='far fa-file-powerpoint'></i> Policy details
+                            </li>
+                            <li>
+                                <i class='fa fa-user-plus'></i> Customer details
+                            </li>
+                            <li> <i class='fas fa-user-tie'></i> Beneficiary details </li>
+
+                            @if (!customerExist || !beneficiaryExist)
+                            {
+                                @if (Model.AutoAllocation)
+                                {
+                                    <li>
+                                        <i class='far fa-thumbs-up'></i>
+
+                                        <button class="btn btn-warning  btn-xs disabled">
+                                            <span class="badge badge-warning"> <i class="fas fa-random"></i></span><b> ASSIGN </b> <i class="small-suffix"> auto</i>
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <i class='far fa-thumbs-up'></i>
+                                        <button class="btn btn-danger  btn-xs disabled">
+                                            <span class="badge badge-danger"> <i class="fas fa-external-link-alt"></i></span><b> ASSIGN </b>
+                                        </button>
+                                    </li>
+                                }
+                                else
+                                {
+                                    <li>
+                                        <i class='far fa-thumbs-up'></i>
+                                        <button class="btn btn-danger  btn-xs disabled">
+                                            <span class="badge badge-danger"> <i class="fas fa-external-link-alt"></i></span><b> ASSIGN </b>
+                                        </button>
+                                    </li>
+                                }
+                            }
+                            else
+                            {
+                                @if (Model.AutoAllocation)
+                                {
+                                    <li>
+                                        <i class='far fa-thumbs-up'></i>
+
+                                        <button class="btn btn-warning  btn-xs">
+                                            <span class="badge badge-warning"> <i class="fas fa-random"></i></span><b> ASSIGN </b> <i class="small-suffix"> auto</i>
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <i class='far fa-thumbs-up'></i>
+                                        <button class="btn btn-danger  btn-xs">
+                                            <span class="badge badge-danger"> <i class="fas fa-external-link-alt"></i></span><b> ASSIGN </b>
+                                        </button>
+                                    </li>
+                                }
+                                else
+                                {
+                                    <li>
+                                        <i class='far fa-thumbs-up'></i>
+                                        <button class="btn btn-danger  btn-xs">
+                                            <span class="badge badge-danger"> <i class="fas fa-external-link-alt"></i></span><b> ASSIGN </b>
+                                        </button>
+                                    </li>
+                                }
+                            }
+
+                        
+                    </span>
+                </span>
+            </h3>
+        </div>
+        <div class="submit-progress hidden">
+            <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+        </div>
+            
             <input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail?.CustomerDetailId" />
             <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
             <input type="hidden" id="beneficiaryId" value="@Model.Location?.CaseLocationId" />
@@ -117,7 +176,7 @@
                                 <span class="hover-text">
                                     <i class="fas fa-info-circle"></i>
                                     <span class="tooltip-text" id="policy-information">
-                                        <i class='far fa-file-powerpoint'></i> Policy details.
+                                        <i class='far fa-file-powerpoint'></i> Policy details
                                     </span>
                                 </span>
                             </div>

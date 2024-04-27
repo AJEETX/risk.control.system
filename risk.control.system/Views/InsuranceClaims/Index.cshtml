@@ -17,22 +17,39 @@
                     <span class="tooltip-text" id="information">
                         <span>
                             <li>
-                                <i class='far fa-hand-point-right'></i> <button class="badge badge-success btn-xs">
-                                    <span class="badge badge-success btn-xs"> <i class="far fa-file-powerpoint"></i> </span>  <b> Add Policy </b>
-                                </button>  details.
+                                <i class='far fa-hand-point-right'></i> 
+                                <a class="btn btn-success  btn-xs">
+                                    <i class="far fa-file-powerpoint"></i> Add Policy</a>
                             </li>
                             <li>
-                                <i class='far fa-hand-point-right'></i> Complete wizard.
+                                <i class='far fa-hand-point-right'></i>
+                                <a class="btn btn-success  btn-xs">
+                                    <i class="fa fa-user-plus"></i> Add Customer
+                                </a>
                             </li>
                             <li>
-                                <i class='far fa-thumbs-up'></i> <button class="badge badge-secondary btn-xs">
-                                    <b>
+                                <i class='far fa-hand-point-right'></i>
+                                <a class="btn btn-success  btn-xs">
+                                    <i class="fas fa-user-tie"></i> Add Beneficiary
+                                </a>
+                            </li>
+                            <li>
+                                <i class='far fa-thumbs-up'></i> 
 
-                                        <span class="badge badge-secondary btn-xs">
-                                            ASSIGN
-                                        </span>
-                                    </b>
-                                </button>  to Agency
+                                @if (Model.AutoAllocation)
+                                {
+
+                                    <button type="submit" class="btn btn-warning  btn-xs">
+                                        <span class="badge badge-warning"> <i class="fas fa-random"></i></span><b> ASSIGN </b> <i class="small-suffix"> auto</i>
+                                    </button>
+                                } 
+                            </li>
+                            <li>
+                                <i class='far fa-thumbs-up'></i>
+
+                                <button class="btn btn-danger  btn-xs">
+                                    <span class="badge badge-danger"> <i class="fas fa-external-link-alt"></i></span><b> ASSIGN </b>
+                                </button>
                             </li>
                         </span>
 
@@ -79,7 +96,7 @@
                                 <span class="hover-text">
                                     <i class="fas fa-info-circle"></i>
                                     <span class="tooltip-text" id="policy-information">
-                                        <i class='far fa-file-powerpoint'></i> Add Policy details.
+                                        <i class='far fa-file-powerpoint'></i> Add Policy details
                                     </span>
                                 </span>
                             </div>
@@ -174,7 +191,7 @@
                                 <span class="hover-text">
                                     <i class="fas fa-info-circle"></i>
                                     <span class="tooltip-text" id="customer-information">
-                                        <i class='fa fa-user-plus'></i> Add Customer detail.
+                                        <i class='fa fa-user-plus'></i> Add Customer detail
                                     </span>
                                 </span>
                             </div>
@@ -235,7 +252,7 @@
                                     <i class="fas fa-info-circle"></i>
                                     <span class="tooltip-text" id="beneficiary-information">
 
-                                        <i class='fas fa-user-tie'></i> Add Beneficiary Details.
+                                        <i class='fas fa-user-tie'></i> Add Beneficiary details
                                     </span>
                                 </span>
                             </div>

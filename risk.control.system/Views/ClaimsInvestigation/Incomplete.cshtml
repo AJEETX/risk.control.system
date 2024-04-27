@@ -13,22 +13,28 @@
                     <span class="tooltip-text" id="information">
                         <li>
                             <i class='far fa-hand-point-right'></i> 
-                            <button class="badge badge-success btn-xs">
+                            <button class="btn btn-success  btn-xs">
                                 <span class="badge badge-success btn-xs"> <i class="far fa-edit"></i> </span>  <b> ADD NEW </b> 
-                                </button> Claim
+                                </button>
                         </li>
+                       
                         <li>
-                        <i class='far fa-thumbs-up'></i> Complete the wizard.
-                        </li>
-                        <li>
-                            <i class='far fa-thumbs-up'></i> <button class="badge badge-secondary btn-xs">
-                                <b>
+                            <i class='far fa-thumbs-up'></i>
 
-                                    <span class="badge badge-secondary btn-xs">
-                                        ASSIGN
-                                    </span>
-                                </b>
-                            </button>  to Agency
+                            @if (Model.AutoAllocation)
+                            {
+
+                                <button class="btn btn-warning  btn-xs">
+                                    <span class="badge badge-warning"> <i class="fas fa-random"></i></span><b> ASSIGN </b> <i class="small-suffix"> auto</i>
+                                </button>
+                            }
+                        </li>
+                        <li>
+                            <i class='far fa-thumbs-up'></i>
+
+                            <button class="btn btn-danger  btn-xs">
+                                <span class="badge badge-danger"> <i class="fas fa-external-link-alt"></i></span><b> ASSIGN </b>
+                            </button>
                         </li>
                     </span>
                 </span>

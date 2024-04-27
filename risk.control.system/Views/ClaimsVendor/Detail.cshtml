@@ -21,6 +21,19 @@
                         <li>
                             <i class='fas fa-user-tie'></i> Beneficiary details
                         </li>
+                        @if (!Model.NotWithdrawable)
+                        {
+                            <li>
+                                <i class='far fa-thumbs-up'></i> <b>
+                                    <button class='btn btn-danger'>
+                                        <span class='badge badge-danger btn-xs'>
+                                            <i class='fas fa-undo'></i>
+                                        </span> <b>Withdraw</b>
+                                    </button>
+                                </b>
+                            </li>
+                        }
+                        
                     </span>
                 </span>
             </h3>

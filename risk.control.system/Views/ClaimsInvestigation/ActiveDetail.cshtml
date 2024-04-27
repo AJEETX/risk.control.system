@@ -15,13 +15,38 @@
                     <i class="fas fa-info-circle"></i>
                     <span class="tooltip-text" id="information">
                         <li>
-                            <i class='far fa-file-powerpoint'></i> Policy details.
+                            <i class='far fa-file-powerpoint'></i> Policy details
                         </li>
                         <li>
-                            <i class='fa fa-user-plus'></i> Customer details.
+                            <i class='fa fa-user-plus'></i> Customer details
                         </li>
                         <li> <i class='fas fa-user-tie'></i> Beneficiary details </li>
                         <li><i class="fas fa-clock"></i> Timeline </li>
+
+                        @if (!Model.NotWithdrawable)
+                        {
+                            <li>
+                                <i class='far fa-thumbs-up'></i> <b>
+                                    <button class='btn btn-danger'>
+                                        <span class='badge badge-danger btn-xs'>
+                                            <i class='fas fa-undo'></i>
+                                        </span> <b>Withdraw</b>
+                                    </button>
+                                </b>
+                            </li>
+                        }
+                        else
+                        {
+                            <li>
+                                <i class='far fa-thumbs-down'></i> <b>
+                                    <button id="back" disabled class="btn btn-outline-danger btn-xs">
+                                        <span class="badge badge-light"> <i class="fas fa-undo"></i> </span> Withdraw <span class="badge badge-danger">
+                                            <i class="fas fa-info"></i>
+                                        </span>
+                                    </button>
+                                </b>
+                            </li>
+                        }
 
                     </span>
                 </span>
@@ -92,11 +117,11 @@
                                 <span class="hover-text">
                                     <i class="fas fa-info-circle"></i>
                                     <span class="tooltip-text" id="information">
-                                        <span>
+                                        <li>
 
-                                            <i class='far fa-file-powerpoint'></i><b> Claim details.</b>
+                                            <i class='far fa-hand-point-right'></i> Claim <i class='far fa-file-powerpoint'></i><strong>#@Model.ClaimsInvestigation?.PolicyDetail?.ContractNumber </strong>  details
                                             
-                                        </span>
+                                        </li>
 
                                     </span>
                                 </span>
@@ -120,7 +145,7 @@
                                             <span class="hover-text">
                                                 <i class="fas fa-info-circle"></i>
                                                 <span class="tooltip-text" id="policy-information">
-                                                    <i class='far fa-file-powerpoint'></i> Policy details.
+                                                    <i class='far fa-file-powerpoint'></i> Policy details
                                                 </span>
                                             </span>
 
