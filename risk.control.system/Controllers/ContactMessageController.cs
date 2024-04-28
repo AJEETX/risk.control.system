@@ -127,6 +127,7 @@ namespace risk.control.system.Controllers
             }
             var userMessage = await inboxMailService.GetInboxMessagedetailReply(id, userEmail, actiontype);
             ViewBag.ActionType = actiontype;
+            ViewBag.MessageId = id;
             return View(userMessage);
         }
             //

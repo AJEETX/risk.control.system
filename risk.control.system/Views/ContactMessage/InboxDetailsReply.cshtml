@@ -34,22 +34,22 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <div class="btn btn-default btn-file">
-                        <i class="fas fa-paperclip"></i> Attachment
-                        <img class="file-image doc-profile-image" id="documentImage0" src=@Applicationsettings.NO_IMAGE>
-                        <input id="document" name="document" asp-for="Attachment" type="file" accept="*.png, *.jpeg" class="form-control remarks" />
-                    </div>
-                    <p class="help-block">Max. 10MB</p>
+                    
 
                 </div>
             </div>
 
             <div class="card-footer">
+                <div class="btn btn-default btn-file">
+                    <i class="fas fa-paperclip"></i> Attachment
+                    <img class="file-image doc-profile-image" id="documentImage0" src=@Applicationsettings.NO_IMAGE>
+                    <input id="document" name="document" asp-for="Attachment" type="file" accept="*.png, *.jpeg" class="form-control remarks" />
+                </div>
+                <span class="help-block">Max. 2MB</span>
                 <div class="float-right">
-                    @*<button type="submit" asp-action="Draft" class="btn btn-secondary"><i class="fas fa-pencil-alt"></i> Draft</button>*@
+                    <a asp-controller="ContactMessage" asp-action="InboxDetails" asp-route-id="@ViewBag.MessageId" type="reset" class="btn btn-secondary"><i class="fas fa-times"></i> @Applicationsettings.CANCEL</a>
                     <button id="send-email" type="submit" asp-action="InboxDetailsReply" class="btn btn-success"><i class="far fa-envelope"></i> Reply</button>
                 </div>
-                <button type="reset" class="btn btn-secondary"><i class="fas fa-times"></i> @Applicationsettings.CANCEL</button>
             </div>
 
         </div>

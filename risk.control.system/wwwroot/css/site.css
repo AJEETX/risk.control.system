@@ -1,7 +1,4 @@
-﻿/* Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
-for details on configuring this project to bundle and minify static web assets. */
-
-
+﻿
 * {
     margin: 0;
     padding: 0;
@@ -63,28 +60,6 @@ button.accept-policy {
     line-height: inherit;
 }
 
-#watermark {
-    position: fixed;
-    z-index: 10000;
-    color: red;
-    transform: rotate(-60deg);
-    opacity: 0.7;
-    height: 50px;
-}
-
-.coming-soon-watermark {
-    border: 4px solid #ebebef;
-    border-radius: 1rem;
-    padding: 10px 0;
-    margin-bottom: 2rem;
-}
-
-.watermark {
-    height: 2rem;
-    opacity: 0.9;
-    z-index: 10000;
-}
-
 .brand-link .brand-image {
     width: 3rem;
 }
@@ -136,8 +111,6 @@ button.accept-policy {
     line-height: 60px;
     /* Vertically center the text there */
 }
-
-/* custom */
 
 .login-box {
     background-color: #e5e5e5;
