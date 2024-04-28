@@ -78,7 +78,7 @@ $(document).ready(function () {
                     }
 
                     else {
-                        document.getElementById('policyImage').src = window.URL.createObjectURL($(this)[0].files[i]);
+                        document.getElementById('profileImage').src = window.URL.createObjectURL($(this)[0].files[i]);
                     }
                 }
 

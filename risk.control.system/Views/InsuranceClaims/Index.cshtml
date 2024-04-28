@@ -18,29 +18,22 @@
                         <span>
                             <li>
                                 <i class='far fa-hand-point-right'></i> 
-                                <a class="btn btn-success  btn-xs">
+                                <a class="btn btn-success btn-xs">
                                     <i class="far fa-file-powerpoint"></i> Add Policy</a>
                             </li>
                             <li>
                                 <i class='far fa-hand-point-right'></i>
-                                <a class="btn btn-success  btn-xs">
-                                    <i class="fa fa-user-plus"></i> Add Customer
-                                </a>
+                                <button disabled class="btn btn-outline-secondary btn-xs"><i class="fa fa-user-plus"></i> Customer</button>
                             </li>
                             <li>
                                 <i class='far fa-hand-point-right'></i>
-                                <a class="btn btn-success  btn-xs">
-                                    <i class="fas fa-user-tie"></i> Add Beneficiary
-                                </a>
+                                <button disabled class="btn btn-outline-secondary btn-xs"><i class="fas fa-user-tie"></i> Beneficiary</button>
                             </li>
                             @if (Model.AutoAllocation)
                                 {
                             <li>
                                 <i class='far fa-thumbs-up'></i> 
-
-                               
-
-                                    <button type="submit" class="btn btn-warning  btn-xs">
+                                    <button disabled class="btn btn-warning  btn-xs">
                                         <span class="badge badge-warning"> <i class="fas fa-random"></i></span><b> ASSIGN </b> <i class="small-suffix"> auto</i>
                                     </button>
                             </li>
@@ -48,7 +41,7 @@
                             <li>
                                 <i class='far fa-thumbs-up'></i>
 
-                                <button class="btn btn-danger  btn-xs">
+                                <button disabled class="btn btn-danger  btn-xs">
                                     <span class="badge badge-danger"> <i class="fas fa-external-link-alt"></i></span><b> ASSIGN </b>
                                 </button>
                             </li>

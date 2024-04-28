@@ -94,6 +94,25 @@ $(document).ready(function () {
         );
     });
 
+    $('#withdraw-information-popup').on('mouseover', function (e) {
+        $.alert(
+            {
+                title: " Withdraw Claim !",
+                content: "The case can not be withdrawn. See <i class='fas fa-clock'></i> Timeline section  for more info",
+                icon: 'fas fa-info',
+                animationBounce: 2.5,
+                type: 'red',
+                closeIcon: true,
+                buttons: {
+                    cancel: {
+                        text: "CLOSE",
+                        btnClass: 'btn-danger'
+                    }
+                }
+            }
+        );
+    });
+
     $('#password').on('click', function () {
         $("body").addClass("submit-progress-bg");
         // Wrap in setTimeout so the UI

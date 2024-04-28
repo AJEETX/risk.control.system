@@ -73,13 +73,49 @@
                     <span class="hover-text">
                         <i class="fas fa-info-circle"></i>
                         <span class="tooltip-text" id="information">
+
                             <li>
-                                <i class='far fa-file-powerpoint'></i> Policy details
+                                <i class='far fa-hand-point-right'></i>
+                                <button class="btn btn-warning btn-xs"><i class="far fa-file-powerpoint"></i>  Edit Policy</button>
+
                             </li>
-                            <li>
-                                <i class='fa fa-user-plus'></i> Customer details
-                            </li>
-                            <li> <i class='fas fa-user-tie'></i> Beneficiary details </li>
+                            @if (customerExist)
+                            {
+                                <li>
+                                    <i class='far fa-hand-point-right'></i>
+                                    <button class="btn btn-warning btn-xs"><i class="fa fa-user-plus"></i>  Edit Customer</button>
+                                </li>
+                            }
+                            else
+                            {
+                                <li>
+                                    <i class='far fa-hand-point-right'></i>
+                                    <a class="btn btn-success btn-xs"><i class="fa fa-user-plus"></i> Add Customer</a>
+
+                                </li>
+                            }
+
+                            @if (!customerExist && !beneficiaryExist)
+                            {
+                                <li>
+                                    <i class='far fa-hand-point-right'></i>
+                                    <a style="pointer-events:none;color:grey;" class="btn btn-outline-secondary btn-xs"><i class="fas fa-user-tie"></i> Beneficiary</a>
+                                </li>
+                            }
+                            else if (customerExist && !beneficiaryExist)
+                            {
+                                <li>
+                                    <i class='far fa-hand-point-right'></i>
+                                    <a class="btn btn-success btn-xs"><i class="fas fa-user-tie"></i> Add Beneficiary</a>
+                                </li>
+                            }
+                            else if (customerExist && beneficiaryExist)
+                            {
+                                <li>
+                                    <i class='far fa-hand-point-right'></i>
+                                    <button class="btn btn-warning btn-xs"><i class="fas fa-user-tie"></i> Edit Beneficiary</button>
+                                </li>
+                            }
 
                             @if (!customerExist || !beneficiaryExist)
                             {
@@ -137,8 +173,6 @@
                                     </li>
                                 }
                             }
-
-                        
                     </span>
                 </span>
             </h3>
