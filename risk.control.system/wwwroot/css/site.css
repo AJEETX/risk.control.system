@@ -1315,3 +1315,6 @@ a#back-button {
 .tooltip-text li {
     margin: 5px 0px;
 }
+.far.fa-hand-point-right, .far.fa-thumbs-up, .far.fa-thumbs-down, .fa.fa-hand-peace-o {
+    font-size: 1.1rem;
+}

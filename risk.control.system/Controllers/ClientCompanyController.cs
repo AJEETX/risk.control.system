@@ -438,7 +438,7 @@ namespace risk.control.system.Controllers
                     company.Updated = DateTime.Now;
                     company.UpdatedBy = HttpContext.User?.Identity?.Name;
                     var savedRows = await _context.SaveChangesAsync();
-                    notifyService.Custom($"Agency(s) de-panelled.", 3, "red", "fas fa-thumbs-down");
+                    notifyService.Custom($"Agency(s) de-panelled.", 3, "red", "far fa-thumbs-down");
                     try
                     {
                         if (savedRows > 0)

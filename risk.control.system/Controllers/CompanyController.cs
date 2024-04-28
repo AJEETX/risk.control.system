@@ -611,7 +611,7 @@ namespace risk.control.system.Controllers
                 company.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.ClientCompany.Update(company);
                 var savedRows = await _context.SaveChangesAsync();
-                notifyService.Custom($"Agency(s) de-panelled.", 3, "red", "fas fa-thumbs-down");
+                notifyService.Custom($"Agency(s) de-panelled.", 3, "red", "far fa-thumbs-down");
                 return RedirectToAction("EmpanelledVendors");
             }
             catch (Exception)

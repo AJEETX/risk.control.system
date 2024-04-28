@@ -204,7 +204,10 @@
 
                             $('#upload-face').submit();
                             $('html *').css('cursor', 'not-allowed');
-                            $('#back').attr('disabled', 'disabled');
+                            $('html a').css('pointer-events', 'none');
+                            $('html a').css('cursor', 'none');
+                            $('html button').attr('disabled', true);
+                            $('#back').attr('disabled', true);
 
                             $('html a *, html button *').css('pointer-events', 'none');
 
