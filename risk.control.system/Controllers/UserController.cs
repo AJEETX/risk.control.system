@@ -187,7 +187,7 @@ namespace risk.control.system.Controllers
                         user.ProfileImage = applicationUser?.ProfileImage ?? user.ProfileImage;
                         user.ProfilePictureUrl = applicationUser?.ProfilePictureUrl ?? user.ProfilePictureUrl;
                         user.PhoneNumber = applicationUser?.PhoneNumber ?? user.PhoneNumber;
-                        user.ProfilePicture = applicationUser?.ProfilePicture;
+                        user.ProfilePicture = applicationUser?.ProfilePicture ?? user.ProfilePicture;
                         user.FirstName = applicationUser?.FirstName;
                         user.LastName = applicationUser?.LastName;
                         if (!string.IsNullOrWhiteSpace(applicationUser?.Password))

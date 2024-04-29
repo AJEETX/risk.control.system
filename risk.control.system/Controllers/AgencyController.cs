@@ -452,6 +452,7 @@ namespace risk.control.system.Controllers
                 if (user != null)
                 {
                     user.ProfilePictureUrl = applicationUser?.ProfilePictureUrl ?? user.ProfilePictureUrl;
+                    user.ProfilePicture = applicationUser?.ProfilePicture ?? user.ProfilePicture;
                     user.PhoneNumber = applicationUser?.PhoneNumber ?? user.PhoneNumber;
                     user.FirstName = applicationUser?.FirstName;
                     user.LastName = applicationUser?.LastName;
@@ -756,7 +757,7 @@ namespace risk.control.system.Controllers
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
-            
+
         }
 
         // POST: VendorService/Edit/5
@@ -810,7 +811,7 @@ namespace risk.control.system.Controllers
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
-            
+
         }
 
         // GET: VendorService/Delete/5

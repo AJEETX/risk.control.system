@@ -113,7 +113,7 @@ namespace risk.control.system.Controllers
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
-            
+
         }
 
         [Breadcrumb(" Manage Users", FromAction = "Details")]
@@ -144,7 +144,7 @@ namespace risk.control.system.Controllers
         {
             try
             {
-                if(string.IsNullOrEmpty(emailSuffix) || user is null)
+                if (string.IsNullOrEmpty(emailSuffix) || user is null)
                 {
                     notifyService.Error("OOPS !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
@@ -231,7 +231,7 @@ namespace risk.control.system.Controllers
                     }
                     return RedirectToAction(nameof(Users), "Vendors", new { id = user.VendorId });
                 }
-                
+
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -324,6 +324,7 @@ namespace risk.control.system.Controllers
                     applicationUser.ProfileImage.CopyTo(dataStream);
                     applicationUser.ProfilePicture = dataStream.ToArray();
                 }
+                user.ProfilePicture = applicationUser?.ProfilePicture ?? user.ProfilePicture;
                 user.ProfileImage = applicationUser?.ProfileImage ?? user.ProfileImage;
                 user.ProfilePictureUrl = applicationUser?.ProfilePictureUrl ?? user.ProfilePictureUrl;
                 user.PhoneNumber = applicationUser?.PhoneNumber ?? user.PhoneNumber;
@@ -532,7 +533,7 @@ namespace risk.control.system.Controllers
         {
             try
             {
-                if(string.IsNullOrWhiteSpace(domainAddress) || string.IsNullOrWhiteSpace(mailAddress) || vendor is null)
+                if (string.IsNullOrWhiteSpace(domainAddress) || string.IsNullOrWhiteSpace(mailAddress) || vendor is null)
                 {
                     notifyService.Error("OOPS !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
@@ -616,7 +617,7 @@ namespace risk.control.system.Controllers
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
-            
+
         }
 
         [RequestSizeLimit(2_000_000)] // Checking for 2 MB
@@ -710,7 +711,7 @@ namespace risk.control.system.Controllers
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
-            
+
         }
 
         // POST: Vendors/Delete/5
