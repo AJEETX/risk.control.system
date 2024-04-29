@@ -14,8 +14,8 @@
         public static readonly int TokenTimeoutMinutes = 5;
         public static readonly string GMAPData = "AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
         public static readonly string SGKData = "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";
-        public static readonly string aws_id = "AKIAU7ZHLI5BQL6HYBHX";
-        public static readonly string aws_secret = "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";
+        //public static readonly string aws_id = "AKIAU7ZHLI5BQL6HYBHX";
+        //public static readonly string aws_secret = "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";
         public const string APP_URL = "https://apkichck.s3.ap-southeast-2.amazonaws.com/ichck/app-release_20242901-002101_dev.apk";
         
         //WEBSITE SETTINGS
