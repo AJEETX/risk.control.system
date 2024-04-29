@@ -9,8 +9,8 @@ namespace risk.control.system.Services
         public static async Task<bool> Do(byte[] data, byte[] tdata)
         {
             float similarityThreshold = 70F;
-            var awsAccessKeyId = Environment.GetEnvironmentVariable("AWS_ACCESS_KEY_ID") ?? "AKIAU7ZHLI5BQL6HYBHX";
-            var awsSecretAccessKey = Environment.GetEnvironmentVariable("AWS_SECRET_ACCESS_KEY") ?? "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";
+            var awsAccessKeyId = Environment.GetEnvironmentVariable("AWS_ACCESS_KEY_ID");
+            var awsSecretAccessKey = Environment.GetEnvironmentVariable("AWS_SECRET_ACCESS_KEY");
             var rekognitionClient = new AmazonRekognitionClient(awsAccessKeyId, awsSecretAccessKey, RegionEndpoint.APSoutheast2);
 
             Amazon.Rekognition.Model.Image imageSource = new Amazon.Rekognition.Model.Image();

@@ -3,9 +3,6 @@ using System.Net;
 using System.Reflection;
 using System.Threading.RateLimiting;
 
-using Amazon.Extensions.NETCore.Setup;
-using Amazon.Runtime;
-
 using AspNetCoreHero.ToastNotification;
 using AspNetCoreHero.ToastNotification.Extensions;
 
@@ -13,7 +10,6 @@ using Highsoft.Web.Mvc.Charts;
 
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Http.Features;
@@ -84,12 +80,6 @@ builder.Services.Configure<ForwardedHeadersOptions>(options => {
     options.KnownNetworks.Clear();
     options.KnownProxies.Clear();
 });
-
-AWSOptions awsOptions = new AWSOptions
-{
-    Credentials = new BasicAWSCredentials("AKIAU7ZHLI5BQL6HYBHX", "mWccLqHfmXDr5kONMfX5TCEgYKEqaL7KHHKYinbF")
-};
-builder.Services.AddDefaultAWSOptions(awsOptions);
 
 builder.Services.AddFeatureManagement().AddFeatureFilter<TimeWindowFilter>();
 builder.Services.AddScoped<INumberSequenceService, NumberSequenceService>();
