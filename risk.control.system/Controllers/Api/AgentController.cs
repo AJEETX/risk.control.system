@@ -155,6 +155,10 @@ namespace risk.control.system.Controllers.Api
                 {
                     return BadRequest($"{nameof(request.Uid)} {request.Uid} not exists");
                 }
+                if (mobileUidExist.ProfilePicture == null)
+                {
+                    return BadRequest($"{mobileUidExist.Email}  {nameof(mobileUidExist.ProfilePicture)}  does not exists");
+                }
                 if (!request.VerifyId)
                 {
                     return Ok(new { Email = mobileUidExist.Email, Pin = mobileUidExist.SecretPin });
@@ -190,7 +194,7 @@ namespace risk.control.system.Controllers.Api
             }
             catch (Exception ex)
             {
-                return BadRequest("face mismatch");
+                return BadRequest("face matcherror "+ ex.StackTrace);
             }
         }
 
