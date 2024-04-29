@@ -160,9 +160,9 @@ namespace risk.control.system.Controllers.Api
                     return Ok(new { Email = mobileUidExist.Email, Pin = mobileUidExist.SecretPin });
                 }
 
-                //var image = Convert.FromBase64String(request.Image);
+                var image = Convert.FromBase64String(request.Image);
 
-                ////var savedImage = ImageCompression.ConverterSkia(image);
+                var savedImage = ImageCompression.ConverterSkia(image);
                 //string path = Path.Combine(webHostEnvironment.WebRootPath, "onboard");
                 //if (!Directory.Exists(path))
                 //{
@@ -176,11 +176,11 @@ namespace risk.control.system.Controllers.Api
 
                 //var savedImage = await System.IO.File.ReadAllBytesAsync(filePath);
 
-                //var saveImageBase64Image2Verify = Convert.ToBase64String(savedImage);
+                var saveImageBase64Image2Verify = Convert.ToBase64String(savedImage);
 
                 var saveImageBase64String = Convert.ToBase64String(mobileUidExist.ProfilePicture);
 
-                var faceImageDetail = await httpClientService.GetFaceMatch(new MatchImage { Source = saveImageBase64String, Dest = request.Image }, FaceMatchBaseUrl);
+                var faceImageDetail = await httpClientService.GetFaceMatch(new MatchImage { Source = saveImageBase64String, Dest = saveImageBase64Image2Verify }, FaceMatchBaseUrl);
 
                 if (faceImageDetail == null || faceImageDetail?.Confidence == null)
                 {
