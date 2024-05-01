@@ -209,6 +209,9 @@ namespace risk.control.system.Controllers
                         var result = await userManager.UpdateAsync(user);
                         if (result.Succeeded)
                         {
+                            var roles = await userManager.GetRolesAsync(user);
+                            var roleResult = await userManager.RemoveFromRolesAsync(user, roles);
+                            await userManager.AddToRoleAsync(user, user.Role.ToString());
                             var response = SmsService.SendSingleMessage(user.PhoneNumber, "User edited. Email : " + user.Email);
                             notifyService.Custom($"User edited successfully.", 3, "orange", "fas fa-user-check");
                             return RedirectToAction(nameof(Index));

@@ -23,7 +23,7 @@ namespace risk.control.system.Seeds
             };
             var pinCode = context.PinCode.Include(p => p.District).Include(p => p.State).FirstOrDefault(p => p.Code == CURRENT_PINCODE);
             var district = context.District.FirstOrDefault(c => c.DistrictId == pinCode.District.DistrictId);
-            var state = context.State.FirstOrDefault(s => s.StateId == pinCode.State.StateId);
+            var state = context.State.Include(s=>s.Country).FirstOrDefault(s => s.StateId == pinCode.State.StateId);
 
             string adminImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "portal-admin.jpeg");
             var adminImage = File.ReadAllBytes(adminImagePath);
@@ -50,12 +50,13 @@ namespace risk.control.system.Seeds
                 IsVendorAdmin = true,
                 PhoneNumberConfirmed = true,
                 PhoneNumber = Applicationsettings.PORTAL_ADMIN_MOBILE,
-                CountryId = indiaCountry.Entity.CountryId,
+                CountryId = state.Country.CountryId,
                 DistrictId = district?.DistrictId ?? default!,
                 StateId = state?.StateId ?? default!,
                 PinCodeId = pinCode?.PinCodeId ?? default!,
                 ProfilePictureUrl = PORTAL_ADMIN.PROFILE_IMAGE,
-                ProfilePicture = adminImage
+                ProfilePicture = adminImage,
+                Role = AppRoles.PORTAL_ADMIN,
             };
             if (userManager.Users.All(u => u.Id != portalAdmin.Id))
             {

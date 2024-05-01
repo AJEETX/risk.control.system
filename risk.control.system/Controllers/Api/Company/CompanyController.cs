@@ -96,7 +96,7 @@ namespace risk.control.system.Controllers.Api.Company
                     District = u.District.Name,
                     State = u.State.Name,
                     Country = u.Country.Name,
-                    Roles = string.Join(",", GetUserRoles(u).Result),
+                    Roles = u.UserRole != null ? $"<span class=\"badge badge-light\">{u.UserRole.GetEnumDisplayName()}</span>" : "<span class=\"badge badge-light\">...</span>",
                     Pincode = u.PinCode.Code,
                 })?.ToArray();
             return Ok(result);

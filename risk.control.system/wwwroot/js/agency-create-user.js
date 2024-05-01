@@ -2,8 +2,7 @@
     submitHandler: function (form) {
         $.confirm({
             title: "Confirm Add User",
-
-            content: "Are you sure to add ?",
+            content: "Are you sure to add?",
             icon: 'fas fa-user-plus',
             type: 'green',
             closeIcon: true,
@@ -23,7 +22,6 @@
                         $('button#create-agency').attr('disabled', 'disabled');
                         $('button#create-agency').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Add User");
                         $('html a *, html button *').css('pointer-events', 'none');
-
 
                         form.submit();
                         var nodes = document.getElementById("create-form").getElementsByTagName('*');

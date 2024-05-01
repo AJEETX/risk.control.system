@@ -163,10 +163,13 @@ namespace risk.control.system.Controllers
             user.Updated = DateTime.Now;
             user.UpdatedBy = HttpContext.User?.Identity?.Name;
             user.Id = 0;
+            user.Role = (AppRoles)Enum.Parse(typeof(AppRoles), user.UserRole.ToString());
             IdentityResult result = await userManager.CreateAsync(user, user.Password);
 
             if (result.Succeeded)
             {
+                await userManager.AddToRoleAsync(user, user.UserRole.ToString());
+
                 var response = SmsService.SendSingleMessage(user.PhoneNumber, "Company account created. Domain : " + user.Email);
                 notifyService.Custom($"User created successfully.", 3, "green", "fas fa-user-plus");
 
@@ -285,12 +288,17 @@ namespace risk.control.system.Controllers
                         user.PinCodeId = applicationUser.PinCodeId;
                         user.Updated = DateTime.Now;
                         user.Comments = applicationUser.Comments;
+                        user.UserRole = applicationUser.UserRole;
+                        user.Role = (AppRoles)Enum.Parse(typeof(AppRoles), user.UserRole.ToString());
                         user.PhoneNumber = applicationUser.PhoneNumber;
                         user.UpdatedBy = HttpContext.User?.Identity?.Name;
                         user.SecurityStamp = DateTime.Now.ToString();
                         var result = await userManager.UpdateAsync(user);
                         if (result.Succeeded)
                         {
+                            var roles = await userManager.GetRolesAsync(user);
+                            var roleResult = await userManager.RemoveFromRolesAsync(user, roles);
+                            await userManager.AddToRoleAsync(user, user.UserRole.ToString());
                             notifyService.Custom($"Company user edited successfully.", 3, "orange", "fas fa-user-check");
                             var response = SmsService.SendSingleMessage(user.PhoneNumber, "Company account edited. Domain : " + user.Email);
 

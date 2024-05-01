@@ -50,8 +50,9 @@
         </div>
 
         <form id="create-form" asp-action="CreateUser" enctype="multipart/form-data" autocomplete="off">
-            <input type="hidden" asp-for="VendorId" value="@Model.Vendor.VendorId" />
+            <input type="hidden" asp-for="VendorId" name="vendorId" value="@Model.Vendor.VendorId" />
             <input type="hidden" asp-for="Email" id="mailAddress" />
+            <input type="hidden" id="txn" name="txn" value="agency" />
             <input type="hidden" id="emailSuffix" name="emailSuffix" value="@email" />
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="card-body">

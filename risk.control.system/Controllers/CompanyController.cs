@@ -300,16 +300,15 @@ namespace risk.control.system.Controllers
                 user.Mailbox = new Mailbox { Name = userFullEmail };
                 user.Updated = DateTime.Now;
                 user.UpdatedBy = HttpContext.User?.Identity?.Name;
+                user.Role = (AppRoles)Enum.Parse(typeof(AppRoles), user.UserRole.ToString());
+
                 IdentityResult result = await userManager.CreateAsync(user, user.Password);
 
                 if (result.Succeeded)
                 {
-                    user.SecurityStamp = Guid.NewGuid().ToString();
                     var roles = await userManager.GetRolesAsync(user);
                     var roleResult = await userManager.RemoveFromRolesAsync(user, roles);
                     roleResult = await userManager.AddToRolesAsync(user, new List<string> { user.UserRole.ToString() });
-                    var currentUser = await userManager.GetUserAsync(HttpContext.User);
-                    await signInManager.RefreshSignInAsync(currentUser);
                     if (!user.Active)
                     {
                         var createdUser = await userManager.FindByEmailAsync(user.Email);
@@ -449,6 +448,7 @@ namespace risk.control.system.Controllers
                     user.Comments = applicationUser.Comments;
                     user.PhoneNumber = applicationUser.PhoneNumber;
                     user.UserRole = applicationUser.UserRole;
+                    user.Role = applicationUser.Role != null ? applicationUser.Role : (AppRoles)Enum.Parse(typeof(AppRoles), user.UserRole.ToString());
                     user.UpdatedBy = HttpContext.User?.Identity?.Name;
                     user.SecurityStamp = DateTime.Now.ToString();
                     var result = await userManager.UpdateAsync(user);
@@ -458,8 +458,6 @@ namespace risk.control.system.Controllers
                         var roleResult = await userManager.RemoveFromRolesAsync(user, roles);
                         await userManager.AddToRoleAsync(user, user.UserRole.ToString());
 
-                        var currentUser = await userManager.GetUserAsync(HttpContext.User);
-                        await signInManager.RefreshSignInAsync(currentUser);
                         if (!user.Active)
                         {
                             var createdUser = await userManager.FindByEmailAsync(user.Email);

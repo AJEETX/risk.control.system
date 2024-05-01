@@ -3,6 +3,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 using Microsoft.AspNetCore.Identity;
 
+using risk.control.system.AppConstant;
+
 namespace risk.control.system.Models
 {
     public partial class ApplicationUser : IdentityUser<long>
@@ -73,6 +75,9 @@ namespace risk.control.system.Models
 
         public string? SecretPin { get; set; }
         public string? MobileUId { get; set; }
+
+        public AppRoles? Role { get; set; }
+
     }
 
     public class ApplicationRole : IdentityRole<long>

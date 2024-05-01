@@ -59,6 +59,7 @@ namespace risk.control.system.Seeds
                 PinCodeId = pinCode?.PinCodeId ?? default!,
                 ProfilePictureUrl = COMPANY_ADMIN.PROFILE_IMAGE,
                 ProfilePicture = adminImage,
+                Role = AppRoles.COMPANY_ADMIN,
                 UserRole = CompanyRole.COMPANY_ADMIN,
             };
             if (userManager.Users.All(u => u.Id != clientAdmin.Id))
@@ -123,6 +124,7 @@ namespace risk.control.system.Seeds
                 PinCodeId = pinCode?.PinCodeId ?? default!,
                 ProfilePictureUrl = CREATOR.PROFILE_IMAGE,
                 ProfilePicture = creatorImage,
+                Role = AppRoles.CREATOR,
                 UserRole = CompanyRole.CREATOR,
             };
             if (userManager.Users.All(u => u.Id != clientCreator.Id))
@@ -175,6 +177,7 @@ namespace risk.control.system.Seeds
                 PinCodeId = pinCode?.PinCodeId ?? default!,
                 ProfilePictureUrl = MANAGER.PROFILE_IMAGE,
                 ProfilePicture = managerImage,
+                Role = AppRoles.MANAGER,
                 UserRole = CompanyRole.MANAGER,
             };
             if (userManager.Users.All(u => u.Id != manager.Id))
@@ -228,6 +231,7 @@ namespace risk.control.system.Seeds
                 PinCodeId = pinCode?.PinCodeId ?? default!,
                 ProfilePictureUrl = ASSESSOR.PROFILE_IMAGE,
                 ProfilePicture = assessorImage,
+                Role= AppRoles.ASSESSOR,
                 UserRole = CompanyRole.ASSESSOR,
             };
             if (userManager.Users.All(u => u.Id != clientAssessor.Id))

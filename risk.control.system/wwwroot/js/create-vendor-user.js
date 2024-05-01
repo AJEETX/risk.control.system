@@ -1,15 +1,14 @@
 ﻿$.validator.setDefaults({
     submitHandler: function (form) {
         $.confirm({
-            title: "Confirm  Add User",
+            title: "Confirm Add User",
             content: "Are you sure to add?",
             icon: 'fas fa-user-plus',
-
             type: 'green',
             closeIcon: true,
             buttons: {
                 confirm: {
-                    text: " Add User",
+                    text: "Add User",
                     btnClass: 'btn-success',
                     action: function () {
                         $("body").addClass("submit-progress-bg");

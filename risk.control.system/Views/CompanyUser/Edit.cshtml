@@ -96,7 +96,18 @@
                                             <input type="text" asp-for="Comments" class="form-control remarks" placeholder="Note (optional)" maxlength="20" />
                                         </div>
                                     </div>
-
+                                    <div class="form-group">
+                                        <span class="input-group-label"> Role:</span>
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text" asp-for="ClaimType"><i class="nav-icon fas fa-file-invoice"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                            </div>
+                                            <select required asp-for="@Model.UserRole" class="form-control remarks" asp-items="Html.GetEnumSelectList<CompanyRole>()">
+                                                <option value="">--- SELECT ---</option>
+                                            </select>
+                                            <span asp-validation-for="@Model.UserRole" class="text-danger"></span>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>

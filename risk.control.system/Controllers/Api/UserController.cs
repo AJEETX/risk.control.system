@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
+using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
 
@@ -52,7 +53,7 @@ namespace risk.control.system.Controllers.Api
                         Name = u.FirstName + " " + u.LastName,
                         Email = "<a href=''>" + u.Email + "</a>",
                         Phone = u.PhoneNumber,
-                        Photo = u.ProfilePictureUrl,
+                        Photo = string.IsNullOrWhiteSpace(u.ProfilePictureUrl) ? Applicationsettings.NO_USER : u.ProfilePictureUrl,
                         Active = u.Active,
                         Addressline = u.Addressline,
                         District = u.District.Name,

@@ -174,6 +174,7 @@ namespace risk.control.system.Controllers
                 user.EmailConfirmed = true;
                 user.UserName = userFullEmail;
                 user.Mailbox = new Mailbox { Name = userFullEmail };
+                user.Role = (AppRoles)Enum.Parse(typeof(AppRoles), user.UserRole.ToString());
                 user.Updated = DateTime.Now;
                 user.UpdatedBy = HttpContext.User?.Identity?.Name;
                 IdentityResult result = await userManager.CreateAsync(user, user.Password);
@@ -348,6 +349,8 @@ namespace risk.control.system.Controllers
                 user.UpdatedBy = HttpContext.User?.Identity?.Name;
                 user.SecurityStamp = DateTime.Now.ToString();
                 user.UserRole = applicationUser.UserRole;
+                user.Role = applicationUser.Role != null ? applicationUser.Role : (AppRoles)Enum.Parse(typeof(AppRoles), user.UserRole.ToString());
+
                 var result = await userManager.UpdateAsync(user);
                 if (result.Succeeded)
                 {

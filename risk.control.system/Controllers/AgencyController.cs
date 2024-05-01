@@ -1,5 +1,7 @@
 ﻿using System.Net;
 
+using Amazon.Rekognition.Model;
+
 using AspNetCoreHero.ToastNotification.Abstractions;
 
 using Microsoft.AspNetCore.Identity;
@@ -280,7 +282,7 @@ namespace risk.control.system.Controllers
         [HttpPost]
         [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateUser(VendorApplicationUser user, string emailSuffix)
+        public async Task<IActionResult> CreateUser(VendorApplicationUser user, string emailSuffix, string vendorId, string txn = "agency")
         {
             try
             {
@@ -311,14 +313,15 @@ namespace risk.control.system.Controllers
                 user.Mailbox = new Mailbox { Name = userFullEmail };
                 user.Updated = DateTime.Now;
                 user.UpdatedBy = HttpContext.User?.Identity?.Name;
+                user.Role = user.Role != null ? user.Role : (AppRoles)Enum.Parse(typeof(AppRoles), user.UserRole.ToString());
+
                 IdentityResult result = await userManager.CreateAsync(user, user.Password);
                 if (result.Succeeded)
                 {
                     var roles = await userManager.GetRolesAsync(user);
                     var roleResult = await userManager.RemoveFromRolesAsync(user, roles);
                     roleResult = await userManager.AddToRolesAsync(user, new List<string> { user.UserRole.ToString() });
-                    var currentUser = await userManager.GetUserAsync(HttpContext.User);
-                    await signInManager.RefreshSignInAsync(currentUser);
+                    
                     if (!user.Active)
                     {
                         var createdUser = await userManager.FindByEmailAsync(user.Email);
@@ -329,15 +332,28 @@ namespace risk.control.system.Controllers
                         {
                             notifyService.Custom($"User created and locked.", 3, "orange", "fas fa-user-lock");
                             var response = SmsService.SendSingleMessage(user.PhoneNumber, "Agency user created and locked. Email : " + user.Email);
-
-                            return RedirectToAction(nameof(AgencyController.User), "Agency");
+                            if(txn =="agency")
+                            {
+                                return RedirectToAction(nameof(AgencyController.User), "Agency");
+                            }
+                            else
+                            {
+                                return RedirectToAction(nameof(VendorsController.Users), "Vendors", new { id = vendorId });
+                            }
                         }
                     }
                     else
                     {
                         notifyService.Custom($"User created successfully.", 3, "green", "fas fa-user-plus");
                         var response = SmsService.SendSingleMessage(user.PhoneNumber, "Agency user created. Email : " + user.Email);
-                        return RedirectToAction(nameof(AgencyController.User), "Agency");
+                        if (txn == "agency")
+                        {
+                            return RedirectToAction(nameof(AgencyController.User), "Agency");
+                        }
+                        else
+                        {
+                            return RedirectToAction(nameof(VendorsController.Users), "Vendors", new { id = vendorId });
+                        }
                     }
                 }
                 else
@@ -349,7 +365,7 @@ namespace risk.control.system.Controllers
                 notifyService.Custom($"Error to create user.", 3, "red", "fas fa-user-plus");
                 return View(user);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -474,6 +490,8 @@ namespace risk.control.system.Controllers
                     user.UpdatedBy = HttpContext.User?.Identity?.Name;
                     user.SecurityStamp = DateTime.Now.ToString();
                     user.UserRole = applicationUser.UserRole;
+                    user.Role = applicationUser.Role != null ? applicationUser.Role : (AppRoles)Enum.Parse(typeof(AppRoles), user.UserRole.ToString());
+
                     var result = await userManager.UpdateAsync(user);
                     if (result.Succeeded)
                     {
