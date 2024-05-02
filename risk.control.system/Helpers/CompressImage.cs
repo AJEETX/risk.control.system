@@ -167,6 +167,57 @@ namespace risk.control.system.Helpers
             return imageOutByte;
         }
 
+        public static byte[] ProcessCompressBlur(byte[] imageByte, float cornerRadius = 10, int quality = 99)
+        {
+            using var stream = new MemoryStream(imageByte);
+            using var image = SixLabors.ImageSharp.Image.Load(stream);
+            float maxHeight = 1800.0f;
+            float maxWidth = 1800.0f;
+            float newWidth;
+            float newHeight;
+
+            if (image.Width > maxWidth || image.Height > maxHeight)
+            {
+                // To preserve the aspect ratio
+                float ratioX = (float)maxWidth / (float)image.Width;
+                float ratioY = (float)maxHeight / (float)image.Height;
+                float ratio = Math.Min(ratioX, ratioY);
+                newWidth = (image.Width * ratio);
+                newHeight = (image.Height * ratio);
+            }
+            else
+            {
+                newWidth = (int)image.Width;
+                newHeight = (int)image.Height;
+            }
+
+            image.Mutate(x => x.Resize(image.Width / 2, image.Height / 2, KnownResamplers.Triangle));
+            var encoder = new JpegEncoder
+            {
+                Quality = quality, // Adjust this value for desired compression quality
+            };
+
+            //using var roundImage = image.Clone(x => x.ConvertToAvatar(new Size(image.Width, image.Height), cornerRadius));
+
+            Font font = SixLabors.Fonts.SystemFonts.CreateFont("Arial", 1, SixLabors.Fonts.FontStyle.Bold);
+
+            // The options are optional
+            RichTextOptions options = new(font)
+            {
+                Origin = new PointF(500, 100), // Set the rendering origin.
+                TabWidth = 1, // A tab renders as 8 spaces wide
+                WrappingLength = 0, // Greater than zero so we will word wrap at 100 pixels wide
+                HorizontalAlignment = HorizontalAlignment.Left // Right align
+            };
+
+            using var waterMarkedImage = image.Clone(ctx => ctx.ApplyScalingWaterMarkSimple(font, "XXXXXXXXXX", Color.Black, 5));
+
+            using MemoryStream streamOut = new MemoryStream();
+
+            waterMarkedImage.Save(streamOut, encoder);
+            var imageOutByte = streamOut.ToArray();
+            return imageOutByte;
+        }
         public static byte[] ProcessCompress(byte[] imageByte, float cornerRadius = 10, int quality = 99)
         {
             using var stream = new MemoryStream(imageByte);

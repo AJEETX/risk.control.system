@@ -85,7 +85,7 @@ namespace risk.control.system.Models
         public string? RapidAPIPanRemainCount { get; set; }
         public bool SendSMS { get; set; } = false;
         public bool CanChangePassword { get; set; } = false;
-        public string MobileAppUrl { get; set; } = "https://apkichck.s3.ap-southeast-2.amazonaws.com/ichck/app-release_20240704-013754_dev.apk";
+        public string MobileAppUrl { get; set; } = "https://apkichck.s3.ap-southeast-2.amazonaws.com/icheckify/app-release.apk";
         public bool BulkUpload { get; set; } = false;
         public string WhitelistIpAddress { get; set; } = "::1;202.7.251.71";
         public string? WhitelistIpAddressRange { get; set; } = default!;

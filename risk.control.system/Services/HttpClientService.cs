@@ -69,6 +69,8 @@ namespace risk.control.system.Services
 
                 return maskedImageDetail;
             }
+            var error = await response.Content.ReadAsStringAsync();
+
             return null;
         }
 

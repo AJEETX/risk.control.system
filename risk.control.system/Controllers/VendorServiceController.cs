@@ -287,7 +287,7 @@ namespace risk.control.system.Controllers
                 vendorInvestigationServiceType.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.VendorInvestigationServiceType.Remove(vendorInvestigationServiceType);
                 await _context.SaveChangesAsync();
-                notifyService.Custom($"Service deleted successfully.", 3, "red", "fas fa-truck");
+                notifyService.Custom($"Service deleted successfully.", 3, "blue", "fas fa-truck");
                 return RedirectToAction("Details", "Vendors", new { id = vendorInvestigationServiceType.VendorId });
             }
             notifyService.Error($"Err Service delete.", 3);

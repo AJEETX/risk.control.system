@@ -9,6 +9,7 @@ using risk.control.system.Controllers.Api;
 using risk.control.system.Data;
 using risk.control.system.AppConstant;
 using System.IO;
+using Tesseract;
 
 namespace risk.control.system.Services
 {
@@ -46,7 +47,7 @@ namespace risk.control.system.Services
                 return false;
             }
 
-            company.WhitelistIpAddress += ";"+ request.IpAddress;
+            company.WhitelistIpAddress += ";" + request.IpAddress;
             _context.ClientCompany.Update(company);
             await _context.SaveChangesAsync();
             return true;
@@ -101,7 +102,7 @@ namespace risk.control.system.Services
                 {
                     if (registeredImage != null)
                     {
-                        var image = Convert.FromBase64String(data.LocationImage);
+                        var face2Verify = Convert.FromBase64String(data.LocationImage);
 
                         //using MemoryStream stream = new MemoryStream(image);
                         //string path = Path.Combine(webHostEnvironment.WebRootPath, "verify");
@@ -116,21 +117,30 @@ namespace risk.control.system.Services
 
                         //var savedImage = await File.ReadAllBytesAsync(filePath);
 
-                        var savedImage = ImageCompression.ConverterSkia(image);
+                        //var savedImage = ImageCompression.ConverterSkia(image);
 
-                        var saveImageBase64String = Convert.ToBase64String(savedImage);
+                        //var saveImageBase64String = Convert.ToBase64String(savedImage);
 
                         claimCase.ClaimReport.DigitalIdReport.DigitalIdImageLongLatTime = DateTime.Now;
 
-                        var base64Image = Convert.ToBase64String(registeredImage);
+                        //var base64Image = Convert.ToBase64String(registeredImage);
 
                         try
                         {
-                            var faceImageDetail = await httpClientService.GetFaceMatch(new MatchImage { Source = base64Image, Dest = saveImageBase64String }, company.ApiBaseUrl);
 
-                            claimCase.ClaimReport.DigitalIdReport.DigitalIdImage = CompressImage.ProcessCompress(image);
+                            claimCase.ClaimReport.DigitalIdReport.DigitalIdImage = CompressImage.ProcessCompress(face2Verify);
+                            var matched = await CompareFaces.Do(registeredImage, face2Verify);
 
-                            claimCase.ClaimReport.DigitalIdReport.DigitalIdImageMatchConfidence = faceImageDetail?.Confidence;
+                            //var faceImageDetail = await httpClientService.GetFaceMatch(new MatchImage { Source = base64Image, Dest = saveImageBase64String }, company.ApiBaseUrl);
+
+                            if (matched)
+                            {
+                                claimCase.ClaimReport.DigitalIdReport.DigitalIdImageMatchConfidence = "99";
+                            }
+                            else
+                            {
+                                claimCase.ClaimReport.DigitalIdReport.DigitalIdImageMatchConfidence = string.Empty;
+                            }
                         }
                         catch (Exception)
                         {
@@ -266,6 +276,62 @@ namespace risk.control.system.Services
             {
                 var byteimage = Convert.FromBase64String(data.OcrImage);
 
+                //var engine = new TesseractEngine(Path.Combine(webHostEnvironment.WebRootPath), "eng");
+                //var image2Process = Pix.LoadFromMemory(byteimage);
+
+                //var lstOcrData = new List<string>();
+                //using (var pager = engine.Process(image2Process))
+                //{
+                //    var textData = pager.GetText();
+                //    Console.WriteLine("Mean confidence: {0}", pager.GetMeanConfidence());
+
+                //    Console.WriteLine("Text (GetText): \r\n{0}", textData);
+                //    Console.WriteLine("Text (iterator):");
+                //    using (var iter = pager.GetIterator())
+                //    {
+                //        iter.Begin();
+
+                //        do
+                //        {
+                //            do
+                //            {
+                //                do
+                //                {
+                //                    do
+                //                    {
+                //                        if (iter.IsAtBeginningOf(PageIteratorLevel.Block))
+                //                        {
+                //                            Console.WriteLine("<BLOCK>");
+                //                        }
+                //                        lstOcrData.Add(iter.GetText(PageIteratorLevel.Word));
+                //                        //Console.Write(iter.GetText(PageIteratorLevel.Word));
+                //                        Console.Write(" ");
+
+                //                        if (iter.IsAtFinalOf(PageIteratorLevel.TextLine, PageIteratorLevel.Word))
+                //                        {
+                //                            Console.WriteLine();
+                //                        }
+                //                    } while (iter.Next(PageIteratorLevel.TextLine, PageIteratorLevel.Word));
+
+                //                    if (iter.IsAtFinalOf(PageIteratorLevel.Para, PageIteratorLevel.TextLine))
+                //                    {
+                //                        Console.WriteLine();
+                //                    }
+                //                } while (iter.Next(PageIteratorLevel.Para, PageIteratorLevel.TextLine));
+                //            } while (iter.Next(PageIteratorLevel.Block, PageIteratorLevel.Para));
+                //        } while (iter.Next(PageIteratorLevel.Block));
+                //    }
+                //}
+
+                //var page = engine.Process(image2Process);
+
+                //var text = page.GetText();
+                //var txt2Find = "Permanent Account Number";
+                //var indexOfPanNumber = text.IndexOf(txt2Find);
+                //var panSub = text.Substring(indexOfPanNumber + txt2Find.Length, 13).Trim();
+
+
+
                 //MemoryStream stream = new MemoryStream(byteimage);
                 //string path = Path.Combine(webHostEnvironment.WebRootPath, "verify");
                 //if (!Directory.Exists(path))
@@ -278,6 +344,18 @@ namespace risk.control.system.Services
                 //claimCase.ClaimReport.DocumentIdReport.DocumentIdImagePath = mfilePath;
 
                 //var savedImage = await File.ReadAllBytesAsync(mfilePath);
+
+                //var base64Image = Convert.ToBase64String(savedImage);
+
+                //var processPAN = CompressImage.ProcessCompressBlur(byteimage);
+                //var maskedImage = new FaceImageDetail
+                //{
+                //    DocType = indexOfPanNumber > 0 ? "PAN" : String.Empty,
+                //    DocumentId = panSub,
+                //    MaskedImage = Convert.ToBase64String(processPAN),       //TO-DO,
+                //    OcrData =string.Join(",",lstOcrData)
+                //};
+
                 var savedImage = ImageCompression.ConverterSkia(byteimage);
 
                 var base64Image = Convert.ToBase64String(savedImage);
@@ -355,7 +433,7 @@ namespace risk.control.system.Services
                     var image = Convert.FromBase64String(data.OcrImage);
 
                     claimCase.ClaimReport.DocumentIdReport.DocumentIdImage = image;
-
+                    claimCase.ClaimReport.DocumentIdReport.DocumentIdImageValid = false;
                     claimCase.ClaimReport.DocumentIdReport.DocumentIdImageLongLatTime = DateTime.Now;
                     claimCase.ClaimReport.DocumentIdReport.DocumentIdImageData = "no data: ";
                 }

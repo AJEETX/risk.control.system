@@ -885,11 +885,13 @@ namespace risk.control.system.Controllers
                     vendorInvestigationServiceType.Updated = DateTime.Now;
                     vendorInvestigationServiceType.UpdatedBy = HttpContext.User?.Identity?.Name;
                     _context.VendorInvestigationServiceType.Remove(vendorInvestigationServiceType);
+                    await _context.SaveChangesAsync();
+                    notifyService.Custom($"Service deleted successfully.", 3, "blue", "fas fa-truck");
+                    return RedirectToAction("Service", "Agency");
                 }
-
-                await _context.SaveChangesAsync();
-                notifyService.Error($"Service deleted successfully.", 3);
+                notifyService.Error($"Err Service delete.", 3);
                 return RedirectToAction("Service", "Agency");
+
             }
             catch (Exception)
             {
