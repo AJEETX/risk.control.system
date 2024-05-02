@@ -71,6 +71,7 @@ namespace risk.control.system.Helpers
             return maskedbyteImage;
 
         }
+
         private static SKBitmap CreateTextMask(int width, int height, string text, SKTypeface typeface, float textSize)
         {
             SKBitmap mask = new SKBitmap(width, height);

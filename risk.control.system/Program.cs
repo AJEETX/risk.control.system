@@ -96,6 +96,8 @@ builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddScoped<IFtpService, FtpService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IMailboxService, MailboxService>();
+builder.Services.AddScoped<IGoogleApi, GoogleApi>();
+builder.Services.AddScoped<IGoogleMaskHelper, GoogleMaskHelper>();
 
 builder.Services.AddScoped<IInboxMailService, InboxMailService>();
 builder.Services.AddScoped<ISentMailService, SentMailService>();

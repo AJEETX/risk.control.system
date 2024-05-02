@@ -23,4 +23,5 @@ public class TextDetection
         var response = await textractClient.DetectDocumentTextAsync(request);
         return response.Blocks;
     }
+
 }

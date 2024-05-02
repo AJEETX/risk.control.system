@@ -9,7 +9,8 @@ using risk.control.system.Controllers.Api;
 using risk.control.system.Data;
 using risk.control.system.AppConstant;
 using System.IO;
-using Tesseract;
+using Amazon.Textract;
+using System.Xml;
 
 namespace risk.control.system.Services
 {
@@ -29,14 +30,18 @@ namespace risk.control.system.Services
     {
         private static string txt2Find = "Permanent Account Number";
         private readonly ApplicationDbContext _context;
+        private readonly IGoogleApi googleApi;
+        private readonly IGoogleMaskHelper googleHelper;
         private readonly IHttpClientService httpClientService;
         private readonly IWebHostEnvironment webHostEnvironment;
         private static HttpClient httpClient = new();
 
         //test PAN FNLPM8635N
-        public ICheckifyService(ApplicationDbContext context, IHttpClientService httpClientService, IWebHostEnvironment webHostEnvironment)
+        public ICheckifyService(ApplicationDbContext context, IGoogleApi googleApi, IGoogleMaskHelper googleHelper, IHttpClientService httpClientService, IWebHostEnvironment webHostEnvironment)
         {
             this._context = context;
+            this.googleApi = googleApi;
+            this.googleHelper = googleHelper;
             this.httpClientService = httpClientService;
             this.webHostEnvironment = webHostEnvironment;
         }
@@ -129,7 +134,6 @@ namespace risk.control.system.Services
                         try
                         {
 
-                            claimCase.ClaimReport.DigitalIdReport.DigitalIdImage = CompressImage.ProcessCompress(face2Verify);
                             var matched = await CompareFaces.Do(registeredImage, face2Verify);
 
                             //var faceImageDetail = await httpClientService.GetFaceMatch(new MatchImage { Source = base64Image, Dest = saveImageBase64String }, company.ApiBaseUrl);
@@ -142,6 +146,8 @@ namespace risk.control.system.Services
                             {
                                 claimCase.ClaimReport.DigitalIdReport.DigitalIdImageMatchConfidence = string.Empty;
                             }
+                            claimCase.ClaimReport.DigitalIdReport.DigitalIdImage = CompressImage.ProcessCompress(face2Verify);
+
                         }
                         catch (Exception)
                         {
@@ -354,33 +360,52 @@ namespace risk.control.system.Services
 
                 var byteimage = Convert.FromBase64String(data.OcrImage);
 
-                var blocks = await TextDetection.ExtractTextDataAsync(byteimage);
-                var maskedImagez = SkiaSharpHelper.MaskTextInImage(byteimage, blocks);
-                var hasPanLabel = blocks[9].Text == txt2Find;
+                //=================GOOGLE VISION API =========================
 
-                var firstblockWord = blocks[1].Text.Split(" ");
+                var imageReadOnly = await googleApi.DetectTextAsync(byteimage);
 
-                var textReq = string.Join("\n", blocks.Select(b => b.Text)?.ToList());
+                var allPanText = imageReadOnly.FirstOrDefault().Description;
 
-                var endIndex = textReq.IndexOf(firstblockWord.First(), firstblockWord.First().Length + 1);
+                var panTextPre = allPanText.IndexOf(txt2Find);
 
-                string filteredPanText = textReq;
+                var panNumber = allPanText.Substring(panTextPre + txt2Find.Length + 1, 11);
 
-                if(endIndex > 0 && textReq.Length > endIndex)
-                {
-                    filteredPanText = textReq.Substring(0, endIndex);
 
-                }
+                var ocrImaged = googleHelper.MaskTextInImage(byteimage, imageReadOnly);
+                //=================END GOOGLE VISION  API =========================
+
+
+                //=================AMAZON API =========================
+                //var blocks = await TextDetection.ExtractTextDataAsync(byteimage);
+                //var maskedImagez = SkiaSharpHelper.MaskTextInImage(byteimage, blocks);
+                //var hasPanLabel = blocks[9].Text == txt2Find;
+
+                //var firstblockWord = blocks.FirstOrDefault(b=>b.BlockType == BlockType.WORD).Text.Split(" ");
+
+                //var textReq = string.Join("\n", blocks.Select(b => b.Text)?.ToList());
+
+                //var endIndex = textReq.IndexOf(firstblockWord.First(), firstblockWord.First().Length + 1);
+
+                //string filteredPanText = textReq;
+
+                //if(endIndex > 0 && textReq.Length > endIndex)
+                //{
+                //    filteredPanText = textReq.Substring(0, endIndex);
+
+                //}
+
+
+                //=================END AMAZON API =========================
 
                 var maskedImage = new FaceImageDetail
                 {
-                    DocType = blocks[9].Text == txt2Find ? "PAN" : "UNKNOWN",
-                    DocumentId = blocks[10].Text,
-                    MaskedImage = Convert.ToBase64String(maskedImagez),       //TO-DO,
-                    OcrData = filteredPanText
+                    DocType = allPanText.IndexOf(txt2Find) > 0 && allPanText.Length > allPanText.IndexOf(txt2Find) ? "PAN" : "UNKNOWN",
+                    DocumentId = panNumber,
+                    MaskedImage = Convert.ToBase64String(ocrImaged),       //TO-DO,
+                    OcrData = allPanText
                 };
 
-               
+
 
                 if (maskedImage != null)
                 {

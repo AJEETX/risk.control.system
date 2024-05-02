@@ -390,8 +390,8 @@ namespace risk.control.system.Services
                                             CurrentClaimOwner = userEmail,
                                             HopCount = 0,
                                             Time2Update = 0,
-                                            InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INITIATED).InvestigationCaseStatusId,
-                                            InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR).InvestigationCaseSubStatusId,
+                                            InvestigationCaseStatusId = status.InvestigationCaseStatusId,
+                                            InvestigationCaseSubStatusId = subStatus.InvestigationCaseSubStatusId,
                                             UpdatedBy = userEmail
                                         };
                                         _context.InvestigationTransaction.Add(log);
