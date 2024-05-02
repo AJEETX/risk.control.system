@@ -298,7 +298,7 @@ namespace risk.control.system.Services
                     );
             claimCase.ClaimReport.AgentEmail = userEmail;
 
-            if (!claimsInvestigation.IsReviewCase && !claimCase.IsReviewCaseLocation && claimCase.ClaimReport.DigitalIdReport?.DigitalIdImageLongLat != null)
+            if (claimCase.ClaimReport.DigitalIdReport?.DigitalIdImageLongLat != null)
             {
                 var longLat = claimCase.ClaimReport.DigitalIdReport.DigitalIdImageLongLat.IndexOf("/");
                 var latitude = claimCase.ClaimReport.DigitalIdReport.DigitalIdImageLongLat.Substring(0, longLat)?.Trim();

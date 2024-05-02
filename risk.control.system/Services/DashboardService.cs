@@ -130,7 +130,7 @@ namespace risk.control.system.Services
         {
 
             var claimsAssessor = GetManagerAssess(userEmail);
-            var claimsReview = GetManagerReview(userEmail);
+            //var claimsReview = GetManagerReview(userEmail);
             var claimsReject = GetManagerReject(userEmail);
             var claimsCompleted = GetCompanyManagerCompleted(userEmail);
             var actives = GetManagerActive(userEmail);
@@ -140,9 +140,9 @@ namespace risk.control.system.Services
             data.FirstBlockCount = claimsAssessor.Count;
             data.FirstBlockUrl = "/ClaimsInvestigation/Manager";
 
-            data.SecondBlockName = "Review";
-            data.SecondBlockCount = claimsReview.Count;
-            data.SecondBlockUrl = "/ClaimsInvestigation/ManagerReview";
+            //data.SecondBlockName = "Review";
+            //data.SecondBlockCount = claimsReview.Count;
+            //data.SecondBlockUrl = "/ClaimsInvestigation/ManagerReview";
 
             data.SecondBBlockName = "Active";
             data.SecondBBlockUrl = "/ClaimsInvestigation/ManagerActive";

@@ -27,6 +27,7 @@ namespace risk.control.system.Services
 
     public class ICheckifyService : IICheckifyService
     {
+        private static string txt2Find = "Permanent Account Number";
         private readonly ApplicationDbContext _context;
         private readonly IHttpClientService httpClientService;
         private readonly IWebHostEnvironment webHostEnvironment;
@@ -326,12 +327,11 @@ namespace risk.control.system.Services
                 //var page = engine.Process(image2Process);
 
                 //var text = page.GetText();
-                //var txt2Find = "Permanent Account Number";
                 //var indexOfPanNumber = text.IndexOf(txt2Find);
                 //var panSub = text.Substring(indexOfPanNumber + txt2Find.Length, 13).Trim();
 
-
-
+                var blocks =await TextDetection.ExtractTextDataAsync(byteimage);
+                var maskedImagez = SkiaSharpHelper.MaskTextInImage(byteimage, blocks);
                 //MemoryStream stream = new MemoryStream(byteimage);
                 //string path = Path.Combine(webHostEnvironment.WebRootPath, "verify");
                 //if (!Directory.Exists(path))
@@ -347,21 +347,24 @@ namespace risk.control.system.Services
 
                 //var base64Image = Convert.ToBase64String(savedImage);
 
-                //var processPAN = CompressImage.ProcessCompressBlur(byteimage);
-                //var maskedImage = new FaceImageDetail
-                //{
-                //    DocType = indexOfPanNumber > 0 ? "PAN" : String.Empty,
-                //    DocumentId = panSub,
-                //    MaskedImage = Convert.ToBase64String(processPAN),       //TO-DO,
-                //    OcrData =string.Join(",",lstOcrData)
-                //};
+                //var processPAN = SkiaSharpHelper.GetMaskedImage(byteimage);
+                var hasPanLabel = blocks[9].Text == txt2Find;
+
+
+                var maskedImage = new FaceImageDetail
+                {
+                    DocType = blocks[9].Text == txt2Find ? "PAN" : "UNKNOWN",
+                    DocumentId = blocks[10].Text,
+                    MaskedImage = Convert.ToBase64String(maskedImagez),       //TO-DO,
+                    OcrData = string.Join(",", blocks.Select(b => b.Text)?.ToList())
+                };
 
                 var savedImage = ImageCompression.ConverterSkia(byteimage);
 
                 var base64Image = Convert.ToBase64String(savedImage);
                 var inputImage = new MaskImage { Image = base64Image };
 
-                var maskedImage = await httpClientService.GetMaskedImage(inputImage, company.ApiBaseUrl);
+                //var maskedImage = await httpClientService.GetMaskedImage(inputImage, company.ApiBaseUrl);
 
                 if (maskedImage != null)
                 {
@@ -415,7 +418,7 @@ namespace risk.control.system.Services
 
                         if (!string.IsNullOrWhiteSpace(maskedImage.OcrData))
                         {
-                            claimCase.ClaimReport.DocumentIdReport.DocumentIdImageData = claimCase.ClaimReport.DocumentIdReport.DocumentIdImageData + ". \r\n " +
+                            claimCase.ClaimReport.DocumentIdReport.DocumentIdImageData = maskedImage.DocType + " data:. \r\n " +
                                 "" + maskedImage.OcrData.Replace(maskedImage.DocumentId, "xxxxxxxxxx");
                         }
                     }
