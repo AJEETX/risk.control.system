@@ -275,8 +275,6 @@ namespace risk.control.system.Services
 
             if (!string.IsNullOrWhiteSpace(data.OcrImage))
             {
-                var byteimage = Convert.FromBase64String(data.OcrImage);
-
                 //var engine = new TesseractEngine(Path.Combine(webHostEnvironment.WebRootPath), "eng");
                 //var image2Process = Pix.LoadFromMemory(byteimage);
 
@@ -330,8 +328,6 @@ namespace risk.control.system.Services
                 //var indexOfPanNumber = text.IndexOf(txt2Find);
                 //var panSub = text.Substring(indexOfPanNumber + txt2Find.Length, 13).Trim();
 
-                var blocks =await TextDetection.ExtractTextDataAsync(byteimage);
-                var maskedImagez = SkiaSharpHelper.MaskTextInImage(byteimage, blocks);
                 //MemoryStream stream = new MemoryStream(byteimage);
                 //string path = Path.Combine(webHostEnvironment.WebRootPath, "verify");
                 //if (!Directory.Exists(path))
@@ -348,23 +344,43 @@ namespace risk.control.system.Services
                 //var base64Image = Convert.ToBase64String(savedImage);
 
                 //var processPAN = SkiaSharpHelper.GetMaskedImage(byteimage);
+
+                //var savedImage = ImageCompression.ConverterSkia(byteimage);
+
+                //var base64Image = Convert.ToBase64String(savedImage);
+                //var inputImage = new MaskImage { Image = base64Image };
+
+                //var maskedImage = await httpClientService.GetMaskedImage(inputImage, company.ApiBaseUrl);
+
+                var byteimage = Convert.FromBase64String(data.OcrImage);
+
+                var blocks = await TextDetection.ExtractTextDataAsync(byteimage);
+                var maskedImagez = SkiaSharpHelper.MaskTextInImage(byteimage, blocks);
                 var hasPanLabel = blocks[9].Text == txt2Find;
 
+                var firstblockWord = blocks[1].Text.Split(" ");
+
+                var textReq = string.Join("\n", blocks.Select(b => b.Text)?.ToList());
+
+                var endIndex = textReq.IndexOf(firstblockWord.First(), firstblockWord.First().Length + 1);
+
+                string filteredPanText = textReq;
+
+                if(endIndex > 0 && textReq.Length > endIndex)
+                {
+                    filteredPanText = textReq.Substring(0, endIndex);
+
+                }
 
                 var maskedImage = new FaceImageDetail
                 {
                     DocType = blocks[9].Text == txt2Find ? "PAN" : "UNKNOWN",
                     DocumentId = blocks[10].Text,
                     MaskedImage = Convert.ToBase64String(maskedImagez),       //TO-DO,
-                    OcrData = string.Join(",", blocks.Select(b => b.Text)?.ToList())
+                    OcrData = filteredPanText
                 };
 
-                var savedImage = ImageCompression.ConverterSkia(byteimage);
-
-                var base64Image = Convert.ToBase64String(savedImage);
-                var inputImage = new MaskImage { Image = base64Image };
-
-                //var maskedImage = await httpClientService.GetMaskedImage(inputImage, company.ApiBaseUrl);
+               
 
                 if (maskedImage != null)
                 {
