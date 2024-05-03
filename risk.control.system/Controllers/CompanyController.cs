@@ -175,6 +175,9 @@ namespace risk.control.system.Controllers
                     notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
+
+                var existCompany = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
+
                 IFormFile? companyDocument = Request.Form?.Files?.FirstOrDefault();
                 if (companyDocument is not null)
                 {
@@ -188,25 +191,28 @@ namespace risk.control.system.Controllers
                     }
                     var upload = Path.Combine(webHostEnvironment.WebRootPath, "company", newFileName);
                     companyDocument.CopyTo(new FileStream(upload, FileMode.Create));
-                    clientCompany.DocumentUrl = "/company/" + newFileName;
+                    existCompany.DocumentUrl = "/company/" + newFileName;
                     using var dataStream = new MemoryStream();
                     companyDocument.CopyTo(dataStream);
-                    clientCompany.DocumentImage = dataStream.ToArray();
+                    existCompany.DocumentImage = dataStream.ToArray();
                 }
-                else
-                {
-                    var existingClientCompany = _context.ClientCompany.AsNoTracking().FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
-                    if (existingClientCompany.DocumentUrl != null || existingClientCompany.DocumentUrl != null)
-                    {
-                        clientCompany.DocumentImage = existingClientCompany.DocumentImage;
-                        clientCompany.DocumentUrl = existingClientCompany.DocumentUrl;
-                    }
-                }
+                existCompany.CountryId = clientCompany.CountryId;
+                existCompany.StateId = clientCompany.StateId;
+                existCompany.DistrictId = clientCompany.DistrictId;
+                existCompany.PinCodeId = clientCompany.PinCodeId;
+                existCompany.Name = clientCompany.Name;
+                existCompany.Code = clientCompany.Code;
+                existCompany.PhoneNumber = clientCompany.PhoneNumber;
+                existCompany.Branch = clientCompany.Branch;
+                existCompany.BankName = clientCompany.BankName;
+                existCompany.BankAccountNumber =   clientCompany.BankAccountNumber;
+                existCompany.IFSCCode =   clientCompany.IFSCCode;
+                existCompany.Addressline =   clientCompany.Addressline;
+                existCompany.Description =   clientCompany.Description;
 
-                clientCompany.Updated = DateTime.Now;
-                clientCompany.UpdatedBy = HttpContext.User?.Identity?.Name;
-                _context.ChangeTracker.Clear();
-                _context.ClientCompany.Update(clientCompany);
+                existCompany.Updated = DateTime.Now;
+                existCompany.UpdatedBy = HttpContext.User?.Identity?.Name;
+                _context.ClientCompany.Update(existCompany);
                 await _context.SaveChangesAsync();
 
                 var response = SmsService.SendSingleMessage(clientCompany.PhoneNumber, "Company edited. Domain : " + clientCompany.Email);

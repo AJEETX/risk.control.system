@@ -50,43 +50,8 @@ namespace risk.control.system.Controllers
 
         public async Task<IActionResult> Index(long id)
         {
-            var companyUsers = _context.ClientCompanyApplicationUser
-                .Include(c => c.Country)
-                .Include(c => c.State)
-                .Include(c => c.District)
-                .Include(c => c.PinCode)
-                .Include(c => c.ClientCompany)
-                .Where(u => u.ClientCompanyId == id);
-
             var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == id);
-            foreach (var user in companyUsers)
-            {
-                var country = _context.Country.FirstOrDefault(c => c.CountryId == user.CountryId);
-                var state = _context.State.FirstOrDefault(c => c.StateId == user.StateId);
-                var district = _context.District.FirstOrDefault(c => c.DistrictId == user.DistrictId);
-                var pinCode = _context.PinCode.FirstOrDefault(c => c.PinCodeId == user.PinCodeId);
-
-                var thisViewModel = new UsersViewModel();
-                thisViewModel.UserId = user.Id.ToString();
-                thisViewModel.Email = user?.Email;
-                thisViewModel.UserName = user?.UserName;
-                thisViewModel.ProfileImage = user?.ProfilePictureUrl ?? Applicationsettings.NO_IMAGE;
-                thisViewModel.FirstName = user.FirstName;
-                thisViewModel.LastName = user.LastName;
-                thisViewModel.Addressline = user.Addressline;
-                thisViewModel.PhoneNumber = user.PhoneNumber;
-                thisViewModel.Country = country.Name;
-                thisViewModel.CountryId = user.CountryId;
-                thisViewModel.StateId = user.StateId;
-                thisViewModel.State = state.Name;
-                thisViewModel.PinCode = pinCode.Name + "-" + pinCode.Code;
-                thisViewModel.PinCodeId = pinCode.PinCodeId;
-                thisViewModel.CompanyName = user.ClientCompany.Name;
-                thisViewModel.CompanyId = user.ClientCompanyId.Value;
-                thisViewModel.ProfileImageInByte = user.ProfilePicture;
-                thisViewModel.Roles = await GetUserRoles(user);
-                UserList.Add(thisViewModel);
-            }
+           
             var model = new CompanyUsersViewModel
             {
                 Company = company,

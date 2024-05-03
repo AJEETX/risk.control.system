@@ -22,7 +22,7 @@
                             <h3 class="card-title"><i class="fas fa-building"></i> <span class="badge badge-light"> Company Detail</span></h3>
 
                             <div class="card-tools">
-                                <span data-toggle="tooltip" title="Company Profile @Model.Name" class="badge badge-light"><i class="fas fa-building"></i></span>
+                                <span data-toggle="tooltip" title="Company Profile @Model.Name" class="badge badge-light">  <i class='far fa-hand-point-right'></i> </span>
                                 <button type="button" class="btn btn-tool" data-card-widget="collapse">
                                     <i class="fas fa-plus"></i>
                                 </button>
@@ -43,27 +43,7 @@
                                             <input readonly asp-for="Email" class="form-control remarks" />
                                         </div>
                                     </div>
-                                    <div class="form-group">
-                                        <span class="input-group-label"> Agreement Date: </span>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text" id="AgreementDate"><i class="far fa-calendar-check"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                            </div>
-                                            <input readonly type="text" asp-for="AgreementDate" class="form-control remarks" required placeholder="Agreement Date">
-                                            <span asp-validation-for="AgreementDate" class="text-danger"></span>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <span class="input-group-label"> Activated Date: </span>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text" id="ActivatedDate"> <i class="fas fa-calendar-check"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                            </div>
-                                            <input readonly type="text" asp-for="ActivatedDate" class="form-control remarks" required placeholder="Activated Date">
-                                            <span asp-validation-for="ActivatedDate" class="text-danger"></span>
-                                        </div>
-                                    </div>
+                                    
                                     <div class="form-group">
                                         <span class="input-group-label"> Document: </span>
                                         <div class="input-group mb-3">
@@ -134,10 +114,6 @@
                                         </div>
                                     </div>
 
-
-                                </div>
-                                <div class="col-sm-6">
-
                                     <div class="form-group">
                                         <span class="input-group-label"> Bank Account #: </span>
                                         <div class="input-group mb-3">
@@ -157,6 +133,30 @@
                                             </div>
                                             <input type="text" asp-for="IFSCCode" class="form-control remarks asterikx" required placeholder="IFSC Code" maxlength="20">
                                             <span asp-validation-for="IFSCCode" class="text-danger"></span>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <span class="input-group-label"> Agreement Date: </span>
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text" id="AgreementDate"><i class="far fa-calendar-check"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                            </div>
+                                            <input readonly type="text" asp-for="AgreementDate" class="form-control remarks" required placeholder="Agreement Date">
+                                            <span asp-validation-for="AgreementDate" class="text-danger"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <span class="input-group-label"> Activated Date: </span>
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text" id="ActivatedDate"> <i class="fas fa-calendar-check"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                            </div>
+                                            <input readonly type="text" asp-for="ActivatedDate" class="form-control remarks" required placeholder="Activated Date">
+                                            <span asp-validation-for="ActivatedDate" class="text-danger"></span>
                                         </div>
                                     </div>
 
@@ -247,10 +247,10 @@
                     <div class="card card-light expand-card">
 
                         <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-sitemap"></i> <span class="badge badge-light"> Api Detail</span></h3>
+                            <h3 class="card-title"><i class="fas fa-sitemap"></i> <span class="badge badge-light"> Config Detail</span></h3>
 
                             <div class="card-tools">
-                                <span data-toggle="tooltip" title="Company Api Detail" class="badge badge-light"><i class="fas fa-sitemap"></i></span>
+                                <span data-toggle="tooltip" title="Company Api Detail" class="badge badge-light">  <i class='far fa-hand-point-right'></i> </span>
                                 <button type="button" class="btn btn-tool" data-card-widget="collapse">
                                     <i class="fas fa-minus"></i>
                                 </button>

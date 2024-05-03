@@ -234,7 +234,7 @@ namespace risk.control.system.Controllers.Api.Agency
                 .Include(u=>u.State)
                 .Include(u=>u.District)
                 .Include(u=>u.PinCode)
-                .Where(c => c.VendorId == vendorUser.VendorId && c.Active);
+                .Where(c => c.VendorId == vendorUser.VendorId);
 
             var users = vendorUsers?
                 .OrderBy(u => u.FirstName)
