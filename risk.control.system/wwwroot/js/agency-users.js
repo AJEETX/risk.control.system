@@ -67,6 +67,7 @@
                 }
             },
             { "data": "roles" },
+            { "data": "updated" },
             {
                 "sDefaultContent": "",
                 "bSortable": false,

@@ -42,6 +42,7 @@ namespace risk.control.system.Seeds
             {
                 Name = "AUSTRALIA",
                 Code = "AU",
+                Updated = DateTime.Now,
             };
             var australiaCountry = await context.Country.AddAsync(australia);
 
@@ -51,6 +52,7 @@ namespace risk.control.system.Seeds
             {
                 Name = "INDIA",
                 Code = "IND",
+                Updated = DateTime.Now,
             };
             var indiaCountry = await context.Country.AddAsync(india);
 
@@ -65,6 +67,7 @@ namespace risk.control.system.Seeds
                 Name = "CLAIMS",
                 Code = "CLAIMS",
                 MasterData = true,
+                Updated = DateTime.Now,
             };
 
             var claimCaseType = await context.LineOfBusiness.AddAsync(claims);
@@ -74,6 +77,7 @@ namespace risk.control.system.Seeds
                 Name = "UNDERWRITING",
                 Code = "UNDERWRITING",
                 MasterData = true,
+                Updated = DateTime.Now,
             };
 
             var underwritingCaseType = await context.LineOfBusiness.AddAsync(underwriting);
@@ -87,6 +91,7 @@ namespace risk.control.system.Seeds
                 Name = "COMPREHENSIVE",
                 Code = "COMP",
                 MasterData = true,
+                Updated = DateTime.Now,
                 LineOfBusiness = claimCaseType.Entity
             };
             var claimComprehensiveService = await context.InvestigationServiceType.AddAsync(claimComprehensive);
@@ -96,6 +101,7 @@ namespace risk.control.system.Seeds
                 Name = "NON-COMPREHENSIVE",
                 Code = "NON-COMP",
                 MasterData = true,
+                Updated = DateTime.Now,
                 LineOfBusiness = claimCaseType.Entity
             };
 
@@ -106,6 +112,7 @@ namespace risk.control.system.Seeds
                 Name = "DOCUMENT-COLLECTION",
                 Code = "DOC",
                 MasterData = true,
+                Updated = DateTime.Now,
                 LineOfBusiness = claimCaseType.Entity
             };
 
@@ -116,6 +123,7 @@ namespace risk.control.system.Seeds
                 Name = "DISCREET",
                 Code = "DISCREET",
                 MasterData = true,
+                Updated = DateTime.Now,
                 LineOfBusiness = claimCaseType.Entity
             };
 
@@ -126,6 +134,7 @@ namespace risk.control.system.Seeds
                 Name = "PRE-ONBOARDING-VERIFICATION",
                 Code = "PRE-OV",
                 MasterData = true,
+                Updated = DateTime.Now,
                 LineOfBusiness = underwritingCaseType.Entity
             };
 
@@ -151,6 +160,7 @@ namespace risk.control.system.Seeds
             {
                 Name = CONSTANTS.CASE_STATUS.INITIATED,
                 Code = CONSTANTS.CASE_STATUS.INITIATED,
+                Updated = DateTime.Now,
                 MasterData = true,
             };
 
@@ -160,6 +170,7 @@ namespace risk.control.system.Seeds
             {
                 Name = CONSTANTS.CASE_STATUS.INPROGRESS,
                 Code = CONSTANTS.CASE_STATUS.INPROGRESS,
+                Updated = DateTime.Now,
                 MasterData = true,
             };
 
@@ -169,6 +180,7 @@ namespace risk.control.system.Seeds
             {
                 Name = CONSTANTS.CASE_STATUS.FINISHED,
                 Code = CONSTANTS.CASE_STATUS.FINISHED,
+                Updated = DateTime.Now,
                 MasterData = true,
             };
 
@@ -190,7 +202,8 @@ namespace risk.control.system.Seeds
                 Name = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.EDITED_BY_CREATOR,
                 Code = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.EDITED_BY_CREATOR,
                 MasterData = true,
-                InvestigationCaseStatus = initiatedStatus.Entity
+                InvestigationCaseStatus = initiatedStatus.Entity,
+                Updated = DateTime.Now,
             };
             var editedSubStatus = await context.InvestigationCaseSubStatus.AddAsync(edited);
 
@@ -199,6 +212,7 @@ namespace risk.control.system.Seeds
                 Name = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER,
                 Code = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER,
                 MasterData = true,
+                Updated = DateTime.Now,
                 InvestigationCaseStatus = inProgressStatus.Entity
             };
 
@@ -209,6 +223,7 @@ namespace risk.control.system.Seeds
                 Name = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR,
                 Code = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR,
                 MasterData = true,
+                Updated = DateTime.Now,
                 InvestigationCaseStatus = inProgressStatus.Entity
             };
 
@@ -219,6 +234,7 @@ namespace risk.control.system.Seeds
                 Name = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY,
                 Code = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY,
                 MasterData = true,
+                Updated = DateTime.Now,
                 InvestigationCaseStatus = inProgressStatus.Entity
             };
 
@@ -229,6 +245,7 @@ namespace risk.control.system.Seeds
                 Name = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT,
                 Code = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT,
                 MasterData = true,
+                Updated = DateTime.Now,
                 InvestigationCaseStatus = inProgressStatus.Entity
             };
 
@@ -239,6 +256,7 @@ namespace risk.control.system.Seeds
                 Name = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR,
                 Code = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR,
                 MasterData = true,
+                Updated = DateTime.Now,
                 InvestigationCaseStatus = inProgressStatus.Entity
             };
 
@@ -249,6 +267,7 @@ namespace risk.control.system.Seeds
                 Name = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR,
                 Code = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR,
                 MasterData = true,
+                Updated = DateTime.Now,
                 InvestigationCaseStatus = inProgressStatus.Entity
             };
 
@@ -259,6 +278,7 @@ namespace risk.control.system.Seeds
                 Name = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR,
                 Code = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR,
                 MasterData = true,
+                Updated = DateTime.Now,
                 InvestigationCaseStatus = finishedStatus.Entity
             };
 
@@ -268,6 +288,7 @@ namespace risk.control.system.Seeds
             {
                 Name = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR,
                 Code = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR,
+                Updated = DateTime.Now,
                 MasterData = true,
                 InvestigationCaseStatus = finishedStatus.Entity
             };
@@ -278,6 +299,7 @@ namespace risk.control.system.Seeds
             {
                 Name = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER,
                 Code = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER,
+                Updated = DateTime.Now,
                 MasterData = true,
                 InvestigationCaseStatus = finishedStatus.Entity
             };
@@ -287,6 +309,7 @@ namespace risk.control.system.Seeds
             {
                 Name = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY,
                 Code = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY,
+                Updated = DateTime.Now,
                 MasterData = true,
                 InvestigationCaseStatus = finishedStatus.Entity
             };

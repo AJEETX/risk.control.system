@@ -50,7 +50,8 @@ namespace risk.control.system.Controllers.Api.Company
                     Address = u.Addressline,
                     District = u.District.Name,
                     State = u.State.Name,
-                    Country = u.Country.Name
+                    Country = u.Country.Name,
+                    Updated = u.Updated.HasValue ?  u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy")
                 });
 
             return Ok(result?.ToArray());
@@ -66,18 +67,14 @@ namespace risk.control.system.Controllers.Api.Company
                 return BadRequest();
             }
 
-            var company = _context.ClientCompany
-                .Include(c => c.CompanyApplicationUser)
-                .ThenInclude(u => u.PinCode)
-                .Include(c => c.CompanyApplicationUser)
-                .ThenInclude(u => u.Country)
-                .Include(c => c.CompanyApplicationUser)
-                .ThenInclude(u => u.District)
-                .Include(c => c.CompanyApplicationUser)
-                .ThenInclude(u => u.State)
-                .FirstOrDefault(c => c.ClientCompanyId == id);
+            var companyUsers = _context.ClientCompanyApplicationUser
+                .Include(u => u.PinCode)
+                .Include(u => u.Country)
+                .Include(u => u.District)
+                .Include(u => u.State)
+                .Where(c => c.ClientCompanyId == id);
 
-            var users = company.CompanyApplicationUser
+            var users = companyUsers
                 .Where(u => !u.Deleted)?
                 .OrderBy(u => u.FirstName)
                 .ThenBy(u => u.LastName)
@@ -98,6 +95,7 @@ namespace risk.control.system.Controllers.Api.Company
                     Country = u.Country.Name,
                     Roles = u.UserRole != null ? $"<span class=\"badge badge-light\">{u.UserRole.GetEnumDisplayName()}</span>" : "<span class=\"badge badge-light\">...</span>",
                     Pincode = u.PinCode.Code,
+                    Updated = u.Updated.HasValue ?  u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy")
                 })?.ToArray();
             return Ok(result);
         }
@@ -140,6 +138,7 @@ namespace risk.control.system.Controllers.Api.Company
                     Country = u.Country.Name,
                     Roles = u.UserRole != null ? $"<span class=\"badge badge-light\">{u.UserRole.GetEnumDisplayName()}</span>" : "<span class=\"badge badge-light\">...</span>",
                     Pincode = u.PinCode.Code,
+                    Updated = u.Updated.HasValue ?  u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy")
                 })?.ToArray();
             return Ok(result);
         }
@@ -175,7 +174,8 @@ namespace risk.control.system.Controllers.Api.Company
                     Address = u.Addressline,
                     District = u.District.Name,
                     State = u.State.Name,
-                    Country = u.Country.Name
+                    Country = u.Country.Name,
+                    Updated = u.Updated.HasValue ? u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy")
                 });
 
             return Ok(result?.ToArray());
@@ -224,7 +224,8 @@ namespace risk.control.system.Controllers.Api.Company
                     Address = u.Addressline,
                     District = u.District.Name,
                     State = u.State.Name,
-                    Country = u.Country.Name
+                    Country = u.Country.Name,
+                    Updated = u.Updated.HasValue ? u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy")
                 });
             return Ok(result?.ToArray());
         }
@@ -268,23 +269,10 @@ namespace risk.control.system.Controllers.Api.Company
                      string.Join("", s.PincodeServices.Select(c => "<span class='badge badge-light'>" + c.Pincode + "</span> ")),
                     Rate = s.Price,
                     UpdatedBy = s.UpdatedBy,
+                    Updated = s.Updated.HasValue ? s.Updated.Value.ToString("dd-MM-yyyy") : s.Created.ToString("dd-MM-yyyy")
                 });
 
             return Ok(result?.ToArray());
-        }
-
-        private async Task<List<string>> GetUserRoles(ClientCompanyApplicationUser user)
-        {
-            var roles = await userManager.GetRolesAsync(user);
-
-            var decoratedRoles = new List<string>();
-
-            foreach (var role in roles)
-            {
-                var decoratedRole = "<span class=\"badge badge-light\">" + role + "</span>";
-                decoratedRoles.Add(decoratedRole);
-            }
-            return decoratedRoles;
         }
     }
 }

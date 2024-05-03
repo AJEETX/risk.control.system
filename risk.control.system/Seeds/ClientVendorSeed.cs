@@ -36,7 +36,8 @@ namespace risk.control.system.Seeds
                 Description = "HEAD OFFICE ",
                 Email = Applicationsettings.AGENCY1DOMAIN,
                 PhoneNumber = "8888004739",
-                DocumentUrl = "/img/checker.png"
+                DocumentUrl = "/img/checker.png",
+                Updated = DateTime.Now,
             };
 
             var checkerAgency = await context.Vendor.AddAsync(checker);
@@ -64,7 +65,8 @@ namespace risk.control.system.Seeds
                 Description = "HEAD OFFICE ",
                 Email = Applicationsettings.AGENCY2DOMAIN,
                 PhoneNumber = "4444404739",
-                DocumentUrl = "/img/verify.png"
+                DocumentUrl = "/img/verify.png",
+                Updated = DateTime.Now,
             };
 
             var verifyAgency = await context.Vendor.AddAsync(verify);
@@ -92,7 +94,8 @@ namespace risk.control.system.Seeds
                 Description = "HEAD OFFICE ",
                 Email = Applicationsettings.AGENCY3DOMAIN,
                 PhoneNumber = "7964404160",
-                DocumentUrl = "/img/investigate.png"
+                DocumentUrl = "/img/investigate.png",
+                Updated = DateTime.Now,
             };
 
             var investigateAgency = await context.Vendor.AddAsync(investigate);
@@ -231,7 +234,8 @@ namespace risk.control.system.Seeds
                 DocumentUrl = Applicationsettings.INSURERLOGO,
                 PhoneNumber = "9988004739",
                 ExpiryDate = DateTime.Now.AddDays(5),
-                EmpanelledVendors = new List<Vendor> { checker, verify, investigate }
+                EmpanelledVendors = new List<Vendor> { checker, verify, investigate },
+                Updated = DateTime.Now,
             };
 
             var insurerCompany = await context.ClientCompany.AddAsync(insurer);
@@ -257,7 +261,8 @@ namespace risk.control.system.Seeds
                             Pincode = context.PinCode.FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE)?.Code ?? default !,
                             Name = context.PinCode.FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE)?.Name ?? default !
                         }
-                    }
+                    },
+                    Updated = DateTime.Now,
                 },
                 new VendorInvestigationServiceType{
                     VendorId = checkerAgency.Entity.VendorId,
@@ -274,7 +279,8 @@ namespace risk.control.system.Seeds
                             Pincode = context.PinCode.FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE)?.Code ?? default !,
                             Name = context.PinCode.FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE)?.Name ?? default !
                         }
-                    }
+                    },
+                    Updated = DateTime.Now,
                 }
             };
 
@@ -295,7 +301,8 @@ namespace risk.control.system.Seeds
                             Pincode = context.PinCode.FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE)?.Code ?? default !,
                             Name = context.PinCode.FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE)?.Name ?? default !
                         }
-                    }
+                    },
+                    Updated = DateTime.Now,
                 },
                 new VendorInvestigationServiceType{
                     VendorId = verifyAgency.Entity.VendorId,
@@ -312,7 +319,8 @@ namespace risk.control.system.Seeds
                             Pincode = context.PinCode.FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE)?.Code ?? default !,
                             Name = context.PinCode.FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE)?.Name ?? default !
                         }
-                    }
+                    },
+                    Updated = DateTime.Now,
                 }
             };
 
@@ -333,7 +341,8 @@ namespace risk.control.system.Seeds
                             Pincode = context.PinCode.FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE)?.Code ?? default !,
                             Name = context.PinCode.FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE)?.Name ?? default !
                         }
-                    }
+                    },
+                    Updated = DateTime.Now,
                 },
                 new VendorInvestigationServiceType{
                     VendorId = investigateAgency.Entity.VendorId,
@@ -350,7 +359,8 @@ namespace risk.control.system.Seeds
                             Pincode = context.PinCode.FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE)?.Code ?? default !,
                             Name = context.PinCode.FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE)?.Name ?? default !
                         }
-                    }
+                    },
+                    Updated = DateTime.Now,
                 },
                 new VendorInvestigationServiceType{
                     VendorId = investigateAgency.Entity.VendorId,
@@ -367,7 +377,8 @@ namespace risk.control.system.Seeds
                             Pincode = context.PinCode.FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE)?.Code ?? default !,
                             Name = context.PinCode.FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE)?.Name ?? default !
                         }
-                    }
+                    },
+                    Updated = DateTime.Now,
                 }
             };
 

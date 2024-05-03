@@ -44,20 +44,18 @@ namespace risk.control.system.Controllers.Api.Agency
             var userEmail = HttpContext.User?.Identity?.Name;
             var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
 
-            var vendor = _context.Vendor
-                .Include(c => c.VendorApplicationUser)
-                .ThenInclude(u => u.District)
-                .Include(c => c.VendorApplicationUser)
-                .ThenInclude(u => u.State)
-                .Include(c => c.VendorApplicationUser)
-                .ThenInclude(u => u.Country)
-                .Include(c => c.VendorApplicationUser)
-                .ThenInclude(u => u.PinCode)
-                .FirstOrDefault(c => c.VendorId == vendorUser.VendorId);
+            var vendorUsers = _context.VendorApplicationUser
+                 .Include(u => u.Country)
+                 .Include(u => u.State)
+                 .Include(u => u.District)
+                 .Include(u => u.PinCode)
+                 .Where(c => c.VendorId == vendorUser.VendorId);
 
-            var users = vendor.VendorApplicationUser.Where(u => !u.Deleted)?
+            var users = vendorUsers?
                 .OrderBy(u => u.FirstName)
-                .ThenBy(u => u.LastName);
+                .ThenBy(u => u.LastName)
+                .AsQueryable();
+
             var result =
                 users?.Select(u =>
                 new
@@ -74,6 +72,7 @@ namespace risk.control.system.Controllers.Api.Agency
                     Country = u.Country.Name,
                     Pincode = u.PinCode.Code,
                     Roles = u.UserRole != null ? $"<span class=\"badge badge-light\">{u.UserRole.GetEnumDisplayName()}</span>" : "<span class=\"badge badge-light\">...</span>",
+                    Updated = u.Updated.HasValue ? u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy")
                 });
 
             return Ok(result?.ToArray());
@@ -103,7 +102,8 @@ namespace risk.control.system.Controllers.Api.Agency
                     Address = u.Addressline,
                     District = u.District.Name,
                     State = u.State.Name,
-                    Country = u.Country.Name
+                    Country = u.Country.Name,
+                    Updated = u.Updated.HasValue ? u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy")
                 })
                 ?.OrderBy(a => a.Name);
 
@@ -117,7 +117,6 @@ namespace risk.control.system.Controllers.Api.Agency
                 .Include(v => v.PinCode)
                 .Include(v => v.District)
                 .Include(v => v.State)
-                .Include(v => v.VendorInvestigationServiceTypes)
                 .Where(v => !v.Deleted);
             var result =
                 agencies
@@ -133,7 +132,8 @@ namespace risk.control.system.Controllers.Api.Agency
                     Address = u.Addressline,
                     District = u.District.Name,
                     State = u.State.Name,
-                    Country = u.Country.Name
+                    Country = u.Country.Name,
+                    Updated = u.Updated.HasValue ? u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy")
                 })
                 ?.OrderBy(a => a.Name);
 
@@ -179,6 +179,7 @@ namespace risk.control.system.Controllers.Api.Agency
                      string.Join("", s.PincodeServices.Select(c => "<span class='badge badge-light'>" + c.Pincode + "</span> ")),
                     Rate = s.Price,
                     UpdatedBy = s.UpdatedBy,
+                    Updated = s.Updated.HasValue ? s.Updated.Value.ToString("dd-MM-yyyy") :  s.Created.ToString("dd-MM-yyyy")
                 });
 
             return Ok(result?.ToArray());
@@ -187,18 +188,14 @@ namespace risk.control.system.Controllers.Api.Agency
         [HttpGet("GetCompanyAgencyUser")]
         public async Task<IActionResult> GetCompanyAgencyUser(long id)
         {
-            var vendor = _context.Vendor
-                .Include(c => c.VendorApplicationUser)
-                .ThenInclude(u => u.District)
-                .Include(c => c.VendorApplicationUser)
-                .ThenInclude(u => u.State)
-                .Include(c => c.VendorApplicationUser)
-                .ThenInclude(u => u.Country)
-                .Include(c => c.VendorApplicationUser)
-                .ThenInclude(u => u.PinCode)
-                .FirstOrDefault(c => c.VendorId == id && !c.Deleted);
+            var vendorUsers = _context.VendorApplicationUser
+                  .Include(u => u.Country)
+                  .Include(u => u.State)
+                  .Include(u => u.District)
+                  .Include(u => u.PinCode)
+                  .Where(c => c.VendorId == id);
 
-            var users = vendor.VendorApplicationUser?
+            var users = vendorUsers?
                 .OrderBy(u => u.FirstName)
                 .ThenBy(u => u.LastName)
                 .AsQueryable();
@@ -219,6 +216,7 @@ namespace risk.control.system.Controllers.Api.Agency
                     Country = u.Country.Name,
                     Pincode = u.PinCode.Code,
                     Roles = u.UserRole != null ? $"<span class=\"badge badge-light\">{u.UserRole.GetEnumDisplayName()}</span>" : "<span class=\"badge badge-light\">...</span>",
+                    Updated = u.Updated.HasValue ? u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy")
                 });
 
             return Ok(result?.ToArray());
@@ -229,21 +227,16 @@ namespace risk.control.system.Controllers.Api.Agency
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-            var adminRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.AGENCY_ADMIN.ToString()));
             List<VendorUserClaim> agents = new List<VendorUserClaim>();
 
-            var vendor = _context.Vendor
-                .Include(c => c.VendorApplicationUser)
-                .ThenInclude(u => u.PinCode)
-                .Include(c => c.VendorApplicationUser)
-                .ThenInclude(u => u.State)
-                .Include(c => c.VendorApplicationUser)
-                .ThenInclude(u => u.District)
-                .Include(c => c.VendorApplicationUser)
-                .ThenInclude(u => u.Country)
-                .FirstOrDefault(c => c.VendorId == vendorUser.VendorId);
+            var vendorUsers = _context.VendorApplicationUser
+                .Include(u=>u.Country)
+                .Include(u=>u.State)
+                .Include(u=>u.District)
+                .Include(u=>u.PinCode)
+                .Where(c => c.VendorId == vendorUser.VendorId && c.Active);
 
-            var users = vendor.VendorApplicationUser?
+            var users = vendorUsers?
                 .OrderBy(u => u.FirstName)
                 .ThenBy(u => u.LastName)
                 .AsQueryable();
@@ -251,28 +244,24 @@ namespace risk.control.system.Controllers.Api.Agency
 
             foreach (var user in users)
             {
-                var isAdmin = await userManager.IsInRoleAsync(user, adminRole?.Name);
-                if (!isAdmin)
+                int claimCount = 0;
+                if (result.TryGetValue(user.Email, out claimCount))
                 {
-                    int claimCount = 0;
-                    if (result.TryGetValue(user.Email, out claimCount))
+                    var agentData = new VendorUserClaim
                     {
-                        var agentData = new VendorUserClaim
-                        {
-                            AgencyUser = user,
-                            CurrentCaseCount = claimCount,
-                        };
-                        agents.Add(agentData);
-                    }
-                    else
+                        AgencyUser = user,
+                        CurrentCaseCount = claimCount,
+                    };
+                    agents.Add(agentData);
+                }
+                else
+                {
+                    var agentData = new VendorUserClaim
                     {
-                        var agentData = new VendorUserClaim
-                        {
-                            AgencyUser = user,
-                            CurrentCaseCount = 0,
-                        };
-                        agents.Add(agentData);
-                    }
+                        AgencyUser = user,
+                        CurrentCaseCount = 0,
+                    };
+                    agents.Add(agentData);
                 }
             }
             var agentWithLoad = agents?
@@ -290,23 +279,10 @@ namespace risk.control.system.Controllers.Api.Agency
                     Pincode = u.AgencyUser.PinCode.Code,
                     Active = u.AgencyUser.Active,
                     Roles = u.AgencyUser.UserRole != null ? $"<span class=\"badge badge-light\">{u.AgencyUser.UserRole.GetEnumDisplayName()}</span>" : "<span class=\"badge badge-light\">...</span>",
-                    Count = u.CurrentCaseCount
+                    Count = u.CurrentCaseCount,
                 });
             return Ok(agentWithLoad?.ToArray());
         }
 
-        private async Task<List<string>> GetUserRoles(VendorApplicationUser user)
-        {
-            var roles = await userManager.GetRolesAsync(user);
-
-            var decoratedRoles = new List<string>();
-
-            foreach (var role in roles)
-            {
-                var decoratedRole = "<span class=\"badge badge-light\">" + role + "</span>";
-                decoratedRoles.Add(decoratedRole);
-            }
-            return decoratedRoles;
-        }
     }
 }

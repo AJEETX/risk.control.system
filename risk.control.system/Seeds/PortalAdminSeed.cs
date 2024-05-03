@@ -57,6 +57,7 @@ namespace risk.control.system.Seeds
                 ProfilePictureUrl = PORTAL_ADMIN.PROFILE_IMAGE,
                 ProfilePicture = adminImage,
                 Role = AppRoles.PORTAL_ADMIN,
+                Updated = DateTime.Now
             };
             if (userManager.Users.All(u => u.Id != portalAdmin.Id))
             {

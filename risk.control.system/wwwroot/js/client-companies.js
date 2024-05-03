@@ -33,6 +33,7 @@
             { "data": "district" },
             { "data": "state" },
             { "data": "country" },
+            { "data": "updated" },
             {
                 "sDefaultContent": "",
                 "bSortable": false,

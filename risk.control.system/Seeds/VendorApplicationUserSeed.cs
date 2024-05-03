@@ -60,6 +60,7 @@ namespace risk.control.system.Seeds
                 ProfilePicture = adminImage,
                 Role = AppRoles.AGENCY_ADMIN,
                 UserRole = AgencyRole.AGENCY_ADMIN,
+                Updated = DateTime.Now
             };
             if (userManager.Users.All(u => u.Id != vendorAdmin.Id))
             {
@@ -121,7 +122,8 @@ namespace risk.control.system.Seeds
                 ProfilePictureUrl = SUPERVISOR.PROFILE_IMAGE,
                 ProfilePicture = supervisorImage,
                 Role = AppRoles.SUPERVISOR,
-                UserRole = AgencyRole.SUPERVISOR
+                UserRole = AgencyRole.SUPERVISOR,
+                Updated = DateTime.Now
             };
             if (userManager.Users.All(u => u.Id != vendorSupervisor.Id))
             {
@@ -178,6 +180,7 @@ namespace risk.control.system.Seeds
                 ProfilePicture = agentImage,
                 Role = AppRoles.AGENT,
                 UserRole = AgencyRole.AGENT,
+                Updated = DateTime.Now
             };
             if (userManager.Users.All(u => u.Id != vendorAgent.Id))
             {

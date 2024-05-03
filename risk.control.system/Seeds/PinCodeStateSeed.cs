@@ -27,7 +27,7 @@ namespace risk.control.system.Seeds
             var states = pincodes.GroupBy(g => new { g.StateName, g.StateCode });
             foreach (var state in states)
             {
-                var recordState = new State { Code = state.Key.StateCode, Name = state.Key.StateName, Country = country };
+                var recordState = new State { Code = state.Key.StateCode, Name = state.Key.StateName, Country = country, Updated = DateTime.Now };
                 var stateAdded = await context.State.AddAsync(recordState);
 
                 var districts = state.GroupBy(g => g.District);
@@ -35,7 +35,7 @@ namespace risk.control.system.Seeds
                 var pinCodeList = new List<PinCode> { };
                 foreach (var district in districts)
                 {
-                    var districtDetail = new District { Code = district.Key, Name = district.Key, State = stateAdded.Entity, Country = country };
+                    var districtDetail = new District { Code = district.Key, Name = district.Key, State = stateAdded.Entity, Country = country, Updated = DateTime.Now };
                     var districtAdded = await context.District.AddAsync(districtDetail);
                     foreach (var pinCode in district)
                     {
@@ -48,6 +48,7 @@ namespace risk.control.system.Seeds
                             District = districtAdded.Entity,
                             State = stateAdded.Entity,
                             Country = country,
+                            Updated = DateTime.Now,
                         };
                         pinCodeList.Add(pincodeState);
                     }
@@ -66,7 +67,7 @@ namespace risk.control.system.Seeds
                 var states = pincodes.GroupBy(g => new { g.StateName, g.StateCode });
                 foreach (var state in states)
                 {
-                    var recordState = new State { Code = state.Key.StateCode, Name = state.Key.StateName, Country = country };
+                    var recordState = new State { Code = state.Key.StateCode, Name = state.Key.StateName, Country = country, Updated = DateTime.Now };
                     var stateAdded = await context.State.AddAsync(recordState);
 
                     var districts = state.GroupBy(g => g.District);
@@ -74,7 +75,7 @@ namespace risk.control.system.Seeds
                     var pinCodeList = new List<PinCode> { };
                     foreach (var district in districts)
                     {
-                        var districtDetail = new District { Code = district.Key, Name = district.Key, State = stateAdded.Entity, Country = country };
+                        var districtDetail = new District { Code = district.Key, Name = district.Key, State = stateAdded.Entity, Country = country, Updated = DateTime.Now };
                         var districtAdded = await context.District.AddAsync(districtDetail);
                         foreach (var pinCode in district)
                         {
@@ -87,6 +88,7 @@ namespace risk.control.system.Seeds
                                 District = districtAdded.Entity,
                                 State = stateAdded.Entity,
                                 Country = country,
+                                Updated = DateTime.Now
                             };
                             pinCodeList.Add(pincodeState);
                         }
@@ -141,7 +143,7 @@ namespace risk.control.system.Seeds
                 }
             }
             var smallerPincodes = pincodes.Where(p => p.StateCode == "VIC" || p.StateCode == "NSW")?.ToList();
-            return smallerPincodes.Distinct()?.ToList();
+            return smallerPincodes.ToList();
         }
 
         private static async Task<List<PinCodeState>> CsvRead_India()
@@ -183,7 +185,7 @@ namespace risk.control.system.Seeds
                     }
                 }
             }
-            return pincodes.Distinct()?.ToList();
+            return pincodes.ToList();
         }
     }
 }

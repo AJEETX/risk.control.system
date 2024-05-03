@@ -242,6 +242,9 @@
                                             <th>
                                                 Pincodes
                                             </th>
+                                            <th>
+                                                Updated
+                                            </th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -270,6 +273,12 @@
                                                             @pin.Pincode
                                                         </span>
                                                     }
+                                                </td>
+                                                <td>
+                                                    @{
+                                                        var updatedDate = item.Updated.HasValue ? item.Updated.Value.ToString("dd-MM-yyyy") : item.Created.ToString("dd-MM-yyyy");
+                                                    }
+                                                    @Html.DisplayFor(modelItem => updatedDate);
                                                 </td>
                                             </tr>
                                         }

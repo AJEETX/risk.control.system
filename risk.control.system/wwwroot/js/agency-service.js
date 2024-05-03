@@ -43,6 +43,7 @@
             { "data": "country" },
             { "data": "pincodes" },
             { "data": "updatedBy" },
+            { "data": "updated" },
             {
                 "sDefaultContent": "",
                 "bSortable": false,

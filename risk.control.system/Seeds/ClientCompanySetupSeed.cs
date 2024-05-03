@@ -13,6 +13,7 @@ namespace risk.control.system.Seeds
             {
                 Name = "BROTHER",
                 Code = "BROTHER",
+                Updated = DateTime.Now,
             };
             var brotherEntity = await context.AddAsync(brother);
 
@@ -20,6 +21,7 @@ namespace risk.control.system.Seeds
             {
                 Name = "FATHER",
                 Code = "FATHER",
+                Updated = DateTime.Now,
             };
             var fatherEntity = await context.AddAsync(father);
 
@@ -27,6 +29,7 @@ namespace risk.control.system.Seeds
             {
                 Name = "MOTHER",
                 Code = "MOTHER",
+                Updated = DateTime.Now,
             };
             var motherEntity = await context.AddAsync(mother);
 
@@ -35,6 +38,7 @@ namespace risk.control.system.Seeds
             {
                 Name = "SISTER",
                 Code = "SISTER",
+                Updated = DateTime.Now,
             };
             var sisterEntity = await context.AddAsync(sister);
 
@@ -42,6 +46,7 @@ namespace risk.control.system.Seeds
             {
                 Name = "UNCLE",
                 Code = "UNCLE",
+                Updated = DateTime.Now,
             };
             var uncleEntity = await context.AddAsync(uncle);
 
@@ -49,6 +54,7 @@ namespace risk.control.system.Seeds
             {
                 Name = "AUNTY",
                 Code = "AUNTY",
+                Updated = DateTime.Now,
             };
             var auntyEntity = await context.AddAsync(aunty);
 
@@ -56,6 +62,7 @@ namespace risk.control.system.Seeds
             {
                 Name = "NEWPHEW",
                 Code = "NEWPHEW",
+                Updated = DateTime.Now,
             };
             var newphewEntity = await context.AddAsync(newphew);
 
@@ -63,6 +70,7 @@ namespace risk.control.system.Seeds
             {
                 Name = "NIECE",
                 Code = "NIECE",
+                Updated = DateTime.Now,
             };
             var nieceEntity = await context.AddAsync(niece);
 
@@ -70,6 +78,7 @@ namespace risk.control.system.Seeds
             {
                 Name = "INLAW",
                 Code = "INLAW",
+                Updated = DateTime.Now,
             };
             var inlawEntity = await context.AddAsync(inlaw);
 
@@ -81,6 +90,7 @@ namespace risk.control.system.Seeds
             {
                 Name = "DOUBTFUL BACKGROUND DETAILS",
                 Code = "DBD",
+                Updated = DateTime.Now,
             };
             var doubtCaseEnablerEntity = await context.CaseEnabler.AddAsync(doubtCaseEnabler);
 
@@ -88,6 +98,7 @@ namespace risk.control.system.Seeds
             {
                 Name = "VERY HIGH INSURANCE PREMIUM",
                 Code = "VHIP",
+                Updated = DateTime.Now,
             };
             var highAmountCaseEnablerEntity = await context.CaseEnabler.AddAsync(highAmountCaseEnabler);
 
@@ -99,6 +110,7 @@ namespace risk.control.system.Seeds
             {
                 Name = "LOANS",
                 Code = "LOANS",
+                Updated = DateTime.Now,
             };
 
             var loansCostCentreEntity = await context.CostCentre.AddAsync(loansCostCentre);
@@ -107,6 +119,7 @@ namespace risk.control.system.Seeds
             {
                 Name = "FINANCE",
                 Code = "FINANCE",
+                Updated = DateTime.Now,
             };
 
             var financeCostCentreEntity = await context.CostCentre.AddAsync(financeCostCentre);
@@ -119,6 +132,7 @@ namespace risk.control.system.Seeds
             {
                 Name = "SUCCESS",
                 Code = "SUCCESS",
+                Updated = DateTime.Now,
             };
 
             var postiveOutcomeEntity = await context.InvestigationCaseOutcome.AddAsync(postiveOutcome);
@@ -127,6 +141,7 @@ namespace risk.control.system.Seeds
             {
                 Name = "FAILURE",
                 Code = "FAILURE",
+                Updated = DateTime.Now,
             };
 
             var negativeOutcomeEntity = await context.InvestigationCaseOutcome.AddAsync(negativeOutcome);
@@ -135,6 +150,7 @@ namespace risk.control.system.Seeds
             {
                 Name = "UNKNOWN",
                 Code = "UNKNOWN",
+                Updated = DateTime.Now,
             };
 
             var unknownOutcomeEntity = await context.InvestigationCaseOutcome.AddAsync(unknownOutcome);

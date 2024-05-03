@@ -61,6 +61,7 @@ namespace risk.control.system.Seeds
                 ProfilePicture = adminImage,
                 Role = AppRoles.COMPANY_ADMIN,
                 UserRole = CompanyRole.COMPANY_ADMIN,
+                Updated = DateTime.Now,
             };
             if (userManager.Users.All(u => u.Id != clientAdmin.Id))
             {
@@ -126,6 +127,7 @@ namespace risk.control.system.Seeds
                 ProfilePicture = creatorImage,
                 Role = AppRoles.CREATOR,
                 UserRole = CompanyRole.CREATOR,
+                Updated = DateTime.Now,
             };
             if (userManager.Users.All(u => u.Id != clientCreator.Id))
             {
@@ -179,6 +181,7 @@ namespace risk.control.system.Seeds
                 ProfilePicture = managerImage,
                 Role = AppRoles.MANAGER,
                 UserRole = CompanyRole.MANAGER,
+                Updated = DateTime.Now,
             };
             if (userManager.Users.All(u => u.Id != manager.Id))
             {
@@ -233,6 +236,7 @@ namespace risk.control.system.Seeds
                 ProfilePicture = assessorImage,
                 Role= AppRoles.ASSESSOR,
                 UserRole = CompanyRole.ASSESSOR,
+                Updated = DateTime.Now,
             };
             if (userManager.Users.All(u => u.Id != clientAssessor.Id))
             {
