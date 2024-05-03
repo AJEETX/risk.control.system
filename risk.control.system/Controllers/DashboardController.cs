@@ -44,9 +44,16 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
+
                 if(userRole.Value.Contains(AppRoles.CREATOR.ToString()))
                 {
                     var model = dashboardService.GetCreatorCount(currentUserEmail, userRole.Value);
+                    return View(model);
+
+                }
+                else if (userRole.Value.Contains(AppRoles.COMPANY_ADMIN.ToString()))
+                {
+                    var model = dashboardService.GetCompanyAdminCount(currentUserEmail, userRole.Value);
                     return View(model);
 
                 }

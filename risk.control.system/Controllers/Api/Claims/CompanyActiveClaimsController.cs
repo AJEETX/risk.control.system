@@ -371,7 +371,8 @@ namespace risk.control.system.Controllers.Api.Claims
             if (userRole.Value.Contains(AppRoles.CREATOR.ToString()))
             {
                 var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
-                var claims = applicationDbContext.Where(a => openStatusesIds.Contains(a.InvestigationCaseStatusId) && a.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId)?.ToList();
+                var claims = applicationDbContext.Where(a => openStatusesIds.Contains(a.InvestigationCaseStatusId) && 
+                a.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId)?.ToList();
                 foreach (var claim in claims)
                 {
                     var userHasReviewClaimLogs = _context.InvestigationTransaction.Where(c => c.ClaimsInvestigationId == claim.ClaimsInvestigationId && c.IsReviewCase &&
@@ -382,8 +383,8 @@ namespace risk.control.system.Controllers.Api.Claims
                     {
                         reviewLogCount = userHasReviewClaimLogs.OrderByDescending(o => o.HopCount).First().HopCount;
                     }
-                    var userHasClaimLog = _context.InvestigationTransaction.Any(c => c.ClaimsInvestigationId == claim.ClaimsInvestigationId && c.UserEmailActioned == companyUser.Email &&
-                    c.HopCount >= reviewLogCount);
+                    var userHasClaimLog = _context.InvestigationTransaction.Any(c => c.ClaimsInvestigationId == claim.ClaimsInvestigationId &&
+                    c.UserEmailActioned == companyUser.Email &&  c.HopCount >= reviewLogCount);
 
                     if (userHasClaimLog)
                     {

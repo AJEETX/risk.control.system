@@ -73,20 +73,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 (a.UserEmailActioned == vendorUser.Email && a.InvestigationCaseSubStatus == submittedToAssesssorStatus)
                 );
 
-                var claimsAllocated = new List<ClaimsInvestigation>();
-
-                foreach (var item in applicationDbContext)
-                {
-                    item.CaseLocations = item.CaseLocations.Where(c => (c.VendorId.HasValue
-                        && c.InvestigationCaseSubStatusId == allocateToVendorStatus.InvestigationCaseSubStatusId)
-                        || c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId
-                        || c.InvestigationCaseSubStatusId == submittedToAssesssorStatus.InvestigationCaseSubStatusId)?.ToList();
-                    if (item.CaseLocations.Any())
-                    {
-                        claimsAllocated.Add(item);
-                    }
-                }
-                var response = claimsAllocated
+                var response = applicationDbContext
                    .Select(a => new ClaimsInvesgationResponse
                    {
                        Id = a.ClaimsInvestigationId,
@@ -96,15 +83,15 @@ namespace risk.control.system.Controllers.Api.Claims
                        Agent = !string.IsNullOrWhiteSpace(a.UserEmailActionedTo) ?
                         string.Join("", "<span class='badge badge-light'>" + a.UserEmailActionedTo + "</span>") :
                         string.Join("", "<span class='badge badge-light'>" + a.UserRoleActionedTo + "</span>"),
-                       Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
-                       PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
+                       Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations.FirstOrDefault()),
+                       PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations.FirstOrDefault()),
                        Company = a.PolicyDetail.ClientCompany.Name,
                        Document = a.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : Applicationsettings.NO_POLICY_IMAGE,
                        Customer = a.CustomerDetail.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail.ProfilePicture)) : Applicationsettings.NO_USER,
                        Name = a.CustomerDetail.CustomerName,
-                       Policy = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail?.LineOfBusiness.Name + "</span>"),
+                       Policy = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail.LineOfBusiness.Name + "</span>"),
                        Status = string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseStatus.Name + "</span>"),
-                       ServiceType = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail?.ClaimType.GetEnumDisplayName() + "</span>"),
+                       ServiceType = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail.ClaimType.GetEnumDisplayName() + "</span>"),
                        Service = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail.InvestigationServiceType.Name + "</span>"),
                        Location = a.CaseLocations.Count == 0 ?
                         "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>" :
@@ -245,9 +232,9 @@ namespace risk.control.system.Controllers.Api.Claims
             var userAdminOrSuperVisor = userRole.Value.Contains(AppRoles.AGENCY_ADMIN.ToString()) || userRole.Value.Contains(AppRoles.SUPERVISOR.ToString());
             if (userAdminOrSuperVisor)
             {
-                var allocatedClaims = applicationDbContext.Where(a =>
-                a.InvestigationCaseSubStatusId == allocatedStatus.InvestigationCaseSubStatusId)?.ToList();
-                foreach (var claim in allocatedClaims)
+                applicationDbContext = applicationDbContext.Where(a =>
+                a.InvestigationCaseSubStatusId == allocatedStatus.InvestigationCaseSubStatusId);
+                foreach (var claim in applicationDbContext)
                 {
                     claim.AllocateView += 1;
                     if (claim.AllocateView <= 1)
@@ -265,9 +252,9 @@ namespace risk.control.system.Controllers.Api.Claims
             else if (userRole.Value.Contains(AppRoles.AGENT.ToString()))
             {
                 List<ClaimsInvestigation> newInvestigateClaims = new List<ClaimsInvestigation>();
-                var allocatedClaims = applicationDbContext.Where(a => a.UserEmailActionedTo == currentUserEmail
-                && a.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId)?.ToList();
-                foreach (var claim in allocatedClaims)
+                applicationDbContext = applicationDbContext.Where(a => a.UserEmailActionedTo == currentUserEmail
+                && a.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId);
+                foreach (var claim in applicationDbContext)
                 {
                     claim.InvestigateView += 1;
                     if (claim.InvestigateView <= 1)
