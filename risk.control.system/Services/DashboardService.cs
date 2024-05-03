@@ -223,10 +223,11 @@ namespace risk.control.system.Services
         private int GetAvailableAgencies(string userEmail)
         {
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == userEmail);
-            var empAgencies = _context.ClientCompany.Include(c => c.EmpanelledVendors).FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
-            var empannelledAgenciesId = empAgencies.EmpanelledVendors.Select(e => e.VendorId);
-            var agencyCount = _context.Vendor.Count(v=> !empannelledAgenciesId.Any(e =>e == v.VendorId));
-            return agencyCount;
+            var availableVendors = _context.Vendor.Include(a=>a.VendorInvestigationServiceTypes)
+                           .Count(v =>
+                           !v.Clients.Any(c => c.ClientCompanyId == companyUser.ClientCompanyId) &&
+                           (v.VendorInvestigationServiceTypes != null) && v.VendorInvestigationServiceTypes.Count > 0 &&  !v.Deleted);
+            return availableVendors;
         }
         private int GetEmpanelledAgencies(string userEmail)
         {
@@ -262,7 +263,13 @@ namespace risk.control.system.Services
 
             IQueryable<ClaimsInvestigation> applicationDbContext = GetAgencyClaims();
             var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-
+            if(vendorUser.IsVendorAdmin)
+            {
+                return applicationDbContext.Count(a => a.VendorId == vendorUser.VendorId &&
+            openSubstatusesForSupervisor.Contains(a.InvestigationCaseSubStatusId) &&
+                 (a.InvestigationCaseSubStatus == assignedToAgentStatus ||
+                 a.InvestigationCaseSubStatus == submittedToAssesssorStatus));
+            }
             var count = applicationDbContext.Count(a => a.VendorId == vendorUser.VendorId &&
             openSubstatusesForSupervisor.Contains(a.InvestigationCaseSubStatusId) &&
                 a.UserEmailActioned == vendorUser.Email && (a.InvestigationCaseSubStatus == assignedToAgentStatus ||
@@ -339,25 +346,43 @@ namespace risk.control.system.Services
             var agencyUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
             IQueryable<ClaimsInvestigation> applicationDbContext = GetAgencyClaims().Where(c =>
                 c.CustomerDetail != null && c.VendorId == agencyUser.VendorId);
-            
-            var userAttendedClaims = _context.InvestigationTransaction.Where(t => (t.UserEmailActioned == agencyUser.Email && 
-            t.InvestigationCaseSubStatusId == submittedToAssessorStatus.InvestigationCaseSubStatusId))?.Select(c => c.ClaimsInvestigationId);
-
-            var claimsSubmitted = 0;
-            foreach (var item in applicationDbContext)
+            if (agencyUser.IsVendorAdmin)
             {
-                if (item.InvestigationCaseStatus.Name == CONSTANTS.CASE_STATUS.FINISHED &&
-                    item.InvestigationCaseSubStatus.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR ||
-                    item.InvestigationCaseSubStatus.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR
-                    )
+                var claimsSubmitted = 0;
+                foreach (var item in applicationDbContext)
                 {
-                    if (userAttendedClaims.Contains(item.ClaimsInvestigationId))
+                    if (item.InvestigationCaseStatus.Name == CONSTANTS.CASE_STATUS.FINISHED &&
+                        item.InvestigationCaseSubStatus.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR ||
+                        item.InvestigationCaseSubStatus.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR
+                        )
                     {
                         claimsSubmitted += 1;
                     }
                 }
+                return claimsSubmitted;
             }
-            return claimsSubmitted;
+            else
+            {
+                var userAttendedClaims = _context.InvestigationTransaction.Where(t => (t.UserEmailActioned == agencyUser.Email &&
+            t.InvestigationCaseSubStatusId == submittedToAssessorStatus.InvestigationCaseSubStatusId))?.Select(c => c.ClaimsInvestigationId);
+
+                var claimsSubmitted = 0;
+                foreach (var item in applicationDbContext)
+                {
+                    if (item.InvestigationCaseStatus.Name == CONSTANTS.CASE_STATUS.FINISHED &&
+                        item.InvestigationCaseSubStatus.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR ||
+                        item.InvestigationCaseSubStatus.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR
+                        )
+                    {
+                        if (userAttendedClaims.Contains(item.ClaimsInvestigationId))
+                        {
+                            claimsSubmitted += 1;
+                        }
+                    }
+                }
+                return claimsSubmitted;
+            }
+            
         }
         private int GetCompanyManagerApproved(string userEmail)
         {

@@ -63,7 +63,7 @@ namespace risk.control.system.Controllers
                     return View(model);
 
                 }
-                else if (userRole.Value.Contains(AppRoles.SUPERVISOR.ToString()))
+                else if (userRole.Value.Contains(AppRoles.AGENCY_ADMIN.ToString()) || userRole.Value.Contains(AppRoles.SUPERVISOR.ToString()))
                 {
                     var model = dashboardService.GetSupervisorCount(currentUserEmail, userRole.Value);
                     return View(model);

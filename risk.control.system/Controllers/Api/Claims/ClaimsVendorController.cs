@@ -48,7 +48,7 @@ namespace risk.control.system.Controllers.Api.Claims
 
             if (vendorUser != null)
             {
-                applicationDbContext = applicationDbContext.Where(i => i.CaseLocations.Any(c => c.VendorId == vendorUser.VendorId));
+                applicationDbContext = applicationDbContext.Where(i => i.VendorId == vendorUser.VendorId);
             }
 
             var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
@@ -66,8 +66,54 @@ namespace risk.control.system.Controllers.Api.Claims
             var submittedToAssesssorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
 
-            if (userRole.Value.Contains(AppRoles.AGENCY_ADMIN.ToString()) || userRole.Value.Contains(AppRoles.SUPERVISOR.ToString()))
+            if (userRole.Value.Contains(AppRoles.AGENCY_ADMIN.ToString()))
             {
+                applicationDbContext = applicationDbContext.Where(a => openSubstatusesForSupervisor.Contains(a.InvestigationCaseSubStatusId) &&
+                ( a.InvestigationCaseSubStatus == assignedToAgentStatus) ||
+                ( a.InvestigationCaseSubStatus == submittedToAssesssorStatus)
+                );
+
+                var response = applicationDbContext
+                   .Select(a => new ClaimsInvesgationResponse
+                   {
+                       Id = a.ClaimsInvestigationId,
+                       AssignedToAgency = a.AssignedToAgency,
+                       PolicyId = a.PolicyDetail.ContractNumber,
+                       Amount = string.Format(new CultureInfo("hi-IN"), "{0:C}", a.PolicyDetail.SumAssuredValue),
+                       Agent = !string.IsNullOrWhiteSpace(a.UserEmailActionedTo) ?
+                        string.Join("", "<span class='badge badge-light'>" + a.UserEmailActionedTo + "</span>") :
+                        string.Join("", "<span class='badge badge-light'>" + a.UserRoleActionedTo + "</span>"),
+                       Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations.FirstOrDefault()),
+                       PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations.FirstOrDefault()),
+                       Company = a.PolicyDetail.ClientCompany.Name,
+                       Document = a.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : Applicationsettings.NO_POLICY_IMAGE,
+                       Customer = a.CustomerDetail.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail.ProfilePicture)) : Applicationsettings.NO_USER,
+                       Name = a.CustomerDetail.CustomerName,
+                       Policy = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail.LineOfBusiness.Name + "</span>"),
+                       Status = string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseStatus.Name + "</span>"),
+                       ServiceType = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail.ClaimType.GetEnumDisplayName() + "</span>"),
+                       Service = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail.InvestigationServiceType.Name + "</span>"),
+                       Location = a.CaseLocations.Count == 0 ?
+                        "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>" :
+                        string.Join("", a.CaseLocations.Select(c => "<span class='badge badge-light'>" + c.InvestigationCaseSubStatus.Name + "</span> ")),
+                       Created = string.Join("", "<span class='badge badge-light'>" + a.Created.ToString("dd-MM-yyyy") + "</span>"),
+                       timePending = a.GetTimePending(),
+                       PolicyNum = a.PolicyDetail.ContractNumber,
+                       BeneficiaryPhoto = a.CaseLocations.Count != 0 && a.CaseLocations.FirstOrDefault().ProfilePicture != null ?
+                                       string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CaseLocations.FirstOrDefault().ProfilePicture)) :
+                                      @Applicationsettings.NO_USER,
+                       BeneficiaryName = a.CaseLocations.Count == 0 ?
+                        "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>" :
+                        a.CaseLocations.FirstOrDefault().BeneficiaryName,
+                       TimeElapsed = DateTime.Now.Subtract(a.Created).TotalSeconds
+                   })?
+                   .ToList();
+
+                return Ok(response);
+            }
+            else if(userRole.Value.Contains(AppRoles.SUPERVISOR.ToString()))
+            
+                    {
                 applicationDbContext = applicationDbContext.Where(a => openSubstatusesForSupervisor.Contains(a.InvestigationCaseSubStatusId) &&
                 (a.UserEmailActioned == vendorUser.Email && a.InvestigationCaseSubStatus == assignedToAgentStatus) ||
                 (a.UserEmailActioned == vendorUser.Email && a.InvestigationCaseSubStatus == submittedToAssesssorStatus)
@@ -577,54 +623,104 @@ namespace risk.control.system.Controllers.Api.Claims
             var agencyUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == currentUserEmail);
             var submittedToAssessorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
-            var userAttendedClaims = _context.InvestigationTransaction.Where(t => (t.UserEmailActioned == agencyUser.Email &&
-            t.InvestigationCaseSubStatusId == submittedToAssessorStatus.InvestigationCaseSubStatusId))?.Select(c => c.ClaimsInvestigationId);
 
-            var claimsSubmitted = new List<ClaimsInvestigation>();
-            foreach (var item in applicationDbContext)
+            if(agencyUser.IsVendorAdmin)
             {
-                if ((item.InvestigationCaseStatus.Name == CONSTANTS.CASE_STATUS.FINISHED &&
-                    item.InvestigationCaseSubStatus.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR) ||
-                    (item.InvestigationCaseSubStatus.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR))
+                var claimsSubmitted = new List<ClaimsInvestigation>();
+                foreach (var item in applicationDbContext)
                 {
-                    if (userAttendedClaims.Contains(item.ClaimsInvestigationId))
+                    if ((item.InvestigationCaseStatus.Name == CONSTANTS.CASE_STATUS.FINISHED &&
+                        item.InvestigationCaseSubStatus.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR) ||
+                        (item.InvestigationCaseSubStatus.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR))
                     {
                         claimsSubmitted.Add(item);
                     }
                 }
-            }
-            var response = claimsSubmitted
-                   .Select(a => new ClaimsInvesgationResponse
-                   {
-                       Id = a.ClaimsInvestigationId,
-                       PolicyId = a.PolicyDetail.ContractNumber,
-                       Amount = string.Format(new CultureInfo("hi-IN"), "{0:C}", a.PolicyDetail.SumAssuredValue),
-                       AssignedToAgency = a.AssignedToAgency,
-                       Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
-                       PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
-                       Company = a.PolicyDetail.ClientCompany.Name,
-                       Document = a.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : Applicationsettings.NO_POLICY_IMAGE,
-                       Customer = a.CustomerDetail.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail.ProfilePicture)) : Applicationsettings.NO_USER,
-                       Name = a.CustomerDetail.CustomerName,
-                       Policy = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail?.LineOfBusiness.Name + "</span>"),
-                       Status = string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseStatus.Name + "</span>"),
-                       ServiceType = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail?.ClaimType.GetEnumDisplayName() + "</span>"),
-                       Service = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail.InvestigationServiceType.Name + "</span>"),
-                       Location = string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseSubStatus.Name + "</span>"),
-                       Created = string.Join("", "<span class='badge badge-light'>" + a.Created.ToString("dd-MM-yyyy") + "</span>"),
-                       timePending = a.GetTimePending(),
-                       PolicyNum = a.PolicyDetail.ContractNumber,
-                       BeneficiaryPhoto = a.CaseLocations.Count != 0 && a.CaseLocations.FirstOrDefault().ProfilePicture != null ?
-                                       string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CaseLocations.FirstOrDefault().ProfilePicture)) :
-                                      @Applicationsettings.NO_USER,
-                       BeneficiaryName = a.CaseLocations.Count == 0 ?
-                        "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>" :
-                        a.CaseLocations.FirstOrDefault().BeneficiaryName,
-                       TimeElapsed = DateTime.Now.Subtract(a.Created).TotalSeconds
-                   })
-                    ?.ToList();
+                var response = claimsSubmitted
+                       .Select(a => new ClaimsInvesgationResponse
+                       {
+                           Id = a.ClaimsInvestigationId,
+                           PolicyId = a.PolicyDetail.ContractNumber,
+                           Amount = string.Format(new CultureInfo("hi-IN"), "{0:C}", a.PolicyDetail.SumAssuredValue),
+                           AssignedToAgency = a.AssignedToAgency,
+                           Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
+                           PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
+                           Company = a.PolicyDetail.ClientCompany.Name,
+                           Document = a.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : Applicationsettings.NO_POLICY_IMAGE,
+                           Customer = a.CustomerDetail.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail.ProfilePicture)) : Applicationsettings.NO_USER,
+                           Name = a.CustomerDetail.CustomerName,
+                           Policy = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail?.LineOfBusiness.Name + "</span>"),
+                           Status = string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseStatus.Name + "</span>"),
+                           ServiceType = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail?.ClaimType.GetEnumDisplayName() + "</span>"),
+                           Service = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail.InvestigationServiceType.Name + "</span>"),
+                           Location = string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseSubStatus.Name + "</span>"),
+                           Created = string.Join("", "<span class='badge badge-light'>" + a.Created.ToString("dd-MM-yyyy") + "</span>"),
+                           timePending = a.GetTimePending(),
+                           PolicyNum = a.PolicyDetail.ContractNumber,
+                           BeneficiaryPhoto = a.CaseLocations.Count != 0 && a.CaseLocations.FirstOrDefault().ProfilePicture != null ?
+                                           string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CaseLocations.FirstOrDefault().ProfilePicture)) :
+                                          @Applicationsettings.NO_USER,
+                           BeneficiaryName = a.CaseLocations.Count == 0 ?
+                            "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>" :
+                            a.CaseLocations.FirstOrDefault().BeneficiaryName,
+                           TimeElapsed = DateTime.Now.Subtract(a.Created).TotalSeconds
+                       })
+                        ?.ToList();
 
-            return Ok(response);
+                return Ok(response);
+            }
+            else
+            {
+                var userAttendedClaims = _context.InvestigationTransaction.Where(t => (t.UserEmailActioned == agencyUser.Email &&
+                            t.InvestigationCaseSubStatusId == submittedToAssessorStatus.InvestigationCaseSubStatusId))?.Select(c => c.ClaimsInvestigationId);
+
+                var claimsSubmitted = new List<ClaimsInvestigation>();
+                foreach (var item in applicationDbContext)
+                {
+                    if ((item.InvestigationCaseStatus.Name == CONSTANTS.CASE_STATUS.FINISHED &&
+                        item.InvestigationCaseSubStatus.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR) ||
+                        (item.InvestigationCaseSubStatus.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR))
+                    {
+                        if (userAttendedClaims.Contains(item.ClaimsInvestigationId))
+                        {
+                            claimsSubmitted.Add(item);
+                        }
+                    }
+                }
+                var response = claimsSubmitted
+                       .Select(a => new ClaimsInvesgationResponse
+                       {
+                           Id = a.ClaimsInvestigationId,
+                           PolicyId = a.PolicyDetail.ContractNumber,
+                           Amount = string.Format(new CultureInfo("hi-IN"), "{0:C}", a.PolicyDetail.SumAssuredValue),
+                           AssignedToAgency = a.AssignedToAgency,
+                           Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
+                           PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
+                           Company = a.PolicyDetail.ClientCompany.Name,
+                           Document = a.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : Applicationsettings.NO_POLICY_IMAGE,
+                           Customer = a.CustomerDetail.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail.ProfilePicture)) : Applicationsettings.NO_USER,
+                           Name = a.CustomerDetail.CustomerName,
+                           Policy = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail?.LineOfBusiness.Name + "</span>"),
+                           Status = string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseStatus.Name + "</span>"),
+                           ServiceType = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail?.ClaimType.GetEnumDisplayName() + "</span>"),
+                           Service = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail.InvestigationServiceType.Name + "</span>"),
+                           Location = string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseSubStatus.Name + "</span>"),
+                           Created = string.Join("", "<span class='badge badge-light'>" + a.Created.ToString("dd-MM-yyyy") + "</span>"),
+                           timePending = a.GetTimePending(),
+                           PolicyNum = a.PolicyDetail.ContractNumber,
+                           BeneficiaryPhoto = a.CaseLocations.Count != 0 && a.CaseLocations.FirstOrDefault().ProfilePicture != null ?
+                                           string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CaseLocations.FirstOrDefault().ProfilePicture)) :
+                                          @Applicationsettings.NO_USER,
+                           BeneficiaryName = a.CaseLocations.Count == 0 ?
+                            "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>" :
+                            a.CaseLocations.FirstOrDefault().BeneficiaryName,
+                           TimeElapsed = DateTime.Now.Subtract(a.Created).TotalSeconds
+                       })
+                        ?.ToList();
+
+                return Ok(response);
+            }
+            
         }
 
         private IQueryable<ClaimsInvestigation> GetClaims()

@@ -41,14 +41,14 @@
                 <!-- Add icons to the links using the .nav-icon class with font-awesome or any other icon font library -->
                 <partial name="AdminLTE/_VendorSidebarMailbox" />
 
-                @if (User.IsInRole(AppRoles.AGENCY_ADMIN.ToString()))
-                {
-                <partial name="AdminLTE/_VendorSidebarAdmin" />
-                }
-
-                @if (User.IsInRole(AppRoles.SUPERVISOR.ToString()))
+                
+                @if (User.IsInRole(AppRoles.AGENCY_ADMIN.ToString()) || User.IsInRole(AppRoles.SUPERVISOR.ToString()))
                 {
                 <partial name="AdminLTE/_VendorSidebarSupervisor" />
+                }
+                @if (User.IsInRole(AppRoles.AGENCY_ADMIN.ToString()))
+                {
+                    <partial name="AdminLTE/_VendorSidebarAdmin" />
                 }
 
                 @{
