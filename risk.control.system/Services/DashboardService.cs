@@ -11,6 +11,8 @@ using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 
+using static risk.control.system.AppConstant.Applicationsettings;
+
 namespace risk.control.system.Services
 {
     public interface IDashboardService
@@ -33,6 +35,8 @@ namespace risk.control.system.Services
         DashboardData GetCompanyAdminCount(string userEmail, string role);
         DashboardData GetManagerCount(string userEmail, string role);
         DashboardData GetSupervisorCount(string userEmail, string role);
+        DashboardData GetAgentCount(string userEmail, string role);
+        DashboardData GetSuperAdminCount(string userEmail, string role);
     }
 
     public class DashboardService : IDashboardService
@@ -42,6 +46,61 @@ namespace risk.control.system.Services
         public DashboardService(ApplicationDbContext context)
         {
             this._context = context;
+        }
+
+        public DashboardData GetAgentCount(string userEmail, string role)
+        {
+            var vendorUser = _context.VendorApplicationUser.Include(u=>u.Vendor).FirstOrDefault(c => c.Email == userEmail);
+            var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
+
+            var submitted2Supervisor = _context.InvestigationCaseSubStatus
+               .FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR);
+
+            var taskCount = _context.ClaimsInvestigation.Count(c => c.VendorId == vendorUser.VendorId &&
+            c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId &&
+            c.UserEmailActionedTo == userEmail && c.UserRoleActionedTo == $"{AppRoles.AGENT.GetEnumDisplayName()} ({vendorUser.Vendor.Email})");
+
+            var taskSubmitted = _context.InvestigationTransaction.Count(l => l.UserEmailActioned == userEmail && l.UserEmailActionedTo == string.Empty &&
+            l.UserRoleActionedTo == $"{AppRoles.SUPERVISOR.GetEnumDisplayName()} ({vendorUser.Vendor.Email})" &&
+            l.InvestigationCaseSubStatusId == submitted2Supervisor.InvestigationCaseSubStatusId);
+
+            var data = new DashboardData();
+            data.FirstBlockName = "Tasks";
+            data.FirstBlockCount = taskCount;
+            data.FirstBlockUrl = "/ClaimsVendor/Agent";
+
+            data.SecondBlockName = "Submitted";
+            data.SecondBlockCount = taskSubmitted;
+            data.SecondBlockUrl = "/ClaimsVendor/Submitted";
+
+            return data;
+        }
+        public DashboardData GetSuperAdminCount(string userEmail, string role)
+        {
+            var allCompaniesCount = _context.ClientCompany.Count();
+            var allAgenciesCount = _context.Vendor.Count();
+            var AllUsersCount = _context.ApplicationUser.Count();
+            //var availableAgenciesCount = GetAvailableAgencies(userEmail);
+
+            var data = new DashboardData();
+            data.FirstBlockName = "Companies";
+            data.FirstBlockCount = allCompaniesCount;
+            data.FirstBlockUrl = "/ClientCompany/Companies";
+
+            data.SecondBlockName = "Agencies";
+            data.SecondBlockCount = allAgenciesCount;
+            data.SecondBlockUrl = "/Vendors/Agencies";
+
+            data.ThirdBlockName = "Users";
+            data.ThirdBlockCount = AllUsersCount;
+            data.ThirdBlockUrl = "/User";
+
+            //data.LastBlockName = "Available Agencies";
+            //data.LastBlockCount = availableAgenciesCount;
+            //data.LastBlockUrl = "/Company/AvailableVendors";
+
+            return data;
         }
 
         public DashboardData GetSupervisorCount(string userEmail, string role)
@@ -1463,7 +1522,6 @@ namespace risk.control.system.Services
             return dictWeeklyCases;
         }
 
-       
     }
 
     public class TatDetail

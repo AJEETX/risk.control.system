@@ -72,6 +72,15 @@
                                 </p>
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a is-active-page asp-controller="ClaimsVendor" asp-action="Submitted" class="actual-link nav-link @Url.MakeActiveClass("ClaimsVendor","Submitted")
+                                                    @Url.MakeActiveClass("ClaimsVendor","SubmittedDetail")">
+                                <i class="fas fa-print nav-icon"></i>
+                                <p>
+                                    <span class="badge badge-secondary">SUBMITTED</span>
+                                </p>
+                            </a>
+                        </li>
                     }
                 }
 

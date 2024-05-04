@@ -242,6 +242,105 @@ namespace risk.control.system.Controllers
         {
             return View();
         }
+        [Breadcrumb(title: " Submitted")]
+        [Authorize(Roles = "AGENT")]
+        public IActionResult Submitted()
+        {
+            return View();
+        }
+        [Breadcrumb(title: " Detail")]
+        [Authorize(Roles = "AGENT")]
+        public async Task<IActionResult> SubmittedDetail(string id)
+        {
+            if (id == null)
+            {
+                notifyService.Error("NOT FOUND !!!..");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+            try
+            {
+                var caseLogs = await _context.InvestigationTransaction
+                .Include(i => i.InvestigationCaseStatus)
+                .Include(i => i.InvestigationCaseSubStatus)
+                .Include(c => c.ClaimsInvestigation)
+                .ThenInclude(i => i.CaseLocations)
+                .Include(c => c.ClaimsInvestigation)
+                .ThenInclude(i => i.InvestigationCaseStatus)
+                .Include(c => c.ClaimsInvestigation)
+                .ThenInclude(i => i.InvestigationCaseSubStatus)
+                .Where(t => t.ClaimsInvestigationId == id)
+                .OrderByDescending(c => c.HopCount)?.ToListAsync();
+
+                var claimsInvestigation = await _context.ClaimsInvestigation
+                  .Include(c => c.ClaimMessages)
+                  .Include(c => c.PolicyDetail)
+                  .ThenInclude(c => c.ClientCompany)
+                  .Include(c => c.PolicyDetail)
+                  .ThenInclude(c => c.CaseEnabler)
+                  .Include(c => c.PolicyDetail)
+                  .ThenInclude(c => c.CostCentre)
+                  .Include(c => c.CaseLocations)
+                  .ThenInclude(c => c.InvestigationCaseSubStatus)
+                  .Include(c => c.CaseLocations)
+                  .ThenInclude(c => c.PinCode)
+                  .Include(c => c.CaseLocations)
+                  .ThenInclude(c => c.BeneficiaryRelation)
+                  .Include(c => c.CaseLocations)
+                  .ThenInclude(c => c.District)
+                  .Include(c => c.CaseLocations)
+                  .ThenInclude(c => c.State)
+                  .Include(c => c.CaseLocations)
+                  .ThenInclude(c => c.Country)
+                  .Include(c => c.CustomerDetail)
+                  .ThenInclude(c => c.Country)
+                  .Include(c => c.CustomerDetail)
+                  .ThenInclude(c => c.District)
+                  .Include(c => c.InvestigationCaseStatus)
+                  .Include(c => c.InvestigationCaseSubStatus)
+                  .Include(c => c.PolicyDetail)
+                  .ThenInclude(c => c.InvestigationServiceType)
+                  .Include(c => c.PolicyDetail)
+                  .ThenInclude(c => c.LineOfBusiness)
+                  .Include(c => c.CustomerDetail)
+                  .ThenInclude(c => c.PinCode)
+                  .Include(c => c.CustomerDetail)
+                  .ThenInclude(c => c.State)
+                    .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == id);
+
+                var location = await _context.CaseLocation
+                    .Include(c => c.ClaimReport)
+                    .ThenInclude(c => c.DigitalIdReport)
+                    .Include(c => c.ClaimReport)
+                    .ThenInclude(c => c.DocumentIdReport)
+                    .Include(l => l.Vendor)
+                    .Include(c => c.ClaimReport)
+                    .ThenInclude(c => c.ReportQuestionaire)
+                    .FirstOrDefaultAsync(l => l.ClaimsInvestigationId == id);
+
+                if (claimsInvestigation == null)
+                {
+                    notifyService.Error("NOT FOUND !!!..");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var invoice = _context.VendorInvoice.FirstOrDefault(i => i.ClaimReportId == location.ClaimReport.ClaimReportId);
+
+                var model = new ClaimTransactionModel
+                {
+                    ClaimsInvestigation = claimsInvestigation,
+                    Log = caseLogs,
+                    Location = location,
+                    VendorInvoice = invoice,
+                    TimeTaken = caseLogs.GetElapsedTime()
+                };
+
+                return View(model);
+            }
+            catch (Exception)
+            {
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+        }
 
         [Breadcrumb(" Details", FromAction = "Completed")]
         [Authorize(Roles = "AGENCY_ADMIN,SUPERVISOR")]

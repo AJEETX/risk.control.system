@@ -51,6 +51,12 @@ namespace risk.control.system.Controllers
                     return View(model);
 
                 }
+                else if (userRole.Value.Contains(AppRoles.PORTAL_ADMIN.ToString()))
+                {
+                    var model = dashboardService.GetSuperAdminCount(currentUserEmail, userRole.Value);
+                    return View(model);
+
+                }
                 else if (userRole.Value.Contains(AppRoles.COMPANY_ADMIN.ToString()))
                 {
                     var model = dashboardService.GetCompanyAdminCount(currentUserEmail, userRole.Value);
@@ -63,15 +69,22 @@ namespace risk.control.system.Controllers
                     return View(model);
 
                 }
+
+                else if (userRole.Value.Contains(AppRoles.MANAGER.ToString()))
+                {
+                    var model = dashboardService.GetManagerCount(currentUserEmail, userRole.Value);
+                    return View(model);
+
+                }
                 else if (userRole.Value.Contains(AppRoles.AGENCY_ADMIN.ToString()) || userRole.Value.Contains(AppRoles.SUPERVISOR.ToString()))
                 {
                     var model = dashboardService.GetSupervisorCount(currentUserEmail, userRole.Value);
                     return View(model);
 
                 }
-                else if (userRole.Value.Contains(AppRoles.MANAGER.ToString()))
+                else if (userRole.Value.Contains(AppRoles.AGENT.ToString()))
                 {
-                    var model = dashboardService.GetManagerCount(currentUserEmail, userRole.Value);
+                    var model = dashboardService.GetAgentCount(currentUserEmail, userRole.Value);
                     return View(model);
 
                 }

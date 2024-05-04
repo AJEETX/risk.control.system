@@ -496,27 +496,27 @@ namespace risk.control.system.Services
             var assignedToAgency = _context.InvestigationCaseSubStatus.FirstOrDefault(
                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
             var userIsAgent = agencyUser.Active && agencyUser.UserRole == AgencyRole.AGENT;
-            if(userIsAgent)
-            {
-                if(!string.IsNullOrWhiteSpace(claimsInvestigation.UserEmailActionedTo) 
-                    && claimsInvestigation.UserEmailActionedTo.Equals(agencyUser.Email, StringComparison.OrdinalIgnoreCase))
-                {
-                    return new ClaimTransactionModel
-                    {
-                        ClaimsInvestigation = claimsInvestigation,
-                        Location = location,
-                        NotWithdrawable = claimsInvestigation.InvestigationCaseSubStatusId == submittedStatus.InvestigationCaseSubStatusId
-                    };
-                }
-                else
-                {
-                    return null!;
-                }
-            }
+            //if(userIsAgent)
+            //{
+            //    if(!string.IsNullOrWhiteSpace(claimsInvestigation.UserEmailActionedTo) 
+            //        && claimsInvestigation.UserEmailActionedTo.Equals(agencyUser.Email, StringComparison.OrdinalIgnoreCase))
+            //    {
+            //        return new ClaimTransactionModel
+            //        {
+            //            ClaimsInvestigation = claimsInvestigation,
+            //            Location = location,
+            //            NotWithdrawable = claimsInvestigation.InvestigationCaseSubStatusId == submittedStatus.InvestigationCaseSubStatusId
+            //        };
+            //    }
+            //    else
+            //    {
+            //        return null!;
+            //    }
+            //}
             claimsInvestigation.AgencyDeclineComment = string.Empty;
             if(caseLogs.Any(l=>l.UserEmailActioned == agencyUser.Email || 
             ( claimsInvestigation.InvestigationCaseSubStatusId == assignedToAgency.InvestigationCaseSubStatusId)  
-            && claimsInvestigation.CaseLocations.Any(l=>l.VendorId == agencyUser.VendorId)))
+            && claimsInvestigation.VendorId == agencyUser.VendorId))
             {
                 return new ClaimTransactionModel
                 {
