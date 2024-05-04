@@ -19,12 +19,14 @@ namespace risk.control.system.Helpers
         private readonly RequestDelegate _next;
         private readonly ILogger<WhitelistListMiddleware> _logger;
         private readonly IFeatureManager featureManager;
+        private readonly IConfiguration config;
         private byte[][] _safelist;
-        public WhitelistListMiddleware(RequestDelegate next, ILogger<WhitelistListMiddleware> logger, IFeatureManager featureManager)
+        public WhitelistListMiddleware(RequestDelegate next, ILogger<WhitelistListMiddleware> logger, IFeatureManager featureManager, IConfiguration config)
         {
             _next = next;
             _logger = logger;
             this.featureManager = featureManager;
+            this.config = config;
         }
 
         public async Task Invoke(HttpContext context)
@@ -91,7 +93,8 @@ namespace risk.control.system.Helpers
                     }
                 }
             }
-
+            var timeout = double.Parse(config["SESSION_TIMEOUT_SEC"]) - 30;
+            context.Items.Add("timeout", timeout);
             await _next.Invoke(context);
         }
     }

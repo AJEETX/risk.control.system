@@ -1,7 +1,6 @@
 var askConfirmation = true;
 var alertTimeInSeconds = 15;
 var alertImeMilliSeconds = alertTimeInSeconds * 1000;
-var idleTimeDuration = 300;
 
 function startTimer(duration, display) {
 	var timer = duration, minutes, seconds;
@@ -95,6 +94,7 @@ function showTime() {
 }
 window.onload = function () {
 	var display = document.querySelector('#time');
-	startTimer(idleTimeDuration, display);
+	var timeout = document.getElementById('timeout').value;
+	startTimer(timeout, display);
 	showTime();
 }

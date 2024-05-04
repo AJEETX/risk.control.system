@@ -10,6 +10,19 @@ var showOcrMap = false;
 const image =
     "/images/beachflag.png";
 
+
+//document.addEventListener("DOMContentLoaded", function () {
+//    var ws = new WebSocket('wss://' + window.location.host + '/ws');
+//    ws.onopen = function () {
+//        ws.send("Hello, server!");
+//    };
+//    ws.onmessage = function (event) {
+//        console.log("Received message: " + event.data);
+//    };
+//    ws.onerror = function (error) {
+//        console.error("WebSocket error: " + error);
+//    };
+//});
 function clearAllInputs(event) {
     var allInputs = document.querySelectorAll('input');
     allInputs.forEach(singleInput => singleInput.value = '');
@@ -73,6 +86,7 @@ async function fetchIpInfo() {
     }
 }
 $(document).ready(function () {
+
     fetchIpInfo();
 
     $('#information-popup').on('click', function (e) {
@@ -82,12 +96,12 @@ $(document).ready(function () {
                 content: "Detail completed <i class='far fa-thumbs-up'></i><br /> <b>ASSIGN</b> now or later",
                 icon: 'fas fa-info',
                 animationBounce: 2.5,
-                type: 'dark',
+                type: 'red',
                 closeIcon: true,
                 buttons: {
                     cancel: {
                         text: "CLOSE",
-                        btnClass: 'btn-secondary'
+                        btnClass: 'btn-danger'
                     }
                 }
             }

@@ -18,7 +18,11 @@
 </head>
 
 <body class="hold-transition sidebar-mini">
+    @{
+        var timeout = Context.Items["timeout"];
+    }
     <div class="wrapper">
+        <input type="hidden" id="timeout" name="timeout" value="@timeout" />
         @if (SignInManager.IsSignedIn(User))
         {
             var userEmail = User?.Identity?.Name;

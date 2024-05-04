@@ -1,5 +1,6 @@
 using System;
 using System.Net;
+using System.Net.WebSockets;
 using System.Reflection;
 using System.Threading.RateLimiting;
 
@@ -18,6 +19,7 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.AspNetCore.WebSockets;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.FeatureManagement;
@@ -219,7 +221,13 @@ builder.Services.AddMvcCore(config =>
 });
 builder.Services.AddHttpContextAccessor();
 
+builder.Services.AddWebSockets(options =>
+{
+    options.KeepAliveInterval = TimeSpan.FromSeconds(120);
+});
 var app = builder.Build();
+
+app.UseWebSockets();
 app.UseSwagger();
 
 if (!app.Environment.IsDevelopment())
@@ -259,5 +267,6 @@ app.UseFileServer();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Dashboard}/{action=Index}/{id?}");
+
 
 app.Run();
