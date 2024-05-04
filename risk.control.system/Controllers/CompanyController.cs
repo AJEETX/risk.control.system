@@ -67,13 +67,13 @@ namespace risk.control.system.Controllers
                 }
 
                 var userEmail = HttpContext.User?.Identity?.Name;
-                if(userEmail is null)
+                if (userEmail is null)
                 {
                     notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-                if(companyUser is null)
+                if (companyUser is null)
                 {
                     notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
@@ -97,7 +97,7 @@ namespace risk.control.system.Controllers
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
-            
+
         }
 
         [Breadcrumb("Edit Company")]
@@ -144,7 +144,7 @@ namespace risk.control.system.Controllers
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
-            
+
         }
 
         // POST: ClientCompanies/Edit/5
@@ -205,10 +205,10 @@ namespace risk.control.system.Controllers
                 existCompany.PhoneNumber = clientCompany.PhoneNumber;
                 existCompany.Branch = clientCompany.Branch;
                 existCompany.BankName = clientCompany.BankName;
-                existCompany.BankAccountNumber =   clientCompany.BankAccountNumber;
-                existCompany.IFSCCode =   clientCompany.IFSCCode;
-                existCompany.Addressline =   clientCompany.Addressline;
-                existCompany.Description =   clientCompany.Description;
+                existCompany.BankAccountNumber = clientCompany.BankAccountNumber;
+                existCompany.IFSCCode = clientCompany.IFSCCode;
+                existCompany.Addressline = clientCompany.Addressline;
+                existCompany.Description = clientCompany.Description;
 
                 existCompany.Updated = DateTime.Now;
                 existCompany.UpdatedBy = HttpContext.User?.Identity?.Name;
@@ -254,7 +254,7 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var company = _context.ClientCompany.FirstOrDefault(v => v.ClientCompanyId == companyUser.ClientCompanyId);
-                if(company == null)
+                if (company == null)
                 {
                     notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
@@ -268,7 +268,7 @@ namespace risk.control.system.Controllers
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
-            
+
         }
 
         [HttpPost]
@@ -307,7 +307,7 @@ namespace risk.control.system.Controllers
                 user.Updated = DateTime.Now;
                 user.UpdatedBy = HttpContext.User?.Identity?.Name;
                 user.Role = (AppRoles)Enum.Parse(typeof(AppRoles), user.UserRole.ToString());
-
+                user.IsClientAdmin = user.UserRole == CompanyRole.COMPANY_ADMIN;
                 IdentityResult result = await userManager.CreateAsync(user, user.Password);
 
                 if (result.Succeeded)
@@ -345,7 +345,7 @@ namespace risk.control.system.Controllers
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
-            
+
         }
 
         [Breadcrumb("Edit User", FromAction = "User")]
@@ -395,7 +395,7 @@ namespace risk.control.system.Controllers
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
-            
+
         }
 
         // POST: ClientCompanyApplicationUser/Edit/5
@@ -455,6 +455,7 @@ namespace risk.control.system.Controllers
                     user.PhoneNumber = applicationUser.PhoneNumber;
                     user.UserRole = applicationUser.UserRole;
                     user.Role = applicationUser.Role != null ? applicationUser.Role : (AppRoles)Enum.Parse(typeof(AppRoles), user.UserRole.ToString());
+                    user.IsClientAdmin = user.UserRole == CompanyRole.COMPANY_ADMIN;
                     user.UpdatedBy = HttpContext.User?.Identity?.Name;
                     user.SecurityStamp = DateTime.Now.ToString();
                     var result = await userManager.UpdateAsync(user);
@@ -515,19 +516,19 @@ namespace risk.control.system.Controllers
         {
             try
             {
-                if(vendors is null || vendors.Count == 0)
+                if (vendors is null || vendors.Count == 0)
                 {
                     notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var userEmail = HttpContext.User?.Identity?.Name;
-                if(string.IsNullOrWhiteSpace(userEmail))
+                if (string.IsNullOrWhiteSpace(userEmail))
                 {
                     notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-                if(companyUser == null)
+                if (companyUser == null)
                 {
                     notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
@@ -561,7 +562,7 @@ namespace risk.control.system.Controllers
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
-            
+
         }
 
         [Breadcrumb("Empanelled Agencies", FromAction = "Index", FromController = typeof(VendorsController))]
@@ -631,7 +632,7 @@ namespace risk.control.system.Controllers
             try
             {
 
-                if (1> id || _context.Vendor == null)
+                if (1 > id || _context.Vendor == null)
                 {
                     notifyService.Error("AGENCY NOT FOUND!");
                     return RedirectToAction(nameof(DashboardController.Index), "Dashboard");
@@ -751,7 +752,7 @@ namespace risk.control.system.Controllers
                 CompanyId = user.ClientCompanyId.Value,
                 UserName = user.UserName,
                 CompanyUserRoleViewModel = userRoles,
-                 UserRole = !string.IsNullOrWhiteSpace(selectedRole) ? (CompanyRole)Enum.Parse(typeof(CompanyRole), selectedRole, true) : null,
+                UserRole = !string.IsNullOrWhiteSpace(selectedRole) ? (CompanyRole)Enum.Parse(typeof(CompanyRole), selectedRole, true) : null,
             };
 
             //var companyPage = new MvcBreadcrumbNode("Index", "Company", "Company");
@@ -778,7 +779,7 @@ namespace risk.control.system.Controllers
             user.UpdatedBy = HttpContext.User?.Identity?.Name;
             var roles = await userManager.GetRolesAsync(user);
             var result = await userManager.RemoveFromRolesAsync(user, roles);
-            result = await userManager.AddToRolesAsync(user, new List<string> { model.UserRole.ToString()});
+            result = await userManager.AddToRolesAsync(user, new List<string> { model.UserRole.ToString() });
             var currentUser = await userManager.GetUserAsync(HttpContext.User);
             await signInManager.RefreshSignInAsync(currentUser);
             var response = SmsService.SendSingleMessage(user.PhoneNumber, "User role edited . Email : " + user.Email);

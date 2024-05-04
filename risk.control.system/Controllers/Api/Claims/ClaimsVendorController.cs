@@ -607,33 +607,48 @@ namespace risk.control.system.Controllers.Api.Claims
         [Authorize(Roles = "AGENCY_ADMIN,SUPERVISOR")]
         public async Task<IActionResult> GetCompleted()
         {
-            IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
 
-            var allocatedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
-            var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
-            var submittedToVendorSupervisorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR);
+            var finishedStatus = _context.InvestigationCaseStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.FINISHED);
+            var inprogressStatus = _context.InvestigationCaseStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS);
+            var approvedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR);
+            var rejectedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR);
 
+            var reassignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER);
             var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
             var currentUserEmail = HttpContext.User?.Identity?.Name;
 
             var agencyUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == currentUserEmail);
+
+            IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
+
             var submittedToAssessorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
 
-            if(agencyUser.IsVendorAdmin)
+            var reviewCases = _context.InvestigationTransaction.Where(i => i.IsReviewCase &&
+                    i.InvestigationCaseStatusId == inprogressStatus.InvestigationCaseStatusId &&
+                    i.InvestigationCaseSubStatusId == reassignedStatus.InvestigationCaseSubStatusId &&
+                    i.UserEmailActionedTo == string.Empty);
+
+            if (agencyUser.IsVendorAdmin)
             {
                 var claimsSubmitted = new List<ClaimsInvestigation>();
-                foreach (var item in applicationDbContext)
+                foreach (var claim in applicationDbContext)
                 {
-                    if ((item.InvestigationCaseStatus.Name == CONSTANTS.CASE_STATUS.FINISHED &&
-                        item.InvestigationCaseSubStatus.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR) ||
-                        (item.InvestigationCaseSubStatus.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR))
+                    var reviewClaimIds = reviewCases.Select(r => r.ClaimsInvestigationId);
+                    var previousReport = _context.PreviousClaimReport.Any(r => r.CaseLocationId == claim.CaseLocations.FirstOrDefault().ClaimReport.CaseLocationId);
+                    if ((claim.InvestigationCaseStatusId== finishedStatus.InvestigationCaseStatusId &&
+                        claim.VendorId == agencyUser.VendorId && 
+                        claim.InvestigationCaseSubStatusId== approvedStatus.InvestigationCaseSubStatusId ||
+                        claim.InvestigationCaseSubStatusId == rejectedStatus.InvestigationCaseSubStatusId) ||
+                        (reviewClaimIds.Contains(claim.ClaimsInvestigationId)) && claim.ReviewCount == 1 && claim.IsReviewCase && previousReport)
                     {
-                        claimsSubmitted.Add(item);
+                        claimsSubmitted.Add(claim);
                     }
                 }
                 var response = claimsSubmitted
@@ -675,15 +690,26 @@ namespace risk.control.system.Controllers.Api.Claims
                             t.InvestigationCaseSubStatusId == submittedToAssessorStatus.InvestigationCaseSubStatusId))?.Select(c => c.ClaimsInvestigationId);
 
                 var claimsSubmitted = new List<ClaimsInvestigation>();
-                foreach (var item in applicationDbContext)
+                foreach (var claim in applicationDbContext)
                 {
-                    if ((item.InvestigationCaseStatus.Name == CONSTANTS.CASE_STATUS.FINISHED &&
-                        item.InvestigationCaseSubStatus.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR) ||
-                        (item.InvestigationCaseSubStatus.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR))
+                    var previousReport = _context.PreviousClaimReport.Any(r => r.CaseLocationId == claim.CaseLocations.FirstOrDefault().ClaimReport.CaseLocationId);
+
+                    var isReview = reviewCases.Any(i => i.IsReviewCase &&
+                    claim.ReviewCount == 1 &&
+                    i.ClaimsInvestigationId == claim.ClaimsInvestigationId &&
+                     i.InvestigationCaseSubStatusId == reassignedStatus.InvestigationCaseSubStatusId &&
+                     i.UserEmailActionedTo == string.Empty &&
+                     i.UserRoleActionedTo == $"{AppRoles.CREATOR.GetEnumDisplayName()} ( {claim.PolicyDetail.ClientCompany.Email})");
+
+                    if ((claim.InvestigationCaseStatus.Name == CONSTANTS.CASE_STATUS.FINISHED &&
+                        claim.VendorId == agencyUser.VendorId && 
+                        claim.InvestigationCaseSubStatus.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR) ||
+                        (claim.InvestigationCaseSubStatus.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR) || 
+                        ( isReview && previousReport))
                     {
-                        if (userAttendedClaims.Contains(item.ClaimsInvestigationId))
+                        if (userAttendedClaims.Contains(claim.ClaimsInvestigationId) )
                         {
-                            claimsSubmitted.Add(item);
+                            claimsSubmitted.Add(claim);
                         }
                     }
                 }
@@ -824,6 +850,8 @@ namespace risk.control.system.Controllers.Api.Claims
                .Include(c => c.Vendor)
                .Include(c => c.CaseLocations)
                .ThenInclude(l => l.PreviousClaimReports)
+               .Include(c=>c.CaseLocations)
+               .ThenInclude(l=>l.ClaimReport)
                 .Where(c => !c.Deleted);
             return applicationDbContext.OrderByDescending(o => o.Created);
         }

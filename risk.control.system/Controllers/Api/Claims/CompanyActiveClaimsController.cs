@@ -494,8 +494,7 @@ namespace risk.control.system.Controllers.Api.Claims
             var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
             applicationDbContext = applicationDbContext.Where(a =>
             openStatusesIds.Contains(a.InvestigationCaseStatusId) &&
-            a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId != null)
-            );
+            a.VendorId != null);
 
             foreach (var claim in applicationDbContext)
             {

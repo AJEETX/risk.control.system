@@ -61,9 +61,20 @@ namespace risk.control.system.Services
             c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId &&
             c.UserEmailActionedTo == userEmail && c.UserRoleActionedTo == $"{AppRoles.AGENT.GetEnumDisplayName()} ({vendorUser.Vendor.Email})");
 
-            var taskSubmitted = _context.InvestigationTransaction.Count(l => l.UserEmailActioned == userEmail && l.UserEmailActionedTo == string.Empty &&
-            l.UserRoleActionedTo == $"{AppRoles.SUPERVISOR.GetEnumDisplayName()} ({vendorUser.Vendor.Email})" &&
-            l.InvestigationCaseSubStatusId == submitted2Supervisor.InvestigationCaseSubStatusId);
+            var userAttendedClaims = _context.InvestigationTransaction.Where(t => (t.UserEmailActioned == vendorUser.Email &&
+                            t.InvestigationCaseSubStatusId == submitted2Supervisor.InvestigationCaseSubStatusId))?.Select(c => c.ClaimsInvestigationId);
+
+            var claims = GetAgencyClaims();
+            int completedCount = 0;
+
+            var count = claims.Count(c => userAttendedClaims.Contains(c.ClaimsInvestigationId));
+            //foreach (var claim in claims)
+            //{
+            //    if(userAttendedClaims.Contains(claim.ClaimsInvestigationId))
+            //    {
+            //        completedCount += 1;
+            //    }
+            //}
 
             var data = new DashboardData();
             data.FirstBlockName = "Tasks";
@@ -71,7 +82,7 @@ namespace risk.control.system.Services
             data.FirstBlockUrl = "/ClaimsVendor/Agent";
 
             data.SecondBlockName = "Submitted";
-            data.SecondBlockCount = taskSubmitted;
+            data.SecondBlockCount = count;
             data.SecondBlockUrl = "/ClaimsVendor/Submitted";
 
             return data;

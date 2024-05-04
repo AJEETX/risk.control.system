@@ -177,6 +177,7 @@ namespace risk.control.system.Controllers
                 user.Role = (AppRoles)Enum.Parse(typeof(AppRoles), user.UserRole.ToString());
                 user.Updated = DateTime.Now;
                 user.UpdatedBy = HttpContext.User?.Identity?.Name;
+                user.IsVendorAdmin = user.UserRole == AgencyRole.AGENCY_ADMIN;
                 IdentityResult result = await userManager.CreateAsync(user, user.Password);
 
                 if (result.Succeeded)
@@ -349,6 +350,7 @@ namespace risk.control.system.Controllers
                 user.UpdatedBy = HttpContext.User?.Identity?.Name;
                 user.SecurityStamp = DateTime.Now.ToString();
                 user.UserRole = applicationUser.UserRole;
+                user.IsVendorAdmin = user.UserRole == AgencyRole.AGENCY_ADMIN;
                 user.Role = applicationUser.Role != null ? applicationUser.Role : (AppRoles)Enum.Parse(typeof(AppRoles), user.UserRole.ToString());
 
                 var result = await userManager.UpdateAsync(user);

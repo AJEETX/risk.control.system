@@ -94,7 +94,7 @@ $(document).ready(function () {
         );
     });
 
-    $('#withdraw-information-popup').on('mouseover', function (e) {
+    $('#withdraw-information-popup').on('click', function (e) {
         $.alert(
             {
                 title: " Withdraw Claim !",

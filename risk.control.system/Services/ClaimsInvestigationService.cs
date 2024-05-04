@@ -1205,6 +1205,7 @@ namespace risk.control.system.Services
             var claimsCaseToReassign = _context.ClaimsInvestigation
                 .Include(c => c.PolicyDetail)
                 .FirstOrDefault(v => v.ClaimsInvestigationId == claimsInvestigationId);
+            claimsCaseToReassign.VendorId = 0;
             claimsCaseToReassign.AssignedToAgency = false;
             claimsCaseToReassign.ReviewCount += 1;
             claimsCaseToReassign.UserEmailActioned = userEmail;

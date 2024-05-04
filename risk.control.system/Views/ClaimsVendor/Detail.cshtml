@@ -57,7 +57,7 @@
                         <input type="hidden" name="claimId" asp-for="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
                         <div class="col-md-12">
                             <div class="form-group">
-                                Withdrawl Remarks
+                                Decline Remarks
                                 <input id="remarks" asp-for="@Model.ClaimsInvestigation.PolicyDetail.Comments" class="form-control remarks" required />
                                 <span asp-validation-for="@Model.ClaimsInvestigation.PolicyDetail.Comments" class="text-danger"></span>
                             </div>
@@ -67,7 +67,7 @@
                         <div class="col-md-12">
                                 <a id="back" asp-action="Open" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i>
                                 <span class="badge badge-light"> <i class="fa fa-toggle-on"></i> </span> @Applicationsettings.BACK</a>
-                            <button id="submit-case" disabled type="submit" class="btn btn-danger"><i class="fas fa-undo"></i> Withdraw</button>
+                            <button id="submit-case" disabled type="submit" class="btn btn-danger"><i class="fas fa-undo"></i> DECLINE</button>
                         </div>
                     </div>
                 </form>
@@ -78,7 +78,7 @@
             else
             {
                 <div class="card-footer">
-                <div class="row">
+                <div class="row float-right">
                     <div class="col-md-12">
                             <a id="back" asp-action="Open" class="btn btn-outline-secondary">
                                 <i class="fas fa-arrow-left"></i>

@@ -478,54 +478,19 @@ namespace risk.control.system.Services
                 .Include(c => c.CaseLocations)
                     .ThenInclude(c => c.ClaimReport.ServiceReportTemplate.ReportTemplate.ReportQuestionaire)
                 .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == selectedcase);
-            var caseLogs = await _context.InvestigationTransaction
-                 .Include(i => i.InvestigationCaseStatus)
-                 .Include(i => i.InvestigationCaseSubStatus)
-                 .Include(c => c.ClaimsInvestigation)
-                 .ThenInclude(i => i.CaseLocations)
-                 .Include(c => c.ClaimsInvestigation)
-                 .ThenInclude(i => i.InvestigationCaseStatus)
-                 .Include(c => c.ClaimsInvestigation)
-                 .ThenInclude(i => i.InvestigationCaseSubStatus)
-                 .Where(t => t.ClaimsInvestigationId == selectedcase)
-                 .OrderByDescending(c => c.HopCount)?.ToListAsync();
+            
             var location = claimsInvestigation.CaseLocations.FirstOrDefault();
             var submittedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
 
-            var assignedToAgency = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
-            var userIsAgent = agencyUser.Active && agencyUser.UserRole == AgencyRole.AGENT;
-            //if(userIsAgent)
-            //{
-            //    if(!string.IsNullOrWhiteSpace(claimsInvestigation.UserEmailActionedTo) 
-            //        && claimsInvestigation.UserEmailActionedTo.Equals(agencyUser.Email, StringComparison.OrdinalIgnoreCase))
-            //    {
-            //        return new ClaimTransactionModel
-            //        {
-            //            ClaimsInvestigation = claimsInvestigation,
-            //            Location = location,
-            //            NotWithdrawable = claimsInvestigation.InvestigationCaseSubStatusId == submittedStatus.InvestigationCaseSubStatusId
-            //        };
-            //    }
-            //    else
-            //    {
-            //        return null!;
-            //    }
-            //}
+           
             claimsInvestigation.AgencyDeclineComment = string.Empty;
-            if(caseLogs.Any(l=>l.UserEmailActioned == agencyUser.Email || 
-            ( claimsInvestigation.InvestigationCaseSubStatusId == assignedToAgency.InvestigationCaseSubStatusId)  
-            && claimsInvestigation.VendorId == agencyUser.VendorId))
+            return new ClaimTransactionModel
             {
-                return new ClaimTransactionModel
-                {
-                    ClaimsInvestigation = claimsInvestigation,
-                    Location = location,
-                    NotWithdrawable = claimsInvestigation.InvestigationCaseSubStatusId == submittedStatus.InvestigationCaseSubStatusId
-                };
-            }
-            return null!;
+                ClaimsInvestigation = claimsInvestigation,
+                Location = location,
+                NotWithdrawable = claimsInvestigation.InvestigationCaseSubStatusId == submittedStatus.InvestigationCaseSubStatusId
+            };
         }
 
         public async Task<List<VendorUserClaim>> GetAgentLoad(string userEmail)

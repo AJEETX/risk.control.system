@@ -31,7 +31,11 @@
         <partial name="_AgentSubmittedReport" model="@Model" />
         <div class="card-footer">
             <div class="text-right">
-                <a id="back" asp-controller="Claimsvendor" asp-action="Submitted" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
+
+                <a id="back" asp-controller="Claimsvendor" asp-action="Submitted" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left"></i>
+                    <span class="badge badge-light"> <i class="fas fa-print"></i> </span> Back
+                </a>
 
             </div>
         </div>
