@@ -82,9 +82,9 @@ namespace risk.control.system.Controllers
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             await _signInManager.SignOutAsync();
             var showLoginUsers = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
-            if(showLoginUsers)
+            if (showLoginUsers)
             {
-                ViewData["Users"] = new SelectList(_context.Users.OrderBy(o=>o.Email), "Email", "Email");
+                ViewData["Users"] = new SelectList(_context.Users.OrderBy(o => o.Email), "Email", "Email");
             }
             return View(new LoginViewModel { ShowUserOnLogin = showLoginUsers });
         }
@@ -123,7 +123,7 @@ namespace risk.control.system.Controllers
                             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal,
                                 new AuthenticationProperties
                                 {
-                                    
+
                                 });
                             var isAuthenticated = HttpContext.User.Identity.IsAuthenticated;
 
@@ -150,7 +150,7 @@ namespace risk.control.system.Controllers
                             }
 
                             notifyService.Success("Login successful");
-                            return RedirectToAction("Index","Dashboard");
+                            return RedirectToAction("Index", "Dashboard");
                         }
                     }
 
@@ -220,6 +220,7 @@ namespace risk.control.system.Controllers
                         ModelState.AddModelError(string.Empty, "Invalid login attempt.");
                         model.Error = "Invalid login attempt.";
                         model.ShowUserOnLogin = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
+                        ViewData["Users"] = new SelectList(_context.Users.OrderBy(o => o.Email), "Email", "Email");
                         return View(model);
                     }
                 }
@@ -227,6 +228,7 @@ namespace risk.control.system.Controllers
             ModelState.AddModelError(string.Empty, "Bad Request.");
             model.Error = "Bad Request.";
             model.ShowUserOnLogin = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
+            ViewData["Users"] = new SelectList(_context.Users.OrderBy(o => o.Email), "Email", "Email");
             return View(model);
         }
 

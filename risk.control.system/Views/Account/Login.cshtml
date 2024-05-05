@@ -68,7 +68,7 @@
                                 @if(Model.ShowUserOnLogin)
                                 {
                                     <select required id="email" asp-for="Email" class="form-control remarks" asp-items="ViewBag.Users">
-                                        <option value="">--- SELECT USER EMAIL---</option>
+                                        <option value="">--- select user email ---</option>
                                     </select>
                                     <span asp-validation-for="Email" class="text-danger"></span>}
                                 else
@@ -129,19 +129,10 @@
     </div>
 </body>
 
-<!-- jQuery -->
-<script src="~/plugins/jquery/jquery.min.js"></script>
-<!-- Bootstrap 4 -->
 <script src="~/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-
-<!-- Summernote -->
 <script src="~/js/bootstrap-select.min.js"></script>
 <script src="~/js/jquery-1.10.2.js"></script>
 <script src="~/js/jquery-ui.js"></script>
-<script src="~/js/jqueryconfirm/dist/jquery-confirm.min.js"></script>
-<script src="~/js/jqueryconfirm/js/custom.jqueryconfirm.js"></script>
-<script src="~/js/bootstrap-toggle.min.js"></script>
-<script src="/plugins/form/jquery.form.min.js"></script>
 @{
     await Html.RenderPartialAsync("_ValidationScriptsPartial");
 }

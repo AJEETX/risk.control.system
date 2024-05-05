@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace risk.control.system.Controllers
 {
     [Route("ws")]
+    [ApiExplorerSettings(IgnoreApi = true)]
     [ApiController]
     public class WebSocketController : ControllerBase
     {

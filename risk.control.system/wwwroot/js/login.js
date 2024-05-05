@@ -1,4 +1,28 @@
+$.validator.setDefaults({
+    submitHandler: function (form) {
+        $("body").addClass("submit-progress-bg");
+        // Wrap in setTimeout so the UI
+        // can update the spinners
+        setTimeout(function () {
+            $(".submit-progress").removeClass("hidden");
+        }, 1);
 
+        $('#login').attr('disabled', 'disabled');
+        $('#login').css('color', 'lightgrey');
+        $('#login').html('<span class="fas fa-sync fa-spin" aria-hidden="true"></span> Login');
+
+        $('#login-form').submit();
+        $('html a *').css('cursor', 'not-allowed');
+        $('html input *, html a *').attr('disabled', 'disabled');
+        $('html a *, html button *').attr('disabled', 'disabled');
+        $('html a, html button *').css('pointer-events', 'none')
+
+        var nodes = document.getElementById("login-form").getElementsByTagName('*');
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].disabled = true;
+        }
+    }
+});
 function focusLogin() {
     const showUsers = document.getElementById("show-users").value;
     if (showUsers == 'true') {
@@ -28,30 +52,8 @@ async function fetchIpInfo() {
 }
 
 $(document).ready(function () {
+    $("#login-form").validate();
 
-    $('#login').on('click', function (event) {
-        $("body").addClass("submit-progress-bg");
-        // Wrap in setTimeout so the UI
-        // can update the spinners
-        setTimeout(function () {
-            $(".submit-progress").removeClass("hidden");
-        }, 1);
-
-        $('#login').attr('disabled', 'disabled');
-        $('#login').css('color', 'lightgrey');
-        $('#login').html('<span class="fas fa-sync fa-spin" aria-hidden="true"></span> Login');
-
-        $('#login-form').submit();
-        $('html a *').css('cursor', 'not-allowed');
-        $('html input *, html a *').attr('disabled', 'disabled');
-        $('html a *, html button *').attr('disabled', 'disabled');
-        $('html a, html button *').css('pointer-events', 'none')
-
-        var nodes = document.getElementById("login-form").getElementsByTagName('*');
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].disabled = true;
-        }
-    });
     $('#reset-pwd').on('click', function (event) {
         $("body").addClass("submit-progress-bg");
         // Wrap in setTimeout so the UI
