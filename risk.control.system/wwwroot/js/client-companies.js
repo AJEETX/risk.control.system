@@ -33,6 +33,21 @@
             { "data": "district" },
             { "data": "state" },
             { "data": "country" },
+            {
+                "sDefaultContent": "",
+                "bSortable": false,
+                "mRender": function (data, type, row) {
+                    var buttons = "";
+                    buttons += '<span class="checkbox">'
+                    if (row.active) {
+                        buttons += '<i class="fa fa-toggle-on"></i>';
+                    } else {
+                        buttons += '<i class="fa fa-toggle-off"></i>';
+                    }
+                    buttons += '</span>'
+                    return buttons;
+                }
+            },
             { "data": "updated" },
             {
                 "sDefaultContent": "",
@@ -77,7 +92,7 @@ function showdetails(id) {
     }, 1);
     $('a.btn.btn-info').attr('disabled', 'disabled');
     var btn = this;
-    $('a.btn.btn-info').html("<i class='fas fa-sync fa-spin'></i> Detail");
+    $('a#details' + id + '.btn.btn-info').html("<i class='fas fa-sync fa-spin'></i> Detail");
 
     var nodes = document.getElementById("article").getElementsByTagName('*');
     for (var i = 0; i < nodes.length; i++) {
@@ -92,7 +107,7 @@ function showedit(id) {
         $(".submit-progress").removeClass("hidden");
     }, 1);
     $('a.btn.btn-warning').attr('disabled', 'disabled');
-    $('a.btn.btn-warning').html("<i class='fas fa-sync fa-spin'></i> Edit");
+    $('a#edit ' +id + '.btn.btn-warning').html("<i class='fas fa-sync fa-spin'></i> Edit");
 
     var nodes = document.getElementById("article").getElementsByTagName('*');
     for (var i = 0; i < nodes.length; i++) {

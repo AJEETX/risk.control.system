@@ -237,7 +237,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text" for="Status"><i class="fa fa-toggle-on"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <select id="Status" asp-for="Status" class="form-control remarks" asp-items="Html.GetEnumSelectList<CompanyStatus>()">
+                                <select required id="Status" asp-for="Status" class="form-control remarks" asp-items="Html.GetEnumSelectList<CompanyStatus>()">
                                     <option value="">--- SELECT ---</option>
                                 </select>
                                 <span asp-validation-for="Status" class="text-danger"></span>

@@ -51,7 +51,8 @@ namespace risk.control.system.Controllers.Api.Company
                     District = u.District.Name,
                     State = u.State.Name,
                     Country = u.Country.Name,
-                    Updated = u.Updated.HasValue ?  u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy")
+                    Updated = u.Updated.HasValue ?  u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy"),
+                    Active = u.Status.GetEnumDisplayName()
                 });
 
             return Ok(result?.ToArray());

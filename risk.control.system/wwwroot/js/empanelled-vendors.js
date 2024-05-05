@@ -56,13 +56,13 @@
     $('#customerTable').on('draw.dt', function () {
         $('[data-toggle="tooltip"]').tooltip();
     });
-    $('#customerTable input[type="checkbox"].vendors').on('click', function () {
-        var checkboxes = $("input[type='checkbox'].vendors");
-        var anyChecked = checkIfAnyChecked(checkboxes);
-        var allChecked = checkIfAllChecked(checkboxes);
-        $('#checkall').prop('checked', allChecked);
-        $('#manage-vendors').prop('disabled', !anyChecked)
-    });
+    //$('#customerTable input[type="checkbox"].vendors').on('click', function () {
+    //    var checkboxes = $("input[type='checkbox'].vendors");
+    //    var anyChecked = checkIfAnyChecked(checkboxes);
+    //    var allChecked = checkIfAllChecked(checkboxes);
+    //    $('#checkall').prop('checked', allChecked);
+    //    $('#empanel-vendors').prop('disabled', !anyChecked)
+    //});
     // Handle click on "Select all" control
     $('#checkall').on('click', function () {
         // Get all rows with search applied
@@ -154,8 +154,8 @@
                             $('html *').css('cursor', 'not-allowed');
                             $('html a *, html button *').attr('disabled', 'disabled');
                             $('html a *, html button *').css('pointer-events', 'none')
-                            $('#manage-vendors').attr('disabled', 'disabled');
-                            $('#manage-vendors').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Depanel");
+                            $('#empanel-vendors').attr('disabled', 'disabled');
+                            $('#empanel-vendors').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Depanel");
 
                             var nodes = document.getElementById("article").getElementsByTagName('*');
                             for (var i = 0; i < nodes.length; i++) {

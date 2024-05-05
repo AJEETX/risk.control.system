@@ -54,13 +54,11 @@
                         @if(Model.ShowUserOnLogin)
                         {
                             <input type="hidden" id="show-users" name="show-users" value="true" />
-
                         }
                         else
 
                         {
                             <input type="hidden" id="show-users" name="show-users" value="false" />
-
                         }
                         <div class="input-boxes">
                             <div class="input-box">
@@ -108,12 +106,12 @@
                         <div class="input-boxes">
                             <div class="input-box">
                                 <i class="fas fa-envelope left-padd"></i>
-                                <input name="useremail" id="useremail" class="form-control remarks" type="email" placeholder="Your email" autocomplete="off" required>
+                                <input name="useremail" id="useremail" class="form-control remarks" type="email" placeholder="Your email" autocomplete="email" required>
                             </div>
                             <div class="input-box">
                                 <i class="fa fa-mobile left-padd" aria-hidden="true"></i>
-                                <input id="mobile" name="mobile" class="form-control remarks" maxlength="14" type="text" placeholder="Phone (61432854196)"
-                                       oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');">
+                                <input id="mobile" name="mobile" class="form-control remarks" maxlength="14" type="text" placeholder="Phone (61432854196)" autocomplete="number"
+                                       oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" required>
                             </div>
                             <p class="account">By clicking Reset, you agree to our <a href="#">Terms & Conditions!</a></p>
 
@@ -129,10 +127,11 @@
     </div>
 </body>
 
-<script src="~/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-<script src="~/js/bootstrap-select.min.js"></script>
 <script src="~/js/jquery-1.10.2.js"></script>
 <script src="~/js/jquery-ui.js"></script>
+<script src="~/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="~/js/bootstrap-select.min.js"></script>
+
 @{
     await Html.RenderPartialAsync("_ValidationScriptsPartial");
 }

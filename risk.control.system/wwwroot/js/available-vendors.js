@@ -62,14 +62,7 @@
         // Check/uncheck checkboxes for all rows in the table
         $('input[type="checkbox"]', rows).prop('checked', this.checked);
     });
-    $('input.vendors').on('click', function () {
-        var checkboxes = $("input[type='checkbox'].vendors");
-        var anyChecked = checkIfAnyChecked(checkboxes);
-        var allChecked = checkIfAllChecked(checkboxes);
-        $('#checkall').prop('checked', allChecked);
-        $('#manage-vendors').prop('disabled', !anyChecked)
-    });
-
+   
     // Handle click on checkbox to set state of "Select all" control
     $('#customerTable tbody').on('change', 'input[type="checkbox"]', function () {
         // If checkbox is not checked
@@ -152,8 +145,8 @@
                             $('html *').css('cursor', 'not-allowed');
                             $('html a *, html button *').attr('disabled', 'disabled');
                             $('html a *, html button *').css('pointer-events', 'none')
-                            $('#manage-vendors').attr('disabled', 'disabled');
-                            $('#manage-vendors').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Empanel");
+                            $('#depanel-vendors').attr('disabled', 'disabled');
+                            $('#depanel-vendors').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Empanel");
 
                             var nodes = document.getElementById("article").getElementsByTagName('*');
                             for (var i = 0; i < nodes.length; i++) {
