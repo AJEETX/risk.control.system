@@ -1,25 +1,34 @@
-function focusLogin() {
-    const pwd = document.getElementById("password");
-    pwd.select();
-}
-focusLogin();
-    async function fetchIpInfo() {
-        try {
-            const url = "/api/Notification/GetClientIp?url="+ encodeURIComponent(window.location.pathname);
-                //const url = "/api/Notification/GetClientIp";
-            const response = await fetch(url);
-            if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-            const data = await response.json();
-            document.querySelector('#ipAddress .info-data').textContent = data.ipAddress || 'Not available';
 
-            } catch (error) {
-            console.error('There has been a problem with your fetch operation:', error);
-            }
+function focusLogin() {
+    const showUsers = document.getElementById("show-users").value;
+    if (showUsers == 'true') {
+        const login = document.getElementById("email");
+        login.focus();
+    }
+    else {
+        const pwd = document.getElementById("password");
+        pwd.select();
+    }
+
+}
+async function fetchIpInfo() {
+    try {
+        const url = "/api/Notification/GetClientIp?url=" + encodeURIComponent(window.location.pathname);
+        //const url = "/api/Notification/GetClientIp";
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
         }
+        const data = await response.json();
+        document.querySelector('#ipAddress .info-data').textContent = data.ipAddress || 'Not available';
+
+    } catch (error) {
+        console.error('There has been a problem with your fetch operation:', error);
+    }
+}
 
 $(document).ready(function () {
+
     $('#login').on('click', function (event) {
         $("body").addClass("submit-progress-bg");
         // Wrap in setTimeout so the UI
@@ -66,3 +75,6 @@ $(document).ready(function () {
     });
     fetchIpInfo();
 });
+window.onload = function () {
+    focusLogin();
+}

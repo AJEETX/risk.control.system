@@ -178,7 +178,7 @@ namespace risk.control.system.Controllers
                         SMS.API.SendSingleMessage("+" + admin.PhoneNumber, message);
                     }
                         
-                    if (model.Mobile)
+                    if (model.ShowUserOnLogin)
                     {
                         return BadRequest();
                     }
@@ -208,7 +208,7 @@ namespace risk.control.system.Controllers
                         SMS.API.SendSingleMessage("+" + admin.PhoneNumber, message);
                     }
                         
-                    if (model.Mobile)
+                    if (model.ShowUserOnLogin)
                     {
                         return BadRequest();
                     }
@@ -221,7 +221,7 @@ namespace risk.control.system.Controllers
                 }
 
             }
-            if (model.Mobile)
+            if (model.ShowUserOnLogin)
             {
                 return BadRequest();
             }

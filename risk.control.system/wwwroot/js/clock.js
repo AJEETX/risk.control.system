@@ -1,10 +1,9 @@
 var askConfirmation = true;
-var alertTimeInSeconds = 15;
-var alertImeMilliSeconds = alertTimeInSeconds * 1000;
-
-function startTimer(duration, display) {
-	var timer = duration, minutes, seconds;
-	setInterval(function () {
+var timeoutSeconds = 15;
+var logoutPath = "/Account/Logout";
+function startTimer(timeout, display) {
+	var timer = timeout, minutes, seconds;
+	var countdown = setInterval(function () {
 		minutes = parseInt(timer / 60, 10);
 		seconds = parseInt(timer % 60, 10);
 
@@ -12,43 +11,44 @@ function startTimer(duration, display) {
 		seconds = seconds < 10 ? "0" + seconds : seconds;
 
 		display.textContent = minutes + ":" + seconds;
-		if (--timer < alertTimeInSeconds) {
-			if (askConfirmation) {
-				askConfirmation = false;
-				$.alert(
-					{
-						title: "Idle Session timeout!",
-						content: `Your idle time out to expire! <br /> Click <b> REFRESH </b> to continue... `,
-						icon: 'fas fa-hourglass-end fa-spin',
-						type: 'orange',
-						closeIcon: true,
-						autoClose: `cancel|` + alertImeMilliSeconds + ``,
-						buttons: {
-							confirm: {
-								text: "REFRESH",
-								btnClass: 'btn-warning',
-								action: function () {
-									window.location.href = window.location.pathname;
-									return;
-								}
-							},
-							cancel: {
-								text: "LOGOUT",
-								btnClass: 'btn-default',
-								action: function () {
-									window.location.href = "/account/logout";
-									return;
-								}
+
+		if (timer <= 0) {
+			clearInterval(countdown);
+			window.location.href = logoutPath;
+		}
+
+		else if (timer == timeoutSeconds) {
+			$.confirm(
+				{
+					title: "Session expire!",
+					content: `Session to expire! <br /> Click <b> REFRESH </b> to continue... `,
+					icon: 'fas fa-hourglass-end fa-spin',
+					type: 'orange',
+					closeIcon: true,
+					autoClose: `cancel|` + timer * 1000 + ``,
+					buttons: {
+						confirm: {
+							text: "REFRESH",
+							btnClass: 'btn-warning',
+							action: function () {
+								window.location.href = window.location.pathname;
+								return;
+							}
+						},
+						cancel: {
+							text: "LOGOUT",
+							btnClass: 'btn-default',
+							action: function () {
+								window.location.href = logoutPath;
+								return;
 							}
 						}
 					}
-				);
-			}
+				}
+			);
 				
-		} else if (timer < 0) {
-			timer = 0;
-			window.location.href = "/account/logout";
 		}
+		timer--;
 		
 	}, 1000);
 }

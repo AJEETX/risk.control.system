@@ -15,7 +15,7 @@ namespace risk.control.system.Models.ViewModel
         [Display(Name = "Remember me?")]
         public bool RememberMe { get; set; }
 
-        public bool Mobile { get; set; }
+        public bool ShowUserOnLogin { get; set; }
 
         public string? Error { get; set; }
     }

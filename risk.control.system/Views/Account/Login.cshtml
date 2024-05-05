@@ -13,11 +13,12 @@
     <title>icheckify: login</title>
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="~/plugins/fontawesome-free/css/all.min.css">
+    <link rel="stylesheet" href="~/css/jquery-ui.css">
     <link rel="stylesheet" href="~/css/login.css">
-    <link rel="stylesheet" href="~/css/all.min.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Security-Policy" content="default-src 'none';connect-src 'self' wss:; script-src 'self';  style-src 'self' https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://fonts.googleapis.com; img-src 'self' https://hostedscan.com; frame-src 'self';form-action 'self';upgrade-insecure-requests;" />
-
+    
 </head>
 <body>
     <div class="submit-progress hidden">
@@ -41,7 +42,7 @@
             </div> *@
         </div>
         <div class="forms">
-            <a href="https://hostedscan.com"><img id="hostedscan" src="https://hostedscan.com/hostedscan-badge-light.svg" alt="HostedScan | An automated vulnerability scanner" /></a>
+            <a target="_blank" href="https://hostedscan.com"><img id="hostedscan" src="https://hostedscan.com/hostedscan-badge-light.svg" alt="HostedScan | An automated vulnerability scanner" /></a>
 
             <div class="form-content">
                 <div class="login-form">
@@ -50,10 +51,30 @@
                     <div class="title">Login</div>
                     @Html.AntiForgeryToken()
                     <form id="login-form" asp-controller="account" asp-action="login" method="post">
+                        @if(Model.ShowUserOnLogin)
+                        {
+                            <input type="hidden" id="show-users" name="show-users" value="true" />
+
+                        }
+                        else
+
+                        {
+                            <input type="hidden" id="show-users" name="show-users" value="false" />
+
+                        }
                         <div class="input-boxes">
                             <div class="input-box">
                                 <i class="fas fa-envelope left-padd"></i>
-                                <input asp-for=Email id="email" type="email" class="form-control remarks" placeholder="Enter your email" title="Enter your email" value="@Applicationsettings.INSURER_CREATOR" autocomplete="off" required />
+                                @if(Model.ShowUserOnLogin)
+                                {
+                                    <select required id="email" asp-for="Email" class="form-control remarks" asp-items="ViewBag.Users">
+                                        <option value="">--- SELECT USER EMAIL---</option>
+                                    </select>
+                                    <span asp-validation-for="Email" class="text-danger"></span>}
+                                else
+                                {
+                                    <input asp-for=Email id="email" type="email" class="form-control remarks" placeholder="Enter your email" title="Enter your email" value="@Applicationsettings.INSURER_CREATOR" autocomplete="off" required />
+                                }
                             </div>
                             <div class="input-box">
                                 <i class="fas fa-lock left-padd"></i>
@@ -107,8 +128,22 @@
         </div>
     </div>
 </body>
+
+<!-- jQuery -->
+<script src="~/plugins/jquery/jquery.min.js"></script>
+<!-- Bootstrap 4 -->
+<script src="~/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+<!-- Summernote -->
+<script src="~/js/bootstrap-select.min.js"></script>
 <script src="~/js/jquery-1.10.2.js"></script>
-<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
-<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+<script src="~/js/jquery-ui.js"></script>
+<script src="~/js/jqueryconfirm/dist/jquery-confirm.min.js"></script>
+<script src="~/js/jqueryconfirm/js/custom.jqueryconfirm.js"></script>
+<script src="~/js/bootstrap-toggle.min.js"></script>
+<script src="/plugins/form/jquery.form.min.js"></script>
+@{
+    await Html.RenderPartialAsync("_ValidationScriptsPartial");
+}
 <script src="~/js/login.js"></script>
 </html>

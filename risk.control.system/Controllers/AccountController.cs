@@ -11,6 +11,8 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Hosting;
 using Microsoft.FeatureManagement;
 using Microsoft.FeatureManagement.Mvc;
 
@@ -30,6 +32,7 @@ namespace risk.control.system.Controllers
 {
     public class AccountController : Controller
     {
+        private readonly IWebHostEnvironment env;
         private readonly UserManager<Models.ApplicationUser> _userManager;
         private readonly SignInManager<Models.ApplicationUser> _signInManager;
         private readonly IHttpContextAccessor httpContextAccessor;
@@ -42,6 +45,7 @@ namespace risk.control.system.Controllers
         private readonly ApplicationDbContext _context;
 
         public AccountController(
+            IWebHostEnvironment env,
             UserManager<Models.ApplicationUser> userManager,
             SignInManager<Models.ApplicationUser> signInManager,
              IHttpContextAccessor httpContextAccessor,
@@ -53,6 +57,7 @@ namespace risk.control.system.Controllers
             INotyfService notifyService,
             ApplicationDbContext context)
         {
+            this.env = env;
             _userManager = userManager ?? throw new ArgumentNullException();
             _signInManager = signInManager ?? throw new ArgumentNullException();
             this.httpContextAccessor = httpContextAccessor;
@@ -76,8 +81,12 @@ namespace risk.control.system.Controllers
             // Clear the existing external cookie to ensure a clean login process
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             await _signInManager.SignOutAsync();
-
-            return View();
+            var showLoginUsers = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
+            if(showLoginUsers)
+            {
+                ViewData["Users"] = new SelectList(_context.Users.OrderBy(o=>o.Email), "Email", "Email");
+            }
+            return View(new LoginViewModel { ShowUserOnLogin = showLoginUsers });
         }
 
         [HttpPost]
@@ -181,11 +190,6 @@ namespace risk.control.system.Controllers
                         message += $"{BaseUrl}";
                         SMS.API.SendSingleMessage("+" + admin.PhoneNumber, message);
                     }
-                        
-                    if (model.Mobile)
-                    {
-                        return BadRequest();
-                    }
                     else
                     {
                         _logger.LogWarning("User account locked out.");
@@ -211,30 +215,19 @@ namespace risk.control.system.Controllers
                         message += $"{BaseUrl}";
                         SMS.API.SendSingleMessage("+" + admin.PhoneNumber, message);
                     }
-                        
-                    if (model.Mobile)
-                    {
-                        return BadRequest();
-                    }
                     else
                     {
                         ModelState.AddModelError(string.Empty, "Invalid login attempt.");
                         model.Error = "Invalid login attempt.";
+                        model.ShowUserOnLogin = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
                         return View(model);
                     }
                 }
-
             }
-            if (model.Mobile)
-            {
-                return BadRequest();
-            }
-            else
-            {
-                ModelState.AddModelError(string.Empty, "Bad Request.");
-                model.Error = "Bad Request.";
-                return View(model);
-            }
+            ModelState.AddModelError(string.Empty, "Bad Request.");
+            model.Error = "Bad Request.";
+            model.ShowUserOnLogin = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
+            return View(model);
         }
 
         [HttpGet]

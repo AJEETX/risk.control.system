@@ -185,6 +185,16 @@ div .error-message {
     border-radius: 2px;
     transition: all 0.3s ease;
 }
+.form-content .input-box select {
+    height: 100%;
+    width: 100%;
+    outline: none;
+    padding: 0 3rem;
+    font-size: 1.1rem;
+    border: 1px solid rgba(0,0,0,0.2);
+    border-radius: 2px;
+    transition: all 0.3s ease;
+}
 
 .form-content .input-box i {
     position: absolute;
@@ -235,6 +245,18 @@ div .error-message {
     .forms .form-content .button input:hover {
         background: grey;
     }
+
+#email:focus {
+    border: 1px solid #333;
+    background-color:whitesmoke;
+}
+.input-validation-error {
+    border-color: red !important;
+}
+
+.field-validation-error {
+    display: none;
+}
 
 .forms .form-content label {
     color: lightgray;
