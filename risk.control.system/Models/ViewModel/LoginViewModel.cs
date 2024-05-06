@@ -8,7 +8,6 @@ namespace risk.control.system.Models.ViewModel
         [EmailAddress]
         public string Email { get; set; }
 
-        [Required]
         [DataType(DataType.Password)]
         public string Password { get; set; }
 
@@ -18,5 +17,6 @@ namespace risk.control.system.Models.ViewModel
         public bool ShowUserOnLogin { get; set; }
 
         public string? Error { get; set; }
+        public string? Mobile { get; set; }
     }
 }

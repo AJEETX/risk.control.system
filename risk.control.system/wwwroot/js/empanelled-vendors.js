@@ -50,6 +50,12 @@
             { "data": "country" },
             { "data": "updated" },
         ],
+        "drawCallback": function (settings, start, end, max, total, pre) {
+            var rowCount = (this.fnSettings().fnRecordsTotal()); // total number of rows
+            if (rowCount > 0) {
+                $('#empanel-vendors').prop('disabled', false);
+            }
+        },
         error: function (xhr, status, error) { alert('err ' + error) }
     });
 

@@ -232,15 +232,15 @@ namespace risk.control.system.Controllers
             return View(model);
         }
 
-        [HttpGet]
+        [HttpPost]
         [AllowAnonymous]
-        public async Task<IActionResult> Forgot(string useremail, long mobile)
+        public async Task<IActionResult> Forgot(LoginViewModel input)
         {
             string message = string.Empty;
-            var smsSent = accountService.ForgotPassword(useremail, mobile);
+            var smsSent = accountService.ForgotPassword(input.Email,long.Parse(input.Mobile));
             if (smsSent)
             {
-                message = "Password sent to mobile: " + mobile;
+                message = "Password sent to mobile: " + input.Mobile;
                 notifyService.Success(message);
             }
             else

@@ -68,10 +68,12 @@
                                     <select required id="email" asp-for="Email" class="form-control remarks" asp-items="ViewBag.Users">
                                         <option value="">--- select user email ---</option>
                                     </select>
-                                    <span asp-validation-for="Email" class="text-danger"></span>}
+                                    <span asp-validation-for="Email" class="text-danger"></span>
+                                }
                                 else
                                 {
                                     <input asp-for=Email id="email" type="email" class="form-control remarks" placeholder="Enter your email" title="Enter your email" value="@Applicationsettings.INSURER_CREATOR" autocomplete="off" required />
+                                    <span asp-validation-for="Email" class="text-danger"></span>
                                 }
                             </div>
                             <div class="input-box">
@@ -101,17 +103,28 @@
                     <img class="login-logo" src="/img/iCheckifyLogo.png" />™️
 
                     <div class="title">Forgot Password</div>
-                    @Html.AntiForgeryToken()
-                    <form id="reset-form" action="Forgot" method="get">
+                    <form id="reset-form" asp-controller="Account" asp-action="Forgot" method="post">
                         <div class="input-boxes">
                             <div class="input-box">
                                 <i class="fas fa-envelope left-padd"></i>
-                                <input name="useremail" id="useremail" class="form-control remarks" type="email" placeholder="Your email" autocomplete="email" required>
+                                @if (Model.ShowUserOnLogin)
+                                {
+                                    <select required id="resetemail" asp-for="Email" class="form-control remarks" asp-items="ViewBag.Users">
+                                        <option value="">--- select user email ---</option>
+                                    </select>
+                                    <span asp-validation-for="Email" class="text-danger"></span>
+                                }
+                                else
+                                {
+                                    <input asp-for=Email id="resetemail" type="email" class="form-control remarks" placeholder="Enter your email" title="Enter your email" value="@Applicationsettings.INSURER_CREATOR" autocomplete="off" required />
+                                    <span asp-validation-for="Email" class="text-danger"></span>
+                                }
                             </div>
                             <div class="input-box">
                                 <i class="fa fa-mobile left-padd" aria-hidden="true"></i>
-                                <input id="mobile" name="mobile" class="form-control remarks" maxlength="14" type="text" placeholder="Phone (61432854196)" autocomplete="number"
-                                       oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" required>
+                                <input asp-for="Mobile" id="mobile" name="mobile" class="form-control remarks" maxlength="14" type="text" placeholder="Phone (61432854196)" autocomplete="number"
+                                        required>
+                                <span asp-validation-for="Mobile" class="text-danger"></span>
                             </div>
                             <p class="account">By clicking Reset, you agree to our <a href="#">Terms & Conditions!</a></p>
 

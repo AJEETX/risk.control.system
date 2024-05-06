@@ -7,15 +7,15 @@ $.validator.setDefaults({
             $(".submit-progress").removeClass("hidden");
         }, 1);
 
-        $('#login').attr('disabled', 'disabled');
-        $('#login').css('color', 'lightgrey');
-        $('#login').html('<span class="fas fa-sync fa-spin" aria-hidden="true"></span> Login');
+        form.submit();
 
-        $('#login-form').submit();
-        $('html a *').css('cursor', 'not-allowed');
-        $('html input *, html a *').attr('disabled', 'disabled');
+        $('#login-form').attr('disabled', 'disabled');
+        $('input').attr('disabled', 'disabled');
+        $('#login-form').css('color', 'lightgrey');
+        $('#login, #reset-pwd').html('<span class="fas fa-sync fa-spin" aria-hidden="true"></span> Login');
+
         $('html a *, html button *').attr('disabled', 'disabled');
-        $('html a, html button *').css('pointer-events', 'none')
+        $('html a *, html button *').css('pointer-events', 'none')
 
         var nodes = document.getElementById("login-form").getElementsByTagName('*');
         for (var i = 0; i < nodes.length; i++) {
@@ -50,33 +50,42 @@ async function fetchIpInfo() {
         console.error('There has been a problem with your fetch operation:', error);
     }
 }
-
+var askConfirm = true;
 $(document).ready(function () {
     $("#login-form").validate();
+    $("#reset-form").validate();
 
-    $('#reset-pwd').on('click', function (event) {
-        $("body").addClass("submit-progress-bg");
-        // Wrap in setTimeout so the UI
-        // can update the spinners
-        setTimeout(function () {
-            $(".submit-progress").removeClass("hidden");
-        }, 1);
+    //$('#reset-form').submit(function (event) {
+    //    if ($(this).valid()) {
+    //        event.preventDefault();
+    //        $("body").addClass("submit-progress-bg");
+    //        // Wrap in setTimeout so the UI
+    //        // can update the spinners
+    //        setTimeout(function () {
+    //            $(".submit-progress").removeClass("hidden");
+    //        }, 1);
 
-        $('#reset-pwd').attr('disabled', 'disabled');
-        $('#reset-pwd').css('color', 'lightgrey');
-        $('#reset-pwd').html('<span class="fas fa-sync fa-spin" aria-hidden="true"></span> Login');
+    //        $('#reset-pwd').attr('disabled', 'disabled');
+    //        $('#reset-pwd').css('color', 'lightgrey');
+    //        $('#reset-pwd').html('<span class="fas fa-sync fa-spin" aria-hidden="true"></span> Login');
+    //        askConfirm = false;
+    //        $('#reset-form').submit();
+    //        $('html *').css('cursor', 'not-allowed');
+    //        $('#reset-form').attr('disabled', 'disabled');
 
-        $('#reset-form').submit();
-        $('html *').css('cursor', 'not-allowed');
-        $('#reset-form').attr('disabled', 'disabled');
-
-        var nodes = document.getElementById("reset-pwd").getElementsByTagName('*');
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].disabled = true;
-        }
-    });
+    //        var nodes = document.getElementById("reset-pwd").getElementsByTagName('*');
+    //        for (var i = 0; i < nodes.length; i++) {
+    //            nodes[i].disabled = true;
+    //        }
+    //    }
+        
+    //});
     fetchIpInfo();
 });
+
+function onlyDigits(el) {
+    el.value = el.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');
+}
 window.onload = function () {
     focusLogin();
 }
