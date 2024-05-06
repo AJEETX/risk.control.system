@@ -6,7 +6,7 @@
 <section class="content">
     <div class="card card-secondary">
         <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-paper-plane"></i> Sent Details</h3>
+            <h3 class="card-title"><i class="fas fa-paper-plane"></i> Details</h3>
 
             @* <div class="card-tools">
             <a href="#" class="btn btn-tool" title="Previous"><i class="fas fa-chevron-left"></i></a>
@@ -35,7 +35,7 @@
                         <i class="far fa-trash-alt"></i>
                     </a>
                     <a asp-action="SentDetailsReply" asp-route-id="@Model.SentMessageId" asp-route-actiontype="Reply" class="btn btn-default btn-sm" data-container="body" title="Reply">
-                        <i class="fas fa-reply"></i>
+                        <i class="fa fa-reply"></i>
                     </a>
                     <a asp-action="SentDetailsReply" asp-route-id="@Model.SentMessageId" asp-route-actiontype="Forward" class="btn btn-default btn-sm" data-container="body" title="Forward">
                         <i class="fas fa-share"></i>
@@ -72,7 +72,7 @@
 
         <div class="card-footer">
             <div class="float-right">
-                <a asp-action="SentDetailsReply" asp-route-id="@Model.SentMessageId" asp-route-actiontype="Reply" class="btn btn-default"><i class="far fa-paper-plane"></i> Reply</a>
+                <a asp-action="SentDetailsReply" asp-route-id="@Model.SentMessageId" asp-route-actiontype="Reply" class="btn btn-default"><i class="fa fa-reply"></i> Reply</a>
                 <a sp-action="SentDetailsReply" asp-route-id="@Model.SentMessageId" asp-route-actiontype="Forward" class="btn btn-default"><i class="fas fa-share"></i> Forward</a>
             </div>
             <a asp-action="SentDetailsDelete" asp-route-id="@Model.SentMessageId" class="btn btn-default"><i class="far fa-trash-alt"></i> Delete</a>

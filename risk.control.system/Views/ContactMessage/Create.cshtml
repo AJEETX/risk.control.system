@@ -6,7 +6,7 @@
 }
 
 <section class="content">
-    <form asp-controller="ContactMessage" id="email-form" method="post" enctype="multipart/form-data">
+    <form asp-controller="ContactMessage" id="email-form" method="post" enctype="multipart/form-data" autocomplete="off">
         <div class="card card-secondary">
             <div class="card-header">
                 <h3 class="card-title"><i class="fa fa-edit"></i> Compose </h3>
@@ -17,7 +17,7 @@
                     <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
                 </div>
                 <div class="form-group">
-                    <input id="receipient-email" asp-for="ReceipientEmail" class="form-control remarks" placeholder="PLEASE ENTER MIN 3 CHARACTERS TO SELECT EMAIL">
+                    <input id="receipient-email" asp-for="ReceipientEmail" class="form-control remarks" placeholder="PLEASE ENTER MIN 3 CHARACTERS TO SELECT EMAIL" autocomplete="email">
                 </div>
                 <div class="form-group">
                     <input class="form-control remarks" asp-for="Subject" placeholder="SUBJET LINE">

@@ -7,9 +7,7 @@
     <div class="card card-secondary">
         <div class="card-header">
             <h3 class="card-title">
-                <a asp-controller="ContactMessage" asp-action="Trash" class="btn btn-default">
-                    <i class="fas fa-level-up-alt"></i> To Trash
-                </a>
+                <i class="fas fa-level-up-alt"></i> To Trash
             </h3>
             <div class="card-tools">
                 <a href="#" class="btn btn-tool" title="Previous"><i class="fas fa-chevron-left"></i></a>
@@ -46,7 +44,7 @@
             </div>
 
             <div class="mailbox-read-message">
-                @Model.Message
+                @Html.Raw(Model.Message)
             </div>
 
         </div>

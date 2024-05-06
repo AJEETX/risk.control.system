@@ -39,7 +39,7 @@
                 "mRender": function (data, type, row) {
                     var buttons = "";
                     buttons += '<span class="checkbox">'
-                    if (row.active) {
+                    if (row.active == 'ACTIVE') {
                         buttons += '<i class="fa fa-toggle-on"></i>';
                     } else {
                         buttons += '<i class="fa fa-toggle-off"></i>';
