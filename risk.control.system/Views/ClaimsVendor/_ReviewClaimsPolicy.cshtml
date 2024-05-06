@@ -5,22 +5,33 @@
         <div id="article" class="card  card-secondary">
             <div class="card-header">
                 <h3 class="card-title"><i class="fas fa-users"></i>  @Applicationsettings.AGENTS
-                    <span class="hover-text">
-                        <i class="fas fa-info-circle"></i>
-                        <span class="tooltip-text" id="information">
-                            <li>
-                                <i class='far fa-hand-point-right'></i> Select <input type='radio' /> <strong>AGENT</strong>
-                            </li>
-                            <li>
-                                <i class='far fa-thumbs-up'></i>
-                                <button class='btn btn-danger btn-xs'>
-                                    <span class='badge badge-danger btn-xs'>
-                                        <i class='fas fa-external-link-alt'></i>
-                                    </span> <b>ALLOCATE</b>
-                                </button>
-                            </li>
+                    <h3 class="card-title">
+                        <i class="fas fa-users"></i>  @Applicationsettings.AGENTS
+                        <span class="hover-text">
+                            <i class="fas fa-info-circle"></i>
+                            <span class="tooltip-text" id="information">
+                                <li>
+
+                                    <i class='far fa-hand-point-right'></i> Claim:
+                                    <b>
+                                        <i class="far fa-file-powerpoint"></i>
+                                        @Model.ClaimsInvestigation?.PolicyDetail?.ContractNumber
+                                    </b>
+                                </li>
+                                <li>
+                                    <i class='far fa-hand-point-right'></i> Select <input type='radio' /> <strong>AGENT</strong>
+                                </li>
+                                <li>
+                                    <i class='far fa-thumbs-up'></i>
+                                    <button class='btn btn-danger  btn-xs'>
+                                        <span class='badge badge-danger btn-xs'>
+                                            <i class='fas fa-external-link-alt'></i>
+                                        </span> <b>ALLOCATE</b>
+                                    </button>
+                                </li>
+                            </span>
                         </span>
-                    </span>
+                    </h3>
                 </h3>
             </div>
             <div class="submit-progress hidden">

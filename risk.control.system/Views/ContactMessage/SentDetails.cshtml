@@ -62,7 +62,10 @@
                     <div class="mailbox-attachment-info">
                         <a asp-controller="Download" asp-action="SentDetailsDownloadFileAttachment" asp-route-id="@Model.SentMessageId" class="mailbox-attachment-name"><i class="fas fa-paperclip"></i> @Model.AttachmentName</a>
                         <span class="mailbox-attachment-size clearfix mt-1">
-                            <span>@Model.Attachment?.Length  KB</span>
+                            @{
+                                var size = Model.Attachment?.Length / 1024;
+                            }
+                            <span> @size  KB</span>
                             <a asp-controller="Download" asp-action="SentDetailsDownloadFileAttachment" asp-route-id="@Model.SentMessageId" class="btn btn-default btn-sm float-right"><i class="fas fa-cloud-download-alt"></i></a>
                         </span>
                     </div>

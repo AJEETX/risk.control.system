@@ -2,7 +2,7 @@
 
 @{
     ViewData["Title"] = "Reply";
-    
+    <link href="~/plugins/summernote/summernote.css" rel="stylesheet" />
 }
 <section class="content">
     <form asp-controller="ContactMessage" id="email-form" method="post" enctype="multipart/form-data">
@@ -16,20 +16,42 @@
                 <div class="submit-progress hidden">
                     <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
                 </div>
-                <div class="form-group">
-                    <input id="receipient-email" class="form-control remarks" asp-for="ReceipientEmail" value="@Model.ReceipientEmail">
-                </div>
-                <div class="form-group">
-                    <input class="form-control remarks" asp-for="Subject" value="@Model.Subject">
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <span class="input-group-label"> Recepient Email:</span>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" asp-for="ReceipientEmail"><i class="fas fa-at"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
+                                </div>
+                                <input disabled id="receipient-email" asp-for="ReceipientEmail" class="form-control remarks" value="@Model.ReceipientEmail">
+
+                                <span asp-validation-for="ReceipientEmail" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <span class="input-group-label"> Email Subject:</span>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" asp-for="Subject"><i class="far fa-comment-alt"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
+                                </div>
+                                <input class="form-control remarks" asp-for="Subject" value="@Model.Subject">
+
+                                <span asp-validation-for="Subject" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div style="display:none" class="form-group">
                     <select asp-for="Priority" asp-items="Html.GetEnumSelectList<ContactMessagePriority>()">
                     </select>
                 </div>
                 <div class="form-group">
-                    @Html.LabelFor(model => model.RawMessage, new { @class = "col-md-12 control-label" })
                     <div class="col-md-12">
-                        @Html.TextAreaFor(model => model.RawMessage, new { @class = "form-control remarks", @row = 5 })
+                        @Html.TextAreaFor(model => model.RawMessage, new { @class = "form-control remarks message-content", @row = 5 })
                     </div>
                 </div>
                 <div class="form-group">

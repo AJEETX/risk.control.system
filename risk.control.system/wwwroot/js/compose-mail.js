@@ -1,5 +1,25 @@
 $(document).ready(function () {
-    $('#receipient-email').focus()
+
+    var recepientInputDisabled = document.getElementById('receipient-email');
+    if (!recepientInputDisabled.disabled) {
+        $('#receipient-email').focus();
+        $('#RawMessage').summernote({
+            height: 300,                 // set editor height
+            minHeight: null,             // set minimum height of editor
+            maxHeight: null,             // set maximum height of editor
+            focus: false                  // set focus to editable area after initializing summernote
+        });
+
+    }
+    else {
+        $('#RawMessage').summernote({
+            height: 300,                 // set editor height
+            minHeight: null,             // set minimum height of editor
+            maxHeight: null,             // set maximum height of editor
+            focus: true                  // set focus to editable area after initializing summernote
+        });
+
+    }
     var currentImage = document.getElementById('documentImage0').src;
 
     $("#document").on('change', function () {
@@ -81,7 +101,7 @@ $(document).ready(function () {
     });
 
     var askConfirmation = true;
-    $('#send-email').on('click', function (e) {
+    $('#send-email').submit(function (e) {
         if (askConfirmation) {
             e.preventDefault();
             $.confirm({
@@ -133,11 +153,5 @@ $(document).ready(function () {
     });
 
 
-    $('#RawMessage').summernote({
-        height: 300,                 // set editor height
-        minHeight: null,             // set minimum height of editor
-        maxHeight: null,             // set maximum height of editor
-        focus: false                  // set focus to editable area after initializing summernote
-    });
-
+   
 });

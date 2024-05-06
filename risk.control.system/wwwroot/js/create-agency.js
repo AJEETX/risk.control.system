@@ -158,7 +158,7 @@ $("input#emailAddress").on({
 });
 
 function checkDomain() {
-    var url = "/Account/CheckUserName";
+    var url = "/Account/CheckAgencyName";
     var name = $('#emailAddress').val().toLowerCase();
     var domain = $('#domain').val().toLowerCase();
     if (name) {

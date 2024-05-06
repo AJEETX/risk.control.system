@@ -277,10 +277,33 @@ namespace risk.control.system.Controllers
             var newDomain = input.Trim().ToLower() + domainData.GetEnumDisplayName();
 
             var allUsers = _userManager.Users.Where(u =>
-            u.Email.Substring(u.Email.IndexOf("@") + 1) == newDomain
+            u.Email.Trim().ToLower().Substring(u.Email.IndexOf("@") + 1) == newDomain
             )?.ToList();
 
             if (allUsers?.Count == 0)
+            {
+                return 0;
+            }
+            else
+            {
+                return 1;
+            }
+        }
+
+        [HttpGet]
+        public async Task<int?> CheckAgencyName(string input, string domain)
+        {
+            if (string.IsNullOrWhiteSpace(input) || string.IsNullOrWhiteSpace(domain))
+            {
+                return null;
+            }
+            Domain domainData = (Domain)Enum.Parse(typeof(Domain), domain, true);
+
+            var newDomain = input.Trim().ToLower() + domainData.GetEnumDisplayName();
+
+            var agencyExist = _context.Vendor.Any(u =>u.Email.Trim().ToLower() == newDomain );
+
+            if (!agencyExist)
             {
                 return 0;
             }
