@@ -1,9 +1,6 @@
 <img src="risk.control.system/wwwroot/images/iCheckifyLogo.png" />™️ engine
 ### a simple and secure investigation workflow system [Multi-tenant SAAS^]
 
-<img src="Flyer.gif" style="height:90%;" />
-
-
 ### 1. iCheckify™️ engine highlights [web-portal]
 
 ##### Admin features : [admin user from Insurer]
@@ -84,3 +81,6 @@
 ####
     ^ = Available on Secure Cloud with Complete Regulatory and Statutatory Compliance.
     * = TBD for bespoke solution
+
+
+<a  href="http://s01.flagcounter.com/oH"><img  src="https://s01.flagcounter.com/countxl/oH/bg_FFFFFF/txt_000000/border_CCCCCC/columns_8/maxflags_12/viewers_Visits/labels_0/pageviews_0/flags_0/percent_0/"  alt="Flag Counter"  border="0"></a>
