@@ -8,7 +8,7 @@
 //        fetchIpInfo();
 //    }
 //}
-var hexData = 'AIzaSyDH8T9FvJ8n2LNwxkppRAeOq3Mx7I3qi1E';
+var hexData = 'AIzaSyDYRB1qIx1AyTxGnV5r5IZC3mk4uYV6MFI';
 
 function loadScript() {
     var script = document.createElement('script');

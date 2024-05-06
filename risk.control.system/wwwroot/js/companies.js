@@ -1,4 +1,4 @@
-﻿var apiKey = 'AIzaSyDH8T9FvJ8n2LNwxkppRAeOq3Mx7I3qi1E';
+﻿var apiKey = 'AIzaSyDYRB1qIx1AyTxGnV5r5IZC3mk4uYV6MFI';
 $(function () {
 
     $('a#edit-profile.btn.btn-warning').on('click', function () {

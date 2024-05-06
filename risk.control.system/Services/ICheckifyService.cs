@@ -351,6 +351,7 @@ namespace risk.control.system.Services
 
                 //var processPAN = SkiaSharpHelper.GetMaskedImage(byteimage);
 
+                //var byteimage = Convert.FromBase64String(data.OcrImage);
                 //var savedImage = ImageCompression.ConverterSkia(byteimage);
 
                 //var base64Image = Convert.ToBase64String(savedImage);
@@ -358,10 +359,10 @@ namespace risk.control.system.Services
 
                 //var maskedImage = await httpClientService.GetMaskedImage(inputImage, company.ApiBaseUrl);
 
-                var byteimage = Convert.FromBase64String(data.OcrImage);
 
                 //=================GOOGLE VISION API =========================
 
+                var byteimage = Convert.FromBase64String(data.OcrImage);
                 var imageReadOnly = await googleApi.DetectTextAsync(byteimage);
 
                 var allPanText = imageReadOnly.FirstOrDefault().Description;
@@ -372,6 +373,14 @@ namespace risk.control.system.Services
 
 
                 var ocrImaged = googleHelper.MaskTextInImage(byteimage, imageReadOnly);
+                var maskedImage = new FaceImageDetail
+                {
+                    DocType = allPanText.IndexOf(txt2Find) > 0 && allPanText.Length > allPanText.IndexOf(txt2Find) ? "PAN" : "UNKNOWN",
+                    DocumentId = panNumber,
+                    MaskedImage = Convert.ToBase64String(ocrImaged),       //TO-DO,
+                    OcrData = allPanText
+                };
+
                 //=================END GOOGLE VISION  API =========================
 
 
@@ -397,13 +406,6 @@ namespace risk.control.system.Services
 
                 //=================END AMAZON API =========================
 
-                var maskedImage = new FaceImageDetail
-                {
-                    DocType = allPanText.IndexOf(txt2Find) > 0 && allPanText.Length > allPanText.IndexOf(txt2Find) ? "PAN" : "UNKNOWN",
-                    DocumentId = panNumber,
-                    MaskedImage = Convert.ToBase64String(ocrImaged),       //TO-DO,
-                    OcrData = allPanText
-                };
 
 
 
