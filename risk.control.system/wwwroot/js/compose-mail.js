@@ -1,7 +1,7 @@
 $(document).ready(function () {
 
     var recepientInputDisabled = document.getElementById('receipient-email');
-    if (!recepientInputDisabled.disabled) {
+    if (!recepientInputDisabled.readOnly) {
         $('#receipient-email').focus();
         $('#RawMessage').summernote({
             height: 300,                 // set editor height
