@@ -234,6 +234,7 @@ namespace risk.control.system.Controllers
 
         [HttpPost]
         [AllowAnonymous]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Forgot(LoginViewModel input)
         {
             string message = string.Empty;

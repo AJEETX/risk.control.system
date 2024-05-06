@@ -39,7 +39,7 @@ namespace risk.control.system.Services
 
                 string message = $"Dear {useremail}";
                 message += $"                                          ";
-                message += $"Uid reset for mobile: {user.PhoneNumber}";
+                message += $"{passwordString}";
                 message += $"                                          ";
                 message += $"Thanks";
                 message += $"                                          ";
