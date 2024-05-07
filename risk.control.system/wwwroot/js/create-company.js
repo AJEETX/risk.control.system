@@ -55,7 +55,7 @@ $(document).ready(function () {
                 for (var i = 0; i < countFiles; i++) {
                     var fileSize = $(this)[0].files[i].size;
                     if (fileSize > MaxSizeInBytes) {
-                        document.getElementById('profileImage').src = '/img/no-user.png';
+                        document.getElementById('companyImage').src = '/img/no-image.png';
                         document.getElementById('documentImageInput').value = '';
                         $.alert(
                             {
@@ -72,6 +72,9 @@ $(document).ready(function () {
                                 }
                             }
                         );
+                    }
+                    else {
+                        document.getElementById('companyImage').src = window.URL.createObjectURL(this.files[0])
                     }
                 }
 

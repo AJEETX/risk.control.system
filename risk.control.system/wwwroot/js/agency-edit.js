@@ -1,48 +1,49 @@
-﻿$(document).ready(function () {
-    var askConfirmation = true;
-    $('#create-form').submit(function (e) {
-        if (askConfirmation) {
-            e.preventDefault();
-            $.confirm({
-                title: "Confirm Edit Agency",
-                content: "Are you sure to edit?",
-                icon: 'fas fa-building',
-    
-                type: 'orange',
-                closeIcon: true,
-                typeAnimated: true,
-                buttons: {
-                    confirm: {
-                        text: "Edit Agency",
-                        btnClass: 'btn-warning',
-                        action: function () {
-                            askConfirmation = false;
-                            $("body").addClass("submit-progress-bg");
-                            // Wrap in setTimeout so the UI
-                            // can update the spinners
-                            setTimeout(function () {
-                                $(".submit-progress").removeClass("hidden");
-                            }, 1);
-                            $('.btn.btn-warning').attr('disabled', 'disabled');
-                            $('.btn.btn-warning').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Edit Agency");
-                            $('html a *, html button *').css('pointer-events', 'none');
+﻿$.validator.setDefaults({
+    submitHandler: function (form) {
+        $.confirm({
+            title: "Confirm Edit",
+            content: "Are you sure to edit?",
 
-                            $('#create-form').submit();
-                            var nodes = document.getElementById("create-form").getElementsByTagName('*');
-                            for (var i = 0; i < nodes.length; i++) {
-                                nodes[i].disabled = true;
-                            }
+            icon: 'fas fa-building',
+            type: 'orange',
+            closeIcon: true,
+            buttons: {
+                confirm: {
+                    text: "Edit",
+                    btnClass: 'btn-warning',
+                    action: function () {
+                        askConfirmation = false;
+                        $("body").addClass("submit-progress-bg");
+                        // Wrap in setTimeout so the UI
+                        // can update the spinners
+                        setTimeout(function () {
+                            $(".submit-progress").removeClass("hidden");
+                        }, 1);
+                        $('#create-agency').attr('disabled', 'disabled');
+                        $('#create-agency').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Edit Agency");
+
+                        form.submit();
+                        var nodes = document.getElementById("create-form").getElementsByTagName('*');
+                        for (var i = 0; i < nodes.length; i++) {
+                            nodes[i].disabled = true;
                         }
-                    },
-                    cancel: {
-                        text: "Cancel",
-                        btnClass: 'btn-default'
                     }
+                },
+                cancel: {
+                    text: "Cancel",
+                    btnClass: 'btn-default'
                 }
-            });
-        }
+            }
+        });
+    }
+});
+$(document).ready(function () {
+    $('#txtInput').on("cut copy paste", function (e) {
+        e.preventDefault();
     });
-    var currentImage = document.getElementById('profileImage').src;
+
+    $("#create-form").validate();
+    var currentImage = document.getElementById('companyImage').src;
 
     $("#documentImageInput").on('change', function () {
         var MaxSizeInBytes = 2097152;
@@ -60,7 +61,7 @@
                     var fileSize = $(this)[0].files[i].size;
                     if (fileSize > MaxSizeInBytes) {
                         if (currentImage.startsWith('https://') && currentImage.endsWith('/img/no-image.png')) {
-                            document.getElementById('profileImage').src = '/img/no-image.png';
+                            document.getElementById('companyImage').src = '/img/no-image.png';
                             document.getElementById('documentImageInput').value = '';
                         }
                         $.alert(
@@ -80,7 +81,7 @@
                         );
                     }
                     else {
-                        document.getElementById('profileImage').src = window.URL.createObjectURL($(this)[0].files[i]);
+                        document.getElementById('companyImage').src = window.URL.createObjectURL($(this)[0].files[i]);
                     }
                 }
 

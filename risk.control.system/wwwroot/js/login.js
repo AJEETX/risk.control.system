@@ -13,14 +13,11 @@ $.validator.setDefaults({
         $('#reset-form').attr('disabled', 'disabled');
 
         $('#email').attr('disabled', 'disabled');
-        $('#email').css('background-color', 'white');
 
         $('#resetemail').attr('disabled', 'disabled');
-        $('#resetemail').css('background-color', 'white');
 
         $('#password').attr('disabled', 'disabled');
-        $('#password').css('background-color', 'white');
-        $('#password').css('color', 'grey');
+        $('#password').css('color', 'lightgrey');
 
         $('#login').css('color', 'lightgrey');
         $('#reset-pwd').css('color', 'lightgrey');

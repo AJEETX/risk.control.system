@@ -261,6 +261,9 @@
                             </div>
                         </div>
                         <div class="form-group text-right">
+                            <button id="reset" type="submit" onclick="clearAllInputs()" class="btn btn-outline-secondary">
+                                <i class="fas fa-undo"></i> RESET
+                            </button>
                             <a id="back" asp-action="Details" asp-route-id="@Model.VendorId" class="btn btn-secondary">
                                 <i class="fa fa-window-close"></i>
                                 @Applicationsettings.CANCEL

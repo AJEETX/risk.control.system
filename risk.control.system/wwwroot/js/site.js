@@ -25,8 +25,13 @@ const image =
 //});
 function clearAllInputs(event) {
     var allInputs = document.querySelectorAll('input');
-    allInputs.forEach(singleInput => singleInput.value = '');
+
+    allInputs.forEach(singleInput => singleInput.readOnly ? singleInput.value: singleInput.value = '');
     $("option:selected").prop("selected", false);
+    var companyImage = document.getElementById('company-Image');
+    if (companyImage) {
+        formImage.src = '/img/no-image.png';
+    }
     var policyImage = document.getElementById('policyImage');
     var profileImage = document.getElementById('profileImage');
     if (policyImage) {

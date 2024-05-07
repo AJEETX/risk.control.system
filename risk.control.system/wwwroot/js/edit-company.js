@@ -40,7 +40,7 @@
 
 $(document).ready(function () {
     $("#create-form").validate();
-    var currentImage = document.getElementById('profileImage').src;
+    var currentImage = document.getElementById('companyImage').src;
     $("#documentImageInput").on('change', function () {
         var MaxSizeInBytes = 2097152;
         //Get count of selected files
@@ -57,7 +57,7 @@ $(document).ready(function () {
                     var fileSize = $(this)[0].files[i].size;
                     if (fileSize > MaxSizeInBytes) {
                         if (currentImage.startsWith('https://') && currentImage.endsWith('/img/no-image.png')) {
-                            document.getElementById('profileImage').src = '/img/no-image.png';
+                            document.getElementById('companyImage').src = '/img/no-image.png';
                             document.getElementById('documentImageInput').value = '';
                         }
 
@@ -77,7 +77,7 @@ $(document).ready(function () {
                             }
                         );
                     } else {
-                        document.getElementById('profileImage').src = window.URL.createObjectURL($(this)[0].files[i]);
+                        document.getElementById('companyImage').src = window.URL.createObjectURL($(this)[0].files[i]);
                     }
                 }
 
