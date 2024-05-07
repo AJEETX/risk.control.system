@@ -183,15 +183,15 @@
         if (askFaceUploadConfirmation) {
             e.preventDefault();
             $.confirm({
-                title: "Confirm Image Upload",
-                content: "Are you sure to upload?",
+                title: "Confirm Upload",
+                content: "Are you sure to upload Face Image?",
                 icon: 'fa fa-upload',
     
                 type: 'green',
                 closeIcon: true,
                 buttons: {
                     confirm: {
-                        text: "Image Upload",
+                        text: "Upload",
                         btnClass: 'btn-success',
                         action: function () {
                             askFaceUploadConfirmation = false;
@@ -239,15 +239,15 @@
         if (askPanUploadConfirmation) {
             e.preventDefault();
             $.confirm({
-                title: "Confirm Image Upload",
-                content: "Are you sure to upload?",
+                title: "Confirm Upload",
+                content: "Are you sure to upload PAN Card?",
                 icon: 'fa fa-upload',
     
                 type: 'green',
                 closeIcon: true,
                 buttons: {
                     confirm: {
-                        text: "Image Upload",
+                        text: "Upload",
                         btnClass: 'btn-success',
                         action: function () {
                             askPanUploadConfirmation = false;

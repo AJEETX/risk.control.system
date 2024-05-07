@@ -242,12 +242,10 @@ namespace risk.control.system.Controllers
             if (smsSent)
             {
                 message = "Password sent to mobile: " + input.Mobile;
-                notifyService.Success(message);
             }
             else
             {
                 message = "Incorrect details. Try Again";
-                notifyService.Error(message);
             }
             ForgotPassword model = new ForgotPassword
             {

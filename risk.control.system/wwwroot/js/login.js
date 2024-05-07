@@ -10,16 +10,34 @@ $.validator.setDefaults({
         form.submit();
 
         $('#login-form').attr('disabled', 'disabled');
-        $('select, input').attr('disabled', 'disabled');
-        $('#login-form').css('color', 'lightgrey');
-        $('#login, #reset-pwd').html('<span class="fas fa-sync fa-spin" aria-hidden="true"></span> Login');
+        $('#reset-form').attr('disabled', 'disabled');
+
+        $('#email').attr('disabled', 'disabled');
+        $('#email').css('background-color', 'white');
+
+        $('#resetemail').attr('disabled', 'disabled');
+        $('#resetemail').css('background-color', 'white');
+
+        $('#password').attr('disabled', 'disabled');
+        $('#password').css('background-color', 'white');
+        $('#password').css('color', 'grey');
+
+        $('#login').css('color', 'lightgrey');
+        $('#reset-pwd').css('color', 'lightgrey');
+
+        $('#login').html('<span class="fas fa-sync fa-spin" aria-hidden="true"></span> Login');
+        $('#reset-pwd').html('<span class="fas fa-sync fa-spin" aria-hidden="true"></span> Reset Password');
 
         $('a').attr('disabled', 'disabled');
         $('button').attr('disabled', 'disabled');
-        $('button ').css('pointer-events', 'none')
+        $('button').css('pointer-events', 'none')
         $('a ').css({ 'pointer-events': 'none' }, { 'cursor': 'none' })
 
         var nodes = document.getElementById("login-form").getElementsByTagName('*');
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].disabled = true;
+        }
+        var nodes = document.getElementById("reset-form").getElementsByTagName('*');
         for (var i = 0; i < nodes.length; i++) {
             nodes[i].disabled = true;
         }
