@@ -66,13 +66,11 @@ namespace risk.control.system.Controllers.Api.Agency
                     Phone = u.PhoneNumber,
                     Photo = string.IsNullOrWhiteSpace(u.ProfilePictureUrl) ? noUserImagefilePath : u.ProfilePictureUrl,
                     Active = u.Active,
-                    Addressline = u.Addressline,
-                    District = u.District.Name,
-                    State = u.State.Name,
-                    Country = u.Country.Name,
+                    Addressline = u.Addressline + ", " + u.District.Name + ", " + u.State.Name + ", " + u.Country.Code,
                     Pincode = u.PinCode.Code,
                     Roles = u.UserRole != null ? $"<span class=\"badge badge-light\">{u.UserRole.GetEnumDisplayName()}</span>" : "<span class=\"badge badge-light\">...</span>",
-                    Updated = u.Updated.HasValue ? u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy")
+                    Updated = u.Updated.HasValue ? u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy"),
+                    UpdateBy = u.UpdatedBy
                 });
 
             return Ok(result?.ToArray());
@@ -103,7 +101,8 @@ namespace risk.control.system.Controllers.Api.Agency
                     District = u.District.Name,
                     State = u.State.Name,
                     Country = u.Country.Name,
-                    Updated = u.Updated.HasValue ? u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy")
+                    Updated = u.Updated.HasValue ? u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy"),
+                    Update = u.UpdatedBy
                 })
                 ?.OrderBy(a => a.Name);
 
@@ -133,7 +132,8 @@ namespace risk.control.system.Controllers.Api.Agency
                     District = u.District.Name,
                     State = u.State.Name,
                     Country = u.Country.Name,
-                    Updated = u.Updated.HasValue ? u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy")
+                    Updated = u.Updated.HasValue ? u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy"),
+                    UpdateBy = u.UpdatedBy
                 })
                 ?.OrderBy(a => a.Name);
 
@@ -179,7 +179,8 @@ namespace risk.control.system.Controllers.Api.Agency
                      string.Join("", s.PincodeServices.Select(c => "<span class='badge badge-light'>" + c.Pincode + "</span> ")),
                     Rate = s.Price,
                     UpdatedBy = s.UpdatedBy,
-                    Updated = s.Updated.HasValue ? s.Updated.Value.ToString("dd-MM-yyyy") :  s.Created.ToString("dd-MM-yyyy")
+                    Updated = s.Updated.HasValue ? s.Updated.Value.ToString("dd-MM-yyyy") :  s.Created.ToString("dd-MM-yyyy"),
+                    UpdateBy = s.UpdatedBy
                 });
 
             return Ok(result?.ToArray());
@@ -216,7 +217,8 @@ namespace risk.control.system.Controllers.Api.Agency
                     Country = u.Country.Name,
                     Pincode = u.PinCode.Code,
                     Roles = u.UserRole != null ? $"<span class=\"badge badge-light\">{u.UserRole.GetEnumDisplayName()}</span>" : "<span class=\"badge badge-light\">...</span>",
-                    Updated = u.Updated.HasValue ? u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy")
+                    Updated = u.Updated.HasValue ? u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy"),
+                    UpdateBy = u.UpdatedBy
                 });
 
             return Ok(result?.ToArray());
@@ -272,14 +274,12 @@ namespace risk.control.system.Controllers.Api.Agency
                     Email = "<a href=''>" + u.AgencyUser.Email + "</a>",
                     Name = u.AgencyUser.FirstName + " " + u.AgencyUser.LastName,
                     Phone = u.AgencyUser.PhoneNumber,
-                    Addressline = u.AgencyUser.Addressline,
-                    District = u.AgencyUser.District.Name,
-                    State = u.AgencyUser.State.Name,
-                    Country = u.AgencyUser.Country.Name,
+                    Addressline = u.AgencyUser.Addressline +", "+ u.AgencyUser.District.Name + ", " +u.AgencyUser.State.Name +", "+u.AgencyUser.Country.Code,
                     Pincode = u.AgencyUser.PinCode.Code,
                     Active = u.AgencyUser.Active,
                     Roles = u.AgencyUser.UserRole != null ? $"<span class=\"badge badge-light\">{u.AgencyUser.UserRole.GetEnumDisplayName()}</span>" : "<span class=\"badge badge-light\">...</span>",
                     Count = u.CurrentCaseCount,
+                    UpdateBy = u.AgencyUser.UpdatedBy
                 });
             return Ok(agentWithLoad?.ToArray());
         }

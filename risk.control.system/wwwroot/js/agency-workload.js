@@ -29,9 +29,7 @@
             { "data": "name" },
             { "data": "phone" },
             { "data": "addressline" },
-            { "data": "district" },
-            { "data": "state" },
-            { "data": "country" },
+            
             { "data": "pincode" },
             {
                 "sDefaultContent": "",
@@ -50,6 +48,7 @@
             },
             { "data": "roles" },
             { "data": "count" },
+            { "data": "updateBy" },
             {
                 "sDefaultContent": "",
                 "bSortable": false,

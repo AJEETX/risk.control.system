@@ -52,7 +52,8 @@ namespace risk.control.system.Controllers.Api.Company
                     State = u.State.Name,
                     Country = u.Country.Name,
                     Updated = u.Updated.HasValue ?  u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy"),
-                    Active = u.Status.GetEnumDisplayName()
+                    Active = u.Status.GetEnumDisplayName(),
+                    UpdatedBy = u.UpdatedBy
                 });
 
             return Ok(result?.ToArray());
@@ -90,13 +91,12 @@ namespace risk.control.system.Controllers.Api.Company
                     Phone = u.PhoneNumber,
                     Photo = string.IsNullOrWhiteSpace(u.ProfilePictureUrl) ? Applicationsettings.NO_USER : u.ProfilePictureUrl,
                     Active = u.Active,
-                    Addressline = u.Addressline,
-                    District = u.District.Name,
-                    State = u.State.Name,
-                    Country = u.Country.Name,
+                    Addressline = u.Addressline + ", " + u.District.Name + ", " + u.State.Name + ", " + u.Country.Code,
+
                     Roles = u.UserRole != null ? $"<span class=\"badge badge-light\">{u.UserRole.GetEnumDisplayName()}</span>" : "<span class=\"badge badge-light\">...</span>",
                     Pincode = u.PinCode.Code,
-                    Updated = u.Updated.HasValue ?  u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy")
+                    Updated = u.Updated.HasValue ?  u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy"),
+                    UpdateBy = u.UpdatedBy
                 })?.ToArray();
             return Ok(result);
         }
@@ -133,13 +133,13 @@ namespace risk.control.system.Controllers.Api.Company
                     Phone = u.PhoneNumber,
                     Photo = string.IsNullOrWhiteSpace(u.ProfilePictureUrl) ? Applicationsettings.NO_USER : u.ProfilePictureUrl,
                     Active = u.Active,
-                    Addressline = u.Addressline,
-                    District = u.District.Name,
-                    State = u.State.Name,
-                    Country = u.Country.Name,
+                    Addressline = u.Addressline + ", " + u.District.Name +", " +u.State.Name+", " + u.Country.Code,
+                    
                     Roles = u.UserRole != null ? $"<span class=\"badge badge-light\">{u.UserRole.GetEnumDisplayName()}</span>" : "<span class=\"badge badge-light\">...</span>",
                     Pincode = u.PinCode.Code,
-                    Updated = u.Updated.HasValue ?  u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy")
+                    Updated = u.Updated.HasValue ?  u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy"),
+                    UpdateBy = u.UpdatedBy
+
                 })?.ToArray();
             return Ok(result);
         }
@@ -176,7 +176,9 @@ namespace risk.control.system.Controllers.Api.Company
                     District = u.District.Name,
                     State = u.State.Name,
                     Country = u.Country.Name,
-                    Updated = u.Updated.HasValue ? u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy")
+                    Updated = u.Updated.HasValue ? u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy"),
+                    UpdateBy = u.UpdatedBy
+
                 });
 
             return Ok(result?.ToArray());
@@ -226,7 +228,9 @@ namespace risk.control.system.Controllers.Api.Company
                     District = u.District.Name,
                     State = u.State.Name,
                     Country = u.Country.Name,
-                    Updated = u.Updated.HasValue ? u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy")
+                    Updated = u.Updated.HasValue ? u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy"),
+                    UpdateBy = u.UpdatedBy
+
                 });
             return Ok(result?.ToArray());
         }
@@ -271,6 +275,7 @@ namespace risk.control.system.Controllers.Api.Company
                     Rate = s.Price,
                     UpdatedBy = s.UpdatedBy,
                     Updated = s.Updated.HasValue ? s.Updated.Value.ToString("dd-MM-yyyy") : s.Created.ToString("dd-MM-yyyy")
+
                 });
 
             return Ok(result?.ToArray());

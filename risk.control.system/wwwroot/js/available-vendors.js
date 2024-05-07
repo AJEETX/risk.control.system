@@ -52,6 +52,7 @@
             { "data": "state" },
             { "data": "country" },
             { "data": "updated" },
+            { "data": "updateBy" },
         ],
         "drawCallback": function (settings, start, end, max, total, pre) {
             var rowCount = (this.fnSettings().fnRecordsTotal()); // total number of rows

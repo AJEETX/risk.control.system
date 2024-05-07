@@ -59,7 +59,7 @@ namespace risk.control.system.Models
 
         public DateTime Created { get; set; } = DateTime.Now;
         public DateTime? Updated { get; set; }
-        public string? UpdatedBy { get; set; } = default!;
+        public string? UpdatedBy { get; set; } = "--";
 
         [Required]
         public string? Password { get; set; }

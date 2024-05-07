@@ -245,6 +245,9 @@
                                             <th>
                                                 Updated
                                             </th>
+                                            <th>
+                                                Updated by
+                                            </th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -279,6 +282,9 @@
                                                         var updatedDate = item.Updated.HasValue ? item.Updated.Value.ToString("dd-MM-yyyy") : item.Created.ToString("dd-MM-yyyy");
                                                     }
                                                     @Html.DisplayFor(modelItem => updatedDate)
+                                                </td>
+                                                <td>
+                                                    @Html.DisplayFor(m => item.UpdatedBy)
                                                 </td>
                                             </tr>
                                         }

@@ -229,8 +229,9 @@ a.table-link {
 }
 
 #documentImage {
+    width: 350px;
     height: 150px;
-    width: 150px;
+    object-fit: cover;
     border: 1px solid #ccc;
     border-radius: 5px;
 }

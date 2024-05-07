@@ -12,7 +12,8 @@ $.validator.setDefaults({
         $('#login-form').attr('disabled', 'disabled');
         $('#reset-form').attr('disabled', 'disabled');
 
-        $('#email').attr('disabled', 'disabled');
+        $('#email, .login-link').attr('disabled', 'disabled');
+        $('#flip').attr('disabled', 'disabled');
 
         $('#resetemail').attr('disabled', 'disabled');
 

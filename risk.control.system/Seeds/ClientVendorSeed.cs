@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
@@ -8,15 +9,25 @@ namespace risk.control.system.Seeds
 {
     public class ClientVendorSeed
     {
-        public static async Task<(List<Vendor> vendors, List<ClientCompany> companyIds)> Seed(ApplicationDbContext context,
+        public static async Task<(List<Vendor> vendors, List<ClientCompany> companyIds)> Seed(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment,
                     InvestigationServiceType investigationServiceType, InvestigationServiceType discreetServiceType, InvestigationServiceType docServiceType, LineOfBusiness lineOfBusiness)
         {
+            string noCompanyImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", @Applicationsettings.NO_IMAGE);
+
             //CREATE VENDOR COMPANY
 
             var checkerPinCode = context.PinCode.Include(p => p.District).FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE2);
             var checkerDistrict = context.District.Include(d => d.State).FirstOrDefault(s => s.DistrictId == checkerPinCode.District.DistrictId);
             var checkerState = context.State.Include(s => s.Country).FirstOrDefault(s => s.StateId == checkerDistrict.State.StateId);
             var checkerCountry = context.Country.FirstOrDefault(s => s.CountryId == checkerState.Country.CountryId) ?? default!;
+            string checkerImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "checker.png");
+            var checkerImage = File.ReadAllBytes(checkerImagePath);
+
+            if (checkerImage == null)
+            {
+                checkerImage = File.ReadAllBytes(noCompanyImagePath);
+            }
+
 
             var checker = new Vendor
             {
@@ -37,7 +48,9 @@ namespace risk.control.system.Seeds
                 Email = Applicationsettings.AGENCY1DOMAIN,
                 PhoneNumber = "8888004739",
                 DocumentUrl = "/img/checker.png",
+                DocumentImage = checkerImage,
                 Updated = DateTime.Now,
+                Status = VendorStatus.ACTIVE
             };
 
             var checkerAgency = await context.Vendor.AddAsync(checker);
@@ -46,6 +59,13 @@ namespace risk.control.system.Seeds
             var verifyDistrict = context.District.Include(d => d.State).FirstOrDefault(s => s.DistrictId == verifyPinCode.District.DistrictId);
             var verifyState = context.State.Include(s => s.Country).FirstOrDefault(s => s.StateId == verifyDistrict.State.StateId);
             var verifyCountry = context.Country.FirstOrDefault(s => s.CountryId == verifyState.Country.CountryId) ?? default!;
+            string verifyImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "verify.png");
+            var verifyImage = File.ReadAllBytes(verifyImagePath);
+
+            if (verifyImage == null)
+            {
+                verifyImage = File.ReadAllBytes(noCompanyImagePath);
+            }
 
             var verify = new Vendor
             {
@@ -66,6 +86,8 @@ namespace risk.control.system.Seeds
                 Email = Applicationsettings.AGENCY2DOMAIN,
                 PhoneNumber = "4444404739",
                 DocumentUrl = "/img/verify.png",
+                DocumentImage = verifyImage,
+                Status = VendorStatus.ACTIVE,
                 Updated = DateTime.Now,
             };
 
@@ -75,6 +97,13 @@ namespace risk.control.system.Seeds
             var investigateDistrict = context.District.Include(d => d.State).FirstOrDefault(s => s.DistrictId == investigatePinCode.District.DistrictId);
             var investigateState = context.State.Include(s => s.Country).FirstOrDefault(s => s.StateId == investigateDistrict.State.StateId);
             var investigateCountry = context.Country.FirstOrDefault(s => s.CountryId == investigateState.Country.CountryId) ?? default!;
+            string investigateImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "investigate.png");
+            var investigateImage = File.ReadAllBytes(investigateImagePath);
+
+            if (investigateImage == null)
+            {
+                investigateImage = File.ReadAllBytes(noCompanyImagePath);
+            }
 
             var investigate = new Vendor
             {
@@ -95,6 +124,8 @@ namespace risk.control.system.Seeds
                 Email = Applicationsettings.AGENCY3DOMAIN,
                 PhoneNumber = "7964404160",
                 DocumentUrl = "/img/investigate.png",
+                DocumentImage = investigateImage,
+                Status = VendorStatus.ACTIVE,
                 Updated = DateTime.Now,
             };
 
@@ -213,7 +244,13 @@ namespace risk.control.system.Seeds
             //var tataCompany = await context.ClientCompany.AddAsync(tata);
 
             //CREATE COMPANY1
+            string insurerImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "insurer.jpg");
+            var insurerImage = File.ReadAllBytes(insurerImagePath);
 
+            if (insurerImage == null)
+            {
+                insurerImage = File.ReadAllBytes(noCompanyImagePath);
+            }
             var insurer = new ClientCompany
             {
                 Name = Applicationsettings.INSURER,
@@ -232,9 +269,11 @@ namespace risk.control.system.Seeds
                 Description = "CORPORATE OFFICE ",
                 Email = Applicationsettings.INSURERDOMAIN,
                 DocumentUrl = Applicationsettings.INSURERLOGO,
+                DocumentImage = insurerImage,
                 PhoneNumber = "9988004739",
                 ExpiryDate = DateTime.Now.AddDays(5),
                 EmpanelledVendors = new List<Vendor> { checker, verify, investigate },
+                Status = CompanyStatus.ACTIVE,
                 Updated = DateTime.Now,
             };
 
