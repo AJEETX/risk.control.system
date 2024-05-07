@@ -30,7 +30,7 @@ function clearAllInputs(event) {
     $("option:selected").prop("selected", false);
     var companyImage = document.getElementById('company-Image');
     if (companyImage) {
-        formImage.src = '/img/no-image.png';
+        companyImage.src = '/img/no-image.png';
     }
     var policyImage = document.getElementById('policyImage');
     var profileImage = document.getElementById('profileImage');
