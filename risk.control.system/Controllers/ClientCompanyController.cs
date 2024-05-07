@@ -45,7 +45,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: ClientCompanies/Create
-        [Breadcrumb("Add New")]
+        [Breadcrumb("Add Company")]
         public IActionResult Create()
         {
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");

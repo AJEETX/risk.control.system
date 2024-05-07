@@ -28,7 +28,7 @@ function clearAllInputs(event) {
 
     allInputs.forEach(singleInput => singleInput.readOnly ? singleInput.value: singleInput.value = '');
     $("option:selected").prop("selected", false);
-    var companyImage = document.getElementById('company-Image');
+    var companyImage = document.getElementById('companyImage');
     if (companyImage) {
         companyImage.src = '/img/no-image.png';
     }

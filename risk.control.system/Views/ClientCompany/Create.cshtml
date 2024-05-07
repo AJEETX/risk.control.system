@@ -8,7 +8,7 @@
 <section class="content">
     <div class="card bg-light card-secondary">
         <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-building"></i> Add New</h3>
+            <h3 class="card-title"><i class="fas fa-building"></i> Add Company</h3>
         </div>
         <div class="card-body">
             <div class="submit-progress hidden">
@@ -145,6 +145,17 @@
 
                     </div>
                     <div class="col-sm-6">
+                       
+                        <div class="form-group">
+                            <span class="input-group-label"> Agreement Date:</span>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" asp-for="DateOfIncident"><i class="nav-icon far fa-calendar-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                </div>
+                                <input required asp-for="AgreementDate" id="dateIncidentId" class="form-control remarks" min="2000-01-01" type="date" />
+                                <span asp-validation-for="AgreementDate" class="text-danger"></span>
+                            </div>
+                        </div>
                         <div class="form-group">
                             <span class="input-group-label"> Country:</span>
                             <div class="input-group mb-3">
@@ -210,11 +221,7 @@
                                 <span asp-validation-for="Addressline" class="text-danger"></span>
                             </div>
                         </div>
-                        @* <div class="form-group">
-                        <label asp-for="AgreementDate" class="control-label"></label>
-                        <input asp-for="AgreementDate" class="form-control remarks" />
-                        <span asp-validation-for="AgreementDate" class="text-danger"></span>
-                        </div>
+                        @*
                         <div class="form-group">
                         <label asp-for="ActivatedDate" class="control-label"></label>
                         <input asp-for="ActivatedDate" class="form-control remarks" />
@@ -245,20 +252,22 @@
                             </div>
                         </div>
 
-                        <div class="form-group text-right">
-                            <button id="reset" type="submit" onclick="clearAllInputs()" class="btn btn-outline-secondary">
-                                <i class="fas fa-undo"></i> RESET
-                            </button>
-                            <a id="back" asp-action="Index" class="btn btn-secondary">
-                                <i class="fa fa-window-close"></i>
-                                @Applicationsettings.CANCEL
-                            </a>
-                            <button id="create-agency" disabled type="submit" class="btn btn-success">
-                                <i class="fas fa-building"></i> Add New
-                            </button>
-                        </div>
-                        </>
+                        
                     </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="form-group text-right">
+                    <button id="reset" type="submit" onclick="clearAllInputs()" class="btn btn-outline-secondary">
+                        <i class="fas fa-undo"></i> RESET
+                    </button>
+                    <a id="back" asp-action="Index" class="btn btn-secondary">
+                        <i class="fa fa-window-close"></i>
+                        @Applicationsettings.CANCEL
+                    </a>
+                    <button id="create-agency" disabled type="submit" class="btn btn-success">
+                        <i class="fas fa-building"></i> Add Company
+                    </button>
                 </div>
             </div>
         </form>
