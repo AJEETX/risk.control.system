@@ -27,7 +27,7 @@ body {
 }
 
 .login-form form {
-    padding-top: 3rem;
+    padding-top: 2rem;
 }
 
 div .error-message {
@@ -35,11 +35,11 @@ div .error-message {
 }
 
 .signup-form form {
-    padding-top: 3rem;
+    padding-top: 2rem;
 }
-#ipAddress {
+#ipAddress, #ipAddress1 {
     padding: 2rem 5rem;
-    font-size:.6rem;
+    font-size: .6rem;
 }
 .container .cover {
     position: absolute;

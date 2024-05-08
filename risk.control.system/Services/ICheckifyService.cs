@@ -11,6 +11,7 @@ using risk.control.system.AppConstant;
 using System.IO;
 using Amazon.Textract;
 using System.Xml;
+using System.Text.RegularExpressions;
 
 namespace risk.control.system.Services
 {
@@ -28,6 +29,7 @@ namespace risk.control.system.Services
 
     public class ICheckifyService : IICheckifyService
     {
+        private static Regex panRegex = new Regex(@"[A-Z]{5}\d{4}[A-Z]{1}");
         private static string txt2Find = "Permanent Account Number";
         private readonly ApplicationDbContext _context;
         private readonly IGoogleApi googleApi;
@@ -369,7 +371,7 @@ namespace risk.control.system.Services
 
                 var panTextPre = allPanText.IndexOf(txt2Find);
 
-                var panNumber = allPanText.Substring(panTextPre + txt2Find.Length + 1, 11);
+                var panNumber = allPanText.Substring(panTextPre + txt2Find.Length + 1, 10);
 
 
                 var ocrImaged = googleHelper.MaskTextInImage(byteimage, imageReadOnly);
@@ -421,13 +423,15 @@ namespace risk.control.system.Services
                             {
                                 try
                                 {
-                                    var body = await httpClientService.VerifyPan(maskedImage.DocumentId, company.PanIdfyUrl, company.RapidAPIKey, company.RapidAPITaskId, company.RapidAPIGroupId);
-                                    company.RapidAPIPanRemainCount = body.count_remain;
+                                    //var body = await httpClientService.VerifyPan(maskedImage.DocumentId, company.PanIdfyUrl, company.RapidAPIKey, company.RapidAPITaskId, company.RapidAPIGroupId);
+                                    //company.RapidAPIPanRemainCount = body?.count_remain;
 
-                                    if (body != null && body?.status == "completed" &&
-                                        body?.result != null &&
-                                        body.result?.source_output != null
-                                        && body.result?.source_output?.status == "id_found")
+                                    //if (body != null && body?.status == "completed" &&
+                                    //    body?.result != null &&
+                                    //    body.result?.source_output != null
+                                    //    && body.result?.source_output?.status == "id_found")
+                                    var panMatch = panRegex.Match(maskedImage.DocumentId);
+                                    if(panMatch.Success)
                                     {
                                         claimCase.ClaimReport.DocumentIdReport.DocumentIdImageValid = true;
                                     }

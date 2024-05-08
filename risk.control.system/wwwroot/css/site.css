@@ -3,7 +3,6 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: "Poppins", sans-serif;
 }
 
 a.navbar-brand {
@@ -388,22 +387,22 @@ nav > .mt2 {
 
 .sidebar-light-primary .nav-sidebar > .nav-item > .actual-link.nav-link {
     font-family: "Helvetica Neue",Helvetica,Arial,sans-serif !important;
-    font-size: 15px;
-    padding-left: 2em;
+    font-size: 1rem;
+    padding-left: 1.5em;
 }
 
 .sidebar-light-primary .nav-sidebar > .nav-item > .actual-link.nav-link.active {
     background-color: #ccc !important;
     font-family: "Helvetica Neue",Helvetica,Arial,sans-serif !important;
-    padding-left: 2em;
-    font-size: 15px;
+    padding-left: 1.5em;
+    font-size: 1rem;
     font-weight: bold;
 }
 
     .sidebar-light-primary .nav-sidebar > .nav-item > .actual-link.nav-link.active > p {
         color: black;
         font-family: "Helvetica Neue",Helvetica,Arial,sans-serif !important;
-        font-size: 15px;
+        font-size: 1rem;
         font-weight: bold;
     }
     .sidebar-light-primary .nav-sidebar > .nav-item > .actual-link.nav-link > p > span {
@@ -412,13 +411,13 @@ nav > .mt2 {
     }
         .sidebar-light-primary .nav-sidebar > .nav-item > .actual-link.nav-link.active > p > span {
             font-family: "Helvetica Neue",Helvetica,Arial,sans-serif !important;
-            font-size: 15px !important;
+            font-size: 1rem !important;
             font-weight: bold !important;
         }
 
 
 .content {
-    font-size: 15px;
+    font-size: 1rem;
 }
 
 .d-block {

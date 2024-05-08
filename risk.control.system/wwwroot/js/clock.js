@@ -31,7 +31,7 @@ function startTimer(timeout, display) {
 							text: "REFRESH",
 							btnClass: 'btn-warning',
 							action: function () {
-								window.location.href = window.location.pathname;
+								window.location.href = window.location.href;
 								return;
 							}
 						},
