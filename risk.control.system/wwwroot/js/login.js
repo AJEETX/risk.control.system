@@ -28,8 +28,9 @@ $.validator.setDefaults({
 
         $('a').attr('disabled', 'disabled');
         $('button').attr('disabled', 'disabled');
-        $('button').css('pointer-events', 'none')
-        $('a ').css({ 'pointer-events': 'none' }, { 'cursor': 'none' })
+        $('html button').css('pointer-events', 'none')
+        $('html a').css({ 'pointer-events': 'none' }, { 'cursor': 'none' })
+        $('.text').css({ 'pointer-events': 'none' }, { 'cursor': 'none' })
 
         var nodes = document.getElementById("login-form").getElementsByTagName('*');
         for (var i = 0; i < nodes.length; i++) {
