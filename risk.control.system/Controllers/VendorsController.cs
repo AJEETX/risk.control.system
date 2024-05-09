@@ -50,7 +50,7 @@ namespace risk.control.system.Controllers
             return RedirectToAction("Agencies");
         }
 
-        [Breadcrumb("Agencies", FromAction = "Index")]
+        [Breadcrumb("All Agencies", FromAction = "Index")]
         public IActionResult Agencies()
         {
             return View();

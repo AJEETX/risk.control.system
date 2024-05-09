@@ -50,7 +50,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb("Manage Company")]
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
             return RedirectToAction("CompanyProfile");
         }
@@ -100,7 +100,7 @@ namespace risk.control.system.Controllers
 
         }
 
-        [Breadcrumb("Edit Company")]
+        [Breadcrumb("Edit Company", FromAction = "CompanyProfile")]
         public async Task<IActionResult> Edit()
         {
             try
