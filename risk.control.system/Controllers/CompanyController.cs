@@ -231,7 +231,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb("Manage Users ")]
-        public IActionResult User()
+        public IActionResult Users()
         {
             return View();
         }
@@ -348,7 +348,7 @@ namespace risk.control.system.Controllers
 
         }
 
-        [Breadcrumb("Edit User", FromAction = "User")]
+        [Breadcrumb("Edit User", FromAction = "Users")]
         public async Task<IActionResult> EditUser(long? userId)
         {
             try
@@ -712,7 +712,7 @@ namespace risk.control.system.Controllers
             }
         }
 
-        [Breadcrumb("Edit Role", FromAction = "User")]
+        [Breadcrumb("Edit Role", FromAction = "Users")]
         public async Task<IActionResult> UserRoles(string userId)
         {
             var userRoles = new List<CompanyUserRoleViewModel>();

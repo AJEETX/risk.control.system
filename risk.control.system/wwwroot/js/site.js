@@ -352,8 +352,8 @@ $(document).ready(function () {
                     method: 'get'
                 }).done(function (response) {
                     data = response;
-                    self.setTitle('<i class="fas fa-portrait"></i> Digital <span class="badge badge-light">checkify</span>');
-                    self.setContent('<span class="badge badge-light"><i class="far fa-image"></i> Digital Image</span>');
+                    self.setTitle('<i class="fas fa-portrait"></i> Photo <span class="badge badge-light">Uploaded</span>');
+                    self.setContent('<span class="badge badge-light"><i class="far fa-image"></i> Photo Scanned Image</span>');
                     self.setContentAppend('<br><img id="agentLocationPicture" class="img-fluid investigation-actual-image" src="' + response.location + '" /> ');
                     self.setContentAppend('<br><span class="badge badge-light"><i class="fas fa-info"></i> Location Info</span> ');
                     self.setContentAppend('<br><i>' + response.locationData + '</i>');
@@ -376,6 +376,7 @@ $(document).ready(function () {
         $.confirm({
             type: 'green',
             closeIcon: true,
+            columnClass: 'medium',
 
             buttons: {
                 confirm: {
@@ -394,7 +395,7 @@ $(document).ready(function () {
                     method: 'get'
                 }).done(function (response) {
                     data = response;
-                    self.setTitle('<i class="fas fa-portrait"></i> Digital <span class="badge badge-light">checkify</span>');
+                    self.setTitle('<i class="fas fa-portrait"></i> Photo <span class="badge badge-light">Uploaded</span>');
                     self.setContent('<span class="badge badge-light"><i class="fas fa-map-pin"></i> Location visited</span>:');
                     self.setContentAppend('<div id="maps"></div>')
                     self.setContentAppend('<br><div id="pop-face-map"></div>')
@@ -420,6 +421,7 @@ $(document).ready(function () {
         $.confirm({
             type: 'green',
             closeIcon: true,
+            columnClass: 'medium',
 
             buttons: {
                 confirm: {
@@ -438,7 +440,7 @@ $(document).ready(function () {
                     method: 'get'
                 }).done(function (response) {
                     data = response;
-                    self.setTitle('<i class="fas fa-portrait"></i> Document <span class="badge badge-light">checkify</span>');
+                    self.setTitle('<i class="fas fa-portrait"></i> Pan card <span class="badge badge-light">uploaded</span>');
                     self.setContent('<span class="badge badge-light"><i class="fas fa-map-pin"></i> Location visited</span>:');
                     self.setContentAppend('<div id="maps"></div>')
                     self.setContentAppend('<br><div id="pop-face-map"></div>')
@@ -464,6 +466,7 @@ $(document).ready(function () {
         $.confirm({
             type: 'green',
             closeIcon: true,
+            columnClass: 'medium',
 
             buttons: {
                 confirm: {
@@ -510,7 +513,7 @@ $(document).ready(function () {
         $.confirm({
             type: 'green',
             closeIcon: true,
-
+            columnClass: 'medium',
             buttons: {
                 confirm: {
                     text: "Ok",
@@ -572,8 +575,8 @@ $(document).ready(function () {
                     dataType: 'json',
                     method: 'get'
                 }).done(function (response) {
-                    self.setTitle('<i class="fas fa-portrait"></i> Document <span class="badge badge-light">checkify</span>');
-                    self.setContent('<span class="badge badge-light"><i class="fas fa-film"></i> Document Image</span>');
+                    self.setTitle('<i class="fas fa-portrait"></i> Pan card <span class="badge badge-light">Uploaded</span>');
+                    self.setContent('<span class="badge badge-light"><i class="fas fa-film"></i> Pan card scanned Image</span>');
                     self.setContentAppend('<br><img id="agentOcrPicture" class="img-fluid investigation-actual-image" src="' + response.ocrData + '" /> ');
                     self.setContentAppend('<br><span class="badge badge-light"><i class="fas fa-info"></i> Image Scan Info</span> ');
                     self.setContentAppend('<br><i>' + response.qrData + '</i>');
@@ -586,10 +589,8 @@ $(document).ready(function () {
 
     $('#policy-detail').click(function () {
         $.confirm({
-
             title: "Policy details",
             closeIcon: true,
-
             type: 'blue',
             buttons: {
                 confirm: {
@@ -606,51 +607,50 @@ $(document).ready(function () {
                     'type': 'GET',
                     'url': '/api/ClaimsInvestigation/GetPolicyDetail?id=' + $('#policyDetailId').val(),
                     'dataType': 'json',
-                    'success': function (response) {
-                        console.log(response);
-                        self.setTitle('<i class="far fa-file-powerpoint"></i> Policy details ');
-                        self.setContent('<article>');
-                        self.setContent('<div class="bb-blog-inner">');
+                    method: 'get'
+                }).done(function (response) {
+                    self.setTitle('<i class="far fa-file-powerpoint"></i> Policy details ');
+                    self.setContent('<article>');
+                    self.setContent('<div class="bb-blog-inner">');
 
-                        self.setContentAppend('<div class="card card-solid">');
-                        self.setContentAppend('<header class="bb-blog-header">');
-                        self.setContentAppend('<h5 class="bb-blog-title" itemprop="name">Policy #: ' + response.contractNumber);
-                        self.setContentAppend('</header>');
-                        self.setContentAppend('<div class="card-body pb-0">');
-                        self.setContentAppend('<div class="row">');
-                        self.setContentAppend('<b> Claim Type: </b>' + response.claimType);
-                        self.setContentAppend('<br><p class="fa-li">');
-                        self.setContentAppend('<b><i class="fas fa-rupee-sign"></i> Insured Amount</b>:  ' + response.sumAssuredValue);
-                        self.setContentAppend('</p');
-                        self.setContentAppend('<br><p class="fa-li">');
-                        self.setContentAppend('<b><i class="far fa-clock"></i> Policy Issue Date</b>:  ' + response.contractIssueDate);
-                        self.setContentAppend('</p');
-                        self.setContentAppend('<br><p class="fa-li">');
-                        self.setContentAppend('<b><i class="fas fa-clock"></i>  Incident Date</b>: ' + response.dateOfIncident);
-                        self.setContentAppend('</p');
-                        self.setContentAppend('<br><p class="fa-li">');
-                        self.setContentAppend('<b><i class="fas fa-tools"></i> Service Type</b>:  ' + response.investigationServiceType);
-                        self.setContentAppend('</p');
-                        self.setContentAppend('<br><p class="fa-li">');
-                        self.setContentAppend('<b> <i class="fas fa-bolt"></i> Reason to verify</b>: ' + response.caseEnabler);
-                        self.setContentAppend('</p');
-                        self.setContentAppend('<br><p class="fa-li">');
-                        self.setContentAppend('<b><i class="far fa-check-circle"></i> Cause of Incidence</b>:  ' + response.causeOfLoss);
-                        self.setContentAppend('</p');
-                        self.setContentAppend('<br><p class="fa-li">');
-                        self.setContentAppend('<b><i class="fas fa-money-check-alt"></i> Budget Centre</b>:  ' + response.costCentre);
-                        self.setContentAppend('</p');
-                        self.setContentAppend('<br><b><i class="far fa-id-badge"></i> Policy Document</b>:');
-                        self.setContentAppend('<br><img id="agentLocationPicture" class="img-fluid investigation-actual-image" src="' + response.document + '" /> ');
-                        self.setContentAppend('</p');
-                        self.setContentAppend('</div>');
-                        self.setContentAppend('</div>');
-                        self.setContentAppend('</div>');
-                        self.setContentAppend('</div>');
-                        self.setContentAppend('</article>');
-                    }
-                }, function () {
-                    //This function is for unhover.
+                    self.setContentAppend('<div class="card card-solid">');
+                    self.setContentAppend('<header class="bb-blog-header">');
+                    self.setContentAppend('<h5 class="bb-blog-title" itemprop="name">Policy #: ' + response.contractNumber);
+                    self.setContentAppend('</header>');
+                    self.setContentAppend('<div class="card-body pb-0">');
+                    self.setContentAppend('<div class="row">');
+                    self.setContentAppend('<b> Claim Type: </b>' + response.claimType);
+                    self.setContentAppend('<br><p class="fa-li">');
+                    self.setContentAppend('<b><i class="fas fa-rupee-sign"></i> Insured Amount</b>:  ' + response.sumAssuredValue);
+                    self.setContentAppend('</p');
+                    self.setContentAppend('<br><p class="fa-li">');
+                    self.setContentAppend('<b><i class="far fa-clock"></i> Policy Issue Date</b>:  ' + response.contractIssueDate);
+                    self.setContentAppend('</p');
+                    self.setContentAppend('<br><p class="fa-li">');
+                    self.setContentAppend('<b><i class="fas fa-clock"></i>  Incident Date</b>: ' + response.dateOfIncident);
+                    self.setContentAppend('</p');
+                    self.setContentAppend('<br><p class="fa-li">');
+                    self.setContentAppend('<b><i class="fas fa-tools"></i> Service Type</b>:  ' + response.investigationServiceType);
+                    self.setContentAppend('</p');
+                    self.setContentAppend('<br><p class="fa-li">');
+                    self.setContentAppend('<b> <i class="fas fa-bolt"></i> Reason to verify</b>: ' + response.caseEnabler);
+                    self.setContentAppend('</p');
+                    self.setContentAppend('<br><p class="fa-li">');
+                    self.setContentAppend('<b><i class="far fa-check-circle"></i> Cause of Incidence</b>:  ' + response.causeOfLoss);
+                    self.setContentAppend('</p');
+                    self.setContentAppend('<br><p class="fa-li">');
+                    self.setContentAppend('<b><i class="fas fa-money-check-alt"></i> Budget Centre</b>:  ' + response.costCentre);
+                    self.setContentAppend('</p');
+                    self.setContentAppend('<br><b><i class="far fa-id-badge"></i> Policy Document</b>:');
+                    self.setContentAppend('<br><img id="agentLocationPicture" class="img-fluid investigation-actual-image" src="' + response.document + '" /> ');
+                    self.setContentAppend('</p');
+                    self.setContentAppend('</div>');
+                    self.setContentAppend('</div>');
+                    self.setContentAppend('</div>');
+                    self.setContentAppend('</div>');
+                    self.setContentAppend('</article>');
+                }).fail(function () {
+                    self.setContent('Something went wrong.');
                 });
             }
         })

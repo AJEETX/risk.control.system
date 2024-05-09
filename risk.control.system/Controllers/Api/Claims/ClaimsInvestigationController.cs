@@ -43,7 +43,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 .Include(p => p.CaseEnabler)
                 .FirstOrDefaultAsync(p => p.PolicyDetailId == id);
 
-            var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, Applicationsettings.NO_POLICY_IMAGE);
+            var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath,"img", "no-policy.jpg");
 
             var noDataimage = await System.IO.File.ReadAllBytesAsync(noDataImagefilePath);
 

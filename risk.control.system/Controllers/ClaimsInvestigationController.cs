@@ -130,11 +130,11 @@ namespace risk.control.system.Controllers
                     if (totalClaimsCreated?.Count >= companyUser.ClientCompany.TotalCreatedClaimAllowed)
                     {
                         userCanUpload = false;
-                        notifyService.Information($"MAX limit = <b>{companyUser.ClientCompany.TotalCreatedClaimAllowed}</b> reached.");
+                        notifyService.Information($"MAX limit = <b>{companyUser.ClientCompany.TotalCreatedClaimAllowed}</b> reached");
                     }
                     else
                     {
-                        notifyService.Information($"Limit available = <b>{availableCount}</b>.");
+                        notifyService.Information($"Limit available = <b>{availableCount}</b>");
                     }
                 }
 
@@ -221,11 +221,11 @@ namespace risk.control.system.Controllers
                     if (totalClaimsCreated?.Count >= companyUser.ClientCompany.TotalCreatedClaimAllowed)
                     {
                         userCanUpload = false;
-                        notifyService.Information($"MAX Claim limit = <b>{companyUser.ClientCompany.TotalCreatedClaimAllowed}</b> reached.");
+                        notifyService.Information($"MAX Claim limit = <b>{companyUser.ClientCompany.TotalCreatedClaimAllowed}</b> reached");
                     }
                     else
                     {
-                        notifyService.Information($"Limit available = <b>{availableCount}</b>.");
+                        notifyService.Information($"Limit available = <b>{availableCount}</b>");
                     }
                 }
 
@@ -451,11 +451,11 @@ namespace risk.control.system.Controllers
                     if (totalClaimsCreated?.Count >= companyUser.ClientCompany.TotalCreatedClaimAllowed)
                     {
                         userCanCreate = false;
-                        notifyService.Information($"MAX Claim limit = <b>{companyUser.ClientCompany.TotalCreatedClaimAllowed}</b> reached.");
+                        notifyService.Information($"MAX Claim limit = <b>{companyUser.ClientCompany.TotalCreatedClaimAllowed}</b> reached");
                     }
                     else
                     {
-                        notifyService.Information($"Limit available = <b>{availableCount}</b>.");
+                        notifyService.Information($"Limit available = <b>{availableCount}</b>");
                     }
                 }
                 var model = new ClaimTransactionModel

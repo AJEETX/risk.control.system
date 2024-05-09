@@ -143,7 +143,7 @@ namespace risk.control.system.Controllers
                     var imageByte = ds.ToArray();
                     await vendorService.PostFaceId(userEmail, selectedcase, digitalIdLatitude, digitalIdLongitude, imageByte);
 
-                    notifyService.Custom($"Digital Id Image Uploaded", 3, "green", "fas fa-portrait");
+                    notifyService.Custom($"Photo Image Uploaded", 3, "green", "fas fa-portrait");
                     return Redirect("/ClaimsVendor/GetInvestigate?selectedcase=" + selectedcase);
                 }
             }
@@ -181,7 +181,7 @@ namespace risk.control.system.Controllers
                     var imageByte = ds.ToArray();
                     await vendorService.PostDocumentId(userEmail, selectedclaim, documentIdLatitude, documentIdLongitude, imageByte);
 
-                    notifyService.Custom($"Digital Id Image Uploaded", 3, "green", "fas fa-mobile-alt");
+                    notifyService.Custom($"Pan card Image Uploaded", 3, "green", "fas fa-mobile-alt");
                     return Redirect("/ClaimsVendor/GetInvestigate?selectedcase=" + selectedclaim);
                 }
             }

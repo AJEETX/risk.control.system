@@ -47,7 +47,8 @@
             <div class="submit-progress hidden">
                 <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
             </div>
-            <partial name="_PolicyDetailsWithdraw" model="@data" />
+            <partial name="_AgentSubmittedReport" model="@Model" />
+
             if (!@Model.NotWithdrawable)
             {
             <div class="card-footer">

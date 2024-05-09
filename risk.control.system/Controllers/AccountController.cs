@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using Microsoft.FeatureManagement;
 using Microsoft.FeatureManagement.Mvc;
@@ -235,7 +236,7 @@ namespace risk.control.system.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Forgot(LoginViewModel input)
+        public IActionResult Forgot(LoginViewModel input)
         {
             string message = string.Empty;
             var smsSent = accountService.ForgotPassword(input.Email,long.Parse(input.Mobile));
@@ -274,18 +275,10 @@ namespace risk.control.system.Controllers
 
             var newDomain = input.Trim().ToLower() + domainData.GetEnumDisplayName();
 
-            var allUsers = _userManager.Users.Where(u =>
-            u.Email.Trim().ToLower().Substring(u.Email.IndexOf("@") + 1) == newDomain
-            )?.ToList();
+            var userCount =  await  _userManager.Users.CountAsync(u => u.Email.Trim().ToLower().Substring(u.Email.IndexOf("@") + 1) == newDomain);
 
-            if (allUsers?.Count == 0)
-            {
-                return 0;
-            }
-            else
-            {
-                return 1;
-            }
+            return userCount == 0 ? 0 : 1;
+
         }
 
         [HttpGet]
@@ -299,16 +292,10 @@ namespace risk.control.system.Controllers
 
             var newDomain = input.Trim().ToLower() + domainData.GetEnumDisplayName();
 
-            var agencyExist = _context.Vendor.Any(u =>u.Email.Trim().ToLower() == newDomain );
+            var agenccompanyCount = await _context.ClientCompany.CountAsync(u =>u.Email.Trim().ToLower() == newDomain );
+            var agencyCount = await _context.Vendor.CountAsync(u =>u.Email.Trim().ToLower() == newDomain );
 
-            if (!agencyExist)
-            {
-                return 0;
-            }
-            else
-            {
-                return 1;
-            }
+            return agencyCount == 0  && agenccompanyCount == 0 ? 0 : 1;
         }
 
         [HttpGet]
@@ -319,18 +306,9 @@ namespace risk.control.system.Controllers
                 return null;
             }
 
-            var allUsers = _userManager.Users.Where(u =>
-            u.Email == input
-            )?.ToList();
+            var userCount = await _userManager.Users.CountAsync(u => u.Email == input);
 
-            if (allUsers?.Count == 0)
-            {
-                return 0;
-            }
-            else
-            {
-                return 1;
-            }
+            return userCount == 0 ? 0 : 1;
         }
 
     }
