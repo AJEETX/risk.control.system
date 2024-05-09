@@ -31,10 +31,8 @@
             { "data": "name" },
             { "data": "code" },
             { "data": "phone" },
-            { "data": "address" },
-            { "data": "district" },
-            { "data": "state" },
-            { "data": "country" },
+            { "data": "address", bSortable: false },
+            { "data": "status" },
             { "data": "updated" },
             { "data": "update" },
             {

@@ -204,24 +204,25 @@ namespace risk.control.system.Controllers
                         var response = SmsService.SendSingleMessage(user.PhoneNumber, "Agency user created. Email : " + user.Email);
 
                         var onboardAgent = roles.Any(r => AppConstant.AppRoles.AGENT.ToString().Contains(r)) && string.IsNullOrWhiteSpace(user.MobileUId);
-                        var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == user.VendorId);
-
-                        System.Uri address = new System.Uri("http://tinyurl.com/api-create.php?url=" + vendor.MobileAppUrl);
-                        System.Net.WebClient client = new System.Net.WebClient();
-                        string tinyUrl = client.DownloadString(address);
-
-                        var message = $"Dear {user.FirstName}";
-                        message += "                                                                                ";
-                        message += $"Click on link below to install the mobile app";
-                        message += "                                                                                ";
-                        message += $"{tinyUrl}";
-                        message += "                                                                                ";
-                        message += $"Thanks";
-                        message += "                                                                                ";
-                        message += $"https://icheckify.co.in";
-
+                        
                         if (onboardAgent)
                         {
+                            var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == user.VendorId);
+
+                            System.Uri address = new System.Uri("http://tinyurl.com/api-create.php?url=" + vendor.MobileAppUrl);
+                            System.Net.WebClient client = new System.Net.WebClient();
+                            string tinyUrl = client.DownloadString(address);
+
+                            var message = $"Dear {user.FirstName}";
+                            message += "                                                                                ";
+                            message += $"Click on link below to install the mobile app";
+                            message += "                                                                                ";
+                            message += $"{tinyUrl}";
+                            message += "                                                                                ";
+                            message += $"Thanks";
+                            message += "                                                                                ";
+                            message += $"https://icheckify.co.in";
+
                             var onboard = SmsService.SendSingleMessage(user.PhoneNumber, message, onboardAgent);
                             notifyService.Custom($"Agent onboarding initiated.", 3, "green", "fas fa-user-check");
                         }
@@ -379,24 +380,23 @@ namespace risk.control.system.Controllers
                         var onboardAgent = roles.Any(r => AppConstant.AppRoles.AGENT.ToString().Contains(r)) && string.IsNullOrWhiteSpace(user.MobileUId);
                         if (lockUser.Succeeded && lockDate.Succeeded)
                         {
-                            var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == user.VendorId);
-
-                            System.Uri address = new System.Uri("http://tinyurl.com/api-create.php?url=" + vendor.MobileAppUrl);
-                            System.Net.WebClient client = new System.Net.WebClient();
-                            string tinyUrl = client.DownloadString(address);
-
-                            var message = $"Dear {user.FirstName}";
-                            message += "                                                                                ";
-                            message += $"Click on link below to install the mobile app";
-                            message += "                                                                                ";
-                            message += $"{tinyUrl}";
-                            message += "                                                                                ";
-                            message += $"Thanks";
-                            message += "                                                                                ";
-                            message += $"https://icheckify.co.in";
-
                             if (onboardAgent)
                             {
+                                var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == user.VendorId);
+
+                                System.Uri address = new System.Uri("http://tinyurl.com/api-create.php?url=" + vendor.MobileAppUrl);
+                                System.Net.WebClient client = new System.Net.WebClient();
+                                string tinyUrl = client.DownloadString(address);
+
+                                var message = $"Dear {user.FirstName}";
+                                message += "                                                                                ";
+                                message += $"Click on link below to install the mobile app";
+                                message += "                                                                                ";
+                                message += $"{tinyUrl}";
+                                message += "                                                                                ";
+                                message += $"Thanks";
+                                message += "                                                                                ";
+                                message += $"https://icheckify.co.in";
                                 var onboard = SmsService.SendSingleMessage(user.PhoneNumber, message, onboardAgent);
                                 notifyService.Custom($"Agent onboarding initiated.", 3, "green", "fas fa-user-check");
                             }

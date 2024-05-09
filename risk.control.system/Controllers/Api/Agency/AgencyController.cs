@@ -97,10 +97,8 @@ namespace risk.control.system.Controllers.Api.Agency
                     Name = u.Name,
                     Code = u.Code,
                     Phone = u.PhoneNumber,
-                    Address = u.Addressline,
-                    District = u.District.Name,
-                    State = u.State.Name,
-                    Country = u.Country.Name,
+                    Address =  u.Addressline + ", " + u.District.Name + ", " + u.State.Name + ", " + u.Country.Code + "," + u.PinCode.Code,
+                    Status = "<span class='badge badge-light'>"+ u.Status.GetEnumDisplayName() + "</span>",
                     Updated = u.Updated.HasValue ? u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy"),
                     Update = u.UpdatedBy
                 })

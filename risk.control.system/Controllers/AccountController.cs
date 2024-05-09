@@ -109,10 +109,24 @@ namespace risk.control.system.Controllers
                 if (result.Succeeded)
                 {
                     var user = await _userManager.FindByEmailAsync(model.Email);
-                    if (user.Active)
+                    var roles = await _userManager.GetRolesAsync(user);
+                    if (roles != null && roles.Count > 0)
                     {
-                        var roles = await _userManager.GetRolesAsync(user);
-                        if (roles != null && roles.Count > 0)
+                        var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == email);
+                        var vendorUser = _context.VendorApplicationUser.FirstOrDefault(u => u.Email == email);
+                        bool vendorIsActive = false;
+                        bool companyIsActive = false;
+
+                        if (companyUser != null)
+                        {
+                            companyIsActive = _context.ClientCompany.Any(c => c.ClientCompanyId == companyUser.ClientCompanyId && c.Status == Models.CompanyStatus.ACTIVE);
+
+                        }
+                        else if (vendorUser != null)
+                        {
+                            vendorIsActive = _context.Vendor.Any(c => c.VendorId == vendorUser.VendorId && c.Status == Models.VendorStatus.ACTIVE);
+                        }
+                        if (companyIsActive && user.Active || vendorIsActive && user.Active || companyUser == null && vendorUser == null)
                         {
                             var claims = new List<Claim> {
                             new Claim(ClaimTypes.NameIdentifier, model.Email) ,
@@ -169,10 +183,11 @@ namespace risk.control.system.Controllers
                         failedMessage += $"{BaseUrl}";
                         SMS.API.SendSingleMessage("+" + adminForFailed.PhoneNumber, failedMessage);
                     }
-
+                    model.ShowUserOnLogin = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
+                    ViewData["Users"] = new SelectList(_context.Users.OrderBy(o => o.Email), "Email", "Email");
                     _logger.LogWarning("User account locked out.");
                     model.Error = "User account locked out.";
-                    return RedirectToAction("login", model);
+                    return View(model);
                 }
                 else if (result.IsLockedOut)
                 {
@@ -193,6 +208,8 @@ namespace risk.control.system.Controllers
                     }
                     else
                     {
+                        model.ShowUserOnLogin = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
+                        ViewData["Users"] = new SelectList(_context.Users.OrderBy(o => o.Email), "Email", "Email");
                         _logger.LogWarning("User account locked out.");
                         model.Error = "User account locked out.";
                         return View(model);
