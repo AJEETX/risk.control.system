@@ -29,9 +29,8 @@
             { "data": "email" },
             { "data": "name" },
             { "data": "phone" },
-            { "data": "addressline" },
+            { "data": "addressline", bSortable: false },
             
-            { "data": "pincode" },
             {
                 "sDefaultContent": "",
                 "bSortable": false,

@@ -91,7 +91,7 @@ namespace risk.control.system.Controllers.Api.Company
                     Phone = u.PhoneNumber,
                     Photo = string.IsNullOrWhiteSpace(u.ProfilePictureUrl) ? Applicationsettings.NO_USER : u.ProfilePictureUrl,
                     Active = u.Active,
-                    Addressline = u.Addressline + ", " + u.District.Name + ", " + u.State.Name + ", " + u.Country.Code,
+                    Addressline = u.Addressline + ", " + u.District.Name +", " +u.State.Name+", " + u.Country.Code +","+u.PinCode.Code,
 
                     Roles = u.UserRole != null ? $"<span class=\"badge badge-light\">{u.UserRole.GetEnumDisplayName()}</span>" : "<span class=\"badge badge-light\">...</span>",
                     Pincode = u.PinCode.Code,
@@ -133,7 +133,7 @@ namespace risk.control.system.Controllers.Api.Company
                     Phone = u.PhoneNumber,
                     Photo = string.IsNullOrWhiteSpace(u.ProfilePictureUrl) ? Applicationsettings.NO_USER : u.ProfilePictureUrl,
                     Active = u.Active,
-                    Addressline = u.Addressline + ", " + u.District.Name +", " +u.State.Name+", " + u.Country.Code,
+                    Addressline = u.Addressline + ", " + u.District.Name +", " +u.State.Name+", " + u.Country.Code +","+u.PinCode.Code,
                     
                     Roles = u.UserRole != null ? $"<span class=\"badge badge-light\">{u.UserRole.GetEnumDisplayName()}</span>" : "<span class=\"badge badge-light\">...</span>",
                     Pincode = u.PinCode.Code,

@@ -227,7 +227,7 @@ namespace risk.control.system.Controllers
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
             notifyService.Custom($"Company edited successfully.", 3, "orange", "fas fa-building");
-            return RedirectToAction(nameof(CompanyController.Index), "Company");
+            return RedirectToAction(nameof(CompanyController.CompanyProfile), "Company");
         }
 
         [Breadcrumb("Manage Users ")]
@@ -325,17 +325,17 @@ namespace risk.control.system.Controllers
                         {
                             notifyService.Custom($"User created and locked.", 3, "orange", "fas fa-user-lock");
                             var response = SmsService.SendSingleMessage(createdUser.PhoneNumber, "User created and locked. Email : " + createdUser.Email);
-                            return RedirectToAction(nameof(CompanyController.User), "Company");
+                            return RedirectToAction(nameof(CompanyController.Users), "Company");
                         }
                     }
                     else
                     {
                         notifyService.Custom($"User created successfully.", 3, "green", "fas fa-user-plus");
                         var response = SmsService.SendSingleMessage(user.PhoneNumber, "User created . Email : " + user.Email);
-                        return RedirectToAction(nameof(CompanyController.User), "Company");
+                        return RedirectToAction(nameof(CompanyController.Users), "Company");
                     }
                     notifyService.Custom($"User created successfully.", 3, "green", "fas fa-user-plus");
-                    return RedirectToAction(nameof(CompanyController.User), "Company");
+                    return RedirectToAction(nameof(CompanyController.Users), "Company");
                 }
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -411,7 +411,7 @@ namespace risk.control.system.Controllers
                 if (id != applicationUser.Id.ToString())
                 {
                     notifyService.Error("USER NOT FOUND!");
-                    return RedirectToAction(nameof(CompanyController.User), "Company");
+                    return RedirectToAction(nameof(CompanyController.Users), "Company");
                 }
                 var user = await userManager.FindByIdAsync(id);
                 if (applicationUser?.ProfileImage != null && applicationUser.ProfileImage.Length > 0)
@@ -475,7 +475,7 @@ namespace risk.control.system.Controllers
                             {
                                 notifyService.Custom($"User edited and locked.", 3, "orange", "fas fa-user-lock");
                                 var response = SmsService.SendSingleMessage(createdUser.PhoneNumber, "User created and locked. Email : " + createdUser.Email);
-                                return RedirectToAction(nameof(CompanyController.User), "Company");
+                                return RedirectToAction(nameof(CompanyController.Users), "Company");
                             }
                         }
                         else
@@ -488,7 +488,7 @@ namespace risk.control.system.Controllers
                             {
                                 notifyService.Custom($"User edited and unlocked.", 3, "green", "fas fa-user-check");
                                 var response = SmsService.SendSingleMessage(user.PhoneNumber, "User created . Email : " + user.Email);
-                                return RedirectToAction(nameof(CompanyController.User), "Company");
+                                return RedirectToAction(nameof(CompanyController.Users), "Company");
                             }
                         }
                     }
@@ -497,11 +497,11 @@ namespace risk.control.system.Controllers
             catch (Exception)
             {
                 notifyService.Error($"Error to create Company user.", 3);
-                return RedirectToAction(nameof(CompanyController.User), "Company");
+                return RedirectToAction(nameof(CompanyController.Users), "Company");
             }
 
             notifyService.Error($"Error to create Company user.", 3);
-            return RedirectToAction(nameof(CompanyController.User), "Company");
+            return RedirectToAction(nameof(CompanyController.Users), "Company");
         }
 
         [Breadcrumb("Available Agencies", FromAction = "Index", FromController = typeof(VendorsController))]
@@ -656,7 +656,7 @@ namespace risk.control.system.Controllers
                 if (vendor == null)
                 {
                     notifyService.Error("agency not found!");
-                    return RedirectToAction(nameof(CompanyController.User), "Company");
+                    return RedirectToAction(nameof(CompanyController.Users), "Company");
                 }
                 ViewBag.Backurl = backurl;
 
@@ -772,7 +772,7 @@ namespace risk.control.system.Controllers
             if (user == null)
             {
                 toastNotification.AddErrorToastMessage("user not found!");
-                return RedirectToAction(nameof(CompanyController.User), "Company");
+                return RedirectToAction(nameof(CompanyController.Users), "Company");
             }
             user.SecurityStamp = Guid.NewGuid().ToString();
             user.Updated = DateTime.Now;
@@ -785,7 +785,7 @@ namespace risk.control.system.Controllers
             var response = SmsService.SendSingleMessage(user.PhoneNumber, "User role edited . Email : " + user.Email);
 
             notifyService.Custom($"User role(s) updated successfully.", 3, "orange", "fas fa-user-cog");
-            return RedirectToAction(nameof(CompanyController.User));
+            return RedirectToAction(nameof(CompanyController.Users));
         }
     }
 }

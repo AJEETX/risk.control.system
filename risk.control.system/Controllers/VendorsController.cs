@@ -578,7 +578,7 @@ namespace risk.control.system.Controllers
                 var response = SmsService.SendSingleMessage(vendor.PhoneNumber, "Agency created. Domain : " + vendor.Email);
 
                 notifyService.Custom($"Agency created successfully.", 3, "green", "fas fa-building");
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(VendorsController.Agencies));
             }
             catch (Exception)
             {
@@ -742,7 +742,7 @@ namespace risk.control.system.Controllers
                 _context.Vendor.Remove(vendor);
                 await _context.SaveChangesAsync();
                 notifyService.Custom($"Agency deleted successfully.", 3, "red", "fas fa-building");
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Agencies));
             }
             catch (Exception)
             {

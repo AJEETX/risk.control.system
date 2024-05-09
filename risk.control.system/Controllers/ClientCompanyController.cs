@@ -89,10 +89,10 @@ namespace risk.control.system.Controllers
 
                 clientCompany.Updated = DateTime.Now;
                 clientCompany.UpdatedBy = HttpContext.User?.Identity?.Name;
-                _context.Add(clientCompany);
+                var addedCompany = _context.Add(clientCompany);
                 await _context.SaveChangesAsync();
                 notifyService.Custom($"Company created successfully.", 3, "green", "fas fa-building");
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Companies));
             }
             notifyService.Custom($"Company not found.", 3, "red", "fas fa-building");
             return RedirectToAction(nameof(Index));
@@ -286,7 +286,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: ClientCompanies
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
             return RedirectToAction("Companies");
         }

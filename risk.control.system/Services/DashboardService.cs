@@ -269,7 +269,7 @@ namespace risk.control.system.Services
             var data = new DashboardData();
             data.FirstBlockName = "All Users";
             data.FirstBlockCount = companyUsersCount;
-            data.FirstBlockUrl = "/Company/User";
+            data.FirstBlockUrl = "/Company/Users";
 
             data.SecondBlockName = "All Agencies";
             data.SecondBlockCount = allAgenciesCount;

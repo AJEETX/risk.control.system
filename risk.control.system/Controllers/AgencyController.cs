@@ -128,7 +128,7 @@ namespace risk.control.system.Controllers
                 if (vendor == null)
                 {
                     notifyService.Custom($"Agency Not found.", 3, "red", "fas fa-building");
-                    return RedirectToAction(nameof(AgencyController.Index), "Agency");
+                    return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
                 var country = _context.Country.OrderBy(c => c.Name);
@@ -163,7 +163,7 @@ namespace risk.control.system.Controllers
                 if (vendor == null || vendor.VendorId == 0)
                 {
                     notifyService.Custom($"No agency not found.", 3, "red", "fas fa-building");
-                    return RedirectToAction(nameof(AgencyController.Index), "Agency");
+                    return RedirectToAction(nameof(AgencyController.Profile), "Agency");
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 if (string.IsNullOrWhiteSpace(currentUserEmail))
@@ -213,7 +213,7 @@ namespace risk.control.system.Controllers
                 var response = SmsService.SendSingleMessage(vendor.PhoneNumber, "Agency account created. Domain : " + vendor.Email);
 
                 notifyService.Custom($"Agency edited successfully.", 3, "green", "fas fa-building");
-                return RedirectToAction(nameof(AgencyController.Index), "Agency");
+                return RedirectToAction(nameof(AgencyController.Profile), "Agency");
             }
             catch (Exception)
             {
@@ -224,7 +224,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb("Manage Users ")]
-        public async Task<IActionResult> User()
+        public IActionResult Users()
         {
             try
             {
@@ -265,7 +265,7 @@ namespace risk.control.system.Controllers
                 if (vendor == null)
                 {
                     notifyService.Custom($"No agency not found.", 3, "red", "fas fa-building");
-                    return RedirectToAction(nameof(AgencyController.Index), "Agency");
+                    return RedirectToAction(nameof(AgencyController.Profile), "Agency");
                 }
                 var model = new VendorApplicationUser { Vendor = vendor };
                 ViewData["CountryId"] = new SelectList(_context.Country.OrderBy(c => c.Name), "CountryId", "Name");
@@ -334,7 +334,7 @@ namespace risk.control.system.Controllers
                             var response = SmsService.SendSingleMessage(user.PhoneNumber, "Agency user created and locked. Email : " + user.Email);
                             if(txn =="agency")
                             {
-                                return RedirectToAction(nameof(AgencyController.User), "Agency");
+                                return RedirectToAction(nameof(AgencyController.Users), "Agency");
                             }
                             else
                             {
@@ -348,7 +348,7 @@ namespace risk.control.system.Controllers
                         var response = SmsService.SendSingleMessage(user.PhoneNumber, "Agency user created. Email : " + user.Email);
                         if (txn == "agency")
                         {
-                            return RedirectToAction(nameof(AgencyController.User), "Agency");
+                            return RedirectToAction(nameof(AgencyController.Users), "Agency");
                         }
                         else
                         {
@@ -372,7 +372,7 @@ namespace risk.control.system.Controllers
             }
         }
 
-        [Breadcrumb("Edit User", FromAction = "User")]
+        [Breadcrumb("Edit User", FromAction = "Users")]
         public async Task<IActionResult> EditUser(long? userId)
         {
             try
@@ -405,7 +405,7 @@ namespace risk.control.system.Controllers
                 if (vendor == null)
                 {
                     notifyService.Custom($"No agency not found.", 3, "red", "fas fa-building");
-                    return RedirectToAction(nameof(AgencyController.Index), "Agency");
+                    return RedirectToAction(nameof(AgencyController.Profile), "Agency");
                 }
 
                 ViewBag.Show = vendorApplicationUser.Email == vendorUser.Email ? false : true;
@@ -444,7 +444,7 @@ namespace risk.control.system.Controllers
                 if (id != applicationUser.Id.ToString())
                 {
                     notifyService.Error("Err !!! bad Request");
-                    return RedirectToAction(nameof(AgencyController.User), "Agency");
+                    return RedirectToAction(nameof(AgencyController.Users), "Agency");
                 }
                 var user = await userManager.FindByIdAsync(id);
                 if (applicationUser?.ProfileImage != null && applicationUser.ProfileImage.Length > 0)
@@ -547,7 +547,7 @@ namespace risk.control.system.Controllers
                                 }
                             }
                         }
-                        return RedirectToAction(nameof(AgencyController.User), "Agency");
+                        return RedirectToAction(nameof(AgencyController.Users), "Agency");
                     }
                 }
             }
@@ -560,7 +560,7 @@ namespace risk.control.system.Controllers
             return RedirectToAction(nameof(Index), "Dashboard");
         }
 
-        [Breadcrumb("Edit Role", FromAction = "User")]
+        [Breadcrumb("Edit Role", FromAction = "Users")]
         public async Task<IActionResult> UserRoles(string userId)
         {
             var userRoles = new List<VendorUserRoleViewModel>();
@@ -568,7 +568,7 @@ namespace risk.control.system.Controllers
             if (user == null)
             {
                 toastNotification.AddErrorToastMessage("user not found!");
-                return RedirectToAction(nameof(AgencyController.User), "Agency");
+                return RedirectToAction(nameof(AgencyController.Users), "Agency");
             }
             foreach (var role in roleManager.Roles.Where(r =>
                 r.Name.Contains(AppRoles.AGENCY_ADMIN.ToString()) ||
@@ -646,7 +646,7 @@ namespace risk.control.system.Controllers
             {
                 notifyService.Custom($"User role(s) updated successfully.", 3, "orange", "fas fa-user-cog");
             }
-            return RedirectToAction(nameof(AgencyController.User), "Agency");
+            return RedirectToAction(nameof(AgencyController.Users), "Agency");
         }
 
         [Breadcrumb("Manage Service")]
@@ -936,7 +936,7 @@ namespace risk.control.system.Controllers
             }
         }
 
-        [Breadcrumb("Agent Load", FromAction = "User")]
+        [Breadcrumb("Agent Load", FromAction = "Users")]
         public IActionResult AgentLoad()
         {
             return View();
