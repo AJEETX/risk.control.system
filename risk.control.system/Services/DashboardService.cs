@@ -99,7 +99,7 @@ namespace risk.control.system.Services
             data.FirstBlockCount = allCompaniesCount;
             data.FirstBlockUrl = "/ClientCompany/Companies";
 
-            data.SecondBlockName = "Agencies";
+            data.SecondBlockName = "All Agencies";
             data.SecondBlockCount = allAgenciesCount;
             data.SecondBlockUrl = "/Vendors/Agencies";
 

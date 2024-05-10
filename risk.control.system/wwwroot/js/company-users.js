@@ -30,7 +30,7 @@
             { "data": "name" },
             { "data": "phone" },
             { "data": "addressline", bSortable: false },
-            
+            { "data": "pincode" },
             {
                 "sDefaultContent": "",
                 "bSortable": false,

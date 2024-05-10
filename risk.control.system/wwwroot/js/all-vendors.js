@@ -32,6 +32,7 @@
             { "data": "code" },
             { "data": "phone" },
             { "data": "address", bSortable: false },
+            { "data": "pincode" },
             { "data": "status" },
             { "data": "updated" },
             { "data": "update" },

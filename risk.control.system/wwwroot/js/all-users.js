@@ -28,7 +28,7 @@ $(document).ready(function () {
             { "data": "email" },
             { "data": "name" },
             { "data": "phone" },
-            { "data": "addressline" },
+            { "data": "addressline", bSortable : false },
             { "data": "district" },
             { "data": "state" },
             { "data": "country" },

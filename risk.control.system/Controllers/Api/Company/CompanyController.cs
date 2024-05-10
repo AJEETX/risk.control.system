@@ -91,8 +91,7 @@ namespace risk.control.system.Controllers.Api.Company
                     Phone = u.PhoneNumber,
                     Photo = string.IsNullOrWhiteSpace(u.ProfilePictureUrl) ? Applicationsettings.NO_USER : u.ProfilePictureUrl,
                     Active = u.Active,
-                    Addressline = u.Addressline + ", " + u.District.Name +", " +u.State.Name+", " + u.Country.Code +","+u.PinCode.Code,
-
+                    Addressline = "<span class='badge badge-light'>" + u.Addressline + ", " + u.District.Name + ", " + u.State.Name + ", " + u.Country.Code + "</span>",
                     Roles = u.UserRole != null ? $"<span class=\"badge badge-light\">{u.UserRole.GetEnumDisplayName()}</span>" : "<span class=\"badge badge-light\">...</span>",
                     Pincode = u.PinCode.Code,
                     Updated = u.Updated.HasValue ?  u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy"),
@@ -133,8 +132,7 @@ namespace risk.control.system.Controllers.Api.Company
                     Phone = u.PhoneNumber,
                     Photo = string.IsNullOrWhiteSpace(u.ProfilePictureUrl) ? Applicationsettings.NO_USER : u.ProfilePictureUrl,
                     Active = u.Active,
-                    Addressline = u.Addressline + ", " + u.District.Name +", " +u.State.Name+", " + u.Country.Code +","+u.PinCode.Code,
-                    
+                    Addressline = "<span class='badge badge-light'>" + u.Addressline + ", " + u.District.Name + ", " + u.State.Name + ", " + u.Country.Code + "</span>",
                     Roles = u.UserRole != null ? $"<span class=\"badge badge-light\">{u.UserRole.GetEnumDisplayName()}</span>" : "<span class=\"badge badge-light\">...</span>",
                     Pincode = u.PinCode.Code,
                     Updated = u.Updated.HasValue ?  u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy"),
