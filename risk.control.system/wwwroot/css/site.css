@@ -32,13 +32,13 @@ a {
 /* Sticky footer styles
 -------------------------------------------------- */
 html {
-    font-size: .95rem;
+    font-size: .94rem;
     position: relative;
 }
 
 @media (min-width: 768px) {
     html {
-        font-size: 1rem;
+        font-size: .97rem;
     }
 }
 

@@ -93,23 +93,6 @@
     //});
 
 
-    $('#empanelled.btn.btn-info').on('click', function () {
-        $("body").addClass("submit-progress-bg");
-        // Wrap in setTimeout so the UI
-        // can update the spinners
-        setTimeout(function () {
-            $(".submit-progress").removeClass("hidden");
-        }, 1);
-        $('.btn.btn-info').attr('disabled', 'disabled');
-        $(this).html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Details");
-
-        var nodes = document.getElementById("article").getElementsByTagName('*');
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].disabled = true;
-        }
-    });
-
-
     $("img.rating").mouseover(function () {
         giveRating($(this), "FilledStar.jpeg");
         $(this).css("cursor", "pointer");
@@ -191,4 +174,21 @@ function refilRating(img1) {
     var rt = $(img1).closest('tr').find("span.avr").text();
     var img = $(img1).closest('tr').find("img[id='" + parseInt(rt) + "']");
     img.attr("src", "/images/FilledStar.jpeg").prevAll("img.rating").attr("src", "/images/FilledStar.jpeg");
+}
+
+function showVendor(id) {
+    $("body").addClass("submit-progress-bg");
+    // Wrap in setTimeout so the UI
+    // can update the spinners
+    setTimeout(function () {
+        $(".submit-progress").removeClass("hidden");
+    }, 1);
+    var editbtn = $('a#' + id + '.btn.btn-xs.btn-info')
+    $('.btn.btn-xs.btn-info').attr('disabled', 'disabled');
+    editbtn.html("<i class='fas fa-sync fa-spin'></i> Details");
+
+    var nodes = document.getElementById("article").getElementsByTagName('*');
+    for (var i = 0; i < nodes.length; i++) {
+        nodes[i].disabled = true;
+    }
 }

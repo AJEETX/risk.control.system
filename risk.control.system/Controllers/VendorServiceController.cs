@@ -82,11 +82,12 @@ namespace risk.control.system.Controllers
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
             var model = new VendorInvestigationServiceType { SelectedMultiPincodeId = new List<long>(), Vendor = vendor, PincodeServices = new List<ServicedPinCode>() };
 
-            //var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "Manage Agency(s)");
-            //var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Manage Agency") { Parent = agencysPage, RouteValues = new { id = id } };
-            //var editPage = new MvcBreadcrumbNode("Service", "Vendors", $"Manage Services") { Parent = agencyPage, RouteValues = new { id = id } };
-            //var createPage = new MvcBreadcrumbNode("Create", "VendorService", $"Add Service") { Parent = editPage, RouteValues = new { id = id } };
-            //ViewData["BreadcrumbNode"] = createPage;
+            var agencysPage = new MvcBreadcrumbNode("Agencies", "Vendors", "Manage Agency(s)");
+            var agencyPage = new MvcBreadcrumbNode("Agencies", "Vendors", "All Agencies") { Parent = agencysPage };
+            var agencyDetailPage = new MvcBreadcrumbNode("Details", "Vendors", "Manage Agency") { Parent = agencyPage, RouteValues = new { id = id } };
+            var editPage = new MvcBreadcrumbNode("Service", "Vendors", $"Manage Service") { Parent = agencyDetailPage, RouteValues = new { id = id } };
+            var createPage = new MvcBreadcrumbNode("Create", "VendorService", $"Add Service") { Parent = editPage, RouteValues = new { id = id } };
+            ViewData["BreadcrumbNode"] = createPage;
             return View(model);
         }
 
@@ -170,11 +171,12 @@ namespace risk.control.system.Controllers
             var selected = services.PincodeServices.Select(s => s.Pincode).ToList();
             services.SelectedMultiPincodeId = _context.PinCode.Where(p => selected.Contains(p.Code)).Select(p => p.PinCodeId).ToList();
 
-            //var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "Manage Agency(s)");
-            //var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Manage Agency") { Parent = agencysPage, RouteValues = new { id = services.VendorId } };
-            //var editPage = new MvcBreadcrumbNode("Service", "Vendors", $"Manage Services") { Parent = agencyPage, RouteValues = new { id = services.VendorId } };
-            //var createPage = new MvcBreadcrumbNode("Edit", "VendorService", $"Edit Service") { Parent = editPage, RouteValues = new { id = id } };
-            //ViewData["BreadcrumbNode"] = createPage;
+            var agencysPage = new MvcBreadcrumbNode("Agencies", "Vendors", "Manage Agency(s)");
+            var agencyPage = new MvcBreadcrumbNode("Agencies", "Vendors", "All Agencies") { Parent = agencysPage };
+            var agencyDetailPage = new MvcBreadcrumbNode("Details", "Vendors", "Manage Agency") { Parent = agencyPage, RouteValues = new { id = services.VendorId } };
+            var editPage = new MvcBreadcrumbNode("Service", "Vendors", $"Manage Service") { Parent = agencyDetailPage, RouteValues = new { id = services.VendorId } };
+            var createPage = new MvcBreadcrumbNode("Edit", "VendorService", $"Edit Service") { Parent = editPage, RouteValues = new { id = id } };
+            ViewData["BreadcrumbNode"] = createPage;
 
             return View(services);
         }
@@ -262,11 +264,12 @@ namespace risk.control.system.Controllers
             {
                 return NotFound();
             }
-            //var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "Manage Agency(s)");
-            //var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Manage Agency") { Parent = agencysPage, RouteValues = new { id = vendorInvestigationServiceType.VendorId } };
-            //var editPage = new MvcBreadcrumbNode("Service", "Vendors", $"Manage Services") { Parent = agencyPage, RouteValues = new { id = vendorInvestigationServiceType.VendorId } };
-            //var createPage = new MvcBreadcrumbNode("Delete", "VendorService", $"Delete Service") { Parent = editPage, RouteValues = new { id = id } };
-            //ViewData["BreadcrumbNode"] = createPage;
+            var agencysPage = new MvcBreadcrumbNode("Agencies", "Vendors", "Manage Agency(s)");
+            var agencyPage = new MvcBreadcrumbNode("Agencies", "Vendors", "All Agencies") { Parent = agencysPage };
+            var agencyDetailPage = new MvcBreadcrumbNode("Details", "Vendors", "Manage Agency") { Parent = agencyPage, RouteValues = new { id = vendorInvestigationServiceType.VendorId } };
+            var editPage = new MvcBreadcrumbNode("Service", "Vendors", $"Manage Service") { Parent = agencyDetailPage, RouteValues = new { id = vendorInvestigationServiceType.VendorId } };
+            var createPage = new MvcBreadcrumbNode("Delete", "VendorService", $"Delete Service") { Parent = editPage, RouteValues = new { id = vendorInvestigationServiceType.VendorId } };
+            ViewData["BreadcrumbNode"] = createPage;
 
             return View(vendorInvestigationServiceType);
         }

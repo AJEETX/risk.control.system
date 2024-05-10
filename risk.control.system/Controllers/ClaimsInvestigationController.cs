@@ -18,6 +18,7 @@ using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
 
 using SmartBreadcrumbs.Attributes;
+using SmartBreadcrumbs.Nodes;
 
 using static risk.control.system.AppConstant.Applicationsettings;
 
@@ -823,7 +824,7 @@ namespace risk.control.system.Controllers
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
-        [Breadcrumb(title: " Details", FromAction = "Active")]
+        [Breadcrumb(title: " Details", FromAction = "Manager")]
         [Authorize(Roles = MANAGER.DISPLAY_NAME)]
         public async Task<IActionResult> ManagerDetail(string id)
         {
@@ -851,9 +852,8 @@ namespace risk.control.system.Controllers
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
-        [Breadcrumb(title: " Agency detail", FromAction = "ManagerActive")]
         [Authorize(Roles = CREATOR.DISPLAY_NAME)]
-        public async Task<IActionResult> VendorDetail(string companyId, long id, string backurl, string selectedcase)
+        public async Task<IActionResult> VendorDetail(long id,  string selectedcase)
         {
             try
             {
@@ -863,7 +863,7 @@ namespace risk.control.system.Controllers
                     notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                if (id == 0 || companyId is null || selectedcase is null)
+                if (id == 0 || selectedcase is null)
                 {
                     notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
@@ -891,9 +891,14 @@ namespace risk.control.system.Controllers
                     notifyService.Error("NOT FOUND !!!..");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                ViewBag.CompanyId = companyId;
-                ViewBag.Backurl = backurl;
                 ViewBag.Selectedcase = selectedcase;
+
+                var claimsPage = new MvcBreadcrumbNode("Incomplete", "ClaimsInvestigation", "Claims");
+                var agencyPage = new MvcBreadcrumbNode("Assigner", "ClaimsInvestigation", "Assign & Re") { Parent = claimsPage, };
+                var detailsPage = new MvcBreadcrumbNode("EmpanelledVendors", "ClaimsInvestigation", $"Empanelled Agencies") { Parent = agencyPage, RouteValues = new { selectedcase = selectedcase } };
+                var editPage = new MvcBreadcrumbNode("VendorDetail", "ClaimsInvestigation", $"Agency Detail") { Parent = detailsPage, RouteValues = new { id = id } };
+                ViewData["BreadcrumbNode"] = editPage;
+
 
                 return View(vendor);
             }

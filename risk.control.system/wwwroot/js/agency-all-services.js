@@ -47,7 +47,6 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += '<a id=details' + row.id + '  onclick="showdetails(' + row.id + ')" href="/VendorService/Details?id=' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Detail</a>&nbsp;'
                     buttons += '<a id=edit' + row.id + ' onclick="showedit(' + row.id + ')" href="/VendorService/Edit?id=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-pen"></i> Edit</a>&nbsp;'
                     buttons += '<a id=delete' + row.id + ' onclick="getdetails(' + row.id + ')" href="/VendorService/Delete?id=' + row.id + '"  class="btn btn-xs btn-danger"><i class="fas fa-trash"></i> Delete</a>'
                     return buttons;

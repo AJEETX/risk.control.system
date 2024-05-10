@@ -186,11 +186,16 @@
             </div>
         </div>
         <div class="card-footer">
-            <div class="row">
+            <div class="row float-right">
                 <div class="col-md-12">
                     <div class="form-group">
 
-                        <a id="back" asp-controller="ClaimsInvestigation" asp-action="EmpanelledVendors" asp-route-selectedcase="@ViewBag.Selectedcase" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
+                        <a id="back" asp-controller="ClaimsInvestigation" asp-action="EmpanelledVendors" asp-route-selectedcase="@ViewBag.Selectedcase" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left"></i>
+                            <span class="badge badge-light"> <i class="fas fa-tasks"></i> </span> Back
+                        </a>
+
+
                         @*<a asp-controller="Agency" asp-action="User" class="btn btn-success"><i class="fas fa-user-friends"></i>  @Applicationsettings.USER</a>
                         <a asp-controller="Agency" asp-action="Service" class="btn btn-info"><i class="fas fa-plus"></i>  @Applicationsettings.SERVICE</a>*@
                     </div>

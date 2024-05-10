@@ -166,7 +166,7 @@ namespace risk.control.system.Controllers
             }
         }
 
-        [Breadcrumb(" Details")]
+        [Breadcrumb(" Details", FromAction ="ManagerIndex")]
         public async Task<IActionResult> ApprovedDetail(string id)
         {
             try
@@ -267,7 +267,7 @@ namespace risk.control.system.Controllers
             }
         }
 
-        [Breadcrumb(" Details")]
+        [Breadcrumb(" Details", FromAction = "ManagerRejected")]
         public async Task<IActionResult> ManagerRejectDetail(string id)
         {
             try
@@ -367,7 +367,7 @@ namespace risk.control.system.Controllers
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
-        [Breadcrumb(" Details")]
+        [Breadcrumb(" Details", FromAction = "Rejected")]
         public async Task<IActionResult> RejectDetail(string id)
         {
             try
