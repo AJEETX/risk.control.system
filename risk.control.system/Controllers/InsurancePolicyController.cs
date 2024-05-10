@@ -23,18 +23,15 @@ namespace risk.control.system.Controllers
         private readonly IClaimPolicyService claimPolicyService;
         private readonly ApplicationDbContext _context;
         private readonly INotyfService notifyService;
-        private readonly IToastNotification toastNotification;
         private readonly IInvestigationReportService investigationReportService;
 
         public InsurancePolicyController(IClaimPolicyService claimPolicyService, ApplicationDbContext context,
             INotyfService notifyService,
-
-            IToastNotification toastNotification, IInvestigationReportService investigationReportService)
+            IInvestigationReportService investigationReportService)
         {
             this.claimPolicyService = claimPolicyService;
             this._context = context;
             this.notifyService = notifyService;
-            this.toastNotification = toastNotification;
             this.investigationReportService = investigationReportService;
         }
 

@@ -42,7 +42,6 @@ namespace risk.control.system.Controllers
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly RoleManager<ApplicationRole> roleManager;
         private readonly INotyfService notifyService;
-        private readonly IToastNotification toastNotification;
         private readonly IEmpanelledAgencyService empanelledAgencyService;
         private readonly IClaimPolicyService claimPolicyService;
 
@@ -57,8 +56,7 @@ namespace risk.control.system.Controllers
             RoleManager<ApplicationRole> roleManager,
             INotyfService notifyService,
 
-            IClaimPolicyService claimPolicyService,
-            IToastNotification toastNotification)
+            IClaimPolicyService claimPolicyService)
         {
             _context = context;
             this.ftpService = ftpService;
@@ -71,7 +69,6 @@ namespace risk.control.system.Controllers
             this.notifyService = notifyService;
             this.claimPolicyService = claimPolicyService;
             this.empanelledAgencyService = empanelledAgencyService;
-            this.toastNotification = toastNotification;
         }
 
         [ValidateAntiForgeryToken]

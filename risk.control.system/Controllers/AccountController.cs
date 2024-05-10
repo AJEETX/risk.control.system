@@ -38,7 +38,6 @@ namespace risk.control.system.Controllers
         private readonly SignInManager<Models.ApplicationUser> _signInManager;
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly INotificationService service;
-        private readonly IToastNotification toastNotification;
         private readonly IAccountService accountService;
         private readonly ILogger _logger;
         private readonly IFeatureManager featureManager;
@@ -51,7 +50,6 @@ namespace risk.control.system.Controllers
             SignInManager<Models.ApplicationUser> signInManager,
              IHttpContextAccessor httpContextAccessor,
             INotificationService service,
-            IToastNotification toastNotification,
             IAccountService accountService,
             ILogger<AccountController> logger,
             IFeatureManager featureManager,
@@ -63,7 +61,6 @@ namespace risk.control.system.Controllers
             _signInManager = signInManager ?? throw new ArgumentNullException();
             this.httpContextAccessor = httpContextAccessor;
             this.service = service;
-            this.toastNotification = toastNotification ?? throw new ArgumentNullException();
             this.accountService = accountService;
             this._context = context;
             _logger = logger;

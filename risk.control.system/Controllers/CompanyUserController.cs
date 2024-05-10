@@ -15,6 +15,7 @@ using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
 
 using SmartBreadcrumbs.Attributes;
+using SmartBreadcrumbs.Nodes;
 
 namespace risk.control.system.Controllers
 {
@@ -48,7 +49,7 @@ namespace risk.control.system.Controllers
             UserList = new List<UsersViewModel>();
         }
 
-        public async Task<IActionResult> Index(long id)
+        public IActionResult Index(long id)
         {
             var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == id);
            
@@ -57,6 +58,13 @@ namespace risk.control.system.Controllers
                 Company = company,
                 Users = UserList
             };
+            var agencysPage = new MvcBreadcrumbNode("Companies", "ClientCompany", "Admin Settings");
+            var agency2Page = new MvcBreadcrumbNode("Companies", "ClientCompany", "Companies") { Parent = agencysPage, };
+            var agencyPage = new MvcBreadcrumbNode("Details", "ClientCompany", "Company Profile") { Parent = agency2Page, RouteValues = new { id = id } };
+            var editPage = new MvcBreadcrumbNode("Index", "CompanyUser", $"Users") { Parent = agencyPage };
+            ViewData["BreadcrumbNode"] = editPage;
+
+
             return View(model);
         }
 
@@ -90,6 +98,15 @@ namespace risk.control.system.Controllers
             var company = _context.ClientCompany.FirstOrDefault(v => v.ClientCompanyId == id);
             var model = new ClientCompanyApplicationUser { ClientCompany = company };
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
+
+            var agencysPage = new MvcBreadcrumbNode("Companies", "ClientCompany", "Admin Settings");
+            var agency2Page = new MvcBreadcrumbNode("Companies", "ClientCompany", "Companies") { Parent = agencysPage, };
+            var agencyPage = new MvcBreadcrumbNode("Details", "ClientCompany", "Company Profile") { Parent = agency2Page, RouteValues = new { id = id } };
+            var createPage = new MvcBreadcrumbNode("Index", "CompanyUser", $"Users") { Parent = agencyPage, RouteValues = new { id = id } };
+            var editPage = new MvcBreadcrumbNode("Create", "CompanyUser", $"Add User") { Parent = createPage };
+            ViewData["BreadcrumbNode"] = editPage;
+
+
             return View(model);
         }
 
@@ -192,6 +209,15 @@ namespace risk.control.system.Controllers
             ViewData["StateId"] = new SelectList(relatedStates, "StateId", "Name", clientCompanyApplicationUser.StateId);
             ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", clientCompanyApplicationUser.DistrictId);
             ViewData["PinCodeId"] = new SelectList(pincodes, "PinCodeId", "Code", clientCompanyApplicationUser.PinCodeId);
+
+
+            var agencysPage = new MvcBreadcrumbNode("Companies", "ClientCompany", "Admin Settings");
+            var agency2Page = new MvcBreadcrumbNode("Companies", "ClientCompany", "Companies") { Parent = agencysPage, };
+            var agencyPage = new MvcBreadcrumbNode("Details", "ClientCompany", "Company Profile") { Parent = agency2Page, RouteValues = new { id = clientCompany.ClientCompanyId } };
+            var createPage = new MvcBreadcrumbNode("Index", "CompanyUser", $"Users") { Parent = agencyPage, RouteValues = new { id = clientCompany.ClientCompanyId } };
+            var editPage = new MvcBreadcrumbNode("Edit", "CompanyUser", $"Edit User") { Parent = createPage };
+            ViewData["BreadcrumbNode"] = editPage;
+
             return View(clientCompanyApplicationUser);
         }
 
@@ -345,11 +371,6 @@ namespace risk.control.system.Controllers
         private bool VendorApplicationUserExists(long id)
         {
             return (_context.VendorApplicationUser?.Any(e => e.Id == id)).GetValueOrDefault();
-        }
-
-        private async Task<List<string>> GetUserRoles(ClientCompanyApplicationUser user)
-        {
-            return new List<string>(await userManager.GetRolesAsync(user));
         }
     }
 }

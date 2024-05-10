@@ -46,7 +46,7 @@ namespace risk.control.system.Controllers
         [Breadcrumb(" Manage Service", FromAction = "Details", FromController = typeof(VendorsController))]
         public async Task<IActionResult> Details(long id)
         {
-            if (id == null || _context.VendorInvestigationServiceType == null)
+            if (id < 1 || _context.VendorInvestigationServiceType == null)
             {
                 return NotFound();
             }

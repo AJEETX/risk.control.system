@@ -15,6 +15,7 @@ using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
 
 using SmartBreadcrumbs.Attributes;
+using SmartBreadcrumbs.Nodes;
 
 namespace risk.control.system.Controllers
 {
@@ -24,7 +25,6 @@ namespace risk.control.system.Controllers
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly INotyfService notifyService;
-        private readonly IToastNotification toastNotification;
         private readonly RoleManager<ApplicationRole> roleManager;
         private readonly UserManager<ClientCompanyApplicationUser> userManager;
 
@@ -33,13 +33,11 @@ namespace risk.control.system.Controllers
             IWebHostEnvironment webHostEnvironment,
             INotyfService notifyService,
             RoleManager<ApplicationRole> roleManager,
-            UserManager<ClientCompanyApplicationUser> userManager,
-            IToastNotification toastNotification)
+            UserManager<ClientCompanyApplicationUser> userManager)
         {
             _context = context;
             this.webHostEnvironment = webHostEnvironment;
             this.notifyService = notifyService;
-            this.toastNotification = toastNotification;
             this.roleManager = roleManager;
             this.userManager = userManager;
         }
@@ -102,10 +100,10 @@ namespace risk.control.system.Controllers
         [Breadcrumb("Delete ", FromAction = "Companies")]
         public async Task<IActionResult> Delete(long id)
         {
-            if (id == null || _context.ClientCompany == null)
+            if (id < 1 || _context.ClientCompany == null)
             {
-                toastNotification.AddErrorToastMessage("client company not found!");
-                return NotFound();
+                notifyService.Error("Company not found!");
+                    return RedirectToAction(nameof(Index), "Dashboard");
             }
 
             var clientCompany = await _context.ClientCompany
@@ -115,8 +113,9 @@ namespace risk.control.system.Controllers
                 .FirstOrDefaultAsync(m => m.ClientCompanyId == id);
             if (clientCompany == null)
             {
-                toastNotification.AddErrorToastMessage("client company not found!");
-                return NotFound();
+                notifyService.Error("Company not found!");
+                return RedirectToAction(nameof(Index), "Dashboard");
+
             }
 
             return View(clientCompany);
@@ -129,8 +128,8 @@ namespace risk.control.system.Controllers
         {
             if (_context.ClientCompany == null)
             {
-                toastNotification.AddErrorToastMessage("client company not found!");
-                return Problem("Entity set 'ApplicationDbContext.ClientCompany'  is null.");
+                notifyService.Error("Company not found!");
+                return RedirectToAction(nameof(Index), "Dashboard");
             }
             var clientCompany = await _context.ClientCompany.FindAsync(ClientCompanyId);
             if (clientCompany != null)
@@ -146,18 +145,18 @@ namespace risk.control.system.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            notifyService.Error($"Err Company delete.", 3);
-            return RedirectToAction(nameof(Index));
+            notifyService.Error("Company not found!");
+            return RedirectToAction(nameof(Index), "Dashboard");
         }
 
         // GET: ClientCompanies/Details/5
         [Breadcrumb("Company Profile", FromAction = "Companies")]
         public async Task<IActionResult> Details(long id)
         {
-            if (id == null || _context.ClientCompany == null)
+            if (id < 1 || _context.ClientCompany == null)
             {
-                toastNotification.AddErrorToastMessage("client company not found!");
-                return NotFound();
+                notifyService.Error("Company not found!");
+                return RedirectToAction(nameof(Index), "Dashboard");
             }
 
             var clientCompany = await _context.ClientCompany
@@ -168,8 +167,8 @@ namespace risk.control.system.Controllers
                 .FirstOrDefaultAsync(m => m.ClientCompanyId == id);
             if (clientCompany == null)
             {
-                toastNotification.AddErrorToastMessage("client company not found!");
-                return NotFound();
+                notifyService.Error("Company not found!");
+                return RedirectToAction(nameof(Index), "Dashboard");
             }
 
             return View(clientCompany);
@@ -181,15 +180,15 @@ namespace risk.control.system.Controllers
         {
             if (id == 0 || _context.ClientCompany == null)
             {
-                toastNotification.AddErrorToastMessage("client company not found!");
-                return NotFound();
+                notifyService.Error("Company not found!");
+                return RedirectToAction(nameof(Index), "Dashboard");
             }
 
             var clientCompany = await _context.ClientCompany.FindAsync(id);
             if (clientCompany == null)
             {
-                toastNotification.AddErrorToastMessage("client company not found!");
-                return NotFound();
+                notifyService.Error("Company not found!");
+                return RedirectToAction(nameof(Index), "Dashboard");
             }
 
             var country = _context.Country;
@@ -201,6 +200,12 @@ namespace risk.control.system.Controllers
             ViewData["StateId"] = new SelectList(relatedStates, "StateId", "Name", clientCompany.StateId);
             ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", clientCompany.DistrictId);
             ViewData["PinCodeId"] = new SelectList(pincodes, "PinCodeId", "Code", clientCompany.PinCodeId);
+
+            var agencysPage = new MvcBreadcrumbNode("Companies", "ClientCompany", "Admin Settings");
+            var agency2Page = new MvcBreadcrumbNode("Companies", "ClientCompany", "Companies") { Parent = agencysPage, };
+            var agencyPage = new MvcBreadcrumbNode("Details", "ClientCompany", "Company Profile") { Parent = agency2Page, RouteValues = new { id = id } };
+            var editPage = new MvcBreadcrumbNode("Edit", "ClientCompany", $"Edit Company") { Parent = agencyPage };
+            ViewData["BreadcrumbNode"] = editPage;
 
             return View(clientCompany);
         }
@@ -270,16 +275,9 @@ namespace risk.control.system.Controllers
 
                 var response = SmsService.SendSingleMessage(clientCompany.PhoneNumber, "Company account edited. Domain : " + clientCompany.Email);
             }
-            catch (DbUpdateConcurrencyException)
+            catch
             {
-                if (!ClientCompanyExists(clientCompany.ClientCompanyId))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                
             }
             notifyService.Custom($"Company edited successfully.", 3, "orange", "fas fa-building");
             return RedirectToAction(nameof(ClientCompanyController.Details), "ClientCompany", new { id = clientCompany.ClientCompanyId });
@@ -463,10 +461,10 @@ namespace risk.control.system.Controllers
         [Breadcrumb("Agency Detail")]
         public async Task<IActionResult> VendorDetail(string companyId, long id, string backurl)
         {
-            if (id == null || _context.Vendor == null)
+            if (id < 1 || _context.Vendor == null)
             {
-                toastNotification.AddErrorToastMessage("agency not found!");
-                return NotFound();
+                notifyService.Error("Agency not found!");
+                return RedirectToAction(nameof(Index), "Dashboard");
             }
 
             var vendor = await _context.Vendor
@@ -492,11 +490,6 @@ namespace risk.control.system.Controllers
             ViewBag.Backurl = backurl;
 
             return View(vendor);
-        }
-
-        private bool ClientCompanyExists(long id)
-        {
-            return (_context.ClientCompany?.Any(e => e.ClientCompanyId == id)).GetValueOrDefault();
         }
     }
 }

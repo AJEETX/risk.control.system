@@ -33,7 +33,6 @@ namespace risk.control.system.Controllers
         private readonly IDashboardService dashboardService;
         private readonly IClaimsVendorService vendorService;
         private readonly IMailboxService mailboxService;
-        private readonly IToastNotification toastNotification;
         private readonly INotyfService notifyService;
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment webHostEnvironment;
@@ -45,7 +44,6 @@ namespace risk.control.system.Controllers
             IDashboardService dashboardService,
             IClaimsVendorService vendorService,
             IMailboxService mailboxService,
-            IToastNotification toastNotification,
             INotyfService notifyService,
             ApplicationDbContext context)
         {
@@ -54,7 +52,6 @@ namespace risk.control.system.Controllers
             this.dashboardService = dashboardService;
             this.vendorService = vendorService;
             this.mailboxService = mailboxService;
-            this.toastNotification = toastNotification;
             this.notifyService = notifyService;
             this._context = context;
             this.webHostEnvironment = webHostEnvironment;
@@ -449,9 +446,9 @@ namespace risk.control.system.Controllers
                     notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                if (id == null)
+                if (id < 1)
                 {
-                    toastNotification.AddAlertToastMessage("NOT FOUND !!!..");
+                    notifyService.Error("NOT FOUND !!!..");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var invoice = await _context.VendorInvoice

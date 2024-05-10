@@ -41,13 +41,13 @@ namespace risk.control.system.Controllers
             UserList = new List<UsersViewModel>();
         }
 
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
             return RedirectToAction("Load");
         }
 
         [Breadcrumb(" Agency Workload", FromAction = "Index", FromController = typeof(AgencyController))]
-        public async Task<IActionResult> Load()
+        public IActionResult Load()
         {
             return View();
         }
