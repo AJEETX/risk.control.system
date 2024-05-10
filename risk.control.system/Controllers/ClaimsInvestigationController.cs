@@ -1,4 +1,6 @@
-﻿using AspNetCoreHero.ToastNotification.Abstractions;
+﻿using System.Security.Claims;
+
+using AspNetCoreHero.ToastNotification.Abstractions;
 
 using CsvHelper;
 
@@ -9,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 
 using NToastNotify;
 
+using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
@@ -45,7 +48,6 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(" Claims")]
-        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
         public IActionResult Index()
         {
             try
@@ -56,7 +58,23 @@ namespace risk.control.system.Controllers
                     notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                return RedirectToAction("Incomplete");
+                var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
+                if (userRole.Value.Contains(AppRoles.CREATOR.ToString()))
+                {
+                    return RedirectToAction("Incomplete");
+                }
+                else if (userRole.Value.Contains(AppRoles.ASSESSOR.ToString()))
+                {
+                    return RedirectToAction("Assessor");
+                }
+                else if (userRole.Value.Contains(AppRoles.MANAGER.ToString()))
+                {
+                    return RedirectToAction("Manager");
+                }
+                else
+                {
+                    return RedirectToAction("Index", "Dashboard");
+                }
             }
             catch (Exception)
             {
@@ -634,7 +652,7 @@ namespace risk.control.system.Controllers
         }
 
 
-        [Breadcrumb("Details", FromAction = "Index", FromController = typeof(InsuranceClaimsController))]
+        [Breadcrumb("Details", FromAction = "Incomplete")]
         [Authorize(Roles = CREATOR.DISPLAY_NAME)]
         public async Task<IActionResult> Details(string id)
         {
@@ -777,7 +795,7 @@ namespace risk.control.system.Controllers
             }
         }
 
-        [Breadcrumb(title: " Details", FromAction = "Active")]
+        [Breadcrumb(title: " Details", FromAction = "ManagerActive")]
         [Authorize(Roles = MANAGER.DISPLAY_NAME)]
         public async Task<IActionResult> ManagerActiveDetail(string id)
         {

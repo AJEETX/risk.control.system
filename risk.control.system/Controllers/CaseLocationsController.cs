@@ -131,6 +131,12 @@ namespace risk.control.system.Controllers
                 ViewData["PinCodeId"] = new SelectList(pincodes.OrderBy(s => s.Code), "PinCodeId", "Code", model.PinCodeId);
                 ViewData["BeneficiaryRelationId"] = new SelectList(_context.BeneficiaryRelation, "BeneficiaryRelationId", "Name");
 
+                var claimsPage = new MvcBreadcrumbNode("Incomplete", "ClaimsInvestigation", "Claims");
+                var agencyPage = new MvcBreadcrumbNode("Incomplete", "ClaimsInvestigation", "New & Draft") { Parent = claimsPage, };
+                var detailsPage = new MvcBreadcrumbNode("Details", "ClaimsInvestigation", $"Details") { Parent = agencyPage, RouteValues = new { id = id } };
+                var editPage = new MvcBreadcrumbNode("Create", "CaseLocations", $"Add beneficiary") { Parent = detailsPage, RouteValues = new { id = id } };
+                ViewData["BreadcrumbNode"] = editPage;
+
                 return View(model);
             }
             catch (Exception)
@@ -240,6 +246,13 @@ namespace risk.control.system.Controllers
 
                 ViewData["BeneficiaryRelationId"] = new SelectList(_context.BeneficiaryRelation.OrderBy(s => s.Code), "BeneficiaryRelationId", "Name", caseLocation.BeneficiaryRelationId);
 
+
+                var claimsPage = new MvcBreadcrumbNode("Incomplete", "ClaimsInvestigation", "Claims");
+                var agencyPage = new MvcBreadcrumbNode("Incomplete", "ClaimsInvestigation", "New & Draft") { Parent = claimsPage, };
+                var detailsPage = new MvcBreadcrumbNode("Details", "ClaimsInvestigation", $"Details") { Parent = agencyPage, RouteValues = new { id = caseLocation.ClaimsInvestigationId } };
+                var editPage = new MvcBreadcrumbNode("Edit", "CaseLocations", $"Edit Beneficiary") { Parent = detailsPage, RouteValues = new { id = id } };
+                ViewData["BreadcrumbNode"] = editPage;
+
                 return View(services);
             }
             catch (Exception)
@@ -283,6 +296,13 @@ namespace risk.control.system.Controllers
                 ViewData["PinCodeId"] = new SelectList(pincodes, "PinCodeId", "Code", caseLocation.PinCodeId);
 
                 ViewData["BeneficiaryRelationId"] = new SelectList(_context.BeneficiaryRelation.OrderBy(s => s.Code), "BeneficiaryRelationId", "Name", caseLocation.BeneficiaryRelationId);
+
+
+                var claimsPage = new MvcBreadcrumbNode("Incomplete", "ClaimsInvestigation", "Claims");
+                var agencyPage = new MvcBreadcrumbNode("Draft", "ClaimsInvestigation", "Assign(auto)") { Parent = claimsPage, };
+                var detailsPage = new MvcBreadcrumbNode("DetailsAuto", "ClaimsInvestigation", $"Details") { Parent = agencyPage, RouteValues = new { id = caseLocation.ClaimsInvestigationId } };
+                var editPage = new MvcBreadcrumbNode("EditAuto", "ClaimsInvestigation", $"Edit beneficiary") { Parent = detailsPage, RouteValues = new { id = id } };
+                ViewData["BreadcrumbNode"] = editPage;
 
                 return View(services);
             }
@@ -328,6 +348,13 @@ namespace risk.control.system.Controllers
                 ViewData["PinCodeId"] = new SelectList(pincodes, "PinCodeId", "Code", caseLocation.PinCodeId);
 
                 ViewData["BeneficiaryRelationId"] = new SelectList(_context.BeneficiaryRelation.OrderBy(s => s.Code), "BeneficiaryRelationId", "Name", caseLocation.BeneficiaryRelationId);
+
+
+                var claimsPage = new MvcBreadcrumbNode("Incomplete", "ClaimsInvestigation", "Claims");
+                var agencyPage = new MvcBreadcrumbNode("Assigner", "ClaimsInvestigation", "Assign & Re") { Parent = claimsPage, };
+                var detailsPage = new MvcBreadcrumbNode("DetailsManual", "ClaimsInvestigation", $"Details") { Parent = agencyPage, RouteValues = new { id = caseLocation.ClaimsInvestigationId } };
+                var editPage = new MvcBreadcrumbNode("EditManual", "ClaimsInvestigation", $"Edit Beneficairy") { Parent = detailsPage, RouteValues = new { id = id } };
+                ViewData["BreadcrumbNode"] = editPage;
 
                 return View(services);
             }

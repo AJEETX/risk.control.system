@@ -248,7 +248,7 @@ namespace risk.control.system.Controllers
         {
             return View();
         }
-        [Breadcrumb(title: " Detail")]
+        [Breadcrumb(title: " Detail",FromAction = "Submitted")]
         [Authorize(Roles = "AGENT")]
         public async Task<IActionResult> SubmittedDetail(string id)
         {
@@ -472,6 +472,12 @@ namespace risk.control.system.Controllers
                     .ThenInclude(v => v.Country)
                     .Include(i => i.InvestigationServiceType)
                     .FirstOrDefaultAsync();
+
+                var claimsPage = new MvcBreadcrumbNode("Index", "ClaimsVendor", "Claims");
+                var agencyPage = new MvcBreadcrumbNode("Completed", "ClaimsVendor", "Completed") { Parent = claimsPage, };
+                var detailsPage = new MvcBreadcrumbNode("CompletedDetail", "ClaimsVendor", $"Details") { Parent = agencyPage, RouteValues = new { id = invoice.ClaimId } };
+                var editPage = new MvcBreadcrumbNode("ShowInvoice", "ClaimsVendor", $"Invoice") { Parent = detailsPage, RouteValues = new { id = id } };
+                ViewData["BreadcrumbNode"] = editPage;
 
                 return View(invoice);
             }

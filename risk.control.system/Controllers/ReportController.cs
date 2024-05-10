@@ -13,6 +13,7 @@ using AspNetCoreHero.ToastNotification.Notyf;
 using AspNetCoreHero.ToastNotification.Abstractions;
 using Microsoft.AspNetCore.Authorization;
 using static risk.control.system.AppConstant.Applicationsettings;
+using SmartBreadcrumbs.Nodes;
 
 namespace risk.control.system.Controllers
 {
@@ -501,6 +502,12 @@ namespace risk.control.system.Controllers
                     .ThenInclude(v => v.Country)
                     .Include(i => i.InvestigationServiceType)
                     .FirstOrDefaultAsync();
+
+                var claimsPage = new MvcBreadcrumbNode("Assessor", "ClaimsInvestigation", "Claims");
+                var agencyPage = new MvcBreadcrumbNode("Index", "Report", "Approved") { Parent = claimsPage, };
+                var detailsPage = new MvcBreadcrumbNode("Detail", "Report", $"Details") { Parent = agencyPage, RouteValues = new { id = invoice.ClaimId } };
+                var editPage = new MvcBreadcrumbNode("ShowInvoice", "Report", $"Invoice") { Parent = detailsPage, RouteValues = new { id = id } };
+                ViewData["BreadcrumbNode"] = editPage;
 
                 return View(invoice);
             }

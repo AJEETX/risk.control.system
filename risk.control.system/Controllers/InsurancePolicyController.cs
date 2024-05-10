@@ -14,6 +14,7 @@ using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
 
 using SmartBreadcrumbs.Attributes;
+using SmartBreadcrumbs.Nodes;
 
 namespace risk.control.system.Controllers
 {
@@ -104,6 +105,12 @@ namespace risk.control.system.Controllers
                 ViewData["InvestigationCaseStatusId"] = new SelectList(_context.InvestigationCaseStatus, "InvestigationCaseStatusId", "Name", claimsInvestigation.InvestigationCaseStatusId);
                 ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", claimsInvestigation.PolicyDetail.LineOfBusinessId);
 
+                var claimsPage = new MvcBreadcrumbNode("Incomplete", "ClaimsInvestigation", "Claims");
+                var agencyPage = new MvcBreadcrumbNode("Incomplete", "ClaimsInvestigation", "New & Draft") { Parent = claimsPage, };
+                var detailsPage = new MvcBreadcrumbNode("Details", "ClaimsInvestigation", $"Details") { Parent = agencyPage, RouteValues = new { id = id } };
+                var editPage = new MvcBreadcrumbNode("EditPolicy", "ClaimsInvestigation", $"Edit Policy") { Parent = detailsPage, RouteValues = new { id = id } };
+                ViewData["BreadcrumbNode"] = editPage;
+
                 return View(claimsInvestigation);
             }
             catch (Exception)
@@ -143,6 +150,12 @@ namespace risk.control.system.Controllers
                 ViewData["InvestigationCaseStatusId"] = new SelectList(_context.InvestigationCaseStatus, "InvestigationCaseStatusId", "Name", claimsInvestigation.InvestigationCaseStatusId);
                 ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", claimsInvestigation.PolicyDetail.LineOfBusinessId);
 
+                var claimsPage = new MvcBreadcrumbNode("Incomplete", "ClaimsInvestigation", "Claims");
+                var agencyPage = new MvcBreadcrumbNode("Draft", "ClaimsInvestigation", "Assign(auto)") { Parent = claimsPage, };
+                var detailsPage = new MvcBreadcrumbNode("DetailsAuto", "ClaimsInvestigation", $"Details") { Parent = agencyPage, RouteValues = new { id = id } };
+                var editPage = new MvcBreadcrumbNode("EditPolicy", "ClaimsInvestigation", $"Edit Policy") { Parent = detailsPage, RouteValues = new { id = id } };
+                ViewData["BreadcrumbNode"] = editPage;
+
                 return View(claimsInvestigation);
             }
             catch (Exception)
@@ -181,6 +194,11 @@ namespace risk.control.system.Controllers
                 ViewData["InvestigationCaseStatusId"] = new SelectList(_context.InvestigationCaseStatus, "InvestigationCaseStatusId", "Name", claimsInvestigation.InvestigationCaseStatusId);
                 ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", claimsInvestigation.PolicyDetail.LineOfBusinessId);
 
+                var claimsPage = new MvcBreadcrumbNode("Incomplete", "ClaimsInvestigation", "Claims");
+                var agencyPage = new MvcBreadcrumbNode("Assigner", "ClaimsInvestigation", "Assign & Re") { Parent = claimsPage, };
+                var detailsPage = new MvcBreadcrumbNode("DetailsManual", "ClaimsInvestigation", $"Details") { Parent = agencyPage, RouteValues = new { id = id } };
+                var editPage = new MvcBreadcrumbNode("EditPolicy", "ClaimsInvestigation", $"Edit Policy") { Parent = detailsPage, RouteValues = new { id = id } };
+                ViewData["BreadcrumbNode"] = editPage;
                 return View(claimsInvestigation);
             }
             catch (Exception)
