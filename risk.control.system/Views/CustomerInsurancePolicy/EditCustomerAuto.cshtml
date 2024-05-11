@@ -240,30 +240,19 @@
                             <span class="input-group-label"> Customer Photo:</span>
                             <div class="input-group mb-3">
 
+
                                 @if (Model?.CustomerDetail.ProfilePicture is not null)
                                 {
                                     <img id="profileImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.CustomerDetail.ProfilePicture))">
+                                    <i class="fa fa-asterisk asterik-style"></i>
+                                    <input accept="image/*" asp-for="CustomerDetail.ProfileImage" type="file" class="form-control remarks" id="documentImageInput" />
+
                                 }
                                 else
                                 {
                                     <img id="profileImage" class="form-Image" src="@Applicationsettings.NO_USER">
-                                }
-
-                                @if (Model.PolicyDetail.ClaimType == ClaimType.HEALTH)
-                                {
                                     <i class="fa fa-asterisk asterik-style"></i>
-                                    @if (Model?.CustomerDetail.ProfilePicture is not null)
-                                    {
-                                        <input accept="image/*" asp-for="CustomerDetail.ProfileImage" type="file" class="form-control remarks" id="documentImageInput" />
-                                    }
-                                    else
-                                    {
-                                        <input accept="image/*" asp-for="CustomerDetail.ProfileImage" type="file" class="form-control remarks" id="documentImageInput" required />
-                                    }
-                                }
-                                else
-                                {
-                                    <input accept="image/*" asp-for="CustomerDetail.ProfileImage" type="file" class="form-control remarks" id="documentImageInput" />
+                                    <input accept="image/*" asp-for="CustomerDetail.ProfileImage" type="file" class="form-control remarks" id="documentImageInput" required />
 
                                 }
                             </div>

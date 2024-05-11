@@ -35,54 +35,6 @@ namespace risk.control.system.Controllers
             this.toastNotification = toastNotification;
         }
 
-        [Breadcrumb("Location", FromController = typeof(ClaimsInvestigationController), FromAction = "Draft")]
-        public async Task<IActionResult> Index()
-        {
-            var applicationDbContext = _context.CaseLocation.Include(c => c.District).Include(c => c.State);
-            return View(await applicationDbContext.ToListAsync());
-        }
-
-        public async Task<IActionResult> AssignerDetails(long? id)
-        {
-            if (id == null || _context.CaseLocation == null)
-            {
-                return NotFound();
-            }
-
-            var caseLocation = await _context.CaseLocation
-                .Include(c => c.District)
-                .Include(c => c.State)
-                .Include(c => c.BeneficiaryRelation)
-                .Include(c => c.Country)
-                .FirstOrDefaultAsync(m => m.CaseLocationId == id);
-            if (caseLocation == null)
-            {
-                return NotFound();
-            }
-
-            return View(caseLocation);
-        }
-
-        public async Task<IActionResult> Details(long? id)
-        {
-            if (id == null || _context.CaseLocation == null)
-            {
-                return NotFound();
-            }
-
-            var caseLocation = await _context.CaseLocation
-                .Include(c => c.District)
-                .Include(c => c.State)
-                .Include(c => c.Country)
-                .FirstOrDefaultAsync(m => m.CaseLocationId == id);
-            if (caseLocation == null)
-            {
-                return NotFound();
-            }
-
-            return View(caseLocation);
-        }
-
         [Breadcrumb("Add Beneficiary", FromAction = "Index", FromController = typeof(InsuranceClaimsController))]
         public IActionResult Create(string id)
         {

@@ -112,9 +112,8 @@ namespace risk.control.system.Services
                 .FirstOrDefault(c => c.ClaimsInvestigationId == message.ClaimId);
             var assignedToAgentStatus = context.InvestigationCaseSubStatus.FirstOrDefault(
                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
-            var beneficiary = context.CaseLocation
-                .FirstOrDefault(c => c.ClaimsInvestigationId == message.ClaimId
-                && c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId);
+            var beneficiary = context.BeneficiaryDetail
+                .FirstOrDefault(c => c.ClaimsInvestigationId == message.ClaimId);
 
             string mobile = string.Empty;
             string recepientName = string.Empty;
@@ -228,9 +227,8 @@ namespace risk.control.system.Services
                 .FirstOrDefault(c => c.ClaimsInvestigationId == id);
             var assignedToAgentStatus = context.InvestigationCaseSubStatus.FirstOrDefault(
                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
-            var beneficiary = context.CaseLocation
-                .FirstOrDefault(c => c.ClaimsInvestigationId == id
-                && c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId);
+            var beneficiary = context.BeneficiaryDetail
+                .FirstOrDefault(c => c.ClaimsInvestigationId == id);
 
             string recepientName = string.Empty;
             string recepientPhone = string.Empty;
@@ -303,7 +301,7 @@ namespace risk.control.system.Services
              .FirstOrDefault(c => c.ClaimsInvestigationId == id);
             var assignedToAgentStatus = context.InvestigationCaseSubStatus.FirstOrDefault(
                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
-            var beneficiary = context.CaseLocation
+            var beneficiary = context.BeneficiaryDetail
                 .Include(c => c.ClaimsInvestigation)
                 .Include(c => c.PinCode)
                 .Include(c => c.BeneficiaryRelation)
@@ -316,15 +314,13 @@ namespace risk.control.system.Services
                 .Include(c => c.District)
                 .Include(c => c.Country)
                 .Include(c => c.State)
-                .Include(c => c.Vendor)
                 .Include(c => c.ClaimReport)
                 .ThenInclude(c => c.ServiceReportTemplate.ReportTemplate.DigitalIdReport)
                 .Include(c => c.ClaimReport)
                 .ThenInclude(c => c.ServiceReportTemplate.ReportTemplate.DocumentIdReport)
                 .Include(c => c.ClaimReport)
                     .ThenInclude(c => c.ServiceReportTemplate.ReportTemplate.ReportQuestionaire)
-                .FirstOrDefault(c => c.ClaimsInvestigationId == id
-                && c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId);
+                .FirstOrDefault(c => c.ClaimsInvestigationId == id);
 
             string mobile = string.Empty;
             string recepientName = string.Empty;
@@ -438,7 +434,7 @@ namespace risk.control.system.Services
 
         public string SendSms2Beneficiary(string currentUser, string claimId, string sms)
         {
-            var beneficiary = context.CaseLocation.Include(b => b.ClaimsInvestigation).ThenInclude(c => c.PolicyDetail)
+            var beneficiary = context.BeneficiaryDetail.Include(b => b.ClaimsInvestigation).ThenInclude(c => c.PolicyDetail)
                .FirstOrDefault(c => c.ClaimsInvestigationId == claimId);
 
             var mobile = beneficiary.BeneficiaryContactNumber.ToString();

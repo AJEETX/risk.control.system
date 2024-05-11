@@ -1288,16 +1288,14 @@ namespace risk.control.system.Services
         {
             var agencyUser = _context.VendorApplicationUser.Include(u=>u.Vendor).FirstOrDefault(s => s.Email == userEmail);
 
-            var claimsCaseLocation = _context.CaseLocation
+            var claimsCaseLocation = _context.BeneficiaryDetail
             .Include(c => c.ClaimReport)
             .Include(c => c.ClaimsInvestigation)
-            .Include(c => c.InvestigationCaseSubStatus)
-            .Include(c => c.Vendor)
             .Include(c => c.PinCode)
             .Include(c => c.District)
             .Include(c => c.State)
             .Include(c => c.State)
-            .FirstOrDefault(c => c.CaseLocationId == caseLocationId && c.ClaimsInvestigationId == claimsInvestigationId);
+            .FirstOrDefault(c => c.BeneficiaryDetailId == caseLocationId && c.ClaimsInvestigationId == claimsInvestigationId);
 
             var report = _context.ClaimReport.FirstOrDefault(c => c.ClaimReportId == claimsCaseLocation.ClaimReport.ClaimReportId);
             report.SupervisorRemarkType = reportUpdateStatus;
@@ -1305,10 +1303,7 @@ namespace risk.control.system.Services
 
             _context.ClaimReport.Update(report);
             claimsCaseLocation.ClaimReport = report;
-            claimsCaseLocation.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                    i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT).InvestigationCaseSubStatusId;
-            claimsCaseLocation.IsReviewCaseLocation = true;
-            _context.CaseLocation.Update(claimsCaseLocation);
+            _context.BeneficiaryDetail.Update(claimsCaseLocation);
 
             var claimsCaseToAllocateToVendor = _context.ClaimsInvestigation
                 .Include(c => c.PolicyDetail)

@@ -400,16 +400,14 @@ namespace risk.control.system.Services
                 .ThenInclude(c => c.DocumentIdReport)
                 .Include(c => c.ClaimReport)
                 .ThenInclude(c => c.ReportQuestionaire)
-                .Include(c => c.ClaimReport)
-                .ThenInclude(c => c.ServiceReportTemplate.ReportTemplate.DigitalIdReport)
-                .Include(c => c.ClaimReport)
-                .ThenInclude(c => c.ServiceReportTemplate.ReportTemplate.DocumentIdReport)
-                .Include(c => c.ClaimReport)
-                    .ThenInclude(c => c.ServiceReportTemplate.ReportTemplate.ReportQuestionaire)
                 .Include(c => c.District)
                 .Include(c => c.Country)
                 .Include(c => c.State)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == selectedcase);
+
+
+
+
             var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
             

@@ -35,7 +35,6 @@ namespace risk.control.system.Data
         public virtual DbSet<ApplicationRole> ApplicationRole { get; set; }
         public virtual DbSet<InvestigationCase> InvestigationCase { get; set; }
 
-        //public virtual DbSet<ClaimsInvestigation> ClaimsInvestigation { get; set; }
         public virtual DbSet<LineOfBusiness> LineOfBusiness { get; set; }
 
         public virtual DbSet<InvestigationCaseStatus> InvestigationCaseStatus { get; set; }
@@ -68,8 +67,6 @@ namespace risk.control.system.Data
         public virtual DbSet<FileOnDatabaseModel> FilesOnDatabase { get; set; }
         public virtual DbSet<FileOnFileSystemModel> FilesOnFileSystem { get; set; }
         public DbSet<ClaimsInvestigation> ClaimsInvestigation { get; set; } = default!;
-        public DbSet<CaseLocation> CaseLocation { get; set; } = default!;
-        public DbSet<VerifyPinCode> VerifyPinCode { get; set; } = default!;
         public DbSet<PolicyDetail> PolicyDetail { get; set; } = default!;
         public DbSet<CustomerDetail> CustomerDetail { get; set; } = default!;
         public DbSet<BeneficiaryDetail> BeneficiaryDetail { get; set; } = default!;

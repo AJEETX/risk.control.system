@@ -22,21 +22,21 @@
     var newTrashMessgeDisplay = string.Empty;
 
 
-    var newInboxMessages = userMailbox?.Inbox.Where(i => i.Read == false);
-    if (newInboxMessages is not null && newInboxMessages.Count() > 0)
+    var newInboxMessages = userMailbox?.Inbox.Count(i => i.Read == false);
+    if (newInboxMessages is not null && newInboxMessages > 0)
     {
-        newInboxMessgeDisplay = "(" + newInboxMessages.Count().ToString() + ")";
+        newInboxMessgeDisplay = "(" + newInboxMessages?.ToString() + ")";
     }
 
-    var newOutboxMessages = userMailbox?.Outbox.Where(i => i.Read == false);
-    if (newOutboxMessages is not null && newOutboxMessages.Count() > 0)
+    var newOutboxMessages = userMailbox?.Outbox.Count(i => i.Read == false);
+    if (newOutboxMessages is not null && newOutboxMessages > 0)
     {
-        newOutboxMessgeDisplay = "(" + newOutboxMessages.Count().ToString() + ")";
+        newOutboxMessgeDisplay = "(" + newOutboxMessages?.ToString() + ")";
     }
-    var newSentMessages = userMailbox?.Sent.Where(i => i.Read == false);
-    if (newSentMessages is not null && newSentMessages.Count() > 0)
+    var newSentMessages = userMailbox?.Sent.Count(i => i.Read == false);
+    if (newSentMessages is not null && newSentMessages > 0)
     {
-        newSentMessgeDisplay = "(" + newSentMessages.Count().ToString() + ")";
+        newSentMessgeDisplay = "(" + newSentMessages?.ToString() + ")";
     }
 }
 <li class="nav-item ">

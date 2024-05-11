@@ -448,7 +448,7 @@ namespace risk.control.system.Services
 
         public async Task GetAudio(AudioData data)
         {
-            var caseLocation = _context.CaseLocation
+            var caseLocation = _context.BeneficiaryDetail
                 .Include(c => c.ClaimReport)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == data.ClaimId);
             var claimReport = _context.ClaimReport
@@ -472,7 +472,7 @@ namespace risk.control.system.Services
 
         public async Task GetVideo(VideoData data)
         {
-            var caseLocation = _context.CaseLocation
+            var caseLocation = _context.BeneficiaryDetail
                 .Include(c => c.ClaimReport)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == data.ClaimId);
             var claimReport = _context.ClaimReport
