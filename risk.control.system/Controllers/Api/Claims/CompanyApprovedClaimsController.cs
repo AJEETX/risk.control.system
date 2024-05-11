@@ -55,12 +55,13 @@ namespace risk.control.system.Controllers.Api.Claims
 
             if (userRole.Value.Contains(AppRoles.ASSESSOR.ToString()))
             {
-                applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId != null));
-
                 foreach (var item in applicationDbContext)
                 {
-                    item.CaseLocations = item.CaseLocations.Where(c => c.InvestigationCaseSubStatusId == assessorApprovedStatus.InvestigationCaseSubStatusId)?.ToList();
-                    if (item.CaseLocations.Any() || item.IsReviewCase && item.InvestigationCaseStatusId != finishedStatus.InvestigationCaseStatusId)
+                    if (
+                        item.InvestigationCaseSubStatusId == assessorApprovedStatus.InvestigationCaseSubStatusId && 
+                        item.InvestigationCaseStatusId == finishedStatus.InvestigationCaseStatusId || 
+                        item.IsReviewCase && 
+                        item.InvestigationCaseStatusId != finishedStatus.InvestigationCaseStatusId)
                     {
                         claimsSubmitted.Add(item);
                     }
@@ -74,8 +75,8 @@ namespace risk.control.system.Controllers.Api.Claims
                 PolicyId = a.PolicyDetail.ContractNumber,
                 Amount = String.Format(new CultureInfo("hi-IN"), "{0:C}", a.PolicyDetail.SumAssuredValue),
                 AssignedToAgency = a.AssignedToAgency,
-                Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
-                PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
+                Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
+                PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
                 Document = a.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : Applicationsettings.NO_POLICY_IMAGE,
                 Customer = a.CustomerDetail?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail.ProfilePicture)) : Applicationsettings.NO_USER,
                 Name = a.CustomerDetail?.CustomerName != null ? a.CustomerDetail?.CustomerName : "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/user.png\" /> </span>",
@@ -87,12 +88,12 @@ namespace risk.control.system.Controllers.Api.Claims
                 Created = string.Join("", "<span class='badge badge-light'>" + a.Created.ToString("dd-MM-yyyy") + "</span>"),
                 timePending = a.GetTimePending(),
                 PolicyNum = a.GetPolicyNum(),
-                BeneficiaryPhoto = a.CaseLocations.Count != 0 && a.CaseLocations.FirstOrDefault().ProfilePicture != null ?
-                                       string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CaseLocations.FirstOrDefault().ProfilePicture)) :
-                                      @Applicationsettings.NO_USER,
-                BeneficiaryName = a.CaseLocations.Count == 0 ?
-                        "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>" :
-                        a.CaseLocations.FirstOrDefault().BeneficiaryName,
+                BeneficiaryPhoto = a.BeneficiaryDetail?.ProfilePicture != null ?
+                                       string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.BeneficiaryDetail.ProfilePicture)) :
+                                      Applicationsettings.NO_USER,
+                BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.BeneficiaryName) ?
+                        "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>" :
+                        a.BeneficiaryDetail.BeneficiaryName,
                 TimeElapsed = DateTime.Now.Subtract(a.Created).TotalSeconds
             })?.ToList();
 
@@ -131,12 +132,11 @@ namespace risk.control.system.Controllers.Api.Claims
 
             if (userRole.Value.Contains(AppRoles.ASSESSOR.ToString()))
             {
-                applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId != null));
 
                 foreach (var item in applicationDbContext)
                 {
-                    item.CaseLocations = item.CaseLocations.Where(c => c.InvestigationCaseSubStatusId == assessorApprovedStatus.InvestigationCaseSubStatusId)?.ToList();
-                    if (item.CaseLocations.Any() || item.IsReviewCase && item.InvestigationCaseStatusId != finishedStatus.InvestigationCaseStatusId)
+                    if (item.InvestigationCaseSubStatusId == assessorApprovedStatus.InvestigationCaseSubStatusId || 
+                        item.IsReviewCase && item.InvestigationCaseStatusId != finishedStatus.InvestigationCaseStatusId)
                     {
                         claimsSubmitted.Add(item);
                     }
@@ -146,7 +146,7 @@ namespace risk.control.system.Controllers.Api.Claims
                     .Select(a => new MapResponse
                     {
                         Id = a.ClaimsInvestigationId,
-                        Address = LocationDetail.GetAddress(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
+                        Address = LocationDetail.GetAddress(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
                         Description = a.PolicyDetail.CauseOfLoss,
                         Price = a.PolicyDetail.SumAssuredValue,
                         Type = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? "home" : "building",
@@ -156,11 +156,11 @@ namespace risk.control.system.Controllers.Api.Claims
                         Position = new Position
                         {
                             Lat = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
-                           decimal.Parse(a.CustomerDetail.PinCode.Latitude) : decimal.Parse(a.CaseLocations.FirstOrDefault().PinCode.Latitude),
+                           decimal.Parse(a.CustomerDetail.PinCode.Latitude) : decimal.Parse(a.BeneficiaryDetail.PinCode.Latitude),
                             Lng = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
-                            decimal.Parse(a.CustomerDetail.PinCode.Longitude) : decimal.Parse(a.CaseLocations.FirstOrDefault().PinCode.Longitude)
+                            decimal.Parse(a.CustomerDetail.PinCode.Longitude) : decimal.Parse(a.BeneficiaryDetail.PinCode.Longitude)
                         },
-                        Url = (a.CaseLocations?.FirstOrDefault() != null && a.CaseLocations?.FirstOrDefault().InvestigationCaseSubStatus.Code != CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR) ? "/ClaimsInvestigation/Detail?Id=" + a.ClaimsInvestigationId : "/ClaimsInvestigation/Details?Id=" + a.ClaimsInvestigationId
+                        Url = (a.BeneficiaryDetail != null) ? "/ClaimsInvestigation/Detail?Id=" + a.ClaimsInvestigationId : "/ClaimsInvestigation/Details?Id=" + a.ClaimsInvestigationId
                     })?
                     .ToList();
             var company = _context.ClientCompany.Include(c => c.PinCode).FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
@@ -191,17 +191,18 @@ namespace risk.control.system.Controllers.Api.Claims
             IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
                .Include(c => c.PolicyDetail)
                .ThenInclude(c => c.ClientCompany)
+               .Include(c => c.BeneficiaryDetail)
+               .ThenInclude(c => c.BeneficiaryRelation)
                .Include(c => c.PolicyDetail)
                .ThenInclude(c => c.CaseEnabler)
                .Include(c => c.PolicyDetail)
                .ThenInclude(c => c.CostCentre)
-               .Include(c => c.CaseLocations)
-               .ThenInclude(c => c.InvestigationCaseSubStatus)
-               .Include(c => c.CaseLocations)
+              
+               .Include(c => c.BeneficiaryDetail)
                .ThenInclude(c => c.PinCode)
-               .Include(c => c.CaseLocations)
+               .Include(c => c.BeneficiaryDetail)
                 .ThenInclude(c => c.District)
-                .Include(c => c.CaseLocations)
+                .Include(c => c.BeneficiaryDetail)
                 .ThenInclude(c => c.State)
                .Include(c => c.CustomerDetail)
                .ThenInclude(c => c.Country)
@@ -218,7 +219,7 @@ namespace risk.control.system.Controllers.Api.Claims
                .Include(c => c.CustomerDetail)
                .ThenInclude(c => c.State)
                .Include(c => c.Vendor)
-               .Include(c => c.CaseLocations)
+               .Include(c => c.BeneficiaryDetail)
                .ThenInclude(l => l.PreviousClaimReports)
                 .Where(c => !c.Deleted);
             return applicationDbContext.OrderByDescending(o => o.Created);

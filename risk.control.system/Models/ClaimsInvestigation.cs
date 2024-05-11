@@ -18,6 +18,7 @@ namespace risk.control.system.Models
         public long? PolicyDetailId { get; set; }
         public PolicyDetail? PolicyDetail { get; set; }
         public CustomerDetail? CustomerDetail { get; set; }
+        public BeneficiaryDetail? BeneficiaryDetail { get; set; }
 
         [NotMapped]
         public bool HasClientCompany { get; set; } = true;

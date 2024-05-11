@@ -104,15 +104,15 @@ namespace risk.control.system.Controllers.Api.Claims
                         Id = a.ClaimsInvestigationId,
                         AutoAllocated = a.AutoAllocated,
                         CustomerFullName = string.IsNullOrWhiteSpace(a.CustomerDetail?.CustomerName) ? "" : a.CustomerDetail.CustomerName,
-                        BeneficiaryFullName = a.CaseLocations.Count == 0 ? "" : a.CaseLocations.FirstOrDefault().BeneficiaryName,
+                        BeneficiaryFullName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.BeneficiaryName) ? "" : a.BeneficiaryDetail.BeneficiaryName,
                         PolicyId = a.PolicyDetail.ContractNumber,
                         Amount = String.Format(new CultureInfo("hi-IN"), "{0:C}", a.PolicyDetail.SumAssuredValue),
                         AssignedToAgency = a.AssignedToAgency,
                         Agent = !string.IsNullOrWhiteSpace(a.UserEmailActionedTo) ?
                         string.Join("", "<span class='badge badge-light'>" + a.UserEmailActionedTo + "</span>") :
                         string.Join("", "<span class='badge badge-light'>" + a.UserRoleActionedTo + "</span>"),
-                        Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
-                        PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
+                        Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
+                        PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
                         Document = a.PolicyDetail?.DocumentImage != null ?
                         string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail?.DocumentImage)) : Applicationsettings.NO_POLICY_IMAGE,
                         Customer = a.CustomerDetail?.ProfilePicture != null ?
@@ -130,12 +130,12 @@ namespace risk.control.system.Controllers.Api.Claims
                         timePending = a.GetTimePending(),
                         Withdrawable = a.InvestigationCaseSubStatusId == allocateToVendorStatus.InvestigationCaseSubStatusId ? true : false,
                         PolicyNum = a.GetPolicyNum(),
-                        BeneficiaryPhoto = a.CaseLocations.Count != 0 && a.CaseLocations.FirstOrDefault().ProfilePicture != null ?
-                                       string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CaseLocations.FirstOrDefault().ProfilePicture)) :
+                        BeneficiaryPhoto = a.BeneficiaryDetail?.ProfilePicture != null ?
+                                       string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.BeneficiaryDetail.ProfilePicture)) :
                                       Applicationsettings.NO_USER,
-                        BeneficiaryName = a.CaseLocations.Count == 0 ?
+                        BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.BeneficiaryName) ?
                         "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>" :
-                        a.CaseLocations.FirstOrDefault().BeneficiaryName,
+                        a.BeneficiaryDetail.BeneficiaryName,
                         TimeElapsed = DateTime.Now.Subtract(a.Created).TotalSeconds,
                         IsNewAssigned = a.ActiveView <= 1
                     })?
@@ -206,15 +206,15 @@ namespace risk.control.system.Controllers.Api.Claims
                         Id = a.ClaimsInvestigationId,
                         AutoAllocated = a.AutoAllocated,
                         CustomerFullName = string.IsNullOrWhiteSpace(a.CustomerDetail?.CustomerName) ? "" : a.CustomerDetail.CustomerName,
-                        BeneficiaryFullName = a.CaseLocations.Count == 0 ? "" : a.CaseLocations.FirstOrDefault().BeneficiaryName,
+                        BeneficiaryFullName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.BeneficiaryName) ? "" : a.BeneficiaryDetail.BeneficiaryName,
                         PolicyId = a.PolicyDetail.ContractNumber,
                         Amount = String.Format(new CultureInfo("hi-IN"), "{0:C}", a.PolicyDetail.SumAssuredValue),
                         AssignedToAgency = a.AssignedToAgency,
                         Agent = !string.IsNullOrWhiteSpace(a.UserEmailActionedTo) ?
                         string.Join("", "<span class='badge badge-light'>" + a.UserEmailActionedTo + "</span>") :
                         string.Join("", "<span class='badge badge-light'>" + a.UserRoleActionedTo + "</span>"),
-                        Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
-                        PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
+                        Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
+                        PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
                         Document = a.PolicyDetail?.DocumentImage != null ?
                         string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail?.DocumentImage)) : Applicationsettings.NO_POLICY_IMAGE,
                         Customer = a.CustomerDetail?.ProfilePicture != null ?
@@ -232,12 +232,12 @@ namespace risk.control.system.Controllers.Api.Claims
                         timePending = a.GetTimePending(),
                         Withdrawable = a.InvestigationCaseSubStatusId == allocateToVendorStatus.InvestigationCaseSubStatusId ? true : false,
                         PolicyNum = a.GetPolicyNum(),
-                        BeneficiaryPhoto = a.CaseLocations.Count != 0 && a.CaseLocations.FirstOrDefault().ProfilePicture != null ?
-                                       string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CaseLocations.FirstOrDefault().ProfilePicture)) :
+                        BeneficiaryPhoto = a.BeneficiaryDetail?.ProfilePicture != null ?
+                                       string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.BeneficiaryDetail.ProfilePicture)) :
                                       Applicationsettings.NO_USER,
-                        BeneficiaryName = a.CaseLocations.Count == 0 ?
+                        BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.BeneficiaryName) ?
                         "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>" :
-                        a.CaseLocations.FirstOrDefault().BeneficiaryName,
+                        a.BeneficiaryDetail.BeneficiaryName,
                         TimeElapsed = DateTime.Now.Subtract(a.Created).TotalSeconds,
                         IsNewAssigned = a.ManagerActiveView <= 1
                     })?
@@ -302,15 +302,15 @@ namespace risk.control.system.Controllers.Api.Claims
                         Id = a.ClaimsInvestigationId,
                         AutoAllocated = a.AutoAllocated,
                         CustomerFullName = string.IsNullOrWhiteSpace(a.CustomerDetail?.CustomerName) ? "" : a.CustomerDetail.CustomerName,
-                        BeneficiaryFullName = a.CaseLocations.Count == 0 ? "" : a.CaseLocations.FirstOrDefault().BeneficiaryName,
+                        BeneficiaryFullName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.BeneficiaryName) ? "" : a.BeneficiaryDetail?.BeneficiaryName,
                         PolicyId = a.PolicyDetail.ContractNumber,
                         Amount = String.Format(new CultureInfo("hi-IN"), "{0:C}", a.PolicyDetail.SumAssuredValue),
                         AssignedToAgency = a.AssignedToAgency,
                         Agent = !string.IsNullOrWhiteSpace(a.UserEmailActionedTo) ?
                         string.Join("", "<span class='badge badge-light'>" + a.UserEmailActionedTo + "</span>") :
                         string.Join("", "<span class='badge badge-light'>" + a.UserRoleActionedTo + "</span>"),
-                        Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
-                        PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
+                        Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
+                        PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
                         Document = a.PolicyDetail?.DocumentImage != null ?
                         string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail?.DocumentImage)) : Applicationsettings.NO_POLICY_IMAGE,
                         Customer = a.CustomerDetail?.ProfilePicture != null ?
@@ -328,12 +328,12 @@ namespace risk.control.system.Controllers.Api.Claims
                         timePending = a.GetTimePending(),
                         Withdrawable = a.InvestigationCaseSubStatusId == allocateToVendorStatus.InvestigationCaseSubStatusId ? true : false,
                         PolicyNum = a.GetPolicyNum(),
-                        BeneficiaryPhoto = a.CaseLocations.Count != 0 && a.CaseLocations.FirstOrDefault().ProfilePicture != null ?
-                                       string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CaseLocations.FirstOrDefault().ProfilePicture)) :
+                        BeneficiaryPhoto =  a.BeneficiaryDetail?.ProfilePicture != null ?
+                                       string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.BeneficiaryDetail.ProfilePicture)) :
                                       Applicationsettings.NO_USER,
-                        BeneficiaryName = a.CaseLocations.Count == 0 ?
+                        BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.BeneficiaryName) ?
                         "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>" :
-                        a.CaseLocations.FirstOrDefault().BeneficiaryName,
+                        a.BeneficiaryDetail?.BeneficiaryName,
                         TimeElapsed = DateTime.Now.Subtract(a.Created).TotalSeconds,
                         IsNewAssigned = a.DraftView <= 1
                     })?
@@ -397,8 +397,7 @@ namespace risk.control.system.Controllers.Api.Claims
             {
                 var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
                 applicationDbContext = applicationDbContext.Where(a =>
-                openStatusesIds.Contains(a.InvestigationCaseStatusId) &&
-                a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId != null)
+                openStatusesIds.Contains(a.InvestigationCaseStatusId)
                 );
 
                 foreach (var claim in applicationDbContext)
@@ -425,15 +424,15 @@ namespace risk.control.system.Controllers.Api.Claims
                         Id = a.ClaimsInvestigationId,
                         AutoAllocated = a.AutoAllocated,
                         CustomerFullName = string.IsNullOrWhiteSpace(a.CustomerDetail?.CustomerName) ? "" : a.CustomerDetail.CustomerName,
-                        BeneficiaryFullName = a.CaseLocations.Count == 0 ? "" : a.CaseLocations.FirstOrDefault().BeneficiaryName,
+                        BeneficiaryFullName = a.BeneficiaryDetail is null ? "" : a.BeneficiaryDetail.BeneficiaryName,
                         PolicyId = a.PolicyDetail.ContractNumber,
                         Amount = String.Format(new CultureInfo("hi-IN"), "{0:C}", a.PolicyDetail.SumAssuredValue),
                         AssignedToAgency = a.AssignedToAgency,
                         Agent = !string.IsNullOrWhiteSpace(a.UserEmailActionedTo) ?
                         string.Join("", "<span class='badge badge-light'>" + a.UserEmailActionedTo + "</span>") :
                         string.Join("", "<span class='badge badge-light'>" + a.UserRoleActionedTo + "</span>"),
-                        Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
-                        PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
+                        Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
+                        PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
                         Document = a.PolicyDetail?.DocumentImage != null ?
                         string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail?.DocumentImage)) : Applicationsettings.NO_POLICY_IMAGE,
                         Customer = a.CustomerDetail?.ProfilePicture != null ?
@@ -451,12 +450,12 @@ namespace risk.control.system.Controllers.Api.Claims
                         timePending = a.GetTimePending(),
                         Withdrawable = a.InvestigationCaseSubStatusId == allocateToVendorStatus.InvestigationCaseSubStatusId ? true : false,
                         PolicyNum = a.GetPolicyNum(),
-                        BeneficiaryPhoto = a.CaseLocations.Count != 0 && a.CaseLocations.FirstOrDefault().ProfilePicture != null ?
-                                       string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CaseLocations.FirstOrDefault().ProfilePicture)) :
+                        BeneficiaryPhoto = a.BeneficiaryDetail?.ProfilePicture != null ?
+                                       string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.BeneficiaryDetail.ProfilePicture)) :
                                       Applicationsettings.NO_USER,
-                        BeneficiaryName = a.CaseLocations.Count == 0 ?
+                        BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.BeneficiaryName) ?
                         "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>" :
-                        a.CaseLocations.FirstOrDefault().BeneficiaryName,
+                        a.BeneficiaryDetail.BeneficiaryName,
                         TimeElapsed = DateTime.Now.Subtract(a.Created).TotalSeconds
                     })?
                     .ToList();
@@ -509,15 +508,15 @@ namespace risk.control.system.Controllers.Api.Claims
                         Id = a.ClaimsInvestigationId,
                         AutoAllocated = a.AutoAllocated,
                         CustomerFullName = string.IsNullOrWhiteSpace(a.CustomerDetail?.CustomerName) ? "" : a.CustomerDetail.CustomerName,
-                        BeneficiaryFullName = a.CaseLocations.Count == 0 ? "" : a.CaseLocations.FirstOrDefault().BeneficiaryName,
+                        BeneficiaryFullName = a.BeneficiaryDetail is null ? "" : a.BeneficiaryDetail.BeneficiaryName,
                         PolicyId = a.PolicyDetail.ContractNumber,
                         Amount = String.Format(new CultureInfo("hi-IN"), "{0:C}", a.PolicyDetail.SumAssuredValue),
                         AssignedToAgency = a.AssignedToAgency,
                         Agent = !string.IsNullOrWhiteSpace(a.UserEmailActionedTo) ?
                         string.Join("", "<span class='badge badge-light'>" + a.UserEmailActionedTo + "</span>") :
                         string.Join("", "<span class='badge badge-light'>" + a.UserRoleActionedTo + "</span>"),
-                        Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
-                        PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
+                        Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
+                        PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
                         Document = a.PolicyDetail?.DocumentImage != null ?
                         string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail?.DocumentImage)) : Applicationsettings.NO_POLICY_IMAGE,
                         Customer = a.CustomerDetail?.ProfilePicture != null ?
@@ -535,12 +534,12 @@ namespace risk.control.system.Controllers.Api.Claims
                         timePending = a.GetTimePending(),
                         Withdrawable = a.InvestigationCaseSubStatusId == allocateToVendorStatus.InvestigationCaseSubStatusId ? true : false,
                         PolicyNum = a.GetPolicyNum(),
-                        BeneficiaryPhoto = a.CaseLocations.Count != 0 && a.CaseLocations.FirstOrDefault().ProfilePicture != null ?
-                                       string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CaseLocations.FirstOrDefault().ProfilePicture)) :
+                        BeneficiaryPhoto = a.BeneficiaryDetail.ProfilePicture != null ?
+                                       string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.BeneficiaryDetail.ProfilePicture)) :
                                       Applicationsettings.NO_USER,
-                        BeneficiaryName = a.CaseLocations.Count == 0 ?
+                        BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.BeneficiaryName) ?
                         "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>" :
-                        a.CaseLocations.FirstOrDefault().BeneficiaryName,
+                        a.BeneficiaryDetail.BeneficiaryName,
                         TimeElapsed = DateTime.Now.Subtract(a.Created).TotalSeconds
                     })?
                     .ToList();
@@ -589,8 +588,7 @@ namespace risk.control.system.Controllers.Api.Claims
             {
                 var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
                 applicationDbContext = applicationDbContext.Where(a =>
-                openStatusesIds.Contains(a.InvestigationCaseStatusId) &&
-                a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId != null)
+                openStatusesIds.Contains(a.InvestigationCaseStatusId)
                 );
 
                 foreach (var item in applicationDbContext)
@@ -607,7 +605,7 @@ namespace risk.control.system.Controllers.Api.Claims
                    .Select(a => new MapResponse
                    {
                        Id = a.ClaimsInvestigationId,
-                       Address = LocationDetail.GetAddress(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
+                       Address = LocationDetail.GetAddress(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
                        Description = a.PolicyDetail.CauseOfLoss,
                        Price = a.PolicyDetail.SumAssuredValue,
                        Type = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? "home" : "building",
@@ -616,10 +614,10 @@ namespace risk.control.system.Controllers.Api.Claims
                        Size = a.CustomerDetail?.Description,
                        Position = new Position
                        {
-                           Lat = GetLat(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()) ?? decimal.Parse(company.PinCode.Latitude),
-                           Lng = GetLng(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()) ?? decimal.Parse(company.PinCode.Longitude),
+                           Lat = GetLat(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail) ?? decimal.Parse(company.PinCode.Latitude),
+                           Lng = GetLng(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail) ?? decimal.Parse(company.PinCode.Longitude),
                        },
-                       Url = (a.CaseLocations?.FirstOrDefault() != null && a.CaseLocations?.FirstOrDefault().InvestigationCaseSubStatus.Code != CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR) ? "/ClaimsInvestigation/Detail?Id=" + a.ClaimsInvestigationId : "/ClaimsInvestigation/Details?Id=" + a.ClaimsInvestigationId
+                       Url = (a.BeneficiaryDetail != null) ? "/ClaimsInvestigation/Detail?Id=" + a.ClaimsInvestigationId : "/ClaimsInvestigation/Details?Id=" + a.ClaimsInvestigationId
                    })?
                    .ToList();
 
@@ -649,17 +647,19 @@ namespace risk.control.system.Controllers.Api.Claims
             IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
                .Include(c => c.PolicyDetail)
                .ThenInclude(c => c.ClientCompany)
+               .Include(c => c.BeneficiaryDetail)
+               .ThenInclude(c => c.BeneficiaryRelation)
+               .Include(c => c.BeneficiaryDetail.ClaimReport)
                .Include(c => c.PolicyDetail)
                .ThenInclude(c => c.CaseEnabler)
                .Include(c => c.PolicyDetail)
                .ThenInclude(c => c.CostCentre)
-               .Include(c => c.CaseLocations)
-               .ThenInclude(c => c.InvestigationCaseSubStatus)
-               .Include(c => c.CaseLocations)
+               
+               .Include(c => c.BeneficiaryDetail)
                .ThenInclude(c => c.PinCode)
-               .Include(c => c.CaseLocations)
+               .Include(c => c.BeneficiaryDetail)
                 .ThenInclude(c => c.District)
-                .Include(c => c.CaseLocations)
+                .Include(c => c.BeneficiaryDetail)
                 .ThenInclude(c => c.State)
                .Include(c => c.CustomerDetail)
                .ThenInclude(c => c.Country)
@@ -676,13 +676,13 @@ namespace risk.control.system.Controllers.Api.Claims
                .Include(c => c.CustomerDetail)
                .ThenInclude(c => c.State)
                .Include(c => c.Vendor)
-               .Include(c => c.CaseLocations)
+               .Include(c => c.BeneficiaryDetail)
                .ThenInclude(l => l.PreviousClaimReports)
                 .Where(c => !c.Deleted);
             return applicationDbContext.OrderByDescending(o => o.Created);
         }
 
-        private decimal? GetLat(ClaimType? claimType, CustomerDetail a, CaseLocation location)
+        private decimal? GetLat(ClaimType? claimType, CustomerDetail a, BeneficiaryDetail location)
         {
             if (claimType == ClaimType.HEALTH)
             {
@@ -698,7 +698,7 @@ namespace risk.control.system.Controllers.Api.Claims
             }
         }
 
-        private decimal? GetLng(ClaimType? claimType, CustomerDetail a, CaseLocation location)
+        private decimal? GetLng(ClaimType? claimType, CustomerDetail a, BeneficiaryDetail location)
         {
             if (claimType == ClaimType.HEALTH)
             {

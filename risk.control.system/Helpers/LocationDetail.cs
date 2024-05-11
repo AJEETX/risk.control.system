@@ -29,7 +29,7 @@ namespace risk.control.system.Helpers
             return (NewLat, NewLng);
         }
 
-        public static string GetAddress(ClaimType? claimType, CustomerDetail a, CaseLocation location)
+        public static string GetAddress(ClaimType? claimType, CustomerDetail a, BeneficiaryDetail location)
         {
             if (claimType == ClaimType.HEALTH)
             {

@@ -26,8 +26,8 @@ namespace risk.control.system.Models
         public string? AssessorRemarks { get; set; }
         public AssessorRemarkType? AssessorRemarkType { get; set; }
 
-        public long CaseLocationId { get; set; }
-        public CaseLocation CaseLocation { get; set; }
+        public string ClaimsInvestigationId { get; set; }
+        public ClaimsInvestigation ClaimsInvestigation { get; set; }
         public virtual ServiceReportTemplate? ServiceReportTemplate { get; set; }
     }
 

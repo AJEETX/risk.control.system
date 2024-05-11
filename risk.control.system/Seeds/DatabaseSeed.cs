@@ -273,6 +273,29 @@ namespace risk.control.system.Seeds
 
             var submittedToAssessorSubStatus = await context.InvestigationCaseSubStatus.AddAsync(submittedToAssessor);
 
+            var requestedByCompany = new InvestigationCaseSubStatus
+            {
+                Name = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR,
+                Code = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR,
+                Updated = DateTime.Now,
+                MasterData = true,
+                InvestigationCaseStatus = inProgressStatus.Entity
+            };
+
+            var requestedByCompanySubStatus = await context.InvestigationCaseSubStatus.AddAsync(requestedByCompany);
+
+
+            var replyToCompany = new InvestigationCaseSubStatus
+            {
+                Name = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR,
+                Code = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR,
+                Updated = DateTime.Now,
+                MasterData = true,
+                InvestigationCaseStatus = inProgressStatus.Entity
+            };
+
+            var replyToCompanySubStatus = await context.InvestigationCaseSubStatus.AddAsync(replyToCompany);
+
             var approved = new InvestigationCaseSubStatus
             {
                 Name = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR,
@@ -315,6 +338,7 @@ namespace risk.control.system.Seeds
             };
 
             var withdrawnByCompanySubStatus = await context.InvestigationCaseSubStatus.AddAsync(withdrawnByCompany);
+
 
             #endregion //CREATE RISK CASE DETAILS
 

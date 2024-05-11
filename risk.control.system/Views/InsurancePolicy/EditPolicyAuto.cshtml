@@ -34,7 +34,7 @@
             @{
                 bool policyExist = true;
                 bool customerExist = Model.CustomerDetail != null;
-                bool beneficiaryExist = Model.CaseLocations?.Any() == true;
+                bool beneficiaryExist = Model.BeneficiaryDetail != null;
 
                 string customerProgressColor = "steps2";
                 string customerLineColor = "line";

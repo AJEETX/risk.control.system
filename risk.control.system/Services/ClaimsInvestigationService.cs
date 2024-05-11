@@ -74,7 +74,7 @@ namespace risk.control.system.Services
                     .Include(c => c.CustomerDetail)
                     .ThenInclude(c => c.PinCode)
                     .First(c => c.ClaimsInvestigationId == claim);
-                var beneficiary = _context.CaseLocation.Include(b => b.PinCode).FirstOrDefault(b => b.ClaimsInvestigationId == claim);
+                var beneficiary = _context.BeneficiaryDetail.Include(b => b.PinCode).FirstOrDefault(b => b.ClaimsInvestigationId == claim);
 
                 if (claimsInvestigation.PolicyDetail?.ClaimType == ClaimType.HEALTH)
                 {
@@ -175,11 +175,11 @@ namespace risk.control.system.Services
                     {
                         var selectedVendor = vendorsWithCaseLoad.FirstOrDefault();
 
-                        var policy = await AllocateToVendor(userEmail, claimsInvestigation.ClaimsInvestigationId, selectedVendor.Vendor.VendorId, beneficiary.CaseLocationId);
+                        var policy = await AllocateToVendor(userEmail, claimsInvestigation.ClaimsInvestigationId, selectedVendor.Vendor.VendorId, beneficiary.BeneficiaryDetailId);
 
                         autoAllocatedClaims.Add(claim);
 
-                        await mailboxService.NotifyClaimAllocationToVendor(userEmail, policy.PolicyDetail.ContractNumber, claimsInvestigation.ClaimsInvestigationId, selectedVendor.Vendor.VendorId, beneficiary.CaseLocationId);
+                        await mailboxService.NotifyClaimAllocationToVendor(userEmail, policy.PolicyDetail.ContractNumber, claimsInvestigation.ClaimsInvestigationId, selectedVendor.Vendor.VendorId, beneficiary.BeneficiaryDetailId);
                     }
                 }
             }
@@ -196,7 +196,7 @@ namespace risk.control.system.Services
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR);
 
             var claimsCases = _context.ClaimsInvestigation
-                .Include(c => c.CaseLocations)
+                .Include(c => c.BeneficiaryDetail)
                 .Include(c => c.Vendors)
                 .Where(c =>
                 c.VendorId.HasValue &&
@@ -210,7 +210,7 @@ namespace risk.control.system.Services
             int countOfCases = 0;
             foreach (var claimsCase in claimsCases)
             {
-                if (claimsCase.CaseLocations.Count > 0)
+                if (claimsCase.BeneficiaryDetail.BeneficiaryDetailId > 0)
                 {
                     if (claimsCase.VendorId.HasValue)
                     {
@@ -449,7 +449,7 @@ namespace risk.control.system.Services
             if (claims is not null && claims.Count > 0)
             {
                 var cases2Assign = _context.ClaimsInvestigation
-                    .Include(c => c.CaseLocations)
+                    .Include(c => c.BeneficiaryDetail)
                     .Where(v => claims.Contains(v.ClaimsInvestigationId));
 
                 var currentUser = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
@@ -470,10 +470,7 @@ namespace risk.control.system.Services
                     claimsInvestigation.AssignedToAgency = false;
                     claimsInvestigation.IsReady2Assign = true;
                     claimsInvestigation.InvestigationCaseSubStatusId = assigned.InvestigationCaseSubStatusId;
-                    foreach (var caseLocation in claimsInvestigation.CaseLocations)
-                    {
-                        caseLocation.InvestigationCaseSubStatusId = assigned.InvestigationCaseSubStatusId;
-                    }
+                    
 
                     var lastLog = _context.InvestigationTransaction
                         .Where(i =>
@@ -507,8 +504,7 @@ namespace risk.control.system.Services
         {
             var currentUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == userEmail);
             var claimsInvestigation = _context.ClaimsInvestigation
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.Vendor)
+                .Include(c => c.BeneficiaryDetail)
                 .Include(c => c.PolicyDetail)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimId);
             var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claimsInvestigation.PolicyDetail.ClientCompanyId);
@@ -536,11 +532,7 @@ namespace risk.control.system.Services
             //currentVendor.SelectedByCompany = false;
             claimsInvestigation.InvestigationCaseStatusId = inProgress.InvestigationCaseStatusId;
             claimsInvestigation.InvestigationCaseSubStatusId = withdrawnByCompany.InvestigationCaseSubStatusId;
-            foreach (var caseLocation in claimsInvestigation.CaseLocations)
-            {
-                caseLocation.InvestigationCaseSubStatusId = withdrawnByCompany.InvestigationCaseSubStatusId;
-                caseLocation.Vendor = null;
-            }
+            
 
             var lastLog = _context.InvestigationTransaction
                 .Where(i =>
@@ -581,8 +573,7 @@ namespace risk.control.system.Services
         {
             var currentUser = _context.VendorApplicationUser.FirstOrDefault(u => u.Email == userEmail);
             var claimsInvestigation = _context.ClaimsInvestigation
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.Vendor)
+                .Include(c => c.BeneficiaryDetail)
                 .Include(c => c.PolicyDetail)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimId);
             var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claimsInvestigation.PolicyDetail.ClientCompanyId);
@@ -609,11 +600,6 @@ namespace risk.control.system.Services
             claimsInvestigation.UserRoleActionedTo = $"{AppRoles.CREATOR.GetEnumDisplayName()} ({company.Email})";
             claimsInvestigation.InvestigationCaseStatusId = inProgress.InvestigationCaseStatusId;
             claimsInvestigation.InvestigationCaseSubStatusId = withdrawnByAgency.InvestigationCaseSubStatusId;
-            foreach (var caseLocation in claimsInvestigation.CaseLocations)
-            {
-                caseLocation.InvestigationCaseSubStatusId = withdrawnByAgency.InvestigationCaseSubStatusId;
-                caseLocation.Vendor = null;
-            }
 
             var lastLog = _context.InvestigationTransaction
                 .Where(i =>
@@ -654,21 +640,15 @@ namespace risk.control.system.Services
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
             if (vendor != null)
             {
-                var claimsCaseLocation = _context.CaseLocation
+                var beneficiaryDetail = _context.BeneficiaryDetail
                 .Include(c => c.ClaimsInvestigation)
-                .Include(c => c.InvestigationCaseSubStatus)
-                .Include(c => c.Vendor)
                 .Include(c => c.PinCode)
                 .Include(c => c.District)
                 .Include(c => c.State)
                 .Include(c => c.State)
-                .FirstOrDefault(c => c.CaseLocationId == caseLocationId && c.ClaimsInvestigationId == claimsInvestigationId);
+                .FirstOrDefault(c => c.BeneficiaryDetailId == caseLocationId && c.ClaimsInvestigationId == claimsInvestigationId);
 
-                claimsCaseLocation.Vendor = vendor;
-                claimsCaseLocation.VendorId = vendorId;
-                claimsCaseLocation.AssignedAgentUserEmail = supervisor.Email;
-                claimsCaseLocation.InvestigationCaseSubStatusId = allocatedToVendor.InvestigationCaseSubStatusId;
-                _context.CaseLocation.Update(claimsCaseLocation);
+                _context.BeneficiaryDetail.Update(beneficiaryDetail);
 
                 var claimsCaseToAllocateToVendor = _context.ClaimsInvestigation
                     .Include(c => c.PolicyDetail)
@@ -730,15 +710,12 @@ namespace risk.control.system.Services
                 .ThenInclude(c => c.ClientCompany)
                 .Include(c => c.PolicyDetail)
                 .ThenInclude(c => c.InvestigationServiceType)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.Vendor)
+                .Include(c => c.BeneficiaryDetail)
                 .Where(c => c.ClaimsInvestigationId == claimsInvestigationId).FirstOrDefault();
             if (claim != null)
             {
-                var claimsCaseLocation = _context.CaseLocation
+                var beneficiary = _context.BeneficiaryDetail
                     .Include(c => c.ClaimsInvestigation)
-                    .Include(c => c.InvestigationCaseSubStatus)
-                    .Include(c => c.Vendor)
                     .Include(c => c.PinCode)
                     .Include(c => c.District)
                     .Include(c => c.State)
@@ -748,17 +725,15 @@ namespace risk.control.system.Services
                     .ThenInclude(c => c.ServiceReportTemplate.ReportTemplate.DocumentIdReport)
                     .Include(c => c.ClaimReport)
                     .ThenInclude(c => c.ServiceReportTemplate.ReportTemplate.ReportQuestionaire)
-                    .FirstOrDefault(c => c.VendorId == vendorId && c.ClaimsInvestigationId == claimsInvestigationId);
-                claimsCaseLocation.AssignedAgentUserEmail = vendorAgentEmail;
-                claimsCaseLocation.InvestigationCaseSubStatusId = assignedToAgent.InvestigationCaseSubStatusId;
+                    .FirstOrDefault(c => c.ClaimsInvestigationId == claimsInvestigationId);
 
                 var template = _context.ServiceReportTemplate.FirstOrDefault(c => c.ClientCompanyId == claim.PolicyDetail.ClientCompanyId
                 && c.LineOfBusinessId == claim.PolicyDetail.LineOfBusinessId
                 && c.InvestigationServiceTypeId == claim.PolicyDetail.InvestigationServiceTypeId);
 
-                claimsCaseLocation.ClaimReport.ServiceReportTemplate = template;
+                beneficiary.ClaimReport.ServiceReportTemplate = template;
 
-                _context.CaseLocation.Update(claimsCaseLocation);
+                _context.BeneficiaryDetail.Update(beneficiary);
 
                 var agentUser = _context.VendorApplicationUser.Include(u=>u.Vendor).FirstOrDefault(u => u.Email == vendorAgentEmail);
                 claim.UserEmailActioned = currentUser;
@@ -823,9 +798,9 @@ namespace risk.control.system.Services
             claim.CurrentClaimOwner = supervisor.Email;
             claim.InvestigationCaseSubStatusId = submitted2Supervisor.InvestigationCaseSubStatusId;
 
-            var caseLocation = _context.CaseLocation
+            var caseLocation = _context.BeneficiaryDetail
                 .Include(c => c.ClaimReport)
-                .FirstOrDefault(c => c.CaseLocationId == caseLocationId && c.ClaimsInvestigationId == claimsInvestigationId);
+                .FirstOrDefault(c => c.BeneficiaryDetailId == caseLocationId && c.ClaimsInvestigationId == claimsInvestigationId);
 
             var claimReport = _context.ClaimReport.Include(c => c.ReportQuestionaire).FirstOrDefault(c => c.ClaimReportId == caseLocation.ClaimReport.ClaimReportId);
 
@@ -852,12 +827,9 @@ namespace risk.control.system.Services
             claimReport.AgentEmail = userEmail;
             _context.ClaimReport.Update(claimReport);
 
-            caseLocation.InvestigationCaseSubStatusId = submitted2Supervisor.InvestigationCaseSubStatusId;
             caseLocation.Updated = DateTime.Now;
             caseLocation.UpdatedBy = userEmail;
-            caseLocation.AssignedAgentUserEmail = supervisor.Email;
-            caseLocation.IsReviewCaseLocation = false;
-            _context.CaseLocation.Update(caseLocation);
+            _context.BeneficiaryDetail.Update(caseLocation);
 
             var lastLog = _context.InvestigationTransaction.Where(i =>
                i.ClaimsInvestigationId == claimsInvestigationId).OrderByDescending(o => o.Created)?.FirstOrDefault();
@@ -929,9 +901,9 @@ namespace risk.control.system.Services
 
         private async Task<ClaimsInvestigation> RejectCaseReport(string userEmail, string assessorRemarks, long caseLocationId, string claimsInvestigationId, AssessorRemarkType assessorRemarkType)
         {
-            var caseLocation = _context.CaseLocation
+            var caseLocation = _context.BeneficiaryDetail
                 .Include(c => c.ClaimReport)
-                .FirstOrDefault(c => c.CaseLocationId == caseLocationId && c.ClaimsInvestigationId == claimsInvestigationId);
+                .FirstOrDefault(c => c.BeneficiaryDetailId == caseLocationId && c.ClaimsInvestigationId == claimsInvestigationId);
             var rejected = _context.InvestigationCaseSubStatus
                 .FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR);
             var finished = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.FINISHED);
@@ -940,10 +912,9 @@ namespace risk.control.system.Services
             caseLocation.ClaimReport.AssessorRemarksUpdated = DateTime.Now;
             caseLocation.ClaimReport.AssessorEmail = userEmail;
 
-            caseLocation.InvestigationCaseSubStatusId = rejected.InvestigationCaseSubStatusId;
             caseLocation.Updated = DateTime.Now;
             caseLocation.UpdatedBy = userEmail;
-            _context.CaseLocation.Update(caseLocation);
+            _context.BeneficiaryDetail.Update(caseLocation);
             try
             {
                 await _context.SaveChangesAsync();
@@ -981,7 +952,7 @@ namespace risk.control.system.Services
 
                 //create invoice
 
-                var vendor = _context.Vendor.Include(s => s.VendorInvestigationServiceTypes).FirstOrDefault(v => v.VendorId == caseLocation.VendorId);
+                var vendor = _context.Vendor.Include(s => s.VendorInvestigationServiceTypes).FirstOrDefault(v => v.VendorId == claim.VendorId);
                 var currentUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
                 var investigationServiced = vendor.VendorInvestigationServiceTypes.FirstOrDefault(s => s.InvestigationServiceTypeId == claim.PolicyDetail.InvestigationServiceTypeId);
 
@@ -1024,9 +995,9 @@ namespace risk.control.system.Services
         }
         private async Task<ClaimsInvestigation> ApproveCaseReport(string userEmail, string assessorRemarks, long caseLocationId, string claimsInvestigationId, AssessorRemarkType assessorRemarkType)
         {
-            var caseLocation = _context.CaseLocation
+            var caseLocation = _context.BeneficiaryDetail
                 .Include(c => c.ClaimReport)
-                .FirstOrDefault(c => c.CaseLocationId == caseLocationId && c.ClaimsInvestigationId == claimsInvestigationId);
+                .FirstOrDefault(c => c.BeneficiaryDetailId == caseLocationId && c.ClaimsInvestigationId == claimsInvestigationId);
             var approved = _context.InvestigationCaseSubStatus
                 .FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR);
             var finished = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.FINISHED);
@@ -1035,10 +1006,9 @@ namespace risk.control.system.Services
             caseLocation.ClaimReport.AssessorRemarksUpdated = DateTime.Now;
             caseLocation.ClaimReport.AssessorEmail = userEmail;
 
-            caseLocation.InvestigationCaseSubStatusId = approved.InvestigationCaseSubStatusId;
             caseLocation.Updated = DateTime.Now;
             caseLocation.UpdatedBy = userEmail;
-            _context.CaseLocation.Update(caseLocation);
+            _context.BeneficiaryDetail.Update(caseLocation);
             try
             {
                 await _context.SaveChangesAsync();
@@ -1076,7 +1046,7 @@ namespace risk.control.system.Services
 
                 //create invoice
 
-                var vendor = _context.Vendor.Include(s => s.VendorInvestigationServiceTypes).FirstOrDefault(v => v.VendorId == caseLocation.VendorId);
+                var vendor = _context.Vendor.Include(s => s.VendorInvestigationServiceTypes).FirstOrDefault(v => v.VendorId == claim.VendorId);
                 var currentUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
                 var investigationServiced = vendor.VendorInvestigationServiceTypes.FirstOrDefault(s => s.InvestigationServiceTypeId == claim.PolicyDetail.InvestigationServiceTypeId);
 
@@ -1138,7 +1108,7 @@ namespace risk.control.system.Services
 
         private async Task<ClaimsInvestigation> ReAssignToCreator(string userEmail, string claimsInvestigationId, long caseLocationId, string assessorRemarks, AssessorRemarkType assessorRemarkType)
         {
-            var claimsCaseLocation = _context.CaseLocation
+            var claimsCaseLocation = _context.BeneficiaryDetail
                 .Include(c => c.ClaimReport)
                 .ThenInclude(c => c.ReportQuestionaire)
                 .Include(c => c.ClaimReport)
@@ -1146,13 +1116,11 @@ namespace risk.control.system.Services
                 .Include(c => c.ClaimReport)
                 .ThenInclude(c => c.DocumentIdReport)
                 .Include(c => c.ClaimsInvestigation)
-                .Include(c => c.InvestigationCaseSubStatus)
-                .Include(c => c.Vendor)
                 .Include(c => c.PinCode)
                 .Include(c => c.District)
                 .Include(c => c.State)
                 .Include(c => c.PreviousClaimReports)
-                .FirstOrDefault(c => c.CaseLocationId == caseLocationId && c.ClaimsInvestigationId == claimsInvestigationId);
+                .FirstOrDefault(c => c.BeneficiaryDetailId == caseLocationId && c.ClaimsInvestigationId == claimsInvestigationId);
 
             var currentUser = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
 
@@ -1164,6 +1132,7 @@ namespace risk.control.system.Services
                     i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER);
             var saveReport = new PreviousClaimReport
             {
+                ClaimsInvestigationId = claimsInvestigationId,
                 AgentEmail = claimsCaseLocation.ClaimReport.AgentEmail,
                 DigitalIdReport = claimsCaseLocation.ClaimReport.DigitalIdReport,
                 DocumentIdReport = claimsCaseLocation.ClaimReport.DocumentIdReport,
@@ -1173,34 +1142,26 @@ namespace risk.control.system.Services
                 AssessorRemarks = claimsCaseLocation.ClaimReport.AssessorRemarks,
                 AssessorRemarkType = claimsCaseLocation.ClaimReport.AssessorRemarkType,
                 AssessorRemarksUpdated = claimsCaseLocation.ClaimReport.AssessorRemarksUpdated,
-                CaseLocation = claimsCaseLocation,
-                CaseLocationId = claimsCaseLocation.CaseLocationId,
                 ReportQuestionaire = claimsCaseLocation.ClaimReport.ReportQuestionaire,
                 SupervisorEmail = claimsCaseLocation.ClaimReport.SupervisorEmail,
                 SupervisorRemarks = claimsCaseLocation.ClaimReport.SupervisorRemarks,
                 SupervisorRemarksUpdated = claimsCaseLocation.ClaimReport.SupervisorRemarksUpdated,
                 SupervisorRemarkType = claimsCaseLocation.ClaimReport.SupervisorRemarkType,
-                Vendor = claimsCaseLocation.Vendor,
-                VendorId = claimsCaseLocation.VendorId,
                 Updated = claimsCaseLocation.Updated,
                 UpdatedBy = claimsCaseLocation.UpdatedBy,
             };
             var currentSavedReport = _context.PreviousClaimReport.Add(saveReport);
-            claimsCaseLocation.InvestigationCaseSubStatusId = reAssigned.InvestigationCaseSubStatusId;
-            claimsCaseLocation.IsReviewCaseLocation = true;
 
             var newReport = new ClaimReport
             {
-                CaseLocation = claimsCaseLocation,
-                CaseLocationId = claimsCaseLocation.CaseLocationId,
-                Vendor = claimsCaseLocation.Vendor,
+                ClaimsInvestigationId = claimsInvestigationId,
                 ReportQuestionaire = new ReportQuestionaire(),
                 DocumentIdReport = new DocumentIdReport(),
                 DigitalIdReport = new DigitalIdReport()
             };
             claimsCaseLocation.ClaimReport = newReport;
             _context.ClaimReport.Add(newReport);
-            _context.CaseLocation.Update(claimsCaseLocation);
+            _context.BeneficiaryDetail.Update(claimsCaseLocation);
 
             var claimsCaseToReassign = _context.ClaimsInvestigation
                 .Include(c => c.PolicyDetail)
@@ -1253,9 +1214,9 @@ namespace risk.control.system.Services
 
         private async Task<ClaimsInvestigation> ApproveAgentReport(string userEmail, string claimsInvestigationId, long caseLocationId, string supervisorRemarks, SupervisorRemarkType reportUpdateStatus)
         {
-            var caseLocation = _context.CaseLocation
+            var caseLocation = _context.BeneficiaryDetail
                 .Include(c => c.ClaimReport)
-                .FirstOrDefault(c => c.CaseLocationId == caseLocationId && c.ClaimsInvestigationId == claimsInvestigationId);
+                .FirstOrDefault(c => c.BeneficiaryDetailId == caseLocationId && c.ClaimsInvestigationId == claimsInvestigationId);
 
             var claim = _context.ClaimsInvestigation
                 .Include(c => c.Vendor)
@@ -1290,11 +1251,9 @@ namespace risk.control.system.Services
             report.Vendor = claim.Vendor;
             _context.ClaimReport.Update(report);
             caseLocation.ClaimReport = report;
-            caseLocation.InvestigationCaseSubStatusId = submitted2Assessor.InvestigationCaseSubStatusId;
             caseLocation.Updated = DateTime.Now;
             caseLocation.UpdatedBy = userEmail;
-            caseLocation.AssignedAgentUserEmail = string.Empty;
-            _context.CaseLocation.Update(caseLocation);
+            _context.BeneficiaryDetail.Update(caseLocation);
 
             var lastLogHop = _context.InvestigationTransaction
                                        .Where(i => i.ClaimsInvestigationId == claimsInvestigationId)
@@ -1363,9 +1322,7 @@ namespace risk.control.system.Services
             claimsCaseToAllocateToVendor.IsReviewCase = true;
             claimsCaseToAllocateToVendor.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(
                     i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT).InvestigationCaseSubStatusId;
-            var existinCaseLocation = claimsCaseToAllocateToVendor.CaseLocations.FirstOrDefault(c => c.CaseLocationId == caseLocationId);
-            existinCaseLocation.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                    i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT).InvestigationCaseSubStatusId;
+            
             _context.ClaimsInvestigation.Update(claimsCaseToAllocateToVendor);
 
             var lastLog = _context.InvestigationTransaction.Where(i =>

@@ -239,15 +239,8 @@
                             <span class="input-group-label"> Customer Photo:</span>
                             <div class="input-group mb-3">
                                 <img class="form-Image" id="profileImage" src="@Applicationsettings.NO_USER">
-                                @if (Model.PolicyDetail.ClaimType == ClaimType.HEALTH)
-                                {
-                                    <i class="fa fa-asterisk asterik-style"></i>
-                                    <input accept="image/*" asp-for="CustomerDetail.ProfileImage" type="file" class="form-control remarks" id="documentImageInput" onchange="document.getElementById('profileImage').src = window.URL.createObjectURL(this.files[0])" required />
-                                }
-                                else
-                                {
-                                    <input accept="image/*" asp-for="CustomerDetail.ProfileImage" type="file" class="form-control remarks" id="documentImageInput" onchange="document.getElementById('profileImage').src = window.URL.createObjectURL(this.files[0])" />
-                                }
+                                <i class="fa fa-asterisk asterik-style"></i>
+                                <input accept="image/*" asp-for="CustomerDetail.ProfileImage" type="file" class="form-control remarks" id="documentImageInput" />
                             </div>
                         </div>
                     </div>

@@ -58,14 +58,9 @@ namespace risk.control.system.Controllers
             IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
                 .Include(c => c.PolicyDetail)
                 .ThenInclude(c => c.ClientCompany)
+                .Include(c=>c.BeneficiaryDetail)
                 .Include(c => c.PolicyDetail)
                 .ThenInclude(c => c.CaseEnabler)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.InvestigationCaseSubStatus)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.PinCode)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.Vendor)
                 .Include(c => c.PolicyDetail)
                 .ThenInclude(c => c.CostCentre)
                 .Include(c => c.CustomerDetail)
@@ -97,7 +92,7 @@ namespace risk.control.system.Controllers
 
             if (vendorUser != null)
             {
-                applicationDbContext = applicationDbContext.Where(i => i.CaseLocations.Any(c => c.VendorId == vendorUser.VendorId));
+                applicationDbContext = applicationDbContext.Where(i => i.VendorId == vendorUser.VendorId);
             }
 
             var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
@@ -127,12 +122,8 @@ namespace risk.control.system.Controllers
 
                 foreach (var item in applicationDbContext)
                 {
-                    item.CaseLocations = item.CaseLocations.Where(c => c.AssignedAgentUserEmail == email && c.VendorId.HasValue
-                        && c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId)?.ToList();
-                    if (item.CaseLocations.Any())
-                    {
+                    if(item.VendorId.HasValue && item.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId)
                         claimsAllocated.Add(item);
-                    }
                 }
                 var model = new AgentClaimsModel
                 {
@@ -158,12 +149,8 @@ namespace risk.control.system.Controllers
                 .ThenInclude(c => c.ClientCompany)
                 .Include(c => c.PolicyDetail)
                 .ThenInclude(c => c.CaseEnabler)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.InvestigationCaseSubStatus)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.PinCode)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.Vendor)
+                .Include(c=>c.Vendor)
+                
                 .Include(c => c.PolicyDetail)
                 .ThenInclude(c => c.CostCentre)
                 .Include(c => c.CustomerDetail)
@@ -196,12 +183,12 @@ namespace risk.control.system.Controllers
                 return NotFound();
             }
 
-            var caseLocation = await _context.CaseLocation
+            var caseLocation = await _context.BeneficiaryDetail
                 .Include(c => c.BeneficiaryRelation)
                 .Include(c => c.District)
                 .Include(c => c.State)
                 .Include(c => c.Country)
-                .FirstOrDefaultAsync(m => m.CaseLocationId == id);
+                .FirstOrDefaultAsync(m => m.BeneficiaryDetailId == id);
             if (caseLocation == null)
             {
                 return NotFound();

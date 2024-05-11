@@ -31,7 +31,7 @@
     {
         customerExist = true;
     }
-    if (Model.Location?.CaseLocationId > 0)
+    if (Model.Location?.BeneficiaryDetailId > 0)
     {
         beneficiaryExist = true;
     }
@@ -55,7 +55,7 @@
     }
     <input type="hidden" id="policyDetailId" value="@Model.ClaimsInvestigation?.PolicyDetail.PolicyDetailId" />
     <input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail.CustomerDetailId" />
-    <input type="hidden" id="beneficiaryId" value="@Model.Location?.CaseLocationId" />
+    <input type="hidden" id="beneficiaryId" value="@Model.Location?.BeneficiaryDetailId" />
     <input type="hidden" id="claimId" value="@Model.ClaimsInvestigation?.ClaimsInvestigationId" />
     <article>
         <div class="bb-blog-inner">
@@ -396,13 +396,13 @@
             <div class="card card-light collapsed-card">
                 <div class="card-header">
                     <h3 class="card-title">
-                        <i class="fas fa-print nav-icon"></i> Agency: <span class="badge badge-light">@Model.Location.Vendor.Email</span>
+                        <i class="fas fa-print nav-icon"></i> Agency: <span class="badge badge-light">@Model.ClaimsInvestigation.Vendor.Email</span>
                         <span class="hover-text">
                             <i class="fas fa-info-circle"></i>
                             <span class="tooltip-text" id="information">
                                 <span>
 
-                                    <i class='far fa-hand-point-right'></i><b> @Model.Location.Vendor.Email</b> report  <i class="fas fa-print nav-icon"></i>.
+                                    <i class='far fa-hand-point-right'></i><b> @Model.ClaimsInvestigation.Vendor.Email</b> report  <i class="fas fa-print nav-icon"></i>.
                                 </span>
 
                             </span>

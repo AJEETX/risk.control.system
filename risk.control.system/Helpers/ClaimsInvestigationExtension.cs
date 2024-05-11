@@ -32,7 +32,7 @@ namespace risk.control.system.Helpers
 
         public static string GetPolicyNum(this ClaimsInvestigation a)
         {
-            var location = a.CaseLocations?.FirstOrDefault(c => c.ClaimsInvestigationId == a.ClaimsInvestigationId);
+            var location = a.BeneficiaryDetail;
             if (location is not null)
             {
                 var isReview = location.PreviousClaimReports.Count > 0;
@@ -44,7 +44,7 @@ namespace risk.control.system.Helpers
             return string.Join("", a.PolicyDetail?.ContractNumber + "<i class=\"fa fa-asterisk asterik-style-none\"></i>");
         }
 
-        public static string GetPincode(ClaimType? claimType, CustomerDetail cdetail, CaseLocation location)
+        public static string GetPincode(ClaimType? claimType, CustomerDetail cdetail, BeneficiaryDetail location)
         {
             if (claimType == ClaimType.HEALTH)
             {
@@ -60,7 +60,7 @@ namespace risk.control.system.Helpers
             }
         }
 
-        public static string GetPincodeName(ClaimType? claimType, CustomerDetail cdetail, CaseLocation location)
+        public static string GetPincodeName(ClaimType? claimType, CustomerDetail cdetail, BeneficiaryDetail location)
         {
             if (claimType == ClaimType.HEALTH)
             {

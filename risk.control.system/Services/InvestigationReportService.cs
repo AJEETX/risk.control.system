@@ -35,7 +35,7 @@ namespace risk.control.system.Services
                 .Include(i => i.InvestigationCaseStatus)
                 .Include(i => i.InvestigationCaseSubStatus)
                 .Include(c => c.ClaimsInvestigation)
-                .ThenInclude(i => i.CaseLocations)
+                .ThenInclude(i => i.BeneficiaryDetail)
                 .Include(c => c.ClaimsInvestigation)
                 .ThenInclude(i => i.InvestigationCaseStatus)
                 .Include(c => c.ClaimsInvestigation)
@@ -50,11 +50,10 @@ namespace risk.control.system.Services
               .ThenInclude(c => c.CaseEnabler)
               .Include(c => c.PolicyDetail)
               .ThenInclude(c => c.CostCentre)
-              .Include(c => c.CaseLocations)
-              .ThenInclude(c => c.InvestigationCaseSubStatus)
-              .Include(c => c.CaseLocations)
+             .Include(c=>c.Vendor)
+              .Include(c => c.BeneficiaryDetail)
               .ThenInclude(c => c.PinCode)
-              .Include(c => c.CaseLocations)
+              .Include(c => c.BeneficiaryDetail)
               .ThenInclude(c => c.BeneficiaryRelation)
               .Include(c => c.CustomerDetail)
               .ThenInclude(c => c.Country)
@@ -72,12 +71,11 @@ namespace risk.control.system.Services
               .ThenInclude(c => c.State)
                 .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == selectedcase);
 
-            var location = await _context.CaseLocation
+            var location = await _context.BeneficiaryDetail
                 .Include(c => c.ClaimReport)
                 .ThenInclude(c => c.DigitalIdReport)
                 .Include(c => c.ClaimReport)
                 .ThenInclude(c => c.DocumentIdReport)
-                .Include(l => l.Vendor)
                 .Include(c => c.ClaimReport)
                 .ThenInclude(c => c.ReportQuestionaire)
                 .FirstOrDefaultAsync(l => l.ClaimsInvestigationId == selectedcase);
@@ -123,12 +121,11 @@ namespace risk.control.system.Services
                 .ThenInclude(c => c.ClientCompany)
                 .Include(c => c.PolicyDetail)
                 .ThenInclude(c => c.CaseEnabler)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.InvestigationCaseSubStatus)
-                .Include(c => c.CaseLocations)
+                .Include(c=> c.Vendor)
+                .Include(c => c.BeneficiaryDetail)
                 .ThenInclude(c => c.PinCode)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.Vendor)
+                .Include(c => c.BeneficiaryDetail)
+                .ThenInclude(c => c.BeneficiaryRelation)
                 .Include(c => c.PolicyDetail)
                 .ThenInclude(c => c.CostCentre)
                 .Include(c => c.CustomerDetail)
@@ -155,7 +152,7 @@ namespace risk.control.system.Services
                 .Include(i => i.InvestigationCaseStatus)
                 .Include(i => i.InvestigationCaseSubStatus)
                 .Include(c => c.ClaimsInvestigation)
-                .ThenInclude(i => i.CaseLocations)
+                .ThenInclude(i => i.BeneficiaryDetail)
                 .Include(c => c.ClaimsInvestigation)
                 .ThenInclude(i => i.InvestigationCaseStatus)
                 .Include(c => c.ClaimsInvestigation)
@@ -168,19 +165,18 @@ namespace risk.control.system.Services
                 .ThenInclude(c => c.ClientCompany)
                 .Include(c => c.PolicyDetail)
                 .ThenInclude(c => c.CaseEnabler)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.InvestigationCaseSubStatus)
-                .Include(c => c.CaseLocations)
+            .Include(c=> c.Vendor)
+
+                .Include(c => c.BeneficiaryDetail)
                 .ThenInclude(c => c.PinCode)
-                .Include(c => c.CaseLocations)
+                .Include(c => c.BeneficiaryDetail)
                 .ThenInclude(c => c.District)
-                .Include(c => c.CaseLocations)
+                .Include(c => c.BeneficiaryDetail)
                 .ThenInclude(c => c.State)
-                .Include(c => c.CaseLocations)
+                .Include(c => c.BeneficiaryDetail)
                 .ThenInclude(c => c.Country)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.Vendor)
-                .Include(c => c.CaseLocations)
+               
+                .Include(c => c.BeneficiaryDetail)
                 .ThenInclude(c => c.BeneficiaryRelation)
                 .Include(c => c.PolicyDetail)
                 .ThenInclude(c => c.CostCentre)
@@ -200,7 +196,7 @@ namespace risk.control.system.Services
                 .ThenInclude(c => c.State)
                 .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == id);
 
-            var location = claimsInvestigation.CaseLocations.FirstOrDefault();
+            var location = claimsInvestigation.BeneficiaryDetail;
             var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u=>u.Email == currentUserEmail);
@@ -227,12 +223,12 @@ namespace risk.control.system.Services
                 .ThenInclude(c => c.ClientCompany)
                 .Include(c => c.PolicyDetail)
                 .ThenInclude(c => c.CaseEnabler)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.InvestigationCaseSubStatus)
-                .Include(c => c.CaseLocations)
+            .Include(c=> c.Vendor)
+
+                .Include(c => c.BeneficiaryDetail)
                 .ThenInclude(c => c.PinCode)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.Vendor)
+                .Include(c => c.BeneficiaryDetail)
+                .ThenInclude(c => c.BeneficiaryRelation)
                 .Include(c => c.PolicyDetail)
                 .ThenInclude(c => c.CostCentre)
                 .Include(c => c.CustomerDetail)
@@ -252,7 +248,7 @@ namespace risk.control.system.Services
                 .FirstOrDefault(c => c.ClaimsInvestigationId == selectedcase);
             var submittedToAssessorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
-            var claimCase = _context.CaseLocation
+            var claimCase = _context.BeneficiaryDetail
                 .Include(c => c.ClaimsInvestigation)
                 .Include(c => c.PinCode)
                 .Include(c => c.BeneficiaryRelation)
@@ -273,9 +269,7 @@ namespace risk.control.system.Services
                  .ThenInclude(c => c.DocumentIdReport)
                   .Include(c => c.PreviousClaimReports)
                  .ThenInclude(c => c.ReportQuestionaire)
-                .FirstOrDefault(c => c.ClaimsInvestigationId == selectedcase
-                && c.InvestigationCaseSubStatusId == submittedToAssessorStatus.InvestigationCaseSubStatusId
-            );
+                .FirstOrDefault(c => c.ClaimsInvestigationId == selectedcase);
             var companyUser = _context.ClientCompanyApplicationUser.Include(u=>u.ClientCompany).FirstOrDefault(u => u.Email == currentUserEmail);
 
             if (claimsInvestigation.IsReviewCase)
@@ -289,7 +283,7 @@ namespace risk.control.system.Services
         {
             var report = _context.PreviousClaimReport
                 .Include(r=>r.Vendor)
-                .Include(r=>r.CaseLocation)
+                .Include(r=>r.ClaimsInvestigation)
                 .Include(r=>r.DigitalIdReport)
                 .Include(r=>r.DocumentIdReport)
                 .Include(r=>r.ReportQuestionaire)

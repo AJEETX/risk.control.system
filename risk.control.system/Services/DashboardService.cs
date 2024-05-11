@@ -476,8 +476,7 @@ namespace risk.control.system.Services
         private int GetCompanyCompleted(string userEmail)
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims().Where(c =>
-                c.CustomerDetail != null && c.CaseLocations.Count > 0 &&
-                c.CaseLocations.All(c => c.ClaimReport != null));
+                c.CustomerDetail != null && c.BeneficiaryDetail.ClaimReport != null);
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
 
             var approvedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
@@ -527,8 +526,7 @@ namespace risk.control.system.Services
         private int GetAssessorReject(string userEmail)
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims().Where(c =>
-                c.CustomerDetail != null && c.CaseLocations.Count > 0 &&
-                c.CaseLocations.All(c => c.ClaimReport != null));
+                c.CustomerDetail != null && c.BeneficiaryDetail.ClaimReport != null);
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
 
             var approvedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
@@ -605,9 +603,7 @@ namespace risk.control.system.Services
             var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
             applicationDbContext = applicationDbContext.Where(a => a.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
-            openStatusesIds.Contains(a.InvestigationCaseStatusId) &&
-            a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId != null)
-            );
+            openStatusesIds.Contains(a.InvestigationCaseStatusId));
 
             foreach (var claim in applicationDbContext)
             {
@@ -839,13 +835,12 @@ namespace risk.control.system.Services
                .ThenInclude(c => c.CaseEnabler)
                .Include(c => c.PolicyDetail)
                .ThenInclude(c => c.CostCentre)
-               .Include(c => c.CaseLocations)
-               .ThenInclude(c => c.InvestigationCaseSubStatus)
-               .Include(c => c.CaseLocations)
+              
+               .Include(c => c.BeneficiaryDetail)
                .ThenInclude(c => c.PinCode)
-               .Include(c => c.CaseLocations)
+               .Include(c => c.BeneficiaryDetail)
                 .ThenInclude(c => c.District)
-                .Include(c => c.CaseLocations)
+                .Include(c => c.BeneficiaryDetail)
                 .ThenInclude(c => c.State)
                .Include(c => c.CustomerDetail)
                .ThenInclude(c => c.Country)
@@ -862,7 +857,7 @@ namespace risk.control.system.Services
                .Include(c => c.CustomerDetail)
                .ThenInclude(c => c.State)
                .Include(c => c.Vendor)
-               .Include(c => c.CaseLocations)
+               .Include(c => c.BeneficiaryDetail)
                .ThenInclude(l => l.PreviousClaimReports)
                 .Where(c => !c.Deleted);
             return applicationDbContext.OrderBy(o => o.Created);
@@ -876,13 +871,12 @@ namespace risk.control.system.Services
                .ThenInclude(c => c.CaseEnabler)
                .Include(c => c.PolicyDetail)
                .ThenInclude(c => c.CostCentre)
-               .Include(c => c.CaseLocations)
-               .ThenInclude(c => c.InvestigationCaseSubStatus)
-               .Include(c => c.CaseLocations)
+            
+               .Include(c => c.BeneficiaryDetail)
                .ThenInclude(c => c.PinCode)
-               .Include(c => c.CaseLocations)
+               .Include(c => c.BeneficiaryDetail)
                 .ThenInclude(c => c.District)
-                .Include(c => c.CaseLocations)
+                .Include(c => c.BeneficiaryDetail)
                 .ThenInclude(c => c.State)
                .Include(c => c.CustomerDetail)
                .ThenInclude(c => c.Country)
@@ -899,7 +893,7 @@ namespace risk.control.system.Services
                .Include(c => c.CustomerDetail)
                .ThenInclude(c => c.State)
                .Include(c => c.Vendor)
-               .Include(c => c.CaseLocations)
+               .Include(c => c.BeneficiaryDetail)
                .ThenInclude(l => l.PreviousClaimReports)
                 .Where(c => !c.Deleted);
             return applicationDbContext.OrderBy(o => o.Created);
@@ -997,10 +991,10 @@ namespace risk.control.system.Services
             }
             else if (vendorUser != null)
             {
-                var activeClaims = _context.ClaimsInvestigation.Include(c => c.CaseLocations) 
+                var activeClaims = _context.ClaimsInvestigation.Include(c => c.BeneficiaryDetail) 
                     .Where(c => openStatusesIds.Contains(c.InvestigationCaseStatusId) && !c.Deleted)?.ToList();
                 var agencyActiveClaims = activeClaims.Where(c =>
-                (c.CaseLocations?.Count() > 0 && c.CaseLocations.Any(l => l.VendorId == vendorUser.VendorId)) &&
+                (c.VendorId == vendorUser.VendorId) &&
                 (c.InvestigationCaseSubStatusId == allocateToVendorStatus.InvestigationCaseSubStatusId ||
                 c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId ||
                 c.InvestigationCaseSubStatusId == submittededToSupervisorStatus.InvestigationCaseSubStatusId))?.ToList();
@@ -1014,15 +1008,13 @@ namespace risk.control.system.Services
                 data.SecondBlockName = "Pending Claims";
                 data.SecondBlockCount = pendinClaims.Count;
 
-                var agentActiveClaims = _context.ClaimsInvestigation.Include(c => c.CaseLocations).Where(c =>
-                (c.CaseLocations.Count() > 0 && c.CaseLocations.Any(l => l.VendorId == vendorUser.VendorId)) &&
+                var agentActiveClaims = _context.ClaimsInvestigation.Include(c => c.VendorId == vendorUser.VendorId &&
                 c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId && !c.Deleted)?.ToList();
 
                 data.ThirdBlockName = "Allocated Claims";
                 data.ThirdBlockCount = agentActiveClaims.Count;
 
-                var submitClaims = _context.ClaimsInvestigation.Include(c => c.CaseLocations).Where(c =>
-                (c.CaseLocations.Count() > 0 && c.CaseLocations.Any(l => l.VendorId == vendorUser.VendorId)) &&
+                var submitClaims = _context.ClaimsInvestigation.Include(c => c.VendorId == vendorUser.VendorId &&
                     c.InvestigationCaseSubStatusId == submittededToAssesssorStatus.InvestigationCaseSubStatusId && !c.Deleted)?.ToList();
                 data.LastBlockName = "Submitted Claims";
                 data.LastBlockCount = submitClaims.Count;
@@ -1058,7 +1050,7 @@ namespace risk.control.system.Services
 
             var claimsCases = _context.ClaimsInvestigation
                .Include(c => c.Vendors)
-               .Include(c => c.CaseLocations);
+               .Include(c => c.BeneficiaryDetail);
 
             var allocatedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
@@ -1070,27 +1062,24 @@ namespace risk.control.system.Services
             int countOfCases = 0;
             foreach (var claimsCase in claimsCases)
             {
-                if (claimsCase.CaseLocations.Count > 0)
+                if (claimsCase.BeneficiaryDetail?.BeneficiaryDetailId > 0)
                 {
-                    foreach (var CaseLocation in claimsCase.CaseLocations)
+                    if (claimsCase.VendorId.HasValue)
                     {
-                        if (CaseLocation.VendorId.HasValue)
+                        if (claimsCase.InvestigationCaseSubStatusId == allocatedStatus.InvestigationCaseSubStatusId ||
+                                claimsCase.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId ||
+                                claimsCase.InvestigationCaseSubStatusId == submitted2SuperStatus.InvestigationCaseSubStatusId
+                                )
                         {
-                            if (CaseLocation.InvestigationCaseSubStatusId == allocatedStatus.InvestigationCaseSubStatusId ||
-                                    CaseLocation.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId ||
-                                    CaseLocation.InvestigationCaseSubStatusId == submitted2SuperStatus.InvestigationCaseSubStatusId
-                                    )
+                            if (!vendorCaseCount.TryGetValue(claimsCase.VendorId.Value.ToString(), out countOfCases))
                             {
-                                if (!vendorCaseCount.TryGetValue(CaseLocation.VendorId.Value.ToString(), out countOfCases))
-                                {
-                                    vendorCaseCount.Add(CaseLocation.VendorId.Value.ToString(), 1);
-                                }
-                                else
-                                {
-                                    int currentCount = vendorCaseCount[CaseLocation.VendorId.Value.ToString()];
-                                    ++currentCount;
-                                    vendorCaseCount[CaseLocation.VendorId.Value.ToString()] = currentCount;
-                                }
+                                vendorCaseCount.Add(claimsCase.VendorId.Value.ToString(), 1);
+                            }
+                            else
+                            {
+                                int currentCount = vendorCaseCount[claimsCase.VendorId.Value.ToString()];
+                                ++currentCount;
+                                vendorCaseCount[claimsCase.VendorId.Value.ToString()] = currentCount;
                             }
                         }
                     }
@@ -1134,7 +1123,7 @@ namespace risk.control.system.Services
 
             var claimsCases = _context.ClaimsInvestigation
                .Include(c => c.Vendor)
-               .Include(c => c.CaseLocations.Where(c => c.VendorId == vendorUser.VendorId));
+               .Include(c => c.BeneficiaryDetail).Where(c => c.VendorId == vendorUser.VendorId);
 
             var allocatedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
@@ -1156,30 +1145,27 @@ namespace risk.control.system.Services
 
                 foreach (var claimsCase in claimsCases)
                 {
-                    if (claimsCase.CaseLocations.Count > 0)
+                    if (claimsCase.BeneficiaryDetail?.BeneficiaryDetailId > 0)
                     {
-                        foreach (var CaseLocation in claimsCase.CaseLocations)
+                        if (claimsCase.VendorId.HasValue && claimsCase.UserEmailActionedTo?.Trim()?.ToLower() == vendorNonAdminUser.Email.Trim().ToLower())
                         {
-                            if (CaseLocation.VendorId.HasValue && CaseLocation.AssignedAgentUserEmail.Trim().ToLower() == vendorNonAdminUser.Email.Trim().ToLower())
+                            if (claimsCase.InvestigationCaseSubStatusId == allocatedStatus.InvestigationCaseSubStatusId ||
+                                    claimsCase.InvestigationCaseSubStatusId == submitted2SuperStatus.InvestigationCaseSubStatusId
+                                    )
                             {
-                                if (CaseLocation.InvestigationCaseSubStatusId == allocatedStatus.InvestigationCaseSubStatusId ||
-                                        CaseLocation.InvestigationCaseSubStatusId == submitted2SuperStatus.InvestigationCaseSubStatusId
-                                        )
+                                vendorCaseCount[vendorNonAdminUser.Email] += 1;
+                            }
+                            else
+                            {
+                                if (!vendorCaseCount.TryGetValue(vendorNonAdminUser.Email, out countOfCases))
                                 {
-                                    vendorCaseCount[vendorNonAdminUser.Email] += 1;
+                                    vendorCaseCount.Add(vendorNonAdminUser.Email, 1);
                                 }
                                 else
                                 {
-                                    if (!vendorCaseCount.TryGetValue(vendorNonAdminUser.Email, out countOfCases))
-                                    {
-                                        vendorCaseCount.Add(vendorNonAdminUser.Email, 1);
-                                    }
-                                    else
-                                    {
-                                        int currentCount = vendorCaseCount[vendorNonAdminUser.Email];
-                                        ++currentCount;
-                                        vendorCaseCount[vendorNonAdminUser.Email] = currentCount;
-                                    }
+                                    int currentCount = vendorCaseCount[vendorNonAdminUser.Email];
+                                    ++currentCount;
+                                    vendorCaseCount[vendorNonAdminUser.Email] = currentCount;
                                 }
                             }
                         }
@@ -1243,10 +1229,10 @@ namespace risk.control.system.Services
 
                 var tdetail = _context.InvestigationTransaction
                     .Include(i => i.ClaimsInvestigation)
-                    .ThenInclude(i => i.CaseLocations)
+                    .ThenInclude(i => i.BeneficiaryDetail)
                     .Where(d =>
                         (vendorUser.IsVendorAdmin ? true : d.UpdatedBy == userEmail) &&
-                     d.ClaimsInvestigation.CaseLocations.Any(c => c.VendorId == vendorUser.VendorId));
+                     d.ClaimsInvestigation.VendorId == vendorUser.VendorId);
 
                 var userSubStatuses = tdetail.Select(s => s.InvestigationCaseSubStatusId).Distinct()?.ToList();
                 var filteredCases = subStatuses.Where(c => userSubStatuses.Contains(c.InvestigationCaseSubStatusId));
@@ -1318,10 +1304,10 @@ namespace risk.control.system.Services
                     );
                 var tdetail = _context.InvestigationTransaction
                     .Include(i => i.ClaimsInvestigation)
-                    .ThenInclude(i => i.CaseLocations)
+                    .ThenInclude(i => i.BeneficiaryDetail)
                     .Where(d =>
                         (vendorUser.IsVendorAdmin ? true : d.UpdatedBy == userEmail) &&
-                     d.ClaimsInvestigation.CaseLocations.Any(c => c.VendorId == vendorUser.VendorId) &&
+                     d.ClaimsInvestigation.VendorId == vendorUser.VendorId &&
                        d.Created > DateTime.Now.AddMonths(-7));
                 var userSubStatuses = tdetail.Select(s => s.InvestigationCaseSubStatusId).Distinct()?.ToList();
                 var filteredCases = subStatuses.Where(c => userSubStatuses.Contains(c.InvestigationCaseSubStatusId));
@@ -1410,9 +1396,9 @@ namespace risk.control.system.Services
                    );
                 var tdetail = _context.InvestigationTransaction
                     .Include(i => i.ClaimsInvestigation)
-                    .ThenInclude(i => i.CaseLocations)
+                    .ThenInclude(i => i.BeneficiaryDetail)
                     .Where(d =>
-                     d.ClaimsInvestigation.CaseLocations.Any(c => c.VendorId == vendorUser.VendorId) &&
+                     d.ClaimsInvestigation.VendorId == vendorUser.VendorId &&
                     (vendorUser.IsVendorAdmin || d.UpdatedBy == userEmail) &&
                     d.Created > DateTime.Now.AddDays(-28));
 
@@ -1462,7 +1448,7 @@ namespace risk.control.system.Services
                     .Include(i => i.ClaimsInvestigation)
                     .ThenInclude(i => i.PolicyDetail)
                     .Include(i => i.ClaimsInvestigation)
-             .ThenInclude(i => i.CaseLocations)
+             .ThenInclude(i => i.BeneficiaryDetail)
              .Where(d =>
              d.Created > DateTime.Now.AddDays(-28));
 
@@ -1508,7 +1494,7 @@ namespace risk.control.system.Services
                 var statuses = _context.InvestigationCaseStatus;
                 var tdetail = tdetailDays.Where(d =>
                     (vendorUser.IsVendorAdmin || d.UpdatedBy == userEmail) &&
-                    d.ClaimsInvestigation.CaseLocations.Any(c => c.VendorId == vendorUser.VendorId));
+                    d.ClaimsInvestigation.VendorId == vendorUser.VendorId);
 
                 var userSubStatuses = tdetail.Select(s => s.InvestigationCaseSubStatusId).Distinct()?.ToList();
                 var filteredCases = subStatuses.Where(c => userSubStatuses.Contains(c.InvestigationCaseSubStatusId));

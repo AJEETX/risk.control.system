@@ -173,13 +173,13 @@
                     </div>
                 </div>
                 @{
-                    var locationAdded = Model.CaseLocations?.Count != null && Model.CaseLocations?.Count > 0;
+                    var locationAdded = Model.BeneficiaryDetail.BeneficiaryDetailId > 0;
                     if (!locationAdded)
                     {
                         <div class="row">
 
                             <div class="col-md-12 text-right">
-                                <a class="btn btn-success" asp-controller="CaseLocations" asp-action="Create" asp-route-id="@Model.ClaimsInvestigationId"><i class="fas fa-map-marker-alt"></i> Add Location</a>
+                                <a class="btn btn-success" asp-controller="Beneficiary" asp-action="Create" asp-route-id="@Model.ClaimsInvestigationId"><i class="fas fa-map-marker-alt"></i> Add Location</a>
                                 @*<a class="btn btn-success" asp-action="CaseLocation" asp-route-id="@Model?.ClaimsInvestigationId"><i class="fas fa-pen"></i> @Applicationsettings.VERIFY_LOCATIONS</a>*@
                             </div>
                         </div>

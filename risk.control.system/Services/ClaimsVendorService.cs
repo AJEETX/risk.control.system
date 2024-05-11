@@ -124,9 +124,7 @@ namespace risk.control.system.Services
               .ThenInclude(c => c.CaseEnabler)
               .Include(c => c.PolicyDetail)
               .ThenInclude(c => c.CostCentre)
-              .Include(c => c.CaseLocations)
-              .ThenInclude(c => c.InvestigationCaseSubStatus)
-              .Include(c => c.CaseLocations)
+              .Include(c => c.BeneficiaryDetail)
               .ThenInclude(c => c.PinCode)
               .Include(c => c.CustomerDetail)
               .ThenInclude(c => c.Country)
@@ -142,9 +140,7 @@ namespace risk.control.system.Services
               .ThenInclude(c => c.PinCode)
               .Include(c => c.CustomerDetail)
               .ThenInclude(c => c.State)
-                .FirstOrDefault(m => m.ClaimsInvestigationId == selectedcase && m.CaseLocations.Any(c => c.VendorId == vendorUser.VendorId));
-            claimsInvestigation.CaseLocations = claimsInvestigation.CaseLocations.Where(c => c.VendorId == vendorUser.VendorId
-                        && c.InvestigationCaseSubStatusId == allocatedStatus.InvestigationCaseSubStatusId)?.ToList();
+                .FirstOrDefault(m => m.ClaimsInvestigationId == selectedcase && m.VendorId == vendorUser.VendorId);
 
             return claimsInvestigation;
         }
@@ -161,9 +157,8 @@ namespace risk.control.system.Services
               .ThenInclude(c => c.CaseEnabler)
               .Include(c => c.PolicyDetail)
               .ThenInclude(c => c.CostCentre)
-              .Include(c => c.CaseLocations)
-              .ThenInclude(c => c.InvestigationCaseSubStatus)
-              .Include(c => c.CaseLocations)
+              
+              .Include(c => c.BeneficiaryDetail)
               .ThenInclude(c => c.PinCode)
               .Include(c => c.CustomerDetail)
               .ThenInclude(c => c.Country)
@@ -182,17 +177,14 @@ namespace risk.control.system.Services
                 .Include(c => c.Vendors)
                 .FirstOrDefault(v => v.ClaimsInvestigationId == selectedcase);
 
-            var claimsCaseLocation = _context.CaseLocation
+            var claimsCaseLocation = _context.BeneficiaryDetail
                 .Include(c => c.ClaimsInvestigation)
-                .Include(c => c.InvestigationCaseSubStatus)
-                .Include(c => c.Vendor)
                 .Include(c => c.PinCode)
                 .Include(c => c.BeneficiaryRelation)
                 .Include(c => c.District)
                 .Include(c => c.State)
                 .Include(c => c.Country)
-                .FirstOrDefault(c => c.CaseLocationId == claimsCaseToAllocateToVendorAgent.CaseLocations.FirstOrDefault().CaseLocationId &&
-                c.InvestigationCaseSubStatusId == allocatedStatus.InvestigationCaseSubStatusId);
+                .FirstOrDefault(c => c.BeneficiaryDetailId == claimsCaseToAllocateToVendorAgent.BeneficiaryDetail.BeneficiaryDetailId);
 
             var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.AGENT.ToString()));
 
@@ -201,7 +193,7 @@ namespace risk.control.system.Services
                 .Include(u => u.State)
                 .Include(u => u.Country)
                 .Include(u => u.PinCode)
-                .Where(u => u.VendorId == claimsCaseLocation.VendorId && u.Active);
+                .Where(u => u.VendorId == claimsCaseToAllocateToVendorAgent.VendorId && u.Active);
 
             List<VendorUserClaim> agents = new List<VendorUserClaim>();
             var result = dashboardService.CalculateAgentCaseStatus(userEmail);
@@ -249,12 +241,9 @@ namespace risk.control.system.Services
                 .ThenInclude(c => c.ClientCompany)
                 .Include(c => c.PolicyDetail)
                 .ThenInclude(c => c.CaseEnabler)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.InvestigationCaseSubStatus)
-                .Include(c => c.CaseLocations)
+                
+                .Include(c => c.BeneficiaryDetail)
                 .ThenInclude(c => c.PinCode)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.Vendor)
                 .Include(c => c.PolicyDetail)
                 .ThenInclude(c => c.CostCentre)
                 .Include(c => c.CustomerDetail)
@@ -274,7 +263,7 @@ namespace risk.control.system.Services
                 .FirstOrDefault(c => c.ClaimsInvestigationId == selectedcase);
             var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
-            var claimCase = _context.CaseLocation
+            var claimCase = _context.BeneficiaryDetail
                 .Include(c => c.ClaimsInvestigation)
                 .Include(c => c.PinCode)
                 .Include(c => c.BeneficiaryRelation)
@@ -293,9 +282,7 @@ namespace risk.control.system.Services
                 .ThenInclude(c => c.ServiceReportTemplate.ReportTemplate.DocumentIdReport)
                 .Include(c => c.ClaimReport)
                     .ThenInclude(c => c.ServiceReportTemplate.ReportTemplate.ReportQuestionaire)
-                .FirstOrDefault(c => c.ClaimsInvestigationId == selectedcase
-                && c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId
-                    );
+                .FirstOrDefault(c => c.ClaimsInvestigationId == selectedcase);
             claimCase.ClaimReport.AgentEmail = userEmail;
 
             if (claimCase.ClaimReport.DigitalIdReport?.DigitalIdImageLongLat != null)
@@ -380,13 +367,12 @@ namespace risk.control.system.Services
               .ThenInclude(c => c.CaseEnabler)
               .Include(c => c.PolicyDetail)
               .ThenInclude(c => c.CostCentre)
-              .Include(c => c.CaseLocations)
-              .ThenInclude(c => c.InvestigationCaseSubStatus)
-              .Include(c => c.CaseLocations)
+              
+              .Include(c => c.BeneficiaryDetail)
               .ThenInclude(c => c.PinCode)
-              .Include(c => c.CaseLocations)
+              .Include(c => c.BeneficiaryDetail)
               .ThenInclude(c => c.BeneficiaryRelation)
-              .Include(c => c.CaseLocations)
+              .Include(c => c.BeneficiaryDetail)
               .ThenInclude(c => c.ClaimReport)
               .Include(c => c.CustomerDetail)
               .ThenInclude(c => c.Country)
@@ -404,7 +390,7 @@ namespace risk.control.system.Services
               .ThenInclude(c => c.State)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == selectedcase);
 
-            var claimCase = _context.CaseLocation
+            var claimCase = _context.BeneficiaryDetail
                 .Include(c => c.ClaimsInvestigation)
                 .Include(c => c.PinCode)
                 .Include(c => c.BeneficiaryRelation)
@@ -439,18 +425,17 @@ namespace risk.control.system.Services
             var agencyUser = _context.VendorApplicationUser.FirstOrDefault(u=>u.Email == userEmail);
 
             var claimsInvestigation = await _context.ClaimsInvestigation
+                .Include(c=>c.Vendor)
                 .Include(c => c.PolicyDetail)
                 .ThenInclude(c => c.ClientCompany)
                 .Include(c => c.PolicyDetail)
                 .ThenInclude(c => c.CaseEnabler)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.InvestigationCaseSubStatus)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.PinCode)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.Vendor)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.BeneficiaryRelation)
+                .Include(c => c.BeneficiaryDetail)
+              .ThenInclude(c => c.PinCode)
+              .Include(c => c.BeneficiaryDetail)
+              .ThenInclude(c => c.BeneficiaryRelation)
+              .Include(c => c.BeneficiaryDetail)
+              .ThenInclude(c => c.ClaimReport)
                 .Include(c => c.PolicyDetail)
                 .ThenInclude(c => c.CostCentre)
                 .Include(c => c.CustomerDetail)
@@ -467,19 +452,19 @@ namespace risk.control.system.Services
                 .ThenInclude(c => c.PinCode)
                 .Include(c => c.CustomerDetail)
                 .ThenInclude(c => c.State)
-                .Include(c => c.CaseLocations)
+                .Include(c => c.BeneficiaryDetail)
                 .ThenInclude(c => c.ClaimReport.DigitalIdReport)
-                .Include(c => c.CaseLocations)
+                .Include(c => c.BeneficiaryDetail)
                 .ThenInclude(c => c.ClaimReport.DocumentIdReport)
-                .Include(c => c.CaseLocations)
+                .Include(c => c.BeneficiaryDetail)
                 .ThenInclude(c => c.ClaimReport.ServiceReportTemplate.ReportTemplate.DigitalIdReport)
-                .Include(c => c.CaseLocations)
+                .Include(c => c.BeneficiaryDetail)
                 .ThenInclude(c => c.ClaimReport.ServiceReportTemplate.ReportTemplate.DocumentIdReport)
-                .Include(c => c.CaseLocations)
+                .Include(c => c.BeneficiaryDetail)
                     .ThenInclude(c => c.ClaimReport.ServiceReportTemplate.ReportTemplate.ReportQuestionaire)
                 .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == selectedcase);
             
-            var location = claimsInvestigation.CaseLocations.FirstOrDefault();
+            var location = claimsInvestigation.BeneficiaryDetail;
             var submittedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
 
@@ -547,9 +532,8 @@ namespace risk.control.system.Services
               .ThenInclude(c => c.CaseEnabler)
               .Include(c => c.PolicyDetail)
               .ThenInclude(c => c.CostCentre)
-              .Include(c => c.CaseLocations)
-              .ThenInclude(c => c.InvestigationCaseSubStatus)
-              .Include(c => c.CaseLocations)
+             
+              .Include(c => c.BeneficiaryDetail)
               .ThenInclude(c => c.PinCode)
               .Include(c => c.CustomerDetail)
               .ThenInclude(c => c.Country)
@@ -568,19 +552,16 @@ namespace risk.control.system.Services
                 .Include(c => c.Vendors)
                 .FirstOrDefault(v => v.ClaimsInvestigationId == selectedcase);
 
-            var location = claimsCaseToAllocateToVendorAgent.CaseLocations.FirstOrDefault();
+            var location = claimsCaseToAllocateToVendorAgent.BeneficiaryDetail;
 
-            var claimsCaseLocation = _context.CaseLocation
+            var claimsCaseLocation = _context.BeneficiaryDetail
                 .Include(c => c.ClaimsInvestigation)
-                .Include(c => c.InvestigationCaseSubStatus)
-                .Include(c => c.Vendor)
                 .Include(c => c.PinCode)
                 .Include(c => c.BeneficiaryRelation)
                 .Include(c => c.District)
                 .Include(c => c.State)
                 .Include(c => c.Country)
-                .FirstOrDefault(c => c.CaseLocationId == location.CaseLocationId &&
-                c.InvestigationCaseSubStatusId == submittedStatus.InvestigationCaseSubStatusId);
+                .FirstOrDefault(c => c.BeneficiaryDetailId == location.BeneficiaryDetailId);
 
             var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.AGENT.ToString()));
 
@@ -589,7 +570,7 @@ namespace risk.control.system.Services
                 .Include(u => u.State)
                 .Include(u => u.Country)
                 .Include(u => u.PinCode)
-                .Where(u => u.VendorId == claimsCaseLocation.VendorId && u.Active);
+                .Where(u => u.VendorId == claimsCaseToAllocateToVendorAgent.VendorId && u.Active);
 
             List<VendorUserClaim> agents = new List<VendorUserClaim>();
             var result = dashboardService.CalculateAgentCaseStatus(userEmail);
@@ -642,12 +623,10 @@ namespace risk.control.system.Services
                 .ThenInclude(c => c.ClientCompany)
                 .Include(c => c.PolicyDetail)
                 .ThenInclude(c => c.CaseEnabler)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.InvestigationCaseSubStatus)
-                .Include(c => c.CaseLocations)
+                
+                .Include(c => c.BeneficiaryDetail)
                 .ThenInclude(c => c.PinCode)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.Vendor)
+                .Include(c => c.BeneficiaryDetail)
                 .Include(c => c.PolicyDetail)
                 .ThenInclude(c => c.CostCentre)
                 .Include(c => c.CustomerDetail)
@@ -667,7 +646,7 @@ namespace risk.control.system.Services
                 .FirstOrDefault(c => c.ClaimsInvestigationId == selectedcase);
             var submittedToSupervisortStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR);
-            var claimCase = _context.CaseLocation
+            var claimCase = _context.BeneficiaryDetail
                 .Include(c => c.ClaimsInvestigation)
                 .Include(c => c.PinCode)
                 .Include(c => c.ClaimReport)
@@ -678,12 +657,10 @@ namespace risk.control.system.Services
                 .ThenInclude(c => c.ReportQuestionaire)
                 .Include(c => c.District)
                 .Include(c => c.State)
-                .FirstOrDefault(c => (c.ClaimsInvestigationId == selectedcase
-                && c.InvestigationCaseSubStatusId == submittedToSupervisortStatus.InvestigationCaseSubStatusId) || c.IsReviewCaseLocation
-                    );
+                .FirstOrDefault(c => c.ClaimsInvestigationId == selectedcase);
             var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.AGENT.ToString()));
 
-            var vendorUsers = _context.VendorApplicationUser.Where(u => u.VendorId == claimCase.VendorId);
+            var vendorUsers = _context.VendorApplicationUser.Where(u => u.VendorId == claimsInvestigation.VendorId);
 
             List<VendorUserClaim> agents = new List<VendorUserClaim>();
             var result = dashboardService.CalculateAgentCaseStatus(userEmail);

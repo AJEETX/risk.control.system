@@ -72,6 +72,7 @@ namespace risk.control.system.Data
         public DbSet<VerifyPinCode> VerifyPinCode { get; set; } = default!;
         public DbSet<PolicyDetail> PolicyDetail { get; set; } = default!;
         public DbSet<CustomerDetail> CustomerDetail { get; set; } = default!;
+        public DbSet<BeneficiaryDetail> BeneficiaryDetail { get; set; } = default!;
         public DbSet<DigitalIdReport> DigitalIdReport { get; set; } = default!;
         public DbSet<DocumentIdReport> DocumentIdReport { get; set; } = default!;
     }

@@ -62,7 +62,7 @@ namespace risk.control.system.Services
         }
         public async Task<AppiCheckifyResponse> GetFaceId(FaceData data)
         {
-            var claimCase = _context.CaseLocation
+            var claimCase = _context.BeneficiaryDetail
                 .Include(c => c.BeneficiaryRelation)
                 .Include(c => c.ClaimReport)
                 .ThenInclude(c => c.DigitalIdReport)
@@ -218,7 +218,7 @@ namespace risk.control.system.Services
                 claimCase.ClaimReport.DigitalIdReport.UpdatedBy = claimCase.ClaimReport.AgentEmail;
             }
 
-            _context.CaseLocation.Update(claimCase);
+            _context.BeneficiaryDetail.Update(claimCase);
 
             try
             {
@@ -234,7 +234,7 @@ namespace risk.control.system.Services
             var noDataimage = await File.ReadAllBytesAsync(noDataImagefilePath);
             return new AppiCheckifyResponse
             {
-                BeneficiaryId = claimCase.CaseLocationId,
+                BeneficiaryId = claimCase.BeneficiaryDetailId,
                 LocationImage = claimCase.ClaimReport?.DigitalIdReport?.DigitalIdImage != null ?
                 Convert.ToBase64String(claimCase.ClaimReport?.DigitalIdReport?.DigitalIdImage) :
                 Convert.ToBase64String(noDataimage),
@@ -252,7 +252,7 @@ namespace risk.control.system.Services
 
         public async Task<AppiCheckifyResponse> GetDocumentId(DocumentData data)
         {
-            var claimCase = _context.CaseLocation
+            var claimCase = _context.BeneficiaryDetail
                 .Include(c => c.BeneficiaryRelation)
                 .Include(c => c.ClaimReport)
                 .ThenInclude(c => c.DigitalIdReport)
@@ -283,83 +283,6 @@ namespace risk.control.system.Services
 
             if (!string.IsNullOrWhiteSpace(data.OcrImage))
             {
-                //var engine = new TesseractEngine(Path.Combine(webHostEnvironment.WebRootPath), "eng");
-                //var image2Process = Pix.LoadFromMemory(byteimage);
-
-                //var lstOcrData = new List<string>();
-                //using (var pager = engine.Process(image2Process))
-                //{
-                //    var textData = pager.GetText();
-                //    Console.WriteLine("Mean confidence: {0}", pager.GetMeanConfidence());
-
-                //    Console.WriteLine("Text (GetText): \r\n{0}", textData);
-                //    Console.WriteLine("Text (iterator):");
-                //    using (var iter = pager.GetIterator())
-                //    {
-                //        iter.Begin();
-
-                //        do
-                //        {
-                //            do
-                //            {
-                //                do
-                //                {
-                //                    do
-                //                    {
-                //                        if (iter.IsAtBeginningOf(PageIteratorLevel.Block))
-                //                        {
-                //                            Console.WriteLine("<BLOCK>");
-                //                        }
-                //                        lstOcrData.Add(iter.GetText(PageIteratorLevel.Word));
-                //                        //Console.Write(iter.GetText(PageIteratorLevel.Word));
-                //                        Console.Write(" ");
-
-                //                        if (iter.IsAtFinalOf(PageIteratorLevel.TextLine, PageIteratorLevel.Word))
-                //                        {
-                //                            Console.WriteLine();
-                //                        }
-                //                    } while (iter.Next(PageIteratorLevel.TextLine, PageIteratorLevel.Word));
-
-                //                    if (iter.IsAtFinalOf(PageIteratorLevel.Para, PageIteratorLevel.TextLine))
-                //                    {
-                //                        Console.WriteLine();
-                //                    }
-                //                } while (iter.Next(PageIteratorLevel.Para, PageIteratorLevel.TextLine));
-                //            } while (iter.Next(PageIteratorLevel.Block, PageIteratorLevel.Para));
-                //        } while (iter.Next(PageIteratorLevel.Block));
-                //    }
-                //}
-
-                //var page = engine.Process(image2Process);
-
-                //var text = page.GetText();
-                //var indexOfPanNumber = text.IndexOf(txt2Find);
-                //var panSub = text.Substring(indexOfPanNumber + txt2Find.Length, 13).Trim();
-
-                //MemoryStream stream = new MemoryStream(byteimage);
-                //string path = Path.Combine(webHostEnvironment.WebRootPath, "verify");
-                //if (!Directory.Exists(path))
-                //{
-                //    Directory.CreateDirectory(path);
-                //}
-                //var mfilePath = Path.Combine(webHostEnvironment.WebRootPath, "verify", $"pan{DateTime.Now.ToString("dd-MMM-yyyy-HH-mm-ss")}.jpg");
-                //CompressImage.CompressimageWindows(stream, mfilePath);
-
-                //claimCase.ClaimReport.DocumentIdReport.DocumentIdImagePath = mfilePath;
-
-                //var savedImage = await File.ReadAllBytesAsync(mfilePath);
-
-                //var base64Image = Convert.ToBase64String(savedImage);
-
-                //var processPAN = SkiaSharpHelper.GetMaskedImage(byteimage);
-
-                //var byteimage = Convert.FromBase64String(data.OcrImage);
-                //var savedImage = ImageCompression.ConverterSkia(byteimage);
-
-                //var base64Image = Convert.ToBase64String(savedImage);
-                //var inputImage = new MaskImage { Image = base64Image };
-
-                //var maskedImage = await httpClientService.GetMaskedImage(inputImage, company.ApiBaseUrl);
 
 
                 //=================GOOGLE VISION API =========================
@@ -384,32 +307,6 @@ namespace risk.control.system.Services
                 };
 
                 //=================END GOOGLE VISION  API =========================
-
-
-                //=================AMAZON API =========================
-                //var blocks = await TextDetection.ExtractTextDataAsync(byteimage);
-                //var maskedImagez = SkiaSharpHelper.MaskTextInImage(byteimage, blocks);
-                //var hasPanLabel = blocks[9].Text == txt2Find;
-
-                //var firstblockWord = blocks.FirstOrDefault(b=>b.BlockType == BlockType.WORD).Text.Split(" ");
-
-                //var textReq = string.Join("\n", blocks.Select(b => b.Text)?.ToList());
-
-                //var endIndex = textReq.IndexOf(firstblockWord.First(), firstblockWord.First().Length + 1);
-
-                //string filteredPanText = textReq;
-
-                //if(endIndex > 0 && textReq.Length > endIndex)
-                //{
-                //    filteredPanText = textReq.Substring(0, endIndex);
-
-                //}
-
-
-                //=================END AMAZON API =========================
-
-
-
 
                 if (maskedImage != null)
                 {
@@ -517,7 +414,7 @@ namespace risk.control.system.Services
             }
             claimCase.ClaimReport.DocumentIdReport.Updated = DateTime.Now;
             claimCase.ClaimReport.DocumentIdReport.UpdatedBy = claimCase.ClaimReport.AgentEmail;
-            _context.CaseLocation.Update(claimCase);
+            _context.BeneficiaryDetail.Update(claimCase);
 
             try
             {
@@ -533,7 +430,7 @@ namespace risk.control.system.Services
             var noDataimage = await File.ReadAllBytesAsync(noDataImagefilePath);
             return new AppiCheckifyResponse
             {
-                BeneficiaryId = claimCase.CaseLocationId,
+                BeneficiaryId = claimCase.BeneficiaryDetailId,
                 LocationImage = claimCase.ClaimReport.DigitalIdReport?.DigitalIdImage != null ?
                 Convert.ToBase64String(claimCase.ClaimReport.DigitalIdReport?.DigitalIdImage) :
                 Convert.ToBase64String(noDataimage),

@@ -60,7 +60,7 @@
             {
                 customerExist = true;
             }
-            if (Model.Location?.CaseLocationId > 0)
+            if (Model.Location?.BeneficiaryDetailId > 0)
             {
                 beneficiaryExist = true;
             }
@@ -423,7 +423,7 @@
                     </div>
                     <div class="table-responsive mailbox-messages">
                         <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
-                        <input type="hidden" id="CaseLocationId" name="CaseLocationId" value="@Model.Location.CaseLocationId" />
+                        <input type="hidden" id="CaseLocationId" name="CaseLocationId" value="@Model.Location.BeneficiaryDetailId" />
                         <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
                             <thead>
                                 <tr>

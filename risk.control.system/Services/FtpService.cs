@@ -351,7 +351,7 @@ namespace risk.control.system.Services
 
                                             dt.Rows[dt.Rows.Count - 1][29] = $"{Convert.ToBase64String(beneficiaryNewImage)}";
 
-                                            var beneficairy = new CaseLocation
+                                            var beneficairy = new BeneficiaryDetail
                                             {
                                                 BeneficiaryName = rowData[22]?.Trim(),
                                                 BeneficiaryRelationId = relation.BeneficiaryRelationId,
@@ -363,12 +363,12 @@ namespace risk.control.system.Services
                                                 DistrictId = beneDistrict.DistrictId,
                                                 StateId = beneState.StateId,
                                                 CountryId = beneCountry.CountryId,
-                                                InvestigationCaseSubStatusId = subStatus.InvestigationCaseSubStatusId,
                                                 ProfilePicture = beneficiaryNewImage,
                                                 Updated = DateTime.Now,
-                                                UpdatedBy = userEmail
+                                                UpdatedBy = userEmail,
+                                                ClaimsInvestigation = claim
                                             };
-
+                                            beneficairy.ClaimReport.ClaimsInvestigationId = claim.ClaimsInvestigationId;
                                             beneficairy.ClaimsInvestigationId = claim.ClaimsInvestigationId;
 
                                             beneficairy.PinCode = benePinCode;
@@ -378,7 +378,7 @@ namespace risk.control.system.Services
 
                                             var beneUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={beneLatLong}&zoom=18&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{beneLatLong}&key={Applicationsettings.GMAPData}";
                                             beneficairy.BeneficiaryLocationMap = beneUrl;
-                                            _context.CaseLocation.Add(beneficairy);
+                                            _context.BeneficiaryDetail.Add(beneficairy);
                                         }
                                         _context.ClaimsInvestigation.Add(claim);
 

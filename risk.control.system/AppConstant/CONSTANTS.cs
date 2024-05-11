@@ -17,8 +17,10 @@
                 public const string ASSIGNED_TO_AGENT = "TASKED";
                 public const string SUBMITTED_TO_SUPERVISOR = "INVESTIGATED";
                 public const string SUBMITTED_TO_ASSESSOR = "SUBMITTED";
+                public const string REPLY_TO_ASSESSOR = "REPLY";
                 public const string APPROVED_BY_ASSESSOR = "APPROVED";
                 public const string REJECTED_BY_ASSESSOR = "REJECTED";
+                public const string REQUESTED_BY_ASSESSOR = "REQUESTED";
                 public const string REASSIGNED_TO_ASSIGNER = "REASSIGNED";
                 public const string WITHDRAWN_BY_COMPANY = "WITHDRAWN";
                 public const string WITHDRAWN_BY_AGENCY= "DECLINED";

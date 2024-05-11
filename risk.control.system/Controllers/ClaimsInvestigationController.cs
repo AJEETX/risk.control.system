@@ -483,7 +483,7 @@ namespace risk.control.system.Controllers
                     Log = null,
                     AllowedToCreate = userCanCreate,
                     AutoAllocation = companyUser.ClientCompany.AutoAllocation,
-                    Location = new CaseLocation { },
+                    Location = new BeneficiaryDetail { },
                     AvailableCount = availableCount,
                     TotalCount = companyUser.ClientCompany.TotalCreatedClaimAllowed,
                     Trial = trial

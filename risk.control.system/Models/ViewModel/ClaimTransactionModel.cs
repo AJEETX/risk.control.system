@@ -3,7 +3,7 @@
     public class ClaimTransactionModel
     {
         public ClaimsInvestigation ClaimsInvestigation { get; set; }
-        public CaseLocation Location { get; set; }
+        public BeneficiaryDetail Location { get; set; }
         public VendorInvoice? VendorInvoice { get; set; }
         public List<InvestigationTransaction> Log { get; set; }
         public string? TimeTaken { get; set; }

@@ -277,7 +277,7 @@ namespace risk.control.system.Controllers.Api
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimId);
             try
             {
-                var caseLocation = _context.CaseLocation
+                var caseLocation = _context.BeneficiaryDetail
                     .Include(l => l.ClaimsInvestigation)
                     .Include(l => l.ClaimReport)
                     .ThenInclude(l => l.DigitalIdReport)
@@ -319,20 +319,16 @@ namespace risk.control.system.Controllers.Api
                 .ThenInclude(c => c.ClientCompany)
                 .Include(c => c.PolicyDetail)
                 .ThenInclude(c => c.CaseEnabler)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.InvestigationCaseSubStatus)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.PinCode)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.Vendor)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.District)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.State)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.Country)
-                .Include(c => c.CaseLocations)
+                .Include(c =>c.BeneficiaryDetail)
+                .ThenInclude(c =>c.Country)
+                .Include(c => c.BeneficiaryDetail)
                 .ThenInclude(c => c.BeneficiaryRelation)
+                .Include(c => c.BeneficiaryDetail)
+                .ThenInclude(c => c.State)
+                .Include(c => c.BeneficiaryDetail)
+                .ThenInclude(c => c.District)
+                .Include(c => c.BeneficiaryDetail)
+                .ThenInclude(c => c.PinCode)
                 .Include(c => c.PolicyDetail)
                 .ThenInclude(c => c.CostCentre)
                 .Include(c => c.CustomerDetail)
@@ -362,15 +358,13 @@ namespace risk.control.system.Controllers.Api
 
                 if (vendorUser != null)
                 {
-                    applicationDbContext = applicationDbContext.Where(i => i.CaseLocations.Any(c => c.VendorId == vendorUser.VendorId));
+                    applicationDbContext = applicationDbContext.Where(i => i.VendorId == vendorUser.VendorId);
                     var claimsAssigned = new List<ClaimsInvestigation>();
 
                     foreach (var item in applicationDbContext)
                     {
-                        item.CaseLocations = item.CaseLocations.Where(c => c.VendorId == vendorUser.VendorId
-                            && c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId
-                            && c.AssignedAgentUserEmail == email)?.ToList();
-                        if (item.CaseLocations.Any())
+                        if(item.VendorId == vendorUser.VendorId
+                            && item.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId)
                         {
                             claimsAssigned.Add(item);
                         }
@@ -403,19 +397,18 @@ namespace risk.control.system.Controllers.Api
                         State = c.CustomerDetail.State.Name,
                         District = c.CustomerDetail.District.Name,
                         c.CustomerDetail.Description,
-                        Locations = c.CaseLocations.Select(l => new
+                        Locations = new
                         {
-                            l.CaseLocationId,
-                            Photo = l?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(l.ProfilePicture)) :
+                            c.BeneficiaryDetail.BeneficiaryDetailId,
+                            Photo = c.BeneficiaryDetail?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(c.BeneficiaryDetail.ProfilePicture)) :
                             string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noCustomerimage)),
-                            l.Country.Name,
-                            l.BeneficiaryName,
-                            l.Addressline,
-                            l?.Addressline2,
-                            l.PinCode.Code,
-                            District = l.District.Name,
-                            State = l.State.Name
-                        })
+                             c.BeneficiaryDetail.Country.Name,
+                            c.BeneficiaryDetail.BeneficiaryName,
+                            c.BeneficiaryDetail.Addressline,
+                            c.BeneficiaryDetail.PinCode.Code,
+                            District = c.BeneficiaryDetail.District.Name,
+                            State = c.BeneficiaryDetail.State.Name
+                        }
                     });
                     return Ok(claim2Agent);
                 }
@@ -441,20 +434,18 @@ namespace risk.control.system.Controllers.Api
                     .ThenInclude(c => c.ClientCompany)
                     .Include(c => c.PolicyDetail)
                     .ThenInclude(c => c.CaseEnabler)
-                    .Include(c => c.CaseLocations)
-                    .ThenInclude(c => c.InvestigationCaseSubStatus)
-                    .Include(c => c.CaseLocations)
-                    .ThenInclude(c => c.PinCode)
-                    .Include(c => c.CaseLocations)
-                    .ThenInclude(c => c.Vendor)
-                    .Include(c => c.CaseLocations)
-                    .ThenInclude(c => c.District)
-                    .Include(c => c.CaseLocations)
-                    .ThenInclude(c => c.State)
-                    .Include(c => c.CaseLocations)
-                    .ThenInclude(c => c.Country)
-                    .Include(c => c.CaseLocations)
+                    .Include(c => c.BeneficiaryDetail)
                     .ThenInclude(c => c.BeneficiaryRelation)
+                    .Include(c => c.BeneficiaryDetail)
+                    .ThenInclude(c => c.PinCode)
+                    
+                    .Include(c => c.BeneficiaryDetail)
+                    .ThenInclude(c => c.District)
+                    .Include(c => c.BeneficiaryDetail)
+                    .ThenInclude(c => c.State)
+                    .Include(c => c.BeneficiaryDetail)
+                    .ThenInclude(c => c.Country)
+                    
                     .Include(c => c.PolicyDetail)
                     .ThenInclude(c => c.CostCentre)
                     .Include(c => c.CustomerDetail)
@@ -481,15 +472,13 @@ namespace risk.control.system.Controllers.Api
 
                 if (vendorUser != null)
                 {
-                    applicationDbContext = applicationDbContext.Where(i => i.CaseLocations.Any(c => c.VendorId == vendorUser.VendorId));
+                    applicationDbContext = applicationDbContext.Where(i => i.VendorId == vendorUser.VendorId);
                     var claimsAssigned = new List<ClaimsInvestigation>();
 
                     foreach (var item in applicationDbContext)
                     {
-                        item.CaseLocations = item.CaseLocations.Where(c => c.VendorId == vendorUser.VendorId
-                            && c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId
-                            && c.AssignedAgentUserEmail == email)?.ToList();
-                        if (item.CaseLocations.Any())
+                        if (item.VendorId == vendorUser.VendorId
+                            && item.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId)
                         {
                             claimsAssigned.Add(item);
                         }
@@ -510,11 +499,11 @@ namespace risk.control.system.Controllers.Api
                         Coordinate = new
                         {
                             Lat = c.PolicyDetail.ClaimType == ClaimType.HEALTH ?
-                                decimal.Parse(c.CustomerDetail.PinCode.Latitude) : decimal.Parse(c.CaseLocations.FirstOrDefault().PinCode.Latitude),
+                                decimal.Parse(c.CustomerDetail.PinCode.Latitude) : decimal.Parse(c.BeneficiaryDetail.PinCode.Latitude),
                             Lng = c.PolicyDetail.ClaimType == ClaimType.HEALTH ?
-                                 decimal.Parse(c.CustomerDetail.PinCode.Longitude) : decimal.Parse(c.CaseLocations.FirstOrDefault().PinCode.Longitude)
+                                 decimal.Parse(c.CustomerDetail.PinCode.Longitude) : decimal.Parse(c.BeneficiaryDetail.PinCode.Longitude)
                         },
-                        Address = LocationDetail.GetAddress(c.PolicyDetail.ClaimType, c.CustomerDetail, c.CaseLocations?.FirstOrDefault()),
+                        Address = LocationDetail.GetAddress(c.PolicyDetail.ClaimType, c.CustomerDetail, c.BeneficiaryDetail),
                         PolicyNumber = c.PolicyDetail.ContractNumber,
                     });
                     return Ok(claim2Agent);
@@ -553,7 +542,7 @@ namespace risk.control.system.Controllers.Api
                     );
                 var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                            i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
-                var claimCase = _context.CaseLocation
+                var claimCase = _context.BeneficiaryDetail
                     .Include(c => c.BeneficiaryRelation)
                     .Include(c => c.PinCode)
                     .Include(c => c.ClaimReport)
@@ -593,7 +582,7 @@ namespace risk.control.system.Controllers.Api
                         },
                         beneficiary = new
                         {
-                            BeneficiaryId = claimCase.CaseLocationId,
+                            BeneficiaryId = claimCase.BeneficiaryDetailId,
                             Name = claimCase.BeneficiaryName,
                             Photo = claimCase.ProfilePicture != null ?
                             string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claimCase.ProfilePicture)) :
