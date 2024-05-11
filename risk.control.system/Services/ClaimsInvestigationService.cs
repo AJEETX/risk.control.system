@@ -714,27 +714,6 @@ namespace risk.control.system.Services
                 .Where(c => c.ClaimsInvestigationId == claimsInvestigationId).FirstOrDefault();
             if (claim != null)
             {
-                var beneficiary = _context.BeneficiaryDetail
-                    .Include(c => c.ClaimsInvestigation)
-                    .Include(c => c.PinCode)
-                    .Include(c => c.District)
-                    .Include(c => c.State)
-                    .Include(c => c.ClaimReport)
-                    .ThenInclude(c => c.ServiceReportTemplate.ReportTemplate.DigitalIdReport)
-                    .Include(c => c.ClaimReport)
-                    .ThenInclude(c => c.ServiceReportTemplate.ReportTemplate.DocumentIdReport)
-                    .Include(c => c.ClaimReport)
-                    .ThenInclude(c => c.ServiceReportTemplate.ReportTemplate.ReportQuestionaire)
-                    .FirstOrDefault(c => c.ClaimsInvestigationId == claimsInvestigationId);
-
-                var template = _context.ServiceReportTemplate.FirstOrDefault(c => c.ClientCompanyId == claim.PolicyDetail.ClientCompanyId
-                && c.LineOfBusinessId == claim.PolicyDetail.LineOfBusinessId
-                && c.InvestigationServiceTypeId == claim.PolicyDetail.InvestigationServiceTypeId);
-
-                beneficiary.ClaimReport.ServiceReportTemplate = template;
-
-                _context.BeneficiaryDetail.Update(beneficiary);
-
                 var agentUser = _context.VendorApplicationUser.Include(u=>u.Vendor).FirstOrDefault(u => u.Email == vendorAgentEmail);
                 claim.UserEmailActioned = currentUser;
                 claim.UserEmailActionedTo = agentUser.Email;
@@ -769,7 +748,7 @@ namespace risk.control.system.Services
                 _context.InvestigationTransaction.Add(log);
             }
             _context.ClaimsInvestigation.Update(claim);
-            await _context.SaveChangesAsync();
+            var rows = await _context.SaveChangesAsync();
             return claim;
         }
 

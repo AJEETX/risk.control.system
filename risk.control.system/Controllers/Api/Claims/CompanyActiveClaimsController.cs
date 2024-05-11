@@ -164,6 +164,8 @@ namespace risk.control.system.Controllers.Api.Claims
                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY);
             var reAssignedToAssignerStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                          i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER);
+            var submittededToAssesssorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
             var approvedStatus = _context.InvestigationCaseSubStatus
                 .FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR);
             var claimsSubmitted = new List<ClaimsInvestigation>();
@@ -180,6 +182,8 @@ namespace risk.control.system.Controllers.Api.Claims
                     claim.InvestigationCaseSubStatusId != reAssignedToAssignerStatus.InvestigationCaseSubStatusId
                     &&
                     claim.InvestigationCaseSubStatusId != approvedStatus.InvestigationCaseSubStatusId
+                    &&
+                     claim.InvestigationCaseSubStatusId != submittededToAssesssorStatus.InvestigationCaseSubStatusId
                     &&
                     claim.InvestigationCaseSubStatusId != withdrawnByCompany.InvestigationCaseSubStatusId
                     &&

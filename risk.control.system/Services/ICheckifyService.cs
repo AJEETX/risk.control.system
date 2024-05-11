@@ -68,6 +68,8 @@ namespace risk.control.system.Services
                 .ThenInclude(c => c.DigitalIdReport)
                 .Include(c => c.ClaimReport)
                 .ThenInclude(c => c.DocumentIdReport)
+                 .Include(c => c.ClaimReport)
+                .ThenInclude(c => c.ReportQuestionaire)
                 .Include(c => c.PinCode)
                 .Include(c => c.District)
                 .Include(c => c.State)
@@ -84,6 +86,8 @@ namespace risk.control.system.Services
             var claim = _context.ClaimsInvestigation
             .Include(c => c.PolicyDetail)
             .Include(c => c.CustomerDetail)
+            .ThenInclude(c => c.PinCode)
+            .Include(c => c.BeneficiaryDetail)
             .ThenInclude(c => c.PinCode)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == data.ClaimId);
 
@@ -258,6 +262,8 @@ namespace risk.control.system.Services
                 .ThenInclude(c => c.DigitalIdReport)
                 .Include(c => c.ClaimReport)
                 .ThenInclude(c => c.DocumentIdReport)
+                .Include(c => c.ClaimReport)
+                .ThenInclude(c => c.ReportQuestionaire)
                 .Include(c => c.PinCode)
                 .Include(c => c.District)
                 .Include(c => c.State)
@@ -274,6 +280,8 @@ namespace risk.control.system.Services
             var claim = _context.ClaimsInvestigation
                 .Include(c => c.PolicyDetail)
                 .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.PinCode)
+                .Include(c => c.BeneficiaryDetail)
                 .ThenInclude(c => c.PinCode)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == data.ClaimId);
 
