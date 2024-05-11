@@ -1,25 +1,11 @@
 $(document).ready(function () {
-
-    var recepientInputDisabled = document.getElementById('receipient-email');
-    if (!recepientInputDisabled.readOnly) {
-        $('#receipient-email').focus();
-        $('#RawMessage').summernote({
-            height: 300,                 // set editor height
-            minHeight: null,             // set minimum height of editor
-            maxHeight: null,             // set maximum height of editor
-            focus: false                  // set focus to editable area after initializing summernote
-        });
-
-    }
-    else {
-        $('#RawMessage').summernote({
-            height: 300,                 // set editor height
-            minHeight: null,             // set minimum height of editor
-            maxHeight: null,             // set maximum height of editor
-            focus: true                  // set focus to editable area after initializing summernote
-        });
-
-    }
+    $('#RawMessage').summernote({
+        height: 300,                 // set editor height
+        minHeight: null,             // set minimum height of editor
+        maxHeight: null,             // set maximum height of editor
+        focus: false                  // set focus to editable area after initializing summernote
+    });
+    $("#receipient-email").focus();
     var currentImage = document.getElementById('documentImage0').src;
 
     $("#document").on('change', function () {
@@ -106,7 +92,7 @@ $(document).ready(function () {
             e.preventDefault();
             $.confirm({
                 title: "Confirm Send",
-    
+
                 content: "Are you sure to send?",
                 icon: 'far fa-envelope',
                 type: 'green',
@@ -127,8 +113,7 @@ $(document).ready(function () {
                 }
             });
         }
-    })
-
+    });
 
     $("#receipient-email").autocomplete({
         source: function (request, response) {
@@ -151,7 +136,5 @@ $(document).ready(function () {
         },
         minLength: 3
     });
-
-
    
 });

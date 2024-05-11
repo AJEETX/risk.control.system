@@ -57,8 +57,6 @@
                                     {
                                         fileAttachment = "none";
                                     }
-                                    var messageLength = @HttpUtility.HtmlDecode(@message.Message).Length > 30 ? 30 : @HttpUtility.HtmlDecode(@message.Message).Length;
-                                    var messageSummary = @HttpUtility.HtmlDecode(@message.Message).Substring(0, messageLength) + "....";
                                     <tr class="@(message.Read == false ? "message-unread" : "message-read")">
                                         <td>
                                             <input id="@message.InboxMessageId" class="vendors" name="messages" type="checkbox" value="@message.InboxMessageId" checked="@message.SelectedForAction" />
@@ -68,7 +66,7 @@
                                         </td>
                                         <td><a class="row-links" asp-action="InboxDetails" asp-route-id="@message.InboxMessageId">@message.SenderEmail</a></td>
                                         <td class="message-title text-muted">
-                                            <a class="row-links" asp-action="InboxDetails" asp-route-id="@message.InboxMessageId"><span>@message.Subject</span> - @messageSummary</a>
+                                            <a class="row-links" asp-action="InboxDetails" asp-route-id="@message.InboxMessageId"><span>@message.Subject</span> </a>
                                         </td>
 
                                         <td class="mailbox-attachment">
