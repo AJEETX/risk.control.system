@@ -90,16 +90,6 @@ namespace risk.control.system.Services
 
             var noDataimage = image != null ? image : await File.ReadAllBytesAsync(noDataImagefilePath);
 
-            //var ipAddress = httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString();
-            //if (ipAddress != null)
-            //{
-            //    var address = await httpClientService.GetAddressFromIp(ipAddress);
-            //    if (address != null)
-            //    {
-            //        latitude = address.lat.ToString();
-            //        longitude = address.lat.ToString();
-            //    }
-            //}
             var locationLongLat = string.IsNullOrWhiteSpace(latitude) || string.IsNullOrWhiteSpace(longitude) ? string.Empty : $"{latitude}/{longitude}";
             var data = new FaceData
             {
@@ -191,13 +181,20 @@ namespace risk.control.system.Services
         {
             var claimsInvestigation = claimsService.GetClaims()
                 .Include(c => c.AgencyReport)
-                .Include(c => c.AgencyReport.DigitalIdReport)
-                .Include(c => c.AgencyReport.ReportQuestionaire)
-                .Include(c => c.AgencyReport.DocumentIdReport)
+                .ThenInclude(c => c.DigitalIdReport)
+                .Include(c => c.AgencyReport)
+                .ThenInclude(c => c.ReportQuestionaire)
+                .Include(c => c.AgencyReport)
+                .ThenInclude(c => c.DocumentIdReport)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == selectedcase);
             var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
 
+
+            if(claimsInvestigation.AgencyReport == null)
+            {
+                claimsInvestigation.AgencyReport = new AgencyReport();
+            }
             claimsInvestigation.AgencyReport.AgentEmail = userEmail;
 
             if (claimsInvestigation.AgencyReport.DigitalIdReport?.DigitalIdImageLongLat != null)
@@ -268,7 +265,8 @@ namespace risk.control.system.Services
             }
 
             var model = new ClaimsInvestigationVendorsModel { AgencyReport = claimsInvestigation.AgencyReport, Location = claimsInvestigation.BeneficiaryDetail, ClaimsInvestigation = claimsInvestigation };
-
+            _context.ClaimsInvestigation.Update(claimsInvestigation);
+            var rows = _context.SaveChanges();
             return model;
         }
 

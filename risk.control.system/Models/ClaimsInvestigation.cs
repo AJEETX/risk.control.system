@@ -43,7 +43,7 @@ namespace risk.control.system.Models
         public bool AssignedToAgency { get; set; } = false;
 
         public string? CurrentUserEmail { get; set; }
-        public AgencyReport? AgencyReport { get; set; } =new();
+        public AgencyReport? AgencyReport { get; set; } 
 
         public List<PreviousClaimReport> PreviousClaimReports { get; set; } = new List<PreviousClaimReport>();
 

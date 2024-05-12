@@ -774,9 +774,6 @@ namespace risk.control.system.Services
             claim.CurrentClaimOwner = supervisor.Email;
             claim.InvestigationCaseSubStatusId = submitted2Supervisor.InvestigationCaseSubStatusId;
 
-            var caseLocation = _context.BeneficiaryDetail
-                .FirstOrDefault(c => c.BeneficiaryDetailId == caseLocationId && c.ClaimsInvestigationId == claimsInvestigationId);
-
             var claimReport = claim.AgencyReport;
 
             claimReport.ReportQuestionaire.Answer1 = answer1;
@@ -800,12 +797,6 @@ namespace risk.control.system.Services
             claimReport.AgentRemarks = remarks;
             claimReport.AgentRemarksUpdated = DateTime.Now;
             claimReport.AgentEmail = userEmail;
-
-            _context.ClaimsInvestigation.Update(claim);
-
-            caseLocation.Updated = DateTime.Now;
-            caseLocation.UpdatedBy = userEmail;
-            _context.BeneficiaryDetail.Update(caseLocation);
 
             var lastLog = _context.InvestigationTransaction.Where(i =>
                i.ClaimsInvestigationId == claimsInvestigationId).OrderByDescending(o => o.Created)?.FirstOrDefault();
@@ -832,7 +823,7 @@ namespace risk.control.system.Services
 
             try
             {
-                await _context.SaveChangesAsync();
+                var rows = await _context.SaveChangesAsync();
                 return claim;
             }
             catch (Exception)

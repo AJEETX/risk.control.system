@@ -70,9 +70,11 @@ namespace risk.control.system.Services
         {
             var claim = claimsService.GetClaims()
                 .Include(c => c.AgencyReport)
-                .Include(c => c.AgencyReport.DigitalIdReport)
-                .Include(c => c.AgencyReport.ReportQuestionaire)
-                .Include(c => c.AgencyReport.DocumentIdReport)
+                .ThenInclude(c => c.DigitalIdReport)
+                .Include(c => c.AgencyReport)
+                .ThenInclude(c => c.ReportQuestionaire)
+                .Include(c => c.AgencyReport)
+                .ThenInclude(c => c.DocumentIdReport)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == data.ClaimId);
 
             claim.AgencyReport.AgentEmail = data.Email;
@@ -244,9 +246,11 @@ namespace risk.control.system.Services
         {
             var claim = claimsService.GetClaims()
                 .Include(c => c.AgencyReport)
-                .Include(c => c.AgencyReport.DigitalIdReport)
-                .Include(c => c.AgencyReport.ReportQuestionaire)
-                .Include(c => c.AgencyReport.DocumentIdReport)
+                .ThenInclude(c => c.DigitalIdReport)
+                .Include(c => c.AgencyReport)
+                .ThenInclude(c => c.ReportQuestionaire)
+                .Include(c => c.AgencyReport)
+                .ThenInclude(c => c.DocumentIdReport)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == data.ClaimId);
 
             claim.AgencyReport.AgentEmail = data.Email;

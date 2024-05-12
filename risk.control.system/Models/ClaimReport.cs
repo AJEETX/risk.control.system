@@ -56,5 +56,7 @@ namespace risk.control.system.Models
         public string? AssessorEmail { get; set; }
         public string? AssessorRemarks { get; set; }
         public AssessorRemarkType? AssessorRemarkType { get; set; }
+        public string? ClaimsInvestigationId { get; set; }
+        public ClaimsInvestigation? ClaimsInvestigation { get; set; }
     }
 }
