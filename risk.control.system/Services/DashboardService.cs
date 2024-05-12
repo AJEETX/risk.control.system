@@ -62,12 +62,12 @@ namespace risk.control.system.Services
             c.UserEmailActionedTo == userEmail && c.UserRoleActionedTo == $"{AppRoles.AGENT.GetEnumDisplayName()} ({vendorUser.Vendor.Email})");
 
             var userAttendedClaims = _context.InvestigationTransaction.Where(t => (t.UserEmailActioned == vendorUser.Email &&
-                            t.InvestigationCaseSubStatusId == submitted2Supervisor.InvestigationCaseSubStatusId))?.Select(c => c.ClaimsInvestigationId);
+                            t.InvestigationCaseSubStatusId == submitted2Supervisor.InvestigationCaseSubStatusId))?.Select(c => c.ClaimsInvestigationId).Distinct();
 
             var claims = GetAgencyClaims();
             int completedCount = 0;
 
-            var count = claims.Count(c => userAttendedClaims.Contains(c.ClaimsInvestigationId));
+            var count = claims.Count(c => userAttendedClaims.Contains(c.ClaimsInvestigationId) && c.UserEmailActionedTo != vendorUser.Email);
             //foreach (var claim in claims)
             //{
             //    if(userAttendedClaims.Contains(claim.ClaimsInvestigationId))

@@ -18,6 +18,7 @@ using System.Security.Claims;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
+using System.Web;
 
 using static risk.control.system.AppConstant.Applicationsettings;
 
@@ -564,6 +565,43 @@ namespace risk.control.system.Controllers
                 notifyService.Custom($"Claim #{policyNumber}  withdrawn successfully", 3, "green", "far fa-file-powerpoint");
 
                 return RedirectToAction(nameof(ClaimsInvestigationController.Active), "ClaimsInvestigation");
+            }
+            catch (Exception)
+            {
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = ASSESSOR.DISPLAY_NAME)]
+        public async Task<IActionResult> SubmitQuery(string claimId, QueryRequest request)
+        {
+            try
+            {
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (string.IsNullOrWhiteSpace(currentUserEmail))
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                if (request == null)
+                {
+                    notifyService.Error("NOT FOUND !!!..");
+                    return RedirectToAction(nameof(Index));
+                }
+                request.Description = HttpUtility.HtmlEncode(request.Description);
+
+                IFormFile? messageDocument = Request.Form?.Files?.FirstOrDefault();
+
+                var model =await  claimsInvestigationService.SubmitQueryToAgency(currentUserEmail, claimId, request, messageDocument);
+                if(model !=null)
+                {
+                    notifyService.Success("Query Sent to Agency");
+                    return RedirectToAction(nameof(ClaimsInvestigationController.Assessor),"ClaimsInvestigation"); 
+                }
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
             }
             catch (Exception)
             {

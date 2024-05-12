@@ -16,6 +16,7 @@ namespace risk.control.system.Services
         Task<ClaimTransactionModel> GetClaimDetails(string currentUserEmail, string id);
 
         Task<ClaimsInvestigation> GetAssignDetails(string id);
+        QueryRequest GetQueryReport(string currentUserEmail, string id);
 
         PreviousClaimReport GetPreviousReport(long id);
     }
@@ -287,6 +288,19 @@ namespace risk.control.system.Services
                 .Include(r=>r.ReportQuestionaire)
                 .FirstOrDefault(r => r.PreviousClaimReportId == id);
             return report;
+        }
+
+        public QueryRequest GetQueryReport(string currentUserEmail, string id)
+        {
+            var claim = _context.ClaimsInvestigation
+                .Include(c=>c.AgencyReport)
+                .ThenInclude(a=>a.QueryRequest)
+                .FirstOrDefault(c=>c.ClaimsInvestigationId == id);
+            var request = new QueryRequest();
+            claim.AgencyReport.QueryRequest = request;
+            _context.ClaimsInvestigation.Update(claim);
+            _context.SaveChanges();
+            return request;
         }
     }
 }

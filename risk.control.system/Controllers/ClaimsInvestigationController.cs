@@ -623,6 +623,34 @@ namespace risk.control.system.Controllers
             }
         }
 
+        [Breadcrumb(title: "Enquiry", FromAction = "GetInvestigateReport")]
+        [Authorize(Roles = ASSESSOR.DISPLAY_NAME)]
+        public IActionResult QueryReport(string selectedcase)
+        {
+            try
+            {
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (string.IsNullOrWhiteSpace(currentUserEmail))
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                if (selectedcase == null)
+                {
+                    notifyService.Error("NOT FOUND !!!..");
+                    return RedirectToAction(nameof(Index));
+                }
+                //var model = investigationReportService.GetQueryReport(currentUserEmail,selectedcase);
+                ViewData["claimId"] = selectedcase;
+                return View();
+            }
+            catch (Exception)
+            {
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+        }
+
         [Breadcrumb(title: "Previous Reports", FromAction = "GetInvestigateReport")]
         [Authorize(Roles = ASSESSOR.DISPLAY_NAME)]
         public IActionResult PreviousReports(long id)
