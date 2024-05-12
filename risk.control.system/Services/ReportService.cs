@@ -27,13 +27,11 @@ namespace risk.control.system.Services
                 .Include(c => c.PolicyDetail)
                 .Include(c => c.CustomerDetail)
                 .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(r => r.ClaimReport)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == id);
 
             var policy = claim.PolicyDetail;
             var customer = claim.CustomerDetail;
             var beneficiary = claim.BeneficiaryDetail;
-            var report = claim.BeneficiaryDetail?.ClaimReport;
 
             var file = "report.pdf";
 

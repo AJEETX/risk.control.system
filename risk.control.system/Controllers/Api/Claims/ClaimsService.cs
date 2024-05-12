@@ -40,12 +40,10 @@ namespace risk.control.system.Controllers.Api.Claims
                .ThenInclude(c => c.ClientCompany)
                .Include(c => c.BeneficiaryDetail)
                .ThenInclude(c => c.BeneficiaryRelation)
-               .Include(c => c.BeneficiaryDetail.ClaimReport)
                .Include(c => c.PolicyDetail)
                .ThenInclude(c => c.CaseEnabler)
                .Include(c => c.PolicyDetail)
                .ThenInclude(c => c.CostCentre)
-               
                .Include(c => c.BeneficiaryDetail)
                .ThenInclude(c => c.PinCode)
                .Include(c => c.BeneficiaryDetail)
@@ -67,8 +65,6 @@ namespace risk.control.system.Controllers.Api.Claims
                .Include(c => c.CustomerDetail)
                .ThenInclude(c => c.State)
                .Include(c => c.Vendor)
-               .Include(c => c.BeneficiaryDetail)
-               .ThenInclude(l => l.PreviousClaimReports)
                 .Where(c => !c.Deleted);
             return applicationDbContext.OrderByDescending(o => o.Created);
         }

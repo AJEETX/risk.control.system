@@ -368,7 +368,6 @@ namespace risk.control.system.Services
                                                 UpdatedBy = userEmail,
                                                 ClaimsInvestigation = claim
                                             };
-                                            beneficairy.ClaimReport.ClaimsInvestigationId = claim.ClaimsInvestigationId;
                                             beneficairy.ClaimsInvestigationId = claim.ClaimsInvestigationId;
 
                                             beneficairy.PinCode = benePinCode;

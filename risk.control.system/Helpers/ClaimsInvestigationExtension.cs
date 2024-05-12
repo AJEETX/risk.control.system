@@ -35,7 +35,7 @@ namespace risk.control.system.Helpers
             var location = a.BeneficiaryDetail;
             if (location is not null)
             {
-                var isReview = location.PreviousClaimReports.Count > 0;
+                var isReview = a.PreviousClaimReports.Count > 0;
                 if (isReview)
                 {
                     return string.Join("", a.PolicyDetail?.ContractNumber + "<i class=\"fa fa-asterisk asterik-style\" title=\"REVIEW CASE\"></i>");

@@ -1,10 +1,10 @@
 ﻿@model ClaimsInvestigationVendorsModel
 
 @{
-    var questionTime = @Model.Location.ClaimReport.AgentRemarksUpdated != null ? @Model.Location.ClaimReport.AgentRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt") : null;
+    var questionTime = @Model.AgencyReport.AgentRemarksUpdated != null ? @Model.AgencyReport.AgentRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt") : null;
 
     string questionaire = "grey";
-    if (Model.Location.ClaimReport.AgentRemarks != null)
+    if (Model.AgencyReport.AgentRemarks != null)
     {
         questionaire = "green";
     }
@@ -31,7 +31,7 @@
                 
             </div>
             <div class="card-footer text-muted border-bottom-0">
-                <i class="fas fa-user-shield"></i>  Agent :<span class="badge badge-light">  @Model.Location.ClaimReport.AgentEmail </span>
+                <i class="fas fa-user-shield"></i>  Agent :<span class="badge badge-light">  @Model.AgencyReport.AgentEmail </span>
             </div>
             <div class="progress">
                 <i class="far fa-bookmark bookmark-green"></i>
@@ -52,57 +52,57 @@
                                 <span class="input-group-label"> Ownership of residence ?</span>
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text" asp-for="Location.ClaimReport.ReportQuestionaire.Answer1"><i class="nav-icon fas fa-home"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                        <span class="input-group-text" asp-for="AgencyReport.ReportQuestionaire.Answer1"><i class="nav-icon fas fa-home"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                     </div>
-                                    <select name="question1" id="question1" required asp-for="Location.ClaimReport.ReportQuestionaire.Answer1" class="form-control remarks" asp-items="Html.GetEnumSelectList<DwellType>()">
+                                    <select name="question1" id="question1" required asp-for="AgencyReport.ReportQuestionaire.Answer1" class="form-control remarks" asp-items="Html.GetEnumSelectList<DwellType>()">
                                         <option value="">--- SELECT ---</option>
                                     </select>
-                                    <span asp-validation-for="Location.ClaimReport.ReportQuestionaire.Answer1" class="text-danger"></span>
+                                    <span asp-validation-for="AgencyReport.ReportQuestionaire.Answer1" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="form-group">
                                 <span class="input-group-label"> Perceived financial status ?</span>
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text" asp-for="Location.ClaimReport.ReportQuestionaire.Answer2"><i class="far fa-money-bill-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                        <span class="input-group-text" asp-for="AgencyReport.ReportQuestionaire.Answer2"><i class="far fa-money-bill-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                     </div>
-                                    <select name="question2" id="question2" required asp-for="Location.ClaimReport.ReportQuestionaire.Answer2" class="form-control remarks" asp-items="Html.GetEnumSelectList<Income>()">
+                                    <select name="question2" id="question2" required asp-for="AgencyReport.ReportQuestionaire.Answer2" class="form-control remarks" asp-items="Html.GetEnumSelectList<Income>()">
                                         <option value="">--- SELECT---</option>
                                     </select>
-                                    <span asp-validation-for="Location.ClaimReport.ReportQuestionaire.Answer2" class="text-danger"></span>
+                                    <span asp-validation-for="AgencyReport.ReportQuestionaire.Answer2" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="form-group">
                                 <span class="input-group-label"> Name of neighbour met ?</span>
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text" asp-for="Location.ClaimReport.ReportQuestionaire.Answer3"><i class="fas fa-user-check"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
+                                        <span class="input-group-text" asp-for="AgencyReport.ReportQuestionaire.Answer3"><i class="fas fa-user-check"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
                                     </div>
-                                    <input id="ContractNumber" required name="question3" id="question3" asp-for="Location.ClaimReport.ReportQuestionaire.Answer3" class="form-control remarks" type="text" placeholder="Neighbour name" maxlength="20" />
-                                    <span asp-validation-for="Location.ClaimReport.ReportQuestionaire.Answer3" class="text-danger"></span>
+                                    <input id="ContractNumber" required name="question3" id="question3" asp-for="AgencyReport.ReportQuestionaire.Answer3" class="form-control remarks" type="text" placeholder="Neighbour name" maxlength="20" />
+                                    <span asp-validation-for="AgencyReport.ReportQuestionaire.Answer3" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="form-group">
                                 <span class="input-group-label"> Date met with neighbour ?:</span>
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text" asp-for="Location.ClaimReport.ReportQuestionaire.Answer4"><i class="nav-icon far fa-calendar-check"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                        <span class="input-group-text" asp-for="AgencyReport.ReportQuestionaire.Answer4"><i class="nav-icon far fa-calendar-check"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                     </div>
                                     @{
                                         var maxDate = @DateTime.Now.ToString("dd-MM-yyyy");
                                     }
-                                    <input required asp-for="Location.ClaimReport.ReportQuestionaire.Answer4" name="question4" id="question4" class="form-control remarks date-width" min="2000-01-01" max="@maxDate" type="date" />
-                                    <span asp-validation-for="Location.ClaimReport.ReportQuestionaire.Answer4" class="text-danger"></span>
+                                    <input required asp-for="AgencyReport.ReportQuestionaire.Answer4" name="question4" id="question4" class="form-control remarks date-width" min="2000-01-01" max="@maxDate" type="date" />
+                                    <span asp-validation-for="AgencyReport.ReportQuestionaire.Answer4" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="form-group">
                                 <span class="input-group-label"> Remarks :</span>
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text" asp-for="Location.ClaimReport.AgentRemarks"><i class="fas fa-comment"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
+                                        <span class="input-group-text" asp-for="AgencyReport.AgentRemarks"><i class="fas fa-comment"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
                                     </div>
-                                    <input required name="remarks" id="remarks" asp-for="Location.ClaimReport.AgentRemarks" class="form-control remarks" type="text" placeholder="Remarks" maxlength="100" />
-                                    <span asp-validation-for="Location.ClaimReport.AgentRemarks" class="text-danger"></span>
+                                    <input required name="remarks" id="remarks" asp-for="AgencyReport.AgentRemarks" class="form-control remarks" type="text" placeholder="Remarks" maxlength="100" />
+                                    <span asp-validation-for="AgencyReport.AgentRemarks" class="text-danger"></span>
                                 </div>
                             </div>
                         </div>
@@ -124,7 +124,7 @@
 
                     <div class="text-right">
                         <a id="back" asp-action="Agent" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a> &nbsp;
-                        @if (@Model.Location?.ClaimReport?.DigitalIdReport?.DigitalIdImageLocationUrl != null && @Model.Location?.ClaimReport?.DocumentIdReport?.DocumentIdImageLocationUrl != null)
+                        @if (@Model.AgencyReport?.DigitalIdReport?.DigitalIdImageLocationUrl != null && @Model.AgencyReport?.DocumentIdReport?.DocumentIdImageLocationUrl != null)
                         {
                             <button disabled id="submit-case" type="submit" class="btn btn-danger">
                                 <i class="fa fa-binoculars" aria-hidden="true"></i> SUBMIT

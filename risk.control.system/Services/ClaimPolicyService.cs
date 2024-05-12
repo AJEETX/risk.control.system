@@ -69,6 +69,11 @@ namespace risk.control.system.Services
                 .OrderByDescending(c => c.HopCount)?.ToListAsync();
 
             var claimsInvestigation = await _context.ClaimsInvestigation
+                .Include(c => c.AgencyReport)
+              .Include(c => c.PreviousClaimReports)
+              .Include(c => c.AgencyReport.DigitalIdReport)
+              .Include(c => c.AgencyReport.DocumentIdReport)
+              .Include(c => c.AgencyReport.ReportQuestionaire)
                 .Include(c => c.PolicyDetail)
                 .ThenInclude(c => c.ClientCompany)
                 .Include(c => c.PolicyDetail)
@@ -101,12 +106,6 @@ namespace risk.control.system.Services
                 .ThenInclude(c => c.PinCode)
                 .Include(c => c.CustomerDetail)
                 .ThenInclude(c => c.State)
-                .Include(c=>c.BeneficiaryDetail)
-                .ThenInclude(c=>c.ClaimReport.DigitalIdReport)
-                .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.ClaimReport.DocumentIdReport)
-                .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.ClaimReport.ReportQuestionaire)
                 .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == id);
 
             var location = claimsInvestigation.BeneficiaryDetail;
@@ -141,6 +140,11 @@ namespace risk.control.system.Services
                  .OrderByDescending(c => c.HopCount)?.ToListAsync();
 
             var claimsInvestigation = await _context.ClaimsInvestigation
+                .Include(c => c.AgencyReport)
+              .Include(c => c.PreviousClaimReports)
+              .Include(c => c.AgencyReport.DigitalIdReport)
+              .Include(c => c.AgencyReport.DocumentIdReport)
+              .Include(c => c.AgencyReport.ReportQuestionaire)
                 .Include(c => c.PolicyDetail)
                 .ThenInclude(c => c.ClientCompany)
                   .Include(c=>c.Vendor)

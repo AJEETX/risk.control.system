@@ -475,8 +475,10 @@ namespace risk.control.system.Services
 
         private int GetCompanyCompleted(string userEmail)
         {
-            IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims().Where(c =>
-                c.CustomerDetail != null && c.BeneficiaryDetail.ClaimReport != null);
+            IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims()
+                .Include(c=>c.AgencyReport)
+                .Where(c =>
+                c.CustomerDetail != null && c.AgencyReport != null);
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
 
             var approvedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
@@ -525,8 +527,10 @@ namespace risk.control.system.Services
         }
         private int GetAssessorReject(string userEmail)
         {
-            IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims().Where(c =>
-                c.CustomerDetail != null && c.BeneficiaryDetail.ClaimReport != null);
+            IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims()
+                .Include(c=>c.AgencyReport)
+                .Where(c =>
+                c.CustomerDetail != null && c.AgencyReport != null);
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
 
             var approvedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
@@ -861,8 +865,7 @@ namespace risk.control.system.Services
                .Include(c => c.CustomerDetail)
                .ThenInclude(c => c.State)
                .Include(c => c.Vendor)
-               .Include(c => c.BeneficiaryDetail)
-               .ThenInclude(l => l.PreviousClaimReports)
+               .Include(c => c.PreviousClaimReports)
                 .Where(c => !c.Deleted);
             return applicationDbContext.OrderBy(o => o.Created);
         }
@@ -875,7 +878,6 @@ namespace risk.control.system.Services
                .ThenInclude(c => c.CaseEnabler)
                .Include(c => c.PolicyDetail)
                .ThenInclude(c => c.CostCentre)
-            
                .Include(c => c.BeneficiaryDetail)
                .ThenInclude(c => c.PinCode)
                .Include(c => c.BeneficiaryDetail)
@@ -897,8 +899,7 @@ namespace risk.control.system.Services
                .Include(c => c.CustomerDetail)
                .ThenInclude(c => c.State)
                .Include(c => c.Vendor)
-               .Include(c => c.BeneficiaryDetail)
-               .ThenInclude(l => l.PreviousClaimReports)
+               .Include(c => c.PreviousClaimReports)
                 .Where(c => !c.Deleted);
             return applicationDbContext.OrderBy(o => o.Created);
         }

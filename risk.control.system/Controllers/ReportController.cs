@@ -96,6 +96,10 @@ namespace risk.control.system.Controllers
                     .OrderByDescending(c => c.HopCount)?.ToListAsync();
 
                 var claimsInvestigation = await _context.ClaimsInvestigation
+                    .Include(c => c.AgencyReport)
+                  .Include(c => c.AgencyReport.DocumentIdReport)
+                  .Include(c => c.AgencyReport.DigitalIdReport)
+                  .Include(c => c.AgencyReport.ReportQuestionaire)
                     .Include(c => c.ClaimMessages)
                   .Include(c => c.PolicyDetail)
                   .ThenInclude(c => c.ClientCompany)
@@ -131,12 +135,7 @@ namespace risk.control.system.Controllers
                     .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == id);
 
                 var location = await _context.BeneficiaryDetail
-                    .Include(c => c.ClaimReport)
-                    .ThenInclude(c => c.DigitalIdReport)
-                    .Include(c => c.ClaimReport)
-                    .ThenInclude(c => c.DocumentIdReport)
-                    .Include(c => c.ClaimReport)
-                    .ThenInclude(c => c.ReportQuestionaire)
+                    
                     .FirstOrDefaultAsync(l => l.ClaimsInvestigationId == id);
 
                 if (claimsInvestigation == null)
@@ -144,7 +143,7 @@ namespace risk.control.system.Controllers
                     notifyService.Error("NOT FOUND !!!..");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var invoice = _context.VendorInvoice.FirstOrDefault(i => i.ClaimReportId == location.ClaimReport.ClaimReportId);
+                var invoice = _context.VendorInvoice.FirstOrDefault(i => i.AgencyReportId == claimsInvestigation.AgencyReport.AgencyReportId);
 
                 var model = new ClaimTransactionModel
                 {
@@ -195,6 +194,10 @@ namespace risk.control.system.Controllers
                     .OrderByDescending(c => c.HopCount)?.ToListAsync();
 
                 var claimsInvestigation = await _context.ClaimsInvestigation
+                    .Include(c => c.AgencyReport)
+                  .Include(c => c.AgencyReport.DocumentIdReport)
+                  .Include(c => c.AgencyReport.DigitalIdReport)
+                  .Include(c => c.AgencyReport.ReportQuestionaire)
                     .Include(c => c.ClaimMessages)
                   .Include(c => c.PolicyDetail)
                   .ThenInclude(c => c.ClientCompany)
@@ -231,12 +234,7 @@ namespace risk.control.system.Controllers
                     .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == id);
 
                 var location = await _context.BeneficiaryDetail
-                    .Include(c => c.ClaimReport)
-                    .ThenInclude(c => c.DigitalIdReport)
-                    .Include(c => c.ClaimReport)
-                    .ThenInclude(c => c.DocumentIdReport)
-                    .Include(c => c.ClaimReport)
-                    .ThenInclude(c => c.ReportQuestionaire)
+                    .Include(b=>b.BeneficiaryRelation)
                     .FirstOrDefaultAsync(l => l.ClaimsInvestigationId == id);
 
                 if (claimsInvestigation == null)
@@ -244,7 +242,7 @@ namespace risk.control.system.Controllers
                     notifyService.Error("NOT FOUND !!!..");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var invoice = _context.VendorInvoice.FirstOrDefault(i => i.ClaimReportId == location.ClaimReport.ClaimReportId);
+                var invoice = _context.VendorInvoice.FirstOrDefault(i => i.AgencyReportId == claimsInvestigation.AgencyReport.AgencyReportId);
 
                 var model = new ClaimTransactionModel
                 {
@@ -295,6 +293,10 @@ namespace risk.control.system.Controllers
                     .OrderByDescending(c => c.HopCount)?.ToListAsync();
 
                 var claimsInvestigation = await _context.ClaimsInvestigation
+                    .Include(c => c.AgencyReport)
+                  .Include(c => c.AgencyReport.DocumentIdReport)
+                  .Include(c => c.AgencyReport.DigitalIdReport)
+                  .Include(c => c.AgencyReport.ReportQuestionaire)
                     .Include(c => c.ClaimMessages)
                   .Include(c => c.PolicyDetail)
                   .ThenInclude(c => c.ClientCompany)
@@ -331,12 +333,8 @@ namespace risk.control.system.Controllers
                     .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == id);
 
                 var location = await _context.BeneficiaryDetail
-                    .Include(c => c.ClaimReport)
-                    .ThenInclude(c => c.DigitalIdReport)
-                    .Include(c => c.ClaimReport)
-                    .ThenInclude(c => c.DocumentIdReport)
-                    .Include(c => c.ClaimReport)
-                    .ThenInclude(c => c.ReportQuestionaire)
+                    .Include(c => c.BeneficiaryRelation)
+                    
                     .FirstOrDefaultAsync(l => l.ClaimsInvestigationId == id);
 
                 if (claimsInvestigation == null)
@@ -344,7 +342,7 @@ namespace risk.control.system.Controllers
                     notifyService.Error("NOT FOUND !!!..");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var invoice = _context.VendorInvoice.FirstOrDefault(i => i.ClaimReportId == location.ClaimReport.ClaimReportId);
+                var invoice = _context.VendorInvoice.FirstOrDefault(i => i.AgencyReportId == claimsInvestigation.AgencyReport.AgencyReportId);
 
                 var model = new ClaimTransactionModel
                 {
@@ -394,6 +392,10 @@ namespace risk.control.system.Controllers
                     .OrderByDescending(c => c.HopCount)?.ToListAsync();
 
                 var claimsInvestigation = await _context.ClaimsInvestigation
+                    .Include(c => c.AgencyReport)
+                  .Include(c => c.AgencyReport.DocumentIdReport)
+                  .Include(c => c.AgencyReport.DigitalIdReport)
+                  .Include(c => c.AgencyReport.ReportQuestionaire)
                     .Include(c => c.ClaimMessages)
                   .Include(c => c.PolicyDetail)
                   .ThenInclude(c => c.ClientCompany)
@@ -430,12 +432,8 @@ namespace risk.control.system.Controllers
                     .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == id);
 
                 var location = await _context.BeneficiaryDetail
-                    .Include(c => c.ClaimReport)
-                    .ThenInclude(c => c.DigitalIdReport)
-                    .Include(c => c.ClaimReport)
-                    .ThenInclude(c => c.DocumentIdReport)
-                    .Include(c => c.ClaimReport)
-                    .ThenInclude(c => c.ReportQuestionaire)
+                    .Include(c => c.BeneficiaryRelation)
+                   
                     .FirstOrDefaultAsync(l => l.ClaimsInvestigationId == id);
 
                 if (claimsInvestigation == null)
@@ -443,7 +441,7 @@ namespace risk.control.system.Controllers
                     notifyService.Error("NOT FOUND !!!..");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var invoice = _context.VendorInvoice.FirstOrDefault(i => i.ClaimReportId == location.ClaimReport.ClaimReportId);
+                var invoice = _context.VendorInvoice.FirstOrDefault(i => i.AgencyReportId == claimsInvestigation.AgencyReport.AgencyReportId);
 
                 var model = new ClaimTransactionModel
                 {
@@ -574,13 +572,12 @@ namespace risk.control.system.Controllers
                     .Include(c => c.PolicyDetail)
                     .Include(c => c.CustomerDetail)
                     .Include(c => c.BeneficiaryDetail)
-                    .ThenInclude(r => r.ClaimReport)
+                    .Include(r => r.AgencyReport)
                     .FirstOrDefault(c => c.ClaimsInvestigationId == id);
 
                 var policy = claim.PolicyDetail;
                 var customer = claim.CustomerDetail;
                 var beneficiary = claim.BeneficiaryDetail;
-                var report = claim.BeneficiaryDetail?.ClaimReport;
 
                 string folder = Path.Combine(webHostEnvironment.WebRootPath, "report");
 
@@ -629,13 +626,11 @@ namespace risk.control.system.Controllers
                     .Include(c => c.PolicyDetail)
                     .Include(c => c.CustomerDetail)
                     .Include(c => c.BeneficiaryDetail)
-                    .ThenInclude(r => r.ClaimReport)
                     .FirstOrDefault(c => c.ClaimsInvestigationId == id);
 
                 var policy = claim.PolicyDetail;
                 var customer = claim.CustomerDetail;
                 var beneficiary = claim.BeneficiaryDetail;
-                var report = claim.BeneficiaryDetail?.ClaimReport;
 
                 string folder = Path.Combine(webHostEnvironment.WebRootPath, "report");
 

@@ -12,6 +12,7 @@ using System.IO;
 using Amazon.Textract;
 using System.Xml;
 using System.Text.RegularExpressions;
+using risk.control.system.Controllers.Api.Claims;
 
 namespace risk.control.system.Services
 {
@@ -35,16 +36,21 @@ namespace risk.control.system.Services
         private readonly IGoogleApi googleApi;
         private readonly IGoogleMaskHelper googleHelper;
         private readonly IHttpClientService httpClientService;
+        private readonly IClaimsService claimsService;
         private readonly IWebHostEnvironment webHostEnvironment;
         private static HttpClient httpClient = new();
 
         //test PAN FNLPM8635N
-        public ICheckifyService(ApplicationDbContext context, IGoogleApi googleApi, IGoogleMaskHelper googleHelper, IHttpClientService httpClientService, IWebHostEnvironment webHostEnvironment)
+        public ICheckifyService(ApplicationDbContext context, IGoogleApi googleApi,
+            IGoogleMaskHelper googleHelper, IHttpClientService httpClientService, 
+            IClaimsService claimsService,
+            IWebHostEnvironment webHostEnvironment)
         {
             this._context = context;
             this.googleApi = googleApi;
             this.googleHelper = googleHelper;
             this.httpClientService = httpClientService;
+            this.claimsService = claimsService;
             this.webHostEnvironment = webHostEnvironment;
         }
         public async Task<bool> WhitelistIP(IPWhitelistRequest request)
@@ -62,34 +68,14 @@ namespace risk.control.system.Services
         }
         public async Task<AppiCheckifyResponse> GetFaceId(FaceData data)
         {
-            var claimCase = _context.BeneficiaryDetail
-                .Include(c => c.BeneficiaryRelation)
-                .Include(c => c.ClaimReport)
-                .ThenInclude(c => c.DigitalIdReport)
-                .Include(c => c.ClaimReport)
-                .ThenInclude(c => c.DocumentIdReport)
-                 .Include(c => c.ClaimReport)
-                .ThenInclude(c => c.ReportQuestionaire)
-                .Include(c => c.PinCode)
-                .Include(c => c.District)
-                .Include(c => c.State)
-                .Include(c => c.Country)
+            var claim = claimsService.GetClaims()
+                .Include(c => c.AgencyReport)
+                .Include(c => c.AgencyReport.DigitalIdReport)
+                .Include(c => c.AgencyReport.ReportQuestionaire)
+                .Include(c => c.AgencyReport.DocumentIdReport)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == data.ClaimId);
 
-            if (claimCase == null)
-            {
-                return null;
-            }
-
-            claimCase.ClaimReport.AgentEmail = data.Email;
-
-            var claim = _context.ClaimsInvestigation
-            .Include(c => c.PolicyDetail)
-            .Include(c => c.CustomerDetail)
-            .ThenInclude(c => c.PinCode)
-            .Include(c => c.BeneficiaryDetail)
-            .ThenInclude(c => c.PinCode)
-                .FirstOrDefault(c => c.ClaimsInvestigationId == data.ClaimId);
+            claim.AgencyReport.AgentEmail = data.Email;
 
             var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claim.PolicyDetail.ClientCompanyId);
 
@@ -106,7 +92,7 @@ namespace risk.control.system.Services
                 }
                 if (claim.PolicyDetail.ClaimType == ClaimType.DEATH)
                 {
-                    registeredImage = claimCase.ProfilePicture;
+                    registeredImage = claim.BeneficiaryDetail.ProfilePicture;
                 }
 
                 string ImageData = string.Empty;
@@ -133,7 +119,7 @@ namespace risk.control.system.Services
 
                         //var saveImageBase64String = Convert.ToBase64String(savedImage);
 
-                        claimCase.ClaimReport.DigitalIdReport.DigitalIdImageLongLatTime = DateTime.Now;
+                        claim.AgencyReport.DigitalIdReport.DigitalIdImageLongLatTime = DateTime.Now;
 
                         //var base64Image = Convert.ToBase64String(registeredImage);
 
@@ -146,32 +132,32 @@ namespace risk.control.system.Services
 
                             if (matched)
                             {
-                                claimCase.ClaimReport.DigitalIdReport.DigitalIdImageMatchConfidence = "99";
+                                claim.AgencyReport.DigitalIdReport.DigitalIdImageMatchConfidence = "99";
                             }
                             else
                             {
-                                claimCase.ClaimReport.DigitalIdReport.DigitalIdImageMatchConfidence = string.Empty;
+                                claim.AgencyReport.DigitalIdReport.DigitalIdImageMatchConfidence = string.Empty;
                             }
-                            claimCase.ClaimReport.DigitalIdReport.DigitalIdImage = CompressImage.ProcessCompress(face2Verify);
+                            claim.AgencyReport.DigitalIdReport.DigitalIdImage = CompressImage.ProcessCompress(face2Verify);
 
                         }
                         catch (Exception)
                         {
-                            claimCase.ClaimReport.DigitalIdReport.DigitalIdImageMatchConfidence = string.Empty;
+                            claim.AgencyReport.DigitalIdReport.DigitalIdImageMatchConfidence = string.Empty;
                         }
                     }
                     else
                     {
-                        claimCase.ClaimReport.DigitalIdReport.DigitalIdImageMatchConfidence = "no face image";
+                        claim.AgencyReport.DigitalIdReport.DigitalIdImageMatchConfidence = "no face image";
                     }
                 }
                 catch (Exception ex)
                 {
-                    claimCase.ClaimReport.DigitalIdReport.DigitalIdImageMatchConfidence = "err " + ImageData;
+                    claim.AgencyReport.DigitalIdReport.DigitalIdImageMatchConfidence = "err " + ImageData;
                 }
                 if (registeredImage == null)
                 {
-                    claimCase.ClaimReport.DigitalIdReport.DigitalIdImageMatchConfidence = "no image";
+                    claim.AgencyReport.DigitalIdReport.DigitalIdImageMatchConfidence = "no image";
                 }
             }
 
@@ -179,15 +165,15 @@ namespace risk.control.system.Services
 
             if (!string.IsNullOrWhiteSpace(data.LocationLongLat))
             {
-                claimCase.ClaimReport.DigitalIdReport.DigitalIdImageLongLatTime = DateTime.Now;
-                claimCase.ClaimReport.DigitalIdReport.DigitalIdImageLongLat = data.LocationLongLat;
+                claim.AgencyReport.DigitalIdReport.DigitalIdImageLongLatTime = DateTime.Now;
+                claim.AgencyReport.DigitalIdReport.DigitalIdImageLongLat = data.LocationLongLat;
             }
 
-            if (!string.IsNullOrWhiteSpace(claimCase.ClaimReport.DigitalIdReport.DigitalIdImageLongLat))
+            if (!string.IsNullOrWhiteSpace(claim.AgencyReport.DigitalIdReport.DigitalIdImageLongLat))
             {
-                var longLat = claimCase.ClaimReport.DigitalIdReport.DigitalIdImageLongLat.IndexOf("/");
-                var latitude = claimCase.ClaimReport.DigitalIdReport.DigitalIdImageLongLat.Substring(0, longLat)?.Trim();
-                var longitude = claimCase.ClaimReport.DigitalIdReport.DigitalIdImageLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
+                var longLat = claim.AgencyReport.DigitalIdReport.DigitalIdImageLongLat.IndexOf("/");
+                var latitude = claim.AgencyReport.DigitalIdReport.DigitalIdImageLongLat.Substring(0, longLat)?.Trim();
+                var longitude = claim.AgencyReport.DigitalIdReport.DigitalIdImageLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
                 var latLongString = latitude + "," + longitude;
                 var weatherUrl = $"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current=temperature_2m,windspeed_10m&hourly=temperature_2m,relativehumidity_2m,windspeed_10m";
                 var weatherData = await httpClient.GetFromJsonAsync<Weather>(weatherUrl);
@@ -196,9 +182,9 @@ namespace risk.control.system.Services
                     $"\r\nWindspeed:{weatherData.current.windspeed_10m} {weatherData.current_units.windspeed_10m}" +
                     $"\r\n" +
                     $"\r\nElevation(sea level):{weatherData.elevation} metres";
-                claimCase.ClaimReport.DigitalIdReport.DigitalIdImageData = weatherCustomData;
+                claim.AgencyReport.DigitalIdReport.DigitalIdImageData = weatherCustomData;
                 var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key={Applicationsettings.GMAPData}";
-                claimCase.ClaimReport.DigitalIdReport.DigitalIdImageLocationUrl = url;
+                claim.AgencyReport.DigitalIdReport.DigitalIdImageLocationUrl = url;
 
                 var rootObject = await httpClientService.GetAddress((latitude), (longitude));
                 double registeredLatitude = 0;
@@ -210,23 +196,23 @@ namespace risk.control.system.Services
                 }
                 else
                 {
-                    registeredLatitude = Convert.ToDouble(claimCase.PinCode.Latitude);
-                    registeredLongitude = Convert.ToDouble(claimCase.PinCode.Longitude);
+                    registeredLatitude = Convert.ToDouble(claim.BeneficiaryDetail.PinCode.Latitude);
+                    registeredLongitude = Convert.ToDouble(claim.BeneficiaryDetail.PinCode.Longitude);
                 }
                 var distance = DistanceFinder.GetDistance(registeredLatitude, registeredLongitude, Convert.ToDouble(latitude), Convert.ToDouble(longitude));
 
                 var address = rootObject.display_name;
 
-                claimCase.ClaimReport.DigitalIdReport.DigitalIdImageLocationAddress = string.IsNullOrWhiteSpace(rootObject.display_name) ? "12 Heathcote Drive Forest Hill VIC 3131" : address;
-                claimCase.ClaimReport.DigitalIdReport.Updated = DateTime.Now;
-                claimCase.ClaimReport.DigitalIdReport.UpdatedBy = claimCase.ClaimReport.AgentEmail;
+                claim.AgencyReport.DigitalIdReport.DigitalIdImageLocationAddress = string.IsNullOrWhiteSpace(rootObject.display_name) ? "12 Heathcote Drive Forest Hill VIC 3131" : address;
+                claim.AgencyReport.DigitalIdReport.Updated = DateTime.Now;
+                claim.AgencyReport.DigitalIdReport.UpdatedBy = claim.AgencyReport.AgentEmail;
             }
 
-            _context.BeneficiaryDetail.Update(claimCase);
+            _context.ClaimsInvestigation.Update(claim);
 
             try
             {
-                await _context.SaveChangesAsync();
+                var rows = await _context.SaveChangesAsync();
             }
             catch (Exception exception)
             {
@@ -238,52 +224,32 @@ namespace risk.control.system.Services
             var noDataimage = await File.ReadAllBytesAsync(noDataImagefilePath);
             return new AppiCheckifyResponse
             {
-                BeneficiaryId = claimCase.BeneficiaryDetailId,
-                LocationImage = claimCase.ClaimReport?.DigitalIdReport?.DigitalIdImage != null ?
-                Convert.ToBase64String(claimCase.ClaimReport?.DigitalIdReport?.DigitalIdImage) :
+                BeneficiaryId = claim.BeneficiaryDetail.BeneficiaryDetailId,
+                LocationImage = claim.AgencyReport?.DigitalIdReport?.DigitalIdImage != null ?
+                Convert.ToBase64String(claim.AgencyReport?.DigitalIdReport?.DigitalIdImage) :
                 Convert.ToBase64String(noDataimage),
-                LocationLongLat = claimCase.ClaimReport.DigitalIdReport?.DigitalIdImageLongLat,
-                LocationTime = claimCase.ClaimReport.DigitalIdReport?.DigitalIdImageLongLatTime,
-                OcrImage = claimCase.ClaimReport?.DocumentIdReport?.DocumentIdImage != null ?
-                Convert.ToBase64String((claimCase.ClaimReport?.DocumentIdReport?.DocumentIdImage)) :
+                LocationLongLat = claim.AgencyReport.DigitalIdReport?.DigitalIdImageLongLat,
+                LocationTime = claim.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime,
+                OcrImage = claim.AgencyReport?.DocumentIdReport?.DocumentIdImage != null ?
+                Convert.ToBase64String((claim.AgencyReport?.DocumentIdReport?.DocumentIdImage)) :
                 Convert.ToBase64String(noDataimage),
-                OcrLongLat = claimCase.ClaimReport.DocumentIdReport?.DocumentIdImageLongLat,
-                OcrTime = claimCase.ClaimReport.DocumentIdReport?.DocumentIdImageLongLatTime,
-                FacePercent = claimCase.ClaimReport.DigitalIdReport?.DigitalIdImageMatchConfidence,
-                PanValid = claimCase.ClaimReport.DocumentIdReport?.DocumentIdImageValid
+                OcrLongLat = claim.AgencyReport.DocumentIdReport?.DocumentIdImageLongLat,
+                OcrTime = claim.AgencyReport.DocumentIdReport?.DocumentIdImageLongLatTime,
+                FacePercent = claim.AgencyReport.DigitalIdReport?.DigitalIdImageMatchConfidence,
+                PanValid = claim.AgencyReport.DocumentIdReport?.DocumentIdImageValid
             };
         }
 
         public async Task<AppiCheckifyResponse> GetDocumentId(DocumentData data)
         {
-            var claimCase = _context.BeneficiaryDetail
-                .Include(c => c.BeneficiaryRelation)
-                .Include(c => c.ClaimReport)
-                .ThenInclude(c => c.DigitalIdReport)
-                .Include(c => c.ClaimReport)
-                .ThenInclude(c => c.DocumentIdReport)
-                .Include(c => c.ClaimReport)
-                .ThenInclude(c => c.ReportQuestionaire)
-                .Include(c => c.PinCode)
-                .Include(c => c.District)
-                .Include(c => c.State)
-                .Include(c => c.Country)
+            var claim = claimsService.GetClaims()
+                .Include(c => c.AgencyReport)
+                .Include(c => c.AgencyReport.DigitalIdReport)
+                .Include(c => c.AgencyReport.ReportQuestionaire)
+                .Include(c => c.AgencyReport.DocumentIdReport)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == data.ClaimId);
 
-            if (claimCase == null)
-            {
-                return null;
-            }
-
-            claimCase.ClaimReport.AgentEmail = data.Email;
-
-            var claim = _context.ClaimsInvestigation
-                .Include(c => c.PolicyDetail)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.PinCode)
-                .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.PinCode)
-                .FirstOrDefault(c => c.ClaimsInvestigationId == data.ClaimId);
+            claim.AgencyReport.AgentEmail = data.Email;
 
             var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claim.PolicyDetail.ClientCompanyId);
 
@@ -291,8 +257,6 @@ namespace risk.control.system.Services
 
             if (!string.IsNullOrWhiteSpace(data.OcrImage))
             {
-
-
                 //=================GOOGLE VISION API =========================
 
                 var byteimage = Convert.FromBase64String(data.OcrImage);
@@ -338,21 +302,21 @@ namespace risk.control.system.Services
                                     var panMatch = panRegex.Match(maskedImage.DocumentId);
                                     if(panMatch.Success)
                                     {
-                                        claimCase.ClaimReport.DocumentIdReport.DocumentIdImageValid = true;
+                                        claim.AgencyReport.DocumentIdReport.DocumentIdImageValid = true;
                                     }
                                     else
                                     {
-                                        claimCase.ClaimReport.DocumentIdReport.DocumentIdImageValid = false;
+                                        claim.AgencyReport.DocumentIdReport.DocumentIdImageValid = false;
                                     }
                                 }
                                 catch (Exception)
                                 {
-                                    claimCase.ClaimReport.DocumentIdReport.DocumentIdImageValid = false;
+                                    claim.AgencyReport.DocumentIdReport.DocumentIdImageValid = false;
                                 }
                             }
                             else
                             {
-                                claimCase.ClaimReport.DocumentIdReport.DocumentIdImageValid = true;
+                                claim.AgencyReport.DocumentIdReport.DocumentIdImageValid = true;
                             }
                         }
 
@@ -362,15 +326,15 @@ namespace risk.control.system.Services
 
                         var savedMaskedImage = CompressImage.ProcessCompress(image);
 
-                        claimCase.ClaimReport.DocumentIdReport.DocumentIdImage = savedMaskedImage;
+                        claim.AgencyReport.DocumentIdReport.DocumentIdImage = savedMaskedImage;
 
-                        claimCase.ClaimReport.DocumentIdReport.DocumentIdImageLongLatTime = DateTime.Now;
-                        claimCase.ClaimReport.DocumentIdReport.DocumentIdImageType = maskedImage.DocType;
-                        claimCase.ClaimReport.DocumentIdReport.DocumentIdImageData = maskedImage.DocType + " data: ";
+                        claim.AgencyReport.DocumentIdReport.DocumentIdImageLongLatTime = DateTime.Now;
+                        claim.AgencyReport.DocumentIdReport.DocumentIdImageType = maskedImage.DocType;
+                        claim.AgencyReport.DocumentIdReport.DocumentIdImageData = maskedImage.DocType + " data: ";
 
                         if (!string.IsNullOrWhiteSpace(maskedImage.OcrData))
                         {
-                            claimCase.ClaimReport.DocumentIdReport.DocumentIdImageData = maskedImage.DocType + " data:. \r\n " +
+                            claim.AgencyReport.DocumentIdReport.DocumentIdImageData = maskedImage.DocType + " data:. \r\n " +
                                 "" + maskedImage.OcrData.Replace(maskedImage.DocumentId, "xxxxxxxxxx");
                         }
                     }
@@ -378,19 +342,19 @@ namespace risk.control.system.Services
                     {
                         var image = Convert.FromBase64String(maskedImage.MaskedImage);
 
-                        claimCase.ClaimReport.DocumentIdReport.DocumentIdImage = image;
+                        claim.AgencyReport.DocumentIdReport.DocumentIdImage = image;
 
-                        claimCase.ClaimReport.DocumentIdReport.DocumentIdImageLongLatTime = DateTime.Now;
+                        claim.AgencyReport.DocumentIdReport.DocumentIdImageLongLatTime = DateTime.Now;
                     }
                 }
                 else
                 {
                     var image = Convert.FromBase64String(data.OcrImage);
 
-                    claimCase.ClaimReport.DocumentIdReport.DocumentIdImage = image;
-                    claimCase.ClaimReport.DocumentIdReport.DocumentIdImageValid = false;
-                    claimCase.ClaimReport.DocumentIdReport.DocumentIdImageLongLatTime = DateTime.Now;
-                    claimCase.ClaimReport.DocumentIdReport.DocumentIdImageData = "no data: ";
+                    claim.AgencyReport.DocumentIdReport.DocumentIdImage = image;
+                    claim.AgencyReport.DocumentIdReport.DocumentIdImageValid = false;
+                    claim.AgencyReport.DocumentIdReport.DocumentIdImageLongLatTime = DateTime.Now;
+                    claim.AgencyReport.DocumentIdReport.DocumentIdImageData = "no data: ";
                 }
             }
 
@@ -398,14 +362,14 @@ namespace risk.control.system.Services
 
             if (!string.IsNullOrWhiteSpace(data.OcrLongLat))
             {
-                claimCase.ClaimReport.DocumentIdReport.DocumentIdImageLongLat = data.OcrLongLat;
-                claimCase.ClaimReport.DocumentIdReport.DocumentIdImageLongLatTime = DateTime.Now;
-                var longLat = claimCase.ClaimReport.DocumentIdReport.DocumentIdImageLongLat.IndexOf("/");
-                var latitude = claimCase.ClaimReport.DocumentIdReport.DocumentIdImageLongLat.Substring(0, longLat)?.Trim();
-                var longitude = claimCase.ClaimReport.DocumentIdReport.DocumentIdImageLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
+                claim.AgencyReport.DocumentIdReport.DocumentIdImageLongLat = data.OcrLongLat;
+                claim.AgencyReport.DocumentIdReport.DocumentIdImageLongLatTime = DateTime.Now;
+                var longLat = claim.AgencyReport.DocumentIdReport.DocumentIdImageLongLat.IndexOf("/");
+                var latitude = claim.AgencyReport.DocumentIdReport.DocumentIdImageLongLat.Substring(0, longLat)?.Trim();
+                var longitude = claim.AgencyReport.DocumentIdReport.DocumentIdImageLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
                 var latLongString = latitude + "," + longitude;
                 var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key={Applicationsettings.GMAPData}";
-                claimCase.ClaimReport.DocumentIdReport.DocumentIdImageLocationUrl = url;
+                claim.AgencyReport.DocumentIdReport.DocumentIdImageLocationUrl = url;
                 RootObject rootObject = await httpClientService.GetAddress((latitude), (longitude));
                 double registeredLatitude = 0;
                 double registeredLongitude = 0;
@@ -418,11 +382,11 @@ namespace risk.control.system.Services
 
                 var address = rootObject.display_name;
 
-                claimCase.ClaimReport.DocumentIdReport.DocumentIdImageLocationAddress = string.IsNullOrWhiteSpace(rootObject.display_name) ? "12 Heathcote Drive Forest Hill VIC 3131" : address;
+                claim.AgencyReport.DocumentIdReport.DocumentIdImageLocationAddress = string.IsNullOrWhiteSpace(rootObject.display_name) ? "12 Heathcote Drive Forest Hill VIC 3131" : address;
             }
-            claimCase.ClaimReport.DocumentIdReport.Updated = DateTime.Now;
-            claimCase.ClaimReport.DocumentIdReport.UpdatedBy = claimCase.ClaimReport.AgentEmail;
-            _context.BeneficiaryDetail.Update(claimCase);
+            claim.AgencyReport.DocumentIdReport.Updated = DateTime.Now;
+            claim.AgencyReport.DocumentIdReport.UpdatedBy = claim.AgencyReport.AgentEmail;
+            _context.ClaimsInvestigation.Update(claim);
 
             try
             {
@@ -438,30 +402,28 @@ namespace risk.control.system.Services
             var noDataimage = await File.ReadAllBytesAsync(noDataImagefilePath);
             return new AppiCheckifyResponse
             {
-                BeneficiaryId = claimCase.BeneficiaryDetailId,
-                LocationImage = claimCase.ClaimReport.DigitalIdReport?.DigitalIdImage != null ?
-                Convert.ToBase64String(claimCase.ClaimReport.DigitalIdReport?.DigitalIdImage) :
+                BeneficiaryId = claim.BeneficiaryDetail.BeneficiaryDetailId,
+                LocationImage = claim.AgencyReport.DigitalIdReport?.DigitalIdImage != null ?
+                Convert.ToBase64String(claim.AgencyReport.DigitalIdReport?.DigitalIdImage) :
                 Convert.ToBase64String(noDataimage),
-                LocationLongLat = claimCase.ClaimReport.DigitalIdReport?.DigitalIdImageLongLat,
-                LocationTime = claimCase.ClaimReport.DigitalIdReport?.DigitalIdImageLongLatTime,
-                OcrImage = claimCase.ClaimReport.DocumentIdReport?.DocumentIdImage != null ?
-                Convert.ToBase64String(claimCase.ClaimReport.DocumentIdReport?.DocumentIdImage) :
+                LocationLongLat = claim.AgencyReport.DigitalIdReport?.DigitalIdImageLongLat,
+                LocationTime = claim.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime,
+                OcrImage = claim.AgencyReport.DocumentIdReport?.DocumentIdImage != null ?
+                Convert.ToBase64String(claim.AgencyReport.DocumentIdReport?.DocumentIdImage) :
                 Convert.ToBase64String(noDataimage),
-                OcrLongLat = claimCase.ClaimReport.DocumentIdReport?.DocumentIdImageLongLat,
-                OcrTime = claimCase.ClaimReport.DocumentIdReport?.DocumentIdImageLongLatTime,
-                FacePercent = claimCase.ClaimReport.DigitalIdReport?.DigitalIdImageMatchConfidence,
-                PanValid = claimCase.ClaimReport.DocumentIdReport?.DocumentIdImageValid
+                OcrLongLat = claim.AgencyReport.DocumentIdReport?.DocumentIdImageLongLat,
+                OcrTime = claim.AgencyReport.DocumentIdReport?.DocumentIdImageLongLatTime,
+                FacePercent = claim.AgencyReport.DigitalIdReport?.DigitalIdImageMatchConfidence,
+                PanValid = claim.AgencyReport.DocumentIdReport?.DocumentIdImageValid
             };
         }
 
         public async Task GetAudio(AudioData data)
         {
-            var caseLocation = _context.BeneficiaryDetail
-                .Include(c => c.ClaimReport)
+            var claim = _context.ClaimsInvestigation
+                .Include(c => c.AgencyReport)
+                .Include(c => c.AgencyReport.ReportQuestionaire)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == data.ClaimId);
-            var claimReport = _context.ClaimReport
-                .Include(c => c.ReportQuestionaire)
-                .FirstOrDefault(c => c.ClaimReportId == caseLocation.ClaimReport.ClaimReportId);
 
             using var dataStream = new MemoryStream();
             data.Uri.CopyTo(dataStream);
@@ -472,20 +434,18 @@ namespace risk.control.system.Services
             }
             var audioPath = Path.Combine(audioDirectory, $"{Guid.NewGuid()}.mp3");
             File.WriteAllBytes(audioPath, dataStream.ToArray());
-            claimReport.ReportQuestionaire.Audio = dataStream.ToArray();
-            claimReport.ReportQuestionaire.AudioUrl = audioPath;
-            _context.ClaimReport.Update(claimReport);
+            claim.AgencyReport.ReportQuestionaire.Audio = dataStream.ToArray();
+            claim.AgencyReport.ReportQuestionaire.AudioUrl = audioPath;
+            _context.ClaimsInvestigation.Update(claim);
             await _context.SaveChangesAsync();
         }
 
         public async Task GetVideo(VideoData data)
         {
-            var caseLocation = _context.BeneficiaryDetail
-                .Include(c => c.ClaimReport)
-                .FirstOrDefault(c => c.ClaimsInvestigationId == data.ClaimId);
-            var claimReport = _context.ClaimReport
-                .Include(c => c.ReportQuestionaire)
-                .FirstOrDefault(c => c.ClaimReportId == caseLocation.ClaimReport.ClaimReportId);
+            var claim = _context.ClaimsInvestigation
+                            .Include(c => c.AgencyReport)
+                            .Include(c => c.AgencyReport.ReportQuestionaire)
+                            .FirstOrDefault(c => c.ClaimsInvestigationId == data.ClaimId);
 
             using var dataStream = new MemoryStream();
             data.Uri.CopyTo(dataStream);
@@ -496,9 +456,9 @@ namespace risk.control.system.Services
             }
             var videoPath = Path.Combine(videoDirectory, $"{Guid.NewGuid()}.mp4");
             File.WriteAllBytes(videoPath, dataStream.ToArray());
-            claimReport.ReportQuestionaire.Video = dataStream.ToArray();
-            claimReport.ReportQuestionaire.VideoUrl = videoPath;
-            _context.ClaimReport.Update(claimReport);
+            claim.AgencyReport.ReportQuestionaire.Video = dataStream.ToArray();
+            claim.AgencyReport.ReportQuestionaire.VideoUrl = videoPath;
+            _context.ClaimsInvestigation.Update(claim);
             await _context.SaveChangesAsync();
         }
     }

@@ -409,7 +409,7 @@
                         </span>
                     </h3>
                     <div class="card-tools">
-                        <span data-toggle="tooltip" title="Agent report # : @Model.Location.ClaimReport.AgentEmail" class="badge badge-light"><i class='far fa-hand-point-right'></i></span>
+                        <span data-toggle="tooltip" title="Agent report # : @Model.ClaimsInvestigation.AgencyReport.AgentEmail" class="badge badge-light"><i class='far fa-hand-point-right'></i></span>
                         <button type="button" class="btn btn-tool" data-card-widget="collapse">
                             <i class="fas fa-plus"></i>
                         </button>
@@ -420,21 +420,21 @@
                 <div class="card-body pb-0">
                     <div class="row">
                         @{
-                            if (@Model.Location.ClaimReport?.DigitalIdReport?.DigitalIdImageData != null && @Model.Location.ClaimReport?.DigitalIdReport?.DigitalIdImageLongLatTime != null)
+                            if (@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImageData != null && @Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImageLongLatTime != null)
                             {
                                 string digitalIdColor = "grey";
                                 var borderColor = "";
-                                if (Model.Location.ClaimReport.DigitalIdReport?.DigitalIdImageLongLatTime == null)
+                                if (Model.ClaimsInvestigation.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime == null)
                                 {
                                     digitalIdColor = "grey";
                                     borderColor = "";
                                 }
-                                else if (Model.Location.ClaimReport.DigitalIdReport?.DigitalIdImageLongLatTime != null && string.IsNullOrWhiteSpace(@Model.Location.ClaimReport?.DigitalIdReport?.DigitalIdImageMatchConfidence))
+                                else if (Model.ClaimsInvestigation.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime != null && string.IsNullOrWhiteSpace(@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImageMatchConfidence))
                                 {
                                     digitalIdColor = "#dc3545!important";
                                     borderColor = "border-danger";
                                 }
-                                else if (Model.Location.ClaimReport.DigitalIdReport?.DigitalIdImageLongLatTime != null && !string.IsNullOrWhiteSpace(@Model.Location.ClaimReport?.DigitalIdReport?.DigitalIdImageMatchConfidence))
+                                else if (Model.ClaimsInvestigation.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime != null && !string.IsNullOrWhiteSpace(@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImageMatchConfidence))
                                 {
                                     borderColor = "border-success";
                                     digitalIdColor = "green";
@@ -455,16 +455,16 @@
                                                 </span>
                                             </h3>
                                             <div class="card-tools">
-                                                <span data-toggle="tooltip" title="Agent report # : @Model.Location.ClaimReport.AgentEmail" class="badge badge-light">
+                                                <span data-toggle="tooltip" title="Agent report # : @Model.ClaimsInvestigation.AgencyReport.AgentEmail" class="badge badge-light">
                                                     <i class="nav-icon fas fa-clock"></i>
-                                                    @Model.Location.ClaimReport?.DigitalIdReport?.DigitalIdImageLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt")
+                                                    @Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImageLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt")
                                                 </span>
 
                                             </div>
                                         </div>
                                         <div class="card-footer text-center">
                                             <span class="badge badge-light"><i class="fas fa-portrait"></i> Match :  </span>
-                                            @if (string.IsNullOrWhiteSpace(@Model.Location.ClaimReport?.DigitalIdReport?.DigitalIdImageMatchConfidence))
+                                            @if (string.IsNullOrWhiteSpace(@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImageMatchConfidence))
                                             {
                                                 <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i>
                                             }
@@ -487,9 +487,9 @@
                                                         <span class="badge badge-light"><i class="far fa-image"></i> Photo Id Image</span>:
                                                         <br />
                                                         @{
-                                                            if (Model.Location.ClaimReport?.DigitalIdReport?.DigitalIdImage != null)
+                                                            if (Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImage != null)
                                                             {
-                                                                <img title="digital image" id="agentLocationPicture" class="img-fluid face-Image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.Location.ClaimReport?.DigitalIdReport?.DigitalIdImage))">
+                                                                <img title="digital image" id="agentLocationPicture" class="img-fluid face-Image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImage))">
                                                             }
                                                             else
                                                             {
@@ -501,7 +501,7 @@
 
                                                         <span class="badge badge-light"><i class="fas fa-info"></i> Location Info</span>
                                                         <br />
-                                                        <label class="ocr-data img-fluid"> @Model.Location.ClaimReport?.DigitalIdReport?.DigitalIdImageData</label>
+                                                        <label class="ocr-data img-fluid"> @Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImageData</label>
 
                                                     </p>
                                                 </div>
@@ -509,13 +509,13 @@
                                                     <p class="text-muted text-sm">
                                                         <span class="badge badge-light"><i class="fas fa-map-pin"></i> Location visited</span>
                                                         <br />
-                                                        <img class="img-fluid locationImage" src="@Model.Location?.ClaimReport?.DigitalIdReport?.DigitalIdImageLocationUrl" />
+                                                        <img class="img-fluid locationImage" src="@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImageLocationUrl" />
                                                     </p>
                                                     <p class="text-muted text-sm">
 
                                                         <span class="badge badge-light"><i class="fas fa-map-marker-alt"></i> Address visited</span>
                                                         <br />
-                                                        <label class="img-fluid ocr-data"> @Model.Location?.ClaimReport?.DigitalIdReport?.DigitalIdImageLocationAddress</label>
+                                                        <label class="img-fluid ocr-data"> @Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImageLocationAddress</label>
                                                     </p>
                                                 </div>
                                             </div>
@@ -541,16 +541,16 @@
                                     </div>
                                 </div>
                             }
-                            if (@Model.Location.ClaimReport?.DocumentIdReport?.DocumentIdImageData != null && @Model.Location.ClaimReport?.DocumentIdReport?.DocumentIdImageLongLatTime != null)
+                            if (@Model.ClaimsInvestigation.AgencyReport?.DocumentIdReport?.DocumentIdImageData != null && @Model.ClaimsInvestigation.AgencyReport?.DocumentIdReport?.DocumentIdImageLongLatTime != null)
                             {
                                 string documentIdColor = "grey";
                                 var borderColor = "";
-                                if (Model.Location.ClaimReport.DocumentIdReport?.DocumentIdImageLongLat == null)
+                                if (Model.ClaimsInvestigation.AgencyReport.DocumentIdReport?.DocumentIdImageLongLat == null)
                                 {
 
                                 }
-                                else if (Model.Location.ClaimReport.DocumentIdReport?.DocumentIdImageLongLat != null && (
-                                Model.Location.ClaimReport?.DocumentIdReport?.DocumentIdImageValid != null && Model.Location.ClaimReport?.DocumentIdReport?.DocumentIdImageValid == true))
+                                else if (Model.ClaimsInvestigation.AgencyReport.DocumentIdReport?.DocumentIdImageLongLat != null && (
+                                Model.ClaimsInvestigation.AgencyReport?.DocumentIdReport?.DocumentIdImageValid != null && Model.ClaimsInvestigation.AgencyReport?.DocumentIdReport?.DocumentIdImageValid == true))
                                 {
                                     documentIdColor = "green";
                                     borderColor = "border-success";
@@ -574,9 +574,9 @@
                                                 </span>
                                             </h3>
                                             <div class="card-tools">
-                                                <span data-toggle="tooltip" title="Agent report # : @Model.Location.ClaimReport.AgentEmail" class="badge badge-light">
+                                                <span data-toggle="tooltip" title="Agent report # : @Model.ClaimsInvestigation.AgencyReport.AgentEmail" class="badge badge-light">
                                                     <i class="nav-icon fas fa-clock"></i>
-                                                    @Model.Location.ClaimReport?.DocumentIdReport?.DocumentIdImageLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt")
+                                                    @Model.ClaimsInvestigation.AgencyReport?.DocumentIdReport?.DocumentIdImageLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt")
                                                 </span>
 
                                             </div>
@@ -584,7 +584,7 @@
                                         </div>
                                         <div class="card-footer text-center">
                                             <span class="badge badge-light"><i class="far fa-image"></i> Valid : </span>
-                                            @if (@Model.Location.ClaimReport?.DocumentIdReport?.DocumentIdImageValid.Value ?? false)
+                                            @if (@Model.ClaimsInvestigation.AgencyReport?.DocumentIdReport?.DocumentIdImageValid.Value ?? false)
                                             {
                                                 <i style='color:green;' class='fas fa-check-circle'></i>
                                             }
@@ -606,9 +606,9 @@
                                                         <span class="badge badge-light"><i class="fas fa-film"></i> Pan card Image</span>:
                                                         <br />
                                                         @{
-                                                            if (Model.Location.ClaimReport?.DocumentIdReport?.DocumentIdImage != null)
+                                                            if (Model.ClaimsInvestigation.AgencyReport?.DocumentIdReport?.DocumentIdImage != null)
                                                             {
-                                                                <img title="document image" id="agentOcrPicture" class="img-fluid ocr-Image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.Location.ClaimReport?.DocumentIdReport?.DocumentIdImage))">
+                                                                <img title="document image" id="agentOcrPicture" class="img-fluid ocr-Image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.ClaimsInvestigation.AgencyReport?.DocumentIdReport?.DocumentIdImage))">
                                                             }
                                                             else
                                                             {
@@ -620,7 +620,7 @@
 
                                                         <span class="badge badge-light"><i class="fas fa-info"></i> Image Scan Info</span>
                                                         <br />
-                                                        <label class="img-fluid ocr-data"> @Model.Location?.ClaimReport?.DocumentIdReport?.DocumentIdImageData</label>
+                                                        <label class="img-fluid ocr-data"> @Model.ClaimsInvestigation.AgencyReport?.DocumentIdReport?.DocumentIdImageData</label>
                                                     </p>
                                                 </div>
                                                 <div class="col-6">
@@ -628,13 +628,13 @@
                                                     <p class="text-muted text-sm">
                                                         <span class="badge badge-light"><i class="fas fa-map-pin"></i> Location visited</span>
                                                         <br />
-                                                        <img class="img-fluid olocationImage" src="@Model.Location?.ClaimReport?.DocumentIdReport?.DocumentIdImageLocationUrl" />
+                                                        <img class="img-fluid olocationImage" src="@Model.ClaimsInvestigation.AgencyReport?.DocumentIdReport?.DocumentIdImageLocationUrl" />
                                                     </p>
                                                     <p class="text-muted text-sm">
 
                                                         <span class="badge badge-light"><i class="fas fa-map-marker-alt"></i> Address visited</span>
                                                         <br />
-                                                        <label class="img-fluid ocr-data"> @Model.Location?.ClaimReport?.DocumentIdReport?.DocumentIdImageLocationAddress</label>
+                                                        <label class="img-fluid ocr-data"> @Model.ClaimsInvestigation.AgencyReport?.DocumentIdReport?.DocumentIdImageLocationAddress</label>
                                                     </p>
                                                 </div>
                                             </div>
@@ -662,9 +662,9 @@
                                 </div>
                             }
                         }
-                        @if (!string.IsNullOrWhiteSpace(Model.Location.ClaimReport?.AgentRemarks))
+                        @if (!string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.AgencyReport?.AgentRemarks))
                         {
-                            var questionTime = @Model.Location.ClaimReport.AgentRemarksUpdated != null ? @Model.Location.ClaimReport.AgentRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt") : null;
+                            var questionTime = @Model.ClaimsInvestigation.AgencyReport.AgentRemarksUpdated != null ? @Model.ClaimsInvestigation.AgencyReport.AgentRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt") : null;
 
                             <div class="col-12 col-sm-4 d-flex align-items-stretch flex-column">
                                 <div class="card bg-light d-flex flex-fill border-success">
@@ -684,12 +684,12 @@
                                         <div class="card-tools">
                                             <span data-toggle="tooltip" title="Claim #" class="badge badge-light">
                                                 <i class="nav-icon fas fa-clock"></i>
-                                                @Model.Location.ClaimReport?.AgentRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt")
+                                                @Model.ClaimsInvestigation.AgencyReport?.AgentRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt")
                                             </span>
                                         </div>
                                     </div>
                                     <div class="card-footer text-muted border-bottom-0">
-                                        <i class="fas fa-user-shield"></i>  Agent:<span class="badge badge-light">  @Model.Location.ClaimReport.AgentEmail </span>
+                                        <i class="fas fa-user-shield"></i>  Agent:<span class="badge badge-light">  @Model.ClaimsInvestigation.AgencyReport.AgentEmail </span>
                                     </div>
                                     <div class="progress">
                                         <i class="far fa-bookmark bookmark-green"></i>
@@ -753,7 +753,7 @@
                                                             <span class="fa-li">
                                                                 <i class="far fa-comment"></i>
                                                             </span>
-                                                            @Model.Location.ClaimReport?.ReportQuestionaire?.Answer1
+                                                            @Model.ClaimsInvestigation.AgencyReport?.ReportQuestionaire?.Answer1
                                                         </li>
                                                         <br />
                                                         <li class="small">
@@ -761,28 +761,28 @@
                                                             <span class="fa-li">
                                                                 <i class="far fa-comment"></i>
                                                             </span>
-                                                            @Model.Location.ClaimReport?.ReportQuestionaire?.Answer2
+                                                            @Model.ClaimsInvestigation.AgencyReport?.ReportQuestionaire?.Answer2
                                                         </li>
                                                         <br />
                                                         <li class="small">
                                                             <span class="fa-li">
                                                                 <i class="far fa-comment"></i>
                                                             </span>
-                                                            @Model.Location.ClaimReport?.ReportQuestionaire?.Answer3
+                                                            @Model.ClaimsInvestigation.AgencyReport?.ReportQuestionaire?.Answer3
                                                         </li>
                                                         <br />
                                                         <li class="small">
                                                             <span class="fa-li">
                                                                 <i class="far fa-comment"></i>
                                                             </span>
-                                                            @Model.Location.ClaimReport?.ReportQuestionaire?.Answer4
+                                                            @Model.ClaimsInvestigation.AgencyReport?.ReportQuestionaire?.Answer4
                                                         </li>
                                                         <br />
                                                         <li class="small">
                                                             <span class="fa-li">
                                                                 <i class="far fa-comment"></i>
                                                             </span>
-                                                            @Model.Location.ClaimReport?.AgentRemarks
+                                                            @Model.ClaimsInvestigation.AgencyReport?.AgentRemarks
                                                         </li>
                                                     </ul>
                                                 </p>
@@ -797,26 +797,26 @@
 
                     </div>
                     <div class="col-12">
-                        @if (!string.IsNullOrWhiteSpace(Model.Location.ClaimReport?.SupervisorRemarks))
+                        @if (!string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.AgencyReport?.SupervisorRemarks))
                         {
                             <div class="card bg-light border-success">
 
                                 <div class="card-header">
                                     <h3 class="card-title">
-                                        <i class="fas fa-user-edit"></i> Supervisor : <span class="badge badge-light"> @Model?.Location.ClaimReport?.SupervisorEmail</span>
+                                        <i class="fas fa-user-edit"></i> Supervisor : <span class="badge badge-light"> @Model?.ClaimsInvestigation.AgencyReport?.SupervisorEmail</span>
                                         <span class="hover-text">
                                             <i class="fas fa-info-circle"></i>
                                             <span class="tooltip-text" id="information">
                                                 <span>
-                                                    <i class="fas fa-user-shield"></i><b> @Model?.Location.ClaimReport?.SupervisorEmail</b> remark.
+                                                    <i class="fas fa-user-shield"></i><b> @Model?.ClaimsInvestigation.AgencyReport?.SupervisorEmail</b> remark.
                                                 </span>
 
                                             </span>
                                         </span>
                                     </h3>
                                     <div class="card-tools">
-                                        <span data-toggle="tooltip" title=" Supervisor :  @Model?.Location.ClaimReport?.SupervisorEmail" class="badge badge-light">
-                                             @Model.Location.ClaimReport?.SupervisorRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt")
+                                        <span data-toggle="tooltip" title=" Supervisor :  @Model?.ClaimsInvestigation.AgencyReport?.SupervisorEmail" class="badge badge-light">
+                                             @Model.ClaimsInvestigation.AgencyReport?.SupervisorRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt")
                                         </span>
                                     </div>
 
@@ -834,7 +834,7 @@
                                                     <span class="fa-li">
                                                         <i class="far fa-comment"></i>
                                                     </span>
-                                                    @Model.Location.ClaimReport?.SupervisorRemarks <i class="far fa-comment"></i>
+                                                    @Model.ClaimsInvestigation.AgencyReport?.SupervisorRemarks <i class="far fa-comment"></i>
                                                 </li>
                                             </ul>
                                         </div>
@@ -855,19 +855,19 @@
             <div class="card card-light collapsed-card">
                 <div class="card-header">
                     <h3 class="card-title">
-                        <i class="fas fa-user-check"></i> Assessor: <span class="badge badge-light">@Model.Location.ClaimReport.AssessorEmail</span>
+                        <i class="fas fa-user-check"></i> Assessor: <span class="badge badge-light">@Model.ClaimsInvestigation.AgencyReport.AssessorEmail</span>
                         <span class="hover-text">
                             <i class="fas fa-info-circle"></i>
                             <span class="tooltip-text" id="information">
                                 <span>
-                                    <i class="fas fa-user-check"></i><b> @Model?.Location.ClaimReport?.AssessorEmail</b> remark.
+                                    <i class="fas fa-user-check"></i><b> @Model?.ClaimsInvestigation.AgencyReport?.AssessorEmail</b> remark.
                                 </span>
 
                             </span>
                         </span>
                     </h3>
                     <div class="card-tools">
-                        <span data-toggle="tooltip" title="Assessor: : @Model.Location.ClaimReport.AssessorEmail" class="badge badge-light">
+                        <span data-toggle="tooltip" title="Assessor: : @Model.ClaimsInvestigation.AgencyReport.AssessorEmail" class="badge badge-light">
                             <i class='far fa-hand-point-right'></i>
                         </span>
                         <button type="button" class="btn btn-tool" data-card-widget="collapse">
@@ -890,7 +890,7 @@
                                     <span class="fa-li">
                                         <i class="far fa-comment"></i>
                                     </span>
-                                    @Model.Location.ClaimReport.AssessorRemarks <i class="far fa-comment"></i>
+                                    @Model.ClaimsInvestigation.AgencyReport.AssessorRemarks <i class="far fa-comment"></i>
                                 </li>
                             </ul>
                         </div>

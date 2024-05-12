@@ -44,6 +44,11 @@ namespace risk.control.system.Services
                 .OrderByDescending(c => c.HopCount)?.ToListAsync();
 
             var claimsInvestigation = await _context.ClaimsInvestigation
+              .Include(c => c.AgencyReport)
+              .Include(c => c.PreviousClaimReports)
+              .Include(c => c.AgencyReport.DigitalIdReport)
+              .Include(c => c.AgencyReport.DocumentIdReport)
+              .Include(c => c.AgencyReport.ReportQuestionaire)
               .Include(c => c.PolicyDetail)
               .ThenInclude(c => c.ClientCompany)
               .Include(c => c.PolicyDetail)
@@ -72,15 +77,9 @@ namespace risk.control.system.Services
                 .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == selectedcase);
 
             var location = await _context.BeneficiaryDetail
-                .Include(c => c.ClaimReport)
-                .ThenInclude(c => c.DigitalIdReport)
-                .Include(c => c.ClaimReport)
-                .ThenInclude(c => c.DocumentIdReport)
-                .Include(c => c.ClaimReport)
-                .ThenInclude(c => c.ReportQuestionaire)
                 .FirstOrDefaultAsync(l => l.ClaimsInvestigationId == selectedcase);
 
-            var invoice = _context.VendorInvoice.FirstOrDefault(i => i.ClaimReportId == location.ClaimReport.ClaimReportId);
+            var invoice = _context.VendorInvoice.FirstOrDefault(i => i.AgencyReportId == claimsInvestigation.AgencyReport.AgencyReportId);
             var model = new ClaimTransactionModel
             {
                 ClaimsInvestigation = claimsInvestigation,
@@ -117,6 +116,11 @@ namespace risk.control.system.Services
         public async Task<ClaimsInvestigation> GetAssignDetails(string id)
         {
             var claimsInvestigation = await _context.ClaimsInvestigation
+                .Include(c => c.AgencyReport)
+              .Include(c => c.PreviousClaimReports)
+              .Include(c => c.AgencyReport.DigitalIdReport)
+              .Include(c => c.AgencyReport.DocumentIdReport)
+              .Include(c => c.AgencyReport.ReportQuestionaire)
                 .Include(c => c.PolicyDetail)
                 .ThenInclude(c => c.ClientCompany)
                 .Include(c => c.PolicyDetail)
@@ -161,6 +165,11 @@ namespace risk.control.system.Services
                 .OrderByDescending(c => c.HopCount)?.ToListAsync();
 
             var claimsInvestigation = await _context.ClaimsInvestigation
+                .Include(c => c.AgencyReport)
+              .Include(c => c.PreviousClaimReports)
+              .Include(c => c.AgencyReport.DigitalIdReport)
+              .Include(c => c.AgencyReport.DocumentIdReport)
+              .Include(c => c.AgencyReport.ReportQuestionaire)
                 .Include(c => c.PolicyDetail)
                 .ThenInclude(c => c.ClientCompany)
                 .Include(c => c.PolicyDetail)
@@ -218,13 +227,17 @@ namespace risk.control.system.Services
         public ClaimsInvestigationVendorsModel GetInvestigateReport(string currentUserEmail, string selectedcase)
         {
             var claimsInvestigation = _context.ClaimsInvestigation
+                .Include(c => c.PreviousClaimReports)
+                .Include(c => c.AgencyReport)
+                .Include(c => c.AgencyReport.DigitalIdReport)
+                .Include(c => c.AgencyReport.DocumentIdReport)
+                .Include(c => c.AgencyReport.ReportQuestionaire)
                 .Include(c => c.ClaimMessages)
                 .Include(c => c.PolicyDetail)
                 .ThenInclude(c => c.ClientCompany)
                 .Include(c => c.PolicyDetail)
                 .ThenInclude(c => c.CaseEnabler)
-            .Include(c=> c.Vendor)
-
+                .Include(c=> c.Vendor)
                 .Include(c => c.BeneficiaryDetail)
                 .ThenInclude(c => c.PinCode)
                 .Include(c => c.BeneficiaryDetail)
@@ -251,32 +264,17 @@ namespace risk.control.system.Services
             var claimCase = _context.BeneficiaryDetail
                 .Include(c => c.ClaimsInvestigation)
                 .Include(c => c.PinCode)
-                .Include(c => c.BeneficiaryRelation)
-                .Include(c => c.ClaimReport)
-                .ThenInclude(c => c.DigitalIdReport)
-                .Include(c => c.ClaimReport)
-                .ThenInclude(c => c.DocumentIdReport)
                 .Include(c => c.District)
                 .Include(c => c.State)
                 .Include(c => c.Country)
-                .Include(c => c.ClaimReport)
-                .ThenInclude(c => c.ReportQuestionaire)
-                 .Include(c => c.PreviousClaimReports)
-                 .ThenInclude(c => c.Vendor)
-                  .Include(c => c.PreviousClaimReports)
-                 .ThenInclude(c => c.DigitalIdReport)
-                  .Include(c => c.PreviousClaimReports)
-                 .ThenInclude(c => c.DocumentIdReport)
-                  .Include(c => c.PreviousClaimReports)
-                 .ThenInclude(c => c.ReportQuestionaire)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == selectedcase);
             var companyUser = _context.ClientCompanyApplicationUser.Include(u=>u.ClientCompany).FirstOrDefault(u => u.Email == currentUserEmail);
 
             if (claimsInvestigation.IsReviewCase)
             {
-                claimCase.ClaimReport.AssessorRemarks = null;
+                claimsInvestigation.AgencyReport.AssessorRemarks = null;
             }
-            return (new ClaimsInvestigationVendorsModel { Location = claimCase, ClaimsInvestigation = claimsInvestigation, TrialVersion = companyUser.ClientCompany.LicenseType == Standard.Licensing.LicenseType.Trial });
+            return (new ClaimsInvestigationVendorsModel { AgencyReport = claimsInvestigation.AgencyReport, Location = claimCase, ClaimsInvestigation = claimsInvestigation, TrialVersion = companyUser.ClientCompany.LicenseType == Standard.Licensing.LicenseType.Trial });
         }
 
         public PreviousClaimReport GetPreviousReport(long id)

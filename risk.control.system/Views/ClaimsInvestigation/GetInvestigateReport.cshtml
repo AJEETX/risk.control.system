@@ -7,17 +7,17 @@
 @{
     string digitalIdColor = "grey";
     var borderColor = "";
-    if (Model.Location.ClaimReport.DigitalIdReport?.DigitalIdImageLongLatTime == null)
+    if (Model.ClaimsInvestigation.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime == null)
     {
         digitalIdColor = "grey";
         borderColor = "";
     }
-    else if (Model.Location.ClaimReport.DigitalIdReport?.DigitalIdImageLongLatTime != null && string.IsNullOrWhiteSpace(@Model.Location.ClaimReport?.DigitalIdReport?.DigitalIdImageMatchConfidence))
+    else if (Model.ClaimsInvestigation.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime != null && string.IsNullOrWhiteSpace(@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImageMatchConfidence))
     {
         digitalIdColor = "#dc3545!important";
         borderColor = "border-danger";
     }
-    else if (Model.Location.ClaimReport.DigitalIdReport?.DigitalIdImageLongLatTime != null && !string.IsNullOrWhiteSpace(@Model.Location.ClaimReport?.DigitalIdReport?.DigitalIdImageMatchConfidence))
+    else if (Model.ClaimsInvestigation.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime != null && !string.IsNullOrWhiteSpace(@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImageMatchConfidence))
     {
         borderColor = "border-success";
         digitalIdColor = "green";
@@ -71,7 +71,7 @@
 
             <partial name="_AgencyReport" model="@Model" />
             @{
-                var lastReport = Model.Location?.PreviousClaimReports.FirstOrDefault();
+                var lastReport = Model.ClaimsInvestigation?.PreviousClaimReports.FirstOrDefault();
                 if (lastReport is not null)
                 {
                     <a class="btn btn-default btn-sm" href="@Url.Action("PreviousReports", new { id = lastReport.PreviousClaimReportId })"> <i class="fas fa-newspaper"></i> Previous Report</a>
@@ -119,7 +119,7 @@
                                             <div class="form-check form-switch">
                                                 
                                                 <label class="form-check-label" for="flexRadioDefault2">
-                                                    @if (string.IsNullOrWhiteSpace(@Model.Location.ClaimReport?.DigitalIdReport?.DigitalIdImageMatchConfidence))
+                                                    @if (string.IsNullOrWhiteSpace(@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImageMatchConfidence))
                                                     {
                                                         <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i>
                                                     }
@@ -136,7 +136,7 @@
                                             <div class="form-check form-switch">
                                                
                                                 <label class="form-check-label" for="flexRadioDefault1">
-                                                    @if (@Model.Location.ClaimReport.DocumentIdReport?.DocumentIdImageValid != null && @Model.Location.ClaimReport.DocumentIdReport.DocumentIdImageValid.Value)
+                                                    @if (@Model.ClaimsInvestigation.AgencyReport.DocumentIdReport?.DocumentIdImageValid != null && @Model.ClaimsInvestigation.AgencyReport.DocumentIdReport.DocumentIdImageValid.Value)
                                                     {
                                                         <i style='color:green;' class='fas fa-check-circle'></i>
                                                     }
@@ -191,9 +191,9 @@
                                                     </label>
                                                 </div>
                                                 </div>
-                                                @if (string.IsNullOrWhiteSpace(@Model.Location.ClaimReport?.DigitalIdReport?.DigitalIdImageMatchConfidence) ||
-                                               @Model.Location.ClaimReport.DocumentIdReport?.DocumentIdImageValid == null || 
-                                               !@Model.Location.ClaimReport.DocumentIdReport.DocumentIdImageValid.Value)
+                                                @if (string.IsNullOrWhiteSpace(@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImageMatchConfidence) ||
+                                               @Model.ClaimsInvestigation.AgencyReport.DocumentIdReport?.DocumentIdImageValid == null || 
+                                               !@Model.ClaimsInvestigation.AgencyReport.DocumentIdReport.DocumentIdImageValid.Value)
                                                 {
                                                 <div class="form-group">
                                                     <div class="form-check form-switch">
@@ -257,9 +257,9 @@
                                                     </div>
                                                 </div>
                                                 }
-                                                @if (string.IsNullOrWhiteSpace(@Model.Location.ClaimReport?.DigitalIdReport?.DigitalIdImageMatchConfidence) ||
-                                               @Model.Location.ClaimReport.DocumentIdReport?.DocumentIdImageValid == null ||
-                                               !@Model.Location.ClaimReport.DocumentIdReport.DocumentIdImageValid.Value)
+                                                @if (string.IsNullOrWhiteSpace(@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImageMatchConfidence) ||
+                                               @Model.ClaimsInvestigation.AgencyReport.DocumentIdReport?.DocumentIdImageValid == null ||
+                                               !@Model.ClaimsInvestigation.AgencyReport.DocumentIdReport.DocumentIdImageValid.Value)
                                                 {
                                                 <div class="form-group">
                                                     <div class="form-check form-switch">
@@ -314,11 +314,11 @@
                                             <span class="input-group-label"> Remarks :</span>
                                             <div class="input-group">
                                                 <div class="input-group-prepend">
-                                                    <span class="input-group-text" asp-for="Location.ClaimReport.AgentRemarks"><i class="far fa-comment"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
+                                                    <span class="input-group-text" asp-for="ClaimsInvestigation.AgencyReport.AgentRemarks"><i class="far fa-comment"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
                                                 </div>
                                                 <input required maxlength="100" name="assessorRemarks" id="assessorRemarks" type="text" class="form-control remarks" autocomplete="off" required placeholder="enter remarks to submit" />
 
-                                                <span asp-validation-for="Location.ClaimReport.SupervisorRemarks" class="text-danger"></span>
+                                                <span asp-validation-for="ClaimsInvestigation.AgencyReport.SupervisorRemarks" class="text-danger"></span>
                                             </div>
                                         </div>
                                     </div>

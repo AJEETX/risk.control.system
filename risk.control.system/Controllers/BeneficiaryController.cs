@@ -127,7 +127,6 @@ namespace risk.control.system.Controllers
                 var customerLatLong = caseLocation.PinCode.Latitude + "," + caseLocation.PinCode.Longitude;
                 var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=8&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key={Applicationsettings.GMAPData}";
                 caseLocation.BeneficiaryLocationMap = url;
-                caseLocation.ClaimReport.ClaimsInvestigationId = claimId;
                 _context.Add(caseLocation);
                 await _context.SaveChangesAsync();
 

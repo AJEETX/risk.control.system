@@ -635,7 +635,6 @@ namespace risk.control.system.Controllers.Api.Claims
                .ThenInclude(c => c.ClientCompany)
                .Include(c => c.BeneficiaryDetail)
                .ThenInclude(b=>b.BeneficiaryRelation)
-               .Include(c => c.BeneficiaryDetail.ClaimReport)
                .Include(c => c.PolicyDetail)
                .ThenInclude(c => c.CaseEnabler)
                .Include(c => c.PolicyDetail)
@@ -661,10 +660,6 @@ namespace risk.control.system.Controllers.Api.Claims
                .Include(c => c.CustomerDetail)
                .ThenInclude(c => c.State)
                .Include(c => c.Vendor)
-               .Include(c => c.BeneficiaryDetail)
-               .ThenInclude(l => l.PreviousClaimReports)
-               .Include(c=>c.BeneficiaryDetail)
-               .ThenInclude(l=>l.ClaimReport)
                 .Where(c => !c.Deleted);
             return applicationDbContext.OrderByDescending(o => o.Created);
         }

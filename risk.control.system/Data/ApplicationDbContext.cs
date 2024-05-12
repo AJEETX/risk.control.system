@@ -61,7 +61,7 @@ namespace risk.control.system.Data
         public virtual DbSet<VendorInvestigationServiceType> VendorInvestigationServiceType { get; set; } = default!;
         public virtual DbSet<VendorApplicationUser> VendorApplicationUser { get; set; } = default!;
         public virtual DbSet<Mailbox> Mailbox { get; set; } = default!;
-        public virtual DbSet<ClaimReport> ClaimReport { get; set; } = default!;
+        public virtual DbSet<AgencyReport> ClaimReport { get; set; } = default!;
         public virtual DbSet<PreviousClaimReport> PreviousClaimReport { get; set; } = default!;
 
         public virtual DbSet<FileOnDatabaseModel> FilesOnDatabase { get; set; }

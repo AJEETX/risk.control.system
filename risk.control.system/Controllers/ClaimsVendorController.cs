@@ -269,6 +269,10 @@ namespace risk.control.system.Controllers
                 .OrderByDescending(c => c.HopCount)?.ToListAsync();
 
                 var claimsInvestigation = await _context.ClaimsInvestigation
+                  .Include(c => c.AgencyReport)
+                  .Include(c => c.AgencyReport.DocumentIdReport)
+                  .Include(c => c.AgencyReport.DigitalIdReport)
+                  .Include(c => c.AgencyReport.ReportQuestionaire)
                   .Include(c => c.ClaimMessages)
                   .Include(c => c.PolicyDetail)
                   .ThenInclude(c => c.ClientCompany)
@@ -305,12 +309,8 @@ namespace risk.control.system.Controllers
                     .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == id);
 
                 var location = await _context.BeneficiaryDetail
-                    .Include(c => c.ClaimReport)
-                    .ThenInclude(c => c.DigitalIdReport)
-                    .Include(c => c.ClaimReport)
-                    .ThenInclude(c => c.DocumentIdReport)
-                    .Include(c => c.ClaimReport)
-                    .ThenInclude(c => c.ReportQuestionaire)
+                    .Include(c => c.BeneficiaryRelation)
+                    
                     .FirstOrDefaultAsync(l => l.ClaimsInvestigationId == id);
 
                 if (claimsInvestigation == null)
@@ -318,7 +318,7 @@ namespace risk.control.system.Controllers
                     notifyService.Error("NOT FOUND !!!..");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var invoice = _context.VendorInvoice.FirstOrDefault(i => i.ClaimReportId == location.ClaimReport.ClaimReportId);
+                var invoice = _context.VendorInvoice.FirstOrDefault(i => i.AgencyReportId == claimsInvestigation.AgencyReport.AgencyReportId);
 
                 var model = new ClaimTransactionModel
                 {
@@ -363,6 +363,10 @@ namespace risk.control.system.Controllers
                 .OrderByDescending(c => c.HopCount)?.ToListAsync();
 
                 var claimsInvestigation = await _context.ClaimsInvestigation
+                  .Include(c => c.AgencyReport)
+                  .Include(c => c.AgencyReport.DocumentIdReport)
+                  .Include(c => c.AgencyReport.DigitalIdReport)
+                  .Include(c => c.AgencyReport.ReportQuestionaire)
                   .Include(c => c.ClaimMessages)
                   .Include(c => c.PolicyDetail)
                   .ThenInclude(c => c.ClientCompany)
@@ -371,7 +375,6 @@ namespace risk.control.system.Controllers
                   .Include(c => c.PolicyDetail)
                   .ThenInclude(c => c.CostCentre)
                   .Include(c=>c.Vendor)
-
                   .Include(c => c.BeneficiaryDetail)
                   .ThenInclude(c => c.PinCode)
                   .Include(c => c.BeneficiaryDetail)
@@ -399,12 +402,7 @@ namespace risk.control.system.Controllers
                     .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == id);
 
                 var location = await _context.BeneficiaryDetail
-                    .Include(c => c.ClaimReport)
-                    .ThenInclude(c => c.DigitalIdReport)
-                    .Include(c => c.ClaimReport)
-                    .ThenInclude(c => c.DocumentIdReport)
-                    .Include(c => c.ClaimReport)
-                    .ThenInclude(c => c.ReportQuestionaire)
+                    
                     .FirstOrDefaultAsync(l => l.ClaimsInvestigationId == id);
 
                 if (claimsInvestigation == null)
@@ -412,7 +410,7 @@ namespace risk.control.system.Controllers
                     notifyService.Error("NOT FOUND !!!..");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var invoice = _context.VendorInvoice.FirstOrDefault(i => i.ClaimReportId == location.ClaimReport.ClaimReportId);
+                var invoice = _context.VendorInvoice.FirstOrDefault(i => i.AgencyReportId == claimsInvestigation.AgencyReport.AgencyReportId);
 
                 var model = new ClaimTransactionModel
                 {
@@ -556,33 +554,6 @@ namespace risk.control.system.Controllers
             
         }
 
-        [Breadcrumb(" Review Report")]
-        public async Task<IActionResult> GetInvestigateReportReview(string selectedcase)
-        {
-            try
-            {
-                if (string.IsNullOrWhiteSpace(selectedcase))
-                {
-                    notifyService.Error("No case selected!!!. Please select case to be review.");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-
-                if (string.IsNullOrWhiteSpace(currentUserEmail))
-                {
-                    notifyService.Error("OOPs !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-                var model = await vendorService.GetInvestigateReportReview(currentUserEmail, selectedcase);
-                return View(model);
-            }
-            catch (Exception)
-            {
-                notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
-            }
-        }
 
         [Breadcrumb("Submit", FromAction= "ClaimReport")]
         [Authorize(Roles = "AGENCY_ADMIN,SUPERVISOR")]

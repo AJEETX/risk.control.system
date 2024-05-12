@@ -19,12 +19,12 @@
             </h3>
             <div class="card-tools">
                 <span data-toggle="tooltip" title="Claim #" class="badge badge-light"> <i class="nav-icon fas fa-clock"></i>
-                    @Model.Location.ClaimReport?.AgentRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt") </span>
+                    @Model.AgencyReport?.AgentRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt") </span>
             </div>
         </div>
 
         <div class="card-footer text-muted border-bottom-0">
-            <i class="fas fa-user-shield"></i>  Agent :<span class="badge badge-light">  @Model.Location.ClaimReport.AgentEmail </span>
+            <i class="fas fa-user-shield"></i>  Agent :<span class="badge badge-light">  @Model.AgencyReport.AgentEmail </span>
         </div>
         <div class="progress">
             <i class="far fa-bookmark bookmark-green"></i>
@@ -91,7 +91,7 @@
                                 <span class="fa-li">
                                     <i class="far fa-comment"></i>
                                 </span>
-                                @Model.Location.ClaimReport?.ReportQuestionaire?.Answer1
+                                @Model.AgencyReport?.ReportQuestionaire?.Answer1
                             </li>
                             <br />
                             <li class="small">
@@ -99,28 +99,28 @@
                                 <span class="fa-li">
                                     <i class="far fa-comment"></i>
                                 </span>
-                                @Model.Location.ClaimReport?.ReportQuestionaire?.Answer2
+                                @Model.AgencyReport?.ReportQuestionaire?.Answer2
                             </li>
                             <br />
                             <li class="small">
                                 <span class="fa-li">
                                     <i class="far fa-comment"></i>
                                 </span>
-                                @Model.Location.ClaimReport?.ReportQuestionaire?.Answer3
+                                @Model.AgencyReport?.ReportQuestionaire?.Answer3
                             </li>
                             <br />
                             <li class="small">
                                 <span class="fa-li">
                                     <i class="far fa-comment"></i>
                                 </span>
-                                @Model.Location.ClaimReport?.ReportQuestionaire?.Answer4
+                                @Model.AgencyReport?.ReportQuestionaire?.Answer4
                             </li>
                             <br />
                             <li class="small">
                                 <span class="fa-li">
                                     <i class="far fa-comment"></i>
                                 </span>
-                                @Model.Location.ClaimReport?.AgentRemarks
+                                @Model.AgencyReport?.AgentRemarks
                             </li>
                         </ul>
                     </p>

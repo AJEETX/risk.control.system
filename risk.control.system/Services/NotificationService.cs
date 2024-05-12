@@ -305,21 +305,9 @@ namespace risk.control.system.Services
                 .Include(c => c.ClaimsInvestigation)
                 .Include(c => c.PinCode)
                 .Include(c => c.BeneficiaryRelation)
-                .Include(c => c.ClaimReport)
-                .ThenInclude(c => c.DigitalIdReport)
-                .Include(c => c.ClaimReport)
-                .ThenInclude(c => c.ReportQuestionaire)
-                .Include(c => c.ClaimReport)
-                .ThenInclude(c => c.DocumentIdReport)
                 .Include(c => c.District)
                 .Include(c => c.Country)
                 .Include(c => c.State)
-                .Include(c => c.ClaimReport)
-                .ThenInclude(c => c.ServiceReportTemplate.ReportTemplate.DigitalIdReport)
-                .Include(c => c.ClaimReport)
-                .ThenInclude(c => c.ServiceReportTemplate.ReportTemplate.DocumentIdReport)
-                .Include(c => c.ClaimReport)
-                    .ThenInclude(c => c.ServiceReportTemplate.ReportTemplate.ReportQuestionaire)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == id);
 
             string mobile = string.Empty;

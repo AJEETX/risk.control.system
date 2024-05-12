@@ -55,8 +55,8 @@ namespace risk.control.system.Models
         [Display(Name = "Grand Total")]
         public decimal GrandTotal { get; set; }
 
-        public long? ClaimReportId { get; set; }
-        public virtual ClaimReport? Report { get; set; }
+        public long? AgencyReportId { get; set; }
+        public virtual AgencyReport? AgencyReport { get; set; }
         public virtual InvestigationServiceType? InvestigationServiceType { get; set; }
         public string? ClaimId { get; set; }
     }

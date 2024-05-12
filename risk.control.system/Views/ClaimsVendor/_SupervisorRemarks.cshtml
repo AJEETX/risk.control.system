@@ -25,11 +25,11 @@
                             <span class="input-group-label"> Remarks :</span>
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
-                                    <span class="input-group-text" asp-for="Location.ClaimReport.AgentRemarks"><i class="fas fa-comment"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
+                                    <span class="input-group-text" asp-for="AgencyReport.AgentRemarks"><i class="fas fa-comment"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <input required maxlength="100" name="supervisorRemarks" id="supervisorRemarks" asp-for="Location.ClaimReport.SupervisorRemarks" type="text" class="form-control remarks" autocomplete="off" />
+                                <input required maxlength="100" name="supervisorRemarks" id="supervisorRemarks" asp-for="AgencyReport.SupervisorRemarks" type="text" class="form-control remarks" autocomplete="off" />
 
-                                <span asp-validation-for="Location.ClaimReport.SupervisorRemarks" class="text-danger"></span>
+                                <span asp-validation-for="AgencyReport.SupervisorRemarks" class="text-danger"></span>
                             </div>
                         </div>
                     </div>

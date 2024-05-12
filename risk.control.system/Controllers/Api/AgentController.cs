@@ -259,44 +259,40 @@ namespace risk.control.system.Controllers.Api
         [HttpGet("GetImage")]
         public IActionResult GetImage(string claimId, string type)
         {
-            var claim = _context.ClaimsInvestigation
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.LineOfBusiness)
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.CostCentre)
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.CaseEnabler)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.District)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.State)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.Country)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.PinCode)
-                .FirstOrDefault(c => c.ClaimsInvestigationId == claimId);
+
             try
             {
-                var caseLocation = _context.BeneficiaryDetail
-                    .Include(l => l.ClaimsInvestigation)
-                    .Include(l => l.ClaimReport)
-                    .ThenInclude(l => l.DigitalIdReport)
-                    .Include(l => l.ClaimReport)
-                    .ThenInclude(l => l.DocumentIdReport)
-                    .FirstOrDefault(c => c.ClaimsInvestigation.ClaimsInvestigationId == claimId);
-
-                if (caseLocation != null)
+                var claim = _context.ClaimsInvestigation
+                 .Include(c => c.AgencyReport)
+                 .Include(c => c.AgencyReport.DigitalIdReport)
+                 .Include(c => c.AgencyReport.DocumentIdReport)
+                 .Include(c => c.PolicyDetail)
+                 .ThenInclude(c => c.LineOfBusiness)
+                 .Include(c => c.PolicyDetail)
+                 .ThenInclude(c => c.CostCentre)
+                 .Include(c => c.PolicyDetail)
+                 .ThenInclude(c => c.CaseEnabler)
+                 .Include(c => c.CustomerDetail)
+                 .ThenInclude(c => c.District)
+                 .Include(c => c.CustomerDetail)
+                 .ThenInclude(c => c.State)
+                 .Include(c => c.CustomerDetail)
+                 .ThenInclude(c => c.Country)
+                 .Include(c => c.CustomerDetail)
+                 .ThenInclude(c => c.PinCode)
+                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimId);
+                if (claim != null)
                 {
                     if (type.ToLower() == "face")
                     {
-                        var image = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(caseLocation.ClaimReport?.DigitalIdReport?.DigitalIdImage));
-                        return Ok(new { Image = image, Valid = caseLocation.ClaimReport?.DigitalIdReport?.DigitalIdImageMatchConfidence ?? "00.00" });
+                        var image = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claim.AgencyReport?.DigitalIdReport?.DigitalIdImage));
+                        return Ok(new { Image = image, Valid = claim.AgencyReport?.DigitalIdReport?.DigitalIdImageMatchConfidence ?? "00.00" });
                     }
 
                     if (type.ToLower() == "ocr")
                     {
-                        var image = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(caseLocation.ClaimReport?.DocumentIdReport?.DocumentIdImage));
-                        return Ok(new { Image = image, Valid = caseLocation.ClaimReport.DocumentIdReport?.DocumentIdImageValid.ToString() });
+                        var image = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claim.AgencyReport?.DocumentIdReport?.DocumentIdImage));
+                        return Ok(new { Image = image, Valid = claim.AgencyReport.DocumentIdReport?.DocumentIdImageValid.ToString() });
                     }
                 }
             }
@@ -319,8 +315,8 @@ namespace risk.control.system.Controllers.Api
                 .ThenInclude(c => c.ClientCompany)
                 .Include(c => c.PolicyDetail)
                 .ThenInclude(c => c.CaseEnabler)
-                .Include(c =>c.BeneficiaryDetail)
-                .ThenInclude(c =>c.Country)
+                .Include(c => c.BeneficiaryDetail)
+                .ThenInclude(c => c.Country)
                 .Include(c => c.BeneficiaryDetail)
                 .ThenInclude(c => c.BeneficiaryRelation)
                 .Include(c => c.BeneficiaryDetail)
@@ -363,7 +359,7 @@ namespace risk.control.system.Controllers.Api
 
                     foreach (var item in applicationDbContext)
                     {
-                        if(item.VendorId == vendorUser.VendorId
+                        if (item.VendorId == vendorUser.VendorId
                             && item.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId)
                         {
                             claimsAssigned.Add(item);
@@ -402,7 +398,7 @@ namespace risk.control.system.Controllers.Api
                             c.BeneficiaryDetail.BeneficiaryDetailId,
                             Photo = c.BeneficiaryDetail?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(c.BeneficiaryDetail.ProfilePicture)) :
                             string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noCustomerimage)),
-                             c.BeneficiaryDetail.Country.Name,
+                            c.BeneficiaryDetail.Country.Name,
                             c.BeneficiaryDetail.BeneficiaryName,
                             c.BeneficiaryDetail.Addressline,
                             c.BeneficiaryDetail.PinCode.Code,
@@ -438,14 +434,12 @@ namespace risk.control.system.Controllers.Api
                     .ThenInclude(c => c.BeneficiaryRelation)
                     .Include(c => c.BeneficiaryDetail)
                     .ThenInclude(c => c.PinCode)
-                    
                     .Include(c => c.BeneficiaryDetail)
                     .ThenInclude(c => c.District)
                     .Include(c => c.BeneficiaryDetail)
                     .ThenInclude(c => c.State)
                     .Include(c => c.BeneficiaryDetail)
                     .ThenInclude(c => c.Country)
-                    
                     .Include(c => c.PolicyDetail)
                     .ThenInclude(c => c.CostCentre)
                     .Include(c => c.CustomerDetail)
@@ -524,6 +518,7 @@ namespace risk.control.system.Controllers.Api
             {
 
                 var claim = _context.ClaimsInvestigation
+                    .Include(c => c.AgencyReport)
                     .Include(c => c.PolicyDetail)
                     .ThenInclude(c => c.LineOfBusiness)
                     .Include(c => c.PolicyDetail)
@@ -545,7 +540,6 @@ namespace risk.control.system.Controllers.Api
                 var claimCase = _context.BeneficiaryDetail
                     .Include(c => c.BeneficiaryRelation)
                     .Include(c => c.PinCode)
-                    .Include(c => c.ClaimReport)
                     .Include(c => c.District)
                     .Include(c => c.State)
                     .Include(c => c.Country)
@@ -607,17 +601,17 @@ namespace risk.control.system.Controllers.Api
                         },
                         InvestigationData = new
                         {
-                            LocationImage = claimCase?.ClaimReport?.DigitalIdReport?.DigitalIdImage != null ?
-                            string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claimCase?.ClaimReport?.DigitalIdReport?.DigitalIdImage)) :
+                            LocationImage = claim?.AgencyReport?.DigitalIdReport?.DigitalIdImage != null ?
+                            string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claim?.AgencyReport?.DigitalIdReport?.DigitalIdImage)) :
                             string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noDataimage)),
-                            OcrImage = claimCase?.ClaimReport?.DocumentIdReport?.DocumentIdImage != null ?
-                            string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claimCase?.ClaimReport?.DocumentIdReport?.DocumentIdImage)) :
+                            OcrImage = claim?.AgencyReport?.DocumentIdReport?.DocumentIdImage != null ?
+                            string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claim?.AgencyReport?.DocumentIdReport?.DocumentIdImage)) :
                             string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noDataimage)),
-                            OcrData = claimCase?.ClaimReport?.DocumentIdReport?.DocumentIdImageData,
-                            LocationLongLat = claimCase?.ClaimReport?.DigitalIdReport?.DigitalIdImageLongLat,
-                            OcrLongLat = claimCase?.ClaimReport?.DocumentIdReport?.DocumentIdImageLongLat,
+                            OcrData = claim?.AgencyReport?.DocumentIdReport?.DocumentIdImageData,
+                            LocationLongLat = claim?.AgencyReport?.DigitalIdReport?.DigitalIdImageLongLat,
+                            OcrLongLat = claim?.AgencyReport?.DocumentIdReport?.DocumentIdImageLongLat,
                         },
-                        Remarks = claimCase?.ClaimReport?.AgentRemarks
+                        Remarks = claim?.AgencyReport?.AgentRemarks
                     });
             }
             catch (Exception)

@@ -22,13 +22,17 @@ namespace risk.control.system.Controllers.Api.Claims
     public class ClaimsInvestigationController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly IClaimsService claimsService;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly IHttpClientService httpClientService;
         private static HttpClient httpClient = new HttpClient();
 
-        public ClaimsInvestigationController(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, IHttpClientService httpClientService)
+        public ClaimsInvestigationController(ApplicationDbContext context, 
+            IClaimsService claimsService,
+            IWebHostEnvironment webHostEnvironment, IHttpClientService httpClientService)
         {
             _context = context;
+            this.claimsService = claimsService;
             this.webHostEnvironment = webHostEnvironment;
             this.httpClientService = httpClientService;
         }
@@ -105,7 +109,6 @@ namespace risk.control.system.Controllers.Api.Claims
                 .Include(c => c.State)
                 .Include(c => c.District)
                 .Include(c => c.PinCode)
-                .Include(c => c.ClaimReport)
                 .FirstOrDefaultAsync(p => p.BeneficiaryDetailId == id && p.ClaimsInvestigationId == claimId);
 
             var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "user.png");
@@ -129,11 +132,13 @@ namespace risk.control.system.Controllers.Api.Claims
         [HttpGet("GetInvestigationData")]
         public async Task<IActionResult> GetInvestigationData(long id, string claimId)
         {
+            var claim = claimsService.GetClaims()
+                .Include(c=>c.AgencyReport)
+                .Include(c=>c.AgencyReport.DocumentIdReport)
+                .Include(c=>c.AgencyReport.DigitalIdReport)
+                .FirstOrDefault(c=> c.ClaimsInvestigationId == claimId);
+
             var beneficiary = await _context.BeneficiaryDetail
-                .Include(c => c.ClaimReport)
-                .ThenInclude(c => c.DigitalIdReport)
-                .Include(c => c.ClaimReport)
-                .ThenInclude(c => c.DocumentIdReport)
                 .FirstOrDefaultAsync(p => p.BeneficiaryDetailId == id && p.ClaimsInvestigationId == claimId);
 
             var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-photo.jpg");
@@ -144,11 +149,11 @@ namespace risk.control.system.Controllers.Api.Claims
             string imageAddress = string.Empty;
             string faceLat = string.Empty, faceLng = string.Empty;
             string ocrLatitude = string.Empty, ocrLongitude = string.Empty;
-            if (!string.IsNullOrWhiteSpace(beneficiary.ClaimReport?.DigitalIdReport?.DigitalIdImageLongLat))
+            if (!string.IsNullOrWhiteSpace(claim.AgencyReport?.DigitalIdReport?.DigitalIdImageLongLat))
             {
-                var longLat = beneficiary.ClaimReport.DigitalIdReport.DigitalIdImageLongLat.IndexOf("/");
-                faceLat = beneficiary.ClaimReport.DigitalIdReport.DigitalIdImageLongLat.Substring(0, longLat)?.Trim();
-                faceLng = beneficiary.ClaimReport.DigitalIdReport.DigitalIdImageLongLat.Substring(longLat + 1)?.Trim();
+                var longLat = claim.AgencyReport.DigitalIdReport.DigitalIdImageLongLat.IndexOf("/");
+                faceLat = claim.AgencyReport.DigitalIdReport.DigitalIdImageLongLat.Substring(0, longLat)?.Trim();
+                faceLng = claim.AgencyReport.DigitalIdReport.DigitalIdImageLongLat.Substring(longLat + 1)?.Trim();
                 var longLatString = faceLat + "," + faceLng;
                 RootObject rootObject = await httpClientService.GetAddress((faceLat), (faceLng));
                 imageAddress = rootObject.display_name;
@@ -157,11 +162,11 @@ namespace risk.control.system.Controllers.Api.Claims
 
             string ocrUrl = $"https://maps.googleapis.com/maps/api/staticmap?center=32.661839,-97.263680&zoom=14&size=150x200&maptype=roadmap&markers=color:red%7Clabel:S%7C32.661839,-97.263680&key={Applicationsettings.GMAPData}";
             string ocrAddress = string.Empty;
-            if (!string.IsNullOrWhiteSpace(beneficiary.ClaimReport?.DocumentIdReport?.DocumentIdImageLongLat))
+            if (!string.IsNullOrWhiteSpace(claim.AgencyReport?.DocumentIdReport?.DocumentIdImageLongLat))
             {
-                var ocrlongLat = beneficiary.ClaimReport.DocumentIdReport.DocumentIdImageLongLat.IndexOf("/");
-                ocrLatitude = beneficiary.ClaimReport.DocumentIdReport.DocumentIdImageLongLat.Substring(0, ocrlongLat)?.Trim();
-                ocrLongitude = beneficiary.ClaimReport.DocumentIdReport.DocumentIdImageLongLat.Substring(ocrlongLat + 1)?.Trim();
+                var ocrlongLat = claim.AgencyReport.DocumentIdReport.DocumentIdImageLongLat.IndexOf("/");
+                ocrLatitude = claim.AgencyReport.DocumentIdReport.DocumentIdImageLongLat.Substring(0, ocrlongLat)?.Trim();
+                ocrLongitude = claim.AgencyReport.DocumentIdReport.DocumentIdImageLongLat.Substring(ocrlongLat + 1)?.Trim();
                 var ocrLongLatString = ocrLatitude + "," + ocrLongitude;
                 RootObject rootObject = await httpClientService.GetAddress((ocrLatitude), (ocrLongitude));
                 ocrAddress = rootObject.display_name;
@@ -171,15 +176,15 @@ namespace risk.control.system.Controllers.Api.Claims
             var data = new
             {
                 Title = "Investigation Data",
-                QrData = beneficiary.ClaimReport?.DocumentIdReport?.DocumentIdImageData,
-                LocationData = beneficiary.ClaimReport?.DigitalIdReport?.DigitalIdImageData ?? "Location Data",
+                QrData = claim.AgencyReport?.DocumentIdReport?.DocumentIdImageData,
+                LocationData = claim.AgencyReport?.DigitalIdReport?.DigitalIdImageData ?? "Location Data",
                 LatLong = mapUrl,
                 ImageAddress = imageAddress,
-                Location = beneficiary.ClaimReport?.DigitalIdReport?.DigitalIdImage != null ?
-                string.Format("data:image/*;base64,{0}", Convert.ToBase64String(beneficiary.ClaimReport?.DigitalIdReport?.DigitalIdImage)) :
+                Location = claim.AgencyReport?.DigitalIdReport?.DigitalIdImage != null ?
+                string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claim.AgencyReport?.DigitalIdReport?.DigitalIdImage)) :
                 string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noDataimage)),
-                OcrData = beneficiary.ClaimReport?.DocumentIdReport?.DocumentIdImage != null ?
-                string.Format("data:image/*;base64,{0}", Convert.ToBase64String(beneficiary.ClaimReport?.DocumentIdReport?.DocumentIdImage)) :
+                OcrData = claim.AgencyReport?.DocumentIdReport?.DocumentIdImage != null ?
+                string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claim.AgencyReport?.DocumentIdReport?.DocumentIdImage)) :
                 string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noDataimage)),
                 OcrLatLong = ocrUrl,
                 OcrAddress = ocrAddress,
@@ -244,7 +249,6 @@ namespace risk.control.system.Controllers.Api.Claims
                 .Include(c => c.State)
                 .Include(c => c.District)
                 .Include(c => c.PinCode)
-            .Include(c => c.ClaimReport)
                 .FirstOrDefaultAsync(p => p.BeneficiaryDetailId == id && p.ClaimsInvestigationId == claimId);
 
             var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-image.png");
@@ -275,43 +279,10 @@ namespace risk.control.system.Controllers.Api.Claims
         [HttpGet("GetFaceDetail")]
         public IActionResult GetFaceDetail(string claimid)
         {
-            var claim = _context.ClaimsInvestigation
-                .Include(c=>c.BeneficiaryDetail)
-               .Include(c=>c.BeneficiaryDetail.ClaimReport.DigitalIdReport)
-               .Include(b=>b.BeneficiaryDetail.BeneficiaryRelation)
-                .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.ClientCompany)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.CaseEnabler)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.CostCentre)
-              
-               .Include(c => c.BeneficiaryDetail)
-               .ThenInclude(c => c.PinCode)
-               .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.District)
-                .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.State)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.Country)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.District)
-               .Include(c => c.InvestigationCaseStatus)
-               .Include(c => c.InvestigationCaseSubStatus)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.InvestigationServiceType)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.LineOfBusiness)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.PinCode)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.State)
-               .Include(c => c.BeneficiaryDetail)
-               .ThenInclude(l => l.ClaimReport)
-               .Include(c => c.BeneficiaryDetail)
-               .ThenInclude(l => l.ClaimReport.DigitalIdReport)
-               .Include(c => c.BeneficiaryDetail)
-               .ThenInclude(l => l.ClaimReport.DocumentIdReport)
+            var claim = claimsService.GetClaims()
+                .Include(c=>c.AgencyReport)
+                .Include(c=>c.AgencyReport.DigitalIdReport)
+                .Include(c=>c.AgencyReport.DocumentIdReport)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimid);
 
             if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
@@ -319,11 +290,11 @@ namespace risk.control.system.Controllers.Api.Claims
                 var center = new { Lat = decimal.Parse(claim.CustomerDetail.PinCode.Latitude), Lng = decimal.Parse(claim.CustomerDetail.PinCode.Longitude) };
                 var dakota = new { Lat = decimal.Parse(claim.CustomerDetail.PinCode.Latitude), Lng = decimal.Parse(claim.CustomerDetail.PinCode.Longitude) };
 
-                if (claim.BeneficiaryDetail.ClaimReport is not null && claim.BeneficiaryDetail.ClaimReport?.DigitalIdReport?.DigitalIdImageLongLat is not null)
+                if (claim.AgencyReport is not null && claim.AgencyReport?.DigitalIdReport?.DigitalIdImageLongLat is not null)
                 {
-                    var longLat = claim.BeneficiaryDetail.ClaimReport.DigitalIdReport.DigitalIdImageLongLat.IndexOf("/");
-                    var latitude = claim.BeneficiaryDetail?.ClaimReport?.DigitalIdReport?.DigitalIdImageLongLat.Substring(0, longLat)?.Trim();
-                    var longitude = claim.BeneficiaryDetail?.ClaimReport?.DigitalIdReport?.DigitalIdImageLongLat.Substring(longLat + 1)?.Trim();
+                    var longLat = claim.AgencyReport.DigitalIdReport.DigitalIdImageLongLat.IndexOf("/");
+                    var latitude = claim.AgencyReport?.DigitalIdReport?.DigitalIdImageLongLat.Substring(0, longLat)?.Trim();
+                    var longitude = claim.AgencyReport?.DigitalIdReport?.DigitalIdImageLongLat.Substring(longLat + 1)?.Trim();
 
                     var frick = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) };
                     return Ok(new { center, dakota, frick });
@@ -334,11 +305,11 @@ namespace risk.control.system.Controllers.Api.Claims
                 var center = new { Lat = decimal.Parse(claim.BeneficiaryDetail.PinCode.Latitude), Lng = decimal.Parse(claim.BeneficiaryDetail.PinCode.Longitude) };
                 var dakota = new { Lat = decimal.Parse(claim.BeneficiaryDetail.PinCode.Latitude), Lng = decimal.Parse(claim.BeneficiaryDetail.PinCode.Longitude) };
 
-                if (claim.BeneficiaryDetail.ClaimReport is not null && claim.BeneficiaryDetail.ClaimReport?.DigitalIdReport?.DigitalIdImageLongLat is not null)
+                if (claim.AgencyReport is not null && claim.AgencyReport?.DigitalIdReport?.DigitalIdImageLongLat is not null)
                 {
-                    var longLat = claim.BeneficiaryDetail.ClaimReport.DigitalIdReport.DigitalIdImageLongLat.IndexOf("/");
-                    var latitude = claim.BeneficiaryDetail?.ClaimReport?.DigitalIdReport?.DigitalIdImageLongLat.Substring(0, longLat)?.Trim();
-                    var longitude = claim.BeneficiaryDetail?.ClaimReport?.DigitalIdReport?.DigitalIdImageLongLat.Substring(longLat + 1)?.Trim();
+                    var longLat = claim.AgencyReport.DigitalIdReport.DigitalIdImageLongLat.IndexOf("/");
+                    var latitude = claim.AgencyReport?.DigitalIdReport?.DigitalIdImageLongLat.Substring(0, longLat)?.Trim();
+                    var longitude = claim.AgencyReport?.DigitalIdReport?.DigitalIdImageLongLat.Substring(longLat + 1)?.Trim();
 
                     var frick = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) };
                     return Ok(new { center, dakota, frick });
@@ -350,43 +321,10 @@ namespace risk.control.system.Controllers.Api.Claims
         [HttpGet("GetOcrDetail")]
         public IActionResult GetOcrDetail(string claimid)
         {
-            var claim = _context.ClaimsInvestigation
-                .Include(c => c.BeneficiaryDetail)
-               .ThenInclude(b => b.BeneficiaryRelation)
-               .Include(b=>b.BeneficiaryDetail.ClaimReport.DocumentIdReport)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.ClientCompany)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.CaseEnabler)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.CostCentre)
-               
-               .Include(c => c.BeneficiaryDetail)
-               .ThenInclude(c => c.PinCode)
-               .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.District)
-                .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.State)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.Country)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.District)
-               .Include(c => c.InvestigationCaseStatus)
-               .Include(c => c.InvestigationCaseSubStatus)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.InvestigationServiceType)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.LineOfBusiness)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.PinCode)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.State)
-               .Include(c => c.BeneficiaryDetail)
-               .ThenInclude(l => l.ClaimReport)
-               .Include(c => c.BeneficiaryDetail)
-               .ThenInclude(l => l.ClaimReport.DigitalIdReport)
-               .Include(c => c.BeneficiaryDetail)
-               .ThenInclude(l => l.ClaimReport.DocumentIdReport)
+            var claim = claimsService.GetClaims()
+                .Include(c => c.AgencyReport)
+                .Include(c => c.AgencyReport.DigitalIdReport)
+                .Include(c => c.AgencyReport.DocumentIdReport)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimid);
 
             if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
@@ -394,11 +332,11 @@ namespace risk.control.system.Controllers.Api.Claims
                 var center = new { Lat = decimal.Parse(claim.CustomerDetail.PinCode.Latitude), Lng = decimal.Parse(claim.CustomerDetail.PinCode.Longitude) };
                 var dakota = new { Lat = decimal.Parse(claim.CustomerDetail.PinCode.Latitude), Lng = decimal.Parse(claim.CustomerDetail.PinCode.Longitude) };
 
-                if (claim.BeneficiaryDetail.ClaimReport is not null && claim.BeneficiaryDetail.ClaimReport?.DocumentIdReport?.DocumentIdImageLongLat is not null)
+                if (claim.AgencyReport is not null && claim.AgencyReport?.DocumentIdReport?.DocumentIdImageLongLat is not null)
                 {
-                    var longLat = claim.BeneficiaryDetail.ClaimReport.DocumentIdReport.DocumentIdImageLongLat.IndexOf("/");
-                    var latitude = claim.BeneficiaryDetail?.ClaimReport?.DocumentIdReport?.DocumentIdImageLongLat.Substring(0, longLat)?.Trim();
-                    var longitude = claim.BeneficiaryDetail?.ClaimReport?.DocumentIdReport?.DocumentIdImageLongLat.Substring(longLat + 1)?.Trim();
+                    var longLat = claim.AgencyReport.DocumentIdReport.DocumentIdImageLongLat.IndexOf("/");
+                    var latitude = claim.AgencyReport?.DocumentIdReport?.DocumentIdImageLongLat.Substring(0, longLat)?.Trim();
+                    var longitude = claim.AgencyReport?.DocumentIdReport?.DocumentIdImageLongLat.Substring(longLat + 1)?.Trim();
 
                     var frick = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) };
                     return Ok(new { center, dakota, frick });
@@ -409,11 +347,11 @@ namespace risk.control.system.Controllers.Api.Claims
                 var center = new { Lat = decimal.Parse(claim.BeneficiaryDetail.PinCode.Latitude), Lng = decimal.Parse(claim.BeneficiaryDetail.PinCode.Longitude) };
                 var dakota = new { Lat = decimal.Parse(claim.BeneficiaryDetail.PinCode.Latitude), Lng = decimal.Parse(claim.BeneficiaryDetail.PinCode.Longitude) };
 
-                if (claim.BeneficiaryDetail.ClaimReport is not null && claim.BeneficiaryDetail.ClaimReport?.DocumentIdReport?.DocumentIdImageLongLat is not null)
+                if (claim.AgencyReport is not null && claim.AgencyReport?.DocumentIdReport?.DocumentIdImageLongLat is not null)
                 {
-                    var longLat = claim.BeneficiaryDetail.ClaimReport.DocumentIdReport.DocumentIdImageLongLat.IndexOf("/");
-                    var latitude = claim.BeneficiaryDetail?.ClaimReport?.DocumentIdReport?.DocumentIdImageLongLat.Substring(0, longLat)?.Trim();
-                    var longitude = claim.BeneficiaryDetail?.ClaimReport?.DocumentIdReport?.DocumentIdImageLongLat.Substring(longLat + 1)?.Trim();
+                    var longLat = claim.AgencyReport.DocumentIdReport.DocumentIdImageLongLat.IndexOf("/");
+                    var latitude = claim.AgencyReport?.DocumentIdReport?.DocumentIdImageLongLat.Substring(0, longLat)?.Trim();
+                    var longitude = claim.AgencyReport?.DocumentIdReport?.DocumentIdImageLongLat.Substring(longLat + 1)?.Trim();
 
                     var frick = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) };
                     return Ok(new { center, dakota, frick });

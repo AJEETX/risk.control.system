@@ -31,13 +31,6 @@ namespace risk.control.system.Models
         public virtual ServiceReportTemplate? ServiceReportTemplate { get; set; }
     }
 
-    public class ClaimReport : ClaimReportBase
-    {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public long ClaimReportId { get; set; }
-    }
-
     public class AgencyReport : BaseEntity
     {
         [Key]
@@ -46,11 +39,11 @@ namespace risk.control.system.Models
         public long? VendorId { get; set; }
         public Vendor? Vendor { get; set; }
 
-        public DigitalIdReport? DigitalIdReport { get; set; }
+        public DigitalIdReport? DigitalIdReport { get; set; } = new();
 
-        public ReportQuestionaire? ReportQuestionaire { get; set; }
+        public ReportQuestionaire? ReportQuestionaire { get; set; } = new();
 
-        public DocumentIdReport? DocumentIdReport { get; set; }
+        public DocumentIdReport? DocumentIdReport { get; set; } = new();
 
         public string? AgentEmail { get; set; }
         public DateTime? AgentRemarksUpdated { get; set; }
@@ -63,6 +56,5 @@ namespace risk.control.system.Models
         public string? AssessorEmail { get; set; }
         public string? AssessorRemarks { get; set; }
         public AssessorRemarkType? AssessorRemarkType { get; set; }
-        public virtual ClaimsInvestigation? ClaimsInvestigation { get; set; }
     }
 }

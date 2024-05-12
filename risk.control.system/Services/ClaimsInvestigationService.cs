@@ -758,6 +758,8 @@ namespace risk.control.system.Services
             var supervisor = await GetSupervisor(agent.VendorId.Value);
 
             var claim = _context.ClaimsInvestigation
+                .Include(c => c.AgencyReport)
+                .ThenInclude(c => c.ReportQuestionaire)
                 .Include(c => c.PolicyDetail)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimsInvestigationId);
 
@@ -773,10 +775,9 @@ namespace risk.control.system.Services
             claim.InvestigationCaseSubStatusId = submitted2Supervisor.InvestigationCaseSubStatusId;
 
             var caseLocation = _context.BeneficiaryDetail
-                .Include(c => c.ClaimReport)
                 .FirstOrDefault(c => c.BeneficiaryDetailId == caseLocationId && c.ClaimsInvestigationId == claimsInvestigationId);
 
-            var claimReport = _context.ClaimReport.Include(c => c.ReportQuestionaire).FirstOrDefault(c => c.ClaimReportId == caseLocation.ClaimReport.ClaimReportId);
+            var claimReport = claim.AgencyReport;
 
             claimReport.ReportQuestionaire.Answer1 = answer1;
 
@@ -799,7 +800,8 @@ namespace risk.control.system.Services
             claimReport.AgentRemarks = remarks;
             claimReport.AgentRemarksUpdated = DateTime.Now;
             claimReport.AgentEmail = userEmail;
-            _context.ClaimReport.Update(claimReport);
+
+            _context.ClaimsInvestigation.Update(claim);
 
             caseLocation.Updated = DateTime.Now;
             caseLocation.UpdatedBy = userEmail;
@@ -875,27 +877,23 @@ namespace risk.control.system.Services
 
         private async Task<ClaimsInvestigation> RejectCaseReport(string userEmail, string assessorRemarks, long caseLocationId, string claimsInvestigationId, AssessorRemarkType assessorRemarkType)
         {
-            var caseLocation = _context.BeneficiaryDetail
-                .Include(c => c.ClaimReport)
-                .FirstOrDefault(c => c.BeneficiaryDetailId == caseLocationId && c.ClaimsInvestigationId == claimsInvestigationId);
             var rejected = _context.InvestigationCaseSubStatus
                 .FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR);
             var finished = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.FINISHED);
-            caseLocation.ClaimReport.AssessorRemarkType = assessorRemarkType;
-            caseLocation.ClaimReport.AssessorRemarks = assessorRemarks;
-            caseLocation.ClaimReport.AssessorRemarksUpdated = DateTime.Now;
-            caseLocation.ClaimReport.AssessorEmail = userEmail;
-
-            caseLocation.Updated = DateTime.Now;
-            caseLocation.UpdatedBy = userEmail;
-            _context.BeneficiaryDetail.Update(caseLocation);
+           
             try
             {
-                await _context.SaveChangesAsync();
                 var claim = _context.ClaimsInvestigation
+                    .Include(c => c.AgencyReport)
                     .Include(c => c.PolicyDetail)
                     .ThenInclude(p => p.ClientCompany)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimsInvestigationId);
+
+                claim.AgencyReport.AssessorRemarkType = assessorRemarkType;
+                claim.AgencyReport.AssessorRemarks = assessorRemarks;
+                claim.AgencyReport.AssessorRemarksUpdated = DateTime.Now;
+                claim.AgencyReport.AssessorEmail = userEmail;
+
                 claim.InvestigationCaseStatusId = finished.InvestigationCaseStatusId;
                 claim.InvestigationCaseSubStatusId = rejected.InvestigationCaseSubStatusId;
                 claim.Updated = DateTime.Now;
@@ -948,7 +946,7 @@ namespace risk.control.system.Services
                     ClientCompany = currentUser.ClientCompany,
                     UpdatedBy = userEmail,
                     VendorId = vendor.VendorId,
-                    ClaimReportId = caseLocation.ClaimReport?.ClaimReportId,
+                    AgencyReportId = claim.AgencyReport?.AgencyReportId,
                     SubTotal = investigationServiced.Price,
                     TaxAmount = investigationServiced.Price * 10,
                     InvestigationServiceType = investigatService,
@@ -969,27 +967,23 @@ namespace risk.control.system.Services
         }
         private async Task<ClaimsInvestigation> ApproveCaseReport(string userEmail, string assessorRemarks, long caseLocationId, string claimsInvestigationId, AssessorRemarkType assessorRemarkType)
         {
-            var caseLocation = _context.BeneficiaryDetail
-                .Include(c => c.ClaimReport)
-                .FirstOrDefault(c => c.BeneficiaryDetailId == caseLocationId && c.ClaimsInvestigationId == claimsInvestigationId);
             var approved = _context.InvestigationCaseSubStatus
                 .FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR);
             var finished = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.FINISHED);
-            caseLocation.ClaimReport.AssessorRemarkType = assessorRemarkType;
-            caseLocation.ClaimReport.AssessorRemarks = assessorRemarks;
-            caseLocation.ClaimReport.AssessorRemarksUpdated = DateTime.Now;
-            caseLocation.ClaimReport.AssessorEmail = userEmail;
-
-            caseLocation.Updated = DateTime.Now;
-            caseLocation.UpdatedBy = userEmail;
-            _context.BeneficiaryDetail.Update(caseLocation);
+            
             try
             {
-                await _context.SaveChangesAsync();
                 var claim = _context.ClaimsInvestigation
+                    .Include(c => c.AgencyReport)
                     .Include(c => c.PolicyDetail)
                     .ThenInclude(p=>p.ClientCompany)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimsInvestigationId);
+
+                claim.AgencyReport.AssessorRemarkType = assessorRemarkType;
+                claim.AgencyReport.AssessorRemarks = assessorRemarks;
+                claim.AgencyReport.AssessorRemarksUpdated = DateTime.Now;
+                claim.AgencyReport.AssessorEmail = userEmail;
+
                 claim.InvestigationCaseStatusId = finished.InvestigationCaseStatusId;
                 claim.InvestigationCaseSubStatusId = approved.InvestigationCaseSubStatusId;
                 claim.Updated = DateTime.Now;
@@ -1042,7 +1036,7 @@ namespace risk.control.system.Services
                     ClientCompany = currentUser.ClientCompany,
                     UpdatedBy = userEmail,
                     VendorId = vendor.VendorId,
-                    ClaimReportId = caseLocation.ClaimReport?.ClaimReportId,
+                    AgencyReportId = claim.AgencyReport?.AgencyReportId,
                     SubTotal = investigationServiced.Price,
                     TaxAmount = investigationServiced.Price * 10,
                     InvestigationServiceType = investigatService,
@@ -1082,64 +1076,57 @@ namespace risk.control.system.Services
 
         private async Task<ClaimsInvestigation> ReAssignToCreator(string userEmail, string claimsInvestigationId, long caseLocationId, string assessorRemarks, AssessorRemarkType assessorRemarkType)
         {
-            var claimsCaseLocation = _context.BeneficiaryDetail
-                .Include(c => c.ClaimReport)
-                .ThenInclude(c => c.ReportQuestionaire)
-                .Include(c => c.ClaimReport)
-                .ThenInclude(c => c.DigitalIdReport)
-                .Include(c => c.ClaimReport)
-                .ThenInclude(c => c.DocumentIdReport)
-                .Include(c => c.ClaimsInvestigation)
-                .Include(c => c.PinCode)
-                .Include(c => c.District)
-                .Include(c => c.State)
-                .Include(c => c.PreviousClaimReports)
-                .FirstOrDefault(c => c.BeneficiaryDetailId == caseLocationId && c.ClaimsInvestigationId == claimsInvestigationId);
-
             var currentUser = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
 
-            claimsCaseLocation.ClaimReport.AssessorRemarkType = assessorRemarkType;
-            claimsCaseLocation.ClaimReport.AssessorRemarks = assessorRemarks;
-            claimsCaseLocation.ClaimReport.AssessorRemarksUpdated = DateTime.Now;
-            claimsCaseLocation.ClaimReport.AssessorEmail = userEmail;
+            var claimsCaseToReassign = _context.ClaimsInvestigation
+                .Include(c => c.PreviousClaimReports)
+                .Include(c => c.AgencyReport)
+                .Include(c => c.AgencyReport.DigitalIdReport)
+                .Include(c => c.AgencyReport.DocumentIdReport)
+                .Include(c => c.AgencyReport.ReportQuestionaire)
+                .Include(c => c.PolicyDetail)
+                .FirstOrDefault(v => v.ClaimsInvestigationId == claimsInvestigationId);
+
+
+            claimsCaseToReassign.AgencyReport.AssessorRemarkType = assessorRemarkType;
+            claimsCaseToReassign.AgencyReport.AssessorRemarks = assessorRemarks;
+            claimsCaseToReassign.AgencyReport.AssessorRemarksUpdated = DateTime.Now;
+            claimsCaseToReassign.AgencyReport.AssessorEmail = userEmail;
             var reAssigned = _context.InvestigationCaseSubStatus.FirstOrDefault(
                     i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER);
             var saveReport = new PreviousClaimReport
             {
                 ClaimsInvestigationId = claimsInvestigationId,
-                AgentEmail = claimsCaseLocation.ClaimReport.AgentEmail,
-                DigitalIdReport = claimsCaseLocation.ClaimReport.DigitalIdReport,
-                DocumentIdReport = claimsCaseLocation.ClaimReport.DocumentIdReport,
-                AgentRemarks = claimsCaseLocation.ClaimReport.AgentRemarks,
-                AgentRemarksUpdated = claimsCaseLocation.ClaimReport.AssessorRemarksUpdated,
-                AssessorEmail = claimsCaseLocation.ClaimReport.AssessorEmail,
-                AssessorRemarks = claimsCaseLocation.ClaimReport.AssessorRemarks,
-                AssessorRemarkType = claimsCaseLocation.ClaimReport.AssessorRemarkType,
-                AssessorRemarksUpdated = claimsCaseLocation.ClaimReport.AssessorRemarksUpdated,
-                ReportQuestionaire = claimsCaseLocation.ClaimReport.ReportQuestionaire,
-                SupervisorEmail = claimsCaseLocation.ClaimReport.SupervisorEmail,
-                SupervisorRemarks = claimsCaseLocation.ClaimReport.SupervisorRemarks,
-                SupervisorRemarksUpdated = claimsCaseLocation.ClaimReport.SupervisorRemarksUpdated,
-                SupervisorRemarkType = claimsCaseLocation.ClaimReport.SupervisorRemarkType,
-                Updated = claimsCaseLocation.Updated,
-                UpdatedBy = claimsCaseLocation.UpdatedBy,
+                AgentEmail = claimsCaseToReassign.AgencyReport.AgentEmail,
+                DigitalIdReport = claimsCaseToReassign.AgencyReport.DigitalIdReport,
+                DocumentIdReport = claimsCaseToReassign.AgencyReport.DocumentIdReport,
+                AgentRemarks = claimsCaseToReassign.AgencyReport.AgentRemarks,
+                AgentRemarksUpdated = claimsCaseToReassign.AgencyReport.AssessorRemarksUpdated,
+                AssessorEmail = claimsCaseToReassign.AgencyReport.AssessorEmail,
+                AssessorRemarks = claimsCaseToReassign.AgencyReport.AssessorRemarks,
+                AssessorRemarkType = claimsCaseToReassign.AgencyReport.AssessorRemarkType,
+                AssessorRemarksUpdated = claimsCaseToReassign.AgencyReport.AssessorRemarksUpdated,
+                ReportQuestionaire = claimsCaseToReassign.AgencyReport.ReportQuestionaire,
+                SupervisorEmail = claimsCaseToReassign.AgencyReport.SupervisorEmail,
+                SupervisorRemarks = claimsCaseToReassign.AgencyReport.SupervisorRemarks,
+                SupervisorRemarksUpdated = claimsCaseToReassign.AgencyReport.SupervisorRemarksUpdated,
+                SupervisorRemarkType = claimsCaseToReassign.AgencyReport.SupervisorRemarkType,
+                Updated = DateTime.Now,
+                UpdatedBy = userEmail,
             };
             var currentSavedReport = _context.PreviousClaimReport.Add(saveReport);
 
-            var newReport = new ClaimReport
+            var newReport = new AgencyReport
             {
-                ClaimsInvestigationId = claimsInvestigationId,
                 ReportQuestionaire = new ReportQuestionaire(),
                 DocumentIdReport = new DocumentIdReport(),
                 DigitalIdReport = new DigitalIdReport()
             };
-            claimsCaseLocation.ClaimReport = newReport;
-            _context.ClaimReport.Add(newReport);
-            _context.BeneficiaryDetail.Update(claimsCaseLocation);
+            claimsCaseToReassign.PreviousClaimReports.Add(saveReport);
+            claimsCaseToReassign.AgencyReport.DigitalIdReport = new DigitalIdReport();
+            claimsCaseToReassign.AgencyReport.DocumentIdReport = new DocumentIdReport();
+            claimsCaseToReassign.AgencyReport.ReportQuestionaire = new ReportQuestionaire();
 
-            var claimsCaseToReassign = _context.ClaimsInvestigation
-                .Include(c => c.PolicyDetail)
-                .FirstOrDefault(v => v.ClaimsInvestigationId == claimsInvestigationId);
             claimsCaseToReassign.VendorId = 0;
             claimsCaseToReassign.AssignedToAgency = false;
             claimsCaseToReassign.ReviewCount += 1;
@@ -1188,11 +1175,8 @@ namespace risk.control.system.Services
 
         private async Task<ClaimsInvestigation> ApproveAgentReport(string userEmail, string claimsInvestigationId, long caseLocationId, string supervisorRemarks, SupervisorRemarkType reportUpdateStatus)
         {
-            var caseLocation = _context.BeneficiaryDetail
-                .Include(c => c.ClaimReport)
-                .FirstOrDefault(c => c.BeneficiaryDetailId == caseLocationId && c.ClaimsInvestigationId == claimsInvestigationId);
-
             var claim = _context.ClaimsInvestigation
+                .Include(c => c.AgencyReport)
                 .Include(c => c.Vendor)
                 .Include(c => c.PolicyDetail)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimsInvestigationId);
@@ -1217,17 +1201,14 @@ namespace risk.control.system.Services
             claim.InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS).InvestigationCaseStatusId;
             claim.InvestigationCaseSubStatusId = submitted2Assessor.InvestigationCaseSubStatusId;
 
-            var report = _context.ClaimReport.FirstOrDefault(c => c.ClaimReportId == caseLocation.ClaimReport.ClaimReportId);
+            var report = claim.AgencyReport;
             report.SupervisorRemarkType = reportUpdateStatus;
             report.SupervisorRemarks = supervisorRemarks;
             report.SupervisorRemarksUpdated = DateTime.Now;
             report.SupervisorEmail = userEmail;
             report.Vendor = claim.Vendor;
-            _context.ClaimReport.Update(report);
-            caseLocation.ClaimReport = report;
-            caseLocation.Updated = DateTime.Now;
-            caseLocation.UpdatedBy = userEmail;
-            _context.BeneficiaryDetail.Update(caseLocation);
+            _context.AgencyReport.Update(report);
+            _context.ClaimsInvestigation.Update(claim);
 
             var lastLogHop = _context.InvestigationTransaction
                                        .Where(i => i.ClaimsInvestigationId == claimsInvestigationId)
@@ -1262,27 +1243,17 @@ namespace risk.control.system.Services
         {
             var agencyUser = _context.VendorApplicationUser.Include(u=>u.Vendor).FirstOrDefault(s => s.Email == userEmail);
 
-            var claimsCaseLocation = _context.BeneficiaryDetail
-            .Include(c => c.ClaimReport)
-            .Include(c => c.ClaimsInvestigation)
-            .Include(c => c.PinCode)
-            .Include(c => c.District)
-            .Include(c => c.State)
-            .Include(c => c.State)
-            .FirstOrDefault(c => c.BeneficiaryDetailId == caseLocationId && c.ClaimsInvestigationId == claimsInvestigationId);
-
-            var report = _context.ClaimReport.FirstOrDefault(c => c.ClaimReportId == claimsCaseLocation.ClaimReport.ClaimReportId);
-            report.SupervisorRemarkType = reportUpdateStatus;
-            report.SupervisorRemarks = supervisorRemarks;
-
-            _context.ClaimReport.Update(report);
-            claimsCaseLocation.ClaimReport = report;
-            _context.BeneficiaryDetail.Update(claimsCaseLocation);
-
+           
             var claimsCaseToAllocateToVendor = _context.ClaimsInvestigation
+                .Include(c => c.AgencyReport)
                 .Include(c => c.PolicyDetail)
                 .ThenInclude(p=>p.ClientCompany)
                 .FirstOrDefault(v => v.ClaimsInvestigationId == claimsInvestigationId);
+
+            var report = claimsCaseToAllocateToVendor.AgencyReport;
+            report.SupervisorRemarkType = reportUpdateStatus;
+            report.SupervisorRemarks = supervisorRemarks;
+
             claimsCaseToAllocateToVendor.UserEmailActioned = userEmail;
             claimsCaseToAllocateToVendor.UserRoleActionedTo = $"{AppRoles.AGENT.GetEnumDisplayName()} ({agencyUser.Vendor.Email})";
             claimsCaseToAllocateToVendor.Updated = DateTime.Now;

@@ -43,8 +43,10 @@ namespace risk.control.system.Models
         public bool AssignedToAgency { get; set; } = false;
 
         public string? CurrentUserEmail { get; set; }
-        public long? AgencyReportId { get; set; }
-        public AgencyReport? AgencyReport { get; set; }
+        public AgencyReport? AgencyReport { get; set; } =new();
+
+        public List<PreviousClaimReport> PreviousClaimReports { get; set; } = new List<PreviousClaimReport>();
+
         public List<ClaimNote>? ClaimNotes { get; set; } = new();
         public string? CurrentClaimOwner { get; set; }
         public List<ClaimMessage>? ClaimMessages { get; set; } = new();

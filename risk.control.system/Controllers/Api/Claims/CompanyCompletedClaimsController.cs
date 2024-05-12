@@ -35,8 +35,13 @@ namespace risk.control.system.Controllers.Api.Claims
         [Authorize(Roles = ASSESSOR.DISPLAY_NAME)]
         public async Task<IActionResult> GetReport()
         {
-            IQueryable<ClaimsInvestigation> applicationDbContext = claimsService.GetClaims().Where(c =>
-                c.CustomerDetail != null && c.BeneficiaryDetail.ClaimReport != null);
+            IQueryable<ClaimsInvestigation> applicationDbContext = claimsService.GetClaims()
+                .Include(c=>c.AgencyReport)
+                .Include(c=>c.AgencyReport.DigitalIdReport)
+                .Include(c=>c.AgencyReport.DocumentIdReport)
+                .Include(c=>c.AgencyReport.ReportQuestionaire)
+                .Where(c =>
+                c.CustomerDetail != null && c.AgencyReport != null);
             var user = HttpContext.User.Identity.Name;
 
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == user);
@@ -114,8 +119,13 @@ namespace risk.control.system.Controllers.Api.Claims
         [HttpGet("GetManagerReport")]
         public async Task<IActionResult> GetManagerReport()
         {
-            IQueryable<ClaimsInvestigation> applicationDbContext = claimsService.GetClaims().Where(c =>
-                c.CustomerDetail != null && c.BeneficiaryDetail.ClaimReport != null);
+            IQueryable<ClaimsInvestigation> applicationDbContext = claimsService.GetClaims()
+                .Include(c => c.AgencyReport)
+                .Include(c => c.AgencyReport.DigitalIdReport)
+                .Include(c => c.AgencyReport.DocumentIdReport)
+                .Include(c => c.AgencyReport.ReportQuestionaire)
+                .Where(c =>
+                c.CustomerDetail != null && c.AgencyReport != null);
             var user = HttpContext.User.Identity.Name;
 
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == user);
@@ -178,8 +188,13 @@ namespace risk.control.system.Controllers.Api.Claims
         [Authorize(Roles = ASSESSOR.DISPLAY_NAME)]
         public async Task<IActionResult> GetReject()
         {
-            IQueryable<ClaimsInvestigation> applicationDbContext = claimsService.GetClaims().Where(c =>
-                c.CustomerDetail != null && c.BeneficiaryDetail.ClaimReport != null);
+            IQueryable<ClaimsInvestigation> applicationDbContext = claimsService.GetClaims()
+                .Include(c => c.AgencyReport)
+                .Include(c => c.AgencyReport.DigitalIdReport)
+                .Include(c => c.AgencyReport.DocumentIdReport)
+                .Include(c => c.AgencyReport.ReportQuestionaire)
+                .Where(c =>
+                c.CustomerDetail != null && c.AgencyReport != null);
             var userEmail = HttpContext.User.Identity.Name;
 
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
@@ -258,8 +273,13 @@ namespace risk.control.system.Controllers.Api.Claims
         [Authorize(Roles = MANAGER.DISPLAY_NAME)]
         public async Task<IActionResult> GetManagerReject()
         {
-            IQueryable<ClaimsInvestigation> applicationDbContext = claimsService.GetClaims().Where(c =>
-                c.CustomerDetail != null && c.BeneficiaryDetail.ClaimReport != null);
+            IQueryable<ClaimsInvestigation> applicationDbContext = claimsService.GetClaims()
+                .Include(c => c.AgencyReport)
+                .Include(c => c.AgencyReport.DigitalIdReport)
+                .Include(c => c.AgencyReport.DocumentIdReport)
+                .Include(c => c.AgencyReport.ReportQuestionaire)
+                .Where(c =>
+                c.CustomerDetail != null && c.AgencyReport != null);
             var userEmail = HttpContext.User.Identity.Name;
 
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
