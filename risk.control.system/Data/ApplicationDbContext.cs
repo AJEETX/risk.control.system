@@ -72,5 +72,6 @@ namespace risk.control.system.Data
         public DbSet<BeneficiaryDetail> BeneficiaryDetail { get; set; } = default!;
         public DbSet<DigitalIdReport> DigitalIdReport { get; set; } = default!;
         public DbSet<DocumentIdReport> DocumentIdReport { get; set; } = default!;
+        public DbSet<AgencyReport> AgencyReport { get; set; } = default!;
     }
 }

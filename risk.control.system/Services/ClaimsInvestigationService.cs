@@ -706,11 +706,6 @@ namespace risk.control.system.Services
             var assignedToAgent = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
             var claim = _context.ClaimsInvestigation
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.ClientCompany)
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.InvestigationServiceType)
-                .Include(c => c.BeneficiaryDetail)
                 .Where(c => c.ClaimsInvestigationId == claimsInvestigationId).FirstOrDefault();
             if (claim != null)
             {

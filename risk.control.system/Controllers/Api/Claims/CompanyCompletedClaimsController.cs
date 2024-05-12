@@ -23,17 +23,19 @@ namespace risk.control.system.Controllers.Api.Claims
     public class CompanyCompletedClaimsController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly IClaimsService claimsService;
 
-        public CompanyCompletedClaimsController(ApplicationDbContext context)
+        public CompanyCompletedClaimsController(ApplicationDbContext context, IClaimsService claimsService)
         {
             _context = context;
+            this.claimsService = claimsService;
         }
 
         [HttpGet("GetReport")]
         [Authorize(Roles = ASSESSOR.DISPLAY_NAME)]
         public async Task<IActionResult> GetReport()
         {
-            IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims().Where(c =>
+            IQueryable<ClaimsInvestigation> applicationDbContext = claimsService.GetClaims().Where(c =>
                 c.CustomerDetail != null && c.BeneficiaryDetail.ClaimReport != null);
             var user = HttpContext.User.Identity.Name;
 
@@ -112,7 +114,7 @@ namespace risk.control.system.Controllers.Api.Claims
         [HttpGet("GetManagerReport")]
         public async Task<IActionResult> GetManagerReport()
         {
-            IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims().Where(c =>
+            IQueryable<ClaimsInvestigation> applicationDbContext = claimsService.GetClaims().Where(c =>
                 c.CustomerDetail != null && c.BeneficiaryDetail.ClaimReport != null);
             var user = HttpContext.User.Identity.Name;
 
@@ -176,7 +178,7 @@ namespace risk.control.system.Controllers.Api.Claims
         [Authorize(Roles = ASSESSOR.DISPLAY_NAME)]
         public async Task<IActionResult> GetReject()
         {
-            IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims().Where(c =>
+            IQueryable<ClaimsInvestigation> applicationDbContext = claimsService.GetClaims().Where(c =>
                 c.CustomerDetail != null && c.BeneficiaryDetail.ClaimReport != null);
             var userEmail = HttpContext.User.Identity.Name;
 
@@ -256,7 +258,7 @@ namespace risk.control.system.Controllers.Api.Claims
         [Authorize(Roles = MANAGER.DISPLAY_NAME)]
         public async Task<IActionResult> GetManagerReject()
         {
-            IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims().Where(c =>
+            IQueryable<ClaimsInvestigation> applicationDbContext = claimsService.GetClaims().Where(c =>
                 c.CustomerDetail != null && c.BeneficiaryDetail.ClaimReport != null);
             var userEmail = HttpContext.User.Identity.Name;
 
@@ -315,106 +317,6 @@ namespace risk.control.system.Controllers.Api.Claims
             })?.ToList();
 
             return Ok(response);
-        }
-        [HttpGet("GetReportMap")]
-        public async Task<IActionResult> GetReportMap()
-        {
-            IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims().Where(c =>
-                c.CustomerDetail != null && c.BeneficiaryDetail.ClaimReport != null);
-            var user = HttpContext.User.Identity.Name;
-
-            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == user);
-
-            var claimsSubmitted = await applicationDbContext.Where(c => c.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
-                c.InvestigationCaseSubStatus.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR ||
-                c.InvestigationCaseSubStatus.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR ||
-                c.InvestigationCaseSubStatus.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR
-                )
-                 .ToListAsync();
-
-            var response = claimsSubmitted
-                    .Select(a => new MapResponse
-                    {
-                        Id = a.ClaimsInvestigationId,
-                        Address = LocationDetail.GetAddress(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
-                        Description = a.PolicyDetail.CauseOfLoss,
-                        Price = a.PolicyDetail.SumAssuredValue,
-                        Type = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? "home" : "building",
-                        Bed = a.CustomerDetail.CustomerIncome.GetEnumDisplayName(),
-                        Bath = a.CustomerDetail.ContactNumber,
-                        Size = a.CustomerDetail.Description,
-                        Position = new Position
-                        {
-                            Lat = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
-                           decimal.Parse(a.CustomerDetail.PinCode.Latitude) : decimal.Parse(a.BeneficiaryDetail.PinCode.Latitude),
-                            Lng = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
-                            decimal.Parse(a.CustomerDetail.PinCode.Longitude) : decimal.Parse(a.BeneficiaryDetail.PinCode.Longitude)
-                        },
-                        Url = (a.BeneficiaryDetail != null) ? "/ClaimsInvestigation/Detail?Id=" + a.ClaimsInvestigationId : "/ClaimsInvestigation/Details?Id=" + a.ClaimsInvestigationId
-                    })?
-                    .ToList();
-
-            var company = _context.ClientCompany.Include(c => c.PinCode).FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
-
-            foreach (var item in response)
-            {
-                var isExist = response.Any(r => r.Position.Lng == item.Position.Lng && r.Position.Lat == item.Position.Lat && item.Id != r.Id);
-                if (isExist)
-                {
-                    var (lat, lng) = LocationDetail.GetLatLng(item.Position.Lat, item.Position.Lng);
-                    item.Position = new Position
-                    {
-                        Lat = lat,
-                        Lng = lng,
-                    };
-                }
-            }
-            return Ok(new
-            {
-                response = response,
-                lat = decimal.Parse(company.PinCode.Latitude),
-                lng = decimal.Parse(company.PinCode.Longitude)
-            });
-        }
-
-        private IQueryable<ClaimsInvestigation> GetClaims()
-        {
-            IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.ClientCompany)
-               .Include(c=>c.BeneficiaryDetail)
-               .Include(c=>c.BeneficiaryDetail.BeneficiaryRelation)
-               .Include(c=>c.BeneficiaryDetail.ClaimReport)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.CaseEnabler)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.CostCentre)
-              
-               .Include(c => c.BeneficiaryDetail)
-               .ThenInclude(c => c.PinCode)
-               .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.District)
-                .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.State)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.Country)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.District)
-               .Include(c => c.InvestigationCaseStatus)
-               .Include(c => c.InvestigationCaseSubStatus)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.InvestigationServiceType)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.LineOfBusiness)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.PinCode)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.State)
-               .Include(c => c.Vendor)
-               .Include(c => c.BeneficiaryDetail)
-               .ThenInclude(l => l.PreviousClaimReports)
-                .Where(c => !c.Deleted);
-            return applicationDbContext.OrderByDescending(o => o.Created);
         }
     }
 }

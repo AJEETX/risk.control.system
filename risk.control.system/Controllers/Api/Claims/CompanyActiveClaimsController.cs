@@ -24,16 +24,18 @@ namespace risk.control.system.Controllers.Api.Claims
     public class CompanyActiveClaimsController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly IClaimsService claimsService;
 
-        public CompanyActiveClaimsController(ApplicationDbContext context)
+        public CompanyActiveClaimsController(ApplicationDbContext context, IClaimsService claimsService)
         {
             _context = context;
+            this.claimsService = claimsService;
         }
 
         [HttpGet("GetActive")]
         public async Task<IActionResult> GetActive()
         {
-            IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
+            IQueryable<ClaimsInvestigation> applicationDbContext = claimsService.GetClaims();
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
             var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
             var companyUser = _context.ClientCompanyApplicationUser.Include(u=>u.ClientCompany).FirstOrDefault(c => c.Email == userEmail.Value);
@@ -147,7 +149,7 @@ namespace risk.control.system.Controllers.Api.Claims
         [HttpGet("GetManagerActive")]
         public async Task<IActionResult> GetManagerActive()
         {
-            IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
+            IQueryable<ClaimsInvestigation> applicationDbContext = claimsService.GetClaims();
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
             var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
             var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(c => c.Email == userEmail.Value);
@@ -246,13 +248,12 @@ namespace risk.control.system.Controllers.Api.Claims
                         IsNewAssigned = a.ManagerActiveView <= 1
                     })?
                     .ToList();
-
             return Ok(response);
         }
         [HttpGet("GetIncomplete")]
         public async Task<IActionResult> GetIncomplete()
         {
-            IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
+            IQueryable<ClaimsInvestigation> applicationDbContext = claimsService.GetClaims();
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
             var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
@@ -348,7 +349,7 @@ namespace risk.control.system.Controllers.Api.Claims
         [HttpGet("GetReview")]
         public async Task<IActionResult> GetReview()
         {
-            IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
+            IQueryable<ClaimsInvestigation> applicationDbContext = claimsService.GetClaims();
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
             var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
@@ -470,7 +471,7 @@ namespace risk.control.system.Controllers.Api.Claims
         [HttpGet("GetManagerReview")]
         public async Task<IActionResult> GetManagerReview()
         {
-            IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
+            IQueryable<ClaimsInvestigation> applicationDbContext = claimsService.GetClaims();
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
             var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
@@ -554,7 +555,7 @@ namespace risk.control.system.Controllers.Api.Claims
         [HttpGet("GetActiveMap")]
         public async Task<IActionResult> GetActiveMap()
         {
-            IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
+            IQueryable<ClaimsInvestigation> applicationDbContext = claimsService.GetClaims();
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
             var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
@@ -618,8 +619,8 @@ namespace risk.control.system.Controllers.Api.Claims
                        Size = a.CustomerDetail?.Description,
                        Position = new Position
                        {
-                           Lat = GetLat(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail) ?? decimal.Parse(company.PinCode.Latitude),
-                           Lng = GetLng(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail) ?? decimal.Parse(company.PinCode.Longitude),
+                           Lat = claimsService.GetLat(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail) ?? decimal.Parse(company.PinCode.Latitude),
+                           Lng = claimsService.GetLng(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail) ?? decimal.Parse(company.PinCode.Longitude),
                        },
                        Url = (a.BeneficiaryDetail != null) ? "/ClaimsInvestigation/Detail?Id=" + a.ClaimsInvestigationId : "/ClaimsInvestigation/Details?Id=" + a.ClaimsInvestigationId
                    })?
@@ -644,78 +645,6 @@ namespace risk.control.system.Controllers.Api.Claims
                 lat = decimal.Parse(company.PinCode.Latitude),
                 lng = decimal.Parse(company.PinCode.Longitude)
             });
-        }
-
-        private IQueryable<ClaimsInvestigation> GetClaims()
-        {
-            IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.ClientCompany)
-               .Include(c => c.BeneficiaryDetail)
-               .ThenInclude(c => c.BeneficiaryRelation)
-               .Include(c => c.BeneficiaryDetail.ClaimReport)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.CaseEnabler)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.CostCentre)
-               
-               .Include(c => c.BeneficiaryDetail)
-               .ThenInclude(c => c.PinCode)
-               .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.District)
-                .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.State)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.Country)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.District)
-               .Include(c => c.InvestigationCaseStatus)
-               .Include(c => c.InvestigationCaseSubStatus)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.InvestigationServiceType)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.LineOfBusiness)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.PinCode)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.State)
-               .Include(c => c.Vendor)
-               .Include(c => c.BeneficiaryDetail)
-               .ThenInclude(l => l.PreviousClaimReports)
-                .Where(c => !c.Deleted);
-            return applicationDbContext.OrderByDescending(o => o.Created);
-        }
-
-        private decimal? GetLat(ClaimType? claimType, CustomerDetail a, BeneficiaryDetail location)
-        {
-            if (claimType == ClaimType.HEALTH)
-            {
-                if (a is null)
-                    return null;
-                return decimal.Parse(a.PinCode.Latitude);
-            }
-            else
-            {
-                if (location is null)
-                    return null;
-                return decimal.Parse(location.PinCode.Latitude);
-            }
-        }
-
-        private decimal? GetLng(ClaimType? claimType, CustomerDetail a, BeneficiaryDetail location)
-        {
-            if (claimType == ClaimType.HEALTH)
-            {
-                if (a is null)
-                    return null;
-                return decimal.Parse(a.PinCode.Longitude);
-            }
-            else
-            {
-                if (location is null)
-                    return null;
-                return decimal.Parse(location.PinCode.Longitude);
-            }
         }
     }
 }

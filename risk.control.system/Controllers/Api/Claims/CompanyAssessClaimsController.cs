@@ -23,17 +23,19 @@ namespace risk.control.system.Controllers.Api.Claims
     public class CompanyAssessClaimsController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly IClaimsService claimsService;
 
-        public CompanyAssessClaimsController(ApplicationDbContext context)
+        public CompanyAssessClaimsController(ApplicationDbContext context, IClaimsService claimsService)
         {
             _context = context;
+            this.claimsService = claimsService;
         }
 
         [Authorize(Roles = ASSESSOR.DISPLAY_NAME)]
         [HttpGet("GetAssessor")]
         public async Task<IActionResult> GetAssessor()
         {
-            IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
+            IQueryable<ClaimsInvestigation> applicationDbContext = claimsService.GetClaims();
 
             var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
@@ -105,7 +107,7 @@ namespace risk.control.system.Controllers.Api.Claims
         [Authorize(Roles = MANAGER.DISPLAY_NAME)]
         public async Task<IActionResult> GetManager()
         {
-            IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
+            IQueryable<ClaimsInvestigation> applicationDbContext = claimsService.GetClaims();
 
             var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
@@ -172,48 +174,6 @@ namespace risk.control.system.Controllers.Api.Claims
             })?.ToList();
 
             return Ok(response);
-        }
-
-
-        private IQueryable<ClaimsInvestigation> GetClaims()
-        {
-            IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.ClientCompany)
-               .Include(c => c.BeneficiaryDetail)
-               .Include(c => c.BeneficiaryDetail.BeneficiaryRelation)
-               .Include(c => c.BeneficiaryDetail.ClaimReport)
-
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.CaseEnabler)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.CostCentre)
-               
-               .Include(c => c.BeneficiaryDetail)
-               .ThenInclude(c => c.PinCode)
-               .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.District)
-                .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.State)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.Country)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.District)
-               .Include(c => c.InvestigationCaseStatus)
-               .Include(c => c.InvestigationCaseSubStatus)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.InvestigationServiceType)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.LineOfBusiness)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.PinCode)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.State)
-               .Include(c => c.Vendor)
-               .Include(c => c.BeneficiaryDetail)
-               .ThenInclude(l => l.PreviousClaimReports)
-                .Where(c => !c.Deleted);
-            return applicationDbContext.OrderBy(o => o.Created);
         }
     }
 }

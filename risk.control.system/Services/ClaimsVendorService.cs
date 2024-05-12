@@ -237,11 +237,11 @@ namespace risk.control.system.Services
         public async Task<ClaimsInvestigationVendorsModel> GetInvestigate(string userEmail, string selectedcase, bool uploaded = false)
         {
             var claimsInvestigation = _context.ClaimsInvestigation
+                .Include(c => c.Vendor)
                 .Include(c => c.PolicyDetail)
                 .ThenInclude(c => c.ClientCompany)
                 .Include(c => c.PolicyDetail)
                 .ThenInclude(c => c.CaseEnabler)
-                
                 .Include(c => c.BeneficiaryDetail)
                 .ThenInclude(c => c.PinCode)
                 .Include(c => c.PolicyDetail)
@@ -267,21 +267,12 @@ namespace risk.control.system.Services
                 .Include(c => c.ClaimsInvestigation)
                 .Include(c => c.PinCode)
                 .Include(c => c.BeneficiaryRelation)
-                .Include(c => c.ClaimReport)
-                .ThenInclude(c => c.DigitalIdReport)
-                .Include(c => c.ClaimReport)
-                .ThenInclude(c => c.ReportQuestionaire)
-                .Include(c => c.ClaimReport)
-                .ThenInclude(c => c.DocumentIdReport)
+                .Include(c => c.ClaimReport.DigitalIdReport)
+                .Include(c => c.ClaimReport.ReportQuestionaire)
+                .Include(c => c.ClaimReport.DocumentIdReport)
                 .Include(c => c.District)
                 .Include(c => c.Country)
                 .Include(c => c.State)
-                .Include(c => c.ClaimReport)
-                .ThenInclude(c => c.ServiceReportTemplate.ReportTemplate.DigitalIdReport)
-                .Include(c => c.ClaimReport)
-                .ThenInclude(c => c.ServiceReportTemplate.ReportTemplate.DocumentIdReport)
-                .Include(c => c.ClaimReport)
-                    .ThenInclude(c => c.ServiceReportTemplate.ReportTemplate.ReportQuestionaire)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == selectedcase);
             claimCase.ClaimReport.AgentEmail = userEmail;
 

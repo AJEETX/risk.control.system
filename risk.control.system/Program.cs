@@ -28,6 +28,7 @@ using Microsoft.OpenApi.Models;
 
 using NToastNotify;
 
+using risk.control.system.Controllers.Api.Claims;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
@@ -92,6 +93,7 @@ builder.Services.AddScoped<IInvestigationReportService, InvestigationReportServi
 builder.Services.AddScoped<IClaimsVendorService, ClaimsVendorService>();
 builder.Services.AddScoped<IEmpanelledAgencyService, EmpanelledAgencyService>();
 builder.Services.AddScoped<IClaimPolicyService, ClaimPolicyService>();
+builder.Services.AddScoped<IClaimsService, ClaimsService>();
 builder.Services.AddScoped<IICheckifyService, ICheckifyService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IReportService, ReportService>();

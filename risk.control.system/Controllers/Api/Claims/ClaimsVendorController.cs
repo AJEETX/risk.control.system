@@ -156,99 +156,6 @@ namespace risk.control.system.Controllers.Api.Claims
             return Ok(null);
         }
 
-        [HttpGet("GetOpenMap")]
-        public async Task<IActionResult> GetOpenMap()
-        {
-            IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
-
-            var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
-
-            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
-
-            if (vendorUser != null)
-            {
-                applicationDbContext = applicationDbContext.Where(i => i.VendorId == vendorUser.VendorId);
-            }
-
-            var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
-            var openStatuses = _context.InvestigationCaseStatus.Where(i => !i.Name.Contains(CONSTANTS.CASE_STATUS.FINISHED)).ToList();
-            var openSubstatusesForSupervisor = _context.InvestigationCaseSubStatus.Where(i =>
-            i.Name.Contains(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR) ||
-            i.Name.Contains(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT) ||
-            i.Name.Contains(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR)
-            ).Select(s => s.InvestigationCaseSubStatusId).ToList();
-
-            var allocateToVendorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
-            var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
-            var submittedToVendorSupervisorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR);
-
-            var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
-            if (userRole.Value.Contains(AppRoles.AGENCY_ADMIN.ToString()) || userRole.Value.Contains(AppRoles.SUPERVISOR.ToString()))
-            {
-                applicationDbContext = applicationDbContext.Where(a => openSubstatusesForSupervisor.Contains(a.InvestigationCaseSubStatusId));
-
-                var claimsAllocated = new List<ClaimsInvestigation>();
-
-                foreach (var item in applicationDbContext)
-                {
-                    
-                    if (item.VendorId.HasValue
-                        && item.InvestigationCaseSubStatusId == allocateToVendorStatus.InvestigationCaseSubStatusId
-                        || item.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId
-                        || item.InvestigationCaseSubStatusId == submittedToVendorSupervisorStatus.InvestigationCaseSubStatusId)
-                    {
-                        claimsAllocated.Add(item);
-                    }
-                }
-                var response = claimsAllocated
-                   .Select(a => new MapResponse
-                   {
-                       Id = a.ClaimsInvestigationId,
-                       Address = LocationDetail.GetAddress(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
-                       Description = a.PolicyDetail.CauseOfLoss,
-                       Price = a.PolicyDetail.SumAssuredValue,
-                       Type = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? "home" : "building",
-                       Bed = a.CustomerDetail.CustomerIncome.GetEnumDisplayName(),
-                       Bath = a.CustomerDetail.ContactNumber,
-                       Size = a.CustomerDetail.Description,
-                       Position = new Position
-                       {
-                           Lat = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
-                            decimal.Parse(a.CustomerDetail.PinCode.Latitude) : decimal.Parse(a.BeneficiaryDetail.PinCode.Latitude),
-                           Lng = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
-                             decimal.Parse(a.CustomerDetail.PinCode.Longitude) : decimal.Parse(a.BeneficiaryDetail.PinCode.Longitude)
-                       },
-                       Url = "/ClaimsVendor/Detail?Id=" + a.ClaimsInvestigationId
-                   })?
-                   .ToList();
-
-                foreach (var item in response)
-                {
-                    var isExist = response.Any(r => r.Position.Lng == item.Position.Lng && r.Position.Lat == item.Position.Lat && item.Id != r.Id);
-                    if (isExist)
-                    {
-                        var (lat, lng) = LocationDetail.GetLatLng(item.Position.Lat, item.Position.Lng);
-                        item.Position = new Position
-                        {
-                            Lat = lat,
-                            Lng = lng,
-                        };
-                    }
-                }
-                var vendor = _context.Vendor.Include(c => c.PinCode).FirstOrDefault(c => c.VendorId == vendorUser.VendorId);
-
-                return Ok(new
-                {
-                    response = response,
-                    lat = vendor.PinCode.Latitude,
-                    lng = vendor.PinCode.Longitude
-                });
-            }
-            return Ok(null);
-        }
 
         [HttpGet("GetNew")]
         public async Task<IActionResult> GetNew()
@@ -345,8 +252,8 @@ namespace risk.control.system.Controllers.Api.Claims
                    })
                     ?.ToList();
 
-            return Ok(response);
-        }
+                return Ok(response);
+            }
 
         [HttpGet("GetNewMap")]
         public async Task<IActionResult> GetNewMap()
@@ -370,7 +277,7 @@ namespace risk.control.system.Controllers.Api.Claims
                     .Include(a => a.PolicyDetail)
                     .ThenInclude(a => a.LineOfBusiness)
                     .Where(i => i.VendorId == vendorUser.VendorId);
-            }
+        }
             var claims = new List<ClaimsInvestigation>();
 
             if (userRole.Value.Contains(AppRoles.AGENCY_ADMIN.ToString()) || userRole.Value.Contains(AppRoles.SUPERVISOR.ToString()))
@@ -456,7 +363,7 @@ namespace risk.control.system.Controllers.Api.Claims
             var claims = applicationDbContext.Where(i => i.VendorId == vendorUser.VendorId &&
             i.UserEmailActionedTo == string.Empty &&
             i.UserRoleActionedTo == $"{AppRoles.SUPERVISOR.GetEnumDisplayName()} ({vendorUser.Vendor.Email})" &&
-            i.InvestigationCaseSubStatusId == submittedToVendorSupervisorStatus.InvestigationCaseSubStatusId)?.ToList();
+            i.InvestigationCaseSubStatusId == submittedToVendorSupervisorStatus.InvestigationCaseSubStatusId);
 
             var claimsSubmitted = new List<ClaimsInvestigation>();
             List<ClaimsInvestigation> newVerifyClaims = new List<ClaimsInvestigation>();
@@ -509,84 +416,6 @@ namespace risk.control.system.Controllers.Api.Claims
             return Ok(response);
         }
 
-        [HttpGet("GetReportMap")]
-        public async Task<IActionResult> GetReportMap()
-        {
-            IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
-
-            var allocatedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
-            var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
-            var submittedToVendorSupervisorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR);
-
-            var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
-            var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
-            var currentUserEmail = HttpContext.User?.Identity?.Name;
-
-            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
-
-            if (vendorUser != null)
-            {
-                applicationDbContext = applicationDbContext.Where(i => i.VendorId == vendorUser.VendorId);
-            }
-            // SHOWING DIFFERRENT PAGES AS PER ROLES
-            var claimsSubmitted = new List<ClaimsInvestigation>();
-            if (userRole.Value.Contains(AppRoles.AGENCY_ADMIN.ToString()) || userRole.Value.Contains(AppRoles.SUPERVISOR.ToString()))
-            {
-                foreach (var item in applicationDbContext)
-                {
-                    
-                    if (item.VendorId == vendorUser.VendorId
-                        && item.InvestigationCaseSubStatusId == submittedToVendorSupervisorStatus.InvestigationCaseSubStatusId)
-                    {
-                        claimsSubmitted.Add(item);
-                    }
-                }
-            }
-            var response = claimsSubmitted
-                   .Select(a => new MapResponse
-                   {
-                       Id = a.ClaimsInvestigationId,
-                       Address = LocationDetail.GetAddress(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
-                       Description = a.PolicyDetail.CauseOfLoss,
-                       Price = a.PolicyDetail.SumAssuredValue,
-                       Type = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? "home" : "building",
-                       Bed = a.CustomerDetail.CustomerIncome.GetEnumDisplayName(),
-                       Bath = a.CustomerDetail.ContactNumber,
-                       Size = a.CustomerDetail.Description,
-                       Position = new Position
-                       {
-                           Lat = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
-                            decimal.Parse(a.CustomerDetail.PinCode.Latitude) : decimal.Parse(a.BeneficiaryDetail.PinCode.Latitude),
-                           Lng = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
-                             decimal.Parse(a.CustomerDetail.PinCode.Longitude) : decimal.Parse(a.BeneficiaryDetail.PinCode.Longitude)
-                       },
-                       Url = "/ClaimsVendor/Detail?Id=" + a.ClaimsInvestigationId
-                   })?
-                     .ToList();
-            var vendor = _context.Vendor.Include(c => c.PinCode).FirstOrDefault(c => c.VendorId == vendorUser.VendorId);
-            foreach (var item in response)
-            {
-                var isExist = response.Any(r => r.Position.Lng == item.Position.Lng && r.Position.Lat == item.Position.Lat && item.Id != r.Id);
-                if (isExist)
-                {
-                    var (lat, lng) = LocationDetail.GetLatLng(item.Position.Lat, item.Position.Lng);
-                    item.Position = new Position
-                    {
-                        Lat = lat,
-                        Lng = lng,
-                    };
-                }
-            }
-            return Ok(new
-            {
-                response = response,
-                lat = vendor.PinCode.Latitude,
-                lng = vendor.PinCode.Longitude
-            });
-        }
 
         [HttpGet("GetCompleted")]
         [Authorize(Roles = "AGENCY_ADMIN,SUPERVISOR")]
@@ -618,7 +447,7 @@ namespace risk.control.system.Controllers.Api.Claims
             var reviewCases = _context.InvestigationTransaction.Where(i => i.IsReviewCase &&
                     i.InvestigationCaseStatusId == inprogressStatus.InvestigationCaseStatusId &&
                     i.InvestigationCaseSubStatusId == reassignedStatus.InvestigationCaseSubStatusId &&
-                    i.UserEmailActionedTo == string.Empty);
+                    i.UserEmailActionedTo == string.Empty)?.Distinct();
 
             if (agencyUser.IsVendorAdmin)
             {
@@ -672,7 +501,7 @@ namespace risk.control.system.Controllers.Api.Claims
             else
             {
                 var userAttendedClaims = _context.InvestigationTransaction.Where(t => (t.UserEmailActioned == agencyUser.Email &&
-                            t.InvestigationCaseSubStatusId == submittedToAssessorStatus.InvestigationCaseSubStatusId))?.Select(c => c.ClaimsInvestigationId);
+                            t.InvestigationCaseSubStatusId == submittedToAssessorStatus.InvestigationCaseSubStatusId))?.Select(c => c.ClaimsInvestigationId)?.Distinct();
 
                 var claimsSubmitted = new List<ClaimsInvestigation>();
                 foreach (var claim in applicationDbContext)
@@ -746,22 +575,20 @@ namespace risk.control.system.Controllers.Api.Claims
             var submittedToVendorSupervisorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR);
 
-            var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
-            var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
             var currentUserEmail = HttpContext.User?.Identity?.Name;
 
-            var agencyUser = _context.VendorApplicationUser.Include(u=>u.Vendor).FirstOrDefault(c => c.Email == currentUserEmail);
+            var agentUser = _context.VendorApplicationUser.Include(u=>u.Vendor).FirstOrDefault(c => c.Email == currentUserEmail);
             var submittedToSupervisorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR);
 
-            var userAttendedClaims = _context.InvestigationTransaction.Where(t => (t.UserEmailActioned == agencyUser.Email &&
-            t.UserRoleActionedTo == $"{AppRoles.SUPERVISOR.GetEnumDisplayName()} ({agencyUser.Vendor.Email})" &&
-                           t.InvestigationCaseSubStatusId == submittedToSupervisorStatus.InvestigationCaseSubStatusId))?.Select(c => c.ClaimsInvestigationId);
+            var userAttendedClaims = _context.InvestigationTransaction.Where(t => (t.UserEmailActioned == agentUser.Email &&
+            t.UserRoleActionedTo == $"{AppRoles.SUPERVISOR.GetEnumDisplayName()} ({agentUser.Vendor.Email})" &&
+                           t.InvestigationCaseSubStatusId == submittedToSupervisorStatus.InvestigationCaseSubStatusId))?.Select(c => c.ClaimsInvestigationId).Distinct();
 
             var claimsSubmitted = new List<ClaimsInvestigation>();
             foreach (var item in applicationDbContext)
             {
-                if (userAttendedClaims.Contains(item.ClaimsInvestigationId))
+                if (userAttendedClaims != null && userAttendedClaims.Contains(item.ClaimsInvestigationId) && item.UserEmailActionedTo != currentUserEmail)
                 {
                     claimsSubmitted.Add(item);
                 }

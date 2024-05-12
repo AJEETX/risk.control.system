@@ -38,23 +38,31 @@ namespace risk.control.system.Models
         public long ClaimReportId { get; set; }
     }
 
-    public enum SupervisorRemarkType
+    public class AgencyReport : BaseEntity
     {
-        OK,
-        REVIEW
-    }
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public long AgencyReportId { get; set; }
+        public long? VendorId { get; set; }
+        public Vendor? Vendor { get; set; }
 
-    public enum AssessorRemarkType
-    {
-        OK,
-        REVIEW,
-        REJECT
-    }
+        public DigitalIdReport? DigitalIdReport { get; set; }
 
-    public enum OcrImageType
-    {
-        PAN,
-        ADHAAR,
-        DL
+        public ReportQuestionaire? ReportQuestionaire { get; set; }
+
+        public DocumentIdReport? DocumentIdReport { get; set; }
+
+        public string? AgentEmail { get; set; }
+        public DateTime? AgentRemarksUpdated { get; set; }
+        public string? AgentRemarks { get; set; }
+        public DateTime? SupervisorRemarksUpdated { get; set; }
+        public string? SupervisorEmail { get; set; }
+        public string? SupervisorRemarks { get; set; }
+        public SupervisorRemarkType? SupervisorRemarkType { get; set; }
+        public DateTime? AssessorRemarksUpdated { get; set; }
+        public string? AssessorEmail { get; set; }
+        public string? AssessorRemarks { get; set; }
+        public AssessorRemarkType? AssessorRemarkType { get; set; }
+        public virtual ClaimsInvestigation? ClaimsInvestigation { get; set; }
     }
 }

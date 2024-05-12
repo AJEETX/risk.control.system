@@ -24,16 +24,18 @@ namespace risk.control.system.Controllers.Api.Claims
     public class CompanyDraftClaimsController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly IClaimsService claimsService;
 
-        public CompanyDraftClaimsController(ApplicationDbContext context)
+        public CompanyDraftClaimsController(ApplicationDbContext context, IClaimsService claimsService)
         {
             _context = context;
+            this.claimsService = claimsService;
         }
 
         [HttpGet("GetAssign")]
         public async Task<IActionResult> GetAssign()
         {
-            IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
+            IQueryable<ClaimsInvestigation> applicationDbContext = claimsService.GetClaims();
 
             var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
@@ -119,44 +121,5 @@ namespace risk.control.system.Controllers.Api.Claims
             return Ok(response);
         }
 
-        private IQueryable<ClaimsInvestigation> GetClaims()
-        {
-            IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.ClientCompany)
-               .Include(c => c.BeneficiaryDetail)
-               .Include(c => c.BeneficiaryDetail.BeneficiaryRelation)
-               .Include(c => c.BeneficiaryDetail.ClaimReport)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.CaseEnabler)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.CostCentre)
-              
-               .Include(c => c.BeneficiaryDetail)
-               .ThenInclude(c => c.PinCode)
-               .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.District)
-                .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.State)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.Country)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.District)
-               .Include(c => c.InvestigationCaseStatus)
-               .Include(c => c.InvestigationCaseSubStatus)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.InvestigationServiceType)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.LineOfBusiness)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.PinCode)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.State)
-               .Include(c => c.Vendor)
-               .Include(c => c.BeneficiaryDetail)
-               .ThenInclude(l => l.PreviousClaimReports)
-                .Where(c => !c.Deleted);
-            return applicationDbContext.OrderByDescending(o => o.Created);
-        }
     }
 }

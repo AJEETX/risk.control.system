@@ -24,16 +24,18 @@ namespace risk.control.system.Controllers.Api.Claims
     public class CompanyApprovedClaimsController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly IClaimsService claimsService;
 
-        public CompanyApprovedClaimsController(ApplicationDbContext context)
+        public CompanyApprovedClaimsController(ApplicationDbContext context, IClaimsService claimsService)
         {
             _context = context;
+            this.claimsService = claimsService;
         }
 
         [HttpGet("GetApproved")]
         public async Task<IActionResult> GetApproved()
         {
-            IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
+            IQueryable<ClaimsInvestigation> applicationDbContext = claimsService.GetClaims();
             var finishedStatus = _context.InvestigationCaseStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.FINISHED);
             var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
@@ -58,9 +60,9 @@ namespace risk.control.system.Controllers.Api.Claims
                 foreach (var item in applicationDbContext)
                 {
                     if (
-                        item.InvestigationCaseSubStatusId == assessorApprovedStatus.InvestigationCaseSubStatusId && 
-                        item.InvestigationCaseStatusId == finishedStatus.InvestigationCaseStatusId || 
-                        item.IsReviewCase && 
+                        item.InvestigationCaseSubStatusId == assessorApprovedStatus.InvestigationCaseSubStatusId &&
+                        item.InvestigationCaseStatusId == finishedStatus.InvestigationCaseStatusId ||
+                        item.IsReviewCase &&
                         item.InvestigationCaseStatusId != finishedStatus.InvestigationCaseStatusId)
                     {
                         claimsSubmitted.Add(item);
@@ -98,131 +100,6 @@ namespace risk.control.system.Controllers.Api.Claims
             })?.ToList();
 
             return Ok(response);
-        }
-
-        [HttpGet("GetApprovedMap")]
-        public IActionResult GetApprovedMap()
-        {
-            IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
-            var finishedStatus = _context.InvestigationCaseStatus.FirstOrDefault(i =>
-               i.Name == CONSTANTS.CASE_STATUS.FINISHED);
-            var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
-                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
-            var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
-                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
-            var assessorApprovedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
-                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR);
-            var reassignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
-                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER);
-            var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
-            var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
-
-            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
-            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
-
-            if (companyUser == null && vendorUser == null)
-            {
-                applicationDbContext = applicationDbContext.Where(i => i.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId);
-            }
-            else if (companyUser != null && vendorUser == null)
-            {
-                applicationDbContext = applicationDbContext.Where(i => i.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId);
-            }
-            var claimsSubmitted = new List<ClaimsInvestigation>();
-
-            if (userRole.Value.Contains(AppRoles.ASSESSOR.ToString()))
-            {
-
-                foreach (var item in applicationDbContext)
-                {
-                    if (item.InvestigationCaseSubStatusId == assessorApprovedStatus.InvestigationCaseSubStatusId || 
-                        item.IsReviewCase && item.InvestigationCaseStatusId != finishedStatus.InvestigationCaseStatusId)
-                    {
-                        claimsSubmitted.Add(item);
-                    }
-                }
-            }
-            var response = claimsSubmitted
-                    .Select(a => new MapResponse
-                    {
-                        Id = a.ClaimsInvestigationId,
-                        Address = LocationDetail.GetAddress(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
-                        Description = a.PolicyDetail.CauseOfLoss,
-                        Price = a.PolicyDetail.SumAssuredValue,
-                        Type = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? "home" : "building",
-                        Bed = a.CustomerDetail.CustomerIncome.GetEnumDisplayName(),
-                        Bath = a.CustomerDetail.ContactNumber,
-                        Size = a.CustomerDetail.Description,
-                        Position = new Position
-                        {
-                            Lat = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
-                           decimal.Parse(a.CustomerDetail.PinCode.Latitude) : decimal.Parse(a.BeneficiaryDetail.PinCode.Latitude),
-                            Lng = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
-                            decimal.Parse(a.CustomerDetail.PinCode.Longitude) : decimal.Parse(a.BeneficiaryDetail.PinCode.Longitude)
-                        },
-                        Url = (a.BeneficiaryDetail != null) ? "/ClaimsInvestigation/Detail?Id=" + a.ClaimsInvestigationId : "/ClaimsInvestigation/Details?Id=" + a.ClaimsInvestigationId
-                    })?
-                    .ToList();
-            var company = _context.ClientCompany.Include(c => c.PinCode).FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
-
-            foreach (var item in response)
-            {
-                var isExist = response.Any(r => r.Position.Lng == item.Position.Lng && r.Position.Lat == item.Position.Lat && item.Id != r.Id);
-                if (isExist)
-                {
-                    var (lat, lng) = LocationDetail.GetLatLng(item.Position.Lat, item.Position.Lng);
-                    item.Position = new Position
-                    {
-                        Lat = lat,
-                        Lng = lng,
-                    };
-                }
-            }
-            return Ok(new
-            {
-                response = response,
-                lat = decimal.Parse(company.PinCode.Latitude),
-                lng = decimal.Parse(company.PinCode.Longitude)
-            });
-        }
-
-        private IQueryable<ClaimsInvestigation> GetClaims()
-        {
-            IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.ClientCompany)
-               .Include(c => c.BeneficiaryDetail)
-               .ThenInclude(c => c.BeneficiaryRelation)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.CaseEnabler)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.CostCentre)
-              
-               .Include(c => c.BeneficiaryDetail)
-               .ThenInclude(c => c.PinCode)
-               .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.District)
-                .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.State)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.Country)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.District)
-               .Include(c => c.InvestigationCaseStatus)
-               .Include(c => c.InvestigationCaseSubStatus)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.InvestigationServiceType)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.LineOfBusiness)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.PinCode)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.State)
-               .Include(c => c.Vendor)
-               .Include(c => c.BeneficiaryDetail)
-               .ThenInclude(l => l.PreviousClaimReports)
-                .Where(c => !c.Deleted);
-            return applicationDbContext.OrderByDescending(o => o.Created);
         }
     }
 }
