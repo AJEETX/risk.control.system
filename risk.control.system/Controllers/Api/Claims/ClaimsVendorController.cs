@@ -164,6 +164,8 @@ namespace risk.control.system.Controllers.Api.Claims
 
             var allocatedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
+            var requestedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR);
             var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
 
@@ -182,7 +184,8 @@ namespace risk.control.system.Controllers.Api.Claims
             if (userAdminOrSuperVisor)
             {
                 applicationDbContext = applicationDbContext.Where(a =>
-                a.InvestigationCaseSubStatusId == allocatedStatus.InvestigationCaseSubStatusId);
+                a.InvestigationCaseSubStatusId == allocatedStatus.InvestigationCaseSubStatusId || 
+                a.InvestigationCaseSubStatusId == requestedStatus.InvestigationCaseSubStatusId);
                 foreach (var claim in applicationDbContext)
                 {
                     claim.AllocateView += 1;
@@ -240,7 +243,7 @@ namespace risk.control.system.Controllers.Api.Claims
                        Location = string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseSubStatus.Name + "</span>"),
                        Created = string.Join("", "<span class='badge badge-light'>" + a.Created.ToString("dd-MM-yyyy") + "</span>"),
                        timePending = a.GetTimePending(),
-                       PolicyNum = a.PolicyDetail.ContractNumber,
+                       PolicyNum = a.GetPolicyNumForAgency(requestedStatus.InvestigationCaseSubStatusId),
                        BeneficiaryPhoto = a.BeneficiaryDetail?.ProfilePicture != null ?
                                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.BeneficiaryDetail.ProfilePicture)) :
                                       Applicationsettings.NO_USER,
@@ -248,7 +251,8 @@ namespace risk.control.system.Controllers.Api.Claims
                         "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>" :
                         a.BeneficiaryDetail.BeneficiaryName,
                        TimeElapsed = DateTime.Now.Subtract(a.Created).TotalSeconds,
-                       IsNewAssigned = userAdminOrSuperVisor ? a.AllocateView <= 1 : a.InvestigateView <= 1,
+                       IsNewAssigned = userAdminOrSuperVisor ?  a.AllocateView <= 1 : a.InvestigateView <= 1,
+                       IsQueryCase = a.InvestigationCaseSubStatusId == requestedStatus.InvestigationCaseSubStatusId
                    })
                     ?.ToList();
 

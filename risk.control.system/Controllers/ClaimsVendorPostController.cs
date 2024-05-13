@@ -1,4 +1,6 @@
-﻿using AspNetCoreHero.ToastNotification.Abstractions;
+﻿using System.Web;
+
+using AspNetCoreHero.ToastNotification.Abstractions;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -202,6 +204,44 @@ namespace risk.control.system.Controllers
                 notifyService.Custom($"Claim #{policyNumber}  declined successfully", 3, "red", "far fa-file-powerpoint");
 
                 return RedirectToAction(nameof(ClaimsVendorController.Allocate), "ClaimsVendor");
+            }
+            catch (Exception)
+            {
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ReplyQuery(string claimId, ClaimsInvestigationVendorsModel request, List<string> flexRadioDefault)
+        {
+            try
+            {
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (string.IsNullOrWhiteSpace(currentUserEmail))
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                if (request == null)
+                {
+                    notifyService.Error("NOT FOUND !!!..");
+                    return RedirectToAction(nameof(Index));
+                }
+                request.ClaimsInvestigation.AgencyReport.EnquiryRequest.Answer = HttpUtility.HtmlEncode(request.ClaimsInvestigation.AgencyReport.EnquiryRequest.Answer);
+
+                IFormFile? messageDocument = Request.Form?.Files?.FirstOrDefault();
+
+                var claim = await claimsInvestigationService.SubmitQueryReplyToCompany(currentUserEmail, claimId, request.ClaimsInvestigation.AgencyReport.EnquiryRequest, messageDocument, flexRadioDefault);
+
+                if (claim != null)
+                {
+                    notifyService.Success("Enquiry Reply Sent to Company");
+                    return RedirectToAction(nameof(ClaimsVendorController.Allocate), "ClaimsVendor");
+                }
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
             }
             catch (Exception)
             {

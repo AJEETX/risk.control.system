@@ -84,5 +84,20 @@ namespace risk.control.system.Controllers.Api
 
             return trash != null ? File(trash.Attachment, trash.FileType, trash.AttachmentName + trash.Extension) : Problem();
         }
+
+        public async Task<IActionResult> EnquiryFileAttachment(int id)
+        {
+            var userEmail = HttpContext.User.Identity.Name;
+
+            var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
+            if (applicationUser == null)
+            {
+                return NotFound();
+            }
+
+            var fileAttachment = _context.QueryRequest.FirstOrDefault(q=>q.QueryRequestId == id);
+
+            return fileAttachment != null ? File(fileAttachment.QuestionAttachment, fileAttachment.QuestionFileType, fileAttachment.QuestionFileName + fileAttachment.QuestionFileName): null;
+        }
     }
 }

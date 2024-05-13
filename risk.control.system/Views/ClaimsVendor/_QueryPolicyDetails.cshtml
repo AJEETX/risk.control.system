@@ -1,0 +1,337 @@
+﻿@model ClaimsInvestigationVendorsModel
+
+@{
+    string address = string.Empty;
+    string baddress = string.Empty;
+    int currentAgeinYrs = 0;
+    bool customerExist = false;
+    bool beneficiaryExist = false;
+    int beneficaryAge = 0;
+    if (Model.ClaimsInvestigation != null)
+    {
+        address = @Model.ClaimsInvestigation?.CustomerDetail.Addressline + " " + @Model.ClaimsInvestigation?.CustomerDetail.District.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.State.Name + " " +
+        @Model.ClaimsInvestigation?.CustomerDetail.Country.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.PinCode.Code;
+        baddress = @Model.Location != null ? @Model.Location?.Addressline + " " +
+        @Model.Location?.District?.Name + " " + @Model.Location?.State?.Name + " " +
+        @Model.Location?.Country?.Name + " " + @Model.Location?.PinCode?.Code : string.Empty;
+        if (Model.ClaimsInvestigation?.CustomerDetail.CustomerDateOfBirth != null)
+        {
+            var age = DateTime.Now.Subtract(Model.ClaimsInvestigation.CustomerDetail.CustomerDateOfBirth).TotalDays;
+            currentAgeinYrs = (int)age / 365;
+        }
+    }
+    if (Model.Location.BeneficiaryDateOfBirth != null)
+    {
+        var age = DateTime.Now.Subtract(Model.Location.BeneficiaryDateOfBirth).TotalDays;
+        beneficaryAge = (int)age / 365;
+    }
+
+    <article>
+        <div class="bb-blog-inner">
+            <div class="card card-light collapsed-card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="far fa-file-powerpoint"></i> Claim # @Model.ClaimsInvestigation.PolicyDetail.ContractNumber
+                        <span class="hover-text">
+                            <i class="fas fa-info-circle"></i>
+                            <span class="tooltip-text" id="information">
+                                <li>
+                                    <i class='far fa-file-powerpoint'></i> Policy details.
+                                </li>
+                                <li>
+                                    <i class='fa fa-user-plus'></i> Customer details.
+                                </li>
+                                <li> <i class='fas fa-user-tie'></i> Beneficiary details </li>
+
+                            </span>
+                        </span>
+                    </h3>
+
+                    <div class="card-tools">
+                        <span data-toggle="tooltip" title="Policy # : @Model.ClaimsInvestigation.PolicyDetail.ContractNumber" class="badge badge-light">
+                            <i class='far fa-hand-point-right'></i>
+                        </span>
+                        <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card-body pb-0">
+                    <div class="row">
+                        <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
+                            <div class="card bg-light d-flex flex-fill">
+                                <div class="card-header text-muted border-bottom-0">
+                                    <i class="far fa-file-powerpoint"></i> Policy Details
+                                    <span class="hover-text">
+                                        <i class="fas fa-info-circle"></i>
+                                        <span class="tooltip-text" id="policy-information">
+                                            <i class='far fa-file-powerpoint'></i> Policy details.
+                                        </span>
+                                    </span>
+                                </div>
+                                <div class="progress">
+                                    <i class="far fa-bookmark bookmark-green"></i>
+                                    <div class="progress-bar" role="progressbar" style="width:100%;background-color:green;">
+                                        policy
+                                    </div>
+
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-7">
+                                            <h4 class="lead"><b>@Model.ClaimsInvestigation?.PolicyDetail.LineOfBusiness.Name</b></h4>
+                                            <p class="text-muted text-sm">
+                                                <b>Claim Type: </b>@Model.ClaimsInvestigation?.PolicyDetail.ClaimType
+                                            </p>
+                                            <ul class="ml-4 mb-0 fa-ul text-muted">
+                                                <li class="small">
+                                                    <span class="fa-li">
+                                                        <i class="far fa-clock"></i>
+                                                    </span>
+                                                    Incident Date: @Model.ClaimsInvestigation?.PolicyDetail.DateOfIncident.ToString("dd-MMM-yyyy")
+                                                </li>
+                                                <li class="small">
+                                                    <span class="fa-li">
+                                                        <i class="fas fa-money-bill-wave"></i>
+                                                    </span>
+                                                    Amount: <i class="fas fa-rupee-sign"></i>@Model.ClaimsInvestigation?.PolicyDetail.SumAssuredValue
+                                                </li>
+                                                <li class="small">
+                                                    <span class="fa-li">
+                                                        <i class="fas fa-tools"></i>
+                                                    </span>
+                                                    Service: @Model.ClaimsInvestigation?.PolicyDetail.InvestigationServiceType.Name
+                                                </li>
+                                                <li class="small">
+                                                    <span class="fa-li">
+                                                        <i class="fas fa-money-check-alt"></i>
+                                                    </span>
+                                                    Budget center: @Model.ClaimsInvestigation?.PolicyDetail.CostCentre.Name
+                                                </li>
+                                                <li class="small">
+                                                    <span class="fa-li">
+                                                        <i class="fas fa-sun"></i>
+                                                    </span>
+                                                    Reason: @Model.ClaimsInvestigation?.PolicyDetail.CaseEnabler.Name;
+                                                </li>
+                                                <li class="small">
+                                                    <span class="fa-li">
+                                                        <i class="far fa-clock"></i>
+                                                    </span>
+                                                    Issue Date: @Model.ClaimsInvestigation?.PolicyDetail.ContractIssueDate.ToString("dd-MMM-yyyy")
+                                                </li>
+
+                                            </ul>
+                                        </div>
+                                        <div class="col-5 text-center">
+                                            <p class="text-muted text-sm">
+
+                                            </p>
+                                            <p class="text-muted text-sm">
+                                                @if (Model?.ClaimsInvestigation?.PolicyDetail.DocumentImage is not null)
+                                                {
+                                                    <img id="documentImage" class="img-fluid" src="data:image/*;base64,@(Convert.ToBase64String(Model?.ClaimsInvestigation?.PolicyDetail.DocumentImage))">
+                                                }
+                                                else
+                                                {
+                                                    <img id="documentImage" alt="user-avatar"
+                                                         class="img-fluid form-Image" src=@Applicationsettings.NO_POLICY_IMAGE>
+                                                }
+                                            </p>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-footer">
+                                    <div class="text-right">
+                                        <a id="policy-comments" class="btn btn-sm bg-teal">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a id="policy-detail" class="btn btn-sm btn-info">
+                                            <i class="far fa-file-powerpoint"></i> ...
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
+                            <div class="card bg-light d-flex flex-fill">
+                                <div class="card-header text-muted border-bottom-0">
+                                    <i class="fa fa-user-plus"></i> Customer Details
+                                    <span class="hover-text">
+                                        <i class="fas fa-info-circle"></i>
+                                        <span class="tooltip-text" id="customer-information">
+                                            <i class='fa fa-user-plus'></i> Customer details
+                                        </span>
+                                    </span>
+                                </div>
+                                <div class="progress">
+                                    <i class="far fa-bookmark bookmark-green"></i>
+
+                                    <div class="progress-bar" role="progressbar" style="width:100%;background-color:green;">
+                                        customer
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-7">
+                                            <h4 class="lead"><b>@Model.ClaimsInvestigation.CustomerDetail.CustomerName</b></h4>
+                                            <p class="text-muted text-sm">
+                                                <b>Occupation: </b> @Model.ClaimsInvestigation.CustomerDetail.CustomerOccupation
+                                            </p>
+                                            <ul class="ml-4 mb-0 fa-ul text-muted">
+                                                <li class="small">
+                                                    <span class="fa-li">
+                                                        <i class="fas fa-user-clock"></i>
+                                                    </span>
+                                                    Age: @currentAgeinYrs
+                                                </li>
+                                                <li class="small">
+                                                    <span class="fa-li">
+                                                        <i class="fas fa-user-graduate"></i>
+                                                    </span>
+                                                    Education: @Model.ClaimsInvestigation.CustomerDetail.CustomerEducation
+                                                </li>
+                                                <li class="small">
+                                                    <span class="fa-li">
+                                                        <i class="fas fa-rupee-sign"></i>
+                                                    </span>
+                                                    Income: @Model.ClaimsInvestigation.CustomerDetail.CustomerIncome
+                                                </li>
+
+                                                <li class="small">
+                                                    <span class="fa-li">
+                                                        <i class="fas fa-home"></i>
+                                                    </span>
+                                                    Address:  @address
+                                                </li>
+                                                <li class="small">
+                                                    <span class="fa-li">
+                                                        <i class="fas fa-lg fa-phone"></i>
+                                                    </span>
+                                                    Phone #: + @Model.ClaimsInvestigation.CustomerDetail.ContactNumber
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-5 text-center">
+                                            <p class="text-muted text-sm">
+                                                @if (Model?.ClaimsInvestigation?.CustomerDetail?.ProfilePicture is not null)
+                                                {
+                                                    <img id="profileImage" class="img-fluid block-data" src="data:image/*;base64,@(Convert.ToBase64String(Model?.ClaimsInvestigation?.CustomerDetail?.ProfilePicture))">
+                                                }
+                                                else
+                                                {
+                                                    <img id="profileImage" class="img-fluid block-data" src="@Applicationsettings.NO_USER">
+                                                }
+                                            </p>
+                                            <p class="text-muted text-sm">
+                                                <img id="profileImageMap" class="img-fluid block-data" src="@Model.ClaimsInvestigation?.CustomerDetail?.CustomerLocationMap">
+                                            </p>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-footer">
+                                    <div class="text-right">
+                                        <a id="customer-comments" class="btn btn-sm bg-teal">
+                                            <i class="fas fa-comments"></i>
+                                        </a>
+                                        <a id="customer-detail" class="btn btn-sm btn-warning">
+                                            <i class="fa fa-user-plus"></i> ...
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
+                            <div class="card bg-light d-flex flex-fill">
+                                <div class="card-header text-muted border-bottom-0">
+                                    <i class="fas fa-user-tie"></i>  Beneficiary Details
+                                    <span class="hover-text">
+                                        <i class="fas fa-info-circle"></i>
+                                        <span class="tooltip-text" id="beneficiary-information">
+
+                                            <i class='fas fa-user-tie'></i> Beneficiary details
+                                        </span>
+                                    </span>
+                                </div>
+                                <div class="progress">
+                                    <i class="far fa-bookmark bookmark-green"></i>
+
+                                    <div class="progress-bar" role="progressbar" style="width:100%;background-color:green;">
+                                        beneficiary
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-7">
+                                            <h4 class="lead"><b>@Model.Location?.BeneficiaryName</b></h4>
+                                            <p class="text-muted text-sm">
+                                                <b>Relation: </b> @Model.Location?.BeneficiaryRelation.Name
+                                            </p>
+                                            <ul class="ml-4 mb-0 fa-ul text-muted">
+                                                <li class="small">
+                                                    <span class="fa-li">
+                                                        <i class="fas fa-user-clock"></i>
+                                                    </span>
+                                                    Age: @beneficaryAge
+                                                </li>
+
+                                                <li class="small">
+                                                    <span class="fa-li">
+                                                        <i class="fas fa-rupee-sign"></i>
+                                                    </span>
+                                                    Income: @Model.Location?.BeneficiaryIncome
+                                                </li>
+                                                <li class="small">
+                                                    <span class="fa-li">
+                                                        <i class="fas fa-home"></i>
+                                                    </span>
+                                                    Address: @baddress
+                                                </li>
+                                                <li class="small">
+                                                    <span class="fa-li">
+                                                        <i class="fas fa-lg fa-phone"></i>
+                                                    </span>
+                                                    Phone #: + @Model.Location?.BeneficiaryContactNumber
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-5 text-center">
+                                            <p class="text-muted text-sm">
+                                                @if (Model?.Location?.ProfilePicture is not null)
+                                                {
+                                                    <img id="bImage" class="img-fluid block-data" src="data:image/*;base64,@(Convert.ToBase64String(Model?.Location?.ProfilePicture))">
+                                                }
+                                                else
+                                                {
+                                                    <img id="bImage" class="img-fluid block-data" src="@Applicationsettings.NO_USER">
+                                                }
+                                            </p>
+                                            <p class="text-muted text-sm">
+                                                <img id="bImageMap" class="img-fluid block-data" src="@Model.Location?.BeneficiaryLocationMap">
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-footer">
+                                    <div class="text-right">
+                                        <a id="beneficiary-comments" class="btn btn-sm bg-teal">
+                                            <i class="fas fa-comments"></i>
+                                        </a>
+                                        <a id="beneficiary-detail" class="btn btn-sm btn-success">
+                                            <i class="fas fa-user-tie"></i> ...
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div> <!-- class bb-blog-inner -->
+    </article>
+}

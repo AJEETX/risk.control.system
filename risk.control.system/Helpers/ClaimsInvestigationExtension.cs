@@ -32,13 +32,31 @@ namespace risk.control.system.Helpers
 
         public static string GetPolicyNum(this ClaimsInvestigation a)
         {
-            var location = a.BeneficiaryDetail;
+            var location = a;
             if (location is not null)
             {
                 var isReview = a.PreviousClaimReports.Count > 0;
                 if (isReview)
                 {
                     return string.Join("", a.PolicyDetail?.ContractNumber + "<i class=\"fa fa-asterisk asterik-style\" title=\"REVIEW CASE\"></i>");
+                }
+                var isEnquiry = a.IsQueryCase;
+                if(isEnquiry)
+                {
+                    return string.Join("", a.PolicyDetail?.ContractNumber + "<i class=\"fa fa-asterisk asterik-style\" title=\"ENQUIRY REPLY\"></i>");
+                }
+            }
+            return string.Join("", a.PolicyDetail?.ContractNumber + "<i class=\"fa fa-asterisk asterik-style-none\"></i>");
+        }
+        public static string GetPolicyNumForAgency(this ClaimsInvestigation a, string id)
+        {
+            var location = a;
+            if (location is not null)
+            {
+                var isRequested = a.InvestigationCaseSubStatusId == id;
+                if (isRequested)
+                {
+                    return string.Join("", a.PolicyDetail?.ContractNumber + "<i class=\"fa fa-asterisk asterik-style\" title=\"ENQUIRY\"></i>");
                 }
             }
             return string.Join("", a.PolicyDetail?.ContractNumber + "<i class=\"fa fa-asterisk asterik-style-none\"></i>");

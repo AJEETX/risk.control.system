@@ -16,7 +16,7 @@ namespace risk.control.system.Services
         Task<ClaimTransactionModel> GetClaimDetails(string currentUserEmail, string id);
 
         Task<ClaimsInvestigation> GetAssignDetails(string id);
-        QueryRequest GetQueryReport(string currentUserEmail, string id);
+        EnquiryRequest GetQueryReport(string currentUserEmail, string id);
 
         PreviousClaimReport GetPreviousReport(long id);
     }
@@ -230,6 +230,7 @@ namespace risk.control.system.Services
             var claimsInvestigation = _context.ClaimsInvestigation
                 .Include(c => c.PreviousClaimReports)
                 .Include(c => c.AgencyReport)
+                .ThenInclude(c => c.EnquiryRequest)
                 .Include(c => c.AgencyReport.DigitalIdReport)
                 .Include(c => c.AgencyReport.DocumentIdReport)
                 .Include(c => c.AgencyReport.ReportQuestionaire)
@@ -275,7 +276,8 @@ namespace risk.control.system.Services
             {
                 claimsInvestigation.AgencyReport.AssessorRemarks = null;
             }
-            return (new ClaimsInvestigationVendorsModel { AgencyReport = claimsInvestigation.AgencyReport, Location = claimCase, ClaimsInvestigation = claimsInvestigation, TrialVersion = companyUser.ClientCompany.LicenseType == Standard.Licensing.LicenseType.Trial });
+            return (new ClaimsInvestigationVendorsModel { AgencyReport = claimsInvestigation.AgencyReport, Location = claimCase, ClaimsInvestigation = claimsInvestigation, 
+                TrialVersion = companyUser?.ClientCompany?.LicenseType == Standard.Licensing.LicenseType.Trial });
         }
 
         public PreviousClaimReport GetPreviousReport(long id)
@@ -290,14 +292,14 @@ namespace risk.control.system.Services
             return report;
         }
 
-        public QueryRequest GetQueryReport(string currentUserEmail, string id)
+        public EnquiryRequest GetQueryReport(string currentUserEmail, string id)
         {
             var claim = _context.ClaimsInvestigation
                 .Include(c=>c.AgencyReport)
-                .ThenInclude(a=>a.QueryRequest)
+                .ThenInclude(a=>a.EnquiryRequest)
                 .FirstOrDefault(c=>c.ClaimsInvestigationId == id);
-            var request = new QueryRequest();
-            claim.AgencyReport.QueryRequest = request;
+            var request = new EnquiryRequest();
+            claim.AgencyReport.EnquiryRequest = request;
             _context.ClaimsInvestigation.Update(claim);
             _context.SaveChanges();
             return request;

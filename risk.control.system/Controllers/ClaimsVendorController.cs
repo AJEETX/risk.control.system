@@ -32,6 +32,7 @@ namespace risk.control.system.Controllers
         private readonly UserManager<VendorApplicationUser> userManager;
         private readonly IDashboardService dashboardService;
         private readonly IClaimsVendorService vendorService;
+        private readonly IInvestigationReportService investigationReportService;
         private readonly IMailboxService mailboxService;
         private readonly INotyfService notifyService;
         private readonly ApplicationDbContext _context;
@@ -43,6 +44,7 @@ namespace risk.control.system.Controllers
             IWebHostEnvironment webHostEnvironment,
             IDashboardService dashboardService,
             IClaimsVendorService vendorService,
+            IInvestigationReportService investigationReportService,
             IMailboxService mailboxService,
             INotyfService notifyService,
             ApplicationDbContext context)
@@ -51,6 +53,7 @@ namespace risk.control.system.Controllers
             this.userManager = userManager;
             this.dashboardService = dashboardService;
             this.vendorService = vendorService;
+            this.investigationReportService = investigationReportService;
             this.mailboxService = mailboxService;
             this.notifyService = notifyService;
             this._context = context;
@@ -428,6 +431,26 @@ namespace risk.control.system.Controllers
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
+        }
+        [Breadcrumb(" Reply Enquiry", FromAction = "GetInvestigateReport")]
+        [Authorize(Roles = "AGENCY_ADMIN,SUPERVISOR")]
+
+        public IActionResult ReplyEnquiry(string id)
+        {
+            var currentUserEmail = HttpContext.User?.Identity?.Name;
+            if (string.IsNullOrWhiteSpace(currentUserEmail))
+            {
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+            if (id == null)
+            {
+                notifyService.Error("NOT FOUND !!!..");
+                return RedirectToAction(nameof(Index));
+            }
+            var model = investigationReportService.GetInvestigateReport(currentUserEmail, id);
+            ViewData["claimId"] = id;
+            return View(model);
         }
 
         [Breadcrumb(title: "Invoice", FromAction = "CompletedDetail")]

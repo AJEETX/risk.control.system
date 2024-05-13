@@ -371,6 +371,8 @@ namespace risk.control.system.Controllers.Api.Claims
 
             var reAssigned2AssignerStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER);
+            var requestedByAssessor = _context.InvestigationCaseSubStatus
+               .FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR);
 
             var claimsSubmitted = new List<ClaimsInvestigation>();
             if (userRole.Value.Contains(AppRoles.CREATOR.ToString()))
@@ -407,17 +409,18 @@ namespace risk.control.system.Controllers.Api.Claims
 
                 foreach (var claim in applicationDbContext)
                 {
-                    var userHasReviewClaimLogs = _context.InvestigationTransaction.Where(c => c.ClaimsInvestigationId == claim.ClaimsInvestigationId && c.IsReviewCase &&
-                        c.UserEmailActioned == companyUser.Email)?.ToList();
+                    var userHasReviewClaimLogs = _context.InvestigationTransaction.Where(c => c.ClaimsInvestigationId == claim.ClaimsInvestigationId && 
+                    c.IsReviewCase && c.UserEmailActioned == companyUser.Email)?.ToList();
 
                     int? reviewLogCount = 0;
                     if (userHasReviewClaimLogs != null && userHasReviewClaimLogs.Count > 0)
                     {
                         reviewLogCount = userHasReviewClaimLogs.OrderByDescending(o=>o.HopCount).First().HopCount;
                     }
-                    var userHasClaimLog = _context.InvestigationTransaction.Any(c => c.ClaimsInvestigationId == claim.ClaimsInvestigationId && c.UserEmailActioned == companyUser.Email && c.HopCount >= reviewLogCount);
+                    var userHasClaimLog = _context.InvestigationTransaction.Any(c => c.ClaimsInvestigationId == claim.ClaimsInvestigationId && 
+                    c.UserEmailActioned == companyUser.Email && c.HopCount >= reviewLogCount);
 
-                    if (claim.IsReviewCase && userHasClaimLog)
+                    if (claim.IsReviewCase && userHasClaimLog || claim.InvestigationCaseSubStatusId == requestedByAssessor.InvestigationCaseSubStatusId)
                     {
                         claimsSubmitted.Add(claim);
                     }

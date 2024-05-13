@@ -43,14 +43,20 @@ namespace risk.control.system.Controllers.Api.Claims
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
             var submittedToAssessorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
+
+            var replyByAgency = _context.InvestigationCaseSubStatus
+               .FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR);
             var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
 
             var companyUser = _context.ClientCompanyApplicationUser.Include(u=>u.ClientCompany).FirstOrDefault(c => c.Email == userEmail.Value);
-            applicationDbContext = applicationDbContext.Where(i => i.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
-            i.InvestigationCaseSubStatusId == submittedToAssessorStatus.InvestigationCaseSubStatusId && 
+            applicationDbContext = applicationDbContext.Where(i =>
+            i.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
             i.UserEmailActionedTo == string.Empty &&
-             i.UserRoleActionedTo == $"{AppRoles.ASSESSOR.GetEnumDisplayName()} ( {companyUser.ClientCompany.Email})");
+             i.UserRoleActionedTo == $"{AppRoles.ASSESSOR.GetEnumDisplayName()} ( {companyUser.ClientCompany.Email})" &&
+            i.InvestigationCaseSubStatusId == submittedToAssessorStatus.InvestigationCaseSubStatusId ||
+            i.InvestigationCaseSubStatusId == replyByAgency.InvestigationCaseSubStatusId 
+             );
 
             var newClaimsAssigned = new List<ClaimsInvestigation>();
             var claimsAssigned = new List<ClaimsInvestigation>();

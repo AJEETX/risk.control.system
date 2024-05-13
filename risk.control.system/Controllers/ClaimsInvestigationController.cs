@@ -625,7 +625,7 @@ namespace risk.control.system.Controllers
 
         [Breadcrumb(title: "Enquiry", FromAction = "GetInvestigateReport")]
         [Authorize(Roles = ASSESSOR.DISPLAY_NAME)]
-        public IActionResult QueryReport(string selectedcase)
+        public IActionResult SendEnquiry(string selectedcase)
         {
             try
             {
@@ -640,9 +640,9 @@ namespace risk.control.system.Controllers
                     notifyService.Error("NOT FOUND !!!..");
                     return RedirectToAction(nameof(Index));
                 }
-                //var model = investigationReportService.GetQueryReport(currentUserEmail,selectedcase);
+                var model = investigationReportService.GetInvestigateReport(currentUserEmail, selectedcase);
                 ViewData["claimId"] = selectedcase;
-                return View();
+                return View(model);
             }
             catch (Exception)
             {

@@ -374,6 +374,8 @@ namespace risk.control.system.Services
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
             var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
+            var requestedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR);
 
             IQueryable<ClaimsInvestigation> applicationDbContext = GetAgencyClaims();
 
@@ -381,7 +383,8 @@ namespace risk.control.system.Services
 
             var count = applicationDbContext
                     .Count(i => i.VendorId == vendorUser.VendorId 
-                    && i.InvestigationCaseSubStatusId == allocatedStatus.InvestigationCaseSubStatusId);
+                    && i.InvestigationCaseSubStatusId == allocatedStatus.InvestigationCaseSubStatusId ||
+                    i.InvestigationCaseSubStatusId == requestedStatus.InvestigationCaseSubStatusId);
             
             return count;
         }
@@ -390,12 +393,18 @@ namespace risk.control.system.Services
             IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
             var submittedToAssessorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
+
+            var replyByAgency = _context.InvestigationCaseSubStatus
+               .FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR);
+
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
 
             var count = applicationDbContext.Count(i => i.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
-            i.InvestigationCaseSubStatusId == submittedToAssessorStatus.InvestigationCaseSubStatusId &&
             i.UserEmailActionedTo == string.Empty &&
-             i.UserRoleActionedTo == $"{AppRoles.ASSESSOR.GetEnumDisplayName()} ( {companyUser.ClientCompany.Email})");
+             i.UserRoleActionedTo == $"{AppRoles.ASSESSOR.GetEnumDisplayName()} ( {companyUser.ClientCompany.Email})" &&
+            i.InvestigationCaseSubStatusId == submittedToAssessorStatus.InvestigationCaseSubStatusId ||
+            i.InvestigationCaseSubStatusId == replyByAgency.InvestigationCaseSubStatusId
+             );
             
             return count;
         }
@@ -603,6 +612,9 @@ namespace risk.control.system.Services
 
             var reAssigned2AssignerStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER);
+            var requestedByAssessor = _context.InvestigationCaseSubStatus
+               .FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR);
+
             var count = 0;
             var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
@@ -622,7 +634,7 @@ namespace risk.control.system.Services
                 var userHasClaimLog = _context.InvestigationTransaction.Any(c => c.ClaimsInvestigationId == claim.ClaimsInvestigationId && 
                 c.UserEmailActioned == companyUser.Email && c.HopCount >= reviewLogCount);
 
-                if (claim.IsReviewCase && userHasClaimLog)
+                if (claim.IsReviewCase && userHasClaimLog || claim.InvestigationCaseSubStatusId == requestedByAssessor.InvestigationCaseSubStatusId)
                 {
                     count +=1;
                 }

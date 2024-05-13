@@ -70,6 +70,15 @@
             <partial name="_PolicyDetails" model="@Model" />
 
             <partial name="_AgencyReport" model="@Model" />
+            @if (@Model.ClaimsInvestigation.IsQueryCase && @Model.ClaimsInvestigation.AgencyReport.EnquiryRequest != null)
+            {
+                var data = new ClaimTransactionModel
+                {
+                    ClaimsInvestigation = Model.ClaimsInvestigation,
+                };
+                <partial name="_EnquiryReport" model="@data" />
+            }
+
             @{
                 var lastReport = Model.ClaimsInvestigation?.PreviousClaimReports.FirstOrDefault();
                 if (lastReport is not null)
@@ -117,7 +126,7 @@
                                     <div class="col-md-12">
                                         <div class="form-group">
                                             <div class="form-check form-switch">
-                                                
+
                                                 <label class="form-check-label" for="flexRadioDefault2">
                                                     @if (string.IsNullOrWhiteSpace(@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImageMatchConfidence))
                                                     {
@@ -130,11 +139,11 @@
                                                     <i class="fas fa-portrait"></i> <b> Photo Match </b>
                                                 </label>
                                             </div>
-                                            
+
                                         </div>
                                         <div class="form-group">
                                             <div class="form-check form-switch">
-                                               
+
                                                 <label class="form-check-label" for="flexRadioDefault1">
                                                     @if (@Model.ClaimsInvestigation.AgencyReport.DocumentIdReport?.DocumentIdImageValid != null && @Model.ClaimsInvestigation.AgencyReport.DocumentIdReport.DocumentIdImageValid.Value)
                                                     {
@@ -150,10 +159,10 @@
                                         </div>
                                         <div class="form-group">
                                             <div class="form-check form-switch">
-                                                
+
                                                 <label class="form-check-label" for="flexRadioDefault3">
                                                     <i style='color:green;' class='fas fa-check-circle'></i> <span class="process-case"> </span>
-                                                    <i class="far fa-comment"></i>  <b> Questionaire info </b> 
+                                                    <i class="far fa-comment"></i>  <b> Questionaire info </b>
                                                 </label>
 
                                             </div>
@@ -166,7 +175,7 @@
                                                 </label>
                                             </div>
                                         </div>
-                                        
+
                                     </div>
                                 </div>
                             </div>
@@ -181,8 +190,8 @@
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-md-12">
-                                            @if (Model.TrialVersion)
-                                            {
+                                        @if (Model.TrialVersion)
+                                        {
                                             <div class="form-group">
                                                 <div class="form-check form-switch">
                                                     <input disabled class="form-check-input selected-case" type="radio" name="flexRadioDefault" id="flexRadioDefault2">
@@ -190,11 +199,11 @@
                                                         <b> REVIEW </b> <span class="trial-case">  disabled in trial version </span>
                                                     </label>
                                                 </div>
-                                                </div>
-                                                @if (string.IsNullOrWhiteSpace(@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImageMatchConfidence) ||
-                                               @Model.ClaimsInvestigation.AgencyReport.DocumentIdReport?.DocumentIdImageValid == null || 
-                                               !@Model.ClaimsInvestigation.AgencyReport.DocumentIdReport.DocumentIdImageValid.Value)
-                                                {
+                                            </div>
+                                            @if (string.IsNullOrWhiteSpace(@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImageMatchConfidence) ||
+                                           @Model.ClaimsInvestigation.AgencyReport.DocumentIdReport?.DocumentIdImageValid == null ||
+                                           !@Model.ClaimsInvestigation.AgencyReport.DocumentIdReport.DocumentIdImageValid.Value)
+                                            {
                                                 <div class="form-group">
                                                     <div class="form-check form-switch">
                                                         <input class="form-check-input selected-case" type="radio" name="flexRadioDefault" id="flexRadioDefault1" checked>
@@ -202,18 +211,18 @@
                                                             <b>  REJECT </b> <span class="process-case"> System recommendation : <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i> </span>
                                                         </label>
                                                     </div>
-                                                    </div>
-                                                    <div class="form-group">
+                                                </div>
+                                                <div class="form-group">
                                                     <div class="form-check form-switch">
                                                         <input class="form-check-input selected-case" type="radio" name="flexRadioDefault" id="flexRadioDefault3">
                                                         <label class="form-check-label" for="flexRadioDefault3">
                                                             <b> APPROVE </b>
                                                         </label>
                                                     </div>
-                                                    </div>
-                                                }
-                                                else
-                                                {
+                                                </div>
+                                            }
+                                            else
+                                            {
                                                 <div class="form-group">
                                                     <div class="form-check form-switch">
                                                         <input class="form-check-input selected-case" type="radio" name="flexRadioDefault" id="flexRadioDefault1">
@@ -221,7 +230,7 @@
                                                             <b>  REJECT </b> <span class="process-case"> analyse the report and reject</span>
                                                         </label>
                                                     </div>
-                                                    </div>
+                                                </div>
                                                 <div class="form-group">
                                                     <div class="form-check form-switch">
                                                         <input class="form-check-input selected-case" type="radio" name="flexRadioDefault" id="flexRadioDefault3" checked>
@@ -230,12 +239,12 @@
                                                         </label>
                                                     </div>
                                                 </div>
-                                                }
                                             }
-                                            else
+                                        }
+                                        else
+                                        {
+                                            if (Model.ClaimsInvestigation.ReviewCount == 1)
                                             {
-                                                if (Model.ClaimsInvestigation.ReviewCount == 1)
-                                                {
                                                 <div class="form-group">
 
                                                     <div class="form-check form-switch">
@@ -245,9 +254,9 @@
                                                         </label>
                                                     </div>
                                                 </div>
-                                                }
-                                                else
-                                                {
+                                            }
+                                            else
+                                            {
                                                 <div class="form-group">
                                                     <div class="form-check form-switch">
                                                         <input class="form-check-input selected-case" type="radio" name="flexRadioDefault" id="flexRadioDefault2">
@@ -256,11 +265,11 @@
                                                         </label>
                                                     </div>
                                                 </div>
-                                                }
-                                                @if (string.IsNullOrWhiteSpace(@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImageMatchConfidence) ||
-                                               @Model.ClaimsInvestigation.AgencyReport.DocumentIdReport?.DocumentIdImageValid == null ||
-                                               !@Model.ClaimsInvestigation.AgencyReport.DocumentIdReport.DocumentIdImageValid.Value)
-                                                {
+                                            }
+                                            @if (string.IsNullOrWhiteSpace(@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImageMatchConfidence) ||
+                                           @Model.ClaimsInvestigation.AgencyReport.DocumentIdReport?.DocumentIdImageValid == null ||
+                                           !@Model.ClaimsInvestigation.AgencyReport.DocumentIdReport.DocumentIdImageValid.Value)
+                                            {
                                                 <div class="form-group">
                                                     <div class="form-check form-switch">
                                                         <input class="form-check-input selected-case" type="radio" name="flexRadioDefault" id="flexRadioDefault1" checked>
@@ -278,10 +287,10 @@
                                                         </label>
                                                     </div>
                                                 </div>
-                                                }
+                                            }
 
-                                                else
-                                                {
+                                            else
+                                            {
                                                 <div class="form-group">
 
                                                     <div class="form-check form-switch">
@@ -300,53 +309,64 @@
                                                         </label>
                                                     </div>
                                                 </div>
-                                                }
-
                                             }
-                                            
-                                        </div>
+
+                                        }
+
                                     </div>
                                 </div>
+
                                 <div class="row">
                                     <div class="col-md-12">
-                                    <div class="col-sm-12">
-                                        <div class="form-group">
-                                            <span class="input-group-label"> Remarks :</span>
-                                            <div class="input-group">
-                                                <div class="input-group-prepend">
-                                                    <span class="input-group-text" asp-for="ClaimsInvestigation.AgencyReport.AgentRemarks"><i class="far fa-comment"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
-                                                </div>
-                                                <input required maxlength="100" name="assessorRemarks" id="assessorRemarks" type="text" class="form-control remarks" autocomplete="off" required placeholder="enter remarks to submit" />
+                                        <div class="col-sm-12">
+                                            <div class="form-group">
+                                                <span class="input-group-label"> Remarks :</span>
+                                                <div class="input-group">
+                                                    <div class="input-group-prepend">
+                                                        <span class="input-group-text" asp-for="ClaimsInvestigation.AgencyReport.AgentRemarks"><i class="far fa-comment"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
+                                                    </div>
+                                                    <input required maxlength="100" name="assessorRemarks" id="assessorRemarks" type="text" class="form-control remarks" autocomplete="off" required placeholder="enter remarks to submit" />
 
-                                                <span asp-validation-for="ClaimsInvestigation.AgencyReport.SupervisorRemarks" class="text-danger"></span>
+                                                    <span asp-validation-for="ClaimsInvestigation.AgencyReport.SupervisorRemarks" class="text-danger"></span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                    </div>
                                 </div>
-                                
                             </div>
                         </div>
                     </div>
                 </div>
-
             </div>
-            <div class="card-footer">
 
+            <div class="card-footer">
                 <div class="row  float-right">
                     <div class="col-md-12">
                         <a id="back" asp-controller="ClaimsInvestigation" class="btn btn-outline-secondary" asp-action="Assessor">
                             <i class="fas fa-arrow-left" aria-hidden="true"></i> Back
                         </a>
-                        <div id="enquire-case" asp-controller="ClaimsInvestigation" asp-action="QueryReport" asp-route-selectedcase="@Model.ClaimsInvestigation.ClaimsInvestigationId" class="btn btn-warning">
-                        <i class="fa fa-edit"></i>  Enquire
-                        </div>
+                        @if (@Model.ClaimsInvestigation.IsQueryCase && @Model.ClaimsInvestigation.AgencyReport.EnquiryRequest != null)
+                        {
+
+                            <div class="btn btn-warning disabled">
+                                <i class="fa fa-edit"></i>  ENQUIRE
+                            </div>
+                        }
+                        else
+                        {
+                            <a id="enquire-case" asp-controller="ClaimsInvestigation" asp-action="SendEnquiry" onclick="showenquiry()"
+                               asp-route-selectedcase="@Model.ClaimsInvestigation.ClaimsInvestigationId" class="btn btn-warning">
+                                <i class="fa fa-edit"></i>  ENQUIRE
+                            </a>
+                        }
                         <button id="approve-case" type="submit" class="btn btn-info">
                             <i class="fas fa-glasses" aria-hidden="true"></i> SUBMIT
                         </button>
                     </div>
                 </div>
             </div>
+        </div>
+
     </form>
 </section>
 

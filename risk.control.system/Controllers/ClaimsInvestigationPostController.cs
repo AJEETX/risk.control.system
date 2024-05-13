@@ -209,7 +209,7 @@ namespace risk.control.system.Controllers
 
                 return RedirectToAction(nameof(ClaimsInvestigationController.Assessor), "ClaimsInvestigation");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -558,6 +558,7 @@ namespace risk.control.system.Controllers
                     notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
+
                 await claimsInvestigationService.WithdrawCaseByCompany(userEmail, model, claimId);
 
                 await mailboxService.NotifyClaimWithdrawlToCompany(userEmail, claimId);
@@ -574,8 +575,8 @@ namespace risk.control.system.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = ASSESSOR.DISPLAY_NAME)]
-        public async Task<IActionResult> SubmitQuery(string claimId, QueryRequest request)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SubmitQuery(string claimId, string reply, ClaimsInvestigationVendorsModel request)
         {
             try
             {
@@ -590,11 +591,11 @@ namespace risk.control.system.Controllers
                     notifyService.Error("NOT FOUND !!!..");
                     return RedirectToAction(nameof(Index));
                 }
-                request.Description = HttpUtility.HtmlEncode(request.Description);
+                request.AgencyReport.EnquiryRequest.Description = HttpUtility.HtmlEncode(request.AgencyReport.EnquiryRequest.Description);
 
                 IFormFile? messageDocument = Request.Form?.Files?.FirstOrDefault();
 
-                var model =await  claimsInvestigationService.SubmitQueryToAgency(currentUserEmail, claimId, request, messageDocument);
+                var model =await  claimsInvestigationService.SubmitQueryToAgency(currentUserEmail, claimId, request.AgencyReport.EnquiryRequest, messageDocument);
                 if(model !=null)
                 {
                     notifyService.Success("Query Sent to Agency");

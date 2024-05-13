@@ -32,7 +32,21 @@ $(function () {
             nodes[i].disabled = true;
         }
     });
+    $('#edit-profile.btn.btn-warning').on('click', function () {
+        $("body").addClass("submit-progress-bg");
+        // Wrap in setTimeout so the UI
+        // can update the spinners
+        setTimeout(function () {
+            $(".submit-progress").removeClass("hidden");
+        }, 1);
+        $('#edit-profile.btn.btn-warning').attr('disabled', 'disabled');
+        $('#edit-profile.btn.btn-warning').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Edit Profile");
 
+        var nodes = document.getElementById("article").getElementsByTagName('*');
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].disabled = true;
+        }
+    });
 
     $('a#editagency.btn.btn-warning').on('click', function () {
         $("body").addClass("submit-progress-bg");

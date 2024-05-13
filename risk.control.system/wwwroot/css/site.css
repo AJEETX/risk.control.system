@@ -34,7 +34,6 @@ a {
 html {
     font-size: .94rem;
     position: relative;
-    overflow-y:hidden;
 }
 
 @media (min-width: 768px) {

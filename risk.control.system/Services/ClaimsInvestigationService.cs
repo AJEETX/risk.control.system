@@ -42,7 +42,8 @@ namespace risk.control.system.Services
         Task<List<string>> ProcessAutoAllocation(List<string> claims, ClientCompany company, string userEmail);
         Task WithdrawCaseByCompany(string userEmail, ClaimTransactionModel model, string claimId);
 
-        Task<ClaimsInvestigation> SubmitQueryToAgency(string userEmail, string claimId, QueryRequest request, IFormFile messageDocument);
+        Task<ClaimsInvestigation> SubmitQueryToAgency(string userEmail, string claimId, EnquiryRequest request, IFormFile messageDocument);
+        Task<ClaimsInvestigation> SubmitQueryReplyToCompany(string userEmail, string claimId, EnquiryRequest request, IFormFile messageDocument, List<string> flexRadioDefault);
     }
 
     public class ClaimsInvestigationService : IClaimsInvestigationService
@@ -1120,7 +1121,6 @@ namespace risk.control.system.Services
             claimsCaseToReassign.AgencyReport.DocumentIdReport = new DocumentIdReport();
             claimsCaseToReassign.AgencyReport.ReportQuestionaire = new ReportQuestionaire();
 
-            claimsCaseToReassign.VendorId = 0;
             claimsCaseToReassign.AssignedToAgency = false;
             claimsCaseToReassign.ReviewCount += 1;
             claimsCaseToReassign.UserEmailActioned = userEmail;
@@ -1282,9 +1282,10 @@ namespace risk.control.system.Services
             return await _context.SaveChangesAsync() > 0 ? claimsCaseToAllocateToVendor : null;
         }
 
-        public async Task<ClaimsInvestigation> SubmitQueryToAgency(string userEmail, string claimId, QueryRequest request, IFormFile messageDocument)
+        public async Task<ClaimsInvestigation> SubmitQueryToAgency(string userEmail, string claimId, EnquiryRequest request, IFormFile messageDocument)
         {
             var claim = _context.ClaimsInvestigation
+                .Include(c=>c.AgencyReport)
                 .Include(c=>c.Vendor)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimId);
 
@@ -1297,6 +1298,7 @@ namespace risk.control.system.Services
             claim.UpdatedBy = userEmail;
             claim.UserEmailActioned = userEmail;
             claim.AssignedToAgency = true;
+            claim.IsQueryCase = true;
             claim.UserRoleActionedTo = $"{AppRoles.SUPERVISOR.GetEnumDisplayName()} ( {claim.Vendor.Email})";
 
             if(messageDocument != null)
@@ -1304,7 +1306,11 @@ namespace risk.control.system.Services
                 using var ms = new MemoryStream();
                 messageDocument.CopyTo(ms);
                 request.QuestionAttachment = ms.ToArray();
+                request.QuestionFileName =Path.GetFileName(messageDocument.FileName);
+                request.QuestionFileExtension = Path.GetExtension(messageDocument.FileName);
+                request.QuestionFileType = messageDocument.ContentType;
             }
+            claim.AgencyReport.EnquiryRequest = request;
             _context.QueryRequest.Update(request);
             _context.ClaimsInvestigation.Update(claim);
 
@@ -1324,6 +1330,71 @@ namespace risk.control.system.Services
                 Time2Update = DateTime.Now.Subtract(lastLog.Created).Days,
                 InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS).InvestigationCaseStatusId,
                 InvestigationCaseSubStatusId = requestedByAssessor.InvestigationCaseSubStatusId,
+                UpdatedBy = userEmail
+            };
+            try
+            {
+                return await _context.SaveChangesAsync() > 0 ? claim : null;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<ClaimsInvestigation> SubmitQueryReplyToCompany(string userEmail, string claimId, EnquiryRequest request, IFormFile messageDocument, List<string> flexRadioDefault)
+        {
+            var claim = _context.ClaimsInvestigation
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(p=>p.ClientCompany)
+                .Include(c => c.AgencyReport)
+                .ThenInclude(c => c.EnquiryRequest)
+                .Include(c => c.Vendor)
+                .FirstOrDefault(c => c.ClaimsInvestigationId == claimId);
+
+            var replyByAgency = _context.InvestigationCaseSubStatus
+               .FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR);
+            var lastLog = _context.InvestigationTransaction.Where(i =>
+                i.ClaimsInvestigationId == claim.ClaimsInvestigationId).OrderByDescending(o => o.Created)?.FirstOrDefault();
+
+            claim.InvestigationCaseSubStatusId = replyByAgency.InvestigationCaseSubStatusId;
+            claim.UpdatedBy = userEmail;
+            claim.UserEmailActioned = userEmail;
+            claim.AssignedToAgency = false;
+            claim.AssessView = 0;
+            claim.UserRoleActionedTo = $"{AppRoles.ASSESSOR.GetEnumDisplayName()} ( {claim.PolicyDetail.ClientCompany.Email})";
+            var enquiryRequest = claim.AgencyReport.EnquiryRequest;
+            enquiryRequest.Answer = request.Answer;
+
+            if (messageDocument != null)
+            {
+                using var ms = new MemoryStream();
+                messageDocument.CopyTo(ms);
+                enquiryRequest.AnswerAttachment = ms.ToArray();
+                enquiryRequest.AnswerFileName = Path.GetFileName(messageDocument.FileName);
+                enquiryRequest.AnswerFileExtension = Path.GetExtension(messageDocument.FileName);
+                enquiryRequest.AnswerFileType = messageDocument.ContentType;
+            }
+            
+            _context.QueryRequest.Update(enquiryRequest);
+            _context.ClaimsInvestigation.Update(claim);
+
+
+            var lastLogHop = _context.InvestigationTransaction
+                                       .Where(i => i.ClaimsInvestigationId == claim.ClaimsInvestigationId)
+                .AsNoTracking().Max(s => s.HopCount);
+
+            var log = new InvestigationTransaction
+            {
+                HopCount = lastLogHop + 1,
+                ClaimsInvestigationId = claim.ClaimsInvestigationId,
+                UserEmailActioned = userEmail,
+                UserRoleActionedTo = $"{AppRoles.ASSESSOR.GetEnumDisplayName()} ( {claim.Vendor.Email})",
+                CurrentClaimOwner = userEmail,
+                Created = DateTime.Now,
+                Time2Update = DateTime.Now.Subtract(lastLog.Created).Days,
+                InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS).InvestigationCaseStatusId,
+                InvestigationCaseSubStatusId = replyByAgency.InvestigationCaseSubStatusId,
                 UpdatedBy = userEmail
             };
             try

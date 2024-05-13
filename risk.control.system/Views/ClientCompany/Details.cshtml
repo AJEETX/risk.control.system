@@ -252,8 +252,8 @@
                         <i class="fas fa-arrow-left"></i>
                         Back
                     </a>
-                    <a asp-controller="ClientCompany" asp-action="Edit" asp-route-id="@Model.ClientCompanyId" class="btn btn-warning"><i class='fas fa-building'></i> @Applicationsettings.PROFILE</a>
-                    <a asp-controller="CompanyUser" asp-action="Index" asp-route-id="@Model.ClientCompanyId" class="btn btn-success"><i class="fas fa-user-plus"></i> Users</a>
+                        <a id="edit-profile" asp-controller="ClientCompany" asp-action="Edit" asp-route-id="@Model.ClientCompanyId" class="btn btn-warning"><i class='fas fa-building'></i> Edit Profile</a>
+                    <a id="users" asp-controller="CompanyUser" asp-action="Index" asp-route-id="@Model.ClientCompanyId" class="btn btn-success"><i class="fas fa-user-plus"></i> Users</a>
                     @*<a asp-controller="ClientCompany" asp-action="EmpanelledVendors" asp-route-id="@Model.ClientCompanyId" class="btn btn-success"><i class="fas fa-user-secret"></i>  @Applicationsettings.VENDOR</a>*@
                     </div>
                 </div>

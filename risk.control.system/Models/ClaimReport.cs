@@ -58,6 +58,6 @@ namespace risk.control.system.Models
         public AssessorRemarkType? AssessorRemarkType { get; set; }
         public string? ClaimsInvestigationId { get; set; }
         public ClaimsInvestigation? ClaimsInvestigation { get; set; }
-        public QueryRequest? QueryRequest { get; set; }
+        public EnquiryRequest? EnquiryRequest { get; set; }
     }
 }

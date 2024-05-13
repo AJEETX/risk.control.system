@@ -32,6 +32,6 @@
         public string? Company { get; set; }
         public bool AutoAllocated { get; set; }
         public bool? IsNewAssigned { get; set; }
-
+        public bool? IsQueryCase { get; set; }
     }
 }
