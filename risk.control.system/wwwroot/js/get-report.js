@@ -4,9 +4,12 @@ $(document).ready(function () {
     let review = false;
     let reject = false;
 
-    $('#create-form').validate();
     $('#query-form').validate();
-    var currentImage = document.getElementById('documentImage0').src;
+    var currentImageElement = document.getElementById('documentImage0');
+    var currentImage;
+    if (currentImageElement) {
+        currentImage = currentImageElement.src;
+    }
 
     $("#document").on('change', function () {
         var MaxSizeInBytes = 2097152;
@@ -86,26 +89,6 @@ $(document).ready(function () {
         }
     });
 
-    $('#approve-case').click(function () {
-        //If the checkbox is checked.
-        var report = $('#assessorRemarks').val();
-        var rejectChecked = $('#flexRadioDefault1').is(':checked');
-        var reviewChecked = $('#flexRadioDefault2').is(':checked');
-        var approvedChecked = $('#flexRadioDefault3').is(':checked');
-
-        if (report != '' && approvedChecked) {
-            $('#assessorRemarkType').val('OK');
-            approve = true;
-        }
-        else if (report != '' && reviewChecked) {
-            $('#assessorRemarkType').val('REVIEW');
-            review = true;
-        }
-        else if (report != '' && rejectChecked) {
-            reject = true;
-            $('#assessorRemarkType').val('REJECT');
-        }
-    });
 
     $('#create-form').on('submit', function (e) {
         var report = $('#assessorRemarks').val();
@@ -313,6 +296,27 @@ $(document).ready(function () {
                     }
                 }
             });
+        }
+    });
+
+    $('#approve-case').click(function () {
+        //If the checkbox is checked.
+        var report = $('#assessorRemarks').val();
+        var rejectChecked = $('#flexRadioDefault1').is(':checked');
+        var reviewChecked = $('#flexRadioDefault2').is(':checked');
+        var approvedChecked = $('#flexRadioDefault3').is(':checked');
+
+        if (report != '' && approvedChecked) {
+            $('#assessorRemarkType').val('OK');
+            approve = true;
+        }
+        else if (report != '' && reviewChecked) {
+            $('#assessorRemarkType').val('REVIEW');
+            review = true;
+        }
+        else if (report != '' && rejectChecked) {
+            reject = true;
+            $('#assessorRemarkType').val('REJECT');
         }
     });
 
