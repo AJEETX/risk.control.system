@@ -117,7 +117,7 @@ namespace risk.control.system.Services
                 ClaimsInvestigation = claimsInvestigation,
                 Log = caseLogs,
                 Location = location,
-                NotWithdrawable = claimsInvestigation.InvestigationCaseSubStatusId != allocatedStatus.InvestigationCaseSubStatusId,
+                NotWithdrawable = claimsInvestigation.NotWithdrawable,
                 TimeTaken = GetElapsedTime(caseLogs)
             };
             return model;

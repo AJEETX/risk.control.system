@@ -53,9 +53,9 @@
             </div>
             <partial name="_AgentSubmittedReport" model="@Model" />
 
-            if (!@Model.NotWithdrawable)
+            if (!@Model.ClaimsInvestigation.NotDeclinable)
             {
-            <div class="card-footer">
+                <div class="card-footer">
                
                 <form id="create-form" method="post" asp-action="WithdrawCase" asp-controller="ClaimsVendorPost">
                     <div class="row">

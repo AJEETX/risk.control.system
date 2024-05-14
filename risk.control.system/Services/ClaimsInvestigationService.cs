@@ -720,6 +720,7 @@ namespace risk.control.system.Services
                 claim.UpdatedBy = supervisor.Email;
                 claim.CurrentUserEmail = currentUser;
                 claim.InvestigateView = 0;
+                claim.NotWithdrawable = true;
                 claim.CurrentClaimOwner = agentUser.Email;
                 claim.InvestigationCaseSubStatusId = assignedToAgent.InvestigationCaseSubStatusId;
 
@@ -1189,6 +1190,7 @@ namespace risk.control.system.Services
             claim.UserEmailActionedTo = string.Empty;
             claim.Updated = DateTime.Now;
             claim.UpdatedBy = agencyUser.Email;
+            claim.NotDeclinable = true;
             claim.CurrentUserEmail = userEmail;
             claim.CurrentClaimOwner = agencyUser.Email;
             claim.InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS).InvestigationCaseStatusId;

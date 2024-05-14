@@ -15,6 +15,22 @@
         }
     });
 
+    $('#investigatecase').on('click', function (event) {
+        $("body").addClass("submit-progress-bg");
+
+        setTimeout(function () {
+            $(".submit-progress").removeClass("hidden");
+        }, 1);
+        $('#investigatecase').attr('disabled', 'disabled');
+        $('#investigatecase').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> INVESTIGATE");
+
+        $('#radioButtons').submit();
+        var nodes = document.getElementById("article").getElementsByTagName('*');
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].disabled = true;
+        }
+    });
+
     $('#view-type a').on('click', function () {
         var id = this.id;
         if (this.id == 'map-type') {
@@ -136,18 +152,22 @@
     });
     if ($("input[type='radio'].selected-case:checked").length) {
         $("#allocatedcase").prop('disabled', false);
+        $("#investigatecase").prop('disabled', false);
     }
     else {
         $("#allocatedcase").prop('disabled', true);
+        $("#investigatecase").prop('disabled', true);
     }
 
     // When user checks a radio button, Enable submit button
     $("input[type='radio'].selected-case").change(function (e) {
         if ($(this).is(":checked")) {
             $("#allocatedcase").prop('disabled', false);
+        $("#investigatecase").prop('disabled', false);
         }
         else {
             $("#allocatedcase").prop('disabled', true);
+        $("#investigatecase").prop('disabled', true);
         }
     });
 
@@ -156,8 +176,10 @@
         // If checkbox is not checked
         if (this.checked) {
             $("#allocatedcase").prop('disabled', false);
+            $("#investigatecase").prop('disabled', false);
         } else {
             $("#allocatedcase").prop('disabled', true);
+        $("#investigatecase").prop('disabled', true);
         }
     });
     let askConfirmation = false;

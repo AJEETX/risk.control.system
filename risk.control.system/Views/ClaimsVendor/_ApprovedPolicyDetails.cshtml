@@ -310,7 +310,8 @@
 
                 <div class="card card-light collapsed-card">
                     <div class="card-header">
-                        <h3 class="card-title"><i class="fas fa-print nav-icon"></i> Agency: <span class="badge badge-light">@Model.ClaimsInvestigation.Vendor.Email</span>
+                        <h3 class="card-title">
+                            <i class="fas fa-print nav-icon"></i> Agency: <span class="badge badge-light">@Model.ClaimsInvestigation.Vendor.Email</span>
                             <span class="hover-text">
                                 <i class="fas fa-info-circle"></i>
                                 <span class="tooltip-text" id="information">
@@ -717,7 +718,8 @@
                                 <div class="card bg-light  border-success">
 
                                     <div class="card-header">
-                                        <h3 class="card-title"><i class="fas fa-user-edit"></i> Supervisor : <span class="badge badge-light"> @Model?.ClaimsInvestigation.AgencyReport?.SupervisorEmail</span>
+                                        <h3 class="card-title">
+                                            <i class="fas fa-user-edit"></i> Supervisor : <span class="badge badge-light"> @Model?.ClaimsInvestigation.AgencyReport?.SupervisorEmail</span>
                                             <span class="hover-text">
                                                 <i class="fas fa-info-circle"></i>
                                                 <span class="tooltip-text" id="information">
@@ -730,7 +732,8 @@
                                         </h3>
                                         <div class="card-tools">
                                             <span data-toggle="tooltip" title=" Supervisor :  @Model?.ClaimsInvestigation.AgencyReport?.SupervisorEmail" class="badge badge-light">
-                                            <i class="nav-icon fas fa-clock"></i> @Model.ClaimsInvestigation.AgencyReport?.SupervisorRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt")</span>
+                                                <i class="nav-icon fas fa-clock"></i> @Model.ClaimsInvestigation.AgencyReport?.SupervisorRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt")
+                                            </span>
                                         </div>
 
                                     </div>
@@ -758,6 +761,11 @@
 
                             }
                         </div>
+
+                        @if (@Model.ClaimsInvestigation.IsQueryCase && @Model.ClaimsInvestigation.AgencyReport.EnquiryRequest != null)
+                        {
+                            <partial name="_EnquiryReport" model="@Model" />
+                        }
                     </div>
                 </div>
                 @if (!Model.ClaimsInvestigation.IsQueryCase && !string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.AgencyReport.AssessorRemarks))

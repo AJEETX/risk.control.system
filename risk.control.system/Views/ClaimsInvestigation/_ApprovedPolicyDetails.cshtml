@@ -24,6 +24,10 @@
             <partial name="_ApprovedDocumentReport" model="@Model" />
             <partial name="_ApprovedReportAgentRemarks" model="@Model" />
             <partial name="_ApprovedReportSupervisorRemarks" model="@Model" />
+            @if (@Model.ClaimsInvestigation.IsQueryCase && @Model.ClaimsInvestigation.AgencyReport.EnquiryRequest != null)
+            {
+                <partial name="_EnquiryReport" model="@Model" />
+            }
         </div>
         <div class="row">
             <partial name="_ApprovedReportAssessorRemarks" model="@Model" />

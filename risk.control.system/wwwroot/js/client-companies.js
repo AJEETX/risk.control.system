@@ -76,10 +76,10 @@ function getdetails(id) {
     setTimeout(function () {
         $(".submit-progress").removeClass("hidden");
     }, 1);
-    $('a.btn.btn-danger').attr('disabled', 'disabled');
-    $('a#delete'+ id + '.btn.btn-danger').html("<i class='fas fa-sync fa-spin'></i> Delete");
+    $('a.btn.btn-xs.btn-danger').attr('disabled', 'disabled');
+    $('a#delete' + id + '.btn.btn-xs.btn-danger').html("<i class='fas fa-sync fa-spin'></i> Delete");
 
-    var nodes = document.getElementById("article").getElementsByTagName('*');
+    var nodes = document.getElementById("customerTable").getElementsByTagName('*');
     for (var i = 0; i < nodes.length; i++) {
         nodes[i].disabled = true;
     }
@@ -91,11 +91,10 @@ function showdetails(id) {
     setTimeout(function () {
         $(".submit-progress").removeClass("hidden");
     }, 1);
-    $('a.btn.btn-info').attr('disabled', 'disabled');
-    var btn = this;
-    $('a#details' + id + '.btn.btn-info').html("<i class='fas fa-sync fa-spin'></i> Detail");
+    $('a.btn.btn-xs.btn-info').attr('disabled', 'disabled');
+    $('a#detail' + id + '.btn.btn-xs.btn-info').html("<i class='fas fa-sync fa-spin'></i> Detail");
 
-    var nodes = document.getElementById("article").getElementsByTagName('*');
+    var nodes = document.getElementById("customerTable").getElementsByTagName('*');
     for (var i = 0; i < nodes.length; i++) {
         nodes[i].disabled = true;
     }
@@ -110,7 +109,7 @@ function showedit(id) {
     $('a.btn.btn-warning').attr('disabled', 'disabled');
     $('a#edit ' +id + '.btn.btn-warning').html("<i class='fas fa-sync fa-spin'></i> Edit");
 
-    var nodes = document.getElementById("article").getElementsByTagName('*');
+    var nodes = document.getElementById("customerTable").getElementsByTagName('*');
     for (var i = 0; i < nodes.length; i++) {
         nodes[i].disabled = true;
     }

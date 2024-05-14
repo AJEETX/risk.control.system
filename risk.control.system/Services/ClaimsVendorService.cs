@@ -318,7 +318,7 @@ namespace risk.control.system.Services
             {
                 ClaimsInvestigation = claimsInvestigation,
                 Location = location,
-                NotWithdrawable = claimsInvestigation.InvestigationCaseSubStatusId == submittedStatus.InvestigationCaseSubStatusId
+                NotWithdrawable = claimsInvestigation.NotWithdrawable,
             };
         }
 

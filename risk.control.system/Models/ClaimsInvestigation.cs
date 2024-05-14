@@ -57,6 +57,8 @@ namespace risk.control.system.Models
         }
 
         public bool IsReviewCase { get; set; } = false;
+        public bool NotWithdrawable { get; set; } = false;
+        public bool NotDeclinable { get; set; } = false;
         public bool IsQueryCase { get; set; } = false;
         public bool IsReady2Assign { get; set; } = false;
         public bool AutoAllocated { get; set; } = true;

@@ -845,6 +845,11 @@
 
                         }
                     </div>
+
+                    @if (@Model.ClaimsInvestigation.IsQueryCase && @Model.ClaimsInvestigation.AgencyReport.EnquiryRequest != null)
+                    {
+                        <partial name="_EnquiryReport" model="@Model" />
+                    }
                 </div>
             </div>
         </div> <!-- class bb-blog-inner -->
