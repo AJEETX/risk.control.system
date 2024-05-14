@@ -367,6 +367,7 @@ namespace risk.control.system.Controllers
 
                 var claimsInvestigation = await _context.ClaimsInvestigation
                   .Include(c => c.AgencyReport)
+                  .ThenInclude(c => c.EnquiryRequest)
                   .Include(c => c.AgencyReport.DocumentIdReport)
                   .Include(c => c.AgencyReport.DigitalIdReport)
                   .Include(c => c.AgencyReport.ReportQuestionaire)
@@ -432,7 +433,7 @@ namespace risk.control.system.Controllers
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
-        [Breadcrumb(" Reply Enquiry", FromAction = "GetInvestigateReport")]
+        [Breadcrumb(" Reply Enquiry", FromAction = "Allocate")]
         [Authorize(Roles = "AGENCY_ADMIN,SUPERVISOR")]
 
         public IActionResult ReplyEnquiry(string id)
@@ -450,6 +451,13 @@ namespace risk.control.system.Controllers
             }
             var model = investigationReportService.GetInvestigateReport(currentUserEmail, id);
             ViewData["claimId"] = id;
+
+            //var claimsPage = new MvcBreadcrumbNode("Assessor", "ClaimsVendor", "Claims");
+            //var agencyPage = new MvcBreadcrumbNode("Assessor", "ClaimsVendor", "Assess") { Parent = claimsPage, };
+            //var detailsPage = new MvcBreadcrumbNode("Detail", "ClaimsVendor", $"Details") { Parent = agencyPage, RouteValues = new { id = id } };
+            //var editPage = new MvcBreadcrumbNode("SendEnquiry", "ClaimsVendor", $"Reply Enquiry") { Parent = detailsPage, RouteValues = new { id = id } };
+            //ViewData["BreadcrumbNode"] = editPage;
+
             return View(model);
         }
 

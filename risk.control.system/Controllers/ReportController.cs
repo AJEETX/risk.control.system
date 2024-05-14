@@ -97,6 +97,7 @@ namespace risk.control.system.Controllers
 
                 var claimsInvestigation = await _context.ClaimsInvestigation
                     .Include(c => c.AgencyReport)
+                    .ThenInclude(c => c.EnquiryRequest)
                   .Include(c => c.AgencyReport.DocumentIdReport)
                   .Include(c => c.AgencyReport.DigitalIdReport)
                   .Include(c => c.AgencyReport.ReportQuestionaire)
@@ -195,6 +196,7 @@ namespace risk.control.system.Controllers
 
                 var claimsInvestigation = await _context.ClaimsInvestigation
                     .Include(c => c.AgencyReport)
+                    .ThenInclude(c => c.EnquiryRequest)
                   .Include(c => c.AgencyReport.DocumentIdReport)
                   .Include(c => c.AgencyReport.DigitalIdReport)
                   .Include(c => c.AgencyReport.ReportQuestionaire)
@@ -294,6 +296,7 @@ namespace risk.control.system.Controllers
 
                 var claimsInvestigation = await _context.ClaimsInvestigation
                     .Include(c => c.AgencyReport)
+                    .ThenInclude(c => c.EnquiryRequest)
                   .Include(c => c.AgencyReport.DocumentIdReport)
                   .Include(c => c.AgencyReport.DigitalIdReport)
                   .Include(c => c.AgencyReport.ReportQuestionaire)
@@ -393,6 +396,7 @@ namespace risk.control.system.Controllers
 
                 var claimsInvestigation = await _context.ClaimsInvestigation
                     .Include(c => c.AgencyReport)
+                    .ThenInclude(c => c.EnquiryRequest)
                   .Include(c => c.AgencyReport.DocumentIdReport)
                   .Include(c => c.AgencyReport.DigitalIdReport)
                   .Include(c => c.AgencyReport.ReportQuestionaire)

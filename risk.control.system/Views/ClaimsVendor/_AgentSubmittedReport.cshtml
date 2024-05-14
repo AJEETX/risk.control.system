@@ -302,418 +302,421 @@
 
                 </div>
 
+                @if (@Model.ClaimsInvestigation.AgencyReport != null)
+                {
+                    <div class="card card-light collapsed-card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-print nav-icon"></i> Agent: <span class="badge badge-light">@Model.ClaimsInvestigation.AgencyReport.AgentEmail</span>
+                                <span class="hover-text">
+                                    <i class="fas fa-info-circle"></i>
+                                    <span class="tooltip-text" id="information">
+                                        <span>
+                                            <i class='far fa-hand-point-right'></i><b> @Model.ClaimsInvestigation.AgencyReport.AgentEmail</b> report  <i class="fas fa-print nav-icon"></i>.
+                                        </span>
 
-                <div class="card card-light collapsed-card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="fas fa-print nav-icon"></i> Agent: <span class="badge badge-light">@Model.ClaimsInvestigation.AgencyReport.AgentEmail</span>
-                            <span class="hover-text">
-                                <i class="fas fa-info-circle"></i>
-                                <span class="tooltip-text" id="information">
-                                    <span>
-                                        <i class='far fa-hand-point-right'></i><b> @Model.ClaimsInvestigation.AgencyReport.AgentEmail</b> report  <i class="fas fa-print nav-icon"></i>.
                                     </span>
-
                                 </span>
-                            </span>
-                        </h3>
-                        <div class="card-tools">
-                            <span data-toggle="tooltip" title="Agent report # : @Model.ClaimsInvestigation.Vendor.Email" class="badge badge-light">
-                                <i class='far fa-hand-point-right'></i>
-                            </span>
-                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                <i class="fas fa-plus"></i>
-                            </button>
+                            </h3>
+                            <div class="card-tools">
+                                <span data-toggle="tooltip" title="Agent report # : @Model.ClaimsInvestigation.Vendor.Email" class="badge badge-light">
+                                    <i class='far fa-hand-point-right'></i>
+                                </span>
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+
                         </div>
-
-                    </div>
-                    <div class="card-body pb-0">
-                        <div class="row">
-                            @{
-                                if (@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImageData != null && @Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImageLongLatTime != null)
-                                {
-
-                                    string digitalIdColor = "grey";
-                                    var borderColor = "";
-                                    if (Model.ClaimsInvestigation.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime == null)
+                        <div class="card-body pb-0">
+                            <div class="row">
+                                @{
+                                    if (@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImageData != null && @Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImageLongLatTime != null)
                                     {
-                                        digitalIdColor = "grey";
-                                        borderColor = "";
-                                    }
-                                    else if (Model.ClaimsInvestigation.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime != null && 
+
+                                        string digitalIdColor = "grey";
+                                        var borderColor = "";
+                                        if (Model.ClaimsInvestigation.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime == null)
+                                        {
+                                            digitalIdColor = "grey";
+                                            borderColor = "";
+                                        }
+                                        else if (Model.ClaimsInvestigation.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime != null &&
                                         string.IsNullOrWhiteSpace(@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImageMatchConfidence))
-                                    {
-                                        digitalIdColor = "#dc3545!important";
-                                        borderColor = "border-danger";
-                                    }
-                                    else if (Model.ClaimsInvestigation.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime != null &&
-                                    !string.IsNullOrWhiteSpace(@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImageMatchConfidence))
-                                    {
-                                        borderColor = "border-success";
-                                        digitalIdColor = "green";
-                                    }
+                                        {
+                                            digitalIdColor = "#dc3545!important";
+                                            borderColor = "border-danger";
+                                        }
+                                        else if (Model.ClaimsInvestigation.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime != null &&
+                                        !string.IsNullOrWhiteSpace(@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImageMatchConfidence))
+                                        {
+                                            borderColor = "border-success";
+                                            digitalIdColor = "green";
+                                        }
 
-                                    <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
-                                        <div class="card bg-light d-flex flex-fill @borderColor">
-                                            <div class="card-header text-muted border-bottom-0">
-                                                <h3 class="card-title">
-                                                    <i class="fas fa-portrait"></i> Photo ID
-                                                    <span class="hover-text">
-                                                        <i class="fas fa-info-circle"></i>
-                                                        <span class="tooltip-text" id="beneficiary-information">
+                                        <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
+                                            <div class="card bg-light d-flex flex-fill @borderColor">
+                                                <div class="card-header text-muted border-bottom-0">
+                                                    <h3 class="card-title">
+                                                        <i class="fas fa-portrait"></i> Photo ID
+                                                        <span class="hover-text">
+                                                            <i class="fas fa-info-circle"></i>
+                                                            <span class="tooltip-text" id="beneficiary-information">
 
-                                                            <b> <i class='fas fa-portrait'></i> Photo Image ID</b>
+                                                                <b> <i class='fas fa-portrait'></i> Photo Image ID</b>
+                                                            </span>
                                                         </span>
-                                                    </span>
-                                                </h3>
-                                                <div class="card-tools">
-                                                    <span data-toggle="tooltip" title="Agent report # : @Model.ClaimsInvestigation.AgencyReport.AgentEmail" class="badge badge-light">
-                                                        <i class="nav-icon fas fa-clock"></i>
-                                                        @Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImageLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt")
-                                                    </span>
+                                                    </h3>
+                                                    <div class="card-tools">
+                                                        <span data-toggle="tooltip" title="Agent report # : @Model.ClaimsInvestigation.AgencyReport.AgentEmail" class="badge badge-light">
+                                                            <i class="nav-icon fas fa-clock"></i>
+                                                            @Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImageLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt")
+                                                        </span>
 
-                                                </div>
-                                            </div>
-                                            <div class="card-footer text-center">
-                                                <span class="badge badge-light"><i class="fas fa-portrait"></i> Match :  </span>
-                                                @if (string.IsNullOrWhiteSpace(@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImageMatchConfidence))
-                                                {
-                                                    <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i>
-                                                }
-                                                else
-                                                {
-                                                    <i style='color:green;' class='fas fa-check-circle'></i>
-                                                }
-                                            </div>
-                                            <div class="progress">
-                                                <i class="far fa-bookmark bookmark-green"></i>
-                                                <div class="progress-bar" role="progressbar" style="width:100%;background-color:@digitalIdColor;">
-                                                    photo-id
-                                                </div>
-
-                                            </div>
-                                            <div class="card-body">
-                                                <div class="row">
-                                                    <div class="col-6">
-                                                        <p class="text-muted text-sm">
-                                                            <span class="badge badge-light"><i class="far fa-image"></i> Photo Id Image</span>:
-                                                            <br />
-                                                            @{
-                                                                if (Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImage != null)
-                                                                {
-                                                                    <img title="digital image" id="agentLocationPicture" class="img-fluid face-Image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImage))">
-                                                                }
-                                                                else
-                                                                {
-                                                                    <img title="digital image" id="agentLocationPicture" alt="face image" class="img-fluid  ocr-data" src=@Applicationsettings.NO_PHOTO_IMAGE>
-                                                                }
-                                                            }
-                                                        </p>
-                                                        <p class="text-muted text-sm">
-
-                                                            <span class="badge badge-light"><i class="fas fa-info"></i> Location Info</span>
-                                                            <br />
-                                                            <label class="ocr-data img-fluid"> @Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImageData</label>
-
-                                                        </p>
                                                     </div>
-                                                    <div class="col-6">
-                                                        <p class="text-muted text-sm">
-                                                            <span class="badge badge-light"><i class="fas fa-map-pin"></i> Location visited</span>
-                                                            <br />
-                                                            <img class="img-fluid locationImage" src="@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImageLocationUrl" />
-                                                        </p>
-                                                        <p class="text-muted text-sm">
+                                                </div>
+                                                <div class="card-footer text-center">
+                                                    <span class="badge badge-light"><i class="fas fa-portrait"></i> Match :  </span>
+                                                    @if (string.IsNullOrWhiteSpace(@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImageMatchConfidence))
+                                                    {
+                                                        <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i>
+                                                    }
+                                                    else
+                                                    {
+                                                        <i style='color:green;' class='fas fa-check-circle'></i>
+                                                    }
+                                                </div>
+                                                <div class="progress">
+                                                    <i class="far fa-bookmark bookmark-green"></i>
+                                                    <div class="progress-bar" role="progressbar" style="width:100%;background-color:@digitalIdColor;">
+                                                        photo-id
+                                                    </div>
 
-                                                            <span class="badge badge-light"><i class="fas fa-map-marker-alt"></i> Address visited</span>
-                                                            <br />
-                                                            <label class="img-fluid ocr-data"> @Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImageLocationAddress</label>
-                                                        </p>
+                                                </div>
+                                                <div class="card-body">
+                                                    <div class="row">
+                                                        <div class="col-6">
+                                                            <p class="text-muted text-sm">
+                                                                <span class="badge badge-light"><i class="far fa-image"></i> Photo Id Image</span>:
+                                                                <br />
+                                                                @{
+                                                                    if (Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImage != null)
+                                                                    {
+                                                                        <img title="digital image" id="agentLocationPicture" class="img-fluid face-Image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImage))">
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <img title="digital image" id="agentLocationPicture" alt="face image" class="img-fluid  ocr-data" src=@Applicationsettings.NO_PHOTO_IMAGE>
+                                                                    }
+                                                                }
+                                                            </p>
+                                                            <p class="text-muted text-sm">
+
+                                                                <span class="badge badge-light"><i class="fas fa-info"></i> Location Info</span>
+                                                                <br />
+                                                                <label class="ocr-data img-fluid"> @Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImageData</label>
+
+                                                            </p>
+                                                        </div>
+                                                        <div class="col-6">
+                                                            <p class="text-muted text-sm">
+                                                                <span class="badge badge-light"><i class="fas fa-map-pin"></i> Location visited</span>
+                                                                <br />
+                                                                <img class="img-fluid locationImage" src="@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImageLocationUrl" />
+                                                            </p>
+                                                            <p class="text-muted text-sm">
+
+                                                                <span class="badge badge-light"><i class="fas fa-map-marker-alt"></i> Address visited</span>
+                                                                <br />
+                                                                <label class="img-fluid ocr-data"> @Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImageLocationAddress</label>
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="card direct-chat direct-chat-warning collapsed-card">
+                                                <div class="card-header">
+                                                    <i class="fas fa-film"></i><h3 class="card-title">Map<span class="badge badge-light">Expected and visited</span></h3>
+
+                                                    <div class="card-tools">
+                                                        <span data-toggle="tooltip" title="Map Location" class="badge badge-light"> <i class='far fa-hand-point-right'></i></span>
+                                                        <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                                            <i class="fas fa-plus"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <div class="card-body">
+                                                    <div id="face-map">
+                                                    </div>
+                                                    <div id="face-msg">
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="card direct-chat direct-chat-warning collapsed-card">
-                                            <div class="card-header">
-                                                <i class="fas fa-film"></i><h3 class="card-title">Map<span class="badge badge-light">Expected and visited</span></h3>
+                                    }
+                                    if (@Model.ClaimsInvestigation.AgencyReport?.DocumentIdReport?.DocumentIdImageData != null && @Model.ClaimsInvestigation.AgencyReport?.DocumentIdReport?.DocumentIdImageLongLatTime != null)
+                                    {
+                                        string documentIdColor = "grey";
+                                        var borderColor = "";
+                                        if (Model.ClaimsInvestigation.AgencyReport.DocumentIdReport?.DocumentIdImageLongLat == null)
+                                        {
 
-                                                <div class="card-tools">
-                                                    <span data-toggle="tooltip" title="Map Location" class="badge badge-light"> <i class='far fa-hand-point-right'></i></span>
-                                                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                                        <i class="fas fa-plus"></i>
-                                                    </button>
+                                        }
+                                        else if (Model.ClaimsInvestigation.AgencyReport.DocumentIdReport?.DocumentIdImageLongLat != null && (
+                                        Model.ClaimsInvestigation.AgencyReport?.DocumentIdReport?.DocumentIdImageValid != null &&
+                                        Model.ClaimsInvestigation.AgencyReport?.DocumentIdReport?.DocumentIdImageValid == true))
+                                        {
+                                            documentIdColor = "green";
+                                            borderColor = "border-success";
+                                        }
+                                        else
+                                        {
+                                            documentIdColor = "#dc3545!important";
+                                            borderColor = "border-danger";
+                                        }
+                                        <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
+                                            <div class="card bg-light d-flex flex-fill @borderColor">
+                                                <div class="card-header text-muted border-bottom-0">
+                                                    <h3 class="card-title">
+                                                        <i class="fas fa-mobile-alt"></i> PAN CARD
+                                                        <span class="hover-text">
+                                                            <i class="fas fa-info-circle"></i>
+                                                            <span class="tooltip-text" id="beneficiary-information">
+
+                                                                <b> <i class='fas fa-user-tie'></i> PAN CARD Image </b>
+                                                            </span>
+                                                        </span>
+                                                    </h3>
+                                                    <div class="card-tools">
+                                                        <span data-toggle="tooltip" title="Agent report # : @Model.ClaimsInvestigation.AgencyReport.AgentEmail" class="badge badge-light">
+                                                            <i class="nav-icon fas fa-clock"></i>
+                                                            @Model.ClaimsInvestigation.AgencyReport?.DocumentIdReport?.DocumentIdImageLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt")
+                                                        </span>
+
+                                                    </div>
+
+                                                </div>
+                                                <div class="card-footer text-center">
+                                                    <span class="badge badge-light"><i class="far fa-image"></i> Valid : </span>
+                                                    @if (@Model.ClaimsInvestigation.AgencyReport?.DocumentIdReport?.DocumentIdImageValid.Value ?? false)
+                                                    {
+                                                        <i style='color:green;' class='fas fa-check-circle'></i>
+                                                    }
+                                                    else
+                                                    {
+                                                        <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i>
+                                                    }
+                                                </div>
+                                                <div class="progress">
+                                                    <i class="far fa-bookmark bookmark-green"></i>
+                                                    <div class="progress-bar" role="progressbar" style="width:100%;background-color:@documentIdColor;">
+                                                        pan-card
+                                                    </div>
+
+                                                </div>
+                                                <div class="card-body">
+                                                    <div class="row">
+                                                        <div class="col-6">
+                                                            <p class="text-muted text-sm">
+                                                                <span class="badge badge-light"><i class="fas fa-film"></i> Pan card Image</span>:
+                                                                <br />
+                                                                @{
+                                                                    if (Model.ClaimsInvestigation.AgencyReport?.DocumentIdReport?.DocumentIdImage != null)
+                                                                    {
+                                                                        <img title="document image" id="agentOcrPicture" class="img-fluid ocr-Image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.ClaimsInvestigation.AgencyReport?.DocumentIdReport?.DocumentIdImage))">
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <img title="document image" id="agentOcrPicture" alt="ocr-image" class="img-fluid ocr-data" src=@Applicationsettings.NO_PHOTO_IMAGE />
+                                                                    }
+                                                                }
+                                                            </p>
+                                                            <p class="text-muted text-sm">
+
+                                                                <span class="badge badge-light"><i class="fas fa-info"></i> Image Scan Info</span>
+                                                                <br />
+                                                                <label class="img-fluid ocr-data"> @Model.ClaimsInvestigation.AgencyReport?.DocumentIdReport?.DocumentIdImageData</label>
+                                                            </p>
+                                                        </div>
+                                                        <div class="col-6">
+
+                                                            <p class="text-muted text-sm">
+                                                                <span class="badge badge-light"><i class="fas fa-map-pin"></i> Location visited</span>
+                                                                <br />
+                                                                <img class="img-fluid olocationImage" src="@Model.ClaimsInvestigation.AgencyReport?.DocumentIdReport?.DocumentIdImageLocationUrl" />
+                                                            </p>
+                                                            <p class="text-muted text-sm">
+
+                                                                <span class="badge badge-light"><i class="fas fa-map-marker-alt"></i> Address visited</span>
+                                                                <br />
+                                                                <label class="img-fluid ocr-data"> @Model.ClaimsInvestigation.AgencyReport?.DocumentIdReport?.DocumentIdImageLocationAddress</label>
+                                                            </p>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div class="card-body">
-                                                <div id="face-map">
+                                            <div class="card direct-chat direct-chat-warning collapsed-card">
+                                                <div class="card-header">
+                                                    <i class="fas fa-film"></i> <h3 class="card-title">Map<span class="badge badge-light">Expected and visited</span></h3>
+
+                                                    <div class="card-tools">
+                                                        <span data-toggle="tooltip" title="Map Location" class="badge badge-light"> <i class='far fa-hand-point-right'></i></span>
+                                                        <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                                            <i class="fas fa-plus"></i>
+                                                        </button>
+                                                    </div>
                                                 </div>
-                                                <div id="face-msg">
+                                                <div class="card-body">
+                                                    <div id="ocr-map">
+                                                    </div>
+                                                    <div id="ocr-msg">
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    }
                                 }
-                                if (@Model.ClaimsInvestigation.AgencyReport?.DocumentIdReport?.DocumentIdImageData != null && @Model.ClaimsInvestigation.AgencyReport?.DocumentIdReport?.DocumentIdImageLongLatTime != null)
+
+                                @if (!string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.AgencyReport?.AgentRemarks))
                                 {
-                                    string documentIdColor = "grey";
-                                    var borderColor = "";
-                                    if (Model.ClaimsInvestigation.AgencyReport.DocumentIdReport?.DocumentIdImageLongLat == null)
-                                    {
+                                    var questionTime = @Model.ClaimsInvestigation.AgencyReport.AgentRemarksUpdated != null ?
+                                    @Model.ClaimsInvestigation.AgencyReport.AgentRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt") : null;
 
-                                    }
-                                    else if (Model.ClaimsInvestigation.AgencyReport.DocumentIdReport?.DocumentIdImageLongLat != null && (
-                                    Model.ClaimsInvestigation.AgencyReport?.DocumentIdReport?.DocumentIdImageValid != null &&
-                                    Model.ClaimsInvestigation.AgencyReport?.DocumentIdReport?.DocumentIdImageValid == true))
-                                    {
-                                        documentIdColor = "green";
-                                        borderColor = "border-success";
-                                    }
-                                    else
-                                    {
-                                        documentIdColor = "#dc3545!important";
-                                        borderColor = "border-danger";
-                                    }
-                                    <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
-                                        <div class="card bg-light d-flex flex-fill @borderColor">
+                                    <div class="col-12 col-sm-4 d-flex align-items-stretch flex-column">
+                                        <div class="card bg-light d-flex flex-fill border-success">
                                             <div class="card-header text-muted border-bottom-0">
                                                 <h3 class="card-title">
-                                                    <i class="fas fa-mobile-alt"></i> PAN CARD
+                                                    <i class="far fa-comment"></i> Questionnaire
                                                     <span class="hover-text">
                                                         <i class="fas fa-info-circle"></i>
-                                                        <span class="tooltip-text" id="beneficiary-information">
+                                                        <span class="tooltip-text" id="information">
+                                                            <span>
+                                                                <i class="far fa-comment"></i><b> Questionnaire.</b>
+                                                            </span>
 
-                                                            <b> <i class='fas fa-user-tie'></i> PAN CARD Image </b>
                                                         </span>
                                                     </span>
                                                 </h3>
                                                 <div class="card-tools">
-                                                    <span data-toggle="tooltip" title="Agent report # : @Model.ClaimsInvestigation.AgencyReport.AgentEmail" class="badge badge-light">
+                                                    <span data-toggle="tooltip" title="Claim #" class="badge badge-light">
                                                         <i class="nav-icon fas fa-clock"></i>
-                                                        @Model.ClaimsInvestigation.AgencyReport?.DocumentIdReport?.DocumentIdImageLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt")
+                                                        @Model.ClaimsInvestigation.AgencyReport?.AgentRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt")
                                                     </span>
-
                                                 </div>
-
                                             </div>
-                                            <div class="card-footer text-center">
-                                                <span class="badge badge-light"><i class="far fa-image"></i> Valid : </span>
-                                                @if (@Model.ClaimsInvestigation.AgencyReport?.DocumentIdReport?.DocumentIdImageValid.Value ?? false)
-                                                {
-                                                    <i style='color:green;' class='fas fa-check-circle'></i>
-                                                }
-                                                else
-                                                {
-                                                    <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i>
-                                                }
+                                            <div class="card-footer text-muted border-bottom-0">
+                                                <i class="fas fa-user-shield"></i>  Agent:<span class="badge badge-light">  @Model.ClaimsInvestigation.AgencyReport.AgentEmail </span>
                                             </div>
                                             <div class="progress">
                                                 <i class="far fa-bookmark bookmark-green"></i>
-                                                <div class="progress-bar" role="progressbar" style="width:100%;background-color:@documentIdColor;">
-                                                    pan-card
+                                                <div class="progress-bar" role="progressbar" style="width:100%;background-color:green;">
+                                                    questionaaire
                                                 </div>
-
                                             </div>
                                             <div class="card-body">
+
                                                 <div class="row">
-                                                    <div class="col-6">
+                                                    <div class="col-7">
                                                         <p class="text-muted text-sm">
-                                                            <span class="badge badge-light"><i class="fas fa-film"></i> Pan card Image</span>:
+                                                            <span class="badge badge-light"><i class="fas fa-film"></i> Questions</span>:
                                                             <br />
-                                                            @{
-                                                                if (Model.ClaimsInvestigation.AgencyReport?.DocumentIdReport?.DocumentIdImage != null)
-                                                                {
-                                                                    <img title="document image" id="agentOcrPicture" class="img-fluid ocr-Image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.ClaimsInvestigation.AgencyReport?.DocumentIdReport?.DocumentIdImage))">
-                                                                }
-                                                                else
-                                                                {
-                                                                    <img title="document image" id="agentOcrPicture" alt="ocr-image" class="img-fluid ocr-data" src=@Applicationsettings.NO_PHOTO_IMAGE />
-                                                                }
-                                                            }
-                                                        </p>
-                                                        <p class="text-muted text-sm">
-
-                                                            <span class="badge badge-light"><i class="fas fa-info"></i> Image Scan Info</span>
-                                                            <br />
-                                                            <label class="img-fluid ocr-data"> @Model.ClaimsInvestigation.AgencyReport?.DocumentIdReport?.DocumentIdImageData</label>
+                                                            <ul class="ml-4 mb-0 fa-ul text-muted">
+                                                                <li class="small">
+                                                                    Ownership of residence ?
+                                                                    <span class="fa-li">
+                                                                        <i class="far fa-comment"></i>
+                                                                    </span>
+                                                                </li>
+                                                                <br />
+                                                                <li class="small">
+                                                                    Perceived financial status ?
+                                                                    <span class="fa-li">
+                                                                        <i class="far fa-comment"></i>
+                                                                    </span>
+                                                                </li>
+                                                                <br />
+                                                                <li class="small">
+                                                                    Name of neighbour met ?
+                                                                    <span class="fa-li">
+                                                                        <i class="far fa-comment"></i>
+                                                                    </span>
+                                                                </li>
+                                                                <br />
+                                                                <li class="small">
+                                                                    Date when met with neighbour ?
+                                                                    <span class="fa-li">
+                                                                        <i class="far fa-comment"></i>
+                                                                    </span>
+                                                                </li>
+                                                                <br />
+                                                                <li class="small">
+                                                                    Remarks?
+                                                                    <span class="fa-li">
+                                                                        <i class="far fa-comment"></i>
+                                                                    </span>
+                                                                </li>
+                                                            </ul>
                                                         </p>
                                                     </div>
-                                                    <div class="col-6">
 
+                                                    <div class="col-5">
                                                         <p class="text-muted text-sm">
-                                                            <span class="badge badge-light"><i class="fas fa-map-pin"></i> Location visited</span>
+                                                            <span class="badge badge-light"><i class="fas fa-film"></i> Answers</span>:
                                                             <br />
-                                                            <img class="img-fluid olocationImage" src="@Model.ClaimsInvestigation.AgencyReport?.DocumentIdReport?.DocumentIdImageLocationUrl" />
-                                                        </p>
-                                                        <p class="text-muted text-sm">
+                                                            <ul class="ml-4 mb-0 fa-ul text-muted">
+                                                                <li class="small">
+                                                                    <span class="fa-li">
+                                                                        <i class="far fa-comment"></i>
+                                                                    </span>
+                                                                    @Model.ClaimsInvestigation.AgencyReport?.ReportQuestionaire?.Answer1
+                                                                </li>
+                                                                <br />
+                                                                <li class="small">
 
-                                                            <span class="badge badge-light"><i class="fas fa-map-marker-alt"></i> Address visited</span>
-                                                            <br />
-                                                            <label class="img-fluid ocr-data"> @Model.ClaimsInvestigation.AgencyReport?.DocumentIdReport?.DocumentIdImageLocationAddress</label>
+                                                                    <span class="fa-li">
+                                                                        <i class="far fa-comment"></i>
+                                                                    </span>
+                                                                    @Model.ClaimsInvestigation.AgencyReport?.ReportQuestionaire?.Answer2
+                                                                </li>
+                                                                <br />
+                                                                <li class="small">
+                                                                    <span class="fa-li">
+                                                                        <i class="far fa-comment"></i>
+                                                                    </span>
+                                                                    @Model.ClaimsInvestigation.AgencyReport?.ReportQuestionaire?.Answer3
+                                                                </li>
+                                                                <br />
+                                                                <li class="small">
+                                                                    <span class="fa-li">
+                                                                        <i class="far fa-comment"></i>
+                                                                    </span>
+                                                                    @Model.ClaimsInvestigation.AgencyReport?.ReportQuestionaire?.Answer4
+                                                                </li>
+                                                                <br />
+                                                                <li class="small">
+                                                                    <span class="fa-li">
+                                                                        <i class="far fa-comment"></i>
+                                                                    </span>
+                                                                    @Model.ClaimsInvestigation.AgencyReport?.AgentRemarks
+                                                                </li>
+                                                            </ul>
                                                         </p>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        </div>
-                                        <div class="card direct-chat direct-chat-warning collapsed-card">
-                                            <div class="card-header">
-                                                <i class="fas fa-film"></i> <h3 class="card-title">Map<span class="badge badge-light">Expected and visited</span></h3>
 
-                                                <div class="card-tools">
-                                                    <span data-toggle="tooltip" title="Map Location" class="badge badge-light"> <i class='far fa-hand-point-right'></i></span>
-                                                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                                        <i class="fas fa-plus"></i>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                            <div class="card-body">
-                                                <div id="ocr-map">
-                                                </div>
-                                                <div id="ocr-msg">
-                                                </div>
                                             </div>
                                         </div>
+                                        <partial name="_AgentChat" model="@Model" />
+
                                     </div>
                                 }
-                            }
 
-                            @if (!string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.AgencyReport?.AgentRemarks))
-                            {
-                                var questionTime = @Model.ClaimsInvestigation.AgencyReport.AgentRemarksUpdated != null ?
-                                @Model.ClaimsInvestigation.AgencyReport.AgentRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt") : null;
-
-                                <div class="col-12 col-sm-4 d-flex align-items-stretch flex-column">
-                                    <div class="card bg-light d-flex flex-fill border-success">
-                                        <div class="card-header text-muted border-bottom-0">
-                                            <h3 class="card-title">
-                                                <i class="far fa-comment"></i> Questionnaire
-                                                <span class="hover-text">
-                                                    <i class="fas fa-info-circle"></i>
-                                                    <span class="tooltip-text" id="information">
-                                                        <span>
-                                                            <i class="far fa-comment"></i><b> Questionnaire.</b>
-                                                        </span>
-
-                                                    </span>
-                                                </span>
-                                            </h3>
-                                            <div class="card-tools">
-                                                <span data-toggle="tooltip" title="Claim #" class="badge badge-light">
-                                                    <i class="nav-icon fas fa-clock"></i>
-                                                    @Model.ClaimsInvestigation.AgencyReport?.AgentRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt")
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <div class="card-footer text-muted border-bottom-0">
-                                            <i class="fas fa-user-shield"></i>  Agent:<span class="badge badge-light">  @Model.ClaimsInvestigation.AgencyReport.AgentEmail </span>
-                                        </div>
-                                        <div class="progress">
-                                            <i class="far fa-bookmark bookmark-green"></i>
-                                            <div class="progress-bar" role="progressbar" style="width:100%;background-color:green;">
-                                                questionaaire
-                                            </div>
-                                        </div>
-                                        <div class="card-body">
-
-                                            <div class="row">
-                                                <div class="col-7">
-                                                    <p class="text-muted text-sm">
-                                                        <span class="badge badge-light"><i class="fas fa-film"></i> Questions</span>:
-                                                        <br />
-                                                        <ul class="ml-4 mb-0 fa-ul text-muted">
-                                                            <li class="small">
-                                                                Ownership of residence ?
-                                                                <span class="fa-li">
-                                                                    <i class="far fa-comment"></i>
-                                                                </span>
-                                                            </li>
-                                                            <br />
-                                                            <li class="small">
-                                                                Perceived financial status ?
-                                                                <span class="fa-li">
-                                                                    <i class="far fa-comment"></i>
-                                                                </span>
-                                                            </li>
-                                                            <br />
-                                                            <li class="small">
-                                                                Name of neighbour met ?
-                                                                <span class="fa-li">
-                                                                    <i class="far fa-comment"></i>
-                                                                </span>
-                                                            </li>
-                                                            <br />
-                                                            <li class="small">
-                                                                Date when met with neighbour ?
-                                                                <span class="fa-li">
-                                                                    <i class="far fa-comment"></i>
-                                                                </span>
-                                                            </li>
-                                                            <br />
-                                                            <li class="small">
-                                                                Remarks?
-                                                                <span class="fa-li">
-                                                                    <i class="far fa-comment"></i>
-                                                                </span>
-                                                            </li>
-                                                        </ul>
-                                                    </p>
-                                                </div>
-
-                                                <div class="col-5">
-                                                    <p class="text-muted text-sm">
-                                                        <span class="badge badge-light"><i class="fas fa-film"></i> Answers</span>:
-                                                        <br />
-                                                        <ul class="ml-4 mb-0 fa-ul text-muted">
-                                                            <li class="small">
-                                                                <span class="fa-li">
-                                                                    <i class="far fa-comment"></i>
-                                                                </span>
-                                                                @Model.ClaimsInvestigation.AgencyReport?.ReportQuestionaire?.Answer1
-                                                            </li>
-                                                            <br />
-                                                            <li class="small">
-
-                                                                <span class="fa-li">
-                                                                    <i class="far fa-comment"></i>
-                                                                </span>
-                                                                @Model.ClaimsInvestigation.AgencyReport?.ReportQuestionaire?.Answer2
-                                                            </li>
-                                                            <br />
-                                                            <li class="small">
-                                                                <span class="fa-li">
-                                                                    <i class="far fa-comment"></i>
-                                                                </span>
-                                                                @Model.ClaimsInvestigation.AgencyReport?.ReportQuestionaire?.Answer3
-                                                            </li>
-                                                            <br />
-                                                            <li class="small">
-                                                                <span class="fa-li">
-                                                                    <i class="far fa-comment"></i>
-                                                                </span>
-                                                                @Model.ClaimsInvestigation.AgencyReport?.ReportQuestionaire?.Answer4
-                                                            </li>
-                                                            <br />
-                                                            <li class="small">
-                                                                <span class="fa-li">
-                                                                    <i class="far fa-comment"></i>
-                                                                </span>
-                                                                @Model.ClaimsInvestigation.AgencyReport?.AgentRemarks
-                                                            </li>
-                                                        </ul>
-                                                    </p>
-                                                </div>
-                                            </div>
-
-                                        </div>
-                                    </div>
-                                    <partial name="_AgentChat" model="@Model" />
-
-                                </div>
-                            }
+                            </div>
 
                         </div>
-                        
                     </div>
-                </div>
+                }
+               
             </div>
 
             

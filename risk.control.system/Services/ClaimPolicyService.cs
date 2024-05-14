@@ -70,6 +70,7 @@ namespace risk.control.system.Services
 
             var claimsInvestigation = await _context.ClaimsInvestigation
                 .Include(c => c.AgencyReport)
+                    .ThenInclude(c => c.EnquiryRequest)
               .Include(c => c.PreviousClaimReports)
               .Include(c => c.AgencyReport.DigitalIdReport)
               .Include(c => c.AgencyReport.DocumentIdReport)
@@ -141,6 +142,7 @@ namespace risk.control.system.Services
 
             var claimsInvestigation = await _context.ClaimsInvestigation
                 .Include(c => c.AgencyReport)
+                    .ThenInclude(c => c.EnquiryRequest)
               .Include(c => c.PreviousClaimReports)
               .Include(c => c.AgencyReport.DigitalIdReport)
               .Include(c => c.AgencyReport.DocumentIdReport)

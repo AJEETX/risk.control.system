@@ -87,6 +87,11 @@
                     </span>
                 </h3>
             </div>
+            @{
+                var fileIcon = "far fa-file-pdf";
+                var hasAttachment = (@Model.ClaimsInvestigation.AgencyReport.EnquiryRequest.QuestionAttachment != null &&
+                @Model.ClaimsInvestigation.AgencyReport.EnquiryRequest.QuestionAttachment.Length > 0) ? "" : "none";
+            }
             <div class="card-body">
                 <div class="row">
                     <div class="col-sm-6 d-flex align-items-stretch flex-column">
@@ -99,8 +104,19 @@
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="form-group">
-                                            
-                                            <label class="control-label">@Model.ClaimsInvestigation.AgencyReport.EnquiryRequest.Subject</label>
+                                            <span class="input-group-label"> Company Enquiry info :</span>
+                                            <div class="input-group mb-3">
+
+                                                @if (@hasAttachment is not null)
+                                                {
+                                                    <img id="profileImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model.ClaimsInvestigation.AgencyReport.EnquiryRequest.QuestionAttachment))">
+                                                }
+                                                else
+                                                {
+                                                    <img id="profileImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
+                                                }
+                                                <label class="control-label">@Model.ClaimsInvestigation.AgencyReport.EnquiryRequest.Subject</label>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -146,27 +162,6 @@
                                         </div>
                                     </div>
                                 </div>
-
-                                @{
-                                    var fileIcon = "far fa-file-pdf";
-                                    var hasAttachment = (@Model.ClaimsInvestigation.AgencyReport.EnquiryRequest.QuestionAttachment != null &&
-                                    @Model.ClaimsInvestigation.AgencyReport.EnquiryRequest.QuestionAttachment.Length > 0) ? "" : "none";
-                                }
-                                <span class="mailbox-attachments d-flex align-items-stretch clearfix">
-                                    <div class="mailbox-attachment-info" style="display:@hasAttachment">
-                                        <a asp-controller="Download" asp-action="EnquiryFileAttachment"
-                                           asp-route-id="@Model.ClaimsInvestigation.AgencyReport.EnquiryRequest.QueryRequestId" class="mailbox-attachment-name">
-                                            <i class="fas fa-paperclip"></i> @Model.ClaimsInvestigation.AgencyReport.EnquiryRequest.QuestionFileName
-                                        </a>
-                                        <span class="mailbox-attachment-size clearfix mt-1">
-                                            @{
-                                                var size = Model.ClaimsInvestigation.AgencyReport.EnquiryRequest.QuestionAttachment?.Length / 1024;
-                                            }
-                                            <span> @size  KB</span>
-                                            <a asp-controller="Download" asp-action="EnquiryFileAttachment" asp-route-id="@Model.ClaimsInvestigation.AgencyReport.EnquiryRequest.QueryRequestId" class="btn btn-default btn-sm float-right"><i class="fas fa-cloud-download-alt"></i></a>
-                                        </span>
-                                    </div>
-                                </span>
                             </div>
                         </div>
                     </div>

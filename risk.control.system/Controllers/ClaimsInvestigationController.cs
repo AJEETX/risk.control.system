@@ -642,6 +642,14 @@ namespace risk.control.system.Controllers
                 }
                 var model = investigationReportService.GetInvestigateReport(currentUserEmail, selectedcase);
                 ViewData["claimId"] = selectedcase;
+
+
+                var claimsPage = new MvcBreadcrumbNode("Assessor", "ClaimsInvestigation", "Claims");
+                var agencyPage = new MvcBreadcrumbNode("Assessor", "ClaimsInvestigation", "Assess") { Parent = claimsPage, };
+                var detailsPage = new MvcBreadcrumbNode("GetInvestigateReport", "ClaimsInvestigation", $"Details") { Parent = agencyPage, RouteValues = new { selectedcase = selectedcase } };
+                var editPage = new MvcBreadcrumbNode("SendEnquiry", "ClaimsInvestigation", $"Send Enquiry") { Parent = detailsPage, RouteValues = new { id = selectedcase } };
+                ViewData["BreadcrumbNode"] = editPage;
+
                 return View(model);
             }
             catch (Exception)

@@ -274,6 +274,7 @@ namespace risk.control.system.Services
         {
             var claimsInvestigation = claimsService.GetClaims()
                 .Include(c => c.AgencyReport)
+                .ThenInclude(c=>c.EnquiryRequest)
                 .Include(c => c.AgencyReport.DigitalIdReport)
                 .Include(c => c.AgencyReport.ReportQuestionaire)
                 .Include(c => c.AgencyReport.DocumentIdReport)
@@ -300,7 +301,6 @@ namespace risk.control.system.Services
             var agencyUser = _context.VendorApplicationUser.FirstOrDefault(u=>u.Email == userEmail);
 
             var claimsInvestigation = claimsService.GetClaims()
-                .Include(c=>c.Vendor)
                 .Include(c=>c.Vendor)
                 .Include(c=>c.AgencyReport)
                 .Include(c=>c.AgencyReport.DigitalIdReport)

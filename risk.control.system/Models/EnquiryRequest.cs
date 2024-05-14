@@ -19,6 +19,7 @@ namespace risk.control.system.Models
         public string? AnswerB { get; set; }
         public string? AnswerC { get; set; }
         public string? AnswerD { get; set; }
+        public string? AnswerSelected { get; set; }
         public byte[]? AnswerAttachment { get; set; }
         public string? AnswerFileName { get; set; }
         public string? AnswerFileType { get; set; }

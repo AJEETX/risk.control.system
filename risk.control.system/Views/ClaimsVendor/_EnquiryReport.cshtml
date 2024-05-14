@@ -27,17 +27,18 @@
                         <p class="text-muted text-sm">
 
                             <span>@Model.ClaimsInvestigation.AgencyReport.EnquiryRequest.Subject </span> : <span class="badge badge-light">
-                                <i class="far fa-image"></i> @Model.ClaimsInvestigation.AgencyReport.EnquiryRequest.AnswerSelected</span>:
+                                <i class="far fa-image"></i> @Model.ClaimsInvestigation.AgencyReport.EnquiryRequest.AnswerSelected
+                            </span>:
                         </p>
                         <p class="text-muted text-sm">
-                            
+
                             @if (Model.ClaimsInvestigation.AgencyReport?.EnquiryRequest.QuestionAttachment != null)
                             {
-                            <img title="enquiry document" id="enquiryDocument" class="img-fluid face-Image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.ClaimsInvestigation.AgencyReport?.EnquiryRequest.QuestionAttachment))">
+                                <img title="enquiry document" id="enquiryDocument" class="img-fluid face-Image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.ClaimsInvestigation.AgencyReport?.EnquiryRequest.QuestionAttachment))">
                             }
                             else
                             {
-                             <img title="enquiry document" id="enquiryDocument" alt="face image" class="img-fluid" src=@Applicationsettings.NO_IMAGE>
+                                <img title="enquiry document" id="enquiryDocument" alt="face image" class="img-fluid" src=@Applicationsettings.NO_IMAGE>
                             }
                         </p>
                     </div>
