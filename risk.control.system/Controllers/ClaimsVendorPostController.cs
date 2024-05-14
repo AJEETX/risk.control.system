@@ -160,7 +160,7 @@ namespace risk.control.system.Controllers
 
                 var reportUpdateStatus = SupervisorRemarkType.OK;
 
-                var success = await claimsInvestigationService.ProcessAgentReport(userEmail, supervisorRemarks, caseLocationId, claimId, reportUpdateStatus);
+                var success = await claimsInvestigationService.ProcessAgentReport(userEmail, supervisorRemarks, caseLocationId, claimId, reportUpdateStatus, Request.Form.Files.FirstOrDefault());
 
                 if (success != null)
                 {

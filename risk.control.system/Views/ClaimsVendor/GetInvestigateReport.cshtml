@@ -6,7 +6,7 @@
 }
 
 <section class="content">
-    <form id="create-form" method="post" asp-action="ProcessReport" asp-controller="ClaimsVendorPost">
+    <form id="create-form" method="post" asp-action="ProcessReport" asp-controller="ClaimsVendorPost" enctype="multipart/form-data">
         <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
         <input type="hidden" id="CaseLocationId" name="CaseLocationId" value="@Model.Location.BeneficiaryDetailId" />
         <input type="hidden" id="policyDetailId" value="@Model.ClaimsInvestigation?.PolicyDetail.PolicyDetailId" />

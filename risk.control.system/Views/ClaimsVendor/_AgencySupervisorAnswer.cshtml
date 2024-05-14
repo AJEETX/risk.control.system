@@ -3,7 +3,8 @@
 <div class="col-12 d-flex align-items-stretch flex-column">
     <div class="card bg-light border-success">
         <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-user-edit"></i> Supervisor : <span class="badge badge-light"> @Model?.AgencyReport?.SupervisorEmail</span>
+            <h3 class="card-title">
+                <i class="fas fa-user-edit"></i> Supervisor : <span class="badge badge-light"> @Model?.AgencyReport?.SupervisorEmail</span>
                 <span class="hover-text">
                     <i class="fas fa-info-circle"></i>
                     <span class="tooltip-text" id="information">
@@ -16,7 +17,8 @@
             </h3>
             <div class="card-tools">
                 <span data-toggle="tooltip" title=" Supervisor :  @Model?.AgencyReport?.SupervisorEmail" class="badge badge-light">
-                    <i class="nav-icon fas fa-clock"></i> @Model.AgencyReport?.SupervisorRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt")</span>
+                    <i class="nav-icon fas fa-clock"></i> @Model.AgencyReport?.SupervisorRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt")
+                </span>
             </div>
 
         </div>
@@ -30,9 +32,18 @@
                     <ul class="ml-4 mb-0 fa-ul text-muted">
                         <li class="small">
                             <span class="fa-li">
-                                <i class="far fa-comment"></i>
                             </span>
-                            @Model.AgencyReport?.SupervisorRemarks <i class="far fa-comment"></i>
+
+                            @if (Model.AgencyReport?.SupervisorAttachment != null)
+                            {
+                                <img title="enquiry document" id="enquiryDocument" class="img-fluid doc-profile-image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.AgencyReport?.SupervisorAttachment))">
+                            }
+                            else
+                            {
+                                <img title="enquiry document" id="enquiryDocument" alt="face image" class="img-fluid doc-profile-image" src=@Applicationsettings.NO_IMAGE>
+                            }
+
+                            @Model.AgencyReport?.SupervisorRemarks
                         </li>
                     </ul>
                 </div>

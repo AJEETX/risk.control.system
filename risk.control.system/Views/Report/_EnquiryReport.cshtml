@@ -23,44 +23,48 @@
             </div>
             <div class="card-body">
                 <div class="row">
-                    <div class="col-6">
-                        <p class="text-muted text-sm">
 
-                            <span>@Model.ClaimsInvestigation.AgencyReport.EnquiryRequest.Subject </span> : <span class="badge badge-light">
-                                <i class="far fa-image"></i> @Model.ClaimsInvestigation.AgencyReport.EnquiryRequest.AnswerSelected
-                            </span>:
-                        </p>
-                        <p class="text-muted text-sm">
+                    <table>
+                        <tr>
+                            <td>
+                                @if (Model.ClaimsInvestigation.AgencyReport?.EnquiryRequest.QuestionImageAttachment != null)
+                                {
+                                    <img title="enquiry document" id="enquiryDocument" class="img-fluid doc-profile-image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.ClaimsInvestigation.AgencyReport?.EnquiryRequest.QuestionImageAttachment))">
+                                }
+                                else
+                                {
+                                    <img title="enquiry document" id="enquiryDocument" alt="face image" class="img-fluid doc-profile-image" src=@Applicationsettings.NO_IMAGE>
+                                }
+                            </td>
+                            <td>
+                                @Model.ClaimsInvestigation.AgencyReport.EnquiryRequest.Subject
+                            </td>
+                            <td>
+                                @Model.ClaimsInvestigation.AgencyReport.EnquiryRequest.AnswerSelected
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                @if (Model.ClaimsInvestigation.AgencyReport?.EnquiryRequest.AnswerImageAttachment != null)
+                                {
+                                    <img title="enquiry document" id="enquiryDocument" class="img-fluid doc-profile-image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.ClaimsInvestigation.AgencyReport?.EnquiryRequest.AnswerImageAttachment))">
+                                }
+                                else
+                                {
+                                    <img title="enquiry document" id="enquiryDocument" alt="face image" class="img-fluid doc-profile-image" src=@Applicationsettings.NO_IMAGE>
+                                }
 
-                            @if (Model.ClaimsInvestigation.AgencyReport?.EnquiryRequest.QuestionAttachment != null)
-                            {
-                                <img title="enquiry document" id="enquiryDocument" class="img-fluid face-Image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.ClaimsInvestigation.AgencyReport?.EnquiryRequest.QuestionAttachment))">
-                            }
-                            else
-                            {
-                                <img title="enquiry document" id="enquiryDocument" alt="face image" class="img-fluid" src=@Applicationsettings.NO_IMAGE>
-                            }
-                        </p>
-                    </div>
-                    <div class="col-6">
-                        <p class="text-muted text-sm">
+                            </td>
+                            <td>
+                                @Model.ClaimsInvestigation.AgencyReport.EnquiryRequest.Description
+                            </td>
+                            <td>
+                                <i class="fas fa-user-check"></i> @Model.ClaimsInvestigation.AgencyReport.EnquiryRequest.Answer
+                            </td>
+                        </tr>
+                    </table>
 
-                            <span>@Model.ClaimsInvestigation.AgencyReport.EnquiryRequest.Description </span>
-                        </p>
-                        <p class="text-muted text-sm">
 
-                            <span class="badge badge-light"><i class="far fa-image"></i> @Model.ClaimsInvestigation.AgencyReport.EnquiryRequest.Answer</span>:
-                            @if (Model.ClaimsInvestigation.AgencyReport?.EnquiryRequest.AnswerAttachment != null)
-                            {
-                                <img title="enquiry document" id="enquiryDocument" class="img-fluid face-Image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.ClaimsInvestigation.AgencyReport?.EnquiryRequest.AnswerAttachment))">
-                            }
-                            else
-                            {
-                                <img title="enquiry document" id="enquiryDocument" alt="face image" class="img-fluid" src=@Applicationsettings.NO_IMAGE>
-                            }
-                        </p>
-
-                    </div>
                 </div>
             </div>
         </div>

@@ -97,7 +97,7 @@ namespace risk.control.system.Controllers.Api
 
             var fileAttachment = _context.QueryRequest.FirstOrDefault(q=>q.QueryRequestId == id);
 
-            return fileAttachment != null ? File(fileAttachment.QuestionAttachment, fileAttachment.QuestionFileType, fileAttachment.QuestionFileName + fileAttachment.QuestionFileName): null;
+            return fileAttachment != null ? File(fileAttachment.QuestionImageAttachment, fileAttachment.QuestionImageFileType, fileAttachment.QuestionImageFileName + fileAttachment.QuestionImageFileName): null;
         }
     }
 }

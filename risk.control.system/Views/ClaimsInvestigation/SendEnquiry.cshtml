@@ -214,9 +214,10 @@
                                         <div class="btn btn-default btn-file">
                                             <i class="fas fa-paperclip"></i> Attachment
                                             <img class="file-image doc-profile-image" id="documentImage0" src=@Applicationsettings.NO_IMAGE>
-                                            <input id="document" name="document" asp-for="AgencyReport.EnquiryRequest.QuestionAttachment" type="file" accept="*.png, *.jpeg" class="form-control remarks" />
+                                            <input id="document" name="document" asp-for="AgencyReport.EnquiryRequest.QuestionImageAttachment" type="file" accept="*.png, *.jpeg" class="form-control remarks" />
                                         </div>
                                         <span class="help-block">Max. 2MB</span>
+
                                         <div class="float-right">
                                             <a asp-controller="ClaimsInvestigation" asp-action="GetInvestigateReport" asp-route-selectedcase="@Model.ClaimsInvestigation.ClaimsInvestigationId" class="btn btn-secondary">
                                                 <i class="fas fa-times"></i> @Applicationsettings.CANCEL
@@ -226,6 +227,7 @@
                                             </button>
                                         </div>
                                     </div>
+
                                 </div>
                             </div>
                         </div>

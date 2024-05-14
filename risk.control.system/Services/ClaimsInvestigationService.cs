@@ -31,7 +31,7 @@ namespace risk.control.system.Services
 
         Task<ClaimsInvestigation> SubmitToVendorSupervisor(string userEmail, long caseLocationId, string claimsInvestigationId, string remarks, string? answer1, string? answer2, string? answer3, string? answer4);
 
-        Task<ClaimsInvestigation> ProcessAgentReport(string userEmail, string supervisorRemarks, long caseLocationId, string claimsInvestigationId, SupervisorRemarkType remarks);
+        Task<ClaimsInvestigation> ProcessAgentReport(string userEmail, string supervisorRemarks, long caseLocationId, string claimsInvestigationId, SupervisorRemarkType remarks, IFormFile? claimDocument = null);
 
         Task<ClaimsInvestigation> ProcessCaseReport(string userEmail, string assessorRemarks, long caseLocationId, string claimsInvestigationId, AssessorRemarkType assessorRemarkType);
 
@@ -836,11 +836,11 @@ namespace risk.control.system.Services
             }
         }
 
-        public async Task<ClaimsInvestigation> ProcessAgentReport(string userEmail, string supervisorRemarks, long caseLocationId, string claimsInvestigationId, SupervisorRemarkType reportUpdateStatus)
+        public async Task<ClaimsInvestigation> ProcessAgentReport(string userEmail, string supervisorRemarks, long caseLocationId, string claimsInvestigationId, SupervisorRemarkType reportUpdateStatus, IFormFile? claimDocument = null)
         {
             if (reportUpdateStatus == SupervisorRemarkType.OK)
             {
-                return await ApproveAgentReport(userEmail, claimsInvestigationId, caseLocationId, supervisorRemarks, reportUpdateStatus);
+                return await ApproveAgentReport(userEmail, claimsInvestigationId, caseLocationId, supervisorRemarks, reportUpdateStatus, claimDocument);
             }
             else
             {
@@ -1167,7 +1167,7 @@ namespace risk.control.system.Services
             return await _context.SaveChangesAsync() > 0 ? claimsCaseToReassign : null;
         }
 
-        private async Task<ClaimsInvestigation> ApproveAgentReport(string userEmail, string claimsInvestigationId, long caseLocationId, string supervisorRemarks, SupervisorRemarkType reportUpdateStatus)
+        private async Task<ClaimsInvestigation> ApproveAgentReport(string userEmail, string claimsInvestigationId, long caseLocationId, string supervisorRemarks, SupervisorRemarkType reportUpdateStatus, IFormFile? claimDocument = null)
         {
             var claim = _context.ClaimsInvestigation
                 .Include(c => c.AgencyReport)
@@ -1201,6 +1201,14 @@ namespace risk.control.system.Services
             report.SupervisorRemarks = supervisorRemarks;
             report.SupervisorRemarksUpdated = DateTime.Now;
             report.SupervisorEmail = userEmail;
+
+            if (claimDocument is not null)
+            {
+                using var dataStream = new MemoryStream();
+                claimDocument.CopyTo(dataStream);
+                report.SupervisorAttachment = dataStream.ToArray();
+            }
+            
             report.Vendor = claim.Vendor;
             _context.AgencyReport.Update(report);
             _context.ClaimsInvestigation.Update(claim);
@@ -1307,10 +1315,10 @@ namespace risk.control.system.Services
             {
                 using var ms = new MemoryStream();
                 messageDocument.CopyTo(ms);
-                request.QuestionAttachment = ms.ToArray();
-                request.QuestionFileName = Path.GetFileName(messageDocument.FileName);
-                request.QuestionFileExtension = Path.GetExtension(messageDocument.FileName);
-                request.QuestionFileType = messageDocument.ContentType;
+                request.QuestionImageAttachment = ms.ToArray();
+                request.QuestionImageFileName = Path.GetFileName(messageDocument.FileName);
+                request.QuestionImageFileExtension = Path.GetExtension(messageDocument.FileName);
+                request.QuestionImageFileType = messageDocument.ContentType;
             }
             claim.AgencyReport.EnquiryRequest = request;
             claim.AgencyReport.Updated = DateTime.Now;
@@ -1396,10 +1404,10 @@ namespace risk.control.system.Services
             {
                 using var ms = new MemoryStream();
                 messageDocument.CopyTo(ms);
-                enquiryRequest.AnswerAttachment = ms.ToArray();
-                enquiryRequest.AnswerFileName = Path.GetFileName(messageDocument.FileName);
-                enquiryRequest.AnswerFileExtension = Path.GetExtension(messageDocument.FileName);
-                enquiryRequest.AnswerFileType = messageDocument.ContentType;
+                enquiryRequest.AnswerImageAttachment = ms.ToArray();
+                enquiryRequest.AnswerImageFileName = Path.GetFileName(messageDocument.FileName);
+                enquiryRequest.AnswerImageFileExtension = Path.GetExtension(messageDocument.FileName);
+                enquiryRequest.AnswerImageFileType = messageDocument.ContentType;
             }
 
             _context.QueryRequest.Update(enquiryRequest);

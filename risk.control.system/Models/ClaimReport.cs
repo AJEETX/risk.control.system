@@ -51,6 +51,7 @@ namespace risk.control.system.Models
         public DateTime? SupervisorRemarksUpdated { get; set; }
         public string? SupervisorEmail { get; set; }
         public string? SupervisorRemarks { get; set; }
+        public byte[]? SupervisorAttachment { get; set; }
         public SupervisorRemarkType? SupervisorRemarkType { get; set; }
         public DateTime? AssessorRemarksUpdated { get; set; }
         public string? AssessorEmail { get; set; }
