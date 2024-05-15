@@ -52,7 +52,7 @@ namespace risk.control.system.Controllers.Api.Claims
 
             applicationDbContext = applicationDbContext.Where(a => a.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
                  (
-                     a.IsReady2Assign && !a.AssignedToAgency && (a.UserEmailActioned == companyUser.Email &&
+                     (a.UserEmailActioned == companyUser.Email &&
                          a.UserEmailActionedTo == companyUser.Email &&
                          a.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId)
                  ));
@@ -61,15 +61,12 @@ namespace risk.control.system.Controllers.Api.Claims
             var newClaimsAssigned = new List<ClaimsInvestigation>();
             foreach (var item in applicationDbContext)
             {
-                if (item.IsReady2Assign)
+                item.AssignAutoUploadView += 1;
+                if (item.AssignAutoUploadView <= 1)
                 {
-                    item.AssignAutoUploadView += 1;
-                    if(item.AssignAutoUploadView <= 1)
-                    {
-                        newClaimsAssigned.Add(item);
-                    }
-                    claimsAssigned.Add(item);
+                    newClaimsAssigned.Add(item);
                 }
+                claimsAssigned.Add(item);
             }
 
             if(newClaimsAssigned.Count > 0)

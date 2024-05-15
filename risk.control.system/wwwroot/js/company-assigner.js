@@ -1,4 +1,22 @@
 ﻿$(document).ready(function () {
+
+
+
+    $('a.create-policy').on('click', function () {
+        $("body").addClass("submit-progress-bg");
+        // Wrap in setTimeout so the UI
+        // can update the spinners
+        setTimeout(function () {
+            $(".submit-progress").removeClass("hidden");
+        }, 1);
+        $('a.create-policy').attr('disabled', 'disabled');
+        $('a.create-policy').html("<i class='fas fa-sync fa-spin'></i> Add New");
+
+        var nodes = document.getElementById("article").getElementsByTagName('*');
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].disabled = true;
+        }
+    });
     $('#postedFile').on("change", function () {
         var val = $(this).val(),
             fbtn = $('#UploadFileButton');
@@ -54,11 +72,13 @@
             /* Name of the keys from
             data file source */
             {
-                "sDefaultContent": "",
+                "sDefaultContent": "<i class='far fa-edit'></i>",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    var img = '<input name="selectedcase" class="selected-case" type="radio" id="' + row.id + '"  value="' + row.id + '"  />';
-                    return img;
+                    if (row.ready2Assign) {
+                        var img = '<input name="selectedcase" class="selected-case" type="radio" id="' + row.id + '"  value="' + row.id + '"  />';
+                        return img;
+                    }
                 }
             },
             {
@@ -77,7 +97,7 @@
                 "sDefaultContent": "",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    var img = '<img alt="' + row.name + '" title="' + row.name + '" src="' + row.customer + '" class="table-profile-image" data-toggle="tooltip"/>';
+                    var img = '<img alt="' + row.customerFullName + '" title="' + row.customerFullName + '" src="' + row.customer + '" class="table-profile-image" data-toggle="tooltip"/>';
                     return img;
                 }
             },
@@ -86,7 +106,7 @@
                 "sDefaultContent": "",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    var img = '<img alt="' + row.beneficiaryName + '" title="' + row.beneficiaryName + '" src="' + row.beneficiaryPhoto + '" class="table-profile-image" data-toggle="tooltip"/>';
+                    var img = '<img alt="' + row.beneficiaryFullName + '" title="' + row.beneficiaryFullName + '" src="' + row.beneficiaryPhoto + '" class="table-profile-image" data-toggle="tooltip"/>';
                     return img;
                 }
             },

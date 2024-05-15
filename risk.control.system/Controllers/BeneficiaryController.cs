@@ -96,6 +96,129 @@ namespace risk.control.system.Controllers
             
         }
 
+        [Breadcrumb("Add Beneficiary", FromAction = "IndexAuto", FromController = typeof(InsuranceClaimsController))]
+        public IActionResult CreateAuto(string id)
+        {
+            try
+            {
+                var claim = _context.ClaimsInvestigation
+                                .Include(i => i.PolicyDetail)
+                                .FirstOrDefault(v => v.ClaimsInvestigationId == id);
+
+                ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
+                ViewData["BeneficiaryRelationId"] = new SelectList(_context.BeneficiaryRelation, "BeneficiaryRelationId", "Name");
+
+                var beneRelationId = _context.BeneficiaryRelation.FirstOrDefault().BeneficiaryRelationId;
+                var pinCode = _context.PinCode.Include(p => p.District).FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE2);
+                var district = _context.District.Include(d => d.State).FirstOrDefault(d => d.DistrictId == pinCode.District.DistrictId);
+                var state = _context.State.Include(s => s.Country).FirstOrDefault(s => s.StateId == district.State.StateId);
+                var country = _context.Country.FirstOrDefault(c => c.CountryId == state.Country.CountryId);
+                var random = new Random();
+
+                var model = new BeneficiaryDetail
+                {
+                    ClaimsInvestigation = claim,
+                    ClaimsInvestigationId = id,
+                    Addressline = random.Next(100, 999) + " GREAT ROAD",
+                    BeneficiaryDateOfBirth = DateTime.Now.AddYears(-random.Next(25, 77)).AddMonths(3),
+                    BeneficiaryIncome = Income.MEDIUUM_INCOME,
+                    BeneficiaryName = NameGenerator.GenerateName(),
+                    BeneficiaryRelationId = beneRelationId,
+                    CountryId = country.CountryId,
+                    StateId = state.StateId,
+                    DistrictId = district.DistrictId,
+                    PinCodeId = pinCode.PinCodeId,
+                    BeneficiaryContactNumber = random.NextInt64(5555555555, 9999999999),
+                };
+
+                var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == country.CountryId).OrderBy(d => d.Name);
+                var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == state.StateId).OrderBy(d => d.Name);
+                var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == district.DistrictId).OrderBy(d => d.Name);
+
+                ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", model.CountryId);
+                ViewData["DistrictId"] = new SelectList(districts.OrderBy(s => s.Code), "DistrictId", "Name", model.DistrictId);
+                ViewData["StateId"] = new SelectList(relatedStates.OrderBy(s => s.Code), "StateId", "Name", model.StateId);
+                ViewData["PinCodeId"] = new SelectList(pincodes.OrderBy(s => s.Code), "PinCodeId", "Code", model.PinCodeId);
+                ViewData["BeneficiaryRelationId"] = new SelectList(_context.BeneficiaryRelation, "BeneficiaryRelationId", "Name");
+
+                var claimsPage = new MvcBreadcrumbNode("Draft", "ClaimsInvestigation", "Claims");
+                var agencyPage = new MvcBreadcrumbNode("Draft", "ClaimsInvestigation", "Assign(auto)") { Parent = claimsPage, };
+                var detailsPage = new MvcBreadcrumbNode("DetailsAuto", "ClaimsInvestigation", $"Details") { Parent = agencyPage, RouteValues = new { id = id } };
+                var editPage = new MvcBreadcrumbNode("CreateAuto", "Beneficiary", $"Add beneficiary") { Parent = detailsPage, RouteValues = new { id = id } };
+                ViewData["BreadcrumbNode"] = editPage;
+
+                return View(model);
+            }
+            catch (Exception)
+            {
+                notifyService.Error("OOPS !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+
+        }
+
+
+        [Breadcrumb("Add Beneficiary", FromAction = "IndexManual", FromController = typeof(InsuranceClaimsController))]
+        public IActionResult CreateManual(string id)
+        {
+            try
+            {
+                var claim = _context.ClaimsInvestigation
+                                .Include(i => i.PolicyDetail)
+                                .FirstOrDefault(v => v.ClaimsInvestigationId == id);
+
+                ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
+                ViewData["BeneficiaryRelationId"] = new SelectList(_context.BeneficiaryRelation, "BeneficiaryRelationId", "Name");
+
+                var beneRelationId = _context.BeneficiaryRelation.FirstOrDefault().BeneficiaryRelationId;
+                var pinCode = _context.PinCode.Include(p => p.District).FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE2);
+                var district = _context.District.Include(d => d.State).FirstOrDefault(d => d.DistrictId == pinCode.District.DistrictId);
+                var state = _context.State.Include(s => s.Country).FirstOrDefault(s => s.StateId == district.State.StateId);
+                var country = _context.Country.FirstOrDefault(c => c.CountryId == state.Country.CountryId);
+                var random = new Random();
+
+                var model = new BeneficiaryDetail
+                {
+                    ClaimsInvestigation = claim,
+                    ClaimsInvestigationId = id,
+                    Addressline = random.Next(100, 999) + " GREAT ROAD",
+                    BeneficiaryDateOfBirth = DateTime.Now.AddYears(-random.Next(25, 77)).AddMonths(3),
+                    BeneficiaryIncome = Income.MEDIUUM_INCOME,
+                    BeneficiaryName = NameGenerator.GenerateName(),
+                    BeneficiaryRelationId = beneRelationId,
+                    CountryId = country.CountryId,
+                    StateId = state.StateId,
+                    DistrictId = district.DistrictId,
+                    PinCodeId = pinCode.PinCodeId,
+                    BeneficiaryContactNumber = random.NextInt64(5555555555, 9999999999),
+                };
+
+                var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == country.CountryId).OrderBy(d => d.Name);
+                var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == state.StateId).OrderBy(d => d.Name);
+                var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == district.DistrictId).OrderBy(d => d.Name);
+
+                ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", model.CountryId);
+                ViewData["DistrictId"] = new SelectList(districts.OrderBy(s => s.Code), "DistrictId", "Name", model.DistrictId);
+                ViewData["StateId"] = new SelectList(relatedStates.OrderBy(s => s.Code), "StateId", "Name", model.StateId);
+                ViewData["PinCodeId"] = new SelectList(pincodes.OrderBy(s => s.Code), "PinCodeId", "Code", model.PinCodeId);
+                ViewData["BeneficiaryRelationId"] = new SelectList(_context.BeneficiaryRelation, "BeneficiaryRelationId", "Name");
+
+                var claimsPage = new MvcBreadcrumbNode("Assigner", "ClaimsInvestigation", "Claims");
+                var agencyPage = new MvcBreadcrumbNode("Assigner", "ClaimsInvestigation", "Assign & Re") { Parent = claimsPage, };
+                var detailsPage = new MvcBreadcrumbNode("DetailsManual", "ClaimsInvestigation", $"Details") { Parent = agencyPage, RouteValues = new { id = id } };
+                var editPage = new MvcBreadcrumbNode("CreateManual", "Beneficiary", $"Add beneficiary") { Parent = detailsPage, RouteValues = new { id = id } };
+                ViewData["BreadcrumbNode"] = editPage;
+
+                return View(model);
+            }
+            catch (Exception)
+            {
+                notifyService.Error("OOPS !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+
+        }
+
         [HttpPost]
         [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
@@ -154,6 +277,122 @@ namespace risk.control.system.Controllers
             }
         }
 
+
+        [HttpPost]
+        [RequestSizeLimit(2_000_000)] // Checking for 2 MB
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateAuto(string claimId, BeneficiaryDetail caseLocation)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(claimId) || caseLocation is null)
+                {
+                    notifyService.Error("NOT FOUND  !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                caseLocation.Updated = DateTime.Now;
+                caseLocation.UpdatedBy = HttpContext.User?.Identity?.Name;
+
+                IFormFile? customerDocument = Request.Form?.Files?.FirstOrDefault();
+                if (customerDocument != null)
+                {
+                    using var dataStream = new MemoryStream();
+                    customerDocument.CopyTo(dataStream);
+                    caseLocation.ProfilePicture = dataStream.ToArray();
+                }
+
+                caseLocation.ClaimsInvestigationId = claimId;
+                var pincode = _context.PinCode.FirstOrDefault(p => p.PinCodeId == caseLocation.PinCodeId);
+
+                caseLocation.PinCode = pincode;
+
+                var customerLatLong = caseLocation.PinCode.Latitude + "," + caseLocation.PinCode.Longitude;
+                var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=8&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key={Applicationsettings.GMAPData}";
+                caseLocation.BeneficiaryLocationMap = url;
+                _context.Add(caseLocation);
+                await _context.SaveChangesAsync();
+
+                var claimsInvestigation = await _context.ClaimsInvestigation
+                .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == claimId);
+                claimsInvestigation.IsReady2Assign = true;
+
+                _context.ClaimsInvestigation.Update(claimsInvestigation);
+                await _context.SaveChangesAsync();
+                notifyService.Custom($"Beneficiary {caseLocation.BeneficiaryName} added successfully", 3, "green", "fas fa-user-tie");
+
+                return RedirectToAction(nameof(ClaimsInvestigationController.DetailsAuto), "ClaimsInvestigation", new { id = caseLocation.ClaimsInvestigationId });
+
+                ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", caseLocation.CountryId);
+                ViewData["BeneficiaryRelationId"] = new SelectList(_context.BeneficiaryRelation.OrderBy(s => s.Code), "BeneficiaryRelationId", "Name", caseLocation.BeneficiaryRelationId);
+                ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name", caseLocation.DistrictId);
+                ViewData["StateId"] = new SelectList(_context.State, "StateId", "StateId", caseLocation.StateId);
+                ViewData["PinCodeId"] = new SelectList(_context.PinCode, "PinCodeId", "Code", caseLocation.PinCodeId);
+                return View(caseLocation);
+            }
+            catch (Exception)
+            {
+                notifyService.Error("OOPS !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+        }
+
+        [HttpPost]
+        [RequestSizeLimit(2_000_000)] // Checking for 2 MB
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateManual(string claimId, BeneficiaryDetail caseLocation)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(claimId) || caseLocation is null)
+                {
+                    notifyService.Error("NOT FOUND  !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                caseLocation.Updated = DateTime.Now;
+                caseLocation.UpdatedBy = HttpContext.User?.Identity?.Name;
+
+                IFormFile? customerDocument = Request.Form?.Files?.FirstOrDefault();
+                if (customerDocument != null)
+                {
+                    using var dataStream = new MemoryStream();
+                    customerDocument.CopyTo(dataStream);
+                    caseLocation.ProfilePicture = dataStream.ToArray();
+                }
+
+                caseLocation.ClaimsInvestigationId = claimId;
+                var pincode = _context.PinCode.FirstOrDefault(p => p.PinCodeId == caseLocation.PinCodeId);
+
+                caseLocation.PinCode = pincode;
+
+                var customerLatLong = caseLocation.PinCode.Latitude + "," + caseLocation.PinCode.Longitude;
+                var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=8&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key={Applicationsettings.GMAPData}";
+                caseLocation.BeneficiaryLocationMap = url;
+                _context.Add(caseLocation);
+                await _context.SaveChangesAsync();
+
+                var claimsInvestigation = await _context.ClaimsInvestigation
+                .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == claimId);
+                claimsInvestigation.IsReady2Assign = true;
+
+                _context.ClaimsInvestigation.Update(claimsInvestigation);
+                await _context.SaveChangesAsync();
+                notifyService.Custom($"Beneficiary {caseLocation.BeneficiaryName} added successfully", 3, "green", "fas fa-user-tie");
+
+                return RedirectToAction(nameof(ClaimsInvestigationController.DetailsManual), "ClaimsInvestigation", new { id = caseLocation.ClaimsInvestigationId });
+
+                ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", caseLocation.CountryId);
+                ViewData["BeneficiaryRelationId"] = new SelectList(_context.BeneficiaryRelation.OrderBy(s => s.Code), "BeneficiaryRelationId", "Name", caseLocation.BeneficiaryRelationId);
+                ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name", caseLocation.DistrictId);
+                ViewData["StateId"] = new SelectList(_context.State, "StateId", "StateId", caseLocation.StateId);
+                ViewData["PinCodeId"] = new SelectList(_context.PinCode, "PinCodeId", "Code", caseLocation.PinCodeId);
+                return View(caseLocation);
+            }
+            catch (Exception)
+            {
+                notifyService.Error("OOPS !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+        }
         [Breadcrumb("Edit Beneficiary", FromAction = "Index", FromController = typeof(InsuranceClaimsController))]
         public async Task<IActionResult> Edit(long? id)
         {

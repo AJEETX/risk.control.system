@@ -68,16 +68,13 @@ namespace risk.control.system.Services
 
         public async Task<AppiCheckifyResponse> PostDocumentId(string userEmail, string claimId, string latitude, string longitude, byte[]? image = null)
         {
-            var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "agency", "pan.jpg");
-
-            var noDataimage = image != null ? image : await File.ReadAllBytesAsync(noDataImagefilePath);
             var locationLongLat = string.IsNullOrWhiteSpace(latitude) || string.IsNullOrWhiteSpace(longitude) ? string.Empty : $"{latitude}/{longitude}";
 
             var data = new DocumentData
             {
                 Email = userEmail,
                 ClaimId = claimId,
-                OcrImage = Convert.ToBase64String(noDataimage),
+                OcrImage = Convert.ToBase64String(image),
                 OcrLongLat = locationLongLat
             };
             var result = await checkifyService.GetDocumentId(data);
@@ -86,16 +83,12 @@ namespace risk.control.system.Services
 
         public async Task<AppiCheckifyResponse> PostFaceId(string userEmail, string claimId, string latitude, string longitude, byte[]? image = null)
         {
-            var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "agency", "ajeet.jpg");
-
-            var noDataimage = image != null ? image : await File.ReadAllBytesAsync(noDataImagefilePath);
-
             var locationLongLat = string.IsNullOrWhiteSpace(latitude) || string.IsNullOrWhiteSpace(longitude) ? string.Empty : $"{latitude}/{longitude}";
             var data = new FaceData
             {
                 Email = userEmail,
                 ClaimId = claimId,
-                LocationImage = Convert.ToBase64String(noDataimage),
+                LocationImage = Convert.ToBase64String(image),
                 LocationLongLat = locationLongLat
             };
             var result = await checkifyService.GetFaceId(data);
@@ -303,6 +296,7 @@ namespace risk.control.system.Services
             var claimsInvestigation = claimsService.GetClaims()
                 .Include(c=>c.Vendor)
                 .Include(c=>c.AgencyReport)
+                .ThenInclude(c=>c.EnquiryRequest)
                 .Include(c=>c.AgencyReport.DigitalIdReport)
                 .Include(c=>c.AgencyReport.DocumentIdReport)
                 .Include(c=>c.AgencyReport.ReportQuestionaire)

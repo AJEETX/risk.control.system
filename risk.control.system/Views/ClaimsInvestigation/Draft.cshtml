@@ -181,11 +181,13 @@
             <div class="card-footer">
                 <div class="row">
                     <div class="col-md-12">
-                        <a id="back" asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
+                        <a class="create-policy btn btn-success" asp-controller="InsuranceClaims" asp-action="IndexAuto"><i class="far fa-edit"></i> @Applicationsettings.CREATE New</a>
+
 
                         <button disabled id="allocatedcase" type="submit" class="btn btn-warning">
                             <span class="badge badge-warning"> <i class="fas fa-random"></i> </span> ASSIGN<span class="badge badge-warning">auto</span>
                         </button>
+
                     </div>
                 </div>
             </div>

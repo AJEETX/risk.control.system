@@ -2,6 +2,7 @@
 
 using AspNetCoreHero.ToastNotification.Abstractions;
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
@@ -17,6 +18,7 @@ using risk.control.system.Services;
 
 namespace risk.control.system.Controllers
 {
+    [Authorize(Roles = "AGENCY_ADMIN,SUPERVISOR,AGENT")]
     public class ClaimsVendorPostController : Controller
     {
         public List<UsersViewModel> UserList;
@@ -46,6 +48,7 @@ namespace risk.control.system.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "AGENCY_ADMIN,SUPERVISOR")]
         public async Task<IActionResult> AllocateToVendorAgent(string selectedcase, string claimId, long caseLocationId)
         {
             try
@@ -94,7 +97,14 @@ namespace risk.control.system.Controllers
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(remarks) || string.IsNullOrWhiteSpace(claimId) || caseLocationId < 1)
+                if (string.IsNullOrWhiteSpace(remarks) ||
+                    string.IsNullOrWhiteSpace(claimId) || 
+                    caseLocationId < 1 || 
+                    string.IsNullOrWhiteSpace(question1) ||
+                    string.IsNullOrWhiteSpace(question2) ||
+                    string.IsNullOrWhiteSpace(question3) ||
+                    string.IsNullOrWhiteSpace(question4)
+                    )
                 {
                     notifyService.Error($"No Agent remarks entered!!!. Please enter remarks.", 3);
                     return RedirectToAction(nameof(ClaimsVendorController.GetInvestigate), "\"ClaimsVendor\"", new { selectedcase = claimId });
@@ -125,7 +135,8 @@ namespace risk.control.system.Controllers
                 if(claim == null)
                 {
                     notifyService.Error("OOPs !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return RedirectToAction(nameof(ClaimsVendorController.GetInvestigate), "\"ClaimsVendor\"", new { selectedcase = claimId });
+
                 }
                 await mailboxService.NotifyClaimReportSubmitToVendorSupervisor(userEmail, claimId, caseLocationId);
 
@@ -136,12 +147,14 @@ namespace risk.control.system.Controllers
             catch (Exception)
             {
                 notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return RedirectToAction(nameof(ClaimsVendorController.GetInvestigate), "\"ClaimsVendor\"", new { selectedcase = claimId });
+
             }
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "AGENCY_ADMIN,SUPERVISOR")]
         public async Task<IActionResult> ProcessReport(string supervisorRemarks, string supervisorRemarkType, string claimId, long caseLocationId)
         {
             try
@@ -155,7 +168,8 @@ namespace risk.control.system.Controllers
                 if (string.IsNullOrWhiteSpace(userEmail))
                 {
                     notifyService.Error("OOPs !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return RedirectToAction(nameof(ClaimsVendorController.GetInvestigateReport), new { selectedcase = claimId });
+
                 }
 
                 var reportUpdateStatus = SupervisorRemarkType.OK;
@@ -176,11 +190,12 @@ namespace risk.control.system.Controllers
             catch (Exception)
             {
                 notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return RedirectToAction(nameof(ClaimsVendorController.GetInvestigateReport), new { selectedcase = claimId });
             }
         }
 
         [HttpPost]
+        [Authorize(Roles = "AGENCY_ADMIN,SUPERVISOR")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> WithdrawCase(ClaimTransactionModel model, string claimId, string policyNumber)
         {
@@ -189,13 +204,15 @@ namespace risk.control.system.Controllers
                 if (model == null || string.IsNullOrWhiteSpace(claimId))
                 {
                     notifyService.Error("OOPs !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return RedirectToAction(nameof(ClaimsVendorController.Allocate), "ClaimsVendor");
+
                 }
                 string userEmail = HttpContext?.User?.Identity.Name;
                 if (string.IsNullOrWhiteSpace(userEmail))
                 {
                     notifyService.Error("OOPs !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return RedirectToAction(nameof(ClaimsVendorController.Allocate), "ClaimsVendor");
+
                 }
                 await claimsInvestigationService.WithdrawCase(userEmail, model, claimId);
 
@@ -208,12 +225,14 @@ namespace risk.control.system.Controllers
             catch (Exception)
             {
                 notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return RedirectToAction(nameof(ClaimsVendorController.Allocate), "ClaimsVendor");
+
             }
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "AGENCY_ADMIN,SUPERVISOR")]
         public async Task<IActionResult> ReplyQuery(string claimId, ClaimsInvestigationVendorsModel request, List<string> flexRadioDefault)
         {
             try
@@ -222,12 +241,14 @@ namespace risk.control.system.Controllers
                 if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
                     notifyService.Error("OOPs !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return RedirectToAction(nameof(ClaimsVendorController.Allocate), "ClaimsVendor");
+
                 }
                 if (request == null)
                 {
                     notifyService.Error("NOT FOUND !!!..");
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction(nameof(ClaimsVendorController.Allocate), "ClaimsVendor");
+
                 }
                 request.ClaimsInvestigation.AgencyReport.EnquiryRequest.Answer = HttpUtility.HtmlEncode(request.ClaimsInvestigation.AgencyReport.EnquiryRequest.Answer);
 
@@ -243,12 +264,14 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(ClaimsVendorController.Allocate), "ClaimsVendor");
                 }
                 notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return RedirectToAction(nameof(ClaimsVendorController.Allocate), "ClaimsVendor");
+
             }
             catch (Exception)
             {
                 notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return RedirectToAction(nameof(ClaimsVendorController.Allocate), "ClaimsVendor");
+
             }
         }
     }

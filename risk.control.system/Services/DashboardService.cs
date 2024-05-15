@@ -809,7 +809,8 @@ namespace risk.control.system.Services
             // SHOWING DIFFERRENT PAGES AS PER ROLES
             var count = applicationDbContext.Count(a => a.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
                 (
-                    a.IsReady2Assign && !a.AssignedToAgency && ( a.UserEmailActioned == companyUser.Email &&
+                    //a.IsReady2Assign && !a.AssignedToAgency &&
+                    ( a.UserEmailActioned == companyUser.Email &&
                         a.UserEmailActionedTo == companyUser.Email &&
                         a.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId
                         || a.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId)
@@ -846,7 +847,7 @@ namespace risk.control.system.Services
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
             var count = applicationDbContext.Count(a => a.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
                 (
-                    a.IsReady2Assign && !a.AssignedToAgency && (a.UserEmailActioned == companyUser.Email &&
+                    (a.UserEmailActioned == companyUser.Email &&
                         a.UserEmailActionedTo == companyUser.Email &&
                         a.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId)
                 ));

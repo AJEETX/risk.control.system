@@ -178,10 +178,12 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 IFormFile? vendorDocument = Request.Form?.Files?.FirstOrDefault();
+
+
                 if (vendorDocument is not null)
                 {
                     string newFileName = vendor.Email + Guid.NewGuid().ToString();
-                    string fileExtension = Path.GetExtension(vendorDocument.FileName);
+                    string fileExtension = Path.GetExtension(Path.GetFileName(vendorDocument.FileName));
                     newFileName += fileExtension;
                     string path = Path.Combine(webHostEnvironment.WebRootPath, "agency");
                     if (!Directory.Exists(path))
@@ -286,10 +288,16 @@ namespace risk.control.system.Controllers
         {
             try
             {
-                if (user.ProfileImage != null && user.ProfileImage.Length > 0)
+                if(user == null || string.IsNullOrWhiteSpace(emailSuffix) || string.IsNullOrWhiteSpace(vendorId))
+                {
+                    notifyService.Custom($"Error to create user.", 3, "red", "fas fa-user-plus");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+
+                if (user.ProfileImage != null && user.ProfileImage.Length > 0 && !string .IsNullOrWhiteSpace(Path.GetFileName(user.ProfileImage.FileName)))
                 {
                     string newFileName = Guid.NewGuid().ToString();
-                    string fileExtension = Path.GetExtension(user.ProfileImage.FileName);
+                    string fileExtension = Path.GetExtension(Path.GetFileName(user.ProfileImage.FileName));
                     newFileName += fileExtension;
                     string path = Path.Combine(webHostEnvironment.WebRootPath, "agency");
                     if (!Directory.Exists(path))
@@ -474,7 +482,7 @@ namespace risk.control.system.Controllers
         {
             try
             {
-                if (id != applicationUser.Id.ToString())
+                if (id != applicationUser.Id.ToString() || applicationUser == null)
                 {
                     notifyService.Error("Err !!! bad Request");
                     return RedirectToAction(nameof(AgencyController.Users), "Agency");
@@ -717,11 +725,30 @@ namespace risk.control.system.Controllers
         {
             try
             {
-
+                if(vendorInvestigationServiceType is null)
+                {
+                    notifyService.Custom($"Error to create service.", 3, "red", "fas fa-truck");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
                 var userEmail = HttpContext.User?.Identity?.Name;
+                if (userEmail is null)
+                {
+                    notifyService.Custom($"Error to create service.", 3, "red", "fas fa-truck");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
                 var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-                var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == vendorUser.VendorId);
 
+                if (vendorUser == null)
+                {
+                    notifyService.Custom($"Error to create service.", 3, "red", "fas fa-truck");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == vendorUser.VendorId);
+                if (vendor == null)
+                {
+                    notifyService.Custom($"Error to create service.", 3, "red", "fas fa-truck");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
                 if (vendorInvestigationServiceType is not null)
                 {
                     var pincodesServiced = await _context.PinCode.Where(p => vendorInvestigationServiceType.SelectedMultiPincodeId.Contains(p.PinCodeId)).ToListAsync();
@@ -763,16 +790,26 @@ namespace risk.control.system.Controllers
         {
             try
             {
+                var userEmail = HttpContext.User?.Identity?.Name;
+                if (userEmail is null)
+                {
+                    notifyService.Custom($"Error to edit service.", 3, "red", "fas fa-truck");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
                 if (id == 0 || _context.VendorInvestigationServiceType == null)
                 {
-                    return NotFound();
+                    notifyService.Custom($"Error to edit service.", 3, "red", "fas fa-truck");
+                    return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
                 var vendorInvestigationServiceType = await _context.VendorInvestigationServiceType.FindAsync(id);
-                if (vendorInvestigationServiceType == null)
+
+                if (vendorInvestigationServiceType is null)
                 {
-                    return NotFound();
+                    notifyService.Custom($"Error to edit service.", 3, "red", "fas fa-truck");
+                    return RedirectToAction(nameof(Index), "Dashboard");
                 }
+
                 var services = _context.VendorInvestigationServiceType
                     .Include(v => v.Vendor)
                     .Include(v => v.PincodeServices)
@@ -807,7 +844,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPS !!!..Contact Admin");
+                notifyService.Custom($"Error to edit service.", 3, "red", "fas fa-truck");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
 
@@ -825,7 +862,7 @@ namespace risk.control.system.Controllers
             {
                 if (vendorInvestigationServiceTypeId != vendorInvestigationServiceType.VendorInvestigationServiceTypeId)
                 {
-                    notifyService.Error("OOPS !!!..Contact Admin");
+                    notifyService.Custom($"Error to edit service.", 3, "red", "fas fa-truck");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
@@ -861,7 +898,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPS !!!..Contact Admin");
+                notifyService.Custom($"Error to edit service.", 3, "red", "fas fa-truck");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
 
@@ -874,9 +911,10 @@ namespace risk.control.system.Controllers
             try
             {
 
-                if (id == null || _context.VendorInvestigationServiceType == null)
+                if (id == 0 || _context.VendorInvestigationServiceType == null)
                 {
-                    return NotFound();
+                    notifyService.Custom($"NOT FOUND.", 3, "red", "fas fa-truck");
+                    return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
                 var vendorInvestigationServiceType = await _context.VendorInvestigationServiceType
@@ -910,7 +948,7 @@ namespace risk.control.system.Controllers
         {
             try
             {
-                if (_context.VendorInvestigationServiceType == null)
+                if (_context.VendorInvestigationServiceType == null || id == 0)
                 {
                     return Problem("Entity set 'ApplicationDbContext.VendorInvestigationServiceType'  is null.");
                 }
@@ -930,7 +968,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("OOPS !!!..Contact Admin");
+                notifyService.Custom($"Error to delete service.", 3, "red", "fas fa-truck");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }

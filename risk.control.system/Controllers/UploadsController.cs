@@ -126,7 +126,12 @@ namespace risk.control.system.Controllers
             {
                 var userEmail = HttpContext.User?.Identity?.Name;
 
-                if (string.IsNullOrWhiteSpace(userEmail))
+                if (string.IsNullOrWhiteSpace(userEmail) || 
+                    string.IsNullOrWhiteSpace(selectedcase) || 
+                    string.IsNullOrWhiteSpace(digitalIdLatitude) || 
+                    string.IsNullOrWhiteSpace(Path.GetFileName(digitalImage.FileName)) ||
+                    string.IsNullOrWhiteSpace(Path.GetFileName(digitalImage.Name)) ||
+                    string.IsNullOrWhiteSpace(digitalIdLongitude))
                 {
                     notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
@@ -141,7 +146,7 @@ namespace risk.control.system.Controllers
                 {
                     digitalImage.CopyTo(ds);
                     var imageByte = ds.ToArray();
-                    await vendorService.PostFaceId(userEmail, selectedcase, digitalIdLatitude, digitalIdLongitude, imageByte);
+                    var response = await vendorService.PostFaceId(userEmail, selectedcase, digitalIdLatitude, digitalIdLongitude, imageByte);
 
                     notifyService.Custom($"Photo Image Uploaded", 3, "green", "fas fa-portrait");
                     return Redirect("/ClaimsVendor/GetInvestigate?selectedcase=" + selectedcase);
@@ -164,7 +169,13 @@ namespace risk.control.system.Controllers
 
                 var userEmail = HttpContext.User?.Identity?.Name;
 
-                if (string.IsNullOrWhiteSpace(userEmail))
+                if (string.IsNullOrWhiteSpace(userEmail) ||
+                    string.IsNullOrWhiteSpace(documentIdLatitude) || 
+                    string.IsNullOrWhiteSpace(documentIdLongitude) ||
+                    Path.GetInvalidFileNameChars() == null ||
+                    string.IsNullOrWhiteSpace(Path.GetFileName(panImage.FileName)) ||
+                    string.IsNullOrWhiteSpace(Path.GetFileName(panImage.Name))
+                    )
                 {
                     notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
@@ -179,7 +190,7 @@ namespace risk.control.system.Controllers
                 {
                     panImage.CopyTo(ds);
                     var imageByte = ds.ToArray();
-                    await vendorService.PostDocumentId(userEmail, selectedclaim, documentIdLatitude, documentIdLongitude, imageByte);
+                    var response = await vendorService.PostDocumentId(userEmail, selectedclaim, documentIdLatitude, documentIdLongitude, imageByte);
 
                     notifyService.Custom($"Pan card Image Uploaded", 3, "green", "fas fa-mobile-alt");
                     return Redirect("/ClaimsVendor/GetInvestigate?selectedcase=" + selectedclaim);
@@ -200,8 +211,8 @@ namespace risk.control.system.Controllers
             if(postedFile == null || string.IsNullOrWhiteSpace(uploadtype) || 
                 string.IsNullOrWhiteSpace(Path.GetFileName(postedFile.FileName)) ||
                 (Path.GetInvalidFileNameChars() == null) ||
-                string.IsNullOrWhiteSpace(Path.GetExtension(postedFile.FileName)) ||
-                Path.GetExtension(postedFile.FileName) !="zip"
+                string.IsNullOrWhiteSpace(Path.GetExtension(Path.GetFileName(postedFile.FileName))) ||
+                Path.GetExtension(Path.GetFileName(postedFile.FileName)) !="zip"
                 )
             {
                 notifyService.Custom($"Upload Error. Contact Admin", 3, "red", "far fa-file-powerpoint");

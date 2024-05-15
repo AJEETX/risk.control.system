@@ -83,6 +83,107 @@ namespace risk.control.system.Controllers
 
             return View(model);
         }
+        [Breadcrumb(" Add New", FromAction = "Draft", FromController = typeof(ClaimsInvestigationController))]
+        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
+        public IActionResult IndexAuto()
+        {
+            var currentUserEmail = HttpContext.User?.Identity?.Name;
+            if (string.IsNullOrWhiteSpace(currentUserEmail))
+            {
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+            var claim = new ClaimsInvestigation
+            {
+                PolicyDetail = new PolicyDetail
+                {
+                    LineOfBusinessId = context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == "claims").LineOfBusinessId
+                }
+            };
+            var companyUser = context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(c => c.Email == currentUserEmail);
+            bool userCanCreate = true;
+            int availableCount = 0;
+            var trial = companyUser.ClientCompany.LicenseType == Standard.Licensing.LicenseType.Trial;
+            if (trial)
+            {
+                var totalClaimsCreated = context.ClaimsInvestigation.Include(c => c.PolicyDetail).Where(c => !c.Deleted && c.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId)?.ToList();
+                availableCount = companyUser.ClientCompany.TotalCreatedClaimAllowed - totalClaimsCreated.Count;
+
+                if (totalClaimsCreated?.Count >= companyUser.ClientCompany.TotalCreatedClaimAllowed)
+                {
+                    userCanCreate = false;
+                    notifyService.Information($"MAX Claim limit = <b>{companyUser.ClientCompany.TotalCreatedClaimAllowed}</b> reached");
+                }
+                else
+                {
+                    notifyService.Information($"Limit available = <b>{availableCount}</b>");
+                }
+            }
+            var model = new ClaimTransactionModel
+            {
+                ClaimsInvestigation = claim,
+                Log = null,
+                AllowedToCreate = userCanCreate,
+                AutoAllocation = companyUser.ClientCompany.AutoAllocation,
+                Location = new BeneficiaryDetail { },
+                AvailableCount = availableCount,
+                TotalCount = companyUser.ClientCompany.TotalCreatedClaimAllowed,
+                Trial = trial
+            };
+
+            return View(model);
+        }
+
+        [Breadcrumb(" Add New", FromAction = "Assigner", FromController = typeof(ClaimsInvestigationController))]
+        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
+        public IActionResult IndexManual()
+        {
+            var currentUserEmail = HttpContext.User?.Identity?.Name;
+            if (string.IsNullOrWhiteSpace(currentUserEmail))
+            {
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+            var claim = new ClaimsInvestigation
+            {
+                PolicyDetail = new PolicyDetail
+                {
+                    LineOfBusinessId = context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == "claims").LineOfBusinessId
+                }
+            };
+            var companyUser = context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(c => c.Email == currentUserEmail);
+            bool userCanCreate = true;
+            int availableCount = 0;
+            var trial = companyUser.ClientCompany.LicenseType == Standard.Licensing.LicenseType.Trial;
+            if (trial)
+            {
+                var totalClaimsCreated = context.ClaimsInvestigation.Include(c => c.PolicyDetail).Where(c => !c.Deleted && c.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId)?.ToList();
+                availableCount = companyUser.ClientCompany.TotalCreatedClaimAllowed - totalClaimsCreated.Count;
+
+                if (totalClaimsCreated?.Count >= companyUser.ClientCompany.TotalCreatedClaimAllowed)
+                {
+                    userCanCreate = false;
+                    notifyService.Information($"MAX Claim limit = <b>{companyUser.ClientCompany.TotalCreatedClaimAllowed}</b> reached");
+                }
+                else
+                {
+                    notifyService.Information($"Limit available = <b>{availableCount}</b>");
+                }
+            }
+            var model = new ClaimTransactionModel
+            {
+                ClaimsInvestigation = claim,
+                Log = null,
+                AllowedToCreate = userCanCreate,
+                AutoAllocation = companyUser.ClientCompany.AutoAllocation,
+                Location = new BeneficiaryDetail { },
+                AvailableCount = availableCount,
+                TotalCount = companyUser.ClientCompany.TotalCreatedClaimAllowed,
+                Trial = trial
+            };
+
+            return View(model);
+        }
         public async Task<IActionResult> Summary4Insurer(string id)
         {
             try
