@@ -4,7 +4,6 @@ $(document).ready(function () {
     let review = false;
     let reject = false;
 
-    $('#query-form').validate();
     var currentImageElement = document.getElementById('documentImage0');
     var currentImage;
     if (currentImageElement) {

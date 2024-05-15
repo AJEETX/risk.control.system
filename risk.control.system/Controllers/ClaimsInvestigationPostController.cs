@@ -598,6 +598,8 @@ namespace risk.control.system.Controllers
                 var model =await  claimsInvestigationService.SubmitQueryToAgency(currentUserEmail, claimId, request.AgencyReport.EnquiryRequest, messageDocument);
                 if(model !=null)
                 {
+                    await mailboxService.NotifySubmitQueryToAgency(currentUserEmail, claimId);
+
                     notifyService.Success("Query Sent to Agency");
                     return RedirectToAction(nameof(ClaimsInvestigationController.Assessor),"ClaimsInvestigation"); 
                 }

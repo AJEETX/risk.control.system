@@ -237,6 +237,8 @@ namespace risk.control.system.Controllers
 
                 if (claim != null)
                 {
+                    await mailboxService.NotifySubmitReplyToCompany(currentUserEmail, claimId);
+
                     notifyService.Success("Enquiry Reply Sent to Company");
                     return RedirectToAction(nameof(ClaimsVendorController.Allocate), "ClaimsVendor");
                 }
