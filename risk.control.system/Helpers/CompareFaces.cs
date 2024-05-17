@@ -53,15 +53,15 @@ namespace risk.control.system.Services
 
             var result = compareFacesResponse.FaceMatches.Count == 1 && compareFacesResponse.UnmatchedFaces.Count == 0 && compareFacesResponse.FaceMatches[0].Similarity >= similarityThreshold;
 
-            // Display results
-            compareFacesResponse.FaceMatches.ForEach(match =>
-            {
-                ComparedFace face = match.Face;
-                BoundingBox position = face.BoundingBox;
-                Console.WriteLine($"Face at {position.Left} {position.Top} matches with {match.Similarity}% confidence.");
-            });
+            //// Display results
+            //compareFacesResponse.FaceMatches.ForEach(match =>
+            //{
+            //    ComparedFace face = match.Face;
+            //    BoundingBox position = face.BoundingBox;
+            //    Console.WriteLine($"Face at {position.Left} {position.Top} matches with {match.Similarity}% confidence.");
+            //});
 
-            Console.WriteLine($"Found {compareFacesResponse.UnmatchedFaces.Count} face(s) that did not match.");
+            //Console.WriteLine($"Found {compareFacesResponse.UnmatchedFaces.Count} face(s) that did not match.");
             return result;
         }
     }

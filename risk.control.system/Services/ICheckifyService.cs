@@ -73,150 +73,92 @@ namespace risk.control.system.Services
                 var claim = claimsService.GetClaims()
                                 .Include(c => c.AgencyReport)
                                 .ThenInclude(c => c.DigitalIdReport)
-                                .Include(c => c.AgencyReport)
-                                .ThenInclude(c => c.ReportQuestionaire)
-                                .Include(c => c.AgencyReport)
-                                .ThenInclude(c => c.DocumentIdReport)
                                 .FirstOrDefault(c => c.ClaimsInvestigationId == data.ClaimId);
 
                 claim.AgencyReport.AgentEmail = data.Email;
 
                 var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claim.PolicyDetail.ClientCompanyId);
 
-                #region FACE IMAGE PROCESSING
+                byte[]? registeredImage = null;
 
-                if (!string.IsNullOrWhiteSpace(data.LocationImage))
+                if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
                 {
-                    byte[]? registeredImage = null;
-
-                    if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
-                    {
-                        registeredImage = claim.CustomerDetail.ProfilePicture;
-                    }
-                    if (claim.PolicyDetail.ClaimType == ClaimType.DEATH)
-                    {
-                        registeredImage = claim.BeneficiaryDetail.ProfilePicture;
-                    }
-
-                    string ImageData = string.Empty;
-                    try
-                    {
-                        if (registeredImage != null)
-                        {
-                            var face2Verify = Convert.FromBase64String(data.LocationImage);
-
-                            //using MemoryStream stream = new MemoryStream(image);
-                            //string path = Path.Combine(webHostEnvironment.WebRootPath, "verify");
-                            //if (!Directory.Exists(path))
-                            //{
-                            //    Directory.CreateDirectory(path);
-                            //}
-                            //var filePath = Path.Combine(webHostEnvironment.WebRootPath, "verify", $"face{DateTime.Now.ToString("dd-MMM-yyyy-HH-mm-ss")}.jpg");
-                            //CompressImage.CompressimageWindows(stream, filePath);
-
-                            //claimCase.ClaimReport.DigitalIdReport.DigitalIdImagePath = filePath;
-
-                            //var savedImage = await File.ReadAllBytesAsync(filePath);
-
-                            //var savedImage = ImageCompression.ConverterSkia(image);
-
-                            //var saveImageBase64String = Convert.ToBase64String(savedImage);
-
-                            claim.AgencyReport.DigitalIdReport.DigitalIdImageLongLatTime = DateTime.Now;
-
-                            //var base64Image = Convert.ToBase64String(registeredImage);
-
-                            try
-                            {
-
-                                var matched = await CompareFaces.Do(registeredImage, face2Verify);
-
-                                //var faceImageDetail = await httpClientService.GetFaceMatch(new MatchImage { Source = base64Image, Dest = saveImageBase64String }, company.ApiBaseUrl);
-
-                                if (matched)
-                                {
-                                    claim.AgencyReport.DigitalIdReport.DigitalIdImageMatchConfidence = "99";
-                                }
-                                else
-                                {
-                                    claim.AgencyReport.DigitalIdReport.DigitalIdImageMatchConfidence = string.Empty;
-                                }
-                                claim.AgencyReport.DigitalIdReport.DigitalIdImage = CompressImage.ProcessCompress(face2Verify);
-
-                            }
-                            catch (Exception ex)
-                            {
-                                claim.AgencyReport.DigitalIdReport.DigitalIdImageMatchConfidence = string.Empty;
-                                claim.AgencyReport.DigitalIdReport.DigitalIdImage = CompressImage.ProcessCompress(face2Verify);
-                                throw ex;
-                            }
-                        }
-                        else
-                        {
-                            claim.AgencyReport.DigitalIdReport.DigitalIdImageMatchConfidence = "no face image";
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        claim.AgencyReport.DigitalIdReport.DigitalIdImageMatchConfidence = "err " + ImageData;
-                    }
-                    if (registeredImage == null)
-                    {
-                        claim.AgencyReport.DigitalIdReport.DigitalIdImageMatchConfidence = "no image";
-                    }
+                    registeredImage = claim.CustomerDetail.ProfilePicture;
                 }
-
-                #endregion FACE IMAGE PROCESSING
-
-                if (!string.IsNullOrWhiteSpace(data.LocationLongLat))
+                else if (claim.PolicyDetail.ClaimType == ClaimType.DEATH)
                 {
+                    registeredImage = claim.BeneficiaryDetail.ProfilePicture;
+                }
+                #region FACE IMAGE PROCESSING
+                string ImageData = string.Empty;
+                if (!string.IsNullOrWhiteSpace(data.LocationImage) && registeredImage != null)
+                {
+                    var face2Verify = Convert.FromBase64String(data.LocationImage);
+
                     claim.AgencyReport.DigitalIdReport.DigitalIdImageLongLatTime = DateTime.Now;
-                    claim.AgencyReport.DigitalIdReport.DigitalIdImageLongLat = data.LocationLongLat;
 
-                    var longLat = claim.AgencyReport.DigitalIdReport.DigitalIdImageLongLat.IndexOf("/");
-                    var latitude = claim.AgencyReport.DigitalIdReport.DigitalIdImageLongLat.Substring(0, longLat)?.Trim();
-                    var longitude = claim.AgencyReport.DigitalIdReport.DigitalIdImageLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
-                    var latLongString = latitude + "," + longitude;
-                    var weatherUrl = $"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current=temperature_2m,windspeed_10m&hourly=temperature_2m,relativehumidity_2m,windspeed_10m";
-                    var weatherData = await httpClient.GetFromJsonAsync<Weather>(weatherUrl);
-                    string weatherCustomData = $"Temperature:{weatherData.current.temperature_2m} {weatherData.current_units.temperature_2m}." +
-                        $"\r\n" +
-                        $"\r\nWindspeed:{weatherData.current.windspeed_10m} {weatherData.current_units.windspeed_10m}" +
-                        $"\r\n" +
-                        $"\r\nElevation(sea level):{weatherData.elevation} metres";
-                    claim.AgencyReport.DigitalIdReport.DigitalIdImageData = weatherCustomData;
-                    var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key={Applicationsettings.GMAPData}";
-                    claim.AgencyReport.DigitalIdReport.DigitalIdImageLocationUrl = url;
+                    var matched = await CompareFaces.Do(registeredImage, face2Verify);
 
-                    var rootObject = await httpClientService.GetAddress((latitude), (longitude));
-                    double registeredLatitude = 0;
-                    double registeredLongitude = 0;
-                    if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
+                    if (matched)
                     {
-                        registeredLatitude = Convert.ToDouble(claim.CustomerDetail.PinCode.Latitude);
-                        registeredLongitude = Convert.ToDouble(claim.CustomerDetail.PinCode.Longitude);
+                        claim.AgencyReport.DigitalIdReport.DigitalIdImageMatchConfidence = "99";
                     }
                     else
                     {
-                        registeredLatitude = Convert.ToDouble(claim.BeneficiaryDetail.PinCode.Latitude);
-                        registeredLongitude = Convert.ToDouble(claim.BeneficiaryDetail.PinCode.Longitude);
+                        claim.AgencyReport.DigitalIdReport.DigitalIdImageMatchConfidence = string.Empty;
                     }
-                    var distance = DistanceFinder.GetDistance(registeredLatitude, registeredLongitude, Convert.ToDouble(latitude), Convert.ToDouble(longitude));
+                    claim.AgencyReport.DigitalIdReport.DigitalIdImage = CompressImage.ProcessCompress(face2Verify);
 
-                    var address = rootObject.display_name;
+                    #endregion FACE IMAGE PROCESSING
 
-                    claim.AgencyReport.DigitalIdReport.DigitalIdImageLocationAddress = string.IsNullOrWhiteSpace(rootObject.display_name) ? "12 Heathcote Drive Forest Hill VIC 3131" : address;
-                    claim.AgencyReport.DigitalIdReport.Updated = DateTime.Now;
-                    claim.AgencyReport.DigitalIdReport.UpdatedBy = claim.AgencyReport.AgentEmail;
+                    if (!string.IsNullOrWhiteSpace(data.LocationLongLat))
+                    {
+                        claim.AgencyReport.DigitalIdReport.DigitalIdImageLongLatTime = DateTime.Now;
+                        claim.AgencyReport.DigitalIdReport.DigitalIdImageLongLat = data.LocationLongLat;
+
+                        var longLat = claim.AgencyReport.DigitalIdReport.DigitalIdImageLongLat.IndexOf("/");
+                        var latitude = claim.AgencyReport.DigitalIdReport.DigitalIdImageLongLat.Substring(0, longLat)?.Trim();
+                        var longitude = claim.AgencyReport.DigitalIdReport.DigitalIdImageLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
+                        var latLongString = latitude + "," + longitude;
+                        var weatherUrl = $"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current=temperature_2m,windspeed_10m&hourly=temperature_2m,relativehumidity_2m,windspeed_10m";
+                        var weatherData = await httpClient.GetFromJsonAsync<Weather>(weatherUrl);
+                        string weatherCustomData = $"Temperature:{weatherData.current.temperature_2m} {weatherData.current_units.temperature_2m}." +
+                            $"\r\n" +
+                            $"\r\nWindspeed:{weatherData.current.windspeed_10m} {weatherData.current_units.windspeed_10m}" +
+                            $"\r\n" +
+                            $"\r\nElevation(sea level):{weatherData.elevation} metres";
+                        claim.AgencyReport.DigitalIdReport.DigitalIdImageData = weatherCustomData;
+                        var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key={Applicationsettings.GMAPData}";
+                        claim.AgencyReport.DigitalIdReport.DigitalIdImageLocationUrl = url;
+
+                        var rootObject = await httpClientService.GetAddress((latitude), (longitude));
+                        double registeredLatitude = 0;
+                        double registeredLongitude = 0;
+                        if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
+                        {
+                            registeredLatitude = Convert.ToDouble(claim.CustomerDetail.PinCode.Latitude);
+                            registeredLongitude = Convert.ToDouble(claim.CustomerDetail.PinCode.Longitude);
+                        }
+                        else
+                        {
+                            registeredLatitude = Convert.ToDouble(claim.BeneficiaryDetail.PinCode.Latitude);
+                            registeredLongitude = Convert.ToDouble(claim.BeneficiaryDetail.PinCode.Longitude);
+                        }
+                        var distance = DistanceFinder.GetDistance(registeredLatitude, registeredLongitude, Convert.ToDouble(latitude), Convert.ToDouble(longitude));
+
+                        var address = rootObject.display_name;
+
+                        claim.AgencyReport.DigitalIdReport.DigitalIdImageLocationAddress = string.IsNullOrWhiteSpace(rootObject.display_name) ? "12 Heathcote Drive Forest Hill VIC 3131" : address;
+                        claim.AgencyReport.DigitalIdReport.Updated = DateTime.Now;
+                        claim.AgencyReport.DigitalIdReport.UpdatedBy = claim.AgencyReport.AgentEmail;
+                    }
+
+                    _context.ClaimsInvestigation.Update(claim);
+
+                    var rows = await _context.SaveChangesAsync();
+
                 }
-
-                _context.ClaimsInvestigation.Update(claim);
-
-                var rows = await _context.SaveChangesAsync();
-
-                var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-photo.jpg");
-
-                var noDataimage = await File.ReadAllBytesAsync(noDataImagefilePath);
+                var noDataimage = await File.ReadAllBytesAsync(Path.Combine(webHostEnvironment.WebRootPath, "img", "no-photo.jpg"));
                 return new AppiCheckifyResponse
                 {
                     BeneficiaryId = claim.BeneficiaryDetail.BeneficiaryDetailId,
@@ -227,12 +169,12 @@ namespace risk.control.system.Services
                     LocationTime = claim.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime,
                     FacePercent = claim.AgencyReport.DigitalIdReport?.DigitalIdImageMatchConfidence
                 };
+
             }
             catch (Exception ex)
             {
                 throw ex;
             }
-
         }
 
         public async Task<AppiCheckifyResponse> GetDocumentId(DocumentData data)
@@ -240,10 +182,6 @@ namespace risk.control.system.Services
             try
             {
                 var claim = claimsService.GetClaims()
-                .Include(c => c.AgencyReport)
-                .ThenInclude(c => c.DigitalIdReport)
-                .Include(c => c.AgencyReport)
-                .ThenInclude(c => c.ReportQuestionaire)
                 .Include(c => c.AgencyReport)
                 .ThenInclude(c => c.DocumentIdReport)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == data.ClaimId);
@@ -254,104 +192,74 @@ namespace risk.control.system.Services
 
                 #region PAN IMAGE PROCESSING
 
-                if (!string.IsNullOrWhiteSpace(data.OcrImage))
+                var byteimage = Convert.FromBase64String(data.OcrImage);
+
+                var imageReadOnly = await googleApi.DetectTextAsync(byteimage);
+
+                var allPanText = imageReadOnly.FirstOrDefault().Description;
+
+                var panTextPre = allPanText.IndexOf(txt2Find);
+                if (panTextPre == -1)
                 {
-                    //=================GOOGLE VISION API =========================
+                    var image = Convert.FromBase64String(data.OcrImage);
 
-                    var byteimage = Convert.FromBase64String(data.OcrImage);
+                    claim.AgencyReport.DocumentIdReport.DocumentIdImage = ImageCompression.ConverterSkia(image);
+                    claim.AgencyReport.DocumentIdReport.DocumentIdImageValid = false;
+                    claim.AgencyReport.DocumentIdReport.DocumentIdImageLongLatTime = DateTime.Now;
+                    claim.AgencyReport.DocumentIdReport.DocumentIdImageData = "NO DATA: ";
+                }
+                else
+                {
+                    var panNumber = allPanText.Substring(panTextPre + txt2Find.Length + 1, 10);
 
 
-
-                    var imageReadOnly = await googleApi.DetectTextAsync(byteimage);
-
-                    var allPanText = imageReadOnly.FirstOrDefault().Description;
-
-                    var panTextPre = allPanText.IndexOf(txt2Find);
-                    if(panTextPre != -1)
+                    var ocrImaged = googleHelper.MaskTextInImage(byteimage, imageReadOnly);
+                    var docyTypePan = allPanText.IndexOf(txt2Find) > 0 && allPanText.Length > allPanText.IndexOf(txt2Find) ? "PAN" : "UNKNOWN";
+                    var maskedImage = new FaceImageDetail
                     {
-                        var panNumber = allPanText.Substring(panTextPre + txt2Find.Length + 1, 10);
+                        DocType = docyTypePan,
+                        DocumentId = panNumber,
+                        MaskedImage = Convert.ToBase64String(ocrImaged),       //TO-DO,
+                        OcrData = allPanText
+                    };
+                    #region// PAN VERIFICATION ::: //test PAN FNLPM8635N, BYSPP5796F
+                    if (company.VerifyOcr)
+                    {
+                        //var body = await httpClientService.VerifyPan(maskedImage.DocumentId, company.PanIdfyUrl, company.RapidAPIKey, company.RapidAPITaskId, company.RapidAPIGroupId);
+                        //company.RapidAPIPanRemainCount = body?.count_remain;
 
-
-                        var ocrImaged = googleHelper.MaskTextInImage(byteimage, imageReadOnly);
-                        var docyTypePan = allPanText.IndexOf(txt2Find) > 0 && allPanText.Length > allPanText.IndexOf(txt2Find) ? "PAN" : "UNKNOWN";
-                        var maskedImage = new FaceImageDetail
+                        //if (body != null && body?.status == "completed" &&
+                        //    body?.result != null &&
+                        //    body.result?.source_output != null
+                        //    && body.result?.source_output?.status == "id_found")
+                        var panMatch = panRegex.Match(maskedImage.DocumentId);
+                        if (panMatch.Success)
                         {
-                            DocType = docyTypePan,
-                            DocumentId = panNumber,
-                            MaskedImage = Convert.ToBase64String(ocrImaged),       //TO-DO,
-                            OcrData = allPanText
-                        };
-                        try
-                        {
-                            #region// PAN VERIFICATION ::: //test PAN FNLPM8635N, BYSPP5796F
-                            if (company.VerifyOcr)
-                            {
-                                try
-                                {
-                                    //var body = await httpClientService.VerifyPan(maskedImage.DocumentId, company.PanIdfyUrl, company.RapidAPIKey, company.RapidAPITaskId, company.RapidAPIGroupId);
-                                    //company.RapidAPIPanRemainCount = body?.count_remain;
-
-                                    //if (body != null && body?.status == "completed" &&
-                                    //    body?.result != null &&
-                                    //    body.result?.source_output != null
-                                    //    && body.result?.source_output?.status == "id_found")
-                                    var panMatch = panRegex.Match(maskedImage.DocumentId);
-                                    if (panMatch.Success)
-                                    {
-                                        claim.AgencyReport.DocumentIdReport.DocumentIdImageValid = true;
-                                    }
-                                    else
-                                    {
-                                        claim.AgencyReport.DocumentIdReport.DocumentIdImageValid = false;
-                                    }
-                                }
-                                catch (Exception)
-                                {
-                                    claim.AgencyReport.DocumentIdReport.DocumentIdImageValid = false;
-                                }
-                            }
-                            else
-                            {
-                                claim.AgencyReport.DocumentIdReport.DocumentIdImageValid = true;
-                            }
-
-                            #endregion PAN IMAGE PROCESSING
-
-                            var image = Convert.FromBase64String(maskedImage.MaskedImage);
-
-                            var savedMaskedImage = CompressImage.ProcessCompress(image);
-
-                            claim.AgencyReport.DocumentIdReport.DocumentIdImage = savedMaskedImage;
-
-                            claim.AgencyReport.DocumentIdReport.DocumentIdImageLongLatTime = DateTime.Now;
-                            claim.AgencyReport.DocumentIdReport.DocumentIdImageType = maskedImage.DocType;
-                            claim.AgencyReport.DocumentIdReport.DocumentIdImageData = maskedImage.DocType + " data: ";
-
-                            if (!string.IsNullOrWhiteSpace(maskedImage.OcrData))
-                            {
-                                claim.AgencyReport.DocumentIdReport.DocumentIdImageData = maskedImage.DocType + " data:. \r\n " +
-                                    "" + maskedImage.OcrData.Replace(maskedImage.DocumentId, "xxxxxxxxxx");
-                            }
+                            claim.AgencyReport.DocumentIdReport.DocumentIdImageValid = true;
                         }
-                        catch (Exception)
+                        else
                         {
-                            var image = Convert.FromBase64String(maskedImage.MaskedImage);
-
-                            claim.AgencyReport.DocumentIdReport.DocumentIdImage = image;
-
-                            claim.AgencyReport.DocumentIdReport.DocumentIdImageLongLatTime = DateTime.Now;
+                            claim.AgencyReport.DocumentIdReport.DocumentIdImageValid = false;
                         }
                     }
-                    //=================END GOOGLE VISION  API =========================
-
                     else
                     {
-                        var image = Convert.FromBase64String(data.OcrImage);
+                        claim.AgencyReport.DocumentIdReport.DocumentIdImageValid = true;
+                    }
 
-                        claim.AgencyReport.DocumentIdReport.DocumentIdImage = ImageCompression.ConverterSkia(image);
-                        claim.AgencyReport.DocumentIdReport.DocumentIdImageValid = false;
-                        claim.AgencyReport.DocumentIdReport.DocumentIdImageLongLatTime = DateTime.Now;
-                        claim.AgencyReport.DocumentIdReport.DocumentIdImageData = "no data: ";
+                    #endregion PAN IMAGE PROCESSING
+
+                    var image = Convert.FromBase64String(maskedImage.MaskedImage);
+
+                    var savedMaskedImage = CompressImage.ProcessCompress(image);
+
+                    claim.AgencyReport.DocumentIdReport.DocumentIdImage = savedMaskedImage;
+                    claim.AgencyReport.DocumentIdReport.DocumentIdImageLongLatTime = DateTime.Now;
+                    claim.AgencyReport.DocumentIdReport.DocumentIdImageType = maskedImage.DocType;
+                    if (!string.IsNullOrWhiteSpace(maskedImage.OcrData))
+                    {
+                        claim.AgencyReport.DocumentIdReport.DocumentIdImageData = maskedImage.DocType + " data:. \r\n " +
+                            "" + maskedImage.OcrData.Replace(maskedImage.DocumentId, "xxxxxxxxxx");
                     }
                 }
 
@@ -383,7 +291,7 @@ namespace risk.control.system.Services
                 }
                 claim.AgencyReport.DocumentIdReport.Updated = DateTime.Now;
                 claim.AgencyReport.DocumentIdReport.UpdatedBy = claim.AgencyReport.AgentEmail;
-                
+
                 _context.ClaimsInvestigation.Update(claim);
 
                 var rows = await _context.SaveChangesAsync();
