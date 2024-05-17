@@ -210,7 +210,6 @@ namespace risk.control.system.Services
                     claim.AgencyReport.DigitalIdReport.UpdatedBy = claim.AgencyReport.AgentEmail;
                 }
 
-                _context.DigitalIdReport.Add(claim.AgencyReport?.DigitalIdReport);
                 _context.ClaimsInvestigation.Update(claim);
 
                 var rows = await _context.SaveChangesAsync();
@@ -222,7 +221,7 @@ namespace risk.control.system.Services
                 {
                     BeneficiaryId = claim.BeneficiaryDetail.BeneficiaryDetailId,
                     LocationImage = claim.AgencyReport?.DigitalIdReport?.DigitalIdImage != null ?
-                    Convert.ToBase64String(claim.AgencyReport?.DigitalIdReport?.DigitalIdImage) :
+                    Convert.ToBase64String(ImageCompression.ConverterSkia(claim.AgencyReport?.DigitalIdReport?.DigitalIdImage)) :
                     Convert.ToBase64String(noDataimage),
                     LocationLongLat = claim.AgencyReport.DigitalIdReport?.DigitalIdImageLongLat,
                     LocationTime = claim.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime,
@@ -260,29 +259,28 @@ namespace risk.control.system.Services
                     //=================GOOGLE VISION API =========================
 
                     var byteimage = Convert.FromBase64String(data.OcrImage);
+
+
+
                     var imageReadOnly = await googleApi.DetectTextAsync(byteimage);
 
                     var allPanText = imageReadOnly.FirstOrDefault().Description;
 
                     var panTextPre = allPanText.IndexOf(txt2Find);
-
-                    var panNumber = allPanText.Substring(panTextPre + txt2Find.Length + 1, 10);
-
-
-                    var ocrImaged = googleHelper.MaskTextInImage(byteimage, imageReadOnly);
-                    var docyTypePan = allPanText.IndexOf(txt2Find) > 0 && allPanText.Length > allPanText.IndexOf(txt2Find) ? "PAN" : "UNKNOWN";
-                    var maskedImage = new FaceImageDetail
+                    if(panTextPre != -1)
                     {
-                        DocType = docyTypePan,
-                        DocumentId = panNumber,
-                        MaskedImage = Convert.ToBase64String(ocrImaged),       //TO-DO,
-                        OcrData = allPanText
-                    };
+                        var panNumber = allPanText.Substring(panTextPre + txt2Find.Length + 1, 10);
 
-                    //=================END GOOGLE VISION  API =========================
 
-                    if (maskedImage != null && docyTypePan == "PAN")
-                    {
+                        var ocrImaged = googleHelper.MaskTextInImage(byteimage, imageReadOnly);
+                        var docyTypePan = allPanText.IndexOf(txt2Find) > 0 && allPanText.Length > allPanText.IndexOf(txt2Find) ? "PAN" : "UNKNOWN";
+                        var maskedImage = new FaceImageDetail
+                        {
+                            DocType = docyTypePan,
+                            DocumentId = panNumber,
+                            MaskedImage = Convert.ToBase64String(ocrImaged),       //TO-DO,
+                            OcrData = allPanText
+                        };
                         try
                         {
                             #region// PAN VERIFICATION ::: //test PAN FNLPM8635N, BYSPP5796F
@@ -344,11 +342,13 @@ namespace risk.control.system.Services
                             claim.AgencyReport.DocumentIdReport.DocumentIdImageLongLatTime = DateTime.Now;
                         }
                     }
+                    //=================END GOOGLE VISION  API =========================
+
                     else
                     {
                         var image = Convert.FromBase64String(data.OcrImage);
 
-                        claim.AgencyReport.DocumentIdReport.DocumentIdImage = image;
+                        claim.AgencyReport.DocumentIdReport.DocumentIdImage = ImageCompression.ConverterSkia(image);
                         claim.AgencyReport.DocumentIdReport.DocumentIdImageValid = false;
                         claim.AgencyReport.DocumentIdReport.DocumentIdImageLongLatTime = DateTime.Now;
                         claim.AgencyReport.DocumentIdReport.DocumentIdImageData = "no data: ";
@@ -384,8 +384,6 @@ namespace risk.control.system.Services
                 claim.AgencyReport.DocumentIdReport.Updated = DateTime.Now;
                 claim.AgencyReport.DocumentIdReport.UpdatedBy = claim.AgencyReport.AgentEmail;
                 
-                _context.DocumentIdReport.Add(claim.AgencyReport?.DocumentIdReport);
-
                 _context.ClaimsInvestigation.Update(claim);
 
                 var rows = await _context.SaveChangesAsync();
