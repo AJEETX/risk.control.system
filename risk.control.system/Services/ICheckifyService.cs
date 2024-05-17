@@ -85,7 +85,6 @@ namespace risk.control.system.Services
 
                 #region FACE IMAGE PROCESSING
 
-                //var (claimWithDigitalId, ClaimCaseWithDitialId) = await ProcessDigitalId(data, claim, claimCase);
                 if (!string.IsNullOrWhiteSpace(data.LocationImage))
                 {
                     byte[]? registeredImage = null;
@@ -145,9 +144,11 @@ namespace risk.control.system.Services
                                 claim.AgencyReport.DigitalIdReport.DigitalIdImage = CompressImage.ProcessCompress(face2Verify);
 
                             }
-                            catch (Exception)
+                            catch (Exception ex)
                             {
                                 claim.AgencyReport.DigitalIdReport.DigitalIdImageMatchConfidence = string.Empty;
+                                claim.AgencyReport.DigitalIdReport.DigitalIdImage = CompressImage.ProcessCompress(face2Verify);
+                                throw ex;
                             }
                         }
                         else
@@ -209,6 +210,7 @@ namespace risk.control.system.Services
                     claim.AgencyReport.DigitalIdReport.UpdatedBy = claim.AgencyReport.AgentEmail;
                 }
 
+                _context.DigitalIdReport.Add(claim.AgencyReport?.DigitalIdReport);
                 _context.ClaimsInvestigation.Update(claim);
 
                 var rows = await _context.SaveChangesAsync();
@@ -224,13 +226,7 @@ namespace risk.control.system.Services
                     Convert.ToBase64String(noDataimage),
                     LocationLongLat = claim.AgencyReport.DigitalIdReport?.DigitalIdImageLongLat,
                     LocationTime = claim.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime,
-                    OcrImage = claim.AgencyReport?.DocumentIdReport?.DocumentIdImage != null ?
-                    Convert.ToBase64String((claim.AgencyReport?.DocumentIdReport?.DocumentIdImage)) :
-                    Convert.ToBase64String(noDataimage),
-                    OcrLongLat = claim.AgencyReport.DocumentIdReport?.DocumentIdImageLongLat,
-                    OcrTime = claim.AgencyReport.DocumentIdReport?.DocumentIdImageLongLatTime,
-                    FacePercent = claim.AgencyReport.DigitalIdReport?.DigitalIdImageMatchConfidence,
-                    PanValid = claim.AgencyReport.DocumentIdReport?.DocumentIdImageValid
+                    FacePercent = claim.AgencyReport.DigitalIdReport?.DigitalIdImageMatchConfidence
                 };
             }
             catch (Exception ex)
@@ -244,7 +240,6 @@ namespace risk.control.system.Services
         {
             try
             {
-
                 var claim = claimsService.GetClaims()
                 .Include(c => c.AgencyReport)
                 .ThenInclude(c => c.DigitalIdReport)
@@ -275,9 +270,10 @@ namespace risk.control.system.Services
 
 
                     var ocrImaged = googleHelper.MaskTextInImage(byteimage, imageReadOnly);
+                    var docyTypePan = allPanText.IndexOf(txt2Find) > 0 && allPanText.Length > allPanText.IndexOf(txt2Find) ? "PAN" : "UNKNOWN";
                     var maskedImage = new FaceImageDetail
                     {
-                        DocType = allPanText.IndexOf(txt2Find) > 0 && allPanText.Length > allPanText.IndexOf(txt2Find) ? "PAN" : "UNKNOWN",
+                        DocType = docyTypePan,
                         DocumentId = panNumber,
                         MaskedImage = Convert.ToBase64String(ocrImaged),       //TO-DO,
                         OcrData = allPanText
@@ -285,44 +281,40 @@ namespace risk.control.system.Services
 
                     //=================END GOOGLE VISION  API =========================
 
-                    if (maskedImage != null)
+                    if (maskedImage != null && docyTypePan == "PAN")
                     {
                         try
                         {
                             #region// PAN VERIFICATION ::: //test PAN FNLPM8635N, BYSPP5796F
-
-                            if (maskedImage.DocType.ToUpper() == "PAN")
+                            if (company.VerifyOcr)
                             {
-                                if (company.VerifyOcr)
+                                try
                                 {
-                                    try
-                                    {
-                                        //var body = await httpClientService.VerifyPan(maskedImage.DocumentId, company.PanIdfyUrl, company.RapidAPIKey, company.RapidAPITaskId, company.RapidAPIGroupId);
-                                        //company.RapidAPIPanRemainCount = body?.count_remain;
+                                    //var body = await httpClientService.VerifyPan(maskedImage.DocumentId, company.PanIdfyUrl, company.RapidAPIKey, company.RapidAPITaskId, company.RapidAPIGroupId);
+                                    //company.RapidAPIPanRemainCount = body?.count_remain;
 
-                                        //if (body != null && body?.status == "completed" &&
-                                        //    body?.result != null &&
-                                        //    body.result?.source_output != null
-                                        //    && body.result?.source_output?.status == "id_found")
-                                        var panMatch = panRegex.Match(maskedImage.DocumentId);
-                                        if (panMatch.Success)
-                                        {
-                                            claim.AgencyReport.DocumentIdReport.DocumentIdImageValid = true;
-                                        }
-                                        else
-                                        {
-                                            claim.AgencyReport.DocumentIdReport.DocumentIdImageValid = false;
-                                        }
+                                    //if (body != null && body?.status == "completed" &&
+                                    //    body?.result != null &&
+                                    //    body.result?.source_output != null
+                                    //    && body.result?.source_output?.status == "id_found")
+                                    var panMatch = panRegex.Match(maskedImage.DocumentId);
+                                    if (panMatch.Success)
+                                    {
+                                        claim.AgencyReport.DocumentIdReport.DocumentIdImageValid = true;
                                     }
-                                    catch (Exception)
+                                    else
                                     {
                                         claim.AgencyReport.DocumentIdReport.DocumentIdImageValid = false;
                                     }
                                 }
-                                else
+                                catch (Exception)
                                 {
-                                    claim.AgencyReport.DocumentIdReport.DocumentIdImageValid = true;
+                                    claim.AgencyReport.DocumentIdReport.DocumentIdImageValid = false;
                                 }
+                            }
+                            else
+                            {
+                                claim.AgencyReport.DocumentIdReport.DocumentIdImageValid = true;
                             }
 
                             #endregion PAN IMAGE PROCESSING
@@ -391,9 +383,12 @@ namespace risk.control.system.Services
                 }
                 claim.AgencyReport.DocumentIdReport.Updated = DateTime.Now;
                 claim.AgencyReport.DocumentIdReport.UpdatedBy = claim.AgencyReport.AgentEmail;
+                
+                _context.DocumentIdReport.Add(claim.AgencyReport?.DocumentIdReport);
+
                 _context.ClaimsInvestigation.Update(claim);
 
-                await _context.SaveChangesAsync();
+                var rows = await _context.SaveChangesAsync();
 
                 var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-photo.jpg");
 
@@ -401,17 +396,11 @@ namespace risk.control.system.Services
                 return new AppiCheckifyResponse
                 {
                     BeneficiaryId = claim.BeneficiaryDetail.BeneficiaryDetailId,
-                    LocationImage = claim.AgencyReport.DigitalIdReport?.DigitalIdImage != null ?
-                    Convert.ToBase64String(claim.AgencyReport.DigitalIdReport?.DigitalIdImage) :
-                    Convert.ToBase64String(noDataimage),
-                    LocationLongLat = claim.AgencyReport.DigitalIdReport?.DigitalIdImageLongLat,
-                    LocationTime = claim.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime,
                     OcrImage = claim.AgencyReport.DocumentIdReport?.DocumentIdImage != null ?
                     Convert.ToBase64String(claim.AgencyReport.DocumentIdReport?.DocumentIdImage) :
                     Convert.ToBase64String(noDataimage),
                     OcrLongLat = claim.AgencyReport.DocumentIdReport?.DocumentIdImageLongLat,
                     OcrTime = claim.AgencyReport.DocumentIdReport?.DocumentIdImageLongLatTime,
-                    FacePercent = claim.AgencyReport.DigitalIdReport?.DigitalIdImageMatchConfidence,
                     PanValid = claim.AgencyReport.DocumentIdReport?.DocumentIdImageValid
                 };
             }
