@@ -27,17 +27,16 @@
         var uploadType = $('#postedFile').val();
         (val == "0" || val == "1") && uploadType.endsWith('.zip') ? fbtn.removeAttr("disabled") : fbtn.attr('disabled', 'disabled');
     });
-
     $('#view-type a').on('click', function () {
         var id = this.id;
         if (this.id == 'map-type') {
-            $('#checkboxes').css('display', 'none');
+            $('#radioButtons').css('display', 'none');
             $('#maps').css('display', 'block');
             $('#map-type').css('display', 'none');
             $('#list-type').css('display', 'block');
         }
         else {
-            $('#checkboxes').css('display', 'block');
+            $('#radioButtons').css('display', 'block');
             $('#maps').css('display', 'none');
             $('#map-type').css('display', 'block');
             $('#list-type').css('display', 'none');
@@ -46,7 +45,7 @@
 
     var table = $("#customerTable").DataTable({
         ajax: {
-            url: '/api/CompanyDraftClaims/GetAssign',
+            url: '/api/CompanyAssignClaims/GetReAssignerAuto',
             dataSrc: ''
         },
         columnDefs: [{
@@ -55,14 +54,13 @@
             'orderable': false,
             'className': 'dt-body-center',
             'render': function (data, type, full, meta) {
-                return '<input type="checkbox" name="id[]" value="' + $('<div/>').text(data).html() + '">';
+                return '<input type="checkbox" name="selectedcase[]" value="' + $('<div/>').text(data).html() + '">';
             }
         }],
-        order: [[12, 'desc']],
+        order: [[11, 'asc']],
         fixedHeader: true,
         processing: true,
         paging: true,
-
         language: {
             loadingRecords: '&nbsp;',
             processing: '<i class="fas fa-sync fa-spin fa-4x fa-fw"></i><span class="sr-only">Loading...</span>'
@@ -75,7 +73,7 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     if (row.ready2Assign) {
-                        var img = '<input class="vendors" name="claims" type="checkbox" id="' + row.id + '"  value="' + row.id + '"  />';
+                        var img = '<input name="selectedcase" class="selected-case" type="radio" id="' + row.id + '"  value="' + row.id + '"  />';
                         return img;
                     }
                 }
@@ -84,7 +82,7 @@
                 "sDefaultContent": "",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    var img = '<img alt="' + row.policyId + '" title="' + row.policyId + '" src="' + row.document + '" class="doc-profile-image" data-toggle="tooltip"/>';
+                    var img = '<img alt="' + row.policyId + '" title="' + row.policyId + '" src="' + row.document + '"class="doc-profile-image" data-toggle="tooltip"/>';
                     return img;
                 }
             },
@@ -126,18 +124,12 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += '<a id="edit' + row.id + '" onclick="showedit(`' + row.id + '`)" href="DetailsAuto?Id=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-pencil-alt"></i> Edit</a>&nbsp;'
-                    buttons += '<a id="details' + row.id + '" onclick="getdetails(`' + row.id + '`)" href="/InsurancePolicy/DeleteAuto?Id=' + row.id + '" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i> Delete </a>'
+                    buttons += '<a id="edit' + row.id + '" onclick="showedit(`' + row.id + '`)" href="Details?Id=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-pencil-alt"></i> Edit</a>&nbsp;'
+                    buttons += '<a id="details' + row.id + '" onclick="getdetails(`' + row.id + '`)" href="/InsurancePolicy/Delete?Id=' + row.id + '" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i> Delete </a>'
                     return buttons;
                 }
             }
         ],
-        "drawCallback": function (settings, start, end, max, total, pre) {
-            var rowCount = (this.fnSettings().fnRecordsTotal()); // total number of rows
-            if (rowCount > 0) {
-                $('#allocatedcase').prop('disabled', false);
-            }
-        },
         "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
             if (aData.isNewAssigned) {
                 $('td', nRow).css('background-color', '#ffa');
@@ -153,105 +145,46 @@
     $('#customerTable tbody').hide();
     $('#customerTable tbody').fadeIn(2000);
 
-    // Handle click on "Select all" control
-    $('#checkall').on('click', function () {
-        // Get all rows with search applied
-        var rows = table.rows({ 'search': 'applied' }).nodes();
-        // Check/uncheck checkboxes for all rows in the table
-        $('input[type="checkbox"]', rows).prop('checked', this.checked);
+    if ($("input[type='radio'].selected-case:checked").length) {
+        $("#allocatedcase").prop('disabled', false);
+    }
+    else {
+        $("#allocatedcase").prop('disabled', true);
+    }
+
+    // When user checks a radio button, Enable submit button
+    $("input[type='radio'].selected-case").change(function (e) {
+        if ($(this).is(":checked")) {
+            $("#allocatedcase").prop('disabled', false);
+        }
+        else {
+            $("#allocatedcase").prop('disabled', true);
+        }
     });
 
     // Handle click on checkbox to set state of "Select all" control
-    $('#customerTable tbody').on('change', 'input[type="checkbox"]', function () {
+    $('#customerTable tbody').on('change', 'input[type="radio"]', function () {
         // If checkbox is not checked
-        if (!this.checked) {
-            var el = $('#checkall').get(0);
-            // If "Select all" control is checked and has 'indeterminate' property
-            if (el && el.checked && ('indeterminate' in el)) {
-                // Set visual state of "Select all" control
-                // as 'indeterminate'
-                el.indeterminate = true;
-            }
+        if (this.checked) {
+            $("#allocatedcase").prop('disabled', false);
+        } else {
+            $("#allocatedcase").prop('disabled', true);
         }
     });
-    let askConfirmation = false;
-    // Handle form submission event
-    $('#checkboxes').on('submit', function (e) {
-        var form = this;
 
-        // Iterate over all checkboxes in the table
-        table.$('input[type="checkbox"]').each(function () {
-            // If checkbox doesn't exist in DOM
-            if (!$.contains(document, this)) {
-                // If checkbox is checked
-                if (this.checked) {
-                    // Create a hidden element
-                    $(form).append(
-                        $('<input>')
-                            .attr('type', 'hidden')
-                            .attr('name', this.name)
-                            .val(this.value)
-                    );
-                }
-            }
-        });
+    $('#allocatedcase').on('click', function (event) {
+        $("body").addClass("submit-progress-bg");
 
-        var checkboxes = $("input[type='checkbox'].vendors");
-        var anyChecked = checkIfAnyChecked(checkboxes);
+        setTimeout(function () {
+            $(".submit-progress").removeClass("hidden");
+        }, 1);
+        $('#allocatedcase').attr('disabled', 'disabled');
+        $('#allocatedcase').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> ReAssign");
 
-        if (!anyChecked) {
-            e.preventDefault();
-            $.alert({
-                title: "ASSIGN<span class='badge badge-light'>(auto)</span> !",
-                content: "Please select Claim<span class='badge badge-light'>(s)</span> to Assign<span class='badge badge-light'>(auto)</span>!",
-                icon: 'fas fa-random fa-sync',
-                type: 'red',
-                closeIcon: true,
-                buttons: {
-                    cancel: {
-                        text: "SELECT Claim<span class='badge badge-danger'>(s)</span>",
-                        btnClass: 'btn-danger'
-                    }
-                }
-            });
-        }
-        else if (!askConfirmation) {
-            e.preventDefault();
-            $.confirm({
-                title: "Confirm Assign<span class='badge badge-light'>(auto)</span>",
-                content: "Are you sure to Assign<span class='badge badge-light'>(auto)</span> ?",
-                icon: 'fas fa-random',
-                type: 'orange',
-                closeIcon: true,
-                buttons: {
-                    confirm: {
-                        text: "Assign <span class='badge badge-warning'>(auto)</span>",
-                        btnClass: 'btn-warning',
-                        action: function () {
-                            askConfirmation = true;
-
-                            $("body").addClass("submit-progress-bg");
-                            // Wrap in setTimeout so the UI
-                            // can update the spinners
-                            setTimeout(function () {
-                                $(".submit-progress").removeClass("hidden");
-                            }, 1);
-                            $('#allocatedcase').attr('disabled', 'disabled');
-                            $('#allocatedcase').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Assign<span class='badge badge-warning'>(auto)</span>");
-
-                            $('#checkboxes').submit();
-                            var nodes = document.getElementById("article").getElementsByTagName('*');
-                            for (var i = 0; i < nodes.length; i++) {
-                                nodes[i].disabled = true;
-                            }
-                        }
-                    },
-                    cancel: {
-                        text: "Cancel",
-                        btnClass: 'btn-default'
-                    }
-                }
-            });
+        $('#radioButtons').submit();
+        var nodes = document.getElementById("article").getElementsByTagName('*');
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].disabled = true;
         }
     });
     let askFileUploadConfirmation = true;
@@ -326,7 +259,7 @@
             );
         }
     });
-    $('#upload-claims').on('submit', function (event) {
+    $('#UploadFileButton').on('click', function (event) {
         if (askFileUploadConfirmation) {
             event.preventDefault();
             $.confirm({
@@ -342,7 +275,7 @@
                         btnClass: 'btn-success',
                         action: function () {
                             askFileUploadConfirmation = false;
-                           
+
                             $("body").addClass("submit-progress-bg");
                             // Wrap in setTimeout so the UI
                             // can update the spinners
@@ -371,12 +304,11 @@
                 }
             });
         }
-        
+
     });
-
-    //initMap("/api/CompanyDraftClaims/GetAssignMap");
-
+    //initMap("/api/CompanyAssignClaims/GetAssignerMap");
 });
+
 
 function showedit(id) {
     $("body").addClass("submit-progress-bg");
@@ -386,7 +318,7 @@ function showedit(id) {
         $(".submit-progress").removeClass("hidden");
     }, 1);
     $('a.btn *').attr('disabled', 'disabled');
-    $('a#edit' + id + '.btn.btn-xs.btn-warning').html("<i class='fas fa-sync fa-spin'></i> EDIT");
+    $('a#edit' + id + '.btn.btn-xs.btn-warning').html("<i class='fas fa-sync fa-spin'></i> Edit");
 
     var nodes = document.getElementById("article").getElementsByTagName('*');
     for (var i = 0; i < nodes.length; i++) {
@@ -409,40 +341,3 @@ function getdetails(id) {
     }
 }
 
-
-function Delete(userId, status) {
-    $.confirm({
-        title: 'Change Status!',
-        content: 'Do you want to Change Status!',
-        buttons: {
-            confirm: function () {
-                $.ajax({
-                    url: "/Administration/User/ChangeUserStatus",
-                    type: "POST",
-                    data: { UserId: userId, Status: status },
-                    success: function (data, textStatus, xhr) {
-                        if (data.Result == "success") {
-                            location.reload();
-                        }
-                        if (data.Result == "failed") {
-                            $.alert('Something Went Wrong');
-                        }
-                    },
-                    error: function (xhr, status, err) {
-                        if (xhr.status == 401) {
-                            alert('Error');
-                            window.location.href = "/Portal/Logout";
-                        }
-                        if (xhr.status == 500) {
-                            alert('Error');
-                            window.location.href = "/Portal/Logout";
-                        }
-                    }
-                });
-            },
-            cancel: function () {
-                $.alert('Canceled!');
-            }
-        }
-    });
-}

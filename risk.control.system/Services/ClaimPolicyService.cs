@@ -28,6 +28,8 @@ namespace risk.control.system.Services
 
         public (ClaimsInvestigation claim,bool trial) AddClaimPolicy(string userEmail)
         {
+            var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
             var lineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == "claims").LineOfBusinessId;
             var contractNumber = numberService.GetNumberSequence("PX");
             var model = new ClaimsInvestigation
@@ -45,7 +47,10 @@ namespace risk.control.system.Services
                     Comments = "SOMETHING FISHY",
                     SumAssuredValue = new Random().Next(100000, 9999999),
                     ContractNumber = contractNumber,
-                }
+                },
+                InvestigationCaseSubStatusId = createdStatus.InvestigationCaseSubStatusId,
+                UserEmailActioned = userEmail,
+                UserEmailActionedTo = userEmail,
             };
 
             var clientCompanyUser = _context.ClientCompanyApplicationUser.Include(u=>u.ClientCompany).FirstOrDefault(c => c.Email == userEmail);

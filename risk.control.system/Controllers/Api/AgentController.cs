@@ -624,51 +624,35 @@ namespace risk.control.system.Controllers.Api
         [HttpPost("faceid")]
         public async Task<IActionResult> FaceId(FaceData data)
         {
-            try
+            if (data == null ||
+                     string.IsNullOrWhiteSpace(data.LocationImage) ||
+                     !data.LocationImage.IsBase64String() ||
+                     string.IsNullOrEmpty(data.LocationLongLat))
             {
-
-                if (data == null ||
-                    string.IsNullOrWhiteSpace(data.LocationImage) ||
-                    !data.LocationImage.IsBase64String() ||
-                    string.IsNullOrEmpty(data.LocationLongLat))
-                {
-                    return BadRequest();
-                }
-
-                var response = await iCheckifyService.GetFaceId(data);
-
-                return Ok(response);
+                return BadRequest();
             }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.StackTrace);
-            }
+
+            var response = await iCheckifyService.GetFaceId(data);
+
+            return Ok(response);
         }
 
         [AllowAnonymous]
         [HttpPost("documentid")]
         public async Task<IActionResult> DocumentId(DocumentData data)
         {
-            try
-            {
-
-                if (data == null
+            if (data == null
                     || string.IsNullOrWhiteSpace(data.OcrImage)
                     || !data.OcrImage.IsBase64String()
                     || string.IsNullOrEmpty(data.OcrLongLat)
                     )
-                {
-                    return BadRequest();
-                }
-
-                var response = await iCheckifyService.GetDocumentId(data);
-
-                return Ok(response);
-            }
-            catch (Exception ex)
             {
-                return StatusCode(500, ex.StackTrace);
+                return BadRequest();
             }
+
+            var response = await iCheckifyService.GetDocumentId(data);
+
+            return Ok(response);
         }
 
         [ApiExplorerSettings(IgnoreApi = true)]

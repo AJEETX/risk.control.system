@@ -1,0 +1,214 @@
+﻿@model risk.control.system.Models.Vendor
+
+@{
+    ViewData["Title"] = @Applicationsettings.DETAILS;
+}
+
+<section class="content">
+    <input type="hidden" id="Latitude" asp-for="@Model.PinCode.Latitude" />
+    <input type="hidden" id="Longitude" asp-for="@Model.PinCode.Longitude" />
+    <div class="card  card-secondary">
+        <div class="card-header">
+            <h3 class="card-title"><i class="fas fa-building"></i> Agency Detail
+                <span class="hover-text">
+                    <i class="fas fa-info-circle"></i>
+                    <span class="tooltip-text" id="information">
+                        <span>
+
+                            <i class='fas fa-building'></i><b> AGENCY DETAILS.</b>
+                            
+                        </span>
+
+                    </span>
+                </span>
+            </h3>
+        </div>
+        <div class="card-body">
+            <div class="submit-progress hidden">
+                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+            </div>
+            <div class="row">
+                <div class="col-12 col-sm-6 d-flex align-items-stretch flex-column">
+                    <div class="card bg-light d-flex flex-fill">
+                        <div class="card-header text-muted border-bottom-0">
+                            <i class="fas fa-building"></i> Agency Profile
+                        </div>
+                        <div class="card-body pt-0">
+                            <div class="row">
+                                <div class="col-7">
+                                    <p class="text-muted text-sm">
+                                        <b>Domain: </b>  <i class="fa fa-globe"></i>  <a href="#">@Model.Email</a>
+                                    </p>
+                                    <ul class="ml-4 mb-0 fa-ul text-muted">
+                                        <li class="small">
+                                            <span class="fa-li">
+                                                <i class="fas fa-building"></i>
+                                            </span>
+                                            Agency Name: <i class="fas fa-building"></i> @Model.Name
+                                        </li>
+                                        <li class="small">
+                                            <span class="fa-li">
+                                                <i class="fas fa-code"></i>
+                                            </span>
+                                            Agency Code:  <i class="fas fa-code"></i> </i>@Model.Code
+                                        </li>
+                                        <li class="small">
+                                            <span class="fa-li">
+                                                <i class="fas fa-tools"></i>
+                                            </span>
+                                            Branch : <i class="fas fa-tools"></i> @Model.Description
+                                        </li>
+                                        <li class="small">
+                                            <span class="fa-li">
+                                                <i class="fas fa-phone"></i>
+                                            </span>
+                                            Phone #: <i class="fas fa-phone"></i> @Model.PhoneNumber
+                                        </li>
+                                        <li class="small">
+                                            <span class="fa-li">
+                                                <i class="far fa-building"></i>
+                                            </span>
+                                            Branch: <i class="far fa-building"></i> @Model.Branch
+                                        </li>
+                                        <li class="small">
+                                            <span class="fa-li">
+                                                <i class="fas fa-landmark"></i>
+                                            </span>
+                                            Bank Name: <i class="fas fa-landmark"></i> @Model.BankName
+                                        </li>
+                                        <li class="small">
+                                            <span class="fa-li">
+                                                <i class="fab fa-btc"></i>
+                                            </span>
+                                            Bank Account #: <i class="fab fa-btc"></i> @Model.BankAccountNumber
+                                        </li>
+                                        <li class="small">
+                                            <span class="fa-li">
+                                                <i class="fas fa-rupee-sign"></i>
+                                            </span>
+                                            IFSC Code: <i class="fas fa-rupee-sign"></i> @Model.IFSCCode
+                                        </li>
+                                        <li class="small">
+                                            <span class="fa-li">
+                                                <i class="fas fa-calendar-check"></i>
+                                            </span>
+                                            Active Date:  <i class="fas fa-calendar-check"></i>  @Model.ActivatedDate?.ToString("dd-MMM-yyyy")
+                                        </li>
+                                        <li class="small">
+                                            <span class="fa-li">
+                                                <i class="fas fa-calendar-check"></i>
+                                            </span>
+                                            Agreement Date:  <i class="fas fa-calendar-check"></i>  @Model.AgreementDate?.ToString("dd-MMM-yyyy")
+                                        </li>
+                                        <li class="small">
+                                            <span class="fa-li">
+                                                <i class="fas fa-home"></i>
+                                            </span>
+                                            Address:  @Model.Addressline @Model.District.Name @Model.State.Name @Model.PinCode.Code
+                                        </li>
+
+
+                                    </ul>
+                                </div>
+                                <div class="col-5 text-center">
+                                    <p class="text-muted text-sm">
+                                        <i class="fa fa-star"></i>  <b>Rating: </b>
+                                    </p>
+
+                                    <ul class="ml-4 mb-0 fa-ul text-muted">
+                                        <li class="small">
+                                            <div class="col-md-12" id="agency-rating">
+                                                <img src="~/images/StarFade.gif" alt="Star Rating" align="middle" id="1" class="main-rating" vendorId="@Model.VendorId" />
+                                                <img src="~/images/StarFade.gif" alt="Star Rating" align="middle" id="2" class="main-rating" vendorId="@Model.VendorId" />
+                                                <img src="~/images/StarFade.gif" alt="Star Rating" align="middle" id="3" class="main-rating" vendorId="@Model.VendorId" />
+                                                <img src="~/images/StarFade.gif" alt="Star Rating" align="middle" id="4" class="main-rating" vendorId="@Model.VendorId" />
+                                                <img src="~/images/StarFade.gif" alt="Star Rating" align="middle" id="5" class="main-rating" vendorId="@Model.VendorId" />
+
+                                                <span id="rating-result">
+                                                    <span class="badge badge-light">
+                                                        (@Model.RateCount)
+                                                    </span>
+                                                    @if (Model.RateCount != null && Model.RateCount > 0)
+                                                    {
+                                                        decimal a = @Model.RateTotal.Value / @Model.RateCount.Value;
+                                                        <span class="avr"> @a</span>
+                                                    }
+
+                                                </span>
+                                                <div class="badge badge-light">
+                                                    <span id="rating-result-data" class="result"></span>
+                                                </div>
+                                            </div>
+                                        </li>
+
+                                        <li class="small">
+                                            @if (Model?.DocumentUrl is not null)
+                                            {
+                                                <img id="documentImage" class="img-fluid" src="@Model?.DocumentUrl">
+                                            }
+                                            else
+                                            {
+                                                <img id="documentImage" alt="user-avatar"
+                                                     class="img-fluid form-Image" src="@Applicationsettings.NO_IMAGE">
+                                            }
+                                        </li>
+
+                                    </ul>
+
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-sm-6 d-flex align-items-stretch flex-column">
+                    <div class="card bg-light d-flex flex-fill">
+                        <div class="card-header text-muted border-bottom-0">
+                            <i class="fas fa-map-marked-alt"></i> Map View
+                        </div>
+                        <div class="card-body">
+
+                            <div class="row">
+                                <div class="col-md-12">
+
+                                    <div id="maps">
+                                    </div>
+                                    <div id="company-map"></div>
+
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer">
+            <div class="row float-right">
+                <div class="col-md-12">
+                    <div class="form-group">
+
+                        <a id="back" asp-controller="ClaimsInvestigation" asp-action="ReAssign2EmpanelledVendors" asp-route-selectedcase="@ViewBag.Selectedcase" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left"></i>
+                            <span class="badge badge-light"> <i class="fas fa-tasks"></i> </span> Back
+                        </a>
+
+
+                        @*<a asp-controller="Agency" asp-action="User" class="btn btn-success"><i class="fas fa-user-friends"></i>  @Applicationsettings.USER</a>
+                        <a asp-controller="Agency" asp-action="Service" class="btn btn-info"><i class="fas fa-plus"></i>  @Applicationsettings.SERVICE</a>*@
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script src="~/js/companies.js"></script>
+
+}

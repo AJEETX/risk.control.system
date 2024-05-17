@@ -28,7 +28,7 @@
                         </li>
                         <li>
                             <i class='far fa-thumbs-up'></i> 
-                            <button class='btn btn-warning btn-xs'><i class='fas fa-external-link-alt'></i> Assign</button></b>
+                            <button class='btn btn-danger btn-xs'><i class='fas fa-external-link-alt'></i> ReAssign</button></b>
                         </li>
 
                     </span>
@@ -509,7 +509,7 @@
                                         </td>
                                         <td>
                                             <a id="@item.Vendor.VendorId" onclick="showVendor(@item.Vendor.VendorId)"
-                                               class="btn btn-xs btn-warning" asp-action="VendorDetail" asp-route-selectedcase="@Model.ClaimsInvestigation.ClaimsInvestigationId"
+                                               class="btn btn-xs btn-warning" asp-action="VendorDetailAuto" asp-route-selectedcase="@Model.ClaimsInvestigation.ClaimsInvestigationId"
                                                asp-route-id="@item.Vendor.VendorId">
                                                 @Html.DisplayFor(modelItem => item.Vendor.Email)
                                                </a>...
@@ -554,10 +554,10 @@
                 <div class="card-footer">
                     <div class="row">
                         <div class="col-md-12">
-                            <a id="back" asp-controller="ClaimsInvestigation" asp-action="Assigner" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> Back</a>
+                            <a id="back" asp-controller="ClaimsInvestigation" asp-action="ReAssignerAuto" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> Back</a>
 
-                            <button disabled="disabled" id="allocate-case" type="submit" class="btn btn-warning">
-                                <i class="fas fa-external-link-alt" aria-hidden="true"></i> Assign
+                            <button disabled="disabled" id="allocate-case" type="submit" class="btn btn-danger">
+                                <i class="fas fa-external-link-alt" aria-hidden="true"></i> ReAssign
                             </button>
                         </div>
                     </div>
@@ -568,6 +568,6 @@
 </section>
 @section Scripts {
 
-    <script type="text/javascript" src="~/js/get-empanelled-vendors.js">
+    <script type="text/javascript" src="~/js/reassign-2-empanelled-vendors.js">
     </script>
 }

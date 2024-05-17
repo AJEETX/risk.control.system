@@ -18,9 +18,9 @@ namespace risk.control.system.Services
 {
     public interface IFtpService
     {
-        Task<bool> UploadFile(string userEmail, IFormFile postedFile);
+        Task<bool> UploadFile(string userEmail, IFormFile postedFile, string uploadingway);
 
-        Task<bool> DownloadFtpFile(string userEmail, IFormFile postedFile);
+        Task<bool> DownloadFtpFile(string userEmail, IFormFile postedFile, string uploadingway);
     }
 
     public class FtpService : IFtpService
@@ -41,7 +41,7 @@ namespace risk.control.system.Services
             this.webHostEnvironment = webHostEnvironment;
         }
 
-        public async Task<bool> DownloadFtpFile(string userEmail, IFormFile postedFile)
+        public async Task<bool> DownloadFtpFile(string userEmail, IFormFile postedFile, string uploadingway)
         {
             try
             {
@@ -62,7 +62,7 @@ namespace risk.control.system.Services
 
                 var data = Encoding.UTF8.GetString(response);
 
-                var processed =await DownloadFtp(userEmail);
+                var processed =await DownloadFtp(userEmail, uploadingway);
                 if(!processed)
                 {
                     return false;
@@ -78,7 +78,7 @@ namespace risk.control.system.Services
             }
         }
 
-        private async Task <bool> DownloadFtp(string userEmail)
+        private async Task <bool> DownloadFtp(string userEmail, string uploadingway)
         {
             string path = Path.Combine(webHostEnvironment.WebRootPath, "download-ftp");
             if (!Directory.Exists(path))
@@ -97,7 +97,7 @@ namespace risk.control.system.Services
                 client.DownloadFile(ftpPath, filePath);
                 using (var archive = ZipFile.OpenRead(filePath))
                 {
-                    var processed = await ProcessFile(userEmail, archive);
+                    var processed = await ProcessFile(userEmail, archive, uploadingway);
                     if(!processed)
                     {
                         return false;
@@ -118,7 +118,7 @@ namespace risk.control.system.Services
             return true;
         }
 
-        public async Task<bool> UploadFile(string userEmail, IFormFile postedFile)
+        public async Task<bool> UploadFile(string userEmail, IFormFile postedFile, string uploadingway)
         {
             string path = Path.Combine(webHostEnvironment.WebRootPath, "upload-file");
             if (!Directory.Exists(path))
@@ -138,7 +138,7 @@ namespace risk.control.system.Services
             {
                 using (var archive = new ZipArchive(stream))
                 {
-                    var processed = await ProcessFile(userEmail, archive);
+                    var processed = await ProcessFile(userEmail, archive, uploadingway);
                     if(!processed)
                     {
                         return false;
@@ -169,8 +169,10 @@ namespace risk.control.system.Services
             await _context.SaveChangesAsync();
         }
 
-        private async Task<bool> ProcessFile(string userEmail, ZipArchive archive)
+        private async Task<bool> ProcessFile(string userEmail, ZipArchive archive, string uploadingway)
         {
+            var uploadMethod = (ORIGIN)Enum.Parse(typeof(ORIGIN), uploadingway, true);
+
             var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(c => c.Email == userEmail);
             bool userCanCreate = true;
             var totalClaimsCreated = _context.ClaimsInvestigation.Include(c=>c.PolicyDetail).Where(c => !c.Deleted && c.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId)?.ToList();
@@ -245,6 +247,7 @@ namespace risk.control.system.Services
                                             SelectedToAssign = false,
                                             UserEmailActioned = userEmail,
                                             UserEmailActionedTo = userEmail,
+                                            ORIGIN = uploadMethod,
                                             UserRoleActionedTo = $"{AppRoles.CREATOR.GetEnumDisplayName()} ({companyUser.ClientCompany.Email})"
                                     };
 

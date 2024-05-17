@@ -125,16 +125,16 @@
         if (askConfirmation) {
             e.preventDefault();
             $.confirm({
-                title: "Confirm ASSIGN & RE",
+                title: "Confirm ASSIGN",
                 content: "Are you sure ?",
     
                 icon: 'fas fa-external-link-alt',
-                type: 'red',
+                type: 'orange',
                 closeIcon: true,
                 buttons: {
                     confirm: {
-                        text: "ASSIGN & RE",
-                        btnClass: 'btn-danger',
+                        text: "ASSIGN",
+                        btnClass: 'btn-warning',
                         action: function () {
                             askConfirmation = false;
 
@@ -145,7 +145,7 @@
                                 $(".submit-progress").removeClass("hidden");
                             }, 1);
                             $('#allocate-case').attr('disabled', 'disabled');
-                            $('#allocate-case').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> ASSIGN & RE");
+                            $('#allocate-case').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> ASSIGN");
 
                             $('#radioButtons').submit();
                             var nodes = document.getElementById("article").getElementsByTagName('*');

@@ -148,7 +148,9 @@ namespace risk.control.system.Services
             var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
             var claimsIncomplete = GetCreatorIncomplete(userEmail);
             var claimsAssignAuto = GetCreatorAssignAuto(userEmail);
-            var claimsAssignManual = GetCreatorAssignManual(userEmail);
+            var claimsAssign = GetCreatorAssignManual(userEmail);
+            var claimsAssignReAssign = GetCreatorReAssign(userEmail);
+            var claimsAssignReAssignAuto = GetCreatorReAssignAuto(userEmail);
             var claimsActive = GetCreatorActive(userEmail);
             //var claimsCompleted = GetCompanyCompleted(userEmail);
 
@@ -157,43 +159,37 @@ namespace risk.control.system.Services
                 AutoAllocation = company.AutoAllocation,
                 BulkUpload = company.BulkUpload
             };
-            data.FirstBlockName = "New & Draft";
-            data.FirstBlockCount = claimsIncomplete;
-            data.FirstBlockUrl = "/ClaimsInvestigation/Incomplete";
+
+            data.SecondBlockName = "ReAssign ";
 
             if (company.AutoAllocation)
             {
-                data.SecondBlockName = "Assign (auto)";
-                data.SecondBlockUrl = "/ClaimsInvestigation/Draft";
-                data.SecondBlockCount = claimsAssignAuto;
+                data.FirstBlockName = "Assign(auto)";
+                data.FirstBlockCount = claimsAssignAuto;
+                data.FirstBlockUrl = "/ClaimsInvestigation/Draft";
 
-                data.SecondBBlockName = "Assign & Re";
-                data.SecondBBlockUrl = "/ClaimsInvestigation/Assigner";
-                data.SecondBBlockCount = claimsAssignManual;
-                data.SecondBBlockCountBoth = "" + (claimsAssignAuto) + " & " + (claimsAssignManual - claimsAssignAuto) + "";
-
-                
+                data.SecondBlockUrl = "/ClaimsInvestigation/ReAssignerAuto";
+                data.SecondBlockCount = claimsAssignReAssignAuto;
             }
             else
             {
-                data.SecondBlockName = "Assign & Re";
-                data.SecondBlockUrl = "/ClaimsInvestigation/Assigner";
-                data.SecondBlockCount = claimsAssignManual;
+                data.FirstBlockName = "Assign";
+                data.FirstBlockCount = claimsAssign;
+                data.FirstBlockUrl = "/ClaimsInvestigation/Assigner";
+
+                data.SecondBlockUrl = "/ClaimsInvestigation/ReAssigner";
+                data.SecondBlockCount = claimsAssignReAssign;
+
             }
-            if (company.BulkUpload)
-            {
-                var files = _context.FilesOnFileSystem.Where(f => f.CompanyId == company.ClientCompanyId && f.UploadedBy == companyUser.Email).ToList();
-                data.BulkUploadBlockName = "Upload Log";
-                data.BulkUploadBlockUrl = "/Uploads/Uploads";
-                data.BulkUploadBlockCount = files.Count;
-            }
+
+            var files = _context.FilesOnFileSystem.Where(f => f.CompanyId == company.ClientCompanyId && f.UploadedBy == companyUser.Email).ToList();
+            data.BulkUploadBlockName = "Upload Log";
+            data.BulkUploadBlockUrl = "/Uploads/Uploads";
+            data.BulkUploadBlockCount = files.Count;
+
             data.ThirdBlockName = "Active";
             data.ThirdBlockCount = claimsActive;
             data.ThirdBlockUrl = "/ClaimsInvestigation/Active";
-
-            //data.LastBlockName = "Completed";
-            //data.LastBlockCount = claimsCompleted.Count;
-            //data.LastBlockUrl = "/Report";
 
             return data;
         }
@@ -683,6 +679,8 @@ namespace risk.control.system.Services
             var openStatuses = _context.InvestigationCaseStatus.Where(i => !i.Name.Contains(CONSTANTS.CASE_STATUS.FINISHED)).ToList();
             var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                          i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
+            var assignedToAssignerStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                               i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
             var withdrawnByAgency = _context.InvestigationCaseSubStatus.FirstOrDefault(
                      i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY);
             var reAssignedToAssignerStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
@@ -711,6 +709,7 @@ namespace risk.control.system.Services
                 var userHasClaimLog = _context.InvestigationTransaction.Any(c => c.ClaimsInvestigationId == claim.ClaimsInvestigationId && 
                 c.UserEmailActioned == companyUser.Email && c.HopCount >= reviewLogCount);
                 if (userHasClaimLog && claim.InvestigationCaseSubStatusId != createdStatus.InvestigationCaseSubStatusId &&
+                    claim.InvestigationCaseSubStatusId != assignedToAssignerStatus.InvestigationCaseSubStatusId &&
                     claim.InvestigationCaseSubStatusId != withdrawnByAgency.InvestigationCaseSubStatusId
                     &&
                     claim.InvestigationCaseSubStatusId != reAssignedToAssignerStatus.InvestigationCaseSubStatusId
@@ -788,14 +787,13 @@ namespace risk.control.system.Services
             }
             return count;
         }
-        private int GetCreatorAssignManual(string userEmail)
+        private int GetCreatorReAssignAuto(string userEmail)
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
 
-            var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
-                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
             var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
-                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
+    i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
+
             var reAssignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER);
             var submittedToAssessorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
@@ -804,29 +802,86 @@ namespace risk.control.system.Services
                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY);
             var withdrawnByCompany = _context.InvestigationCaseSubStatus.FirstOrDefault(
                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY);
+            var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+               i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
             var companyUser = _context.ClientCompanyApplicationUser.Include(u=>u.ClientCompany).FirstOrDefault(c => c.Email == userEmail);
 
             // SHOWING DIFFERRENT PAGES AS PER ROLES
             var count = applicationDbContext.Count(a => a.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
-                (
-                    //a.IsReady2Assign && !a.AssignedToAgency &&
-                    ( a.UserEmailActioned == companyUser.Email &&
-                        a.UserEmailActionedTo == companyUser.Email &&
-                        a.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId
-                        || a.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId)
-                ) ||
-                 (a.InvestigationCaseSubStatusId == withdrawnByCompany.InvestigationCaseSubStatusId &&
-                        a.UserEmailActionedTo == companyUser.Email &&
-                        a.UserEmailActioned == companyUser.Email &&
-                        a.UserRoleActionedTo == $"{AppRoles.CREATOR.GetEnumDisplayName()} ({companyUser.ClientCompany.Email})") ||
-                 (a.InvestigationCaseSubStatusId == withdrawnByAgency.InvestigationCaseSubStatusId &&
+                (a.InvestigationCaseSubStatusId == withdrawnByAgency.InvestigationCaseSubStatusId &&
                         a.UserEmailActionedTo == string.Empty &&
                         a.UserRoleActionedTo == $"{AppRoles.CREATOR.GetEnumDisplayName()} ({companyUser.ClientCompany.Email})")
                  ||
-                (a.IsReviewCase && a.InvestigationCaseSubStatusId == reAssignedStatus.InvestigationCaseSubStatusId && 
+                 (a.InvestigationCaseSubStatusId == withdrawnByCompany.InvestigationCaseSubStatusId &&
+                        a.UserEmailActionedTo == companyUser.Email &&
+                        a.UserEmailActioned == companyUser.Email &&
+                        a.UserRoleActionedTo == $"{AppRoles.CREATOR.GetEnumDisplayName()} ({companyUser.ClientCompany.Email})")
+                 ||
+                  (a.UserEmailActioned == companyUser.Email &&
+                        a.UserEmailActionedTo == companyUser.Email &&
+                        a.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId)
+                        ||
+                (a.IsReviewCase && a.InvestigationCaseSubStatusId == reAssignedStatus.InvestigationCaseSubStatusId &&
                 a.UserEmailActionedTo == string.Empty &&
-                a.UserRoleActionedTo == $"{AppRoles.CREATOR.GetEnumDisplayName()} ( {companyUser.ClientCompany.Email})")
-                );
+                a.UserRoleActionedTo == $"{AppRoles.CREATOR.GetEnumDisplayName()} ( {companyUser.ClientCompany.Email})"));
+
+            return count;
+        }
+
+        private int GetCreatorReAssign(string userEmail)
+        {
+            IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
+            var reAssignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER);
+            var submittedToAssessorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
+            var withdrawnByAgency = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                      i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY);
+            var withdrawnByCompany = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY);
+
+            var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(c => c.Email == userEmail);
+
+            // SHOWING DIFFERRENT PAGES AS PER ROLES
+            var count = applicationDbContext.Count(a => a.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
+                (a.InvestigationCaseSubStatusId == withdrawnByAgency.InvestigationCaseSubStatusId &&
+                        a.UserEmailActionedTo == string.Empty &&
+                        a.UserRoleActionedTo == $"{AppRoles.CREATOR.GetEnumDisplayName()} ({companyUser.ClientCompany.Email})")
+                 ||
+                 (a.InvestigationCaseSubStatusId == withdrawnByCompany.InvestigationCaseSubStatusId &&
+                        a.UserEmailActionedTo == companyUser.Email &&
+                        a.UserEmailActioned == companyUser.Email &&
+                        a.UserRoleActionedTo == $"{AppRoles.CREATOR.GetEnumDisplayName()} ({companyUser.ClientCompany.Email})")
+                 ||
+                (a.IsReviewCase && a.InvestigationCaseSubStatusId == reAssignedStatus.InvestigationCaseSubStatusId &&
+                a.UserEmailActionedTo == string.Empty &&
+                a.UserRoleActionedTo == $"{AppRoles.CREATOR.GetEnumDisplayName()} ( {companyUser.ClientCompany.Email})"));
+
+            return count;
+        }
+
+        private int GetCreatorAssignManual(string userEmail)
+        {
+            IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
+
+            var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
+            var reAssignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER);
+            var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
+            var submittedToAssessorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
+            var allocateToVendorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
+            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+            var count = applicationDbContext.Count(a => a.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
+                (
+                    (a.UserEmailActioned == companyUser.Email &&
+                        a.UserEmailActionedTo == companyUser.Email &&
+                        a.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId &&
+                        a.ORIGIN == ORIGIN.MANUAL)
+                ));
 
             return count;
         }

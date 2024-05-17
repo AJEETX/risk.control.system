@@ -145,6 +145,9 @@ namespace risk.control.system.Models
     public enum ORIGIN
     {
         USER,
+        AUTO,
+        MANUAL,
+        REASSIGNED,
         FILE,
         FTP,
         API

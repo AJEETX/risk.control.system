@@ -54,6 +54,9 @@ namespace risk.control.system.Controllers.Api.Claims
                          i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER);
             var approvedStatus = _context.InvestigationCaseSubStatus
                 .FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR);
+            var assignedToAssignerStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
+
             var claimsSubmitted = new List<ClaimsInvestigation>();
             var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
 
@@ -75,6 +78,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 c.UserEmailActioned == companyUser.Email && c.HopCount >= reviewLogCount);
 
                 if (userHasClaimLog && claim.InvestigationCaseSubStatusId != createdStatus.InvestigationCaseSubStatusId &&
+                    claim.InvestigationCaseSubStatusId != assignedToAssignerStatus.InvestigationCaseSubStatusId &&
                     claim.InvestigationCaseSubStatusId != withdrawnByAgency.InvestigationCaseSubStatusId
                     &&
                     claim.InvestigationCaseSubStatusId != reAssignedToAssignerStatus.InvestigationCaseSubStatusId

@@ -6,7 +6,7 @@
 <section class="content">
     <div id="article" class="card card-secondary">
         <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-external-link-alt"></i> Assign & RE
+            <h3 class="card-title"><i class="fas fa-external-link-alt"></i> Assign
                 <span class="hover-text">
                     <i class="fas fa-info-circle"></i>
                     <span class="tooltip-text" id="information">
@@ -41,10 +41,10 @@
                         </li>
                         <li>
                             <i class='far fa-thumbs-up'></i>
-                            <button class='btn btn-danger btn-xs'>
-                                    <span class="badge badge-danger btn-xs">
+                            <button class='btn btn-warning btn-xs'>
+                                <span class="badge badge-warning btn-xs">
                                         <i class='fas fa-external-link-alt'></i>
-                                    </span> ASSIGN & RE
+                                    </span> Assign
                                 </button>
                         </li>
                     </span>
@@ -89,6 +89,7 @@
                     </div>
                     <div class="card-body">
                         <form id="upload-claims" method="post" enctype="multipart/form-data">
+                            <input type="hidden" id="uploadingway" name="uploadingway" value="manual" />
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
@@ -180,9 +181,9 @@
                     <div class="col-md-12">
                         <a class="create-policy btn btn-success" asp-controller="InsuranceClaims" asp-action="IndexManual"><i class="far fa-edit"></i> @Applicationsettings.CREATE New</a>
 
-                        <button disabled id="allocatedcase" type="submit" class="btn btn-danger">
-                            <span class="badge badge-danger"> <i class="fas fa-external-link-alt" aria-hidden="true"></i> </span>
-                            ASSIGN & RE
+                        <button disabled id="allocatedcase" type="submit" class="btn btn-warning">
+                            <span class="badge badge-warning"> <i class="fas fa-external-link-alt" aria-hidden="true"></i> </span>
+                            Assign
                         </button>
 
 

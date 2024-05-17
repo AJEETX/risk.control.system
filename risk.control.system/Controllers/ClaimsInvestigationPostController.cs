@@ -104,9 +104,11 @@ namespace risk.control.system.Controllers
                     if (claims.Count == autoAllocatedClaims.Count)
                     {
                         notifyService.Custom($"{autoAllocatedClaims.Count}/{claims.Count} claim(s) auto-assigned", 3, "green", "far fa-file-powerpoint");
+                        return RedirectToAction(nameof(ClaimsInvestigationController.Active), "ClaimsInvestigation");
+
                     }
 
-                    if (claims.Count > autoAllocatedClaims.Count)
+                    else if (claims.Count > autoAllocatedClaims.Count)
                     {
                         if (autoAllocatedClaims.Count > 0)
                         {
@@ -119,7 +121,8 @@ namespace risk.control.system.Controllers
 
                         await mailboxService.NotifyClaimAssignmentToAssigner(HttpContext.User.Identity.Name, notAutoAllocated);
 
-                        notifyService.Custom($"{notAutoAllocated.Count}/{claims.Count} claim(s) need manual assign", 3, "orange", "far fa-file-powerpoint");
+                        notifyService.Custom($"{notAutoAllocated.Count}/{claims.Count} claim(s) need assign manually through ReAssign", 3, "orange", "far fa-file-powerpoint");
+                        return RedirectToAction(nameof(ClaimsInvestigationController.ReAssignerAuto), "ClaimsInvestigation");
 
                     }
                 }
@@ -369,7 +372,7 @@ namespace risk.control.system.Controllers
                         profileFile = file;
                     }
                 }
-
+                claimsInvestigation.ORIGIN = ORIGIN.AUTO;
                 var claim = await claimsInvestigationService.CreatePolicy(userEmail, claimsInvestigation, documentFile, profileFile);
                 if (claim == null)
                 {
@@ -437,7 +440,7 @@ namespace risk.control.system.Controllers
                         profileFile = file;
                     }
                 }
-
+                claimsInvestigation.ORIGIN = ORIGIN.MANUAL;
                 var claim = await claimsInvestigationService.CreatePolicy(userEmail, claimsInvestigation, documentFile, profileFile);
                 if (claim == null)
                 {

@@ -81,7 +81,7 @@ namespace risk.control.system.Controllers
                 ViewData["BeneficiaryRelationId"] = new SelectList(_context.BeneficiaryRelation, "BeneficiaryRelationId", "Name");
 
                 var claimsPage = new MvcBreadcrumbNode("Incomplete", "ClaimsInvestigation", "Claims");
-                var agencyPage = new MvcBreadcrumbNode("Incomplete", "ClaimsInvestigation", "New & Draft") { Parent = claimsPage, };
+                var agencyPage = new MvcBreadcrumbNode("Draft", "ClaimsInvestigation", "Assign(auto)") { Parent = claimsPage, };
                 var detailsPage = new MvcBreadcrumbNode("Details", "ClaimsInvestigation", $"Details") { Parent = agencyPage, RouteValues = new { id = id } };
                 var editPage = new MvcBreadcrumbNode("Create", "Beneficiary", $"Add beneficiary") { Parent = detailsPage, RouteValues = new { id = id } };
                 ViewData["BreadcrumbNode"] = editPage;
@@ -204,7 +204,7 @@ namespace risk.control.system.Controllers
                 ViewData["BeneficiaryRelationId"] = new SelectList(_context.BeneficiaryRelation, "BeneficiaryRelationId", "Name");
 
                 var claimsPage = new MvcBreadcrumbNode("Assigner", "ClaimsInvestigation", "Claims");
-                var agencyPage = new MvcBreadcrumbNode("Assigner", "ClaimsInvestigation", "Assign & Re") { Parent = claimsPage, };
+                var agencyPage = new MvcBreadcrumbNode("Assigner", "ClaimsInvestigation", "Assign") { Parent = claimsPage, };
                 var detailsPage = new MvcBreadcrumbNode("DetailsManual", "ClaimsInvestigation", $"Details") { Parent = agencyPage, RouteValues = new { id = id } };
                 var editPage = new MvcBreadcrumbNode("CreateManual", "Beneficiary", $"Add beneficiary") { Parent = detailsPage, RouteValues = new { id = id } };
                 ViewData["BreadcrumbNode"] = editPage;
@@ -261,7 +261,7 @@ namespace risk.control.system.Controllers
                 await _context.SaveChangesAsync();
                 notifyService.Custom($"Beneficiary {caseLocation.BeneficiaryName} added successfully", 3, "green", "fas fa-user-tie");
 
-                return RedirectToAction(nameof(ClaimsInvestigationController.Details), "ClaimsInvestigation", new { id = caseLocation.ClaimsInvestigationId });
+                return RedirectToAction(nameof(ClaimsInvestigationController.DetailsAuto), "ClaimsInvestigation", new { id = caseLocation.ClaimsInvestigationId });
 
                 ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", caseLocation.CountryId);
                 ViewData["BeneficiaryRelationId"] = new SelectList(_context.BeneficiaryRelation.OrderBy(s => s.Code), "BeneficiaryRelationId", "Name", caseLocation.BeneficiaryRelationId);
@@ -431,8 +431,8 @@ namespace risk.control.system.Controllers
 
 
                 var claimsPage = new MvcBreadcrumbNode("Incomplete", "ClaimsInvestigation", "Claims");
-                var agencyPage = new MvcBreadcrumbNode("Incomplete", "ClaimsInvestigation", "New & Draft") { Parent = claimsPage, };
-                var detailsPage = new MvcBreadcrumbNode("Details", "ClaimsInvestigation", $"Details") { Parent = agencyPage, RouteValues = new { id = caseLocation.ClaimsInvestigationId } };
+                var agencyPage = new MvcBreadcrumbNode("Draft", "ClaimsInvestigation", "Assign(auto)") { Parent = claimsPage, };
+                var detailsPage = new MvcBreadcrumbNode("DetailsAuto", "ClaimsInvestigation", $"Details") { Parent = agencyPage, RouteValues = new { id = caseLocation.ClaimsInvestigationId } };
                 var editPage = new MvcBreadcrumbNode("Edit", "Beneficiary", $"Edit Beneficiary") { Parent = detailsPage, RouteValues = new { id = id } };
                 ViewData["BreadcrumbNode"] = editPage;
 

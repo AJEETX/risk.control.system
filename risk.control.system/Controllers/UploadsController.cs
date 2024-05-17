@@ -206,7 +206,7 @@ namespace risk.control.system.Controllers
         [HttpPost]
         [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> FileUpload(IFormFile postedFile, string uploadtype)
+        public async Task<IActionResult> FileUpload(IFormFile postedFile, string uploadtype, string uploadingway)
         {
             if(postedFile == null || string.IsNullOrWhiteSpace(uploadtype) || 
                 string.IsNullOrWhiteSpace(Path.GetFileName(postedFile.FileName)) ||
@@ -234,7 +234,7 @@ namespace risk.control.system.Controllers
 
                     if (uploadType == UploadType.FTP)
                     {
-                        await ftpService.DownloadFtpFile(userEmail, postedFile);
+                        await ftpService.DownloadFtpFile(userEmail, postedFile, uploadingway);
 
                         notifyService.Custom($"Ftp download complete ", 3, "green", "far fa-file-powerpoint");
 
@@ -245,7 +245,7 @@ namespace risk.control.system.Controllers
                     {
                         try
                         {
-                            await ftpService.UploadFile(userEmail, postedFile);
+                            await ftpService.UploadFile(userEmail, postedFile, uploadingway);
 
                             notifyService.Custom($"File upload complete", 3, "green", "far fa-file-powerpoint");
 

@@ -5,14 +5,14 @@ $(document).ready(function () {
         if (askConfirmation) {
             e.preventDefault();
             $.confirm({
-                title: "Confirm ASSIGN<span class='badge badge-light'>(auto)</span>",
-                content: "Are you sure to ASSIGN<span class='badge badge-light'>(auto)</span> ?",
+                title: "Confirm Assign<span class='badge badge-light'>(auto)</span>",
+                content: "Are you sure to Assign<span class='badge badge-light'>(auto)</span> ?",
                 icon: 'fas fa-random',
                 type: 'orange',
                 closeIcon: true,
                 buttons: {
                     confirm: {
-                        text: "ASSIGN <span class='badge badge-warning'>(auto)</span>",
+                        text: "Assign <span class='badge badge-warning'>(auto)</span>",
                         btnClass: 'btn-warning',
                         action: function () {
                             askConfirmation = false;
@@ -24,7 +24,7 @@ $(document).ready(function () {
                                 $(".submit-progress").removeClass("hidden");
                             }, 1);
                             $('#assign-list').attr('disabled', 'disabled');
-                            $('#assign-list').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> ASSIGN<span class='badge badge-light'>(auto)</span>");
+                            $('#assign-list').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Assign<span class='badge badge-light'>(auto)</span>");
 
                             $('#create-form').submit();
                             var nodes = document.getElementById("article").getElementsByTagName('*');
@@ -130,7 +130,7 @@ $(document).ready(function () {
             $(".submit-progress").removeClass("hidden");
         }, 1);
         $('#assign-manual-list').attr('disabled', 'disabled');
-        $('#assign-manual-list').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> ASSIGN");
+        $('#assign-manual-list').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Assign");
 
         var nodes = document.getElementById("article").getElementsByTagName('*');
         for (var i = 0; i < nodes.length; i++) {

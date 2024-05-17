@@ -98,7 +98,7 @@ $(document).ready(function () {
         $.alert(
             {
                 title: " Detail Complete !",
-                content: "Detail completed <i class='far fa-thumbs-up'></i><br /> <b>ASSIGN</b> now or later",
+                content: "Detail completed <i class='far fa-thumbs-up'></i><br /> <b>Assign</b> now or later",
                 icon: 'fas fa-info',
                 animationBounce: 2.5,
                 type: 'red',

@@ -127,9 +127,88 @@ namespace risk.control.system.Controllers
 
         }
 
-        [Breadcrumb(" Assign & Re")]
+        [Breadcrumb(" Assign")]
         [Authorize(Roles = CREATOR.DISPLAY_NAME)]
         public IActionResult Assigner()
+        {
+            try
+            {
+                bool userCanUpload = true;
+                int availableCount = 0;
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (string.IsNullOrWhiteSpace(currentUserEmail))
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == currentUserEmail);
+                if (companyUser.ClientCompany.LicenseType == Standard.Licensing.LicenseType.Trial)
+                {
+                    var totalClaimsCreated = _context.ClaimsInvestigation.Include(c => c.PolicyDetail).Where(c => !c.Deleted && c.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId)?.ToList();
+                    availableCount = companyUser.ClientCompany.TotalCreatedClaimAllowed - totalClaimsCreated.Count;
+                    if (totalClaimsCreated?.Count >= companyUser.ClientCompany.TotalCreatedClaimAllowed)
+                    {
+                        userCanUpload = false;
+                        notifyService.Information($"MAX limit = <b>{companyUser.ClientCompany.TotalCreatedClaimAllowed}</b> reached");
+                    }
+                    else
+                    {
+                        notifyService.Information($"Limit available = <b>{availableCount}</b>");
+                    }
+                }
+
+                return View(companyUser.ClientCompany.BulkUpload && userCanUpload);
+            }
+            catch (Exception)
+            {
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+
+        }
+        [Breadcrumb("ReAssign")]
+        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
+        public IActionResult ReAssigner()
+        {
+            try
+            {
+                bool userCanUpload = true;
+                int availableCount = 0;
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (string.IsNullOrWhiteSpace(currentUserEmail))
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == currentUserEmail);
+                if (companyUser.ClientCompany.LicenseType == Standard.Licensing.LicenseType.Trial)
+                {
+                    var totalClaimsCreated = _context.ClaimsInvestigation.Include(c => c.PolicyDetail).Where(c => !c.Deleted && c.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId)?.ToList();
+                    availableCount = companyUser.ClientCompany.TotalCreatedClaimAllowed - totalClaimsCreated.Count;
+                    if (totalClaimsCreated?.Count >= companyUser.ClientCompany.TotalCreatedClaimAllowed)
+                    {
+                        userCanUpload = false;
+                        notifyService.Information($"MAX limit = <b>{companyUser.ClientCompany.TotalCreatedClaimAllowed}</b> reached");
+                    }
+                    else
+                    {
+                        notifyService.Information($"Limit available = <b>{availableCount}</b>");
+                    }
+                }
+
+                return View(companyUser.ClientCompany.BulkUpload && userCanUpload);
+            }
+            catch (Exception)
+            {
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+
+        }
+
+        [Breadcrumb("ReAssign")]
+        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
+        public IActionResult ReAssignerAuto()
         {
             try
             {
@@ -169,7 +248,7 @@ namespace risk.control.system.Controllers
         [HttpPost]
         [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Assigner(IFormFile postedFile, string uploadtype)
+        public async Task<IActionResult> Assigner(IFormFile postedFile, string uploadtype, string uploadingway)
         {
             try
             {
@@ -185,7 +264,7 @@ namespace risk.control.system.Controllers
 
                     if (uploadType == UploadType.FTP)
                     {
-                        var processed = await ftpService.DownloadFtpFile(userEmail, postedFile);
+                        var processed = await ftpService.DownloadFtpFile(userEmail, postedFile, uploadingway);
                         if (processed)
                         {
                             notifyService.Custom($"FTP download complete ", 3, "green", "fa fa-upload");
@@ -198,7 +277,7 @@ namespace risk.control.system.Controllers
 
                     if (uploadType == UploadType.FILE && Path.GetExtension(postedFile.FileName) == ".zip")
                     {
-                        var processed = await ftpService.UploadFile(userEmail, postedFile);
+                        var processed = await ftpService.UploadFile(userEmail, postedFile, uploadingway);
                         if (processed)
                         {
                             notifyService.Custom($"File upload complete", 3, "green", "fa fa-upload");
@@ -261,7 +340,7 @@ namespace risk.control.system.Controllers
         [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
         [Authorize(Roles = CREATOR.DISPLAY_NAME)]
-        public async Task<IActionResult> Draft(IFormFile postedFile, string uploadtype)
+        public async Task<IActionResult> Draft(IFormFile postedFile, string uploadtype, string uploadingway)
         {
             try
             {
@@ -277,7 +356,7 @@ namespace risk.control.system.Controllers
 
                     if (uploadType == UploadType.FTP)
                     {
-                        var processed = await ftpService.DownloadFtpFile(userEmail, postedFile);
+                        var processed = await ftpService.DownloadFtpFile(userEmail, postedFile, uploadingway);
                         if (processed)
                         {
                             notifyService.Custom($"FTP download complete ", 3, "green", "fa fa-upload");
@@ -291,7 +370,7 @@ namespace risk.control.system.Controllers
                     if (uploadType == UploadType.FILE && Path.GetExtension(postedFile.FileName) == ".zip")
                     {
 
-                        var processed = await ftpService.UploadFile(userEmail, postedFile);
+                        var processed = await ftpService.UploadFile(userEmail, postedFile, uploadingway);
                         if (processed)
                         {
                             notifyService.Custom($"File upload complete", 3, "green", "fa fa-upload");
@@ -316,6 +395,37 @@ namespace risk.control.system.Controllers
         [Breadcrumb(" Empanelled Agencies", FromAction = "Assigner")]
         [Authorize(Roles = CREATOR.DISPLAY_NAME)]
         public async Task<IActionResult> EmpanelledVendors(string selectedcase)
+        {
+            try
+            {
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+
+                if (string.IsNullOrWhiteSpace(currentUserEmail))
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                if (string.IsNullOrWhiteSpace(selectedcase))
+                {
+                    notifyService.Error("No case selected!!!. Please select case to be allocate.");
+                    return RedirectToAction(nameof(Assigner));
+                }
+
+                var model = await empanelledAgencyService.GetEmpanelledVendors(selectedcase);
+
+                return View(model);
+            }
+            catch (Exception)
+            {
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+        }
+
+        [HttpGet]
+        [Breadcrumb(" Empanelled Agencies", FromAction = "ReAssignerAuto")]
+        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
+        public async Task<IActionResult> ReAssign2EmpanelledVendors(string selectedcase)
         {
             try
             {
@@ -689,7 +799,7 @@ namespace risk.control.system.Controllers
         }
 
 
-        [Breadcrumb("Details", FromAction = "Incomplete")]
+        [Breadcrumb("Details", FromAction = "ReAssignerAuto")]
         [Authorize(Roles = CREATOR.DISPLAY_NAME)]
         public async Task<IActionResult> Details(string id)
         {
@@ -889,7 +999,7 @@ namespace risk.control.system.Controllers
             }
         }
         [Authorize(Roles = CREATOR.DISPLAY_NAME)]
-        public async Task<IActionResult> VendorDetail(long id,  string selectedcase)
+        public async Task<IActionResult> VendorDetail(long id, string selectedcase)
         {
             try
             {
@@ -929,10 +1039,66 @@ namespace risk.control.system.Controllers
                 }
                 ViewBag.Selectedcase = selectedcase;
 
-                var claimsPage = new MvcBreadcrumbNode("Incomplete", "ClaimsInvestigation", "Claims");
-                var agencyPage = new MvcBreadcrumbNode("Assigner", "ClaimsInvestigation", "Assign & Re") { Parent = claimsPage, };
+                var claimsPage = new MvcBreadcrumbNode("Assigner", "ClaimsInvestigation", "Claims");
+                var agencyPage = new MvcBreadcrumbNode("Assigner", "ClaimsInvestigation", "Assigner") { Parent = claimsPage, };
                 var detailsPage = new MvcBreadcrumbNode("EmpanelledVendors", "ClaimsInvestigation", $"Empanelled Agencies") { Parent = agencyPage, RouteValues = new { selectedcase = selectedcase } };
                 var editPage = new MvcBreadcrumbNode("VendorDetail", "ClaimsInvestigation", $"Agency Detail") { Parent = detailsPage, RouteValues = new { id = id } };
+                ViewData["BreadcrumbNode"] = editPage;
+
+
+                return View(vendor);
+            }
+            catch (Exception)
+            {
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+        }
+        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
+        public async Task<IActionResult> VendorDetailAuto(long id, string selectedcase)
+        {
+            try
+            {
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (string.IsNullOrWhiteSpace(currentUserEmail))
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                if (id == 0 || selectedcase is null)
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+
+                var vendor = await _context.Vendor
+                    .Include(v => v.ratings)
+                    .Include(v => v.Country)
+                    .Include(v => v.PinCode)
+                    .Include(v => v.State)
+                    .Include(v => v.District)
+                    .Include(v => v.VendorInvestigationServiceTypes)
+                    .ThenInclude(v => v.PincodeServices)
+                    .Include(v => v.VendorInvestigationServiceTypes)
+                    .ThenInclude(v => v.State)
+                    .Include(v => v.VendorInvestigationServiceTypes)
+                    .ThenInclude(v => v.District)
+                    .Include(v => v.VendorInvestigationServiceTypes)
+                    .ThenInclude(v => v.LineOfBusiness)
+                    .Include(v => v.VendorInvestigationServiceTypes)
+                    .ThenInclude(v => v.InvestigationServiceType)
+                    .FirstOrDefaultAsync(m => m.VendorId == id);
+                if (vendor == null)
+                {
+                    notifyService.Error("NOT FOUND !!!..");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                ViewBag.Selectedcase = selectedcase;
+
+                var claimsPage = new MvcBreadcrumbNode("Draft", "ClaimsInvestigation", "Claims");
+                var agencyPage = new MvcBreadcrumbNode("ReAssignerAuto", "ClaimsInvestigation", "ReAssign") { Parent = claimsPage, };
+                var detailsPage = new MvcBreadcrumbNode("ReAssign2EmpanelledVendors", "ClaimsInvestigation", $"Empanelled Agencies") { Parent = agencyPage, RouteValues = new { selectedcase = selectedcase } };
+                var editPage = new MvcBreadcrumbNode("VendorDetailAuto", "ClaimsInvestigation", $"Agency Detail") { Parent = detailsPage, RouteValues = new { id = id } };
                 ViewData["BreadcrumbNode"] = editPage;
 
 

@@ -53,6 +53,7 @@ namespace risk.control.system.Controllers
                     notifyService.Error("OOPS!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
+                model.ORIGIN = ORIGIN.REASSIGNED;
 
                 ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name");
                 ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType.Where(i =>
@@ -91,7 +92,7 @@ namespace risk.control.system.Controllers
                     notifyService.Error("OOPS!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-
+                model.ORIGIN = ORIGIN.AUTO;
                 ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name");
                 ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType.Where(i =>
                 i.LineOfBusinessId == model.PolicyDetail.LineOfBusinessId).OrderBy(s => s.Code), "InvestigationServiceTypeId", "Name");
@@ -101,7 +102,13 @@ namespace risk.control.system.Controllers
                 ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
                 ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name");
                 return false ?
-                    View(new ClaimsInvestigation { PolicyDetail = new PolicyDetail { LineOfBusinessId = model.PolicyDetail.LineOfBusinessId } }) :
+                    View(new ClaimsInvestigation 
+                    { 
+                        PolicyDetail = new PolicyDetail 
+                        { 
+                            LineOfBusinessId = model.PolicyDetail.LineOfBusinessId 
+                        } 
+                    }) :
                     View(model);
             }
             catch (Exception)
@@ -129,6 +136,7 @@ namespace risk.control.system.Controllers
                     notifyService.Error("OOPS!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
+                model.ORIGIN = ORIGIN.MANUAL;
 
                 ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name");
                 ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType.Where(i =>
@@ -178,8 +186,8 @@ namespace risk.control.system.Controllers
                 ViewData["InvestigationCaseStatusId"] = new SelectList(_context.InvestigationCaseStatus, "InvestigationCaseStatusId", "Name", claimsInvestigation.InvestigationCaseStatusId);
                 ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", claimsInvestigation.PolicyDetail.LineOfBusinessId);
 
-                var claimsPage = new MvcBreadcrumbNode("Incomplete", "ClaimsInvestigation", "Claims");
-                var agencyPage = new MvcBreadcrumbNode("Incomplete", "ClaimsInvestigation", "New & Draft") { Parent = claimsPage, };
+                var claimsPage = new MvcBreadcrumbNode("Draft", "ClaimsInvestigation", "Claims");
+                var agencyPage = new MvcBreadcrumbNode("Draft", "ClaimsInvestigation", "ReAssign") { Parent = claimsPage, };
                 var detailsPage = new MvcBreadcrumbNode("Details", "ClaimsInvestigation", $"Details") { Parent = agencyPage, RouteValues = new { id = id } };
                 var editPage = new MvcBreadcrumbNode("EditPolicy", "ClaimsInvestigation", $"Edit Policy") { Parent = detailsPage, RouteValues = new { id = id } };
                 ViewData["BreadcrumbNode"] = editPage;
@@ -215,6 +223,7 @@ namespace risk.control.system.Controllers
                     notifyService.Error("Not Found!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
+                claimsInvestigation.ORIGIN = ORIGIN.AUTO;
                 ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name", claimsInvestigation.PolicyDetail.ClientCompanyId);
                 ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType.Where(i =>
                 i.LineOfBusinessId == claimsInvestigation.PolicyDetail.LineOfBusinessId).OrderBy(s => s.Code), "InvestigationServiceTypeId", "Name", claimsInvestigation.PolicyDetail.InvestigationServiceTypeId);
@@ -259,6 +268,7 @@ namespace risk.control.system.Controllers
                     notifyService.Error("Not Found!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
+                claimsInvestigation.ORIGIN = ORIGIN.MANUAL;
                 ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name", claimsInvestigation.PolicyDetail.ClientCompanyId);
                 ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType.Where(i =>
                 i.LineOfBusinessId == claimsInvestigation.PolicyDetail.LineOfBusinessId).OrderBy(s => s.Code), "InvestigationServiceTypeId", "Name", claimsInvestigation.PolicyDetail.InvestigationServiceTypeId);
@@ -268,7 +278,7 @@ namespace risk.control.system.Controllers
                 ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", claimsInvestigation.PolicyDetail.LineOfBusinessId);
 
                 var claimsPage = new MvcBreadcrumbNode("Incomplete", "ClaimsInvestigation", "Claims");
-                var agencyPage = new MvcBreadcrumbNode("Assigner", "ClaimsInvestigation", "Assign & Re") { Parent = claimsPage, };
+                var agencyPage = new MvcBreadcrumbNode("Assigner", "ClaimsInvestigation", "Assign") { Parent = claimsPage, };
                 var detailsPage = new MvcBreadcrumbNode("DetailsManual", "ClaimsInvestigation", $"Details") { Parent = agencyPage, RouteValues = new { id = id } };
                 var editPage = new MvcBreadcrumbNode("EditPolicy", "ClaimsInvestigation", $"Edit Policy") { Parent = detailsPage, RouteValues = new { id = id } };
                 ViewData["BreadcrumbNode"] = editPage;
@@ -282,7 +292,7 @@ namespace risk.control.system.Controllers
 
         }
         // GET: ClaimsInvestigation/Delete/5
-        [Breadcrumb(title: " Delete", FromAction = "Incomplete", FromController = typeof(ClaimsInvestigationController))]
+        [Breadcrumb(title: " Delete", FromAction = "ReAssignerAuto", FromController = typeof(ClaimsInvestigationController))]
         public async Task<IActionResult> Delete(string id)
         {
             try
@@ -494,7 +504,7 @@ namespace risk.control.system.Controllers
                 _context.ClaimsInvestigation.Update(claimsInvestigation);
                 await _context.SaveChangesAsync();
                 notifyService.Custom("Claim deleted", 3, "red", "far fa-file-powerpoint");
-                return RedirectToAction(nameof(ClaimsInvestigationController.Incomplete), "ClaimsInvestigation");
+                return RedirectToAction(nameof(ClaimsInvestigationController.Draft), "ClaimsInvestigation");
             }
             catch (Exception)
             {
