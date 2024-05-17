@@ -310,24 +310,30 @@
             <div class="card-footer d-flex  justify-content-center align-items-center">
                 <div class="row">
                     <div class="col-md-12">
-                        <div class="d-flex justify-content-center align-items-center">
-                            <span class="detail-wizard"> Complete details <i class="fas fa-hand-point-up"></i> to <b> Assign </b> <i class="far fa-hand-point-down"></i></span>
-                        </div>
-                        <div>
-                            <a id="back" asp-action="Assigner" class="btn btn-outline-secondary"><span class="badge badge-light"> <i class="fas fa-arrow-left"></i> </span> Back </a>
-                            @if (customerExist && beneficiaryExist)
-                            {
-                                <a id="assign-manual-list" asp-action="EmpanelledVendors" asp-route-selectedcase="@Model.ClaimsInvestigation.ClaimsInvestigationId" class="btn btn-warning">
-                                    <span class="badge badge-warning"> <i class="fas fa-external-link-alt"></i></span>Assign
-                                </a>
-                            }
-                            else
-                            {
+                        @if (!customerExist || !beneficiaryExist)
+                        {
+                            <div class="d-flex justify-content-center align-items-center">
+                                <span class="detail-wizard"> Complete details <i class="fas fa-hand-point-up"></i>  to <b> Assign </b> <i class="far fa-hand-point-down"></i></span>
+                            </div>
+                            <div>
+                                <a id="back" asp-action="Assigner" class="btn btn-outline-secondary"><span class="badge badge-light"> <i class="fas fa-arrow-left"></i> </span> Back </a>
                                 <button disabled id="assign-manual-list" class="btn btn-warning disabled">
                                     <span class="badge badge-warning"> <i class="fas fa-external-link-alt"></i></span><b> Assign </b>
                                 </button>
-                            }
-                        </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="d-flex justify-content-center align-items-center">
+                                <span class="detail-wizard-complete"> Detail completed <i class="far fa-thumbs-up"></i>.   <b> Assign </b> <i class="far fa-hand-point-down"></i>  now or later </span>
+                            </div>
+                            <div>
+                                <a id="back" asp-action="Assigner" class="btn btn-outline-secondary"><span class="badge badge-light"> <i class="fas fa-arrow-left"></i> </span> Back </a>
+                                <a id="assign-manual-list" asp-action="EmpanelledVendors" asp-route-selectedcase="@Model.ClaimsInvestigation.ClaimsInvestigationId" class="btn btn-warning">
+                                    <span class="badge badge-warning"> <i class="fas fa-external-link-alt"></i></span>Assign
+                                </a>
+                            </div>
+                        }
                     </div>
                 </div>
             </div>

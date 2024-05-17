@@ -72,13 +72,17 @@
             /* Name of the keys from
             data file source */
             {
-                "sDefaultContent": "",
+                "sDefaultContent": "<i class='fas fa-question'></i>",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     if (!row.isQueryCase) {
 
                         var img = '<input name="selectedcase" class="selected-case" type="radio" id="' + row.id + '"  value="' + row.id + '"  />';
                         return img;
+                    }
+                    else {
+                        var buttons = '<a id="details' + row.id + '" onclick="showenquiry(`' + row.id + '`)" href="/ClaimsVendor/ReplyEnquiry?Id=' + row.id + '"  class="btn btn-xs btn-warning"><i class="fas fa-question" aria-hidden="true"></i> ENQUIRY </a>'
+                        return buttons;
                     }
                 }
             },

@@ -111,7 +111,10 @@ namespace risk.control.system.Controllers.Api.Claims
                         "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>" :
                         a.BeneficiaryDetail.BeneficiaryName,
                     TimeElapsed = DateTime.Now.Subtract(a.Created).TotalSeconds,
-                       IsNewAssigned = a.AssignAutoUploadView <= 1
+                       IsNewAssigned = a.AssignAutoUploadView <= 1,
+                    BeneficiaryFullName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.BeneficiaryName) ? "" : a.BeneficiaryDetail.BeneficiaryName,
+                    CustomerFullName = string.IsNullOrWhiteSpace(a.CustomerDetail?.CustomerName) ? "" : a.CustomerDetail.CustomerName,
+
                 })?
                 .ToList();
 

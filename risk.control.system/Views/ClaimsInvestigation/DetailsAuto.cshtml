@@ -2,7 +2,66 @@
 
 @{
     ViewData["Title"] = "Details";
-    
+    string address = string.Empty;
+    string baddress = string.Empty;
+    int currentAgeinYrs = 0;
+    int currentBAgeinYrs = 0;
+    bool policyExist = true;
+    bool customerExist = Model.ClaimsInvestigation.CustomerDetail != null;
+    bool beneficiaryExist = Model.Location != null;
+    string customerProgressbarMessage = "add customer";
+    string beneficiaryProgressbarMessage = "beneficiary";
+    if (Model.ClaimsInvestigation != null && Model.ClaimsInvestigation.CustomerDetail != null)
+    {
+        address = @Model.ClaimsInvestigation?.CustomerDetail.Addressline + " " + @Model.ClaimsInvestigation?.CustomerDetail.District.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.State.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.Country.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.PinCode.Code;
+        baddress = @Model.Location != null ? @Model.Location?.Addressline + " " +
+        @Model.Location?.District?.Name + " " + @Model.Location?.State?.Name + " " +
+        @Model.Location?.Country?.Name + " " + @Model.Location?.PinCode?.Code : string.Empty;
+        if (Model.ClaimsInvestigation?.CustomerDetail.CustomerDateOfBirth != null)
+        {
+            var age = DateTime.Now.Subtract(Model.ClaimsInvestigation.CustomerDetail.CustomerDateOfBirth).TotalDays;
+            currentAgeinYrs = (int)age / 365;
+        }
+        if (Model.Location?.BeneficiaryDateOfBirth != null)
+        {
+            var age = DateTime.Now.Subtract(Model.Location.BeneficiaryDateOfBirth).TotalDays;
+            currentBAgeinYrs = (int)age / 365;
+        }
+    }
+    if (Model.ClaimsInvestigation.CustomerDetail != null)
+    {
+        customerExist = true;
+        customerProgressbarMessage = "customer";
+    }
+    if (Model.Location?.BeneficiaryDetailId > 0)
+    {
+        beneficiaryExist = true;
+        beneficiaryProgressbarMessage = "edit beneficiary";
+    }
+    string customerProgressColor = "steps2";
+    string customerLineColor = "line";
+    if (Model.ClaimsInvestigation.PolicyDetail != null)
+    {
+        customerLineColor = "line0";
+    }
+    if (@customerExist)
+    {
+        customerProgressColor = "steps";
+        customerLineColor = "line1";
+    }
+    string benficiaryProgressColor = "steps3";
+    string beneficiaryLineColor = "line";
+
+    if (@customerExist)
+    {
+        benficiaryProgressColor = "steps2";
+        beneficiaryLineColor = "line0";
+    }
+    if (@customerExist && @beneficiaryExist)
+    {
+        benficiaryProgressColor = "steps";
+        beneficiaryLineColor = "line1";
+    }
 }
 
 <section class="content">
@@ -18,21 +77,64 @@
                             <button class="btn btn-warning btn-xs"><i class="far fa-file-powerpoint"></i>  Edit Policy</button>
 
                         </li>
-                        <li>
-                            <i class='far fa-hand-point-right'></i>
-                            <button class="btn btn-warning btn-xs"><i class="fa fa-user-plus"></i>  Edit Customer</button>
-                        </li>
-                        <li>
-                            <i class='far fa-hand-point-right'></i>
-                            <button class="btn btn-warning btn-xs"><i class="fas fa-user-tie"></i> Edit Beneficiary</button>
-                        </li>
-                        <li>
-                            <i class='far fa-thumbs-up'></i>
+                        @if (customerExist)
+                        {
+                            <li>
+                                <i class='far fa-hand-point-right'></i>
+                                <button class="btn btn-warning btn-xs"><i class="fa fa-user-plus"></i>  Edit Customer</button>
+                            </li>
+                        }
+                        else
+                        {
+                            <li>
+                                <i class='far fa-hand-point-right'></i>
+                                <a class="btn btn-success btn-xs"><i class="fa fa-user-plus"></i> Add Customer</a>
 
-                            <button class="btn btn-warning btn-xs">
-                                <span class="badge badge-warning"> <i class="fas fa-random"></i></span><b> Assign </b> <i class="small-suffix"> auto</i>
-                            </button>
-                        </li>
+                            </li>
+                        }
+
+                        @if (!customerExist && !beneficiaryExist)
+                        {
+                            <li>
+                                <i class='far fa-hand-point-right'></i>
+                                <a style="pointer-events:none;color:grey;" class="btn btn-outline-secondary btn-xs"><i class="fas fa-user-tie"></i> Beneficiary</a>
+                            </li>
+                        }
+                        else if (customerExist && !beneficiaryExist)
+                        {
+                            <li>
+                                <i class='far fa-hand-point-right'></i>
+                                <a class="btn btn-success btn-xs"><i class="fas fa-user-tie"></i> Add Beneficiary</a>
+                            </li>
+                        }
+                        else if (customerExist && beneficiaryExist)
+                        {
+                            <li>
+                                <i class='far fa-hand-point-right'></i>
+                                <button class="btn btn-warning btn-xs"><i class="fas fa-user-tie"></i> Edit Beneficiary</button>
+                            </li>
+                        }
+
+                        @if (!customerExist || !beneficiaryExist)
+                        {
+                            <li>
+                                <i class='far fa-thumbs-up'></i>
+
+                                <button class="btn btn-warning  btn-xs disabled">
+                                    <span class="badge badge-warning"> <i class="fas fa-random"></i></span><b> Assign(auto)</b>
+                                </button>
+                            </li>
+                        }
+                        else
+                        {
+                            <li>
+                                <i class='far fa-thumbs-up'></i>
+
+                                <button class="btn btn-warning  btn-xs">
+                                    <span class="badge badge-warning"> <i class="fas fa-random"></i></span><b>Assign(auto)</b>
+                                </button>
+                            </li>
+                        }
                     </span>
                 </span>
 
@@ -42,66 +144,7 @@
             <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
         </div>
         @{
-            string address = string.Empty;
-            string baddress = string.Empty;
-            int currentAgeinYrs = 0;
-            int currentBAgeinYrs = 0;
-            bool policyExist = true;
-            bool customerExist = Model.ClaimsInvestigation.CustomerDetail != null;
-            bool beneficiaryExist = Model.Location != null;
-            string customerProgressbarMessage = "add customer";
-            string beneficiaryProgressbarMessage = "beneficiary";
-            if (Model.ClaimsInvestigation != null && Model.ClaimsInvestigation.CustomerDetail != null)
-            {
-                address = @Model.ClaimsInvestigation?.CustomerDetail.Addressline + " " + @Model.ClaimsInvestigation?.CustomerDetail.District.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.State.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.Country.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.PinCode.Code;
-                baddress = @Model.Location != null ? @Model.Location?.Addressline + " " +
-                @Model.Location?.District?.Name + " " + @Model.Location?.State?.Name + " " +
-                @Model.Location?.Country?.Name + " " + @Model.Location?.PinCode?.Code : string.Empty;
-                if (Model.ClaimsInvestigation?.CustomerDetail.CustomerDateOfBirth != null)
-                {
-                    var age = DateTime.Now.Subtract(Model.ClaimsInvestigation.CustomerDetail.CustomerDateOfBirth).TotalDays;
-                    currentAgeinYrs = (int)age / 365;
-                }
-                if (Model.Location?.BeneficiaryDateOfBirth != null)
-                {
-                    var age = DateTime.Now.Subtract(Model.Location.BeneficiaryDateOfBirth).TotalDays;
-                    currentBAgeinYrs = (int)age / 365;
-                }
-            }
-            if (Model.ClaimsInvestigation.CustomerDetail != null)
-            {
-                customerExist = true;
-                customerProgressbarMessage = "customer";
-            }
-            if (Model.Location?.BeneficiaryDetailId > 0)
-            {
-                beneficiaryExist = true;
-                beneficiaryProgressbarMessage = "edit beneficiary";
-            }
-            string customerProgressColor = "steps2";
-            string customerLineColor = "line";
-            if (Model.ClaimsInvestigation.PolicyDetail != null)
-            {
-                customerLineColor = "line0";
-            }
-            if (@customerExist)
-            {
-                customerProgressColor = "steps";
-                customerLineColor = "line1";
-            }
-            string benficiaryProgressColor = "steps3";
-            string beneficiaryLineColor = "line";
-
-            if (@customerExist)
-            {
-                benficiaryProgressColor = "steps2";
-                beneficiaryLineColor = "line0";
-            }
-            if (@customerExist && @beneficiaryExist)
-            {
-                benficiaryProgressColor = "steps";
-                beneficiaryLineColor = "line1";
-            }
+            
             <input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail?.CustomerDetailId" />
             <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
             <input type="hidden" id="beneficiaryId" value="@Model.Location?.BeneficiaryDetailId" />
@@ -252,27 +295,46 @@
                     <div class="row">
 
                         <div class="col-md-12">
-                            <div class="d-flex justify-content-center align-items-center">
-                                <span class="detail-wizard"> Complete details <i class="fas fa-hand-point-up"></i> to <b> Assign </b> <i class="far fa-hand-point-down"></i></span>
-                            </div>
-                            <div>
 
-                                <a id="back" asp-action="Draft" class="btn btn-outline-secondary"><span class="badge badge-light"> <i class="fas fa-arrow-left"></i> </span> Back </a>
+                            @if (!customerExist || !beneficiaryExist)
+                            {
+                                <div class="d-flex justify-content-center align-items-center">
+                                    <span class="detail-wizard"> Complete details <i class="fas fa-hand-point-up"></i> to <b> Assign </b> <i class="far fa-hand-point-down"></i></span>
+                                </div>
+                                <div>
 
-                                @if (customerExist && beneficiaryExist && !Model.Assigned && Model.AutoAllocation)
-                                {
-
-                                    <button type="submit" id="assign-list" class="btn btn-warning">
-                                        <span class="badge badge-warning"> <i class="fas fa-random"></i></span>Assign<span class="badge badge-warning">auto</span>
-                                    </button>
-                                }
-                                else
-                                {
+                                    <a id="back" asp-action="Draft" class="btn btn-outline-secondary"><span class="badge badge-light"> <i class="fas fa-arrow-left"></i> </span> Back </a>
                                     <button disabled class="btn btn-warning disabled">
                                         <span class="badge badge-warning"> <i class="fas fa-random"></i></span><b> Assign </b> <i class="small-suffix"> auto</i>
                                     </button>
-                                }
-                            </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="d-flex justify-content-center align-items-center">
+                                    <span class="detail-wizard-complete"> Detail completed <i class="far fa-thumbs-up"></i>.   <b> Assign </b> <i class="far fa-hand-point-down"></i>  now or later </span>
+                                </div>
+
+                                <div>
+
+                                    <a id="back" asp-action="Draft" class="btn btn-outline-secondary"><span class="badge badge-light"> <i class="fas fa-arrow-left"></i> </span> Back </a>
+
+                                    @if (customerExist && beneficiaryExist && !Model.Assigned && Model.AutoAllocation)
+                                    {
+
+                                        <button type="submit" id="assign-list" class="btn btn-warning">
+                                            <span class="badge badge-warning"> <i class="fas fa-random"></i></span><b> Assign </b><span class="badge badge-warning">auto</span>
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <button disabled class="btn btn-warning disabled">
+                                            <span class="badge badge-warning"> <i class="fas fa-random"></i></span><b> Assign </b> <i class="small-suffix"> auto</i>
+                                        </button>
+                                    }
+                                </div>
+                            }
+                            
                         </div>
                     </div>
                 </div>

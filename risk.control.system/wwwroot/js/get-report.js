@@ -11,9 +11,16 @@ $(document).ready(function () {
         currentImage = currentImageElement.src;
     }
 
-    var enquiryinput = document.getElementById('enquiryinput');
-    if (enquiryinput) {
-        enquiryinput.focus();
+    var descriptioninput = document.getElementById('description');
+    if (descriptioninput) {
+        descriptioninput.value = "Please provide brief information about the person previous claim. Attached document shall be duly completed and sent in the reply."
+        descriptioninput.focus();
+    }
+
+    var answerinput = document.getElementById('answer');
+    if (answerinput) {
+        answerinput.value = "The person detailed information is that there is no previous claim. Attached  is the duly completed and signed document."
+        answerinput.focus();
     }
     $("#document").on('change', function () {
         var MaxSizeInBytes = 2097152;
@@ -76,8 +83,8 @@ $(document).ready(function () {
         } else {
             $.alert(
                 {
-                    title: "FILE UPLOAD TYPE !!",
-                    content: "Pls select only image with extension jpg, png,gif ! ",
+                    title: "Upload Error !!",
+                    content: "Pls select only image with extension jpg, png",
                     icon: 'fas fa-exclamation-triangle',
 
                     type: 'red',
