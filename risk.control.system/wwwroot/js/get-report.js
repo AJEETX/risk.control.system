@@ -1,4 +1,5 @@
 $(document).ready(function () {
+  
     let askConfirmation = false;
     let approve= false;
     let review = false;
@@ -10,6 +11,10 @@ $(document).ready(function () {
         currentImage = currentImageElement.src;
     }
 
+    var enquiryinput = document.getElementById('enquiryinput');
+    if (enquiryinput) {
+        enquiryinput.focus();
+    }
     $("#document").on('change', function () {
         var MaxSizeInBytes = 2097152;
         //Get count of selected files
