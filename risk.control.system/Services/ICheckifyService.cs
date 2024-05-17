@@ -105,33 +105,12 @@ namespace risk.control.system.Services
                         {
                             var face2Verify = Convert.FromBase64String(data.LocationImage);
 
-                            //using MemoryStream stream = new MemoryStream(image);
-                            //string path = Path.Combine(webHostEnvironment.WebRootPath, "verify");
-                            //if (!Directory.Exists(path))
-                            //{
-                            //    Directory.CreateDirectory(path);
-                            //}
-                            //var filePath = Path.Combine(webHostEnvironment.WebRootPath, "verify", $"face{DateTime.Now.ToString("dd-MMM-yyyy-HH-mm-ss")}.jpg");
-                            //CompressImage.CompressimageWindows(stream, filePath);
-
-                            //claimCase.ClaimReport.DigitalIdReport.DigitalIdImagePath = filePath;
-
-                            //var savedImage = await File.ReadAllBytesAsync(filePath);
-
-                            //var savedImage = ImageCompression.ConverterSkia(image);
-
-                            //var saveImageBase64String = Convert.ToBase64String(savedImage);
-
                             claim.AgencyReport.DigitalIdReport.DigitalIdImageLongLatTime = DateTime.Now;
-
-                            //var base64Image = Convert.ToBase64String(registeredImage);
 
                             try
                             {
 
                                 var matched = await CompareFaces.Do(registeredImage, face2Verify);
-
-                                //var faceImageDetail = await httpClientService.GetFaceMatch(new MatchImage { Source = base64Image, Dest = saveImageBase64String }, company.ApiBaseUrl);
 
                                 if (matched)
                                 {
@@ -206,11 +185,12 @@ namespace risk.control.system.Services
                     var address = rootObject.display_name;
 
                     claim.AgencyReport.DigitalIdReport.DigitalIdImageLocationAddress = string.IsNullOrWhiteSpace(rootObject.display_name) ? "12 Heathcote Drive Forest Hill VIC 3131" : address;
-                    claim.AgencyReport.DigitalIdReport.Updated = DateTime.Now;
-                    claim.AgencyReport.DigitalIdReport.UpdatedBy = claim.AgencyReport.AgentEmail;
+ 
                 }
+                claim.AgencyReport.DigitalIdReport.Updated = DateTime.Now;
+                claim.AgencyReport.DigitalIdReport.UpdatedBy = claim.AgencyReport.AgentEmail;
 
-                _context.ClaimsInvestigation.Update(claim);
+                var updateClaim = _context.ClaimsInvestigation.Update(claim);
 
                 var rows = await _context.SaveChangesAsync();
 
@@ -219,9 +199,9 @@ namespace risk.control.system.Services
                 var noDataimage = await File.ReadAllBytesAsync(noDataImagefilePath);
                 return new AppiCheckifyResponse
                 {
-                    BeneficiaryId = claim.BeneficiaryDetail.BeneficiaryDetailId,
-                    LocationImage = claim.AgencyReport?.DigitalIdReport?.DigitalIdImage != null ?
-                    Convert.ToBase64String(ImageCompression.ConverterSkia(claim.AgencyReport?.DigitalIdReport?.DigitalIdImage)) :
+                    BeneficiaryId = updateClaim.Entity.BeneficiaryDetail.BeneficiaryDetailId,
+                    LocationImage = updateClaim.Entity.AgencyReport?.DigitalIdReport?.DigitalIdImage != null ?
+                    Convert.ToBase64String(claim.AgencyReport?.DigitalIdReport?.DigitalIdImage) :
                     Convert.ToBase64String(noDataimage),
                     LocationLongLat = claim.AgencyReport.DigitalIdReport?.DigitalIdImageLongLat,
                     LocationTime = claim.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime,
@@ -336,9 +316,10 @@ namespace risk.control.system.Services
                         {
                             var image = Convert.FromBase64String(maskedImage.MaskedImage);
 
-                            claim.AgencyReport.DocumentIdReport.DocumentIdImage = image;
+                            claim.AgencyReport.DocumentIdReport.DocumentIdImage = CompressImage.ProcessCompress(image);
 
                             claim.AgencyReport.DocumentIdReport.DocumentIdImageLongLatTime = DateTime.Now;
+                            claim.AgencyReport.DocumentIdReport.DocumentIdImageData = "no data: ";
                         }
                     }
                     //=================END GOOGLE VISION  API =========================
@@ -347,7 +328,7 @@ namespace risk.control.system.Services
                     {
                         var image = Convert.FromBase64String(data.OcrImage);
 
-                        claim.AgencyReport.DocumentIdReport.DocumentIdImage = ImageCompression.ConverterSkia(image);
+                        claim.AgencyReport.DocumentIdReport.DocumentIdImage = CompressImage.ProcessCompress(image);
                         claim.AgencyReport.DocumentIdReport.DocumentIdImageValid = false;
                         claim.AgencyReport.DocumentIdReport.DocumentIdImageLongLatTime = DateTime.Now;
                         claim.AgencyReport.DocumentIdReport.DocumentIdImageData = "no data: ";
