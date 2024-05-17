@@ -1296,3 +1296,8 @@ a#back-button {
 .far.fa-hand-point-right, .far.fa-thumbs-up, .far.fa-thumbs-down, .fa.fa-hand-peace-o {
     font-size: 1.1rem;
 }
+.breadcrumb-item + .breadcrumb-item::before {
+    font-family: "Font Awesome 5 Free";
+    content: "\f105";
+    font-weight: 900;
+}

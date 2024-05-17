@@ -78,7 +78,11 @@ namespace risk.control.system.Services
                                 .Include(c => c.AgencyReport)
                                 .ThenInclude(c => c.DocumentIdReport)
                                 .FirstOrDefault(c => c.ClaimsInvestigationId == data.ClaimId);
-
+                
+                if(claim.AgencyReport == null)
+                {
+                    claim.AgencyReport = new AgencyReport();
+                }
                 claim.AgencyReport.AgentEmail = data.Email;
 
                 var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claim.PolicyDetail.ClientCompanyId);
@@ -226,7 +230,10 @@ namespace risk.control.system.Services
                 .Include(c => c.AgencyReport)
                 .ThenInclude(c => c.DocumentIdReport)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == data.ClaimId);
-
+                if (claim.AgencyReport == null)
+                {
+                    claim.AgencyReport = new AgencyReport();
+                }
                 claim.AgencyReport.AgentEmail = data.Email;
 
                 var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claim.PolicyDetail.ClientCompanyId);
