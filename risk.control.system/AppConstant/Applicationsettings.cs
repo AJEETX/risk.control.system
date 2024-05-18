@@ -102,7 +102,7 @@
         public const string MANAGE_VENDOR_PROFILE = "Manage Agency Profile";
         public const string SELECT_VERIFICATION_LOCATION_TO_ALLOCATE_TO_VENDOR = "Allocate to Agency";
         public const string SELECT_CASE_TO_ALLOCATE_TO_VENDOR = "ALLOCATE";
-        public const string SELECT_CASE_INVESTIGATE = "INVESTIGATE";
+        public const string SELECT_CASE_INVESTIGATE = "Investigate";
         public const string SELECT_CASE_REPORT = "Verify report";
         public const string SUBMIT_CASE_INVESTIGATE = "Submit";
         public const string SUBMIT_CASE_TO_COMPANY = "Submit to company";

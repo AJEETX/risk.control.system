@@ -390,6 +390,76 @@ namespace risk.control.system.Controllers
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
+
+        [HttpPost]
+        [RequestSizeLimit(2_000_000)] // Checking for 2 MB
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
+        public async Task<IActionResult> CreatePolicyReAssignerAuto(ClaimsInvestigation claimsInvestigation)
+        {
+            try
+            {
+                if (claimsInvestigation == null)
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var userEmail = HttpContext.User.Identity.Name;
+                if (string.IsNullOrWhiteSpace(userEmail))
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+
+                var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+                if (companyUser == null)
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                claimsInvestigation.PolicyDetail.ClientCompanyId = companyUser?.ClientCompanyId;
+
+                IFormFile documentFile = null;
+                IFormFile profileFile = null;
+                var files = Request.Form?.Files;
+
+                if (files != null && files.Count > 0)
+                {
+                    var file = files.FirstOrDefault(f => f.FileName == claimsInvestigation.PolicyDetail?.Document?.FileName && f.Name == claimsInvestigation.PolicyDetail?.Document?.Name);
+                    if (file != null && file.Length > 2000000)
+                    {
+                        notifyService.Warning("Uploaded File size morer than 2MB !!! ");
+                        return RedirectToAction(nameof(InsurancePolicyController.CreatePolicy), "InsurancePolicy", new { claimsInvestigation = claimsInvestigation });
+                    }
+                    if (file != null)
+                    {
+                        documentFile = file;
+                    }
+                    file = files.FirstOrDefault(f => f.FileName == claimsInvestigation.CustomerDetail?.ProfileImage?.FileName && f.Name == claimsInvestigation.CustomerDetail?.ProfileImage?.Name);
+                    if (file != null)
+                    {
+                        profileFile = file;
+                    }
+                }
+                claimsInvestigation.ORIGIN = ORIGIN.MANUAL;
+                var claim = await claimsInvestigationService.CreatePolicy(userEmail, claimsInvestigation, documentFile, profileFile);
+                if (claim == null)
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                notifyService.Custom($"Policy #{claim.PolicyDetail.ContractNumber} created successfully", 3, "green", "far fa-file-powerpoint");
+
+                return RedirectToAction(nameof(ClaimsInvestigationController.Details), "ClaimsInvestigation", new { id = claim.ClaimsInvestigationId });
+
+            }
+            catch (Exception)
+            {
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+        }
+
         [HttpPost]
         [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
@@ -823,13 +893,18 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                await claimsInvestigationService.WithdrawCaseByCompany(userEmail, model, claimId);
+                var isAutoAllocationOn = await claimsInvestigationService.WithdrawCaseByCompany(userEmail, model, claimId);
 
                 await mailboxService.NotifyClaimWithdrawlToCompany(userEmail, claimId);
-
                 notifyService.Custom($"Claim #{policyNumber}  withdrawn successfully", 3, "green", "far fa-file-powerpoint");
-
-                return RedirectToAction(nameof(ClaimsInvestigationController.Active), "ClaimsInvestigation");
+                if (!isAutoAllocationOn)
+                {
+                    return RedirectToAction(nameof(ClaimsInvestigationController.Assigner), "ClaimsInvestigation");
+                }
+                else
+                {
+                    return RedirectToAction(nameof(ClaimsInvestigationController.ReAssignerAuto), "ClaimsInvestigation");
+                }
             }
             catch (Exception)
             {

@@ -4,7 +4,7 @@
         if (askConfirmation) {
             e.preventDefault();
             $.confirm({
-                title: "Confirm ALLOCATE",
+                title: "Confirm Allocate",
                 content: "Are you sure to allocate?",
     
                 icon: 'fas fa-external-link-alt',
@@ -12,7 +12,7 @@
                 closeIcon: true,
                 buttons: {
                     confirm: {
-                        text: "ALLOCATE",
+                        text: "Allocate",
                         btnClass: 'btn-danger',
                         action: function () {
                             askConfirmation = false;
@@ -24,7 +24,7 @@
                                 $(".submit-progress").removeClass("hidden");
                             }, 1);
                             $('#allocate-case').attr('disabled', 'disabled');
-                            $('#allocate-case').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> ALLOCATE");
+                            $('#allocate-case').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Allocate");
 
                             $('#radioButtons').submit();
                             var nodes = document.getElementById("article").getElementsByTagName('*');

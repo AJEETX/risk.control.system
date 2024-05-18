@@ -55,7 +55,9 @@
                     @Url.MakeActiveClass("InsurancePolicy","Delete") @Url.MakeActiveClass("Beneficiary","Details")
                 @Url.MakeActiveClass("InsurancePolicy","EditPolicy") @Url.MakeActiveClass("InsuranceClaims","Index")
                 @Url.MakeActiveClass("CustomerInsurancePolicy","CreateCustomer") @Url.MakeActiveClass("CustomerInsurancePolicy","EditCustomer")
-                        @Url.MakeActiveClass("Beneficiary","Create") 
+                            @Url.MakeActiveClass("InsuranceClaims","IndexReAssignerAuto")
+                                    @Url.MakeActiveClass("InsurancePolicy","CreatePolicyReAssignerAuto")
+                            @Url.MakeActiveClass("Beneficiary","Create")
                                                  @Url.MakeActiveClass("ClaimsInvestigation", "VendorDetailAuto")
 
                                 @Url.MakeActiveClass("ClaimsInvestigation","Edit")
@@ -89,11 +91,12 @@
         <li class="nav-item">
             <a is-active-page asp-controller="ClaimsInvestigation" asp-action="ReAssigner" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","ReAssigner")
                     @Url.MakeActiveClass("InsurancePolicy","CreatePolicy") @Url.MakeActiveClass("ClaimsInvestigation","Details")
-                @Url.MakeActiveClass("InsurancePolicy","Delete") @Url.MakeActiveClass("Beneficiary","Details")
-            @Url.MakeActiveClass("InsurancePolicy","EditPolicy") @Url.MakeActiveClass("InsuranceClaims","Index")
+                @Url.MakeActiveClass("InsurancePolicy","DeleteReAssigner") @Url.MakeActiveClass("Beneficiary","Details")
+            @Url.MakeActiveClass("InsurancePolicy","EditPolicy") 
+            @Url.MakeActiveClass("InsuranceClaims","Index")
             @Url.MakeActiveClass("CustomerInsurancePolicy","CreateCustomer") @Url.MakeActiveClass("CustomerInsurancePolicy","EditCustomer")
                     @Url.MakeActiveClass("Beneficiary","Create") @Url.MakeActiveClass("Beneficiary","Edit")
-            @Url.MakeActiveClass("ClaimsInvestigation","ReAssignEmpanelledVendors")">
+                @Url.MakeActiveClass("ClaimsInvestigation","ReAssign2EmpanelledVendors")">
                 <i class="fas fa-external-link-alt nav-icon"></i>
                 <p>
                     <span class="badge badge-danger">REASSIGN</span>

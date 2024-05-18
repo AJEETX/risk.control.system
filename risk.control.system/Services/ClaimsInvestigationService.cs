@@ -40,7 +40,7 @@ namespace risk.control.system.Services
         Task WithdrawCase(string userEmail, ClaimTransactionModel model, string claimId);
 
         Task<List<string>> ProcessAutoAllocation(List<string> claims, ClientCompany company, string userEmail);
-        Task WithdrawCaseByCompany(string userEmail, ClaimTransactionModel model, string claimId);
+        Task<bool> WithdrawCaseByCompany(string userEmail, ClaimTransactionModel model, string claimId);
 
         Task<ClaimsInvestigation> SubmitQueryToAgency(string userEmail, string claimId, EnquiryRequest request, IFormFile messageDocument);
         Task<ClaimsInvestigation> SubmitQueryReplyToCompany(string userEmail, string claimId, EnquiryRequest request, IFormFile messageDocument, List<string> flexRadioDefault);
@@ -503,7 +503,7 @@ namespace risk.control.system.Services
             }
         }
 
-        public async Task WithdrawCaseByCompany(string userEmail, ClaimTransactionModel model, string claimId)
+        public async Task<bool> WithdrawCaseByCompany(string userEmail, ClaimTransactionModel model, string claimId)
         {
             var currentUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == userEmail);
             var claimsInvestigation = _context.ClaimsInvestigation
@@ -563,14 +563,14 @@ namespace risk.control.system.Services
             _context.ClaimsInvestigation.Update(claimsInvestigation);
             try
             {
-                _context.SaveChanges();
-
+                var rows = _context.SaveChanges();
             }
             catch (Exception ex)
             {
 
                 throw;
             }
+            return company.AutoAllocation;
         }
         public async Task WithdrawCase(string userEmail, ClaimTransactionModel model, string claimId)
         {

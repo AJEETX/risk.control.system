@@ -118,6 +118,50 @@ namespace risk.control.system.Controllers
             }
         }
 
+        [Breadcrumb(title: " Add Policy", FromAction = "IndexReAssignerAuto", FromController = typeof(InsuranceClaimsController))]
+        public IActionResult CreatePolicyReAssignerAuto()
+        {
+            try
+            {
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (string.IsNullOrWhiteSpace(currentUserEmail))
+                {
+                    notifyService.Error("Not Found!!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var (model, trial) = claimPolicyService.AddClaimPolicy(currentUserEmail);
+
+                if (model == null)
+                {
+                    notifyService.Error("OOPS!!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                model.ORIGIN = ORIGIN.MANUAL;
+                ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name");
+                ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType.Where(i =>
+                i.LineOfBusinessId == model.PolicyDetail.LineOfBusinessId).OrderBy(s => s.Code), "InvestigationServiceTypeId", "Name");
+                ViewData["BeneficiaryRelationId"] = new SelectList(_context.BeneficiaryRelation.OrderBy(s => s.Code), "BeneficiaryRelationId", "Name");
+                ViewData["CaseEnablerId"] = new SelectList(_context.CaseEnabler.OrderBy(s => s.Code), "CaseEnablerId", "Name");
+                ViewData["CostCentreId"] = new SelectList(_context.CostCentre.OrderBy(s => s.Code), "CostCentreId", "Name");
+                ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
+                ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name");
+                return false ?
+                    View(new ClaimsInvestigation
+                    {
+                        PolicyDetail = new PolicyDetail
+                        {
+                            LineOfBusinessId = model.PolicyDetail.LineOfBusinessId
+                        }
+                    }) :
+                    View(model);
+            }
+            catch (Exception)
+            {
+                notifyService.Error("OOPS!!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+        }
+
         [Breadcrumb(title: " Add Policy", FromAction = "IndexManual", FromController = typeof(InsuranceClaimsController))]
         public IActionResult CreatePolicyManual()
         {
@@ -326,6 +370,41 @@ namespace risk.control.system.Controllers
             
         }
 
+        [Breadcrumb(title: " Delete", FromAction = "ReAssigner", FromController = typeof(ClaimsInvestigationController))]
+        public async Task<IActionResult> DeleteReAssigner(string id)
+        {
+            try
+            {
+                if (id == null || string.IsNullOrWhiteSpace(id))
+                {
+                    notifyService.Error("Not Found!!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (currentUserEmail == null)
+                {
+                    notifyService.Error("Not Found!!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var model = await investigationReportService.GetClaimDetails(currentUserEmail, id);
+
+                if (model == null)
+                {
+                    notifyService.Error("Not Found!!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+
+                return View(model);
+            }
+            catch (Exception)
+            {
+                notifyService.Error("OOPS!!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+
+        }
+
+
         [Breadcrumb(title: " Delete", FromAction = "Draft", FromController = typeof(ClaimsInvestigationController))]
         public async Task<IActionResult> DeleteAuto(string id)
         {
@@ -473,7 +552,7 @@ namespace risk.control.system.Controllers
             }
 
         }
-        // POST: ClaimsInvestigation/Delete/5
+
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(ClaimTransactionModel model)
@@ -504,7 +583,46 @@ namespace risk.control.system.Controllers
                 _context.ClaimsInvestigation.Update(claimsInvestigation);
                 await _context.SaveChangesAsync();
                 notifyService.Custom("Claim deleted", 3, "red", "far fa-file-powerpoint");
-                return RedirectToAction(nameof(ClaimsInvestigationController.Draft), "ClaimsInvestigation");
+                return RedirectToAction(nameof(ClaimsInvestigationController.ReAssignerAuto), "ClaimsInvestigation");
+            }
+            catch (Exception)
+            {
+                notifyService.Error("OOPS!!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+        }
+
+        [HttpPost, ActionName("DeleteConfirmedReAssigner")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmedReAssigner(ClaimTransactionModel model)
+        {
+            try
+            {
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (currentUserEmail == null)
+                {
+                    notifyService.Error("Not Found!!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                if (model is null)
+                {
+                    notifyService.Error("Not Found!!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var claimsInvestigation = await _context.ClaimsInvestigation.FindAsync(model.ClaimsInvestigation.ClaimsInvestigationId);
+                if (claimsInvestigation == null)
+                {
+                    notifyService.Error("Not Found!!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+
+                claimsInvestigation.Updated = DateTime.Now;
+                claimsInvestigation.UpdatedBy = currentUserEmail;
+                claimsInvestigation.Deleted = true;
+                _context.ClaimsInvestigation.Update(claimsInvestigation);
+                await _context.SaveChangesAsync();
+                notifyService.Custom("Claim deleted", 3, "red", "far fa-file-powerpoint");
+                return RedirectToAction(nameof(ClaimsInvestigationController.ReAssigner), "ClaimsInvestigation");
             }
             catch (Exception)
             {

@@ -91,10 +91,10 @@ namespace risk.control.system.Controllers
                 ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", claimsInvestigation.PolicyDetail.LineOfBusinessId);
 
 
-                var claimsPage = new MvcBreadcrumbNode("Draft", "ClaimsInvestigation", "Claims");
-                var agencyPage = new MvcBreadcrumbNode("Draft", "ClaimsInvestigation", "New & Draft") { Parent = claimsPage, };
-                var detailsPage = new MvcBreadcrumbNode("DetailsAuto", "ClaimsInvestigation", $"Details") { Parent = agencyPage, RouteValues = new { id = id } };
-                var editPage = new MvcBreadcrumbNode("CreateCustomerAuto", "CustomerInsurancePolicy", $"Add Customer") { Parent = detailsPage, RouteValues = new { id = id } };
+                var claimsPage = new MvcBreadcrumbNode("ReAssignerAuto", "ClaimsInvestigation", "Claims");
+                var agencyPage = new MvcBreadcrumbNode("ReAssignerAuto", "ClaimsInvestigation", "ReAssign") { Parent = claimsPage, };
+                var detailsPage = new MvcBreadcrumbNode("Details", "ClaimsInvestigation", $"Details") { Parent = agencyPage, RouteValues = new { id = id } };
+                var editPage = new MvcBreadcrumbNode("CreateCustomer", "CustomerInsurancePolicy", $"Add Customer") { Parent = detailsPage, RouteValues = new { id = id } };
                 ViewData["BreadcrumbNode"] = editPage;
 
 
@@ -306,10 +306,10 @@ namespace risk.control.system.Controllers
                 ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", claimsInvestigation.CustomerDetail.DistrictId);
                 ViewData["PinCodeId"] = new SelectList(pincodes, "PinCodeId", "Code", claimsInvestigation.CustomerDetail.PinCodeId);
 
-                var claimsPage = new MvcBreadcrumbNode("Draft", "ClaimsInvestigation", "Claims");
-                var agencyPage = new MvcBreadcrumbNode("Draft", "ClaimsInvestigation", "Assign(auto)") { Parent = claimsPage, };
-                var detailsPage = new MvcBreadcrumbNode("DetailsAuto", "ClaimsInvestigation", $"Details") { Parent = agencyPage, RouteValues = new { id = id } };
-                var editPage = new MvcBreadcrumbNode("EditCustomerAuto", "CustomerInsurancePolicy", $"Edit Customer") { Parent = detailsPage, RouteValues = new { id = id } };
+                var claimsPage = new MvcBreadcrumbNode("ReAssignerAuto", "ClaimsInvestigation", "Claims");
+                var agencyPage = new MvcBreadcrumbNode("ReAssignerAuto", "ClaimsInvestigation", "ReAssign") { Parent = claimsPage, };
+                var detailsPage = new MvcBreadcrumbNode("Details", "ClaimsInvestigation", $"Details") { Parent = agencyPage, RouteValues = new { id = id } };
+                var editPage = new MvcBreadcrumbNode("EditCustomer", "CustomerInsurancePolicy", $"Edit Customer") { Parent = detailsPage, RouteValues = new { id = id } };
                 ViewData["BreadcrumbNode"] = editPage;
 
                 return View(claimsInvestigation);

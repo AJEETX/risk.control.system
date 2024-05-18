@@ -6,7 +6,7 @@
             $(".submit-progress").removeClass("hidden");
         }, 1);
         $('#allocatedcase').attr('disabled', 'disabled');
-        $('#allocatedcase').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> ALLOCATE");
+        $('#allocatedcase').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Allocate");
 
         $('#radioButtons').submit();
         var nodes = document.getElementById("article").getElementsByTagName('*');
@@ -22,7 +22,7 @@
             $(".submit-progress").removeClass("hidden");
         }, 1);
         $('#investigatecase').attr('disabled', 'disabled');
-        $('#investigatecase').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> INVESTIGATE");
+        $('#investigatecase').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Investigate");
 
         $('#radioButtons').submit();
         var nodes = document.getElementById("article").getElementsByTagName('*');
