@@ -367,7 +367,7 @@ namespace risk.control.system.Services
 
             var count = applicationDbContext.Count(i => i.VendorId == vendorUser.VendorId &&
             i.UserEmailActionedTo == string.Empty &&
-            i.UserRoleActionedTo == $"{AppRoles.SUPERVISOR.GetEnumDisplayName()} ({vendorUser.Vendor.Email})" &&
+            i.UserRoleActionedTo == $"{vendorUser.Vendor.Email}" &&
             i.InvestigationCaseSubStatusId == submittedToVendorSupervisorStatus.InvestigationCaseSubStatusId);
             return count;
         }
@@ -404,7 +404,7 @@ namespace risk.control.system.Services
 
             var count = applicationDbContext.Count(i => i.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
             i.UserEmailActionedTo == string.Empty &&
-             i.UserRoleActionedTo == $"{AppRoles.ASSESSOR.GetEnumDisplayName()} ( {companyUser.ClientCompany.Email})" &&
+             i.UserRoleActionedTo == $"{companyUser.ClientCompany.Email}" &&
             i.InvestigationCaseSubStatusId == submittedToAssessorStatus.InvestigationCaseSubStatusId ||
             i.InvestigationCaseSubStatusId == replyByAgency.InvestigationCaseSubStatusId
              );
@@ -699,7 +699,7 @@ namespace risk.control.system.Services
             foreach (var claim in applicationDbContext)
             {
                 var userHasReviewClaimLogs = _context.InvestigationTransaction.Where(c => c.ClaimsInvestigationId == claim.ClaimsInvestigationId && c.IsReviewCase && 
-                c.UserRoleActionedTo == $"{AppRoles.CREATOR.GetEnumDisplayName()} ( {companyUser.ClientCompany.Email})")?.ToList();
+                c.UserRoleActionedTo == $"{companyUser.ClientCompany.Email}")?.ToList();
 
                 int? reviewLogCount = 0;
                 if(userHasReviewClaimLogs !=null && userHasReviewClaimLogs.Count >0)
@@ -810,12 +810,12 @@ namespace risk.control.system.Services
             var count = applicationDbContext.Count(a => a.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
                 (a.InvestigationCaseSubStatusId == withdrawnByAgency.InvestigationCaseSubStatusId &&
                         a.UserEmailActionedTo == string.Empty &&
-                        a.UserRoleActionedTo == $"{AppRoles.CREATOR.GetEnumDisplayName()} ({companyUser.ClientCompany.Email})")
+                        a.UserRoleActionedTo == $"{companyUser.ClientCompany.Email}")
                  ||
                  (a.InvestigationCaseSubStatusId == withdrawnByCompany.InvestigationCaseSubStatusId &&
                         a.UserEmailActionedTo == companyUser.Email &&
                         a.UserEmailActioned == companyUser.Email &&
-                        a.UserRoleActionedTo == $"{AppRoles.CREATOR.GetEnumDisplayName()} ({companyUser.ClientCompany.Email})")
+                        a.UserRoleActionedTo == $"{companyUser.ClientCompany.Email}")
                  ||
                   (a.UserEmailActioned == companyUser.Email &&
                         a.UserEmailActionedTo == companyUser.Email &&
@@ -823,7 +823,7 @@ namespace risk.control.system.Services
                         ||
                 (a.IsReviewCase && a.InvestigationCaseSubStatusId == reAssignedStatus.InvestigationCaseSubStatusId &&
                 a.UserEmailActionedTo == string.Empty &&
-                a.UserRoleActionedTo == $"{AppRoles.CREATOR.GetEnumDisplayName()} ( {companyUser.ClientCompany.Email})"));
+                a.UserRoleActionedTo == $"{companyUser.ClientCompany.Email}"));
 
             return count;
         }
@@ -846,16 +846,16 @@ namespace risk.control.system.Services
             var count = applicationDbContext.Count(a => a.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
                 (a.InvestigationCaseSubStatusId == withdrawnByAgency.InvestigationCaseSubStatusId &&
                         a.UserEmailActionedTo == string.Empty &&
-                        a.UserRoleActionedTo == $"{AppRoles.CREATOR.GetEnumDisplayName()} ({companyUser.ClientCompany.Email})")
+                        a.UserRoleActionedTo == $"{companyUser.ClientCompany.Email}")
                  ||
                  (a.InvestigationCaseSubStatusId == withdrawnByCompany.InvestigationCaseSubStatusId &&
                         a.UserEmailActionedTo == companyUser.Email &&
                         a.UserEmailActioned == companyUser.Email &&
-                        a.UserRoleActionedTo == $"{AppRoles.CREATOR.GetEnumDisplayName()} ({companyUser.ClientCompany.Email})")
+                        a.UserRoleActionedTo == $"{companyUser.ClientCompany.Email}")
                  ||
                 (a.IsReviewCase && a.InvestigationCaseSubStatusId == reAssignedStatus.InvestigationCaseSubStatusId &&
                 a.UserEmailActionedTo == string.Empty &&
-                a.UserRoleActionedTo == $"{AppRoles.CREATOR.GetEnumDisplayName()} ( {companyUser.ClientCompany.Email})"));
+                a.UserRoleActionedTo == $"{companyUser.ClientCompany.Email}"));
 
             return count;
         }

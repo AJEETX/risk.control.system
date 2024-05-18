@@ -67,7 +67,7 @@ namespace risk.control.system.Controllers.Api.Claims
             foreach (var claim in claims)
             {
                 var userHasReviewClaimLogs = _context.InvestigationTransaction.Where(c => c.ClaimsInvestigationId == claim.ClaimsInvestigationId && c.IsReviewCase &&
-                c.UserRoleActionedTo == $"{AppRoles.CREATOR.GetEnumDisplayName()} ( {companyUser.ClientCompany.Email})")?.ToList();
+                c.UserRoleActionedTo == $"{companyUser.ClientCompany.Email}")?.ToList();
 
                 int? reviewLogCount = 0;
                 if (userHasReviewClaimLogs != null && userHasReviewClaimLogs.Count > 0)

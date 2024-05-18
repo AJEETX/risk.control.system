@@ -45,7 +45,7 @@ namespace risk.control.system.Services
                     DateOfIncident = DateTime.Now.AddDays(-3),
                     InvestigationServiceTypeId = _context.InvestigationServiceType.FirstOrDefault(i=>i.LineOfBusinessId == lineOfBusinessId).InvestigationServiceTypeId,
                     Comments = "SOMETHING FISHY",
-                    SumAssuredValue = new Random().Next(100000, 9999999),
+                    SumAssuredValue = new Random().Next(10000, 99999),
                     ContractNumber = contractNumber,
                 },
                 InvestigationCaseSubStatusId = createdStatus.InvestigationCaseSubStatusId,
@@ -115,8 +115,6 @@ namespace risk.control.system.Services
                 .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == id);
 
             var location = claimsInvestigation.BeneficiaryDetail;
-            var allocatedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
             claimsInvestigation.CompanyWithdrawlComment = string.Empty;
             var model = new ClaimTransactionModel
             {

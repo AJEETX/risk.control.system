@@ -122,7 +122,7 @@ namespace risk.control.system.Controllers
             if (user.ProfileImage != null && user.ProfileImage.Length > 0)
             {
                 string newFileName = userFullEmail;
-                string fileExtension = Path.GetExtension(user.ProfileImage.FileName);
+                string fileExtension = Path.GetExtension(Path.GetFileName(user.ProfileImage.FileName));
                 newFileName += fileExtension;
                 string path = Path.Combine(webHostEnvironment.WebRootPath, "company");
                 if (!Directory.Exists(path))
@@ -243,7 +243,7 @@ namespace risk.control.system.Controllers
                     if (applicationUser?.ProfileImage != null && applicationUser.ProfileImage.Length > 0)
                     {
                         string newFileName = user.Email + Guid.NewGuid().ToString();
-                        string fileExtension = Path.GetExtension(applicationUser.ProfileImage.FileName);
+                        string fileExtension = Path.GetExtension(Path.GetFileName(applicationUser.ProfileImage.FileName));
                         newFileName += fileExtension;
                         string path = Path.Combine(webHostEnvironment.WebRootPath, "company");
                         if (!Directory.Exists(path))

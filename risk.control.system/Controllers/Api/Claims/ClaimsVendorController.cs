@@ -370,7 +370,7 @@ namespace risk.control.system.Controllers.Api.Claims
             var vendorUser = _context.VendorApplicationUser.Include(u => u.Vendor).FirstOrDefault(c => c.Email == currentUserEmail);
             var claims = applicationDbContext.Where(i => i.VendorId == vendorUser.VendorId &&
             i.UserEmailActionedTo == string.Empty &&
-            i.UserRoleActionedTo == $"{AppRoles.SUPERVISOR.GetEnumDisplayName()} ({vendorUser.Vendor.Email})" &&
+            i.UserRoleActionedTo == $"{vendorUser.Vendor.Email}" &&
             i.InvestigationCaseSubStatusId == submittedToVendorSupervisorStatus.InvestigationCaseSubStatusId);
 
             var claimsSubmitted = new List<ClaimsInvestigation>();
@@ -521,7 +521,7 @@ namespace risk.control.system.Controllers.Api.Claims
                     i.ClaimsInvestigationId == claim.ClaimsInvestigationId &&
                      i.InvestigationCaseSubStatusId == reassignedStatus.InvestigationCaseSubStatusId &&
                      i.UserEmailActionedTo == string.Empty &&
-                     i.UserRoleActionedTo == $"{AppRoles.CREATOR.GetEnumDisplayName()} ( {claim.PolicyDetail.ClientCompany.Email})");
+                     i.UserRoleActionedTo == $"{claim.PolicyDetail.ClientCompany.Email}");
 
                     if ((claim.InvestigationCaseStatus.Name == CONSTANTS.CASE_STATUS.FINISHED &&
                         claim.VendorId == agencyUser.VendorId && 
@@ -590,7 +590,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR);
 
             var userAttendedClaims = _context.InvestigationTransaction.Where(t => (t.UserEmailActioned == agentUser.Email &&
-            t.UserRoleActionedTo == $"{AppRoles.SUPERVISOR.GetEnumDisplayName()} ({agentUser.Vendor.Email})" &&
+            t.UserRoleActionedTo == $"{agentUser.Vendor.Email}" &&
                            t.InvestigationCaseSubStatusId == submittedToSupervisorStatus.InvestigationCaseSubStatusId))?.Select(c => c.ClaimsInvestigationId).Distinct();
 
             var claimsSubmitted = new List<ClaimsInvestigation>();

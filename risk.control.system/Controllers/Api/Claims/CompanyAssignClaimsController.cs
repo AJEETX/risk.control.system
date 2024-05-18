@@ -143,16 +143,16 @@ namespace risk.control.system.Controllers.Api.Claims
             applicationDbContext = applicationDbContext.Where(a => a.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
                  (a.InvestigationCaseSubStatusId == withdrawnByAgency.InvestigationCaseSubStatusId &&
                         a.UserEmailActionedTo == string.Empty &&
-                        a.UserRoleActionedTo == $"{AppRoles.CREATOR.GetEnumDisplayName()} ({companyUser.ClientCompany.Email})")
+                        a.UserRoleActionedTo == $"{companyUser.ClientCompany.Email}")
                  ||
                  (a.InvestigationCaseSubStatusId == withdrawnByCompany.InvestigationCaseSubStatusId &&
                         a.UserEmailActionedTo == companyUser.Email &&
                         a.UserEmailActioned == companyUser.Email &&
-                        a.UserRoleActionedTo == $"{AppRoles.CREATOR.GetEnumDisplayName()} ({companyUser.ClientCompany.Email})")
+                        a.UserRoleActionedTo == $"{companyUser.ClientCompany.Email}")
                  ||
                 (a.IsReviewCase && a.InvestigationCaseSubStatusId == reAssignedStatus.InvestigationCaseSubStatusId &&
                 a.UserEmailActionedTo == string.Empty &&
-                a.UserRoleActionedTo == $"{AppRoles.CREATOR.GetEnumDisplayName()} ( {companyUser.ClientCompany.Email})")
+                a.UserRoleActionedTo == $"{companyUser.ClientCompany.Email}")
                 );
 
             var claimsAssigned = new List<ClaimsInvestigation>();
@@ -237,12 +237,12 @@ namespace risk.control.system.Controllers.Api.Claims
             applicationDbContext = applicationDbContext.Where(a => a.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
                  (a.InvestigationCaseSubStatusId == withdrawnByAgency.InvestigationCaseSubStatusId &&
                         a.UserEmailActionedTo == string.Empty &&
-                        a.UserRoleActionedTo == $"{AppRoles.CREATOR.GetEnumDisplayName()} ({companyUser.ClientCompany.Email})")
+                        a.UserRoleActionedTo == $"{companyUser.ClientCompany.Email}")
                  ||
                  (a.InvestigationCaseSubStatusId == withdrawnByCompany.InvestigationCaseSubStatusId &&
                         a.UserEmailActionedTo == companyUser.Email &&
                         a.UserEmailActioned == companyUser.Email &&
-                        a.UserRoleActionedTo == $"{AppRoles.CREATOR.GetEnumDisplayName()} ({companyUser.ClientCompany.Email})")
+                        a.UserRoleActionedTo == $"{companyUser.ClientCompany.Email}")
                  ||
                  (a.UserEmailActioned == companyUser.Email &&
                         a.UserEmailActionedTo == companyUser.Email &&
@@ -250,7 +250,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         ||
                 (a.IsReviewCase && a.InvestigationCaseSubStatusId == reAssignedStatus.InvestigationCaseSubStatusId &&
                 a.UserEmailActionedTo == string.Empty &&
-                a.UserRoleActionedTo == $"{AppRoles.CREATOR.GetEnumDisplayName()} ( {companyUser.ClientCompany.Email})")
+                a.UserRoleActionedTo == $"{companyUser.ClientCompany.Email}")
                 );
 
             var claimsAssigned = new List<ClaimsInvestigation>();

@@ -167,7 +167,7 @@ namespace risk.control.system.Controllers
                 if (user.ProfileImage != null && user.ProfileImage.Length > 0)
                 {
                     string newFileName = Guid.NewGuid().ToString();
-                    string fileExtension = Path.GetExtension(user.ProfileImage.FileName);
+                    string fileExtension = Path.GetExtension(Path.GetFileName(user.ProfileImage.FileName));
                     newFileName += fileExtension;
                     string path = Path.Combine(webHostEnvironment.WebRootPath, "agency");
                     if (!Directory.Exists(path))
@@ -338,7 +338,7 @@ namespace risk.control.system.Controllers
                 if (applicationUser?.ProfileImage != null && applicationUser.ProfileImage.Length > 0)
                 {
                     string newFileName = user.Email + Guid.NewGuid().ToString();
-                    string fileExtension = Path.GetExtension(applicationUser.ProfileImage.FileName);
+                    string fileExtension = Path.GetExtension(Path.GetFileName(applicationUser.ProfileImage.FileName));
                     newFileName += fileExtension;
                     string path = Path.Combine(webHostEnvironment.WebRootPath, "agency");
                     if (!Directory.Exists(path))
@@ -583,7 +583,7 @@ namespace risk.control.system.Controllers
                 if (vendorDocument is not null)
                 {
                     string newFileName = vendor.Email + Guid.NewGuid().ToString();
-                    string fileExtension = Path.GetExtension(vendorDocument.FileName);
+                    string fileExtension = Path.GetExtension(Path.GetFileName(vendorDocument.FileName));
                     newFileName += fileExtension;
                     string path = Path.Combine(webHostEnvironment.WebRootPath, "agency");
                     if (!Directory.Exists(path))
@@ -681,7 +681,7 @@ namespace risk.control.system.Controllers
                 if (vendorDocument is not null)
                 {
                     string newFileName = Guid.NewGuid().ToString();
-                    string fileExtension = Path.GetExtension(vendorDocument.FileName);
+                    string fileExtension = Path.GetExtension(Path.GetFileName(vendorDocument.FileName));
                     newFileName += fileExtension;
                     string path = Path.Combine(webHostEnvironment.WebRootPath, "agency");
                     if (!Directory.Exists(path))

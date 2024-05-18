@@ -67,7 +67,7 @@ namespace risk.control.system.Controllers
                 if (companyDocument is not null)
                 {
                     string newFileName = clientCompany.Email;
-                    string fileExtension = Path.GetExtension(companyDocument.FileName);
+                    string fileExtension = Path.GetExtension(Path.GetFileName( companyDocument.FileName));
                     newFileName += fileExtension;
                     string path = Path.Combine(webHostEnvironment.WebRootPath, "company");
                     if (!Directory.Exists(path))
@@ -242,7 +242,7 @@ namespace risk.control.system.Controllers
                 if (companyDocument is not null)
                 {
                     string newFileName = clientCompany.Email + Guid.NewGuid().ToString();
-                    string fileExtension = Path.GetExtension(companyDocument.FileName);
+                    string fileExtension = Path.GetExtension(Path.GetFileName(companyDocument.FileName));
                     newFileName += fileExtension;
                     string path = Path.Combine(webHostEnvironment.WebRootPath, "company");
                     if (!Directory.Exists(path))

@@ -97,8 +97,14 @@ namespace risk.control.system.Services
                 client.DownloadFile(ftpPath, filePath);
                 using (var archive = ZipFile.OpenRead(filePath))
                 {
+                    var csvFileCount = archive.Entries.Count(e => Path.GetExtension(e.FullName).Equals(".csv"));
+                    var innerFile = archive.Entries.FirstOrDefault(e => Path.GetExtension(e.FullName).Equals(".csv"));
+                    if (innerFile == null || csvFileCount != 1)
+                    {
+                        return false;
+                    }
                     var processed = await ProcessFile(userEmail, archive, uploadingway);
-                    if(!processed)
+                    if (!processed)
                     {
                         return false;
                     }
@@ -138,11 +144,18 @@ namespace risk.control.system.Services
             {
                 using (var archive = new ZipArchive(stream))
                 {
-                    var processed = await ProcessFile(userEmail, archive, uploadingway);
-                    if(!processed)
+                    var csvFileCount = archive.Entries.Count(e => Path.GetExtension(e.FullName).Equals(".csv"));
+                    var innerFile = archive.Entries.FirstOrDefault(e => Path.GetExtension(e.FullName).Equals(".csv"));
+                    if(innerFile == null || csvFileCount != 1)
                     {
                         return false;
                     }
+                    var processed = await ProcessFile(userEmail, archive, uploadingway);
+                    if (!processed)
+                    {
+                        return false;
+                    }
+
                 }
             }
             await SaveUpload(postedFile, filePath, "File upload", userEmail);
@@ -248,7 +261,7 @@ namespace risk.control.system.Services
                                             UserEmailActioned = userEmail,
                                             UserEmailActionedTo = userEmail,
                                             ORIGIN = uploadMethod,
-                                            UserRoleActionedTo = $"{AppRoles.CREATOR.GetEnumDisplayName()} ({companyUser.ClientCompany.Email})"
+                                            UserRoleActionedTo = $"{companyUser.ClientCompany.Email}"
                                     };
 
                                         var servicetype = _context.InvestigationServiceType.FirstOrDefault(s => s.Code.ToLower() == (rowData[4].Trim().ToLower()));

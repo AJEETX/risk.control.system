@@ -53,7 +53,7 @@ namespace risk.control.system.Controllers.Api.Claims
             applicationDbContext = applicationDbContext.Where(i =>
             i.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
             i.UserEmailActionedTo == string.Empty &&
-             i.UserRoleActionedTo == $"{AppRoles.ASSESSOR.GetEnumDisplayName()} ( {companyUser.ClientCompany.Email})" &&
+             i.UserRoleActionedTo == $"{companyUser.ClientCompany.Email}" &&
             i.InvestigationCaseSubStatusId == submittedToAssessorStatus.InvestigationCaseSubStatusId ||
             i.InvestigationCaseSubStatusId == replyByAgency.InvestigationCaseSubStatusId 
              );
@@ -128,7 +128,7 @@ namespace risk.control.system.Controllers.Api.Claims
             applicationDbContext = applicationDbContext.Where(i => i.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
             i.InvestigationCaseSubStatusId == submittedToAssessorStatus.InvestigationCaseSubStatusId &&
             i.UserEmailActionedTo == string.Empty &&
-             i.UserRoleActionedTo == $"{AppRoles.ASSESSOR.GetEnumDisplayName()} ( {companyUser.ClientCompany.Email})");
+             i.UserRoleActionedTo == $"{companyUser.ClientCompany.Email}");
 
             var newClaimsAssigned = new List<ClaimsInvestigation>();
             var claimsAssigned = new List<ClaimsInvestigation>();

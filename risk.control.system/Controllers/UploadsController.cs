@@ -127,9 +127,11 @@ namespace risk.control.system.Controllers
                 var userEmail = HttpContext.User?.Identity?.Name;
 
                 if (string.IsNullOrWhiteSpace(userEmail) || 
-                    string.IsNullOrWhiteSpace(selectedcase) || 
+                    (digitalImage == null) || 
+                    string.IsNullOrWhiteSpace(selectedcase) ||
                     string.IsNullOrWhiteSpace(digitalIdLatitude) || 
                     string.IsNullOrWhiteSpace(Path.GetFileName(digitalImage.FileName)) ||
+                    string.IsNullOrWhiteSpace(Path.GetExtension(Path.GetFileName(digitalImage.FileName))) ||
                     string.IsNullOrWhiteSpace(Path.GetFileName(digitalImage.Name)) ||
                     string.IsNullOrWhiteSpace(digitalIdLongitude))
                 {
@@ -170,10 +172,12 @@ namespace risk.control.system.Controllers
                 var userEmail = HttpContext.User?.Identity?.Name;
 
                 if (string.IsNullOrWhiteSpace(userEmail) ||
+                    (panImage == null) || 
                     string.IsNullOrWhiteSpace(documentIdLatitude) || 
                     string.IsNullOrWhiteSpace(documentIdLongitude) ||
                     Path.GetInvalidFileNameChars() == null ||
                     string.IsNullOrWhiteSpace(Path.GetFileName(panImage.FileName)) ||
+                    string.IsNullOrWhiteSpace(Path.GetExtension(Path.GetFileName(panImage.FileName))) ||
                     string.IsNullOrWhiteSpace(Path.GetFileName(panImage.Name))
                     )
                 {
@@ -208,15 +212,22 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> FileUpload(IFormFile postedFile, string uploadtype, string uploadingway)
         {
-            if(postedFile == null || string.IsNullOrWhiteSpace(uploadtype) || 
+            object _;
+            if(!Enum.TryParse(typeof(UploadType), uploadtype,true, out _))
+            {
+                notifyService.Custom($"Upload Error. Contact Admin", 3, "red", "far fa-file-powerpoint");
+                return RedirectToAction("Draft", "ClaimsInvestigation");
+            }
+            
+            UploadType uploadType = (UploadType)Enum.Parse(typeof(UploadType), uploadtype, true);
+
+            if (postedFile == null || string.IsNullOrWhiteSpace(uploadtype) || 
                 string.IsNullOrWhiteSpace(Path.GetFileName(postedFile.FileName)) ||
-                (Path.GetInvalidFileNameChars() == null) ||
                 string.IsNullOrWhiteSpace(Path.GetExtension(Path.GetFileName(postedFile.FileName))) ||
                 Path.GetExtension(Path.GetFileName(postedFile.FileName)) !="zip"
                 )
             {
                 notifyService.Custom($"Upload Error. Contact Admin", 3, "red", "far fa-file-powerpoint");
-
                 return RedirectToAction("Draft", "ClaimsInvestigation");
             }
             var userEmail = HttpContext.User?.Identity?.Name;
@@ -230,7 +241,6 @@ namespace risk.control.system.Controllers
             {
                 if (postedFile != null && !string.IsNullOrWhiteSpace(userEmail))
                 {
-                    UploadType uploadType = (UploadType)Enum.Parse(typeof(UploadType), uploadtype, true);
 
                     if (uploadType == UploadType.FTP)
                     {
@@ -241,7 +251,7 @@ namespace risk.control.system.Controllers
                         return RedirectToAction("Draft", "ClaimsInvestigation");
                     }
 
-                    if (uploadType == UploadType.FILE && Path.GetExtension(postedFile.FileName) == ".zip")
+                    if (uploadType == UploadType.FILE && Path.GetExtension(Path.GetFileName(postedFile.FileName)) == ".zip")
                     {
                         try
                         {

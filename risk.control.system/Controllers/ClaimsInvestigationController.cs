@@ -252,6 +252,17 @@ namespace risk.control.system.Controllers
         {
             try
             {
+                if (postedFile == null || string.IsNullOrWhiteSpace(uploadtype) ||
+                string.IsNullOrWhiteSpace(Path.GetFileName(postedFile.FileName)) ||
+                string.IsNullOrWhiteSpace(Path.GetExtension(Path.GetFileName(postedFile.FileName))) ||
+                Path.GetExtension(Path.GetFileName(postedFile.FileName)) != ".zip"
+                )
+                {
+                    notifyService.Custom($"Upload Error. Contact Admin", 3, "red", "far fa-file-powerpoint");
+
+                    return RedirectToAction("Assigner", "ClaimsInvestigation");
+                }
+
                 var userEmail = HttpContext.User.Identity.Name;
                 if (string.IsNullOrWhiteSpace(userEmail))
                 {
@@ -344,6 +355,22 @@ namespace risk.control.system.Controllers
         {
             try
             {
+                object _;
+                if (!Enum.TryParse(typeof(UploadType), uploadtype, true, out _))
+                {
+                    notifyService.Custom($"Upload Error. Contact Admin", 3, "red", "far fa-file-powerpoint");
+                    return RedirectToAction("Draft", "ClaimsInvestigation");
+                }
+                if (postedFile == null || string.IsNullOrWhiteSpace(uploadtype) ||
+                string.IsNullOrWhiteSpace(Path.GetFileName(postedFile.FileName)) ||
+                string.IsNullOrWhiteSpace(Path.GetExtension(Path.GetFileName(postedFile.FileName))) ||
+                Path.GetExtension(Path.GetFileName(postedFile.FileName)) != ".zip"
+                )
+                {
+                    notifyService.Custom($"Upload Error. Contact Admin", 3, "red", "far fa-file-powerpoint");
+
+                    return RedirectToAction("Draft", "ClaimsInvestigation");
+                }
                 var userEmail = HttpContext.User.Identity.Name;
                 if (string.IsNullOrWhiteSpace(userEmail))
                 {
@@ -377,7 +404,7 @@ namespace risk.control.system.Controllers
                         }
                         else
                         {
-                            notifyService.Custom($"File Upload Error. Check limit", 3, "red", "fa fa-upload");
+                            notifyService.Custom($"File Upload Error.", 3, "red", "fa fa-upload");
                         }
 
                     }

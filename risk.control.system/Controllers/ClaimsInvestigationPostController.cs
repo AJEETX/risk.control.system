@@ -35,41 +35,19 @@ namespace risk.control.system.Controllers
         private static string NO_DATA = " NO - DATA ";
         private static Regex regex = new Regex("\\\"(.*?)\\\"");
         private readonly ApplicationDbContext _context;
-        private readonly IFtpService ftpService;
-        private readonly IHttpClientService httpClientService;
         private readonly IClaimsInvestigationService claimsInvestigationService;
         private readonly IMailboxService mailboxService;
-        private readonly UserManager<ClientCompanyApplicationUser> userManager;
-        private readonly IWebHostEnvironment webHostEnvironment;
-        private readonly RoleManager<ApplicationRole> roleManager;
         private readonly INotyfService notifyService;
-        private readonly IEmpanelledAgencyService empanelledAgencyService;
-        private readonly IClaimPolicyService claimPolicyService;
 
         public ClaimsInvestigationPostController(ApplicationDbContext context,
-            IEmpanelledAgencyService empanelledAgencyService,
-            IFtpService ftpService,
-            IHttpClientService httpClientService,
             IClaimsInvestigationService claimsInvestigationService,
             IMailboxService mailboxService,
-            UserManager<ClientCompanyApplicationUser> userManager,
-            IWebHostEnvironment webHostEnvironment,
-            RoleManager<ApplicationRole> roleManager,
-            INotyfService notifyService,
-
-            IClaimPolicyService claimPolicyService)
+            INotyfService notifyService)
         {
             _context = context;
-            this.ftpService = ftpService;
-            this.httpClientService = httpClientService;
             this.claimsInvestigationService = claimsInvestigationService;
             this.mailboxService = mailboxService;
-            this.userManager = userManager;
-            this.webHostEnvironment = webHostEnvironment;
-            this.roleManager = roleManager;
             this.notifyService = notifyService;
-            this.claimPolicyService = claimPolicyService;
-            this.empanelledAgencyService = empanelledAgencyService;
         }
 
         [ValidateAntiForgeryToken]

@@ -27,7 +27,7 @@
                         @{
                             foreach (var log in Model.Log)
                             {
-                                var movedTo = string.IsNullOrWhiteSpace(log.UserEmailActionedTo) ? "Role " + log.UserRoleActionedTo : "User " + log.UserEmailActionedTo;
+                                var movedTo = string.IsNullOrWhiteSpace(log.UserEmailActionedTo) ?  log.UserRoleActionedTo :  log.UserEmailActionedTo;
                                 <div class="time-label"><span class="bg-red">@log.Created.ToString("dd-MMM-yyyy")</span></div>
 
                                 <div>

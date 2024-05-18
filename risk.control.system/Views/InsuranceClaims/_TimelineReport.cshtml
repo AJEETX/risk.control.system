@@ -1,27 +1,35 @@
 ﻿@model ClaimTransactionModel
-<article>
-    <div class="bb-blog-inner">
+
 <div class="card card-light collapsed-card">
     <div class="card-header">
-        <h3 class="card-title">Timeline : <span class="badge badge-light"><i class="fas fa-clock"></i>  @Model.TimeTaken</span></h3>
+        <h3 class="card-title">
+            Timeline : <span class="badge badge-light"><i class="fas fa-clock"></i>  @Model.TimeTaken</span>
+            <span class="hover-text">
+                <i class="fas fa-info-circle"></i>
+                <span class="tooltip-text" id="beneficiary-information">
+
+                    <i class="fas fa-clock"></i> Time till current status
+                </span>
+            </span>
+        </h3>
         <div class="card-tools">
-            <span data-toggle="tooltip" title="@Model.TimeTaken" class="badge badge-light"><i class="fas fa-clock"></i></span>
+            <span data-toggle="tooltip" title="@Model.TimeTaken"><i class='far fa-hand-point-right'></i></span>
             <button type="button" class="btn btn-tool" data-card-widget="collapse">
                 <i class="fas fa-plus"></i>
             </button>
         </div>
     </div>
-    
+
     <div class="card-body bg-light">
         <div class="row">
             <div class="col-12 d-flex align-items-stretch flex-column">
                 <div class="bb-blog-content" itemprop="articleBody">
                     <div class="timeline">
-                                @{
-                                    foreach (var log in Model.Log)
-                                    {
-                                        var movedTo = string.IsNullOrWhiteSpace(log.UserEmailActionedTo) ? "Role " + log.UserRoleActionedTo : "User "+ log.UserEmailActionedTo;
-                                        <div class="time-label"><span class="bg-red">@log.Created.ToString("dd-MMM-yyyy")</span></div>
+                        @{
+                            foreach (var log in Model.Log)
+                            {
+                                var movedTo = string.IsNullOrWhiteSpace(log.UserEmailActionedTo) ? log.UserRoleActionedTo : log.UserEmailActionedTo;
+                                <div class="time-label"><span class="bg-red">@log.Created.ToString("dd-MMM-yyyy")</span></div>
 
                                 <div>
                                     <i class="nav-icon fas fa-envelope bg-blue"></i>
@@ -29,7 +37,7 @@
                                         <span class="time"><i class="nav-icon fas fa-clock"></i> @log.Created.ToString("hh:mm tt")</span>
                                         <h3 class="timeline-header"><a href="#">@log.UserEmailActioned</a> has actioned the case to: <span class="badge badge-success"> @log.InvestigationCaseStatus.Name : @log.InvestigationCaseSubStatus.Name.</span></h3>
                                         <div class="timeline-body">
-                                                    Case passed to <span class="badge badge-info">@movedTo</span>
+                                            Case passed to <span class="badge badge-info">@movedTo</span>
                                         </div>
 
                                     </div>
@@ -44,5 +52,3 @@
         </div>
     </div>
 </div>
-    </div> <!-- class bb-blog-inner -->
-</article>

@@ -274,6 +274,8 @@ namespace risk.control.system.Seeds
                 ExpiryDate = DateTime.Now.AddDays(5),
                 EmpanelledVendors = new List<Vendor> { checker, verify, investigate },
                 Status = CompanyStatus.ACTIVE,
+                 AutoAllocation = true,
+                 BulkUpload = true,
                 Updated = DateTime.Now,
             };
 

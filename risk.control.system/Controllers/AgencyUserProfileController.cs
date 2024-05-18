@@ -137,7 +137,7 @@ namespace risk.control.system.Controllers
                 if (applicationUser?.ProfileImage != null && applicationUser.ProfileImage.Length > 0)
                 {
                     string newFileName = applicationUser.Email + Guid.NewGuid().ToString();
-                    string fileExtension = Path.GetExtension(applicationUser.ProfileImage.FileName);
+                    string fileExtension = Path.GetExtension(Path.GetFileName( applicationUser.ProfileImage.FileName));
                     newFileName += fileExtension;
                     string path = Path.Combine(webHostEnvironment.WebRootPath, "agency");
                     if (!Directory.Exists(path))
