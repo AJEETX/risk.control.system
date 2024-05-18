@@ -159,14 +159,14 @@ namespace risk.control.system.Controllers.Api.Company
                 .FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
 
             var result =
-                company.EmpanelledVendors?.Where(v => !v.Deleted)
+                company.EmpanelledVendors?.Where(v => !v.Deleted && v.Status == VendorStatus.ACTIVE)
                 .OrderBy(u => u.Name)
                 .Select(u =>
                 new
                 {
                     Id = u.VendorId,
                     Document = string.IsNullOrWhiteSpace(u.DocumentUrl) ? Applicationsettings.NO_IMAGE : u.DocumentUrl,
-                    Domain = "<a href=''>" + u.Email + "</a>",
+                    Domain = "<a href=/Vendors/Details?id=" + u.VendorId + ">" + u.Email + "</a>",
                     Name = u.Name,
                     Code = u.Code,
                     Phone = u.PhoneNumber,
@@ -195,6 +195,7 @@ namespace risk.control.system.Controllers.Api.Company
             var availableVendors = _context.Vendor
                 .Where(v =>
                 !v.Clients.Any(c => c.ClientCompanyId == companyUser.ClientCompanyId) &&
+                v.Status == VendorStatus.ACTIVE  &&
                 (v.VendorInvestigationServiceTypes != null) && v.VendorInvestigationServiceTypes.Count > 0)
                 .Include(v => v.Country)
                 .Include(v => v.PinCode)
@@ -218,7 +219,7 @@ namespace risk.control.system.Controllers.Api.Company
                 {
                     Id = u.VendorId,
                     Document = string.IsNullOrWhiteSpace(u.DocumentUrl) ? Applicationsettings.NO_IMAGE : u.DocumentUrl,
-                    Domain = "<a href=''>" + u.Email + "</a>",
+                    Domain = "<a href=/Vendors/Details?id=" + u.VendorId + ">" + u.Email + "</a>",
                     Name = u.Name,
                     Code = u.Code,
                     Phone = u.PhoneNumber,

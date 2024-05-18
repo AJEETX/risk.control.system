@@ -153,7 +153,6 @@ namespace risk.control.system.Services
                 BulkUpload = company.BulkUpload
             };
 
-            data.SecondBlockName = "ReAssign ";
 
             if (company.AutoAllocation)
             {
@@ -161,6 +160,7 @@ namespace risk.control.system.Services
                 data.FirstBlockCount = GetCreatorAssignAuto(userEmail);
                 data.FirstBlockUrl = "/ClaimsInvestigation/Draft";
 
+            data.SecondBlockName = "Assign(manual)";
                 data.SecondBlockUrl = "/ClaimsInvestigation/ReAssignerAuto";
                 data.SecondBlockCount = GetCreatorReAssignAuto(userEmail);
             }
@@ -170,6 +170,7 @@ namespace risk.control.system.Services
                 data.FirstBlockCount = GetCreatorAssignManual(userEmail);
                 data.FirstBlockUrl = "/ClaimsInvestigation/Assigner";
 
+            data.SecondBlockName = "ReAssign ";
                 data.SecondBlockUrl = "/ClaimsInvestigation/ReAssigner";
                 data.SecondBlockCount = GetCreatorReAssign(userEmail);
 
@@ -285,14 +286,14 @@ namespace risk.control.system.Services
             var availableVendors = _context.Vendor.Include(a=>a.VendorInvestigationServiceTypes)
                            .Count(v =>
                            !v.Clients.Any(c => c.ClientCompanyId == companyUser.ClientCompanyId) &&
-                           (v.VendorInvestigationServiceTypes != null) && v.VendorInvestigationServiceTypes.Count > 0 &&  !v.Deleted);
+                           (v.VendorInvestigationServiceTypes != null) && v.VendorInvestigationServiceTypes.Count > 0 &&  !v.Deleted && v.Status == VendorStatus.ACTIVE);
             return availableVendors;
         }
         private int GetEmpanelledAgencies(string userEmail)
         {
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == userEmail);
             var empAgencies = _context.ClientCompany.Include(c=>c.EmpanelledVendors).FirstOrDefault(c=>c.ClientCompanyId == companyUser.ClientCompanyId);
-            var count = empAgencies.EmpanelledVendors.Count();
+            var count = empAgencies.EmpanelledVendors.Count(v=>v.Status == VendorStatus.ACTIVE);
             return count;
         }
         private int GetCompanyUsers(string userEmail)

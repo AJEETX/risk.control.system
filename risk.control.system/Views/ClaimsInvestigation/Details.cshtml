@@ -123,7 +123,7 @@
                                     <i class='far fa-thumbs-up'></i>
 
                                     <button class="btn btn-danger  btn-xs disabled">
-                                        <span class="badge badge-danger"> <i class="fas fa-external-link-alt"></i></span><b> ReAssign </b>
+                                        <span class="badge badge-danger"> <i class="fas fa-external-link-alt"></i></span><b> Assign </b><sub>manual</sub>
                                     </button>
                                 </li>
                             }
@@ -133,7 +133,7 @@
                                     <i class='far fa-thumbs-up'></i>
 
                                     <button class="btn btn-danger  btn-xs">
-                                        <span class="badge badge-danger"> <i class="fas fa-external-link-alt"></i></span><b> ReAssign </b>
+                                        <span class="badge badge-danger"> <i class="fas fa-external-link-alt"></i></span><b> Assign </b><sub>manual</sub>
                                     </button>
                                 </li>
                             }
@@ -294,27 +294,27 @@
                             @if (!customerExist || !beneficiaryExist)
                             {
                                 <div class="d-flex justify-content-center align-items-center">
-                                    <span class="detail-wizard"> Complete details <i class="fas fa-hand-point-up"></i>  to <b> Assign </b> <i class="far fa-hand-point-down"></i></span>
+                                    <span class="detail-wizard"> Complete details <i class="fas fa-hand-point-up"></i>  to <b> Assign </b> manual <i class="far fa-hand-point-down"></i></span>
                                 </div>
                                 <div>
                                     <a id="back" asp-action="ReAssignerAuto" class="btn btn-outline-secondary"><span class="badge badge-light"> <i class="fas fa-arrow-left"></i> </span> Back </a>
 
                                     <button disabled id="assign-list" class="btn btn-danger disabled">
-                                        <span class="badge badge-danger"> <i class="fas fa-external-link-alt"></i></span><b> ReAssign </b>
+                                        <span class="badge badge-danger"> <i class="fas fa-external-link-alt"></i></span><b> Assign </b><sub>manual</sub>
                                     </button>
                                 </div>
                             }
                             else
                             {
                                 <div class="d-flex justify-content-center align-items-center">
-                                    <span class="detail-wizard-complete"> Detail completed <i class="far fa-thumbs-up"></i>.   <b> Assign </b> <i class="far fa-hand-point-down"></i>  now or later </span>
+                                    <span class="detail-wizard-complete"> Detail completed <i class="far fa-thumbs-up"></i>.   <b> Assign </b> manual <i class="far fa-hand-point-down"></i>  now or later </span>
                                 </div>
 
                                 <div>
                                     <a id="back" asp-action="ReAssignerAuto" class="btn btn-outline-secondary"><span class="badge badge-light"> <i class="fas fa-arrow-left"></i> </span> Back </a>
 
                                     <a id="assign-manual-list" asp-action="ReAssign2EmpanelledVendors" asp-route-selectedcase="@Model.ClaimsInvestigation.ClaimsInvestigationId" class="btn btn-danger">
-                                        <span class="badge badge-danger"> <i class="fas fa-external-link-alt"></i></span>ReAssign
+                                        <span class="badge badge-danger"> <i class="fas fa-external-link-alt"></i></span><b> Assign </b><sub>manual</sub>
                                     </a>
                                 </div>
                             }

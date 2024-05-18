@@ -206,7 +206,7 @@ namespace risk.control.system.Controllers
 
         }
 
-        [Breadcrumb("ReAssign")]
+        [Breadcrumb("Assign(manual)")]
         [Authorize(Roles = CREATOR.DISPLAY_NAME)]
         public IActionResult ReAssignerAuto()
         {
@@ -1071,6 +1071,63 @@ namespace risk.control.system.Controllers
                 var detailsPage = new MvcBreadcrumbNode("EmpanelledVendors", "ClaimsInvestigation", $"Empanelled Agencies") { Parent = agencyPage, RouteValues = new { selectedcase = selectedcase } };
                 var editPage = new MvcBreadcrumbNode("VendorDetail", "ClaimsInvestigation", $"Agency Detail") { Parent = detailsPage, RouteValues = new { id = id } };
                 ViewData["BreadcrumbNode"] = editPage;
+
+
+                return View(vendor);
+            }
+            catch (Exception)
+            {
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+        }
+
+        [Authorize(Roles = COMPANY_ADMIN.DISPLAY_NAME)]
+        [Breadcrumb(title: " Details", FromAction = "Agencies",FromController = typeof(VendorsController))]
+        public async Task<IActionResult> VendorDetailInfo(long id)
+        {
+            try
+            {
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (string.IsNullOrWhiteSpace(currentUserEmail))
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                if (id == 0)
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+
+                var vendor = await _context.Vendor
+                    .Include(v => v.ratings)
+                    .Include(v => v.Country)
+                    .Include(v => v.PinCode)
+                    .Include(v => v.State)
+                    .Include(v => v.District)
+                    .Include(v => v.VendorInvestigationServiceTypes)
+                    .ThenInclude(v => v.PincodeServices)
+                    .Include(v => v.VendorInvestigationServiceTypes)
+                    .ThenInclude(v => v.State)
+                    .Include(v => v.VendorInvestigationServiceTypes)
+                    .ThenInclude(v => v.District)
+                    .Include(v => v.VendorInvestigationServiceTypes)
+                    .ThenInclude(v => v.LineOfBusiness)
+                    .Include(v => v.VendorInvestigationServiceTypes)
+                    .ThenInclude(v => v.InvestigationServiceType)
+                    .FirstOrDefaultAsync(m => m.VendorId == id);
+                if (vendor == null)
+                {
+                    notifyService.Error("NOT FOUND !!!..");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+
+                //var claimsPage = new MvcBreadcrumbNode("Assigner", "ClaimsInvestigation", "Claims");
+                //var agencyPage = new MvcBreadcrumbNode("Assigner", "ClaimsInvestigation", "Assigner") { Parent = claimsPage, };
+                //var detailsPage = new MvcBreadcrumbNode("EmpanelledVendors", "ClaimsInvestigation", $"Empanelled Agencies") { Parent = agencyPage, RouteValues = new { selectedcase = selectedcase } };
+                //var editPage = new MvcBreadcrumbNode("VendorDetail", "ClaimsInvestigation", $"Agency Detail") { Parent = detailsPage, RouteValues = new { id = id } };
+                //ViewData["BreadcrumbNode"] = editPage;
 
 
                 return View(vendor);

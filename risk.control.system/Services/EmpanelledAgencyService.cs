@@ -105,7 +105,6 @@ namespace risk.control.system.Services
                 .ThenInclude(c => c.ClientCompany)
                 .Include(c => c.PolicyDetail)
                 .ThenInclude(c => c.CaseEnabler)
-                
                 .Include(c => c.BeneficiaryDetail)
                 .ThenInclude(c => c.PinCode)
                 .Include(c => c.BeneficiaryDetail)
@@ -128,8 +127,6 @@ namespace risk.control.system.Services
                 .ThenInclude(c => c.State)
                 .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == selectedcase);
 
-            var location = claimsInvestigation.BeneficiaryDetail?.BeneficiaryDetailId;
-
             var claimCase = _context.BeneficiaryDetail
                 .Include(c => c.ClaimsInvestigation)
                 .Include(c => c.PinCode)
@@ -137,12 +134,14 @@ namespace risk.control.system.Services
                 .Include(c => c.District)
                 .Include(c => c.State)
                 .Include(c => c.Country)
-                .FirstOrDefault(c => c.BeneficiaryDetailId == location
+                .FirstOrDefault(c => c.BeneficiaryDetailId == claimsInvestigation.BeneficiaryDetail.BeneficiaryDetailId
                 //&& c.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId
                 );
 
             var existingVendors = await _context.Vendor
-                .Where(c => c.Clients.Any(c => c.ClientCompanyId == claimCase.ClaimsInvestigation.PolicyDetail.ClientCompanyId))
+                .Where(c => 
+                c.Clients.Any(c => c.ClientCompanyId == claimCase.ClaimsInvestigation.PolicyDetail.ClientCompanyId)
+                && c.Status == VendorStatus.ACTIVE)
                 .Include(v => v.ratings)
                 .Include(v => v.Country)
                 .Include(v => v.PinCode)

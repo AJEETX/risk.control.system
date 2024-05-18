@@ -69,7 +69,7 @@ namespace risk.control.system.Controllers
                     .Include(c => c.EmpanelledVendors)
                     .ThenInclude(e => e.VendorInvestigationServiceTypes)
                     .ThenInclude(v => v.PincodeServices)
-                    .Include(c => c.EmpanelledVendors)
+                    .Include(c => c.EmpanelledVendors.Where(v=>v.Status == VendorStatus.ACTIVE && !v.Deleted))
                     .ThenInclude(e => e.VendorInvestigationServiceTypes)
                     .ThenInclude(v => v.District)
                     .FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompany.ClientCompanyId);

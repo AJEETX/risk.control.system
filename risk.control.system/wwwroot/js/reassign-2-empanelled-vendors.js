@@ -32,7 +32,7 @@
         if (askConfirmation) {
             e.preventDefault();
             $.confirm({
-                title: "Confirm ReAssign",
+                title: "Confirm Assign",
                 content: "Are you sure ?",
     
                 icon: 'fas fa-external-link-alt',
@@ -40,7 +40,7 @@
                 closeIcon: true,
                 buttons: {
                     confirm: {
-                        text: "ReAssign",
+                        text: "Assign",
                         btnClass: 'btn-danger',
                         action: function () {
                             askConfirmation = false;
@@ -52,7 +52,7 @@
                                 $(".submit-progress").removeClass("hidden");
                             }, 1);
                             $('#allocate-case').attr('disabled', 'disabled');
-                            $('#allocate-case').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> ReAssign");
+                            $('#allocate-case').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Assign <sub>manual</sub>");
 
                             $('#radioButtons').submit();
                             var nodes = document.getElementById("article").getElementsByTagName('*');

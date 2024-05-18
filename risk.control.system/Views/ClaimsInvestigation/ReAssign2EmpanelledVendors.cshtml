@@ -28,7 +28,7 @@
                         </li>
                         <li>
                             <i class='far fa-thumbs-up'></i> 
-                            <button class='btn btn-danger btn-xs'><i class='fas fa-external-link-alt'></i> ReAssign</button></b>
+                            <button class='btn btn-danger btn-xs'><i class='fas fa-external-link-alt'></i> <b> Assign </b><sub>manual</sub></button>
                         </li>
 
                     </span>
@@ -428,16 +428,16 @@
                     <div class="table-responsive mailbox-messages">
                         <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
                         <input type="hidden" id="CaseLocationId" name="CaseLocationId" value="@Model.Location.BeneficiaryDetailId" />
-                        <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
+                        <table id="customerTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
                             <thead>
                                 <tr>
-                                    <th>
-
-                                    </th>
+                                    <th><img class="action-image" src="~/headers/arrow-down.gif" title="Action Type" alt="Action Type" /></th>
                                     <th>
                                         #
                                     </th>
-
+                                    <th>
+                                        Domain
+                                    </th>
                                     <th>
                                         Agency Name
                                     </th>
@@ -445,9 +445,7 @@
                                     <th>
                                         Phone #
                                     </th>
-                                    <th>
-                                        Email
-                                    </th>
+                                    
                                     <th>
                                         Address
                                     </th>
@@ -474,6 +472,7 @@
                                         <td>
                                             <input id="@item.Vendor.VendorId" name="selectedcase" class="selected-case" type="radio" value="@item.Vendor.VendorId" />
                                         </td>
+                                        
                                         <td>
                                             @if (item?.Vendor.DocumentUrl is not null)
                                             {
@@ -483,6 +482,13 @@
                                             {
                                                 <img title="..." id="profileImage" class="form-Image" src="@Applicationsettings.NO_IMAGE" data-toggle="tooltip" />
                                             }
+                                        </td>
+                                        <td>
+                                            <a id="@item.Vendor.VendorId" onclick="showVendor(@item.Vendor.VendorId)"
+                                               class="link-underline-primary" asp-action="VendorDetailAuto" asp-route-selectedcase="@Model.ClaimsInvestigation.ClaimsInvestigationId"
+                                               asp-route-id="@item.Vendor.VendorId">
+                                                @Html.DisplayFor(modelItem => item.Vendor.Email)
+                                            </a>
                                         </td>
                                         <td>
                                             @Html.DisplayFor(modelItem => item.Vendor.Name)
@@ -507,13 +513,7 @@
                                         <td>
                                             @Html.DisplayFor(modelItem => item.Vendor.PhoneNumber)
                                         </td>
-                                        <td>
-                                            <a id="@item.Vendor.VendorId" onclick="showVendor(@item.Vendor.VendorId)"
-                                               class="btn btn-xs btn-warning" asp-action="VendorDetailAuto" asp-route-selectedcase="@Model.ClaimsInvestigation.ClaimsInvestigationId"
-                                               asp-route-id="@item.Vendor.VendorId">
-                                                @Html.DisplayFor(modelItem => item.Vendor.Email)
-                                               </a>...
-                                        </td>
+                                       
                                         <td>
                                             @Html.DisplayFor(modelItem => item.Vendor.Addressline)
                                         </td>
@@ -557,7 +557,7 @@
                             <a id="back" asp-controller="ClaimsInvestigation" asp-action="ReAssignerAuto" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> Back</a>
 
                             <button disabled="disabled" id="allocate-case" type="submit" class="btn btn-danger">
-                                <i class="fas fa-external-link-alt" aria-hidden="true"></i> ReAssign
+                                <i class="fas fa-external-link-alt" aria-hidden="true"></i> <b> Assign </b><sub>manual</sub>
                             </button>
                         </div>
                     </div>

@@ -319,7 +319,7 @@
 
                                     <a id="back" asp-action="Draft" class="btn btn-outline-secondary"><span class="badge badge-light"> <i class="fas fa-arrow-left"></i> </span> Back </a>
 
-                                    @if (customerExist && beneficiaryExist && !Model.Assigned && Model.AutoAllocation)
+                                    @if (customerExist && beneficiaryExist)
                                     {
 
                                         <button type="submit" id="assign-list" class="btn btn-warning">

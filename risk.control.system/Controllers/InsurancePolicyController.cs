@@ -230,8 +230,8 @@ namespace risk.control.system.Controllers
                 ViewData["InvestigationCaseStatusId"] = new SelectList(_context.InvestigationCaseStatus, "InvestigationCaseStatusId", "Name", claimsInvestigation.InvestigationCaseStatusId);
                 ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", claimsInvestigation.PolicyDetail.LineOfBusinessId);
 
-                var claimsPage = new MvcBreadcrumbNode("Draft", "ClaimsInvestigation", "Claims");
-                var agencyPage = new MvcBreadcrumbNode("Draft", "ClaimsInvestigation", "ReAssign") { Parent = claimsPage, };
+                var claimsPage = new MvcBreadcrumbNode("ReAssignerAuto", "ClaimsInvestigation", "Claims");
+                var agencyPage = new MvcBreadcrumbNode("ReAssignerAuto", "ClaimsInvestigation", "Assign(manual)") { Parent = claimsPage, };
                 var detailsPage = new MvcBreadcrumbNode("Details", "ClaimsInvestigation", $"Details") { Parent = agencyPage, RouteValues = new { id = id } };
                 var editPage = new MvcBreadcrumbNode("EditPolicy", "ClaimsInvestigation", $"Edit Policy") { Parent = detailsPage, RouteValues = new { id = id } };
                 ViewData["BreadcrumbNode"] = editPage;

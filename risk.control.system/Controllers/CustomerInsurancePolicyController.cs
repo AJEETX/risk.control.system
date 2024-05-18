@@ -92,7 +92,7 @@ namespace risk.control.system.Controllers
 
 
                 var claimsPage = new MvcBreadcrumbNode("ReAssignerAuto", "ClaimsInvestigation", "Claims");
-                var agencyPage = new MvcBreadcrumbNode("ReAssignerAuto", "ClaimsInvestigation", "ReAssign") { Parent = claimsPage, };
+                var agencyPage = new MvcBreadcrumbNode("ReAssignerAuto", "ClaimsInvestigation", "Assign(manual)") { Parent = claimsPage, };
                 var detailsPage = new MvcBreadcrumbNode("Details", "ClaimsInvestigation", $"Details") { Parent = agencyPage, RouteValues = new { id = id } };
                 var editPage = new MvcBreadcrumbNode("CreateCustomer", "CustomerInsurancePolicy", $"Add Customer") { Parent = detailsPage, RouteValues = new { id = id } };
                 ViewData["BreadcrumbNode"] = editPage;

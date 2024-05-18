@@ -39,7 +39,7 @@ namespace risk.control.system.Controllers.Api.Agency
         }
 
         [HttpGet("AllUsers")]
-        public async Task<IActionResult> AllUsers()
+        public IActionResult AllUsers()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
@@ -77,7 +77,7 @@ namespace risk.control.system.Controllers.Api.Agency
         }
 
         [HttpGet("AllAgencies")]
-        public async Task<IActionResult> AllAgencies()
+        public IActionResult AllAgencies()
         {
             var agencies = _context.Vendor
                 .Include(v => v.Country)
@@ -93,7 +93,7 @@ namespace risk.control.system.Controllers.Api.Agency
                 {
                     Id = u.VendorId,
                     Document = string.IsNullOrEmpty(u.DocumentUrl) ? noDataImagefilePath : u.DocumentUrl,
-                    Domain = "<a href=''>" + u.Email + "</a>",
+                    Domain = "<a href=/Vendors/Details?id=" + u.VendorId+">" + u.Email + "</a>",
                     Name = u.Name,
                     Code = u.Code,
                     Phone = u.PhoneNumber,
@@ -108,7 +108,7 @@ namespace risk.control.system.Controllers.Api.Agency
             return Ok(result?.ToArray());
         }
         [HttpGet("GetEmpannelled")]
-        public async Task<IActionResult> GetEmpannelled()
+        public IActionResult GetEmpannelled()
         {
             var agencies = _context.Vendor
                 .Include(v => v.Country)
@@ -140,7 +140,7 @@ namespace risk.control.system.Controllers.Api.Agency
         }
 
         [HttpGet("AllServices")]
-        public async Task<IActionResult> AllServices()
+        public IActionResult AllServices()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
@@ -186,7 +186,7 @@ namespace risk.control.system.Controllers.Api.Agency
         }
 
         [HttpGet("GetCompanyAgencyUser")]
-        public async Task<IActionResult> GetCompanyAgencyUser(long id)
+        public IActionResult GetCompanyAgencyUser(long id)
         {
             var vendorUsers = _context.VendorApplicationUser
                   .Include(u => u.Country)
@@ -221,7 +221,7 @@ namespace risk.control.system.Controllers.Api.Agency
         }
 
         [HttpGet("GetAgentLoad")]
-        public async Task<IActionResult> GetAgentLoad()
+        public IActionResult GetAgentLoad()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
