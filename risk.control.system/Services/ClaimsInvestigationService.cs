@@ -1335,7 +1335,6 @@ namespace risk.control.system.Services
             _context.QueryRequest.Update(request);
             _context.ClaimsInvestigation.Update(claim);
 
-
             var lastLogHop = _context.InvestigationTransaction
                                        .Where(i => i.ClaimsInvestigationId == claim.ClaimsInvestigationId)
                 .AsNoTracking().Max(s => s.HopCount);
@@ -1420,8 +1419,8 @@ namespace risk.control.system.Services
             }
 
             _context.QueryRequest.Update(enquiryRequest);
+            claim.AgencyReport.EnquiryRequests.Add(enquiryRequest);
             _context.ClaimsInvestigation.Update(claim);
-
 
             var lastLogHop = _context.InvestigationTransaction
                                        .Where(i => i.ClaimsInvestigationId == claim.ClaimsInvestigationId)

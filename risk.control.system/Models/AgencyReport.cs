@@ -3,16 +3,19 @@ using System.ComponentModel.DataAnnotations;
 
 namespace risk.control.system.Models
 {
-    public class ClaimReportBase : BaseEntity
+    public class AgencyReport : BaseEntity
     {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public long AgencyReportId { get; set; }
         public long? VendorId { get; set; }
         public Vendor? Vendor { get; set; }
 
-        public DigitalIdReport? DigitalIdReport { get; set; } = new DigitalIdReport();
+        public DigitalIdReport? DigitalIdReport { get; set; } = new();
 
-        public ReportQuestionaire ReportQuestionaire { get; set; } = new ReportQuestionaire();
+        public ReportQuestionaire? ReportQuestionaire { get; set; } = new();
 
-        public DocumentIdReport? DocumentIdReport { get; set; } = new DocumentIdReport();
+        public DocumentIdReport? DocumentIdReport { get; set; } = new();
 
         public string? AgentEmail { get; set; }
         public DateTime? AgentRemarksUpdated { get; set; }
@@ -20,14 +23,16 @@ namespace risk.control.system.Models
         public DateTime? SupervisorRemarksUpdated { get; set; }
         public string? SupervisorEmail { get; set; }
         public string? SupervisorRemarks { get; set; }
+        public byte[]? SupervisorAttachment { get; set; }
         public SupervisorRemarkType? SupervisorRemarkType { get; set; }
         public DateTime? AssessorRemarksUpdated { get; set; }
         public string? AssessorEmail { get; set; }
         public string? AssessorRemarks { get; set; }
         public AssessorRemarkType? AssessorRemarkType { get; set; }
-
-        public string ClaimsInvestigationId { get; set; }
-        public ClaimsInvestigation ClaimsInvestigation { get; set; }
-        public virtual ServiceReportTemplate? ServiceReportTemplate { get; set; }
+        public string? ClaimsInvestigationId { get; set; }
+        public ClaimsInvestigation? ClaimsInvestigation { get; set; }
+        public long? EnquiryRequestId { get; set; }
+        public EnquiryRequest? EnquiryRequest { get; set; }
+        public List<EnquiryRequest> EnquiryRequests { get; set; } = new List<EnquiryRequest>();
     }
 }

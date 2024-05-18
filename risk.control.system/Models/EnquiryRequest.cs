@@ -35,8 +35,6 @@ namespace risk.control.system.Models
         public string? AnswerFileName { get; set; }
         public string? AnswerFileType { get; set; }
         public string? AnswerFileExtension { get; set; }
-        public long? AgencyReportId { get; set; }
-        public AgencyReport? AgencyReport { get; set; }
         public string? RequesterEmail { get; set; }
     }
 
