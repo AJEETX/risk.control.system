@@ -300,9 +300,9 @@ namespace risk.control.system.Services
                     var contactMessage = new InboxMessage
                     {
                         //ReceipientEmail = userEmailToSend,
-                        Message = "Claim Withdrawn ",
+                        Message = "Claim Withdrawn/Declined ",
                         Created = DateTime.Now,
-                        Subject = "Claim Withdrawn Policy #:" + claimsInvestigation.PolicyDetail.ContractNumber,
+                        Subject = "Claim Withdrawn/Declined Policy #:" + claimsInvestigation.PolicyDetail.ContractNumber,
                         SenderEmail = senderUserEmail,
                         Priority = ContactMessagePriority.NORMAL,
                         SendDate = DateTime.Now,
@@ -328,7 +328,7 @@ namespace risk.control.system.Services
                     {
                         string message = $"Dear {user.Email},";
                         message += $"                                          ";
-                        message += $"Policy # {claimsInvestigation.PolicyDetail.ContractNumber} Withdrawn";
+                        message += $"Policy # {claimsInvestigation.PolicyDetail.ContractNumber} Withdrawn/Declined";
                         message += $"                                          ";
                         message += $"Thanks";
                         message += $"                                          ";
@@ -680,6 +680,7 @@ namespace risk.control.system.Services
         public async Task NotifyClaimReportSubmitToVendorSupervisor(string senderUserEmail, string claimId, long caseLocationId)
         {
             var supervisorRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.SUPERVISOR.ToString()));
+            var agencyAdminRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.AGENCY_ADMIN.ToString()));
 
             var vendorUser = _context.VendorApplicationUser.FirstOrDefault(u => u.Email == senderUserEmail);
 
@@ -689,6 +690,11 @@ namespace risk.control.system.Services
 
             foreach (var user in vendorUsers)
             {
+                var isAdmin = await userVendorManager.IsInRoleAsync(user, agencyAdminRole?.Name);
+                if (isAdmin)
+                {
+                    users.Add(user);
+                }
                 var isSupervisor = await userVendorManager.IsInRoleAsync(user, supervisorRole?.Name);
                 if (isSupervisor)
                 {

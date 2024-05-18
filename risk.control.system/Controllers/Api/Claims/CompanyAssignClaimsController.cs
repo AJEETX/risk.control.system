@@ -34,23 +34,13 @@ namespace risk.control.system.Controllers.Api.Claims
         }
 
         [HttpGet("GetAssigner")]
-        public async Task<IActionResult> GetAssigner()
+        public IActionResult GetAssigner()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = claimsService.GetClaims();
 
             var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
-            var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
-                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
-            var reAssignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
-                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER);
-            var submittedToAssessorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
-                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
-            var withdrawnByAgency = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                      i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY);
-            var withdrawnByCompany = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY);
-            var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
+            
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
 
             var companyUser = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(c => c.Email == userEmail.Value);
@@ -119,23 +109,17 @@ namespace risk.control.system.Controllers.Api.Claims
         }
 
         [HttpGet("GetReAssigner")]
-        public async Task<IActionResult> GetReAssigner()
+        public IActionResult GetReAssigner()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = claimsService.GetClaims();
 
-            var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
-                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
-            var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
-                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
             var reAssignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER);
-            var submittedToAssessorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
-                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
+            
             var withdrawnByAgency = _context.InvestigationCaseSubStatus.FirstOrDefault(
                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY);
             var withdrawnByCompany = _context.InvestigationCaseSubStatus.FirstOrDefault(
                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY);
-            var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
 
             var companyUser = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(c => c.Email == userEmail.Value);
@@ -213,23 +197,19 @@ namespace risk.control.system.Controllers.Api.Claims
         }
 
         [HttpGet("GetReAssignerAuto")]
-        public async Task<IActionResult> GetReAssignerAuto()
+        public IActionResult GetReAssignerAuto()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = claimsService.GetClaims();
 
-            var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
-                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
             var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
             var reAssignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER);
-            var submittedToAssessorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
-                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
+            
             var withdrawnByAgency = _context.InvestigationCaseSubStatus.FirstOrDefault(
                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY);
             var withdrawnByCompany = _context.InvestigationCaseSubStatus.FirstOrDefault(
                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY);
-            var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
 
             var companyUser = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(c => c.Email == userEmail.Value);

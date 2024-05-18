@@ -36,10 +36,6 @@ namespace risk.control.system.Controllers.Api.Claims
         public async Task<IActionResult> GetReport()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = claimsService.GetClaims()
-                .Include(c=>c.AgencyReport)
-                .Include(c=>c.AgencyReport.DigitalIdReport)
-                .Include(c=>c.AgencyReport.DocumentIdReport)
-                .Include(c=>c.AgencyReport.ReportQuestionaire)
                 .Where(c =>
                 c.CustomerDetail != null && c.AgencyReport != null);
             var user = HttpContext.User.Identity.Name;
@@ -51,14 +47,16 @@ namespace risk.control.system.Controllers.Api.Claims
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR);
             var finishStatus = _context.InvestigationCaseStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.FINISHED);
-            var claims = applicationDbContext.Where(c => c.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
-                (c.InvestigationCaseSubStatus.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR && c.InvestigationCaseStatusId == finishStatus.InvestigationCaseStatusId)
+
+            applicationDbContext = applicationDbContext.Where(c => c.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
+                (c.InvestigationCaseSubStatus.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR && 
+                c.InvestigationCaseStatusId == finishStatus.InvestigationCaseStatusId)
                 || c.InvestigationCaseSubStatusId == rejectdStatus.InvestigationCaseSubStatusId
                 );
             var claimsSubmitted = new List<ClaimsInvestigation>();
-            claims = claims.Where(c => c.InvestigationCaseSubStatusId == approvedStatus.InvestigationCaseSubStatusId);
+            applicationDbContext = applicationDbContext.Where(c => c.InvestigationCaseSubStatusId == approvedStatus.InvestigationCaseSubStatusId);
 
-            foreach (var claim in claims)
+            foreach (var claim in applicationDbContext)
             {
 
                 var userHasReviewClaimLogs = _context.InvestigationTransaction.Where(c => c.ClaimsInvestigationId == claim.ClaimsInvestigationId && c.IsReviewCase &&
@@ -117,15 +115,10 @@ namespace risk.control.system.Controllers.Api.Claims
         }
         [Authorize(Roles = MANAGER.DISPLAY_NAME)]
         [HttpGet("GetManagerReport")]
-        public async Task<IActionResult> GetManagerReport()
+        public IActionResult GetManagerReport()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = claimsService.GetClaims()
-                .Include(c => c.AgencyReport)
-                .Include(c => c.AgencyReport.DigitalIdReport)
-                .Include(c => c.AgencyReport.DocumentIdReport)
-                .Include(c => c.AgencyReport.ReportQuestionaire)
-                .Where(c =>
-                c.CustomerDetail != null && c.AgencyReport != null);
+                .Where(c => c.CustomerDetail != null && c.AgencyReport != null);
             var user = HttpContext.User.Identity.Name;
 
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == user);
@@ -135,14 +128,15 @@ namespace risk.control.system.Controllers.Api.Claims
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR);
             var finishStatus = _context.InvestigationCaseStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.FINISHED);
-            var claims = applicationDbContext.Where(c => c.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
-                (c.InvestigationCaseSubStatus.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR && c.InvestigationCaseStatusId == finishStatus.InvestigationCaseStatusId)
+            applicationDbContext = applicationDbContext.Where(c => c.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
+                (c.InvestigationCaseSubStatusId == approvedStatus.InvestigationCaseSubStatusId && 
+                c.InvestigationCaseStatusId == finishStatus.InvestigationCaseStatusId)
                 || c.InvestigationCaseSubStatusId == rejectdStatus.InvestigationCaseSubStatusId
                 );
             var claimsSubmitted = new List<ClaimsInvestigation>();
-            claims = claims.Where(c => c.InvestigationCaseSubStatusId == approvedStatus.InvestigationCaseSubStatusId);
+            applicationDbContext = applicationDbContext.Where(c => c.InvestigationCaseSubStatusId == approvedStatus.InvestigationCaseSubStatusId);
 
-            foreach (var claim in claims)
+            foreach (var claim in applicationDbContext)
             {
 
                 claimsSubmitted.Add(claim);
@@ -189,23 +183,13 @@ namespace risk.control.system.Controllers.Api.Claims
         public async Task<IActionResult> GetReject()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = claimsService.GetClaims()
-                .Include(c => c.AgencyReport)
-                .Include(c => c.AgencyReport.DigitalIdReport)
-                .Include(c => c.AgencyReport.DocumentIdReport)
-                .Include(c => c.AgencyReport.ReportQuestionaire)
-                .Where(c =>
-                c.CustomerDetail != null && c.AgencyReport != null);
+                .Where(c => c.CustomerDetail != null && c.AgencyReport != null);
             var userEmail = HttpContext.User.Identity.Name;
 
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
 
-            var approvedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR);
             var rejectdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR);
-
-            var finishStatus = _context.InvestigationCaseStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.FINISHED);
 
             var claims = applicationDbContext.Where(c => c.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
                 c.InvestigationCaseSubStatusId == rejectdStatus.InvestigationCaseSubStatusId
@@ -271,33 +255,23 @@ namespace risk.control.system.Controllers.Api.Claims
 
         [HttpGet("GetManagerReject")]
         [Authorize(Roles = MANAGER.DISPLAY_NAME)]
-        public async Task<IActionResult> GetManagerReject()
+        public IActionResult GetManagerReject()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = claimsService.GetClaims()
-                .Include(c => c.AgencyReport)
-                .Include(c => c.AgencyReport.DigitalIdReport)
-                .Include(c => c.AgencyReport.DocumentIdReport)
-                .Include(c => c.AgencyReport.ReportQuestionaire)
-                .Where(c =>
-                c.CustomerDetail != null && c.AgencyReport != null);
+                .Where(c => c.CustomerDetail != null && c.AgencyReport != null);
             var userEmail = HttpContext.User.Identity.Name;
 
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
 
-            var approvedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR);
             var rejectdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR);
 
-            var finishStatus = _context.InvestigationCaseStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.FINISHED);
-
-            var claims = applicationDbContext.Where(c => c.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
+            applicationDbContext = applicationDbContext.Where(c => c.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
                 c.InvestigationCaseSubStatusId == rejectdStatus.InvestigationCaseSubStatusId
-                )?.ToList();
+                );
             var claimsSubmitted = new List<ClaimsInvestigation>();
 
-            foreach (var claim in claims)
+            foreach (var claim in applicationDbContext)
             {
                 claimsSubmitted.Add(claim);
             }

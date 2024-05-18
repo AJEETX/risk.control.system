@@ -41,7 +41,6 @@ namespace risk.control.system.Controllers.Api.Claims
         public async Task<IActionResult> GetPolicyDetail(long id)
         {
             var policy = await _context.PolicyDetail
-                .Include(p => p.LineOfBusiness)
                 .Include(p => p.InvestigationServiceType)
                 .Include(p => p.CostCentre)
                 .Include(p => p.CaseEnabler)
@@ -282,7 +281,6 @@ namespace risk.control.system.Controllers.Api.Claims
             var claim = claimsService.GetClaims()
                 .Include(c=>c.AgencyReport)
                 .Include(c=>c.AgencyReport.DigitalIdReport)
-                .Include(c=>c.AgencyReport.DocumentIdReport)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimid);
 
             if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
@@ -323,7 +321,6 @@ namespace risk.control.system.Controllers.Api.Claims
         {
             var claim = claimsService.GetClaims()
                 .Include(c => c.AgencyReport)
-                .Include(c => c.AgencyReport.DigitalIdReport)
                 .Include(c => c.AgencyReport.DocumentIdReport)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimid);
 

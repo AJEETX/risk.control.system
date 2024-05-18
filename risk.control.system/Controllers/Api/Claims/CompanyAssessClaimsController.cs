@@ -33,20 +33,17 @@ namespace risk.control.system.Controllers.Api.Claims
 
         [Authorize(Roles = ASSESSOR.DISPLAY_NAME)]
         [HttpGet("GetAssessor")]
-        public async Task<IActionResult> GetAssessor()
+        public IActionResult GetAssessor()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = claimsService.GetClaims();
 
-            var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
-                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
             var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
             var submittedToAssessorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
-
             var replyByAgency = _context.InvestigationCaseSubStatus
                .FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR);
-            var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
+
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
 
             var companyUser = _context.ClientCompanyApplicationUser.Include(u=>u.ClientCompany).FirstOrDefault(c => c.Email == userEmail.Value);
@@ -109,19 +106,15 @@ namespace risk.control.system.Controllers.Api.Claims
 
             return Ok(response);
         }
+        
         [HttpGet("GetManager")]
         [Authorize(Roles = MANAGER.DISPLAY_NAME)]
-        public async Task<IActionResult> GetManager()
+        public IActionResult GetManager()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = claimsService.GetClaims();
 
-            var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
-                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
-            var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
-                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
             var submittedToAssessorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
-            var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
 
             var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(c => c.Email == userEmail.Value);

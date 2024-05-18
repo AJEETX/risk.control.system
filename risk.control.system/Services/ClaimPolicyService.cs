@@ -114,13 +114,12 @@ namespace risk.control.system.Services
                 .ThenInclude(c => c.State)
                 .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == id);
 
-            var location = claimsInvestigation.BeneficiaryDetail;
             claimsInvestigation.CompanyWithdrawlComment = string.Empty;
             var model = new ClaimTransactionModel
             {
                 ClaimsInvestigation = claimsInvestigation,
                 Log = caseLogs,
-                Location = location,
+                Location = claimsInvestigation.BeneficiaryDetail,
                 NotWithdrawable = claimsInvestigation.NotWithdrawable,
                 TimeTaken = GetElapsedTime(caseLogs)
             };

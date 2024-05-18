@@ -37,11 +37,9 @@ namespace risk.control.system.Services
         private readonly IICheckifyService checkifyService;
         private readonly UserManager<VendorApplicationUser> userManager;
         private readonly ApplicationDbContext _context;
-        private readonly IHttpContextAccessor httpContextAccessor;
         private readonly IDashboardService dashboardService;
         private readonly IHttpClientService httpClientService;
         private readonly IClaimsService claimsService;
-        private readonly IWebHostEnvironment webHostEnvironment;
 
         //private static string latitude = "-37.839542";
         //private static string longitude = "145.164834";
@@ -50,20 +48,16 @@ namespace risk.control.system.Services
         public ClaimsVendorService(IICheckifyService checkifyService,
             UserManager<VendorApplicationUser> userManager,
             ApplicationDbContext context,
-            IHttpContextAccessor httpContextAccessor,
             IDashboardService dashboardService,
             IHttpClientService httpClientService,
-            IClaimsService claimsService,
-            IWebHostEnvironment webHostEnvironment)
+            IClaimsService claimsService)
         {
             this.checkifyService = checkifyService;
             this.userManager = userManager;
             this._context = context;
-            this.httpContextAccessor = httpContextAccessor;
             this.dashboardService = dashboardService;
             this.httpClientService = httpClientService;
             this.claimsService = claimsService;
-            this.webHostEnvironment = webHostEnvironment;
         }
 
         public async Task<AppiCheckifyResponse> PostDocumentId(string userEmail, string claimId, string latitude, string longitude, byte[]? image = null)

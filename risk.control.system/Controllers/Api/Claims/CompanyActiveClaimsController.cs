@@ -33,35 +33,19 @@ namespace risk.control.system.Controllers.Api.Claims
         }
 
         [HttpGet("GetActive")]
-        public async Task<IActionResult> GetActive()
+        public IActionResult GetActive()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = claimsService.GetClaims();
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
-            var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
             var companyUser = _context.ClientCompanyApplicationUser.Include(u=>u.ClientCompany).FirstOrDefault(c => c.Email == userEmail.Value);
             applicationDbContext = applicationDbContext.Where(i => i.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId);
 
             var openStatuses = _context.InvestigationCaseStatus.Where(i => !i.Name.Contains(CONSTANTS.CASE_STATUS.FINISHED)).ToList();
-            var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
-            var allocateToVendorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
-            var withdrawnByAgency = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                     i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY);
-            var withdrawnByCompany = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY);
-            var reAssignedToAssignerStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER);
-            var approvedStatus = _context.InvestigationCaseSubStatus
-                .FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR);
-            var assignedToAssignerStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
 
             var claimsSubmitted = new List<ClaimsInvestigation>();
             var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
 
             var claims = applicationDbContext.Where(a => openStatusesIds.Contains(a.InvestigationCaseStatusId) &&
-            a.InvestigationCaseStatusId != approvedStatus.InvestigationCaseSubStatusId &&
             a.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId);
             List<ClaimsInvestigation> newClaims = new List<ClaimsInvestigation>();
             foreach (var claim in claims)
@@ -77,18 +61,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 var userHasClaimLog = _context.InvestigationTransaction.Any(c => c.ClaimsInvestigationId == claim.ClaimsInvestigationId && 
                 c.UserEmailActioned == companyUser.Email && c.HopCount >= reviewLogCount);
 
-                if (userHasClaimLog && claim.InvestigationCaseSubStatusId != createdStatus.InvestigationCaseSubStatusId &&
-                    claim.InvestigationCaseSubStatusId != assignedToAssignerStatus.InvestigationCaseSubStatusId &&
-                    claim.InvestigationCaseSubStatusId != withdrawnByAgency.InvestigationCaseSubStatusId
-                    &&
-                    claim.InvestigationCaseSubStatusId != reAssignedToAssignerStatus.InvestigationCaseSubStatusId
-                    &&
-                    claim.InvestigationCaseSubStatusId != approvedStatus.InvestigationCaseSubStatusId
-                    &&
-                    claim.InvestigationCaseSubStatusId != withdrawnByCompany.InvestigationCaseSubStatusId
-                    &&
-                    claim.InvestigationCaseSubStatusId != approvedStatus.InvestigationCaseSubStatusId
-                    )
+                if (userHasClaimLog)
                 {
                     claim.ActiveView += 1;
                     if(claim.ActiveView <= 1)
@@ -134,7 +107,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         Location = string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseSubStatus.Name + "</span>"),
                         Created = string.Join("", "<span class='badge badge-light'>" + a.Created.ToString("dd-MM-yyyy") + "</span>"),
                         timePending = a.GetTimePending(),
-                        Withdrawable = a.InvestigationCaseSubStatusId == allocateToVendorStatus.InvestigationCaseSubStatusId ? true : false,
+                        Withdrawable = !a.NotWithdrawable,
                         PolicyNum = a.GetPolicyNum(),
                         BeneficiaryPhoto = a.BeneficiaryDetail?.ProfilePicture != null ?
                                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.BeneficiaryDetail.ProfilePicture)) :
@@ -151,58 +124,27 @@ namespace risk.control.system.Controllers.Api.Claims
         }
 
         [HttpGet("GetManagerActive")]
-        public async Task<IActionResult> GetManagerActive()
+        public IActionResult GetManagerActive()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = claimsService.GetClaims();
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
-            var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
             var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(c => c.Email == userEmail.Value);
             applicationDbContext = applicationDbContext.Where(i => i.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId);
 
             var openStatuses = _context.InvestigationCaseStatus.Where(i => !i.Name.Contains(CONSTANTS.CASE_STATUS.FINISHED)).ToList();
-            var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
-            var allocateToVendorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
-            var withdrawnByAgency = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                     i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY);
-            var withdrawnByCompany = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY);
-            var reAssignedToAssignerStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER);
-            var submittededToAssesssorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
-            var approvedStatus = _context.InvestigationCaseSubStatus
-                .FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR);
             var claimsSubmitted = new List<ClaimsInvestigation>();
             var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
 
-            var claims = applicationDbContext.Where(a => openStatusesIds.Contains(a.InvestigationCaseStatusId) &&
-            a.InvestigationCaseStatusId != approvedStatus.InvestigationCaseSubStatusId);
+            var claims = applicationDbContext.Where(a => openStatusesIds.Contains(a.InvestigationCaseStatusId));
             List<ClaimsInvestigation> newClaims = new List<ClaimsInvestigation>();
             foreach (var claim in claims)
             {
-                if (claim.InvestigationCaseSubStatusId != createdStatus.InvestigationCaseSubStatusId &&
-                    claim.InvestigationCaseSubStatusId != withdrawnByAgency.InvestigationCaseSubStatusId
-                    &&
-                    claim.InvestigationCaseSubStatusId != reAssignedToAssignerStatus.InvestigationCaseSubStatusId
-                    &&
-                    claim.InvestigationCaseSubStatusId != approvedStatus.InvestigationCaseSubStatusId
-                    &&
-                     claim.InvestigationCaseSubStatusId != submittededToAssesssorStatus.InvestigationCaseSubStatusId
-                    &&
-                    claim.InvestigationCaseSubStatusId != withdrawnByCompany.InvestigationCaseSubStatusId
-                    &&
-                    claim.InvestigationCaseSubStatusId != approvedStatus.InvestigationCaseSubStatusId
-                    )
+                claim.ManagerActiveView += 1;
+                if (claim.ManagerActiveView <= 1)
                 {
-                    claim.ManagerActiveView += 1;
-                    if (claim.ManagerActiveView <= 1)
-                    {
-                        newClaims.Add(claim);
-                    }
-                    claimsSubmitted.Add(claim);
+                    newClaims.Add(claim);
                 }
+                claimsSubmitted.Add(claim);
             }
             if (newClaims.Count > 0)
             {
@@ -240,7 +182,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         Location = string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseSubStatus.Name + "</span>"),
                         Created = string.Join("", "<span class='badge badge-light'>" + a.Created.ToString("dd-MM-yyyy") + "</span>"),
                         timePending = a.GetTimePending(),
-                        Withdrawable = a.InvestigationCaseSubStatusId == allocateToVendorStatus.InvestigationCaseSubStatusId ? true : false,
+                        Withdrawable = !a.NotWithdrawable,
                         PolicyNum = a.GetPolicyNum(),
                         BeneficiaryPhoto = a.BeneficiaryDetail?.ProfilePicture != null ?
                                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.BeneficiaryDetail.ProfilePicture)) :
@@ -255,11 +197,10 @@ namespace risk.control.system.Controllers.Api.Claims
             return Ok(response);
         }
         [HttpGet("GetIncomplete")]
-        public async Task<IActionResult> GetIncomplete()
+        public IActionResult GetIncomplete()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = claimsService.GetClaims();
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
-            var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
             applicationDbContext = applicationDbContext.Where(i => i.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId);
 
@@ -267,27 +208,12 @@ namespace risk.control.system.Controllers.Api.Claims
 
             var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
-            var assignedToAssignerStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
-            var allocateToVendorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
-            var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
-
-            var submittededToSupervisorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR);
-
-            var submittededToAssesssorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
-
-            var reAssigned2AssignerStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER);
 
             var claimsSubmitted = new List<ClaimsInvestigation>();
             var newClaims = new List<ClaimsInvestigation>();
             var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
-            var claims = applicationDbContext.Where(a => openStatusesIds.Contains(a.InvestigationCaseStatusId) && a.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId)?.ToList();
-            foreach (var claim in claims)
+            applicationDbContext = applicationDbContext.Where(a => openStatusesIds.Contains(a.InvestigationCaseStatusId) && a.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId);
+            foreach (var claim in applicationDbContext)
             {
                 var userHasClaimLog = _context.InvestigationTransaction.Any(c => c.ClaimsInvestigationId == claim.ClaimsInvestigationId && c.UserEmailActioned == companyUser.Email);
                 if (userHasClaimLog && !claim.AssignedToAgency && claim.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId && !claim.IsReady2Assign)
@@ -335,7 +261,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         Location = string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseSubStatus.Name + "</span>"),
                         Created = string.Join("", "<span class='badge badge-light'>" + a.Created.ToString("dd-MM-yyyy") + "</span>"),
                         timePending = a.GetTimePending(),
-                        Withdrawable = a.InvestigationCaseSubStatusId == allocateToVendorStatus.InvestigationCaseSubStatusId ? true : false,
+                        Withdrawable = !a.NotWithdrawable,
                         PolicyNum = a.GetPolicyNum(),
                         BeneficiaryPhoto =  a.BeneficiaryDetail?.ProfilePicture != null ?
                                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.BeneficiaryDetail.ProfilePicture)) :
@@ -351,7 +277,7 @@ namespace risk.control.system.Controllers.Api.Claims
             return Ok(response);
         }
         [HttpGet("GetReview")]
-        public async Task<IActionResult> GetReview()
+        public IActionResult GetReview()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = claimsService.GetClaims();
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
@@ -360,21 +286,7 @@ namespace risk.control.system.Controllers.Api.Claims
             applicationDbContext = applicationDbContext.Where(i => i.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId);
 
             var openStatuses = _context.InvestigationCaseStatus.Where(i => !i.Name.Contains(CONSTANTS.CASE_STATUS.FINISHED)).ToList();
-            var assignedToAssignerStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
-            var allocateToVendorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
-            var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
-
-            var submittededToSupervisorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR);
-
-            var submittededToAssesssorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
-
-            var reAssigned2AssignerStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER);
+            
             var requestedByAssessor = _context.InvestigationCaseSubStatus
                .FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR);
 
@@ -460,7 +372,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         Location = string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseSubStatus.Name + "</span>"),
                         Created = string.Join("", "<span class='badge badge-light'>" + a.Created.ToString("dd-MM-yyyy") + "</span>"),
                         timePending = a.GetTimePending(),
-                        Withdrawable = a.InvestigationCaseSubStatusId == allocateToVendorStatus.InvestigationCaseSubStatusId ? true : false,
+                        Withdrawable = !a.NotWithdrawable,
                         PolicyNum = a.GetPolicyNum(),
                         BeneficiaryPhoto = a.BeneficiaryDetail?.ProfilePicture != null ?
                                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.BeneficiaryDetail.ProfilePicture)) :
@@ -476,30 +388,15 @@ namespace risk.control.system.Controllers.Api.Claims
         }
 
         [HttpGet("GetManagerReview")]
-        public async Task<IActionResult> GetManagerReview()
+        public IActionResult GetManagerReview()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = claimsService.GetClaims();
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
-            var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
             applicationDbContext = applicationDbContext.Where(i => i.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId);
 
             var openStatuses = _context.InvestigationCaseStatus.Where(i => !i.Name.Contains(CONSTANTS.CASE_STATUS.FINISHED)).ToList();
-            var assignedToAssignerStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
-            var allocateToVendorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
-            var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
-
-            var submittededToSupervisorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR);
-
-            var submittededToAssesssorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
-
-            var reAssigned2AssignerStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER);
+            
 
             var claimsSubmitted = new List<ClaimsInvestigation>();
             var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
@@ -544,7 +441,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         Location = string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseSubStatus.Name + "</span>"),
                         Created = string.Join("", "<span class='badge badge-light'>" + a.Created.ToString("dd-MM-yyyy") + "</span>"),
                         timePending = a.GetTimePending(),
-                        Withdrawable = a.InvestigationCaseSubStatusId == allocateToVendorStatus.InvestigationCaseSubStatusId ? true : false,
+                        Withdrawable = !a.NotWithdrawable,
                         PolicyNum = a.GetPolicyNum(),
                         BeneficiaryPhoto = a.BeneficiaryDetail.ProfilePicture != null ?
                                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.BeneficiaryDetail.ProfilePicture)) :
@@ -571,21 +468,12 @@ namespace risk.control.system.Controllers.Api.Claims
             var company = _context.ClientCompany.Include(c => c.PinCode).FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
 
             var openStatuses = _context.InvestigationCaseStatus.Where(i => !i.Name.Contains(CONSTANTS.CASE_STATUS.FINISHED)).ToList();
-            var assignedToAssignerStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
-            var allocateToVendorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
-            var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
-
-            var submittededToSupervisorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR);
+            
 
             var submittededToAssesssorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
 
-            var reAssigned2AssignerStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER);
+           
 
             var claimsSubmitted = new List<ClaimsInvestigation>();
 
