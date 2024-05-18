@@ -351,7 +351,7 @@ namespace risk.control.system.Controllers
                     }
                 }
                 claimsInvestigation.ORIGIN = ORIGIN.AUTO;
-                var claim = await claimsInvestigationService.CreatePolicy(userEmail, claimsInvestigation, documentFile, profileFile);
+                var claim = await claimsInvestigationService.   CreatePolicy(userEmail, claimsInvestigation, documentFile, profileFile);
                 if (claim == null)
                 {
                     notifyService.Error("OOPs !!!..Contact Admin");
@@ -420,7 +420,7 @@ namespace risk.control.system.Controllers
                     }
                 }
                 claimsInvestigation.ORIGIN = ORIGIN.MANUAL;
-                var claim = await claimsInvestigationService.CreatePolicy(userEmail, claimsInvestigation, documentFile, profileFile);
+                var claim = await claimsInvestigationService.CreatePolicy(userEmail, claimsInvestigation, documentFile, profileFile, false);
                 if (claim == null)
                 {
                     notifyService.Error("OOPs !!!..Contact Admin");

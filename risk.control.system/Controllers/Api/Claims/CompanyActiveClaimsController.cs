@@ -41,12 +41,24 @@ namespace risk.control.system.Controllers.Api.Claims
             applicationDbContext = applicationDbContext.Where(i => i.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId);
 
             var openStatuses = _context.InvestigationCaseStatus.Where(i => !i.Name.Contains(CONSTANTS.CASE_STATUS.FINISHED)).ToList();
-
+            var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
+            var assigned2AssignerStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
+            var withdrawnByCompanyStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY);
+            var declinedByAgencyStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY);
             var claimsSubmitted = new List<ClaimsInvestigation>();
             var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
 
             var claims = applicationDbContext.Where(a => openStatusesIds.Contains(a.InvestigationCaseStatusId) &&
-            a.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId);
+            a.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId 
+            && a.InvestigationCaseSubStatusId != createdStatus.InvestigationCaseSubStatusId
+            && a.InvestigationCaseSubStatusId != withdrawnByCompanyStatus.InvestigationCaseSubStatusId
+            && a.InvestigationCaseSubStatusId != declinedByAgencyStatus.InvestigationCaseSubStatusId
+            && a.InvestigationCaseSubStatusId != assigned2AssignerStatus.InvestigationCaseSubStatusId
+            );
             List<ClaimsInvestigation> newClaims = new List<ClaimsInvestigation>();
             foreach (var claim in claims)
             {
@@ -134,8 +146,17 @@ namespace risk.control.system.Controllers.Api.Claims
             var openStatuses = _context.InvestigationCaseStatus.Where(i => !i.Name.Contains(CONSTANTS.CASE_STATUS.FINISHED)).ToList();
             var claimsSubmitted = new List<ClaimsInvestigation>();
             var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
+            var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
+            var assigned2AssignerStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
+            var submitted2AssessorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                     i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
 
-            var claims = applicationDbContext.Where(a => openStatusesIds.Contains(a.InvestigationCaseStatusId));
+            var claims = applicationDbContext.Where(a => openStatusesIds.Contains(a.InvestigationCaseStatusId) && 
+            a.InvestigationCaseSubStatusId != createdStatus.InvestigationCaseSubStatusId &&
+            a.InvestigationCaseSubStatusId != createdStatus.InvestigationCaseSubStatusId && 
+            a.InvestigationCaseSubStatusId != submitted2AssessorStatus.InvestigationCaseSubStatusId);
             List<ClaimsInvestigation> newClaims = new List<ClaimsInvestigation>();
             foreach (var claim in claims)
             {

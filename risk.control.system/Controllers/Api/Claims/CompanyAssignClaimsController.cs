@@ -45,11 +45,20 @@ namespace risk.control.system.Controllers.Api.Claims
 
             var companyUser = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(c => c.Email == userEmail.Value);
 
+            var assigned2AssignerStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
+            var withdrawnByCompanyStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY);
+            var declinedByAgencyStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY);
+
+
             applicationDbContext = applicationDbContext.Where(a => a.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
-                a.UserEmailActioned == companyUser.Email &&
+                (a.UserEmailActioned == companyUser.Email &&
                         a.UserEmailActionedTo == companyUser.Email &&
-                        a.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId
-                        && a.ORIGIN == ORIGIN.MANUAL);
+                        a.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId)
+                        
+                        );
 
             var claimsAssigned = new List<ClaimsInvestigation>();
             var newClaimsAssigned = new List<ClaimsInvestigation>();
@@ -115,7 +124,9 @@ namespace risk.control.system.Controllers.Api.Claims
 
             var reAssignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER);
-            
+
+            var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+               i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
             var withdrawnByAgency = _context.InvestigationCaseSubStatus.FirstOrDefault(
                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY);
             var withdrawnByCompany = _context.InvestigationCaseSubStatus.FirstOrDefault(
@@ -134,6 +145,10 @@ namespace risk.control.system.Controllers.Api.Claims
                         a.UserEmailActioned == companyUser.Email &&
                         a.UserRoleActionedTo == $"{companyUser.ClientCompany.Email}")
                  ||
+                 (a.UserEmailActioned == companyUser.Email &&
+                        a.UserEmailActionedTo == companyUser.Email &&
+                        a.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId) 
+                        ||
                 (a.IsReviewCase && a.InvestigationCaseSubStatusId == reAssignedStatus.InvestigationCaseSubStatusId &&
                 a.UserEmailActionedTo == string.Empty &&
                 a.UserRoleActionedTo == $"{companyUser.ClientCompany.Email}")

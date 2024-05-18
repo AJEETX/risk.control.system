@@ -139,11 +139,11 @@ namespace risk.control.system.Services
         {
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
             var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
-            var claimsIncomplete = GetCreatorIncomplete(userEmail);
-            var claimsAssignAuto = GetCreatorAssignAuto(userEmail);
-            var claimsAssign = GetCreatorAssignManual(userEmail);
-            var claimsAssignReAssign = GetCreatorReAssign(userEmail);
-            var claimsAssignReAssignAuto = GetCreatorReAssignAuto(userEmail);
+            //var claimsIncomplete = GetCreatorIncomplete(userEmail);
+            //var claimsAssignAuto = GetCreatorAssignAuto(userEmail);
+            //var claimsAssign = GetCreatorAssignManual(userEmail);
+            //var claimsAssignReAssign = GetCreatorReAssign(userEmail);
+            //var claimsAssignReAssignAuto = GetCreatorReAssignAuto(userEmail);
             var claimsActive = GetCreatorActive(userEmail);
             //var claimsCompleted = GetCompanyCompleted(userEmail);
 
@@ -158,20 +158,20 @@ namespace risk.control.system.Services
             if (company.AutoAllocation)
             {
                 data.FirstBlockName = "Assign(auto)";
-                data.FirstBlockCount = claimsAssignAuto;
+                data.FirstBlockCount = GetCreatorAssignAuto(userEmail);
                 data.FirstBlockUrl = "/ClaimsInvestigation/Draft";
 
                 data.SecondBlockUrl = "/ClaimsInvestigation/ReAssignerAuto";
-                data.SecondBlockCount = claimsAssignReAssignAuto;
+                data.SecondBlockCount = GetCreatorReAssignAuto(userEmail);
             }
             else
             {
                 data.FirstBlockName = "Assign";
-                data.FirstBlockCount = claimsAssign;
+                data.FirstBlockCount = GetCreatorAssignManual(userEmail);
                 data.FirstBlockUrl = "/ClaimsInvestigation/Assigner";
 
                 data.SecondBlockUrl = "/ClaimsInvestigation/ReAssigner";
-                data.SecondBlockCount = claimsAssignReAssign;
+                data.SecondBlockCount = GetCreatorReAssign(userEmail);
 
             }
 
@@ -632,10 +632,27 @@ namespace risk.control.system.Services
             
             var count = 0;
             var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
+
+            var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
+            var assigned2AssignerStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
+
+            var withdrawnByCompanyStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY);
+            var declinedByAgencyStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY);
+
+
             var companyUser = _context.ClientCompanyApplicationUser.Include(u=>u.ClientCompany).FirstOrDefault(c => c.Email == userEmail);
 
             applicationDbContext = applicationDbContext.Where(a => openStatusesIds.Contains(a.InvestigationCaseStatusId) &&
-            a.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId);
+            a.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId 
+            && a.InvestigationCaseSubStatusId != createdStatus.InvestigationCaseSubStatusId
+            && a.InvestigationCaseSubStatusId != withdrawnByCompanyStatus.InvestigationCaseSubStatusId
+            && a.InvestigationCaseSubStatusId != declinedByAgencyStatus.InvestigationCaseSubStatusId
+            && a.InvestigationCaseSubStatusId != assigned2AssignerStatus.InvestigationCaseSubStatusId
+            );
             foreach (var claim in applicationDbContext)
             {
                 var userHasReviewClaimLogs = _context.InvestigationTransaction.Where(c => c.ClaimsInvestigationId == claim.ClaimsInvestigationId && c.IsReviewCase && 
@@ -661,10 +678,20 @@ namespace risk.control.system.Services
             var openStatuses = _context.InvestigationCaseStatus.Where(i => !i.Name.Contains(CONSTANTS.CASE_STATUS.FINISHED)).ToList();
             
             var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
+            var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
+            var assigned2AssignerStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
+            var submitted2AssessorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                      i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
             var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(c => c.Email == userEmail);
 
             var count = applicationDbContext.Count(a => openStatusesIds.Contains(a.InvestigationCaseStatusId) &&
-            a.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId);
+            a.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
+            a.InvestigationCaseSubStatusId != createdStatus.InvestigationCaseSubStatusId  &&
+            a.InvestigationCaseSubStatusId != submitted2AssessorStatus.InvestigationCaseSubStatusId  && 
+            a.InvestigationCaseSubStatusId != assigned2AssignerStatus.InvestigationCaseSubStatusId
+            );
             
             return count;
         }
@@ -729,6 +756,9 @@ namespace risk.control.system.Services
         private int GetCreatorReAssign(string userEmail)
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
+            var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+               i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
+
             var reAssignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER);
             var withdrawnByAgency = _context.InvestigationCaseSubStatus.FirstOrDefault(
@@ -749,6 +779,10 @@ namespace risk.control.system.Services
                         a.UserEmailActioned == companyUser.Email &&
                         a.UserRoleActionedTo == $"{companyUser.ClientCompany.Email}")
                  ||
+                 (a.UserEmailActioned == companyUser.Email &&
+                        a.UserEmailActionedTo == companyUser.Email &&
+                        a.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId) 
+                        ||
                 (a.IsReviewCase && a.InvestigationCaseSubStatusId == reAssignedStatus.InvestigationCaseSubStatusId &&
                 a.UserEmailActionedTo == string.Empty &&
                 a.UserRoleActionedTo == $"{companyUser.ClientCompany.Email}"));
@@ -767,8 +801,7 @@ namespace risk.control.system.Services
                 (
                     (a.UserEmailActioned == companyUser.Email &&
                         a.UserEmailActionedTo == companyUser.Email &&
-                        a.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId &&
-                        a.ORIGIN == ORIGIN.MANUAL)
+                        a.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId)
                 ));
 
             return count;

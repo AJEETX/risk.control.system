@@ -273,6 +273,11 @@ namespace risk.control.system.Services
                     claimDocument.CopyTo(dataStream);
                     claimsInvestigation.PolicyDetail.DocumentImage = dataStream.ToArray();
                 }
+                var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
+
+                var assigned2AssignerStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
 
                 claimsInvestigation.Updated = DateTime.Now;
                 claimsInvestigation.UserEmailActioned = userEmail;
@@ -281,8 +286,9 @@ namespace risk.control.system.Services
                 claimsInvestigation.UpdatedBy = userEmail;
                 claimsInvestigation.CurrentUserEmail = userEmail;
                 claimsInvestigation.CurrentClaimOwner = currentUser.Email;
-                claimsInvestigation.InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INITIATED).InvestigationCaseStatusId;
-                claimsInvestigation.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR).InvestigationCaseSubStatusId;
+                claimsInvestigation.InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => 
+                i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INITIATED).InvestigationCaseStatusId;
+                claimsInvestigation.InvestigationCaseSubStatusId = create? createdStatus.InvestigationCaseSubStatusId:assigned2AssignerStatus.InvestigationCaseSubStatusId;
 
                 var aaddedClaimId = _context.ClaimsInvestigation.Add(claimsInvestigation);
                 var log = new InvestigationTransaction
