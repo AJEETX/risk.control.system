@@ -1129,6 +1129,7 @@ namespace risk.control.system.Services
             claimsCaseToReassign.UserRoleActionedTo = $"{currentUser.ClientCompany.Email}";
             claimsCaseToReassign.Updated = DateTime.Now;
             claimsCaseToReassign.UpdatedBy = userEmail;
+            claimsCaseToReassign.VendorId = null;
             claimsCaseToReassign.CurrentUserEmail = userEmail;
             claimsCaseToReassign.IsReviewCase = true;
             claimsCaseToReassign.AssessView = 0;

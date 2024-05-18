@@ -380,13 +380,13 @@ namespace risk.control.system.Services
             var requestedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR);
 
-            IQueryable<ClaimsInvestigation> applicationDbContext = GetAgencyClaims();
-
             var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
 
+            IQueryable<ClaimsInvestigation> applicationDbContext = GetAgencyClaims().Where(i => i.VendorId == vendorUser.VendorId);
+
+
             var count = applicationDbContext
-                    .Count(i => i.VendorId == vendorUser.VendorId 
-                    && i.InvestigationCaseSubStatusId == allocatedStatus.InvestigationCaseSubStatusId ||
+                    .Count(i => i.InvestigationCaseSubStatusId == allocatedStatus.InvestigationCaseSubStatusId ||
                     i.InvestigationCaseSubStatusId == requestedStatus.InvestigationCaseSubStatusId);
             
             return count;

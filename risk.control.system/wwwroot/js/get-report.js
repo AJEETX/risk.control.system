@@ -19,7 +19,7 @@ $(document).ready(function () {
 
     var answerinput = document.getElementById('answer');
     if (answerinput) {
-        answerinput.value = "The person detailed information is that there is no previous claim. Attached  is the duly completed and signed document."
+        answerinput.value = "The person detailed information is that there is no previous claim. Attached is the duly completed and signed document."
         answerinput.focus();
     }
     $("#document").on('change', function () {

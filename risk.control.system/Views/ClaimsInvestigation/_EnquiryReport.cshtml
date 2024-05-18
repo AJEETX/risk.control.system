@@ -23,48 +23,67 @@
             </div>
             <div class="card-body">
                 <div class="row">
-
-                    <table>
-                        <tr>
-                            <td>
-                                @if (Model.ClaimsInvestigation.AgencyReport?.EnquiryRequest.QuestionImageAttachment != null)
-                                {
-                                    <img title="enquiry document" id="enquiryDocument" class="img-fluid doc-profile-image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.ClaimsInvestigation.AgencyReport?.EnquiryRequest.QuestionImageAttachment))">
-                                }
-                                else
-                                {
-                                    <img title="enquiry document" id="enquiryDocument" alt="face image" class="img-fluid doc-profile-image" src=@Applicationsettings.NO_IMAGE>
-                                }
-                            </td>
-                            <td>
-                                @Model.ClaimsInvestigation.AgencyReport.EnquiryRequest.Subject
-                            </td>
-                            <td>
-                                @Model.ClaimsInvestigation.AgencyReport.EnquiryRequest.AnswerSelected
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                @if (Model.ClaimsInvestigation.AgencyReport?.EnquiryRequest.AnswerImageAttachment != null)
-                                {
-                                    <img title="enquiry document" id="enquiryDocument" class="img-fluid doc-profile-image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.ClaimsInvestigation.AgencyReport?.EnquiryRequest.AnswerImageAttachment))">
-                                }
-                                else
-                                {
-                                    <img title="enquiry document" id="enquiryDocument" alt="face image" class="img-fluid doc-profile-image" src=@Applicationsettings.NO_IMAGE>
-                                }
-
-                            </td>
-                            <td>
-                                @Model.ClaimsInvestigation.AgencyReport.EnquiryRequest.Description
-                            </td>
-                            <td>
-                                <i class="fas fa-user-check"></i> @Model.ClaimsInvestigation.AgencyReport.EnquiryRequest.Answer
-                            </td>
-                        </tr>
-                    </table>
+                    <div class="col-md-12">
+                        <div class="col-12 d-flex align-items-stretch flex-column">
+                            <table id="customerTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        Query
+                                    </th>
+                                    <th>
+                                        Reply
+                                    </th>
+                                    <th>
+                                        File
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tr>
+                                <td>
+                                    @Model.ClaimsInvestigation.AgencyReport.EnquiryRequest.Subject
+                                </td>
+                                <td>
+                                    @Model.ClaimsInvestigation.AgencyReport.EnquiryRequest.AnswerSelected
+                                </td>
+                                <td>
+                                    @if (Model.ClaimsInvestigation.AgencyReport?.EnquiryRequest.QuestionImageAttachment != null)
+                                    {
+                                        <img title="enquiry document" id="enquiryDocument" class="img-fluid doc-profile-image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.ClaimsInvestigation.AgencyReport?.EnquiryRequest.QuestionImageAttachment))">
+                                    }
+                                    else
+                                    {
+                                        <img title="enquiry document" id="enquiryDocument" alt="face image" class="img-fluid doc-profile-image" src=@Applicationsettings.NO_IMAGE>
+                                    }
+                                </td>
 
 
+                            </tr>
+                            <tr>
+
+                                <td>
+                                    @Model.ClaimsInvestigation.AgencyReport.EnquiryRequest.Description
+                                </td>
+                                <td>
+                                    <i class="fas fa-user-check"></i> @Model.ClaimsInvestigation.AgencyReport.EnquiryRequest.Answer
+                                </td>
+                                <td>
+                                    @if (Model.ClaimsInvestigation.AgencyReport?.EnquiryRequest.AnswerImageAttachment != null)
+                                    {
+                                        <img title="enquiry document" id="enquiryDocument" class="img-fluid doc-profile-image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.ClaimsInvestigation.AgencyReport?.EnquiryRequest.AnswerImageAttachment))">
+                                    }
+                                    else
+                                    {
+                                        <img title="enquiry document" id="enquiryDocument" alt="face image" class="img-fluid doc-profile-image" src=@Applicationsettings.NO_IMAGE>
+                                    }
+
+                                </td>
+
+
+                            </tr>
+                        </table>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
