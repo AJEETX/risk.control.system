@@ -1371,6 +1371,8 @@ namespace risk.control.system.Services
                 .ThenInclude(p => p.ClientCompany)
                 .Include(c => c.AgencyReport)
                 .ThenInclude(c => c.EnquiryRequest)
+                .Include(c => c.AgencyReport)
+                .ThenInclude(c => c.EnquiryRequests)
                 .Include(c => c.Vendor)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimId);
 
@@ -1417,6 +1419,8 @@ namespace risk.control.system.Services
                 enquiryRequest.AnswerImageFileExtension = Path.GetExtension(messageDocument.FileName);
                 enquiryRequest.AnswerImageFileType = messageDocument.ContentType;
             }
+
+            claim.AgencyReport.EnquiryRequests.Add(enquiryRequest);
 
             _context.QueryRequest.Update(enquiryRequest);
             claim.AgencyReport.EnquiryRequests.Add(enquiryRequest);

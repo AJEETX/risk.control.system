@@ -345,7 +345,7 @@
                         <a id="back" asp-controller="ClaimsInvestigation" class="btn btn-outline-secondary" asp-action="Assessor">
                             <i class="fas fa-arrow-left" aria-hidden="true"></i> Back
                         </a>
-                        @if (@Model.ClaimsInvestigation.IsQueryCase && @Model.ClaimsInvestigation.AgencyReport.EnquiryRequest != null)
+                        @* @if (@Model.ClaimsInvestigation.IsQueryCase && @Model.ClaimsInvestigation.AgencyReport.EnquiryRequest != null)
                         {
 
                             <div class="btn btn-warning disabled">
@@ -358,7 +358,11 @@
                                asp-route-selectedcase="@Model.ClaimsInvestigation.ClaimsInvestigationId" class="btn btn-warning">
                                 <i class="fa fa-edit"></i>  ENQUIRE
                             </a>
-                        }
+                        } *@
+                        <a id="enquire-case" asp-controller="ClaimsInvestigation" asp-action="SendEnquiry" onclick="showenquiry()"
+                           asp-route-selectedcase="@Model.ClaimsInvestigation.ClaimsInvestigationId" class="btn btn-warning">
+                            <i class="fa fa-edit"></i>  ENQUIRE
+                        </a>
                         <button id="approve-case" type="submit" class="btn btn-info">
                             <i class="fas fa-glasses" aria-hidden="true"></i> SUBMIT
                         </button>
