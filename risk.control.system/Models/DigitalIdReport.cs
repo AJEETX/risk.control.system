@@ -22,15 +22,17 @@ namespace risk.control.system.Models
         public byte[]? DigitalIdImage { get; set; }
 
         [Display(Name = "Digital Id Data")]
-        public string? DigitalIdImageData { get; set; }
+        public string? DigitalIdImageData { get; set; } = "No Location Info...";
 
         [Display(Name = "Digital Id Location")]
         public string? DigitalIdImageLocationUrl { get; set; }
 
         [Display(Name = "Digital Id Location Address")]
-        public string? DigitalIdImageLocationAddress { get; set; }
+        public string? DigitalIdImageLocationAddress { get; set; } = "No Address data";
 
         public string? DigitalIdImageMatchConfidence { get; set; } = string.Empty;
+        public bool MatchExecuted { get; set; } = false;
+        public float Similarity { get; set; } = 0;
 
         public string? DigitalIdImageLongLat { get; set; }
         public DateTime? DigitalIdImageLongLatTime { get; set; }

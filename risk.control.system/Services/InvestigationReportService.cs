@@ -11,7 +11,7 @@ namespace risk.control.system.Services
     {
         ClaimsInvestigationVendorsModel GetInvestigateReport(string currentUserEmail, string selectedcase);
 
-        Task<ClaimTransactionModel> GetApprovedReport(string selectedcase);
+        Task<ClaimTransactionModel> SubmittedDetail(string selectedcase);
 
         Task<ClaimTransactionModel> GetClaimDetails(string currentUserEmail, string id);
 
@@ -30,7 +30,7 @@ namespace risk.control.system.Services
             this._context = context;
         }
 
-        public async Task<ClaimTransactionModel> GetApprovedReport(string selectedcase)
+        public async Task<ClaimTransactionModel> SubmittedDetail(string selectedcase)
         {
             var caseLogs = await _context.InvestigationTransaction
                 .Include(i => i.InvestigationCaseStatus)

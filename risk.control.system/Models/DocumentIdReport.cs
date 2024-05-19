@@ -25,16 +25,19 @@ namespace risk.control.system.Models
         public string? DocumentIdImageType { get; set; }
 
         [Display(Name = "Document Id Data")]
-        public string? DocumentIdImageData { get; set; }
+        public string? DocumentIdImageData { get; set; } = "No Location Info...";
 
         [Display(Name = "Document Id Location")]
         public string? DocumentIdImageLocationUrl { get; set; }
 
         [Display(Name = "Document Id Location Address")]
-        public string? DocumentIdImageLocationAddress { get; set; }
+        public string? DocumentIdImageLocationAddress { get; set; } = "No Address data";
 
         public string? DocumentIdImageLongLat { get; set; }
         public DateTime? DocumentIdImageLongLatTime { get; set; }
+
+        public bool ValidationExecuted { get; set; } = false;
+
         public DocumentIdReportType DocumentIdReportType { get; set; } = DocumentIdReportType.PAN;
     }
 

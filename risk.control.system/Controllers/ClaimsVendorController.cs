@@ -259,78 +259,9 @@ namespace risk.control.system.Controllers
             }
             try
             {
-                var caseLogs = await _context.InvestigationTransaction
-                .Include(i => i.InvestigationCaseStatus)
-                .Include(i => i.InvestigationCaseSubStatus)
-                .Include(c => c.ClaimsInvestigation)
-                .ThenInclude(i => i.BeneficiaryDetail)
-                .Include(c => c.ClaimsInvestigation)
-                .ThenInclude(i => i.InvestigationCaseStatus)
-                .Include(c => c.ClaimsInvestigation)
-                .ThenInclude(i => i.InvestigationCaseSubStatus)
-                .Where(t => t.ClaimsInvestigationId == id)
-                .OrderByDescending(c => c.HopCount)?.ToListAsync();
+                
 
-                var claimsInvestigation = await _context.ClaimsInvestigation
-                  .Include(c => c.AgencyReport)
-                  .Include(c => c.AgencyReport.DocumentIdReport)
-                  .Include(c => c.AgencyReport.DigitalIdReport)
-                  .Include(c => c.AgencyReport.ReportQuestionaire)
-                  .Include(c => c.ClaimMessages)
-                  .Include(c => c.PolicyDetail)
-                  .ThenInclude(c => c.ClientCompany)
-                  .Include(c => c.PolicyDetail)
-                  .ThenInclude(c => c.CaseEnabler)
-                  .Include(c => c.PolicyDetail)
-                  .ThenInclude(c => c.CostCentre)
-                  .Include(c=>c.Vendor)
-
-                  .Include(c => c.BeneficiaryDetail)
-                  .ThenInclude(c => c.PinCode)
-                  .Include(c => c.BeneficiaryDetail)
-                  .ThenInclude(c => c.BeneficiaryRelation)
-                  .Include(c => c.BeneficiaryDetail)
-                  .ThenInclude(c => c.District)
-                  .Include(c => c.BeneficiaryDetail)
-                  .ThenInclude(c => c.State)
-                  .Include(c => c.BeneficiaryDetail)
-                  .ThenInclude(c => c.Country)
-                  .Include(c => c.CustomerDetail)
-                  .ThenInclude(c => c.Country)
-                  .Include(c => c.CustomerDetail)
-                  .ThenInclude(c => c.District)
-                  .Include(c => c.InvestigationCaseStatus)
-                  .Include(c => c.InvestigationCaseSubStatus)
-                  .Include(c => c.PolicyDetail)
-                  .ThenInclude(c => c.InvestigationServiceType)
-                  .Include(c => c.PolicyDetail)
-                  .ThenInclude(c => c.LineOfBusiness)
-                  .Include(c => c.CustomerDetail)
-                  .ThenInclude(c => c.PinCode)
-                  .Include(c => c.CustomerDetail)
-                  .ThenInclude(c => c.State)
-                    .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == id);
-
-                var location = await _context.BeneficiaryDetail
-                    .Include(c => c.BeneficiaryRelation)
-                    
-                    .FirstOrDefaultAsync(l => l.ClaimsInvestigationId == id);
-
-                if (claimsInvestigation == null)
-                {
-                    notifyService.Error("NOT FOUND !!!..");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-                var invoice = _context.VendorInvoice.FirstOrDefault(i => i.AgencyReportId == claimsInvestigation.AgencyReport.AgencyReportId);
-
-                var model = new ClaimTransactionModel
-                {
-                    ClaimsInvestigation = claimsInvestigation,
-                    Log = caseLogs,
-                    Location = location,
-                    VendorInvoice = invoice,
-                    TimeTaken = caseLogs.GetElapsedTime()
-                };
+                var model = await investigationReportService.SubmittedDetail(id);
 
                 return View(model);
             }
@@ -353,78 +284,7 @@ namespace risk.control.system.Controllers
             }
             try
             {
-                var caseLogs = await _context.InvestigationTransaction
-                .Include(i => i.InvestigationCaseStatus)
-                .Include(i => i.InvestigationCaseSubStatus)
-                .Include(c => c.ClaimsInvestigation)
-                .ThenInclude(i => i.BeneficiaryDetail)
-                .Include(c => c.ClaimsInvestigation)
-                .ThenInclude(i => i.InvestigationCaseStatus)
-                .Include(c => c.ClaimsInvestigation)
-                .ThenInclude(i => i.InvestigationCaseSubStatus)
-                .Where(t => t.ClaimsInvestigationId == id)
-                .OrderByDescending(c => c.HopCount)?.ToListAsync();
-
-                var claimsInvestigation = await _context.ClaimsInvestigation
-                  .Include(c => c.AgencyReport)
-                  .ThenInclude(c => c.EnquiryRequest)
-                  .Include(c => c.AgencyReport.DocumentIdReport)
-                  .Include(c => c.AgencyReport.DigitalIdReport)
-                  .Include(c => c.AgencyReport.ReportQuestionaire)
-                  .Include(c => c.ClaimMessages)
-                  .Include(c => c.PolicyDetail)
-                  .ThenInclude(c => c.ClientCompany)
-                  .Include(c => c.PolicyDetail)
-                  .ThenInclude(c => c.CaseEnabler)
-                  .Include(c => c.PolicyDetail)
-                  .ThenInclude(c => c.CostCentre)
-                  .Include(c=>c.Vendor)
-                  .Include(c => c.BeneficiaryDetail)
-                  .ThenInclude(c => c.PinCode)
-                  .Include(c => c.BeneficiaryDetail)
-                  .ThenInclude(c => c.BeneficiaryRelation)
-                  .Include(c => c.BeneficiaryDetail)
-                  .ThenInclude(c => c.District)
-                  .Include(c => c.BeneficiaryDetail)
-                  .ThenInclude(c => c.State)
-                  .Include(c => c.BeneficiaryDetail)
-                  .ThenInclude(c => c.Country)
-                  .Include(c => c.CustomerDetail)
-                  .ThenInclude(c => c.Country)
-                  .Include(c => c.CustomerDetail)
-                  .ThenInclude(c => c.District)
-                  .Include(c => c.InvestigationCaseStatus)
-                  .Include(c => c.InvestigationCaseSubStatus)
-                  .Include(c => c.PolicyDetail)
-                  .ThenInclude(c => c.InvestigationServiceType)
-                  .Include(c => c.PolicyDetail)
-                  .ThenInclude(c => c.LineOfBusiness)
-                  .Include(c => c.CustomerDetail)
-                  .ThenInclude(c => c.PinCode)
-                  .Include(c => c.CustomerDetail)
-                  .ThenInclude(c => c.State)
-                    .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == id);
-
-                var location = await _context.BeneficiaryDetail
-                    
-                    .FirstOrDefaultAsync(l => l.ClaimsInvestigationId == id);
-
-                if (claimsInvestigation == null)
-                {
-                    notifyService.Error("NOT FOUND !!!..");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-                var invoice = _context.VendorInvoice.FirstOrDefault(i => i.AgencyReportId == claimsInvestigation.AgencyReport.AgencyReportId);
-
-                var model = new ClaimTransactionModel
-                {
-                    ClaimsInvestigation = claimsInvestigation,
-                    Log = caseLogs,
-                    Location = location,
-                    VendorInvoice = invoice,
-                    TimeTaken = caseLogs.GetElapsedTime()
-                };
-
+                var model = await investigationReportService.SubmittedDetail(id);
                 return View(model);
             }
             catch (Exception)

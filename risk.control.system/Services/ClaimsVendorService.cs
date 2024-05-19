@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Highsoft.Web.Mvc.Charts;
+
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -92,8 +94,6 @@ namespace risk.control.system.Services
         public async Task<ClaimsInvestigation> AllocateToVendorAgent(string userEmail, string selectedcase)
         {
             var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-            var allocatedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
 
             var claimsInvestigation = claimsService.GetClaims().FirstOrDefault(m => m.ClaimsInvestigationId == selectedcase && m.VendorId == vendorUser.VendorId);
 
@@ -102,19 +102,16 @@ namespace risk.control.system.Services
 
         public async Task<ClaimsInvestigationVendorAgentModel> SelectVendorAgent(string userEmail, string selectedcase)
         {
-            var allocatedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-            i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
+            var claimsAllocate2Agent = claimsService.GetClaims().FirstOrDefault(v => v.ClaimsInvestigationId == selectedcase);
 
-            var claimsCaseToAllocateToVendorAgent = claimsService.GetClaims().FirstOrDefault(v => v.ClaimsInvestigationId == selectedcase);
-
-            var claimsCaseLocation = _context.BeneficiaryDetail
+            var beneficiaryDetail = _context.BeneficiaryDetail
                 .Include(c => c.ClaimsInvestigation)
                 .Include(c => c.PinCode)
                 .Include(c => c.BeneficiaryRelation)
                 .Include(c => c.District)
                 .Include(c => c.State)
                 .Include(c => c.Country)
-                .FirstOrDefault(c => c.BeneficiaryDetailId == claimsCaseToAllocateToVendorAgent.BeneficiaryDetail.BeneficiaryDetailId);
+                .FirstOrDefault(c => c.BeneficiaryDetailId == claimsAllocate2Agent.BeneficiaryDetail.BeneficiaryDetailId);
 
             var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.AGENT.ToString()));
 
@@ -123,7 +120,7 @@ namespace risk.control.system.Services
                 .Include(u => u.State)
                 .Include(u => u.Country)
                 .Include(u => u.PinCode)
-                .Where(u => u.VendorId == claimsCaseToAllocateToVendorAgent.VendorId && u.Active);
+                .Where(u => u.VendorId == claimsAllocate2Agent.VendorId && u.Active);
 
             List<VendorUserClaim> agents = new List<VendorUserClaim>();
             var result = dashboardService.CalculateAgentCaseStatus(userEmail);
@@ -157,8 +154,8 @@ namespace risk.control.system.Services
 
             var model = new ClaimsInvestigationVendorAgentModel
             {
-                CaseLocation = claimsCaseLocation,
-                ClaimsInvestigation = claimsCaseToAllocateToVendorAgent,
+                CaseLocation = beneficiaryDetail,
+                ClaimsInvestigation = claimsAllocate2Agent,
                 VendorUserClaims = agents
             };
             return model;
@@ -166,93 +163,28 @@ namespace risk.control.system.Services
 
         public async Task<ClaimsInvestigationVendorsModel> GetInvestigate(string userEmail, string selectedcase, bool uploaded = false)
         {
-            var claimsInvestigation = claimsService.GetClaims()
+            var claim = claimsService.GetClaims()
                 .Include(c => c.AgencyReport)
                 .ThenInclude(c => c.DigitalIdReport)
                 .Include(c => c.AgencyReport)
-                .ThenInclude(c => c.ReportQuestionaire)
-                .Include(c => c.AgencyReport)
                 .ThenInclude(c => c.DocumentIdReport)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == selectedcase);
-            var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
 
-
-            if(claimsInvestigation.AgencyReport == null)
+            if(claim.AgencyReport == null || claim.AgencyReport.AgentEmail != userEmail &&
+                claim.AgencyReport.DocumentIdReport?.DocumentIdImageLongLat == null &&
+                claim.AgencyReport.DocumentIdReport?.DocumentIdImageLongLat == null)
             {
-                claimsInvestigation.AgencyReport = new AgencyReport();
+                claim.AgencyReport = new AgencyReport();
+                claim.AgencyReport.AgentEmail = userEmail;
+
+                var emptyModel = new ClaimsInvestigationVendorsModel { AgencyReport = claim.AgencyReport, Location = claim.BeneficiaryDetail, ClaimsInvestigation = claim };
+                _context.ClaimsInvestigation.Update(claim);
+                var rowsUpdayed = _context.SaveChanges();
+                return emptyModel;
             }
-            claimsInvestigation.AgencyReport.AgentEmail = userEmail;
-
-            if (claimsInvestigation.AgencyReport.DigitalIdReport?.DigitalIdImageLongLat != null)
-            {
-                var longLat = claimsInvestigation.AgencyReport.DigitalIdReport.DigitalIdImageLongLat.IndexOf("/");
-                var latitude = claimsInvestigation.AgencyReport.DigitalIdReport.DigitalIdImageLongLat.Substring(0, longLat)?.Trim();
-                var longitude = claimsInvestigation.AgencyReport.DigitalIdReport.DigitalIdImageLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
-                var latLongString = latitude + "," + longitude;
-                var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key={Applicationsettings.GMAPData}";
-                claimsInvestigation.AgencyReport.DigitalIdReport.DigitalIdImageLocationUrl = url;
-
-                RootObject rootObject = await httpClientService.GetAddress((latitude), (longitude));
-
-                double registeredLatitude = 0;
-                double registeredLongitude = 0;
-                if (claimsInvestigation.PolicyDetail.ClaimType == ClaimType.HEALTH)
-                {
-                    registeredLatitude = Convert.ToDouble(claimsInvestigation.CustomerDetail.PinCode.Latitude);
-                    registeredLongitude = Convert.ToDouble(claimsInvestigation.CustomerDetail.PinCode.Longitude);
-                }
-                else
-                {
-                    registeredLatitude = Convert.ToDouble(claimsInvestigation.BeneficiaryDetail.PinCode.Latitude);
-                    registeredLongitude = Convert.ToDouble(claimsInvestigation.BeneficiaryDetail.PinCode.Longitude);
-                }
-                var distance = DistanceFinder.GetDistance(registeredLatitude, registeredLongitude, Convert.ToDouble(latitude), Convert.ToDouble(longitude));
-
-                var address = rootObject.display_name;
-
-                claimsInvestigation.AgencyReport.DigitalIdReport.DigitalIdImageLocationAddress = string.IsNullOrWhiteSpace(rootObject.display_name) ? "12 Heathcote Drive Forest Hill VIC 3131" : address;
-            }
-            else
-            {
-                claimsInvestigation.AgencyReport.DigitalIdReport.DigitalIdImageLocationAddress = "No Address data";
-
-                string weatherCustomData = $"No Location Info...";
-                claimsInvestigation.AgencyReport.DigitalIdReport.DigitalIdImageData = weatherCustomData;
-            }
-
-            if (claimsInvestigation.AgencyReport.DocumentIdReport?.DocumentIdImageLongLat != null)
-            {
-                var longLat = claimsInvestigation.AgencyReport.DocumentIdReport.DocumentIdImageLongLat.IndexOf("/");
-                var latitude = claimsInvestigation.AgencyReport.DocumentIdReport.DocumentIdImageLongLat.Substring(0, longLat)?.Trim();
-                var longitude = claimsInvestigation.AgencyReport.DocumentIdReport.DocumentIdImageLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
-                var latLongString = latitude + "," + longitude;
-                var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key={Applicationsettings.GMAPData}";
-                claimsInvestigation.AgencyReport.DocumentIdReport.DocumentIdImageLocationUrl = url;
-                RootObject rootObject = await httpClientService.GetAddress((latitude), (longitude));
-                double registeredLatitude = 0;
-                double registeredLongitude = 0;
-                if (claimsInvestigation.PolicyDetail.ClaimType == ClaimType.HEALTH)
-                {
-                    registeredLatitude = Convert.ToDouble(claimsInvestigation.CustomerDetail.PinCode.Latitude);
-                    registeredLongitude = Convert.ToDouble(claimsInvestigation.CustomerDetail.PinCode.Longitude);
-                }
-
-                var distance = DistanceFinder.GetDistance(registeredLatitude, registeredLongitude, Convert.ToDouble(latitude), Convert.ToDouble(longitude));
-
-                var address = rootObject.display_name;
-                claimsInvestigation.AgencyReport.DocumentIdReport.DocumentIdImageData = claimsInvestigation.AgencyReport.DocumentIdReport.DocumentIdImageData ?? "Sample data";
-                claimsInvestigation.AgencyReport.DocumentIdReport.DocumentIdImageLocationAddress = string.IsNullOrWhiteSpace(rootObject.display_name) ? "12 Heathcote Drive Forest Hill VIC 3131" : address;
-            }
-            else
-            {
-                string weatherCustomData = $"No Location Info...";
-                claimsInvestigation.AgencyReport.DocumentIdReport.DocumentIdImageData = weatherCustomData;
-                claimsInvestigation.AgencyReport.DocumentIdReport.DocumentIdImageLocationAddress = "No Address data";
-            }
-
-            var model = new ClaimsInvestigationVendorsModel { AgencyReport = claimsInvestigation.AgencyReport, Location = claimsInvestigation.BeneficiaryDetail, ClaimsInvestigation = claimsInvestigation };
-            _context.ClaimsInvestigation.Update(claimsInvestigation);
+            
+            var model = new ClaimsInvestigationVendorsModel { AgencyReport = claim.AgencyReport, Location = claim.BeneficiaryDetail, ClaimsInvestigation = claim };
+            _context.ClaimsInvestigation.Update(claim);
             var rows = _context.SaveChanges();
             return model;
         }
@@ -267,7 +199,7 @@ namespace risk.control.system.Services
                 .Include(c => c.AgencyReport.DocumentIdReport)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == selectedcase);
 
-            var claimCase = _context.BeneficiaryDetail
+            var beneficiaryDetails = _context.BeneficiaryDetail
                 .Include(c => c.ClaimsInvestigation)
                 .Include(c => c.PinCode)
                 .Include(c => c.BeneficiaryRelation)
@@ -280,7 +212,7 @@ namespace risk.control.system.Services
             {
                 claimsInvestigation.AgencyReport.SupervisorRemarks = null;
             }
-            return (new ClaimsInvestigationVendorsModel { AgencyReport = claimsInvestigation.AgencyReport, Location = claimCase, ClaimsInvestigation = claimsInvestigation });
+            return (new ClaimsInvestigationVendorsModel { AgencyReport = claimsInvestigation.AgencyReport, Location = beneficiaryDetails, ClaimsInvestigation = claimsInvestigation });
         }
 
         public async Task<ClaimTransactionModel> GetClaimsDetails(string userEmail, string selectedcase)
@@ -296,16 +228,11 @@ namespace risk.control.system.Services
                 .Include(c=>c.AgencyReport.ReportQuestionaire)
                 .FirstOrDefault(m => m.ClaimsInvestigationId == selectedcase);
             
-            var location = claimsInvestigation.BeneficiaryDetail;
-            var submittedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
-
-           
             claimsInvestigation.AgencyDeclineComment = string.Empty;
             return new ClaimTransactionModel
             {
                 ClaimsInvestigation = claimsInvestigation,
-                Location = location,
+                Location = claimsInvestigation.BeneficiaryDetail,
                 NotWithdrawable = claimsInvestigation.NotWithdrawable,
             };
         }

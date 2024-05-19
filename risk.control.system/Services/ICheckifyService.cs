@@ -73,10 +73,6 @@ namespace risk.control.system.Services
                 var claim = claimsService.GetClaims()
                                 .Include(c => c.AgencyReport)
                                 .ThenInclude(c => c.DigitalIdReport)
-                                .Include(c => c.AgencyReport)
-                                .ThenInclude(c => c.ReportQuestionaire)
-                                .Include(c => c.AgencyReport)
-                                .ThenInclude(c => c.DocumentIdReport)
                                 .FirstOrDefault(c => c.ClaimsInvestigationId == data.ClaimId);
                 
                 if(claim.AgencyReport == null)
@@ -184,13 +180,13 @@ namespace risk.control.system.Services
                         registeredLatitude = Convert.ToDouble(claim.BeneficiaryDetail.PinCode.Latitude);
                         registeredLongitude = Convert.ToDouble(claim.BeneficiaryDetail.PinCode.Longitude);
                     }
-                    var distance = DistanceFinder.GetDistance(registeredLatitude, registeredLongitude, Convert.ToDouble(latitude), Convert.ToDouble(longitude));
 
                     var address = rootObject.display_name;
 
                     claim.AgencyReport.DigitalIdReport.DigitalIdImageLocationAddress = string.IsNullOrWhiteSpace(rootObject.display_name) ? "12 Heathcote Drive Forest Hill VIC 3131" : address;
- 
+
                 }
+                claim.AgencyReport.DigitalIdReport.MatchExecuted = true;
                 claim.AgencyReport.DigitalIdReport.Updated = DateTime.Now;
                 claim.AgencyReport.DigitalIdReport.UpdatedBy = claim.AgencyReport.AgentEmail;
 
@@ -223,10 +219,6 @@ namespace risk.control.system.Services
             try
             {
                 var claim = claimsService.GetClaims()
-                .Include(c => c.AgencyReport)
-                .ThenInclude(c => c.DigitalIdReport)
-                .Include(c => c.AgencyReport)
-                .ThenInclude(c => c.ReportQuestionaire)
                 .Include(c => c.AgencyReport)
                 .ThenInclude(c => c.DocumentIdReport)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == data.ClaimId);
@@ -355,6 +347,8 @@ namespace risk.control.system.Services
                     var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key={Applicationsettings.GMAPData}";
                     claim.AgencyReport.DocumentIdReport.DocumentIdImageLocationUrl = url;
                     RootObject rootObject = await httpClientService.GetAddress((latitude), (longitude));
+                    
+                    
                     double registeredLatitude = 0;
                     double registeredLongitude = 0;
                     if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
@@ -362,12 +356,12 @@ namespace risk.control.system.Services
                         registeredLatitude = Convert.ToDouble(claim.CustomerDetail.PinCode.Latitude);
                         registeredLongitude = Convert.ToDouble(claim.CustomerDetail.PinCode.Longitude);
                     }
-                    var distance = DistanceFinder.GetDistance(registeredLatitude, registeredLongitude, Convert.ToDouble(latitude), Convert.ToDouble(longitude));
 
                     var address = rootObject.display_name;
 
                     claim.AgencyReport.DocumentIdReport.DocumentIdImageLocationAddress = string.IsNullOrWhiteSpace(rootObject.display_name) ? "12 Heathcote Drive Forest Hill VIC 3131" : address;
                 }
+                claim.AgencyReport.DocumentIdReport.ValidationExecuted = true;
                 claim.AgencyReport.DocumentIdReport.Updated = DateTime.Now;
                 claim.AgencyReport.DocumentIdReport.UpdatedBy = claim.AgencyReport.AgentEmail;
 
