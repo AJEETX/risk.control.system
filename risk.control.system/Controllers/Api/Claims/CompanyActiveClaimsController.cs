@@ -155,7 +155,7 @@ namespace risk.control.system.Controllers.Api.Claims
 
             var claims = applicationDbContext.Where(a => openStatusesIds.Contains(a.InvestigationCaseStatusId) && 
             a.InvestigationCaseSubStatusId != createdStatus.InvestigationCaseSubStatusId &&
-            a.InvestigationCaseSubStatusId != createdStatus.InvestigationCaseSubStatusId && 
+            a.InvestigationCaseSubStatusId != assigned2AssignerStatus.InvestigationCaseSubStatusId && 
             a.InvestigationCaseSubStatusId != submitted2AssessorStatus.InvestigationCaseSubStatusId);
             List<ClaimsInvestigation> newClaims = new List<ClaimsInvestigation>();
             foreach (var claim in claims)

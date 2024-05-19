@@ -535,8 +535,6 @@ namespace risk.control.system.Controllers.Api
                     .ThenInclude(c => c.PinCode)
                     .FirstOrDefault(c => c.ClaimsInvestigationId == claimId
                     );
-                var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                           i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
                 var claimCase = _context.BeneficiaryDetail
                     .Include(c => c.BeneficiaryRelation)
                     .Include(c => c.PinCode)

@@ -98,6 +98,8 @@ namespace risk.control.system.Controllers
                 var claimsInvestigation = await _context.ClaimsInvestigation
                     .Include(c => c.AgencyReport)
                     .ThenInclude(c => c.EnquiryRequest)
+                    .Include(c => c.AgencyReport)
+                    .ThenInclude(c => c.EnquiryRequests)
                   .Include(c => c.AgencyReport.DocumentIdReport)
                   .Include(c => c.AgencyReport.DigitalIdReport)
                   .Include(c => c.AgencyReport.ReportQuestionaire)
@@ -197,6 +199,8 @@ namespace risk.control.system.Controllers
                 var claimsInvestigation = await _context.ClaimsInvestigation
                     .Include(c => c.AgencyReport)
                     .ThenInclude(c => c.EnquiryRequest)
+                     .Include(c => c.AgencyReport)
+                    .ThenInclude(c => c.EnquiryRequests)
                   .Include(c => c.AgencyReport.DocumentIdReport)
                   .Include(c => c.AgencyReport.DigitalIdReport)
                   .Include(c => c.AgencyReport.ReportQuestionaire)
@@ -295,6 +299,8 @@ namespace risk.control.system.Controllers
                     .OrderByDescending(c => c.HopCount)?.ToListAsync();
 
                 var claimsInvestigation = await _context.ClaimsInvestigation
+                    .Include(c => c.AgencyReport)
+                    .ThenInclude(c => c.EnquiryRequests)
                     .Include(c => c.AgencyReport)
                     .ThenInclude(c => c.EnquiryRequest)
                   .Include(c => c.AgencyReport.DocumentIdReport)
@@ -395,6 +401,8 @@ namespace risk.control.system.Controllers
                     .OrderByDescending(c => c.HopCount)?.ToListAsync();
 
                 var claimsInvestigation = await _context.ClaimsInvestigation
+                     .Include(c => c.AgencyReport)
+                    .ThenInclude(c => c.EnquiryRequests)
                     .Include(c => c.AgencyReport)
                     .ThenInclude(c => c.EnquiryRequest)
                   .Include(c => c.AgencyReport.DocumentIdReport)
