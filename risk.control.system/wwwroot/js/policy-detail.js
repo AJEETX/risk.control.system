@@ -130,7 +130,7 @@ $(document).ready(function () {
             $(".submit-progress").removeClass("hidden");
         }, 1);
         $('#assign-manual-list').attr('disabled', 'disabled');
-        $('#assign-manual-list').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Assign");
+        $('#assign-manual-list').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Assign<b> <sub>manual</sub></b>");
 
         var nodes = document.getElementById("article").getElementsByTagName('*');
         for (var i = 0; i < nodes.length; i++) {
@@ -163,7 +163,7 @@ $(document).ready(function () {
         if (withdrawAskConfirmation) {
             e.preventDefault();
             $.confirm({
-                title: "Confirm withdrwal",
+                title: "Confirm withdrawal",
                 content: "Are you sure?",
 
                 icon: 'fas fa-undo',
