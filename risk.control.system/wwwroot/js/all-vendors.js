@@ -28,7 +28,6 @@
                 }
             },
             { "data": "domain" },
-            { "data": "name" },
             { "data": "code" },
             { "data": "phone" },
             { "data": "address", bSortable: false },
