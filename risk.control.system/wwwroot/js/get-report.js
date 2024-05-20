@@ -295,7 +295,7 @@ $(document).ready(function () {
                             $('#send-query').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Enquiring...");
                             $('#query-form').submit();
 
-                            var nodes = document.getElementById("create-form").getElementsByTagName('*');
+                            var nodes = document.getElementById("query-form").getElementsByTagName('*');
                             for (var i = 0; i < nodes.length; i++) {
                                 nodes[i].disabled = true;
                             }

@@ -99,5 +99,33 @@ namespace risk.control.system.Controllers.Api
 
             return fileAttachment != null ? File(fileAttachment.QuestionImageAttachment, fileAttachment.QuestionImageFileType, fileAttachment.QuestionImageFileName + fileAttachment.QuestionImageFileName): null;
         }
+        public async Task<IActionResult> EnquiryReplyFileAttachment(int id)
+        {
+            var userEmail = HttpContext.User.Identity.Name;
+
+            var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
+            if (applicationUser == null)
+            {
+                return NotFound();
+            }
+
+            var fileAttachment = _context.QueryRequest.FirstOrDefault(q => q.QueryRequestId == id);
+
+            return fileAttachment != null ? File(fileAttachment.AnswerImageAttachment, fileAttachment.AnswerImageFileType, fileAttachment.AnswerImageFileName + fileAttachment.AnswerImageFileName) : null;
+        }
+        public async Task<IActionResult> SupervisorFileAttachment(int id)
+        {
+            var userEmail = HttpContext.User.Identity.Name;
+
+            var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
+            if (applicationUser == null)
+            {
+                return NotFound();
+            }
+
+            var fileAttachment = _context.AgencyReport.FirstOrDefault(q => q.AgencyReportId == id);
+
+            return fileAttachment != null ? File(fileAttachment.SupervisorAttachment, fileAttachment.SupervisorFileType, fileAttachment.SupervisorFileName + fileAttachment.SupervisorFileName) : null;
+        }
     }
 }

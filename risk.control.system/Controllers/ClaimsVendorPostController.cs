@@ -1,4 +1,5 @@
-﻿using System.Web;
+﻿using System.Net;
+using System.Web;
 
 using AspNetCoreHero.ToastNotification.Abstractions;
 
@@ -131,7 +132,12 @@ namespace risk.control.system.Controllers
                     Income question2Enum = (Income)Enum.Parse(typeof(Income), question2, true);
                     question2 = question2Enum.GetEnumDisplayName();
                 }
-                var claim = await claimsInvestigationService.SubmitToVendorSupervisor(userEmail, caseLocationId, claimId, remarks, question1, question2, question3, question4);
+                var claim = await claimsInvestigationService.SubmitToVendorSupervisor(userEmail, caseLocationId, claimId, 
+                    WebUtility.HtmlDecode(remarks),  
+                    WebUtility.HtmlDecode(question1), 
+                    WebUtility.HtmlDecode(question2), 
+                    WebUtility.HtmlDecode(question3), 
+                    WebUtility.HtmlDecode(question4));
                 if(claim == null)
                 {
                     notifyService.Error("OOPs !!!..Contact Admin");

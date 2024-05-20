@@ -1215,6 +1215,9 @@ namespace risk.control.system.Services
                 using var dataStream = new MemoryStream();
                 claimDocument.CopyTo(dataStream);
                 report.SupervisorAttachment = dataStream.ToArray();
+                report.SupervisorFileName = Path.GetFileName(claimDocument.FileName);
+                report.SupervisorFileExtension = Path.GetExtension(claimDocument.FileName);
+                report.SupervisorFileType = claimDocument.ContentType;
             }
             
             report.Vendor = claim.Vendor;

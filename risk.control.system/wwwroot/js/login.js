@@ -75,6 +75,7 @@ $(document).ready(function () {
     $("#login-form").validate();
     $("#reset-form").validate();
 
+
     //$('#reset-form').submit(function (event) {
     //    if ($(this).valid()) {
     //        event.preventDefault();

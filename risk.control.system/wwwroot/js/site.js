@@ -94,61 +94,6 @@ $(document).ready(function () {
 
     fetchIpInfo();
 
-    $('#information-popup').on('click', function (e) {
-        $.alert(
-            {
-                title: " Detail Complete !",
-                content: "Detail completed <i class='far fa-thumbs-up'></i><br /> <b>Assign</b> now or later",
-                icon: 'fas fa-info',
-                animationBounce: 2.5,
-                type: 'red',
-                closeIcon: true,
-                buttons: {
-                    cancel: {
-                        text: "CLOSE",
-                        btnClass: 'btn-danger'
-                    }
-                }
-            }
-        );
-    });
-
-    $('#withdraw-information-popup').on('click', function (e) {
-        $.alert(
-            {
-                title: " Withdraw Claim !",
-                content: "The case can not be withdrawn. See <i class='fas fa-clock'></i> Timeline section  for more info",
-                icon: 'fas fa-info',
-                animationBounce: 2.5,
-                type: 'red',
-                closeIcon: true,
-                buttons: {
-                    cancel: {
-                        text: "CLOSE",
-                        btnClass: 'btn-danger'
-                    }
-                }
-            }
-        );
-    });
-
-    $('#password').on('click', function () {
-        $("body").addClass("submit-progress-bg");
-        // Wrap in setTimeout so the UI
-        // can update the spinners
-        setTimeout(function () {
-            $(".submit-progress").removeClass("hidden");
-        }, 1);
-
-        $('#password').attr('disabled', 'disabled');
-        $('#password').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Change Password");
-
-        var nodes = document.getElementById("section").getElementsByTagName('*');
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].disabled = true;
-        }
-    });
-
     $('#logout').on('click', function () {
         $("body").addClass("submit-progress-bg");
         // Wrap in setTimeout so the UI

@@ -27,23 +27,57 @@
 
                         <span>Supervisor comments: </span>
                     </p>
-                    <ul class="ml-4 mb-0 fa-ul text-muted">
-                        <li class="small">
-                            <span class="fa-li">
-                            </span>
-                           
-                            @if (Model.AgencyReport?.SupervisorAttachment != null)
-                            {
-                                <img title="enquiry document" id="enquiryDocument" class="img-fluid doc-profile-image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.AgencyReport?.SupervisorAttachment))">
-                            }
-                            else
-                            {
-                                <img title="enquiry document" id="enquiryDocument" alt="face image" class="img-fluid doc-profile-image" src=@Applicationsettings.NO_IMAGE>
-                            }
-                       
-                            @Model.AgencyReport?.SupervisorRemarks 
-                        </li>
-                    </ul>
+                    <table id="customerTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
+                        <thead>
+                            <tr>
+                                <th>
+                                    Time
+                                </th>
+                                <th>
+                                    Supervisor Response
+                                </th>
+                                <th>
+                                    Document
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    @{
+                                        string displayTime = string.Empty;
+                                        var time = @Model.AgencyReport?.SupervisorRemarksUpdated;
+                                        if (time is not null)
+                                        {
+                                            displayTime = time.Value.ToString("dd-MMM-yyy HH:mm");
+                                        }
+                                        if (time == null)
+                                        {
+                                            displayTime = @Model.AgencyReport.Created.ToString("dd-MMM-yyy HH:mm");
+                                        }
+                                    }
+                                    <span class="badge badge-light">@displayTime</span>
+                                </td>
+                                <td>
+                                    @Model.AgencyReport?.SupervisorRemarks
+
+                                </td>
+                                <td>
+                                    @if (Model.AgencyReport?.SupervisorAttachment != null)
+                                    {
+                                        <img title="enquiry document" id="enquiryDocument" class="img-fluid doc-profile-image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.AgencyReport?.SupervisorAttachment))">
+                                        <a asp-controller="Download" asp-action="SupervisorFileAttachment" target="_blank"
+                                           asp-route-id="@Model.AgencyReport.AgencyReportId" class="mailbox-attachment-name"><i class="fas fa-paperclip"></i> </a>
+                                    }
+                                    else
+                                    {
+                                        <img title="enquiry document" id="enquiryDocument" alt="face image" class="img-fluid doc-profile-image" src=@Applicationsettings.NO_IMAGE>
+                                    }
+                                </td>
+                                
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
 
             </div>

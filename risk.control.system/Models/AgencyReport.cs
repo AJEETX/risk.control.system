@@ -24,6 +24,9 @@ namespace risk.control.system.Models
         public string? SupervisorEmail { get; set; }
         public string? SupervisorRemarks { get; set; }
         public byte[]? SupervisorAttachment { get; set; }
+        public string? SupervisorFileName { get; set; }
+        public string? SupervisorFileType { get; set; }
+        public string? SupervisorFileExtension { get; set; }
         public SupervisorRemarkType? SupervisorRemarkType { get; set; }
         public DateTime? AssessorRemarksUpdated { get; set; }
         public string? AssessorEmail { get; set; }

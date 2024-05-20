@@ -148,6 +148,7 @@ $(document).ready(function () {
             $('#submit-case').attr("disabled", true);
         }
     })
+
     $('#remarks').on('blur', function () {
         var report = $('#remarks').val();
         if (report != '') {
@@ -158,6 +159,25 @@ $(document).ready(function () {
             $('#submit-case').attr("disabled", true);
         }
     })
+
+    $('#withdraw-information-popup').on('click', function (e) {
+        $.alert(
+            {
+                title: " Withdraw Claim !",
+                content: "The case can not be withdrawn. See <i class='fas fa-clock'></i> Timeline section  for more info",
+                icon: 'fas fa-info',
+                animationBounce: 2.5,
+                type: 'red',
+                closeIcon: true,
+                buttons: {
+                    cancel: {
+                        text: "CLOSE",
+                        btnClass: 'btn-danger'
+                    }
+                }
+            }
+        );
+    });
     var withdrawAskConfirmation = true;
     $('#withdraw-form').submit(function (e) {
         if (withdrawAskConfirmation) {

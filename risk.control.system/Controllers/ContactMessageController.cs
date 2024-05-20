@@ -395,7 +395,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb("Outbox", FromAction = "Index")]
-        public async Task<IActionResult> Outbox()
+        public IActionResult Outbox()
         {
             var userEmail = HttpContext.User.Identity.Name;
 

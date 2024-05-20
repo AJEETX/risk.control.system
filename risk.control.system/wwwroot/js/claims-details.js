@@ -1,6 +1,9 @@
 ﻿$(document).ready(function () {
     var askConfirmation = true;
-
+    var remarksElement = $('#remarks');
+    if (remarksElement) {
+        remarksElement.focus();
+    }
     var report = $('#remarks').val();
     if ($(this).is(':checked') && report != '') {
         //Enable the submit button.
@@ -29,7 +32,25 @@
             //If it is not checked, disable the button.
             $('#submit-case').attr("disabled", true);
         }
-    })
+    });
+    $('#decline-information-popup').on('click', function (e) {
+        $.alert(
+            {
+                title: " Decline Claim !",
+                content: "This CLAIM can not be declined as per the status.",
+                icon: 'fas fa-info',
+                animationBounce: 2.5,
+                type: 'red',
+                closeIcon: true,
+                buttons: {
+                    cancel: {
+                        text: "CLOSE",
+                        btnClass: 'btn-danger'
+                    }
+                }
+            }
+        );
+    });
 
     $('#create-form').submit(function (e) {
         if (askConfirmation) {
@@ -73,3 +94,4 @@
         }
     })
 });
+
