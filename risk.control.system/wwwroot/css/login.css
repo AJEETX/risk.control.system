@@ -56,6 +56,23 @@ div .error-message {
 .container #flip:checked ~ .cover {
     transform: rotateY(-180deg);
 }
+    .container #flip:checked ~ .cover .front {
+        transition: all 0.3s ease;
+        visibility: hidden;
+    }
+    .container #flip:checked ~ .cover .back {
+        transition: all 0.3s ease;
+        visibility: visible;
+    }
+    .container #flip~ .cover .front {
+        transition: all 0.3s ease;
+        visibility: visible;
+    }
+
+.container #flip ~ .cover .back {
+    transition: all 0.3s ease;
+    visibility: hidden;
+}
 
 .container .cover .front,
 .container .cover .back {

@@ -1177,8 +1177,8 @@ a#back-button {
 
 #time {
     font-size: .8rem;
+    font-family:Tahoma;
     width: 4rem;
-    margin-right: 3rem;
     text-align: center;
     border: 2px solid #ccc;
     background-color: white;
