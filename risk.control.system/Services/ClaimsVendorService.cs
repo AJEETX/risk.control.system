@@ -233,7 +233,7 @@ namespace risk.control.system.Services
             {
                 ClaimsInvestigation = claimsInvestigation,
                 Location = claimsInvestigation.BeneficiaryDetail,
-                NotWithdrawable = claimsInvestigation.NotWithdrawable,
+                NotWithdrawable = claimsInvestigation.NotDeclinable,
             };
         }
 

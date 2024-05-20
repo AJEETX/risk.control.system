@@ -2,7 +2,7 @@
 
 @{
     ViewData["Title"] = "Details";
-    
+
 }
 <section class="content">
     <div id="article" class="card card-secondary">
@@ -11,7 +11,8 @@
         <input type="hidden" id="policyDetailId" value="@Model.ClaimsInvestigation?.PolicyDetail.PolicyDetailId" />
         <input type="hidden" id="beneficiaryId" value="@Model.Location?.BeneficiaryDetailId" />
         <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-newspaper"></i> Details
+            <h3 class="card-title">
+                <i class="fas fa-newspaper"></i> Details
                 <span class="hover-text">
                     <i class="fas fa-info-circle"></i>
                     <span class="tooltip-text" id="information">
@@ -29,15 +30,15 @@
                         {
                             <li>
                                 <i class='far fa-thumbs-up'></i>
-                                    <button class='btn btn-danger btn-xs'>
-                                        <span class='badge badge-danger btn-xs'>
-                                            <i class='fas fa-undo'></i>
-                                        </span> Decline
-                                    </button>
-                                
+                                <button class='btn btn-danger btn-xs'>
+                                    <span class='badge badge-danger btn-xs'>
+                                        <i class='fas fa-undo'></i>
+                                    </span> Decline
+                                </button>
+
                             </li>
                         }
-                        
+
                     </span>
                 </span>
             </h3>
@@ -53,47 +54,34 @@
             </div>
             <partial name="_AgentSubmittedReport" model="@Model" />
 
-            if (!@Model.ClaimsInvestigation.NotDeclinable)
-            {
-                <div class="card-footer">
-               
-                <form id="create-form" method="post" asp-action="WithdrawCase" asp-controller="ClaimsVendorPost">
+            <div class="card-footer">
+                <form id="withdraw-form">
                     <div class="row">
-                        <input type="hidden" name="claimId" asp-for="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
                         <div class="col-md-12">
                             <div class="form-group">
-                                Decline Remarks
-                                <input id="remarks" asp-for="@Model.ClaimsInvestigation.PolicyDetail.Comments" class="form-control remarks" required />
-                                <span asp-validation-for="@Model.ClaimsInvestigation.PolicyDetail.Comments" class="text-danger"></span>
+                                This CLAIM can not be declined as per the status.
                             </div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-12">
-                                <a id="back" asp-action="Open" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i>
-                                <span class="badge badge-light"> <i class="fa fa-toggle-on"></i> </span> @Applicationsettings.BACK</a>
-                            <button id="submit-case" disabled type="submit" class="btn btn-danger"><i class="fas fa-undo"></i> DECLINE</button>
-                        </div>
-                    </div>
-                </form>
-                
-
-            </div>
-            }
-            else
-            {
-                <div class="card-footer">
-                <div class="row float-right">
-                    <div class="col-md-12">
                             <a id="back" asp-action="Open" class="btn btn-outline-secondary">
                                 <i class="fas fa-arrow-left"></i>
                                 <span class="badge badge-light"> <i class="fa fa-toggle-on"></i> </span> Back
                             </a>
-                    </div>
-                    </div>
-                </div>
 
-            }
+                            <span id="withdraw-information-popup" class="badge badge-light">
+                                <div class="btn btn-outline-danger">
+                                    <span class="badge badge-light"> <i class="fas fa-undo"></i> </span> Decline <span class="badge badge-danger">
+                                        <i class="fas fa-info"></i>
+                                    </span>
+                                </div>
+                            </span>
+
+                        </div>
+                    </div>
+                </form>
+            </div>
         }
     </div>
 </section>
