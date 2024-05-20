@@ -1,7 +1,7 @@
 ﻿@using risk.control.system.Models;
 @model ClientCompany
 <footer class="main-footer text-sm no-print">
-    @if (Model.LicenseType == Standard.Licensing.LicenseType.Trial)
+   @*  @if (Model.LicenseType == Standard.Licensing.LicenseType.Trial)
     {
         var expires = Model.ExpiryDate.Value.Subtract(DateTime.Now).Days;
         <marquee behavior="scroll" direction="left">
@@ -10,7 +10,7 @@
             <span class="badge badge-light"></span>
             <span class="badge badge-light"> Expire in @expires days. </span>
         </marquee>
-    }
+    } *@
 
     <div class="float-right d-none d-sm-block">
         <a href="https://hostedscan.com"><img src="https://hostedscan.com/hostedscan-badge-dark.svg" alt="HostedScan | An automated vulnerability scanner" height="30px" width="auto" /></a>

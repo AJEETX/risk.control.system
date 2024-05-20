@@ -40,7 +40,7 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += '<a id=details' + row.id + ' onclick="showdetails(' + row.id + ')" href="/Vendors/Details?Id=' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Details</a>&nbsp;'
+                    buttons += '<a id=details' + row.id + ' onclick="showdetails(' + row.id + ')" href="/Vendors/Details?Id=' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Details</a>'
                     //buttons += '<a onclick="showedit()" href="/Vendors/Edit?Id=' + row.id + '"  class="btn btn-xs btn-warning"><i class="fas fa-pen"></i> Edit</a>&nbsp;'
                     buttons += '<a id=delete' + row.id + ' onclick="getdetails(' + row.id + ')" href="/Vendors/Delete?Id=' + row.id + '"  class="btn btn-xs btn-danger"><i class="fas fa-trash"></i></i> Delete</a>'
                     return buttons;

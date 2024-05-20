@@ -267,7 +267,7 @@ namespace risk.control.system.Controllers.Api.Agency
                 {
                     Id = u.AgencyUser.Id,
                     Photo = string.IsNullOrWhiteSpace(u.AgencyUser.ProfilePictureUrl) ? noUserImagefilePath : u.AgencyUser.ProfilePictureUrl,
-                    Email = "<a href=''>" + u.AgencyUser.Email + "</a>",
+                    Email = "<a href=/Agency/EditUser?userId=" +u.AgencyUser.Id +">" + u.AgencyUser.Email + "</a>",
                     Name = u.AgencyUser.FirstName + " " + u.AgencyUser.LastName,
                     Phone = u.AgencyUser.PhoneNumber,
                     Addressline = "<span class='badge badge-light'>" + u.AgencyUser.Addressline +", "+ u.AgencyUser.District.Name + ", " +u.AgencyUser.State.Name +", "+u.AgencyUser.Country.Code + "</span>",
