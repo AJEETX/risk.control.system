@@ -4,8 +4,8 @@
     padding: 0;
     box-sizing: border-box;
     font-family: 'VictorMono NF';
-    font-weight: 650 !important;
-    letter-spacing: -.7px;
+    font-weight: 550 !important;
+    letter-spacing: -.5px;
     word-spacing:.1rem;
 }
 
@@ -42,7 +42,7 @@ html {
 
 @media (min-width: 768px) {
     html {
-        font-size: .97rem;
+        font-size: .98rem;
     }
 }
 
