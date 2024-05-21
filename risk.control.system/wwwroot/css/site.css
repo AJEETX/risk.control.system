@@ -4,8 +4,8 @@
     padding: 0;
     box-sizing: border-box;
     font-family: 'VictorMono NF';
-    letter-spacing: -.5px;
-    word-spacing:1px;
+    letter-spacing: -1px;
+    word-spacing:-3px;
 }
 
 a.navbar-brand {
@@ -18,7 +18,9 @@ a.navbar-brand {
 a {
     color: #0366d6;
 }
+.upload{
 
+}
 .btn-primary {
     color: #fff;
     background-color: #1b6ec2;
@@ -1095,6 +1097,7 @@ img.doc-profile-image {
     -webkit-border-radius: 0.4em;
     -moz-border-radius: 0.4em;
     border-radius: 0.4em;
+    border: 1px solid rgba(0,0,0,0.6);
     box-shadow: 0.4em 0.4em rgba(0,0,0,0.6);
     -webkit-box-shadow: 0.4em 0.4em rgba(0,0,0,0.6);
     -moz-box-shadow: 0.4em 0.4em rgba(0,0,0,0.6);
@@ -1152,6 +1155,9 @@ a.btn.btn-sm {
     min-width: 3rem;
 }
 
+button.btn.btn-info.upload {
+    margin-top: 0;
+}
 button.btn.btn-tool {
     min-width: 1rem;
 }
