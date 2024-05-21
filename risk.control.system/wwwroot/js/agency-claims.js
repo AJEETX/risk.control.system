@@ -80,10 +80,6 @@
                         var img = '<input name="selectedcase" class="selected-case" type="radio" id="' + row.id + '"  value="' + row.id + '"  />';
                         return img;
                     }
-                    else {
-                        var buttons = '<a id="details' + row.id + '" onclick="showenquiry(`' + row.id + '`)" href="/ClaimsVendor/ReplyEnquiry?Id=' + row.id + '"  class="btn btn-xs btn-warning"><i class="fas fa-question" aria-hidden="true"></i> ENQUIRY </a>'
-                        return buttons;
-                    }
                 }
             },
             {
@@ -136,7 +132,7 @@
                         buttons += '<a id="details' + row.id + '" onclick="showenquiry(`' + row.id + '`)" href="/ClaimsVendor/ReplyEnquiry?Id=' + row.id + '"  class="btn btn-xs btn-warning"><i class="fas fa-question" aria-hidden="true"></i> ENQUIRY </a>'
                     }
                     else {
-                        buttons += '<a id="details' + row.id + '" onclick="showdetails(`' + row.id + '`)" href="/ClaimsVendor/CaseDetail?Id=' + row.id + '"  class="btn btn-xs btn-danger"><i class="fas fa-undo"></i></i> DECLINE</a>'
+                        buttons += '<a id="details' + row.id + '" onclick="showdetails(`' + row.id + '`)" href="/ClaimsVendor/CaseDetail?Id=' + row.id + '"  class="btn btn-xs btn-info"><i class="fa fa-search"></i></i> DETAILS</a>'
                     }
                     return buttons;
                 }
@@ -221,7 +217,7 @@ function showdetails(id) {
         $(".submit-progress").removeClass("hidden");
     }, 1);
     $('a.btn *').attr('disabled', 'disabled');
-    $('a#details' + id + '.btn.btn-xs.btn-danger').html("<i class='fas fa-sync fa-spin'></i> DECLINE");
+    $('a#details' + id + '.btn.btn-xs.btn-info').html("<i class='fas fa-sync fa-spin'></i> DETAILS");
 
     var nodes = document.getElementById("article").getElementsByTagName('*');
     for (var i = 0; i < nodes.length; i++) {

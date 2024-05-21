@@ -51,7 +51,7 @@ namespace risk.control.system.Controllers.Api
                     {
                         Id = u.Id,
                         Name = u.FirstName + " " + u.LastName,
-                        Email = "<a href=''>" + u.Email + "</a>",
+                        Email = "<a href=/User/Edit?userId=" + u.Id + ">" + u.Email + "</a>",
                         Phone = u.PhoneNumber,
                         Photo = string.IsNullOrWhiteSpace(u.ProfilePictureUrl) ? Applicationsettings.NO_USER : u.ProfilePictureUrl,
                         Active = u.Active,

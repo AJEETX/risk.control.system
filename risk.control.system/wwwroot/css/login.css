@@ -4,8 +4,8 @@
     padding: 0;
     box-sizing: border-box;
     font-family: 'VictorMono NF';
-    letter-spacing: -1px;
-    word-spacing: .1rem;
+    letter-spacing: .5px;
+    word-spacing: 1px;
 }
 
 body {
@@ -403,8 +403,8 @@ img.logo {
     /* Set 'margin-left' to a negative number
     that is 1/2 of 'width' */
     padding-left: 5em;
-    background-color: black;
-    color: white;
+    background-color: white;
+    color: black;
     -webkit-border-radius: 0.4em;
     -moz-border-radius: 0.4em;
     border-radius: 0.4em;

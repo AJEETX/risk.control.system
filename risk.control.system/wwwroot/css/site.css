@@ -5,7 +5,7 @@
     box-sizing: border-box;
     font-family: 'VictorMono NF';
     letter-spacing: -.5px;
-    word-spacing:.1rem;
+    word-spacing:1px;
 }
 
 a.navbar-brand {
@@ -1090,8 +1090,8 @@ img.doc-profile-image {
     /* Set 'margin-left' to a negative number
     that is 1/2 of 'width' */
     padding-left: 5em;
-    background-color: black;
-    color: white;
+    background-color: white;
+    color: black;
     -webkit-border-radius: 0.4em;
     -moz-border-radius: 0.4em;
     border-radius: 0.4em;
@@ -1132,6 +1132,7 @@ input[type="text"] #emailAddress {
 
 a.btn {
     min-width: 5rem;
+    margin-top: 5px;
 }
 
     a.btn.btn-xs {
@@ -1140,6 +1141,7 @@ a.btn {
 
 button.btn {
     min-width: 5rem;
+    margin-top:5px;
 }
 
     button.btn.btn-sm {
