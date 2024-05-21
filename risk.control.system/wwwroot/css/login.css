@@ -4,8 +4,8 @@
     padding: 0;
     box-sizing: border-box;
     font-family: 'VictorMono NF';
-    letter-spacing: -1px;
-    word-spacing: -3px;
+    letter-spacing: -.05rem;
+    word-spacing: -.1rem;
 }
 
 body {
@@ -29,7 +29,7 @@ body {
 }
 
 .login-form form {
-    padding-top: 2rem;
+    padding-top: 1rem;
 }
 
 div .error-message {
@@ -37,7 +37,7 @@ div .error-message {
 }
 
 .signup-form form {
-    padding-top: 2rem;
+    padding-top:1rem;
 }
 #ipAddress, #ipAddress1 {
     padding: 2rem 5rem;
