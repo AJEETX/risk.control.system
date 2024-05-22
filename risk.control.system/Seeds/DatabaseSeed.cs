@@ -88,7 +88,7 @@ namespace risk.control.system.Seeds
 
             var claimComprehensive = new InvestigationServiceType
             {
-                Name = "COMPLETE",
+                Name = "COMPREHENSIVE",
                 Code = "COMP",
                 MasterData = true,
                 Updated = DateTime.Now,
@@ -98,8 +98,8 @@ namespace risk.control.system.Seeds
 
             var claimNonComprehensive = new InvestigationServiceType
             {
-                Name = "RANDOM",
-                Code = "RAND",
+                Name = "NON-COMPREHENSIVE",
+                Code = "NON-COMP",
                 MasterData = true,
                 Updated = DateTime.Now,
                 LineOfBusiness = claimCaseType.Entity
@@ -109,8 +109,8 @@ namespace risk.control.system.Seeds
 
             var claimDocumentCollection = new InvestigationServiceType
             {
-                Name = "COLLECTION",
-                Code = "COLL",
+                Name = "DOCUMENT-COLLECTION",
+                Code = "DOC",
                 MasterData = true,
                 Updated = DateTime.Now,
                 LineOfBusiness = claimCaseType.Entity
@@ -121,7 +121,7 @@ namespace risk.control.system.Seeds
             var claimDiscreet = new InvestigationServiceType
             {
                 Name = "DISCREET",
-                Code = "DISC",
+                Code = "DISCREET",
                 MasterData = true,
                 Updated = DateTime.Now,
                 LineOfBusiness = claimCaseType.Entity
@@ -131,8 +131,8 @@ namespace risk.control.system.Seeds
 
             var underWritingPreVerification = new InvestigationServiceType
             {
-                Name = "PRE-ISSUED",
-                Code = "PREIS",
+                Name = "PRE-ONBOARDING-VERIFICATION",
+                Code = "PRE-OV",
                 MasterData = true,
                 Updated = DateTime.Now,
                 LineOfBusiness = underwritingCaseType.Entity
@@ -142,8 +142,8 @@ namespace risk.control.system.Seeds
 
             var underWritingPostVerification = new InvestigationServiceType
             {
-                Name = "POST-ISSUED",
-                Code = "POSTIS",
+                Name = "POST-ONBOARDING-VERIFICATION",
+                Code = "POST-OV",
                 MasterData = true,
                 LineOfBusiness = underwritingCaseType.Entity
             };
