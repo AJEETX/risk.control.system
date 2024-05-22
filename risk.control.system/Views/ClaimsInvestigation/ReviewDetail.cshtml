@@ -81,28 +81,7 @@
                 <div class="bb-blog-inner">
                     <div class="card card-light expand-card">
                         <div class="card-header">
-                            <h3 class="card-title">
-                                <span class="badge badge-info">
-                                    Status:
-                                    <b>   @Model.ClaimsInvestigation?.InvestigationCaseSubStatus.Name</b>
-                                </span>
-                                |
-
-                                <span class="badge badge-secondary">
-                                    Owner :
-                                    @{
-                                        if (string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.UserEmailActionedTo))
-                                        {
-                                            <b>   @Model.ClaimsInvestigation?.UserRoleActionedTo</b>
-                                        }
-                                        else
-                                        {
-                                            <b>   @Model.ClaimsInvestigation?.UserEmailActionedTo</b>
-
-                                        }
-                                    }
-                                </span>
-                            </h3>
+                            <h3 class="card-title">Claim: <span class="badge badge-light"><i class="far fa-file-powerpoint"></i>  @Model.ClaimsInvestigation?.PolicyDetail?.ContractNumber</span></h3>
                             <div class="card-tools">
                                 <span data-toggle="tooltip" title="Claim # : @Model.ClaimsInvestigation?.PolicyDetail?.ContractNumber" class="badge badge-light"> <i class="far fa-file-powerpoint"></i> </span>
                                 <button type="button" class="btn btn-tool" data-card-widget="collapse">
