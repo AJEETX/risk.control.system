@@ -33,7 +33,6 @@ namespace risk.control.system.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly IWebHostEnvironment env;
         private readonly UserManager<Models.ApplicationUser> _userManager;
         private readonly SignInManager<Models.ApplicationUser> _signInManager;
         private readonly IHttpContextAccessor httpContextAccessor;
@@ -45,7 +44,6 @@ namespace risk.control.system.Controllers
         private readonly ApplicationDbContext _context;
 
         public AccountController(
-            IWebHostEnvironment env,
             UserManager<Models.ApplicationUser> userManager,
             SignInManager<Models.ApplicationUser> signInManager,
              IHttpContextAccessor httpContextAccessor,
@@ -56,7 +54,6 @@ namespace risk.control.system.Controllers
             INotyfService notifyService,
             ApplicationDbContext context)
         {
-            this.env = env;
             _userManager = userManager ?? throw new ArgumentNullException();
             _signInManager = signInManager ?? throw new ArgumentNullException();
             this.httpContextAccessor = httpContextAccessor;
@@ -71,6 +68,22 @@ namespace risk.control.system.Controllers
         [TempData]
         public string ErrorMessage { get; set; }
 
+
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> icheckify()
+        {
+            var timer = DateTime.Now;
+            // Clear the existing external cookie to ensure a clean login process
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            await _signInManager.SignOutAsync();
+            var showLoginUsers = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
+            if (showLoginUsers)
+            {
+                    ViewData["Users"] = new SelectList(_context.Users.Where(u=>u.Email.StartsWith("admin")).OrderBy(o => o.Email), "Email", "Email");
+            }
+            return View(new LoginViewModel { ShowUserOnLogin = showLoginUsers });
+        }
         [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> Login()
@@ -82,7 +95,16 @@ namespace risk.control.system.Controllers
             var showLoginUsers = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
             if (showLoginUsers)
             {
-                ViewData["Users"] = new SelectList(_context.Users.OrderBy(o => o.Email), "Email", "Email");
+                var showgtrialUsers = await featureManager.IsEnabledAsync(FeatureFlags.TrialVersion);
+                if(showgtrialUsers)
+                {
+                    ViewData["Users"] = new SelectList(_context.Users.Where(u=>!u.Email.StartsWith("admin")).OrderBy(o => o.Email), "Email", "Email");
+                }
+                else
+                {
+                    ViewData["Users"] = new SelectList(_context.Users.OrderBy(o => o.Email), "Email", "Email");
+                }
+
             }
             return View(new LoginViewModel { ShowUserOnLogin = showLoginUsers });
         }
