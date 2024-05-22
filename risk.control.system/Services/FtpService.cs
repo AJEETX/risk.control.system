@@ -215,7 +215,8 @@ namespace risk.control.system.Services
                     DataTable dt = new DataTable();
                     bool firstRow = true;
                     var dataRows = csvData.Split('\n');
-                    if(totalClaimsCreated?.Count + dataRows.Length - 1  <= companyUser.ClientCompany.TotalCreatedClaimAllowed)
+
+                    if(userCanCreate)
                     {
                         foreach (string row in dataRows)
                         {
