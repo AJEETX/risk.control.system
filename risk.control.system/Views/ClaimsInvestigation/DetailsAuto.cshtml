@@ -140,9 +140,7 @@
 
             </h3>
         </div>
-        <div class="submit-progress hidden">
-            <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
-        </div>
+        
         @{
             
             <input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail?.CustomerDetailId" />
@@ -165,7 +163,9 @@
                 </div>
             </div>
             <div class="card-body">
-                
+                <div class="submit-progress hidden">
+                    <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+                </div>
                 <div class="row">
                     <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
                         <div class="card bg-light d-flex flex-fill">

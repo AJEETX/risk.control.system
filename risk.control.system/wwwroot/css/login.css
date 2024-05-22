@@ -3,9 +3,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'VictorMono NF';
-    letter-spacing: -.05rem;
-    word-spacing: -.1rem;
+    font-family: Tahoma;
 }
 
 body {
