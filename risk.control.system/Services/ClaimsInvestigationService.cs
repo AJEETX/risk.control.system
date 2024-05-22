@@ -727,7 +727,6 @@ namespace risk.control.system.Services
                 claim.CurrentUserEmail = currentUser;
                 claim.InvestigateView = 0;
                 claim.NotWithdrawable = true;
-                claim.NotDeclinable = true;
                 claim.CurrentClaimOwner = agentUser.Email;
                 claim.InvestigationCaseSubStatusId = assignedToAgent.InvestigationCaseSubStatusId;
 
@@ -774,6 +773,7 @@ namespace risk.control.system.Services
                 .Include(c => c.PolicyDetail)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimsInvestigationId);
 
+            claim.NotDeclinable = true;
             claim.VerifyView = 0;
             claim.InvestigateView = 0;
             claim.UserEmailActioned = userEmail;
