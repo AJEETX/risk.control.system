@@ -15,6 +15,8 @@ using System.Globalization;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 using Microsoft.AspNetCore.Authorization;
 using static risk.control.system.AppConstant.Applicationsettings;
+using System.Text;
+using Microsoft.AspNetCore.Hosting;
 
 namespace risk.control.system.Controllers.Api.Claims
 {
@@ -24,11 +26,13 @@ namespace risk.control.system.Controllers.Api.Claims
     public class CompanyActiveClaimsController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly IWebHostEnvironment webHostEnvironment;
         private readonly IClaimsService claimsService;
 
-        public CompanyActiveClaimsController(ApplicationDbContext context, IClaimsService claimsService)
+        public CompanyActiveClaimsController(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, IClaimsService claimsService)
         {
             _context = context;
+            this.webHostEnvironment = webHostEnvironment;
             this.claimsService = claimsService;
         }
 
@@ -88,7 +92,9 @@ namespace risk.control.system.Controllers.Api.Claims
                 _context.ClaimsInvestigation.UpdateRange(newClaims);
                 _context.SaveChanges();
             }
-            
+            var profilebuilder = new StringBuilder();
+            profilebuilder.Append("<i class='fas fa-portrait'></i> Profile Image <span class='badge badge-light'></span>");
+
             var response = claimsSubmitted
                     .Select(a => new ClaimsInvesgationResponse
                     {
@@ -99,9 +105,8 @@ namespace risk.control.system.Controllers.Api.Claims
                         PolicyId = a.PolicyDetail.ContractNumber,
                         Amount = String.Format(new CultureInfo("hi-IN"), "{0:C}", a.PolicyDetail.SumAssuredValue),
                         AssignedToAgency = a.AssignedToAgency,
-                        Agent = !string.IsNullOrWhiteSpace(a.UserEmailActionedTo) ?
-                        string.Join("", "<span class='badge badge-light'>" + a.UserEmailActionedTo + "</span>") :
-                        string.Join("", "<span class='badge badge-light'>" + a.UserRoleActionedTo + "</span>"),
+                        Agent = !string.IsNullOrWhiteSpace(a.UserEmailActionedTo) ? a.UserEmailActionedTo : a.UserRoleActionedTo,
+                        OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(GetOwner(a))),
                         Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
                         PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
                         Document = a.PolicyDetail?.DocumentImage != null ?
@@ -134,7 +139,61 @@ namespace risk.control.system.Controllers.Api.Claims
 
             return Ok(response);
         }
+        private byte[] GetOwner(ClaimsInvestigation a)
+        {
+            string ownerEmail= string.Empty;
+            string ownerDomain = string.Empty;
+            ClientCompany company = null;
+            ClientCompanyApplicationUser companyuser = null;
+            Vendor vendorOwner = null;
+            VendorApplicationUser agent = null;
+            string profileImage = string.Empty;
+            var allocated2agent = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
 
+            if (!string.IsNullOrWhiteSpace(a.UserEmailActionedTo) && a.InvestigationCaseSubStatusId == allocated2agent.InvestigationCaseSubStatusId)
+            {
+                ownerEmail = a.UserEmailActionedTo;
+                var agentProfile = _context.VendorApplicationUser.FirstOrDefault(u => u.Email == ownerEmail)?.ProfilePicture;
+                if(agentProfile == null)
+                {
+                    var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-photo.jpg");
+
+                    var noDataimage = System.IO.File.ReadAllBytes(noDataImagefilePath);
+                    return noDataimage;
+                }
+                return agentProfile;
+            }
+            else if (string.IsNullOrWhiteSpace(a.UserEmailActionedTo) &&
+                !string.IsNullOrWhiteSpace(a.UserRoleActionedTo) 
+                && a.AssignedToAgency)
+            {
+                ownerDomain = a.UserRoleActionedTo;
+                var vendorImage = _context.Vendor.FirstOrDefault(v=>v.Email ==  ownerDomain)?.DocumentImage;
+                if(vendorImage == null)
+                {
+                    var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-photo.jpg");
+
+                    var noDataimage = System.IO.File.ReadAllBytes(noDataImagefilePath);
+                    return noDataimage;
+                }
+                return vendorImage;
+            }
+            else
+            {
+                ownerDomain = a.UserRoleActionedTo;
+                var companyImage = _context.ClientCompany.FirstOrDefault(v => v.Email == ownerDomain)?.DocumentImage;
+                if(companyImage == null)
+                {
+                    var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-photo.jpg");
+
+                    var noDataimage = System.IO.File.ReadAllBytes(noDataImagefilePath);
+                    return noDataimage;
+                }
+                return companyImage;
+            }
+
+        }
         [HttpGet("GetManagerActive")]
         public IActionResult GetManagerActive()
         {
@@ -183,9 +242,8 @@ namespace risk.control.system.Controllers.Api.Claims
                         PolicyId = a.PolicyDetail.ContractNumber,
                         Amount = String.Format(new CultureInfo("hi-IN"), "{0:C}", a.PolicyDetail.SumAssuredValue),
                         AssignedToAgency = a.AssignedToAgency,
-                        Agent = !string.IsNullOrWhiteSpace(a.UserEmailActionedTo) ?
-                        string.Join("", "<span class='badge badge-light'>" + a.UserEmailActionedTo + "</span>") :
-                        string.Join("", "<span class='badge badge-light'>" + a.UserRoleActionedTo + "</span>"),
+                        Agent = !string.IsNullOrWhiteSpace(a.UserEmailActionedTo) ? a.UserEmailActionedTo : a.UserRoleActionedTo,
+                        OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(GetOwner(a))),
                         Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
                         PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
                         Document = a.PolicyDetail?.DocumentImage != null ?
@@ -373,9 +431,8 @@ namespace risk.control.system.Controllers.Api.Claims
                         PolicyId = a.PolicyDetail.ContractNumber,
                         Amount = String.Format(new CultureInfo("hi-IN"), "{0:C}", a.PolicyDetail.SumAssuredValue),
                         AssignedToAgency = a.AssignedToAgency,
-                        Agent = !string.IsNullOrWhiteSpace(a.UserEmailActionedTo) ?
-                        string.Join("", "<span class='badge badge-light'>" + a.UserEmailActionedTo + "</span>") :
-                        string.Join("", "<span class='badge badge-light'>" + a.UserRoleActionedTo + "</span>"),
+                        Agent = !string.IsNullOrWhiteSpace(a.UserEmailActionedTo) ? a.UserEmailActionedTo : a.UserRoleActionedTo,
+                        OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(GetOwner(a))),
                         Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
                         PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
                         Document = a.PolicyDetail?.DocumentImage != null ?

@@ -33,5 +33,6 @@
         public bool AutoAllocated { get; set; }
         public bool? IsNewAssigned { get; set; }
         public bool? IsQueryCase { get; set; }
+        public string OwnerDetail { get; set; }
     }
 }

@@ -73,7 +73,13 @@ $(document).ready(function () {
             { "data": "location" },
             { "data": "created" },
             { "data": "timePending" },
-            { "data": "agent" },
+            {
+                "data": "agent",
+                "mRender": function (data, type, row) {
+                    var img = '<img alt="' + row.agent + '" title="' + row.agent + '" src="' + row.ownerDetail + '" class="table-profile-image" data-toggle="tooltip"/>';
+                    return img;
+                }
+            },
             {
                 "sDefaultContent": "",
                 "bSortable": false,

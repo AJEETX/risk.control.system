@@ -98,7 +98,7 @@ namespace risk.control.system.Seeds
 
             var claimNonComprehensive = new InvestigationServiceType
             {
-                Name = "NON-COMPREHENSIVE",
+                Name = "STANDARD",
                 Code = "NON-COMP",
                 MasterData = true,
                 Updated = DateTime.Now,
@@ -109,7 +109,7 @@ namespace risk.control.system.Seeds
 
             var claimDocumentCollection = new InvestigationServiceType
             {
-                Name = "DOCUMENT-COLLECTION",
+                Name = "COLLECTION",
                 Code = "DOC",
                 MasterData = true,
                 Updated = DateTime.Now,
@@ -131,7 +131,7 @@ namespace risk.control.system.Seeds
 
             var underWritingPreVerification = new InvestigationServiceType
             {
-                Name = "PRE-ONBOARDING-VERIFICATION",
+                Name = "PRE-BOARD",
                 Code = "PRE-OV",
                 MasterData = true,
                 Updated = DateTime.Now,
@@ -142,7 +142,7 @@ namespace risk.control.system.Seeds
 
             var underWritingPostVerification = new InvestigationServiceType
             {
-                Name = "POST-ONBOARDING-VERIFICATION",
+                Name = "POST-BOARD",
                 Code = "POST-OV",
                 MasterData = true,
                 LineOfBusiness = underwritingCaseType.Entity

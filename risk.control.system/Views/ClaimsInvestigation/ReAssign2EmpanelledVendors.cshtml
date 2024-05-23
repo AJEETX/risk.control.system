@@ -436,17 +436,17 @@
                                     <th data-orderable="false">
                                         Agency
                                     </th>
-
+                                    <th>
+                                        Domain
+                                    </th>
                                     <th>
                                         Name
                                     </th>
-
+                                   
                                     <th data-orderable="false">
                                         Phone #
                                     </th>
-                                    <th>
-                                        Email
-                                    </th>
+                                    
                                     <th data-orderable="false">
                                         Address
                                     </th>
@@ -470,7 +470,7 @@
                                 {
                                     var vendorId = item.Vendor.VendorId;
                                     <tr>
-                                        <td bSortable="false">
+                                        <td>
                                             <input id="@item.Vendor.VendorId" name="selectedcase" class="selected-case" type="radio" value="@item.Vendor.VendorId" />
                                         </td>
                                         

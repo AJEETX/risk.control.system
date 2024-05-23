@@ -436,17 +436,17 @@
                                     <th data-orderable="false">
                                         Agency
                                     </th>
-
                                     <th>
-                                         Name
+                                        Domain
+                                    </th>
+                                    <th>
+                                        Name
                                     </th>
 
                                     <th data-orderable="false">
                                         Phone #
                                     </th>
-                                    <th>
-                                        Email
-                                    </th>
+
                                     <th data-orderable="false">
                                         Address
                                     </th>
@@ -473,6 +473,7 @@
                                         <td>
                                             <input id="@item.Vendor.VendorId" name="selectedcase" class="selected-case" type="radio" value="@item.Vendor.VendorId" />
                                         </td>
+
                                         <td>
                                             @if (item?.Vendor.DocumentUrl is not null)
                                             {
@@ -482,6 +483,13 @@
                                             {
                                                 <img title="..." id="profileImage" class="form-Image" src="@Applicationsettings.NO_IMAGE" data-toggle="tooltip" />
                                             }
+                                        </td>
+                                        <td>
+                                            <a id="@item.Vendor.VendorId" onclick="showVendor(@item.Vendor.VendorId)"
+                                               class="link-underline-primary" asp-action="VendorDetailAuto" asp-route-selectedcase="@Model.ClaimsInvestigation.ClaimsInvestigationId"
+                                               asp-route-id="@item.Vendor.VendorId">
+                                                @Html.DisplayFor(modelItem => item.Vendor.Email)
+                                            </a>
                                         </td>
                                         <td>
                                             @Html.DisplayFor(modelItem => item.Vendor.Name)
@@ -506,13 +514,7 @@
                                         <td>
                                             @Html.DisplayFor(modelItem => item.Vendor.PhoneNumber)
                                         </td>
-                                        <td>
-                                            <a id="@item.Vendor.VendorId" onclick="showVendor(@item.Vendor.VendorId)"
-                                               class="btn btn-xs btn-warning" asp-action="VendorDetail" asp-route-selectedcase="@Model.ClaimsInvestigation.ClaimsInvestigationId"
-                                               asp-route-id="@item.Vendor.VendorId">
-                                                @Html.DisplayFor(modelItem => item.Vendor.Email)
-                                               </a>...
-                                        </td>
+
                                         <td>
                                             @Html.DisplayFor(modelItem => item.Vendor.Addressline)
                                         </td>
@@ -541,7 +543,7 @@
                                             }
                                         </td>
 
-                                       
+
                                     </tr>
                                 }
                             </tbody>

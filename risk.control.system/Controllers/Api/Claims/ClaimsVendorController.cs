@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -27,19 +28,23 @@ namespace risk.control.system.Controllers.Api.Claims
     public class ClaimsVendorController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly IWebHostEnvironment webHostEnvironment;
         private readonly IDashboardService dashboardService;
         private readonly UserManager<VendorApplicationUser> userManager;
 
-        public ClaimsVendorController(ApplicationDbContext context, IDashboardService dashboardService, UserManager<VendorApplicationUser> userManager)
+        public ClaimsVendorController(ApplicationDbContext context,
+             IWebHostEnvironment webHostEnvironment, 
+             IDashboardService dashboardService, UserManager<VendorApplicationUser> userManager)
         {
             _context = context;
+            this.webHostEnvironment = webHostEnvironment;
             this.dashboardService = dashboardService;
             this.userManager = userManager;
         }
 
         [HttpGet("GetOpen")]
         [Authorize(Roles = "AGENCY_ADMIN,SUPERVISOR")]
-        public async Task<IActionResult> GetOpen()
+        public IActionResult GetOpen()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
@@ -83,9 +88,8 @@ namespace risk.control.system.Controllers.Api.Claims
                        AssignedToAgency = a.AssignedToAgency,
                        PolicyId = a.PolicyDetail.ContractNumber,
                        Amount = string.Format(new CultureInfo("hi-IN"), "{0:C}", a.PolicyDetail.SumAssuredValue),
-                       Agent = !string.IsNullOrWhiteSpace(a.UserEmailActionedTo) ?
-                        string.Join("", "<span class='badge badge-light'>" + a.UserEmailActionedTo + "</span>") :
-                        string.Join("", "<span class='badge badge-light'>" + a.UserRoleActionedTo + "</span>"),
+                       Agent = !string.IsNullOrWhiteSpace(a.UserEmailActionedTo) ? a.UserEmailActionedTo : a.UserRoleActionedTo,
+                       OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(GetOwner(a))),
                        Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
                        PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
                        Company = a.PolicyDetail.ClientCompany.Name,
@@ -121,16 +125,16 @@ namespace risk.control.system.Controllers.Api.Claims
                 (a.UserEmailActioned == vendorUser.Email && a.InvestigationCaseSubStatus == submittedToAssesssorStatus)
                 );
 
-                var response = applicationDbContext
+                var claimsSubmitted = applicationDbContext?.ToList();
+                var response = claimsSubmitted?
                    .Select(a => new ClaimsInvesgationResponse
                    {
                        Id = a.ClaimsInvestigationId,
                        AssignedToAgency = a.AssignedToAgency,
                        PolicyId = a.PolicyDetail.ContractNumber,
                        Amount = string.Format(new CultureInfo("hi-IN"), "{0:C}", a.PolicyDetail.SumAssuredValue),
-                       Agent = !string.IsNullOrWhiteSpace(a.UserEmailActionedTo) ?
-                        string.Join("", "<span class='badge badge-light'>" + a.UserEmailActionedTo + "</span>") :
-                        string.Join("", "<span class='badge badge-light'>" + a.UserRoleActionedTo + "</span>"),
+                       Agent = !string.IsNullOrWhiteSpace(a.UserEmailActionedTo) ? a.UserEmailActionedTo : a.UserRoleActionedTo,
+                       OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(GetOwner(a))),
                        Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
                        PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
                        Company = a.PolicyDetail.ClientCompany.Name,
@@ -160,9 +164,63 @@ namespace risk.control.system.Controllers.Api.Claims
             return Ok(null);
         }
 
+        private byte[] GetOwner(ClaimsInvestigation a)
+        {
+            string ownerEmail = string.Empty;
+            string ownerDomain = string.Empty;
+            ClientCompany company = null;
+            ClientCompanyApplicationUser companyuser = null;
+            Vendor vendorOwner = null;
+            VendorApplicationUser agent = null;
+            string profileImage = string.Empty;
+            var allocated2agent = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
 
+            if (!string.IsNullOrWhiteSpace(a.UserEmailActionedTo) && a.InvestigationCaseSubStatusId == allocated2agent.InvestigationCaseSubStatusId)
+            {
+                ownerEmail = a.UserEmailActionedTo;
+                var agentProfile = _context.VendorApplicationUser.FirstOrDefault(u => u.Email == ownerEmail)?.ProfilePicture;
+                if (agentProfile == null)
+                {
+                    var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-photo.jpg");
+
+                    var noDataimage = System.IO.File.ReadAllBytes(noDataImagefilePath);
+                    return noDataimage;
+                }
+                return agentProfile;
+            }
+            else if (string.IsNullOrWhiteSpace(a.UserEmailActionedTo) &&
+                !string.IsNullOrWhiteSpace(a.UserRoleActionedTo)
+                && a.AssignedToAgency)
+            {
+                ownerDomain = a.UserRoleActionedTo;
+                var vendorImage = _context.Vendor.FirstOrDefault(v => v.Email == ownerDomain)?.DocumentImage;
+                if (vendorImage == null)
+                {
+                    var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-photo.jpg");
+
+                    var noDataimage = System.IO.File.ReadAllBytes(noDataImagefilePath);
+                    return noDataimage;
+                }
+                return vendorImage;
+            }
+            else
+            {
+                ownerDomain = a.UserRoleActionedTo;
+                var companyImage = _context.ClientCompany.FirstOrDefault(v => v.Email == ownerDomain)?.DocumentImage;
+                if (companyImage == null)
+                {
+                    var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-photo.jpg");
+
+                    var noDataimage = System.IO.File.ReadAllBytes(noDataImagefilePath);
+                    return noDataimage;
+                }
+                return companyImage;
+            }
+
+        }
         [HttpGet("GetNew")]
-        public async Task<IActionResult> GetNew()
+        public IActionResult GetNew()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
 
@@ -264,7 +322,7 @@ namespace risk.control.system.Controllers.Api.Claims
             }
 
         [HttpGet("GetNewMap")]
-        public async Task<IActionResult> GetNewMap()
+        public IActionResult GetNewMap()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
 
@@ -352,7 +410,7 @@ namespace risk.control.system.Controllers.Api.Claims
 
         [HttpGet("GetReport")]
         [Authorize(Roles = "AGENCY_ADMIN,SUPERVISOR")]
-        public async Task<IActionResult> GetReport()
+        public IActionResult GetReport()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
 
@@ -427,7 +485,7 @@ namespace risk.control.system.Controllers.Api.Claims
 
         [HttpGet("GetCompleted")]
         [Authorize(Roles = "AGENCY_ADMIN,SUPERVISOR")]
-        public async Task<IActionResult> GetCompleted()
+        public IActionResult GetCompleted()
         {
 
             var finishedStatus = _context.InvestigationCaseStatus.FirstOrDefault(
@@ -572,7 +630,7 @@ namespace risk.control.system.Controllers.Api.Claims
         }
         [HttpGet("GetSubmitted")]
         [Authorize(Roles = "AGENT")]
-        public async Task<IActionResult> GetSubmitted()
+        public IActionResult GetSubmitted()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
 
