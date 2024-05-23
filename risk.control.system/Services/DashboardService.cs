@@ -159,22 +159,22 @@ namespace risk.control.system.Services
                 data.FirstBlockName = "Assign(auto)";
                 data.FirstBlockCount = GetCreatorAssignAuto(userEmail);
                 data.FirstBlockUrl = "/ClaimsInvestigation/Draft";
+            }
 
             data.SecondBlockName = "Assign(manual)";
                 data.SecondBlockUrl = "/ClaimsInvestigation/ReAssignerAuto";
                 data.SecondBlockCount = GetCreatorReAssignAuto(userEmail);
-            }
-            else
-            {
-                data.FirstBlockName = "Assign";
-                data.FirstBlockCount = GetCreatorAssignManual(userEmail);
-                data.FirstBlockUrl = "/ClaimsInvestigation/Assigner";
+            //else
+            //{
+            //    data.FirstBlockName = "Assign";
+            //    data.FirstBlockCount = GetCreatorAssignManual(userEmail);
+            //    data.FirstBlockUrl = "/ClaimsInvestigation/Assigner";
 
-            data.SecondBlockName = "ReAssign ";
-                data.SecondBlockUrl = "/ClaimsInvestigation/ReAssigner";
-                data.SecondBlockCount = GetCreatorReAssign(userEmail);
+            //data.SecondBlockName = "ReAssign ";
+            //    data.SecondBlockUrl = "/ClaimsInvestigation/ReAssigner";
+            //    data.SecondBlockCount = GetCreatorReAssign(userEmail);
 
-            }
+            //}
 
             var filesUploadCount = _context.FilesOnFileSystem.Count(f => f.CompanyId == company.ClientCompanyId && f.UploadedBy == companyUser.Email);
             data.BulkUploadBlockName = "Upload Log";
@@ -721,8 +721,10 @@ namespace risk.control.system.Services
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
 
-            var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
-    i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
+
+            var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
+
+            var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
 
             var reAssignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER);
@@ -747,6 +749,9 @@ namespace risk.control.system.Services
                         a.UserEmailActionedTo == companyUser.Email &&
                         a.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId)
                         ||
+                        (!companyUser.ClientCompany.AutoAllocation && a.UserEmailActioned == companyUser.Email &&
+                         a.UserEmailActionedTo == companyUser.Email &&
+                         a.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId) ||
                 (a.IsReviewCase && a.InvestigationCaseSubStatusId == reAssignedStatus.InvestigationCaseSubStatusId &&
                 a.UserEmailActionedTo == string.Empty &&
                 a.UserRoleActionedTo == $"{companyUser.ClientCompany.Email}"));

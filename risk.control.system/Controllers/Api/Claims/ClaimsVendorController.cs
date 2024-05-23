@@ -81,7 +81,8 @@ namespace risk.control.system.Controllers.Api.Claims
                 ( a.InvestigationCaseSubStatus == submittedToAssesssorStatus)
                 );
 
-                var response = applicationDbContext
+                var claimsSubmitted = applicationDbContext?.ToList();
+                var response = claimsSubmitted?
                    .Select(a => new ClaimsInvesgationResponse
                    {
                        Id = a.ClaimsInvestigationId,

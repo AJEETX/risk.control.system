@@ -211,7 +211,9 @@ namespace risk.control.system.Services
                     var bytes = memoryStream.ToArray();
                     string csvData = Encoding.UTF8.GetString(bytes);
                     var status = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.INITIATED));
-                    var subStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR));
+                    var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name ==CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
+                    var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
+                    var autoEnabled = companyUser.ClientCompany.AutoAllocation;
                     DataTable dt = new DataTable();
                     bool firstRow = true;
                     var dataRows = csvData.Split('\n');
@@ -243,6 +245,7 @@ namespace risk.control.system.Services
                                             dt.Rows[dt.Rows.Count - 1][i] = cell?.Trim() ?? NO_DATA;
                                             i++;
                                         }
+                                        var subStatus = companyUser.ClientCompany.AutoAllocation && uploadMethod == ORIGIN.AUTO ? createdStatus : assignedStatus;
                                         var claim = new ClaimsInvestigation
                                         {
                                             InvestigationCaseStatusId = status.InvestigationCaseStatusId,
@@ -407,7 +410,7 @@ namespace risk.control.system.Services
                                             HopCount = 0,
                                             Time2Update = 0,
                                             InvestigationCaseStatusId = status.InvestigationCaseStatusId,
-                                            InvestigationCaseSubStatusId = subStatus.InvestigationCaseSubStatusId,
+                                            InvestigationCaseSubStatusId = createdStatus.InvestigationCaseSubStatusId,
                                             UpdatedBy = userEmail
                                         };
                                         _context.InvestigationTransaction.Add(log);

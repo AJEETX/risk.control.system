@@ -418,6 +418,78 @@ namespace risk.control.system.Controllers
             }
         }
 
+
+        [HttpPost]
+        [RequestSizeLimit(2_000_000)] // Checking for 2 MB
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
+        public async Task<IActionResult> ReAssignerAuto(IFormFile postedFile, string uploadtype, string uploadingway)
+        {
+            try
+            {
+                object _;
+                if (!Enum.TryParse(typeof(UploadType), uploadtype, true, out _))
+                {
+                    notifyService.Custom($"Upload Error. Contact Admin", 3, "red", "far fa-file-powerpoint");
+                    return RedirectToAction("Draft", "ClaimsInvestigation");
+                }
+                if (postedFile == null || string.IsNullOrWhiteSpace(uploadtype) ||
+                string.IsNullOrWhiteSpace(Path.GetFileName(postedFile.FileName)) ||
+                string.IsNullOrWhiteSpace(Path.GetExtension(Path.GetFileName(postedFile.FileName))) ||
+                Path.GetExtension(Path.GetFileName(postedFile.FileName)) != ".zip"
+                )
+                {
+                    notifyService.Custom($"Upload Error. Contact Admin", 3, "red", "far fa-file-powerpoint");
+
+                    return RedirectToAction("Draft", "ClaimsInvestigation");
+                }
+                var userEmail = HttpContext.User.Identity.Name;
+                if (string.IsNullOrWhiteSpace(userEmail))
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                if (postedFile != null && !string.IsNullOrWhiteSpace(userEmail))
+                {
+                    UploadType uploadType = (UploadType)Enum.Parse(typeof(UploadType), uploadtype, true);
+
+                    if (uploadType == UploadType.FTP)
+                    {
+                        var processed = await ftpService.DownloadFtpFile(userEmail, postedFile, uploadingway);
+                        if (processed)
+                        {
+                            notifyService.Custom($"FTP download complete ", 3, "green", "fa fa-upload");
+                        }
+                        else
+                        {
+                            notifyService.Information($"FTP Upload Error. Check limit <i class='fa fa-upload' ></i>", 3);
+                        }
+                    }
+
+                    if (uploadType == UploadType.FILE && Path.GetExtension(postedFile.FileName) == ".zip")
+                    {
+
+                        var processed = await ftpService.UploadFile(userEmail, postedFile, uploadingway);
+                        if (processed)
+                        {
+                            notifyService.Custom($"File upload complete", 3, "green", "fa fa-upload");
+                        }
+                        else
+                        {
+                            notifyService.Custom($"File Upload Error.", 3, "red", "fa fa-upload");
+                        }
+
+                    }
+                }
+                return RedirectToAction("ReAssignerAuto", "ClaimsInvestigation");
+            }
+            catch (Exception ex)
+            {
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+        }
+
         [HttpGet]
         [Breadcrumb(" Empanelled Agencies", FromAction = "Assigner")]
         [Authorize(Roles = CREATOR.DISPLAY_NAME)]
@@ -450,9 +522,41 @@ namespace risk.control.system.Controllers
         }
 
         [HttpGet]
-        [Breadcrumb(" Empanelled Agencies", FromAction = "ReAssignerAuto")]
+        [Breadcrumb(" Empanelled Agencies", FromAction = "ReAssigner")]
         [Authorize(Roles = CREATOR.DISPLAY_NAME)]
         public async Task<IActionResult> ReAssign2EmpanelledVendors(string selectedcase)
+        {
+            try
+            {
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+
+                if (string.IsNullOrWhiteSpace(currentUserEmail))
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                if (string.IsNullOrWhiteSpace(selectedcase))
+                {
+                    notifyService.Error("No case selected!!!. Please select case to be allocate.");
+                    return RedirectToAction(nameof(Assigner));
+                }
+
+                var model = await empanelledAgencyService.GetEmpanelledVendors(selectedcase);
+
+                return View(model);
+            }
+            catch (Exception)
+            {
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+        }
+
+
+        [HttpGet]
+        [Breadcrumb(" Empanelled Agencies", FromAction = "ReAssignerAuto")]
+        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
+        public async Task<IActionResult> ReAssign2EmpanelledVendorsManual(string selectedcase)
         {
             try
             {
@@ -1027,6 +1131,63 @@ namespace risk.control.system.Controllers
         }
         [Authorize(Roles = CREATOR.DISPLAY_NAME)]
         public async Task<IActionResult> VendorDetail(long id, string selectedcase)
+        {
+            try
+            {
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (string.IsNullOrWhiteSpace(currentUserEmail))
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                if (id == 0 || selectedcase is null)
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+
+                var vendor = await _context.Vendor
+                    .Include(v => v.ratings)
+                    .Include(v => v.Country)
+                    .Include(v => v.PinCode)
+                    .Include(v => v.State)
+                    .Include(v => v.District)
+                    .Include(v => v.VendorInvestigationServiceTypes)
+                    .ThenInclude(v => v.PincodeServices)
+                    .Include(v => v.VendorInvestigationServiceTypes)
+                    .ThenInclude(v => v.State)
+                    .Include(v => v.VendorInvestigationServiceTypes)
+                    .ThenInclude(v => v.District)
+                    .Include(v => v.VendorInvestigationServiceTypes)
+                    .ThenInclude(v => v.LineOfBusiness)
+                    .Include(v => v.VendorInvestigationServiceTypes)
+                    .ThenInclude(v => v.InvestigationServiceType)
+                    .FirstOrDefaultAsync(m => m.VendorId == id);
+                if (vendor == null)
+                {
+                    notifyService.Error("NOT FOUND !!!..");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                ViewBag.Selectedcase = selectedcase;
+
+                var claimsPage = new MvcBreadcrumbNode("Assigner", "ClaimsInvestigation", "Claims");
+                var agencyPage = new MvcBreadcrumbNode("Assigner", "ClaimsInvestigation", "Assigner") { Parent = claimsPage, };
+                var detailsPage = new MvcBreadcrumbNode("EmpanelledVendors", "ClaimsInvestigation", $"Empanelled Agencies") { Parent = agencyPage, RouteValues = new { selectedcase = selectedcase } };
+                var editPage = new MvcBreadcrumbNode("VendorDetail", "ClaimsInvestigation", $"Agency Detail") { Parent = detailsPage, RouteValues = new { id = id } };
+                ViewData["BreadcrumbNode"] = editPage;
+
+
+                return View(vendor);
+            }
+            catch (Exception)
+            {
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+        }
+
+        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
+        public async Task<IActionResult> ReAssignVendorDetail(long id, string selectedcase)
         {
             try
             {

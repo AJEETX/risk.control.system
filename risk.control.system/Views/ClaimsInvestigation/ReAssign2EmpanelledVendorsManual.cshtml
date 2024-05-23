@@ -486,7 +486,7 @@
                                         </td>
                                         <td>
                                             <a id="@item.Vendor.VendorId" onclick="showVendor(@item.Vendor.VendorId)"
-                                               class="link-underline-primary" asp-action="ReAssignVendorDetail" asp-route-selectedcase="@Model.ClaimsInvestigation.ClaimsInvestigationId"
+                                               class="link-underline-primary" asp-action="VendorDetailAuto" asp-route-selectedcase="@Model.ClaimsInvestigation.ClaimsInvestigationId"
                                                asp-route-id="@item.Vendor.VendorId">
                                                 @Html.DisplayFor(modelItem => item.Vendor.Email)
                                             </a>
@@ -555,7 +555,7 @@
                 <div class="card-footer">
                     <div class="row">
                         <div class="col-md-12">
-                            <a id="back" asp-controller="ClaimsInvestigation" asp-action="ReAssigner" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> Back</a>
+                            <a id="back" asp-controller="ClaimsInvestigation" asp-action="ReAssignerAuto" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> Back</a>
 
                             <button disabled="disabled" id="allocate-case" type="submit" class="btn btn-danger">
                                 <i class="fas fa-external-link-alt" aria-hidden="true"></i> <b> Assign </b><sub>manual</sub>

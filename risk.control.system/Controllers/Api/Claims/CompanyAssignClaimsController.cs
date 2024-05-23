@@ -216,6 +216,9 @@ namespace risk.control.system.Controllers.Api.Claims
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = claimsService.GetClaims();
 
+            var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+             i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
+
             var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
             var reAssignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
@@ -243,6 +246,9 @@ namespace risk.control.system.Controllers.Api.Claims
                         a.UserEmailActionedTo == companyUser.Email &&
                         a.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId)
                         ||
+                        (!companyUser.ClientCompany.AutoAllocation && a.UserEmailActioned == companyUser.Email &&
+                         a.UserEmailActionedTo == companyUser.Email &&
+                         a.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId) ||
                 (a.IsReviewCase && a.InvestigationCaseSubStatusId == reAssignedStatus.InvestigationCaseSubStatusId &&
                 a.UserEmailActionedTo == string.Empty &&
                 a.UserRoleActionedTo == $"{companyUser.ClientCompany.Email}")
@@ -265,7 +271,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 _context.ClaimsInvestigation.UpdateRange(newClaimsAssigned);
                 _context.SaveChanges();
             }
-            var response = applicationDbContext?.ToList()
+            var response = claimsAssigned?
                     .Select(a => new ClaimsInvesgationResponse
                     {
                         Id = a.ClaimsInvestigationId,
