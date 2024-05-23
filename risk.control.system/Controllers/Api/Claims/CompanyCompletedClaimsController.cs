@@ -22,11 +22,15 @@ namespace risk.control.system.Controllers.Api.Claims
     [ApiController]
     public class CompanyCompletedClaimsController : ControllerBase
     {
+
+        private static CultureInfo hindi = new CultureInfo("hi-IN");
+        private static NumberFormatInfo hindiNFO = (NumberFormatInfo)hindi.NumberFormat.Clone();
         private readonly ApplicationDbContext _context;
         private readonly IClaimsService claimsService;
 
         public CompanyCompletedClaimsController(ApplicationDbContext context, IClaimsService claimsService)
         {
+                    hindiNFO.CurrencySymbol = string.Empty;
             _context = context;
             this.claimsService = claimsService;
         }
@@ -83,7 +87,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 Id = a.ClaimsInvestigationId,
                 AutoAllocated = a.AutoAllocated,
                 PolicyId = a.PolicyDetail.ContractNumber,
-                Amount = String.Format(new CultureInfo("hi-IN"), "{0:C}", a.PolicyDetail.SumAssuredValue),
+                Amount = String.Format(hindiNFO, "{0:C}", a.PolicyDetail.SumAssuredValue),
                 AssignedToAgency = a.AssignedToAgency,
                 Agent = !string.IsNullOrWhiteSpace(a.UserEmailActionedTo) ?
                         string.Join("", "<span class='badge badge-light'>" + a.UserEmailActionedTo + "</span>") :
@@ -148,7 +152,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 Id = a.ClaimsInvestigationId,
                 AutoAllocated = a.AutoAllocated,
                 PolicyId = a.PolicyDetail.ContractNumber,
-                Amount = String.Format(new CultureInfo("hi-IN"), "{0:C}", a.PolicyDetail.SumAssuredValue),
+                Amount = String.Format(hindiNFO, "{0:C}", a.PolicyDetail.SumAssuredValue),
                 AssignedToAgency = a.AssignedToAgency,
                 Agent = !string.IsNullOrWhiteSpace(a.UserEmailActionedTo) ?
                         string.Join("", "<span class='badge badge-light'>" + a.UserEmailActionedTo + "</span>") :
@@ -222,7 +226,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 Id = a.ClaimsInvestigationId,
                 AutoAllocated = a.AutoAllocated,
                 PolicyId = a.PolicyDetail.ContractNumber,
-                Amount = String.Format(new CultureInfo("hi-IN"), "{0:C}", a.PolicyDetail.SumAssuredValue),
+                Amount = String.Format(hindiNFO, "{0:C}", a.PolicyDetail.SumAssuredValue),
                 AssignedToAgency = a.AssignedToAgency,
                 Agent = !string.IsNullOrWhiteSpace(a.UserEmailActionedTo) ?
                         string.Join("", "<span class='badge badge-light'>" + a.UserEmailActionedTo + "</span>") :
@@ -282,7 +286,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 Id = a.ClaimsInvestigationId,
                 AutoAllocated = a.AutoAllocated,
                 PolicyId = a.PolicyDetail.ContractNumber,
-                Amount = String.Format(new CultureInfo("hi-IN"), "{0:C}", a.PolicyDetail.SumAssuredValue),
+                Amount = String.Format(hindiNFO, "{0:C}", a.PolicyDetail.SumAssuredValue),
                 AssignedToAgency = a.AssignedToAgency,
                 Agent = !string.IsNullOrWhiteSpace(a.UserEmailActionedTo) ?
                         string.Join("", "<span class='badge badge-light'>" + a.UserEmailActionedTo + "</span>") :

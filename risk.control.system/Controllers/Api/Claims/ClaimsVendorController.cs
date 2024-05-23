@@ -27,6 +27,8 @@ namespace risk.control.system.Controllers.Api.Claims
     [Authorize(Roles = "AGENCY_ADMIN,SUPERVISOR,AGENT")]
     public class ClaimsVendorController : ControllerBase
     {
+        private static CultureInfo hindi = new CultureInfo("hi-IN");
+        private static NumberFormatInfo hindiNFO = (NumberFormatInfo)hindi.NumberFormat.Clone();
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly IDashboardService dashboardService;
@@ -36,6 +38,7 @@ namespace risk.control.system.Controllers.Api.Claims
              IWebHostEnvironment webHostEnvironment, 
              IDashboardService dashboardService, UserManager<VendorApplicationUser> userManager)
         {
+            hindiNFO.CurrencySymbol = string.Empty;
             _context = context;
             this.webHostEnvironment = webHostEnvironment;
             this.dashboardService = dashboardService;
@@ -88,7 +91,7 @@ namespace risk.control.system.Controllers.Api.Claims
                        Id = a.ClaimsInvestigationId,
                        AssignedToAgency = a.AssignedToAgency,
                        PolicyId = a.PolicyDetail.ContractNumber,
-                       Amount = string.Format(new CultureInfo("hi-IN"), "{0:C}", a.PolicyDetail.SumAssuredValue),
+                       Amount = string.Format(hindiNFO, "{0:C}", a.PolicyDetail.SumAssuredValue),
                        Agent = !string.IsNullOrWhiteSpace(a.UserEmailActionedTo) ? a.UserEmailActionedTo : a.UserRoleActionedTo,
                        OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(GetOwner(a))),
                        Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
@@ -133,7 +136,7 @@ namespace risk.control.system.Controllers.Api.Claims
                        Id = a.ClaimsInvestigationId,
                        AssignedToAgency = a.AssignedToAgency,
                        PolicyId = a.PolicyDetail.ContractNumber,
-                       Amount = string.Format(new CultureInfo("hi-IN"), "{0:C}", a.PolicyDetail.SumAssuredValue),
+                       Amount = string.Format(hindiNFO, "{0:C}", a.PolicyDetail.SumAssuredValue),
                        Agent = !string.IsNullOrWhiteSpace(a.UserEmailActionedTo) ? a.UserEmailActionedTo : a.UserRoleActionedTo,
                        OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(GetOwner(a))),
                        Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
@@ -291,7 +294,7 @@ namespace risk.control.system.Controllers.Api.Claims
                    {
                        Id = a.ClaimsInvestigationId,
                        PolicyId = a.PolicyDetail.ContractNumber,
-                       Amount = string.Format(new CultureInfo("hi-IN"), "{0:C}", a.PolicyDetail.SumAssuredValue),
+                       Amount = string.Format(hindiNFO, "{0:C}", a.PolicyDetail.SumAssuredValue),
                        Company = a.PolicyDetail.ClientCompany.Name,
                        Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
                        PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
@@ -453,7 +456,7 @@ namespace risk.control.system.Controllers.Api.Claims
                    {
                        Id = a.ClaimsInvestigationId,
                        PolicyId = a.PolicyDetail.ContractNumber,
-                       Amount = string.Format(new CultureInfo("hi-IN"), "{0:C}", a.PolicyDetail.SumAssuredValue),
+                       Amount = string.Format(hindiNFO, "{0:C}", a.PolicyDetail.SumAssuredValue),
                        AssignedToAgency = a.AssignedToAgency,
                        Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
                        PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
@@ -537,7 +540,7 @@ namespace risk.control.system.Controllers.Api.Claims
                        {
                            Id = a.ClaimsInvestigationId,
                            PolicyId = a.PolicyDetail.ContractNumber,
-                           Amount = string.Format(new CultureInfo("hi-IN"), "{0:C}", a.PolicyDetail.SumAssuredValue),
+                           Amount = string.Format(hindiNFO, "{0:C}", a.PolicyDetail.SumAssuredValue),
                            AssignedToAgency = a.AssignedToAgency,
                            Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
                            PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
@@ -599,7 +602,7 @@ namespace risk.control.system.Controllers.Api.Claims
                        {
                            Id = a.ClaimsInvestigationId,
                            PolicyId = a.PolicyDetail.ContractNumber,
-                           Amount = string.Format(new CultureInfo("hi-IN"), "{0:C}", a.PolicyDetail.SumAssuredValue),
+                           Amount = string.Format(hindiNFO, "{0:C}", a.PolicyDetail.SumAssuredValue),
                            AssignedToAgency = a.AssignedToAgency,
                            Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
                            PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
@@ -665,7 +668,7 @@ namespace risk.control.system.Controllers.Api.Claims
                    {
                        Id = a.ClaimsInvestigationId,
                        PolicyId = a.PolicyDetail.ContractNumber,
-                       Amount = string.Format(new CultureInfo("hi-IN"), "{0:C}", a.PolicyDetail.SumAssuredValue),
+                       Amount = string.Format(hindiNFO, "{0:C}", a.PolicyDetail.SumAssuredValue),
                        AssignedToAgency = a.AssignedToAgency,
                        Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
                        PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),

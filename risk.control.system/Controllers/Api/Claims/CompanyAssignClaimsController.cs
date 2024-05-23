@@ -24,11 +24,14 @@ namespace risk.control.system.Controllers.Api.Claims
     [ApiController]
     public class CompanyAssignClaimsController : ControllerBase
     {
+        private static CultureInfo hindi = new CultureInfo("hi-IN");
+        private static NumberFormatInfo hindiNFO = (NumberFormatInfo)hindi.NumberFormat.Clone();
         private readonly ApplicationDbContext _context;
         private readonly IClaimsService claimsService;
 
         public CompanyAssignClaimsController(ApplicationDbContext context, IClaimsService claimsService)
         {
+            hindiNFO.CurrencySymbol = string.Empty;
             _context = context;
             this.claimsService = claimsService;
         }
@@ -84,7 +87,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         AutoAllocated = a.AutoAllocated,
                         AssignedToAgency = a.AssignedToAgency,
                         PolicyId = a.PolicyDetail.ContractNumber,
-                        Amount = String.Format(new CultureInfo("hi-IN"), "{0:C}", a.PolicyDetail.SumAssuredValue),
+                        Amount = string.Format(hindiNFO, "{0:c}", a.PolicyDetail.SumAssuredValue),
                         Agent = !string.IsNullOrWhiteSpace(a.CurrentClaimOwner) ?
                         string.Join("", "<span class='badge badge-light'>" + a.CurrentClaimOwner + "</span>") :
                         string.Join("", "<span class='badge badge-light'>" + a.UpdatedBy + "</span>"),
@@ -178,7 +181,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         AutoAllocated = a.AutoAllocated,
                         AssignedToAgency = a.AssignedToAgency,
                         PolicyId = a.PolicyDetail.ContractNumber,
-                        Amount = String.Format(new CultureInfo("hi-IN"), "{0:C}", a.PolicyDetail.SumAssuredValue),
+                        Amount = string.Format(hindiNFO, "{0:c}", a.PolicyDetail.SumAssuredValue),
                         Agent = !string.IsNullOrWhiteSpace(a.CurrentClaimOwner) ?
                         string.Join("", "<span class='badge badge-light'>" + a.CurrentClaimOwner + "</span>") :
                         string.Join("", "<span class='badge badge-light'>" + a.UpdatedBy + "</span>"),
@@ -278,7 +281,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         AutoAllocated = a.AutoAllocated,
                         AssignedToAgency = a.AssignedToAgency,
                         PolicyId = a.PolicyDetail.ContractNumber,
-                        Amount = String.Format(new CultureInfo("hi-IN"), "{0:C}", a.PolicyDetail.SumAssuredValue),
+                        Amount = string.Format(hindiNFO, "{0:c}", a.PolicyDetail.SumAssuredValue),
                         Agent = !string.IsNullOrWhiteSpace(a.CurrentClaimOwner) ?
                         string.Join("", "<span class='badge badge-light'>" + a.CurrentClaimOwner + "</span>") :
                         string.Join("", "<span class='badge badge-light'>" + a.UpdatedBy + "</span>"),

@@ -25,12 +25,16 @@ namespace risk.control.system.Controllers.Api.Claims
     [ApiController]
     public class CompanyActiveClaimsController : ControllerBase
     {
+        private static CultureInfo hindi = new CultureInfo("hi-IN");
+        private static NumberFormatInfo hindiNFO = (NumberFormatInfo)hindi.NumberFormat.Clone();
+
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly IClaimsService claimsService;
 
         public CompanyActiveClaimsController(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, IClaimsService claimsService)
         {
+                    hindiNFO.CurrencySymbol = string.Empty;
             _context = context;
             this.webHostEnvironment = webHostEnvironment;
             this.claimsService = claimsService;
@@ -103,7 +107,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         CustomerFullName = string.IsNullOrWhiteSpace(a.CustomerDetail?.CustomerName) ? "" : a.CustomerDetail.CustomerName,
                         BeneficiaryFullName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.BeneficiaryName) ? "" : a.BeneficiaryDetail.BeneficiaryName,
                         PolicyId = a.PolicyDetail.ContractNumber,
-                        Amount = String.Format(new CultureInfo("hi-IN"), "{0:C}", a.PolicyDetail.SumAssuredValue),
+                        Amount = string.Format(hindiNFO, "{0:c}", a.PolicyDetail.SumAssuredValue),
                         AssignedToAgency = a.AssignedToAgency,
                         Agent = !string.IsNullOrWhiteSpace(a.UserEmailActionedTo) ? a.UserEmailActionedTo : a.UserRoleActionedTo,
                         OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(GetOwner(a))),
@@ -240,7 +244,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         CustomerFullName = string.IsNullOrWhiteSpace(a.CustomerDetail?.CustomerName) ? "" : a.CustomerDetail.CustomerName,
                         BeneficiaryFullName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.BeneficiaryName) ? "" : a.BeneficiaryDetail.BeneficiaryName,
                         PolicyId = a.PolicyDetail.ContractNumber,
-                        Amount = String.Format(new CultureInfo("hi-IN"), "{0:C}", a.PolicyDetail.SumAssuredValue),
+                        Amount = string.Format(hindiNFO, "{0:c}",  a.PolicyDetail.SumAssuredValue),
                         AssignedToAgency = a.AssignedToAgency,
                         Agent = !string.IsNullOrWhiteSpace(a.UserEmailActionedTo) ? a.UserEmailActionedTo : a.UserRoleActionedTo,
                         OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(GetOwner(a))),
@@ -429,7 +433,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         CustomerFullName = string.IsNullOrWhiteSpace(a.CustomerDetail?.CustomerName) ? "" : a.CustomerDetail.CustomerName,
                         BeneficiaryFullName = a.BeneficiaryDetail is null ? "" : a.BeneficiaryDetail.BeneficiaryName,
                         PolicyId = a.PolicyDetail.ContractNumber,
-                        Amount = String.Format(new CultureInfo("hi-IN"), "{0:C}", a.PolicyDetail.SumAssuredValue),
+                        Amount = string.Format(hindiNFO, "{0:c}", a.PolicyDetail.SumAssuredValue),
                         AssignedToAgency = a.AssignedToAgency,
                         Agent = !string.IsNullOrWhiteSpace(a.UserEmailActionedTo) ? a.UserEmailActionedTo : a.UserRoleActionedTo,
                         OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(GetOwner(a))),
@@ -497,7 +501,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         CustomerFullName = string.IsNullOrWhiteSpace(a.CustomerDetail?.CustomerName) ? "" : a.CustomerDetail.CustomerName,
                         BeneficiaryFullName = a.BeneficiaryDetail is null ? "" : a.BeneficiaryDetail.BeneficiaryName,
                         PolicyId = a.PolicyDetail.ContractNumber,
-                        Amount = String.Format(new CultureInfo("hi-IN"), "{0:C}", a.PolicyDetail.SumAssuredValue),
+                        Amount = string.Format(hindiNFO, "{0:c}", a.PolicyDetail.SumAssuredValue),
                         AssignedToAgency = a.AssignedToAgency,
                         Agent = !string.IsNullOrWhiteSpace(a.UserEmailActionedTo) ?
                         string.Join("", "<span class='badge badge-light'>" + a.UserEmailActionedTo + "</span>") :

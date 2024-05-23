@@ -23,11 +23,15 @@ namespace risk.control.system.Controllers.Api.Claims
     [Authorize(Roles = CREATOR.DISPLAY_NAME)]
     public class CompanyDraftClaimsController : ControllerBase
     {
+
+        private static CultureInfo hindi = new CultureInfo("hi-IN");
+        private static NumberFormatInfo hindiNFO = (NumberFormatInfo)hindi.NumberFormat.Clone();
         private readonly ApplicationDbContext _context;
         private readonly IClaimsService claimsService;
 
         public CompanyDraftClaimsController(ApplicationDbContext context, IClaimsService claimsService)
         {
+            hindiNFO.CurrencySymbol = string.Empty;
             _context = context;
             this.claimsService = claimsService;
         }
@@ -71,7 +75,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 .Select(a => new ClaimsInvesgationResponse
                 {
                     Id = a.ClaimsInvestigationId,
-                    Amount = String.Format(new CultureInfo("hi-IN"), "{0:C}", a.PolicyDetail.SumAssuredValue),
+                    Amount = String.Format(hindiNFO, "{0:C}", a.PolicyDetail.SumAssuredValue),
                     PolicyId = a.PolicyDetail.ContractNumber,
                     AssignedToAgency = a.AssignedToAgency,
                     Agent = !string.IsNullOrWhiteSpace(a.UserEmailActionedTo) ?

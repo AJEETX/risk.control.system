@@ -105,7 +105,7 @@ namespace risk.control.system.Controllers
             }
 
         }
-        [Breadcrumb(" To-Assess", FromAction = "Index")]
+        [Breadcrumb(" Assess(new)", FromAction = "Index")]
         [Authorize(Roles = MANAGER.DISPLAY_NAME)]
         public IActionResult Manager()
         {
@@ -886,7 +886,7 @@ namespace risk.control.system.Controllers
 
 
                 var claimsPage = new MvcBreadcrumbNode("Assessor", "ClaimsInvestigation", "Claims");
-                var agencyPage = new MvcBreadcrumbNode("Assessor", "ClaimsInvestigation", "Assess") { Parent = claimsPage, };
+                var agencyPage = new MvcBreadcrumbNode("Assessor", "ClaimsInvestigation", "Assess(new)") { Parent = claimsPage, };
                 var detailsPage = new MvcBreadcrumbNode("GetInvestigateReport", "ClaimsInvestigation", $"Details") { Parent = agencyPage, RouteValues = new { selectedcase = selectedcase } };
                 var editPage = new MvcBreadcrumbNode("SendEnquiry", "ClaimsInvestigation", $"Send Enquiry") { Parent = detailsPage, RouteValues = new { id = selectedcase } };
                 ViewData["BreadcrumbNode"] = editPage;
