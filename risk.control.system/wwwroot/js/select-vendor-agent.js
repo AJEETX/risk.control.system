@@ -12,7 +12,7 @@
                 closeIcon: true,
                 buttons: {
                     confirm: {
-                        text: "Allocate",
+                        text: "Allocate <sub>agent</sub>",
                         btnClass: 'btn-danger',
                         action: function () {
                             askConfirmation = false;
@@ -24,7 +24,7 @@
                                 $(".submit-progress").removeClass("hidden");
                             }, 1);
                             $('#allocate-case').attr('disabled', 'disabled');
-                            $('#allocate-case').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Allocate");
+                            $('#allocate-case').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Allocate <sub>agent</sub>");
 
                             $('#radioButtons').submit();
                             var nodes = document.getElementById("article").getElementsByTagName('*');

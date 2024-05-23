@@ -208,7 +208,7 @@ namespace risk.control.system.Controllers
             
         }
 
-        [Breadcrumb(" Allocate")]
+        [Breadcrumb(" Allocate(new)")]
         [Authorize(Roles = "AGENCY_ADMIN,SUPERVISOR")]
         public ActionResult Allocate()
         {
@@ -542,7 +542,7 @@ namespace risk.control.system.Controllers
             }
         }
 
-        [Breadcrumb("Verify(report)")]
+        [Breadcrumb("Submit(report)")]
         [Authorize(Roles = "AGENCY_ADMIN,SUPERVISOR")]
         public IActionResult ClaimReport()
         {

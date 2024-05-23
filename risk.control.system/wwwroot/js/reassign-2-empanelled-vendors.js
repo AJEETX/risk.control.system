@@ -40,7 +40,7 @@
                 closeIcon: true,
                 buttons: {
                     confirm: {
-                        text: "Assign",
+                        text: "Assign <sub>manual</sub>",
                         btnClass: 'btn-danger',
                         action: function () {
                             askConfirmation = false;

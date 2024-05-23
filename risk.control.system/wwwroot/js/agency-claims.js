@@ -6,7 +6,7 @@
             $(".submit-progress").removeClass("hidden");
         }, 1);
         $('#allocatedcase').attr('disabled', 'disabled');
-        $('#allocatedcase').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Allocate");
+        $('#allocatedcase').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Allocate <sub>new</sub>");
 
         $('#radioButtons').submit();
         var nodes = document.getElementById("article").getElementsByTagName('*');

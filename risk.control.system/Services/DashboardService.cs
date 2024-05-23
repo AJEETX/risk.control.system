@@ -117,11 +117,11 @@ namespace risk.control.system.Services
             var claimsCompleted = GetAgencyyCompleted(userEmail);
 
             var data = new DashboardData();
-            data.FirstBlockName = "Allocate";
+            data.FirstBlockName = "Allocate(new)";
             data.FirstBlockCount = claimsAllocate;
             data.FirstBlockUrl = "/ClaimsVendor/Allocate";
 
-            data.SecondBlockName = "Verify(report)";
+            data.SecondBlockName = "Submit(report)";
             data.SecondBlockCount = claimsVerified;
             data.SecondBlockUrl = "/ClaimsVendor/ClaimReport";
 
@@ -230,7 +230,7 @@ namespace risk.control.system.Services
             var claimsCompleted = GetCompanyCompleted(userEmail);
 
             var data = new DashboardData();
-            data.FirstBlockName = "Assess";
+            data.FirstBlockName = "Assess(report)";
             data.FirstBlockCount = claimsAssessor;
             data.FirstBlockUrl = "/ClaimsInvestigation/Assessor";
 
