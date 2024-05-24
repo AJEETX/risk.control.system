@@ -200,24 +200,24 @@ namespace risk.control.system.Services
             var data = new DashboardData();
             data.FirstBlockName = "Assess(new)";
             data.FirstBlockCount = claimsAssessor;
-            data.FirstBlockUrl = "/ClaimsInvestigation/Manager";
+            data.FirstBlockUrl = "/Manager/Assessor";
 
             //data.SecondBlockName = "Review";
             //data.SecondBlockCount = claimsReview.Count;
             //data.SecondBlockUrl = "/ClaimsInvestigation/ManagerReview";
 
             data.SecondBBlockName = "Active";
-            data.SecondBBlockUrl = "/ClaimsInvestigation/ManagerActive";
+            data.SecondBBlockUrl = "/Manager/Active";
             data.SecondBBlockCount = actives;
 
 
             data.ThirdBlockName = "Approved";
             data.ThirdBlockCount = claimsCompleted;
-            data.ThirdBlockUrl = "/Report/ManagerIndex";
+            data.ThirdBlockUrl = "/Manager/Approved";
 
             data.LastBlockName = "Rejected";
             data.LastBlockCount = claimsReject;
-            data.LastBlockUrl = "/Report/ManagerRejected";
+            data.LastBlockUrl = "/Manager/Rejected";
 
             return data;
         }
