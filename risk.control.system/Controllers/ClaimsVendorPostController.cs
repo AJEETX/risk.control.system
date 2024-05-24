@@ -11,6 +11,7 @@ using Microsoft.OpenApi.Extensions;
 
 using NToastNotify;
 
+using risk.control.system.Controllers.Agency;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
@@ -108,7 +109,7 @@ namespace risk.control.system.Controllers
                     )
                 {
                     notifyService.Error($"No Agent remarks entered!!!. Please enter remarks.", 3);
-                    return RedirectToAction(nameof(ClaimsVendorController.GetInvestigate), "\"ClaimsVendor\"", new { selectedcase = claimId });
+                    return RedirectToAction(nameof(AgentController.GetInvestigate), "\"Agent\"", new { selectedcase = claimId });
                 }
 
                 string userEmail = HttpContext?.User?.Identity.Name;
@@ -141,19 +142,19 @@ namespace risk.control.system.Controllers
                 if(claim == null)
                 {
                     notifyService.Error("OOPs !!!..Contact Admin");
-                    return RedirectToAction(nameof(ClaimsVendorController.GetInvestigate), "\"ClaimsVendor\"", new { selectedcase = claimId });
+                    return RedirectToAction(nameof(AgentController.GetInvestigate), "\"Agent\"", new { selectedcase = claimId });
 
                 }
                 await mailboxService.NotifyClaimReportSubmitToVendorSupervisor(userEmail, claimId, caseLocationId);
 
                 notifyService.Custom($"Claim #{claim.PolicyDetail.ContractNumber}  report submitted to supervisor", 3, "green", "far fa-file-powerpoint");
 
-                return RedirectToAction(nameof(ClaimsVendorController.Agent), "ClaimsVendor");
+                return RedirectToAction(nameof(AgentController.Index), "Agent");
             }
             catch (Exception)
             {
                 notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(ClaimsVendorController.GetInvestigate), "\"ClaimsVendor\"", new { selectedcase = claimId });
+                return RedirectToAction(nameof(AgentController.GetInvestigate), "\"Agent\"", new { selectedcase = claimId });
 
             }
         }

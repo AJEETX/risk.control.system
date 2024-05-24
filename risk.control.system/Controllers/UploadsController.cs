@@ -141,7 +141,7 @@ namespace risk.control.system.Controllers
                 if (string.IsNullOrWhiteSpace(selectedcase))
                 {
                     notifyService.Custom($"No claim selected!!!. ", 3, "orange", "fas fa-portrait");
-                    return Redirect("/ClaimsVendor/GetInvestigate?selectedcase=" + selectedcase);
+                    return Redirect("/Agent/GetInvestigate?selectedcase=" + selectedcase);
                 }
 
                 using (var ds = new MemoryStream())
@@ -151,7 +151,7 @@ namespace risk.control.system.Controllers
                     var response = await vendorService.PostFaceId(userEmail, selectedcase, digitalIdLatitude, digitalIdLongitude, imageByte);
 
                     notifyService.Custom($"Photo Image Uploaded", 3, "green", "fas fa-portrait");
-                    return Redirect("/ClaimsVendor/GetInvestigate?selectedcase=" + selectedcase);
+                    return Redirect("/Agent/GetInvestigate?selectedcase=" + selectedcase);
                 }
             }
             catch (Exception)
@@ -187,7 +187,7 @@ namespace risk.control.system.Controllers
                 if (string.IsNullOrWhiteSpace(selectedclaim))
                 {
                     notifyService.Custom($"No claim selected!!!. ", 3, "orange", "fas fa-mobile-alt");
-                    return Redirect("/ClaimsVendor/GetInvestigate?selectedcase=" + selectedclaim);
+                    return Redirect("/Agent/GetInvestigate?selectedcase=" + selectedclaim);
                 }
 
                 using (var ds = new MemoryStream())
@@ -197,7 +197,7 @@ namespace risk.control.system.Controllers
                     var response = await vendorService.PostDocumentId(userEmail, selectedclaim, documentIdLatitude, documentIdLongitude, imageByte);
 
                     notifyService.Custom($"Pan card Image Uploaded", 3, "green", "fas fa-mobile-alt");
-                    return Redirect("/ClaimsVendor/GetInvestigate?selectedcase=" + selectedclaim);
+                    return Redirect("/Agent/GetInvestigate?selectedcase=" + selectedclaim);
                 }
             }
             catch (Exception)

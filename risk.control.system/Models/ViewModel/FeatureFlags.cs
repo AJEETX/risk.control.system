@@ -10,5 +10,6 @@
         public const string SECURITY = "SECURITY";
         public const string LICENSE = "LICENSE";
         public const string SHOW_USERS_ON_LOGIN = "SHOW_USERS_ON_LOGIN";
+        public const string SHOW_IMAGE_AS_HEADER = "SHOW_IMAGE_AS_HEADER";
     }
 }

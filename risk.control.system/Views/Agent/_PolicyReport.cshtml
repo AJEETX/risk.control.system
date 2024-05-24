@@ -1,0 +1,49 @@
+﻿@model ClaimsInvestigationVendorsModel
+@{
+    string digitalIdColor = "grey";
+    if(Model.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime != null)
+    {
+        digitalIdColor = "green";
+    }
+    string documentIdColor = "grey";
+    if (Model.AgencyReport.DocumentIdReport?.DocumentIdImageLongLat != null)
+    {
+        documentIdColor = "green";
+    }
+    string questionaire = "grey";
+    if (Model.AgencyReport.AgentRemarks != null)
+    {
+        questionaire = "green";
+    }
+}
+<div class="card bg-light card-light">
+    <div class="card-header">
+        <h3 class="card-title">
+            <i class="fas fa-user-shield"></i> Report: <span class="badge badge-light"> @Model.AgencyReport.AgentEmail </span>
+            <span class="hover-text">
+                <i class="fas fa-info-circle"></i>
+                <span class="tooltip-text" id="information">
+                    <span>
+
+                        <i class="fas fa-user-shield"></i><b> @Model.AgencyReport.AgentEmail </b> report
+                    </span>
+                </span>
+            </span>
+        </h3>
+        <div class="card-tools">
+            <span data-toggle="tooltip" title="Agent report # : @Model.AgencyReport.AgentEmail" class="badge badge-light"><i class="fas fa-user-shield"></i></span>
+        </div>
+    </div>
+
+
+    <div class="card-body pb-0">
+        <div class="submit-progress hidden">
+            <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+        </div>
+        <div class="row">
+            <partial name="_DigitalIdReport" model="@Model" />
+            <partial name="_DocumentIdReport" model="@Model" />
+            <partial name="_Questionaire" model="@Model" />
+        </div>
+    </div>
+</div>

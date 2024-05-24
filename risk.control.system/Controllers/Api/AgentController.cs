@@ -306,7 +306,7 @@ namespace risk.control.system.Controllers.Api
 
         [AllowAnonymous]
         [HttpGet("agent")]
-        public async Task<IActionResult> Index(string email = "agent@verify.com")
+        public async Task<IActionResult> GetAll(string email = "agent@verify.com")
         {
             try
             {

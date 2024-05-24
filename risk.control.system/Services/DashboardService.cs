@@ -72,11 +72,11 @@ namespace risk.control.system.Services
             var data = new DashboardData();
             data.FirstBlockName = "Tasks";
             data.FirstBlockCount = taskCount;
-            data.FirstBlockUrl = "/ClaimsVendor/Agent";
+            data.FirstBlockUrl = "/Agent/Index";
 
             data.SecondBlockName = "Submitted";
             data.SecondBlockCount = count;
-            data.SecondBlockUrl = "/ClaimsVendor/Submitted";
+            data.SecondBlockUrl = "/Agent/Submitted";
 
             return data;
         }

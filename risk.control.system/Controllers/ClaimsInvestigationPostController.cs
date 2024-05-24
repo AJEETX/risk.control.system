@@ -906,7 +906,7 @@ namespace risk.control.system.Controllers
                 if (request == null)
                 {
                     notifyService.Error("NOT FOUND !!!..");
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 request.AgencyReport.EnquiryRequest.Description = HttpUtility.HtmlEncode(request.AgencyReport.EnquiryRequest.Description);
 

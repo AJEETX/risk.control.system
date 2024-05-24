@@ -55,7 +55,7 @@
                     if (User.IsInRole(AppRoles.AGENT.ToString()))
                     {
                         <li class="nav-item">
-                            <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("ClaimsVendor","")">
+                            <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("Agent","")">
                                 <i class="nav-icon fa fa-user-secret"></i>
                                 <p class="sidebar-menu-header-label">
                                     @Applicationsettings.INVESTIGATION_CLAIM
@@ -64,8 +64,9 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a is-active-page asp-controller="ClaimsVendor" asp-action="Agent" class="actual-link nav-link @Url.MakeActiveClass("ClaimsVendor","Agent")
-                                        @Url.MakeActiveClass("ClaimsVendor","GetInvestigate")">
+                            <a is-active-page asp-controller="Agent" asp-action="Agent" class="actual-link nav-link
+                                            @Url.MakeActiveClass("Agent","Agent")
+                                            @Url.MakeActiveClass("Agent","GetInvestigate")">
                                 <i class="fa fa-binoculars nav-icon"></i>
                                 <p>
                                     <span class="badge badge-danger">TASKS</span>
@@ -73,8 +74,8 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a is-active-page asp-controller="ClaimsVendor" asp-action="Submitted" class="actual-link nav-link @Url.MakeActiveClass("ClaimsVendor","Submitted")
-                                                    @Url.MakeActiveClass("ClaimsVendor","SubmittedDetail")">
+                            <a is-active-page asp-controller="Agent" asp-action="Submitted" class="actual-link nav-link @Url.MakeActiveClass("Agent","Submitted")
+                                                        @Url.MakeActiveClass("Agent","SubmittedDetail")">
                                 <i class="fas fa-print nav-icon"></i>
                                 <p>
                                     <span class="badge badge-secondary">SUBMITTED</span>

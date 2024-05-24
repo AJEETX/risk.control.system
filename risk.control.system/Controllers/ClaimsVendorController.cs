@@ -192,12 +192,6 @@ namespace risk.control.system.Controllers
                     notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-
-                var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
-                if (userRole.Value.Contains(AppRoles.AGENT.ToString()))
-                {
-                    return RedirectToAction("Agent");
-                }
                 return RedirectToAction("Allocate");
             }
             catch (Exception)
@@ -229,49 +223,13 @@ namespace risk.control.system.Controllers
             }
         }
 
-        [Breadcrumb(" Tasks")]
-        [Authorize(Roles = AGENT.DISPLAY_NAME)]
-        public ActionResult Agent()
-        {
-            return View();
-        }
-
         [Breadcrumb(title: " Completed")]
         [Authorize(Roles = "AGENCY_ADMIN,SUPERVISOR")]
         public IActionResult Completed()
         {
             return View();
         }
-        [Breadcrumb(title: " Submitted")]
-        [Authorize(Roles = "AGENT")]
-        public IActionResult Submitted()
-        {
-            return View();
-        }
-        [Breadcrumb(title: " Detail",FromAction = "Submitted")]
-        [Authorize(Roles = "AGENT")]
-        public async Task<IActionResult> SubmittedDetail(string id)
-        {
-            if (id == null)
-            {
-                notifyService.Error("NOT FOUND !!!..");
-                return RedirectToAction(nameof(Index), "Dashboard");
-            }
-            try
-            {
-                
-
-                var model = await investigationReportService.SubmittedDetail(id);
-
-                return View(model);
-            }
-            catch (Exception)
-            {
-                notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
-            }
-        }
-
+ 
         [Breadcrumb(" Details", FromAction = "Completed")]
         [Authorize(Roles = "AGENCY_ADMIN,SUPERVISOR")]
 
@@ -307,16 +265,10 @@ namespace risk.control.system.Controllers
             if (id == null)
             {
                 notifyService.Error("NOT FOUND !!!..");
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index), "Dashboard");
             }
             var model = investigationReportService.GetInvestigateReport(currentUserEmail, id);
             ViewData["claimId"] = id;
-
-            //var claimsPage = new MvcBreadcrumbNode("Assessor", "ClaimsVendor", "Claims");
-            //var agencyPage = new MvcBreadcrumbNode("Assessor", "ClaimsVendor", "Assess") { Parent = claimsPage, };
-            //var detailsPage = new MvcBreadcrumbNode("Detail", "ClaimsVendor", $"Details") { Parent = agencyPage, RouteValues = new { id = id } };
-            //var editPage = new MvcBreadcrumbNode("SendEnquiry", "ClaimsVendor", $"Reply Enquiry") { Parent = detailsPage, RouteValues = new { id = id } };
-            //ViewData["BreadcrumbNode"] = editPage;
 
             return View(model);
         }
@@ -411,38 +363,6 @@ namespace risk.control.system.Controllers
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
-        }
-
-        [Breadcrumb("Submit", FromAction = "Agent")]
-        [Authorize(Roles = AGENT.DISPLAY_NAME)]
-        public async Task<IActionResult> GetInvestigate(string selectedcase, bool uploaded = false)
-        {
-            try
-            {
-                if (string.IsNullOrWhiteSpace(selectedcase))
-                {
-                    notifyService.Error("No case selected!!!. Please select case to be investigate.");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-
-                var userEmail = HttpContext.User?.Identity?.Name;
-
-                if (string.IsNullOrWhiteSpace(userEmail))
-                {
-                    notifyService.Error("OOPs !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-                
-                var model = await vendorService.GetInvestigate(userEmail, selectedcase, uploaded);
-
-                return View(model);
-            }
-            catch (Exception)
-            {
-                notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
-            }
-            
         }
 
 
