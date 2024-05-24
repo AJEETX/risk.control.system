@@ -58,7 +58,7 @@ namespace risk.control.system.Controllers
                 if (string.IsNullOrWhiteSpace(selectedcase) || string.IsNullOrWhiteSpace(claimId) || caseLocationId < 1)
                 {
                     notifyService.Error($"No case selected!!!. Please select case to be allocate.", 3);
-                    return RedirectToAction(nameof(ClaimsVendorController.Allocate), "ClaimsVendor");
+                    return RedirectToAction(nameof(SupervisorController.Allocate), "Supervisor");
                 }
 
                 var userEmail = HttpContext.User?.Identity?.Name;
@@ -84,7 +84,7 @@ namespace risk.control.system.Controllers
 
                 notifyService.Custom($"Claim #{claim.PolicyDetail.ContractNumber} tasked to {vendorAgent.Email}", 3, "green", "far fa-file-powerpoint");
 
-                return RedirectToAction(nameof(ClaimsVendorController.Allocate), "ClaimsVendor");
+                return RedirectToAction(nameof(SupervisorController.Allocate), "Supervisor");
             }
             catch (Exception)
             {
@@ -169,13 +169,13 @@ namespace risk.control.system.Controllers
                 if (string.IsNullOrWhiteSpace(supervisorRemarks) || string.IsNullOrWhiteSpace(claimId) || caseLocationId < 1)
                 {
                     notifyService.Error("No Supervisor remarks entered!!!. Please enter remarks.");
-                    return RedirectToAction(nameof(ClaimsVendorController.GetInvestigateReport), new { selectedcase = claimId });
+                    return RedirectToAction(nameof(SupervisorController.GetInvestigateReport), new { selectedcase = claimId });
                 }
                 string userEmail = HttpContext?.User?.Identity.Name;
                 if (string.IsNullOrWhiteSpace(userEmail))
                 {
                     notifyService.Error("OOPs !!!..Contact Admin");
-                    return RedirectToAction(nameof(ClaimsVendorController.GetInvestigateReport), new { selectedcase = claimId });
+                    return RedirectToAction(nameof(SupervisorController.GetInvestigateReport), new { selectedcase = claimId });
 
                 }
 
@@ -192,12 +192,12 @@ namespace risk.control.system.Controllers
                 {
                     notifyService.Custom($"Claim #{success.PolicyDetail.ContractNumber}  report sent to review", 3, "orange", "far fa-file-powerpoint");
                 }
-                return RedirectToAction(nameof(ClaimsVendorController.ClaimReport), "ClaimsVendor");
+                return RedirectToAction(nameof(SupervisorController.ClaimReport), "Supervisor");
             }
             catch (Exception)
             {
                 notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(ClaimsVendorController.GetInvestigateReport), new { selectedcase = claimId });
+                return RedirectToAction(nameof(SupervisorController.GetInvestigateReport), new { selectedcase = claimId });
             }
         }
 
@@ -211,14 +211,14 @@ namespace risk.control.system.Controllers
                 if (model == null || string.IsNullOrWhiteSpace(claimId))
                 {
                     notifyService.Error("OOPs !!!..Contact Admin");
-                    return RedirectToAction(nameof(ClaimsVendorController.Allocate), "ClaimsVendor");
+                    return RedirectToAction(nameof(SupervisorController.Allocate), "Supervisor");
 
                 }
                 string userEmail = HttpContext?.User?.Identity.Name;
                 if (string.IsNullOrWhiteSpace(userEmail))
                 {
                     notifyService.Error("OOPs !!!..Contact Admin");
-                    return RedirectToAction(nameof(ClaimsVendorController.Allocate), "ClaimsVendor");
+                    return RedirectToAction(nameof(SupervisorController.Allocate), "Supervisor");
 
                 }
                 await claimsInvestigationService.WithdrawCase(userEmail, model, claimId);
@@ -227,12 +227,12 @@ namespace risk.control.system.Controllers
 
                 notifyService.Custom($"Claim #{policyNumber}  declined successfully", 3, "red", "far fa-file-powerpoint");
 
-                return RedirectToAction(nameof(ClaimsVendorController.Allocate), "ClaimsVendor");
+                return RedirectToAction(nameof(SupervisorController.Allocate), "Supervisor");
             }
             catch (Exception)
             {
                 notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(ClaimsVendorController.Allocate), "ClaimsVendor");
+                return RedirectToAction(nameof(SupervisorController.Allocate), "Supervisor");
 
             }
         }
@@ -248,13 +248,13 @@ namespace risk.control.system.Controllers
                 if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
                     notifyService.Error("OOPs !!!..Contact Admin");
-                    return RedirectToAction(nameof(ClaimsVendorController.Allocate), "ClaimsVendor");
+                    return RedirectToAction(nameof(SupervisorController.Allocate), "Supervisor");
 
                 }
                 if (request == null)
                 {
                     notifyService.Error("NOT FOUND !!!..");
-                    return RedirectToAction(nameof(ClaimsVendorController.Allocate), "ClaimsVendor");
+                    return RedirectToAction(nameof(SupervisorController.Allocate), "Supervisor");
 
                 }
                 request.ClaimsInvestigation.AgencyReport.EnquiryRequest.Answer = HttpUtility.HtmlEncode(request.ClaimsInvestigation.AgencyReport.EnquiryRequest.Answer);
@@ -268,16 +268,16 @@ namespace risk.control.system.Controllers
                     await mailboxService.NotifySubmitReplyToCompany(currentUserEmail, claimId);
 
                     notifyService.Success("Enquiry Reply Sent to Company");
-                    return RedirectToAction(nameof(ClaimsVendorController.Allocate), "ClaimsVendor");
+                    return RedirectToAction(nameof(SupervisorController.Allocate), "Supervisor");
                 }
                 notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(ClaimsVendorController.Allocate), "ClaimsVendor");
+                return RedirectToAction(nameof(SupervisorController.Allocate), "Supervisor");
 
             }
             catch (Exception)
             {
                 notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(ClaimsVendorController.Allocate), "ClaimsVendor");
+                return RedirectToAction(nameof(SupervisorController.Allocate), "Supervisor");
 
             }
         }

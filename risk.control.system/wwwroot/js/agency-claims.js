@@ -129,10 +129,10 @@
                 "mRender": function (data, type, row) {
                     var buttons = "";
                     if (row.isQueryCase) {
-                        buttons += '<a id="details' + row.id + '" onclick="showenquiry(`' + row.id + '`)" href="/ClaimsVendor/ReplyEnquiry?Id=' + row.id + '"  class="btn btn-xs btn-warning"><i class="fas fa-question" aria-hidden="true"></i> ENQUIRY </a>'
+                        buttons += '<a id="details' + row.id + '" onclick="showenquiry(`' + row.id + '`)" href="/SuperVisor/ReplyEnquiry?Id=' + row.id + '"  class="btn btn-xs btn-warning"><i class="fas fa-question" aria-hidden="true"></i> ENQUIRY </a>'
                     }
                     else {
-                        buttons += '<a id="details' + row.id + '" onclick="showdetails(`' + row.id + '`)" href="/ClaimsVendor/CaseDetail?Id=' + row.id + '"  class="btn btn-xs btn-info"><i class="fa fa-search"></i></i> Details</a>'
+                        buttons += '<a id="details' + row.id + '" onclick="showdetails(`' + row.id + '`)" href="/SuperVisor/CaseDetail?Id=' + row.id + '"  class="btn btn-xs btn-info"><i class="fa fa-search"></i></i> Details</a>'
                     }
                     return buttons;
                 }

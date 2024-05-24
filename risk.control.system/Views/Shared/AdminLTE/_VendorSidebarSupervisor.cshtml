@@ -10,11 +10,11 @@
     </a>
 </li>
 <li class="nav-item">
-    <a is-active-page asp-controller="ClaimsVendor" asp-action="Allocate" class="actual-link nav-link @Url.MakeActiveClass("ClaimsVendor","Index")
-                                    @Url.MakeActiveClass("ClaimsVendor","AllocateToVendorAgent") @Url.MakeActiveClass("ClaimsVendor","SelectVendorAgent")
-                                            @Url.MakeActiveClass("ClaimsVendor","Allocate")
-                                            @Url.MakeActiveClass("ClaimsVendor","ReplyEnquiry")
-                                            @Url.MakeActiveClass("ClaimsVendor","CaseDetail")
+    <a is-active-page asp-controller="SuperVisor" asp-action="Allocate" class="actual-link nav-link @Url.MakeActiveClass("SuperVisor","Allocate")
+                                    @Url.MakeActiveClass("SuperVisor","SelectVendorAgent")
+                                            @Url.MakeActiveClass("SuperVisor","Allocate")
+                                            @Url.MakeActiveClass("SuperVisor","ReplyEnquiry")
+                                            @Url.MakeActiveClass("SuperVisor","CaseDetail")
                                             ">
         <i class="fas fa-external-link-alt nav-icon"></i>
         <p>
@@ -23,8 +23,9 @@
     </a>
 </li>
 <li class="nav-item">
-    <a is-active-page asp-controller="ClaimsVendor" asp-action="ClaimReport" class="actual-link nav-link @Url.MakeActiveClass("ClaimsVendor","ClaimReport")
-                                                    @Url.MakeActiveClass("ClaimsVendor","GetInvestigateReport") @Url.MakeActiveClass("ClaimsVendor","ReSelectVendorAgent")">
+    <a is-active-page asp-controller="SuperVisor" asp-action="ClaimReport" class="actual-link nav-link @Url.MakeActiveClass("SuperVisor","ClaimReport")
+                                                    @Url.MakeActiveClass("SuperVisor","GetInvestigateReport")
+                                                    @Url.MakeActiveClass("SuperVisor","ReSelectVendorAgent")">
         <i class="far fa-file-archive nav-icon"></i>
         <p>
             <span class="badge badge-info">SUBMIT</span> <sub>report</sub>
@@ -33,8 +34,8 @@
 </li>
 
 <li class="nav-item">
-    <a is-active-page asp-controller="ClaimsVendor" asp-action="Open" class="actual-link nav-link @Url.MakeActiveClass("ClaimsVendor","Open")
-                                @Url.MakeActiveClass("ClaimsVendor","Detail")">
+    <a is-active-page asp-controller="SuperVisor" asp-action="Open" class="actual-link nav-link @Url.MakeActiveClass("SuperVisor","Open")
+                                @Url.MakeActiveClass("SuperVisor","Detail")">
         <i class="fa fa-toggle-on nav-icon"></i>
         <p>
             <span class="badge badge-primary">ACTIVE</span>
@@ -42,10 +43,10 @@
     </a>
 </li>
 <li class="nav-item">
-    <a is-active-page asp-controller="ClaimsVendor" asp-action="Completed" class="actual-link nav-link @Url.MakeActiveClass("ClaimsVendor","Completed")
-                                           @Url.MakeActiveClass("ClaimsVendor","CompletedDetail")
-                                                   @Url.MakeActiveClass("ClaimsVendor","ShowInvoice")
-                                                       @Url.MakeActiveClass("ClaimsVendor","PrintInvoice")">
+    <a is-active-page asp-controller="SuperVisor" asp-action="Completed" class="actual-link nav-link @Url.MakeActiveClass("SuperVisor","Completed")
+                                           @Url.MakeActiveClass("SuperVisor","CompletedDetail")
+                                                   @Url.MakeActiveClass("SuperVisor","ShowInvoice")
+                                                       @Url.MakeActiveClass("SuperVisor","PrintInvoice")">
         <i class="fas fa-print nav-icon"></i>
         <p>
             <span class="badge badge-secondary">COMPLETED</span>

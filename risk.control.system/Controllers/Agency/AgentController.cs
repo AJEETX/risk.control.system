@@ -37,7 +37,7 @@ namespace risk.control.system.Controllers.Agency
             return View();
         }
 
-        [Breadcrumb("Submit")]
+        [Breadcrumb("Submit",FromAction = "Agent")]
         public async Task<IActionResult> GetInvestigate(string selectedcase, bool uploaded = false)
         {
             try

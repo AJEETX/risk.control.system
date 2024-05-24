@@ -1,0 +1,111 @@
+﻿@model ClaimsInvestigationVendorsModel
+<article>
+    <div class="bb-blog-inner">
+        <div class="card card-light border-secondary">
+
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-user-edit"></i> Supervisor:
+                    <span class="hover-text">
+                        <i class="fas fa-info-circle"></i>
+                        <span class="tooltip-text" id="information">
+                            <span>
+                                <i class="fas fa-user-shield"></i><b> Supervisor</b> remark
+                            </span>
+
+                        </span>
+                    </span>
+                </h3>
+            </div>
+
+            <div class="card-body">
+
+                <div class="row">
+                    <div class="col-12">
+
+                        <div class="form-group">
+                            <span class="input-group-label"> Additional Document:</span>
+                            <div class="input-group mb-3">
+                                <img class="form-Image" id="policyImage" src=@Applicationsettings.NO_POLICY_IMAGE>
+                                <input accept="image/*" asp-for="AgencyReport.SupervisorAttachment" type="file" class="form-control remarks" id="documentImageInput" />
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <span class="input-group-label"> Remarks :</span>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" asp-for="AgencyReport.AgentRemarks"><i class="fas fa-comment"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
+                                </div>
+                                <input required maxlength="100" name="supervisorRemarks" id="supervisorRemarks" asp-for="AgencyReport.SupervisorRemarks" type="text" class="form-control remarks" autocomplete="off" />
+
+                                <span asp-validation-for="AgencyReport.SupervisorRemarks" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+        <div class="card card-light border-secondary">
+
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-code"></i> Declaration:</h3>
+            </div>
+            <div class="card-body pt-0 disclaimer-body">
+
+                <div class="row report-disclaimer">
+                    <div class="col-12">
+                        <ul class="ml-4 mb-0 fa-ul text-muted">
+                            <label>
+                                <h4 class="mb-0" style="margin-top: 0.2em!important;">Report Terms and Conditions</h4>
+                                <p>Last updated <span style="color: #8351f9;">@DateTime.Now.AddYears(-1).ToString("dd-MMM-yyyy")</span></p>
+                                <p><strong>AGREEMENT TO TERMS</strong></p>
+                                <p>These Terms and Conditions constitute a legally binding agreement made between you, whether personally or on behalf of an entity (“you”) and<span style="color: #8351f9;"> Holosync Technologies</span> (“we,” “us” or “our”), concerning your access to and use of the <span style="color: #8351f9;">icheckify.co.in</span> Report as well as any other media form, media channel, mobile Report or mobile application related, linked, or otherwise connected thereto (collectively, the “Application”).</p>
+                                <p>The information provided on the Application is not intended for distribution to or use by any person or entity in any jurisdiction or country where such distribution or use would be contrary to law or regulation or which would subject us to any report requirement within such jurisdiction or country.</p>
+                                <p><strong>INTELLECTUAL PROPERTY RIGHTS</strong></p>
+                                <p>Unless otherwise indicated, the Application is our proprietary property and all source code, databases, functionality, software, Report designs, audio, video, text, photographs, and graphics on the Application (collectively, the “Content”) and the trademarks, service marks, and logos contained therein (the “Marks”) are owned or controlled by us or licensed to us, and are protected by copyright and trademark laws and various other intellectual property rights and unfair competition laws of the United States, foreign jurisdictions, and international conventions.</p>
+                                <p>The Content and the Marks are provided on the Application “AS IS” for your information and personal use only. Except as expressly provided in these Terms and Conditions, no part of the Application and no Content or Marks may be copied, reproduced, aggregated, republished, uploaded, posted, publicly displayed, encoded, translated, transmitted, distributed, sold, licensed, or otherwise exploited for any commercial purpose whatsoever, without our express prior written permission.</p>
+                                <p>Provided that you are eligible to use the Application, you are granted a limited license to access and use the Application and to download or print a copy of any portion of the Content to which you have properly gained access solely for your personal, non-commercial use. We reserve all rights not expressly granted to you in and to the Application, the Content and the Marks.</p>
+                                <p><strong>AGENCY REPRESENTATIONS</strong></p>
+                                <p>By using the Application, you represent and warrant that:</p>
+                                <p><span style="color: #8351f9;">[(1) all report information you submit will be true, accurate, current, and complete; (2) you will maintain the accuracy of such information and promptly update such report information as necessary;]</span></p>
+                                <p>(3) you have the legal capacity and you agree to comply with these Terms and Conditions;</p>
+                                <p><strong>CONTACT US</strong></p>
+                                <p>In order to resolve a complaint regarding the Application or to receive further information regarding use of the Application, please contact us at:</p>
+                                <p><span style="color: #8351f9;">Holosync Technologies</span></p>
+                                <p><span style="color: #8351f9;">Bandra Kurla Complex, Mumbai – 400 051</span></p>
+                                <p><span style="color: #8351f9;">+ 91 89579 56607</span></p>
+                                <p><span style="color: #8351f9;">https://icheckify.co.in/</span></p>
+                                <p><span style="color: #8351f9;">hi@icheckify.co.in</span></p>
+                                <p></p>
+                            </label>
+
+                            <div class="form-group">
+                                <div class="custom-control custom-checkbox mr-sm-2">
+                                    <input type="checkbox" class="custom-control-input selected-case" id="selected-case" name="selected-case">
+                                    <label class="custom-control-label" for="selected-case"> I hereby consent to agree to the term and conditions.</label>
+                                </div>
+                            </div>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="text-right">
+                    <a id="back" asp-controller="SuperVisor" class="btn btn-outline-secondary" asp-action="ClaimReport">
+                        <i class="fas fa-arrow-left" aria-hidden="true"></i> Back
+                    </a>
+                    <a id="reselect-case" asp-controller="SuperVisor" asp-action="ReSelectVendorAgent"
+                       asp-route-selectedcase="@Model.ClaimsInvestigation.ClaimsInvestigationId" class="btn btn-danger">
+                        <i class="fas fa-sync" aria-hidden="true"></i> REVIEW
+                    </a>
+                    <button disabled id="allocate-case" type="submit" class="btn btn-success">
+                        <i class="far fa-file-alt" aria-hidden="true"></i> SUBMIT
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</article>

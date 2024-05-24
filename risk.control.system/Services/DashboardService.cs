@@ -119,19 +119,19 @@ namespace risk.control.system.Services
             var data = new DashboardData();
             data.FirstBlockName = "Allocate(new)";
             data.FirstBlockCount = claimsAllocate;
-            data.FirstBlockUrl = "/ClaimsVendor/Allocate";
+            data.FirstBlockUrl = "/SuperVisor/Allocate";
 
             data.SecondBlockName = "Submit(report)";
             data.SecondBlockCount = claimsVerified;
-            data.SecondBlockUrl = "/ClaimsVendor/ClaimReport";
+            data.SecondBlockUrl = "/SuperVisor/ClaimReport";
 
             data.ThirdBlockName = "Active";
             data.ThirdBlockCount = claimsActiveCount;
-            data.ThirdBlockUrl = "/ClaimsVendor/Open";
+            data.ThirdBlockUrl = "/SuperVisor/Open";
 
             data.LastBlockName = "Completed";
             data.LastBlockCount = claimsCompleted;
-            data.LastBlockUrl = "/ClaimsVendor/Completed";
+            data.LastBlockUrl = "/SuperVisor/Completed";
 
             return data;
         }
