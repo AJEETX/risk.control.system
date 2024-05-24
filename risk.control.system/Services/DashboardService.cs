@@ -232,19 +232,19 @@ namespace risk.control.system.Services
             var data = new DashboardData();
             data.FirstBlockName = "Assess(report)";
             data.FirstBlockCount = claimsAssessor;
-            data.FirstBlockUrl = "/ClaimsInvestigation/Assessor";
+            data.FirstBlockUrl = "/Assessor/Assessor";
 
             data.SecondBlockName = "Review";
             data.SecondBlockCount = claimsReview;
-            data.SecondBlockUrl = "/ClaimsInvestigation/Review";
+            data.SecondBlockUrl = "/Assessor/Review";
 
             data.ThirdBlockName = "Approved";
             data.ThirdBlockCount = claimsCompleted;
-            data.ThirdBlockUrl = "/Report";
+            data.ThirdBlockUrl = "/Assessor/Approved";
 
             data.LastBlockName = "Rejected";
             data.LastBlockCount = claimsReject;
-            data.LastBlockUrl = "/Report/Rejected";
+            data.LastBlockUrl = "/Assessor/Rejected";
 
             return data;
         }

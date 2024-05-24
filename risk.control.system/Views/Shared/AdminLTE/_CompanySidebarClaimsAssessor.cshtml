@@ -4,7 +4,7 @@
 
 @{
     <li class="nav-item">
-        <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("ClaimsInvestigation","")  @Url.MakeActiveClass("Report","")">
+        <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("Assessor","") ">
             <i class="nav-icon fa fa-user-secret"></i>
             <p class="sidebar-menu-header-label">
                 @Applicationsettings.INVESTIGATION_CLAIM
@@ -13,11 +13,11 @@
         </a>
     </li>
     <li class="nav-item">
-        <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Assessor" class="actual-link nav-link
-                        @Url.MakeActiveClass("ClaimsInvestigation","Assessor")
-                            @Url.MakeActiveClass("ClaimsInvestigation","SendEnquiry")
-                        @Url.MakeActiveClass("ClaimsInvestigation","PreviousReports")
-                @Url.MakeActiveClass("ClaimsInvestigation","GetInvestigateReport")">
+        <a is-active-page asp-controller="Assessor" asp-action="Assessor" class="actual-link nav-link
+                            @Url.MakeActiveClass("Assessor","Assessor")
+                                @Url.MakeActiveClass("Assessor","SendEnquiry")
+                            @Url.MakeActiveClass("Assessor","PreviousReports")
+                    @Url.MakeActiveClass("Assessor","GetInvestigateReport")">
             <i class="fas fa-glasses nav-icon"></i>
             <p>
                 <span class="badge badge-danger">ASSESS</span> <sub>report</sub>
@@ -25,8 +25,8 @@
         </a>
     </li>
     <li class="nav-item">
-        <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Review" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Review")
-                @Url.MakeActiveClass("ClaimsInvestigation","ReviewDetail")">
+        <a is-active-page asp-controller="Assessor" asp-action="Review" class="actual-link nav-link @Url.MakeActiveClass("Assessor","Review")
+                    @Url.MakeActiveClass("Assessor","ReviewDetail")">
             <i class="fas fa-random nav-icon"></i>
             <p>
                 <span class="badge badge-warning">REVIEW</span>
@@ -34,9 +34,10 @@
         </a>
     </li>
     <li class="nav-item">
-        <a is-active-page asp-controller="Report" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Report","Index")
-                                                @Url.MakeActiveClass("Report","Detail") @Url.MakeActiveClass("Report","ShowInvoice")
-                                                                      @Url.MakeActiveClass("Report","PrintInvoice")">
+        <a is-active-page asp-controller="Assessor" asp-action="Approved" class="actual-link nav-link @Url.MakeActiveClass("Assessor","Approved")
+                                                        @Url.MakeActiveClass("Assessor","ApprovedDetail") 
+                                                            @Url.MakeActiveClass("Assessor","ShowInvoice")
+                                                            @Url.MakeActiveClass("Assessor","PrintInvoice")">
             <i class="far fa-thumbs-up nav-icon"></i>
             <p>
                 <span class="badge badge-info"> APPROVED </span>
@@ -44,8 +45,8 @@
         </a>
     </li>
     <li class="nav-item">
-        <a is-active-page asp-controller="Report" asp-action="Rejected" class="actual-link nav-link @Url.MakeActiveClass("Report","Rejected")
-                                                           @Url.MakeActiveClass("Report","RejectDetail") ">
+        <a is-active-page asp-controller="Assessor" asp-action="Rejected" class="actual-link nav-link @Url.MakeActiveClass("Assessor","Rejected")
+                                                               @Url.MakeActiveClass("Assessor","RejectDetail") ">
            <i class="far fa-thumbs-down nav-icon"></i>
            <p>
                <span class="badge badge-secondary">REJECTED</span>

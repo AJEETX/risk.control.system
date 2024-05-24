@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using NToastNotify;
 
 using risk.control.system.AppConstant;
+using risk.control.system.Controllers.Company;
 using risk.control.system.Data;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
@@ -190,13 +191,12 @@ namespace risk.control.system.Controllers
                     notifyService.Custom($"Policy #{claim.PolicyDetail.ContractNumber} reassigned", 3, "yellow", "far fa-file-powerpoint");
                 }
 
-                return RedirectToAction(nameof(ClaimsInvestigationController.Assessor), "ClaimsInvestigation");
+                return RedirectToAction(nameof(AssessorController.Assessor), "Assessor");
             }
             catch (Exception ex)
             {
                 notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(ClaimsInvestigationController.Assessor), "ClaimsInvestigation");
-
+                return RedirectToAction(nameof(AssessorController.Assessor), "Assessor");
             }
 
         }
@@ -209,7 +209,7 @@ namespace risk.control.system.Controllers
             if (string.IsNullOrWhiteSpace(assessorRemarks) || caseLocationId < 1 || string.IsNullOrWhiteSpace(claimId))
             {
                 notifyService.Custom($"Error!!! Try again", 3, "red", "far fa-file-powerpoint");
-                return RedirectToAction(nameof(ClaimsInvestigationController.Assessor), nameof(ClaimsInvestigationController));
+                return RedirectToAction(nameof(AssessorController.Assessor), "Assessor");
             }
             try
             {
@@ -221,15 +221,13 @@ namespace risk.control.system.Controllers
 
                 await mailboxService.NotifyClaimReportProcess(userEmail, claimId, caseLocationId);
 
-                return RedirectToAction(nameof(ClaimsInvestigationController.Assessor), "ClaimsInvestigation");
+                return RedirectToAction(nameof(AssessorController.Assessor), "Assessor");
             }
             catch (Exception)
             {
                 notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(ClaimsInvestigationController.Assessor), nameof(ClaimsInvestigationController));
-
+                return RedirectToAction(nameof(AssessorController.Assessor), "Assessor");
             }
-
         }
 
         [HttpPost]
@@ -918,7 +916,7 @@ namespace risk.control.system.Controllers
                     await mailboxService.NotifySubmitQueryToAgency(currentUserEmail, claimId);
 
                     notifyService.Success("Query Sent to Agency");
-                    return RedirectToAction(nameof(ClaimsInvestigationController.Assessor),"ClaimsInvestigation"); 
+                    return RedirectToAction(nameof(AssessorController.Assessor), "Assessor");
                 }
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
