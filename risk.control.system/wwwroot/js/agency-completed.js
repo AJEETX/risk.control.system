@@ -17,7 +17,7 @@
 
     $("#customerTable").DataTable({
         ajax: {
-            url: '/api/ClaimsVendor/GetCompleted',
+            url: '/api/agency/Supervisor/GetCompleted',
             dataSrc: ''
         },
         order: [[11, 'desc']],

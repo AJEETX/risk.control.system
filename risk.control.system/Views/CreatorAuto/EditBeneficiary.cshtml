@@ -1,0 +1,230 @@
+﻿@model risk.control.system.Models.BeneficiaryDetail
+
+@{
+    ViewData["Title"] = @Applicationsettings.EDIT;
+    var caseId = Model.ClaimsInvestigation.ClaimsInvestigationId;
+
+}
+
+<section class="content">
+    <form id="create-form" asp-action="EditBeneficiary" enctype="multipart/form-data">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <input type="hidden" asp-for="BeneficiaryDetailId" />
+        <input type="hidden" asp-for="ClaimsInvestigationId" />
+        <input type="hidden" id="claimtype" name="claimtype" value="auto" />
+        <div id="article" class="card  bg-light card-secondary">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-user-tie"></i> Edit Beneficiary
+                    <span class="hover-text">
+                        <i class="fas fa-info-circle"></i>
+                        <span class="tooltip-text" id="information">
+                            <span>
+                                <i class='far fa-hand-point-right'></i> Edit Beneficiary details.
+                                <i class='far fa-thumbs-up'></i> Wizard should complete. <b> <i class='fa fa-hand-peace-o'></i> Assign</b> to Agency
+                            </span>
+
+                        </span>
+                    </span>
+
+                </h3>
+            </div>
+            <div class="container d-flex justify-content-center align-items-center">
+                <div class="progresses">
+                    <div class="steps2">
+                        <span> <i class="far fa-file-powerpoint"></i></span>
+                    </div>
+
+                    <span class="line"></span>
+
+                    <div class="steps2">
+                        <span class="font-weight-bold"><i class="fa fa-user-plus"></i></span>
+                    </div>
+
+                    <span class="line"></span>
+
+                    <div class="steps-edit">
+                        <span class="font-weight-bold"><i class="fas fa-user-tie"></i></span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body pt-0">
+                <div class="submit-progress hidden">
+                    <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <span class="input-group-label"> Beneficiary Name:</span>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" asp-for="BeneficiaryName"><i class="fas fa-user-tie"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                </div>
+                                <input id="BeneficiaryName" required asp-for="BeneficiaryName" class="form-control remarks" type="text" placeholder="Beneficiary Name" maxlength="30" />
+                                <span asp-validation-for="BeneficiaryName" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <span class="input-group-label"> Date Of Birth:</span>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" asp-for="BeneficiaryDateOfBirth"><i class="far fa-calendar-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                </div>
+                                <input required asp-for="BeneficiaryDateOfBirth" id="BeneficiaryDateOfBirthId" class="form-control remarks" type="date" />
+                                <span asp-validation-for="BeneficiaryDateOfBirth" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <span class="input-group-label"> Relation:</span>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" asp-for="BeneficiaryName"><i class="fas fa-user-tie"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                </div>
+                                <select required asp-for="BeneficiaryRelationId" class="form-control remarks" asp-items="ViewBag.BeneficiaryRelationId">
+                                    <option value="">--- SELECT ---</option>
+                                </select>
+                                <span asp-validation-for="BeneficiaryRelationId" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <span class="input-group-label"> Phone #:</span>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="PhoneNumber"><i class="fas fa-phone"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                </div>
+                                <input type="text" asp-for="BeneficiaryContactNumber" class="form-control remarks" required maxlength="14"
+                                       placeholder="Phone # with country code" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" />
+                                <span asp-validation-for="BeneficiaryContactNumber" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <span class="input-group-label"> Income:</span>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" asp-for="BeneficiaryIncome"><i class="far fa-money-bill-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                </div>
+                                <select required asp-for="BeneficiaryIncome" class="form-control remarks" asp-items="Html.GetEnumSelectList<Income>()">
+                                    <option value="">--- SELECT ---</option>
+                                </select>
+                                <span asp-validation-for="BeneficiaryIncome" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <span class="input-group-label"> Beneficiary Photo:</span>
+                            <div class="input-group mb-3">
+                                @if (Model?.ProfilePicture is not null)
+                                {
+                                    <img id="profileImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.ProfilePicture))">
+                                    <i class="fa fa-asterisk asterik-style"></i>
+                                    <input asp-for="ProfileImage" type="file" class="form-control remarks" id="documentImageInput" />
+                                }
+                                else
+                                {
+                                    <img class="form-Image" id="profileImage" src="@Applicationsettings.NO_USER">
+                                    <i class="fa fa-asterisk asterik-style"></i>
+                                    <input asp-for="ProfileImage" type="file" class="form-control remarks" id="documentImageInput" />
+                                }
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <span class="input-group-label"> Country:</span>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" for="CountryId"><i class="fas fa-map-marked-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                </div>
+                                <select asp-for="CountryId" class="form-control remarks" id="CountryId" asp-items="ViewBag.CountryId" onchange="loadState(this)" required>
+                                    <option value="">--- SELECT ---</option>
+                                </select>
+                                <span asp-validation-for="CountryId" class="text-danger"></span>
+
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <span class="input-group-label"> State:</span>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" for="StateId"><i class="fas fa-map-marker-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                </div>
+                                <select id="StateId" asp-for="StateId" class="form-control remarks" asp-items="ViewBag.StateId" onchange="loadDistrict(this)" required>
+                                    <option value="">--- SELECT ---</option>
+                                </select>
+
+                                <span asp-validation-for="StateId" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <span class="input-group-label"> District:</span>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" for="DistrictId"><i class="fas fa-city"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                </div>
+                                <select id="DistrictId" asp-for="DistrictId" class="form-control remarks" asp-items="ViewBag.DistrictId" onchange="loadPinCode(this)" required>
+                                    <option value="">--- SELECT ---</option>
+                                </select>
+
+                                <span asp-validation-for="DistrictId" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <span class="input-group-label"> Pincode:</span>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" for="PinCodeId"><i class="fas fa-map-pin"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                </div>
+                                <select id="PinCodeId" asp-for="PinCodeId" class="form-control remarks" asp-items="ViewBag.PinCodeId" required>
+                                    <option value="">--- SELECT ---</option>
+                                </select>
+                                <span asp-validation-for="PinCodeId" class="text-danger"></span>
+
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <span class="input-group-label"> Address:</span>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="Addressline"><i class="fa fa-home"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                </div>
+                                <input required type="text" asp-for="Addressline" class="form-control remarks" placeholder="Address" maxlength="50" />
+                                <span asp-validation-for="Addressline" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+            <div class="card-footer">
+                <div class="text-right">
+                    <button type="submit" onclick="clearAllInputs()" class="btn btn-outline-secondary">
+                        <i class="fas fa-undo"></i> Reset
+                    </button>
+                    <a id="back" asp-action="Details" asp-route-id="@Model.ClaimsInvestigation.ClaimsInvestigationId" class="btn btn-secondary">
+                        <i class="fa fa-window-close"></i>
+                        @Applicationsettings.CANCEL
+                    </a>
+                    <button id="create-bene" type="submit" class="btn btn-warning">
+                        <i class="fas fa-user-tie"></i> @Applicationsettings.EDIT  Beneficiary
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+</section>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script src="~/js/edit-beneficiary.js">
+
+    </script>
+}

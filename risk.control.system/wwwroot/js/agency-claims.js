@@ -48,7 +48,7 @@
     });
     var table = $("#customerTable").DataTable({
         ajax: {
-            url: '/api/ClaimsVendor/GetNew',
+            url: '/api/agency/supervisor/GetNew',
             dataSrc: ''
         },
         columnDefs: [{

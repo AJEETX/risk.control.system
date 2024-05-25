@@ -60,9 +60,41 @@
         <div class="bb-blog-inner">
             <div class="card card-light expanding-card">
                 <div class="card-header">
-                    <h3 class="card-title">Claim: #<span class="badge badge-light"><i class="far fa-file-powerpoint"></i>  @Model.ClaimsInvestigation?.PolicyDetail?.ContractNumber</span></h3>
+                    <h3 class="card-title">
+                        Status: <span class="badge badge-info">
+                            <b>   @Model.ClaimsInvestigation?.InvestigationCaseSubStatus.Name</b>
+                        </span>
+                        |
+                        Owner
+                        <span class="badge badge-info">
+                            @{
+                                if (string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.UserEmailActionedTo))
+                                {
+                                    <b>   @Model.ClaimsInvestigation?.UserRoleActionedTo</b>
+                                }
+                                else
+                                {
+                                    <b>   @Model.ClaimsInvestigation?.UserEmailActionedTo</b>
+
+                                }
+                            }
+                        </span>
+                        <span class="hover-text">
+                            <i class="fas fa-info-circle"></i>
+                            <span class="tooltip-text" id="information">
+                                <li>
+
+                                    <i class='far fa-hand-point-right'></i> Claim <i class='far fa-file-powerpoint'></i><strong>#@Model.ClaimsInvestigation?.PolicyDetail?.ContractNumber </strong>  details
+
+                                </li>
+
+                            </span>
+                        </span>
+                    </h3>
                     <div class="card-tools">
-                        <span data-toggle="tooltip" title="Claim # : @Model.ClaimsInvestigation?.PolicyDetail?.ContractNumber" class="badge badge-light"> <i class="far fa-file-powerpoint"></i> </span>
+                        <span data-toggle="tooltip" title="Claim # : @Model.ClaimsInvestigation?.PolicyDetail?.ContractNumber" class="badge badge-light">
+                            <i class='far fa-hand-point-right'></i>
+                        </span>
                         <button type="button" class="btn btn-tool" data-card-widget="collapse">
                             <i class="fas fa-minus"></i>
                         </button>
@@ -76,6 +108,12 @@
                             <div class="card bg-light d-flex flex-fill">
                                 <div class="card-header text-muted border-bottom-0">
                                     <i class="far fa-file-powerpoint"></i> Policy Details
+                                    <span class="hover-text">
+                                        <i class="fas fa-info-circle"></i>
+                                        <span class="tooltip-text" id="policy-information">
+                                            <i class='far fa-file-powerpoint'></i> Policy details
+                                        </span>
+                                    </span>
                                 </div>
                                 <div class="progress">
                                     <i class="far fa-bookmark bookmark-green"></i>
@@ -177,6 +215,12 @@
                             <div class="card bg-light d-flex flex-fill">
                                 <div class="card-header text-muted border-bottom-0">
                                     <i class="fa fa-user-plus"></i> Customer Details
+                                    <span class="hover-text">
+                                        <i class="fas fa-info-circle"></i>
+                                        <span class="tooltip-text" id="customer-information">
+                                            <i class='fa fa-user-plus'></i> Customer details
+                                        </span>
+                                    </span>
                                 </div>
                                 <div class="progress">
                                     <i class="far fa-bookmark bookmark-green"></i>
@@ -273,6 +317,13 @@
                             <div class="card bg-light d-flex flex-fill">
                                 <div class="card-header text-muted border-bottom-0">
                                     <i class="fas fa-user-tie"></i>  Beneficiary Details
+                                    <span class="hover-text">
+                                        <i class="fas fa-info-circle"></i>
+                                        <span class="tooltip-text" id="beneficiary-information">
+
+                                            <i class='fas fa-user-tie'></i> Beneficiary details
+                                        </span>
+                                    </span>
                                 </div>
                                 <div class="progress">
                                     <i class="far fa-bookmark bookmark-green"></i>

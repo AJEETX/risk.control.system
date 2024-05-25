@@ -59,7 +59,7 @@ namespace risk.control.system.Controllers
             if (claims == null || claims.Count == 0)
             {
                 notifyService.Custom($"No case selected!!!. Please select case to be assigned.", 3, "red", "far fa-file-powerpoint");
-                return RedirectToAction(nameof(ClaimsInvestigationController.Draft), "ClaimsInvestigation");
+                return RedirectToAction(nameof(CreatorManualController.New), "CreatorManual");
             }
             try
             {
@@ -101,7 +101,8 @@ namespace risk.control.system.Controllers
                         await mailboxService.NotifyClaimAssignmentToAssigner(HttpContext.User.Identity.Name, notAutoAllocated);
 
                         notifyService.Custom($"{notAutoAllocated.Count}/{claims.Count} claim(s) need assign manually through ReAssign", 3, "orange", "far fa-file-powerpoint");
-                        return RedirectToAction(nameof(ClaimsInvestigationController.ReAssignerAuto), "ClaimsInvestigation");
+                        
+                        return RedirectToAction(nameof(CreatorManualController.New), "CreatorManual");
 
                     }
                 }
@@ -117,7 +118,7 @@ namespace risk.control.system.Controllers
             catch (Exception)
             {
                 notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(ClaimsInvestigationController.Draft), "ClaimsInvestigation");
+                return RedirectToAction(nameof(CreatorManualController.New), "CreatorManual");
 
             }
 
@@ -132,7 +133,7 @@ namespace risk.control.system.Controllers
             if (selectedcase < 1 || caseLocationId < 1 || string.IsNullOrWhiteSpace(claimId))
             {
                 notifyService.Custom($"Error!!! Try again", 3, "red", "far fa-file-powerpoint");
-                return RedirectToAction(nameof(ClaimsInvestigationController.Draft), "ClaimsInvestigation");
+                return RedirectToAction(nameof(CreatorManualController.New), "CreatorManual");
             }
             //set claim as manual assigned
             try
@@ -152,7 +153,7 @@ namespace risk.control.system.Controllers
             catch (Exception)
             {
                 notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(ClaimsInvestigationController.Assigner), "ClaimsInvestigation");
+                return RedirectToAction(nameof(CreatorManualController.New), "CreatorManual");
 
             }
 
@@ -166,7 +167,7 @@ namespace risk.control.system.Controllers
             if (string.IsNullOrWhiteSpace(assessorRemarks) || caseLocationId < 1 || string.IsNullOrWhiteSpace(claimId) || string.IsNullOrWhiteSpace(assessorRemarkType))
             {
                 notifyService.Custom($"Error!!! Try again", 3, "red", "far fa-file-powerpoint");
-                return RedirectToAction(nameof(ClaimsInvestigationController.Assessor), nameof(ClaimsInvestigationController));
+                return RedirectToAction(nameof(AssessorController.Assessor), "Assessor");
             }
             try
             {
@@ -268,7 +269,7 @@ namespace risk.control.system.Controllers
                     if (file != null && file.Length > 2000000)
                     {
                         notifyService.Warning("Uploaded File size morer than 2MB !!! ");
-                        return RedirectToAction(nameof(InsurancePolicyController.CreatePolicy), "InsurancePolicy",new { claimsInvestigation = claimsInvestigation });
+                        return RedirectToAction(nameof(CreatorManualController.CreatePolicy), "CreatorManual", new { claimsInvestigation = claimsInvestigation });
                     }
                         if (file != null)
                     {
@@ -289,7 +290,7 @@ namespace risk.control.system.Controllers
                 }
                 notifyService.Custom($"Policy #{claim.PolicyDetail.ContractNumber} created successfully", 3, "green", "far fa-file-powerpoint");
 
-                return RedirectToAction(nameof(ClaimsInvestigationController.Details), "ClaimsInvestigation", new { id = claim.ClaimsInvestigationId });
+                return RedirectToAction(nameof(CreatorManualController.Details), "CreatorManual", new { id = claim.ClaimsInvestigationId });
 
             }
             catch (Exception)
@@ -336,7 +337,7 @@ namespace risk.control.system.Controllers
                     if (file != null && file.Length > 2000000)
                     {
                         notifyService.Warning("Uploaded File size morer than 2MB !!! ");
-                        return RedirectToAction(nameof(InsurancePolicyController.CreatePolicy), "InsurancePolicy", new { claimsInvestigation = claimsInvestigation });
+                        return RedirectToAction(nameof(CreatorAutoController.Create), "CreatorAuto", new { claimsInvestigation = claimsInvestigation });
                     }
                     if (file != null)
                     {
@@ -357,7 +358,7 @@ namespace risk.control.system.Controllers
                 }
                 notifyService.Custom($"Policy #{claim.PolicyDetail.ContractNumber} created successfully", 3, "green", "far fa-file-powerpoint");
 
-                return RedirectToAction(nameof(ClaimsInvestigationController.DetailsAuto), "ClaimsInvestigation", new { id = claim.ClaimsInvestigationId });
+                return RedirectToAction(nameof(CreatorAutoController.Details), "CreatorAuto", new { id = claim.ClaimsInvestigationId });
 
             }
             catch (Exception)
@@ -367,143 +368,6 @@ namespace risk.control.system.Controllers
             }
         }
 
-        [HttpPost]
-        [RequestSizeLimit(2_000_000)] // Checking for 2 MB
-        [ValidateAntiForgeryToken]
-        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
-        public async Task<IActionResult> CreatePolicyReAssignerAuto(ClaimsInvestigation claimsInvestigation)
-        {
-            try
-            {
-                if (claimsInvestigation == null)
-                {
-                    notifyService.Error("OOPs !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-                var userEmail = HttpContext.User.Identity.Name;
-                if (string.IsNullOrWhiteSpace(userEmail))
-                {
-                    notifyService.Error("OOPs !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-
-                var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-                if (companyUser == null)
-                {
-                    notifyService.Error("OOPs !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-                claimsInvestigation.PolicyDetail.ClientCompanyId = companyUser?.ClientCompanyId;
-
-                IFormFile documentFile = null;
-                IFormFile profileFile = null;
-                var files = Request.Form?.Files;
-
-                if (files != null && files.Count > 0)
-                {
-                    var file = files.FirstOrDefault(f => f.FileName == claimsInvestigation.PolicyDetail?.Document?.FileName && f.Name == claimsInvestigation.PolicyDetail?.Document?.Name);
-                    if (file != null && file.Length > 2000000)
-                    {
-                        notifyService.Warning("Uploaded File size morer than 2MB !!! ");
-                        return RedirectToAction(nameof(InsurancePolicyController.CreatePolicy), "InsurancePolicy", new { claimsInvestigation = claimsInvestigation });
-                    }
-                    if (file != null)
-                    {
-                        documentFile = file;
-                    }
-                    file = files.FirstOrDefault(f => f.FileName == claimsInvestigation.CustomerDetail?.ProfileImage?.FileName && f.Name == claimsInvestigation.CustomerDetail?.ProfileImage?.Name);
-                    if (file != null)
-                    {
-                        profileFile = file;
-                    }
-                }
-                claimsInvestigation.ORIGIN = ORIGIN.MANUAL;
-                var claim = await claimsInvestigationService.CreatePolicy(userEmail, claimsInvestigation, documentFile, profileFile, false);
-                if (claim == null)
-                {
-                    notifyService.Error("OOPs !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-                notifyService.Custom($"Policy #{claim.PolicyDetail.ContractNumber} created successfully", 3, "green", "far fa-file-powerpoint");
-
-                return RedirectToAction(nameof(ClaimsInvestigationController.Details), "ClaimsInvestigation", new { id = claim.ClaimsInvestigationId });
-
-            }
-            catch (Exception)
-            {
-                notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
-            }
-        }
-
-        [HttpPost]
-        [RequestSizeLimit(2_000_000)] // Checking for 2 MB
-        [ValidateAntiForgeryToken]
-        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
-        public async Task<IActionResult> CreatePolicyManual(ClaimsInvestigation claimsInvestigation)
-        {
-            try
-            {
-                if (claimsInvestigation == null)
-                {
-                    notifyService.Error("OOPs !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-                var userEmail = HttpContext.User.Identity.Name;
-                if (string.IsNullOrWhiteSpace(userEmail))
-                {
-                    notifyService.Error("OOPs !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-
-                var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-                if (companyUser == null)
-                {
-                    notifyService.Error("OOPs !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-                claimsInvestigation.PolicyDetail.ClientCompanyId = companyUser?.ClientCompanyId;
-
-                IFormFile documentFile = null;
-                IFormFile profileFile = null;
-                var files = Request.Form?.Files;
-
-                if (files != null && files.Count > 0)
-                {
-                    var file = files.FirstOrDefault(f => f.FileName == claimsInvestigation.PolicyDetail?.Document?.FileName && f.Name == claimsInvestigation.PolicyDetail?.Document?.Name);
-                    if (file != null && file.Length > 2000000)
-                    {
-                        notifyService.Warning("Uploaded File size morer than 2MB !!! ");
-                        return RedirectToAction(nameof(InsurancePolicyController.CreatePolicy), "InsurancePolicy", new { claimsInvestigation = claimsInvestigation });
-                    }
-                    if (file != null)
-                    {
-                        documentFile = file;
-                    }
-                    file = files.FirstOrDefault(f => f.FileName == claimsInvestigation.CustomerDetail?.ProfileImage?.FileName && f.Name == claimsInvestigation.CustomerDetail?.ProfileImage?.Name);
-                    if (file != null)
-                    {
-                        profileFile = file;
-                    }
-                }
-                claimsInvestigation.ORIGIN = ORIGIN.MANUAL;
-                var claim = await claimsInvestigationService.CreatePolicy(userEmail, claimsInvestigation, documentFile, profileFile);
-                if (claim == null)
-                {
-                    notifyService.Error("OOPs !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-                notifyService.Custom($"Policy #{claim.PolicyDetail.ContractNumber} created successfully", 3, "green", "far fa-file-powerpoint");
-
-                return RedirectToAction(nameof(ClaimsInvestigationController.DetailsManual), "ClaimsInvestigation", new { id = claim.ClaimsInvestigationId });
-
-            }
-            catch (Exception)
-            {
-                notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
-            }
-        }
         [ValidateAntiForgeryToken]
         [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [HttpPost]
@@ -556,19 +420,19 @@ namespace risk.control.system.Controllers
                 notifyService.Custom($"Policy #{claim.PolicyDetail.ContractNumber} edited successfully", 3, "orange", "far fa-file-powerpoint");
                 if(string.IsNullOrWhiteSpace(claimtype) || claimtype.Equals("draft", StringComparison.OrdinalIgnoreCase))
                 {
-                    return RedirectToAction(nameof(ClaimsInvestigationController.Details), "ClaimsInvestigation", new { id = claim.ClaimsInvestigationId });
+                    return RedirectToAction(nameof(CreatorAutoController.Details), "ClaimsInvestigation", new { id = claim.ClaimsInvestigationId });
                 }
 
                 else if( claimtype.Equals("auto", StringComparison.OrdinalIgnoreCase))
                 {
-                    return RedirectToAction(nameof(ClaimsInvestigationController.DetailsAuto), "ClaimsInvestigation", new { id = claim.ClaimsInvestigationId });
+                    return RedirectToAction(nameof(CreatorAutoController.Details), "CreatorAuto", new { id = claim.ClaimsInvestigationId });
 
                 }
                 else if (claimtype.Equals("manual", StringComparison.OrdinalIgnoreCase))
                 {
-                    return RedirectToAction(nameof(ClaimsInvestigationController.DetailsManual), "ClaimsInvestigation", new { id = claim.ClaimsInvestigationId });
+                    return RedirectToAction(nameof(CreatorManualController.Details), "CreatorManual", new { id = claim.ClaimsInvestigationId });
                 }
-                return RedirectToAction(nameof(ClaimsInvestigationController.Details), "ClaimsInvestigation", new { id = claim.ClaimsInvestigationId });
+                    return RedirectToAction(nameof(CreatorAutoController.Details), "CreatorAuto", new { id = claim.ClaimsInvestigationId });
 
             }
             catch (Exception)
@@ -618,7 +482,7 @@ namespace risk.control.system.Controllers
                     if (file != null && file.Length > 2000000)
                     {
                         notifyService.Warning("Uploaded File size morer than 2MB !!! ");
-                        return RedirectToAction(nameof(InsurancePolicyController.CreatePolicy), "InsurancePolicy", new { claimsInvestigation = claimsInvestigation });
+                        return RedirectToAction(nameof(CreatorManualController.CreatePolicy), "CreatorManual", new { claimsInvestigation = claimsInvestigation });
                     }
                     if (file != null)
                     {
@@ -634,7 +498,7 @@ namespace risk.control.system.Controllers
                 }
                 notifyService.Custom($"Customer {claim.CustomerDetail.CustomerName} added successfully", 3, "green", "fas fa-user-plus");
 
-                return RedirectToAction(nameof(ClaimsInvestigationController.Details), "ClaimsInvestigation", new { id = claim.ClaimsInvestigationId });
+                return RedirectToAction(nameof(CreatorManualController.Details), "CreatorManual", new { id = claim.ClaimsInvestigationId });
             }
             catch (Exception)
             {
@@ -683,7 +547,7 @@ namespace risk.control.system.Controllers
                     if (file != null && file.Length > 2000000)
                     {
                         notifyService.Warning("Uploaded File size morer than 2MB !!! ");
-                        return RedirectToAction(nameof(InsurancePolicyController.CreatePolicy), "InsurancePolicy", new { claimsInvestigation = claimsInvestigation });
+                        return RedirectToAction(nameof(CreatorAutoController.CreatePolicy), "CreatorAuto", new { claimsInvestigation = claimsInvestigation });
                     }
                     if (file != null)
                     {
@@ -699,7 +563,7 @@ namespace risk.control.system.Controllers
                 }
                 notifyService.Custom($"Customer {claim.CustomerDetail.CustomerName} added successfully", 3, "green", "fas fa-user-plus");
 
-                return RedirectToAction(nameof(ClaimsInvestigationController.DetailsAuto), "ClaimsInvestigation", new { id = claim.ClaimsInvestigationId });
+                return RedirectToAction(nameof(CreatorAutoController.Details), "CreatorAuto", new { id = claim.ClaimsInvestigationId });
             }
             catch (Exception)
             {
@@ -708,70 +572,6 @@ namespace risk.control.system.Controllers
             }
         }
 
-        [ValidateAntiForgeryToken]
-        [HttpPost]
-        [RequestSizeLimit(2_000_000)] // Checking for 2 MB
-        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
-        public async Task<IActionResult> CreateCustomerManual(string claimsInvestigationId, ClaimsInvestigation claimsInvestigation, bool create = true)
-        {
-            try
-            {
-                if (claimsInvestigation == null || string.IsNullOrWhiteSpace(claimsInvestigationId))
-                {
-                    notifyService.Error("OOPs !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-                var userEmail = HttpContext.User.Identity.Name;
-                if (string.IsNullOrWhiteSpace(userEmail))
-                {
-                    notifyService.Error("OOPs !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-
-                var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-                if (companyUser == null)
-                {
-                    notifyService.Error("OOPs !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-
-                claimsInvestigation.PolicyDetail.ClientCompanyId = companyUser?.ClientCompanyId;
-
-                IFormFile documentFile = null;
-                IFormFile profileFile = null;
-                var files = Request.Form?.Files;
-
-                if (files != null && files.Count > 0)
-                {
-                    //}
-                    var file = files.FirstOrDefault(f => f.FileName == claimsInvestigation.CustomerDetail?.ProfileImage?.FileName && f.Name == claimsInvestigation.CustomerDetail?.ProfileImage?.Name);
-                    if (file != null && file.Length > 2000000)
-                    {
-                        notifyService.Warning("Uploaded File size morer than 2MB !!! ");
-                        return RedirectToAction(nameof(InsurancePolicyController.CreatePolicy), "InsurancePolicy", new { claimsInvestigation = claimsInvestigation });
-                    }
-                    if (file != null)
-                    {
-                        profileFile = file;
-                    }
-                }
-
-                var claim = await claimsInvestigationService.CreateCustomer(userEmail, claimsInvestigation, documentFile, profileFile, create);
-                if (claim == null)
-                {
-                    notifyService.Error("OOPs !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-                notifyService.Custom($"Customer {claim.CustomerDetail.CustomerName} added successfully", 3, "green", "fas fa-user-plus");
-
-                return RedirectToAction(nameof(ClaimsInvestigationController.DetailsManual), "ClaimsInvestigation", new { id = claim.ClaimsInvestigationId });
-            }
-            catch (Exception)
-            {
-                notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
-            }
-        }
 
         [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
@@ -827,21 +627,17 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 notifyService.Custom($"Customer {claim.CustomerDetail.CustomerName} edited successfully", 3, "orange", "fas fa-user-plus");
-                if(string.IsNullOrWhiteSpace(claimtype) || claimtype.Equals("draft", StringComparison.OrdinalIgnoreCase))
+                if(claimtype.Equals("auto", StringComparison.OrdinalIgnoreCase))
                 {
-                    return RedirectToAction(nameof(ClaimsInvestigationController.Details), "ClaimsInvestigation", new { id = claim.ClaimsInvestigationId });
-                }
-                else if(claimtype.Equals("auto", StringComparison.OrdinalIgnoreCase))
-                {
-                    return RedirectToAction(nameof(ClaimsInvestigationController.DetailsAuto), "ClaimsInvestigation", new { id = claim.ClaimsInvestigationId });
+                    return RedirectToAction(nameof(CreatorAutoController.Details), "CreatorAuto", new { id = claim.ClaimsInvestigationId });
 
                 }
                 else if (claimtype.Equals("manual", StringComparison.OrdinalIgnoreCase))
                 {
-                    return RedirectToAction(nameof(ClaimsInvestigationController.DetailsManual), "ClaimsInvestigation", new { id = claim.ClaimsInvestigationId });
+                    return RedirectToAction(nameof(CreatorManualController.Details), "CreatorManual", new { id = claim.ClaimsInvestigationId });
 
                 }
-                return RedirectToAction(nameof(ClaimsInvestigationController.Details), "ClaimsInvestigation", new { id = claim.ClaimsInvestigationId });
+                return RedirectToAction(nameof(CreatorManualController.Details), "CreatorManual", new { id = claim.ClaimsInvestigationId });
             }
             catch (Exception)
             {
@@ -873,14 +669,7 @@ namespace risk.control.system.Controllers
 
                 await mailboxService.NotifyClaimWithdrawlToCompany(userEmail, claimId);
                 notifyService.Custom($"Claim #{policyNumber}  withdrawn successfully", 3, "green", "far fa-file-powerpoint");
-                if (!isAutoAllocationOn)
-                {
-                    return RedirectToAction(nameof(ClaimsInvestigationController.Assigner), "ClaimsInvestigation");
-                }
-                else
-                {
-                    return RedirectToAction(nameof(ClaimsInvestigationController.ReAssignerAuto), "ClaimsInvestigation");
-                }
+                return RedirectToAction(nameof(CreatorManualController.New), "CreatorManual");
             }
             catch (Exception)
             {

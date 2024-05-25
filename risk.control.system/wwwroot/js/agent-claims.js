@@ -36,7 +36,7 @@ $(document).ready(function () {
 
     var table = $("#customerTable").DataTable({
         ajax: {
-            url: '/api/ClaimsVendor/GetNew',
+            url: '/api/agency/agent/GetNew',
             dataSrc: ''
         },
         columnDefs: [{

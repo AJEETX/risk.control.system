@@ -2,13 +2,12 @@
 
 <div class="card card-light collapsed-card">
     <div class="card-header">
-        <h3 class="card-title">
-            Timeline : <span class="badge badge-light"><i class="fas fa-clock"></i>  @Model.TimeTaken</span>
+        <h3 class="card-title">Timeline : <span class="badge badge-light"><i class="fas fa-clock"></i>  @Model.TimeTaken</span>
             <span class="hover-text">
                 <i class="fas fa-info-circle"></i>
                 <span class="tooltip-text" id="beneficiary-information">
 
-                    <i class="fas fa-clock"></i> Time till current status
+                     <i class="fas fa-clock"></i> Time till current status
                 </span>
             </span>
         </h3>
@@ -28,7 +27,7 @@
                         @{
                             foreach (var log in Model.Log)
                             {
-                                var movedTo = string.IsNullOrWhiteSpace(log.UserEmailActionedTo) ? log.UserRoleActionedTo : log.UserEmailActionedTo;
+                                var movedTo = string.IsNullOrWhiteSpace(log.UserEmailActionedTo) ?  log.UserRoleActionedTo :  log.UserEmailActionedTo;
                                 <div class="time-label"><span class="bg-red">@log.Created.ToString("dd-MMM-yyyy")</span></div>
 
                                 <div>

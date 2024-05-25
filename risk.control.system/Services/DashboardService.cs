@@ -158,11 +158,11 @@ namespace risk.control.system.Services
             {
                 data.FirstBlockName = "Assign(auto)";
                 data.FirstBlockCount = GetCreatorAssignAuto(userEmail);
-                data.FirstBlockUrl = "/ClaimsInvestigation/Draft";
+                data.FirstBlockUrl = "/CreatorAuto/New";
             }
 
             data.SecondBlockName = "Assign(manual)";
-                data.SecondBlockUrl = "/ClaimsInvestigation/ReAssignerAuto";
+                data.SecondBlockUrl = "/CreatorManual/New";
                 data.SecondBlockCount = GetCreatorReAssignAuto(userEmail);
             //else
             //{

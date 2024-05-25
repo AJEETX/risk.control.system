@@ -1,26 +1,30 @@
-﻿using AspNetCoreHero.ToastNotification.Notyf;
-using System.Security.Claims;
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
+using AspNetCoreHero.ToastNotification.Notyf;
+
+using Google.Api;
+
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 
 using risk.control.system.AppConstant;
+using risk.control.system.Data;
+using risk.control.system.Helpers;
+using risk.control.system.Models;
+using risk.control.system.Models.ViewModel;
+using risk.control.system.Services;
 
 using SmartBreadcrumbs.Attributes;
-using AspNetCoreHero.ToastNotification.Abstractions;
-using risk.control.system.Data;
-using risk.control.system.Services;
-using static risk.control.system.AppConstant.Applicationsettings;
-using Microsoft.EntityFrameworkCore;
-using Google.Api;
-using risk.control.system.Models.ViewModel;
-using risk.control.system.Models;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using SmartBreadcrumbs.Nodes;
-using risk.control.system.Helpers;
+
+using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers.Company
 {
+    [Authorize(Roles = CREATOR.DISPLAY_NAME)]
     [Breadcrumb(" Claims")]
-    public partial class CreatorAutoController : Controller
+    public class CreatorManualController : Controller
     {
         private readonly ApplicationDbContext _context;
         private readonly IEmpanelledAgencyService empanelledAgencyService;
@@ -30,7 +34,7 @@ namespace risk.control.system.Controllers.Company
         private readonly IInvestigationReportService investigationReportService;
         private readonly IClaimPolicyService claimPolicyService;
 
-        public CreatorAutoController(ApplicationDbContext context,
+        public CreatorManualController(ApplicationDbContext context,
             IEmpanelledAgencyService empanelledAgencyService,
             ICreatorService creatorService,
             IFtpService ftpService,
@@ -64,7 +68,7 @@ namespace risk.control.system.Controllers.Company
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
-        [Breadcrumb(" Assign(auto)")]
+        [Breadcrumb(" Assign(manual)")]
         public IActionResult New()
         {
             try
@@ -103,7 +107,6 @@ namespace risk.control.system.Controllers.Company
             }
         }
 
-
         [HttpPost]
         [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
@@ -115,7 +118,7 @@ namespace risk.control.system.Controllers.Company
                 if (!Enum.TryParse(typeof(UploadType), uploadtype, true, out _))
                 {
                     notifyService.Custom($"Upload Error. Contact Admin", 3, "red", "far fa-file-powerpoint");
-                    return RedirectToAction("New", "CreatorAuto");
+                    return RedirectToAction("New", "CreatorManual");
                 }
                 if (postedFile == null || string.IsNullOrWhiteSpace(uploadtype) ||
                 string.IsNullOrWhiteSpace(Path.GetFileName(postedFile.FileName)) ||
@@ -125,7 +128,7 @@ namespace risk.control.system.Controllers.Company
                 {
                     notifyService.Custom($"Upload Error. Contact Admin", 3, "red", "far fa-file-powerpoint");
 
-                    return RedirectToAction("New", "CreatorAuto");
+                    return RedirectToAction("New", "CreatorManual");
                 }
                 var userEmail = HttpContext.User.Identity.Name;
                 if (string.IsNullOrWhiteSpace(userEmail))
@@ -165,7 +168,7 @@ namespace risk.control.system.Controllers.Company
 
                     }
                 }
-                return RedirectToAction("New", "CreatorAuto");
+                return RedirectToAction("New", "CreatorManual");
             }
             catch (Exception ex)
             {
@@ -173,8 +176,9 @@ namespace risk.control.system.Controllers.Company
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
-
+        
         [Breadcrumb(" Add New", FromAction = "New")]
+        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
         public IActionResult Create()
         {
             var currentUserEmail = HttpContext.User?.Identity?.Name;
@@ -183,8 +187,6 @@ namespace risk.control.system.Controllers.Company
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
-
-
             var model = creatorService.Create(currentUserEmail);
 
             if (!model.AllowedToCreate)
@@ -198,6 +200,7 @@ namespace risk.control.system.Controllers.Company
 
             return View(model);
         }
+
         [Breadcrumb(title: " Add Policy", FromAction = "Create")]
         public IActionResult CreatePolicy()
         {
@@ -216,7 +219,8 @@ namespace risk.control.system.Controllers.Company
                     notifyService.Error("OOPS!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                model.ORIGIN = ORIGIN.AUTO;
+                model.ORIGIN = ORIGIN.MANUAL;
+
                 ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name");
                 ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType.Where(i =>
                 i.LineOfBusinessId == model.PolicyDetail.LineOfBusinessId).OrderBy(s => s.Code), "InvestigationServiceTypeId", "Name");
@@ -226,13 +230,7 @@ namespace risk.control.system.Controllers.Company
                 ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
                 ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name");
                 return false ?
-                    View(new ClaimsInvestigation
-                    {
-                        PolicyDetail = new PolicyDetail
-                        {
-                            LineOfBusinessId = model.PolicyDetail.LineOfBusinessId
-                        }
-                    }) :
+                    View(new ClaimsInvestigation { PolicyDetail = new PolicyDetail { LineOfBusinessId = model.PolicyDetail.LineOfBusinessId } }) :
                     View(model);
             }
             catch (Exception)
@@ -241,6 +239,7 @@ namespace risk.control.system.Controllers.Company
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
+
 
         [Breadcrumb(title: " Edit Policy", FromAction = "Details")]
         public async Task<IActionResult> EditPolicy(string id)
@@ -263,7 +262,7 @@ namespace risk.control.system.Controllers.Company
                     notifyService.Error("Not Found!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                claimsInvestigation.ORIGIN = ORIGIN.AUTO;
+                claimsInvestigation.ORIGIN = ORIGIN.MANUAL;
                 ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name", claimsInvestigation.PolicyDetail.ClientCompanyId);
                 ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType.Where(i =>
                 i.LineOfBusinessId == claimsInvestigation.PolicyDetail.LineOfBusinessId).OrderBy(s => s.Code), "InvestigationServiceTypeId", "Name", claimsInvestigation.PolicyDetail.InvestigationServiceTypeId);
@@ -272,11 +271,11 @@ namespace risk.control.system.Controllers.Company
                 ViewData["InvestigationCaseStatusId"] = new SelectList(_context.InvestigationCaseStatus, "InvestigationCaseStatusId", "Name", claimsInvestigation.InvestigationCaseStatusId);
                 ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", claimsInvestigation.PolicyDetail.LineOfBusinessId);
 
-                var claimsPage = new MvcBreadcrumbNode("New", "CreatorAuto", "Claims");
-                var agencyPage = new MvcBreadcrumbNode("New", "CreatorAuto", "Assign(auto)") { Parent = claimsPage, };
-                var detailsPage = new MvcBreadcrumbNode("Create", "CreatorAuto", $"Add New") { Parent = agencyPage };
-                var details1Page = new MvcBreadcrumbNode("Details", "CreatorAuto", $"Details") { Parent = detailsPage, RouteValues = new { id = id } };
-                var editPage = new MvcBreadcrumbNode("EditPolicy", "CreatorAuto", $"Edit Policy") { Parent = details1Page, RouteValues = new { id = id } };
+                var claimsPage = new MvcBreadcrumbNode("New", "CreatorManual", "Claims");
+                var agencyPage = new MvcBreadcrumbNode("New", "CreatorManual", "Assign(manual)") { Parent = claimsPage, };
+                var detailsPage = new MvcBreadcrumbNode("Create", "CreatorManual", $"Add New") { Parent = agencyPage };
+                var details1Page = new MvcBreadcrumbNode("Details", "CreatorManual", $"Details") { Parent = detailsPage, RouteValues = new { id = id } };
+                var editPage = new MvcBreadcrumbNode("EditPolicy", "CreatorManual", $"Edit Policy") { Parent = details1Page, RouteValues = new { id = id } };
                 ViewData["BreadcrumbNode"] = editPage;
 
                 return View(claimsInvestigation);
@@ -349,11 +348,11 @@ namespace risk.control.system.Controllers.Company
                 ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", claimsInvestigation.PolicyDetail.LineOfBusinessId);
 
 
-                var claimsPage = new MvcBreadcrumbNode("New", "CreatorAuto", "Claims");
-                var agencyPage = new MvcBreadcrumbNode("New", "CreatorAuto", "Assign(auto)") { Parent = claimsPage, };
-                var detailsPage = new MvcBreadcrumbNode("Create", "CreatorAuto", $"Add New") { Parent = agencyPage };
-                var details1Page = new MvcBreadcrumbNode("Details", "CreatorAuto", $"Details") { Parent = detailsPage, RouteValues = new { id = id } };
-                var editPage = new MvcBreadcrumbNode("CreateCustomer", "CreatorAuto", $"Create Customer") { Parent = details1Page, RouteValues = new { id = id } };
+                var claimsPage = new MvcBreadcrumbNode("New", "CreatorManual", "Claims");
+                var agencyPage = new MvcBreadcrumbNode("New", "CreatorManual", "Assign(manual)") { Parent = claimsPage, };
+                var detailsPage = new MvcBreadcrumbNode("Create", "CreatorManual", $"Add New") { Parent = agencyPage };
+                var details1Page = new MvcBreadcrumbNode("Details", "CreatorManual", $"Details") { Parent = detailsPage, RouteValues = new { id = id } };
+                var editPage = new MvcBreadcrumbNode("CreateCustomer", "CreatorManual", $"Create Customer") { Parent = details1Page, RouteValues = new { id = id } };
                 ViewData["BreadcrumbNode"] = editPage;
 
                 return View(claimsInvestigation);
@@ -410,11 +409,11 @@ namespace risk.control.system.Controllers.Company
                 ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", claimsInvestigation.CustomerDetail.DistrictId);
                 ViewData["PinCodeId"] = new SelectList(pincodes, "PinCodeId", "Code", claimsInvestigation.CustomerDetail.PinCodeId);
 
-                var claimsPage = new MvcBreadcrumbNode("New", "CreatorAuto", "Claims");
-                var agencyPage = new MvcBreadcrumbNode("New", "CreatorAuto", "Assign(auto)") { Parent = claimsPage, };
-                var detailsPage = new MvcBreadcrumbNode("Create", "CreatorAuto", $"Add New") { Parent = agencyPage };
-                var details1Page = new MvcBreadcrumbNode("Details", "CreatorAuto", $"Details") { Parent = detailsPage, RouteValues = new { id = id } };
-                var editPage = new MvcBreadcrumbNode("EditCustomer", "CreatorAuto", $"Edit Customer") { Parent = details1Page, RouteValues = new { id = id } };
+                var claimsPage = new MvcBreadcrumbNode("New", "CreatorManual", "Claims");
+                var agencyPage = new MvcBreadcrumbNode("New", "CreatorManual", "Assign(manual)") { Parent = claimsPage, };
+                var detailsPage = new MvcBreadcrumbNode("Create",   "CreatorManual", $"Add New") { Parent = agencyPage };
+                var details1Page = new MvcBreadcrumbNode("Details", "CreatorManual", $"Details") { Parent = detailsPage, RouteValues = new { id = id } };
+                var editPage = new MvcBreadcrumbNode("EditCustomer", "CreatorManual", $"Edit Customer") { Parent = details1Page, RouteValues = new { id = id } };
                 ViewData["BreadcrumbNode"] = editPage;
                 return View(claimsInvestigation);
             }
@@ -471,11 +470,11 @@ namespace risk.control.system.Controllers.Company
                 ViewData["PinCodeId"] = new SelectList(pincodes.OrderBy(s => s.Code), "PinCodeId", "Code", model.PinCodeId);
                 ViewData["BeneficiaryRelationId"] = new SelectList(_context.BeneficiaryRelation, "BeneficiaryRelationId", "Name");
 
-                var claimsPage = new MvcBreadcrumbNode("New", "CreatorAuto", "Claims");
-                var agencyPage = new MvcBreadcrumbNode("New", "CreatorAuto", "Assign(auto)") { Parent = claimsPage, };
-                var detailsPage = new MvcBreadcrumbNode("Create", "CreatorAuto", $"Add New") { Parent = agencyPage };
-                var details1Page = new MvcBreadcrumbNode("Details", "CreatorAuto", $"Details") { Parent = detailsPage, RouteValues = new { id = id } };
-                var editPage = new MvcBreadcrumbNode("CreateBeneficiary", "CreatorAuto", $"Add beneficiary") { Parent = details1Page, RouteValues = new { id = id } };
+                var claimsPage = new MvcBreadcrumbNode("New", "CreatorManual", "Claims");
+                var agencyPage = new MvcBreadcrumbNode("New", "CreatorManual", "Assign(manual)") { Parent = claimsPage, };
+                var detailsPage = new MvcBreadcrumbNode("Create", "CreatorManual", $"Add New") { Parent = agencyPage };
+                var details1Page = new MvcBreadcrumbNode("Details", "CreatorManual", $"Details") { Parent = detailsPage, RouteValues = new { id = id } };
+                var editPage = new MvcBreadcrumbNode("CreateBeneficiary", "CreatorManual", $"Add beneficiary") { Parent = details1Page, RouteValues = new { id = id } };
                 ViewData["BreadcrumbNode"] = editPage;
 
                 return View(model);
@@ -530,7 +529,7 @@ namespace risk.control.system.Controllers.Company
                 await _context.SaveChangesAsync();
                 notifyService.Custom($"Beneficiary {caseLocation.BeneficiaryName} added successfully", 3, "green", "fas fa-user-tie");
 
-                return RedirectToAction(nameof(CreatorAutoController.Details), "CreatorAuto", new { id = caseLocation.ClaimsInvestigationId });
+                return RedirectToAction(nameof(CreatorManualController.Details), "CreatorManual", new { id = caseLocation.ClaimsInvestigationId });
 
                 ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", caseLocation.CountryId);
                 ViewData["BeneficiaryRelationId"] = new SelectList(_context.BeneficiaryRelation.OrderBy(s => s.Code), "BeneficiaryRelationId", "Name", caseLocation.BeneficiaryRelationId);
@@ -584,11 +583,11 @@ namespace risk.control.system.Controllers.Company
                 ViewData["BeneficiaryRelationId"] = new SelectList(_context.BeneficiaryRelation.OrderBy(s => s.Code), "BeneficiaryRelationId", "Name", caseLocation.BeneficiaryRelationId);
 
 
-                var claimsPage = new MvcBreadcrumbNode("New", "CreatorAuto", "Claims");
-                var agencyPage = new MvcBreadcrumbNode("New", "CreatorAuto", "Assign(auto)") { Parent = claimsPage, };
-                var detailsPage = new MvcBreadcrumbNode("Create", "CreatorAuto", $"Add New") { Parent = agencyPage };
-                var details1Page = new MvcBreadcrumbNode("Details", "CreatorAuto", $"Details") { Parent = detailsPage, RouteValues = new { id = id } };
-                var editPage = new MvcBreadcrumbNode("CreateBeneficiary", "CreatorAuto", $"Edit beneficiary") { Parent = details1Page, RouteValues = new { id = id } };
+                var claimsPage = new MvcBreadcrumbNode("New", "CreatorManual", "Claims");
+                var agencyPage = new MvcBreadcrumbNode("New", "CreatorManual", "Assign(manual)") { Parent = claimsPage, };
+                var detailsPage = new MvcBreadcrumbNode("Create", "CreatorManual", $"Add New") { Parent = agencyPage };
+                var details1Page = new MvcBreadcrumbNode("Details", "CreatorManual", $"Details") { Parent = detailsPage, RouteValues = new { id = id } };
+                var editPage = new MvcBreadcrumbNode("CreateBeneficiary", "CreatorManual", $"Edit beneficiary") { Parent = details1Page, RouteValues = new { id = id } };
                 ViewData["BreadcrumbNode"] = editPage;
 
                 return View(services);
@@ -664,7 +663,7 @@ namespace risk.control.system.Controllers.Company
                 _context.Update(caseLocation);
                 await _context.SaveChangesAsync();
                 notifyService.Custom($"Beneficiary {caseLocation.BeneficiaryName} edited successfully", 3, "orange", "fas fa-user-tie");
-                return RedirectToAction(nameof(CreatorAutoController.Details), "CreatorAuto", new { id = caseLocation.ClaimsInvestigationId });
+                return RedirectToAction(nameof(CreatorManualController.Details), "CreatorManual", new { id = caseLocation.ClaimsInvestigationId });
             }
             catch (Exception)
             {
@@ -713,7 +712,7 @@ namespace risk.control.system.Controllers.Company
         }
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteAutoConfirmed(ClaimTransactionModel model)
+        public async Task<IActionResult> DeleteConfirmed(ClaimTransactionModel model)
         {
             try
             {
@@ -741,7 +740,7 @@ namespace risk.control.system.Controllers.Company
                 _context.ClaimsInvestigation.Update(claimsInvestigation);
                 await _context.SaveChangesAsync();
                 notifyService.Custom("Claim deleted", 3, "red", "far fa-file-powerpoint");
-                return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
+                return RedirectToAction(nameof(CreatorManualController.New), "CreatorManual");
             }
             catch (Exception)
             {
@@ -749,6 +748,94 @@ namespace risk.control.system.Controllers.Company
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
 
+        }
+
+        [HttpGet]
+        [Breadcrumb(" Empanelled Agencies", FromAction = "New")]
+        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
+        public async Task<IActionResult> EmpanelledVendors(string selectedcase)
+        {
+            try
+            {
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+
+                if (string.IsNullOrWhiteSpace(currentUserEmail))
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                if (string.IsNullOrWhiteSpace(selectedcase))
+                {
+                    notifyService.Error("No case selected!!!. Please select case to be allocate.");
+                    return RedirectToAction(nameof(New));
+                }
+
+                var model = await empanelledAgencyService.GetEmpanelledVendors(selectedcase);
+
+                return View(model);
+            }
+            catch (Exception)
+            {
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+        }
+
+        [Breadcrumb(" Agency Detail", FromAction = "EmpanelledVendors")]
+        public async Task<IActionResult> VendorDetail(long id, string selectedcase)
+        {
+            try
+            {
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (string.IsNullOrWhiteSpace(currentUserEmail))
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                if (id == 0 || selectedcase is null)
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+
+                var vendor = await _context.Vendor
+                    .Include(v => v.ratings)
+                    .Include(v => v.Country)
+                    .Include(v => v.PinCode)
+                    .Include(v => v.State)
+                    .Include(v => v.District)
+                    .Include(v => v.VendorInvestigationServiceTypes)
+                    .ThenInclude(v => v.PincodeServices)
+                    .Include(v => v.VendorInvestigationServiceTypes)
+                    .ThenInclude(v => v.State)
+                    .Include(v => v.VendorInvestigationServiceTypes)
+                    .ThenInclude(v => v.District)
+                    .Include(v => v.VendorInvestigationServiceTypes)
+                    .ThenInclude(v => v.LineOfBusiness)
+                    .Include(v => v.VendorInvestigationServiceTypes)
+                    .ThenInclude(v => v.InvestigationServiceType)
+                    .FirstOrDefaultAsync(m => m.VendorId == id);
+                if (vendor == null)
+                {
+                    notifyService.Error("NOT FOUND !!!..");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                ViewBag.Selectedcase = selectedcase;
+
+                var claimsPage = new MvcBreadcrumbNode("New", "CreatorManual", "Claims");
+                var agencyPage = new MvcBreadcrumbNode("New", "CreatorManual", "Assign(manual)") { Parent = claimsPage, };
+                var detailsPage = new MvcBreadcrumbNode("EmpanelledVendors", "CreatorManual", $"Empanelled Agencies") { Parent = agencyPage, RouteValues = new { selectedcase = selectedcase } };
+                var editPage = new MvcBreadcrumbNode("VendorDetail", "CreatorManual", $"Agency Detail") { Parent = detailsPage, RouteValues = new { id = id } };
+                ViewData["BreadcrumbNode"] = editPage;
+
+
+                return View(vendor);
+            }
+            catch (Exception)
+            {
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
         }
         [Breadcrumb("Details", FromAction = "Create")]
         public async Task<IActionResult> Details(string id)

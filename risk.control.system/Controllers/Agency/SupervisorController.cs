@@ -12,6 +12,7 @@ using SmartBreadcrumbs.Nodes;
 namespace risk.control.system.Controllers.Agency
 {
     [Breadcrumb(" Claims")]
+    [Authorize(Roles = "AGENCY_ADMIN,SUPERVISOR")]
     public class SupervisorController : Controller
     {
         private readonly INotyfService notifyService;
@@ -49,7 +50,6 @@ namespace risk.control.system.Controllers.Agency
 
         }
         [Breadcrumb(" Allocate(new)")]
-        [Authorize(Roles = "AGENCY_ADMIN,SUPERVISOR")]
         public ActionResult Allocate()
         {
             try
@@ -71,7 +71,6 @@ namespace risk.control.system.Controllers.Agency
 
         [HttpGet]
         [Breadcrumb("Agents", FromAction = "Allocate")]
-        [Authorize(Roles = "AGENCY_ADMIN,SUPERVISOR")]
         public async Task<IActionResult> SelectVendorAgent(string selectedcase)
         {
             try
@@ -104,7 +103,6 @@ namespace risk.control.system.Controllers.Agency
 
         [HttpGet]
         [Breadcrumb("Re-Allocate", FromAction = "ClaimReport")]
-        [Authorize(Roles = "AGENCY_ADMIN,SUPERVISOR")]
         public async Task<IActionResult> ReSelectVendorAgent(string selectedcase)
         {
             try
@@ -134,7 +132,6 @@ namespace risk.control.system.Controllers.Agency
         }
 
         [Breadcrumb("Submit(report)")]
-        [Authorize(Roles = "AGENCY_ADMIN,SUPERVISOR")]
         public IActionResult ClaimReport()
         {
             return View();
@@ -142,7 +139,6 @@ namespace risk.control.system.Controllers.Agency
 
 
         [Breadcrumb("Submit", FromAction = "ClaimReport")]
-        [Authorize(Roles = "AGENCY_ADMIN,SUPERVISOR")]
 
         public async Task<IActionResult> GetInvestigateReport(string selectedcase)
         {
@@ -175,13 +171,11 @@ namespace risk.control.system.Controllers.Agency
         }
 
         [Breadcrumb(" Active")]
-        [Authorize(Roles = "AGENCY_ADMIN,SUPERVISOR")]
         public IActionResult Open()
         {
             return View();
         }
 
-        [Authorize(Roles = "AGENCY_ADMIN,SUPERVISOR")]
         [Breadcrumb(title: " Details", FromAction = "Allocate")]
         public async Task<IActionResult> CaseDetail(string id)
         {
@@ -210,7 +204,6 @@ namespace risk.control.system.Controllers.Agency
         }
 
         [Breadcrumb(title: " Details", FromAction = "Open")]
-        [Authorize(Roles = "AGENCY_ADMIN,SUPERVISOR")]
         public async Task<IActionResult> Detail(string id)
         {
             try
@@ -238,14 +231,12 @@ namespace risk.control.system.Controllers.Agency
         }
 
         [Breadcrumb(title: " Completed")]
-        [Authorize(Roles = "AGENCY_ADMIN,SUPERVISOR")]
         public IActionResult Completed()
         {
             return View();
         }
 
         [Breadcrumb(" Details", FromAction = "Completed")]
-        [Authorize(Roles = "AGENCY_ADMIN,SUPERVISOR")]
 
         public async Task<IActionResult> CompletedDetail(string id)
         {
@@ -266,7 +257,6 @@ namespace risk.control.system.Controllers.Agency
             }
         }
         [Breadcrumb(" Reply Enquiry", FromAction = "Allocate")]
-        [Authorize(Roles = "AGENCY_ADMIN,SUPERVISOR")]
 
         public IActionResult ReplyEnquiry(string id)
         {
@@ -288,7 +278,6 @@ namespace risk.control.system.Controllers.Agency
         }
 
         [Breadcrumb(title: "Invoice", FromAction = "CompletedDetail")]
-        [Authorize(Roles = "AGENCY_ADMIN,SUPERVISOR")]
         public async Task<IActionResult> ShowInvoice(long id)
         {
             try
@@ -323,7 +312,6 @@ namespace risk.control.system.Controllers.Agency
         }
 
         [Breadcrumb(title: "Print", FromAction = "ShowInvoice")]
-        [Authorize(Roles = "AGENCY_ADMIN,SUPERVISOR")]
         public async Task<IActionResult> PrintInvoice(long id)
         {
             try
