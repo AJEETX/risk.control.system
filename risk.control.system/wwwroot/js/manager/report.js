@@ -1,4 +1,4 @@
-$(document).ready(function () {
+﻿$(document).ready(function () {
     $('#view-type a').on('click', function () {
         var id = this.id;
         if (this.id == 'map-type') {
@@ -15,21 +15,12 @@ $(document).ready(function () {
         }
     });
 
-    var table = $("#customerTable").DataTable({
+    $("#customerTable").DataTable({
         ajax: {
-            url: '/api/CompanyAssessClaims/GetManager',
+            url: '/api/Manager/GetReport',
             dataSrc: ''
         },
-        columnDefs: [{
-            'targets': 0,
-            'searchable': false,
-            'orderable': false,
-            'className': 'dt-body-center',
-            'render': function (data, type, full, meta) {
-                return '<input type="checkbox" name="selectedcase[]" value="' + $('<div/>').text(data).html() + '">';
-            }
-        }],
-        order: [[13, 'asc']],
+        order: [[11, 'asc']],
         fixedHeader: true,
         processing: true,
         paging: true,
@@ -40,12 +31,11 @@ $(document).ready(function () {
         columns: [
             /* Name of the keys from
             data file source */
-
             {
                 "sDefaultContent": "",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    var img = '<img alt="' + row.policyId + '" title="' + row.policyId + '" src="' + row.document + '" class="doc-profile-image" data-toggle="tooltip"/>';
+                    var img = '<img alt="' + row.policyId + '" title="' + row.policyId + '" src="' + row.document + '"class="doc-profile-image" data-toggle="tooltip"/>';
                     return img;
                 }
             },
@@ -81,6 +71,7 @@ $(document).ready(function () {
             },
             { "data": "location" },
             { "data": "created" },
+            { "data": "timePending" },
             {
                 "sDefaultContent": "",
                 "bSortable": false,
@@ -97,106 +88,25 @@ $(document).ready(function () {
                     return buttons;
                 }
             },
-            { "data": "timePending" },
             {
                 "sDefaultContent": "",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += '<a id="details' + row.id + '" onclick="getdetails(`' + row.id + '`)"  href="AssessorDetail?Id=' + row.id + '" class="active-claims btn btn-xs btn-info"><i class="fa fa-search"></i> Detail</a>';
-
-                    if (row.autoAllocated) {
-
-                    }
-                    //if (row.withdrawable) {
-                    //    buttons += '<a href="withdraw?Id=' + row.id + '" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i> Withdraw</a>&nbsp;'
-                    //}
+                    buttons += '<a id="details' + row.id + '" onclick="getdetails(`' + row.id + '`)" href="ApprovedDetail?Id=' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Detail</a>&nbsp;'
+                    buttons += '<a href="/Report/PrintPdfReport?Id=' + row.id + '" class="btn btn-xs btn-danger"><i class="far fa-file-pdf"></i> PDF</a>'
                     return buttons;
                 }
             }
         ],
-        "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
-            if (aData.isNewAssigned) {
-                $('td', nRow).css('background-color', '#ffa');
-            }
-        },
         error: function (xhr, status, error) { alert('err ' + error) }
-    });
-
-    $('#customerTable tbody').hide();
-    $('#customerTable tbody').fadeIn(2000);
-    $('#allocatedcase').on('click', function (event) {
-        $("body").addClass("submit-progress-bg");
-
-        setTimeout(function () {
-            $(".submit-progress").removeClass("hidden");
-        }, 1);
-
-        $('#allocatedcase').attr('disabled', 'disabled');
-        $('#allocatedcase').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Assess");
-
-        $('#checkboxes').submit();
-
-        var nodes = document.getElementById("article").getElementsByTagName('*');
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].disabled = true;
-        }
-
     });
     $('#customerTable').on('draw.dt', function () {
         $('[data-toggle="tooltip"]').tooltip();
     });
-    if ($("input[type='radio'].selected-case:checked").length) {
-        $("#allocatedcase").prop('disabled', false);
-    }
-    else {
-        $("#allocatedcase").prop('disabled', true);
-    }
-
-    // When user checks a radio button, Enable submit button
-    $("input[type='radio'].selected-case").change(function (e) {
-        if ($(this).is(":checked")) {
-            $("#allocatedcase").prop('disabled', false);
-        }
-        else {
-            $("#allocatedcase").prop('disabled', true);
-        }
-    });
-
-    // Handle click on checkbox to set state of "Select all" control
-    $('#customerTable tbody').on('change', 'input[type="radio"]', function () {
-        // If checkbox is not checked
-        if (this.checked) {
-            $("#allocatedcase").prop('disabled', false);
-        } else {
-            $("#allocatedcase").prop('disabled', true);
-        }
-    });
-
-    // Handle form submission event
-    $('#checkboxes').on('submit', function (e) {
-        var form = this;
-
-        // Iterate over all checkboxes in the table
-        table.$('input[type="checkbox"]').each(function () {
-            // If checkbox doesn't exist in DOM
-            if (!$.contains(document, this)) {
-                // If checkbox is checked
-                if (this.checked) {
-                    // Create a hidden element
-                    $(form).append(
-                        $('<input>')
-                            .attr('type', 'hidden')
-                            .attr('name', this.name)
-                            .val(this.value)
-                    );
-                }
-            }
-        });
-    });
-
-    //initMap("/api/CompanyAssessClaims/GetAssessorMap");
+    //initMap("/api/CompanyCompletedClaims/GetReportMap");
 });
+
 function getdetails(id) {
     $("body").addClass("submit-progress-bg");
     // Wrap in setTimeout so the UI
@@ -212,3 +122,4 @@ function getdetails(id) {
         nodes[i].disabled = true;
     }
 }
+

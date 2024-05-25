@@ -1,7 +1,4 @@
 ﻿$(document).ready(function () {
-
-
-
     $('a.create-policy').on('click', function () {
         $("body").addClass("submit-progress-bg");
         // Wrap in setTimeout so the UI
@@ -48,7 +45,7 @@
 
     var table = $("#customerTable").DataTable({
         ajax: {
-            url: '/api/CompanyAssignClaims/GetReAssigner',
+            url: '/api/Creator/GetManual',
             dataSrc: ''
         },
         columnDefs: [{
@@ -128,7 +125,7 @@
                 "mRender": function (data, type, row) {
                     var buttons = "";
                     buttons += '<a id="edit' + row.id + '" onclick="showedit(`' + row.id + '`)" href="Details?Id=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-pencil-alt"></i> Edit</a>&nbsp;'
-                    buttons += '<a id="details' + row.id + '" onclick="getdetails(`' + row.id + '`)" href="/InsurancePolicy/Delete?Id=' + row.id + '" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i> Delete </a>'
+                    buttons += '<a id="details' + row.id + '" onclick="getdetails(`' + row.id + '`)" href="Delete?Id=' + row.id + '" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i> Delete </a>'
                     return buttons;
                 }
             }
@@ -182,7 +179,7 @@
             $(".submit-progress").removeClass("hidden");
         }, 1);
         $('#allocatedcase').attr('disabled', 'disabled');
-        $('#allocatedcase').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> ReAssign");
+        $('#allocatedcase').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Assign <b> <sub>manual</sub></b>");
 
         $('#radioButtons').submit();
         var nodes = document.getElementById("article").getElementsByTagName('*');

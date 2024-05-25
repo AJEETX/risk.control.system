@@ -17,7 +17,7 @@
 
     $("#customerTable").DataTable({
         ajax: {
-            url: '/api/CompanyCompletedClaims/GetReject',
+            url: '/api/Manager/GetReject',
             dataSrc: ''
         },
         order: [[12, 'desc']],
@@ -93,7 +93,7 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += '<a id="details' + row.id + '" onclick="getdetails(`' + row.id + '`)" href="/Assessor/RejectDetail?Id=' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Detail</a>&nbsp;'
+                    buttons += '<a id="details' + row.id + '" onclick="getdetails(`' + row.id + '`)" href="RejectDetail?Id=' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Detail</a>&nbsp;'
                     buttons += '<a href="/Report/PrintPdfReport?Id=' + row.id + '" class="btn btn-xs btn-danger"><i class="far fa-file-pdf"></i> PDF</a>'
                     return buttons;
                 }

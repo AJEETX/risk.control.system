@@ -103,7 +103,6 @@ namespace risk.control.system.Controllers.Company
             }
         }
 
-
         [HttpPost]
         [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]

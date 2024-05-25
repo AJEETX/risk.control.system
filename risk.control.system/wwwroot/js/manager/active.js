@@ -19,7 +19,7 @@ $(document).ready(function () {
 
     $("#customerTable").DataTable({
         ajax: {
-            url: '/api/CompanyActiveClaims/GetManagerActive',
+            url: '/api/Manager/GetActive',
             dataSrc: ''
         },
         order: [[10, 'desc']],

@@ -17,10 +17,10 @@
 
     $("#customerTable").DataTable({
         ajax: {
-            url: '/api/CompanyApprovedClaims/GetApproved',
+            url: '/api/Assessor/GetReject',
             dataSrc: ''
         },
-        order: [[11, 'asc']],
+        order: [[12, 'desc']],
         fixedHeader: true,
         processing: true,
         paging: true,
@@ -31,7 +31,6 @@
         columns: [
             /* Name of the keys from
             data file source */
-            { "data": "policyNum", "bSortable": false },
             {
                 "sDefaultContent": "",
                 "bSortable": false,
@@ -40,6 +39,7 @@
                     return img;
                 }
             },
+            { "data": "policyNum", "bSortable": false },
             {
                 "data": "amount"
             },
@@ -77,17 +77,49 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += '<a href="GetApprovedReport?selectedcase=' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Report</a>&nbsp;'
-                    buttons += '<a href="/Report/PrintPdfReport?Id=' + row.id + '" class="btn btn-xs btn-danger"><i class="far fa-file-pdf"></i> PDF</a>&nbsp;'
+                    buttons += '<span class="checkbox">';
+                    if (row.autoAllocated) {
+                        buttons += '<i class="fa fa-toggle-on"></i>';
+                    } else {
+                        buttons += '<i class="fa fa-toggle-off"></i>';
+                    }
+                    buttons += '</span>';
+
+                    return buttons;
+                }
+            },
+            {
+                "sDefaultContent": "",
+                "bSortable": false,
+                "mRender": function (data, type, row) {
+                    var buttons = "";
+                    buttons += '<a id="details' + row.id + '" onclick="getdetails(`' + row.id + '`)" href="/Assessor/RejectDetail?Id=' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Detail</a>&nbsp;'
+                    buttons += '<a href="/Report/PrintPdfReport?Id=' + row.id + '" class="btn btn-xs btn-danger"><i class="far fa-file-pdf"></i> PDF</a>'
                     return buttons;
                 }
             }
         ],
         error: function (xhr, status, error) { alert('err ' + error) }
     });
-
     $('#customerTable').on('draw.dt', function () {
         $('[data-toggle="tooltip"]').tooltip();
     });
-    initMap("/api/CompanyApprovedClaims/GetApprovedMap");
+    //initMap("/api/CompanyCompletedClaims/GetReportMap");
 });
+
+function getdetails(id) {
+    $("body").addClass("submit-progress-bg");
+    // Wrap in setTimeout so the UI
+    // can update the spinners
+    setTimeout(function () {
+        $(".submit-progress").removeClass("hidden");
+    }, 1);
+    $('a.btn *').attr('disabled', 'disabled');
+    $('a#details' + id + '.btn.btn-xs.btn-info').html("<i class='fas fa-sync fa-spin'></i> Detail");
+
+    var nodes = document.getElementById("article").getElementsByTagName('*');
+    for (var i = 0; i < nodes.length; i++) {
+        nodes[i].disabled = true;
+    }
+}
+

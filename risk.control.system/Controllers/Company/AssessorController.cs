@@ -63,7 +63,6 @@ namespace risk.control.system.Controllers.Company
 
         }
         [Breadcrumb(title: "Report", FromAction = "Assessor")]
-        [Authorize(Roles = ASSESSOR.DISPLAY_NAME)]
         public IActionResult GetInvestigateReport(string selectedcase)
         {
             try
@@ -90,7 +89,6 @@ namespace risk.control.system.Controllers.Company
             }
         }
 
-        [Authorize(Roles = ASSESSOR.DISPLAY_NAME)]
         public IActionResult SendEnquiry(string selectedcase)
         {
             try
@@ -126,7 +124,6 @@ namespace risk.control.system.Controllers.Company
         }
 
         [Breadcrumb(title: "Previous Reports", FromAction = "GetInvestigateReport")]
-        [Authorize(Roles = ASSESSOR.DISPLAY_NAME)]
         public IActionResult PreviousReports(long id)
         {
             try
@@ -154,7 +151,6 @@ namespace risk.control.system.Controllers.Company
             }
         }
         [Breadcrumb(title: "Review")]
-        [Authorize(Roles = ASSESSOR.DISPLAY_NAME)]
         public IActionResult Review()
         {
             try
@@ -174,7 +170,6 @@ namespace risk.control.system.Controllers.Company
             }
         }
         [Breadcrumb(title: " Details", FromAction = "Review")]
-        [Authorize(Roles = ASSESSOR.DISPLAY_NAME)]
         public async Task<IActionResult> ReviewDetail(string id)
         {
             try
@@ -203,7 +198,6 @@ namespace risk.control.system.Controllers.Company
         }
 
         [Breadcrumb(title: " Approved")]
-        [Authorize(Roles = ASSESSOR.DISPLAY_NAME)]
         public IActionResult Approved()
         {
             return View();

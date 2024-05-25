@@ -1,5 +1,4 @@
-﻿$(document).ready(function () {
-
+$(document).ready(function () {
     $('#view-type a').on('click', function () {
         var id = this.id;
         if (this.id == 'map-type') {
@@ -16,12 +15,21 @@
         }
     });
 
-    $("#customerTable").DataTable({
+    var table = $("#customerTable").DataTable({
         ajax: {
-            url: '/api/CompanyActiveClaims/GetActive',
+            url: '/api/Manager/Get',
             dataSrc: ''
         },
-        order: [[10, 'desc']],
+        columnDefs: [{
+            'targets': 0,
+            'searchable': false,
+            'orderable': false,
+            'className': 'dt-body-center',
+            'render': function (data, type, full, meta) {
+                return '<input type="checkbox" name="selectedcase[]" value="' + $('<div/>').text(data).html() + '">';
+            }
+        }],
+        order: [[13, 'asc']],
         fixedHeader: true,
         processing: true,
         paging: true,
@@ -32,6 +40,7 @@
         columns: [
             /* Name of the keys from
             data file source */
+
             {
                 "sDefaultContent": "",
                 "bSortable": false,
@@ -48,7 +57,7 @@
                 "sDefaultContent": "",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    var img = '<img alt="' + row.customerFullName + '" title="' + row.customerFullName + '" src="' + row.customer + '" class="table-profile-image" data-toggle="tooltip"/>';
+                    var img = '<img alt="' + row.name + '" title="' + row.name + '" src="' + row.customer + '" class="table-profile-image" data-toggle="tooltip"/>';
                     return img;
                 }
             },
@@ -57,12 +66,13 @@
                 "sDefaultContent": "",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    var img = '<img alt="' + row.beneficiaryFullName + '" title="' + row.beneficiaryFullName + '" src="' + row.beneficiaryPhoto + '" class="table-profile-image" data-toggle="tooltip"/>';
+                    var img = '<img alt="' + row.beneficiaryName + '" title="' + row.beneficiaryName + '" src="' + row.beneficiaryPhoto + '" class="table-profile-image" data-toggle="tooltip"/>';
                     return img;
                 }
             },
             { "data": "beneficiaryName" },
             { "data": "serviceType" },
+            { "data": "service" },
             {
                 "data": "pincode",
                 "mRender": function (data, type, row) {
@@ -71,14 +81,6 @@
             },
             { "data": "location" },
             { "data": "created" },
-            { "data": "timePending" },
-            {
-                "data": "agent",
-                "mRender": function (data, type, row) {
-                    var img = '<img alt="' + row.agent + '" title="' + row.agent + '" src="' + row.ownerDetail + '" class="table-profile-image" data-toggle="tooltip"/>';
-                    return img;
-                }
-            },
             {
                 "sDefaultContent": "",
                 "bSortable": false,
@@ -91,16 +93,17 @@
                         buttons += '<i class="fa fa-toggle-off"></i>';
                     }
                     buttons += '</span>';
-                    
+
                     return buttons;
                 }
             },
+            { "data": "timePending" },
             {
                 "sDefaultContent": "",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += '<a id="details' + row.id + '" onclick="getdetails(`' + row.id + '`)"  href="ActiveDetail?Id=' + row.id + '" class="active-claims btn btn-xs btn-info"><i class="fa fa-search"></i> Detail</a>&nbsp;'
+                    buttons += '<a id="details' + row.id + '" onclick="getdetails(`' + row.id + '`)"  href="AssessorDetail?Id=' + row.id + '" class="active-claims btn btn-xs btn-info"><i class="fa fa-search"></i> Detail</a>';
 
                     if (row.autoAllocated) {
 
@@ -119,16 +122,81 @@
         },
         error: function (xhr, status, error) { alert('err ' + error) }
     });
+
+    $('#customerTable tbody').hide();
+    $('#customerTable tbody').fadeIn(2000);
+    $('#allocatedcase').on('click', function (event) {
+        $("body").addClass("submit-progress-bg");
+
+        setTimeout(function () {
+            $(".submit-progress").removeClass("hidden");
+        }, 1);
+
+        $('#allocatedcase').attr('disabled', 'disabled');
+        $('#allocatedcase').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Assess");
+
+        $('#checkboxes').submit();
+
+        var nodes = document.getElementById("article").getElementsByTagName('*');
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].disabled = true;
+        }
+
+    });
     $('#customerTable').on('draw.dt', function () {
         $('[data-toggle="tooltip"]').tooltip();
     });
-    $('#customerTable tbody').hide();
-    $('#customerTable tbody').fadeIn(2000);
+    if ($("input[type='radio'].selected-case:checked").length) {
+        $("#allocatedcase").prop('disabled', false);
+    }
+    else {
+        $("#allocatedcase").prop('disabled', true);
+    }
 
+    // When user checks a radio button, Enable submit button
+    $("input[type='radio'].selected-case").change(function (e) {
+        if ($(this).is(":checked")) {
+            $("#allocatedcase").prop('disabled', false);
+        }
+        else {
+            $("#allocatedcase").prop('disabled', true);
+        }
+    });
 
-    //initMap("/api/CompanyActiveClaims/GetActiveMap");
+    // Handle click on checkbox to set state of "Select all" control
+    $('#customerTable tbody').on('change', 'input[type="radio"]', function () {
+        // If checkbox is not checked
+        if (this.checked) {
+            $("#allocatedcase").prop('disabled', false);
+        } else {
+            $("#allocatedcase").prop('disabled', true);
+        }
+    });
+
+    // Handle form submission event
+    $('#checkboxes').on('submit', function (e) {
+        var form = this;
+
+        // Iterate over all checkboxes in the table
+        table.$('input[type="checkbox"]').each(function () {
+            // If checkbox doesn't exist in DOM
+            if (!$.contains(document, this)) {
+                // If checkbox is checked
+                if (this.checked) {
+                    // Create a hidden element
+                    $(form).append(
+                        $('<input>')
+                            .attr('type', 'hidden')
+                            .attr('name', this.name)
+                            .val(this.value)
+                    );
+                }
+            }
+        });
+    });
+
+    //initMap("/api/CompanyAssessClaims/GetAssessorMap");
 });
-
 function getdetails(id) {
     $("body").addClass("submit-progress-bg");
     // Wrap in setTimeout so the UI
@@ -144,19 +212,3 @@ function getdetails(id) {
         nodes[i].disabled = true;
     }
 }
-function showedit(id) {
-    $("body").addClass("submit-progress-bg");
-    // Wrap in setTimeout so the UI
-    // can update the spinners
-    setTimeout(function () {
-        $(".submit-progress").removeClass("hidden");
-    }, 1);
-    $('a.btn *').attr('disabled', 'disabled');
-    $('a#edit' + id + '.btn.btn-xs.btn-warning').html("<i class='fas fa-sync fa-spin'></i> Edit");
-
-    var nodes = document.getElementById("article").getElementsByTagName('*');
-    for (var i = 0; i < nodes.length; i++) {
-        nodes[i].disabled = true;
-    }
-}
-

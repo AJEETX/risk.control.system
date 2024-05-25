@@ -34,7 +34,7 @@
             $.confirm({
                 title: "Confirm Assign",
                 content: "Are you sure ?",
-    
+
                 icon: 'fas fa-external-link-alt',
                 type: 'red',
                 closeIcon: true,
