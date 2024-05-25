@@ -293,7 +293,7 @@ namespace risk.control.system.Controllers.Company
                     }
                 }
 
-                var claim = await claimsInvestigationService.CreatePolicy(userEmail, claimsInvestigation, documentFile, profileFile);
+                var claim = await claimsInvestigationService.CreatePolicy(userEmail, claimsInvestigation, documentFile, profileFile, false);
                 if (claim == null)
                 {
                     notifyService.Error("OOPs !!!..Contact Admin");

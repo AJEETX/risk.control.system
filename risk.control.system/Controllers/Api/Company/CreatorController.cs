@@ -51,7 +51,8 @@ namespace risk.control.system.Controllers.Api.Company
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
 
-            applicationDbContext = applicationDbContext.Where(a => a.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
+            applicationDbContext = applicationDbContext.Where(a =>
+                a.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
                      a.UserEmailActioned == companyUser.Email &&
                          a.UserEmailActionedTo == companyUser.Email &&
                          a.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId
