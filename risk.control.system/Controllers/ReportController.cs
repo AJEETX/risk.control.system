@@ -14,6 +14,7 @@ using AspNetCoreHero.ToastNotification.Abstractions;
 using Microsoft.AspNetCore.Authorization;
 using static risk.control.system.AppConstant.Applicationsettings;
 using SmartBreadcrumbs.Nodes;
+using risk.control.system.Controllers.Company;
 
 namespace risk.control.system.Controllers
 {

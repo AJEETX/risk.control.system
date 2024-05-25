@@ -14,6 +14,7 @@ using SmartBreadcrumbs.Attributes;
 using System.Data;
 using AspNetCoreHero.ToastNotification.Abstractions;
 using System.IO.Compression;
+using risk.control.system.Controllers.Company;
 
 namespace risk.control.system.Controllers
 {
@@ -207,76 +208,5 @@ namespace risk.control.system.Controllers
             }
         }
 
-        [HttpPost]
-        [RequestSizeLimit(2_000_000)] // Checking for 2 MB
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> FileUpload(IFormFile postedFile, string uploadtype, string uploadingway)
-        {
-            object _;
-            if(!Enum.TryParse(typeof(UploadType), uploadtype,true, out _))
-            {
-                notifyService.Custom($"Upload Error. Contact Admin", 3, "red", "far fa-file-powerpoint");
-                return RedirectToAction("Draft", "ClaimsInvestigation");
-            }
-            
-            UploadType uploadType = (UploadType)Enum.Parse(typeof(UploadType), uploadtype, true);
-
-            if (postedFile == null || string.IsNullOrWhiteSpace(uploadtype) || 
-                string.IsNullOrWhiteSpace(Path.GetFileName(postedFile.FileName)) ||
-                string.IsNullOrWhiteSpace(Path.GetExtension(Path.GetFileName(postedFile.FileName))) ||
-                Path.GetExtension(Path.GetFileName(postedFile.FileName)) !="zip"
-                )
-            {
-                notifyService.Custom($"Upload Error. Contact Admin", 3, "red", "far fa-file-powerpoint");
-                return RedirectToAction("Draft", "ClaimsInvestigation");
-            }
-            var userEmail = HttpContext.User?.Identity?.Name;
-
-            if (string.IsNullOrWhiteSpace(userEmail))
-            {
-                notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
-            }
-            try
-            {
-                if (postedFile != null && !string.IsNullOrWhiteSpace(userEmail))
-                {
-
-                    if (uploadType == UploadType.FTP)
-                    {
-                        await ftpService.DownloadFtpFile(userEmail, postedFile, uploadingway);
-
-                        notifyService.Custom($"Ftp download complete ", 3, "green", "far fa-file-powerpoint");
-
-                        return RedirectToAction("Draft", "ClaimsInvestigation");
-                    }
-
-                    if (uploadType == UploadType.FILE && Path.GetExtension(Path.GetFileName(postedFile.FileName)) == ".zip")
-                    {
-                        try
-                        {
-                            await ftpService.UploadFile(userEmail, postedFile, uploadingway);
-
-                            notifyService.Custom($"File upload complete", 3, "green", "far fa-file-powerpoint");
-
-                            return RedirectToAction("Draft", "ClaimsInvestigation");
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine(ex.Message);
-                        }
-                    }
-                }
-
-                notifyService.Custom($"Upload Error. Contact Admin", 3, "red", "far fa-file-powerpoint");
-
-                return RedirectToAction("Draft", "ClaimsInvestigation");
-            }
-            catch (Exception)
-            {
-                notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
-            }
-        }
     }
 }

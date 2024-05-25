@@ -10,15 +10,13 @@ using Microsoft.CodeAnalysis;
 using Microsoft.OpenApi.Extensions;
 
 using NToastNotify;
-
-using risk.control.system.Controllers.Agency;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
 
-namespace risk.control.system.Controllers
+namespace risk.control.system.Controllers.Agency
 {
     [Authorize(Roles = "AGENCY_ADMIN,SUPERVISOR,AGENT")]
     public class ClaimsVendorPostController : Controller
@@ -43,7 +41,7 @@ namespace risk.control.system.Controllers
             this.notifyService = notifyService;
             this.vendorService = vendorService;
             this.mailboxService = mailboxService;
-            this._context = context;
+            _context = context;
             this.webHostEnvironment = webHostEnvironment;
             UserList = new List<UsersViewModel>();
         }
@@ -68,14 +66,14 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var vendorAgent = _context.VendorApplicationUser.FirstOrDefault(c => c.Id.ToString() == selectedcase);
-                if(vendorAgent == null)
+                if (vendorAgent == null)
                 {
                     notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
                 var claim = await claimsInvestigationService.AssignToVendorAgent(vendorAgent.Email, userEmail, vendorAgent.VendorId.Value, claimId);
-                if(claim == null)
+                if (claim == null)
                 {
                     notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
@@ -100,8 +98,8 @@ namespace risk.control.system.Controllers
             try
             {
                 if (string.IsNullOrWhiteSpace(remarks) ||
-                    string.IsNullOrWhiteSpace(claimId) || 
-                    caseLocationId < 1 || 
+                    string.IsNullOrWhiteSpace(claimId) ||
+                    caseLocationId < 1 ||
                     string.IsNullOrWhiteSpace(question1) ||
                     string.IsNullOrWhiteSpace(question2) ||
                     string.IsNullOrWhiteSpace(question3) ||
@@ -133,13 +131,13 @@ namespace risk.control.system.Controllers
                     Income question2Enum = (Income)Enum.Parse(typeof(Income), question2, true);
                     question2 = question2Enum.GetEnumDisplayName();
                 }
-                var claim = await claimsInvestigationService.SubmitToVendorSupervisor(userEmail, caseLocationId, claimId, 
-                    WebUtility.HtmlDecode(remarks),  
-                    WebUtility.HtmlDecode(question1), 
-                    WebUtility.HtmlDecode(question2), 
-                    WebUtility.HtmlDecode(question3), 
+                var claim = await claimsInvestigationService.SubmitToVendorSupervisor(userEmail, caseLocationId, claimId,
+                    WebUtility.HtmlDecode(remarks),
+                    WebUtility.HtmlDecode(question1),
+                    WebUtility.HtmlDecode(question2),
+                    WebUtility.HtmlDecode(question3),
                     WebUtility.HtmlDecode(question4));
-                if(claim == null)
+                if (claim == null)
                 {
                     notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(AgentController.GetInvestigate), "\"Agent\"", new { selectedcase = claimId });

@@ -10,7 +10,6 @@ using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 
 using NToastNotify;
-
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
@@ -22,8 +21,9 @@ using SmartBreadcrumbs.Nodes;
 
 using static risk.control.system.AppConstant.Applicationsettings;
 
-namespace risk.control.system.Controllers
+namespace risk.control.system.Controllers.Company
 {
+    [Breadcrumb(" Claims")]
     public class ClaimsInvestigationController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -48,7 +48,6 @@ namespace risk.control.system.Controllers
             this.investigationReportService = investigationReportService;
         }
 
-        [Breadcrumb(" Claims")]
         public IActionResult Index()
         {
             try
