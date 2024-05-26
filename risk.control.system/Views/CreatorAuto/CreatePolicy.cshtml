@@ -7,7 +7,7 @@
 }
 
 <section class="content">
-    <form id="create-form" method="post" asp-action="CreatePolicy" enctype="multipart/form-data">
+    <form id="create-form" method="post" asp-controller="CreatorAutoPost" asp-action="CreatePolicy" enctype="multipart/form-data">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <input type="hidden" asp-for="PolicyDetail.LineOfBusinessId" value="@Model.PolicyDetail.LineOfBusinessId" />
         <div id="article" class="card bg-light card-secondary">

@@ -48,34 +48,6 @@ namespace risk.control.system.Controllers
             return View();
         }
 
-        [Breadcrumb(" Upload Log", FromController = typeof(ClaimsInvestigationController))]
-        public async Task<IActionResult> Uploads()
-        {
-            try
-            {
-                var userEmail = HttpContext.User.Identity.Name;
-                if (string.IsNullOrWhiteSpace(userEmail))
-                {
-                    notifyService.Error("OOPs !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-                var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == userEmail);
-                if (companyUser == null)
-                {
-                    notifyService.Error("OOPs !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-                var files = await _context.FilesOnFileSystem.Where(f => f.CompanyId == companyUser.ClientCompanyId && f.UploadedBy == userEmail).ToListAsync();
-                ViewBag.Message = TempData["Message"];
-                return View(new FileUploadViewModel { FilesOnFileSystem = files });
-            }
-            catch (Exception)
-            {
-                notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
-            }
-            
-        }
 
         public async Task<IActionResult> DownloadLog(long id)
         {

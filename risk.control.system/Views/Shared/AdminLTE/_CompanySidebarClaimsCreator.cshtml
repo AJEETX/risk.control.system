@@ -4,10 +4,10 @@
 
 @{
     <li class="nav-item">
-        <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("ClaimsInvestigation","") @Url.MakeActiveClass("InsuranceClaims","")
-                                                        @Url.MakeActiveClass("CreatorAuto","")
-                                                    @Url.MakeActiveClass("InsurancePolicy","")
-                                                @Url.MakeActiveClass("Beneficiary","") @Url.MakeActiveClass("CustomerInsurancePolicy","") @Url.MakeActiveClass("Report","")">
+        <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("ClaimsActive","")
+                                                            @Url.MakeActiveClass("CreatorAuto","")
+                                                            @Url.MakeActiveClass("CreatorManual","")
+                                                    @Url.MakeActiveClass("ClaimsLog","") ">
             <i class="nav-icon fa fa-user-secret"></i>
             <p class="sidebar-menu-header-label">
                 @Applicationsettings.INVESTIGATION_CLAIM
@@ -110,8 +110,8 @@
     // }
 
     <li class="nav-item">
-        <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Active" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Active")
-                                        @Url.MakeActiveClass("ClaimsInvestigation","ActiveDetail") ">
+        <a is-active-page asp-controller="ClaimsActive" asp-action="Active" class="actual-link nav-link @Url.MakeActiveClass("ClaimsActive","Active")
+                                            @Url.MakeActiveClass("ClaimsActive","ActiveDetail") ">
             <i class="fa fa-toggle-on nav-icon"></i>
             <p>
                 <span class="badge badge-primary">ACTIVE</span>
@@ -130,7 +130,7 @@
     //     </a>
     // </li>
     <li class="nav-item">
-        <a is-active-page asp-controller="Uploads" asp-action="Uploads" class="actual-link nav-link @Url.MakeActiveClass("Uploads","Uploads")">
+        <a is-active-page asp-controller="ClaimsLog" asp-action="Uploads" class="actual-link nav-link @Url.MakeActiveClass("ClaimsLog","Uploads")">
             <i class="nav-icon fa fa-upload"></i>
             <p>
                 <span class="badge badge-secondary"> UPLOAD Log</span>

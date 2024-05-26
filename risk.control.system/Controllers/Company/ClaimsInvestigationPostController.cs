@@ -81,7 +81,7 @@ namespace risk.control.system.Controllers.Company
                     if (claims.Count == autoAllocatedClaims.Count)
                     {
                         notifyService.Custom($"{autoAllocatedClaims.Count}/{claims.Count} claim(s) auto-assigned", 3, "green", "far fa-file-powerpoint");
-                        return RedirectToAction(nameof(ClaimsInvestigationController.Active), "ClaimsInvestigation");
+                        return RedirectToAction(nameof(ClaimsActiveController.Active), "ClaimsActive");
 
                     }
 
@@ -120,7 +120,7 @@ namespace risk.control.system.Controllers.Company
 
             }
 
-            return RedirectToAction(nameof(ClaimsInvestigationController.Active), "ClaimsInvestigation");
+                        return RedirectToAction(nameof(ClaimsActiveController.Active), "ClaimsActive");
         }
 
         [ValidateAntiForgeryToken]
@@ -146,7 +146,7 @@ namespace risk.control.system.Controllers.Company
 
                 notifyService.Custom($"Policy #{policy.PolicyDetail.ContractNumber} assigned to {vendor.Name}", 3, "green", "far fa-file-powerpoint");
 
-                return RedirectToAction(nameof(ClaimsInvestigationController.Active), "ClaimsInvestigation");
+                        return RedirectToAction(nameof(ClaimsActiveController.Active), "ClaimsActive");
             }
             catch (Exception)
             {

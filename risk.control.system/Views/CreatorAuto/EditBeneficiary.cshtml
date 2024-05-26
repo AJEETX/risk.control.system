@@ -7,7 +7,7 @@
 }
 
 <section class="content">
-    <form id="create-form" asp-action="EditBeneficiary" enctype="multipart/form-data">
+    <form id="create-form" asp-controller="CreatorAutoPost" asp-action="EditBeneficiary" enctype="multipart/form-data">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <input type="hidden" asp-for="BeneficiaryDetailId" />

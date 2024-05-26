@@ -23,8 +23,9 @@ using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers.Company
 {
+    [Authorize(Roles = CREATOR.DISPLAY_NAME)]
     [Breadcrumb(" Claims")]
-    public class ClaimsInvestigationController : Controller
+    public class ClaimsLogController : Controller
     {
         private readonly ApplicationDbContext _context;
         private readonly IEmpanelledAgencyService empanelledAgencyService;
@@ -33,7 +34,7 @@ namespace risk.control.system.Controllers.Company
         private readonly IInvestigationReportService investigationReportService;
         private readonly IClaimPolicyService claimPolicyService;
 
-        public ClaimsInvestigationController(ApplicationDbContext context,
+        public ClaimsLogController(ApplicationDbContext context,
             IEmpanelledAgencyService empanelledAgencyService,
             IFtpService ftpService,
             INotyfService notifyService,
@@ -61,7 +62,7 @@ namespace risk.control.system.Controllers.Company
                 var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
                 if (userRole.Value.Contains(AppRoles.CREATOR.ToString()))
                 {
-                    return RedirectToAction("Active");
+                    return RedirectToAction("Uploads");
                 }
                 else if (userRole.Value.Contains(AppRoles.ASSESSOR.ToString()))
                 {
@@ -83,56 +84,33 @@ namespace risk.control.system.Controllers.Company
             }
         }
 
-
-        [Breadcrumb(title: "Active")]
-        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
-        public IActionResult Active()
+        [Breadcrumb(" Upload Log")]
+        public async Task<IActionResult> Uploads()
         {
             try
             {
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (string.IsNullOrWhiteSpace(currentUserEmail))
+                var userEmail = HttpContext.User.Identity.Name;
+                if (string.IsNullOrWhiteSpace(userEmail))
                 {
                     notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                return View();
+                var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == userEmail);
+                if (companyUser == null)
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var files = await _context.FilesOnFileSystem.Where(f => f.CompanyId == companyUser.ClientCompanyId && f.UploadedBy == userEmail).ToListAsync();
+                ViewBag.Message = TempData["Message"];
+                return View(new FileUploadViewModel { FilesOnFileSystem = files });
             }
             catch (Exception)
             {
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
-        }
 
-
-        [Breadcrumb(title: " Details", FromAction = "Active")]
-        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
-        public async Task<IActionResult> ActiveDetail(string id)
-        {
-            try
-            {
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (string.IsNullOrWhiteSpace(currentUserEmail))
-                {
-                    notifyService.Error("OOPs !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-                if (id == null)
-                {
-                    notifyService.Error("NOT FOUND !!!..");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-
-                var model = await claimPolicyService.GetClaimDetail(id);
-
-                return View(model);
-            }
-            catch (Exception)
-            {
-                notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
-            }
         }
     }
 }
