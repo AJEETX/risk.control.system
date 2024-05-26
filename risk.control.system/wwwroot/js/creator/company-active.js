@@ -83,6 +83,7 @@
                     var img = '<img alt="' + row.agent + '" title="' + row.agent + '" src="' + row.ownerDetail + '" class="table-profile-image" data-toggle="tooltip"/>';
                     return img;
                 }
+                ///<button type="button" class="btn btn-lg btn-danger" data-toggle="popover" title="Popover title" data-content="And here's some amazing content. It's very engaging. Right?">Click to toggle popover</button>
             },
             {
                 "sDefaultContent": "",
@@ -125,8 +126,17 @@
         error: function (xhr, status, error) { alert('err ' + error) }
     });
     $('#customerTable').on('draw.dt', function () {
-        $('[data-toggle="tooltip"]').tooltip();
+        $('[data-toggle="tooltip"]').tooltip({
+            animated: 'fade',
+            placement: 'bottom',
+            html: true
+        });
     });
+    //$('[data-toggle="tooltip"]').tooltip({
+    //    animated: 'fade',
+    //    placement: 'bottom',
+    //    html: true
+    //});
     $('#customerTable tbody').hide();
     $('#customerTable tbody').fadeIn(2000);
 

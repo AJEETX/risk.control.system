@@ -48,9 +48,9 @@
                 <div class="login-form">
                     <img class="login-logo" src="/img/iCheckifyLogo.png" />™️
                     
-                    <div class="title">Login</div>
+                    <div id="title" class="title">Login</div>
                     @Html.AntiForgeryToken()
-                    <form id="login-form" asp-controller="account" asp-action="login" method="post">
+                    <form id="login-form" asp-controller="Account" asp-action="@ViewBag.SlimLogin" method="post">
                         @if(Model.ShowUserOnLogin)
                         {
                             <input type="hidden" id="show-users" name="show-users" value="true" />
@@ -65,25 +65,25 @@
                                 <i class="fas fa-envelope left-padd"></i>
                                 @if(Model.ShowUserOnLogin)
                                 {
-                                    <select required id="email" asp-for="Email" class="form-control remarks" asp-items="ViewBag.Users">
+                                    <select required id="email" asp-for="Email" title="Email" class="form-control remarks" asp-items="ViewBag.Users">
                                         <option value=""> --- select user email --- </option>
                                     </select>
                                     <span asp-validation-for="Email" class="text-danger"></span>
                                 }
                                 else
                                 {
-                                    <input asp-for=Email id="email" type="email" class="form-control remarks" placeholder="Enter your email" title="Enter your email" value="@Applicationsettings.INSURER_CREATOR" autocomplete="off" required />
+                                    <input asp-for=Email id="email" type="email" title="Email" class="form-control remarks" placeholder="Enter your email" title="Enter your email" value="@Applicationsettings.INSURER_CREATOR" autocomplete="off" required />
                                     <span asp-validation-for="Email" class="text-danger"></span>
                                 }
                             </div>
                             <div class="input-box">
                                 <i class="fas fa-lock left-padd"></i>
-                                <input asp-for=Password id="password" type="password" class="form-control remarks" placeholder="Enter your password" title="Enter your password" value="@Applicationsettings.TestPassword" autocomplete="off" required />
+                                <input asp-for=Password id="password" type="password" title="password" class="form-control remarks" placeholder="Enter your password" title="Enter your password" value="@Applicationsettings.TestPassword" autocomplete="off" required />
                             </div>
                             
                             <p class="account">By clicking login, you agree to our <a href="#">Terms & Conditions!</a></p>
                             <div class="button input-box">
-                                <button id="login" type="submit" class="btn btn-secondary btn-block"><span class="fa fa-key" aria-hidden="true"></span> Login</button>
+                                <button data-testid="logintest" id="login" type="submit" value="Login" class="btn btn-secondary btn-block"><span class="fa fa-key" aria-hidden="true"></span> Login</button>
                             </div>
                             <div class="text"><label for="flip" class="login-link">Forgot Password?</label></div>
                         </div>

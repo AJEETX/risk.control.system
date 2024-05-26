@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace risk.control.system.Models.ViewModel
 {
@@ -6,9 +7,11 @@ namespace risk.control.system.Models.ViewModel
     {
         [Required]
         [EmailAddress]
+        [DisplayName("Email")]
         public string Email { get; set; }
 
         [DataType(DataType.Password)]
+        [DisplayName("Password")]
         public string Password { get; set; }
 
         [Display(Name = "Remember me?")]
