@@ -50,7 +50,9 @@ namespace risk.control.system.Models
         public List<ClaimNote>? ClaimNotes { get; set; } = new();
         public string? CurrentClaimOwner { get; set; }
         public List<ClaimMessage>? ClaimMessages { get; set; } = new();
+        public CREATEDBY CREATEDBY { get; set; } = CREATEDBY.MANUAL;
         public ORIGIN ORIGIN { get; set; } = ORIGIN.USER;
+
         public override string ToString()
         {
             return $"Case Id: {ClaimsInvestigationId}, <br /> ";
@@ -69,18 +71,13 @@ namespace risk.control.system.Models
         public string? UserRoleActionedTo { get; set; }
         public string? UserEmailActionedTo { get; set; }
         public int ReviewCount { get; set; } = 0;
-        public int DraftView { get; set; } = 0;
-        public int AssignAutoUploadView { get; set; } = 0;
-        public int ReAssignUploadView { get; set; } = 0;
+        public int AutoNew { get; set; } = 0;
+        public int ManualNew { get; set; } = 0;
         public int ActiveView { get; set; } = 0;
         public int AllocateView { get; set; } = 0;
         public int InvestigateView { get; set; } = 0;
         public int VerifyView { get; set; } = 0;
         public int AssessView { get; set; } = 0;
         public int ManagerActiveView { get; set; } = 0;
-        public int ManagerReviewView { get; set; } = 0;
-        public int ManagerApproveView { get; set; } = 0;
-        public int ManagerRejectView { get; set; } = 0;
     }
-
 }

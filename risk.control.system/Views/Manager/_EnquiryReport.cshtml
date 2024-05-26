@@ -32,7 +32,10 @@
                             </tr>
                         </thead>
                         <tr>
-                            <td><span class="badge badge-light">@request.Created.ToString("dd-MMM-yy hh:mm tt")</span> </td>
+                            <td>
+
+                                <span class="badge badge-light">@request.Created.ToString("dd-MMM-yy hh:mm tt")</span>
+                            </td>
                             <td>
                                 @if (@request.QuestionImageAttachment != null)
                                 {
@@ -46,10 +49,10 @@
                                 }
                             </td>
                             <td>
-                                @request.Subject
+                                <i class="fas fa-question" aria-hidden="true"></i> @request.Subject
                             </td>
                             <td>
-                                @request.AnswerSelected
+                                <i class="fas fa-user-check"></i> @request.AnswerSelected
                             </td>
 
                         </tr>
@@ -69,7 +72,7 @@
 
                             </td>
                             <td>
-                                @request.Description
+                                <i class="fas fa-question" aria-hidden="true"></i>  @request.Description
                             </td>
                             <td>
                                 <i class="fas fa-user-check"></i> @request.Answer

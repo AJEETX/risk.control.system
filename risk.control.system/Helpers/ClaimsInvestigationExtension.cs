@@ -67,13 +67,13 @@ namespace risk.control.system.Helpers
             if (claimType == ClaimType.HEALTH)
             {
                 if (cdetail is null)
-                    return "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>";
+                    return "<span class=\"badge badge-danger\"> <i class=\"fas fa-question\" ></i>  </span>";
                 return string.Join("", "<span class='badge badge-light'>" + cdetail.PinCode.Code + "</span>");
             }
             else
             {
                 if (location is null)
-                    return "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>";
+                    return "<span class=\"badge badge-danger\"> <i class=\"fas fa-question\" ></i>  </span>";
                 return string.Join("", "<span class='badge badge-light'>" + location.PinCode.Code + "</span>");
             }
         }

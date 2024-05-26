@@ -227,13 +227,13 @@ builder.Services.AddMvcCore(config =>
 });
 builder.Services.AddHttpContextAccessor();
 
-builder.Services.AddWebSockets(options =>
-{
-    options.KeepAliveInterval = TimeSpan.FromSeconds(120);
-});
+//builder.Services.AddWebSockets(options =>
+//{
+//    options.KeepAliveInterval = TimeSpan.FromSeconds(120);
+//});
 var app = builder.Build();
 
-app.UseWebSockets();
+//app.UseWebSockets();
 app.UseSwagger();
 
 if (!app.Environment.IsDevelopment())

@@ -103,7 +103,7 @@ namespace risk.control.system.Services
                     {
                         return false;
                     }
-                    var processed = await ProcessFile(userEmail, archive, uploadingway);
+                    var processed = await ProcessFile(userEmail, archive, uploadingway, ORIGIN.FTP);
                     if (!processed)
                     {
                         return false;
@@ -150,7 +150,7 @@ namespace risk.control.system.Services
                     {
                         return false;
                     }
-                    var processed = await ProcessFile(userEmail, archive, uploadingway);
+                    var processed = await ProcessFile(userEmail, archive, uploadingway, ORIGIN.FILE);
                     if (!processed)
                     {
                         return false;
@@ -182,9 +182,9 @@ namespace risk.control.system.Services
             await _context.SaveChangesAsync();
         }
 
-        private async Task<bool> ProcessFile(string userEmail, ZipArchive archive, string uploadingway)
+        private async Task<bool> ProcessFile(string userEmail, ZipArchive archive, string createdAs, ORIGIN uploadingway)
         {
-            var uploadMethod = (ORIGIN)Enum.Parse(typeof(ORIGIN), uploadingway, true);
+            var createdAsMethod = (CREATEDBY)Enum.Parse(typeof(CREATEDBY), createdAs, true);
 
             var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(c => c.Email == userEmail);
             bool userCanCreate = true;
@@ -245,7 +245,7 @@ namespace risk.control.system.Services
                                             dt.Rows[dt.Rows.Count - 1][i] = cell?.Trim() ?? NO_DATA;
                                             i++;
                                         }
-                                        var subStatus = companyUser.ClientCompany.AutoAllocation && uploadMethod == ORIGIN.AUTO ? createdStatus : assignedStatus;
+                                        var subStatus = companyUser.ClientCompany.AutoAllocation && createdAsMethod == CREATEDBY.AUTO ? createdStatus : assignedStatus;
                                         var claim = new ClaimsInvestigation
                                         {
                                             InvestigationCaseStatusId = status.InvestigationCaseStatusId,
@@ -264,7 +264,8 @@ namespace risk.control.system.Services
                                             SelectedToAssign = false,
                                             UserEmailActioned = userEmail,
                                             UserEmailActionedTo = userEmail,
-                                            ORIGIN = uploadMethod,
+                                            CREATEDBY = createdAsMethod,
+                                            ORIGIN = uploadingway,
                                             UserRoleActionedTo = $"{companyUser.ClientCompany.Email}"
                                     };
 

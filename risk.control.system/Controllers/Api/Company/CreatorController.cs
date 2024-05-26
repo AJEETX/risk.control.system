@@ -62,8 +62,8 @@ namespace risk.control.system.Controllers.Api.Company
             var newClaimsAssigned = new List<ClaimsInvestigation>();
             foreach (var item in applicationDbContext)
             {
-                item.AssignAutoUploadView += 1;
-                if (item.AssignAutoUploadView <= 1)
+                item.AutoNew += 1;
+                if (item.AutoNew <= 1)
                 {
                     newClaimsAssigned.Add(item);
                 }
@@ -93,14 +93,14 @@ namespace risk.control.system.Controllers.Api.Company
                     Customer = a.CustomerDetail?.ProfilePicture != null ?
                     string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail?.ProfilePicture)) : Applicationsettings.NO_USER,
                     Name = a.CustomerDetail?.CustomerName != null ?
-                    a.CustomerDetail?.CustomerName : "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>",
+                    a.CustomerDetail?.CustomerName : "<span class=\"badge badge-light\"> <i class=\"fas fa-question\" ></i>  </span>",
                     Policy = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail?.LineOfBusiness.Name + "</span>"),
                     Status = string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseStatus.Name + "</span>"),
                     SubStatus = string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseSubStatus.Name + "</span>"),
                     Ready2Assign = a.IsReady2Assign,
                     ServiceType = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail?.ClaimType.GetEnumDisplayName() + "</span>"),
                     Service = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail.InvestigationServiceType.Name + "</span>"),
-                    Location = string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseSubStatus.Name + "</span>"),
+                    Location = string.Join("", "<span class='badge badge-light'>" + a.ORIGIN.GetEnumDisplayName() + "</span>"),
                     Created = string.Join("", "<span class='badge badge-light'>" + a.Created.ToString("dd-MM-yyyy") + "</span>"),
                     timePending = a.GetTimePending(),
                     Withdrawable = !a.NotWithdrawable,
@@ -109,12 +109,12 @@ namespace risk.control.system.Controllers.Api.Company
                                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.BeneficiaryDetail.ProfilePicture)) :
                                       Applicationsettings.NO_USER,
                     BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.BeneficiaryName) ?
-                        "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>" :
+                        "<span class=\"badge badge-light\"> <i class=\"fas fa-question\" ></i>  </span>" :
                         a.BeneficiaryDetail.BeneficiaryName,
                     TimeElapsed = DateTime.Now.Subtract(a.Created).TotalSeconds,
-                    IsNewAssigned = a.AssignAutoUploadView <= 1,
-                    BeneficiaryFullName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.BeneficiaryName) ? "" : a.BeneficiaryDetail.BeneficiaryName,
-                    CustomerFullName = string.IsNullOrWhiteSpace(a.CustomerDetail?.CustomerName) ? "" : a.CustomerDetail.CustomerName,
+                    IsNewAssigned = a.AutoNew <= 1,
+                    BeneficiaryFullName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.BeneficiaryName) ? "?" : a.BeneficiaryDetail.BeneficiaryName,
+                    CustomerFullName = string.IsNullOrWhiteSpace(a.CustomerDetail?.CustomerName) ? "?" : a.CustomerDetail.CustomerName,
 
                 })?
                 .ToList();
@@ -169,8 +169,8 @@ namespace risk.control.system.Controllers.Api.Company
 
             foreach (var item in applicationDbContext)
             {
-                item.AssignAutoUploadView += 1;
-                if (item.AssignAutoUploadView <= 1)
+                item.ManualNew += 1;
+                if (item.ManualNew <= 1)
                 {
                     newClaimsAssigned.Add(item);
                 }
@@ -197,12 +197,12 @@ namespace risk.control.system.Controllers.Api.Company
                         Document = a.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : Applicationsettings.NO_POLICY_IMAGE,
                         Customer = a.CustomerDetail?.ProfilePicture != null ?
                         string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail?.ProfilePicture)) : Applicationsettings.NO_USER,
-                        Name = a.CustomerDetail?.CustomerName != null ? a.CustomerDetail?.CustomerName : "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/user.png\" /> </span>",
+                        Name = a.CustomerDetail?.CustomerName != null ? a.CustomerDetail?.CustomerName : "<span class=\"badge badge-light\"> <i class=\"fas fa-question\" ></i>  </span>",
                         Policy = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail?.LineOfBusiness.Name + "</span>"),
                         Status = string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseStatus.Name + "</span>"),
                         ServiceType = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail?.ClaimType.GetEnumDisplayName() + "</span>"),
                         Service = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail.InvestigationServiceType.Name + "</span>"),
-                        Location = string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseSubStatus.Name + "</span>"),
+                        Location = string.Join("", "<span class='badge badge-light'>" + a.ORIGIN.GetEnumDisplayName() + "</span>"),
                         Created = string.Join("", "<span class='badge badge-light'>" + a.Created.ToString("dd-MM-yyyy") + "</span>"),
                         timePending = a.GetTimePending(),
                         PolicyNum = a.GetPolicyNum(),
@@ -210,11 +210,13 @@ namespace risk.control.system.Controllers.Api.Company
                                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.BeneficiaryDetail.ProfilePicture)) :
                                       Applicationsettings.NO_USER,
                         BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.BeneficiaryName) ?
-                        "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>" :
+                        "<span class=\"badge badge-light\"> <i class=\"fas fa-question\" ></i>  </span>" :
                         a.BeneficiaryDetail.BeneficiaryName,
                         TimeElapsed = DateTime.Now.Subtract(a.Created).TotalSeconds,
-                        IsNewAssigned = a.AssignAutoUploadView <= 1,
-                        Ready2Assign = a.IsReady2Assign
+                        IsNewAssigned = a.ManualNew <= 1,
+                        Ready2Assign = a.IsReady2Assign,
+                        BeneficiaryFullName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.BeneficiaryName) ? "?" : a.BeneficiaryDetail.BeneficiaryName,
+                        CustomerFullName = string.IsNullOrWhiteSpace(a.CustomerDetail?.CustomerName) ? "?" : a.CustomerDetail.CustomerName,
                     })
                     ?.ToList();
 
@@ -300,7 +302,7 @@ namespace risk.control.system.Controllers.Api.Company
                         Name = a.CustomerDetail?.CustomerName != null ?
                         a.CustomerDetail?.CustomerName : "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>",
                         Policy = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail?.LineOfBusiness.Name + "</span>"),
-                        Status = string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseStatus.Name + "</span>"),
+                        Status = a.ORIGIN.GetEnumDisplayName(),
                         SubStatus = string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseSubStatus.Name + "</span>"),
                         Ready2Assign = a.IsReady2Assign,
                         ServiceType = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail?.ClaimType.GetEnumDisplayName() + "(" + a.PolicyDetail.InvestigationServiceType.Name + ")</span>"),

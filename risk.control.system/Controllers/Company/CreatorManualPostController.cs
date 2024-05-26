@@ -149,7 +149,8 @@ namespace risk.control.system.Controllers.Company
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 claimsInvestigation.PolicyDetail.ClientCompanyId = companyUser?.ClientCompanyId;
-
+                claimsInvestigation.CREATEDBY = CREATEDBY.MANUAL;
+                claimsInvestigation.ORIGIN = ORIGIN.USER;
                 IFormFile documentFile = null;
                 IFormFile profileFile = null;
                 var files = Request.Form?.Files;
@@ -218,7 +219,6 @@ namespace risk.control.system.Controllers.Company
                 }
 
                 claimsInvestigation.PolicyDetail.ClientCompanyId = companyUser?.ClientCompanyId;
-
                 IFormFile documentFile = null;
                 IFormFile profileFile = null;
                 var files = Request.Form?.Files;

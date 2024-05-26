@@ -273,6 +273,8 @@ namespace risk.control.system.Services
                     claimDocument.CopyTo(dataStream);
                     claimsInvestigation.PolicyDetail.DocumentImage = dataStream.ToArray();
                 }
+                var initiatedStatus = _context.InvestigationCaseStatus.FirstOrDefault(i =>
+                i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INITIATED);
                 var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
 
@@ -286,8 +288,7 @@ namespace risk.control.system.Services
                 claimsInvestigation.UpdatedBy = userEmail;
                 claimsInvestigation.CurrentUserEmail = userEmail;
                 claimsInvestigation.CurrentClaimOwner = currentUser.Email;
-                claimsInvestigation.InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => 
-                i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INITIATED).InvestigationCaseStatusId;
+                claimsInvestigation.InvestigationCaseStatusId = initiatedStatus.InvestigationCaseStatusId;
                 claimsInvestigation.InvestigationCaseSubStatusId = create? createdStatus.InvestigationCaseSubStatusId:assigned2AssignerStatus.InvestigationCaseSubStatusId;
 
                 var aaddedClaimId = _context.ClaimsInvestigation.Add(claimsInvestigation);
@@ -300,8 +301,8 @@ namespace risk.control.system.Services
                     CurrentClaimOwner = currentUser.Email,
                     HopCount = 0,
                     Time2Update = 0,
-                    InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INITIATED).InvestigationCaseStatusId,
-                    InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR).InvestigationCaseSubStatusId,
+                    InvestigationCaseStatusId = initiatedStatus.InvestigationCaseStatusId,
+                    InvestigationCaseSubStatusId = create ? createdStatus.InvestigationCaseSubStatusId : assigned2AssignerStatus.InvestigationCaseSubStatusId,
                     UpdatedBy = userEmail
                 };
                 _context.InvestigationTransaction.Add(log);
@@ -458,7 +459,6 @@ namespace risk.control.system.Services
             if (claims is not null && claims.Count > 0)
             {
                 var cases2Assign = _context.ClaimsInvestigation
-                    .Include(c => c.BeneficiaryDetail)
                     .Where(v => claims.Contains(v.ClaimsInvestigationId));
 
                 var currentUser = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
@@ -513,7 +513,6 @@ namespace risk.control.system.Services
         {
             var currentUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == userEmail);
             var claimsInvestigation = _context.ClaimsInvestigation
-                .Include(c => c.BeneficiaryDetail)
                 .Include(c => c.PolicyDetail)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimId);
             var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claimsInvestigation.PolicyDetail.ClientCompanyId);
@@ -533,12 +532,11 @@ namespace risk.control.system.Services
             claimsInvestigation.UserRoleActionedTo = $"{company.Email}";
             claimsInvestigation.CompanyWithdrawlComment = model.ClaimsInvestigation.CompanyWithdrawlComment;
             claimsInvestigation.ActiveView = 0;
-            claimsInvestigation.ReAssignUploadView = 0;
+            claimsInvestigation.ManualNew = 0;
             claimsInvestigation.AllocateView = 0;
             claimsInvestigation.VendorId = null;
             claimsInvestigation.Vendor = null;
-            //var currentVendor = claimsInvestigation.Vendors.FirstOrDefault(v => v.VendorId == claimsInvestigation.VendorId);
-            //currentVendor.SelectedByCompany = false;
+
             claimsInvestigation.InvestigationCaseStatusId = inProgress.InvestigationCaseStatusId;
             claimsInvestigation.InvestigationCaseSubStatusId = withdrawnByCompany.InvestigationCaseSubStatusId;
 
@@ -582,7 +580,6 @@ namespace risk.control.system.Services
         {
             var currentUser = _context.VendorApplicationUser.FirstOrDefault(u => u.Email == userEmail);
             var claimsInvestigation = _context.ClaimsInvestigation
-                .Include(c => c.BeneficiaryDetail)
                 .Include(c => c.PolicyDetail)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimId);
             var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claimsInvestigation.PolicyDetail.ClientCompanyId);
@@ -604,7 +601,7 @@ namespace risk.control.system.Services
             claimsInvestigation.AgencyDeclineComment = model.ClaimsInvestigation.AgencyDeclineComment;
             claimsInvestigation.ActiveView = 0;
             claimsInvestigation.AllocateView = 0;
-            claimsInvestigation.AssignAutoUploadView = 0;
+            claimsInvestigation.AutoNew = 0;
             claimsInvestigation.VendorId = null;
             claimsInvestigation.UserRoleActionedTo = $"{company.Email}";
             claimsInvestigation.InvestigationCaseStatusId = inProgress.InvestigationCaseStatusId;
@@ -649,18 +646,8 @@ namespace risk.control.system.Services
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
             if (vendor != null)
             {
-                var beneficiaryDetail = _context.BeneficiaryDetail
-                .Include(c => c.ClaimsInvestigation)
-                .Include(c => c.PinCode)
-                .Include(c => c.District)
-                .Include(c => c.State)
-                .Include(c => c.State)
-                .FirstOrDefault(c => c.BeneficiaryDetailId == caseLocationId && c.ClaimsInvestigationId == claimsInvestigationId);
-
-                _context.BeneficiaryDetail.Update(beneficiaryDetail);
-
                 var claimsCaseToAllocateToVendor = _context.ClaimsInvestigation
-                    .Include(c => c.PolicyDetail)
+                    .Include(c=>c.PolicyDetail)
                     .FirstOrDefault(v => v.ClaimsInvestigationId == claimsInvestigationId);
                 claimsCaseToAllocateToVendor.AssignedToAgency = true;
                 claimsCaseToAllocateToVendor.Updated = DateTime.Now;
@@ -673,7 +660,6 @@ namespace risk.control.system.Services
                 claimsCaseToAllocateToVendor.UserEmailActionedTo = string.Empty;
                 claimsCaseToAllocateToVendor.UserRoleActionedTo = $"{vendor.Email}";
                 claimsCaseToAllocateToVendor.Vendors.Add(vendor);
-                claimsCaseToAllocateToVendor.Vendor = vendor;
                 claimsCaseToAllocateToVendor.VendorId = vendorId;
                 claimsCaseToAllocateToVendor.AllocateView = 0;
                 claimsCaseToAllocateToVendor.AutoAllocated = AutoAllocated;
@@ -771,7 +757,6 @@ namespace risk.control.system.Services
             var claim = _context.ClaimsInvestigation
                 .Include(c => c.AgencyReport)
                 .ThenInclude(c => c.ReportQuestionaire)
-                .Include(c => c.PolicyDetail)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimsInvestigationId);
 
             claim.VerifyView = 0;
@@ -1144,7 +1129,7 @@ namespace risk.control.system.Services
             claimsCaseToReassign.AllocateView = 0;
             claimsCaseToReassign.VerifyView = 0;
             claimsCaseToReassign.AssessView = 0;
-            claimsCaseToReassign.ReAssignUploadView = 0;
+            claimsCaseToReassign.ManualNew = 0;
             claimsCaseToReassign.CurrentClaimOwner = currentUser.Email;
             claimsCaseToReassign.InvestigationCaseSubStatusId = reAssigned.InvestigationCaseSubStatusId;
 

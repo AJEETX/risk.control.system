@@ -147,6 +147,8 @@ namespace risk.control.system.Controllers.Company
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 claimsInvestigation.PolicyDetail.ClientCompanyId = companyUser?.ClientCompanyId;
+                claimsInvestigation.CREATEDBY = CREATEDBY.AUTO;
+                claimsInvestigation.ORIGIN = ORIGIN.USER;
 
                 IFormFile documentFile = null;
                 IFormFile profileFile = null;
@@ -170,7 +172,7 @@ namespace risk.control.system.Controllers.Company
                         profileFile = file;
                     }
                 }
-                claimsInvestigation.ORIGIN = ORIGIN.AUTO;
+                claimsInvestigation.CREATEDBY = CREATEDBY.AUTO;
                 var claim = await claimsInvestigationService.CreatePolicy(userEmail, claimsInvestigation, documentFile, profileFile);
                 if (claim == null)
                 {

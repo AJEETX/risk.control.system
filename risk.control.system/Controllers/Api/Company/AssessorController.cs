@@ -22,7 +22,7 @@ namespace risk.control.system.Controllers.Api.Company
     [ApiExplorerSettings(IgnoreApi = true)]
     [Route("api/[controller]")]
     [ApiController]
-        [Authorize(Roles = ASSESSOR.DISPLAY_NAME)]
+    [Authorize(Roles = ASSESSOR.DISPLAY_NAME)]
     public class AssessorController : ControllerBase
     {
         private static CultureInfo hindi = new CultureInfo("hi-IN");
@@ -53,13 +53,13 @@ namespace risk.control.system.Controllers.Api.Company
 
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
 
-            var companyUser = _context.ClientCompanyApplicationUser.Include(u=>u.ClientCompany).FirstOrDefault(c => c.Email == userEmail.Value);
+            var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(c => c.Email == userEmail.Value);
             applicationDbContext = applicationDbContext.Where(i =>
             i.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
             i.UserEmailActionedTo == string.Empty &&
              i.UserRoleActionedTo == $"{companyUser.ClientCompany.Email}" &&
             i.InvestigationCaseSubStatusId == submittedToAssessorStatus.InvestigationCaseSubStatusId ||
-            i.InvestigationCaseSubStatusId == replyByAgency.InvestigationCaseSubStatusId 
+            i.InvestigationCaseSubStatusId == replyByAgency.InvestigationCaseSubStatusId
              );
 
             var newClaimsAssigned = new List<ClaimsInvestigation>();
@@ -68,14 +68,14 @@ namespace risk.control.system.Controllers.Api.Company
             foreach (var claim in applicationDbContext)
             {
                 claim.AssessView += 1;
-                if( claim.AssessView <= 1 )
+                if (claim.AssessView <= 1)
                 {
                     newClaimsAssigned.Add(claim);
                 }
                 claimsAssigned.Add(claim);
 
             }
-            if(newClaimsAssigned.Count > 0)
+            if (newClaimsAssigned.Count > 0)
             {
                 _context.ClaimsInvestigation.UpdateRange(newClaimsAssigned);
                 _context.SaveChanges();
@@ -94,7 +94,7 @@ namespace risk.control.system.Controllers.Api.Company
                 Customer = a.CustomerDetail?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail.ProfilePicture)) : Applicationsettings.NO_USER,
                 Name = a.CustomerDetail?.CustomerName != null ? a.CustomerDetail?.CustomerName : "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/user.png\" /> </span>",
                 Policy = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail?.LineOfBusiness.Name + "</span>"),
-                Status = string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseStatus.Name + "</span>"),
+                Status = a.ORIGIN.GetEnumDisplayName(),
                 ServiceType = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail?.ClaimType.GetEnumDisplayName() + "</span>"),
                 Service = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail.InvestigationServiceType.Name + "</span>"),
                 Location = string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseSubStatus.Name + "</span>"),
@@ -201,7 +201,7 @@ namespace risk.control.system.Controllers.Api.Company
                         Name = a.CustomerDetail?.CustomerName != null ?
                         a.CustomerDetail?.CustomerName : "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>",
                         Policy = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail?.LineOfBusiness.Name + "</span>"),
-                        Status = string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseStatus.Name + "</span>"),
+                        Status = a.ORIGIN.GetEnumDisplayName(),
                         SubStatus = string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseSubStatus.Name + "</span>"),
                         Ready2Assign = a.IsReady2Assign,
                         ServiceType = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail?.ClaimType.GetEnumDisplayName() + "</span>"),
@@ -286,7 +286,7 @@ namespace risk.control.system.Controllers.Api.Company
                 Customer = a.CustomerDetail?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail.ProfilePicture)) : Applicationsettings.NO_USER,
                 Name = a.CustomerDetail?.CustomerName != null ? a.CustomerDetail?.CustomerName : "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/user.png\" /> </span>",
                 Policy = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail?.LineOfBusiness.Name + "</span>"),
-                Status = string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseStatus.Name + "</span>"),
+                Status = a.ORIGIN.GetEnumDisplayName(),
                 ServiceType = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail?.ClaimType.GetEnumDisplayName() + "</span>"),
                 Service = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail.InvestigationServiceType.Name + "</span>"),
                 Location = string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseSubStatus.Name + "</span>"),
@@ -360,7 +360,7 @@ namespace risk.control.system.Controllers.Api.Company
                 Customer = a.CustomerDetail?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail.ProfilePicture)) : Applicationsettings.NO_USER,
                 Name = a.CustomerDetail?.CustomerName != null ? a.CustomerDetail?.CustomerName : "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/user.png\" /> </span>",
                 Policy = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail?.LineOfBusiness.Name + "</span>"),
-                Status = string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseStatus.Name + "</span>"),
+                Status = a.ORIGIN.GetEnumDisplayName(),
                 ServiceType = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail?.ClaimType.GetEnumDisplayName() + "</span>"),
                 Service = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail.InvestigationServiceType.Name + "</span>"),
                 Location = string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseSubStatus.Name + "</span>"),

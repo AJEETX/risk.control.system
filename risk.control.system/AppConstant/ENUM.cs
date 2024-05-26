@@ -142,12 +142,14 @@ namespace risk.control.system.Models
         ADHAAR,
         DL
     }
+    public enum CREATEDBY
+    {
+        AUTO,
+        MANUAL
+    }
     public enum ORIGIN
     {
         USER,
-        AUTO,
-        MANUAL,
-        REASSIGNED,
         FILE,
         FTP,
         API
