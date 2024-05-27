@@ -95,7 +95,24 @@
                             <span class="hover-text">
                                 <i class="fas fa-info-circle"></i>
                                 <span class="tooltip-text" id="policy-information">
-                                    <i class='far fa-file-powerpoint'></i> Policy details
+                                    <li>
+                                        <i class='far fa-file-powerpoint'></i> Policy details
+
+                                    </li>
+                                    <li>
+                                        <i class='far fa-hand-point-right'></i>
+                                        <div class="btn btn-xs bg-teal">
+                                            <i class="fas fa-edit"></i>
+                                        </div> Add Notes
+
+                                    </li>
+                                    <li>
+                                        <i class='far fa-hand-point-right'></i>
+                                        <div class="btn btn-xs btn-info">
+                                            <i class="far fa-file-powerpoint"></i> ...
+                                        </div> Show Policy Detail
+
+                                    </li>
                                 </span>
                             </span>
                         </div>
@@ -108,28 +125,16 @@
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-7">
-                                    <h2 class="lead"><b>@Model.ClaimsInvestigation?.PolicyDetail.ContractNumber</b></h2>
+                                    <h2 class="lead"><b>@Model.ClaimsInvestigation?.PolicyDetail.LineOfBusiness.Name</b></h2>
                                     <p class="text-muted text-sm">
-                                        <b>Policy Type: </b>@Model.ClaimsInvestigation?.PolicyDetail.LineOfBusiness.Name
+                                        <b>Claim Type: </b>@Model.ClaimsInvestigation?.PolicyDetail.ClaimType
                                     </p>
                                     <ul class="ml-4 mb-0 fa-ul text-muted">
                                         <li class="small">
                                             <span class="fa-li">
                                                 <i class="fas fa-money-bill-wave"></i>
                                             </span>
-                                            Claim Type: <i class="fas fa-rupee-sign"></i>@Model.ClaimsInvestigation?.PolicyDetail.ClaimType
-                                        </li>
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fas fa-money-bill-wave"></i>
-                                            </span>
                                             Amount: <i class="fas fa-rupee-sign"></i>@Model.ClaimsInvestigation?.PolicyDetail.SumAssuredValue
-                                        </li>
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fas fa-bolt"></i>
-                                            </span>
-                                            Cause: @Model.ClaimsInvestigation?.PolicyDetail.CauseOfLoss
                                         </li>
                                         <li class="small">
                                             <span class="fa-li">
@@ -155,45 +160,34 @@
                                             </span>
                                             Issue Date: @Model.ClaimsInvestigation?.PolicyDetail.ContractIssueDate.ToString("dd-MMM-yyyy")
                                         </li>
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="far fa-clock"></i>
-                                            </span>
-                                            Incidence Date: @Model.ClaimsInvestigation?.PolicyDetail.DateOfIncident.ToString("dd-MMM-yyyy")
-                                        </li>
                                     </ul>
                                 </div>
                                 <div class="col-5 text-center">
                                     <p class="text-muted text-sm">
-
-                                    </p>
-                                    <p class="text-muted text-sm">
-                                        @if (Model?.ClaimsInvestigation?.PolicyDetail.DocumentImage is not null)
-                                        {
-                                            <img id="documentImage" class="img-fluid" src="data:image/*;base64,@(Convert.ToBase64String(Model?.ClaimsInvestigation?.PolicyDetail.DocumentImage))">
-                                        }
-                                        else
-                                        {
-                                            <img id="documentImage" alt="user-avatar"
-                                                 class="img-fluid form-Image" src=@Applicationsettings.NO_POLICY_IMAGE>
-                                        }
-                                    </p>
-
+                                            @if (Model?.ClaimsInvestigation?.PolicyDetail.DocumentImage is not null)
+                                            {
+                                                <img id="documentImage" class="img-fluid" src="data:image/*;base64,@(Convert.ToBase64String(Model?.ClaimsInvestigation?.PolicyDetail.DocumentImage))" data-toggle="tooltip" title="@Model?.ClaimsInvestigation?.PolicyDetail.ContractNumber Document">
+                                            }
+                                            else
+                                            {
+                                            <img id="documentImage" alt="No Document"
+                                                     class="img-fluid form-Image" src=@Applicationsettings.NO_POLICY_IMAGE data-toggle="tooltip" title="No Document">
+                                            }
+                                        </p>
                                 </div>
                             </div>
                         </div>
                         <div class="card-footer">
                             <div class="text-right">
-                                <a id="policy-comments" class="btn btn-sm bg-teal">
+                                <a id="policy-comments" class="btn btn-sm bg-teal" data-toggle="tooltip" title="Add Notes">
                                     <i class="fas fa-edit"></i>
                                 </a>
-                                <a id="policy-detail" class="btn btn-sm btn-info">
+                                <a id="policy-detail" class="btn btn-sm btn-info" data-toggle="tooltip" title="Show  Policy Details">
                                     <i class="far fa-file-powerpoint"></i> ...
                                 </a>
                             </div>
                         </div>
                     </div>
-
                 </div>
                 <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
                     <div class="card bg-light d-flex flex-fill">
@@ -202,51 +196,50 @@
                             <span class="hover-text">
                                 <i class="fas fa-info-circle"></i>
                                 <span class="tooltip-text" id="customer-information">
-                                    <i class='fa fa-user-plus'></i> Customer details
+                                    <li>
+
+                                        <i class='fa fa-user-plus'></i> Customer details
+                                    </li>
+                                    <li>
+                                        <i class='far fa-hand-point-right'></i>
+                                        <div class="btn btn-xs bg-teal">
+                                            <i class="fas fa-comments"></i>
+                                        </div> Send SMS to Customer
+
+                                    </li>
+                                    <li>
+                                        <i class='far fa-hand-point-right'></i>
+                                        <div class="btn btn-xs btn-warning">
+                                            <i class="fa fa-user-plus"></i> ...
+                                        </div> Show Customer Details
+
+                                    </li>
                                 </span>
                             </span>
                         </div>
                         <div class="progress">
                             <i class="far fa-bookmark bookmark-green"></i>
-                            <div class="progress-bar" role="progressbar" style="width:100%;background-color:@customerProgressColor;">
+                            <div class="progress-bar" role="progressbar" style="width:100%;background-color:green;">
                                 <i class="fa fa-user-plus"></i>
                             </div>
                         </div>
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-7">
-                                    <h2 class="lead"><b>@Model.ClaimsInvestigation?.CustomerDetail?.CustomerName</b></h2>
+                                    <h2 class="lead"><b>@Model.ClaimsInvestigation.CustomerDetail.CustomerName</b></h2>
                                     <p class="text-muted text-sm">
-                                        <b>Occupation: </b> @Model.ClaimsInvestigation?.CustomerDetail?.CustomerOccupation
+                                        <b>Occupation: </b> @Model.ClaimsInvestigation.CustomerDetail.CustomerOccupation
                                     </p>
                                     <ul class="ml-4 mb-0 fa-ul text-muted">
                                         <li class="small">
                                             <span class="fa-li">
-                                                <i class="fas fa-user-tag"></i>
+                                                <i class="fas fa-rupee-sign"></i>
                                             </span>
-                                            Customer Type: @Model.ClaimsInvestigation?.CustomerDetail?.CustomerType
+                                            Income: @Model.ClaimsInvestigation.CustomerDetail.CustomerIncome
                                         </li>
                                         <li class="small">
                                             <span class="fa-li">
                                                 <i class="fas fa-rupee-sign"></i>
-                                            </span>
-                                            Income: @Model.ClaimsInvestigation?.CustomerDetail?.CustomerIncome
-                                        </li>
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fas fa-restroom"></i>
-                                            </span>
-                                            Gender: @Model.ClaimsInvestigation?.CustomerDetail?.Gender
-                                        </li>
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fas fa-graduation-cap"></i>
-                                            </span>
-                                            Education: @Model.ClaimsInvestigation?.CustomerDetail?.CustomerEducation
-                                        </li>
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fas fa-user-alt"></i>
                                             </span>
                                             Age: @currentAgeinYrs
                                         </li>
@@ -261,7 +254,7 @@
                                             <span class="fa-li">
                                                 <i class="fas fa-lg fa-phone"></i>
                                             </span>
-                                            Phone #: + @Model.ClaimsInvestigation?.CustomerDetail?.ContactNumber
+                                            Phone #: + @Model.ClaimsInvestigation.CustomerDetail.ContactNumber
                                         </li>
                                     </ul>
                                 </div>
@@ -269,26 +262,27 @@
                                     <p class="text-muted text-sm">
                                         @if (Model?.ClaimsInvestigation?.CustomerDetail?.ProfilePicture is not null)
                                         {
-                                            <img id="profileImage" class="img-fluid block-data" src="data:image/*;base64,@(Convert.ToBase64String(Model?.ClaimsInvestigation?.CustomerDetail?.ProfilePicture))">
+                                            <img id="profileImage" class="img-fluid block-data" src="data:image/*;base64,@(Convert.ToBase64String(Model?.ClaimsInvestigation?.CustomerDetail?.ProfilePicture))" data-toggle="tooltip" title="Customer Photo">
                                         }
                                         else
                                         {
-                                            <img id="profileImage" class="img-fluid block-data" src="@Applicationsettings.NO_USER">
+                                            <img id="profileImage" class="img-fluid block-data" src="@Applicationsettings.NO_USER" data-toggle="tooltip" title="No Customer Photo">
                                         }
                                     </p>
                                     <p class="text-muted text-sm">
-                                        <img id="profileImageMap" class="img-fluid block-data" src="@Model?.ClaimsInvestigation?.CustomerDetail?.CustomerLocationMap">
+                                        <img id="profileImageMap" class="img-fluid block-data" src="@Model?.ClaimsInvestigation?.CustomerDetail?.CustomerLocationMap" data-toggle="tooltip" title="Display Customer Address in map">
                                     </p>
+
                                 </div>
                             </div>
                         </div>
                         <div class="card-footer">
                             <div class="text-right">
-                                <a id="customer-comments" class="btn btn-sm bg-teal">
+                                <a id="customer-comments" class="btn btn-sm bg-teal" data-toggle="tooltip" title="Send SMS to Customer">
                                     <i class="fas fa-comments"></i>
                                 </a>
 
-                                <a id="customer-detail" class="btn btn-sm btn-warning">
+                                <a id="customer-detail" class="btn btn-sm btn-warning" data-toggle="tooltip" title="Show Customer Details">
                                     <i class="fa fa-user-plus"></i> ...
                                 </a>
                             </div>
@@ -304,14 +298,29 @@
                             <span class="hover-text">
                                 <i class="fas fa-info-circle"></i>
                                 <span class="tooltip-text" id="beneficiary-information">
-
+                                    <li>
                                         <i class='fas fa-user-tie'></i> Beneficiary details
+                                    </li>
+                                    <li>
+                                        <i class='far fa-hand-point-right'></i>
+                                        <div class="btn btn-xs bg-teal">
+                                            <i class="fas fa-comments"></i>
+                                        </div> Send SMS to Beneficiary
+
+                                    </li>
+                                    <li>
+                                        <i class='far fa-hand-point-right'></i>
+                                        <div class="btn btn-xs btn-success">
+                                            <i class="fas fa-user-tie"></i> ...
+                                        </div> Show Beneficiary Details
+
+                                    </li>
                                 </span>
                             </span>
                         </div>
                         <div class="progress">
                             <i class="far fa-bookmark bookmark-green"></i>
-                            <div class="progress-bar" role="progressbar" style="width:100%;background-color:@benficiaryProgressColor;">
+                            <div class="progress-bar" role="progressbar" style="width:100%;background-color:green;">
                                 <i class="fas fa-user-tie"></i>
                             </div>
                         </div>
@@ -325,17 +334,16 @@
                                     <ul class="ml-4 mb-0 fa-ul text-muted">
                                         <li class="small">
                                             <span class="fa-li">
+                                                <i class="fas fa-user-clock"></i>
+                                            </span>
+                                            Age: @currentBAgeinYrs
+                                        </li>
+                                        <li class="small">
+                                            <span class="fa-li">
                                                 <i class="fas fa-rupee-sign"></i>
                                             </span>
                                             Income: @Model.Location?.BeneficiaryIncome
                                         </li>
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fas fa-user-alt"></i>
-                                            </span>
-                                            Age: @currentBAgeinYrs
-                                        </li>
-
                                         <li class="small">
                                             <span class="fa-li">
                                                 <i class="fas fa-lg fa-building"></i>
@@ -354,28 +362,26 @@
                                     <p class="text-muted text-sm">
                                         @if (Model?.Location?.ProfilePicture is not null)
                                         {
-                                            <img id="bImage" class="img-fluid block-data" src="data:image/*;base64,@(Convert.ToBase64String(Model?.Location?.ProfilePicture))">
+                                            <img id="bImage" class="img-fluid block-data" src="data:image/*;base64,@(Convert.ToBase64String(Model?.Location?.ProfilePicture))" data-toggle="tooltip" title="Beneficiary Photo">
                                         }
                                         else
                                         {
-                                            <img id="bImage" class="img-fluid block-data" src="@Applicationsettings.NO_USER">
+                                            <img id="bImage" class="img-fluid block-data" src="@Applicationsettings.NO_USER" data-toggle="tooltip" title="No Beneficiary Photo">
                                         }
                                     </p>
                                     <p class="text-muted text-sm">
-                                        <img id="bImageMap" class="img-fluid block-data" src="@Model?.Location?.BeneficiaryLocationMap">
+                                        <img id="bImageMap" class="img-fluid block-data" src="@Model?.Location?.BeneficiaryLocationMap" data-toggle="tooltip" title="Display Beneficiary Address in map">
                                     </p>
-
                                 </div>
                             </div>
                         </div>
-
                         <div class="card-footer">
                             <div class="text-right">
-                                <a id="beneficiary-comments" class="btn btn-sm bg-teal">
+                                <a id="beneficiary-comments" class="btn btn-sm bg-teal" data-toggle="tooltip" title="Send SMS to Beneficiary">
                                     <i class="fas fa-comments"></i>
                                 </a>
 
-                                <a id="beneficiary-detail" class="btn btn-sm btn-success">
+                                <a id="beneficiary-detail" class="btn btn-sm btn-success" data-toggle="tooltip" title="Show Beneficiary Details">
                                     <i class="fas fa-user-tie"></i> ...
                                 </a>
                             </div>

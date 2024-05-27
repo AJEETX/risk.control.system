@@ -123,15 +123,15 @@
                         <p class="text-muted text-sm">
                             @if (Model?.ClaimsInvestigation?.CustomerDetail?.ProfilePicture is not null)
                             {
-                                <img id="profileImage" class="img-fluid block-data" src="data:image/*;base64,@(Convert.ToBase64String(Model?.ClaimsInvestigation?.CustomerDetail?.ProfilePicture))">
+                                <img id="profileImage" class="img-fluid block-data" src="data:image/*;base64,@(Convert.ToBase64String(Model?.ClaimsInvestigation?.CustomerDetail?.ProfilePicture))" data-toggle="tooltip" title="Customer Photo">
                             }
                             else
                             {
-                                <img id="profileImage" class="img-fluid block-data" src="@Applicationsettings.NO_USER">
+                                <img id="profileImage" class="img-fluid block-data" src="@Applicationsettings.NO_USER" data-toggle="tooltip" title="No Customer Photo">
                             }
                         </p>
                         <p class="text-muted text-sm">
-                            <img id="profileImageMap" class="img-fluid block-data" src="@Model?.ClaimsInvestigation?.CustomerDetail?.CustomerLocationMap">
+                            <img id="profileImageMap" class="img-fluid block-data" src="@Model?.ClaimsInvestigation?.CustomerDetail?.CustomerLocationMap" data-toggle="tooltip" title="Display Customer Address in map">
                         </p>
 
                     </div>

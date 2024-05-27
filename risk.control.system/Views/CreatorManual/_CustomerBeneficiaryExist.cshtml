@@ -133,15 +133,15 @@
                         <p class="text-muted text-sm">
                             @if (Model?.Location?.ProfilePicture is not null)
                             {
-                                <img id="bImage" class="img-fluid block-data" src="data:image/*;base64,@(Convert.ToBase64String(Model?.Location?.ProfilePicture))">
+                                <img id="bImage" class="img-fluid block-data" src="data:image/*;base64,@(Convert.ToBase64String(Model?.Location?.ProfilePicture))" data-toggle="tooltip" title="Beneficiary Photo"/>
                             }
                             else
                             {
-                                <img id="bImage" class="img-fluid block-data" src="@Applicationsettings.NO_USER">
+                                <img id="bImage" class="img-fluid block-data" src="@Applicationsettings.NO_USER" data-toggle="tooltip" title="No Beneficiary Photo" />
                             }
                         </p>
                         <p class="text-muted text-sm">
-                            <img id="bImageMap" class="img-fluid block-data" src="@Model?.Location?.BeneficiaryLocationMap">
+                            <img id="bImageMap" class="img-fluid block-data" src="@Model?.Location?.BeneficiaryLocationMap" data-toggle="tooltip" title="Display Beneficiary Address in map">
                         </p>
                     </div>
                 </div>

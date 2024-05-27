@@ -10,7 +10,7 @@
     bool beneficiaryExist = false;
     string customerProgressbarMessage = "add customer";
     string beneficiaryProgressbarMessage = "beneficiary";
-    if (Model.ClaimsInvestigation != null && Model.ClaimsInvestigation.CustomerDetail !=null)
+    if (Model.ClaimsInvestigation != null && Model.ClaimsInvestigation.CustomerDetail != null)
     {
         address = @Model.ClaimsInvestigation?.CustomerDetail.Addressline + " " + @Model.ClaimsInvestigation?.CustomerDetail.District.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.State.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.Country.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.PinCode.Code;
         baddress = @Model.Location != null ? @Model.Location?.Addressline + " " +
@@ -39,7 +39,7 @@
     }
     string customerProgressColor = "steps2";
     string customerLineColor = "line";
-    if(Model.ClaimsInvestigation.PolicyDetail !=null)
+    if (Model.ClaimsInvestigation.PolicyDetail != null)
     {
         customerLineColor = "line0";
     }
@@ -123,15 +123,15 @@
                         <p class="text-muted text-sm">
                             @if (Model?.ClaimsInvestigation?.CustomerDetail?.ProfilePicture is not null)
                             {
-                                <img id="profileImage" class="img-fluid block-data" src="data:image/*;base64,@(Convert.ToBase64String(Model?.ClaimsInvestigation?.CustomerDetail?.ProfilePicture))">
+                                <img id="profileImage" class="img-fluid block-data" src="data:image/*;base64,@(Convert.ToBase64String(Model?.ClaimsInvestigation?.CustomerDetail?.ProfilePicture))" data-toggle="tooltip" title="Customer Photo">
                             }
                             else
                             {
-                                <img id="profileImage" class="img-fluid block-data" src="@Applicationsettings.NO_USER">
+                                <img id="profileImage" class="img-fluid block-data" src="@Applicationsettings.NO_USER" data-toggle="tooltip" title="No Customer Photo">
                             }
                         </p>
                         <p class="text-muted text-sm">
-                            <img id="profileImageMap" class="img-fluid block-data" src="@Model?.ClaimsInvestigation?.CustomerDetail?.CustomerLocationMap">
+                            <img id="profileImageMap" class="img-fluid block-data" src="@Model?.ClaimsInvestigation?.CustomerDetail?.CustomerLocationMap" data-toggle="tooltip" title="Display Customer Address in map">
                         </p>
 
                     </div>
