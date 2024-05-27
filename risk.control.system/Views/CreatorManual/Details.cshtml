@@ -3,70 +3,57 @@
 @{
     ViewData["Title"] = "Details";
 }
+@{
+    ViewData["Title"] = "Details";
+    string address = string.Empty;
+    string baddress = string.Empty;
+    int currentAgeinYrs = 0;
+    int currentBAgeinYrs = 0;
+    bool policyExist = true;
+    bool customerExist = Model.ClaimsInvestigation.CustomerDetail != null;
+    bool beneficiaryExist = Model.Location != null;
+    string customerProgressbarMessage = "add customer";
+    string beneficiaryProgressbarMessage = "beneficiary";
+
+    if (Model.ClaimsInvestigation.CustomerDetail != null)
+    {
+        customerExist = true;
+        customerProgressbarMessage = "customer";
+    }
+    if (Model.Location?.BeneficiaryDetailId > 0)
+    {
+        beneficiaryExist = true;
+        beneficiaryProgressbarMessage = "edit beneficiary";
+    }
+    string customerProgressColor = "steps2";
+    string customerLineColor = "line";
+    if (Model.ClaimsInvestigation.PolicyDetail != null)
+    {
+        customerLineColor = "line0";
+    }
+    if (@customerExist)
+    {
+        customerProgressColor = "steps";
+        customerLineColor = "line1";
+    }
+    string benficiaryProgressColor = "steps3";
+    string beneficiaryLineColor = "line";
+
+    if (@customerExist)
+    {
+        benficiaryProgressColor = "steps2";
+        beneficiaryLineColor = "line0";
+    }
+    if (@customerExist && @beneficiaryExist)
+    {
+        benficiaryProgressColor = "steps";
+        beneficiaryLineColor = "line1";
+    }
+}
 
 <section class="content">
     <div id="article" class="card card-secondary">
-        @{
-            string address = string.Empty;
-            string baddress = string.Empty;
-            int currentAgeinYrs = 0;
-            int currentBAgeinYrs = 0;
-            bool policyExist = true;
-            bool customerExist = Model.ClaimsInvestigation.CustomerDetail != null;
-            bool beneficiaryExist = Model.Location != null;
-            string customerProgressbarMessage = "add customer";
-            string beneficiaryProgressbarMessage = "beneficiary";
-            if (Model.ClaimsInvestigation != null && Model.ClaimsInvestigation.CustomerDetail != null)
-            {
-                address = @Model.ClaimsInvestigation?.CustomerDetail.Addressline + " " + @Model.ClaimsInvestigation?.CustomerDetail.District.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.State.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.Country.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.PinCode.Code;
-                baddress = @Model.Location != null ? @Model.Location?.Addressline + " " +
-                @Model.Location?.District?.Name + " " + @Model.Location?.State?.Name + " " +
-                @Model.Location?.Country?.Name + " " + @Model.Location?.PinCode?.Code : string.Empty;
-                if (Model.ClaimsInvestigation?.CustomerDetail.CustomerDateOfBirth != null)
-                {
-                    var age = DateTime.Now.Subtract(Model.ClaimsInvestigation.CustomerDetail.CustomerDateOfBirth).TotalDays;
-                    currentAgeinYrs = (int)age / 365;
-                }
-                if (Model.Location?.BeneficiaryDateOfBirth != null)
-                {
-                    var age = DateTime.Now.Subtract(Model.Location.BeneficiaryDateOfBirth).TotalDays;
-                    currentBAgeinYrs = (int)age / 365;
-                }
-            }
-            if (Model.ClaimsInvestigation.CustomerDetail != null)
-            {
-                customerExist = true;
-                customerProgressbarMessage = "customer";
-            }
-            if (Model.ClaimsInvestigation.BeneficiaryDetail != null)
-            {
-                beneficiaryExist = true;
-                beneficiaryProgressbarMessage = "edit beneficiary";
-            }
-            string customerProgressColor = "steps2";
-            string customerLineColor = "line";
-            if (Model.ClaimsInvestigation.PolicyDetail != null)
-            {
-                customerLineColor = "line0";
-            }
-            if (@customerExist)
-            {
-                customerProgressColor = "steps";
-                customerLineColor = "line1";
-            }
-            string benficiaryProgressColor = "steps3";
-            string beneficiaryLineColor = "line";
-
-            if (@customerExist)
-            {
-                benficiaryProgressColor = "steps2";
-                beneficiaryLineColor = "line0";
-            }
-            if (@customerExist && @beneficiaryExist)
-            {
-                benficiaryProgressColor = "steps";
-                beneficiaryLineColor = "line1";
-            }
+        
             <div class="card-header">
                 <h3 class="card-title">
                     <i class="fas fa-newspaper"></i> Details
@@ -322,7 +309,6 @@
                     </div>
                 </div>
             </form>
-        }
     </div>
 </section>
 

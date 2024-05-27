@@ -11,23 +11,7 @@
     bool beneficiaryExist = Model.Location != null;
     string customerProgressbarMessage = "add customer";
     string beneficiaryProgressbarMessage = "beneficiary";
-    if (Model.ClaimsInvestigation != null && Model.ClaimsInvestigation.CustomerDetail != null)
-    {
-        address = @Model.ClaimsInvestigation?.CustomerDetail.Addressline + " " + @Model.ClaimsInvestigation?.CustomerDetail.District.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.State.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.Country.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.PinCode.Code;
-        baddress = @Model.Location != null ? @Model.Location?.Addressline + " " +
-        @Model.Location?.District?.Name + " " + @Model.Location?.State?.Name + " " +
-        @Model.Location?.Country?.Name + " " + @Model.Location?.PinCode?.Code : string.Empty;
-        if (Model.ClaimsInvestigation?.CustomerDetail.CustomerDateOfBirth != null)
-        {
-            var age = DateTime.Now.Subtract(Model.ClaimsInvestigation.CustomerDetail.CustomerDateOfBirth).TotalDays;
-            currentAgeinYrs = (int)age / 365;
-        }
-        if (Model.Location?.BeneficiaryDateOfBirth != null)
-        {
-            var age = DateTime.Now.Subtract(Model.Location.BeneficiaryDateOfBirth).TotalDays;
-            currentBAgeinYrs = (int)age / 365;
-        }
-    }
+    
     if (Model.ClaimsInvestigation.CustomerDetail != null)
     {
         customerExist = true;
@@ -141,8 +125,6 @@
 
             </h3>
         </div>
-
-        @{
 
             <input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail?.CustomerDetailId" />
             <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
@@ -341,8 +323,6 @@
                 </div>
             </form>
 
-        }
-
     </div>
 </section>
 
@@ -352,5 +332,4 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
     <script src="~/js/policy-detail.js"></script>
-
 }
