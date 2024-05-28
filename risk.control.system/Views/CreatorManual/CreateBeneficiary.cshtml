@@ -122,9 +122,9 @@
                             <span class="input-group-label"> Beneficiary Photo:</span>
                             <div class="input-group mb-3">
 
-                                <img id="profileImage" class="form-Image" src="@Applicationsettings.NO_USER">
+                                <img id="profileImage" class="form-Image" src="@Applicationsettings.NO_USER" data-toggle="tooltip" title="Beneficiary Photo" />
                                 <i class="fa fa-asterisk asterik-style"></i>
-                                <input accept="image/*" asp-for="ProfileImage" class="form-control remarks" type="file" id="documentImageInput" required />
+                                <input accept="image/*" asp-for="ProfileImage" class="form-control remarks" type="file" id="documentImageInput" required data-toggle="tooltip" title="Upload Beneficiary Photo" />
                             </div>
                         </div>
 

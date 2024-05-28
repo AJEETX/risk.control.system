@@ -244,16 +244,16 @@
 
                                 @if (Model?.CustomerDetail.ProfilePicture is not null)
                                 {
-                                    <img id="profileImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.CustomerDetail.ProfilePicture))">
+                                    <img id="profileImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.CustomerDetail.ProfilePicture))" data-toggle="tooltip" title="Customer Photo" />
                                     <i class="fa fa-asterisk asterik-style"></i>
-                                    <input accept="image/*" asp-for="CustomerDetail.ProfileImage" type="file" class="form-control remarks" id="documentImageInput" />
+                                    <input accept="image/*" asp-for="CustomerDetail.ProfileImage" type="file" class="form-control remarks" id="documentImageInput" data-toggle="tooltip" title="Upload Customer Photo" />
 
                                 }
                                 else
                                 {
-                                    <img id="profileImage" class="form-Image" src="@Applicationsettings.NO_USER">
+                                    <img id="profileImage" class="form-Image" src="@Applicationsettings.NO_USER" data-toggle="tooltip" title="Customer Photo" />
                                     <i class="fa fa-asterisk asterik-style"></i>
-                                    <input accept="image/*" asp-for="CustomerDetail.ProfileImage" type="file" class="form-control remarks" id="documentImageInput" required />
+                                    <input accept="image/*" asp-for="CustomerDetail.ProfileImage" type="file" class="form-control remarks" id="documentImageInput" required data-toggle="tooltip" title="Upload Customer Photo" />
 
                                 }
                             </div>

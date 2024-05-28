@@ -239,9 +239,9 @@
                         <div class="form-group">
                             <span class="input-group-label"> Customer Photo:</span>
                             <div class="input-group mb-3">
-                                <img class="form-Image" id="profileImage" src="@Applicationsettings.NO_USER">
+                                <img class="form-Image" id="profileImage" src="@Applicationsettings.NO_USER" data-toggle="tooltip" title="Customer Photo" />
                                 <i class="fa fa-asterisk asterik-style"></i>
-                                <input accept="image/*" asp-for="CustomerDetail.ProfileImage" type="file" class="form-control remarks" id="documentImageInput" required />
+                                <input accept="image/*" asp-for="CustomerDetail.ProfileImage" type="file" class="form-control remarks" id="documentImageInput" required data-toggle="tooltip" title="Upload Customer Photo" />
                             </div>
                         </div>
                     </div>

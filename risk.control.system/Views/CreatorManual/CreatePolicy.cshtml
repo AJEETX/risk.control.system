@@ -167,9 +167,9 @@
                         <div class="form-group">
                             <span class="input-group-label"> Policy Document:</span>
                             <div class="input-group mb-3">
-                                <img class="form-Image" id="policyImage" src=@Applicationsettings.NO_POLICY_IMAGE>
+                                <img class="form-Image" id="policyImage" src=@Applicationsettings.NO_POLICY_IMAGE data-toggle="tooltip" title="Policy Document">
                                 <i class="fa fa-asterisk asterik-style"></i>
-                                <input accept="image/*" asp-for="PolicyDetail.Document" type="file" class="form-control remarks" id="documentImageInput" required />
+                                <input accept="image/*" asp-for="PolicyDetail.Document" type="file" class="form-control remarks" id="documentImageInput" required data-toggle="tooltip" title="Upload New Policy Document" />
                             </div>
                         </div>
                     </div>

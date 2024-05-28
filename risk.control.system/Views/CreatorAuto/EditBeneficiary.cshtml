@@ -117,15 +117,15 @@
                             <div class="input-group mb-3">
                                 @if (Model?.ProfilePicture is not null)
                                 {
-                                    <img id="profileImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.ProfilePicture))">
+                                    <img id="profileImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.ProfilePicture))" data-toggle="tooltip" title="Beneficiary Photo" />
                                     <i class="fa fa-asterisk asterik-style"></i>
-                                    <input asp-for="ProfileImage" type="file" class="form-control remarks" id="documentImageInput" />
+                                    <input asp-for="ProfileImage" type="file" class="form-control remarks" id="documentImageInput" data-toggle="tooltip" title="Upload Beneficiary Photo" />
                                 }
                                 else
                                 {
-                                    <img class="form-Image" id="profileImage" src="@Applicationsettings.NO_USER">
+                                    <img class="form-Image" id="profileImage" src="@Applicationsettings.NO_USER" data-toggle="tooltip" title="Beneficiary Photo" />
                                     <i class="fa fa-asterisk asterik-style"></i>
-                                    <input asp-for="ProfileImage" type="file" class="form-control remarks" id="documentImageInput" />
+                                    <input asp-for="ProfileImage" type="file" class="form-control remarks" id="documentImageInput" data-toggle="tooltip" title="Upload Beneficiary Photo" />
                                 }
 
                             </div>

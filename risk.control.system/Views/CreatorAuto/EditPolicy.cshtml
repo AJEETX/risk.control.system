@@ -205,15 +205,16 @@
                             <div class="input-group mb-3">
                                 @if (Model?.PolicyDetail.DocumentImage is not null)
                                 {
-                                    <img id="policyImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.PolicyDetail.DocumentImage))">
+                                    <img id="policyImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.PolicyDetail.DocumentImage))"
+                                         data-toggle="tooltip" title="Policy Document" />
                                     <i class="fa fa-asterisk asterik-style"></i>
-                                    <input accept="image/*" asp-for="PolicyDetail.Document" type="file" class="form-control remarks" id="documentImageInput" />
+                                    <input accept="image/*" asp-for="PolicyDetail.Document" type="file" class="form-control remarks" id="documentImageInput" data-toggle="tooltip" title="Upload Policy Document" />
                                 }
                                 else
                                 {
-                                    <img id="policyImage" class="form-Image" src=@Applicationsettings.NO_POLICY_IMAGE>
+                                    <img id="policyImage" class="form-Image" src=@Applicationsettings.NO_POLICY_IMAGE data-toggle="tooltip" title="No Policy Document" />
                                     <i class="fa fa-asterisk asterik-style"></i>
-                                    <input accept="image/*" asp-for="PolicyDetail.Document" type="file" class="form-control remarks" id="documentImageInput" required />
+                                    <input accept="image/*" asp-for="PolicyDetail.Document" type="file" class="form-control remarks" id="documentImageInput" required data-toggle="tooltip" title="Upload Policy Document" />
                                 }
                             </div>
                         </div>
