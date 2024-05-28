@@ -91,7 +91,10 @@ async function fetchIpInfo() {
     }
 }
 $(document).ready(function () {
-    $('[data-toggle="tooltip"]').tooltip();
+    $('[data-toggle="tooltip"]').tooltip({
+        animated: 'fade',
+        html: true
+    });
     fetchIpInfo();
 
     $('#logout').on('click', function () {
