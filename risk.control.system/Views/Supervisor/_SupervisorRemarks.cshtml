@@ -25,8 +25,8 @@
                         <div class="form-group">
                             <span class="input-group-label"> Additional Document:</span>
                             <div class="input-group mb-3">
-                                <img class="form-Image" id="policyImage" src=@Applicationsettings.NO_POLICY_IMAGE>
-                                <input accept="image/*" asp-for="AgencyReport.SupervisorAttachment" type="file" class="form-control remarks" id="documentImageInput" />
+                                <img class="form-Image" id="policyImage" src=@Applicationsettings.NO_POLICY_IMAGE data-toggle="tooltip" title="No additional document">
+                                <input accept="image/*" asp-for="AgencyReport.SupervisorAttachment" type="file" class="form-control remarks" id="documentImageInput" data-toggle="tooltip" title="Add additional document">
                             </div>
                         </div>
 
@@ -36,7 +36,8 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text" asp-for="AgencyReport.AgentRemarks"><i class="fas fa-comment"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <input required maxlength="100" name="supervisorRemarks" id="supervisorRemarks" asp-for="AgencyReport.SupervisorRemarks" type="text" class="form-control remarks" autocomplete="off" />
+                                <input required maxlength="100" name="supervisorRemarks" id="supervisorRemarks" asp-for="AgencyReport.SupervisorRemarks" type="text" class="form-control remarks" 
+                                autocomplete="off" data-toggle="tooltip" title="Enter remarks" />
 
                                 <span asp-validation-for="AgencyReport.SupervisorRemarks" class="text-danger"></span>
                             </div>
@@ -84,7 +85,7 @@
                             <div class="form-group">
                                 <div class="custom-control custom-checkbox mr-sm-2">
                                     <input type="checkbox" class="custom-control-input selected-case" id="selected-case" name="selected-case">
-                                    <label class="custom-control-label" for="selected-case"> I hereby consent to agree to the term and conditions.</label>
+                                    <label class="custom-control-label" for="selected-case" data-toggle="tooltip" title="Check 'agree to the term and conditions''"> I hereby consent to agree to the term and conditions.</label>
                                 </div>
                             </div>
                         </ul>

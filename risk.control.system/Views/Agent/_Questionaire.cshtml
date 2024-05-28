@@ -54,7 +54,8 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" asp-for="AgencyReport.ReportQuestionaire.Answer1"><i class="nav-icon fas fa-home"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                     </div>
-                                    <select name="question1" id="question1" required asp-for="AgencyReport.ReportQuestionaire.Answer1" class="form-control remarks" asp-items="Html.GetEnumSelectList<DwellType>()">
+                                    <select name="question1" id="question1" required asp-for="AgencyReport.ReportQuestionaire.Answer1" data-toggle="tooltip" title="Select Ownership of Residence" 
+                                    class="form-control remarks" asp-items="Html.GetEnumSelectList<DwellType>()">
                                         <option value="">--- SELECT ---</option>
                                     </select>
                                     <span asp-validation-for="AgencyReport.ReportQuestionaire.Answer1" class="text-danger"></span>
@@ -66,7 +67,8 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" asp-for="AgencyReport.ReportQuestionaire.Answer2"><i class="far fa-money-bill-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                     </div>
-                                    <select name="question2" id="question2" required asp-for="AgencyReport.ReportQuestionaire.Answer2" class="form-control remarks" asp-items="Html.GetEnumSelectList<Income>()">
+                                    <select name="question2" id="question2" required asp-for="AgencyReport.ReportQuestionaire.Answer2" data-toggle="tooltip" title="Select Perceived financial status"
+                                            class="form-control remarks" asp-items="Html.GetEnumSelectList<Income>()">
                                         <option value="">--- SELECT---</option>
                                     </select>
                                     <span asp-validation-for="AgencyReport.ReportQuestionaire.Answer2" class="text-danger"></span>
@@ -78,7 +80,8 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" asp-for="AgencyReport.ReportQuestionaire.Answer3"><i class="fas fa-user-check"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
                                     </div>
-                                    <input id="ContractNumber" required name="question3" id="question3" asp-for="AgencyReport.ReportQuestionaire.Answer3" class="form-control remarks" type="text" placeholder="Neighbour name" maxlength="20" />
+                                    <input id="ContractNumber" required name="question3" id="question3" asp-for="AgencyReport.ReportQuestionaire.Answer3" data-toggle="tooltip" title="Enter Name of neighbour met"
+                                    class="form-control remarks" type="text" placeholder="Neighbour name" maxlength="20" />
                                     <span asp-validation-for="AgencyReport.ReportQuestionaire.Answer3" class="text-danger"></span>
                                 </div>
                             </div>
@@ -91,7 +94,8 @@
                                     @{
                                         var maxDate = @DateTime.Now.ToString("dd-MM-yyyy");
                                     }
-                                    <input required asp-for="AgencyReport.ReportQuestionaire.Answer4" name="question4" id="question4" class="form-control remarks date-width" min="2000-01-01" max="@maxDate" type="date" />
+                                    <input required asp-for="AgencyReport.ReportQuestionaire.Answer4" name="question4" id="question4" data-toggle="tooltip" title="Select Date met with neighbour"
+                                    class="form-control remarks date-width" min="2000-01-01" max="@maxDate" type="date" />
                                     <span asp-validation-for="AgencyReport.ReportQuestionaire.Answer4" class="text-danger"></span>
                                 </div>
                             </div>
@@ -101,7 +105,8 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" asp-for="AgencyReport.AgentRemarks"><i class="fas fa-comment"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
                                     </div>
-                                    <input required name="remarks" id="remarks" asp-for="AgencyReport.AgentRemarks" class="form-control remarks" type="text" placeholder="Remarks" maxlength="100" />
+                                    <input required name="remarks" id="remarks" asp-for="AgencyReport.AgentRemarks" class="form-control remarks" data-toggle="tooltip" title="Enter remarks"
+                                    type="text" placeholder="Remarks" maxlength="100" />
                                     <span asp-validation-for="AgencyReport.AgentRemarks" class="text-danger"></span>
                                 </div>
                             </div>
@@ -113,7 +118,7 @@
 
                                 <li class="form-group">
                                     <input type="checkbox" id="terms_and_conditions" value="1" />
-                                    <label class="account" for="terms_and_conditions"> I agree to the <a href="#">Terms & Conditions</a></label>
+                                    <label class="account" for="terms_and_conditions" data-toggle="tooltip" title="I agree to the Terms & Conditions"> I agree to the <a href="#">Terms & Conditions</a></label>
                                 </li>
                             </div>
                         </div>

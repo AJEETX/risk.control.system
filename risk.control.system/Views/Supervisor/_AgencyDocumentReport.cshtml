@@ -92,11 +92,12 @@
                                 @{
                                     if (Model.AgencyReport?.DocumentIdReport?.DocumentIdImage != null)
                                     {
-                                        <img title="document image" id="agentOcrPicture" class="img-fluid ocr-Image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.AgencyReport?.DocumentIdReport?.DocumentIdImage))">
+                                        <img id="agentOcrPicture" class="img-fluid ocr-Image" data-toggle="tooltip" title="PAN card image"
+                                             src="data:image/*;base64,@(Convert.ToBase64String(@Model.AgencyReport?.DocumentIdReport?.DocumentIdImage))">
                                     }
                                     else
                                     {
-                                        <img title="document image" id="agentOcrPicture" alt="ocr-image" class="img-fluid ocr-data" src=@Applicationsettings.NO_PHOTO_IMAGE>
+                                        <img data-toggle="tooltip" title="No PAN card image" id="agentOcrPicture" alt="ocr-image" class="img-fluid ocr-data" src=@Applicationsettings.NO_PHOTO_IMAGE>
                                     }
                                 }
                             </p>

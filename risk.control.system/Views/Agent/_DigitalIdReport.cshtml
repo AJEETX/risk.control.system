@@ -115,11 +115,11 @@
                             @{
                                 if (Model.AgencyReport?.DigitalIdReport?.DigitalIdImage != null)
                                 {
-                                    <img title="digital image" id="agentLocationPicture" class="img-fluid face-Image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.AgencyReport?.DigitalIdReport?.DigitalIdImage))">
+                                    <img  data-toggle="tooltip" title="Face Image" id="agentLocationPicture" class="img-fluid face-Image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.AgencyReport?.DigitalIdReport?.DigitalIdImage))">
                                 }
                                 else
                                 {
-                                    <img title="digital image" id="agentLocationPicture" alt="face image" class="img-fluid no-Image" src=@Applicationsettings.NO_PHOTO_IMAGE>
+                                    <img id="agentLocationPicture" alt="face image" class="img-fluid no-Image" src=@Applicationsettings.NO_PHOTO_IMAGE data-toggle="tooltip" title="No Face Image">
                                 }
                             }
                         </p>
@@ -137,11 +137,11 @@
                             <br />
                             @if (@Model.AgencyReport?.DigitalIdReport?.DigitalIdImageLocationUrl != null)
                             {
-                                <img class="img-fluid locationImage" src="@Model.AgencyReport?.DigitalIdReport?.DigitalIdImageLocationUrl" />
+                                <img class="img-fluid locationImage" src="@Model.AgencyReport?.DigitalIdReport?.DigitalIdImageLocationUrl" data-toggle="tooltip" title="Map Location" />
                             }
                             else
                             {
-                                <img class="img-fluid no-Image" src="@Applicationsettings.NO_MAP" />
+                                <img class="img-fluid no-Image" src="@Applicationsettings.NO_MAP" data-toggle="tooltip" title="No Map Location" />
                             }
                         </p>
                         <p class="text-muted text-sm">
@@ -165,7 +165,7 @@
                         <span class="input-group-label"> Upload Photo ID : </span>
                         <div class="input-group mb-3">
                             <img class="form-Image" id="face-Image" src="@Applicationsettings.NO_USER" title="Digital Id Image" />
-                            <input accept=".jpg,jpeg,png" type="file" class="form-control remarks" name="digitalImage" id="digitalImage" />
+                            <input accept=".jpg,jpeg,png" type="file" class="form-control remarks" name="digitalImage" id="digitalImage" data-toggle="tooltip" title="Upload Face Image" />
                             <button id="UploadFaceImageButton" disabled type="submit" class="btn btn-info upload"><i class="nav-icon fa fa-upload"></i> Upload</button>
                         </div>
                     </div>
@@ -179,7 +179,7 @@
                     <i class="fas fa-film"></i><h3 class="card-title">Map<span class="badge badge-light">Expected and visited</span></h3>
 
                     <div class="card-tools">
-                        <span data-toggle="tooltip" title="Map Location" class="badge badge-light"> <i class='far fa-hand-point-right'></i></span>
+                        <span data-toggle="tooltip" title="Map Location: Expected and visited" class="badge badge-light"> <i class='far fa-hand-point-right'></i></span>
                         <button type="button" class="btn btn-tool" data-card-widget="collapse">
                             <i class="fas fa-plus"></i>
                         </button>

@@ -93,6 +93,7 @@ async function fetchIpInfo() {
 $(document).ready(function () {
     $('[data-toggle="tooltip"]').tooltip({
         animated: 'fade',
+        placement: 'top',
         html: true
     });
     fetchIpInfo();
