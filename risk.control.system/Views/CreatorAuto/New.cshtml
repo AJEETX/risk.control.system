@@ -121,8 +121,8 @@
                                             </div>
                                             @if (Model)
                                             {
-                                                <select name="uploadtype" id="uploadtype" required class="form-control remarks" asp-items="Html.GetEnumSelectList<UploadType>()">
-                                                    <option value="">--- SELECT---</option>
+                                                <select data-toggle="tooltip" title="Select upload type" name="uploadtype" id="uploadtype" required class="form-control remarks" asp-items="Html.GetEnumSelectList<UploadType>()">
+                                                    <option value="" title="SELECT">--- SELECT---</option>
                                                 </select>
                                             }
                                             else
@@ -142,12 +142,12 @@
                                             <img class="form-Image" id="ftpImage" src="/img/upload.png">
                                             @if (Model)
                                             {
-                                                <input accept=".zip" type="file" class="form-control remarks" name="postedFile" id="postedFile" />
+                                                <input accept=".zip" type="file" class="form-control remarks" name="postedFile" id="postedFile" data-toggle="tooltip" title="Select file to upload" />
                                                 <button id="UploadFileButton" disabled type="submit" class="btn btn-info upload"><i class="nav-icon fa fa-upload"></i> Upload</button>
                                             }
                                             else
                                             {
-                                                <input disabled type="file" class="form-control remarks" name="postedFile" id="postedFile" />
+                                                <input disabled type="file" class="form-control remarks" name="postedFile" id="postedFile" data-toggle="tooltip" title="Disabled -> file to upload" />
                                                 <button disabled class="btn btn-info"><i class="nav-icon fa fa-upload"></i> Upload</button>
                                             }
                                         </div>

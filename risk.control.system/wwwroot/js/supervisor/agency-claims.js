@@ -148,7 +148,11 @@
     $('#customerTable tbody').hide();
     $('#customerTable tbody').fadeIn(2000);
     $('#customerTable').on('draw.dt', function () {
-        $('[data-toggle="tooltip"]').tooltip();
+        $('[data-toggle="tooltip"]').tooltip({
+            animated: 'fade',
+            placement: 'top',
+            html: true
+        });
     });
     if ($("input[type='radio'].selected-case:checked").length) {
         $("#allocatedcase").prop('disabled', false);

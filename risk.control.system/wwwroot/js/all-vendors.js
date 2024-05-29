@@ -50,7 +50,11 @@
         error: function (xhr, status, error) { alert('err ' + error) }
     });
     $('#customerTable').on('draw.dt', function () {
-        $('[data-toggle="tooltip"]').tooltip();
+        $('[data-toggle="tooltip"]').tooltip({
+            animated: 'fade',
+            placement: 'top',
+            html: true
+        });
     });
 
     $('a.create-agency-user').on('click', function () {
