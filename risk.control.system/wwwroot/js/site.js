@@ -109,7 +109,7 @@ $(document).ready(function () {
         $('#logout').attr('disabled', 'disabled');
         $('#logout').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Logout");
         $('#logoutForm').submit();
-        var nodes = document.getElementById("section").getElementsByTagName('*');
+        var nodes = document.getElementById("main-content").getElementsByTagName('*');
         for (var i = 0; i < nodes.length; i++) {
             nodes[i].disabled = true;
         }
