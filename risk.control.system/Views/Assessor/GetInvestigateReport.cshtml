@@ -325,7 +325,7 @@
                                                     <div class="input-group-prepend">
                                                         <span class="input-group-text" asp-for="ClaimsInvestigation.AgencyReport.AgentRemarks"><i class="far fa-comment"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
                                                     </div>
-                                                    <input required maxlength="100" name="assessorRemarks" id="assessorRemarks" type="text" class="form-control remarks" autocomplete="off" required placeholder="enter remarks to submit" />
+                                                    <input data-toggle="tooltip" title="Enter remarks" required maxlength="100" name="assessorRemarks" id="assessorRemarks" type="text" class="form-control remarks" autocomplete="off" required placeholder="enter remarks to submit" />
 
                                                     <span asp-validation-for="ClaimsInvestigation.AgencyReport.SupervisorRemarks" class="text-danger"></span>
                                                 </div>

@@ -89,24 +89,25 @@
                     <div class="card card-light expand-card">
                         <div class="card-header">
                             <h3 class="card-title">
-                                Status: <span class="badge badge-info">
+                                <span class="badge badge-info" data-toggle="tooltip" title="Status : @Model.ClaimsInvestigation?.InvestigationCaseSubStatus.Name">
                                     <b>   @Model.ClaimsInvestigation?.InvestigationCaseSubStatus.Name</b>
                                 </span>
-                                |
-                                Owner
-                                <span class="badge badge-info">
-                                    @{
-                                        if (string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.UserEmailActionedTo))
-                                        {
-                                            <b>   @Model.ClaimsInvestigation?.UserRoleActionedTo</b>
-                                        }
-                                        else
-                                        {
-                                            <b>   @Model.ClaimsInvestigation?.UserEmailActionedTo</b>
+                                <b> <i class='far fa-hand-point-right'></i> </b>
+                                @{
+                                    if (string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.UserEmailActionedTo))
+                                    {
+                                        <span class="badge badge-info" data-toggle="tooltip" title="Owner : @Model.ClaimsInvestigation?.UserRoleActionedTo">
 
-                                        }
+                                            <b>   @Model.ClaimsInvestigation?.UserRoleActionedTo</b>
+                                        </span>
                                     }
-                                </span>
+                                    else
+                                    {
+                                        <span class="badge badge-info" data-toggle="tooltip" title="Owner : @Model.ClaimsInvestigation?.UserEmailActionedTo">
+                                            <b>   @Model.ClaimsInvestigation?.UserEmailActionedTo</b>
+                                        </span>
+                                    }
+                                }
                                 <span class="hover-text">
                                     <i class="fas fa-info-circle"></i>
                                     <span class="tooltip-text" id="information">

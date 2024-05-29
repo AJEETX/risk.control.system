@@ -2,7 +2,7 @@
 
 @{
     ViewData["Title"] = "Details";
-    
+
 }
 <section class="content">
     <div id="article" class="card card-secondary">
@@ -10,18 +10,20 @@
         <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
         <input type="hidden" id="beneficiaryId" value="@Model.Location?.BeneficiaryDetailId" />
         <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-newspaper"></i> Details
+            <h3 class="card-title">
+                <i class="fas fa-newspaper"></i> Details
                 <span class="hover-text">
                     <i class="fas fa-info-circle"></i>
                     <span class="tooltip-text" id="information">
                         <li>
-                            <i class='far fa-file-powerpoint'></i> 
+                            <i class='far fa-file-powerpoint'></i>
                             Claim: <span class="badge badge-light">
-                                <i class="far fa-file-powerpoint"></i>  
-                                @Model.ClaimsInvestigation?.PolicyDetail?.ContractNumber</span>
-                            
+                                <i class="far fa-file-powerpoint"></i>
+                                @Model.ClaimsInvestigation?.PolicyDetail?.ContractNumber
+                            </span>
+
                         </li>
-                        
+
                         <li><i class="fas fa-clock"></i> Timeline </li>
 
                         @if (!Model.NotWithdrawable)
@@ -115,24 +117,25 @@
                     <div class="card card-light expand-card">
                         <div class="card-header">
                             <h3 class="card-title">
-                                Status: <span class="badge badge-info">
+                                <span class="badge badge-info" data-toggle="tooltip" title="Status : @Model.ClaimsInvestigation?.InvestigationCaseSubStatus.Name">
                                     <b>   @Model.ClaimsInvestigation?.InvestigationCaseSubStatus.Name</b>
                                 </span>
-                                |
-                                Owner
-                                <span class="badge badge-info">
-                                    @{
-                                        if(string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.UserEmailActionedTo))
-                                        {
-                                            <b>   @Model.ClaimsInvestigation?.UserRoleActionedTo</b>
-                                        }
-                                        else
-                                        {
-                                            <b>   @Model.ClaimsInvestigation?.UserEmailActionedTo</b>
+                                <b> <i class='far fa-hand-point-right'></i> </b>
+                                @{
+                                    if (string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.UserEmailActionedTo))
+                                    {
+                                        <span class="badge badge-info" data-toggle="tooltip" title="Owner : @Model.ClaimsInvestigation?.UserRoleActionedTo">
 
-                                        }
+                                            <b>   @Model.ClaimsInvestigation?.UserRoleActionedTo</b>
+                                        </span>
                                     }
-                                </span>
+                                    else
+                                    {
+                                        <span class="badge badge-info" data-toggle="tooltip" title="Owner : @Model.ClaimsInvestigation?.UserEmailActionedTo">
+                                            <b>   @Model.ClaimsInvestigation?.UserEmailActionedTo</b>
+                                        </span>
+                                    }
+                                }
                                 <span class="hover-text">
                                     <i class="fas fa-info-circle"></i>
                                     <span class="tooltip-text" id="information">
@@ -141,12 +144,13 @@
                                         </li>
                                     </span>
                                 </span>
-                                
-                                
+
+
                             </h3>
                             <div class="card-tools">
-                                <span data-toggle="tooltip" title="Claim # : @Model.ClaimsInvestigation?.PolicyDetail?.ContractNumber"> 
-                                <i class='far fa-hand-point-right'></i> </span>
+                                <span data-toggle="tooltip" title="Claim # : @Model.ClaimsInvestigation?.PolicyDetail?.ContractNumber">
+                                    <i class='far fa-hand-point-right'></i>
+                                </span>
                                 <button type="button" class="btn btn-tool" data-card-widget="collapse">
                                     <i class="fas fa-minus"></i>
                                 </button>
@@ -163,10 +167,10 @@
                                             <span class="hover-text">
                                                 <i class="fas fa-info-circle"></i>
                                                 <span class="tooltip-text" id="policy-information">
-                                                <li>
+                                                    <li>
                                                         <i class='far fa-file-powerpoint'></i> Policy details
 
-                                                </li>    
+                                                    </li>
                                                     <li>
                                                         <i class='far fa-hand-point-right'></i>
                                                         <div class="btn btn-xs bg-teal">
@@ -290,7 +294,7 @@
                                                 <span class="tooltip-text" id="customer-information">
                                                     <li>
 
-                                                    <i class='fa fa-user-plus'></i> Customer details
+                                                        <i class='fa fa-user-plus'></i> Customer details
                                                     </li>
                                                     <li>
                                                         <i class='far fa-hand-point-right'></i>
@@ -407,8 +411,8 @@
                                             <span class="hover-text">
                                                 <i class="fas fa-info-circle"></i>
                                                 <span class="tooltip-text" id="beneficiary-information">
-                                                <li>
-                                                    <i class='fas fa-user-tie'></i> Beneficiary details
+                                                    <li>
+                                                        <i class='fas fa-user-tie'></i> Beneficiary details
                                                     </li>
                                                     <li>
                                                         <i class='far fa-hand-point-right'></i>
@@ -512,7 +516,7 @@
 
             <partial name="_TimelineReport" model="@Model" />
 
-            @if(!Model.NotWithdrawable)
+            @if (!Model.NotWithdrawable)
             {
                 <div class="card-footer">
 
@@ -572,7 +576,7 @@
                     </form>
                 </div>
             }
-            
+
         }
     </div>
 </section>
