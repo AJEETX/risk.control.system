@@ -15,8 +15,6 @@
     <PackageReference Include="Google.Cloud.Vision.V1" Version="3.6.0" />
     <PackageReference Include="H.InputSimulator" Version="1.4.1" />
     <PackageReference Include="Highsoft.Highcharts" Version="11.4.1" />
-    <PackageReference Include="IPAddressRange" Version="6.0.0" />
-    <PackageReference Include="libphonenumber-csharp" Version="8.13.35" />
     <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.4" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.4" />

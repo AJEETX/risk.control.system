@@ -3,8 +3,6 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.Extensions.Options;
 using Microsoft.FeatureManagement;
 
-using NetTools;
-
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models.ViewModel;
