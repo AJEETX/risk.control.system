@@ -210,16 +210,19 @@ namespace risk.control.system.Services
                     ss.CopyTo(memoryStream);
                     var bytes = memoryStream.ToArray();
                     string csvData = Encoding.UTF8.GetString(bytes);
-                    var status = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.INITIATED));
-                    var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name ==CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
-                    var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
-                    var autoEnabled = companyUser.ClientCompany.AutoAllocation;
-                    DataTable dt = new DataTable();
-                    bool firstRow = true;
+                    
                     var dataRows = csvData.Split('\n');
-
-                    if(userCanCreate)
+                    var totalIncludingUploaded = totalClaimsCreated?.Count + dataRows.Length;
+                    var userCanUpload = companyUser.ClientCompany.TotalCreatedClaimAllowed >= totalIncludingUploaded;
+                    if (userCanCreate && userCanUpload)
                     {
+                        var status = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.INITIATED));
+                        var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
+                        var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
+                        var autoEnabled = companyUser.ClientCompany.AutoAllocation;
+                        DataTable dt = new DataTable();
+                        bool firstRow = true;
+
                         foreach (string row in dataRows)
                         {
                             if (!string.IsNullOrEmpty(row))
