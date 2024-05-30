@@ -48,7 +48,7 @@
                 <div class="login-form">
                     <img class="login-logo" src="/img/iCheckifyLogo.png" />™️
                     
-                    <div id="title" class="title">Login</div>
+                    <div data-testid="loginheader" id="title" class="title">Login...</div>
                     @Html.AntiForgeryToken()
                     <form id="login-form" asp-controller="Account" asp-action="@ViewBag.SlimLogin" method="post">
                         @if(Model.ShowUserOnLogin)
