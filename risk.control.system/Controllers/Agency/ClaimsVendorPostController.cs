@@ -84,8 +84,9 @@ namespace risk.control.system.Controllers.Agency
 
                 return RedirectToAction(nameof(SupervisorController.Allocate), "Supervisor");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -149,8 +150,9 @@ namespace risk.control.system.Controllers.Agency
 
                 return RedirectToAction(nameof(AgentController.Index), "Agent");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(AgentController.GetInvestigate), "\"Agent\"", new { selectedcase = claimId });
 
@@ -192,8 +194,9 @@ namespace risk.control.system.Controllers.Agency
                 }
                 return RedirectToAction(nameof(SupervisorController.ClaimReport), "Supervisor");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(SupervisorController.GetInvestigateReport), new { selectedcase = claimId });
             }
@@ -227,8 +230,9 @@ namespace risk.control.system.Controllers.Agency
 
                 return RedirectToAction(nameof(SupervisorController.Allocate), "Supervisor");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(SupervisorController.Allocate), "Supervisor");
 
@@ -272,8 +276,9 @@ namespace risk.control.system.Controllers.Agency
                 return RedirectToAction(nameof(SupervisorController.Allocate), "Supervisor");
 
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(SupervisorController.Allocate), "Supervisor");
 

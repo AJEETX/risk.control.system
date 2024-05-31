@@ -49,8 +49,9 @@ namespace risk.control.system.Services
 
                 result = numberSequence.Prefix + counter.ToString().PadLeft(5, '0');
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.StackTrace);
                 throw;
             }
             return result;

@@ -133,8 +133,9 @@ namespace risk.control.system.Data
 
                 _entities.Add(entity);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.StackTrace);
                 throw;
             }
         }
@@ -152,8 +153,9 @@ namespace risk.control.system.Data
 
                 _context.Entry(entity).State = EntityState.Modified;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.StackTrace);
                 throw;
             }
         }
@@ -171,8 +173,9 @@ namespace risk.control.system.Data
 
                 _entities.Remove(entity);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.StackTrace);
                 throw;
             }
         }

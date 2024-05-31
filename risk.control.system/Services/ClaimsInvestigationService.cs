@@ -822,8 +822,9 @@ namespace risk.control.system.Services
                 var rows = await _context.SaveChangesAsync();
                 return claim;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.StackTrace);
                 throw;
             }
         }
@@ -948,7 +949,7 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Console.WriteLine(ex.StackTrace);
             }
             return null!;
         }
@@ -1038,7 +1039,7 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Console.WriteLine(ex.StackTrace);
             }
             return null!;
         }
@@ -1058,7 +1059,7 @@ namespace risk.control.system.Services
                     return vendorNonAdminUser;
                 }
             }
-            return null;
+            return null!;
         }
 
         private async Task<ClaimsInvestigation> ReAssignToCreator(string userEmail, string claimsInvestigationId, long caseLocationId, string assessorRemarks, AssessorRemarkType assessorRemarkType)
@@ -1232,8 +1233,9 @@ namespace risk.control.system.Services
             {
                 return await _context.SaveChangesAsync() > 0 ? claim : null;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.StackTrace);
                 throw;
             }
         }
@@ -1347,8 +1349,9 @@ namespace risk.control.system.Services
             {
                 return await _context.SaveChangesAsync() > 0 ? claim : null;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.StackTrace);
                 throw;
             }
         }
@@ -1438,8 +1441,9 @@ namespace risk.control.system.Services
             {
                 return await _context.SaveChangesAsync() > 0 ? claim : null;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.StackTrace);
                 throw;
             }
         }

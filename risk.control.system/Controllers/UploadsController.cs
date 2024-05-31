@@ -69,8 +69,9 @@ namespace risk.control.system.Controllers
                 memory.Position = 0;
                 return File(memory, file.FileType, file.Name + file.Extension);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -127,8 +128,9 @@ namespace risk.control.system.Controllers
                     return Redirect("/Agent/GetInvestigate?selectedcase=" + selectedcase);
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -173,8 +175,9 @@ namespace risk.control.system.Controllers
                     return Redirect("/Agent/GetInvestigate?selectedcase=" + selectedclaim);
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }

@@ -86,8 +86,9 @@ namespace risk.control.system.Controllers
                 memory.Position = 0;
                 return File(memory, "application/pdf", filename);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -140,8 +141,9 @@ namespace risk.control.system.Controllers
                 notifyService.Success($"Policy {policy.ContractNumber} Report download success !!!");
                 return File(memory, "application/pdf", filename);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }

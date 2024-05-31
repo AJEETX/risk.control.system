@@ -162,8 +162,9 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(Create));
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.StackTrace);
                 toastNotification.AddErrorToastMessage("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -353,8 +354,9 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(Create));
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.StackTrace);
                 toastNotification.AddErrorToastMessage("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -545,8 +547,9 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(Create));
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.StackTrace);
                 toastNotification.AddErrorToastMessage("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }

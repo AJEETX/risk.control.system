@@ -210,8 +210,9 @@ namespace risk.control.system.Controllers
                                 {
                                     SMS.API.SendSingleMessage("+" + admin.PhoneNumber, message);
                                 }
-                                catch (Exception)
+                                catch (Exception ex)
                                 {
+                                    Console.WriteLine(ex.ToString());
                                 }
                             }
 

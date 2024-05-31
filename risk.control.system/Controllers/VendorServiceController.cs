@@ -223,14 +223,7 @@ namespace risk.control.system.Controllers
                 }
                 catch (DbUpdateConcurrencyException ex)
                 {
-                    if (!VendorInvestigationServiceTypeExists(vendorInvestigationServiceType.VendorInvestigationServiceTypeId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    Console.WriteLine(ex.ToString());
                 }
                 toastNotification.AddErrorToastMessage("Err service edit!");
                 return RedirectToAction("Details", "Vendors", new { id = vendorInvestigationServiceType.VendorId });

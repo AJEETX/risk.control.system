@@ -72,8 +72,9 @@ namespace risk.control.system.Services
                 }
                 return response;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.StackTrace);
                 return null!;
             }
             

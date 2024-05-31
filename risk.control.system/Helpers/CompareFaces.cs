@@ -21,8 +21,9 @@ namespace risk.control.system.Services
 
                 imageSource.Bytes = new MemoryStream(data);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.StackTrace);
                 Console.WriteLine($"Failed to load source image:");
                 return false;
             }
@@ -36,8 +37,8 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
+                Console.WriteLine(ex.StackTrace);
                 Console.WriteLine($"Failed to load source image:");
-                Console.WriteLine(ex.Message);
                 return false;
             }
 
