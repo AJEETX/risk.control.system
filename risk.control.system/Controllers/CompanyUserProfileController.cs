@@ -67,8 +67,9 @@ namespace risk.control.system.Controllers
 
                 return View(companyUser);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -111,8 +112,9 @@ namespace risk.control.system.Controllers
                 ViewData["PinCodeId"] = new SelectList(pincodes, "PinCodeId", "Code", clientCompanyApplicationUser.PinCodeId);
                 return View(clientCompanyApplicationUser);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -187,8 +189,9 @@ namespace risk.control.system.Controllers
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -217,8 +220,9 @@ namespace risk.control.system.Controllers
                 return View();
 
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -298,8 +302,9 @@ namespace risk.control.system.Controllers
 
                 return View(model);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }

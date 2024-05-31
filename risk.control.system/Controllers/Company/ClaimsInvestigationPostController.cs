@@ -113,8 +113,9 @@ namespace risk.control.system.Controllers.Company
                     notifyService.Custom($"{claims.Count}/{claims.Count} claim(s) assigned", 3, "green", "far fa-file-powerpoint");
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(CreatorManualController.New), "CreatorManual");
 
@@ -148,8 +149,9 @@ namespace risk.control.system.Controllers.Company
 
                         return RedirectToAction(nameof(ClaimsActiveController.Active), "ClaimsActive");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(CreatorManualController.New), "CreatorManual");
 
@@ -182,8 +184,9 @@ namespace risk.control.system.Controllers.Company
                 notifyService.Custom($"Claim #{policyNumber}  withdrawn successfully", 3, "green", "far fa-file-powerpoint");
                 return RedirectToAction(nameof(CreatorManualController.New), "CreatorManual");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -226,6 +229,7 @@ namespace risk.control.system.Controllers.Company
             }
             catch (Exception ex)
             {
+                Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(AssessorController.Assessor), "Assessor");
             }
@@ -254,8 +258,9 @@ namespace risk.control.system.Controllers.Company
 
                 return RedirectToAction(nameof(AssessorController.Assessor), "Assessor");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(AssessorController.Assessor), "Assessor");
             }
@@ -293,8 +298,9 @@ namespace risk.control.system.Controllers.Company
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }

@@ -29,7 +29,6 @@ namespace risk.control.system.Controllers.Api
         private readonly ApplicationDbContext _context;
         private readonly IHttpClientService httpClientService;
         private readonly UserManager<VendorApplicationUser> userVendorManager;
-        private readonly IHttpContextAccessor httpContextAccessor;
         private readonly IAgentService agentService;
         private readonly IClaimsInvestigationService claimsInvestigationService;
         private readonly IMailboxService mailboxService;
@@ -78,8 +77,9 @@ namespace risk.control.system.Controllers.Api
 
                 return Ok(new { Email = user2Onboard.Email, Pin = user2Onboard.SecretPin });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.ToString());
                 return BadRequest($"mobile number and/or Agent does not exist");
             }
         }
@@ -135,8 +135,9 @@ namespace risk.control.system.Controllers.Api
                 }
                 return BadRequest($"Err");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.ToString());
                 return BadRequest($"mobile number and/or Agent does not exist");
             }
         }
@@ -202,6 +203,7 @@ namespace risk.control.system.Controllers.Api
             }
             catch (Exception ex)
             {
+                Console.WriteLine(ex.ToString());
                 return BadRequest("face matcherror " + ex.StackTrace);
             }
         }
@@ -248,8 +250,9 @@ namespace risk.control.system.Controllers.Api
                 }
                 return BadRequest("document verify issue");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.ToString());
                 return BadRequest("document verify issue");
             }
         }
@@ -296,8 +299,9 @@ namespace risk.control.system.Controllers.Api
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.ToString());
                 return BadRequest();
             }
 
@@ -413,6 +417,7 @@ namespace risk.control.system.Controllers.Api
             }
             catch (Exception ex)
             {
+                Console.WriteLine(ex.ToString());
                 return StatusCode(500, ex.StackTrace);
             }
 
@@ -506,6 +511,7 @@ namespace risk.control.system.Controllers.Api
             }
             catch (Exception ex)
             {
+                Console.WriteLine(ex.ToString());
                 return StatusCode(500, ex.StackTrace);
             }
         }
@@ -612,8 +618,9 @@ namespace risk.control.system.Controllers.Api
                         Remarks = claim?.AgencyReport?.AgentRemarks
                     });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.ToString());
                 return StatusCode(500);
             }
         }
@@ -673,7 +680,6 @@ namespace risk.control.system.Controllers.Api
         [HttpPost("video")]
         public async Task<IActionResult> Video(VideoData data)
         {
-            return Ok(data);
             if (data == null)
             {
                 return BadRequest();
@@ -706,6 +712,7 @@ namespace risk.control.system.Controllers.Api
             }
             catch (Exception ex)
             {
+                Console.WriteLine(ex.StackTrace);
                 return StatusCode(500, ex.StackTrace);
             }
 
@@ -728,6 +735,7 @@ namespace risk.control.system.Controllers.Api
             }
             catch (Exception ex)
             {
+                Console.WriteLine(ex.StackTrace);
                 return StatusCode(500, ex.StackTrace);
             }
         }
@@ -744,12 +752,11 @@ namespace risk.control.system.Controllers.Api
 
                 return Ok(ipSet);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
+                Console.WriteLine(ex.StackTrace);
                 throw;
             }
         }
-
     }
 }

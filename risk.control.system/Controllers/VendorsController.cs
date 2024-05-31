@@ -110,8 +110,9 @@ namespace risk.control.system.Controllers
 
                 return View(vendor);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -253,8 +254,9 @@ namespace risk.control.system.Controllers
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -310,8 +312,9 @@ namespace risk.control.system.Controllers
 
                 return View(vendorApplicationUser);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -435,9 +438,9 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(Users), "Vendors", new { id = applicationUser.VendorId });
                 }
             }
-            catch
+            catch (Exception ex)
             {
-
+                Console.WriteLine(ex.StackTrace);
             }
             notifyService.Error("OOPS !!!..Contact Admin");
             return RedirectToAction(nameof(Index), "Dashboard");
@@ -612,8 +615,9 @@ namespace risk.control.system.Controllers
                 notifyService.Custom($"Agency created successfully.", 3, "green", "fas fa-building");
                 return RedirectToAction(nameof(VendorsController.Agencies));
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -656,8 +660,9 @@ namespace risk.control.system.Controllers
 
                 return View(vendor);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -714,8 +719,9 @@ namespace risk.control.system.Controllers
 
                 await _context.SaveChangesAsync();
             }
-            catch (DbUpdateConcurrencyException)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -751,8 +757,9 @@ namespace risk.control.system.Controllers
                 ViewData["BreadcrumbNode"] = editPage;
                 return View(vendor);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -784,8 +791,9 @@ namespace risk.control.system.Controllers
                 notifyService.Custom($"Agency deleted successfully.", 3, "red", "fas fa-building");
                 return RedirectToAction(nameof(Agencies));
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }

@@ -193,9 +193,9 @@ namespace risk.control.system.Services
                 }
                 return false;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
+                Console.WriteLine(ex.StackTrace);
                 throw;
             }
 

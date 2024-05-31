@@ -42,8 +42,9 @@ namespace risk.control.system.Controllers.Agency
                 }
                 return RedirectToAction("Allocate");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -62,8 +63,9 @@ namespace risk.control.system.Controllers.Agency
                 }
                 return View();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -92,8 +94,9 @@ namespace risk.control.system.Controllers.Agency
 
                 return View(model);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -124,8 +127,9 @@ namespace risk.control.system.Controllers.Agency
 
                 return View(model);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -162,8 +166,9 @@ namespace risk.control.system.Controllers.Agency
 
                 return View(model);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -196,8 +201,9 @@ namespace risk.control.system.Controllers.Agency
                 var model = await vendorService.GetClaimsDetails(currentUserEmail, id);
                 return View(model);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -223,8 +229,9 @@ namespace risk.control.system.Controllers.Agency
                 var model = await vendorService.GetClaimsDetails(currentUserEmail, id);
                 return View(model);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -250,8 +257,9 @@ namespace risk.control.system.Controllers.Agency
                 var model = await investigationReportService.SubmittedDetail(id);
                 return View(model);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -303,8 +311,9 @@ namespace risk.control.system.Controllers.Agency
 
                 return View(invoice);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -326,8 +335,9 @@ namespace risk.control.system.Controllers.Agency
                 var invoice = await invoiceService.GetInvoice(id);
                 return View(invoice);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }

@@ -21,7 +21,7 @@
             url: '/api/Assessor/GetReview',
             dataSrc: ''
         },
-        order: [[12, 'desc']],
+        order: [[13, 'desc']],
         fixedHeader: true,
         processing: true,
         paging: true,

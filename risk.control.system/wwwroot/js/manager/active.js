@@ -22,7 +22,7 @@ $(document).ready(function () {
             url: '/api/Manager/GetActive',
             dataSrc: ''
         },
-        order: [[10, 'desc']],
+        order: [[12, 'desc']],
         fixedHeader: true,
         processing: true,
         paging: true,

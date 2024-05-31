@@ -39,7 +39,7 @@ namespace risk.control.system.Controllers
             UserList = new List<UsersViewModel>();
         }
 
-        public async Task<IActionResult> Index(string id)
+        public IActionResult Index(string id)
         {
             ViewData["vendorId"] = id;
             var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "Manage Agency(s)");

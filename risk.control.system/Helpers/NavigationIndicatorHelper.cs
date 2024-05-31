@@ -19,11 +19,12 @@ namespace risk.control.system.Helpers
                         return result;
                     }
                 }
-                return null;
+                return null!;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return null;
+                Console.WriteLine(ex.StackTrace);
+                return null!;
             }
         }
     }

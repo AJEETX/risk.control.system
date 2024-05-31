@@ -100,6 +100,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
+                Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPs !!!...Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -145,6 +146,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
+                Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -217,8 +219,9 @@ namespace risk.control.system.Controllers
                 notifyService.Custom($"Agency edited successfully.", 3, "green", "fas fa-building");
                 return RedirectToAction(nameof(AgencyController.Profile), "Agency");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -239,8 +242,9 @@ namespace risk.control.system.Controllers
                 return View();
 
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -273,8 +277,9 @@ namespace risk.control.system.Controllers
                 ViewData["CountryId"] = new SelectList(_context.Country.OrderBy(c => c.Name), "CountryId", "Name");
                 return View(model);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -408,6 +413,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
+                Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -465,8 +471,9 @@ namespace risk.control.system.Controllers
 
                 return View(vendorApplicationUser);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -593,8 +600,9 @@ namespace risk.control.system.Controllers
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -711,8 +719,9 @@ namespace risk.control.system.Controllers
                 var model = new VendorInvestigationServiceType { SelectedMultiPincodeId = new List<long>(), Vendor = vendor, PincodeServices = new List<ServicedPinCode>() };
                 return View(model);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -778,8 +787,9 @@ namespace risk.control.system.Controllers
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return View(vendorInvestigationServiceType);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -842,8 +852,9 @@ namespace risk.control.system.Controllers
 
                 return View(services);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.ToString());
                 notifyService.Custom($"Error to edit service.", 3, "red", "fas fa-truck");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -896,8 +907,9 @@ namespace risk.control.system.Controllers
                 ViewData["VendorId"] = new SelectList(_context.Vendor, "VendorId", "Name", vendorInvestigationServiceType.VendorId);
                 return View(vendorInvestigationServiceType);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.ToString());
                 notifyService.Custom($"Error to edit service.", 3, "red", "fas fa-truck");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -934,8 +946,9 @@ namespace risk.control.system.Controllers
 
                 return View(vendorInvestigationServiceType);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -966,8 +979,9 @@ namespace risk.control.system.Controllers
                 return RedirectToAction("Service", "Agency");
 
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.ToString());
                 notifyService.Custom($"Error to delete service.", 3, "red", "fas fa-truck");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -1001,8 +1015,9 @@ namespace risk.control.system.Controllers
 
                 return View(vendorInvestigationServiceType);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }

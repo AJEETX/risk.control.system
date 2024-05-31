@@ -29,7 +29,7 @@ namespace risk.control.system.Controllers.Api
         }
 
         [HttpGet("AllUsers")]
-        public async Task<IActionResult> AllUsers()
+        public IActionResult AllUsers()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             var companyUser = _context.ApplicationUser.FirstOrDefault(c => c.Email == userEmail);

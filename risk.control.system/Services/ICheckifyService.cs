@@ -242,8 +242,9 @@ namespace risk.control.system.Services
                                 "" + maskedImage.OcrData.Replace(maskedImage.DocumentId, "xxxxxxxxxx");
                         }
                     }
-                    catch (Exception)
+                    catch (Exception ex)
                     {
+                        Console.WriteLine(ex.StackTrace);
                         var image = Convert.FromBase64String(maskedImage.MaskedImage);
                         claim.AgencyReport.DocumentIdReport.DocumentIdImage = CompressImage.ProcessCompress(image);
                         claim.AgencyReport.DocumentIdReport.DocumentIdImageLongLatTime = DateTime.Now;
@@ -286,9 +287,10 @@ namespace risk.control.system.Services
                     PanValid = claim.AgencyReport.DocumentIdReport?.DocumentIdImageValid
                 };
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
-                throw exception;
+                Console.WriteLine(ex.StackTrace);
+                throw;
             }
         }
 

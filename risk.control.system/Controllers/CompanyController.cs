@@ -92,8 +92,9 @@ namespace risk.control.system.Controllers
 
                 return View(clientCompany);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -139,8 +140,9 @@ namespace risk.control.system.Controllers
                 ViewData["PinCodeId"] = new SelectList(pincodes, "PinCodeId", "Code", clientCompany.PinCodeId);
                 return View(clientCompany);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -217,10 +219,7 @@ namespace risk.control.system.Controllers
 
                 var response = SmsService.SendSingleMessage(clientCompany.PhoneNumber, "Company edited. Domain : " + clientCompany.Email);
             }
-            catch (DbUpdateConcurrencyException)
-            {
-                throw;
-            }
+            
             catch (Exception ex)
             {
                 notifyService.Error("OOPs !!!..Contact Admin");
@@ -263,8 +262,9 @@ namespace risk.control.system.Controllers
                 ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
                 return View(model);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -340,8 +340,9 @@ namespace risk.control.system.Controllers
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -390,8 +391,9 @@ namespace risk.control.system.Controllers
 
                 return View(clientCompanyApplicationUser);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -494,8 +496,9 @@ namespace risk.control.system.Controllers
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.StackTrace);
                 notifyService.Error($"Error to create Company user.", 3);
                 return RedirectToAction(nameof(CompanyController.Users), "Company");
             }
@@ -557,8 +560,9 @@ namespace risk.control.system.Controllers
                 notifyService.Custom($"Agency(s) empanelled.", 3, "green", "fas fa-thumbs-up");
                 return RedirectToAction("AvailableVendors");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -619,8 +623,9 @@ namespace risk.control.system.Controllers
                 notifyService.Custom($"Agency(s) de-panelled.", 3, "red", "far fa-thumbs-down");
                 return RedirectToAction("EmpanelledVendors");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -662,8 +667,9 @@ namespace risk.control.system.Controllers
 
                 return View(vendor);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -705,8 +711,9 @@ namespace risk.control.system.Controllers
 
                 return View(vendor);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }

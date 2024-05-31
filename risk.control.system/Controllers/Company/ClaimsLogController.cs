@@ -77,8 +77,9 @@ namespace risk.control.system.Controllers.Company
                     return RedirectToAction("Index", "Dashboard");
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
@@ -105,8 +106,9 @@ namespace risk.control.system.Controllers.Company
                 ViewBag.Message = TempData["Message"];
                 return View(new FileUploadViewModel { FilesOnFileSystem = files });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
