@@ -71,11 +71,11 @@
             /* Name of the keys from
             data file source */
             {
-                "sDefaultContent": "<i class='far fa-edit'></i>",
+                "sDefaultContent": "<i class='far fa-edit' data-toggle='tooltip' title='Complete the claim'></i>",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     if (row.ready2Assign) {
-                        var img = '<input class="vendors" name="claims" type="checkbox" id="' + row.id + '"  value="' + row.id + '"  />';
+                        var img = '<input class="vendors" name="claims" type="checkbox" id="' + row.id + '"  value="' + row.id + '"  data-toggle="tooltip" title="Ready to allocate(auto)" />';
                         return img;
                     }
                 }

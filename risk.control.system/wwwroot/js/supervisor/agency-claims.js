@@ -72,12 +72,12 @@
             /* Name of the keys from
             data file source */
             {
-                "sDefaultContent": "<i class='fas fa-question'></i>",
+                "sDefaultContent": "<i class='fas fa-question'  data-toggle='tooltip' title='Enquiry'></i> ",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     if (!row.isQueryCase) {
 
-                        var img = '<input name="selectedcase" class="selected-case" type="radio" id="' + row.id + '"  value="' + row.id + '"  />';
+                        var img = '<input name="selectedcase" class="selected-case" type="radio" id="' + row.id + '"  value="' + row.id + '"  data-toggle="tooltip" title="Allocate" />';
                         return img;
                     }
                 }
