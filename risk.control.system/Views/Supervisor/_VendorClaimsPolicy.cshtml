@@ -500,12 +500,14 @@
                                         {
                                             <tr>
                                                 <td>
-                                                    <input id="@item.AgencyUser.Id" name="selectedcase" class="selected-case" type="radio" value="@item.AgencyUser.Id" />
+                                                @{
+                                                        var title = @item?.AgencyUser.FirstName + ' ' + @item.AgencyUser?.LastName;
+                                                }
+                                                    <input id="@item.AgencyUser.Id" name="selectedcase" class="selected-case" type="radio" value="@item.AgencyUser.Id" data-toggle="tooltip" title="Select Agent @title" />
                                                 </td>
                                                 <td>
                                                     @if (item?.AgencyUser.ProfilePictureUrl is not null)
                                                     {
-                                                        var title = @item?.AgencyUser.FirstName + ' ' + @item.AgencyUser?.LastName;
                                                         <img id="profileImage" title="@title" class="form-Image table-profile-image" src="@item?.AgencyUser.ProfilePictureUrl" data-toggle="tooltip" />
                                                     }
                                                     else
