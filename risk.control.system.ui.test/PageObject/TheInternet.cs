@@ -18,9 +18,10 @@ namespace risk.control.system.ui.test.PageObject
             _page = page;
         }
 
-        public TheInternet Open()
+        public TheInternet Open(string? url = "")
         {
-            _page.GotoAsync(url: Parameters.Get("webAppUrl")).Wait();
+            var serverUrl = url ?? Parameters.Get("webAppUrl");
+            _page.GotoAsync(url: serverUrl).Wait();
             //CheckboxLink.WaitForAsync(new() { State = WaitForSelectorState.Visible }).Wait();
             return this;
         }
