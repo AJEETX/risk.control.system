@@ -388,7 +388,7 @@ namespace risk.control.system.Services
 
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
 
-            var count = applicationDbContext.Count(i => i.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
+            var count = applicationDbContext.Count(i => i.ClientCompanyId == companyUser.ClientCompanyId &&
             i.UserEmailActionedTo == string.Empty &&
              i.UserRoleActionedTo == $"{companyUser.ClientCompany.Email}" &&
             i.InvestigationCaseSubStatusId == submittedToAssessorStatus.InvestigationCaseSubStatusId ||
@@ -403,7 +403,7 @@ namespace risk.control.system.Services
             var submittedToAssessorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-            var count = applicationDbContext.Count(i => i.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
+            var count = applicationDbContext.Count(i => i.ClientCompanyId == companyUser.ClientCompanyId &&
             i.InvestigationCaseSubStatusId == submittedToAssessorStatus.InvestigationCaseSubStatusId);
             
             return count;
@@ -463,7 +463,7 @@ namespace risk.control.system.Services
             var finishStatus = _context.InvestigationCaseStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.FINISHED);
 
-            var count = applicationDbContext.Count(c => c.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
+            var count = applicationDbContext.Count(c => c.ClientCompanyId == companyUser.ClientCompanyId &&
                 c.InvestigationCaseStatusId == finishStatus.InvestigationCaseStatusId &&
                 c.InvestigationCaseSubStatusId == approvedStatus.InvestigationCaseSubStatusId
                 );
@@ -485,7 +485,7 @@ namespace risk.control.system.Services
             var finishStatus = _context.InvestigationCaseStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.FINISHED);
 
-            applicationDbContext = applicationDbContext.Where(c => c.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
+            applicationDbContext = applicationDbContext.Where(c => c.ClientCompanyId == companyUser.ClientCompanyId &&
                 (c.InvestigationCaseSubStatusId == approvedStatus.InvestigationCaseSubStatusId && 
                 c.InvestigationCaseStatusId == finishStatus.InvestigationCaseStatusId)
                 || c.InvestigationCaseSubStatusId == rejectdStatus.InvestigationCaseSubStatusId
@@ -535,7 +535,7 @@ namespace risk.control.system.Services
             var finishStatus = _context.InvestigationCaseStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.FINISHED);
 
-            applicationDbContext = applicationDbContext.Where(c => c.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId && 
+            applicationDbContext = applicationDbContext.Where(c => c.ClientCompanyId == companyUser.ClientCompanyId && 
                 c.InvestigationCaseSubStatusId == rejectdStatus.InvestigationCaseSubStatusId
                 );
             var count = 0;
@@ -572,7 +572,7 @@ namespace risk.control.system.Services
             var finishStatus = _context.InvestigationCaseStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.FINISHED);
 
-            var count = applicationDbContext.Count(c => c.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
+            var count = applicationDbContext.Count(c => c.ClientCompanyId == companyUser.ClientCompanyId &&
                 c.InvestigationCaseSubStatusId == rejectdStatus.InvestigationCaseSubStatusId && c.InvestigationCaseStatusId == finishStatus.InvestigationCaseStatusId);
             
             return count;
@@ -589,7 +589,7 @@ namespace risk.control.system.Services
             var count = 0;
             var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-            applicationDbContext = applicationDbContext.Where(a => a.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
+            applicationDbContext = applicationDbContext.Where(a => a.ClientCompanyId == companyUser.ClientCompanyId &&
             openStatusesIds.Contains(a.InvestigationCaseStatusId));
 
             foreach (var claim in applicationDbContext)
@@ -619,7 +619,7 @@ namespace risk.control.system.Services
             
             var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-            var count = applicationDbContext.Count(a => a.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
+            var count = applicationDbContext.Count(a => a.ClientCompanyId == companyUser.ClientCompanyId &&
             openStatusesIds.Contains(a.InvestigationCaseStatusId) && a.IsReviewCase);
 
             
@@ -648,7 +648,7 @@ namespace risk.control.system.Services
             var companyUser = _context.ClientCompanyApplicationUser.Include(u=>u.ClientCompany).FirstOrDefault(c => c.Email == userEmail);
 
             applicationDbContext = applicationDbContext.Where(a => openStatusesIds.Contains(a.InvestigationCaseStatusId) &&
-            a.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId 
+            a.ClientCompanyId == companyUser.ClientCompanyId 
             && a.InvestigationCaseSubStatusId != createdStatus.InvestigationCaseSubStatusId
             && a.InvestigationCaseSubStatusId != withdrawnByCompanyStatus.InvestigationCaseSubStatusId
             && a.InvestigationCaseSubStatusId != declinedByAgencyStatus.InvestigationCaseSubStatusId
@@ -688,7 +688,7 @@ namespace risk.control.system.Services
             var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(c => c.Email == userEmail);
 
             var count = applicationDbContext.Count(a => openStatusesIds.Contains(a.InvestigationCaseStatusId) &&
-            a.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
+            a.ClientCompanyId == companyUser.ClientCompanyId &&
             a.InvestigationCaseSubStatusId != createdStatus.InvestigationCaseSubStatusId  &&
             a.InvestigationCaseSubStatusId != submitted2AssessorStatus.InvestigationCaseSubStatusId  && 
             a.InvestigationCaseSubStatusId != assigned2AssignerStatus.InvestigationCaseSubStatusId
@@ -706,7 +706,7 @@ namespace risk.control.system.Services
             var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
 
-            applicationDbContext = applicationDbContext.Where(a => openStatusesIds.Contains(a.InvestigationCaseStatusId) && a.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId);
+            applicationDbContext = applicationDbContext.Where(a => openStatusesIds.Contains(a.InvestigationCaseStatusId) && a.ClientCompanyId == companyUser.ClientCompanyId);
             foreach (var claim in applicationDbContext)
             {
                 var userHasClaimLog = _context.InvestigationTransaction.Any(c => c.ClaimsInvestigationId == claim.ClaimsInvestigationId && c.UserEmailActioned == companyUser.Email);
@@ -735,7 +735,7 @@ namespace risk.control.system.Services
             var companyUser = _context.ClientCompanyApplicationUser.Include(u=>u.ClientCompany).FirstOrDefault(c => c.Email == userEmail);
 
             // SHOWING DIFFERRENT PAGES AS PER ROLES
-            var count = applicationDbContext.Count(a => a.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
+            var count = applicationDbContext.Count(a => a.ClientCompanyId == companyUser.ClientCompanyId &&
                 (a.InvestigationCaseSubStatusId == withdrawnByAgency.InvestigationCaseSubStatusId &&
                         a.UserEmailActionedTo == string.Empty &&
                         a.UserRoleActionedTo == $"{companyUser.ClientCompany.Email}")
@@ -775,7 +775,7 @@ namespace risk.control.system.Services
             var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(c => c.Email == userEmail);
 
             // SHOWING DIFFERRENT PAGES AS PER ROLES
-            var count = applicationDbContext.Count(a => a.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
+            var count = applicationDbContext.Count(a => a.ClientCompanyId == companyUser.ClientCompanyId &&
                 (a.InvestigationCaseSubStatusId == withdrawnByAgency.InvestigationCaseSubStatusId &&
                         a.UserEmailActionedTo == string.Empty &&
                         a.UserRoleActionedTo == $"{companyUser.ClientCompany.Email}")
@@ -803,7 +803,7 @@ namespace risk.control.system.Services
             var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-            var count = applicationDbContext.Count(a => a.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
+            var count = applicationDbContext.Count(a => a.ClientCompanyId == companyUser.ClientCompanyId &&
                 (
                     (a.UserEmailActioned == companyUser.Email &&
                         a.UserEmailActionedTo == companyUser.Email &&
@@ -820,7 +820,7 @@ namespace risk.control.system.Services
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
             
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-            var count = applicationDbContext.Count(a => a.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
+            var count = applicationDbContext.Count(a => a.ClientCompanyId == companyUser.ClientCompanyId &&
                 (
                     (a.UserEmailActioned == companyUser.Email &&
                         a.UserEmailActionedTo == companyUser.Email &&
@@ -833,7 +833,7 @@ namespace risk.control.system.Services
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
                .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.ClientCompany)
+               .Include(c => c.ClientCompany)
                .Include(c => c.PolicyDetail)
                .ThenInclude(c => c.CaseEnabler)
                .Include(c => c.PolicyDetail)
@@ -868,7 +868,7 @@ namespace risk.control.system.Services
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
                .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.ClientCompany)
+               .Include(c => c.ClientCompany)
                .Include(c => c.PolicyDetail)
                .ThenInclude(c => c.CaseEnabler)
                .Include(c => c.PolicyDetail)
@@ -934,17 +934,17 @@ namespace risk.control.system.Services
                 var pendinClaims = _context.ClaimsInvestigation
                     .Include(c => c.PolicyDetail)
                     .Where(c => c.CurrentClaimOwner == userEmail && openStatusesIds.Contains(c.InvestigationCaseStatusId) && !c.Deleted &&
-                    c.PolicyDetail.ClientCompanyId == companyUser.ClientCompany.ClientCompanyId).ToList();
+                    c.ClientCompanyId == companyUser.ClientCompany.ClientCompanyId).ToList();
 
                 var approvedClaims = _context.ClaimsInvestigation
                     .Include(c => c.PolicyDetail)
                     .Where(c => c.InvestigationCaseSubStatusId == assessorApprovedStatus.InvestigationCaseSubStatusId &&
-                    c.PolicyDetail.ClientCompanyId == companyUser.ClientCompany.ClientCompanyId)?.ToList();
+                    c.ClientCompanyId == companyUser.ClientCompany.ClientCompanyId)?.ToList();
 
                 var rejectedClaims = _context.ClaimsInvestigation
                     .Include(c => c.PolicyDetail)
                     .Where(c => c.IsReviewCase && openStatusesIds.Contains(c.InvestigationCaseStatusId) &&
-                    c.PolicyDetail.ClientCompanyId == companyUser.ClientCompany.ClientCompanyId)?.ToList();
+                    c.ClientCompanyId == companyUser.ClientCompany.ClientCompanyId)?.ToList();
 
                 var activeCount = 0;
 
@@ -953,7 +953,7 @@ namespace risk.control.system.Services
                     var creatorActiveClaims = _context.ClaimsInvestigation
                     .Include(c => c.PolicyDetail)
                     .Where(c => openStatusesIds.Contains(c.InvestigationCaseStatusId) && !c.Deleted &&
-                    c.PolicyDetail.ClientCompanyId == companyUser.ClientCompany.ClientCompanyId)?.ToList();
+                    c.ClientCompanyId == companyUser.ClientCompany.ClientCompanyId)?.ToList();
                     activeCount = creatorActiveClaims.Count;
                 }
 
@@ -971,7 +971,7 @@ namespace risk.control.system.Services
                     var creatorActiveClaims = _context.ClaimsInvestigation
                     .Include(c => c.PolicyDetail)
                     .Where(c => openStatusesIds.Contains(c.InvestigationCaseStatusId) && !c.Deleted &&
-                    c.PolicyDetail.ClientCompanyId == companyUser.ClientCompany.ClientCompanyId &&
+                    c.ClientCompanyId == companyUser.ClientCompany.ClientCompanyId &&
                     c.InvestigationCaseSubStatusId == submittededToAssesssorStatus.InvestigationCaseSubStatusId
                     )?.ToList();
                     activeCount = creatorActiveClaims.Count;
@@ -1194,7 +1194,7 @@ namespace risk.control.system.Services
                     .ThenInclude(i => i.PolicyDetail)
                     .Where(d =>
                         (companyUser.IsClientAdmin ? true : d.UpdatedBy == userEmail) &&
-                     d.ClaimsInvestigation.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId);
+                     d.ClaimsInvestigation.ClientCompanyId == companyUser.ClientCompanyId);
 
                 var userSubStatuses = tdetail.Select(s => s.InvestigationCaseSubStatusId).Distinct()?.ToList();
                 var subStatuses = _context.InvestigationCaseSubStatus;
@@ -1270,7 +1270,7 @@ namespace risk.control.system.Services
                 var tdetail = _context.InvestigationTransaction
                     .Include(i => i.ClaimsInvestigation).Where(d =>
                         (companyUser.IsClientAdmin ? true : d.UpdatedBy == userEmail) &&
-                       d.ClaimsInvestigation.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
+                       d.ClaimsInvestigation.ClientCompanyId == companyUser.ClientCompanyId &&
                        d.Created > DateTime.Now.AddMonths(-7));
                 var userSubStatuses = tdetail.Select(s => s.InvestigationCaseSubStatusId).Distinct()?.ToList();
                 var subStatuses = _context.InvestigationCaseSubStatus;
@@ -1347,7 +1347,7 @@ namespace risk.control.system.Services
                     .Include(i => i.ClaimsInvestigation)
                     .ThenInclude(i => i.PolicyDetail)
                     .Where(d =>
-                    d.ClaimsInvestigation.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
+                    d.ClaimsInvestigation.ClientCompanyId == companyUser.ClientCompanyId &&
                     (companyUser.IsClientAdmin || d.UpdatedBy == userEmail) &&
                     d.Created > DateTime.Now.AddDays(-28));
 
@@ -1460,7 +1460,7 @@ namespace risk.control.system.Services
                 var statuses = _context.InvestigationCaseStatus;
                 var tdetail = tdetailDays.Where(d =>
                     (companyUser.IsClientAdmin || d.UpdatedBy == userEmail) &&
-                    d.ClaimsInvestigation.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId);
+                    d.ClaimsInvestigation.ClientCompanyId == companyUser.ClientCompanyId);
 
                 var userSubStatuses = tdetail.Select(s => s.InvestigationCaseSubStatusId).Distinct()?.ToList();
                 var subStatuses = _context.InvestigationCaseSubStatus;

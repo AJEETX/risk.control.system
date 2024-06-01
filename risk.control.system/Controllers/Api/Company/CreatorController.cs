@@ -52,7 +52,7 @@ namespace risk.control.system.Controllers.Api.Company
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
 
             applicationDbContext = applicationDbContext.Where(a =>
-                a.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
+                a.ClientCompanyId == companyUser.ClientCompanyId &&
                      a.UserEmailActioned == companyUser.Email &&
                          a.UserEmailActionedTo == companyUser.Email &&
                          a.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId
@@ -142,7 +142,7 @@ namespace risk.control.system.Controllers.Api.Company
 
             var companyUser = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(c => c.Email == userEmail.Value);
 
-            applicationDbContext = applicationDbContext.Where(a => a.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
+            applicationDbContext = applicationDbContext.Where(a => a.ClientCompanyId == companyUser.ClientCompanyId &&
                  (a.InvestigationCaseSubStatusId == withdrawnByAgency.InvestigationCaseSubStatusId &&
                         a.UserEmailActionedTo == string.Empty &&
                         a.UserRoleActionedTo == $"{companyUser.ClientCompany.Email}")
@@ -228,7 +228,7 @@ namespace risk.control.system.Controllers.Api.Company
             IQueryable<ClaimsInvestigation> applicationDbContext = claimsService.GetClaims();
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
             var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(c => c.Email == userEmail.Value);
-            applicationDbContext = applicationDbContext.Where(i => i.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId);
+            applicationDbContext = applicationDbContext.Where(i => i.ClientCompanyId == companyUser.ClientCompanyId);
 
             var openStatuses = _context.InvestigationCaseStatus.Where(i => !i.Name.Contains(CONSTANTS.CASE_STATUS.FINISHED)).ToList();
             var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
@@ -243,7 +243,7 @@ namespace risk.control.system.Controllers.Api.Company
             var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
 
             var claims = applicationDbContext.Where(a => openStatusesIds.Contains(a.InvestigationCaseStatusId) &&
-            a.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId
+            a.ClientCompanyId == companyUser.ClientCompanyId
             && a.InvestigationCaseSubStatusId != createdStatus.InvestigationCaseSubStatusId
             && a.InvestigationCaseSubStatusId != withdrawnByCompanyStatus.InvestigationCaseSubStatusId
             && a.InvestigationCaseSubStatusId != declinedByAgencyStatus.InvestigationCaseSubStatusId

@@ -49,7 +49,7 @@ namespace risk.control.system.Controllers.Api.Company
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
 
             var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(c => c.Email == userEmail.Value);
-            applicationDbContext = applicationDbContext.Where(i => i.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
+            applicationDbContext = applicationDbContext.Where(i => i.ClientCompanyId == companyUser.ClientCompanyId &&
             i.InvestigationCaseSubStatusId == submittedToAssessorStatus.InvestigationCaseSubStatusId &&
             i.UserEmailActionedTo == string.Empty &&
              i.UserRoleActionedTo == $"{companyUser.ClientCompany.Email}");
@@ -112,7 +112,7 @@ namespace risk.control.system.Controllers.Api.Company
             IQueryable<ClaimsInvestigation> applicationDbContext = claimsService.GetClaims();
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
             var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(c => c.Email == userEmail.Value);
-            applicationDbContext = applicationDbContext.Where(i => i.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId);
+            applicationDbContext = applicationDbContext.Where(i => i.ClientCompanyId == companyUser.ClientCompanyId);
 
             var openStatuses = _context.InvestigationCaseStatus.Where(i => !i.Name.Contains(CONSTANTS.CASE_STATUS.FINISHED)).ToList();
             var claimsSubmitted = new List<ClaimsInvestigation>();
@@ -203,7 +203,7 @@ namespace risk.control.system.Controllers.Api.Company
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR);
             var finishStatus = _context.InvestigationCaseStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.FINISHED);
-            applicationDbContext = applicationDbContext.Where(c => c.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
+            applicationDbContext = applicationDbContext.Where(c => c.ClientCompanyId == companyUser.ClientCompanyId &&
                 (c.InvestigationCaseSubStatusId == approvedStatus.InvestigationCaseSubStatusId &&
                 c.InvestigationCaseStatusId == finishStatus.InvestigationCaseStatusId)
                 || c.InvestigationCaseSubStatusId == rejectdStatus.InvestigationCaseSubStatusId
@@ -267,7 +267,7 @@ namespace risk.control.system.Controllers.Api.Company
             var rejectdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR);
 
-            applicationDbContext = applicationDbContext.Where(c => c.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
+            applicationDbContext = applicationDbContext.Where(c => c.ClientCompanyId == companyUser.ClientCompanyId &&
                 c.InvestigationCaseSubStatusId == rejectdStatus.InvestigationCaseSubStatusId
                 );
             var claimsSubmitted = new List<ClaimsInvestigation>();

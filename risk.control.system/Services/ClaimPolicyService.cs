@@ -55,7 +55,7 @@ namespace risk.control.system.Services
 
             var clientCompanyUser = _context.ClientCompanyApplicationUser.Include(u=>u.ClientCompany).FirstOrDefault(c => c.Email == userEmail);
 
-            model.PolicyDetail.ClientCompanyId = clientCompanyUser.ClientCompanyId;
+            model.ClientCompanyId = clientCompanyUser.ClientCompanyId;
             return (model,clientCompanyUser.ClientCompany.LicenseType == Standard.Licensing.LicenseType.Trial);
         }
 
@@ -81,7 +81,7 @@ namespace risk.control.system.Services
               .Include(c => c.AgencyReport.DocumentIdReport)
               .Include(c => c.AgencyReport.ReportQuestionaire)
                 .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.ClientCompany)
+                .Include(c => c.ClientCompany)
                 .Include(c => c.PolicyDetail)
                 .ThenInclude(c => c.CaseEnabler)
                   .Include(c=>c.Vendor)
@@ -150,7 +150,7 @@ namespace risk.control.system.Services
               .Include(c => c.AgencyReport.DocumentIdReport)
               .Include(c => c.AgencyReport.ReportQuestionaire)
                 .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.ClientCompany)
+                .Include(c => c.ClientCompany)
                   .Include(c=>c.Vendor)
                 .Include(c => c.PolicyDetail)
                 .ThenInclude(c => c.CaseEnabler)

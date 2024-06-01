@@ -94,7 +94,7 @@ namespace risk.control.system.Services
                 var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key={Applicationsettings.GMAPData}";
                 claim.AgencyReport.DigitalIdReport.DigitalIdImageLocationUrl = url;
 
-                var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claim.PolicyDetail.ClientCompanyId);
+                var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claim.ClientCompanyId);
 
                 #region FACE IMAGE PROCESSING
 
@@ -175,7 +175,7 @@ namespace risk.control.system.Services
                 var latLongString = latitude + "," + longitude;
                 var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key={Applicationsettings.GMAPData}";
                 claim.AgencyReport.DocumentIdReport.DocumentIdImageLocationUrl = url;
-                var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claim.PolicyDetail.ClientCompanyId);
+                var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claim.ClientCompanyId);
 
                 #region PAN IMAGE PROCESSING
 

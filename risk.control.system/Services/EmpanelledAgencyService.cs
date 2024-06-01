@@ -31,7 +31,7 @@ namespace risk.control.system.Services
         {
             var claim = _context.ClaimsInvestigation
              .Include(c => c.PolicyDetail)
-             .ThenInclude(c => c.ClientCompany)
+             .Include(c => c.ClientCompany)
              .Include(c => c.PolicyDetail)
              .ThenInclude(c => c.CaseEnabler)
              
@@ -63,7 +63,7 @@ namespace risk.control.system.Services
         {
             var claimsInvestigation = await _context.ClaimsInvestigation
              .Include(c => c.PolicyDetail)
-             .ThenInclude(c => c.ClientCompany)
+             .Include(c => c.ClientCompany)
              .Include(c => c.PolicyDetail)
              .ThenInclude(c => c.CaseEnabler)
             
@@ -102,7 +102,7 @@ namespace risk.control.system.Services
 
             var claimsInvestigation = await _context.ClaimsInvestigation
                 .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.ClientCompany)
+                .Include(c => c.ClientCompany)
                 .Include(c => c.PolicyDetail)
                 .ThenInclude(c => c.CaseEnabler)
                 .Include(c => c.BeneficiaryDetail)
@@ -140,7 +140,7 @@ namespace risk.control.system.Services
 
             var existingVendors = await _context.Vendor
                 .Where(c => 
-                c.Clients.Any(c => c.ClientCompanyId == claimCase.ClaimsInvestigation.PolicyDetail.ClientCompanyId)
+                c.Clients.Any(c => c.ClientCompanyId == claimCase.ClaimsInvestigation.ClientCompanyId)
                 && c.Status == VendorStatus.ACTIVE)
                 .Include(v => v.ratings)
                 .Include(v => v.Country)
@@ -229,7 +229,7 @@ namespace risk.control.system.Services
         {
             var claimsInvestigation = await _context.ClaimsInvestigation
                 .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.ClientCompany)
+                .Include(c => c.ClientCompany)
                 .Include(c => c.PolicyDetail)
                 .ThenInclude(c => c.CaseEnabler)
                 

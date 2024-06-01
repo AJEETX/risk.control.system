@@ -188,10 +188,10 @@ namespace risk.control.system.Services
 
             var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(c => c.Email == userEmail);
             bool userCanCreate = true;
-            var totalClaimsCreated = _context.ClaimsInvestigation.Include(c=>c.PolicyDetail).Where(c => !c.Deleted && c.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId)?.ToList();
+            var totalClaimsCreated = _context.ClaimsInvestigation.Count(c => !c.Deleted && c.ClientCompanyId == companyUser.ClientCompanyId);
             if (companyUser.ClientCompany.LicenseType == Standard.Licensing.LicenseType.Trial)
             {
-                if (totalClaimsCreated?.Count >= companyUser.ClientCompany.TotalCreatedClaimAllowed)
+                if (totalClaimsCreated >= companyUser.ClientCompany.TotalCreatedClaimAllowed)
                 {
                     userCanCreate = false;
                 }
@@ -212,7 +212,7 @@ namespace risk.control.system.Services
                     string csvData = Encoding.UTF8.GetString(bytes);
                     
                     var dataRows = csvData.Split('\n');
-                    var totalIncludingUploaded = totalClaimsCreated?.Count + dataRows.Length;
+                    var totalIncludingUploaded = totalClaimsCreated + dataRows.Length;
                     var userCanUpload = companyUser.ClientCompany.TotalCreatedClaimAllowed >= totalIncludingUploaded;
                     if (userCanCreate && userCanUpload)
                     {
@@ -269,6 +269,7 @@ namespace risk.control.system.Services
                                             UserEmailActionedTo = userEmail,
                                             CREATEDBY = createdAsMethod,
                                             ORIGIN = uploadingway,
+                                            ClientCompanyId = companyUser.ClientCompanyId,
                                             UserRoleActionedTo = $"{companyUser.ClientCompany.Email}"
                                     };
 
@@ -294,7 +295,6 @@ namespace risk.control.system.Services
                                                     CaseEnablerId = _context.CaseEnabler.FirstOrDefault(c => c.Code.ToLower() == rowData[7].Trim().ToLower()).CaseEnablerId,
                                                     CostCentreId = _context.CostCentre.FirstOrDefault(c => c.Code.ToLower() == rowData[8].Trim().ToLower()).CostCentreId,
                                                     LineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Code.ToLower() == "claims")?.LineOfBusinessId,
-                                                    ClientCompanyId = companyUser?.ClientCompanyId,
                                                     DocumentImage = savedNewImage,
                                                 };
                                             }

@@ -37,7 +37,7 @@ namespace risk.control.system.Controllers.Api.Claims
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
                .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.ClientCompany)
+               .Include(c => c.ClientCompany)
                .Include(c => c.BeneficiaryDetail)
                .ThenInclude(c => c.BeneficiaryRelation)
                .Include(c => c.PolicyDetail)
