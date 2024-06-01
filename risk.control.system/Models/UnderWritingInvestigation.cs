@@ -3,18 +3,11 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace risk.control.system.Models
 {
-    public class ClaimsInvestigation : BaseEntity
+    public class UnderWritingInvestigation : BaseEntity
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string ClaimsInvestigationId { get; set; } = Guid.NewGuid().ToString();
-
-        [Required]
-        [Display(Name = "Insurer")]
-        public long? ClientCompanyId { get; set; }
-
-        [Display(Name = "Insurer")]
-        public ClientCompany? ClientCompany { get; set; }
+        public string UnderWritingInvestigationId { get; set; } = Guid.NewGuid().ToString();
 
         [Display(Name = "Agency name")]
         public long? VendorId { get; set; }
@@ -25,7 +18,6 @@ namespace risk.control.system.Models
         public long? PolicyDetailId { get; set; }
         public PolicyDetail? PolicyDetail { get; set; }
         public CustomerDetail? CustomerDetail { get; set; }
-        public BeneficiaryDetail? BeneficiaryDetail { get; set; }
 
         [NotMapped]
         public bool HasClientCompany { get; set; } = true;
@@ -62,7 +54,7 @@ namespace risk.control.system.Models
 
         public override string ToString()
         {
-            return $"Case Id: {ClaimsInvestigationId}, <br /> ";
+            return $"Case Id: {UnderWritingInvestigationId}, <br /> ";
         }
 
         public bool IsReviewCase { get; set; } = false;

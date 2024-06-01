@@ -89,7 +89,7 @@ namespace risk.control.system.Controllers.Api.Agency
                        Id = a.ClaimsInvestigationId,
                        PolicyId = a.PolicyDetail.ContractNumber,
                        Amount = string.Format(hindiNFO, "{0:C}", a.PolicyDetail.SumAssuredValue),
-                       Company = a.PolicyDetail.ClientCompany.Name,
+                       Company = a.ClientCompany.Name,
                        Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
                        PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
                        AssignedToAgency = a.AssignedToAgency,
@@ -158,7 +158,7 @@ namespace risk.control.system.Controllers.Api.Agency
                        AssignedToAgency = a.AssignedToAgency,
                        Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
                        PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
-                       Company = a.PolicyDetail.ClientCompany.Name,
+                       Company = a.ClientCompany.Name,
                        Document = a.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : Applicationsettings.NO_POLICY_IMAGE,
                        Customer = a.CustomerDetail.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail.ProfilePicture)) : Applicationsettings.NO_USER,
                        Name = a.CustomerDetail.CustomerName,
@@ -187,7 +187,7 @@ namespace risk.control.system.Controllers.Api.Agency
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
                .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.ClientCompany)
+               .Include(c => c.ClientCompany)
                .Include(c => c.BeneficiaryDetail)
                .ThenInclude(b => b.BeneficiaryRelation)
                .Include(c => c.PolicyDetail)

@@ -259,12 +259,12 @@ namespace risk.control.system.Services
 
         public async Task NotifyClaimWithdrawlToCompany(string senderUserEmail, string claimId)
         {
-            var claim = _context.ClaimsInvestigation.Include(i => i.PolicyDetail).Where(c => c.ClaimsInvestigationId == claimId).FirstOrDefault();
+            var claim = _context.ClaimsInvestigation.Where(c => c.ClaimsInvestigationId == claimId).FirstOrDefault();
             if (claim != null)
             {
-                var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claim.PolicyDetail.ClientCompanyId);
+                var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claim.ClientCompanyId);
 
-                var companyUsers = _context.ClientCompanyApplicationUser.Where(u => u.ClientCompanyId == claim.PolicyDetail.ClientCompanyId);
+                var companyUsers = _context.ClientCompanyApplicationUser.Where(u => u.ClientCompanyId == claim.ClientCompanyId);
 
                 var assessorRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.ASSESSOR.ToString()));
 
@@ -366,7 +366,7 @@ namespace risk.control.system.Services
                 .Include(i => i.PolicyDetail)
                 .Include(i => i.InvestigationCaseSubStatus)
                 .FirstOrDefault(v => v.ClaimsInvestigationId == claimId);
-            var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claimsInvestigation.PolicyDetail.ClientCompanyId);
+            var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claimsInvestigation.ClientCompanyId);
 
             var contactMessage = new InboxMessage
             {
@@ -498,14 +498,14 @@ namespace risk.control.system.Services
             {
                 var companyUsers = _context.ClientCompanyApplicationUser
                     .Include(u => u.ClientCompany)
-                    .Where(u => u.ClientCompanyId == claim.PolicyDetail.ClientCompanyId);
+                    .Where(u => u.ClientCompanyId == claim.ClientCompanyId);
 
                 var claimsInvestigation = _context.ClaimsInvestigation
                     .Include(i => i.PolicyDetail)
                     .Include(i => i.InvestigationCaseSubStatus)
                     .FirstOrDefault(v => v.ClaimsInvestigationId == claimId);
 
-                var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claimsInvestigation.PolicyDetail.ClientCompanyId);
+                var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claimsInvestigation.ClientCompanyId);
 
                 var clientAdminrRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.COMPANY_ADMIN.ToString()));
                 var creatorRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.CREATOR.ToString()));
@@ -595,7 +595,7 @@ namespace risk.control.system.Services
             var claim = _context.ClaimsInvestigation.Include(i => i.PolicyDetail).Where(c => c.ClaimsInvestigationId == claimId).FirstOrDefault();
             if (claim != null)
             {
-                var companyUsers = _context.ClientCompanyApplicationUser.Where(u => u.ClientCompanyId == claim.PolicyDetail.ClientCompanyId);
+                var companyUsers = _context.ClientCompanyApplicationUser.Where(u => u.ClientCompanyId == claim.ClientCompanyId);
 
                 var assessorRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.ASSESSOR.ToString()));
 
@@ -619,7 +619,7 @@ namespace risk.control.system.Services
                     .Include(i => i.PolicyDetail)
                     .Include(i => i.InvestigationCaseSubStatus)
                     .FirstOrDefault(v => v.ClaimsInvestigationId == claimId);
-                var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claimsInvestigation.PolicyDetail.ClientCompanyId);
+                var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claimsInvestigation.ClientCompanyId);
 
                 foreach (var user in users)
                 {
@@ -710,7 +710,7 @@ namespace risk.control.system.Services
                 .Include(i => i.PolicyDetail)
                 .Include(i => i.InvestigationCaseSubStatus)
                 .FirstOrDefault(v => v.ClaimsInvestigationId == claimId);
-            var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claimsInvestigation.PolicyDetail.ClientCompanyId);
+            var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claimsInvestigation.ClientCompanyId);
 
             foreach (var user in users)
             {
@@ -871,7 +871,7 @@ namespace risk.control.system.Services
             var claim = _context.ClaimsInvestigation.Include(i => i.PolicyDetail).Where(c => c.ClaimsInvestigationId == claimId).FirstOrDefault();
             if (claim != null)
             {
-                var companyUsers = _context.ClientCompanyApplicationUser.Where(u => u.ClientCompanyId == claim.PolicyDetail.ClientCompanyId);
+                var companyUsers = _context.ClientCompanyApplicationUser.Where(u => u.ClientCompanyId == claim.ClientCompanyId);
 
                 var assessorRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.ASSESSOR.ToString()));
 
@@ -895,7 +895,7 @@ namespace risk.control.system.Services
                     .Include(i => i.PolicyDetail)
                     .Include(i => i.InvestigationCaseSubStatus)
                     .FirstOrDefault(v => v.ClaimsInvestigationId == claimId);
-                var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claimsInvestigation.PolicyDetail.ClientCompanyId);
+                var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claimsInvestigation.ClientCompanyId);
 
                 foreach (var user in users)
                 {

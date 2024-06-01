@@ -9,13 +9,6 @@ namespace risk.control.system.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long PolicyDetailId { get; set; }
 
-        [Required]
-        [Display(Name = "Insurer name")]
-        public long? ClientCompanyId { get; set; }
-
-        [Display(Name = "Insurer name")]
-        public ClientCompany? ClientCompany { get; set; }
-
         [Display(Name = "Line of Business")]
         public long? LineOfBusinessId { get; set; } = default!;
 

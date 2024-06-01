@@ -513,9 +513,8 @@ namespace risk.control.system.Services
         {
             var currentUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == userEmail);
             var claimsInvestigation = _context.ClaimsInvestigation
-                .Include(c => c.PolicyDetail)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimId);
-            var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claimsInvestigation.PolicyDetail.ClientCompanyId);
+            var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claimsInvestigation.ClientCompanyId);
 
             var inProgress = _context.InvestigationCaseStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS);
@@ -567,11 +566,11 @@ namespace risk.control.system.Services
             _context.ClaimsInvestigation.Update(claimsInvestigation);
             try
             {
-                var rows = _context.SaveChanges();
+                var rows = await _context.SaveChangesAsync();
             }
             catch (Exception ex)
             {
-
+                Console.WriteLine(ex.StackTrace);
                 throw;
             }
             return company.AutoAllocation;
@@ -580,9 +579,8 @@ namespace risk.control.system.Services
         {
             var currentUser = _context.VendorApplicationUser.FirstOrDefault(u => u.Email == userEmail);
             var claimsInvestigation = _context.ClaimsInvestigation
-                .Include(c => c.PolicyDetail)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimId);
-            var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claimsInvestigation.PolicyDetail.ClientCompanyId);
+            var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claimsInvestigation.ClientCompanyId);
 
             var inProgress = _context.InvestigationCaseStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS);
@@ -631,7 +629,15 @@ namespace risk.control.system.Services
             };
             _context.InvestigationTransaction.Add(log);
             _context.ClaimsInvestigation.Update(claimsInvestigation);
-            _context.SaveChanges();
+            try
+            {
+                var rows = await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                throw;
+            }
         }
 
         public async Task<ClaimsInvestigation> AllocateToVendor(string userEmail, string claimsInvestigationId, long vendorId, long caseLocationId, bool AutoAllocated = true)
@@ -872,9 +878,9 @@ namespace risk.control.system.Services
             try
             {
                 var claim = _context.ClaimsInvestigation
-                    .Include(c => c.AgencyReport)
                     .Include(c => c.PolicyDetail)
-                    .ThenInclude(p => p.ClientCompany)
+                    .Include(c => c.AgencyReport)
+                    .Include(p => p.ClientCompany)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimsInvestigationId);
 
                 claim.AgencyReport.AssessorRemarkType = assessorRemarkType;
@@ -886,7 +892,7 @@ namespace risk.control.system.Services
                 claim.InvestigationCaseSubStatusId = rejected.InvestigationCaseSubStatusId;
                 claim.Updated = DateTime.Now;
                 claim.UserEmailActioned = userEmail;
-                claim.UserRoleActionedTo = $"{AppRoles.COMPANY_ADMIN.GetEnumDisplayName()} ({claim.PolicyDetail.ClientCompany.Email})";
+                claim.UserRoleActionedTo = $"{AppRoles.COMPANY_ADMIN.GetEnumDisplayName()} ({claim.ClientCompany.Email})";
                 claim.UserEmailActionedTo = userEmail;
                 _context.ClaimsInvestigation.Update(claim);
 
@@ -898,7 +904,7 @@ namespace risk.control.system.Services
                 {
                     HopCount = finalHop + 1,
                     UserEmailActioned = userEmail,
-                    UserRoleActionedTo = $"{AppRoles.COMPANY_ADMIN.GetEnumDisplayName()} ({claim.PolicyDetail.ClientCompany.Email})",
+                    UserRoleActionedTo = $"{AppRoles.COMPANY_ADMIN.GetEnumDisplayName()} ({claim.ClientCompany.Email})",
                     ClaimsInvestigationId = claimsInvestigationId,
                     CurrentClaimOwner = claim.CurrentClaimOwner,
                     Created = DateTime.Now,
@@ -962,9 +968,9 @@ namespace risk.control.system.Services
             try
             {
                 var claim = _context.ClaimsInvestigation
+                    .Include(p => p.PolicyDetail)
+                    .Include(p => p.ClientCompany)
                     .Include(c => c.AgencyReport)
-                    .Include(c => c.PolicyDetail)
-                    .ThenInclude(p => p.ClientCompany)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimsInvestigationId);
 
                 claim.AgencyReport.AssessorRemarkType = assessorRemarkType;
@@ -976,7 +982,7 @@ namespace risk.control.system.Services
                 claim.InvestigationCaseSubStatusId = approved.InvestigationCaseSubStatusId;
                 claim.Updated = DateTime.Now;
                 claim.UserEmailActioned = userEmail;
-                claim.UserRoleActionedTo = $"{AppRoles.COMPANY_ADMIN.GetEnumDisplayName()} ({claim.PolicyDetail.ClientCompany.Email})";
+                claim.UserRoleActionedTo = $"{AppRoles.COMPANY_ADMIN.GetEnumDisplayName()} ({claim.ClientCompany.Email})";
                 claim.UserEmailActionedTo = userEmail;
                 _context.ClaimsInvestigation.Update(claim);
 
@@ -988,7 +994,7 @@ namespace risk.control.system.Services
                 {
                     HopCount = finalHop + 1,
                     UserEmailActioned = userEmail,
-                    UserRoleActionedTo = $"{AppRoles.COMPANY_ADMIN.GetEnumDisplayName()} ({claim.PolicyDetail.ClientCompany.Email})",
+                    UserRoleActionedTo = $"{AppRoles.COMPANY_ADMIN.GetEnumDisplayName()} ({claim.ClientCompany.Email})",
                     ClaimsInvestigationId = claimsInvestigationId,
                     CurrentClaimOwner = claim.CurrentClaimOwner,
                     Created = DateTime.Now,
@@ -1166,12 +1172,9 @@ namespace risk.control.system.Services
             var claim = _context.ClaimsInvestigation
                 .Include(c => c.AgencyReport)
                 .Include(c => c.Vendor)
-                .Include(c => c.PolicyDetail)
+                .Include(c => c.ClientCompany)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimsInvestigationId);
 
-            var clientCompany = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claim.PolicyDetail.ClientCompanyId);
-
-            var agencyUser = _context.VendorApplicationUser.FirstOrDefault(s => s.Email == userEmail);
             var submitted2Assessor = _context.InvestigationCaseSubStatus
                 .FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
             var lastLog = _context.InvestigationTransaction.Where(i =>
@@ -1180,13 +1183,13 @@ namespace risk.control.system.Services
             claim.IsReviewCase = false;
             claim.UserEmailActioned = userEmail;
             claim.UserEmailActionedTo = string.Empty;
-            claim.UserRoleActionedTo = $"{clientCompany.Email}";
+            claim.UserRoleActionedTo = $"{claim.ClientCompany.Email}";
             claim.UserEmailActionedTo = string.Empty;
             claim.Updated = DateTime.Now;
-            claim.UpdatedBy = agencyUser.Email;
+            claim.UpdatedBy = userEmail;
             claim.NotDeclinable = true;
             claim.CurrentUserEmail = userEmail;
-            claim.CurrentClaimOwner = agencyUser.Email;
+            claim.CurrentClaimOwner = userEmail;
             claim.InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS).InvestigationCaseStatusId;
             claim.InvestigationCaseSubStatusId = submitted2Assessor.InvestigationCaseSubStatusId;
 
@@ -1219,13 +1222,13 @@ namespace risk.control.system.Services
                 HopCount = lastLogHop + 1,
                 ClaimsInvestigationId = claimsInvestigationId,
                 UserEmailActioned = userEmail,
-                UserRoleActionedTo = $"{clientCompany.Email}",
-                CurrentClaimOwner = agencyUser.Email,
+                UserRoleActionedTo = $"{claim.ClientCompany.Email}",
+                CurrentClaimOwner = userEmail,
                 Created = DateTime.Now,
                 Time2Update = DateTime.Now.Subtract(lastLog.Created).Days,
                 InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS).InvestigationCaseStatusId,
                 InvestigationCaseSubStatusId = submitted2Assessor.InvestigationCaseSubStatusId,
-                UpdatedBy = agencyUser.Email
+                UpdatedBy = userEmail
             };
             _context.InvestigationTransaction.Add(log);
             _context.ClaimsInvestigation.Update(claim);
@@ -1248,7 +1251,7 @@ namespace risk.control.system.Services
             var claimsCaseToAllocateToVendor = _context.ClaimsInvestigation
                 .Include(c => c.AgencyReport)
                 .Include(c => c.PolicyDetail)
-                .ThenInclude(p => p.ClientCompany)
+                .Include(p => p.ClientCompany)
                 .FirstOrDefault(v => v.ClaimsInvestigationId == claimsInvestigationId);
 
             var report = claimsCaseToAllocateToVendor.AgencyReport;
@@ -1277,7 +1280,7 @@ namespace risk.control.system.Services
             {
                 HopCount = lastLogHop + 1,
                 UserEmailActioned = userEmail,
-                UserRoleActionedTo = $"{claimsCaseToAllocateToVendor.PolicyDetail.ClientCompany.Email}",
+                UserRoleActionedTo = $"{claimsCaseToAllocateToVendor.ClientCompany.Email}",
                 ClaimsInvestigationId = claimsInvestigationId,
                 Created = DateTime.Now,
                 Time2Update = DateTime.Now.Subtract(lastLog.Created).Days,
@@ -1360,7 +1363,7 @@ namespace risk.control.system.Services
         {
             var claim = _context.ClaimsInvestigation
                 .Include(c => c.PolicyDetail)
-                .ThenInclude(p => p.ClientCompany)
+                .Include(p => p.ClientCompany)
                 .Include(c => c.AgencyReport)
                 .ThenInclude(c => c.EnquiryRequest)
                 .Include(c => c.AgencyReport)
@@ -1378,7 +1381,7 @@ namespace risk.control.system.Services
             claim.UserEmailActioned = userEmail;
             claim.AssignedToAgency = false;
             claim.AssessView = 0;
-            claim.UserRoleActionedTo = $"{claim.PolicyDetail.ClientCompany.Email}";
+            claim.UserRoleActionedTo = $"{claim.ClientCompany.Email}";
             var enquiryRequest = claim.AgencyReport.EnquiryRequest;
             enquiryRequest.Answer = request.Answer;
             if (flexRadioDefault[0] == "a")

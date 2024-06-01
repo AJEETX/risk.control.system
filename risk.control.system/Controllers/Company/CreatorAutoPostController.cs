@@ -146,7 +146,7 @@ namespace risk.control.system.Controllers.Company
                     notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                claimsInvestigation.PolicyDetail.ClientCompanyId = companyUser?.ClientCompanyId;
+                claimsInvestigation.ClientCompanyId = companyUser?.ClientCompanyId;
                 claimsInvestigation.CREATEDBY = CREATEDBY.AUTO;
                 claimsInvestigation.ORIGIN = ORIGIN.USER;
 
@@ -218,8 +218,6 @@ namespace risk.control.system.Controllers.Company
                     notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-
-                claimsInvestigation.PolicyDetail.ClientCompanyId = companyUser?.ClientCompanyId;
 
                 IFormFile documentFile = null;
                 IFormFile profileFile = null;
@@ -294,8 +292,6 @@ namespace risk.control.system.Controllers.Company
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                claimsInvestigation.PolicyDetail.ClientCompanyId = companyUser?.ClientCompanyId;
-
                 IFormFile documentFile = null;
                 IFormFile profileFile = null;
                 var files = Request.Form?.Files;
@@ -359,8 +355,6 @@ namespace risk.control.system.Controllers.Company
                     notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-
-                claimsInvestigation.PolicyDetail.ClientCompanyId = companyUser?.ClientCompanyId;
 
                 IFormFile documentFile = null;
                 IFormFile profileFile = null;

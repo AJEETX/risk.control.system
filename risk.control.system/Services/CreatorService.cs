@@ -35,7 +35,8 @@ namespace risk.control.system.Services
             var trial = companyUser.ClientCompany.LicenseType == Standard.Licensing.LicenseType.Trial;
             if (trial)
             {
-                var totalClaimsCreated = context.ClaimsInvestigation.Include(c => c.PolicyDetail).Where(c => !c.Deleted && c.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId)?.ToList();
+                var totalClaimsCreated = context.ClaimsInvestigation.Include(c => c.PolicyDetail).Where(c => !c.Deleted && 
+                    c.ClientCompanyId == companyUser.ClientCompanyId)?.ToList();
                 availableCount = companyUser.ClientCompany.TotalCreatedClaimAllowed - totalClaimsCreated.Count;
 
                 if (totalClaimsCreated?.Count >= companyUser.ClientCompany.TotalCreatedClaimAllowed)
