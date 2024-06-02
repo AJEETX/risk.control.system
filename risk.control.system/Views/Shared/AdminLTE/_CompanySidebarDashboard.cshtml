@@ -1,0 +1,10 @@
+﻿@using risk.control.system.Helpers;
+
+<li class="nav-item ">
+    <a id="dashboard" asp-controller="Dashboard" asp-action="Index" class="navlink-border nav-link @Url.MakeActiveClass("Dashboard","")">
+        <i class="nav-icon fas fa-home"></i>
+        <p class="sidebar-menu-header-label">
+            @Applicationsettings.DASHBOARD
+        </p>
+    </a>
+</li>

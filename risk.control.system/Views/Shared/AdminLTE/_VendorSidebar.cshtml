@@ -39,9 +39,9 @@
         <nav class="mt-2">
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                 <!-- Add icons to the links using the .nav-icon class with font-awesome or any other icon font library -->
-                <partial name="AdminLTE/_VendorSidebarMailbox" />
 
-                
+                <partial name="AdminLTE/_VendorSidebarDashboard" />
+
                 @if (User.IsInRole(AppRoles.AGENCY_ADMIN.ToString()) || User.IsInRole(AppRoles.SUPERVISOR.ToString()))
                 {
                 <partial name="AdminLTE/_VendorSidebarSupervisor" />
@@ -84,6 +84,7 @@
                         </li>
                     }
                 }
+                <partial name="AdminLTE/_VendorSidebarMailbox" />
 
             </ul>
         </nav>
