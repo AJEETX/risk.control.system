@@ -1,4 +1,4 @@
-﻿@model bool
+﻿@model CreateClaims
 @{
     ViewData["Title"] = "Assign & Re";
 }
@@ -13,7 +13,7 @@
                     <span class="tooltip-text" id="information">
                         <li>
                             <i class='far fa-hand-point-right'></i>
-                            @if (Model)
+                            @if (Model.BulkUpload)
                             {
                                 <button class='btn btn-info  btn-xs'><i class='fa fa-upload'></i> Upload  </button>
                             }
@@ -39,7 +39,7 @@
                         <li>
                             <i class='far fa-hand-point-right'></i> Select <b><input type='radio' /> </b> claim
                         </li>
-                        @if (@Model)
+                        @if (@Model.UserCanCreate)
                         {
                             <li>
                                 <i class='far fa-hand-point-right'></i>
@@ -117,7 +117,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text"><i class="fa fa-file-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
-                                            @if (Model)
+                                            @if (Model.BulkUpload)
                                             {
                                                 <select data-toggle="tooltip" title="Select upload type" name="uploadtype" id="uploadtype" required class="form-control remarks" asp-items="Html.GetEnumSelectList<UploadType>()">
                                                     <option value="">--- SELECT---</option>
@@ -125,8 +125,8 @@
                                             }
                                             else
                                             {
-                                                <select disabled class="form-control remarks">
-                                                    <option value="">--- SELECT---</option>
+                                                <select disabled data-toggle="tooltip" title=" --- DISABLED --- " name="uploadtype" id="uploadtype" required class="form-control remarks">
+                                                    <option value="">--- DISABLED---</option>
                                                 </select>
                                             }
                                         </div>
@@ -138,14 +138,14 @@
                                         <span class="input-group-label"> Perform Upload: </span>
                                         <div class="input-group mb-3">
                                             <img class="form-Image" id="ftpImage" src="/img/upload.png">
-                                            @if (Model)
+                                            @if (Model.BulkUpload)
                                             {
                                                 <input accept=".zip" type="file" class="form-control remarks" name="postedFile" id="postedFile" data-toggle="tooltip" title="Select file to upload" />
                                                 <button id="UploadFileButton" disabled type="submit" class="btn btn-info upload"><i class="nav-icon fa fa-upload"></i> Upload</button>
                                             }
                                             else
                                             {
-                                                <input disabled type="file" class="form-control remarks" name="postedFile" id="postedFile" data-toggle="tooltip" title="Disabled -> file to upload" />
+                                                <input disabled type="file" class="form-control remarks" name="postedFile" id="postedFile" data-toggle="tooltip" title="--- DISABLED --- " />
                                                 <button disabled class="btn btn-info"><i class="nav-icon fa fa-upload"></i> Upload</button>
                                             }
                                         </div>
@@ -199,7 +199,7 @@
             <div class="card-footer">
                 <div class="row">
                     <div class="col-md-12">
-                        @if (@Model)
+                        @if (@Model.UserCanCreate)
                         {
                             <a class="create-policy btn btn-success" asp-action="Create"><i class="far fa-edit"></i> @Applicationsettings.CREATE New</a>
                         }

@@ -77,7 +77,7 @@ namespace risk.control.system.Controllers.Company
         {
             try
             {
-                bool userCanUpload = true;
+                bool userCanCreate = true;
                 int availableCount = 0;
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 if (string.IsNullOrWhiteSpace(currentUserEmail))
@@ -93,7 +93,7 @@ namespace risk.control.system.Controllers.Company
                     availableCount = companyUser.ClientCompany.TotalCreatedClaimAllowed - totalClaimsCreated;
                     if (totalClaimsCreated >= companyUser.ClientCompany.TotalCreatedClaimAllowed)
                     {
-                        userCanUpload = false;
+                        userCanCreate = false;
                         notifyService.Information($"MAX Claim limit = <b>{companyUser.ClientCompany.TotalCreatedClaimAllowed}</b> reached");
                     }
                     else
@@ -102,7 +102,7 @@ namespace risk.control.system.Controllers.Company
                     }
                 }
 
-                return View(companyUser.ClientCompany.BulkUpload && userCanUpload);
+                return View(new CreateClaims { BulkUpload = companyUser.ClientCompany.BulkUpload, UserCanCreate = userCanCreate });
             }
             catch (Exception ex)
             {
