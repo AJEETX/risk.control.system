@@ -212,7 +212,7 @@ namespace risk.control.system.Services
                     string csvData = Encoding.UTF8.GetString(bytes);
                     
                     var dataRows = csvData.Split('\n');
-                    var totalIncludingUploaded = totalClaimsCreated + dataRows.Length;
+                    var totalIncludingUploaded = totalClaimsCreated + dataRows.Length - 1;
                     var userCanUpload = companyUser.ClientCompany.TotalCreatedClaimAllowed >= totalIncludingUploaded;
                     if (userCanCreate && userCanUpload)
                     {
