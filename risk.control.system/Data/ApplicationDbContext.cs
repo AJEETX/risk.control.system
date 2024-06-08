@@ -16,6 +16,8 @@ namespace risk.control.system.Data
             base.OnModelCreating(builder);
         }
 
+        public virtual DbSet<ChatMessage> ChatMessage { get; set; }
+        public virtual DbSet<ImageDetails> ImageDetails { get; set; }
         public virtual DbSet<GlobalSettings> GlobalSettings { get; set; }
         public virtual DbSet<NumberSequence> NumberSequence { get; set; }
         public virtual DbSet<IpAddress> IpAddress { get; set; }

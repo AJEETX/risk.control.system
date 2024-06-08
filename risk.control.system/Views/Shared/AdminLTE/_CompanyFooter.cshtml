@@ -1,15 +1,17 @@
-﻿@using risk.control.system.Models;
-@model ClientCompany
+﻿
+
 <footer class="main-footer text-sm no-print">
-   @*  @if (Model.LicenseType == Standard.Licensing.LicenseType.Trial)
+
+
+    @*  @if (Model.LicenseType == Standard.Licensing.LicenseType.Trial)
     {
-        var expires = Model.ExpiryDate.Value.Subtract(DateTime.Now).Days;
-        <marquee behavior="scroll" direction="left">
-            <span class="trial-banner"> Trial Version with limited features</span> !
-            <b> MAX Allowed Claim Creation = @Model.TotalCreatedClaimAllowed.</b>
-            <span class="badge badge-light"></span>
-            <span class="badge badge-light"> Expire in @expires days. </span>
-        </marquee>
+    var expires = Model.ExpiryDate.Value.Subtract(DateTime.Now).Days;
+    <marquee behavior="scroll" direction="left">
+    <span class="trial-banner"> Trial Version with limited features</span> !
+    <b> MAX Allowed Claim Creation = @Model.TotalCreatedClaimAllowed.</b>
+    <span class="badge badge-light"></span>
+    <span class="badge badge-light"> Expire in @expires days. </span>
+    </marquee>
     } *@
 
     <div class="float-right d-none d-sm-block">

@@ -45,7 +45,18 @@ namespace risk.control.system.Controllers
             this.toastNotification = toastNotification;
         }
 
-        // GET: ContactMessage
+        public IActionResult Chat()
+        {
+            var userEmail = HttpContext.User.Identity.Name;
+            var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
+            if (applicationUser == null)
+            {
+                return NotFound();
+            }
+            ViewData["Email"] = new SelectList(_context.Users, "Email", "Name");
+            var model = new ChatMessage { FromUser = applicationUser, FromUserEmail = userEmail };
+            return View(model);
+        }
         public async Task<IActionResult> Index()
         {
             var userEmail = HttpContext.User.Identity.Name;

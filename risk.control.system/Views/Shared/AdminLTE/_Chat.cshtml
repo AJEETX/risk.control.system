@@ -1,0 +1,60 @@
+﻿@model ChatMessage
+@{
+    ViewData["Title"] = "Chat";
+}
+
+<button class="open-button" onclick="openForm()">Chat</button>
+
+<div class="chat-popup" id="myForm">
+    <div class="form-container">
+        <input type="hidden" id="userInput" value="@Model.FromUserEmail" />
+        <div class="card card-outline">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-comments"></i> Quick Chat </h3>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close" onclick="closeForm()">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-row">
+                            <label for="active-user">
+                                <b>
+                                    <select id="active-user" name="active-user" required class="form-control">
+                                        <option> --- SELECT ACTIVE USER --- </option>
+                                        <option>abc</option>
+                                        <option>xyz</option>
+                                    </select>
+                                </b>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="direct-chat-msg">
+                            <div class="direct-chat-msg">
+                                <div class="direct-chat-infos clearfix">
+                                    <span class="direct-chat-name float-left">You</span>
+                                    <span class="direct-chat-timestamp float-right">@DateTime.Now.ToString("dd MMM hh:mm")</span>
+                                </div>
+                                <img class="direct-chat-img" src="/img/company-admin.jpeg" alt="sender image">
+                                <label class="form-label">@Model.FromUserEmail </label>
+                                <div class="direct-chat-text">
+
+                                    <div id="chat">
+                                        <ul id="messagesList"></ul>
+                                        <input type="text" id="messageInput" placeholder="Message" class="form-control remarks" />
+                                        <button id="sendButton" class="btn btn-primary">Send</button>
+                                        <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

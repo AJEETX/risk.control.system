@@ -24,8 +24,11 @@
         @if (SignInManager.IsSignedIn(User))
         {
             var userEmail = User?.Identity?.Name;
+            var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
             var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+            var chat = new ChatMessage { FromUser = applicationUser, FromUserEmail = userEmail };
+
             ClientCompany company = null!;
             if (companyUser is not null)
             {
@@ -38,7 +41,6 @@
             {
                 var vendor = _context.Vendor.FirstOrDefault(c => c.VendorId == vendorUser.VendorId);
                 <partial name="AdminLTE/_AgencyTopNavigation" model="@vendor.CanChangePassword" />
-
                 <partial name="AdminLTE/_VendorSidebar" model="@vendor" />
             }
             else
@@ -54,14 +56,16 @@
                     </main>
                 </div>
             </div>
-            if(company is not null)
+            @* if(company is not null)
             {
                 <partial name="AdminLTE/_CompanyFooter" model="@company"/>
             }
             else
             {
                 <partial name="AdminLTE/_Footer" />
-            }
+            } *@
+            <partial name="AdminLTE/_Footer" model="@chat"/>
+
         }
 
         <!-- Logout Modal-->
@@ -90,6 +94,8 @@
     <partial name="AdminLTE/_Scripts" />
     <partial name="AdminLTE/_DataTableScriptPartial" />
     <script src="~/js/site.js"></script>
+    <script src="~/lib/signalr.min.js"></script>
+    <script type="text/javascript" src="~/js/chat.js"></script>
     <script src="~/js/clock.js"></script>
     @RenderSection("Scripts", required: false)
     @await Component.InvokeAsync("NToastNotify")

@@ -23,6 +23,14 @@ const image =
 //        console.error("WebSocket error: " + error);
 //    };
 //});
+
+function openForm() {
+    document.getElementById("myForm").style.display = "block";
+}
+
+function closeForm() {
+    document.getElementById("myForm").style.display = "none";
+}
 function clearAllInputs(event) {
     var allInputs = document.querySelectorAll('input');
 
