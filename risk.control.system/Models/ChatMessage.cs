@@ -11,7 +11,6 @@ namespace risk.control.system.Models
         public string FromUserEmail { get; set; }
         public ApplicationUser? FromUser { get; set; }
         public ApplicationUser? ToUser { get; set; }
-        public List<string> FromUserMessage { get; set; }= new List<string>();
-        public List<string> ToUserMessage { get; set; } = new List<string>();
+        public List<string>? ActiveUsers { get; set; }
     }
 }

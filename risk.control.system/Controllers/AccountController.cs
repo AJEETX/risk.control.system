@@ -78,12 +78,13 @@ namespace risk.control.system.Controllers
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             await _signInManager.SignOutAsync();
             var showLoginUsers = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
+            var users = _context.Users.OrderBy(o => o.Email);
             if (showLoginUsers)
             {
-                    ViewData["Users"] = new SelectList(_context.Users.OrderBy(o => o.Email), "Email", "Email");
+                    ViewData["Users"] = new SelectList(users, "Email", "Email");
             }
             ViewBag.SlimLogin = "Login";
-            return View(new LoginViewModel { ShowUserOnLogin = showLoginUsers });
+            return View(new LoginViewModel { ShowUserOnLogin = showLoginUsers , Users = users.Select(u=>u.Email)?.ToList() });
         }
         [HttpGet]
         [AllowAnonymous]

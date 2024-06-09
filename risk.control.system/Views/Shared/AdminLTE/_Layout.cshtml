@@ -27,7 +27,7 @@
             var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
             var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-            var chat = new ChatMessage { FromUser = applicationUser, FromUserEmail = userEmail };
+            var chat = new ChatMessage { FromUser = applicationUser, FromUserEmail = userEmail, ActiveUsers = _context.Users.Where(u=>u.Email != userEmail).OrderBy(o => o.Email).Select(u=>u.Email)?.ToList() };
 
             ClientCompany company = null!;
             if (companyUser is not null)
