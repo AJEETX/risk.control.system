@@ -59,16 +59,7 @@ namespace risk.control.system.Controllers
         }
         public async Task<IActionResult> Index()
         {
-            var userEmail = HttpContext.User.Identity.Name;
-
-            var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
-            if (applicationUser == null)
-            {
-                return NotFound();
-            }
-            var userMailboxMessages = await inboxMailService.GetInboxMessages(userEmail);
-
-            return View(userMailboxMessages);
+            return RedirectToAction("Inbox");
         }
 
         [Breadcrumb("Inbox", FromAction = "Index")]

@@ -1311,7 +1311,7 @@ a#back-button {
 }
 ul#messagesList {
     list-style-type: none;
-    max-height:400px;
+    max-height:300px;
     overflow-y:auto;
 }
 .open-button {
@@ -1333,7 +1333,7 @@ ul#messagesList {
     padding: 20px 0;
     bottom: 0;
     right: 15px;
-    z-index: 9;
+    z-index: 99999;
 }
 
 /* Add styles to the form container */
