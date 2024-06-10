@@ -53,10 +53,7 @@ namespace risk.control.system.Helpers
             var currentUser = ctx.HttpContext.User.Identity.Name;
             if (!string.IsNullOrWhiteSpace(user) && !string.IsNullOrWhiteSpace(message))
             {
-                if(currentUser != user)
-                {
-                    await Clients.All.SendAsync("ReceiveMessage", user, message);
-                }
+                await Clients.All.SendAsync("ReceiveMessage", user, message);
             }
         }
     }

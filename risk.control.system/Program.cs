@@ -31,6 +31,7 @@ using NToastNotify;
 using risk.control.system.Controllers.Api.Claims;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
+using risk.control.system.Middleware;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Permission;
@@ -233,7 +234,7 @@ builder.Services.AddHttpContextAccessor();
 //    options.KeepAliveInterval = TimeSpan.FromSeconds(120);
 //});
 var app = builder.Build();
-
+app.UseMiddleware<UpdateUserLastActivityMiddleware>();
 //app.UseWebSockets();
 app.UseSwagger();
 

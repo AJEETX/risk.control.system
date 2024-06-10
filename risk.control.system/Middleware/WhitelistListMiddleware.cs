@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.Extensions.Options;
 using Microsoft.FeatureManagement;
-
 using risk.control.system.Data;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
@@ -10,7 +9,7 @@ using risk.control.system.Services;
 using System.Collections.Generic;
 using System.Net;
 
-namespace risk.control.system.Helpers
+namespace risk.control.system.Middleware
 {
     public class WhitelistListMiddleware
     {
@@ -35,12 +34,12 @@ namespace risk.control.system.Helpers
                     !context.Request.Path.Value.StartsWith("/Dashboard/Get") &&
                     !context.Request.Path.Value.StartsWith("/js") &&
                     !context.Request.Path.Value.Contains("api/Notification/GetClientIp") &&
-                    (
+                    
                     !context.Request.Path.Value.StartsWith("/Account/Login") &&
                     !context.Request.Path.Value.StartsWith("/account/login") &&
                     !context.Request.Query.Any(q => q.Key == "ReturnUrl") &&
                     !context.Request.Query.Any(q => q.Value.Contains("js"))
-                    ))
+                    )
                 {
                     var remoteIp = context.Connection.RemoteIpAddress;
                     _logger.LogDebug("Request from Remote IP address: {RemoteIp}", remoteIp);
@@ -83,7 +82,7 @@ namespace risk.control.system.Helpers
                         //        }
                         //    }
                         //}
-                       if (badIp)
+                        if (badIp)
                         {
                             context.Response.Redirect("/page/oops.html");
                             return;

@@ -77,7 +77,7 @@ namespace risk.control.system.Models
         public string? MobileUId { get; set; }
 
         public AppRoles? Role { get; set; }
-
+        public DateTime? LastActivityDate { get; set; }
     }
 
     public class ApplicationRole : IdentityRole<long>

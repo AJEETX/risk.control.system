@@ -21,9 +21,10 @@
                         <div class="form-row">
                             <label for="active-user">
                                 <b>
-                                    <input type="text" id="active-user" name="active-user" required class="form-control" list="active-users" />
+                                    <input type="text" id="active-user" name="active-user" required class="form-control" list="active-users" placeholder="select user email" />
                                     <datalist id="active-users">
                                         <option value=""> - select user email - </option>
+                                        <option value="- select user email -">- select user email -</option>
                                         @foreach (string user in Model.ActiveUsers)
                                         {
                                             <option value="@user"> @user </option>

@@ -1,8 +1,7 @@
 ﻿using Microsoft.FeatureManagement;
-
 using risk.control.system.Models.ViewModel;
 
-namespace risk.control.system.Helpers
+namespace risk.control.system.Middleware
 {
     public class SecurityMiddleware
     {
@@ -43,7 +42,7 @@ namespace risk.control.system.Helpers
                     "frame-ancestors 'self' https://maps.googleapis.com;" +
                     "upgrade-insecure-requests;");
             }
-            await _next(context).ConfigureAwait(false); 
+            await _next(context).ConfigureAwait(false);
         }
     }
 }

@@ -65,14 +65,9 @@
                                 <i class="fas fa-envelope left-padd"></i>
                                 @if(Model.ShowUserOnLogin)
                                 {
-                                    <input type="text" required id="email" asp-for="Email" class="form-control remarks" list="active-users" />
-                                    <datalist id="active-users">
-                                        <option value=""> - select user email - </option>
-                                        @foreach (string user in Model.Users)
-                                        {
-                                            <option value="@user"> @user </option>
-                                        }
-                                    </datalist> 
+                                    <select required id="email" asp-for="Email" title="Email" class="form-control remarks" asp-items="@ViewBag.Users">
+                                        <option value=""> --- select user email --- </option>
+                                    </select>
                                     <span asp-validation-for="Email" class="text-danger"></span>
                                 }
                                 else

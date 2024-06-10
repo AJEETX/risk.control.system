@@ -2,6 +2,7 @@
 {
     public static class Applicationsettings
     {
+        public const double ACTIVE_USER_TIMESPAN = 10;
         public const string Password = "R1$kcontrol!";
         public const string TestPassword = "R1$kcontrol";
         public const string PERMISSION = "Permission";
