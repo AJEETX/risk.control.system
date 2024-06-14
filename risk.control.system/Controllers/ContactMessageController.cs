@@ -2,6 +2,7 @@
 using System.Text.Json.Serialization;
 using System.Web;
 
+using AspNetCoreHero.ToastNotification.Abstractions;
 using AspNetCoreHero.ToastNotification.Notyf;
 
 using Microsoft.AspNetCore.Mvc;
@@ -22,6 +23,7 @@ namespace risk.control.system.Controllers
     public class ContactMessageController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly INotyfService notifyService;
         private readonly ISentMailService sentMailService;
         private readonly IInboxMailService inboxMailService;
         private readonly ITrashMailService trashMailService;
@@ -33,12 +35,15 @@ namespace risk.control.system.Controllers
             WriteIndented = true
         };
 
-        public ContactMessageController(ApplicationDbContext context, ISentMailService sentMailService,
+        public ContactMessageController(ApplicationDbContext context,
+            INotyfService notifyService,
+            ISentMailService sentMailService,
             IInboxMailService inboxMailService,
             ITrashMailService trashMailService,
             IToastNotification toastNotification)
         {
             _context = context;
+            this.notifyService = notifyService;
             this.sentMailService = sentMailService;
             this.inboxMailService = inboxMailService;
             this.trashMailService = trashMailService;
@@ -65,75 +70,108 @@ namespace risk.control.system.Controllers
         [Breadcrumb("Inbox", FromAction = "Index")]
         public async Task<IActionResult> Inbox()
         {
-            var userEmail = HttpContext.User.Identity.Name;
-
-            var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
-            if (applicationUser == null)
+            try
             {
-                return NotFound();
-            }
-            var userMailboxMessages = await inboxMailService.GetInboxMessages(userEmail);
+                var userEmail = HttpContext.User.Identity.Name;
 
-            return View("Index", userMailboxMessages);
+                var userMailboxMessages = await inboxMailService.GetInboxMessages(userEmail);
+
+                return View("Index", userMailboxMessages);
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                notifyService.Error("OOPs !!!...Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
         }
 
         [Breadcrumb("Delete", FromAction = "Inbox")]
         public async Task<IActionResult> InboxDelete(List<long> messages)
         {
-            var userEmail = HttpContext.User.Identity.Name;
-
-            var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
-            if (applicationUser == null)
+            try
             {
-                return NotFound();
-            }
-            var rows = await inboxMailService.InboxDelete(messages, applicationUser.Id);
-            toastNotification.AddSuccessToastMessage($" {messages.Count} mail(s) trashed successfully!");
+                var userEmail = HttpContext.User.Identity.Name;
 
-            return RedirectToAction(nameof(Index));
+                var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
+                if (applicationUser == null)
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var rows = await inboxMailService.InboxDelete(messages, applicationUser.Id);
+                notifyService.Success($" {messages.Count} mail(s) trashed successfully!");
+
+                return RedirectToAction(nameof(Inbox));
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                notifyService.Error("OOPs !!!...Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
         }
 
         [Breadcrumb("Details", FromAction = "Inbox")]
         public async Task<IActionResult> InboxDetails(long id)
         {
-            if (id == 0)
+            try
             {
-                return NotFound();
+                if (id == 0)
+                {
+                    notifyService.Error("OOPs !!!...Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+
+                var userEmail = HttpContext.User.Identity.Name;
+
+                var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
+                if (applicationUser == null)
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var userMessage = await inboxMailService.GetInboxMessagedetail(id, userEmail);
+                return View(userMessage);
+
             }
-
-            var userEmail = HttpContext.User.Identity.Name;
-
-            var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
-            if (applicationUser == null)
+            catch (Exception ex)
             {
-                return NotFound();
+                Console.WriteLine(ex.ToString());
+                notifyService.Error("OOPs !!!...Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
             }
-            var userMessage = await inboxMailService.GetInboxMessagedetail(id, userEmail);
-            return View(userMessage);
         }
 
         [Breadcrumb("Reply", FromAction = "Inbox")]
         public async Task<IActionResult> InboxDetailsReply(long id, string actiontype)
         {
-            if (id == 0)
+            try
             {
-                return NotFound();
+                var userEmail = HttpContext.User.Identity.Name;
+                if (id == 0 || string.IsNullOrWhiteSpace(userEmail))
+                {
+                    notifyService.Error("OOPs !!!...Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+
+                ViewData["Users"] = new SelectList(_context.Users.Where(u => u.Email != userEmail).OrderBy(o => o.Email), "Email", "Email");
+                var userMessage = await inboxMailService.GetInboxMessagedetailReply(id, userEmail, actiontype);
+                ViewBag.ActionType = actiontype;
+                ViewBag.MessageId = id;
+                return View(userMessage);
+
             }
-
-            var userEmail = HttpContext.User.Identity.Name;
-
-            var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
-            if (applicationUser == null)
+            catch (Exception ex)
             {
-                return NotFound();
+                Console.WriteLine(ex.ToString());
+                notifyService.Error("OOPs !!!...Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
             }
-            var userMessage = await inboxMailService.GetInboxMessagedetailReply(id, userEmail, actiontype);
-            ViewBag.ActionType = actiontype;
-            ViewBag.MessageId = id;
-            return View(userMessage);
         }
-            //
-        //
+       
         [HttpPost]
         [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
@@ -144,7 +182,7 @@ namespace risk.control.system.Controllers
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
-                    toastNotification.AddErrorToastMessage("OOPs !!!..Contact Admin");
+                    notifyService.Error("OOPs !!!...Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 contactMessage.Message = HttpUtility.HtmlEncode(contactMessage.RawMessage);
@@ -155,19 +193,19 @@ namespace risk.control.system.Controllers
 
                 if (mailSent)
                 {
-                    toastNotification.AddSuccessToastMessage("mail sent successfully!");
-                    return RedirectToAction(nameof(Index));
+                    notifyService.Success("mail sent successfully!");
+                    return RedirectToAction(nameof(Inbox));
                 }
                 else
                 {
-                    toastNotification.AddErrorToastMessage("Error: recepient email incorrect!");
+                    notifyService.Error("Error: recepient email incorrect!");
                     return RedirectToAction(nameof(Create));
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.StackTrace);
-                toastNotification.AddErrorToastMessage("OOPs !!!..Contact Admin");
+                notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
@@ -175,17 +213,28 @@ namespace risk.control.system.Controllers
         [Breadcrumb("Delete", FromAction = "InboxDetails")]
         public async Task<IActionResult> InboxDetailsDelete(long id)
         {
-            var userEmail = HttpContext.User.Identity.Name;
-
-            var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
-            if (applicationUser == null)
+            try
             {
-                return NotFound();
-            }
-            var rows = await inboxMailService.InboxDetailsDelete(id, userEmail);
-            toastNotification.AddSuccessToastMessage($"mail trashed successfully!");
+                var userEmail = HttpContext.User.Identity.Name;
 
-            return RedirectToAction(nameof(Index));
+                var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
+                if (applicationUser == null)
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var rows = await inboxMailService.InboxDetailsDelete(id, userEmail);
+                notifyService.Success($"mail trashed successfully!");
+
+                return RedirectToAction(nameof(Inbox));
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
         }
 
         [Breadcrumb("Trash", FromAction = "Index")]
@@ -196,7 +245,8 @@ namespace risk.control.system.Controllers
             var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
             if (applicationUser == null)
             {
-                return NotFound();
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
             }
             var usertrashMessages = await trashMailService.GetTrashMessages(userEmail);
 
@@ -211,11 +261,12 @@ namespace risk.control.system.Controllers
             var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
             if (applicationUser == null)
             {
-                return NotFound();
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
             }
             var rows = await trashMailService.TrashDelete(messages, applicationUser.Id);
 
-            toastNotification.AddSuccessToastMessage($" {messages.Count} mail(s) deleted permanently successfully!");
+            notifyService.Success($" {messages.Count} mail(s) deleted permanently successfully!");
 
             return RedirectToAction(nameof(Trash));
         }
@@ -225,7 +276,8 @@ namespace risk.control.system.Controllers
         {
             if (id == 0)
             {
-                return NotFound();
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
             }
 
             var userEmail = HttpContext.User.Identity.Name;
@@ -233,7 +285,8 @@ namespace risk.control.system.Controllers
             var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
             if (applicationUser == null)
             {
-                return NotFound();
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
             }
             var userMessage = await trashMailService.GetTrashMessagedetail(id, userEmail);
             return View(userMessage);
@@ -247,10 +300,11 @@ namespace risk.control.system.Controllers
             var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
             if (applicationUser == null)
             {
-                return NotFound();
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
             }
             var rows = await trashMailService.TrashDetailsDelete(id, userEmail);
-            toastNotification.AddSuccessToastMessage($" {rows} mail deleted permanently successfully!");
+            notifyService.Success($" {rows} mail deleted permanently successfully!");
 
             return RedirectToAction(nameof(Trash));
         }
@@ -263,7 +317,8 @@ namespace risk.control.system.Controllers
             var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
             if (applicationUser == null)
             {
-                return NotFound();
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
             }
             var userMailboxMessages = await sentMailService.GetSentMessages(userEmail);
 
@@ -278,10 +333,11 @@ namespace risk.control.system.Controllers
             var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
             if (applicationUser == null)
             {
-                return NotFound();
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
             }
             var rows = await sentMailService.SentDelete(messages, applicationUser.Id);
-            toastNotification.AddSuccessToastMessage($" {rows} mail(s) trashed successfully!");
+            notifyService.Success($" {rows} mail(s) trashed successfully!");
 
             return RedirectToAction(nameof(Sent));
         }
@@ -291,7 +347,8 @@ namespace risk.control.system.Controllers
         {
             if (id == 0)
             {
-                return NotFound();
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
             }
 
             var userEmail = HttpContext.User.Identity.Name;
@@ -299,7 +356,8 @@ namespace risk.control.system.Controllers
             var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
             if (applicationUser == null)
             {
-                return NotFound();
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
             }
             var userMessage = await sentMailService.GetSentMessagedetail(id, userEmail);
             return View(userMessage);
@@ -310,17 +368,14 @@ namespace risk.control.system.Controllers
         {
             if (id == 0)
             {
-                return NotFound();
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
             }
 
             var userEmail = HttpContext.User.Identity.Name;
 
-            var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
-            if (applicationUser == null)
-            {
-                return NotFound();
-            }
             var userMessage = await sentMailService.GetSentMessagedetailReply(id, userEmail, actiontype);
+            ViewData["Users"] = new SelectList(_context.Users.Where(u => u.Email != userEmail).OrderBy(o => o.Email), "Email", "Email");
 
             ViewBag.ActionType = actiontype;
             return View(userMessage);
@@ -336,7 +391,7 @@ namespace risk.control.system.Controllers
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
-                    toastNotification.AddErrorToastMessage("OOPs !!!..Contact Admin");
+                    notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 contactMessage.Message = HttpUtility.HtmlEncode(contactMessage.RawMessage);
@@ -347,22 +402,22 @@ namespace risk.control.system.Controllers
 
                 if (mailSent)
                 {
-                    toastNotification.AddSuccessToastMessage("mail sent successfully!");
-                    return RedirectToAction(nameof(Index));
+                    notifyService.Success("mail sent successfully!");
+                    return RedirectToAction(nameof(Inbox));
                 }
                 else
                 {
-                    toastNotification.AddErrorToastMessage("Error: recepient email incorrect!");
+                    notifyService.Error("Error: recepient email incorrect!");
                     return RedirectToAction(nameof(Create));
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.StackTrace);
-                toastNotification.AddErrorToastMessage("OOPs !!!..Contact Admin");
+                notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
-            
+
         }
 
         [Breadcrumb("Delete", FromAction = "SentDetails")]
@@ -373,7 +428,8 @@ namespace risk.control.system.Controllers
             var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
             if (applicationUser == null)
             {
-                return NotFound();
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
             }
             var userMailbox = _context.Mailbox
                 .Include(m => m.Sent)
@@ -393,7 +449,7 @@ namespace risk.control.system.Controllers
 
             _context.Mailbox.Update(userMailbox);
             var rows = await _context.SaveChangesAsync();
-            toastNotification.AddSuccessToastMessage($" {rows} mail trashed successfully!");
+            notifyService.Success($" {rows} mail trashed successfully!");
 
             return RedirectToAction(nameof(Sent));
         }
@@ -406,7 +462,8 @@ namespace risk.control.system.Controllers
             var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
             if (applicationUser == null)
             {
-                return NotFound();
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
             }
             var userMailbox = _context.Mailbox.Include(m => m.Outbox).FirstOrDefault(c => c.Name == applicationUser.Email);
 
@@ -421,7 +478,8 @@ namespace risk.control.system.Controllers
             var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
             if (applicationUser == null)
             {
-                return NotFound();
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
             }
             var userMailbox = _context.Mailbox
                            .Include(m => m.Outbox)
@@ -443,7 +501,7 @@ namespace risk.control.system.Controllers
             }
             _context.Mailbox.Update(userMailbox);
             var rows = await _context.SaveChangesAsync();
-            toastNotification.AddSuccessToastMessage($" {rows} mail(s) trashed successfully!");
+            notifyService.Success($" {rows} mail(s) trashed successfully!");
 
             return RedirectToAction(nameof(Outbox));
         }
@@ -454,7 +512,8 @@ namespace risk.control.system.Controllers
         {
             if (id == 0)
             {
-                return NotFound();
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
             }
 
             var userEmail = HttpContext.User.Identity.Name;
@@ -462,7 +521,8 @@ namespace risk.control.system.Controllers
             var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
             if (applicationUser == null)
             {
-                return NotFound();
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
             }
             var userMailbox = _context.Mailbox
                 .Include(m => m.Outbox)
@@ -483,7 +543,8 @@ namespace risk.control.system.Controllers
             var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
             if (applicationUser == null)
             {
-                return NotFound();
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
             }
             var userMailbox = _context.Mailbox
                 .Include(m => m.Outbox)
@@ -502,7 +563,7 @@ namespace risk.control.system.Controllers
 
             _context.Mailbox.Update(userMailbox);
             var rows = await _context.SaveChangesAsync();
-            toastNotification.AddSuccessToastMessage($" {rows} mail trashed successfully!");
+            notifyService.Success($" {rows} mail trashed successfully!");
 
             return RedirectToAction(nameof(Outbox));
         }
@@ -511,7 +572,8 @@ namespace risk.control.system.Controllers
         [Breadcrumb("Compose", FromAction = "Index")]
         public IActionResult Create()
         {
-            ViewData["ApplicationUserId"] = new SelectList(_context.ApplicationUser, "Id", "CountryId");
+            var userEmail = HttpContext.User.Identity.Name;
+            ViewData["Users"] = new SelectList(_context.Users.Where(u => u.Email != userEmail).OrderBy(o => o.Email), "Email", "Email");
             return View();
         }
 
@@ -541,7 +603,7 @@ namespace risk.control.system.Controllers
                 if (mailSent)
                 {
                     toastNotification.AddSuccessToastMessage("mail sent successfully!");
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction(nameof(Inbox));
                 }
                 else
                 {
@@ -555,7 +617,7 @@ namespace risk.control.system.Controllers
                 toastNotification.AddErrorToastMessage("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
-            
+
         }
     }
 }

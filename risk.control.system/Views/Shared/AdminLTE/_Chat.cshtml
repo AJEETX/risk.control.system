@@ -16,15 +16,14 @@
                 </button>
             </div>
             <div class="card-body">
-                <div class="row">
+                @* <div class="row">
                     <div class="col-md-12">
                         <div class="form-row">
                             <label for="active-user">
                                 <b>
-                                    <input type="text" id="active-user" name="active-user" required class="form-control" list="active-users" placeholder="select user email" />
+                                    <input type="text" id="active-user" name="active-user" required class="form-control" list="active-users" placeholder="select active user" />
                                     <datalist id="active-users">
-                                        <option value=""> - select user email - </option>
-                                        <option value="- select user email -">- select user email -</option>
+                                        <option value=""> - no active user - </option>
                                         @foreach (string user in Model.ActiveUsers)
                                         {
                                             <option value="@user"> @user </option>
@@ -34,7 +33,7 @@
                             </label>
                         </div>
                     </div>
-                </div>
+                </div> *@
                 <div class="row">
                     <div class="col-md-12">
                         <div class="direct-chat-msg">

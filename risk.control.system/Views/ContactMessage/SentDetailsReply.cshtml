@@ -25,11 +25,9 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text" asp-for="ReceipientEmail"><i class="fas fa-at"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <input id="receipient-email" asp-for="ReceipientEmail" class="form-control remarks" value="@Model.ReceipientEmail" placeholder="enter min 3 character to select the recepient email" autocomplete="email" list="active-users" />
-                                <datalist id="active-users">
-                                    <option value="">TYPE TO SELECT RECEPIENT</option>
-                                    <option value="Pencil">Pencil</option>
-                                </datalist>
+                                <select required id="receipient-email" asp-for="ReceipientEmail" title="Email" class="form-control remarks" asp-items="ViewBag.Users">
+                                    <option value=""> --- SELECT RECEPIENT --- </option>
+                                </select>
                                 <span asp-validation-for="ReceipientEmail" class="text-danger"></span>
                             </div>
                         </div>

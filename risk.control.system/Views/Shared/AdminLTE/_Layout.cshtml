@@ -28,17 +28,17 @@
             var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
             var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-            var activeUsers = _context.Users.Where(u => u.Email != userEmail).AsEnumerable();
+            @* var activeUsers = _context.Users.Where(u => u.Email != userEmail).AsEnumerable();
 
             var allUsers = activeUsers.Where(u => u.LastActivityDate.HasValue &&
-            u.LastActivityDate.Value.AddMinutes(Applicationsettings.ACTIVE_USER_TIMESPAN) > DateTime.Now)?.Select(u => u.Email)?.ToList();
+            u.LastActivityDate.Value.AddMinutes(Applicationsettings.ACTIVE_USER_TIMESPAN) > DateTime.Now)?.Select(u => u.Email)?.ToList(); 
             var chat = new ChatMessage
                 {
                     FromUser = applicationUser,
                     FromUserEmail = userEmail,
                     ActiveUsers = allUsers
                 }
-            ;
+            ; *@
 
             ClientCompany company = null!;
             if (companyUser is not null)
@@ -75,7 +75,8 @@
         {
         <partial name="AdminLTE/_Footer" />
         } *@
-            <partial name="AdminLTE/_Footer" model="@chat" />
+            <partial name="AdminLTE/_Footer" />
+            @* <partial name="AdminLTE/_Footer" model="@chat" /> *@
 
         }
 
@@ -105,8 +106,8 @@
     <partial name="AdminLTE/_Scripts" />
     <partial name="AdminLTE/_DataTableScriptPartial" />
     <script src="~/js/site.js"></script>
-    <script src="~/lib/signalr.min.js"></script>
-    <script type="text/javascript" src="~/js/chat.js"></script>
+    @* <script src="~/lib/signalr.min.js"></script>
+    <script type="text/javascript" src="~/js/chat.js"></script> *@
     <script src="~/js/clock.js"></script>
     @RenderSection("Scripts", required: false)
     @await Component.InvokeAsync("NToastNotify")

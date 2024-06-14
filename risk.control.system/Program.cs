@@ -131,7 +131,7 @@ builder.Services.AddControllersWithViews()
     .AddNewtonsoftJson(options =>
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
 );
-builder.Services.AddSignalR();
+//builder.Services.AddSignalR();
 builder.Services.AddNotyf(config =>
 {
     config.DurationInSeconds = 2;
@@ -234,7 +234,7 @@ builder.Services.AddHttpContextAccessor();
 //    options.KeepAliveInterval = TimeSpan.FromSeconds(120);
 //});
 var app = builder.Build();
-app.UseMiddleware<UpdateUserLastActivityMiddleware>();
+//app.UseMiddleware<UpdateUserLastActivityMiddleware>();
 //app.UseWebSockets();
 app.UseSwagger();
 
@@ -276,7 +276,7 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Dashboard}/{action=Index}/{id?}");
 
-app.MapHub<ChatHub>("/chatHub");
+//app.MapHub<ChatHub>("/chatHub");
 
 app.Run();
 
