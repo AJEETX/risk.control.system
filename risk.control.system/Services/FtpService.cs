@@ -422,7 +422,7 @@ namespace risk.control.system.Services
                                     catch (Exception ex)
                                     {
                                         Console.WriteLine(ex.StackTrace);
-                                        throw ex;
+                                        return false;
                                     }
                                 }
                             }

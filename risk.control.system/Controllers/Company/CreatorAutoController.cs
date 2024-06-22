@@ -106,33 +106,44 @@ namespace risk.control.system.Controllers.Company
             {
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return RedirectToAction(nameof(New));
             }
         }
 
         [Breadcrumb(" Add New", FromAction = "New")]
         public IActionResult Create()
         {
-            var currentUserEmail = HttpContext.User?.Identity?.Name;
-            if (string.IsNullOrWhiteSpace(currentUserEmail))
+            try
             {
-                notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (string.IsNullOrWhiteSpace(currentUserEmail))
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+
+                var model = creatorService.Create(currentUserEmail);
+                if (model.Trial)
+                {
+                    if (!model.AllowedToCreate)
+                    {
+                        notifyService.Information($"MAX Claim limit = <b>{model.TotalCount}</b> reached");
+                    }
+                    else
+                    {
+                        notifyService.Information($"Limit available = <b>{model.AvailableCount}</b>");
+                    }
+                }
+
+                return View(model);
             }
-
-
-            var model = creatorService.Create(currentUserEmail);
-
-            if (!model.AllowedToCreate)
+            catch (Exception ex)
             {
-                notifyService.Information($"MAX Claim limit = <b>{model.TotalCount}</b> reached");
+                Console.WriteLine(ex.StackTrace);
+                notifyService.Error("OOPS!!!..Try Again");
+                return RedirectToAction(nameof(Create));
             }
-            else
-            {
-                notifyService.Information($"Limit available = <b>{model.AvailableCount}</b>");
-            }
-
-            return View(model);
         }
         [Breadcrumb(title: " Add Policy", FromAction = "Create")]
         public IActionResult CreatePolicy()
@@ -150,7 +161,7 @@ namespace risk.control.system.Controllers.Company
                 if (model == null)
                 {
                     notifyService.Error("OOPS!!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return RedirectToAction(nameof(New));
                 }
 
                 ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name");
@@ -174,8 +185,8 @@ namespace risk.control.system.Controllers.Company
             catch (Exception ex)
             {
                 Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPS!!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                notifyService.Error("OOPS!!!..Try Again");
+                return RedirectToAction(nameof(CreatePolicy));
             }
         }
 
@@ -186,8 +197,8 @@ namespace risk.control.system.Controllers.Company
             {
                 if (id == null || string.IsNullOrWhiteSpace(id))
                 {
-                    notifyService.Error("Not Found!!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    notifyService.Error("OOPS!!!.Claim Not Found.Try Again");
+                    return RedirectToAction(nameof(CreatePolicy));
                 }
 
                 var claimsInvestigation = await _context.ClaimsInvestigation
@@ -197,8 +208,8 @@ namespace risk.control.system.Controllers.Company
 
                 if (claimsInvestigation == null)
                 {
-                    notifyService.Error("Not Found!!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    notifyService.Error("Claim Not Found!!!");
+                    return RedirectToAction(nameof(CreatePolicy));
                 }
                 ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name", claimsInvestigation.ClientCompanyId);
                 ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType.Where(i =>
@@ -220,10 +231,9 @@ namespace risk.control.system.Controllers.Company
             catch (Exception ex)
             {
                 Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPS!!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                notifyService.Error("OOPS!!!..Try Again");
+                return RedirectToAction(nameof(CreatePolicy));
             }
-
         }
 
         [Breadcrumb(title: " Add Customer", FromAction = "Details")]
@@ -233,8 +243,8 @@ namespace risk.control.system.Controllers.Company
             {
                 if (id == null || string.IsNullOrWhiteSpace(id))
                 {
-                    notifyService.Error("Not Found!!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    notifyService.Error("OOPS!!!.Claim Not Found.Try Again");
+                    return RedirectToAction(nameof(CreatePolicy));
                 }
 
                 var claimsInvestigation = await _context.ClaimsInvestigation
@@ -243,8 +253,8 @@ namespace risk.control.system.Controllers.Company
 
                 if (claimsInvestigation == null)
                 {
-                    notifyService.Error("Not Found!!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    notifyService.Error("OOPS!!!.Claim Not Found.Try Again");
+                    return RedirectToAction(nameof(CreatePolicy));
                 }
                 var pinCode = _context.PinCode.Include(p => p.District).FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE2);
                 var district = _context.District.Include(d => d.State).FirstOrDefault(d => d.DistrictId == pinCode.District.DistrictId);
@@ -298,8 +308,8 @@ namespace risk.control.system.Controllers.Company
             catch (Exception ex)
             {
                 Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPS!!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                notifyService.Error("OOPS!!!..Try Again");
+                return RedirectToAction(nameof(CreatePolicy));
             }
         }
 
@@ -310,8 +320,8 @@ namespace risk.control.system.Controllers.Company
             {
                 if (id == null || string.IsNullOrWhiteSpace(id))
                 {
-                    notifyService.Error("Not Found!!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    notifyService.Error("OOPS!!!.Claim Not Found.Try Again");
+                    return RedirectToAction(nameof(CreatePolicy));
                 }
 
                 var claimsInvestigation = await _context.ClaimsInvestigation
@@ -328,8 +338,8 @@ namespace risk.control.system.Controllers.Company
 
                 if (claimsInvestigation == null)
                 {
-                    notifyService.Error("Not Found!!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    notifyService.Error("OOPS!!!.Claim Not Found.Try Again");
+                    return RedirectToAction(nameof(CreatePolicy));
                 }
                 ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name", claimsInvestigation.ClientCompanyId);
                 ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType.OrderBy(s => s.Code), "InvestigationServiceTypeId", "Name", claimsInvestigation.PolicyDetail.InvestigationServiceTypeId);
@@ -435,15 +445,15 @@ namespace risk.control.system.Controllers.Company
             {
                 if (id == null)
                 {
-                    notifyService.Error("NOT FOUND!!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    notifyService.Error("OOPS!!!.Claim Not Found.Try Again");
+                    return RedirectToAction(nameof(CreatePolicy));
                 }
 
-                var caseLocation = await _context.BeneficiaryDetail.FindAsync(id);
-                if (caseLocation == null)
+                var beneficiary = await _context.BeneficiaryDetail.FindAsync(id);
+                if (beneficiary == null)
                 {
-                    notifyService.Error("NOT FOUND!!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    notifyService.Error("OOPS!!!.Claim Not Found.Try Again");
+                    return RedirectToAction(nameof(CreatePolicy));
                 }
 
                 var services = _context.BeneficiaryDetail
@@ -453,16 +463,16 @@ namespace risk.control.system.Controllers.Company
                     .First(v => v.BeneficiaryDetailId == id);
 
                 var country = _context.Country.OrderBy(o => o.Name);
-                var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == caseLocation.CountryId).OrderBy(d => d.Name);
-                var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == caseLocation.StateId).OrderBy(d => d.Name);
-                var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == caseLocation.DistrictId).OrderBy(d => d.Name);
+                var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == beneficiary.CountryId).OrderBy(d => d.Name);
+                var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == beneficiary.StateId).OrderBy(d => d.Name);
+                var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == beneficiary.DistrictId).OrderBy(d => d.Name);
 
-                ViewData["CountryId"] = new SelectList(country, "CountryId", "Name", caseLocation.CountryId);
-                ViewData["StateId"] = new SelectList(relatedStates, "StateId", "Name", caseLocation.StateId);
-                ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", caseLocation.DistrictId);
-                ViewData["PinCodeId"] = new SelectList(pincodes, "PinCodeId", "Code", caseLocation.PinCodeId);
+                ViewData["CountryId"] = new SelectList(country, "CountryId", "Name", beneficiary.CountryId);
+                ViewData["StateId"] = new SelectList(relatedStates, "StateId", "Name", beneficiary.StateId);
+                ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", beneficiary.DistrictId);
+                ViewData["PinCodeId"] = new SelectList(pincodes, "PinCodeId", "Code", beneficiary.PinCodeId);
 
-                ViewData["BeneficiaryRelationId"] = new SelectList(_context.BeneficiaryRelation.OrderBy(s => s.Code), "BeneficiaryRelationId", "Name", caseLocation.BeneficiaryRelationId);
+                ViewData["BeneficiaryRelationId"] = new SelectList(_context.BeneficiaryRelation.OrderBy(s => s.Code), "BeneficiaryRelationId", "Name", beneficiary.BeneficiaryRelationId);
 
 
                 var claimsPage = new MvcBreadcrumbNode("New", "CreatorAuto", "Claims");
@@ -489,7 +499,7 @@ namespace risk.control.system.Controllers.Company
             {
                 if (id == null || string.IsNullOrWhiteSpace(id))
                 {
-                    notifyService.Error("Not Found!!!..Contact Admin");
+                    notifyService.Error("OOPS!!!.Claim Not Found.Try Again");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
@@ -502,7 +512,7 @@ namespace risk.control.system.Controllers.Company
 
                 if (model == null)
                 {
-                    notifyService.Error("Not Found!!!..Contact Admin");
+                    notifyService.Error("OOPS!!!.Claim Not Found.Try Again");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 

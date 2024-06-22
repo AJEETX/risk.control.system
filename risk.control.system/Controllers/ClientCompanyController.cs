@@ -389,17 +389,9 @@ namespace risk.control.system.Controllers
                     _context.ClientCompany.Update(company);
                     var savedRows = await _context.SaveChangesAsync();
                     notifyService.Custom($"Agency(s) empanelled.", 3, "green", "fas fa-thumbs-up");
-                    try
-                    {
-                        return RedirectToAction("Details", new { id = company.ClientCompanyId });
-                    }
-                    catch (Exception ex)
-                    {
-                        throw ex;
-                    }
+                    return RedirectToAction("Details", new { id = company.ClientCompanyId });
                 }
             }
-            ViewBag.CompanyId = id;
             return Problem();
         }
 
@@ -407,55 +399,33 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EmpanelledVendors(long id, List<string> vendors)
         {
-            if (vendors is not null && vendors.Count() > 0)
-            {
-                var company = await _context.ClientCompany.FindAsync(id);
+            var company = await _context.ClientCompany.FindAsync(id);
 
-                if (company != null)
-                {
-                    var empanelledVendors = _context.Vendor.Where(v => vendors.Contains(v.VendorId.ToString()))
-                    .Where(v => v.Clients.Any(c => c.ClientCompanyId == id))
-                    .Include(v => v.Country)
-                    .Include(v => v.PinCode)
-                    .Include(v => v.State)
-                    .Include(v => v.VendorInvestigationServiceTypes)
-                    .ThenInclude(v => v.District)
-                    .Include(v => v.VendorInvestigationServiceTypes)
-                    .ThenInclude(v => v.LineOfBusiness)
-                    .Include(v => v.VendorInvestigationServiceTypes)
-                    .ThenInclude(v => v.InvestigationServiceType)
-                    .Include(v => v.VendorInvestigationServiceTypes)
-                    .ThenInclude(v => v.PincodeServices);
-                    foreach (var v in empanelledVendors)
-                    {
-                        company.EmpanelledVendors.Remove(v);
-                        v.Clients.Remove(company);
-                        _context.Vendor.Update(v);
-                    }
-                    _context.ClientCompany.Update(company);
-                    company.Updated = DateTime.Now;
-                    company.UpdatedBy = HttpContext.User?.Identity?.Name;
-                    var savedRows = await _context.SaveChangesAsync();
-                    notifyService.Custom($"Agency(s) de-panelled.", 3, "red", "far fa-thumbs-down");
-                    try
-                    {
-                        if (savedRows > 0)
-                        {
-                            return RedirectToAction("Details", new { id = company.ClientCompanyId });
-                        }
-                        else
-                        {
-                            return Problem();
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        throw;
-                    }
-                }
+            var empanelledVendors = _context.Vendor.Where(v => vendors.Contains(v.VendorId.ToString()))
+                .Where(v => v.Clients.Any(c => c.ClientCompanyId == id))
+                .Include(v => v.Country)
+                .Include(v => v.PinCode)
+                .Include(v => v.State)
+                .Include(v => v.VendorInvestigationServiceTypes)
+                .ThenInclude(v => v.District)
+                .Include(v => v.VendorInvestigationServiceTypes)
+                .ThenInclude(v => v.LineOfBusiness)
+                .Include(v => v.VendorInvestigationServiceTypes)
+                .ThenInclude(v => v.InvestigationServiceType)
+                .Include(v => v.VendorInvestigationServiceTypes)
+                .ThenInclude(v => v.PincodeServices);
+            foreach (var v in empanelledVendors)
+            {
+                company.EmpanelledVendors.Remove(v);
+                v.Clients.Remove(company);
+                _context.Vendor.Update(v);
             }
-            ViewBag.CompanyId = id;
-            return Problem();
+            _context.ClientCompany.Update(company);
+            company.Updated = DateTime.Now;
+            company.UpdatedBy = HttpContext.User?.Identity?.Name;
+            var savedRows = await _context.SaveChangesAsync();
+            notifyService.Custom($"Agency(s) de-panelled.", 3, "red", "far fa-thumbs-down");
+            return RedirectToAction("Details", new { id = company.ClientCompanyId });
         }
 
         [Breadcrumb("Agency Detail")]
@@ -484,7 +454,8 @@ namespace risk.control.system.Controllers
                 .FirstOrDefaultAsync(m => m.VendorId == id);
             if (vendor == null)
             {
-                return NotFound();
+                notifyService.Error("Agency not found!");
+                return RedirectToAction(nameof(Index), "Dashboard");
             }
             ViewBag.CompanyId = companyId;
             ViewBag.Backurl = backurl;
