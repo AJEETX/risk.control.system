@@ -14,7 +14,26 @@
         public string? error { get; set; }
         public string? count_remain { get; set; }
     }
-
+    public class PanRequest
+    {
+        public string PAN { get; set; }
+    }
+    public class PanResponse
+    {
+        public string pan { get; set; }
+        public string type { get; set; }
+        public int reference_id { get; set; }
+        public string name_provided { get; set; }
+        public string registered_name { get; set; }
+        public bool valid { get; set; }
+        public string message { get; set; }
+        public string name_match_score { get; set; }
+        public string name_match_result { get; set; }
+        public string aadhaar_seeding_status { get; set; }
+        public string name_pan_card { get; set; }
+        public string pan_status { get; set; }
+        public string aadhaar_seeding_status_desc { get; set; }
+    }
     public class Result
     {
         public SourceOutput source_output { get; set; }

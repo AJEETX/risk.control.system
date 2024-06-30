@@ -219,8 +219,11 @@ namespace risk.control.system.Services
                             //    body?.result != null &&
                             //    body.result?.source_output != null
                             //    && body.result?.source_output?.status == "id_found")
-                            var panMatch = panRegex.Match(maskedImage.DocumentId);
-                            claim.AgencyReport.DocumentIdReport.DocumentIdImageValid = panMatch.Success ? true : false;
+                            var panResponse = await httpClientService.VerifyPanNew(maskedImage.DocumentId);
+                            if (panResponse != null && panResponse.valid) {
+                                var panMatch = panRegex.Match(maskedImage.DocumentId);
+                                claim.AgencyReport.DocumentIdReport.DocumentIdImageValid = panMatch.Success && panResponse.valid ? true : false;
+                            }
                         }
                         else
                         {

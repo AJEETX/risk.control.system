@@ -23,6 +23,7 @@ namespace risk.control.system.Services
         Task<FaceMatchDetail> GetFaceMatch(MatchImage image, string baseUrl);
 
         Task<PanVerifyResponse?> VerifyPan(string pan, string panUrl, string rapidAPIKey, string task_id, string group_id);
+        Task<PanResponse?> VerifyPanNew(string pan);
 
         Task<RootObject> GetAddress(string lat, string lon);
 
@@ -96,6 +97,7 @@ namespace risk.control.system.Services
             return null!;
         }
 
+
         public async Task<PanVerifyResponse?> VerifyPan(string pan, string panUrl, string rapidAPIKey, string task_id, string group_id)
         {
             var requestPayload = new PanVerifyRequest
@@ -136,17 +138,28 @@ namespace risk.control.system.Services
             return null!;
         }
 
+        //public async Task<RootObject> GetAddress(string lat, string lon)
+        //{
+        //    WebClient webClient = new WebClient();
+        //    webClient.Headers.Add("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
+        //    webClient.Headers.Add("Referer", "http://www.microsoft.com");
+        //    var jsonData = webClient.DownloadData("http://nominatim.openstreetmap.org/reverse?format=json&lat=" + lat + "&lon=" + lon);
+        //    DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(RootObject));
+        //    RootObject rootObject = (RootObject)ser.ReadObject(new MemoryStream(jsonData));
+        //    return rootObject;
+        //}
+
         public async Task<RootObject> GetAddress(string lat, string lon)
         {
-            WebClient webClient = new WebClient();
-            webClient.Headers.Add("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
-            webClient.Headers.Add("Referer", "http://www.microsoft.com");
-            var jsonData = webClient.DownloadData("http://nominatim.openstreetmap.org/reverse?format=json&lat=" + lat + "&lon=" + lon);
-            DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(RootObject));
-            RootObject rootObject = (RootObject)ser.ReadObject(new MemoryStream(jsonData));
+            httpClient.DefaultRequestHeaders.Add("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
+            httpClient.DefaultRequestHeaders.Add("Referer", "http://www.microsoft.com");
+            var result = await httpClient.GetAsync("http://nominatim.openstreetmap.org/reverse?format=json&lat=" + lat + "&lon=" + lon);
+            //var rootObject = await httpClient.GetFromJsonAsync<RootObject>("http://nominatim.openstreetmap.org/reverse?format=json&lat=" + lat + "&lon=" + lon);
+            var rootObject = JsonConvert.DeserializeObject<RootObject>(await result.Content.ReadAsStringAsync());
+            //DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(RootObject));
+            //RootObject rootObject = (RootObject)ser.ReadObject(new MemoryStream(jsonData));
             return rootObject;
         }
-
         public async Task<LocationDetails_IpApi> GetAddressFromIp(string ipAddress)
         {
             var Ip_Api_Url = $"{Applicationsettings.IP_SITE}{ipAddress}"; // 206.189.139.232 - This is a sample IP address. You can pass yours if you want to test
@@ -199,6 +212,36 @@ namespace risk.control.system.Services
                 throw;
             }
 
+        }
+
+        public async Task<PanResponse?> VerifyPanNew(string pan)
+        {
+            var payload = new PanRequest { PAN = pan };
+            var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Post,
+                RequestUri = new Uri("https://pan-card-verification-at-lowest-price.p.rapidapi.com/verification/marketing/pan"),
+                Headers =
+                {
+                    { "x-rapidapi-key", "df0893831fmsh54225589d7b9ad1p15ac51jsnb4f768feed6f" },
+                    { "x-rapidapi-host", "pan-card-verification-at-lowest-price.p.rapidapi.com" },
+                },
+                Content = new StringContent(JsonConvert.SerializeObject(payload))
+                {
+                    Headers =
+                    {
+                        ContentType = new MediaTypeHeaderValue("application/json")
+                    }
+                }
+            };
+            using (var response = await httpClient.SendAsync(request))
+            {
+                response.EnsureSuccessStatusCode();
+                var body = await response.Content.ReadAsStringAsync();
+                Console.WriteLine(body);
+                var panResponse = JsonConvert.DeserializeObject<PanResponse>(body);
+                return panResponse;
+            }
         }
     }
 }
