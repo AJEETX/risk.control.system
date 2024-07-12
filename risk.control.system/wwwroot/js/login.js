@@ -18,7 +18,6 @@ $.validator.setDefaults({
         $('#resetemail').attr('disabled', 'disabled');
 
         $('#password').attr('disabled', 'disabled');
-        $('#password').css('color', 'lightgrey');
 
         $('#login').css('color', 'lightgrey');
         $('#reset-pwd').css('color', 'lightgrey');
