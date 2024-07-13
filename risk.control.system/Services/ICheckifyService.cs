@@ -129,8 +129,7 @@ namespace risk.control.system.Services
                 claim.AgencyReport.DigitalIdReport.DigitalIdImageData = weatherCustomData;
                 claim.AgencyReport.DigitalIdReport.DigitalIdImage = compressImage;
                 claim.AgencyReport.DigitalIdReport.DigitalIdImageMatchConfidence = confidence;
-                var address = rootObject.display_name;
-                claim.AgencyReport.DigitalIdReport.DigitalIdImageLocationAddress = string.IsNullOrWhiteSpace(rootObject.display_name) ? "12 Heathcote Drive Forest Hill VIC 3131" : address;
+                claim.AgencyReport.DigitalIdReport.DigitalIdImageLocationAddress = rootObject.display_name;
                 claim.AgencyReport.DigitalIdReport.MatchExecuted = true;
 
                 var updateClaim = _context.ClaimsInvestigation.Update(claim);
@@ -267,9 +266,7 @@ namespace risk.control.system.Services
 
                 #endregion PAN IMAGE PROCESSING
                 RootObject rootObject = await addressTask;
-
-                var address = rootObject.display_name;
-                claim.AgencyReport.DocumentIdReport.DocumentIdImageLocationAddress = string.IsNullOrWhiteSpace(rootObject.display_name) ? "12 Heathcote Drive Forest Hill VIC 3131" : address;
+                claim.AgencyReport.DocumentIdReport.DocumentIdImageLocationAddress = rootObject.display_name;
                 claim.AgencyReport.DocumentIdReport.ValidationExecuted = true;
 
                 _context.ClaimsInvestigation.Update(claim);

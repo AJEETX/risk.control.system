@@ -155,10 +155,22 @@ namespace risk.control.system.Services
             httpClient.DefaultRequestHeaders.Add("Referer", "http://www.microsoft.com");
             var result = await httpClient.GetAsync("http://nominatim.openstreetmap.org/reverse?format=json&lat=" + lat + "&lon=" + lon);
             //var rootObject = await httpClient.GetFromJsonAsync<RootObject>("http://nominatim.openstreetmap.org/reverse?format=json&lat=" + lat + "&lon=" + lon);
-            var rootObject = JsonConvert.DeserializeObject<RootObject>(await result.Content.ReadAsStringAsync());
-            //DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(RootObject));
-            //RootObject rootObject = (RootObject)ser.ReadObject(new MemoryStream(jsonData));
-            return rootObject;
+            var responseBody = await result.Content.ReadAsStringAsync();
+            try
+            {
+                var rootObject = JsonConvert.DeserializeObject<RootObject>(responseBody);
+                //DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(RootObject));
+                //RootObject rootObject = (RootObject)ser.ReadObject(new MemoryStream(jsonData));
+                return rootObject;
+            }
+            catch (Exception)
+            {
+                return new RootObject
+                {
+                    display_name = "Troy Court, Forest Hill, Melbourne, City of Whitehorse, Victoria, 3131, Australia"
+                };
+            }
+            
         }
         public async Task<LocationDetails_IpApi> GetAddressFromIp(string ipAddress)
         {
