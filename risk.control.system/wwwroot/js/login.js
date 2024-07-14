@@ -7,6 +7,18 @@ $.validator.setDefaults({
             $(".submit-progress").removeClass("hidden");
         }, 1);
 
+        $('#login').css('color', 'lightgrey');
+        $('#reset-pwd').css('color', 'lightgrey');
+
+        $('#login').html('<span class="fas fa-sync fa-spin" aria-hidden="true"></span> Login');
+        $('#reset-pwd').html('<span class="fas fa-sync fa-spin" aria-hidden="true"></span> Reset Password');
+
+        $('a').attr('disabled', 'disabled');
+        $('button').attr('disabled', 'disabled');
+        $('html button').css('pointer-events', 'none')
+        $('html a').css({ 'pointer-events': 'none' }, { 'cursor': 'none' })
+        $('.text').css({ 'pointer-events': 'none' }, { 'cursor': 'none' })
+
         form.submit();
 
         $('#login-form').attr('disabled', 'disabled');
@@ -19,17 +31,7 @@ $.validator.setDefaults({
 
         $('#password').attr('disabled', 'disabled');
 
-        $('#login').css('color', 'lightgrey');
-        $('#reset-pwd').css('color', 'lightgrey');
-
-        $('#login').html('<span class="fas fa-sync fa-spin" aria-hidden="true"></span> Login');
-        $('#reset-pwd').html('<span class="fas fa-sync fa-spin" aria-hidden="true"></span> Reset Password');
-
-        $('a').attr('disabled', 'disabled');
-        $('button').attr('disabled', 'disabled');
-        $('html button').css('pointer-events', 'none')
-        $('html a').css({ 'pointer-events': 'none' }, { 'cursor': 'none' })
-        $('.text').css({ 'pointer-events': 'none' }, { 'cursor': 'none' })
+        
 
         var nodes = document.getElementById("login-form").getElementsByTagName('*');
         for (var i = 0; i < nodes.length; i++) {
