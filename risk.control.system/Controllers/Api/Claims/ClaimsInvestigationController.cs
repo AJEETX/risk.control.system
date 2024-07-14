@@ -154,8 +154,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 faceLat = claim.AgencyReport.DigitalIdReport.DigitalIdImageLongLat.Substring(0, longLat)?.Trim();
                 faceLng = claim.AgencyReport.DigitalIdReport.DigitalIdImageLongLat.Substring(longLat + 1)?.Trim();
                 var longLatString = faceLat + "," + faceLng;
-                RootObject rootObject = await httpClientService.GetAddress((faceLat), (faceLng));
-                imageAddress = rootObject.display_name;
+                imageAddress = await httpClientService.GetRawAddress((faceLat), (faceLng));
                 mapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={longLatString}&zoom=18&size=300x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{longLatString}&key={Applicationsettings.GMAPData}";
             }
 
@@ -167,8 +166,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 ocrLatitude = claim.AgencyReport.DocumentIdReport.DocumentIdImageLongLat.Substring(0, ocrlongLat)?.Trim();
                 ocrLongitude = claim.AgencyReport.DocumentIdReport.DocumentIdImageLongLat.Substring(ocrlongLat + 1)?.Trim();
                 var ocrLongLatString = ocrLatitude + "," + ocrLongitude;
-                RootObject rootObject = await httpClientService.GetAddress((ocrLatitude), (ocrLongitude));
-                ocrAddress = rootObject.display_name;
+                ocrAddress = await httpClientService.GetRawAddress((ocrLatitude), (ocrLongitude));
                 ocrUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={ocrLongLatString}&zoom=18&size=300x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{ocrLongLatString}&key={Applicationsettings.GMAPData}";
             }
 
@@ -226,12 +224,11 @@ namespace risk.control.system.Controllers.Api.Claims
             string weatherCustomData = $"Temperature:{weatherData.current.temperature_2m} {weatherData.current_units.temperature_2m}.\r\nWindspeed:{weatherData.current.windspeed_10m} {weatherData.current_units.windspeed_10m} \r\nElevation(sea level):{weatherData.elevation} metres";
 
             var longLatString = latitude + "," + longitude;
-            RootObject rootObject = await httpClientService.GetAddress((latitude), (longitude));
-            var imageAddress = rootObject.display_name;
+            var imageAddress = await httpClientService.GetRawAddress((latitude), (longitude));
             var customerMapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={longLatString}&zoom=18&size=300x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{longLatString}&key={Applicationsettings.GMAPData}";
             var data = new
             {
-                profileMap = customerMapUrl,
+                profileMap = customer.CustomerLocationMap,
                 weatherData = weatherCustomData,
                 address = customer.Addressline + " " + customer.District.Name + " " + customer.State.Name + " " + customer.Country.Name + " " + customer.PinCode.Code,
                 position = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) }
@@ -262,12 +259,11 @@ namespace risk.control.system.Controllers.Api.Claims
             string weatherCustomData = $"Temperature:{weatherData.current.temperature_2m} {weatherData.current_units.temperature_2m}.\r\nWindspeed:{weatherData.current.windspeed_10m} {weatherData.current_units.windspeed_10m} \r\nElevation(sea level):{weatherData.elevation} metres";
 
             var longLatString = latitude + "," + longitude;
-            RootObject rootObject = await httpClientService.GetAddress((latitude), (longitude));
-            var imageAddress = rootObject.display_name;
+            var imageAddress = await httpClientService.GetRawAddress((latitude), (longitude));
             var customerMapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={longLatString}&zoom=18&size=300x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{longLatString}&key={Applicationsettings.GMAPData}";
             var data = new
             {
-                profileMap = customerMapUrl,
+                profileMap = beneficiary.BeneficiaryLocationMap,
                 weatherData = weatherCustomData,
                 address = beneficiary.Addressline + " " + beneficiary.District.Name + " " + beneficiary.State.Name + " " + beneficiary.Country.Name + " " + beneficiary.PinCode.Code,
                 position = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) }

@@ -26,6 +26,7 @@ namespace risk.control.system.Services
         Task<PanResponse?> VerifyPanNew(string pan);
 
         Task<RootObject> GetAddress(string lat, string lon);
+        Task<string> GetRawAddress(string lat, string lon);
 
         Task<LocationDetails_IpApi> GetAddressFromIp(string ipAddress);
         Task<bool> WhitelistIP(string url, string domain, string ipaddress);
@@ -138,16 +139,33 @@ namespace risk.control.system.Services
             return null!;
         }
 
-        //public async Task<RootObject> GetAddress(string lat, string lon)
-        //{
-        //    WebClient webClient = new WebClient();
-        //    webClient.Headers.Add("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
-        //    webClient.Headers.Add("Referer", "http://www.microsoft.com");
-        //    var jsonData = webClient.DownloadData("http://nominatim.openstreetmap.org/reverse?format=json&lat=" + lat + "&lon=" + lon);
-        //    DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(RootObject));
-        //    RootObject rootObject = (RootObject)ser.ReadObject(new MemoryStream(jsonData));
-        //    return rootObject;
-        //}
+        public async Task<string> GetRawAddress(string lat, string lon)
+        {
+            var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri("https://feroeg-reverse-geocoding.p.rapidapi.com/address?lat=-37.839820319527&lon=145.16481562890925&lang=en&mode=text&format='%5BSN%5B%2C%20%5D%20-%20%5B23456789ab%5B%2C%20%5D'"),
+                Headers =
+                {
+                    { "x-rapidapi-key", "327fd8beb9msh8a441504790e80fp142ea8jsnf74b9208776a" },
+                    { "x-rapidapi-host", "feroeg-reverse-geocoding.p.rapidapi.com" },
+                },
+            };
+            try
+            {
+                using (var response = await httpClient.SendAsync(request))
+                {
+                    response.EnsureSuccessStatusCode();
+                    var body = await response.Content.ReadAsStringAsync();
+                    return (body);
+                }
+            }
+            catch (Exception)
+            {
+                return "Troy Court, Forest Hill, Melbourne, City of Whitehorse, Victoria, 3131, Australia";
+            }
+            
+        }
 
         public async Task<RootObject> GetAddress(string lat, string lon)
         {

@@ -51,7 +51,7 @@ namespace risk.control.system.Controllers.Api
         [HttpGet("GetAddressByLatLng")]
         public async Task<IActionResult> GetAddressByLatLng(string lat, string lng)
         {
-            var verifiedPanResponse = await httpClientService.GetAddress(lat, lng);
+            var verifiedPanResponse = await httpClientService.GetRawAddress(lat, lng);
 
             return Ok(verifiedPanResponse);
         }

@@ -639,7 +639,7 @@ $(document).ready(function () {
                 }).done(function (response) {
                     self.setContent('<hr>');
                     self.setContentAppend('<header>');
-                    self.setContentAppend('<b><i class="fa fa-user-plus"></i>Customer Name</b>: ' + response.customerName);
+                    self.setContentAppend('<b><i class="fa fa-user-plus"></i> Customer Name</b>: ' + response.customerName);
                     self.setContentAppend('</header>');
                     self.setContentAppend('<br><b><i class="far fa-clock"></i> Date of birth</b> : ' + response.dateOfBirth);
                     self.setContentAppend('<br><b><i class="fas fa-tools"></i> Occupation</b> : ' + response.occupation);
@@ -649,7 +649,7 @@ $(document).ready(function () {
                     self.setContentAppend('<br><b><i class="fas fa-lg fa-phone"></i> Phone</b> : ' + response.contactNumber);
                     self.setContentAppend('<br><b><i class="far fa-id-badge"></i> Customer Image</b>:');
                     self.setContentAppend('<br><img id="agentLocationPicture" class="img-fluid investigation-actual-image" src="' + response.customer + '" />');
-                    self.setTitle('Customer detail');
+                    self.setTitle('Customer details');
                 }).fail(function () {
                     self.setContent('Something went wrong.');
                 });

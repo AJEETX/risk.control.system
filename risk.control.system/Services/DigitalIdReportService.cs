@@ -59,7 +59,7 @@ namespace risk.control.system.Services
             var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key={Applicationsettings.GMAPData}";
             claim.AgencyReport.DigitalIdReport.DigitalIdImageLocationUrl = url;
 
-            var rootObject = await httpClientService.GetAddress((latitude), (longitude));
+            var address = await httpClientService.GetRawAddress((latitude), (longitude));
             double registeredLatitude = 0;
             double registeredLongitude = 0;
             if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
@@ -74,9 +74,7 @@ namespace risk.control.system.Services
             }
             var distance = DistanceFinder.GetDistance(registeredLatitude, registeredLongitude, Convert.ToDouble(latitude), Convert.ToDouble(longitude));
 
-            var address = rootObject.display_name;
-
-            claim.AgencyReport.DigitalIdReport.DigitalIdImageLocationAddress = string.IsNullOrWhiteSpace(rootObject.display_name) ? "12 Heathcote Drive Forest Hill VIC 3131" : address;
+            claim.AgencyReport.DigitalIdReport.DigitalIdImageLocationAddress = address;
             claim.AgencyReport.DigitalIdReport.Updated = DateTime.Now;
             claim.AgencyReport.DigitalIdReport.UpdatedBy = claim.AgencyReport.AgentEmail;
         }

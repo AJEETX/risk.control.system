@@ -111,13 +111,13 @@ namespace risk.control.system.Services
 
                 var faceMatchTask = faceMatchService.GetFaceMatchAsync(registeredImage, data.LocationImage);
                 var weatherTask = httpClient.GetFromJsonAsync<Weather>(weatherUrl);
-                var addressTask = httpClientService.GetAddress(latitude, longitude);
+                var addressTask = httpClientService.GetRawAddress(latitude, longitude);
                 #endregion FACE IMAGE PROCESSING
 
                 await Task.WhenAll(faceMatchTask, addressTask, weatherTask);
 
                 var (confidence, compressImage) = await faceMatchTask;
-                var rootObject = await addressTask;
+                var address = await addressTask;
                 var weatherData = await weatherTask;
 
                 string weatherCustomData = $"Temperature:{weatherData.current.temperature_2m} {weatherData.current_units.temperature_2m}." +
@@ -129,7 +129,7 @@ namespace risk.control.system.Services
                 claim.AgencyReport.DigitalIdReport.DigitalIdImageData = weatherCustomData;
                 claim.AgencyReport.DigitalIdReport.DigitalIdImage = compressImage;
                 claim.AgencyReport.DigitalIdReport.DigitalIdImageMatchConfidence = confidence;
-                claim.AgencyReport.DigitalIdReport.DigitalIdImageLocationAddress = rootObject.display_name;
+                claim.AgencyReport.DigitalIdReport.DigitalIdImageLocationAddress = address;
                 claim.AgencyReport.DigitalIdReport.MatchExecuted = true;
 
                 var updateClaim = _context.ClaimsInvestigation.Update(claim);
@@ -184,7 +184,7 @@ namespace risk.control.system.Services
 
                 var googleDetecTask = googleApi.DetectTextAsync(byteimage);
 
-                var addressTask = httpClientService.GetAddress(latitude, longitude);
+                var addressTask = httpClientService.GetRawAddress(latitude, longitude);
 
                 await Task.WhenAll(googleDetecTask, addressTask);
 
@@ -265,8 +265,8 @@ namespace risk.control.system.Services
                 }
 
                 #endregion PAN IMAGE PROCESSING
-                RootObject rootObject = await addressTask;
-                claim.AgencyReport.DocumentIdReport.DocumentIdImageLocationAddress = rootObject.display_name;
+                var rawAddress = await addressTask;
+                claim.AgencyReport.DocumentIdReport.DocumentIdImageLocationAddress = rawAddress;
                 claim.AgencyReport.DocumentIdReport.ValidationExecuted = true;
 
                 _context.ClaimsInvestigation.Update(claim);
