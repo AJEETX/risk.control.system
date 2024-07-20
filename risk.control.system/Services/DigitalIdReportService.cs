@@ -56,7 +56,7 @@ namespace risk.control.system.Services
                 $"\r\n" +
                 $"\r\nElevation(sea level):{weatherData.elevation} metres";
             claim.AgencyReport.DigitalIdReport.DigitalIdImageData = weatherCustomData;
-            var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key={Applicationsettings.GMAPData}";
+            var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
             claim.AgencyReport.DigitalIdReport.DigitalIdImageLocationUrl = url;
 
             var address = await httpClientService.GetRawAddress((latitude), (longitude));

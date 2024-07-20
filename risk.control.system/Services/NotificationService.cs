@@ -56,7 +56,7 @@ namespace risk.control.system.Services
                 page = page == "/" ? "dashboard" : page;
                 var response = await _httpClient.GetFromJsonAsync<IpApiResponse>(route, ct);
                 var longLatString = response?.lat.GetValueOrDefault().ToString() + "," + response?.lon.GetValueOrDefault().ToString();
-                var mapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={longLatString}&zoom=6&size=560x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{longLatString}&key={Applicationsettings.GMAPData}";
+                var mapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={longLatString}&zoom=6&size=560x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{longLatString}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
 
                 if (response != null && (await featureManager.IsEnabledAsync(FeatureFlags.IPTracking)))
                 {

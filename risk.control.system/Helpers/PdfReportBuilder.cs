@@ -341,7 +341,7 @@ namespace risk.control.system.Helpers
                 Path.Combine(imgPath, "images", "CT_Location.png"),
                 XSize.FromHeight(108));
             cellBuilder.AddParagraph("")
-               .AddUrl($"https://maps.googleapis.com/maps/api/staticmap?center=32.661839,-97.263680&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C32.661839,-97.263680&key={Applicationsettings.GMAPData}", "map");
+               .AddUrl($"https://maps.googleapis.com/maps/api/staticmap?center=32.661839,-97.263680&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C32.661839,-97.263680&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}", "map");
         }
 
         private void FillHandBugTableCell1(TableCellBuilder cellBuilder)
@@ -355,7 +355,7 @@ namespace risk.control.system.Helpers
                 Path.Combine(imgPath, "images", "CT_Location.png"),
                 XSize.FromHeight(108));
             cellBuilder.AddParagraph("")
-                .AddUrl($"https://maps.googleapis.com/maps/api/staticmap?center=32.661839,-97.263680&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C32.661839,-97.263680&key={Applicationsettings.GMAPData}", "map");
+                .AddUrl($"https://maps.googleapis.com/maps/api/staticmap?center=32.661839,-97.263680&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C32.661839,-97.263680&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}", "map");
         }
 
         private void FillBoardingTable(TableBuilder tableBuilder,

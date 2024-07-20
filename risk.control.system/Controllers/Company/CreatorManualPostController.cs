@@ -428,7 +428,7 @@ namespace risk.control.system.Controllers.Company
                 caseLocation.PinCode = pincode;
 
                 var customerLatLong = caseLocation.PinCode.Latitude + "," + caseLocation.PinCode.Longitude;
-                var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=8&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key={Applicationsettings.GMAPData}";
+                var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=8&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
                 caseLocation.BeneficiaryLocationMap = url;
                 _context.Add(caseLocation);
                 await _context.SaveChangesAsync();
@@ -495,7 +495,7 @@ namespace risk.control.system.Controllers.Company
                 var pincode = _context.PinCode.FirstOrDefault(p => p.PinCodeId == caseLocation.PinCodeId);
                 caseLocation.PinCode = pincode;
                 var customerLatLong = pincode.Latitude + "," + pincode.Longitude;
-                var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=8&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key={Applicationsettings.GMAPData}";
+                var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=8&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
                 caseLocation.BeneficiaryLocationMap = url;
 
                 IFormFile? customerDocument = Request.Form?.Files?.FirstOrDefault();
