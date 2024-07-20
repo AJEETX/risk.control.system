@@ -13,8 +13,6 @@
         public static readonly string ValidIssuer = "icheckify";
         public static readonly string ValidAudience = "canarahdfclife";
         public static readonly int TokenTimeoutMinutes = 5;
-        public static readonly string DeskData = "AIzaSyDYRB1qIx1AyTxGnV5r5IZC3mk4uYV6MFI";
-        public static readonly string SGKData = "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";
         public const string APP_URL = "https://apkichck.s3.ap-southeast-2.amazonaws.com/ichck/app-release_20242901-002101_dev.apk";
         
         //WEBSITE SETTINGS
