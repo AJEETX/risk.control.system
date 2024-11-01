@@ -127,7 +127,7 @@ namespace risk.control.system.Controllers.Api
                             message += $"Thanks                           ";
                             message += $"                                ";
                             message += $"https://icheckify.co.in";
-                            var response = SmsService.SendSingleMessage(request.Mobile, message, request.SendSMS);
+                            await SmsService.SendSmsAsync(request.Mobile, message);
                         }
 
                         return Ok(new { Email = user2Onboard.Email, Pin = user2Onboard.SecretPin });

@@ -83,7 +83,7 @@ namespace risk.control.system.Controllers
                     clientCompany.DocumentImage = dataStream.ToArray();
                 }
 
-                var response = SmsService.SendSingleMessage(clientCompany.PhoneNumber, "Company account created. Domain : " + clientCompany.Email);
+                await SmsService.SendSmsAsync(clientCompany.PhoneNumber, "Company account created. Domain : " + clientCompany.Email);
 
                 clientCompany.Updated = DateTime.Now;
                 clientCompany.UpdatedBy = HttpContext.User?.Identity?.Name;
@@ -139,7 +139,7 @@ namespace risk.control.system.Controllers
                 _context.ClientCompany.Remove(clientCompany);
                 await _context.SaveChangesAsync();
 
-                var response = SmsService.SendSingleMessage(clientCompany.PhoneNumber, "Company account deleted. Domain : " + clientCompany.Email);
+                await SmsService.SendSmsAsync(clientCompany.PhoneNumber, "Company account deleted. Domain : " + clientCompany.Email);
 
                 notifyService.Custom($"Company deleted successfully.", 3, "red", "fas fa-building");
                 return RedirectToAction(nameof(Index));
@@ -273,7 +273,7 @@ namespace risk.control.system.Controllers
                 _context.ClientCompany.Update(clientCompany);
                 await _context.SaveChangesAsync();
 
-                var response = SmsService.SendSingleMessage(clientCompany.PhoneNumber, "Company account edited. Domain : " + clientCompany.Email);
+                await SmsService.SendSmsAsync(clientCompany.PhoneNumber, "Company account edited. Domain : " + clientCompany.Email);
             }
             catch
             {

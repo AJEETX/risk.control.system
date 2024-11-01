@@ -1,4 +1,6 @@
-﻿using System.Net.Http.Headers;
+﻿using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
 
 using Newtonsoft.Json;
 
@@ -48,10 +50,32 @@ namespace risk.control.system.Services
             // Send a message using the primary device.
             if (active)
             {
-                var result = SMS.API.SendSingleMessage("+" + mobile, message, device, timestamp, isMMS, attachments, priority);
-                return result;
+                SendSmsAsync("+" + mobile, message).RunSynchronously();
+                return null;
             }
             return null;
+        }
+        public static async Task SendSmsAsync(string mobile = "+61432854196", string message = "Testing fom Azy")
+        {
+            var url = "https://api.sms-gate.app/3rdparty/v1/message";
+            var username = "YXNGBE"; 
+            var password = "rfi-gbbukll7-6"; 
+            var authToken = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{username}:{password}"));
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authToken);
+            var newContent = new { message = message, phoneNumbers = new List<string> { mobile } }; 
+            var jsonContent = JsonConvert.SerializeObject(newContent); 
+            var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+            try 
+            { 
+                var response = await client.PostAsync(url, content); 
+                response.EnsureSuccessStatusCode(); 
+                var responseBody = await response.Content.ReadAsStringAsync(); 
+                Console.WriteLine("Response: " + responseBody); 
+            } 
+            catch (Exception ex) 
+            { 
+                Console.WriteLine("Error sending SMS: " + ex.Message); 
+            }
         }
     }
 }

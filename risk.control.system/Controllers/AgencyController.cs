@@ -214,7 +214,7 @@ namespace risk.control.system.Controllers
                 _context.Vendor.Update(vendor);
                 await _context.SaveChangesAsync();
 
-                var response = SmsService.SendSingleMessage(vendor.PhoneNumber, "Agency account created. Domain : " + vendor.Email);
+                await SmsService.SendSmsAsync(vendor.PhoneNumber, "Agency account created. Domain : " + vendor.Email);
 
                 notifyService.Custom($"Agency edited successfully.", 3, "green", "fas fa-building");
                 return RedirectToAction(nameof(AgencyController.Profile), "Agency");
@@ -344,7 +344,7 @@ namespace risk.control.system.Controllers
                         if (lockUser.Succeeded && lockDate.Succeeded)
                         {
                             notifyService.Custom($"User created and locked.", 3, "orange", "fas fa-user-lock");
-                            var response = SmsService.SendSingleMessage(user.PhoneNumber, "Agency user created and locked. Email : " + user.Email);
+                            await SmsService.SendSmsAsync(user.PhoneNumber, "Agency user created and locked. Email : " + user.Email);
                             if(txn =="agency")
                             {
                                 return RedirectToAction(nameof(AgencyController.Users), "Agency");
@@ -382,12 +382,12 @@ namespace risk.control.system.Controllers
                                 message += $"Thanks";
                                 message += "                                                                                ";
                                 message += $"https://icheckify.co.in";
-                                var onboard = SmsService.SendSingleMessage(user.PhoneNumber, message, onboardAgent);
+                                await SmsService.SendSmsAsync(user.PhoneNumber, message);
                                 notifyService.Custom($"Agent onboarding initiated.", 3, "green", "fas fa-user-check");
                             }
                             else
                             {
-                                var response = SmsService.SendSingleMessage(user.PhoneNumber, "Agency user edited and unlocked. Email : " + user.Email);
+                                await SmsService.SendSmsAsync(user.PhoneNumber, "Agency user edited and unlocked. Email : " + user.Email);
                                 notifyService.Custom($"User edited.", 3, "green", "fas fa-user-check");
                             }
                         }
@@ -555,7 +555,7 @@ namespace risk.control.system.Controllers
 
                             if (lockUser.Succeeded && lockDate.Succeeded)
                             {
-                                var response = SmsService.SendSingleMessage(user.PhoneNumber, "Agency user edited and locked. Email : " + user.Email);
+                                await SmsService.SendSmsAsync(user.PhoneNumber, "Agency user edited and locked. Email : " + user.Email);
                                 notifyService.Custom($"User edited and locked.", 3, "orange", "fas fa-user-lock");
                             }
                         }
@@ -586,12 +586,12 @@ namespace risk.control.system.Controllers
                                     message += $"Thanks";
                                     message += "                                                                                ";
                                     message += $"https://icheckify.co.in";
-                                    var onboard = SmsService.SendSingleMessage(user.PhoneNumber, message, onboardAgent);
+                                    await SmsService.SendSmsAsync(user.PhoneNumber, message);
                                     notifyService.Custom($"Agent onboarding initiated.", 3, "green", "fas fa-user-check");
                                 }
                                 else
                                 {
-                                    var response = SmsService.SendSingleMessage(user.PhoneNumber, "Agency user edited and unlocked. Email : " + user.Email);
+                                    await SmsService.SendSmsAsync(user.PhoneNumber, "Agency user edited and unlocked. Email : " + user.Email);
                                     notifyService.Custom($"User edited.", 3, "green", "fas fa-user-check");
                                 }
                             }
@@ -689,7 +689,7 @@ namespace risk.control.system.Controllers
             message += $"https://icheckify.co.in";
             if (onboardAgent)
             {
-                var onboard = SmsService.SendSingleMessage(user.PhoneNumber, message, onboardAgent);
+                await SmsService.SendSmsAsync(user.PhoneNumber, message);
                 notifyService.Custom($"Agent onboarding initiated.", 3, "green", "fas fa-user-check");
             }
             else

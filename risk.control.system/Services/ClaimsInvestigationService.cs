@@ -434,7 +434,7 @@ namespace risk.control.system.Services
                     claimsInvestigation.CustomerDetail.PinCode = pincode;
 
                     var customerLatLong = claimsInvestigation.CustomerDetail.PinCode.Latitude + "," + claimsInvestigation.CustomerDetail.PinCode.Longitude;
-
+                    var key = Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY");
                     var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=8&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
                     claimsInvestigation.CustomerDetail.CustomerLocationMap = url;
 

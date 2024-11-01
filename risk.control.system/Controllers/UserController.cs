@@ -86,7 +86,7 @@ namespace risk.control.system.Controllers
             if (result.Succeeded)
             {
                 notifyService.Custom($"User created successfully.", 3, "green", "fas fa-user-plus");
-                var response = SmsService.SendSingleMessage(user.PhoneNumber, "User created. Email : " + user.Email);
+                await SmsService.SendSmsAsync(user.PhoneNumber, "User created. Email : " + user.Email);
 
                 return RedirectToAction(nameof(Index));
             }
@@ -212,7 +212,7 @@ namespace risk.control.system.Controllers
                             var roles = await userManager.GetRolesAsync(user);
                             var roleResult = await userManager.RemoveFromRolesAsync(user, roles);
                             await userManager.AddToRoleAsync(user, user.Role.ToString());
-                            var response = SmsService.SendSingleMessage(user.PhoneNumber, "User edited. Email : " + user.Email);
+                            await SmsService.SendSmsAsync(user.PhoneNumber, "User edited. Email : " + user.Email);
                             notifyService.Custom($"User edited successfully.", 3, "orange", "fas fa-user-check");
                             return RedirectToAction(nameof(Index));
                         }

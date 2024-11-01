@@ -96,8 +96,8 @@ namespace risk.control.system.Controllers.Api
             string? attachments = $"<a href='{logo}'>team</a>";
             var finalMessage = $"{message} Date: {DateTime.Now.ToString("dd-MMM-yyyy HH:mm")} {logo}";
             bool priority = true;
-            var response = SMS.API.SendSingleMessage("+" + mobile, finalMessage, device, timestamp, isMMS, attachments, priority);
-            return Ok(response);
+            await SmsService.SendSmsAsync("+" + mobile, finalMessage);
+            return Ok();
         }
     }
 }

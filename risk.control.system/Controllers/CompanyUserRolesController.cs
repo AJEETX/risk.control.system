@@ -93,7 +93,7 @@ namespace risk.control.system.Controllers
             result = await userManager.AddToRolesAsync(user, model.CompanyUserRoleViewModel.Where(x => x.Selected).Select(y => y.RoleName));
             var currentUser = await userManager.GetUserAsync(User);
             await signInManager.RefreshSignInAsync(currentUser);
-            var response = SmsService.SendSingleMessage(user.PhoneNumber, "User role edited . Email : " + user.Email);
+            await SmsService.SendSmsAsync(user.PhoneNumber, "User role edited . Email : " + user.Email);
 
             notifyService.Custom($"User role(s) updated successfully.", 3, "orange", "fas fa-user-cog");
             return RedirectToAction(nameof(CompanyUserController.Index), "CompanyUser", new { Id = model.CompanyId });

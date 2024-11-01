@@ -152,7 +152,7 @@ namespace risk.control.system.Controllers
             {
                 await userManager.AddToRoleAsync(user, user.UserRole.ToString());
 
-                var response = SmsService.SendSingleMessage(user.PhoneNumber, "Company account created. Domain : " + user.Email);
+                await SmsService.SendSmsAsync(user.PhoneNumber, "Company account created. Domain : " + user.Email);
                 notifyService.Custom($"User created successfully.", 3, "green", "fas fa-user-plus");
 
                 return RedirectToAction(nameof(CompanyUserController.Index), "CompanyUser", new { id = user.ClientCompanyId });
@@ -291,7 +291,7 @@ namespace risk.control.system.Controllers
                             var roleResult = await userManager.RemoveFromRolesAsync(user, roles);
                             await userManager.AddToRoleAsync(user, user.UserRole.ToString());
                             notifyService.Custom($"Company user edited successfully.", 3, "orange", "fas fa-user-check");
-                            var response = SmsService.SendSingleMessage(user.PhoneNumber, "Company account edited. Domain : " + user.Email);
+                            await SmsService.SendSmsAsync(user.PhoneNumber, "Company account edited. Domain : " + user.Email);
 
                             return RedirectToAction(nameof(CompanyUserController.Index), "CompanyUser", new { id = applicationUser.ClientCompanyId });
                         }

@@ -43,8 +43,11 @@ namespace risk.control.system.Services
                 message += $"                                          ";
                 message += $"Thanks";
                 message += $"                                          ";
-                message += $"{BaseUrl}"; 
-                var response = SmsService.SendSingleMessage(user.PhoneNumber, message, user != null);
+                message += $"{BaseUrl}";
+                if(user != null)
+                {
+                    SmsService.SendSmsAsync(user.PhoneNumber, message).RunSynchronously();
+                }
             }
             //SEND SMS
 

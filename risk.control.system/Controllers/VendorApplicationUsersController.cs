@@ -146,13 +146,13 @@ namespace risk.control.system.Controllers
 
                     if (lockUser.Succeeded && lockDate.Succeeded)
                     {
-                        var response = SmsService.SendSingleMessage(user.PhoneNumber, "Agency user created and locked. Email : " + user.Email);
+                        await SmsService.SendSmsAsync(user.PhoneNumber, "Agency user created and locked. Email : " + user.Email);
                         notifyService.Custom($"User edited and locked.", 3, "orange", "fas fa-user-lock");
                     }
                 }
                 else
                 {
-                    var response = SmsService.SendSingleMessage(user.PhoneNumber, "Agency user created. Email : " + user.Email);
+                    await SmsService.SendSmsAsync(user.PhoneNumber, "Agency user created. Email : " + user.Email);
                     notifyService.Custom($"User created successfully.", 3, "green", "fas fa-user-plus");
                 }
                 return RedirectToAction(nameof(VendorUserController.Index), "VendorUser", new { id = user.VendorId });
@@ -288,7 +288,7 @@ namespace risk.control.system.Controllers
 
                                 if (lockUser.Succeeded && lockDate.Succeeded)
                                 {
-                                    var response = SmsService.SendSingleMessage(user.PhoneNumber, "Agency user edited and locked. Email : " + user.Email);
+                                    await SmsService.SendSmsAsync(user.PhoneNumber, "Agency user edited and locked. Email : " + user.Email);
                                     notifyService.Custom($"User edited and locked.", 3, "orange", "fas fa-user-lock");
                                 }
                             }
@@ -300,7 +300,7 @@ namespace risk.control.system.Controllers
 
                                 if (lockUser.Succeeded && lockDate.Succeeded)
                                 {
-                                    var response = SmsService.SendSingleMessage(user.PhoneNumber, "Agency user edited and unlocked. Email : " + user.Email);
+                                    await SmsService.SendSmsAsync(user.PhoneNumber, "Agency user edited and unlocked. Email : " + user.Email);
                                     notifyService.Custom($"User edited and unlocked.", 3, "green", "fas fa-user-check");
                                 }
                             }

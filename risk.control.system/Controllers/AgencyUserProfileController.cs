@@ -184,7 +184,7 @@ namespace risk.control.system.Controllers
                     {
                         notifyService.Custom($"User profile edited successfully.", 3, "green", "fas fa-user");
 
-                        var response = SmsService.SendSingleMessage(user.PhoneNumber, "Agency user edited. Email : " + user.Email);
+                        await SmsService.SendSmsAsync(user.PhoneNumber, "Agency user edited. Email : " + user.Email);
 
                         return RedirectToAction(nameof(Index), "Dashboard");
                     }
@@ -264,7 +264,7 @@ namespace risk.control.system.Controllers
                         failedMessage += $"                                       ";
                         failedMessage += $"                                       ";
                         failedMessage += $"{BaseUrl}";
-                        SMS.API.SendSingleMessage("+" + admin.PhoneNumber, failedMessage);
+                        await SmsService.SendSmsAsync("+" + admin.PhoneNumber, failedMessage);
                         notifyService.Error("OOPS !!!..Contact Admin");
                         return RedirectToAction("/Account/Login");
                     }
@@ -280,7 +280,7 @@ namespace risk.control.system.Controllers
                     message += $"                                       ";
                     message += $"                                       ";
                     message += $"{BaseUrl}";
-                    SMS.API.SendSingleMessage("+" + admin.PhoneNumber, message);
+                    await SmsService.SendSmsAsync("+" + admin.PhoneNumber, message);
 
 
                     message = string.Empty;
@@ -293,7 +293,7 @@ namespace risk.control.system.Controllers
                     message += $"                                       ";
                     message += $"                                       ";
                     message += $"{BaseUrl}";
-                    SMS.API.SendSingleMessage("+" + user.PhoneNumber, message);
+                    await SmsService.SendSmsAsync("+" + user.PhoneNumber, message);
 
                     return View("ChangePasswordConfirmation");
                 }

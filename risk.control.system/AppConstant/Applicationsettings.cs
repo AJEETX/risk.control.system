@@ -218,6 +218,7 @@
         public const string NO_IMAGE = "/img/no-image.png";
         public const string NO_USER = "/img/no-user.png";
         public const string NO_MAP = "/img/no-map.jpeg";
+        public const string MAP_MARKER = "/img/map-marker-icon.png";
 
         public static class PORTAL_ADMIN
         {

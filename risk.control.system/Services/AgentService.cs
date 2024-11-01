@@ -72,7 +72,7 @@ namespace risk.control.system.Services
                 message += $"Thanks";
                 message += $"                                          ";
                 message += $"{BaseUrl}";
-                var response = SmsService.SendSingleMessage(mobile, message, sendSMS);
+                await SmsService.SendSmsAsync(mobile, message);
             }
             return user2Onboard;
         }

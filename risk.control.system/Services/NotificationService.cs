@@ -193,7 +193,7 @@ namespace risk.control.system.Services
             //    noTinyUrl
             //    );
 
-            var response = SMS.API.SendSingleMessage("+" + mobile, finalMessage, device, timestamp, isMMS, null, priority);
+            await SmsService.SendSmsAsync("+" + mobile, finalMessage);
             var meetingTime = DateTime.Now.AddDays(1);
             if (DateTime.TryParse(message.Time, out DateTime date))
             {
@@ -272,7 +272,7 @@ namespace risk.control.system.Services
             var previousMessage = context.ClaimMessage.FirstOrDefault(u => u.ClaimsInvestigationId == claim.ClaimsInvestigationId);
             var agent = context.VendorApplicationUser.FirstOrDefault(u => u.Email == claim.CurrentClaimOwner);
 
-            var response = SMS.API.SendSingleMessage("+" + agent.PhoneNumber, finalMessage, device, timestamp, isMMS, null, priority);
+            await SmsService.SendSmsAsync("+" + agent.PhoneNumber, finalMessage);
 
             var scheduleMessage = new ClaimMessage
             {
@@ -417,7 +417,7 @@ namespace risk.control.system.Services
             };
             claim.ClaimMessages.Add(scheduleMessage);
             context.SaveChanges();
-            var response = SMS.API.SendSingleMessage("+" + mobile, message, "0", null, false, null, true);
+            SmsService.SendSmsAsync("+" + mobile, message).RunSynchronously();
             return claim.CustomerDetail.CustomerName;
         }
 
@@ -480,7 +480,7 @@ namespace risk.control.system.Services
             .FirstOrDefault(c => c.ClaimsInvestigationId == claimId);
             claim.ClaimMessages.Add(scheduleMessage);
             context.SaveChanges();
-            var response = SMS.API.SendSingleMessage("+" + mobile, message, "0", null, false, null, true);
+            SmsService.SendSmsAsync("+" + mobile, message).RunSynchronously();
             return beneficiary.BeneficiaryName;
         }
     }

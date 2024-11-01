@@ -217,7 +217,7 @@ namespace risk.control.system.Controllers
                 _context.ClientCompany.Update(existCompany);
                 await _context.SaveChangesAsync();
 
-                var response = SmsService.SendSingleMessage(clientCompany.PhoneNumber, "Company edited. Domain : " + clientCompany.Email);
+                await SmsService.SendSmsAsync(clientCompany.PhoneNumber, "Company edited. Domain : " + clientCompany.Email);
             }
             
             catch (Exception ex)
@@ -324,14 +324,14 @@ namespace risk.control.system.Controllers
                         if (lockUser.Succeeded && lockDate.Succeeded)
                         {
                             notifyService.Custom($"User created and locked.", 3, "orange", "fas fa-user-lock");
-                            var response = SmsService.SendSingleMessage(createdUser.PhoneNumber, "User created and locked. Email : " + createdUser.Email);
+                            await SmsService.SendSmsAsync(createdUser.PhoneNumber, "User created and locked. Email : " + createdUser.Email);
                             return RedirectToAction(nameof(CompanyController.Users), "Company");
                         }
                     }
                     else
                     {
                         notifyService.Custom($"User created successfully.", 3, "green", "fas fa-user-plus");
-                        var response = SmsService.SendSingleMessage(user.PhoneNumber, "User created . Email : " + user.Email);
+                        await SmsService.SendSmsAsync(user.PhoneNumber, "User created . Email : " + user.Email);
                         return RedirectToAction(nameof(CompanyController.Users), "Company");
                     }
                     notifyService.Custom($"User created successfully.", 3, "green", "fas fa-user-plus");
@@ -476,7 +476,7 @@ namespace risk.control.system.Controllers
                             if (lockUser.Succeeded && lockDate.Succeeded)
                             {
                                 notifyService.Custom($"User edited and locked.", 3, "orange", "fas fa-user-lock");
-                                var response = SmsService.SendSingleMessage(createdUser.PhoneNumber, "User created and locked. Email : " + createdUser.Email);
+                                await SmsService.SendSmsAsync(createdUser.PhoneNumber, "User created and locked. Email : " + createdUser.Email);
                                 return RedirectToAction(nameof(CompanyController.Users), "Company");
                             }
                         }
@@ -489,7 +489,7 @@ namespace risk.control.system.Controllers
                             if (lockUser.Succeeded && lockDate.Succeeded)
                             {
                                 notifyService.Custom($"User edited and unlocked.", 3, "green", "fas fa-user-check");
-                                var response = SmsService.SendSingleMessage(user.PhoneNumber, "User created . Email : " + user.Email);
+                                await SmsService.SendSmsAsync(user.PhoneNumber, "User created . Email : " + user.Email);
                                 return RedirectToAction(nameof(CompanyController.Users), "Company");
                             }
                         }
@@ -789,7 +789,7 @@ namespace risk.control.system.Controllers
             result = await userManager.AddToRolesAsync(user, new List<string> { model.UserRole.ToString() });
             var currentUser = await userManager.GetUserAsync(HttpContext.User);
             await signInManager.RefreshSignInAsync(currentUser);
-            var response = SmsService.SendSingleMessage(user.PhoneNumber, "User role edited . Email : " + user.Email);
+            await SmsService.SendSmsAsync(user.PhoneNumber, "User role edited . Email : " + user.Email);
 
             notifyService.Custom($"User role(s) updated successfully.", 3, "orange", "fas fa-user-cog");
             return RedirectToAction(nameof(CompanyController.Users));

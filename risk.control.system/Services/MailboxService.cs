@@ -146,7 +146,7 @@ namespace risk.control.system.Services
                     message += $"{clientCompanyUser.Email}";
                     message += $"                                          ";
                     message += $"{BaseUrl}";
-                    var result = SmsService.SendSingleMessage(userEmailToSend.PhoneNumber, message, company.SendSMS);
+                    await SmsService.SendSmsAsync(userEmailToSend.PhoneNumber, message);
                 }
                 //SMS ::END
             }
@@ -243,7 +243,7 @@ namespace risk.control.system.Services
                     message += $"{applicationUser.Email}";
                     message += $"                                          ";
                     message += $"{BaseUrl}";
-                    var result = SmsService.SendSingleMessage(userEmailToSend.PhoneNumber, message, company.SendSMS);
+                    await SmsService.SendSmsAsync(userEmailToSend.PhoneNumber, message);
                 }
                 //SMS ::END
             }
@@ -335,7 +335,7 @@ namespace risk.control.system.Services
                         message += $"{senderUserEmail})";
                         message += $"                                           ";
                         message += $"{BaseUrl}";
-                        var result = SmsService.SendSingleMessage(user.PhoneNumber, message,company.SendSMS);
+                        await SmsService.SendSmsAsync(user.PhoneNumber, message);
                     }
                 }
                 try
@@ -409,7 +409,7 @@ namespace risk.control.system.Services
                     message += $"{userEmail}";
                     message += $"                                          ";
                     message += $"{BaseUrl}";
-                    var result = SmsService.SendSingleMessage(recepientUser.PhoneNumber, message, company.SendSMS);
+                    await SmsService.SendSmsAsync(recepientUser.PhoneNumber, message);
                 }
             }
             catch (Exception ex)
@@ -576,7 +576,7 @@ namespace risk.control.system.Services
                         message += $"{senderUserEmail}";
                         message += $"                                          ";
                         message += $"{BaseUrl}";
-                        var result = SmsService.SendSingleMessage(user.PhoneNumber, message,company.SendSMS);
+                        await SmsService.SendSmsAsync(user.PhoneNumber, message);
                     }
                 }
                 try
@@ -663,7 +663,7 @@ namespace risk.control.system.Services
                         message += $"{senderUserEmail}";
                         message += $"                                          ";
                         message += $"{BaseUrl}";
-                        var result = SmsService.SendSingleMessage(user.PhoneNumber, message, company.SendSMS);
+                        await SmsService.SendSmsAsync(user.PhoneNumber, message);
                     }
                 }
                 try
@@ -754,7 +754,7 @@ namespace risk.control.system.Services
                     message += $"{senderUserEmail}";
                     message += $"                                          ";
                     message += $"{BaseUrl}";
-                    var result = SmsService.SendSingleMessage(user.PhoneNumber, message, company.SendSMS);
+                    await SmsService.SendSmsAsync(user.PhoneNumber, message);
                 }
             }
             try
@@ -851,7 +851,7 @@ namespace risk.control.system.Services
                     message += $"{clientCompanyUser.Email}";
                     message += $"                                          ";
                     message += $"{BaseUrl}";
-                    var result = SmsService.SendSingleMessage(userEmailToSend.PhoneNumber, message, company.SendSMS);
+                    await SmsService.SendSmsAsync(userEmailToSend.PhoneNumber, message);
                 }
                 //SMS ::END
             }
@@ -939,7 +939,7 @@ namespace risk.control.system.Services
                         message += $"{senderUserEmail}";
                         message += $"                                          ";
                         message += $"{BaseUrl}";
-                        var result = SmsService.SendSingleMessage(user.PhoneNumber, message, company.SendSMS);
+                        await SmsService.SendSmsAsync(user.PhoneNumber, message);
                     }
                 }
                 try

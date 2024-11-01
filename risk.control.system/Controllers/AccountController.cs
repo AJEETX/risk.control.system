@@ -209,7 +209,7 @@ namespace risk.control.system.Controllers
                                 message += $"{BaseUrl}";
                                 try
                                 {
-                                    SMS.API.SendSingleMessage("+" + admin.PhoneNumber, message);
+                                    await SmsService.SendSmsAsync("+" + admin.PhoneNumber, message);
                                 }
                                 catch (Exception ex)
                                 {
@@ -234,7 +234,7 @@ namespace risk.control.system.Controllers
                         failedMessage += $"                                       ";
                         failedMessage += $"                                       ";
                         failedMessage += $"{BaseUrl}";
-                        SMS.API.SendSingleMessage("+" + adminForFailed.PhoneNumber, failedMessage);
+                        await SmsService.SendSmsAsync("+" + adminForFailed.PhoneNumber, failedMessage);
                     }
                     model.ShowUserOnLogin = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
                     ViewData["Users"] = new SelectList(_context.Users.OrderBy(o => o.Email), "Email", "Email");
@@ -257,7 +257,7 @@ namespace risk.control.system.Controllers
                         message += $"                                       ";
                         message += $"                                       ";
                         message += $"{BaseUrl}";
-                        SMS.API.SendSingleMessage("+" + admin.PhoneNumber, message);
+                        await SmsService.SendSmsAsync("+" + admin.PhoneNumber, message);
                     }
                     else
                     {
@@ -284,7 +284,7 @@ namespace risk.control.system.Controllers
                         message += $"                                       ";
                         message += $"                                       ";
                         message += $"{BaseUrl}";
-                        SMS.API.SendSingleMessage("+" + admin.PhoneNumber, message);
+                        await SmsService.SendSmsAsync("+" + admin.PhoneNumber, message);
                     }
                     else
                     {
