@@ -50,7 +50,7 @@
                     
                     <div id="title" class="title">Login</div>
                     @Html.AntiForgeryToken()
-                    <form id="login-form" asp-controller="Account" asp-action="@ViewBag.SlimLogin" method="post">
+                    <form id="login-form" asp-controller="Account"  method="post">
                         @if(Model.ShowUserOnLogin)
                         {
                             <input type="hidden" id="show-users" name="show-users" value="true" />

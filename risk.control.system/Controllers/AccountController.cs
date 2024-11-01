@@ -107,45 +107,47 @@ namespace risk.control.system.Controllers
                     ViewData["Users"] = new SelectList(_context.Users.OrderBy(o => o.Email), "Email", "Email");
                 }
             }
-            if(await featureManager.IsEnabledAsync(FeatureFlags.SLIM_LOGIN))
-            {
-                ViewBag.SlimLogin = "Login";
-            }
-            else
-            {
-                ViewBag.SlimLogin = "LoginPost";
-            }
+            //ViewBag.SlimLogin = "Login";
+
+            //if (await featureManager.IsEnabledAsync(FeatureFlags.SLIM_LOGIN))
+            //{
+            //    ViewBag.SlimLogin = "Login";
+            //}
+            //else
+            //{
+            //    ViewBag.SlimLogin = "LoginPost";
+            //}
             return View(new LoginViewModel { ShowUserOnLogin = showLoginUsers });
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [AllowAnonymous]
-        public async Task<IActionResult> Login(LoginViewModel model)
-        {
-            if (ModelState.IsValid || !model.Email.ValidateEmail())
-            {
-                var result = await _signInManager.PasswordSignInAsync(HttpUtility.HtmlEncode(model.Email), HttpUtility.HtmlEncode(model.Password), model.RememberMe, lockoutOnFailure: false);
-                if (result.Succeeded)
-                {
-                    var claims = new List<Claim> { new Claim(ClaimTypes.NameIdentifier, model.Email) , new Claim(ClaimTypes.Name, model.Email) };
-                    var userIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(userIdentity), new AuthenticationProperties{});
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //[AllowAnonymous]
+        //public async Task<IActionResult> Login(LoginViewModel model)
+        //{
+        //    if (ModelState.IsValid || !model.Email.ValidateEmail())
+        //    {
+        //        var result = await _signInManager.PasswordSignInAsync(HttpUtility.HtmlEncode(model.Email), HttpUtility.HtmlEncode(model.Password), model.RememberMe, lockoutOnFailure: false);
+        //        if (result.Succeeded)
+        //        {
+        //            var claims = new List<Claim> { new Claim(ClaimTypes.NameIdentifier, model.Email) , new Claim(ClaimTypes.Name, model.Email) };
+        //            var userIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+        //            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(userIdentity), new AuthenticationProperties{});
 
-                    notifyService.Success("Login successful");
-                    return RedirectToAction("Index", "Dashboard");
-                }
-            }
-            ModelState.AddModelError(string.Empty, "Bad Request.");
-            model.Error = "Bad Request.";
-            model.ShowUserOnLogin = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
-            ViewData["Users"] = new SelectList(_context.Users.OrderBy(o => o.Email), "Email", "Email");
-            return View(model);
-        }
+        //            notifyService.Success("Login successful");
+        //            return RedirectToAction("Index", "Dashboard");
+        //        }
+        //    }
+        //    ModelState.AddModelError(string.Empty, "Bad Request.");
+        //    model.Error = "Bad Request.";
+        //    model.ShowUserOnLogin = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
+        //    ViewData["Users"] = new SelectList(_context.Users.OrderBy(o => o.Email), "Email", "Email");
+        //    return View(model);
+        //}
         [HttpPost]
         [ValidateAntiForgeryToken]
         [AllowAnonymous]
-        public async Task<IActionResult> LoginPost(CancellationToken ct, LoginViewModel model)
+        public async Task<IActionResult> Login(CancellationToken ct, LoginViewModel model)
         {
             var ipAddress = HttpContext.GetServerVariable("HTTP_X_FORWARDED_FOR") ?? HttpContext.Connection.RemoteIpAddress?.ToString();
             var ipAddressWithoutPort = ipAddress?.Split(':')[0];
@@ -292,7 +294,8 @@ namespace risk.control.system.Controllers
                         model.Error = "Invalid login attempt.";
                         model.ShowUserOnLogin = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
                         ViewData["Users"] = new SelectList(_context.Users.OrderBy(o => o.Email), "Email", "Email");
-                        return View(model);
+                            notifyService.Error("Invalid login attempt");
+                            return RedirectToAction("Login", "Account");
                     }
                 }
             }
