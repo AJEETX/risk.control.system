@@ -1,10 +1,10 @@
-name: Build and deploy .NET Core application to Web App icheckify-demo
+name: Build and deploy .NET Core application to Web App riskcontrolsystem
 on:
   push:
     branches:
     - icheckify-demo
 env:
-  AZURE_WEBAPP_NAME: icheckify-demo
+  AZURE_WEBAPP_NAME: riskcontrolsystem
   AZURE_WEBAPP_PACKAGE_PATH: risk.control.system\published
   CONFIGURATION: Release
   DOTNET_CORE_VERSION: 8.0.x
@@ -44,5 +44,5 @@ jobs:
       uses: azure/webapps-deploy@v2
       with:
         app-name: ${{ env.AZURE_WEBAPP_NAME }}
-        publish-profile: ${{ secrets.icheckify_demo_65C0 }}
+        publish-profile: ${{ secrets.riskcontrolsystem_864D }}
         package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
