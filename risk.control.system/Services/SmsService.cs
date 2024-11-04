@@ -62,6 +62,8 @@ namespace risk.control.system.Services
             var password = "rfi-gbbukll7-6"; 
             var authToken = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{username}:{password}"));
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authToken);
+            mobile = mobile.StartsWith("+") ? mobile : "+" + mobile;
+
             var newContent = new { message = message, phoneNumbers = new List<string> { mobile } }; 
             var jsonContent = JsonConvert.SerializeObject(newContent); 
             var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
