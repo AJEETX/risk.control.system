@@ -38,25 +38,14 @@ namespace risk.control.system.Seeds
             await roleManager.CreateAsync(new ApplicationRole(AppRoles.SUPERVISOR.ToString().Substring(0, 2).ToUpper(), AppRoles.SUPERVISOR.ToString()));
             await roleManager.CreateAsync(new ApplicationRole(AppRoles.AGENT.ToString().Substring(0, 2).ToUpper(), AppRoles.AGENT.ToString()));
 
-            var australia = new Country
-            {
-                Name = "AUSTRALIA",
-                Code = "AU",
-                Updated = DateTime.Now,
-            };
-            var australiaCountry = await context.Country.AddAsync(australia);
+            var india = await PinCodeStateSeed.India(context);
+            var indiaPincodes = await PinCodeStateSeed.CsvRead_India();
+            await PinCodeStateSeed.SeedPincode(context,indiaPincodes, india);
 
-            await PinCodeStateSeed.SeedPincode(context, australiaCountry.Entity);
+            var au = await PinCodeStateSeed.Australia(context);
+            var auPincodes = await PinCodeStateSeed.CsvRead_Au();
+            await PinCodeStateSeed.SeedPincode(context, auPincodes, au);
 
-            var india = new Country
-            {
-                Name = "INDIA",
-                Code = "IND",
-                Updated = DateTime.Now,
-            };
-            var indiaCountry = await context.Country.AddAsync(india);
-
-            await PinCodeStateSeed.SeedPincode_India(context, indiaCountry.Entity);
 
             await context.SaveChangesAsync(null, false);
 
@@ -365,7 +354,7 @@ namespace risk.control.system.Seeds
 
             #region APPLICATION USERS ROLES
 
-            await PortalAdminSeed.Seed(context, webHostEnvironment, indiaCountry, userManager, roleManager);
+            await PortalAdminSeed.Seed(context, webHostEnvironment, userManager, roleManager);
 
             foreach (var companyId in companyIds)
             {

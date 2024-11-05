@@ -6,6 +6,7 @@ using CsvHelper;
 using risk.control.system.Data;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Text.RegularExpressions;
+using Google.Api;
 
 namespace risk.control.system.Seeds
 {
@@ -19,10 +20,8 @@ namespace risk.control.system.Seeds
 
         private static Regex regex = new Regex("\\\"(.*?)\\\"");
 
-        public static async Task SeedPincode(ApplicationDbContext context, Country country)
+        public static async Task SeedPincode(ApplicationDbContext context, List<PinCodeState> pincodes, Country country)
         {
-            var pincodes = await CsvRead();
-
             // add the states with pincodes
             var states = pincodes.GroupBy(g => new { g.StateName, g.StateCode });
             foreach (var state in states)
@@ -57,8 +56,16 @@ namespace risk.control.system.Seeds
             }
         }
 
-        public static async Task SeedPincode_India(ApplicationDbContext context, Country country)
+        public static async Task SeedPincode_India(ApplicationDbContext context)
         {
+            var country = new Country
+            {
+                Name = "INDIA",
+                Code = "IND",
+                Updated = DateTime.Now,
+            };
+
+            var indiaCountry = await context.Country.AddAsync(country);
             var pincodes = await CsvRead_India();
 
             try
@@ -101,8 +108,36 @@ namespace risk.control.system.Seeds
                 throw ex;
             }
         }
+        
+        public static async Task<Country> India(ApplicationDbContext context)
+        {
+            var country = new Country
+            {
+                Name = "INDIA",
+                Code = "IND",
+                Updated = DateTime.Now,
+            };
 
-        private static async Task<List<PinCodeState>> CsvRead()
+            var indiaCountry = await context.Country.AddAsync(country);
+            return indiaCountry.Entity;
+
+        }
+
+        public static async Task<Country> Australia(ApplicationDbContext context)
+        {
+
+            var country = new Country
+            {
+                Name = "AUSTRALIA",
+                Code = "AU",
+                Updated = DateTime.Now,
+            };
+            var australiaCountry = await context.Country.AddAsync(country);
+            return australiaCountry.Entity;
+
+        }
+
+        public static async Task<List<PinCodeState>> CsvRead_Au()
         {
             var pincodes = new List<PinCodeState>();
             string csvData = await File.ReadAllTextAsync(au_stateWisePincodeFilePath);
@@ -146,7 +181,7 @@ namespace risk.control.system.Seeds
             return smallerPincodes.ToList();
         }
 
-        private static async Task<List<PinCodeState>> CsvRead_India()
+        public static async Task<List<PinCodeState>> CsvRead_India()
         {
             var pincodes = new List<PinCodeState>();
             string csvData = await File.ReadAllTextAsync(in_stateWisePincodeFilePath);
