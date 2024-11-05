@@ -117,9 +117,12 @@ $(document).ready(function () {
         $('#logout').attr('disabled', 'disabled');
         $('#logout').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Logout");
         $('#logoutForm').submit();
-        var nodes = document.getElementById("main-content").getElementsByTagName('*');
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].disabled = true;
+        var content = document.getElementById("main-content");
+        if (content) {
+            var nodes = content.getElementsByTagName('*');
+            for (var i = 0; i < nodes.length; i++) {
+                nodes[i].disabled = true;
+            }
         }
     });
 
@@ -135,9 +138,12 @@ $(document).ready(function () {
         $('html').css('cursor', 'not-allowed');
         $('a, button').css('cursor', 'not-allowed');
         $('a, button').attr('disabled', 'disabled');
-        var nodes = document.getElementById("section").getElementsByTagName('*');
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].disabled = true;
+        var section = document.getElementById("section");
+        if (section) {
+            var nodes = section.getElementsByTagName('*');
+            for (var i = 0; i < nodes.length; i++) {
+                nodes[i].disabled = true;
+            }
         }
     });
 
@@ -152,9 +158,12 @@ $(document).ready(function () {
         $('html').css('cursor', 'not-allowed');
         $('a, button').css('cursor', 'not-allowed');
         $('a, button').attr('disabled', 'disabled');
-        var nodes = document.getElementById("section").getElementsByTagName('*');
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].disabled = true;
+        var section = document.getElementById("section");
+        if (section) {
+            var nodes = section.getElementsByTagName('*');
+            for (var i = 0; i < nodes.length; i++) {
+                nodes[i].disabled = true;
+            }
         }
     });
 
@@ -171,9 +180,12 @@ $(document).ready(function () {
         $('a, button').css('cursor', 'not-allowed');
         $('a, button').attr('disabled', 'disabled');
 
-        var nodes = document.getElementById("section").getElementsByTagName('*');
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].disabled = true;
+        var section = document.getElementById("section");
+        if (section) {
+            var nodes = section.getElementsByTagName('*');
+            for (var i = 0; i < nodes.length; i++) {
+                nodes[i].disabled = true;
+            }
         }
     })
 
