@@ -15,7 +15,7 @@ namespace risk.control.system.Seeds
 {
     public static class PortalAdminSeed
     {
-        public static async Task Seed(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, EntityEntry<Country> indiaCountry, UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager)
+        public static async Task Seed(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager)
         {
             var mailBox = new Mailbox
             {
