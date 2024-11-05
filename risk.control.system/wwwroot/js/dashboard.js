@@ -37,9 +37,12 @@
         $('.details-page').attr('disabled', 'disabled');
         $('html').css('cursor', 'not-allowed');
 
-        var nodes = document.getElementById("section").getElementsByTagName('*');
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].disabled = true;
+        var section = document.getElementById("section");
+        if (section) {
+            var nodes = section.getElementsByTagName('*');
+            for (var i = 0; i < nodes.length; i++) {
+                nodes[i].disabled = true;
+            }
         }
     });
 });
