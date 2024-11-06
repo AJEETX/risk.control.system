@@ -358,6 +358,5 @@ function getdetails(id) {
             nodes[i].disabled = true;
         }
     } nodes[i].disabled = true;
-    }
 }
 

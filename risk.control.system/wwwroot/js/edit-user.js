@@ -42,7 +42,11 @@ $.validator.setDefaults({
 });
 $(document).ready(function () {
     $("#create-form").validate();
-    var currentImage = document.getElementById('profileImage').src;
+    var currentImage;
+    var pImage = document.getElementById('profileImage');
+    if (pImage) {
+        currentImage = pImage.src;
+    }
 
     $("#documentImageInput").on('change', function () {
         var MaxSizeInBytes = 2097152;
@@ -59,7 +63,7 @@ $(document).ready(function () {
                 for (var i = 0; i < countFiles; i++) {
                     var fileSize = $(this)[0].files[i].size;
                     if (fileSize > MaxSizeInBytes) {
-                        if (currentImage.startsWith('https://') && currentImage.endsWith('/img/no-user.png')) {
+                        if (currentImage && currentImage.startsWith('https://') && currentImage.endsWith('/img/no-user.png')) {
                             document.getElementById('profileImage').src = '/img/no-user.png';
                             document.getElementById('documentImageInput').value = '';
                         }

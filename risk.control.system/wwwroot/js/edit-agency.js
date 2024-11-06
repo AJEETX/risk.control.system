@@ -47,7 +47,11 @@ $(document).ready(function () {
     });
 
     $("#create-form").validate();
-    var currentImage = document.getElementById('companyImage').src;
+    var currentImage;
+    var pImage = document.getElementById('companyImage');
+    if (pImage) {
+        currentImage = pImage.src;
+    }
     $("#documentImageInput").on('change', function () {
         var MaxSizeInBytes = 2097152;
         //Get count of selected files
