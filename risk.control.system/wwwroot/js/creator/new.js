@@ -9,9 +9,12 @@
         $('a.create-policy').attr('disabled', 'disabled');
         $('a.create-policy').html("<i class='fas fa-sync fa-spin'></i> Add New");
 
-        var nodes = document.getElementById("article").getElementsByTagName('*');
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].disabled = true;
+        var article = document.getElementById("article");
+        if (article) {
+            var nodes = article.getElementsByTagName('*');
+            for (var i = 0; i < nodes.length; i++) {
+                nodes[i].disabled = true;
+            }
         }
     });
     $('#postedFile').on("change", function () {
@@ -244,9 +247,12 @@
                             $('#allocatedcase').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Assign<span class='badge badge-warning'>(auto)</span>");
 
                             $('#checkboxes').submit();
-                            var nodes = document.getElementById("article").getElementsByTagName('*');
-                            for (var i = 0; i < nodes.length; i++) {
-                                nodes[i].disabled = true;
+                            var article = document.getElementById("article");
+                            if (article) {
+                                var nodes = article.getElementsByTagName('*');
+                                for (var i = 0; i < nodes.length; i++) {
+                                    nodes[i].disabled = true;
+                                }
                             }
                         }
                     },
@@ -362,9 +368,12 @@
                             $('html *').css('cursor', 'not-allowed');
                             $('html a *, html button *').css('pointer-events', 'none')
 
-                            var nodes = document.getElementById("article").getElementsByTagName('*');
-                            for (var i = 0; i < nodes.length; i++) {
-                                nodes[i].disabled = true;
+                            var article = document.getElementById("article");
+                            if (article) {
+                                var nodes = article.getElementsByTagName('*');
+                                for (var i = 0; i < nodes.length; i++) {
+                                    nodes[i].disabled = true;
+                                }
                             }
                         }
                     },
@@ -392,9 +401,12 @@ function showedit(id) {
     $('a.btn *').attr('disabled', 'disabled');
     $('a#edit' + id + '.btn.btn-xs.btn-warning').html("<i class='fas fa-sync fa-spin'></i> EDIT");
 
-    var nodes = document.getElementById("article").getElementsByTagName('*');
-    for (var i = 0; i < nodes.length; i++) {
-        nodes[i].disabled = true;
+    var article = document.getElementById("article");
+    if (article) {
+        var nodes = article.getElementsByTagName('*');
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].disabled = true;
+        }
     }
 }
 function getdetails(id) {
@@ -407,9 +419,12 @@ function getdetails(id) {
     $('a.btn *').attr('disabled', 'disabled');
     $('a#details' + id + '.btn.btn-xs.btn-danger').html("<i class='fas fa-sync fa-spin'></i> Delete");
 
-    var nodes = document.getElementById("article").getElementsByTagName('*');
-    for (var i = 0; i < nodes.length; i++) {
-        nodes[i].disabled = true;
+    var article = document.getElementById("article");
+    if (article) {
+        var nodes = article.getElementsByTagName('*');
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].disabled = true;
+        }
     }
 }
 

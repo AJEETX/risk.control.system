@@ -9,9 +9,12 @@
         $('#allocatedcase').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Allocate <sub>new</sub>");
 
         $('#radioButtons').submit();
-        var nodes = document.getElementById("article").getElementsByTagName('*');
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].disabled = true;
+        var article = document.getElementById("article");
+        if (article) {
+            var nodes = article.getElementsByTagName('*');
+            for (var i = 0; i < nodes.length; i++) {
+                nodes[i].disabled = true;
+            }
         }
     });
 
@@ -25,9 +28,12 @@
         $('#investigatecase').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Investigate");
 
         $('#radioButtons').submit();
-        var nodes = document.getElementById("article").getElementsByTagName('*');
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].disabled = true;
+        var article = document.getElementById("article");
+        if (article) {
+            var nodes = article.getElementsByTagName('*');
+            for (var i = 0; i < nodes.length; i++) {
+                nodes[i].disabled = true;
+            }
         }
     });
 
@@ -223,9 +229,12 @@ function showdetails(id) {
     $('a.btn *').attr('disabled', 'disabled');
     $('a#details' + id + '.btn.btn-xs.btn-info').html("<i class='fas fa-sync fa-spin'></i> Details");
 
-    var nodes = document.getElementById("article").getElementsByTagName('*');
-    for (var i = 0; i < nodes.length; i++) {
-        nodes[i].disabled = true;
+    var article = document.getElementById("article");
+    if (article) {
+        var nodes = article.getElementsByTagName('*');
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].disabled = true;
+        }
     }
 }
 
@@ -240,8 +249,11 @@ function showenquiry(id) {
     $('a.btn *').attr('disabled', 'disabled');
     $('a#details' + id + '.btn.btn-xs.btn-warning').html("<i class='fas fa-sync fa-spin'></i> ENQUIRY");
 
-    var nodes = document.getElementById("article").getElementsByTagName('*');
-    for (var i = 0; i < nodes.length; i++) {
-        nodes[i].disabled = true;
+    var article = document.getElementById("article");
+    if (article) {
+        var nodes = article.getElementsByTagName('*');
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].disabled = true;
+        }
     }
 }

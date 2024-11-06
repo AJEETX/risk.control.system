@@ -9,9 +9,12 @@
         $('a.create-agency-service').attr('disabled', 'disabled');
         $('a.create-agency-service').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Add Service");
 
-        var nodes = document.getElementById("article").getElementsByTagName('*');
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].disabled = true;
+        var article = document.getElementById("article");
+        if (article) {
+            var nodes = article.getElementsByTagName('*');
+            for (var i = 0; i < nodes.length; i++) {
+                nodes[i].disabled = true;
+            }
         }
     });
 
@@ -70,9 +73,12 @@ function showedit(id) {
     $('a.btn').attr('disabled', 'disabled');
     $('a#edit'+ id +'.btn.btn-warning').html("<i class='fas fa-sync fa-spin'></i> Edit");
 
-    var nodes = document.getElementById("article").getElementsByTagName('*');
-    for (var i = 0; i < nodes.length; i++) {
-        nodes[i].disabled = true;
+    var article = document.getElementById("article");
+    if (article) {
+        var nodes = article.getElementsByTagName('*');
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].disabled = true;
+        }
     }
 }
 function getdetails(id) {
@@ -84,9 +90,11 @@ function getdetails(id) {
     }, 1);
     $('a.btn').attr('disabled', 'disabled');
     $('a#delete' + id +'.btn.btn-danger').html("<i class='fas fa-sync fa-spin'></i> Delete");
-
-    var nodes = document.getElementById("article").getElementsByTagName('*');
-    for (var i = 0; i < nodes.length; i++) {
-        nodes[i].disabled = true;
+    var article = document.getElementById("article");
+    if (article) {
+        var nodes = article.getElementsByTagName('*');
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].disabled = true;
+        }
     }
 }

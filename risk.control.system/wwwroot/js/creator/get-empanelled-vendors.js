@@ -55,12 +55,13 @@
                             $('#allocate-case').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Assign <sub>manual</sub>");
 
                             $('#radioButtons').submit();
-                            var nodes = document.getElementById("article").getElementsByTagName('*');
-                            for (var i = 0; i < nodes.length; i++) {
-                                nodes[i].disabled = true;
+                            var article = document.getElementById("article");
+                            if (article) {
+                                var nodes = article.getElementsByTagName('*');
+                                for (var i = 0; i < nodes.length; i++) {
+                                    nodes[i].disabled = true;
+                                }
                             }
-
-
                         }
                     },
                     cancel: {
@@ -94,8 +95,11 @@ function showVendor(id) {
     $('.btn.btn-xs.btn-info').attr('disabled', 'disabled');
     editbtn.html("<i class='fas fa-sync fa-spin'></i> Details");
 
-    var nodes = document.getElementById("article").getElementsByTagName('*');
-    for (var i = 0; i < nodes.length; i++) {
-        nodes[i].disabled = true;
+    var article = document.getElementById("article");
+    if (article) {
+        var nodes = article.getElementsByTagName('*');
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].disabled = true;
+        }
     }
 }

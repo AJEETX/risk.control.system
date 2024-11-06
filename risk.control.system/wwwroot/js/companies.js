@@ -11,9 +11,12 @@ $(function () {
         $('.btn').attr('disabled', 'disabled');
         $('a#edit-profile.btn.btn-warning').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Profile");
 
-        var nodes = document.getElementById("article").getElementsByTagName('*');
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].disabled = true;
+        var article = document.getElementById("article");
+        if (article) {
+            var nodes = article.getElementsByTagName('*');
+            for (var i = 0; i < nodes.length; i++) {
+                nodes[i].disabled = true;
+            }
         }
     });
 
@@ -27,9 +30,12 @@ $(function () {
         $('#edit-company.btn.btn-warning').attr('disabled', 'disabled');
         $('#edit-company.btn.btn-warning').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Edit Company");
 
-        var nodes = document.getElementById("article").getElementsByTagName('*');
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].disabled = true;
+        var article = document.getElementById("article");
+        if (article) {
+            var nodes = article.getElementsByTagName('*');
+            for (var i = 0; i < nodes.length; i++) {
+                nodes[i].disabled = true;
+            }
         }
     });
     $('#edit-profile.btn.btn-warning').on('click', function () {
@@ -42,9 +48,12 @@ $(function () {
         $('#edit-profile.btn.btn-warning').attr('disabled', 'disabled');
         $('#edit-profile.btn.btn-warning').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Edit Profile");
 
-        var nodes = document.getElementById("article").getElementsByTagName('*');
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].disabled = true;
+        var article = document.getElementById("article");
+        if (article) {
+            var nodes = article.getElementsByTagName('*');
+            for (var i = 0; i < nodes.length; i++) {
+                nodes[i].disabled = true;
+            }
         }
     });
 
@@ -58,9 +67,12 @@ $(function () {
         $('.btn').attr('disabled', 'disabled');
         $('a#editagency.btn.btn-warning').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Edit Agency");
 
-        var nodes = document.getElementById("article").getElementsByTagName('*');
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].disabled = true;
+        var article = document.getElementById("article");
+        if (article) {
+            var nodes = article.getElementsByTagName('*');
+            for (var i = 0; i < nodes.length; i++) {
+                nodes[i].disabled = true;
+            }
         }
     });
 
@@ -74,9 +86,12 @@ $(function () {
         $('.btn').attr('disabled', 'disabled');
         $('.btn.btn-success').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> User");
 
-        var nodes = document.getElementById("article").getElementsByTagName('*');
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].disabled = true;
+        var article = document.getElementById("article");
+        if (article) {
+            var nodes = article.getElementsByTagName('*');
+            for (var i = 0; i < nodes.length; i++) {
+                nodes[i].disabled = true;
+            }
         }
     });
 
@@ -91,9 +106,12 @@ $(function () {
         $('.btn').attr('disabled', 'disabled');
         $('.btn.btn-danger').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Service");
 
-        var nodes = document.getElementById("article").getElementsByTagName('*');
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].disabled = true;
+        var article = document.getElementById("article");
+        if (article) {
+            var nodes = article.getElementsByTagName('*');
+            for (var i = 0; i < nodes.length; i++) {
+                nodes[i].disabled = true;
+            }
         }
     });
 
@@ -193,9 +211,12 @@ function showedit() {
     $('a.btn.btn-warning').attr('disabled', 'disabled');
     $('a.btn.btn-warning').html("<i class='fas fa-sync fa-spin'></i> Edit");
 
-    var nodes = document.getElementById("article").getElementsByTagName('*');
-    for (var i = 0; i < nodes.length; i++) {
-        nodes[i].disabled = true;
+    var article = document.getElementById("article");
+    if (article) {
+        var nodes = article.getElementsByTagName('*');
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].disabled = true;
+        }
     }
 }
 
@@ -209,9 +230,12 @@ function showdetails() {
     $('a.btn.btn-info').attr('disabled', 'disabled');
     $('a.btn.btn-info').html("<i class='fas fa-sync fa-spin'></i> Roles");
 
-    var nodes = document.getElementById("article").getElementsByTagName('*');
-    for (var i = 0; i < nodes.length; i++) {
-        nodes[i].disabled = true;
+    var article = document.getElementById("article");
+    if (article) {
+        var nodes = article.getElementsByTagName('*');
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].disabled = true;
+        }
     }
 }
 GetLoc();

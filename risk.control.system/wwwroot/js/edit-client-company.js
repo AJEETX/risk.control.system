@@ -22,9 +22,12 @@
                         $('#create-user').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Edit");
 
                         form.submit();
-                        var nodes = document.getElementById("article").getElementsByTagName('*');
-                        for (var i = 0; i < nodes.length; i++) {
-                            nodes[i].disabled = true;
+                        var article = document.getElementById("article");
+                        if (article) {
+                            var nodes = article.getElementsByTagName('*');
+                            for (var i = 0; i < nodes.length; i++) {
+                                nodes[i].disabled = true;
+                            }
                         }
                     }
                 },

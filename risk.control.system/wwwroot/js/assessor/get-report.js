@@ -151,10 +151,14 @@ $(document).ready(function () {
                             $('#approve-case').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> APPROVE");
                             $('#create-form').submit();
 
-                            var nodes = document.getElementById("create-form").getElementsByTagName('*');
-                            for (var i = 0; i < nodes.length; i++) {
-                                nodes[i].disabled = true;
+                            var createForm = document.getElementById("create-form");
+                            if (createForm) {
+                                var nodes = createForm.getElementsByTagName('*');
+                                for (var i = 0; i < nodes.length; i++) {
+                                    nodes[i].disabled = true;
+                                }
                             }
+                            
                         }
                     },
                     cancel: {
@@ -191,9 +195,12 @@ $(document).ready(function () {
                             $('#approve-case').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i>  REVIEW");
                             $('#create-form').submit();
 
-                            var nodes = document.getElementById("create-form").getElementsByTagName('*');
-                            for (var i = 0; i < nodes.length; i++) {
-                                nodes[i].disabled = true;
+                            var createForm = document.getElementById("create-form");
+                            if (createForm) {
+                                var nodes = createForm.getElementsByTagName('*');
+                                for (var i = 0; i < nodes.length; i++) {
+                                    nodes[i].disabled = true;
+                                }
                             }
                         }
                     },
@@ -231,9 +238,12 @@ $(document).ready(function () {
                             $('#approve-case').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i>  REJECT");
                             $('#create-form').submit();
 
-                            var nodes = document.getElementById("create-form").getElementsByTagName('*');
-                            for (var i = 0; i < nodes.length; i++) {
-                                nodes[i].disabled = true;
+                            var createForm = document.getElementById("create-form");
+                            if (createForm) {
+                                var nodes = createForm.getElementsByTagName('*');
+                                for (var i = 0; i < nodes.length; i++) {
+                                    nodes[i].disabled = true;
+                                }
                             }
                         }
                     },
@@ -295,9 +305,12 @@ $(document).ready(function () {
                             $('#send-query').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Enquiring...");
                             $('#query-form').submit();
 
-                            var nodes = document.getElementById("query-form").getElementsByTagName('*');
-                            for (var i = 0; i < nodes.length; i++) {
-                                nodes[i].disabled = true;
+                            var createForm = document.getElementById("query-form");
+                            if (createForm) {
+                                var nodes = createForm.getElementsByTagName('*');
+                                for (var i = 0; i < nodes.length; i++) {
+                                    nodes[i].disabled = true;
+                                }
                             }
                         }
                     },
@@ -346,8 +359,11 @@ function showenquiry() {
     $('html *').css('cursor', 'not-allowed');
     $('#enquire-case').css('pointer-events', 'none');
 
-    var nodes = document.getElementById("create-form").getElementsByTagName('*');
-    for (var i = 0; i < nodes.length; i++) {
-        nodes[i].disabled = true;
+    var createForm = document.getElementById("create-form");
+    if (createForm) {
+        var nodes = createForm.getElementsByTagName('*');
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].disabled = true;
+        }
     }
 }

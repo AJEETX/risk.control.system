@@ -168,9 +168,12 @@
                             $('#empanel-vendors').attr('disabled', 'disabled');
                             $('#empanel-vendors').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Depanel");
 
-                            var nodes = document.getElementById("article").getElementsByTagName('*');
-                            for (var i = 0; i < nodes.length; i++) {
-                                nodes[i].disabled = true;
+                            var article = document.getElementById("article");
+                            if (article) {
+                                var nodes = article.getElementsByTagName('*');
+                                for (var i = 0; i < nodes.length; i++) {
+                                    nodes[i].disabled = true;
+                                }
                             }
                         }
                     },

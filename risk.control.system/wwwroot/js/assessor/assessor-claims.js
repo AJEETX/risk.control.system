@@ -133,9 +133,12 @@ $(document).ready(function () {
 
         $('#checkboxes').submit();
 
-        var nodes = document.getElementById("checkboxes").getElementsByTagName('*');
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].disabled = true;
+        var checkboxes = document.getElementById("checkboxes");
+        if(checkboxes) {
+            var nodes = checkboxes.getElementsByTagName('*');
+            for (var i = 0; i < nodes.length; i++) {
+                nodes[i].disabled = true;
+            }
         }
 
     });

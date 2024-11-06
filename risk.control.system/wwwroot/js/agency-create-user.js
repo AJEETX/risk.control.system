@@ -24,9 +24,12 @@
                         $('html a *, html button *').css('pointer-events', 'none');
 
                         form.submit();
-                        var nodes = document.getElementById("create-form").getElementsByTagName('*');
-                        for (var i = 0; i < nodes.length; i++) {
-                            nodes[i].disabled = true;
+                        var createForm = document.getElementById("create-form");
+                        if (createForm) {
+                            var nodes = createForm.getElementsByTagName('*');
+                            for (var i = 0; i < nodes.length; i++) {
+                                nodes[i].disabled = true;
+                            }
                         }
                     }
                 },

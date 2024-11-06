@@ -27,9 +27,12 @@ $(document).ready(function () {
                             $('#assign-list').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Assign<span class='badge badge-light'>(auto)</span>");
 
                             $('#create-form').submit();
-                            var nodes = document.getElementById("article").getElementsByTagName('*');
-                            for (var i = 0; i < nodes.length; i++) {
-                                nodes[i].disabled = true;
+                            var article = document.getElementById("article");
+                            if (article) {
+                                var nodes = article.getElementsByTagName('*');
+                                for (var i = 0; i < nodes.length; i++) {
+                                    nodes[i].disabled = true;
+                                }
                             }
                         }
                     },
@@ -52,9 +55,12 @@ $(document).ready(function () {
         $('#edit-policy').attr('disabled', 'disabled');
         $('#edit-policy').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Edit  Policy");
 
-        var nodes = document.getElementById("article").getElementsByTagName('*');
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].disabled = true;
+        var article = document.getElementById("article");
+        if (article) {
+            var nodes = article.getElementsByTagName('*');
+            for (var i = 0; i < nodes.length; i++) {
+                nodes[i].disabled = true;
+            }
         }
     });
 
@@ -68,9 +74,12 @@ $(document).ready(function () {
         $('#add-customer').attr('disabled', 'disabled');
         $('#add-customer').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Add Customer");
 
-        var nodes = document.getElementById("article").getElementsByTagName('*');
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].disabled = true;
+        var article = document.getElementById("article");
+        if (article) {
+            var nodes = article.getElementsByTagName('*');
+            for (var i = 0; i < nodes.length; i++) {
+                nodes[i].disabled = true;
+            }
         }
     });
 
@@ -84,9 +93,12 @@ $(document).ready(function () {
         $('#edit-customer').attr('disabled', 'disabled');
         $('#edit-customer').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Edit Customer");
 
-        var nodes = document.getElementById("article").getElementsByTagName('*');
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].disabled = true;
+        var article = document.getElementById("article");
+        if (article) {
+            var nodes = article.getElementsByTagName('*');
+            for (var i = 0; i < nodes.length; i++) {
+                nodes[i].disabled = true;
+            }
         }
     });
 
@@ -100,9 +112,12 @@ $(document).ready(function () {
         $('#add-beneficiary').attr('disabled', 'disabled');
         $('#add-beneficiary').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Add Beneficiary");
 
-        var nodes = document.getElementById("article").getElementsByTagName('*');
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].disabled = true;
+        var article = document.getElementById("article");
+        if (article) {
+            var nodes = article.getElementsByTagName('*');
+            for (var i = 0; i < nodes.length; i++) {
+                nodes[i].disabled = true;
+            }
         }
     });
 
@@ -116,9 +131,12 @@ $(document).ready(function () {
         $('#edit-beneficiary').attr('disabled', 'disabled');
         $('#edit-beneficiary').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Edit Beneficiary");
 
-        var nodes = document.getElementById("article").getElementsByTagName('*');
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].disabled = true;
+        var article = document.getElementById("article");
+        if (article) {
+            var nodes = article.getElementsByTagName('*');
+            for (var i = 0; i < nodes.length; i++) {
+                nodes[i].disabled = true;
+            }
         }
     });
 
@@ -132,9 +150,12 @@ $(document).ready(function () {
         $('#assign-manual-list').attr('disabled', 'disabled');
         $('#assign-manual-list').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Assign<b> <sub>manual</sub></b>");
 
-        var nodes = document.getElementById("article").getElementsByTagName('*');
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].disabled = true;
+        var article = document.getElementById("article");
+        if (article) {
+            var nodes = article.getElementsByTagName('*');
+            for (var i = 0; i < nodes.length; i++) {
+                nodes[i].disabled = true;
+            }
         }
     });
 
@@ -206,9 +227,12 @@ $(document).ready(function () {
                             $('#submit-case').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Withdraw");
 
                             $('#withdraw-form').submit();
-                            var nodes = document.getElementById("article").getElementsByTagName('*');
-                            for (var i = 0; i < nodes.length; i++) {
-                                nodes[i].disabled = true;
+                            var article = document.getElementById("article");
+                            if (article) {
+                                var nodes = article.getElementsByTagName('*');
+                                for (var i = 0; i < nodes.length; i++) {
+                                    nodes[i].disabled = true;
+                                }
                             }
                         }
                     },

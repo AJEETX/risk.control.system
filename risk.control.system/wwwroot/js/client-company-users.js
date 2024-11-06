@@ -10,9 +10,12 @@
         $('.btn.btn-success').attr('disabled', 'disabled');
         $('.btn.btn-success').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Add User");
 
-        var nodes = document.getElementById("article").getElementsByTagName('*');
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].disabled = true;
+        var article = document.getElementById("article");
+        if (article) {
+            var nodes = article.getElementsByTagName('*');
+            for (var i = 0; i < nodes.length; i++) {
+                nodes[i].disabled = true;
+            }
         }
     });
 
@@ -99,8 +102,11 @@ function showedit(id) {
     $('.btn.btn-xs.btn-warning').attr('disabled', 'disabled');
     editbtn.html("<i class='fas fa-sync fa-spin'></i> Edit");
 
-    var nodes = document.getElementById("article").getElementsByTagName('*');
-    for (var i = 0; i < nodes.length; i++) {
-        nodes[i].disabled = true;
+    var article = document.getElementById("article");
+    if (article) {
+        var nodes = article.getElementsByTagName('*');
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].disabled = true;
+        }
     }
 }

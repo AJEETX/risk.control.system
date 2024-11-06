@@ -67,9 +67,12 @@
         $('a.create-agency-user').attr('disabled', 'disabled');
         $('a.create-agency-user').html("<i class='fas fa-sync fa-spin'></i> Add Agency");
 
-        var nodes = document.getElementById("article").getElementsByTagName('*');
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].disabled = true;
+        var article = document.getElementById("article");
+        if (article) {
+            var nodes = article.getElementsByTagName('*');
+            for (var i = 0; i < nodes.length; i++) {
+                nodes[i].disabled = true;
+            }
         }
     });
 });
@@ -82,10 +85,12 @@ function getdetails(id) {
     }, 1);
     $('a.btn').attr('disabled', 'disabled');
     $('a#delete' + id + '.btn.btn-xs.btn-danger').html("<i class='fas fa-sync fa-spin'></i> Delete");
-
-    var nodes = document.getElementById("article").getElementsByTagName('*');
-    for (var i = 0; i < nodes.length; i++) {
-        nodes[i].disabled = true;
+    var article = document.getElementById("article");
+    if (article) {
+        var nodes = article.getElementsByTagName('*');
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].disabled = true;
+        }
     }
 }
 
@@ -100,8 +105,11 @@ function showdetails(id) {
     var detailbtn = $('a#details' + id + '.btn.btn-xs.btn-info')
     detailbtn.html("<i class='fas fa-sync fa-spin'></i> Details");
 
-    var nodes = document.getElementById("article").getElementsByTagName('*');
-    for (var i = 0; i < nodes.length; i++) {
-        nodes[i].disabled = true;
+    var article = document.getElementById("article");
+    if (article) {
+        var nodes = article.getElementsByTagName('*');
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].disabled = true;
+        }
     }
 }

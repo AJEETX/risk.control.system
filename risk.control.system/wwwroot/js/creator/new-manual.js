@@ -9,9 +9,12 @@
         $('a.create-policy').attr('disabled', 'disabled');
         $('a.create-policy').html("<i class='fas fa-sync fa-spin'></i> Add New");
 
-        var nodes = document.getElementById("article").getElementsByTagName('*');
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].disabled = true;
+        var article = document.getElementById("article");
+        if (article) {
+            var nodes = article.getElementsByTagName('*');
+            for (var i = 0; i < nodes.length; i++) {
+                nodes[i].disabled = true;
+            }
         }
     });
     $('#postedFile').on("change", function () {
@@ -186,9 +189,12 @@
         $('#allocatedcase').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Assign <b> <sub>manual</sub></b>");
 
         $('#radioButtons').submit();
-        var nodes = document.getElementById("article").getElementsByTagName('*');
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].disabled = true;
+        var article = document.getElementById("article");
+        if (article) {
+            var nodes = article.getElementsByTagName('*');
+            for (var i = 0; i < nodes.length; i++) {
+                nodes[i].disabled = true;
+            }
         }
     });
     let askFileUploadConfirmation = true;
@@ -295,9 +301,12 @@
                             $('html *').css('cursor', 'not-allowed');
                             $('html a *, html button *').css('pointer-events', 'none')
 
-                            var nodes = document.getElementById("article").getElementsByTagName('*');
-                            for (var i = 0; i < nodes.length; i++) {
-                                nodes[i].disabled = true;
+                            var article = document.getElementById("article");
+                            if (article) {
+                                var nodes = article.getElementsByTagName('*');
+                                for (var i = 0; i < nodes.length; i++) {
+                                    nodes[i].disabled = true;
+                                }
                             }
                         }
                     },
@@ -324,9 +333,12 @@ function showedit(id) {
     $('a.btn *').attr('disabled', 'disabled');
     $('a#edit' + id + '.btn.btn-xs.btn-warning').html("<i class='fas fa-sync fa-spin'></i> Edit");
 
-    var nodes = document.getElementById("article").getElementsByTagName('*');
-    for (var i = 0; i < nodes.length; i++) {
-        nodes[i].disabled = true;
+    var article = document.getElementById("article");
+    if (article) {
+        var nodes = article.getElementsByTagName('*');
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].disabled = true;
+        }
     }
 }
 function getdetails(id) {
@@ -339,9 +351,13 @@ function getdetails(id) {
     $('a.btn *').attr('disabled', 'disabled');
     $('a#details' + id + '.btn.btn-xs.btn-danger').html("<i class='fas fa-sync fa-spin'></i> Delete");
 
-    var nodes = document.getElementById("article").getElementsByTagName('*');
-    for (var i = 0; i < nodes.length; i++) {
-        nodes[i].disabled = true;
+    var article = document.getElementById("article");
+    if (article) {
+        var nodes = article.getElementsByTagName('*');
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].disabled = true;
+        }
+    } nodes[i].disabled = true;
     }
 }
 
