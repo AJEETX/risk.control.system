@@ -9,7 +9,7 @@ function haversine_distance(mk1, mk2) {
     var d = 2 * R * Math.asin(Math.sqrt(Math.sin(difflat / 2) * Math.sin(difflat / 2) + Math.cos(rlat1) * Math.cos(rlat2) * Math.sin(difflon / 2) * Math.sin(difflon / 2)));
     return d * 1.609;
 }
-function initReportMap() {
+async function initReportMap() {
     var claimId = document.getElementById('claimId').value;
     var response = $.ajax({
         type: "GET",

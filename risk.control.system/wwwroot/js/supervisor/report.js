@@ -12,11 +12,14 @@
         $('html *').css('cursor', 'not-allowed');
         $('html a *, html button *').attr('disabled', 'disabled');
         $('html a *, html button *').css('pointer-events', 'none')
-        $('!allocatedcase').css('pointer-events', 'none')
+        $('#allocatedcase').css('pointer-events', 'none')
 
-        var nodes = document.getElementById("article").getElementsByTagName('*');
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].disabled = true;
+        var article = document.getElementById("article");
+        if (article) {
+            var nodes = article.getElementsByTagName('*');
+            for (var i = 0; i < nodes.length; i++) {
+                nodes[i].disabled = true;
+            }
         }
     });
     $('#view-type a').on('click', function () {
