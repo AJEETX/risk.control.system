@@ -19,7 +19,11 @@
         $('#documentIdLatitude').val(coordinates.latitude);
         $('#documentIdLongitude').val(coordinates.longitude);
     }
-    var currentImage = document.getElementById('face-Image').src;
+    var currentImage;
+    var currentImageEl = document.getElementById('face-Image');
+    if (currentImageEl) {
+        currentImage = currentImageEl.src;
+    }
 
     $("#digitalImage").on('change', function () {
         var MaxSizeInBytes = 2097152;
@@ -36,7 +40,7 @@
                 for (var i = 0; i < countFiles; i++) {
                     var fileSize = $(this)[0].files[i].size;
                     if (fileSize > MaxSizeInBytes) {
-                        if (currentImage.startsWith('https://') && currentImage.endsWith('/img/no-user.png')) {
+                        if (currentImage && currentImage.startsWith('https://') && currentImage.endsWith('/img/no-user.png')) {
                             document.getElementById('face-Image').src = '/img/no-user.png';
                             document.getElementById('digitalImage').value = '';
                         }
@@ -99,8 +103,11 @@
         }
     });
 
-    var panImage = document.getElementById('pan-Image').src;
-
+    var panImage;
+    var panImageEl = document.getElementById('pan-Image');
+    if (panImageEl) {
+        panImage = panImageEl.src;
+    }
     $("#panImage").on('change', function () {
         var MaxSizeInBytes = 2097152;
         //Get count of selected files
@@ -116,7 +123,7 @@
                 for (var i = 0; i < countFiles; i++) {
                     var fileSize = $(this)[0].files[i].size;
                     if (fileSize > MaxSizeInBytes) {
-                        if (panImage.startsWith('https://') && panImage.endsWith('/img/no-image.png')) {
+                        if (panImage && panImage.startsWith('https://') && panImage.endsWith('/img/no-image.png')) {
                             document.getElementById('pan-Image').src = '/img/no-image.png';
                             document.getElementById('panImage').value = '';
                         }

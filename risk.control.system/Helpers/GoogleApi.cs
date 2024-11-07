@@ -21,21 +21,19 @@ namespace risk.control.system.Helpers
         }
         public async Task<IReadOnlyList<EntityAnnotation>> DetectTextAsync(byte[] byteImage)
         {
-
-
-            string credentialJson = Environment.GetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS_JSON");
-
-            // Create Google Credential from JSON string
-            GoogleCredential googleCredential = GoogleCredential.FromJson(credentialJson);
-
-            var client = new ImageAnnotatorClientBuilder
-            {
-                Credential = googleCredential
-            }.Build();
-
-            var image = Image.FromBytes(byteImage);
             try
             {
+                string credentialJson = Environment.GetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS_JSON");
+
+                // Create Google Credential from JSON string
+                GoogleCredential googleCredential = GoogleCredential.FromJson(credentialJson);
+
+                var client = new ImageAnnotatorClientBuilder
+                {
+                    Credential = googleCredential
+                }.Build();
+
+                var image = Image.FromBytes(byteImage);
                 return await client.DetectTextAsync(image);
 
             }
