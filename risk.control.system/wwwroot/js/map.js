@@ -9,7 +9,7 @@ function haversine_distance(mk1, mk2) {
     var d = 2 * R * Math.asin(Math.sqrt(Math.sin(difflat / 2) * Math.sin(difflat / 2) + Math.cos(rlat1) * Math.cos(rlat2) * Math.sin(difflon / 2) * Math.sin(difflon / 2)));
     return d * 1.609;
 }
-async function initReportMap() {
+function initReportMap() {
     var claimId = document.getElementById('claimId').value;
     var response = $.ajax({
         type: "GET",
@@ -36,8 +36,10 @@ async function initReportMap() {
             frick = data.frick
         }
     }
-
-    initFaceMap(center, dakota, frick);
+    var faceHtml = document.getElementById('face-map');
+    if (faceHtml) {
+        initFaceMap(center, dakota, frick);
+    }
 
     var ocrResponse = $.ajax({
         type: "GET",
@@ -67,7 +69,10 @@ async function initReportMap() {
         }
     }
 
-    initOcrMap(ocenter, odakota, ofrick);
+    var ocrHtml = document.getElementById('ocr-map');
+    if (ocrHtml) {
+        initOcrMap(ocenter, odakota, ofrick);
+    }
 }
 
 function initFaceMap(center, dakota, frick) {

@@ -34,13 +34,12 @@ namespace risk.control.system.Controllers
         public async Task<IActionResult> SendSms2Customer(string claimId, string name)
         {
             var currentUser = HttpContext.User.Identity.Name;
-            var customerName = notificationService.SendSms2Customer(currentUser, claimId, name);
+            var customerName =await notificationService.SendSms2Customer(currentUser, claimId, name);
             if(string.IsNullOrEmpty(customerName))
             {
                 return BadRequest("Error !!!");
             }
 
-            await Task.Delay(1000);
             return Ok(new { message = "Message Sent: Success", customerName = customerName });
         }
 
@@ -49,12 +48,11 @@ namespace risk.control.system.Controllers
         public async Task<IActionResult> SendSms2Beneficiary(string claimId, string name)
         {
             var currentUser = HttpContext.User.Identity.Name;
-            var customerName = notificationService.SendSms2Beneficiary(currentUser, claimId, name);
+            var customerName = await notificationService.SendSms2Beneficiary(currentUser, claimId, name);
             if (string.IsNullOrEmpty(customerName))
             {
                 return BadRequest("Error !!!");
             }
-            await Task.Delay(000);
             return Ok(new { message = "Message Sent: Success", customerName = customerName });
         }
     }

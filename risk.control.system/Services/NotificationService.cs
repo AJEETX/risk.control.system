@@ -22,9 +22,9 @@ namespace risk.control.system.Services
 
         Task<(ClaimMessage message, string yes, string no)> GetClaim(string baseUrl, string id);
 
-        string SendSms2Customer(string currentUser, string claimId, string sms);
+        Task<string> SendSms2Customer(string currentUser, string claimId, string sms);
 
-        string SendSms2Beneficiary(string currentUser, string claimId, string sms);
+        Task<string> SendSms2Beneficiary(string currentUser, string claimId, string sms);
         bool IsWhiteListIpAddress(IPAddress remoteIp);
     }
 
@@ -360,7 +360,7 @@ namespace risk.control.system.Services
             return (scheduleMessage, yesUrl, noUrl);
         }
 
-        public string SendSms2Customer(string currentUser, string claimId, string sms)
+        public async Task<string> SendSms2Customer(string currentUser, string claimId, string sms)
         {
             var claim = context.ClaimsInvestigation
             .Include(c => c.ClaimMessages)
@@ -417,11 +417,11 @@ namespace risk.control.system.Services
             };
             claim.ClaimMessages.Add(scheduleMessage);
             context.SaveChanges();
-            SmsService.SendSmsAsync("+" + mobile, message).RunSynchronously();
+            await SmsService.SendSmsAsync("+" + mobile, message);
             return claim.CustomerDetail.CustomerName;
         }
 
-        public string SendSms2Beneficiary(string currentUser, string claimId, string sms)
+        public async Task<string> SendSms2Beneficiary(string currentUser, string claimId, string sms)
         {
             var beneficiary = context.BeneficiaryDetail.Include(b => b.ClaimsInvestigation).ThenInclude(c => c.PolicyDetail)
                .FirstOrDefault(c => c.ClaimsInvestigationId == claimId);
@@ -480,7 +480,7 @@ namespace risk.control.system.Services
             .FirstOrDefault(c => c.ClaimsInvestigationId == claimId);
             claim.ClaimMessages.Add(scheduleMessage);
             context.SaveChanges();
-            SmsService.SendSmsAsync("+" + mobile, message).RunSynchronously();
+            await SmsService.SendSmsAsync("+" + mobile, message);
             return beneficiary.BeneficiaryName;
         }
     }
