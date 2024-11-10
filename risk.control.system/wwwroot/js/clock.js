@@ -89,12 +89,18 @@ function showTime() {
 
 	// Displaying the time
 	var clockTime = document.getElementById("clock");
-	// Displaying the time
-	clockTime.innerHTML = currentTime;
+	if (clockTime) {
+		// Displaying the time
+		clockTime.innerHTML = currentTime;
+	}
 }
 window.onload = function () {
 	var display = document.querySelector('#time');
-	var timeout = document.getElementById('timeout').value;
-	startTimer(timeout, display);
-	showTime();
+	var timeoutElement = document.getElementById('timeout');
+	if(timeoutElement != null)
+    {
+        var timeout = document.getElementById('timeout').value;
+        startTimer(timeout, display);
+        showTime();
+    }
 }

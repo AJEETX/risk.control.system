@@ -189,11 +189,10 @@ namespace risk.control.system.Services
                 await Task.WhenAll(googleDetecTask, addressTask);
 
                 var imageReadOnly = await googleDetecTask;
-
-                var allPanText = imageReadOnly.FirstOrDefault().Description;
-                var panTextPre = allPanText.IndexOf(txt2Find);
-                if (panTextPre != -1)
+                if(imageReadOnly !=null && imageReadOnly.Count > 0)
                 {
+                    var allPanText = imageReadOnly.FirstOrDefault().Description;
+                    var panTextPre = allPanText.IndexOf(txt2Find);
                     var panNumber = allPanText.Substring(panTextPre + txt2Find.Length + 1, 10);
 
 

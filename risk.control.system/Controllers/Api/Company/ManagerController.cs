@@ -109,7 +109,7 @@ namespace risk.control.system.Controllers.Api.Company
         [HttpGet("GetActive")]
         public IActionResult GetActive()
         {
-            IQueryable<ClaimsInvestigation> applicationDbContext = claimsService.GetClaims();
+            IQueryable<ClaimsInvestigation> applicationDbContext = claimsService.GetClaims().Include(a => a.PreviousClaimReports);
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
             var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(c => c.Email == userEmail.Value);
             applicationDbContext = applicationDbContext.Where(i => i.ClientCompanyId == companyUser.ClientCompanyId);
