@@ -44,7 +44,11 @@
 
 $(document).ready(function () {
     $("#create-form").validate();
-    var currentImage = document.getElementById('companyImage').src;
+    var currentImage;
+    var currentImageElement = document.getElementById('companyImage');
+    if (currentImageElement) {
+        currentImage = currentImageElement.src;
+    }
     $("#documentImageInput").on('change', function () {
         var MaxSizeInBytes = 2097152;
         //Get count of selected files
@@ -123,4 +127,3 @@ $(document).ready(function () {
         }
     });
 });
-ExpiryDate.min = new Date().toISOString().split("T")[0];

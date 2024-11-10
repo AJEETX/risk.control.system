@@ -42,7 +42,11 @@
 });
 $(document).ready(function () {
     $("#create-form").validate();
-    var currentImage = document.getElementById('profileImage').src;
+    var currentImage;
+    var currentImageElement = document.getElementById('profileImage');
+    if (currentImageElement) {
+        currentImage = currentImageElement.src;
+    }
 
     $("#documentImageInput").on('change', function () {
         var MaxSizeInBytes = 2097152;

@@ -9,22 +9,6 @@
             <div class="col-md-12">
                 <div class="card card-secondary">
                     <div class="card-header">
-                        <h3 class="card-title"><i class="fas fa-battery-full"></i> @Applicationsettings.CASE_STATUS</h3>
-                    </div>
-                    <div class="card-body dataTable-search-form">
-                        <div class="row">
-                            <div class="col-md-12 text-right">
-                                <a class="btn btn-success" asp-controller="InvestigationCaseStatus" asp-action="Create"><i class="fas fa-plus"></i>  @Applicationsettings.CREATE</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-12">
-                <div class="card card-secondary">
-                    <div class="card-header">
                         <h3 class="card-title"><i class="fas fa-list"></i> @Applicationsettings.CASE_STATUS List</h3>
                     </div>
                     <div class="card-body">
@@ -73,6 +57,17 @@
                                 }
                             </tbody>
                         </table>
+                    </div>
+                    <div class="card-footer">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <a id="back" asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
+                                    <a class="btn btn-success" as-controller="InvestigationCaseStatus" asp-action="Create"> <i class="fas fa-battery-full"></i> Add  New </a>
+
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

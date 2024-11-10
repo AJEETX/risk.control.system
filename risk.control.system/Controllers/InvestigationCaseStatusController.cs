@@ -23,11 +23,15 @@ namespace risk.control.system.Controllers
         // GET: RiskCaseStatus
         public async Task<IActionResult> Index()
         {
+            return RedirectToAction("Profile");
+        }
+
+        public async Task<IActionResult> Profile()
+        {
             return _context.InvestigationCaseStatus != null ?
                         View(await _context.InvestigationCaseStatus.ToListAsync()) :
                         Problem("Entity set 'ApplicationDbContext.RiskCaseStatus'  is null.");
         }
-
         // GET: RiskCaseStatus/Details/5
         [Breadcrumb("Details")]
         public async Task<IActionResult> Details(string id)

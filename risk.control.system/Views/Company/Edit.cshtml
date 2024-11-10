@@ -36,11 +36,11 @@
                             <div class="input-group mb-3">
                                 @if (Model?.DocumentUrl is not null)
                                 {
-                                    <img id="profileImage" class="form-Image" src="@Model?.DocumentUrl">
+                                    <img id="companyImage" class="form-Image" src="@Model?.DocumentUrl">
                                 }
                                 else
                                 {
-                                    <img id="profileImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
+                                    <img id="companyImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
                                 }
                                 <input asp-for="DocumentImage" type="file" class="form-control remarks" id="documentImageInput" />
                             </div>
