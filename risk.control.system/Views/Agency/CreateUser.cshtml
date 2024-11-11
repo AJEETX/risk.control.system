@@ -123,7 +123,18 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text" asp-for="ClaimType"><i class="nav-icon fas fa-file-invoice"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <select required asp-for="@Model.UserRole" class="form-control remarks" asp-items="Html.GetEnumSelectList<AgencyRole>()">
+                                @{
+                                    // Get the enum values except the one you want to exclude
+                                    var roles = Enum.GetValues(typeof(AgencyRole))
+                                    .Cast<AgencyRole>()
+                                    .Where(role => role != AgencyRole.AGENCY_ADMIN) // Replace RoleToExclude with the actual enum value
+                                    .Select(role => new SelectListItem
+                                    {
+                                        Value = role.ToString(),
+                                        Text = role.ToString()
+                                    });
+                                }
+                                <select required asp-for="@Model.UserRole" class="form-control remarks" asp-items="@roles">
                                     <option value="">--- SELECT ---</option>
                                 </select>
                                 <span asp-validation-for="@Model.UserRole" class="text-danger"></span>

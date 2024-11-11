@@ -87,13 +87,13 @@ namespace risk.control.system.Models
         public bool CanChangePassword { get; set; } = false;
         public string MobileAppUrl { get; set; } = "https://apkichck.s3.ap-southeast-2.amazonaws.com/icheckify/app-release.apk";
         public bool BulkUpload { get; set; } = false;
-        public string WhitelistIpAddress { get; set; } = "::1;202.7.251.131";
+        public string WhitelistIpAddress { get; set; } = "::1;202.7.251.159";
         public string? WhitelistIpAddressRange { get; set; } = default!;
         public LicenseType LicenseType { get; set; } = LicenseType.Trial;
         public string LicenseId { get; set; } = Guid.NewGuid().ToString();
 
         [DataType(DataType.DateTime)]
-        public DateTime? ExpiryDate { get; set; } = DateTime.Now.AddDays(5);
+        public DateTime? ExpiryDate { get; set; } = DateTime.Now.AddDays(10);
         [Range(5, 50)]
         public int TotalCreatedClaimAllowed { get; set; } = 10;
     }
