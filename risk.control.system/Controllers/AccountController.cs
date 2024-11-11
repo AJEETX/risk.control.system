@@ -309,10 +309,10 @@ namespace risk.control.system.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public IActionResult Forgot(LoginViewModel input)
+        public async Task<IActionResult> Forgot(LoginViewModel input)
         {
             string message = string.Empty;
-            var smsSent = accountService.ForgotPassword(input.Email,long.Parse(input.Mobile));
+            var smsSent = await accountService.ForgotPassword(input.Email,long.Parse(input.Mobile));
             if (smsSent)
             {
                 message = "Password sent to mobile: " + input.Mobile;

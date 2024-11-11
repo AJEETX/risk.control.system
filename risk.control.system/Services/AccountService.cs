@@ -8,7 +8,7 @@ namespace risk.control.system.Services
 {
     public interface IAccountService
     {
-        bool ForgotPassword(string useremail, long mobile);
+        Task<bool> ForgotPassword(string useremail, long mobile);
     }
 
     public class AccountService : IAccountService
@@ -24,7 +24,7 @@ namespace risk.control.system.Services
             this.httpContextAccessor = httpContextAccessor;
         }
 
-        public bool ForgotPassword(string useremail, long mobile)
+        public async Task<bool> ForgotPassword(string useremail, long mobile)
         {
             //CHECK AND VALIDATE EMAIL PASSWORD
             var user = context.ApplicationUser.FirstOrDefault(u => u.Email == useremail && u.PhoneNumber == mobile.ToString());
@@ -46,7 +46,7 @@ namespace risk.control.system.Services
                 message += $"{BaseUrl}";
                 if(user != null)
                 {
-                    SmsService.SendSmsAsync(user.PhoneNumber, message).RunSynchronously();
+                    await SmsService.SendSmsAsync(user.PhoneNumber, message);
                 }
             }
             //SEND SMS

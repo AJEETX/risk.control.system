@@ -203,238 +203,243 @@ namespace risk.control.system.Services
             }
 
             var innerFile = archive.Entries.FirstOrDefault(e => Path.GetExtension(e.FullName).Equals(".csv"));
+            string csvData = string.Empty;
             using (var ss = innerFile.Open())
             {
                 using (var memoryStream = new MemoryStream())
                 {
                     ss.CopyTo(memoryStream);
                     var bytes = memoryStream.ToArray();
-                    string csvData = Encoding.UTF8.GetString(bytes);
-                    
-                    var dataRows = csvData.Split('\n');
-                    var totalIncludingUploaded = totalClaimsCreated + dataRows.Length - 1;
-                    var userCanUpload = companyUser.ClientCompany.TotalCreatedClaimAllowed >= totalIncludingUploaded;
-                    if (userCanCreate && userCanUpload)
-                    {
-                        var status = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.INITIATED));
-                        var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
-                        var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
-                        var autoEnabled = companyUser.ClientCompany.AutoAllocation;
-                        DataTable dt = new DataTable();
-                        bool firstRow = true;
-
-                        foreach (string row in dataRows)
-                        {
-                            if (!string.IsNullOrEmpty(row))
-                            {
-                                if (firstRow)
-                                {
-                                    foreach (string cell in row.Split(','))
-                                    {
-                                        dt.Columns.Add(cell.Trim());
-                                    }
-                                    firstRow = false;
-                                }
-                                else
-                                {
-                                    try
-                                    {
-                                        dt.Rows.Add();
-                                        int i = 0;
-                                        var output = regex.Replace(row, m => m.Value.Replace(',', '@'));
-                                        var rowData = output.Split(',').ToList();
-                                        foreach (string cell in rowData)
-                                        {
-                                            dt.Rows[dt.Rows.Count - 1][i] = cell?.Trim() ?? NO_DATA;
-                                            i++;
-                                        }
-                                        var subStatus = companyUser.ClientCompany.AutoAllocation && createdAsMethod == CREATEDBY.AUTO ? createdStatus : assignedStatus;
-                                        var claim = new ClaimsInvestigation
-                                        {
-                                            InvestigationCaseStatusId = status.InvestigationCaseStatusId,
-                                            InvestigationCaseStatus = status,
-                                            InvestigationCaseSubStatusId = subStatus.InvestigationCaseSubStatusId,
-                                            InvestigationCaseSubStatus = subStatus,
-                                            Updated = DateTime.Now,
-                                            UpdatedBy = userEmail,
-                                            CurrentUserEmail = userEmail,
-                                            CurrentClaimOwner = userEmail,
-                                            Deleted = false,
-                                            HasClientCompany = true,
-                                            AssignedToAgency = false,
-                                            IsReady2Assign = true,
-                                            IsReviewCase = false,
-                                            SelectedToAssign = false,
-                                            UserEmailActioned = userEmail,
-                                            UserEmailActionedTo = userEmail,
-                                            CREATEDBY = createdAsMethod,
-                                            ORIGIN = uploadingway,
-                                            ClientCompanyId = companyUser.ClientCompanyId,
-                                            UserRoleActionedTo = $"{companyUser.ClientCompany.Email}"
-                                    };
-
-                                        var servicetype = _context.InvestigationServiceType.FirstOrDefault(s => s.Code.ToLower() == (rowData[4].Trim().ToLower()));
-
-                                        var policyImage = archive.Entries.FirstOrDefault(p => p.FullName.ToLower().EndsWith(rowData[0]?.Trim().ToLower() + "/policy.jpg"));
-                                        using (var pImage = policyImage.Open())
-                                        {
-                                            using (var ps = new MemoryStream())
-                                            {
-                                                pImage.CopyTo(ps);
-                                                var savedNewImage = ps.ToArray();
-                                                dt.Rows[dt.Rows.Count - 1][9] = $"{Convert.ToBase64String(savedNewImage)}";
-                                                claim.PolicyDetail = new PolicyDetail
-                                                {
-                                                    ContractNumber = rowData[0]?.Trim(),
-                                                    SumAssuredValue = Convert.ToDecimal(rowData[1]?.Trim()),
-                                                    ContractIssueDate = DateTime.Now.AddDays(-20),
-                                                    ClaimType = (ClaimType)Enum.Parse(typeof(ClaimType), rowData[3]?.Trim()),
-                                                    InvestigationServiceTypeId = servicetype?.InvestigationServiceTypeId,
-                                                    DateOfIncident = DateTime.Now.AddDays(-5),
-                                                    CauseOfLoss = rowData[6]?.Trim(),
-                                                    CaseEnablerId = _context.CaseEnabler.FirstOrDefault(c => c.Code.ToLower() == rowData[7].Trim().ToLower()).CaseEnablerId,
-                                                    CostCentreId = _context.CostCentre.FirstOrDefault(c => c.Code.ToLower() == rowData[8].Trim().ToLower()).CostCentreId,
-                                                    LineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Code.ToLower() == "claims")?.LineOfBusinessId,
-                                                    DocumentImage = savedNewImage,
-                                                };
-                                            }
-                                        }
-
-                                        var pinCode = _context.PinCode
-                                            .Include(p => p.District)
-                                            .Include(p => p.State)
-                                            .Include(p => p.Country)
-                                            .FirstOrDefault(p => p.Code == rowData[19].Trim());
-
-                                        var district = _context.District.FirstOrDefault(c => c.DistrictId == pinCode.District.DistrictId);
-
-                                        var state = _context.State.FirstOrDefault(s => s.StateId == pinCode.State.StateId);
-
-                                        var country = _context.Country.FirstOrDefault(c => c.CountryId == pinCode.Country.CountryId);
-
-                                        var customerImage = archive.Entries.FirstOrDefault(p => p.FullName.ToLower().EndsWith(rowData[0]?.Trim().ToLower() + "/customer.jpg"));
-
-                                        using (var cImage = customerImage.Open())
-                                        {
-                                            using (var cs = new MemoryStream())
-                                            {
-                                                cImage.CopyTo(cs);
-                                                var customerNewImage = cs.ToArray();
-                                                dt.Rows[dt.Rows.Count - 1][21] = $"{Convert.ToBase64String(customerNewImage)}";
-                                                claim.CustomerDetail = new CustomerDetail
-                                                {
-                                                    CustomerName = rowData[10]?.Trim(),
-                                                    CustomerType = (CustomerType)Enum.Parse(typeof(CustomerType), rowData[11]?.Trim()),
-                                                    Gender = (Gender)Enum.Parse(typeof(Gender), rowData[12]?.Trim()),
-                                                    CustomerDateOfBirth = DateTime.Now.AddYears(-20),
-                                                    ContactNumber = Convert.ToInt64(rowData[14]?.Trim()),
-                                                    CustomerEducation = (Education)Enum.Parse(typeof(Education), rowData[15]?.Trim()),
-                                                    CustomerOccupation = (Occupation)Enum.Parse(typeof(Occupation), rowData[16]?.Trim()),
-                                                    CustomerIncome = (Income)Enum.Parse(typeof(Income), rowData[17]?.Trim()),
-                                                    Addressline = rowData[18]?.Trim(),
-                                                    CountryId = country.CountryId,
-                                                    PinCodeId = pinCode.PinCodeId,
-                                                    StateId = state.StateId,
-                                                    DistrictId = district.DistrictId,
-                                                    Description = rowData[20]?.Trim(),
-                                                    ProfilePicture = customerNewImage,
-                                                };
-                                            }
-                                        }
-
-                                        claim.CustomerDetail.PinCode = pinCode;
-                                        claim.CustomerDetail.PinCode.Latitude = pinCode.Latitude;
-                                        claim.CustomerDetail.PinCode.Longitude = pinCode.Longitude;
-                                        var customerLatLong = pinCode.Latitude + "," + pinCode.Longitude;
-
-                                        var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=18&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
-                                        claim.CustomerDetail.CustomerLocationMap = url;
-
-                                        var benePinCode = _context.PinCode
-                                            .Include(p => p.District)
-                                            .Include(p => p.State)
-                                            .Include(p => p.Country)
-                                            .FirstOrDefault(p => p.Code == rowData[28].Trim());
-
-                                        var beneDistrict = _context.District.FirstOrDefault(c => c.DistrictId == benePinCode.District.DistrictId);
-
-                                        var beneState = _context.State.FirstOrDefault(s => s.StateId == benePinCode.State.StateId);
-
-                                        var beneCountry = _context.Country.FirstOrDefault(c => c.CountryId == benePinCode.Country.CountryId);
-
-                                        var relation = _context.BeneficiaryRelation.FirstOrDefault(b => b.Code.ToLower() == rowData[23].Trim().ToLower());
-
-                                        var beneficiaryImage = archive.Entries.FirstOrDefault(p => p.FullName.ToLower().EndsWith(rowData[0]?.Trim().ToLower() + "/beneficiary.jpg"));
-
-                                        using (var bImage = beneficiaryImage.Open())
-                                        {
-                                            using var bs = new MemoryStream();
-                                            bImage.CopyTo(bs);
-
-                                            var beneficiaryNewImage = bs.ToArray();
-
-                                            dt.Rows[dt.Rows.Count - 1][29] = $"{Convert.ToBase64String(beneficiaryNewImage)}";
-
-                                            var beneficairy = new BeneficiaryDetail
-                                            {
-                                                BeneficiaryName = rowData[22]?.Trim(),
-                                                BeneficiaryRelationId = relation.BeneficiaryRelationId,
-                                                BeneficiaryDateOfBirth = DateTime.Now.AddYears(-22),
-                                                BeneficiaryIncome = (Income)Enum.Parse(typeof(Income), rowData[25]?.Trim()),
-                                                BeneficiaryContactNumber = Convert.ToInt64(rowData[26]?.Trim()),
-                                                Addressline = rowData[27]?.Trim(),
-                                                PinCodeId = benePinCode.PinCodeId,
-                                                DistrictId = beneDistrict.DistrictId,
-                                                StateId = beneState.StateId,
-                                                CountryId = beneCountry.CountryId,
-                                                ProfilePicture = beneficiaryNewImage,
-                                                Updated = DateTime.Now,
-                                                UpdatedBy = userEmail,
-                                                ClaimsInvestigation = claim
-                                            };
-                                            beneficairy.ClaimsInvestigationId = claim.ClaimsInvestigationId;
-
-                                            beneficairy.PinCode = benePinCode;
-                                            beneficairy.PinCode.Latitude = benePinCode.Latitude;
-                                            beneficairy.PinCode.Longitude = benePinCode.Longitude;
-                                            var beneLatLong = benePinCode.Latitude + "," + benePinCode.Longitude;
-
-                                            var beneUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={beneLatLong}&zoom=18&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{beneLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
-                                            beneficairy.BeneficiaryLocationMap = beneUrl;
-                                            _context.BeneficiaryDetail.Add(beneficairy);
-                                        }
-                                        _context.ClaimsInvestigation.Add(claim);
-
-                                        var log = new InvestigationTransaction
-                                        {
-                                            ClaimsInvestigationId = claim.ClaimsInvestigationId,
-                                            UserEmailActioned = claim.UserEmailActioned,
-                                            UserRoleActionedTo = claim.UserRoleActionedTo,
-                                            CurrentClaimOwner = userEmail,
-                                            HopCount = 0,
-                                            Time2Update = 0,
-                                            InvestigationCaseStatusId = status.InvestigationCaseStatusId,
-                                            InvestigationCaseSubStatusId = createdStatus.InvestigationCaseSubStatusId,
-                                            UpdatedBy = userEmail
-                                        };
-                                        _context.InvestigationTransaction.Add(log);
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        Console.WriteLine(ex.StackTrace);
-                                        return false;
-                                    }
-                                }
-                            }
-                        }
-                        var dataObject = ConvertDataTable<UploadClaim>(dt);
-                        _context.UploadClaim.AddRange(dataObject);
-                        _context.SaveChanges();
-                        return true;
-                    }
-                    return false;
+                    csvData = Encoding.UTF8.GetString(bytes);
                 }
             }
+            var dataRows = csvData.Split('\n');
+            var totalIncludingUploaded = totalClaimsCreated + dataRows.Length - 1;
+            var userCanUpload = true;
+            if(companyUser.ClientCompany.LicenseType == Standard.Licensing.LicenseType.Trial)
+            {
+                userCanUpload = companyUser.ClientCompany.TotalCreatedClaimAllowed >= totalIncludingUploaded;
+            }
+            if (userCanCreate && userCanUpload)
+            {
+                var status = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.INITIATED));
+                var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
+                var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
+                var autoEnabled = companyUser.ClientCompany.AutoAllocation;
+                DataTable dt = new DataTable();
+                bool firstRow = true;
+
+                foreach (string row in dataRows)
+                {
+                    if (!string.IsNullOrEmpty(row))
+                    {
+                        if (firstRow)
+                        {
+                            foreach (string cell in row.Split(','))
+                            {
+                                dt.Columns.Add(cell.Trim());
+                            }
+                            firstRow = false;
+                        }
+                        else
+                        {
+                            try
+                            {
+                                dt.Rows.Add();
+                                int i = 0;
+                                var output = regex.Replace(row, m => m.Value.Replace(',', '@'));
+                                var rowData = output.Split(',').ToList();
+                                foreach (string cell in rowData)
+                                {
+                                    dt.Rows[dt.Rows.Count - 1][i] = cell?.Trim() ?? NO_DATA;
+                                    i++;
+                                }
+                                var subStatus = companyUser.ClientCompany.AutoAllocation && createdAsMethod == CREATEDBY.AUTO ? createdStatus : assignedStatus;
+                                var claim = new ClaimsInvestigation
+                                {
+                                    InvestigationCaseStatusId = status.InvestigationCaseStatusId,
+                                    InvestigationCaseStatus = status,
+                                    InvestigationCaseSubStatusId = subStatus.InvestigationCaseSubStatusId,
+                                    InvestigationCaseSubStatus = subStatus,
+                                    Updated = DateTime.Now,
+                                    UpdatedBy = userEmail,
+                                    CurrentUserEmail = userEmail,
+                                    CurrentClaimOwner = userEmail,
+                                    Deleted = false,
+                                    HasClientCompany = true,
+                                    AssignedToAgency = false,
+                                    IsReady2Assign = true,
+                                    IsReviewCase = false,
+                                    SelectedToAssign = false,
+                                    UserEmailActioned = userEmail,
+                                    UserEmailActionedTo = userEmail,
+                                    CREATEDBY = createdAsMethod,
+                                    ORIGIN = uploadingway,
+                                    ClientCompanyId = companyUser.ClientCompanyId,
+                                    UserRoleActionedTo = $"{companyUser.ClientCompany.Email}"
+                            };
+
+                                var servicetype = _context.InvestigationServiceType.FirstOrDefault(s => s.Code.ToLower() == (rowData[4].Trim().ToLower()));
+
+                                var policyImage = archive.Entries.FirstOrDefault(p => p.FullName.ToLower().EndsWith(rowData[0]?.Trim().ToLower() + "/policy.jpg"));
+                                using (var pImage = policyImage.Open())
+                                {
+                                    using (var ps = new MemoryStream())
+                                    {
+                                        pImage.CopyTo(ps);
+                                        var savedNewImage = ps.ToArray();
+                                        dt.Rows[dt.Rows.Count - 1][9] = $"{Convert.ToBase64String(savedNewImage)}";
+                                        claim.PolicyDetail = new PolicyDetail
+                                        {
+                                            ContractNumber = rowData[0]?.Trim(),
+                                            SumAssuredValue = Convert.ToDecimal(rowData[1]?.Trim()),
+                                            ContractIssueDate = DateTime.Now.AddDays(-20),
+                                            ClaimType = (ClaimType)Enum.Parse(typeof(ClaimType), rowData[3]?.Trim()),
+                                            InvestigationServiceTypeId = servicetype?.InvestigationServiceTypeId,
+                                            DateOfIncident = DateTime.Now.AddDays(-5),
+                                            CauseOfLoss = rowData[6]?.Trim(),
+                                            CaseEnablerId = _context.CaseEnabler.FirstOrDefault(c => c.Code.ToLower() == rowData[7].Trim().ToLower()).CaseEnablerId,
+                                            CostCentreId = _context.CostCentre.FirstOrDefault(c => c.Code.ToLower() == rowData[8].Trim().ToLower()).CostCentreId,
+                                            LineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Code.ToLower() == "claims")?.LineOfBusinessId,
+                                            DocumentImage = savedNewImage,
+                                        };
+                                    }
+                                }
+
+                                var pinCode = _context.PinCode
+                                    .Include(p => p.District)
+                                    .Include(p => p.State)
+                                    .Include(p => p.Country)
+                                    .FirstOrDefault(p => p.Code == rowData[19].Trim());
+
+                                var district = _context.District.FirstOrDefault(c => c.DistrictId == pinCode.District.DistrictId);
+
+                                var state = _context.State.FirstOrDefault(s => s.StateId == pinCode.State.StateId);
+
+                                var country = _context.Country.FirstOrDefault(c => c.CountryId == pinCode.Country.CountryId);
+
+                                var customerImage = archive.Entries.FirstOrDefault(p => p.FullName.ToLower().EndsWith(rowData[0]?.Trim().ToLower() + "/customer.jpg"));
+
+                                using (var cImage = customerImage.Open())
+                                {
+                                    using (var cs = new MemoryStream())
+                                    {
+                                        cImage.CopyTo(cs);
+                                        var customerNewImage = cs.ToArray();
+                                        dt.Rows[dt.Rows.Count - 1][21] = $"{Convert.ToBase64String(customerNewImage)}";
+                                        claim.CustomerDetail = new CustomerDetail
+                                        {
+                                            CustomerName = rowData[10]?.Trim(),
+                                            CustomerType = (CustomerType)Enum.Parse(typeof(CustomerType), rowData[11]?.Trim()),
+                                            Gender = (Gender)Enum.Parse(typeof(Gender), rowData[12]?.Trim()),
+                                            CustomerDateOfBirth = DateTime.Now.AddYears(-20),
+                                            ContactNumber = Convert.ToInt64(rowData[14]?.Trim()),
+                                            CustomerEducation = (Education)Enum.Parse(typeof(Education), rowData[15]?.Trim()),
+                                            CustomerOccupation = (Occupation)Enum.Parse(typeof(Occupation), rowData[16]?.Trim()),
+                                            CustomerIncome = (Income)Enum.Parse(typeof(Income), rowData[17]?.Trim()),
+                                            Addressline = rowData[18]?.Trim(),
+                                            CountryId = country.CountryId,
+                                            PinCodeId = pinCode.PinCodeId,
+                                            StateId = state.StateId,
+                                            DistrictId = district.DistrictId,
+                                            Description = rowData[20]?.Trim(),
+                                            ProfilePicture = customerNewImage,
+                                        };
+                                    }
+                                }
+
+                                claim.CustomerDetail.PinCode = pinCode;
+                                claim.CustomerDetail.PinCode.Latitude = pinCode.Latitude;
+                                claim.CustomerDetail.PinCode.Longitude = pinCode.Longitude;
+                                var customerLatLong = pinCode.Latitude + "," + pinCode.Longitude;
+
+                                var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=18&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+                                claim.CustomerDetail.CustomerLocationMap = url;
+
+                                var benePinCode = _context.PinCode
+                                    .Include(p => p.District)
+                                    .Include(p => p.State)
+                                    .Include(p => p.Country)
+                                    .FirstOrDefault(p => p.Code == rowData[28].Trim());
+
+                                var beneDistrict = _context.District.FirstOrDefault(c => c.DistrictId == benePinCode.District.DistrictId);
+
+                                var beneState = _context.State.FirstOrDefault(s => s.StateId == benePinCode.State.StateId);
+
+                                var beneCountry = _context.Country.FirstOrDefault(c => c.CountryId == benePinCode.Country.CountryId);
+
+                                var relation = _context.BeneficiaryRelation.FirstOrDefault(b => b.Code.ToLower() == rowData[23].Trim().ToLower());
+
+                                var beneficiaryImage = archive.Entries.FirstOrDefault(p => p.FullName.ToLower().EndsWith(rowData[0]?.Trim().ToLower() + "/beneficiary.jpg"));
+
+                                using (var bImage = beneficiaryImage.Open())
+                                {
+                                    using var bs = new MemoryStream();
+                                    bImage.CopyTo(bs);
+
+                                    var beneficiaryNewImage = bs.ToArray();
+
+                                    dt.Rows[dt.Rows.Count - 1][29] = $"{Convert.ToBase64String(beneficiaryNewImage)}";
+
+                                    var beneficairy = new BeneficiaryDetail
+                                    {
+                                        BeneficiaryName = rowData[22]?.Trim(),
+                                        BeneficiaryRelationId = relation.BeneficiaryRelationId,
+                                        BeneficiaryDateOfBirth = DateTime.Now.AddYears(-22),
+                                        BeneficiaryIncome = (Income)Enum.Parse(typeof(Income), rowData[25]?.Trim()),
+                                        BeneficiaryContactNumber = Convert.ToInt64(rowData[26]?.Trim()),
+                                        Addressline = rowData[27]?.Trim(),
+                                        PinCodeId = benePinCode.PinCodeId,
+                                        DistrictId = beneDistrict.DistrictId,
+                                        StateId = beneState.StateId,
+                                        CountryId = beneCountry.CountryId,
+                                        ProfilePicture = beneficiaryNewImage,
+                                        Updated = DateTime.Now,
+                                        UpdatedBy = userEmail,
+                                        ClaimsInvestigation = claim
+                                    };
+                                    beneficairy.ClaimsInvestigationId = claim.ClaimsInvestigationId;
+
+                                    beneficairy.PinCode = benePinCode;
+                                    beneficairy.PinCode.Latitude = benePinCode.Latitude;
+                                    beneficairy.PinCode.Longitude = benePinCode.Longitude;
+                                    var beneLatLong = benePinCode.Latitude + "," + benePinCode.Longitude;
+
+                                    var beneUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={beneLatLong}&zoom=18&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{beneLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+                                    beneficairy.BeneficiaryLocationMap = beneUrl;
+                                    _context.BeneficiaryDetail.Add(beneficairy);
+                                }
+                                _context.ClaimsInvestigation.Add(claim);
+
+                                var log = new InvestigationTransaction
+                                {
+                                    ClaimsInvestigationId = claim.ClaimsInvestigationId,
+                                    UserEmailActioned = claim.UserEmailActioned,
+                                    UserRoleActionedTo = claim.UserRoleActionedTo,
+                                    CurrentClaimOwner = userEmail,
+                                    HopCount = 0,
+                                    Time2Update = 0,
+                                    InvestigationCaseStatusId = status.InvestigationCaseStatusId,
+                                    InvestigationCaseSubStatusId = createdStatus.InvestigationCaseSubStatusId,
+                                    UpdatedBy = userEmail
+                                };
+                                _context.InvestigationTransaction.Add(log);
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine(ex.StackTrace);
+                                return false;
+                            }
+                        }
+                    }
+                }
+                var dataObject = ConvertDataTable<UploadClaim>(dt);
+                _context.UploadClaim.AddRange(dataObject);
+                _context.SaveChanges();
+                return true;
+            }
+            return false;
+                
         }
 
         private static List<string> GetFtpData()

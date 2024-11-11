@@ -46,7 +46,6 @@ namespace risk.control.system.Seeds
             var auPincodes = await PinCodeStateSeed.CsvRead_Au();
             await PinCodeStateSeed.SeedPincode(context, auPincodes, au);
 
-
             await context.SaveChangesAsync(null, false);
 
             await PortalAdminSeed.Seed(context, webHostEnvironment, userManager, roleManager);
