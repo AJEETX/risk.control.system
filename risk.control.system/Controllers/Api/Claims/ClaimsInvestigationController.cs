@@ -94,7 +94,7 @@ namespace risk.control.system.Controllers.Api.Claims
                     Occupation = customer.CustomerOccupation.GetEnumDisplayName(),
                     Income = customer.CustomerIncome.GetEnumDisplayName(),
                     Education = customer.CustomerEducation.GetEnumDisplayName(),
-                    DateOfBirth = customer.CustomerDateOfBirth
+                    DateOfBirth = customer.CustomerDateOfBirth,
                 }
                 );
         }

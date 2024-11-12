@@ -19,11 +19,8 @@ namespace risk.control.system.Services
     public interface IICheckifyService
     {
         Task<AppiCheckifyResponse> GetFaceId(FaceData data);
-
         Task<AppiCheckifyResponse> GetDocumentId(DocumentData data);
-
         Task GetAudio(AudioData data);
-
         Task GetVideo(VideoData data);
         Task<bool> WhitelistIP(IPWhitelistRequest request);
     }
@@ -70,6 +67,7 @@ namespace risk.control.system.Services
             await _context.SaveChangesAsync();
             return true;
         }
+
         public async Task<AppiCheckifyResponse> GetFaceId(FaceData data)
         {
             try
