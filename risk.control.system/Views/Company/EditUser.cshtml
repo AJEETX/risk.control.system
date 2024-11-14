@@ -190,6 +190,14 @@
                                 <input type="text" asp-for="Addressline" class="form-control remarks" required placeholder="Enter Address line" maxlength="20" />
                             </div>
                         </div>
+                        @if(Model.UserRole == CompanyRole.COMPANY_ADMIN)
+                        {
+                            <input asp-for="Active" type="hidden" value="true">
+                            
+                        }
+                        else
+                        {
+                            
                         <div class="form-group">
                             <span class="input-group-label"> Status:</span>
                             <div class="input-group mb-3">
@@ -203,6 +211,8 @@
                                 </span>
                             </div>
                         </div>
+                        
+                        }
                     </div>
                 </div>
                 <div class="row">

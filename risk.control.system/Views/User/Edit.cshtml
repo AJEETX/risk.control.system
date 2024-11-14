@@ -154,19 +154,26 @@
                                 <input type="text" asp-for="Addressline" class="form-control remarks" required placeholder="Enter Address line" maxlength="20" />
                             </div>
                         </div>
-                        <div class="form-group">
-                            <span class="input-group-label"> Status:</span>
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text"><i class="fa fa-toggle-on"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                        @if (Model.Role == AppRoles.PORTAL_ADMIN || Model.Role ==  AppRoles.COMPANY_ADMIN || Model.Role == AppRoles.AGENCY_ADMIN )
+                        {
+                            <input asp-for="Active" type="hidden" value="true">
+                        }
+                        else
+                        {
+                            <div class="form-group">
+                                <span class="input-group-label"> Status:</span>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fa fa-toggle-on"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                    </div>
+                                    <div class="input-group-prepend">
+                                    </div>
+                                    <span class="checkbox">
+                                        <input asp-for="Active" type="checkbox" data-toggle="toggle" data-on="<i class='fa fa-toggle-on'></i> Active " data-off="<i class='fa fa-toggle-off'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
+                                    </span>
                                 </div>
-                                <div class="input-group-prepend">
-                                </div>
-                                <span class="checkbox">
-                                    <input asp-for="Active" type="checkbox" data-toggle="toggle" data-on="<i class='fa fa-toggle-on'></i> Active " data-off="<i class='fa fa-toggle-off'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
-                                </span>
                             </div>
-                        </div>
+                        }
                     </div>
                 </div>
                 <div class="row">
