@@ -29,6 +29,7 @@ namespace risk.control.system.Controllers
         private readonly RoleManager<ApplicationRole> roleManager;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly IToastNotification toastNotification;
+        private readonly ISmsService smsService;
         private readonly ApplicationDbContext _context;
 
         public CompanyUserController(UserManager<ClientCompanyApplicationUser> userManager,
@@ -37,6 +38,7 @@ namespace risk.control.system.Controllers
             RoleManager<ApplicationRole> roleManager,
             IWebHostEnvironment webHostEnvironment,
             IToastNotification toastNotification,
+            ISmsService SmsService,
             ApplicationDbContext context)
         {
             this.userManager = userManager;
@@ -45,6 +47,7 @@ namespace risk.control.system.Controllers
             this.roleManager = roleManager;
             this.webHostEnvironment = webHostEnvironment;
             this.toastNotification = toastNotification;
+            smsService = SmsService;
             this._context = context;
             UserList = new List<UsersViewModel>();
         }
@@ -152,7 +155,7 @@ namespace risk.control.system.Controllers
             {
                 await userManager.AddToRoleAsync(user, user.UserRole.ToString());
 
-                await SmsService.SendSmsAsync(user.PhoneNumber, "Company account created. Domain : " + user.Email);
+                await smsService.DoSendSmsAsync(user.PhoneNumber, "Company account created. Domain : " + user.Email);
                 notifyService.Custom($"User created successfully.", 3, "green", "fas fa-user-plus");
 
                 return RedirectToAction(nameof(CompanyUserController.Index), "CompanyUser", new { id = user.ClientCompanyId });
@@ -291,7 +294,7 @@ namespace risk.control.system.Controllers
                             var roleResult = await userManager.RemoveFromRolesAsync(user, roles);
                             await userManager.AddToRoleAsync(user, user.UserRole.ToString());
                             notifyService.Custom($"Company user edited successfully.", 3, "orange", "fas fa-user-check");
-                            await SmsService.SendSmsAsync(user.PhoneNumber, "Company account edited. Domain : " + user.Email);
+                            await smsService.DoSendSmsAsync(user.PhoneNumber, "Company account edited. Domain : " + user.Email);
 
                             return RedirectToAction(nameof(CompanyUserController.Index), "CompanyUser", new { id = applicationUser.ClientCompanyId });
                         }

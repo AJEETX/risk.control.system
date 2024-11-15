@@ -30,6 +30,7 @@ namespace risk.control.system.Controllers.Api
         private readonly IHttpClientService httpClientService;
         private readonly UserManager<VendorApplicationUser> userVendorManager;
         private readonly IAgentService agentService;
+        private readonly ISmsService smsService;
         private readonly IClaimsInvestigationService claimsInvestigationService;
         private readonly IMailboxService mailboxService;
         private readonly IWebHostEnvironment webHostEnvironment;
@@ -42,6 +43,7 @@ namespace risk.control.system.Controllers.Api
             UserManager<VendorApplicationUser> userVendorManager,
              IHttpContextAccessor httpContextAccessor,
             IAgentService agentService,
+            ISmsService SmsService,
             IClaimsInvestigationService claimsInvestigationService, IMailboxService mailboxService,
             IWebHostEnvironment webHostEnvironment, IICheckifyService iCheckifyService)
         {
@@ -49,6 +51,7 @@ namespace risk.control.system.Controllers.Api
             this.httpClientService = httpClientService;
             this.userVendorManager = userVendorManager;
             this.agentService = agentService;
+            smsService = SmsService;
             this.claimsInvestigationService = claimsInvestigationService;
             this.mailboxService = mailboxService;
             this.webHostEnvironment = webHostEnvironment;
@@ -127,7 +130,7 @@ namespace risk.control.system.Controllers.Api
                             message += $"Thanks                           ";
                             message += $"                                ";
                             message += $"https://icheckify.co.in";
-                            await SmsService.SendSmsAsync(request.Mobile, message);
+                            await smsService.DoSendSmsAsync(request.Mobile, message);
                         }
 
                         return Ok(new { Email = user2Onboard.Email, Pin = user2Onboard.SecretPin });

@@ -27,6 +27,7 @@ namespace risk.control.system.Controllers
         private readonly IHttpClientService httpClientService;
         private readonly RoleManager<ApplicationRole> roleManager;
         private readonly IWebHostEnvironment webHostEnvironment;
+        private readonly ISmsService smsService;
         private readonly IToastNotification toastNotification;
 
         public CompanyController(ApplicationDbContext context,
@@ -36,6 +37,7 @@ namespace risk.control.system.Controllers
             INotyfService notifyService,
             RoleManager<ApplicationRole> roleManager,
             IWebHostEnvironment webHostEnvironment,
+            ISmsService SmsService,
             IToastNotification toastNotification)
         {
             this._context = context;
@@ -45,6 +47,7 @@ namespace risk.control.system.Controllers
             this.httpClientService = httpClientService;
             this.roleManager = roleManager;
             this.webHostEnvironment = webHostEnvironment;
+            smsService = SmsService;
             this.toastNotification = toastNotification;
             UserList = new List<UsersViewModel>();
         }
@@ -217,7 +220,7 @@ namespace risk.control.system.Controllers
                 _context.ClientCompany.Update(existCompany);
                 await _context.SaveChangesAsync();
 
-                await SmsService.SendSmsAsync(clientCompany.PhoneNumber, "Company edited. Domain : " + clientCompany.Email);
+                await smsService.DoSendSmsAsync(clientCompany.PhoneNumber, "Company edited. Domain : " + clientCompany.Email);
             }
             
             catch (Exception ex)
@@ -225,7 +228,7 @@ namespace risk.control.system.Controllers
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
-            notifyService.Custom($"Company edited successfully.", 3, "orange", "fas fa-building");
+            notifyService.Custom($"Company {clientCompany.Email} edited successfully.", 3, "orange", "fas fa-building");
             return RedirectToAction(nameof(CompanyController.CompanyProfile), "Company");
         }
 
@@ -323,18 +326,18 @@ namespace risk.control.system.Controllers
 
                         if (lockUser.Succeeded && lockDate.Succeeded)
                         {
-                            notifyService.Custom($"User created and locked.", 3, "orange", "fas fa-user-lock");
-                            await SmsService.SendSmsAsync(createdUser.PhoneNumber, "User created and locked. Email : " + createdUser.Email);
+                            notifyService.Custom($"User {createdUser.Email} created and locked.", 3, "orange", "fas fa-user-lock");
+                            await smsService.DoSendSmsAsync(createdUser.PhoneNumber, "User created and locked. Email : " + createdUser.Email);
                             return RedirectToAction(nameof(CompanyController.Users), "Company");
                         }
                     }
                     else
                     {
-                        notifyService.Custom($"User created successfully.", 3, "green", "fas fa-user-plus");
-                        await SmsService.SendSmsAsync(user.PhoneNumber, "User created . Email : " + user.Email);
+                        notifyService.Custom($"User {user.Email} created successfully.", 3, "green", "fas fa-user-plus");
+                        await smsService.DoSendSmsAsync(user.PhoneNumber, "User created . Email : " + user.Email);
                         return RedirectToAction(nameof(CompanyController.Users), "Company");
                     }
-                    notifyService.Custom($"User created successfully.", 3, "green", "fas fa-user-plus");
+                    notifyService.Custom($"User {user.Email} created successfully.", 3, "green", "fas fa-user-plus");
                     return RedirectToAction(nameof(CompanyController.Users), "Company");
                 }
                 notifyService.Error("OOPs !!!..Contact Admin");
@@ -475,8 +478,8 @@ namespace risk.control.system.Controllers
 
                             if (lockUser.Succeeded && lockDate.Succeeded)
                             {
-                                notifyService.Custom($"User edited and locked.", 3, "orange", "fas fa-user-lock");
-                                await SmsService.SendSmsAsync(createdUser.PhoneNumber, "User created and locked. Email : " + createdUser.Email);
+                                notifyService.Custom($"User {createdUser.Email} edited and locked.", 3, "orange", "fas fa-user-lock");
+                                await smsService.DoSendSmsAsync(createdUser.PhoneNumber, "User created and locked. Email : " + createdUser.Email);
                                 return RedirectToAction(nameof(CompanyController.Users), "Company");
                             }
                         }
@@ -488,8 +491,8 @@ namespace risk.control.system.Controllers
 
                             if (lockUser.Succeeded && lockDate.Succeeded)
                             {
-                                notifyService.Custom($"User edited and unlocked.", 3, "green", "fas fa-user-check");
-                                await SmsService.SendSmsAsync(user.PhoneNumber, "User created . Email : " + user.Email);
+                                notifyService.Custom($"User {createdUser.Email} edited and unlocked.", 3, "green", "fas fa-user-check");
+                                await smsService.DoSendSmsAsync(user.PhoneNumber, "User created . Email : " + user.Email);
                                 return RedirectToAction(nameof(CompanyController.Users), "Company");
                             }
                         }
@@ -789,7 +792,7 @@ namespace risk.control.system.Controllers
             result = await userManager.AddToRolesAsync(user, new List<string> { model.UserRole.ToString() });
             var currentUser = await userManager.GetUserAsync(HttpContext.User);
             await signInManager.RefreshSignInAsync(currentUser);
-            await SmsService.SendSmsAsync(user.PhoneNumber, "User role edited . Email : " + user.Email);
+            await smsService.DoSendSmsAsync(user.PhoneNumber, "User role edited . Email : " + user.Email);
 
             notifyService.Custom($"User role(s) updated successfully.", 3, "orange", "fas fa-user-cog");
             return RedirectToAction(nameof(CompanyController.Users));

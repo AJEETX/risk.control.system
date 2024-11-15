@@ -27,6 +27,7 @@ namespace risk.control.system.Controllers
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly INotyfService notifyService;
         private readonly RoleManager<ApplicationRole> roleManager;
+        private readonly ISmsService smsService;
         private readonly IToastNotification toastNotification;
         private readonly IWebHostEnvironment webHostEnvironment;
 
@@ -37,6 +38,7 @@ namespace risk.control.system.Controllers
             INotyfService notifyService,
             SignInManager<ApplicationUser> signInManager,
             RoleManager<ApplicationRole> roleManager,
+            ISmsService SmsService,
             IToastNotification toastNotification, IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
@@ -46,6 +48,7 @@ namespace risk.control.system.Controllers
             this.httpContextAccessor = httpContextAccessor;
             this.notifyService = notifyService;
             this.roleManager = roleManager;
+            smsService = SmsService;
             this.toastNotification = toastNotification;
             this.webHostEnvironment = webHostEnvironment;
             UserList = new List<UsersViewModel>();
@@ -184,7 +187,7 @@ namespace risk.control.system.Controllers
                     {
                         notifyService.Custom($"User profile edited successfully.", 3, "green", "fas fa-user");
 
-                        await SmsService.SendSmsAsync(user.PhoneNumber, "Agency user edited. Email : " + user.Email);
+                        await smsService.DoSendSmsAsync(user.PhoneNumber, "Agency user edited. Email : " + user.Email);
 
                         return RedirectToAction(nameof(Index), "Dashboard");
                     }
@@ -264,7 +267,7 @@ namespace risk.control.system.Controllers
                         failedMessage += $"                                       ";
                         failedMessage += $"                                       ";
                         failedMessage += $"{BaseUrl}";
-                        await SmsService.SendSmsAsync("+" + admin.PhoneNumber, failedMessage);
+                        await smsService.DoSendSmsAsync("+" + admin.PhoneNumber, failedMessage);
                         notifyService.Error("OOPS !!!..Contact Admin");
                         return RedirectToAction("/Account/Login");
                     }
@@ -280,7 +283,7 @@ namespace risk.control.system.Controllers
                     message += $"                                       ";
                     message += $"                                       ";
                     message += $"{BaseUrl}";
-                    await SmsService.SendSmsAsync("+" + admin.PhoneNumber, message);
+                    await smsService.DoSendSmsAsync("+" + admin.PhoneNumber, message);
 
 
                     message = string.Empty;
@@ -293,7 +296,7 @@ namespace risk.control.system.Controllers
                     message += $"                                       ";
                     message += $"                                       ";
                     message += $"{BaseUrl}";
-                    await SmsService.SendSmsAsync("+" + user.PhoneNumber, message);
+                    await smsService.DoSendSmsAsync("+" + user.PhoneNumber, message);
 
                     return View("ChangePasswordConfirmation");
                 }

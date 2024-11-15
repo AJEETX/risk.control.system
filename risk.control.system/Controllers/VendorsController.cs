@@ -26,6 +26,7 @@ namespace risk.control.system.Controllers
         private readonly RoleManager<ApplicationRole> roleManager;
         private readonly INotyfService notifyService;
         private readonly IToastNotification toastNotification;
+        private readonly ISmsService smsService;
         private readonly IWebHostEnvironment webHostEnvironment;
 
         public VendorsController(
@@ -33,13 +34,16 @@ namespace risk.control.system.Controllers
             UserManager<VendorApplicationUser> userManager,
             RoleManager<ApplicationRole> roleManager,
             INotyfService notifyService,
-            IToastNotification toastNotification, IWebHostEnvironment webHostEnvironment)
+            IToastNotification toastNotification,
+            ISmsService SmsService,
+            IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
             this.userManager = userManager;
             this.roleManager = roleManager;
             this.notifyService = notifyService;
             this.toastNotification = toastNotification;
+            smsService = SmsService;
             this.webHostEnvironment = webHostEnvironment;
         }
 
@@ -210,14 +214,14 @@ namespace risk.control.system.Controllers
 
                         if (lockUser.Succeeded && lockDate.Succeeded)
                         {
-                            await SmsService.SendSmsAsync(user.PhoneNumber, "Agency user created and locked. Email : " + user.Email);
+                            await smsService.DoSendSmsAsync(user.PhoneNumber, "Agency user created and locked. Email : " + user.Email);
                             notifyService.Custom($"User edited and locked.", 3, "orange", "fas fa-user-lock");
                         }
                     }
                     else
                     {
 
-                        await SmsService.SendSmsAsync(user.PhoneNumber, "Agency user created. Email : " + user.Email);
+                        await smsService.DoSendSmsAsync(user.PhoneNumber, "Agency user created. Email : " + user.Email);
 
                         var onboardAgent = roles.Any(r => AppConstant.AppRoles.AGENT.ToString().Contains(r)) && string.IsNullOrWhiteSpace(user.MobileUId);
                         
@@ -239,12 +243,12 @@ namespace risk.control.system.Controllers
                             message += "                                                                                ";
                             message += $"https://icheckify.co.in";
 
-                            await SmsService.SendSmsAsync(user.PhoneNumber, message);
+                            await smsService.DoSendSmsAsync(user.PhoneNumber, message);
                             notifyService.Custom($"Agent onboarding initiated.", 3, "green", "fas fa-user-check");
                         }
                         else
                         {
-                            await SmsService.SendSmsAsync(user.PhoneNumber, "Agency user edited and unlocked. Email : " + user.Email);
+                            await smsService.DoSendSmsAsync(user.PhoneNumber, "Agency user edited and unlocked. Email : " + user.Email);
                         }
                         notifyService.Custom($"User created successfully.", 3, "green", "fas fa-user-plus");
                     }
@@ -396,7 +400,7 @@ namespace risk.control.system.Controllers
 
                         if (lockUser.Succeeded && lockDate.Succeeded)
                         {
-                            await SmsService.SendSmsAsync(user.PhoneNumber, "Agency user edited and locked. Email : " + user.Email);
+                            await smsService.DoSendSmsAsync(user.PhoneNumber, "Agency user edited and locked. Email : " + user.Email);
                             notifyService.Custom($"User edited and locked.", 3, "orange", "fas fa-user-lock");
                         }
                     }
@@ -425,12 +429,12 @@ namespace risk.control.system.Controllers
                                 message += $"Thanks";
                                 message += "                                                                                ";
                                 message += $"https://icheckify.co.in";
-                                await SmsService.SendSmsAsync(user.PhoneNumber, message);
+                                await smsService.DoSendSmsAsync(user.PhoneNumber, message);
                                 notifyService.Custom($"Agent onboarding initiated.", 3, "green", "fas fa-user-check");
                             }
                             else
                             {
-                                await SmsService.SendSmsAsync(user.PhoneNumber, "Agency user edited and unlocked. Email : " + user.Email);
+                                await smsService.DoSendSmsAsync(user.PhoneNumber, "Agency user edited and unlocked. Email : " + user.Email);
                                 notifyService.Custom($"User edited.", 3, "green", "fas fa-user-check");
                             }
                         }
@@ -529,7 +533,7 @@ namespace risk.control.system.Controllers
             message += $"https://icheckify.co.in";
             if (onboardAgent)
             {
-                await SmsService.SendSmsAsync(user.PhoneNumber, message);
+                await smsService.DoSendSmsAsync(user.PhoneNumber, message);
                 notifyService.Custom($"Agent onboarding initiated.", 3, "green", "fas fa-user-check");
             }
             else
@@ -610,7 +614,7 @@ namespace risk.control.system.Controllers
                 _context.Add(vendor);
                 await _context.SaveChangesAsync();
 
-                await SmsService.SendSmsAsync(vendor.PhoneNumber, "Agency created. Domain : " + vendor.Email);
+                await smsService.DoSendSmsAsync(vendor.PhoneNumber, "Agency created. Domain : " + vendor.Email);
 
                 notifyService.Custom($"Agency created successfully.", 3, "green", "fas fa-building");
                 return RedirectToAction(nameof(VendorsController.Agencies));
@@ -715,7 +719,7 @@ namespace risk.control.system.Controllers
 
                 _context.Vendor.Update(vendor);
 
-                await SmsService.SendSmsAsync(vendor.PhoneNumber, "Agency edited. Domain : " + vendor.Email);
+                await smsService.DoSendSmsAsync(vendor.PhoneNumber, "Agency edited. Domain : " + vendor.Email);
 
                 await _context.SaveChangesAsync();
             }

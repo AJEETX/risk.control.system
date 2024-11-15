@@ -44,14 +44,18 @@ namespace risk.control.system.Services
         private static string AgencyBaseUrl = string.Empty;
         private string FilePath = string.Empty;
         private readonly ApplicationDbContext _context;
+        private readonly ISmsService smsService;
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly UserManager<ClientCompanyApplicationUser> userManager;
         private readonly UserManager<VendorApplicationUser> userVendorManager;
 
-        public MailboxService(ApplicationDbContext context, IHttpContextAccessor httpContextAccessor, IWebHostEnvironment webHostEnvironment, UserManager<ClientCompanyApplicationUser> userManager, UserManager<VendorApplicationUser> userVendorManager)
+        public MailboxService(ApplicationDbContext context,
+            ISmsService SmsService,
+            IHttpContextAccessor httpContextAccessor, IWebHostEnvironment webHostEnvironment, UserManager<ClientCompanyApplicationUser> userManager, UserManager<VendorApplicationUser> userVendorManager)
         {
             this._context = context;
+            smsService = SmsService;
             this.httpContextAccessor = httpContextAccessor;
             this.webHostEnvironment = webHostEnvironment;
             FilePath = Path.Combine(webHostEnvironment.WebRootPath, "Templates", "WelcomeTemplate.html");
@@ -146,7 +150,7 @@ namespace risk.control.system.Services
                     message += $"{clientCompanyUser.Email}";
                     message += $"                                          ";
                     message += $"{BaseUrl}";
-                    await SmsService.SendSmsAsync(userEmailToSend.PhoneNumber, message);
+                    await smsService.DoSendSmsAsync(userEmailToSend.PhoneNumber, message);
                 }
                 //SMS ::END
             }
@@ -243,7 +247,7 @@ namespace risk.control.system.Services
                     message += $"{applicationUser.Email}";
                     message += $"                                          ";
                     message += $"{BaseUrl}";
-                    await SmsService.SendSmsAsync(userEmailToSend.PhoneNumber, message);
+                    await smsService.DoSendSmsAsync(userEmailToSend.PhoneNumber, message);
                 }
                 //SMS ::END
             }
@@ -335,7 +339,7 @@ namespace risk.control.system.Services
                         message += $"{senderUserEmail})";
                         message += $"                                           ";
                         message += $"{BaseUrl}";
-                        await SmsService.SendSmsAsync(user.PhoneNumber, message);
+                        await smsService.DoSendSmsAsync(user.PhoneNumber, message);
                     }
                 }
                 try
@@ -409,7 +413,7 @@ namespace risk.control.system.Services
                     message += $"{userEmail}";
                     message += $"                                          ";
                     message += $"{BaseUrl}";
-                    await SmsService.SendSmsAsync(recepientUser.PhoneNumber, message);
+                    await smsService.DoSendSmsAsync(recepientUser.PhoneNumber, message);
                 }
             }
             catch (Exception ex)
@@ -576,7 +580,7 @@ namespace risk.control.system.Services
                         message += $"{senderUserEmail}";
                         message += $"                                          ";
                         message += $"{BaseUrl}";
-                        await SmsService.SendSmsAsync(user.PhoneNumber, message);
+                        await smsService.DoSendSmsAsync(user.PhoneNumber, message);
                     }
                 }
                 try
@@ -663,7 +667,7 @@ namespace risk.control.system.Services
                         message += $"{senderUserEmail}";
                         message += $"                                          ";
                         message += $"{BaseUrl}";
-                        await SmsService.SendSmsAsync(user.PhoneNumber, message);
+                        await smsService.DoSendSmsAsync(user.PhoneNumber, message);
                     }
                 }
                 try
@@ -754,7 +758,7 @@ namespace risk.control.system.Services
                     message += $"{senderUserEmail}";
                     message += $"                                          ";
                     message += $"{BaseUrl}";
-                    await SmsService.SendSmsAsync(user.PhoneNumber, message);
+                    await smsService.DoSendSmsAsync(user.PhoneNumber, message);
                 }
             }
             try
@@ -851,7 +855,7 @@ namespace risk.control.system.Services
                     message += $"{clientCompanyUser.Email}";
                     message += $"                                          ";
                     message += $"{BaseUrl}";
-                    await SmsService.SendSmsAsync(userEmailToSend.PhoneNumber, message);
+                    await smsService.DoSendSmsAsync(userEmailToSend.PhoneNumber, message);
                 }
                 //SMS ::END
             }
@@ -939,7 +943,7 @@ namespace risk.control.system.Services
                         message += $"{senderUserEmail}";
                         message += $"                                          ";
                         message += $"{BaseUrl}";
-                        await SmsService.SendSmsAsync(user.PhoneNumber, message);
+                        await smsService.DoSendSmsAsync(user.PhoneNumber, message);
                     }
                 }
                 try

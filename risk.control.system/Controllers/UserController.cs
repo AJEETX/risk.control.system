@@ -24,6 +24,7 @@ namespace risk.control.system.Controllers
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly INotyfService notifyService;
         private readonly IToastNotification toastNotification;
+        private readonly ISmsService smsService;
         public List<UsersViewModel> UserList;
         private readonly ApplicationDbContext context;
         private IPasswordHasher<ApplicationUser> passwordHasher;
@@ -34,6 +35,7 @@ namespace risk.control.system.Controllers
             IWebHostEnvironment webHostEnvironment,
             INotyfService notifyService,
             IToastNotification toastNotification,
+            ISmsService SmsService,
             ApplicationDbContext context)
         {
             this.userManager = userManager;
@@ -42,6 +44,7 @@ namespace risk.control.system.Controllers
             this.webHostEnvironment = webHostEnvironment;
             this.notifyService = notifyService;
             this.toastNotification = toastNotification;
+            smsService = SmsService;
             this.context = context;
             UserList = new List<UsersViewModel>();
         }
@@ -86,7 +89,7 @@ namespace risk.control.system.Controllers
             if (result.Succeeded)
             {
                 notifyService.Custom($"User created successfully.", 3, "green", "fas fa-user-plus");
-                await SmsService.SendSmsAsync(user.PhoneNumber, "User created. Email : " + user.Email);
+                await smsService.DoSendSmsAsync(user.PhoneNumber, "User created. Email : " + user.Email);
 
                 return RedirectToAction(nameof(Index));
             }
@@ -212,7 +215,7 @@ namespace risk.control.system.Controllers
                             var roles = await userManager.GetRolesAsync(user);
                             var roleResult = await userManager.RemoveFromRolesAsync(user, roles);
                             await userManager.AddToRoleAsync(user, user.Role.ToString());
-                            await SmsService.SendSmsAsync(user.PhoneNumber, "User edited. Email : " + user.Email);
+                            await smsService.DoSendSmsAsync(user.PhoneNumber, "User edited. Email : " + user.Email);
                             notifyService.Custom($"User edited successfully.", 3, "orange", "fas fa-user-check");
                             return RedirectToAction(nameof(Index));
                         }

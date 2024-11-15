@@ -14,13 +14,16 @@ namespace risk.control.system.Services
     public class AccountService : IAccountService
     {
         private readonly ApplicationDbContext context;
+        private readonly ISmsService smsService;
         private readonly IHttpContextAccessor httpContextAccessor;
 
         public AccountService(ApplicationDbContext context,
+            ISmsService SmsService,
              IHttpContextAccessor httpContextAccessor
             )
         {
             this.context = context;
+            smsService = SmsService;
             this.httpContextAccessor = httpContextAccessor;
         }
 
@@ -46,7 +49,7 @@ namespace risk.control.system.Services
                 message += $"{BaseUrl}";
                 if(user != null)
                 {
-                    await SmsService.SendSmsAsync(user.PhoneNumber, message);
+                    await smsService.DoSendSmsAsync(user.PhoneNumber, message);
                 }
             }
             //SEND SMS

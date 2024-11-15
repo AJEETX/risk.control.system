@@ -26,6 +26,7 @@ namespace risk.control.system.Controllers
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly INotyfService notifyService;
         private readonly RoleManager<ApplicationRole> roleManager;
+        private readonly ISmsService smsService;
         private readonly UserManager<ClientCompanyApplicationUser> userManager;
 
         public ClientCompanyController(
@@ -33,12 +34,14 @@ namespace risk.control.system.Controllers
             IWebHostEnvironment webHostEnvironment,
             INotyfService notifyService,
             RoleManager<ApplicationRole> roleManager,
+            ISmsService SmsService,
             UserManager<ClientCompanyApplicationUser> userManager)
         {
             _context = context;
             this.webHostEnvironment = webHostEnvironment;
             this.notifyService = notifyService;
             this.roleManager = roleManager;
+            smsService = SmsService;
             this.userManager = userManager;
         }
 
@@ -83,7 +86,7 @@ namespace risk.control.system.Controllers
                     clientCompany.DocumentImage = dataStream.ToArray();
                 }
 
-                await SmsService.SendSmsAsync(clientCompany.PhoneNumber, "Company account created. Domain : " + clientCompany.Email);
+                await smsService.DoSendSmsAsync(clientCompany.PhoneNumber, "Company account created. Domain : " + clientCompany.Email);
 
                 clientCompany.Updated = DateTime.Now;
                 clientCompany.UpdatedBy = HttpContext.User?.Identity?.Name;
@@ -139,7 +142,7 @@ namespace risk.control.system.Controllers
                 _context.ClientCompany.Remove(clientCompany);
                 await _context.SaveChangesAsync();
 
-                await SmsService.SendSmsAsync(clientCompany.PhoneNumber, "Company account deleted. Domain : " + clientCompany.Email);
+                await smsService.DoSendSmsAsync(clientCompany.PhoneNumber, "Company account deleted. Domain : " + clientCompany.Email);
 
                 notifyService.Custom($"Company deleted successfully.", 3, "red", "fas fa-building");
                 return RedirectToAction(nameof(Index));
@@ -273,7 +276,7 @@ namespace risk.control.system.Controllers
                 _context.ClientCompany.Update(clientCompany);
                 await _context.SaveChangesAsync();
 
-                await SmsService.SendSmsAsync(clientCompany.PhoneNumber, "Company account edited. Domain : " + clientCompany.Email);
+                await smsService.DoSendSmsAsync(clientCompany.PhoneNumber, "Company account edited. Domain : " + clientCompany.Email);
             }
             catch
             {

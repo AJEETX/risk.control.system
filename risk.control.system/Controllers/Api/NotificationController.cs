@@ -15,10 +15,12 @@ namespace risk.control.system.Controllers.Api
     public class NotificationController : ControllerBase
     {
         private readonly INotificationService service;
+        private readonly ISmsService smsService;
 
-        public NotificationController(INotificationService service)
+        public NotificationController(INotificationService service, ISmsService smsService)
         {
             this.service = service;
+            this.smsService = smsService;
         }
 
         [AllowAnonymous]
@@ -96,7 +98,7 @@ namespace risk.control.system.Controllers.Api
             string? attachments = $"<a href='{logo}'>team</a>";
             var finalMessage = $"{message} Date: {DateTime.Now.ToString("dd-MMM-yyyy HH:mm")} {logo}";
             bool priority = true;
-            await SmsService.SendSmsAsync("+" + mobile, finalMessage);
+            await smsService.DoSendSmsAsync("+" + mobile, finalMessage);
             return Ok();
         }
     }

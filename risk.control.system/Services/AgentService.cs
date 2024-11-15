@@ -17,14 +17,17 @@ namespace risk.control.system.Services
     {
         private readonly ApplicationDbContext _context;
         private readonly IHttpContextAccessor httpContextAccessor;
+        private readonly ISmsService smsService;
         private readonly UserManager<VendorApplicationUser> userVendorManager;
 
         public AgentService(ApplicationDbContext context,
              IHttpContextAccessor httpContextAccessor,
+             ISmsService smsService,
             UserManager<VendorApplicationUser> userVendorManager)
         {
             this._context = context;
             this.httpContextAccessor = httpContextAccessor;
+            this.smsService = smsService;
             this.userVendorManager = userVendorManager;
         }
 
@@ -72,7 +75,7 @@ namespace risk.control.system.Services
                 message += $"Thanks";
                 message += $"                                          ";
                 message += $"{BaseUrl}";
-                await SmsService.SendSmsAsync(mobile, message);
+                await smsService.DoSendSmsAsync(mobile, message);
             }
             return user2Onboard;
         }

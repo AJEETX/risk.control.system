@@ -31,6 +31,7 @@ namespace risk.control.system.Services
     public class NotificationService : INotificationService
     {
         private readonly ApplicationDbContext context;
+        private readonly ISmsService smsService;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly IFeatureManager featureManager;
         private static string logo = "https://icheckify.co.in";
@@ -39,9 +40,12 @@ namespace risk.control.system.Services
 
         private static HttpClient _httpClient = new HttpClient();
 
-        public NotificationService(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, IFeatureManager featureManager)
+        public NotificationService(ApplicationDbContext context,
+            ISmsService SmsService,
+            IWebHostEnvironment webHostEnvironment, IFeatureManager featureManager)
         {
             this.context = context;
+            smsService = SmsService;
             this.webHostEnvironment = webHostEnvironment;
             this.featureManager = featureManager;
         }
@@ -193,7 +197,7 @@ namespace risk.control.system.Services
             //    noTinyUrl
             //    );
 
-            await SmsService.SendSmsAsync("+" + mobile, finalMessage);
+            await smsService.DoSendSmsAsync("+" + mobile, finalMessage);
             var meetingTime = DateTime.Now.AddDays(1);
             if (DateTime.TryParse(message.Time, out DateTime date))
             {
@@ -272,7 +276,7 @@ namespace risk.control.system.Services
             var previousMessage = context.ClaimMessage.FirstOrDefault(u => u.ClaimsInvestigationId == claim.ClaimsInvestigationId);
             var agent = context.VendorApplicationUser.FirstOrDefault(u => u.Email == claim.CurrentClaimOwner);
 
-            await SmsService.SendSmsAsync("+" + agent.PhoneNumber, finalMessage);
+            await smsService.DoSendSmsAsync("+" + agent.PhoneNumber, finalMessage);
 
             var scheduleMessage = new ClaimMessage
             {
@@ -417,7 +421,7 @@ namespace risk.control.system.Services
             };
             claim.ClaimMessages.Add(scheduleMessage);
             context.SaveChanges();
-            await SmsService.SendSmsAsync("+" + mobile, message);
+            await smsService.DoSendSmsAsync("+" + mobile, message);
             return claim.CustomerDetail.CustomerName;
         }
 
@@ -480,7 +484,7 @@ namespace risk.control.system.Services
             .FirstOrDefault(c => c.ClaimsInvestigationId == claimId);
             claim.ClaimMessages.Add(scheduleMessage);
             context.SaveChanges();
-            await SmsService.SendSmsAsync("+" + mobile, message);
+            await smsService.DoSendSmsAsync("+" + mobile, message);
             return beneficiary.BeneficiaryName;
         }
     }

@@ -20,16 +20,20 @@ namespace risk.control.system.Controllers
         private readonly UserManager<ApplicationUser> userManager;
         private readonly INotyfService notifyService;
         private readonly RoleManager<ApplicationRole> roleManager;
+        private readonly ISmsService smsService;
         private readonly IToastNotification toastNotification;
 
         public UserRolesController(UserManager<ApplicationUser> userManager,
             INotyfService notifyService,
-            RoleManager<ApplicationRole> roleManager, IToastNotification toastNotification,
+            RoleManager<ApplicationRole> roleManager,
+            ISmsService smsService,
+            IToastNotification toastNotification,
             SignInManager<ApplicationUser> signInManager)
         {
             this.userManager = userManager;
             this.notifyService = notifyService;
             this.roleManager = roleManager;
+            this.smsService = smsService;
             this.toastNotification = toastNotification;
             this.signInManager = signInManager;
         }
@@ -88,7 +92,7 @@ namespace risk.control.system.Controllers
             result = await userManager.AddToRolesAsync(user, model.UserRoleViewModel.Where(x => x.Selected).Select(y => y.RoleName));
             var currentUser = await userManager.GetUserAsync(User);
             await signInManager.RefreshSignInAsync(currentUser);
-            await SmsService.SendSmsAsync(user.PhoneNumber, "User role edited. Email : " + user.Email);
+            await smsService.DoSendSmsAsync(user.PhoneNumber, "User role edited. Email : " + user.Email);
 
             notifyService.Custom($"User role(s) updated successfully.", 3, "orange", "fas fa-user-cog");
             toastNotification.AddSuccessToastMessage("roles updated successfully!");

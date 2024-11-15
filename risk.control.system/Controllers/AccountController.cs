@@ -41,6 +41,7 @@ namespace risk.control.system.Controllers
         private readonly ILogger _logger;
         private readonly IFeatureManager featureManager;
         private readonly INotyfService notifyService;
+        private readonly ISmsService smsService;
         private readonly ApplicationDbContext _context;
 
         public AccountController(
@@ -52,6 +53,7 @@ namespace risk.control.system.Controllers
             ILogger<AccountController> logger,
             IFeatureManager featureManager,
             INotyfService notifyService,
+            ISmsService SmsService,
             ApplicationDbContext context)
         {
             _userManager = userManager ?? throw new ArgumentNullException();
@@ -63,6 +65,7 @@ namespace risk.control.system.Controllers
             _logger = logger;
             this.featureManager = featureManager;
             this.notifyService = notifyService;
+            smsService = SmsService;
         }
 
         [TempData]
@@ -211,7 +214,7 @@ namespace risk.control.system.Controllers
                                 message += $"{BaseUrl}";
                                 try
                                 {
-                                    await SmsService.SendSmsAsync("+" + admin.PhoneNumber, message);
+                                    await smsService.DoSendSmsAsync("+" + admin.PhoneNumber, message);
                                 }
                                 catch (Exception ex)
                                 {
@@ -236,7 +239,7 @@ namespace risk.control.system.Controllers
                         failedMessage += $"                                       ";
                         failedMessage += $"                                       ";
                         failedMessage += $"{BaseUrl}";
-                        await SmsService.SendSmsAsync("+" + adminForFailed.PhoneNumber, failedMessage);
+                        await smsService.DoSendSmsAsync("+" + adminForFailed.PhoneNumber, failedMessage);
                     }
                     model.ShowUserOnLogin = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
                     ViewData["Users"] = new SelectList(_context.Users.OrderBy(o => o.Email), "Email", "Email");
@@ -259,7 +262,7 @@ namespace risk.control.system.Controllers
                         message += $"                                       ";
                         message += $"                                       ";
                         message += $"{BaseUrl}";
-                        await SmsService.SendSmsAsync("+" + admin.PhoneNumber, message);
+                        await smsService.DoSendSmsAsync("+" + admin.PhoneNumber, message);
                     }
                     else
                     {
@@ -286,7 +289,7 @@ namespace risk.control.system.Controllers
                         message += $"                                       ";
                         message += $"                                       ";
                         message += $"{BaseUrl}";
-                        await SmsService.SendSmsAsync("+" + admin.PhoneNumber, message);
+                        await smsService.DoSendSmsAsync("+" + admin.PhoneNumber, message);
                     }
                     else
                     {

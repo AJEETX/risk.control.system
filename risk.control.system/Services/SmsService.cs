@@ -2,16 +2,34 @@
 using System.Net.Http.Headers;
 using System.Text;
 
+using Microsoft.FeatureManagement;
+
 using Newtonsoft.Json;
 
 using risk.control.system.Models.ViewModel;
 
 namespace risk.control.system.Services
 {
-    public class SmsService
+    public interface ISmsService
+    {
+        Task DoSendSmsAsync(string mobile, string message);
+    }
+    public class SmsService : ISmsService
     {
         private static HttpClient client = new HttpClient();
+        private readonly IFeatureManager featureManager;
 
+        public SmsService(IFeatureManager featureManager)
+        {
+            this.featureManager = featureManager;
+        }
+        public async Task DoSendSmsAsync(string mobile, string message)
+        {
+            if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
+            {
+                await SendSmsAsync(mobile, message);
+            }
+        }
         public static async Task SendSmsAsync(string mobile = "+61432854196", string message = "Testing fom Azy")
         {
             try

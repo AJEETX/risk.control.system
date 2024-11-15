@@ -32,6 +32,7 @@ namespace risk.control.system.Controllers
         private readonly INotyfService notifyService;
         private readonly RoleManager<ApplicationRole> roleManager;
         private readonly IDashboardService dashboardService;
+        private readonly ISmsService smsService;
         private readonly IToastNotification toastNotification;
         private readonly IWebHostEnvironment webHostEnvironment;
 
@@ -41,6 +42,7 @@ namespace risk.control.system.Controllers
             SignInManager<ApplicationUser> signInManager,
             RoleManager<ApplicationRole> roleManager,
             IDashboardService dashboardService,
+            ISmsService SmsService,
             IToastNotification toastNotification, IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
@@ -49,6 +51,7 @@ namespace risk.control.system.Controllers
             this.notifyService = notifyService;
             this.roleManager = roleManager;
             this.dashboardService = dashboardService;
+            smsService = SmsService;
             this.toastNotification = toastNotification;
             this.webHostEnvironment = webHostEnvironment;
             UserList = new List<UsersViewModel>();
@@ -214,9 +217,9 @@ namespace risk.control.system.Controllers
                 _context.Vendor.Update(vendor);
                 await _context.SaveChangesAsync();
 
-                await SmsService.SendSmsAsync(vendor.PhoneNumber, "Agency account created. Domain : " + vendor.Email);
+                await smsService.DoSendSmsAsync(vendor.PhoneNumber, "Agency account created. Domain : " + vendor.Email);
 
-                notifyService.Custom($"Agency edited successfully.", 3, "green", "fas fa-building");
+                notifyService.Custom($"Agency {vendor.Email} edited successfully.", 3, "green", "fas fa-building");
                 return RedirectToAction(nameof(AgencyController.Profile), "Agency");
             }
             catch (Exception ex)
@@ -343,8 +346,8 @@ namespace risk.control.system.Controllers
 
                         if (lockUser.Succeeded && lockDate.Succeeded)
                         {
-                            notifyService.Custom($"User created and locked.", 3, "orange", "fas fa-user-lock");
-                            await SmsService.SendSmsAsync(user.PhoneNumber, "Agency user created and locked. Email : " + user.Email);
+                            notifyService.Custom($"User {user.Email} created and locked.", 3, "orange", "fas fa-user-lock");
+                            await smsService.DoSendSmsAsync(user.PhoneNumber, "Agency user created and locked. Email : " + user.Email);
                             if(txn =="agency")
                             {
                                 return RedirectToAction(nameof(AgencyController.Users), "Agency");
@@ -382,13 +385,13 @@ namespace risk.control.system.Controllers
                                 message += $"Thanks";
                                 message += "                                                                                ";
                                 message += $"https://icheckify.co.in";
-                                await SmsService.SendSmsAsync(user.PhoneNumber, message);
+                                await smsService.DoSendSmsAsync(user.PhoneNumber, message);
                                 notifyService.Custom($"Agent onboarding initiated.", 3, "green", "fas fa-user-check");
                             }
                             else
                             {
-                                await SmsService.SendSmsAsync(user.PhoneNumber, "Agency user edited and unlocked. Email : " + user.Email);
-                                notifyService.Custom($"User edited.", 3, "green", "fas fa-user-check");
+                                await smsService.DoSendSmsAsync(user.PhoneNumber, "Agency user edited and unlocked. Email : " + user.Email);
+                                notifyService.Custom($"User {user.Email} edited.", 3, "green", "fas fa-user-check");
                             }
                         }
 
@@ -555,8 +558,8 @@ namespace risk.control.system.Controllers
 
                             if (lockUser.Succeeded && lockDate.Succeeded)
                             {
-                                await SmsService.SendSmsAsync(user.PhoneNumber, "Agency user edited and locked. Email : " + user.Email);
-                                notifyService.Custom($"User edited and locked.", 3, "orange", "fas fa-user-lock");
+                                await smsService.DoSendSmsAsync(user.PhoneNumber, "Agency user edited and locked. Email : " + user.Email);
+                                notifyService.Custom($"User {user.Email} edited and locked.", 3, "orange", "fas fa-user-lock");
                             }
                         }
                         else
@@ -586,13 +589,13 @@ namespace risk.control.system.Controllers
                                     message += $"Thanks";
                                     message += "                                                                                ";
                                     message += $"https://icheckify.co.in";
-                                    await SmsService.SendSmsAsync(user.PhoneNumber, message);
+                                    await smsService.DoSendSmsAsync(user.PhoneNumber, message);
                                     notifyService.Custom($"Agent onboarding initiated.", 3, "green", "fas fa-user-check");
                                 }
                                 else
                                 {
-                                    await SmsService.SendSmsAsync(user.PhoneNumber, "Agency user edited and unlocked. Email : " + user.Email);
-                                    notifyService.Custom($"User edited.", 3, "green", "fas fa-user-check");
+                                    await smsService.DoSendSmsAsync(user.PhoneNumber, "Agency user edited and unlocked. Email : " + user.Email);
+                                    notifyService.Custom($"User {user.Email} edited.", 3, "green", "fas fa-user-check");
                                 }
                             }
                         }
@@ -689,12 +692,12 @@ namespace risk.control.system.Controllers
             message += $"https://icheckify.co.in";
             if (onboardAgent)
             {
-                await SmsService.SendSmsAsync(user.PhoneNumber, message);
+                await smsService.DoSendSmsAsync(user.PhoneNumber, message);
                 notifyService.Custom($"Agent onboarding initiated.", 3, "green", "fas fa-user-check");
             }
             else
             {
-                notifyService.Custom($"User role(s) updated successfully.", 3, "orange", "fas fa-user-cog");
+                notifyService.Custom($"User {user.Email} role(s) updated successfully.", 3, "orange", "fas fa-user-cog");
             }
             return RedirectToAction(nameof(AgencyController.Users), "Agency");
         }

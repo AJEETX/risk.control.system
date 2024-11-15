@@ -1380,3 +1380,7 @@ ul#messagesList {
     .form-container .btn:hover, .open-button:hover {
         opacity: 1;
     }
+.notyf__toast {
+    max-width: 500px !important; /* Set your desired width */
+    max-height: 500px !important; /* Set your desired width */
+}
