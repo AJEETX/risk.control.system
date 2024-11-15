@@ -219,7 +219,7 @@ namespace risk.control.system.Controllers
 
                 await smsService.DoSendSmsAsync(vendor.PhoneNumber, "Agency account created. Domain : " + vendor.Email);
 
-                notifyService.Custom($"Agency {vendor.Email} edited successfully.", 3, "green", "fas fa-building");
+                notifyService.Custom($"Agency {vendor.Email} edited successfully.", 3, "orange", "fas fa-building");
                 return RedirectToAction(nameof(AgencyController.Profile), "Agency");
             }
             catch (Exception ex)
@@ -346,7 +346,7 @@ namespace risk.control.system.Controllers
 
                         if (lockUser.Succeeded && lockDate.Succeeded)
                         {
-                            notifyService.Custom($"User {user.Email} created and locked.", 3, "orange", "fas fa-user-lock");
+                            notifyService.Custom($"User {user.Email} created and locked.", 3, "green", "fas fa-user-lock");
                             await smsService.DoSendSmsAsync(user.PhoneNumber, "Agency user created and locked. Email : " + user.Email);
                             if(txn =="agency")
                             {
@@ -595,7 +595,7 @@ namespace risk.control.system.Controllers
                                 else
                                 {
                                     await smsService.DoSendSmsAsync(user.PhoneNumber, "Agency user edited and unlocked. Email : " + user.Email);
-                                    notifyService.Custom($"User {user.Email} edited.", 3, "green", "fas fa-user-check");
+                                    notifyService.Custom($"User {user.Email} edited.", 3, "orange", "fas fa-user-check");
                                 }
                             }
                         }

@@ -326,7 +326,7 @@ namespace risk.control.system.Controllers
 
                         if (lockUser.Succeeded && lockDate.Succeeded)
                         {
-                            notifyService.Custom($"User {createdUser.Email} created and locked.", 3, "orange", "fas fa-user-lock");
+                            notifyService.Custom($"User {createdUser.Email} created and locked.", 3, "green", "fas fa-user-lock");
                             await smsService.DoSendSmsAsync(createdUser.PhoneNumber, "User created and locked. Email : " + createdUser.Email);
                             return RedirectToAction(nameof(CompanyController.Users), "Company");
                         }
@@ -491,7 +491,7 @@ namespace risk.control.system.Controllers
 
                             if (lockUser.Succeeded && lockDate.Succeeded)
                             {
-                                notifyService.Custom($"User {createdUser.Email} edited and unlocked.", 3, "green", "fas fa-user-check");
+                                notifyService.Custom($"User {createdUser.Email} edited and unlocked.", 3, "orange", "fas fa-user-check");
                                 await smsService.DoSendSmsAsync(user.PhoneNumber, "User created . Email : " + user.Email);
                                 return RedirectToAction(nameof(CompanyController.Users), "Company");
                             }
