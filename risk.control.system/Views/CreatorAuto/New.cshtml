@@ -22,22 +22,24 @@
                                 <button disabled class='btn btn-info  btn-xs'><i class='fa fa-upload'></i> Upload  </button>
                             }
                         </li>
-                       
-                        <li>
-                            <i class='far fa-hand-point-right'></i>
-                            <button class="btn btn-warning  btn-xs">
-                                <i class="fas fa-pencil-alt"></i> Edit
-                            </button>
-                        </li>
-                        <li>
-                            <i class='far fa-hand-point-right'></i>
-                            <button class="btn btn-danger  btn-xs">
-                                <span class="badge badge-danger"> <i class="fa fa-trash"></i></span><b> Delete </b>
-                            </button>
-                        </li>
-                        <li>
-                            <i class='far fa-hand-point-right'></i> Select <span class="badge badge-light btn"> <input type='checkbox' /></span>  claim(s)
-                        </li>
+                        @if (Model.HasClaims)
+                        {
+                            <li>
+                                <i class='far fa-hand-point-right'></i>
+                                <button class="btn btn-warning  btn-xs">
+                                    <i class="fas fa-pencil-alt"></i> Edit
+                                </button>
+                            </li>
+                            <li>
+                                <i class='far fa-hand-point-right'></i>
+                                <button class="btn btn-danger  btn-xs">
+                                    <span class="badge badge-danger"> <i class="fa fa-trash"></i></span><b> Delete </b>
+                                </button>
+                            </li>
+                            <li>
+                                <i class='far fa-hand-point-right'></i> Select <span class="badge badge-light btn"> <input type='checkbox' /></span>  claim(s)
+                            </li>
+                        }
                         @if (@Model.UserCanCreate)
                         {
                             <li>
@@ -56,12 +58,24 @@
                                 </button>
                             </li>
                         }
-                        <li>
-                            <i class='far fa-thumbs-up'></i>
-                            <button class="btn btn-warning btn-xs">
-                                <span class="badge badge-warning btn-xs"> <i class="fas fa-random"></i> </span> Assign<span class="badge badge-warning">auto</span>
-                            </button>
-                        </li>
+                         @if (Model.HasClaims)
+                        {
+                            <li>
+                                <i class='far fa-thumbs-up'></i>
+                                <button class="btn btn-warning btn-xs">
+                                    <span class="badge badge-warning btn-xs"> <i class="fas fa-random"></i> </span> Assign<span class="badge badge-warning">auto</span>
+                                </button>
+                            </li>
+                        }
+                        else
+                        {
+                            <li>
+                                <i class='far fa-thumbs-up'></i>
+                                <button disabled class="btn btn-warning btn-xs">
+                                    <span class="badge badge-warning btn-xs"> <i class="fas fa-random"></i> </span> Assign<span class="badge badge-warning">auto</span>
+                                </button>
+                            </li>
+                        }
                     </span>
                 </span>
 

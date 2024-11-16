@@ -35,6 +35,7 @@ namespace risk.control.system.Controllers
         private readonly IDashboardService dashboardService;
         private readonly ISmsService smsService;
         private readonly IToastNotification toastNotification;
+        private readonly IAgencyService agencyService;
         private readonly IWebHostEnvironment webHostEnvironment;
 
         public AgencyController(ApplicationDbContext context,
@@ -44,7 +45,9 @@ namespace risk.control.system.Controllers
             RoleManager<ApplicationRole> roleManager,
             IDashboardService dashboardService,
             ISmsService SmsService,
-            IToastNotification toastNotification, IWebHostEnvironment webHostEnvironment)
+            IToastNotification toastNotification,
+            IAgencyService agencyService,
+            IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
             this.signInManager = signInManager;
@@ -54,6 +57,7 @@ namespace risk.control.system.Controllers
             this.dashboardService = dashboardService;
             smsService = SmsService;
             this.toastNotification = toastNotification;
+            this.agencyService = agencyService;
             this.webHostEnvironment = webHostEnvironment;
             UserList = new List<UsersViewModel>();
         }
@@ -177,49 +181,15 @@ namespace risk.control.system.Controllers
                     notifyService.Error("User Not found!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == currentUserEmail);
-                if (vendorUser == null)
-                {
-                    notifyService.Error("User Not found !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
+                
                 IFormFile? vendorDocument = Request.Form?.Files?.FirstOrDefault();
 
-
-                if (vendorDocument is not null)
+                var edited = await agencyService.EditAgency(vendor, vendorDocument, currentUserEmail);
+                if (!edited)
                 {
-                    string newFileName = vendor.Email + Guid.NewGuid().ToString();
-                    string fileExtension = Path.GetExtension(Path.GetFileName(vendorDocument.FileName));
-                    newFileName += fileExtension;
-                    string path = Path.Combine(webHostEnvironment.WebRootPath, "agency");
-                    if (!Directory.Exists(path))
-                    {
-                        Directory.CreateDirectory(path);
-                    }
-                    var upload = Path.Combine(webHostEnvironment.WebRootPath, "agency", newFileName);
-
-                    using var dataStream = new MemoryStream();
-                    vendorDocument.CopyTo(dataStream);
-                    vendor.DocumentImage = dataStream.ToArray();
-                    vendorDocument.CopyTo(new FileStream(upload, FileMode.Create));
-                    vendor.DocumentUrl = "/agency/" + newFileName;
+                    notifyService.Custom($"Agency {vendor.Email} not edited.", 3, "red", "fas fa-building");
+                    return RedirectToAction(nameof(AgencyController.Profile), "Agency");
                 }
-                else
-                {
-                    var existingVendor = await _context.Vendor.AsNoTracking().FirstOrDefaultAsync(c => c.VendorId == vendorUser.VendorId);
-                    if (existingVendor.DocumentImage != null || existingVendor.DocumentUrl != null)
-                    {
-                        vendor.DocumentImage = existingVendor.DocumentImage;
-                        vendor.DocumentUrl = existingVendor.DocumentUrl;
-                    }
-                }
-                vendor.Updated = DateTime.Now;
-                vendor.UpdatedBy = HttpContext.User?.Identity?.Name;
-                _context.Vendor.Update(vendor);
-                await _context.SaveChangesAsync();
-
-                await smsService.DoSendSmsAsync(vendor.PhoneNumber, "Agency account created. Domain : " + vendor.Email);
-
                 notifyService.Custom($"Agency {vendor.Email} edited successfully.", 3, "orange", "fas fa-building");
                 return RedirectToAction(nameof(AgencyController.Profile), "Agency");
             }

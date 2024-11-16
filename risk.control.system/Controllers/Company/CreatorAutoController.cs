@@ -99,8 +99,11 @@ namespace risk.control.system.Controllers.Company
                         notifyService.Information($"Limit available = <b>{availableCount}</b>");
                     }
                 }
-
-                return View(new CreateClaims { BulkUpload = companyUser.ClientCompany.BulkUpload, UserCanCreate = userCanCreate });
+                var createdClaimsStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(s => s.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
+                var hasClaim = _context.ClaimsInvestigation.Any(c => c.ClientCompanyId == companyUser.ClientCompany.ClientCompanyId && 
+                !c.Deleted &&
+                c.InvestigationCaseSubStatus == createdClaimsStatus);
+                return View(new CreateClaims { BulkUpload = companyUser.ClientCompany.BulkUpload, UserCanCreate = userCanCreate, HasClaims = hasClaim });
             }
             catch (Exception ex)
             {

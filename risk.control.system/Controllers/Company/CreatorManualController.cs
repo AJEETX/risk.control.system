@@ -101,8 +101,23 @@ namespace risk.control.system.Controllers.Company
                         notifyService.Information($"Limit available = <b>{availableCount}</b>");
                     }
                 }
+                var createdClaimsStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(s => s.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
+                var withDrawnClaimsStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(s => s.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY);
+                var declinedClaimsStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(s => s.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY);
+                var reviewClaimsStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(s => s.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER);
+                var hasClaim1 = _context.ClaimsInvestigation.Where(c =>
+               c.ClientCompanyId == companyUser.ClientCompany.ClientCompanyId &&
+               !c.Deleted);
 
-                return View(new CreateClaims { BulkUpload = companyUser.ClientCompany.BulkUpload, UserCanCreate = userCanCreate });
+               var hasClaim = _context.ClaimsInvestigation.Any(c => 
+                c.ClientCompanyId == companyUser.ClientCompany.ClientCompanyId && 
+                !c.Deleted && 
+                (c.InvestigationCaseSubStatus == createdClaimsStatus ||
+                c.InvestigationCaseSubStatus == withDrawnClaimsStatus ||
+                c.InvestigationCaseSubStatus == declinedClaimsStatus ||
+                c.InvestigationCaseSubStatus == reviewClaimsStatus
+                ));
+                return View(new CreateClaims { BulkUpload = companyUser.ClientCompany.BulkUpload, UserCanCreate = userCanCreate , HasClaims = hasClaim });
             }
             catch (Exception ex)
             {

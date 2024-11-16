@@ -4,5 +4,6 @@
     {
         public bool BulkUpload { get; set; }
         public bool UserCanCreate { get; set; }
+        public bool HasClaims { get; set; }
     }
 }
