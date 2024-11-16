@@ -180,6 +180,8 @@ namespace risk.control.system.Services
 
                 var byteimage = Convert.FromBase64String(data.OcrImage);
 
+                //await CompareFaces.DetectSampleAsync(byteimage);
+
                 var googleDetecTask = googleApi.DetectTextAsync(byteimage);
 
                 var addressTask = httpClientService.GetRawAddress(latitude, longitude);

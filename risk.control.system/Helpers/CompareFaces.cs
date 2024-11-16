@@ -2,16 +2,19 @@
 using Amazon.Rekognition;
 using Amazon;
 using risk.control.system.AppConstant;
+using Amazon.Textract.Model;
+using Amazon.Textract;
 
 namespace risk.control.system.Services
 {
     public class CompareFaces
     {
+        private static string awsAccessKeyId = Environment.GetEnvironmentVariable("aws_id");
+        private static string awsSecretAccessKey = Environment.GetEnvironmentVariable("aws_secret");
         public static async Task<bool> Do(byte[] data, byte[] tdata)
         {
             float similarityThreshold = 70F;
-            var awsAccessKeyId = Environment.GetEnvironmentVariable("aws_id");
-            var awsSecretAccessKey = Environment.GetEnvironmentVariable("aws_secret");
+            
             var rekognitionClient = new AmazonRekognitionClient(awsAccessKeyId, awsSecretAccessKey, RegionEndpoint.APSoutheast2);
 
             Amazon.Rekognition.Model.Image imageSource = new Amazon.Rekognition.Model.Image();
@@ -64,6 +67,26 @@ namespace risk.control.system.Services
 
             //Console.WriteLine($"Found {compareFacesResponse.UnmatchedFaces.Count} face(s) that did not match.");
             return result;
+        }
+
+        public static async Task DetectSampleAsync(byte[] bytes)
+        {
+            using (var textractClient = new AmazonTextractClient(awsAccessKeyId, awsSecretAccessKey, RegionEndpoint.APSoutheast2))
+            {
+                Console.WriteLine("Detect Document Text");
+                var detectResponse = await textractClient.DetectDocumentTextAsync(new DetectDocumentTextRequest
+                {
+                    Document = new Document
+                    {
+                        Bytes = new MemoryStream(bytes)
+                    }
+                });
+
+                foreach (var block in detectResponse.Blocks)
+                {
+                    Console.WriteLine($"Type {block.BlockType}, Text: {block.Text}");
+                }
+            }
         }
     }
 }
