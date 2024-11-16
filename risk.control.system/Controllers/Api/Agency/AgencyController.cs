@@ -214,7 +214,8 @@ namespace risk.control.system.Controllers.Api.Agency
                     Active = u.Active,
                     Roles = u.UserRole != null ? $"<span class=\"badge badge-light\">{u.UserRole.GetEnumDisplayName()}</span>" : "<span class=\"badge badge-light\">...</span>",
                     Updated = u.Updated.HasValue ? u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy"),
-                    UpdateBy = u.UpdatedBy
+                    UpdateBy = u.UpdatedBy,
+                    Role = u.UserRole.GetEnumDisplayName()
                 });
 
             return Ok(result?.ToArray());
@@ -232,7 +233,7 @@ namespace risk.control.system.Controllers.Api.Agency
                 .Include(u=>u.State)
                 .Include(u=>u.District)
                 .Include(u=>u.PinCode)
-                .Where(c => c.VendorId == vendorUser.VendorId);
+                .Where(c => c.VendorId == vendorUser.VendorId && !c.Deleted);
 
             var users = vendorUsers?
                 .OrderBy(u => u.FirstName)
@@ -270,12 +271,12 @@ namespace risk.control.system.Controllers.Api.Agency
                     Email = "<a href=/Agency/EditUser?userId=" +u.AgencyUser.Id +">" + u.AgencyUser.Email + "</a>",
                     Name = u.AgencyUser.FirstName + " " + u.AgencyUser.LastName,
                     Phone = u.AgencyUser.PhoneNumber,
-                    Addressline = "<span class='badge badge-light'>" + u.AgencyUser.Addressline +", "+ u.AgencyUser.District.Name + ", " +u.AgencyUser.State.Name +", "+u.AgencyUser.Country.Code + "</span>",
-                    Pincode = u.AgencyUser.PinCode.Code,
+                    Addressline = "<span class='badge badge-light'>" + u.AgencyUser.Addressline +", "+ u.AgencyUser.District.Name + ", " +u.AgencyUser.State.Name +", "+u.AgencyUser.Country.Code + ", "+u.AgencyUser.PinCode.Code+" </span>",
                     Active = u.AgencyUser.Active,
                     Roles = u.AgencyUser.UserRole != null ? $"<span class=\"badge badge-light\">{u.AgencyUser.UserRole.GetEnumDisplayName()}</span>" : "<span class=\"badge badge-light\">...</span>",
                     Count = u.CurrentCaseCount,
-                    UpdateBy = u.AgencyUser.UpdatedBy
+                    UpdateBy = u.AgencyUser.UpdatedBy,
+                    Role = u.AgencyUser.UserRole.GetEnumDisplayName()
                 });
             return Ok(agentWithLoad?.ToArray());
         }

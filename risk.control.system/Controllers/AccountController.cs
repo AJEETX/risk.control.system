@@ -103,11 +103,11 @@ namespace risk.control.system.Controllers
                 var showgtrialUsers = await featureManager.IsEnabledAsync(FeatureFlags.TrialVersion);
                 if(showgtrialUsers)
                 {
-                    ViewData["Users"] = new SelectList(_context.Users.Where(u=>!u.Email.StartsWith("admin")).OrderBy(o => o.Email), "Email", "Email");
+                    ViewData["Users"] = new SelectList(_context.Users.Where(u=>!u.Deleted && !u.Email.StartsWith("admin")).OrderBy(o => o.Email), "Email", "Email");
                 }
                 else
                 {
-                    ViewData["Users"] = new SelectList(_context.Users.OrderBy(o => o.Email), "Email", "Email");
+                    ViewData["Users"] = new SelectList(_context.Users.Where(u => !u.Deleted).OrderBy(o => o.Email), "Email", "Email");
                 }
             }
             //ViewBag.SlimLogin = "Login";
@@ -169,8 +169,8 @@ namespace risk.control.system.Controllers
                     var roles = await _userManager.GetRolesAsync(user);
                     if (roles != null && roles.Count > 0)
                     {
-                        var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == email);
-                        var vendorUser = _context.VendorApplicationUser.FirstOrDefault(u => u.Email == email);
+                        var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == email && !u.Deleted);
+                        var vendorUser = _context.VendorApplicationUser.FirstOrDefault(u => u.Email == email && !u.Deleted);
                         bool vendorIsActive = false;
                         bool companyIsActive = false;
 
@@ -305,7 +305,7 @@ namespace risk.control.system.Controllers
             ModelState.AddModelError(string.Empty, "Bad Request.");
             model.Error = "Bad Request.";
             model.ShowUserOnLogin = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
-            ViewData["Users"] = new SelectList(_context.Users.OrderBy(o => o.Email), "Email", "Email");
+            ViewData["Users"] = new SelectList(_context.Users.Where(u =>!u.Deleted).OrderBy(o => o.Email), "Email", "Email");
             return View(model);
         }
 

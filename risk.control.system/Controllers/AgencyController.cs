@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using NToastNotify;
 
 using risk.control.system.AppConstant;
+using risk.control.system.Controllers.Company;
 using risk.control.system.Data;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
@@ -386,12 +387,12 @@ namespace risk.control.system.Controllers
                                 message += "                                                                                ";
                                 message += $"https://icheckify.co.in";
                                 await smsService.DoSendSmsAsync(user.PhoneNumber, message);
-                                notifyService.Custom($"Agent onboarding initiated.", 3, "green", "fas fa-user-check");
+                                notifyService.Custom($"Agent {user.Email} onboarding initiated.", 3, "green", "fas fa-user-check");
                             }
                             else
                             {
-                                await smsService.DoSendSmsAsync(user.PhoneNumber, "Agency user edited and unlocked. Email : " + user.Email);
-                                notifyService.Custom($"User {user.Email} edited.", 3, "green", "fas fa-user-check");
+                                await smsService.DoSendSmsAsync(user.PhoneNumber, "User created. Email : " + user.Email);
+                                notifyService.Custom($"User {user.Email} created.", 3, "green", "fas fa-user-check");
                             }
                         }
 
@@ -558,7 +559,7 @@ namespace risk.control.system.Controllers
 
                             if (lockUser.Succeeded && lockDate.Succeeded)
                             {
-                                await smsService.DoSendSmsAsync(user.PhoneNumber, "Agency user edited and locked. Email : " + user.Email);
+                                await smsService.DoSendSmsAsync(user.PhoneNumber, "User edited and locked. Email : " + user.Email);
                                 notifyService.Custom($"User {user.Email} edited and locked.", 3, "orange", "fas fa-user-lock");
                             }
                         }
@@ -594,7 +595,7 @@ namespace risk.control.system.Controllers
                                 }
                                 else
                                 {
-                                    await smsService.DoSendSmsAsync(user.PhoneNumber, "Agency user edited and unlocked. Email : " + user.Email);
+                                    await smsService.DoSendSmsAsync(user.PhoneNumber, "User edited and unlocked. Email : " + user.Email);
                                     notifyService.Custom($"User {user.Email} edited.", 3, "orange", "fas fa-user-check");
                                 }
                             }
@@ -613,6 +614,79 @@ namespace risk.control.system.Controllers
             return RedirectToAction(nameof(Index), "Dashboard");
         }
 
+        [Breadcrumb(title: " Delete", FromAction = "Users")]
+        public async Task<IActionResult> DeleteUser(long userId)
+        {
+            try
+            {
+                if (userId == null || userId ==0)
+                {
+                    notifyService.Error("OOPS!!!.Id Not Found.Try Again");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (currentUserEmail == null)
+                {
+                    notifyService.Error("Not Found!!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var model = _context.VendorApplicationUser.Include(v=>v.Country).Include(v => v.State).Include(v => v.District).Include(v => v.PinCode).FirstOrDefault(c => c.Id == userId);
+                if (model == null)
+                {
+                    notifyService.Error("OOPS!!!.Claim Not Found.Try Again");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                notifyService.Error("OOPS!!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+
+        }
+        [HttpPost, ActionName("DeleteUser")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteUser(string email)
+        {
+            try
+            {
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (currentUserEmail == null)
+                {
+                    notifyService.Error("Not Found!!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                if (string.IsNullOrWhiteSpace(email))
+                {
+                    notifyService.Error("Not Found!!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var model = _context.VendorApplicationUser.Include(v=>v.Country).Include(v => v.State).Include(v => v.District).Include(v => v.PinCode).FirstOrDefault(c => c.Email == email);
+                if (model == null)
+                {
+                    notifyService.Error("Not Found!!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+
+                model.Updated = DateTime.Now;
+                model.UpdatedBy = currentUserEmail;
+                model.Deleted = true;
+                _context.VendorApplicationUser.Update(model);
+                await _context.SaveChangesAsync();
+                notifyService.Custom($"User {model.Email} deleted", 3, "red", "fas fa-user-minus");
+                return RedirectToAction(nameof(AgencyController.Users), "Agency");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                notifyService.Error("OOPS!!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+
+        }
         [Breadcrumb("Edit Role", FromAction = "Users")]
         public async Task<IActionResult> UserRoles(string userId)
         {

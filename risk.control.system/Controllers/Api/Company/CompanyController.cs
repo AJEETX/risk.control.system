@@ -136,7 +136,8 @@ namespace risk.control.system.Controllers.Api.Company
                     Roles = u.UserRole != null ? $"<span class=\"badge badge-light\">{u.UserRole.GetEnumDisplayName()}</span>" : "<span class=\"badge badge-light\">...</span>",
                     Pincode = u.PinCode.Code,
                     Updated = u.Updated.HasValue ?  u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy"),
-                    UpdateBy = u.UpdatedBy
+                    UpdateBy = u.UpdatedBy,
+                    Role = u.UserRole.GetEnumDisplayName()
 
                 })?.ToArray();
             return Ok(result);

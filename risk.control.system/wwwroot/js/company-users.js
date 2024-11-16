@@ -54,7 +54,11 @@
                 "mRender": function (data, type, row) {
                     var buttons = "";
                     buttons += '<a id=edit' + row.id + ' onclick="showedit(' + row.id + ')" href="/Company/EditUser?userId=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-pen"></i> Edit</a>&nbsp;'
-                    //buttons += '<a id=role' + row.id + ' onclick="showroles(' + row.id + ')" href="/Company/UserRoles?userId=' + row.id + '"  class="btn btn-xs btn-info"><i class="fas fa-pen"></i> Role</a>'
+                    if (row.role != "COMPANY_ADMIN") {
+                        buttons += '<a id="details' + row.id + '" onclick="getdetails(`' + row.id + '`)" href="/Company/DeleteUser?userId=' + row.id + '" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i> Delete </a>'
+                    } else {
+                        buttons += '<button disabled class="btn btn-xs btn-danger"><i class="fa fa-trash"></i> Delete </a>'
+                    }
                     return buttons;
                 }
             }
@@ -109,16 +113,15 @@ function showedit(id) {
     }
 }
 
-function showroles(id) {
+function getdetails(id) {
     $("body").addClass("submit-progress-bg");
     // Wrap in setTimeout so the UI
     // can update the spinners
     setTimeout(function () {
         $(".submit-progress").removeClass("hidden");
     }, 1);
-    var rolebtn = $('a#role' + id +'.btn.btn-xs.btn-info')
-    $('a.btn.btn-xs.btn-info').attr('disabled', 'disabled');
-    rolebtn.html("<i class='fas fa-sync fa-spin'></i> Role");
+    $('a.btn *').attr('disabled', 'disabled');
+    $('a#details' + id + '.btn.btn-xs.btn-danger').html("<i class='fas fa-sync fa-spin'></i> Delete");
 
     var article = document.getElementById("article");
     if (article) {
