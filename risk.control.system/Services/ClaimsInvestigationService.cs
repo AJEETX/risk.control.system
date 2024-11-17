@@ -529,7 +529,7 @@ namespace risk.control.system.Services
             claimsInvestigation.UserEmailActioned = userEmail;
             claimsInvestigation.UserEmailActionedTo = userEmail;
             claimsInvestigation.UserRoleActionedTo = $"{company.Email}";
-            claimsInvestigation.CompanyWithdrawlComment = model.ClaimsInvestigation.CompanyWithdrawlComment;
+            claimsInvestigation.CompanyWithdrawlComment = $"WITHDRAWN: {currentUser.Email} :{model.ClaimsInvestigation.CompanyWithdrawlComment}";
             claimsInvestigation.ActiveView = 0;
             claimsInvestigation.ManualNew = 0;
             claimsInvestigation.AllocateView = 0;
@@ -577,7 +577,7 @@ namespace risk.control.system.Services
         }
         public async Task WithdrawCase(string userEmail, ClaimTransactionModel model, string claimId)
         {
-            var currentUser = _context.VendorApplicationUser.FirstOrDefault(u => u.Email == userEmail);
+            var currentUser = _context.VendorApplicationUser.Include(u=>u.Vendor).FirstOrDefault(u => u.Email == userEmail);
             var claimsInvestigation = _context.ClaimsInvestigation
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimId);
             var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claimsInvestigation.ClientCompanyId);
@@ -596,7 +596,7 @@ namespace risk.control.system.Services
             claimsInvestigation.CurrentClaimOwner = currentUser.Email;
             claimsInvestigation.UserEmailActioned = userEmail;
             claimsInvestigation.UserEmailActionedTo = string.Empty;
-            claimsInvestigation.AgencyDeclineComment = model.ClaimsInvestigation.AgencyDeclineComment;
+            claimsInvestigation.AgencyDeclineComment = $"DECLINED: {currentUser.Email} :{model.ClaimsInvestigation.AgencyDeclineComment}";
             claimsInvestigation.ActiveView = 0;
             claimsInvestigation.AllocateView = 0;
             claimsInvestigation.AutoNew = 0;
@@ -604,7 +604,6 @@ namespace risk.control.system.Services
             claimsInvestigation.UserRoleActionedTo = $"{company.Email}";
             claimsInvestigation.InvestigationCaseStatusId = inProgress.InvestigationCaseStatusId;
             claimsInvestigation.InvestigationCaseSubStatusId = withdrawnByAgency.InvestigationCaseSubStatusId;
-
             var lastLog = _context.InvestigationTransaction
                 .Where(i =>
                     i.ClaimsInvestigationId == claimsInvestigation.ClaimsInvestigationId)

@@ -138,7 +138,7 @@
                         buttons += '<a id="details' + row.id + '" onclick="showenquiry(`' + row.id + '`)" href="/SuperVisor/ReplyEnquiry?Id=' + row.id + '"  class="btn btn-xs btn-warning"><i class="fas fa-question" aria-hidden="true"></i> ENQUIRY </a>'
                     }
                     else {
-                        buttons += '<a id="details' + row.id + '" onclick="showdetails(`' + row.id + '`)" href="/SuperVisor/CaseDetail?Id=' + row.id + '"  class="btn btn-xs btn-info"><i class="fa fa-search"></i></i> Details</a>'
+                        buttons += '<a id="details' + row.id + '" onclick="showdetails(`' + row.id + '`)" href="/SuperVisor/CaseDetail?Id=' + row.id + '"  class="btn btn-xs btn-danger"><i class="fas fa-undo"></i> Decline</a>'
                     }
                     return buttons;
                 }
@@ -227,7 +227,7 @@ function showdetails(id) {
         $(".submit-progress").removeClass("hidden");
     }, 1);
     $('a.btn *').attr('disabled', 'disabled');
-    $('a#details' + id + '.btn.btn-xs.btn-info').html("<i class='fas fa-sync fa-spin'></i> Details");
+    $('a#details' + id + '.btn.btn-xs.btn-danger').html("<i class='fas fa-sync fa-spin'></i> Decline");
 
     var article = document.getElementById("article");
     if (article) {

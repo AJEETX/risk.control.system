@@ -34,5 +34,7 @@
         public bool? IsNewAssigned { get; set; }
         public bool? IsQueryCase { get; set; }
         public string OwnerDetail { get; set; }
+        public string AgencyDeclineComment { get; set; }
+
     }
 }

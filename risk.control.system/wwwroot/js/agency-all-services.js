@@ -23,6 +23,11 @@
             url: '/api/Company/AllServices?id=' + $('#vendorId').val(),
             dataSrc: ''
         },
+        columnDefs: [
+            {
+                className: 'max-width-column', // Apply the CSS class,
+                targets: 7                      // Index of the column to style
+            }],
         fixedHeader: true,
         processing: true,
         paging: true,

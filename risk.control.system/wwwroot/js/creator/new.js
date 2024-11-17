@@ -91,7 +91,9 @@
                     return img;
                 }
             },
-            { "data": "policyNum", "bSortable": false },
+            {
+                "data": "policyNum", "bSortable": false
+            },
             {
                 "data": "amount"
             },

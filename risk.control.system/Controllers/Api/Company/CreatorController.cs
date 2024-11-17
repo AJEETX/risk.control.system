@@ -217,6 +217,7 @@ namespace risk.control.system.Controllers.Api.Company
                         Ready2Assign = a.IsReady2Assign,
                         BeneficiaryFullName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.BeneficiaryName) ? "?" : a.BeneficiaryDetail.BeneficiaryName,
                         CustomerFullName = string.IsNullOrWhiteSpace(a.CustomerDetail?.CustomerName) ? "?" : a.CustomerDetail.CustomerName,
+                        AgencyDeclineComment = a.InvestigationCaseSubStatus == withdrawnByCompany ? a.CompanyWithdrawlComment : a.InvestigationCaseSubStatus == withdrawnByAgency ? a.AgencyDeclineComment : a.InvestigationCaseSubStatus == reAssignedStatus ? a.CompanyWithdrawlComment : ""
                     })
                     ?.ToList();
 

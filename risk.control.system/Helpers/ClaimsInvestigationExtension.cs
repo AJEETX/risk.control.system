@@ -40,11 +40,11 @@ namespace risk.control.system.Helpers
                 var status = a.InvestigationCaseSubStatus.Name.ToUpper();
                 if (status == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY)
                 {
-                    return string.Join("", a.PolicyDetail?.ContractNumber + "<i class=\"fa fa-asterisk asterik-style\" title=\"WITHDRAWN\"></i>");
+                    return string.Join("", a.PolicyDetail?.ContractNumber + $"<i class=\"fa fa-asterisk asterik-style\" title=\"{a.CompanyWithdrawlComment}\"></i>");
                 }
                 if (status == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY)
                 {
-                    return string.Join("", a.PolicyDetail?.ContractNumber + "<i class=\"fa fa-asterisk asterik-style\" title=\"DECLINED\"></i>");
+                    return string.Join("", a.PolicyDetail?.ContractNumber + $"<i class=\"fa fa-asterisk asterik-style\" title=\"{a.AgencyDeclineComment}\"></i>");
                 }
                 if (isReview && isEnquiry) {
                     return string.Join("", a.PolicyDetail?.ContractNumber + "<i class=\"fa fa-asterisk asterik-style\" title=\"REVIEW CASE\"></i><i class=\"fa fa-asterisk asterik-style\" title=\"ENQUIRY REPLY\"></i>");

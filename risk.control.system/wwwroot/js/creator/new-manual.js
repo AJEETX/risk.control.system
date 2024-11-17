@@ -89,7 +89,12 @@
                     return img;
                 }
             },
-            { "data": "policyNum", "bSortable": false },
+            {
+                "data": "policyNum", "bSortable": false,
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.agencyDeclineComment + '" data-toggle="tooltip">' + data + '</span>'
+                }
+            },
             {
                 "data": "amount"
             },

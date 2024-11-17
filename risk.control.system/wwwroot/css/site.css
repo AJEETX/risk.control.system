@@ -1384,3 +1384,16 @@ ul#messagesList {
     max-width: 500px !important; /* Set your desired width */
     max-height: 500px !important; /* Set your desired width */
 }
+.max-width-column {
+    max-width: 200px;
+    white-space: nowrap; /* Prevents text wrapping */
+    overflow: hidden; /* Ensures overflow is hidden */
+    text-overflow: ellipsis; /* Adds ellipsis if text overflows */
+}
+
+.max-width-column-picodes {
+    max-width: 300px;
+    white-space: nowrap; /* Prevents text wrapping */
+    overflow: hidden; /* Ensures overflow is hidden */
+    text-overflow: ellipsis; /* Adds ellipsis if text overflows */
+}

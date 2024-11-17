@@ -501,18 +501,13 @@
                                     <th data-orderable="false">
                                         Address
                                     </th>
-                                    <th>
-                                        District
-                                    </th>
-                                    <th>
-                                        State
-                                    </th>
 
-                                    <th>
-                                        Case(s)
-                                    </th>
+                                    
                                     <th data-orderable="false">
                                         <span class="badge badge-light">Service</span> : <span class="badge badge-light">Pincodes</span>
+                                    </th>
+                                    <th>
+                                        Case(s)
                                     </th>
                                 </tr>
                             </thead>
@@ -567,19 +562,13 @@
                                         </td>
 
                                         <td>
-                                            @Html.DisplayFor(modelItem => item.Vendor.Addressline)
-                                        </td>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.Vendor.District.Name)
-                                        </td>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.Vendor.State.Name)
+                                            @{
+                                                var vendorAddress = item.Vendor.Addressline + ", " + item.Vendor.District.Name + ", " + item.Vendor.State.Name;
+                                            }
+                                            @Html.DisplayFor(modelItem => vendorAddress)
                                         </td>
 
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.CaseCount)
-                                        </td>
-                                        <td>
+                                        <td class="max-width-column-picodes">
                                             @foreach (var service in item.Vendor.VendorInvestigationServiceTypes)
                                             {
                                                 <span class="badge badge-light">
@@ -593,7 +582,9 @@
                                                 <br />
                                             }
                                         </td>
-
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.CaseCount)
+                                        </td>
 
                                     </tr>
                                 }
