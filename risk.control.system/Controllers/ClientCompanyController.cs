@@ -120,7 +120,8 @@ namespace risk.control.system.Controllers
                 return RedirectToAction(nameof(Index), "Dashboard");
 
             }
-
+            var hasClaims = _context.ClaimsInvestigation.Any(c => c.ClientCompanyId == id && !c.Deleted);
+            clientCompany.HasClaims = hasClaims;
             return View(clientCompany);
         }
 
@@ -139,12 +140,22 @@ namespace risk.control.system.Controllers
             {
                 clientCompany.Updated = DateTime.Now;
                 clientCompany.UpdatedBy = HttpContext.User?.Identity?.Name;
-                _context.ClientCompany.Remove(clientCompany);
+                clientCompany.Deleted = true;
+                _context.ClientCompany.Update(clientCompany);
+
+                var companyUsers = await _context.ClientCompanyApplicationUser.Where(c => c.ClientCompanyId == ClientCompanyId).ToListAsync();
+                foreach (var companyUser in companyUsers)
+                {
+                    companyUser.Deleted = true;
+                    companyUser.Updated = DateTime.Now;
+                    companyUser.UpdatedBy = HttpContext.User?.Identity?.Name;
+                    _context.ClientCompanyApplicationUser.Update(companyUser);
+                }
                 await _context.SaveChangesAsync();
 
                 await smsService.DoSendSmsAsync(clientCompany.PhoneNumber, "Company account deleted. Domain : " + clientCompany.Email);
 
-                notifyService.Custom($"Company deleted successfully.", 3, "red", "fas fa-building");
+                notifyService.Custom($"Company {clientCompany.Email} deleted successfully.", 3, "red", "fas fa-building");
                 return RedirectToAction(nameof(Index));
             }
 

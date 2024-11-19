@@ -82,9 +82,9 @@ namespace risk.control.system.Services
         }
         public DashboardData GetSuperAdminCount(string userEmail, string role)
         {
-            var allCompaniesCount = _context.ClientCompany.Count();
-            var allAgenciesCount = _context.Vendor.Count();
-            var AllUsersCount = _context.ApplicationUser.Count();
+            var allCompaniesCount = _context.ClientCompany.Count(c=>!c.Deleted);
+            var allAgenciesCount = _context.Vendor.Count(v=>!v.Deleted);
+            var AllUsersCount = _context.ApplicationUser.Count(u=>!u.Deleted);
             //var availableAgenciesCount = GetAvailableAgencies(userEmail);
 
             var data = new DashboardData();
@@ -277,7 +277,7 @@ namespace risk.control.system.Services
         }
         private int GetAllAgencies(string userEmail)
         {
-            var agencyCount = _context.Vendor.Count();
+            var agencyCount = _context.Vendor.Count(a=>!a.Deleted);
             return agencyCount;
         }
         private int GetAvailableAgencies(string userEmail)
@@ -293,14 +293,14 @@ namespace risk.control.system.Services
         {
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == userEmail);
             var empAgencies = _context.ClientCompany.Include(c=>c.EmpanelledVendors).FirstOrDefault(c=>c.ClientCompanyId == companyUser.ClientCompanyId);
-            var count = empAgencies.EmpanelledVendors.Count(v=>v.Status == VendorStatus.ACTIVE);
+            var count = empAgencies.EmpanelledVendors.Count(v=>v.Status == VendorStatus.ACTIVE && !v.Deleted);
             return count;
         }
         private int GetCompanyUsers(string userEmail)
         {
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == userEmail);
 
-            var allCompanyUserCount = _context.ClientCompanyApplicationUser.Count(u => u.ClientCompanyId == companyUser.ClientCompanyId);
+            var allCompanyUserCount = _context.ClientCompanyApplicationUser.Count(u => u.ClientCompanyId == companyUser.ClientCompanyId && !u.Deleted);
 
             return allCompanyUserCount;
         }

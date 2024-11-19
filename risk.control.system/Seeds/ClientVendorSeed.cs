@@ -277,6 +277,7 @@ namespace risk.control.system.Seeds
                  AutoAllocation = true,
                  BulkUpload = true,
                 Updated = DateTime.Now,
+                Deleted = false
             };
 
             var insurerCompany = await context.ClientCompany.AddAsync(insurer);

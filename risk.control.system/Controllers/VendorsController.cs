@@ -1,4 +1,6 @@
-﻿using AspNetCoreHero.ToastNotification.Abstractions;
+﻿using System.Linq;
+
+using AspNetCoreHero.ToastNotification.Abstractions;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -745,20 +747,41 @@ namespace risk.control.system.Controllers
                 }
 
                 var vendor = await _context.Vendor
+                    .Include(v => v.ratings)
                     .Include(v => v.Country)
                     .Include(v => v.PinCode)
                     .Include(v => v.State)
+                    .Include(v => v.District)
+                    .Include(v => v.VendorInvestigationServiceTypes)
+                    .ThenInclude(v => v.PincodeServices)
+                    .Include(v => v.VendorInvestigationServiceTypes)
+                    .ThenInclude(v => v.State)
+                    .Include(v => v.VendorInvestigationServiceTypes)
+                    .ThenInclude(v => v.District)
+                    .Include(v => v.VendorInvestigationServiceTypes)
+                    .ThenInclude(v => v.LineOfBusiness)
+                    .Include(v => v.VendorInvestigationServiceTypes)
+                    .ThenInclude(v => v.InvestigationServiceType)
                     .FirstOrDefaultAsync(m => m.VendorId == id);
                 if (vendor == null)
                 {
                     notifyService.Error("OOPS !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
+                var agencySubStatuses = _context.InvestigationCaseSubStatus.Where(i =>
+                    i.Name.Contains(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR) ||
+                    i.Name.Contains(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR) ||
+                    i.Name.Contains(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT) ||
+                    i.Name.Contains(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR) ||
+                    i.Name.Contains(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR)
+                    ).Select(s => s.InvestigationCaseSubStatusId).ToList();
 
+                var hasClaims = _context.ClaimsInvestigation.Any(c => agencySubStatuses.Contains(c.InvestigationCaseSubStatus.InvestigationCaseSubStatusId) && c.VendorId == id );
                 var agencysPage = new MvcBreadcrumbNode("Agencies", "Vendors", "Manager Agency(s)");
                 var agencyPage = new MvcBreadcrumbNode("Agencies", "Vendors", "All Agencies") { Parent = agencysPage, };
                 var editPage = new MvcBreadcrumbNode("Delete", "Vendors", $"Delete Agency") { Parent = agencyPage, RouteValues = new { id = id } };
                 ViewData["BreadcrumbNode"] = editPage;
+                vendor.HasClaims = hasClaims;
                 return View(vendor);
             }
             catch (Exception ex)
@@ -788,11 +811,21 @@ namespace risk.control.system.Controllers
                     notifyService.Error("OOPS !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
+
+                var vendorUser = await _context.VendorApplicationUser.Where(v => v.VendorId == VendorId).ToListAsync();
+                foreach(var user in vendorUser)
+                {
+                    user.Updated = DateTime.Now;
+                    user.UpdatedBy = HttpContext.User?.Identity?.Name;
+                    user.Deleted = true;
+                    _context.VendorApplicationUser.Update(user);
+                }
                 vendor.Updated = DateTime.Now;
                 vendor.UpdatedBy = HttpContext.User?.Identity?.Name;
-                _context.Vendor.Remove(vendor);
+                vendor.Deleted = true;
+                _context.Vendor.Update(vendor);
                 await _context.SaveChangesAsync();
-                notifyService.Custom($"Agency deleted successfully.", 3, "red", "fas fa-building");
+                notifyService.Custom($"Agency {vendor.Email} deleted successfully.", 3, "red", "fas fa-building");
                 return RedirectToAction(nameof(Agencies));
             }
             catch (Exception ex)
