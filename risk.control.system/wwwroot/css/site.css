@@ -1397,3 +1397,19 @@ ul#messagesList {
     overflow: hidden; /* Ensures overflow is hidden */
     text-overflow: ellipsis; /* Adds ellipsis if text overflows */
 }
+
+.trash-icon {
+    position: relative;
+    padding-left: 2rem; /* Adjust spacing for the icon */
+}
+
+.trash-icon::before {
+    content: "\f1f8"; /* Font Awesome trash icon unicode */
+    font-family: "Font Awesome 5 Free"; /* Use Font Awesome font */
+    font-weight: 900; /* Adjust for solid icon */
+    position: absolute;
+    left: 0.5rem; /* Adjust icon position */
+    top: 50%;
+    transform: translateY(-50%);
+    color: white; /* Icon color */
+}

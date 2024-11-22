@@ -85,7 +85,7 @@ namespace risk.control.system.Controllers.Company
 
                     if (uploadType == UploadType.FTP)
                     {
-                        var processed = await ftpService.DownloadFtpFile(userEmail, postedFile, uploadingway);
+                        var processed = await ftpService.UploadFtpFile(userEmail, postedFile, uploadingway);
                         if (processed)
                         {
                             notifyService.Custom($"FTP download complete ", 3, "green", "fa fa-upload");

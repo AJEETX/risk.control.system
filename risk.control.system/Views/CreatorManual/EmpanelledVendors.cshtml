@@ -532,7 +532,7 @@
                                         </td>
                                         <td>
                                             <a id="@item.Vendor.VendorId" onclick="showVendor(@item.Vendor.VendorId)"
-                                               class="link-underline-primary" asp-action="VendorDetailAuto" asp-route-selectedcase="@Model.ClaimsInvestigation.ClaimsInvestigationId"
+                                               class="link-underline-primary" asp-action="VendorDetail" asp-route-selectedcase="@Model.ClaimsInvestigation.ClaimsInvestigationId"
                                                asp-route-id="@item.Vendor.VendorId">
                                                 @Html.DisplayFor(modelItem => item.Vendor.Email)
                                             </a>

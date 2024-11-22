@@ -2,7 +2,6 @@
 
 @{
     ViewData["Title"] = @Applicationsettings.DELETE;
-    
 }
 <section class="content">
     <div class="container-fluid">
@@ -10,7 +9,7 @@
             <div class="col-12">
                 <div class="card card-secondary">
                     <div class="card-header">
-                        <h3 class="card-title"><i class="fas fa-paper-plane"></i> Agency Service</h3>
+                        <h3 class="card-title"><i class="fas fa-truck"></i> Delete Service</h3>
                     </div>
                     <div class="card-body">
                         <div class="submit-progress hidden">
@@ -97,13 +96,13 @@
                         </div>
                         <div class="row">
                             <div class="col-md-12 text-right">
-                                <form asp-action="Delete">
+                                <form id="create-form" asp-action="Delete">
                                     <input type="hidden" asp-for="VendorInvestigationServiceTypeId" name="id" />
                                     <a id="back" asp-controller="Vendors" asp-action="Service" asp-route-id="@Model.Vendor.VendorId" class="btn btn-secondary">
                                         <i class="fa fa-window-close"></i>
                                         @Applicationsettings.CANCEL
                                     </a> &nbsp;
-                                    <input type="submit" value="Delete" class="btn btn-danger" />
+                                    <input type="submit" value="Delete" class="btn btn-danger trash-icon" />
                                 </form>
                             </div>
                         </div>
@@ -112,5 +111,12 @@
             </div>
         </div>
     </div>
-
 </section>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script src="~/js/delete-user.js">
+
+    </script>
+}

@@ -452,6 +452,80 @@ namespace risk.control.system.Controllers
             return RedirectToAction(nameof(Index), "Dashboard");
         }
 
+        [Breadcrumb(title: " Delete", FromAction = "Users")]
+        public async Task<IActionResult> DeleteUser(long userId)
+        {
+            try
+            {
+                if (userId == null || userId == 0)
+                {
+                    notifyService.Error("OOPS!!!.Id Not Found.Try Again");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (currentUserEmail == null)
+                {
+                    notifyService.Error("Not Found!!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var model = _context.VendorApplicationUser.Include(v => v.Country).Include(v => v.State).Include(v => v.District).Include(v => v.PinCode).FirstOrDefault(c => c.Id == userId);
+                if (model == null)
+                {
+                    notifyService.Error("OOPS!!!.Claim Not Found.Try Again");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                notifyService.Error("OOPS!!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+
+        }
+        [HttpPost, ActionName("DeleteUser")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteUser(string email, long vendorId)
+        {
+            try
+            {
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (currentUserEmail == null)
+                {
+                    notifyService.Error("Not Found!!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                if (string.IsNullOrWhiteSpace(email))
+                {
+                    notifyService.Error("Not Found!!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var model = _context.VendorApplicationUser.Include(v => v.Country).Include(v => v.State).Include(v => v.District).Include(v => v.PinCode).FirstOrDefault(c => c.Email == email);
+                if (model == null)
+                {
+                    notifyService.Error("Not Found!!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+
+                model.Updated = DateTime.Now;
+                model.UpdatedBy = currentUserEmail;
+                model.Deleted = true;
+                _context.VendorApplicationUser.Update(model);
+                await _context.SaveChangesAsync();
+                notifyService.Custom($"User {model.Email} deleted", 3, "red", "fas fa-user-minus");
+                return RedirectToAction(nameof(VendorsController.Users), "Vendors",new {id = vendorId});
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                notifyService.Error("OOPS!!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+
+        }
+
         // GET: VendorApplicationUsers/Delete/5
         [Breadcrumb(" Roles", FromAction = "EditUser")]
         public async Task<IActionResult> UserRoles(string userId)

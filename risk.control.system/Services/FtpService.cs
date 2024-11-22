@@ -20,7 +20,7 @@ namespace risk.control.system.Services
     {
         Task<bool> UploadFile(string userEmail, IFormFile postedFile, string uploadingway);
 
-        Task<bool> DownloadFtpFile(string userEmail, IFormFile postedFile, string uploadingway);
+        Task<bool> UploadFtpFile(string userEmail, IFormFile postedFile, string uploadingway);
     }
 
     public class FtpService : IFtpService
@@ -34,14 +34,13 @@ namespace risk.control.system.Services
         {
             Credentials = new NetworkCredential(Applicationsettings.FTP_SITE_LOG, Applicationsettings.FTP_SITE_DATA),
         };
-
         public FtpService(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
             this.webHostEnvironment = webHostEnvironment;
         }
 
-        public async Task<bool> DownloadFtpFile(string userEmail, IFormFile postedFile, string uploadingway)
+        public async Task<bool> UploadFtpFile(string userEmail, IFormFile postedFile, string uploadingway)
         {
             try
             {
@@ -52,15 +51,17 @@ namespace risk.control.system.Services
                 }
 
                 string fileName = Path.GetFileName(postedFile.FileName);
-                string filePath = Path.Combine(folder, fileName);
-                using (FileStream stream = new FileStream(filePath, FileMode.Create))
+                string ftpUrl = Applicationsettings.FTP_SITE + fileName;  // Replace with your folder and filename
+
+                string localZipFilePath = Path.Combine(folder, fileName);
+                using (FileStream stream = new FileStream(localZipFilePath, FileMode.Create))
                 {
                     postedFile.CopyTo(stream);
                 }
+                byte[] fileBytes = await File.ReadAllBytesAsync(localZipFilePath);
+                var byesUploaded = await client.UploadDataTaskAsync(new Uri(ftpUrl), fileBytes);
 
-                var response = client.UploadFile(Applicationsettings.FTP_SITE + fileName, filePath);
-
-                var data = Encoding.UTF8.GetString(response);
+                Console.WriteLine("ZIP file uploaded successfully.");
 
                 var processed =await DownloadFtp(userEmail, uploadingway);
                 if(!processed)
@@ -68,7 +69,7 @@ namespace risk.control.system.Services
                     return false;
                 }
 
-                SaveUpload(postedFile, filePath, "Ftp download", userEmail);
+                await SaveUpload(postedFile, localZipFilePath, "Ftp download", userEmail);
                 return true;
             }
             catch (Exception ex)
@@ -87,7 +88,6 @@ namespace risk.control.system.Services
             }
             var files = GetFtpData();
             var zipFiles = files.Where(f => Path.GetExtension(f).Equals(".zip"));
-            client.Credentials = new NetworkCredential(Applicationsettings.FTP_SITE_LOG, Applicationsettings.FTP_SITE_DATA);
 
             foreach (var zipFile in zipFiles)
             {

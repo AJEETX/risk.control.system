@@ -49,7 +49,7 @@ namespace risk.control.system.Controllers.Api.Agency
                  .Include(u => u.State)
                  .Include(u => u.District)
                  .Include(u => u.PinCode)
-                 .Where(c => c.VendorId == vendorUser.VendorId);
+                 .Where(c => c.VendorId == vendorUser.VendorId && !c.Deleted);
 
             var users = vendorUsers?
                 .OrderBy(u => u.FirstName)
@@ -193,7 +193,7 @@ namespace risk.control.system.Controllers.Api.Agency
                   .Include(u => u.State)
                   .Include(u => u.District)
                   .Include(u => u.PinCode)
-                  .Where(c => c.VendorId == id);
+                  .Where(c => c.VendorId == id && !c.Deleted);
 
             var users = vendorUsers?
                 .OrderBy(u => u.FirstName)
