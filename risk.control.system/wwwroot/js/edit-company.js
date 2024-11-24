@@ -127,3 +127,7 @@ $(document).ready(function () {
         }
     });
 });
+const ExpiryDate = document.getElementById("ExpiryDate");
+const tomorrow = new Date();
+tomorrow.setDate(tomorrow.getDate() + 1); // Add 1 day to the current date
+ExpiryDate.min = tomorrow.toISOString().split("T")[0];

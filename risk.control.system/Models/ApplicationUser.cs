@@ -78,6 +78,8 @@ namespace risk.control.system.Models
 
         public AppRoles? Role { get; set; }
         public DateTime? LastActivityDate { get; set; }
+        public bool HasClaims { get; set; } = false;
+
     }
 
     public class ApplicationRole : IdentityRole<long>

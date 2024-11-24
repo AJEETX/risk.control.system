@@ -13,87 +13,94 @@
                 <div class="submit-progress hidden">
                     <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
                 </div>
-                <div class="form-group">
-                    <label>Profile Photo:</label>
-                    @if (Model?.ProfilePictureUrl is not null)
-                    {
-                        <img id="profileImage" class="form-Image" src="@Model?.ProfilePictureUrl">
-                    }
-                    else
-                    {
-                        <img id="profileImage" class="form-Image" src="@Applicationsettings.NO_USER">
-                    }
-                </div>
                 <div class="row">
-
                     <div class="col-md-6">
-                        <input type="hidden" asp-for="Email" />
-                        
-                        <div class="form-group">
-                            <label>Email:</label>
-                            <input readonly asp-for="Email" class="form-control" />
-                        </div>
-
-                        
-
-                        <div class="form-group">
-                            <label>First Name:</label>
-                            <input readonly asp-for="FirstName" class="form-control" />
-                        </div>
-
-                        <div class="form-group">
-                            <label>Last Name:</label>
-                            <input readonly asp-for="LastName" class="form-control" />
-                        </div>
-
-                        <div class="form-group">
-                            <label>Phone #:</label>
-                            <input readonly asp-for="PhoneNumber" class="form-control" />
-                        </div>
-
-                        <div class="form-group">
-                            <label>Role:</label>
-                            <input readonly value="@Model.UserRole" class="form-control" />
-                        </div>
-
-                        <div class="form-group">
-                            <label>Note:</label>
-                            <input readonly asp-for="Comments" class="form-control" />
-                        </div>
+                        <dl class="row">
+                            <dt class="col-sm-5">
+                                Profile photo
+                            </dt>
+                            <dd class="col-sm-5">
+                                @if (Model?.ProfilePictureUrl is not null)
+                                {
+                                    <img id="ProfileImage" class="form-Image" src="@Model?.ProfilePictureUrl">
+                                }
+                                else
+                                {
+                                    <img id="ProfileImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
+                                }
+                            </dd>
+                            <dt class="col-sm-5">
+                                @Html.DisplayNameFor(model => model.FirstName)
+                            </dt>
+                            <dd class="col-sm-5">
+                                @Html.DisplayFor(model => model.FirstName)
+                            </dd>
+                            <dt class="col-sm-5">
+                                @Html.DisplayNameFor(model => model.LastName)
+                            </dt>
+                            <dd class="col-sm-5">
+                                @Html.DisplayFor(model => model.LastName)
+                            </dd>
+                            <dt class="col-sm-5">
+                                @Html.DisplayNameFor(model => model.Email)
+                            </dt>
+                            <dd class="col-sm-5">
+                                <a href="#">  @Html.DisplayFor(model => model.Email)</a>
+                            </dd>
+                            <dt class="col-sm-5">
+                                @Html.DisplayNameFor(model => model.PhoneNumber)
+                            </dt>
+                            <dd class="col-sm-5">
+                                @Html.DisplayFor(model => model.PhoneNumber)
+                            </dd>
+                            <dt class="col-sm-5">
+                                @Html.DisplayNameFor(model => model.Active)
+                            </dt>
+                            <dd class="col-sm-5">
+                                @Html.DisplayFor(model => model.Active)
+                            </dd>
+                        </dl>
                     </div>
-
                     <div class="col-md-6">
-                        <div class="form-group">
-                            <label>Country:</label>
-                            <input readonly value="@Model.Country.Name" class="form-control" />
-                        </div>
+                        <dl class="row">
+                            <dt class="col-sm-5">
+                                @Html.DisplayNameFor(model => model.UserRole)
+                            </dt>
+                            <dd class="col-sm-5">
+                                @Html.DisplayFor(model => model.UserRole)
+                            </dd>
+                            <dt class="col-sm-5">
+                                @Html.DisplayNameFor(model => model.Addressline)
+                            </dt>
+                            <dd class="col-sm-5">
+                                @Html.DisplayFor(model => model.Addressline)
+                            </dd>
+                            <dt class="col-sm-5">
+                                @Html.DisplayNameFor(model => model.District)
+                            </dt>
+                            <dd class="col-sm-5">
+                                @Html.DisplayFor(model => model.District.Name)
+                            </dd>
+                            <dt class="col-sm-5">
+                                @Html.DisplayNameFor(model => model.State)
+                            </dt>
+                            <dd class="col-sm-5">
+                                @Html.DisplayFor(model => model.State.Name)
+                            </dd>
+                            <dt class="col-sm-5">
+                                @Html.DisplayNameFor(model => model.Country)
+                            </dt>
+                            <dd class="col-sm-5">
+                                @Html.DisplayFor(model => model.Country.Name)
+                            </dd>
+                            <dt class="col-sm-5">
+                                @Html.DisplayNameFor(model => model.PinCode)
+                            </dt>
+                            <dd class="col-sm-5">
+                                @Html.DisplayFor(model => model.PinCode.Code)
+                            </dd>
 
-                        <div class="form-group">
-                            <label>State:</label>
-                            <input readonly value="@Model.State.Name" class="form-control" />
-                        </div>
-
-                        <div class="form-group">
-                            <label>District:</label>
-                            <input readonly value="@Model.District.Name" class="form-control" />
-                        </div>
-
-                        <div class="form-group">
-                            <label>Pincode:</label>
-                            <input readonly value="@Model.PinCode.Name" class="form-control" />
-                        </div>
-
-                        <div class="form-group">
-                            <label>Address:</label>
-                            <input readonly asp-for="Addressline" class="form-control" />
-                        </div>
-
-                        <div class="form-group">
-                            <label>Status:</label>
-                            <div class="input-group-prepend">
-                            </div>
-                            <input asp-for="Active" type="checkbox" disabled data-toggle="toggle" data-on="<i class='fa fa-toggle-on'></i> Active " data-off="<i class='fa fa-toggle-off'></i> Lock" data-onstyle="secondary" data-offstyle="default" data-width="120" />
-                        </div>
+                        </dl>
                     </div>
                 </div>
             </div>
@@ -102,7 +109,20 @@
                     <div class="col-md-12">
                         <a id="back" asp-action="Users" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
                         <input type="hidden" asp-for="Email" name="email" />
-                        <input type="submit" value="Delete" class="btn btn-danger" />
+                        @if (Model.HasClaims)
+                        {
+                            <span id="withdraw-information-popup" class="badge badge-light">
+                                <div class="btn btn-outline-danger">
+                                    <i class="fa fa-trash"></i>  @Applicationsettings.DELETE <span class="badge badge-danger">
+                                        <i class="fas fa-info"></i>
+                                    </span>
+                                </div>
+                            </span>
+                        }
+                        else
+                        {
+                            <input type="submit" value="Delete" class="btn btn-danger" />
+                        }
                     </div>
                 </div>
             </div>
