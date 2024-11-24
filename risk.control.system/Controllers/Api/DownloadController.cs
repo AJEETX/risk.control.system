@@ -20,7 +20,7 @@ namespace risk.control.system.Controllers.Api
         {
             var userEmail = HttpContext.User.Identity.Name;
 
-            var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
+            var applicationUser =await _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefaultAsync();
             if (applicationUser == null)
             {
                 return NotFound();
@@ -37,14 +37,14 @@ namespace risk.control.system.Controllers.Api
         {
             var userEmail = HttpContext.User.Identity.Name;
 
-            var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
+            var applicationUser = await _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefaultAsync();
             if (applicationUser == null)
             {
                 return NotFound();
             }
 
-            var userMailbox = _context.Mailbox.Include(m => m.Outbox)
-                .FirstOrDefault(c => c.Name == applicationUser.Email);
+            var userMailbox = await _context.Mailbox.Include(m => m.Outbox)
+                .FirstOrDefaultAsync(c => c.Name == applicationUser.Email);
 
             OutboxMessage? outBox = userMailbox.Outbox.FirstOrDefault(c => c.OutboxMessageId == id);
 
@@ -54,14 +54,14 @@ namespace risk.control.system.Controllers.Api
         {
             var userEmail = HttpContext.User.Identity.Name;
 
-            var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
+            var applicationUser = await _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefaultAsync();
             if (applicationUser == null)
             {
                 return NotFound();
             }
 
-            var userMailbox = _context.Mailbox.Include(m => m.Sent)
-                .FirstOrDefault(c => c.Name == applicationUser.Email);
+            var userMailbox = await _context.Mailbox.Include(m => m.Sent)
+                .FirstOrDefaultAsync(c => c.Name == applicationUser.Email);
 
             SentMessage? sentBox = userMailbox.Sent.FirstOrDefault(c => c.SentMessageId == id);
 
@@ -71,14 +71,14 @@ namespace risk.control.system.Controllers.Api
         {
             var userEmail = HttpContext.User.Identity.Name;
 
-            var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
+            var applicationUser = await _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefaultAsync();
             if (applicationUser == null)
             {
                 return NotFound();
             }
 
-            var userMailbox = _context.Mailbox.Include(m => m.Trash)
-                .FirstOrDefault(c => c.Name == applicationUser.Email);
+            var userMailbox = await _context.Mailbox.Include(m => m.Trash)
+                .FirstOrDefaultAsync(c => c.Name == applicationUser.Email);
 
             TrashMessage? trash = userMailbox.Trash.FirstOrDefault(c => c.TrashMessageId == id);
 
@@ -89,7 +89,7 @@ namespace risk.control.system.Controllers.Api
         {
             var userEmail = HttpContext.User.Identity.Name;
 
-            var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
+            var applicationUser = await _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefaultAsync();
             if (applicationUser == null)
             {
                 return NotFound();
@@ -103,7 +103,7 @@ namespace risk.control.system.Controllers.Api
         {
             var userEmail = HttpContext.User.Identity.Name;
 
-            var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
+            var applicationUser = await _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefaultAsync();
             if (applicationUser == null)
             {
                 return NotFound();
@@ -117,7 +117,7 @@ namespace risk.control.system.Controllers.Api
         {
             var userEmail = HttpContext.User.Identity.Name;
 
-            var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
+            var applicationUser = await _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefaultAsync();
             if (applicationUser == null)
             {
                 return NotFound();

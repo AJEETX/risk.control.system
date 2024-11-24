@@ -62,7 +62,7 @@ namespace risk.control.system.Controllers
             var model = new ChatMessage { FromUser = applicationUser, FromUserEmail = userEmail };
             return View(model);
         }
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
             return RedirectToAction("Inbox");
         }

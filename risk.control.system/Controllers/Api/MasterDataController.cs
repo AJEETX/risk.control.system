@@ -167,7 +167,7 @@ namespace risk.control.system.Controllers.Api
         [HttpGet("GetIpAddress")]
         public async Task<IActionResult> GetIpAddress()
         {
-            var ipAddresses = context.IpApiResponse.ToList();
+            var ipAddresses = await context.IpApiResponse.ToListAsync();
             return Ok(ipAddresses);
         }
     }

@@ -442,14 +442,6 @@ namespace risk.control.system.Controllers.Company
                 notifyService.Custom($"Beneficiary {caseLocation.BeneficiaryName} added successfully", 3, "green", "fas fa-user-tie");
 
                 return RedirectToAction(nameof(CreatorManualController.Details), "CreatorManual", new { id = caseLocation.ClaimsInvestigationId });
-
-                ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", caseLocation.CountryId);
-                ViewData["BeneficiaryRelationId"] = new SelectList(_context.BeneficiaryRelation.OrderBy(s => s.Code), "BeneficiaryRelationId", "Name", caseLocation.BeneficiaryRelationId);
-                ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name", caseLocation.DistrictId);
-                ViewData["StateId"] = new SelectList(_context.State, "StateId", "StateId", caseLocation.StateId);
-                ViewData["PinCodeId"] = new SelectList(_context.PinCode, "PinCodeId", "Code", caseLocation.PinCodeId);
-
-                return View(caseLocation);
             }
             catch (Exception ex)
             {
@@ -531,11 +523,6 @@ namespace risk.control.system.Controllers.Company
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
-            ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name", ecaseLocation.DistrictId);
-            ViewData["BeneficiaryRelationId"] = new SelectList(_context.BeneficiaryRelation, "BeneficiaryRelationId", "Name", ecaseLocation.BeneficiaryRelationId);
-            ViewData["PinCodeId"] = new SelectList(_context.PinCode, "PinCodeId", "Name", ecaseLocation.PinCodeId);
-            ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name", ecaseLocation.StateId);
-            return View(ecaseLocation);
         }
 
         [HttpPost, ActionName("Delete")]

@@ -43,7 +43,7 @@ namespace risk.control.system.Controllers
             this.toastNotification = toastNotification;
         }
 
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
             return View();
         }

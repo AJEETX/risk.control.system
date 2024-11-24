@@ -69,7 +69,7 @@ namespace risk.control.system.Controllers
         }
 
         [TempData]
-        public string ErrorMessage { get; set; }
+        public string ErrorMessage { get; set; } = string.Empty;
 
 
         [HttpGet]
@@ -199,11 +199,31 @@ namespace risk.control.system.Controllers
                                 });
                             var isAuthenticated = HttpContext.User.Identity.IsAuthenticated;
 
-                            if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN) && !user.Email.StartsWith("admin"))
+                            if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN) && user?.Email != null && !user.Email.StartsWith("admin"))
                             {
                                 var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct, "login-success", model.Email, isAuthenticated);
                                 var admin = _context.ApplicationUser.FirstOrDefault(u => u.IsSuperAdmin);
-                                string message = $"Dear {admin.Email}";
+                                string message = string.Empty;
+                                if (admin != null)
+                                {
+                                    message = $"Dear {admin.Email}";
+                                    message += $"                                       ";
+                                    message += $"                       ";
+                                    message += $"User {user.Email} logged in from IP address {ipApiResponse.query}";
+                                    message += $"                                       ";
+                                    message += $"Thanks                                         ";
+                                    message += $"                                       ";
+                                    message += $"                                       ";
+                                    message += $"{BaseUrl}";
+                                    try
+                                    {
+                                        await smsService.DoSendSmsAsync("+" + admin.PhoneNumber, message);
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        Console.WriteLine(ex.ToString());
+                                    }
+                                }
                                 message += $"                                       ";
                                 message += $"                       ";
                                 message += $"User {user.Email} logged in from IP address {ipApiResponse.query}";

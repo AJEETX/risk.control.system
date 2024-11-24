@@ -354,7 +354,6 @@ namespace risk.control.system.Services
             {
                 throw;
             }
-            return claimsInvestigation;
         }
 
         public async Task<ClaimsInvestigation> EditCustomer(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? customerDocument)
@@ -408,7 +407,6 @@ namespace risk.control.system.Services
             {
                 throw;
             }
-            return claimsInvestigation;
         }
 
         public async Task<ClaimsInvestigation> CreateCustomer(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? claimDocument, IFormFile? customerDocument, bool create = true)

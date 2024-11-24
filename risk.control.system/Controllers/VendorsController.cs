@@ -56,7 +56,7 @@ namespace risk.control.system.Controllers
             return RedirectToAction("Agencies");
         }
 
-        [Breadcrumb("All Agencies", FromAction = "Index")]
+        [Breadcrumb("Agencies", FromAction = "Index")]
         public IActionResult Agencies()
         {
             return View();
@@ -131,7 +131,7 @@ namespace risk.control.system.Controllers
             ViewData["vendorId"] = id;
 
             var agencysPage = new MvcBreadcrumbNode("Agencies", "Vendors", "Manager Agency(s)");
-            var agency2Page = new MvcBreadcrumbNode("Agencies", "Vendors", "All Agencies") { Parent = agencysPage, };
+            var agency2Page = new MvcBreadcrumbNode("Agencies", "Vendors", "Agencies") { Parent = agencysPage, };
             var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Manage Agency") { Parent = agency2Page, RouteValues = new { id = id } };
             var editPage = new MvcBreadcrumbNode("Users", "Vendors", $"Manager Users") { Parent = agencyPage, RouteValues = new { id = id } };
             ViewData["BreadcrumbNode"] = editPage;
@@ -147,7 +147,7 @@ namespace risk.control.system.Controllers
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
 
             var agencysPage = new MvcBreadcrumbNode("Agencies", "Vendors", "Manager Agency(s)");
-            var agency2Page = new MvcBreadcrumbNode("Agencies", "Vendors", "All Agencies") { Parent = agencysPage, };
+            var agency2Page = new MvcBreadcrumbNode("Agencies", "Vendors", "Agencies") { Parent = agencysPage, };
             var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Manage Agency") { Parent = agency2Page, RouteValues = new { id = id } };
             var usersPage = new MvcBreadcrumbNode("Users", "Vendors", $"Manager Users") { Parent = agencyPage, RouteValues = new { id = id } };
             var editPage = new MvcBreadcrumbNode("CreateUser", "Vendors", $"Add User") { Parent = usersPage, RouteValues = new { id = id } };
@@ -309,7 +309,7 @@ namespace risk.control.system.Controllers
 
 
                 var agencysPage = new MvcBreadcrumbNode("Agencies", "Vendors", "Manager Agency(s)");
-                var agency2Page = new MvcBreadcrumbNode("Agencies", "Vendors", "All Agencies") { Parent = agencysPage, };
+                var agency2Page = new MvcBreadcrumbNode("Agencies", "Vendors", "Agencies") { Parent = agencysPage, };
                 var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Manage Agency") { Parent = agency2Page, RouteValues = new { id = vendor.VendorId } };
                 var usersPage = new MvcBreadcrumbNode("Users", "Vendors", $"Manager Users") { Parent = agencyPage, RouteValues = new { id = vendor.VendorId } };
                 var editPage = new MvcBreadcrumbNode("EditUser", "Vendors", $"Edit User") { Parent = usersPage, RouteValues = new { id = userId } };
@@ -457,7 +457,7 @@ namespace risk.control.system.Controllers
         {
             try
             {
-                if (userId == null || userId == 0)
+                if (userId < 1 || userId == 0)
                 {
                     notifyService.Error("OOPS!!!.Id Not Found.Try Again");
                     return RedirectToAction(nameof(Index), "Dashboard");
@@ -468,7 +468,7 @@ namespace risk.control.system.Controllers
                     notifyService.Error("Not Found!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var model = _context.VendorApplicationUser.Include(v => v.Country).Include(v => v.State).Include(v => v.District).Include(v => v.PinCode).FirstOrDefault(c => c.Id == userId);
+                var model =await _context.VendorApplicationUser.Include(v => v.Country).Include(v => v.State).Include(v => v.District).Include(v => v.PinCode).FirstOrDefaultAsync(c => c.Id == userId);
                 if (model == null)
                 {
                     notifyService.Error("OOPS!!!.Claim Not Found.Try Again");
@@ -512,7 +512,7 @@ namespace risk.control.system.Controllers
                     notifyService.Error("Not Found!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var model = _context.VendorApplicationUser.Include(v => v.Country).Include(v => v.State).Include(v => v.District).Include(v => v.PinCode).FirstOrDefault(c => c.Email == email);
+                var model =await _context.VendorApplicationUser.Include(v => v.Country).Include(v => v.State).Include(v => v.District).Include(v => v.PinCode).FirstOrDefaultAsync(c => c.Email == email);
                 if (model == null)
                 {
                     notifyService.Error("Not Found!!!..Contact Admin");
@@ -576,7 +576,7 @@ namespace risk.control.system.Controllers
                 UserName = user.UserName,
                 VendorUserRoleViewModel = userRoles
             };
-            //var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "All Agencies");
+            //var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "Agencies");
             //var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Manage Agency") { Parent = agencysPage, RouteValues = new { id = user.VendorId } };
             //var usersPage = new MvcBreadcrumbNode("Index", "VendorUser", $"Manage Users") { Parent = agencyPage, RouteValues = new { id = user.VendorId } };
             //var editPage = new MvcBreadcrumbNode("UserRoles", "VendorApplicationUsers", $"Edit Role") { Parent = usersPage, RouteValues = new { id = user.Id } };
@@ -640,7 +640,7 @@ namespace risk.control.system.Controllers
             ViewData["vendorId"] = id;
 
             var agencysPage = new MvcBreadcrumbNode("Agencies", "Vendors", "Manager Agency(s)");
-            var agency2Page = new MvcBreadcrumbNode("Agencies", "Vendors", "All Agencies") { Parent = agencysPage, };
+            var agency2Page = new MvcBreadcrumbNode("Agencies", "Vendors", "Agencies") { Parent = agencysPage, };
             var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Manage Agency") { Parent = agency2Page, RouteValues = new { id = id } };
             var servicesPage = new MvcBreadcrumbNode("Service", "Vendors", $"Manager Service") { Parent = agencyPage, RouteValues = new { id = id } };
             ViewData["BreadcrumbNode"] = servicesPage;
@@ -743,7 +743,7 @@ namespace risk.control.system.Controllers
 
 
                 var agencysPage = new MvcBreadcrumbNode("Agencies", "Vendors", "Manager Agency(s)");
-                var agency2Page = new MvcBreadcrumbNode("Agencies", "Vendors", "All Agencies") { Parent = agencysPage, };
+                var agency2Page = new MvcBreadcrumbNode("Agencies", "Vendors", "Agencies") { Parent = agencysPage, };
                 var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Manage Agency") { Parent = agency2Page, RouteValues = new { id = id } };
                 var editPage = new MvcBreadcrumbNode("Edit", "Vendors", $"Edit Agency") { Parent = agencyPage } ;
                 ViewData["BreadcrumbNode"] = editPage;
@@ -862,7 +862,7 @@ namespace risk.control.system.Controllers
 
                 var hasClaims = _context.ClaimsInvestigation.Any(c => agencySubStatuses.Contains(c.InvestigationCaseSubStatus.InvestigationCaseSubStatusId) && c.VendorId == id );
                 var agencysPage = new MvcBreadcrumbNode("Agencies", "Vendors", "Manager Agency(s)");
-                var agencyPage = new MvcBreadcrumbNode("Agencies", "Vendors", "All Agencies") { Parent = agencysPage, };
+                var agencyPage = new MvcBreadcrumbNode("Agencies", "Vendors", "Agencies") { Parent = agencysPage, };
                 var editPage = new MvcBreadcrumbNode("Delete", "Vendors", $"Delete Agency") { Parent = agencyPage, RouteValues = new { id = id } };
                 ViewData["BreadcrumbNode"] = editPage;
                 vendor.HasClaims = hasClaims;

@@ -137,8 +137,6 @@ namespace risk.control.system.Services
             }
 
             string device = "0";
-            long? timestamp = null;
-            bool isMMS = false;
 
             string? attachments = $"<a href='{logo}'>team</a>";
 
@@ -298,12 +296,12 @@ namespace risk.control.system.Services
 
         public async Task<(ClaimMessage message, string yes, string no)> GetClaim(string baseUrl, string id)
         {
-            var claim = context.ClaimsInvestigation
+            var claim =await context.ClaimsInvestigation
              .Include(c => c.ClaimMessages)
              .Include(c => c.PolicyDetail)
              .Include(c => c.CustomerDetail)
                 .ThenInclude(c => c.PinCode)
-             .FirstOrDefault(c => c.ClaimsInvestigationId == id);
+             .FirstOrDefaultAsync(c => c.ClaimsInvestigationId == id);
             var assignedToAgentStatus = context.InvestigationCaseSubStatus.FirstOrDefault(
                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
             var beneficiary = context.BeneficiaryDetail
@@ -366,12 +364,12 @@ namespace risk.control.system.Services
 
         public async Task<string> SendSms2Customer(string currentUser, string claimId, string sms)
         {
-            var claim = context.ClaimsInvestigation
+            var claim = await context.ClaimsInvestigation
             .Include(c => c.ClaimMessages)
             .Include(c => c.PolicyDetail)
             .Include(c => c.CustomerDetail)
                .ThenInclude(c => c.PinCode)
-            .FirstOrDefault(c => c.ClaimsInvestigationId == claimId);
+            .FirstOrDefaultAsync(c => c.ClaimsInvestigationId == claimId);
 
             var mobile = claim.CustomerDetail.ContactNumber.ToString();
             var user = context.ApplicationUser.FirstOrDefault(u => u.Email == currentUser);
@@ -427,8 +425,8 @@ namespace risk.control.system.Services
 
         public async Task<string> SendSms2Beneficiary(string currentUser, string claimId, string sms)
         {
-            var beneficiary = context.BeneficiaryDetail.Include(b => b.ClaimsInvestigation).ThenInclude(c => c.PolicyDetail)
-               .FirstOrDefault(c => c.ClaimsInvestigationId == claimId);
+            var beneficiary =await context.BeneficiaryDetail.Include(b => b.ClaimsInvestigation).ThenInclude(c => c.PolicyDetail)
+               .FirstOrDefaultAsync(c => c.ClaimsInvestigationId == claimId);
 
             var mobile = beneficiary.BeneficiaryContactNumber.ToString();
             var user = context.ApplicationUser.FirstOrDefault(u => u.Email == currentUser);

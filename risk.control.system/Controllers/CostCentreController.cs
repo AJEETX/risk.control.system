@@ -23,7 +23,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: CostCentre
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
             return RedirectToAction("Profile");
         }
@@ -40,7 +40,7 @@ namespace risk.control.system.Controllers
         [Breadcrumb("Details")]
         public async Task<IActionResult> Details(long id)
         {
-            if (id == null || _context.CostCentre == null)
+            if (id < 1 || _context.CostCentre == null)
             {
                 return NotFound();
             }

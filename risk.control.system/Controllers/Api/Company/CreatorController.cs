@@ -330,10 +330,6 @@ namespace risk.control.system.Controllers.Api.Company
         {
             string ownerEmail = string.Empty;
             string ownerDomain = string.Empty;
-            ClientCompany company = null;
-            ClientCompanyApplicationUser companyuser = null;
-            Vendor vendorOwner = null;
-            VendorApplicationUser agent = null;
             string profileImage = string.Empty;
             var allocated2agent = _context.InvestigationCaseSubStatus.FirstOrDefault(
                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);

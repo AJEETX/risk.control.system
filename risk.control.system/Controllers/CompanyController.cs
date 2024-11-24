@@ -515,7 +515,7 @@ namespace risk.control.system.Controllers
         {
             try
             {
-                if (userId == null || userId == 0)
+                if (userId < 1 || userId == 0)
                 {
                     notifyService.Error("OOPS!!!.Id Not Found.Try Again");
                     return RedirectToAction(nameof(Index), "Dashboard");
@@ -526,7 +526,8 @@ namespace risk.control.system.Controllers
                     notifyService.Error("Not Found!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var model = _context.ClientCompanyApplicationUser.Include(v => v.Country).Include(v => v.State).Include(v => v.District).Include(v => v.PinCode).FirstOrDefault(c => c.Id == userId);
+                var model =await _context.ClientCompanyApplicationUser.Include(v => v.Country).Include(v => v.State).Include(v => v.District).Include(v => v.PinCode)
+                    .FirstOrDefaultAsync(c => c.Id == userId);
                 if (model == null)
                 {
                     notifyService.Error("OOPS!!!.Claim Not Found.Try Again");
@@ -560,7 +561,8 @@ namespace risk.control.system.Controllers
                     notifyService.Error("Not Found!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var model = _context.ClientCompanyApplicationUser.Include(v => v.Country).Include(v => v.State).Include(v => v.District).Include(v => v.PinCode).FirstOrDefault(c => c.Email == email);
+                var model =await _context.ClientCompanyApplicationUser.Include(v => v.Country).Include(v => v.State).Include(v => v.District).Include(v => v.PinCode)
+                    .FirstOrDefaultAsync(c => c.Email == email);
                 if (model == null)
                 {
                     notifyService.Error("Not Found!!!..Contact Admin");

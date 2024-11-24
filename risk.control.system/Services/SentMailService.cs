@@ -38,9 +38,9 @@ namespace risk.control.system.Services
 
         public async Task<SentMessage> GetSentMessagedetailReply(long messageId, string userEmail, string actiontype)
         {
-            var userMailbox = _context.Mailbox
+            var userMailbox =await _context.Mailbox
              .Include(m => m.Sent)
-             .FirstOrDefault(c => c.Name == userEmail);
+             .FirstOrDefaultAsync(c => c.Name == userEmail);
 
             var userMessage = userMailbox.Sent.FirstOrDefault(c => c.SentMessageId == messageId);
 
@@ -65,9 +65,9 @@ namespace risk.control.system.Services
 
         public async Task<SentMessage> GetSentMessagedetail(long messageId, string userEmail)
         {
-            var userMailbox = _context.Mailbox
+            var userMailbox =await _context.Mailbox
                 .Include(m => m.Sent)
-                .FirstOrDefault(c => c.Name == userEmail);
+                .FirstOrDefaultAsync(c => c.Name == userEmail);
 
             var userMessage = userMailbox.Sent.FirstOrDefault(c => c.SentMessageId == messageId);
             userMessage.Read = true;
@@ -78,16 +78,16 @@ namespace risk.control.system.Services
 
         public async Task<IEnumerable<SentMessage>> GetSentMessages(string userEmail)
         {
-            var userMailbox = _context.Mailbox.Include(m => m.Sent).FirstOrDefault(c => c.Name == userEmail);
+            var userMailbox = await _context.Mailbox.Include(m => m.Sent).FirstOrDefaultAsync(c => c.Name == userEmail);
             return userMailbox.Sent.OrderByDescending(o => o.SendDate)?.ToList();
         }
 
         public async Task<int> SentDelete(List<long> messages, long userId)
         {
-            var userMailbox = _context.Mailbox
+            var userMailbox = await _context.Mailbox
                            .Include(m => m.Sent)
                            .Include(m => m.Trash)
-                           .FirstOrDefault(c => c.ApplicationUserId == userId);
+                           .FirstOrDefaultAsync(c => c.ApplicationUserId == userId);
 
             var userSentMails = userMailbox.Sent.Where(d => messages.Contains(d.SentMessageId)).ToList();
 
@@ -111,9 +111,9 @@ namespace risk.control.system.Services
         {
             contactMessage.Message = HttpUtility.HtmlEncode(contactMessage.RawMessage);
 
-            var userMailbox = _context.Mailbox.FirstOrDefault(c => c.Name == userEmail);
+            var userMailbox =await  _context.Mailbox.FirstOrDefaultAsync(c => c.Name == userEmail);
 
-            var recepientMailbox = _context.Mailbox.FirstOrDefault(c => c.Name == contactMessage.ReceipientEmail);
+            var recepientMailbox = await _context.Mailbox.FirstOrDefaultAsync(c => c.Name == contactMessage.ReceipientEmail);
             contactMessage.SenderEmail = userEmail;
             contactMessage.SendDate = DateTime.Now;
             contactMessage.Read = false;

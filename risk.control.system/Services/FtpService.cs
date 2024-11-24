@@ -188,7 +188,7 @@ namespace risk.control.system.Services
 
             var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(c => c.Email == userEmail);
             bool userCanCreate = true;
-            var totalClaimsCreated = _context.ClaimsInvestigation.Count(c => !c.Deleted && c.ClientCompanyId == companyUser.ClientCompanyId);
+            var totalClaimsCreated = await _context.ClaimsInvestigation.CountAsync(c => !c.Deleted && c.ClientCompanyId == companyUser.ClientCompanyId);
             if (companyUser.ClientCompany.LicenseType == Standard.Licensing.LicenseType.Trial)
             {
                 if (totalClaimsCreated >= companyUser.ClientCompany.TotalCreatedClaimAllowed)

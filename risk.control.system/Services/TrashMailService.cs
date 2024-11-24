@@ -48,16 +48,16 @@ namespace risk.control.system.Services
 
         public async Task<IEnumerable<TrashMessage>> GetTrashMessages(string userEmail)
         {
-            var userMailbox = _context.Mailbox.Include(m => m.Trash).FirstOrDefault(c => c.Name == userEmail);
+            var userMailbox = await _context.Mailbox.Include(m => m.Trash).FirstOrDefaultAsync(c => c.Name == userEmail);
             return userMailbox.Trash.OrderByDescending(o => o.SendDate).ToList();
         }
 
         public async Task<int> TrashDelete(List<long> messages, long userId)
         {
-            var userMailbox = _context.Mailbox
+            var userMailbox =await _context.Mailbox
                            .Include(m => m.Trash)
                            .Include(m => m.Deleted)
-                           .FirstOrDefault(c => c.ApplicationUserId == userId);
+                           .FirstOrDefaultAsync(c => c.ApplicationUserId == userId);
 
             var userTrashMails = userMailbox.Trash.Where(d => messages.Contains(d.TrashMessageId)).ToList();
 
@@ -83,9 +83,9 @@ namespace risk.control.system.Services
 
         public async Task<int> TrashDetailsDelete(long id, string userEmail)
         {
-            var userMailbox = _context.Mailbox
+            var userMailbox = await _context.Mailbox
                .Include(m => m.Trash)
-               .FirstOrDefault(c => c.Name == userEmail);
+               .FirstOrDefaultAsync(c => c.Name == userEmail);
 
             var userTrashMessage = userMailbox.Trash.FirstOrDefault(c => c.TrashMessageId == id);
 

@@ -40,15 +40,15 @@ namespace risk.control.system.Services
 
         public async Task<IEnumerable<InboxMessage>> GetInboxMessages(string userEmail)
         {
-            var userMailbox = _context.Mailbox.Include(m => m.Inbox).FirstOrDefault(c => c.Name == userEmail);
+            var userMailbox = await _context.Mailbox.Include(m => m.Inbox).FirstOrDefaultAsync(c => c.Name == userEmail);
             return userMailbox.Inbox.OrderByDescending(o => o.SendDate).ToList();
         }
 
         public async Task<InboxMessage> GetInboxMessagedetail(long messageId, string userEmail)
         {
-            var userMailbox = _context.Mailbox
+            var userMailbox = await _context.Mailbox
                 .Include(m => m.Inbox)
-                .FirstOrDefault(c => c.Name == userEmail);
+                .FirstOrDefaultAsync(c => c.Name == userEmail);
 
             var userMessage = userMailbox.Inbox.FirstOrDefault(c => c.InboxMessageId == messageId);
             userMessage.Read = true;
@@ -61,9 +61,9 @@ namespace risk.control.system.Services
 
         public async Task<OutboxMessage> GetInboxMessagedetailReply(long messageId, string userEmail, string actiontype)
         {
-            var userMailbox = _context.Mailbox
+            var userMailbox = await _context.Mailbox
                 .Include(m => m.Inbox)
-                .FirstOrDefault(c => c.Name == userEmail);
+                .FirstOrDefaultAsync(c => c.Name == userEmail);
 
             var userMessage = userMailbox.Inbox.FirstOrDefault(c => c.InboxMessageId == messageId);
 
@@ -88,10 +88,10 @@ namespace risk.control.system.Services
 
         public async Task<int> InboxDelete(List<long> messages, long userId)
         {
-            var userMailbox = _context.Mailbox
+            var userMailbox =await  _context.Mailbox
                .Include(m => m.Inbox)
                .Include(m => m.Trash)
-               .FirstOrDefault(c => c.ApplicationUserId == userId);
+               .FirstOrDefaultAsync(c => c.ApplicationUserId == userId);
 
             var userInboxMails = userMailbox.Inbox.Where(d => messages.Contains(d.InboxMessageId)).ToList();
 
@@ -128,10 +128,10 @@ namespace risk.control.system.Services
 
         public async Task<int> InboxDetailsDelete(long id, string userEmail)
         {
-            var userMailbox = _context.Mailbox
+            var userMailbox =await _context.Mailbox
                 .Include(m => m.Inbox)
                 .Include(m => m.Trash)
-                .FirstOrDefault(c => c.Name == userEmail);
+                .FirstOrDefaultAsync(c => c.Name == userEmail);
 
             var message = userMailbox.Inbox.FirstOrDefault(c => c.InboxMessageId == id);
 
@@ -166,7 +166,7 @@ namespace risk.control.system.Services
 
         public async Task<bool> SendReplyMessage(OutboxMessage contactMessage, string userEmail, IFormFile? messageDocument)
         {
-            var userMailbox = _context.Mailbox.Include(m => m.Sent).Include(m => m.Outbox).FirstOrDefault(c => c.Name == userEmail);
+            var userMailbox = await _context.Mailbox.Include(m => m.Sent).Include(m => m.Outbox).FirstOrDefaultAsync(c => c.Name == userEmail);
 
             var recepientMailbox = _context.Mailbox.FirstOrDefault(c => c.Name == contactMessage.ReceipientEmail);
 

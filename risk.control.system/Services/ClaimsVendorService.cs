@@ -93,7 +93,7 @@ namespace risk.control.system.Services
 
         public async Task<ClaimsInvestigation> AllocateToVendorAgent(string userEmail, string selectedcase)
         {
-            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+            var vendorUser =await _context.VendorApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
 
             var claimsInvestigation = claimsService.GetClaims().FirstOrDefault(m => m.ClaimsInvestigationId == selectedcase && m.VendorId == vendorUser.VendorId);
 
@@ -185,7 +185,7 @@ namespace risk.control.system.Services
             
             var model = new ClaimsInvestigationVendorsModel { AgencyReport = claim.AgencyReport, Location = claim.BeneficiaryDetail, ClaimsInvestigation = claim };
             _context.ClaimsInvestigation.Update(claim);
-            var rows = _context.SaveChanges();
+            var rows =await _context.SaveChangesAsync();
             return model;
         }
 
@@ -199,14 +199,14 @@ namespace risk.control.system.Services
                 .Include(c => c.AgencyReport.DocumentIdReport)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == selectedcase);
 
-            var beneficiaryDetails = _context.BeneficiaryDetail
+            var beneficiaryDetails =await _context.BeneficiaryDetail
                 .Include(c => c.ClaimsInvestigation)
                 .Include(c => c.PinCode)
                 .Include(c => c.BeneficiaryRelation)
                 .Include(c => c.District)
                 .Include(c => c.Country)
                 .Include(c => c.State)
-                .FirstOrDefault(c => c.ClaimsInvestigationId == selectedcase);
+                .FirstOrDefaultAsync(c => c.ClaimsInvestigationId == selectedcase);
             
             if (claimsInvestigation.IsReviewCase)
             {
@@ -217,7 +217,7 @@ namespace risk.control.system.Services
 
         public async Task<ClaimTransactionModel> GetClaimsDetails(string userEmail, string selectedcase)
         {
-            var agencyUser = _context.VendorApplicationUser.FirstOrDefault(u=>u.Email == userEmail);
+            var agencyUser =await _context.VendorApplicationUser.FirstOrDefaultAsync(u=>u.Email == userEmail);
 
             var claimsInvestigation = claimsService.GetClaims()
                 .Include(c=>c.Vendor)

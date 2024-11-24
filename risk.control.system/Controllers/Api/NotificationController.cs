@@ -91,13 +91,9 @@ namespace risk.control.system.Controllers.Api
         [HttpPost("sms")]
         public async Task<IActionResult> SendSingleSMS(string mobile = "61432854196", string message = "SMS fom iCheckify team")
         {
-            string device = "0";
-            long? timestamp = null;
-            bool isMMS = false;
             string logo = "https://icheckify-demo.azurewebsites.net/img/iCheckifyLogo.png";
             string? attachments = $"<a href='{logo}'>team</a>";
             var finalMessage = $"{message} Date: {DateTime.Now.ToString("dd-MMM-yyyy HH:mm")} {logo}";
-            bool priority = true;
             await smsService.DoSendSmsAsync("+" + mobile, finalMessage);
             return Ok();
         }

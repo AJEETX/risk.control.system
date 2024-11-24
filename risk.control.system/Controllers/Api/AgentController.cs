@@ -202,7 +202,6 @@ namespace risk.control.system.Controllers.Api
                 //{
                 //    return BadRequest("face mismatch");
                 //}
-                return Ok(new { Email = mobileUidExist.Email, Pin = mobileUidExist.SecretPin });
             }
             catch (Exception ex)
             {

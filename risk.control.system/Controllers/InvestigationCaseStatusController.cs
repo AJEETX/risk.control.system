@@ -21,7 +21,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: RiskCaseStatus
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
             return RedirectToAction("Profile");
         }

@@ -30,7 +30,7 @@ namespace risk.control.system.Controllers.Api.Company
         }
 
         [HttpGet("AllCompanies")]
-        public async Task<IActionResult> AllCompanies()
+        public IActionResult AllCompanies()
         {
             var companies = _context.ClientCompany
                 .Include(v => v.Country)
@@ -63,8 +63,8 @@ namespace risk.control.system.Controllers.Api.Company
         public async Task<IActionResult> CompanyUsers(long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
-            var adminUser = _context.ApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-            if (!adminUser.IsSuperAdmin)
+            var adminUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
+            if (adminUser is null || !adminUser.IsSuperAdmin)
             {
                 return BadRequest();
             }
@@ -104,9 +104,9 @@ namespace risk.control.system.Controllers.Api.Company
         public async Task<IActionResult> AllUsers()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
-            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+            var companyUser =await _context.ClientCompanyApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
 
-            var company = _context.ClientCompany
+            var company = await _context.ClientCompany
                 .Include(c => c.CompanyApplicationUser)
                 .ThenInclude(u => u.PinCode)
                 .Include(c => c.CompanyApplicationUser)
@@ -115,7 +115,7 @@ namespace risk.control.system.Controllers.Api.Company
                 .ThenInclude(u => u.District)
                 .Include(c => c.CompanyApplicationUser)
                 .ThenInclude(u => u.State)
-                .FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
+                .FirstOrDefaultAsync(c => c.ClientCompanyId == companyUser.ClientCompanyId);
 
             var users = company.CompanyApplicationUser
                 .Where(u => !u.Deleted)
@@ -147,7 +147,7 @@ namespace risk.control.system.Controllers.Api.Company
         public async Task<IActionResult> GetEmpanelledVendors()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
-            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+            var companyUser = await _context.ClientCompanyApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
 
             var company = _context.ClientCompany
                 .Include(c => c.CompanyApplicationUser)
@@ -187,7 +187,7 @@ namespace risk.control.system.Controllers.Api.Company
         public async Task<IActionResult> GetAvailableVendors()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
-            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+            var companyUser = await _context.ClientCompanyApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
 
             var company = _context.ClientCompany
                 .Include(c => c.CompanyApplicationUser)
@@ -239,7 +239,7 @@ namespace risk.control.system.Controllers.Api.Company
         public async Task<IActionResult> AllServices(long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
-            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+            var vendorUser = await _context.VendorApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
 
             var vendor = _context.Vendor
                 .Include(i => i.VendorInvestigationServiceTypes)

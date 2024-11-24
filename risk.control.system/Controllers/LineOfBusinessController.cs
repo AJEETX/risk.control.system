@@ -23,7 +23,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: RiskCaseTypes
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
             return RedirectToAction("Profile");
         }
@@ -40,7 +40,7 @@ namespace risk.control.system.Controllers
         [Breadcrumb("Details")]
         public async Task<IActionResult> Details(long id)
         {
-            if (id == null || _context.LineOfBusiness == null)
+            if (id < 1 || _context.LineOfBusiness == null)
             {
                 toastNotification.AddErrorToastMessage("line of business not found!");
                 return NotFound();
