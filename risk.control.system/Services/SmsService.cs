@@ -36,7 +36,7 @@ namespace risk.control.system.Services
             {
                 var url = "https://api.sms-gate.app/3rdparty/v1/message";
                 var username = "YXNGBE";
-                var password = "rfi-gbbukll7-6";
+                var password = Environment.GetEnvironmentVariable("SMS_Pwd");
                 var authToken = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{username}:{password}"));
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authToken);
                 mobile = mobile.StartsWith("+") ? mobile : "+" + mobile;
