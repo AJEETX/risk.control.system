@@ -32,7 +32,8 @@ namespace risk.control.system.Controllers.Api.Company
         [HttpGet("AllCompanies")]
         public IActionResult AllCompanies()
         {
-            var companies = _context.ClientCompany
+            var companies = _context.ClientCompany.
+                Where(v =>!v.Deleted)
                 .Include(v => v.Country)
                 .Include(v => v.PinCode)
                 .Include(v => v.District)
@@ -43,7 +44,7 @@ namespace risk.control.system.Controllers.Api.Company
                 {
                     Id = u.ClientCompanyId,
                     Document = string.IsNullOrWhiteSpace(u.DocumentUrl) ? Applicationsettings.NO_IMAGE : u.DocumentUrl,
-                    Domain = "<a href=''>" + u.Email + "</a>",
+                    Domain = $"<a href='/ClientCompany/Details?Id={u.ClientCompanyId}'>" + u.Email + "</a>",
                     Name = u.Name,
                     Code = u.Code,
                     Phone = u.PhoneNumber,
