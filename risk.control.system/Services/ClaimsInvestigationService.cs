@@ -41,6 +41,7 @@ namespace risk.control.system.Services
 
         Task<List<string>> ProcessAutoAllocation(List<string> claims, ClientCompany company, string userEmail);
         Task<bool> WithdrawCaseByCompany(string userEmail, ClaimTransactionModel model, string claimId);
+        Task<bool> SubmitNotes(string userEmail, string claimId, string notes);
 
         Task<ClaimsInvestigation> SubmitQueryToAgency(string userEmail, string claimId, EnquiryRequest request, IFormFile messageDocument);
         Task<ClaimsInvestigation> SubmitQueryReplyToCompany(string userEmail, string claimId, EnquiryRequest request, IFormFile messageDocument, List<string> flexRadioDefault);
@@ -1446,6 +1447,23 @@ namespace risk.control.system.Services
                 Console.WriteLine(ex.StackTrace);
                 throw;
             }
+        }
+
+        public async Task<bool> SubmitNotes(string userEmail, string claimId, string notes)
+        {
+            var claim = _context.ClaimsInvestigation
+               .Include(c => c.ClaimNotes)
+               .FirstOrDefault(c => c.ClaimsInvestigationId == claimId);
+            claim.ClaimNotes.Add(new ClaimNote
+            {
+                 Comment = notes,
+                 Sender = userEmail,
+                Created = DateTime.Now,
+                Updated = DateTime.Now,
+                UpdatedBy = userEmail
+            });
+            _context.ClaimsInvestigation.Update(claim);
+            return await _context.SaveChangesAsync() > 0;
         }
     }
 }

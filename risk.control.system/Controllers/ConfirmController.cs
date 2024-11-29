@@ -9,10 +9,12 @@ namespace risk.control.system.Controllers
     public class ConfirmController : Controller
     {
         private readonly INotificationService notificationService;
+        private readonly IClaimsInvestigationService claimsInvestigationService;
 
-        public ConfirmController(INotificationService notificationService)
+        public ConfirmController(INotificationService notificationService, IClaimsInvestigationService claimsInvestigationService)
         {
             this.notificationService = notificationService;
+            this.claimsInvestigationService = claimsInvestigationService;
         }
 
         [HttpGet]
@@ -54,6 +56,33 @@ namespace risk.control.system.Controllers
                 return BadRequest("Error !!!");
             }
             return Ok(new { message = "Message Sent: Success", customerName = customerName });
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> SubmitNotes(string claimId, string name)
+        {
+            try
+            {
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (string.IsNullOrWhiteSpace(currentUserEmail))
+                {
+                    return Unauthorized("Error !!!");
+                }
+
+
+                var model = await claimsInvestigationService.SubmitNotes(currentUserEmail, claimId, name);
+                if (model)
+                {
+                    return Ok(new { message = "Notes added: Success" });
+                }
+                return BadRequest("Error !!!");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                    return Unauthorized("Error !!!");
+            }
         }
     }
 }

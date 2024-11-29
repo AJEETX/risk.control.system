@@ -226,9 +226,7 @@
                                                     </ul>
                                                 </div>
                                                 <div class="col-5 text-center">
-                                                    <p class="text-muted text-sm">
-
-                                                    </p>
+                                                    
                                                     <p class="text-muted text-sm">
                                                         @if (Model?.ClaimsInvestigation?.PolicyDetail.DocumentImage is not null)
                                                         {
@@ -240,7 +238,16 @@
                                                                  class="img-fluid form-Image" src=@Applicationsettings.NO_POLICY_IMAGE data-toggle="tooltip" title="No Document">
                                                         }
                                                     </p>
-
+                                                    <p class="text-muted text-sm">
+                                                        @if (Model.ClaimsInvestigation.ClaimNotes.Count > 0)
+                                                        {
+                                                            <img id="notesDetail" class="img-fluid form-Image img-circle" src="@Applicationsettings.POLICY_BLANK_IMAGE" data-toggle="tooltip" title="Display Policy notes">
+                                                        }
+                                                        else
+                                                        {
+                                                            <img id="notesDetail-disabled" class="img-fluid form-Image img-circle" src="@Applicationsettings.NO_POLICY_IMAGE" data-toggle="tooltip" title="No Policy notes">
+                                                        }
+                                                    </p>
                                                 </div>
                                             </div>
                                         </div>

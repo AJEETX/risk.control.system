@@ -76,6 +76,7 @@ namespace risk.control.system.Services
               .ThenInclude(c => c.PinCode)
               .Include(c => c.CustomerDetail)
               .ThenInclude(c => c.State)
+              .Include(c => c.ClaimNotes)
                 .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == selectedcase);
 
             var location = await _context.BeneficiaryDetail
@@ -149,6 +150,7 @@ namespace risk.control.system.Services
                 .ThenInclude(c => c.PinCode)
                 .Include(c => c.CustomerDetail)
                 .ThenInclude(c => c.State)
+                .Include(c => c.ClaimNotes)
                 .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == id);
             return claimsInvestigation;
         }
@@ -179,7 +181,6 @@ namespace risk.control.system.Services
                 .Include(c => c.PolicyDetail)
                 .ThenInclude(c => c.CaseEnabler)
             .Include(c=> c.Vendor)
-
                 .Include(c => c.BeneficiaryDetail)
                 .ThenInclude(c => c.PinCode)
                 .Include(c => c.BeneficiaryDetail)
@@ -188,7 +189,6 @@ namespace risk.control.system.Services
                 .ThenInclude(c => c.State)
                 .Include(c => c.BeneficiaryDetail)
                 .ThenInclude(c => c.Country)
-               
                 .Include(c => c.BeneficiaryDetail)
                 .ThenInclude(c => c.BeneficiaryRelation)
                 .Include(c => c.PolicyDetail)
@@ -207,6 +207,7 @@ namespace risk.control.system.Services
                 .ThenInclude(c => c.PinCode)
                 .Include(c => c.CustomerDetail)
                 .ThenInclude(c => c.State)
+                .Include(c=>c.ClaimNotes)
                 .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == id);
 
             var location = claimsInvestigation.BeneficiaryDetail;
@@ -265,6 +266,7 @@ namespace risk.control.system.Services
                 .ThenInclude(c => c.PinCode)
                 .Include(c => c.CustomerDetail)
                 .ThenInclude(c => c.State)
+                .Include(c => c.ClaimNotes)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == selectedcase);
             var submittedToAssessorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);

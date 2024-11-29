@@ -27,11 +27,9 @@ namespace risk.control.system.Controllers.Agency
         private readonly IClaimsVendorService vendorService;
         private readonly IMailboxService mailboxService;
         private readonly ApplicationDbContext _context;
-        private readonly IWebHostEnvironment webHostEnvironment;
 
         public ClaimsVendorPostController(
             IClaimsInvestigationService claimsInvestigationService,
-            IWebHostEnvironment webHostEnvironment,
             INotyfService notifyService,
             IClaimsVendorService vendorService,
             IMailboxService mailboxService,
@@ -42,7 +40,6 @@ namespace risk.control.system.Controllers.Agency
             this.vendorService = vendorService;
             this.mailboxService = mailboxService;
             _context = context;
-            this.webHostEnvironment = webHostEnvironment;
             UserList = new List<UsersViewModel>();
         }
 

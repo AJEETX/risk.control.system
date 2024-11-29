@@ -710,14 +710,66 @@ $(document).ready(function () {
         })
     })
 
+    $('#notesDetail').click(function () {
+        $.confirm({
+            title: 'Policy Note!!!',
+            closeIcon: true,
+            type: 'green',
+            icon: 'far fa-file-powerpoint',
+            buttons: {
+                confirm: {
+                    text: "Close",
+                    btnClass: 'btn-secondary',
+                    action: function () {
+                        askConfirmation = false;
+                    }
+                }
+            },
+            content: function () {
+                var self = this;
+                const date = new Date();
+                const day = String(date.getDate()).padStart(2, '0');
+                const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+                const year = date.getFullYear();
+                const formattedDate = `${day}-${month}-${year}`;
+
+                const hours = String(date.getHours()).padStart(2, '0');
+                const minutes = String(date.getMinutes()).padStart(2, '0');
+                const seconds = String(date.getSeconds()).padStart(2, '0');
+                const formattedTime = `${hours}:${minutes}:${seconds}`;
+
+                return $.ajax({
+                    url: '/api/ClaimsInvestigation/GetPolicyNotes?claimId=' + $('#claimId').val(),
+                    dataType: 'json',
+                    method: 'get'
+                }).done(function (response) {
+                    self.setContent('<header>');
+                   
+                    self.setContentAppend('</header>');
+                    $.each(response.notes, function (index, note) {
+                        self.setContentAppend('<hr>');
+                        self.setContentAppend('<b><i class="fas fa-clock"></i> Notes added date</b>: ' + formattedDate);
+                        self.setContentAppend('<br><b><i class="fas fa-clock"></i> Notes added time</b>: ' + formattedTime);
+                        self.setContentAppend('<br><b><i class="fas fa-user-tag"></i>  Sender</b> : ' + note.sender);
+                        self.setContentAppend('<br><b><i class="far fa-id-badge"></i> Note</b>: ' + note.comment);
+                        self.setContentAppend('<hr>');
+                    })
+                }).fail(function () {
+                    self.setContent('Something went wrong.');
+                });
+            }
+        })
+    })
+
     $('#policy-comments').click(function () {
+        var claimId = $('#claimId').val();
         $.confirm({
             title: 'Policy Note!!!',
             closeIcon: true,
             type: 'green',
             icon: 'far fa-file-powerpoint',
             content: '' +
-                '<form action="" class="formName">' +
+                '<form method="post" action="Confirm/SubmitNotes?claimId="' + claimId + ' class="formName">' +
                 '<div class="form-group">' +
                 '<hr>' +
                 '<label>Enter note on Policy</label>' +
@@ -740,7 +792,33 @@ $(document).ready(function () {
                             });
                             return false;
                         }
-                        $.alert('Policy note is ' + name);
+                        else {
+                            
+                            return $.ajax({
+                                url: '/Confirm/SubmitNotes?claimId=' + $('#claimId').val() + '&name=' + name,
+                                method: 'get'
+                            }).done(function (response) {
+                                $.alert({
+                                    title: 'Policy notes added!',
+                                    closeIcon: true,
+                                    type: 'green',
+                                    icon: 'far fa-comments',
+                                    content: 'Status: ' + response.message,
+                                    buttons: {
+                                        ok: {
+                                            text: 'Close',
+                                        }
+                                    }
+                                });
+                            }).fail(function (response) {
+                                $.alert({
+                                    title: 'Message Status!',
+                                    content: 'Status: failed',
+                                });
+                            }).always(function () {
+
+                            });
+                        }
                     }
                 },
                 cancel: function () {

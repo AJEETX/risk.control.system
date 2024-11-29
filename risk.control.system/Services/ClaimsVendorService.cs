@@ -164,6 +164,7 @@ namespace risk.control.system.Services
         public async Task<ClaimsInvestigationVendorsModel> GetInvestigate(string userEmail, string selectedcase, bool uploaded = false)
         {
             var claim = claimsService.GetClaims()
+                .Include(c => c.ClaimNotes)
                 .Include(c => c.AgencyReport)
                 .ThenInclude(c => c.DigitalIdReport)
                 .Include(c => c.AgencyReport)
@@ -192,6 +193,7 @@ namespace risk.control.system.Services
         public async Task<ClaimsInvestigationVendorsModel> GetInvestigateReport(string userEmail, string selectedcase)
         {
             var claimsInvestigation = claimsService.GetClaims()
+                .Include(c => c.ClaimNotes)
                 .Include(c => c.AgencyReport)
                 .ThenInclude(c=>c.EnquiryRequest)
                 .Include(c => c.AgencyReport.DigitalIdReport)
@@ -226,6 +228,7 @@ namespace risk.control.system.Services
                 .Include(c=>c.AgencyReport.DigitalIdReport)
                 .Include(c=>c.AgencyReport.DocumentIdReport)
                 .Include(c=>c.AgencyReport.ReportQuestionaire)
+                .Include(c=>c.ClaimNotes)
                 .FirstOrDefault(m => m.ClaimsInvestigationId == selectedcase);
             
             claimsInvestigation.AgencyDeclineComment = string.Empty;

@@ -267,6 +267,9 @@ a.table-link {
     width: auto;
 }
 
+#notesDetail {
+    cursor: pointer;
+}
 #ocr-map {
     height: 300px;
     width: auto;

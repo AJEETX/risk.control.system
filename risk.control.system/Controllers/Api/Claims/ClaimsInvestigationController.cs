@@ -69,6 +69,19 @@ namespace risk.control.system.Controllers.Api.Claims
             return Ok(response);
         }
 
+        [HttpGet("GetPolicyNotes")]
+        public async Task<IActionResult> GetPolicyNotes(string claimId)
+        {
+            var claim = claimsService.GetClaims()
+                .Include(c => c.ClaimNotes)
+                .FirstOrDefault(c => c.ClaimsInvestigationId == claimId);
+
+            var response = new
+            {
+                notes = claim.ClaimNotes.ToList()
+            };
+            return Ok(response);
+        }
         [HttpGet("GetCustomerDetail")]
         public async Task<IActionResult> GetCustomerDetail(string id)
         {

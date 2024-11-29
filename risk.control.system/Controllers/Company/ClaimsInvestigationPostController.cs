@@ -305,5 +305,36 @@ namespace risk.control.system.Controllers.Company
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SubmitNotes(string claimId, string name)
+        {
+            try
+            {
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (string.IsNullOrWhiteSpace(currentUserEmail))
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                
+
+                var model = await claimsInvestigationService.SubmitNotes(currentUserEmail, claimId, name);
+                if (model)
+                {
+                    notifyService.Success("Notes added");
+                    return Ok();
+                }
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+        }
     }
 }

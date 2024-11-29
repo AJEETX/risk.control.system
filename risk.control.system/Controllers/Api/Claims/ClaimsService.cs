@@ -65,6 +65,7 @@ namespace risk.control.system.Controllers.Api.Claims
                .Include(c => c.CustomerDetail)
                .ThenInclude(c => c.State)
                .Include(c => c.Vendor)
+               .Include(c => c.ClaimNotes)
                 .Where(c => !c.Deleted);
             return applicationDbContext.OrderByDescending(o => o.Created);
         }
