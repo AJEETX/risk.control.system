@@ -275,6 +275,11 @@ a.table-link {
     width: auto;
 }
 
+#passport-map {
+    height: 300px;
+    width: auto;
+}
+
 .ocr-data {
     width: 200px;
     border: 1px solid #ccc;

@@ -710,7 +710,7 @@ $(document).ready(function () {
         })
     })
 
-    $('#notesDetail').click(function () {
+    $('#notesDetail').on('click',function () {
         $.confirm({
             title: 'Policy Note!!!',
             closeIcon: true,
@@ -744,7 +744,6 @@ $(document).ready(function () {
                     method: 'get'
                 }).done(function (response) {
                     self.setContent('<header>');
-                   
                     self.setContentAppend('</header>');
                     $.each(response.notes, function (index, note) {
                         self.setContentAppend('<hr>');
@@ -756,6 +755,8 @@ $(document).ready(function () {
                     })
                 }).fail(function () {
                     self.setContent('Something went wrong.');
+                }).always(function () {
+                    
                 });
             }
         })
@@ -763,6 +764,7 @@ $(document).ready(function () {
 
     $('#policy-comments').click(function () {
         var claimId = $('#claimId').val();
+        const imgElement = document.getElementById("notesDetail-disabled");
         $.confirm({
             title: 'Policy Note!!!',
             closeIcon: true,
@@ -816,7 +818,11 @@ $(document).ready(function () {
                                     content: 'Status: failed',
                                 });
                             }).always(function () {
-
+                                if (imgElement) {
+                                    imgElement.title = "Display Policy notes"
+                                    imgElement.id = "notesDetail";
+                                    imgElement.src = "/img/blank-document.png";
+                                }
                             });
                         }
                     }

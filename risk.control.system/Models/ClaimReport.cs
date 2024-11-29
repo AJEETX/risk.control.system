@@ -12,7 +12,8 @@ namespace risk.control.system.Models
 
         public ReportQuestionaire ReportQuestionaire { get; set; } = new ReportQuestionaire();
 
-        public DocumentIdReport? DocumentIdReport { get; set; } = new DocumentIdReport();
+        public DocumentIdReport? PanIdReport { get; set; } = new DocumentIdReport();
+        public DocumentIdReport? PassportIdReport { get; set; } = new DocumentIdReport();
 
         public string? AgentEmail { get; set; }
         public DateTime? AgentRemarksUpdated { get; set; }

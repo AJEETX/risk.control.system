@@ -1,15 +1,15 @@
 ﻿@model ClaimTransactionModel
 
-@if (@Model.ClaimsInvestigation.AgencyReport?.DocumentIdReport?.DocumentIdImageData != null && @Model.ClaimsInvestigation.AgencyReport?.DocumentIdReport?.DocumentIdImageLongLatTime != null)
+@if (@Model.ClaimsInvestigation.AgencyReport?.PanIdReport?.DocumentIdImageData != null && @Model.ClaimsInvestigation.AgencyReport?.PanIdReport?.DocumentIdImageLongLatTime != null)
 {
     string documentIdColor = "grey";
     var borderColor = "";
-    if (Model.ClaimsInvestigation.AgencyReport.DocumentIdReport?.DocumentIdImageLongLat == null)
+    if (Model.ClaimsInvestigation.AgencyReport.PanIdReport?.DocumentIdImageLongLat == null)
     {
 
     }
-    else if (Model.ClaimsInvestigation.AgencyReport.DocumentIdReport?.DocumentIdImageLongLat != null && (
-    Model.ClaimsInvestigation.AgencyReport?.DocumentIdReport?.DocumentIdImageValid != null && Model.ClaimsInvestigation.AgencyReport?.DocumentIdReport?.DocumentIdImageValid == true))
+    else if (Model.ClaimsInvestigation.AgencyReport.PanIdReport?.DocumentIdImageLongLat != null && (
+    Model.ClaimsInvestigation.AgencyReport?.PanIdReport?.DocumentIdImageValid != null && Model.ClaimsInvestigation.AgencyReport?.PanIdReport?.DocumentIdImageValid == true))
     {
         documentIdColor = "green";
         borderColor = "border-success";
@@ -26,12 +26,12 @@
                 <i class="fas fa-mobile-alt"></i> Document <span class="badge badge-light">checkify </span>
                 <span class="badge badge-light" style="float:right;">
                     <i class="nav-icon fas fa-clock"></i>
-                    @Model.ClaimsInvestigation.AgencyReport?.DocumentIdReport.DocumentIdImageLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt")
+                    @Model.ClaimsInvestigation.AgencyReport?.PanIdReport.DocumentIdImageLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt")
                 </span>
             </div>
             <div class="card-footer text-center">
                 <span class="badge badge-light"><i class="far fa-image"></i> Valid : </span>
-                @if (@Model.ClaimsInvestigation.AgencyReport?.DocumentIdReport?.DocumentIdImageValid.Value ?? false)
+                @if (@Model.ClaimsInvestigation.AgencyReport?.PanIdReport?.DocumentIdImageValid.Value ?? false)
                 {
                     <i style='color:green;' class='fas fa-check-circle'></i>
                 }
@@ -53,9 +53,9 @@
                             <span class="badge badge-light"><i class="fas fa-film"></i> Pan card Image</span>:
                             <br />
                             @{
-                                if (Model.ClaimsInvestigation.AgencyReport?.DocumentIdReport?.DocumentIdImage != null)
+                                if (Model.ClaimsInvestigation.AgencyReport?.PanIdReport?.DocumentIdImage != null)
                                 {
-                                    <img title="document image" id="agentOcrPicture" class="img-fluid ocr-Image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.ClaimsInvestigation.AgencyReport?.DocumentIdReport?.DocumentIdImage))">
+                                    <img title="document image" id="agentOcrPicture" class="img-fluid ocr-Image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.ClaimsInvestigation.AgencyReport?.PanIdReport?.DocumentIdImage))">
                                 }
                                 else
                                 {
@@ -67,7 +67,7 @@
 
                             <span class="badge badge-light"><i class="fas fa-info"></i> Image Scan Info</span>
                             <br />
-                            <label class="img-fluid ocr-data"> @Model.ClaimsInvestigation.AgencyReport?.DocumentIdReport?.DocumentIdImageData</label>
+                            <label class="img-fluid ocr-data"> @Model.ClaimsInvestigation.AgencyReport?.PanIdReport?.DocumentIdImageData</label>
                         </p>
                     </div>
                     <div class="col-6">
@@ -75,13 +75,13 @@
                         <p class="text-muted text-sm">
                             <span class="badge badge-light"><i class="fas fa-map-pin"></i> Location visited</span>
                             <br />
-                            <img class="img-fluid olocationImage" src="@Model.ClaimsInvestigation.AgencyReport?.DocumentIdReport?.DocumentIdImageLocationUrl" />
+                            <img class="img-fluid olocationImage" src="@Model.ClaimsInvestigation.AgencyReport?.PanIdReport?.DocumentIdImageLocationUrl" />
                         </p>
                         <p class="text-muted text-sm">
 
                             <span class="badge badge-light"><i class="fas fa-map-marker-alt"></i> Address visited</span>
                             <br />
-                            <label class="img-fluid ocr-data"> @Model.ClaimsInvestigation.AgencyReport?.DocumentIdReport?.DocumentIdImageLocationAddress</label>
+                            <label class="img-fluid ocr-data"> @Model.ClaimsInvestigation.AgencyReport?.PanIdReport?.DocumentIdImageLocationAddress</label>
                         </p>
                     </div>
                 </div>

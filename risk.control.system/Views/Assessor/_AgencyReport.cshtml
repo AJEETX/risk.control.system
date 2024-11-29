@@ -35,6 +35,10 @@
                 <div class="row">
                     <partial name="_AgencyDigitalReport" model="@Model" />
                     <partial name="_AgencyDocumentReport" model="@Model" />
+                    @if(Model.ClaimsInvestigation.ClientCompany.EnablePassport)
+                    {
+                        <partial name="_AgencyPassportReport" model="@Model" />
+                    }
                     <partial name="_AgencyAgentAnswer" model="@Model" />
                     <partial name="_AgencySupervisorAnswer" model="@Model" />
 

@@ -74,11 +74,12 @@ namespace risk.control.system.Services
                 .OrderByDescending(c => c.HopCount)?.ToListAsync();
 
             var claimsInvestigation = await _context.ClaimsInvestigation
+                .Include(c => c.ClientCompany)
                 .Include(c => c.AgencyReport)
                     .ThenInclude(c => c.EnquiryRequest)
               .Include(c => c.PreviousClaimReports)
               .Include(c => c.AgencyReport.DigitalIdReport)
-              .Include(c => c.AgencyReport.DocumentIdReport)
+              .Include(c => c.AgencyReport.PanIdReport)
               .Include(c => c.AgencyReport.ReportQuestionaire)
                 .Include(c => c.PolicyDetail)
                 .Include(c => c.ClientCompany)
@@ -144,11 +145,12 @@ namespace risk.control.system.Services
                  .OrderByDescending(c => c.HopCount)?.ToListAsync();
 
             var claimsInvestigation = await _context.ClaimsInvestigation
+                .Include(c => c.ClientCompany)
                 .Include(c => c.AgencyReport)
                     .ThenInclude(c => c.EnquiryRequest)
               .Include(c => c.PreviousClaimReports)
               .Include(c => c.AgencyReport.DigitalIdReport)
-              .Include(c => c.AgencyReport.DocumentIdReport)
+              .Include(c => c.AgencyReport.PanIdReport)
               .Include(c => c.AgencyReport.ReportQuestionaire)
                 .Include(c => c.PolicyDetail)
                 .Include(c => c.ClientCompany)

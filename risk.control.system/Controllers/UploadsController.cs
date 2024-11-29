@@ -183,5 +183,51 @@ namespace risk.control.system.Controllers
             }
         }
 
+        [HttpPost]
+        [RequestSizeLimit(2_000_000)] // Checking for 2 MB
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> PassportUpload(string selectedclaim, IFormFile passportImage, string passportIdLatitude, string passportIdLongitude)
+        {
+            try
+            {
+
+                var userEmail = HttpContext.User?.Identity?.Name;
+
+                if (string.IsNullOrWhiteSpace(userEmail) ||
+                    (passportImage == null) ||
+                    string.IsNullOrWhiteSpace(passportIdLatitude) ||
+                    string.IsNullOrWhiteSpace(passportIdLongitude) ||
+                    Path.GetInvalidFileNameChars() == null ||
+                    string.IsNullOrWhiteSpace(Path.GetFileName(passportImage.FileName)) ||
+                    string.IsNullOrWhiteSpace(Path.GetExtension(Path.GetFileName(passportImage.FileName))) ||
+                    string.IsNullOrWhiteSpace(Path.GetFileName(passportImage.Name))
+                    )
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                if (string.IsNullOrWhiteSpace(selectedclaim))
+                {
+                    notifyService.Custom($"No claim selected!!!. ", 3, "orange", "fas fa-mobile-alt");
+                    return Redirect("/Agent/GetInvestigate?selectedcase=" + selectedclaim);
+                }
+
+                using (var ds = new MemoryStream())
+                {
+                    passportImage.CopyTo(ds);
+                    var imageByte = ds.ToArray();
+                    var response = await vendorService.PostPassportId(userEmail, selectedclaim, passportIdLatitude, passportIdLongitude, imageByte);
+
+                    notifyService.Custom($"Passport Image Uploaded", 3, "green", "fas fa-mobile-alt");
+                    return Redirect("/Agent/GetInvestigate?selectedcase=" + selectedclaim);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+        }
     }
 }

@@ -76,7 +76,9 @@ namespace risk.control.system.Models
         public List<Vendor>? EmpanelledVendors { get; set; } = new();
         public List<ClaimsInvestigation> ClaimsInvestigations { get; set; } = new();
         public bool AutoAllocation { get; set; } = false;
-        public bool VerifyOcr { get; set; } = false;
+        public bool VerifyPan { get; set; } = false;
+        public bool VerifyPassport { get; set; } = false;
+        public bool EnablePassport { get; set; } = false;
         public string ApiBaseUrl { get; set; } = "https://2j2sgigd3l.execute-api.ap-southeast-2.amazonaws.com/Development/icheckify";
         public string PanIdfyUrl { get; set; } = "https://idfy-verification-suite.p.rapidapi.com";
         public string RapidAPIKey { get; set; } = "df0893831fmsh54225589d7b9ad1p15ac51jsnb4f768feed6f";

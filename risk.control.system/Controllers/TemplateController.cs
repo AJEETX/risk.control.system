@@ -55,7 +55,7 @@ namespace risk.control.system.Controllers
         public IActionResult Create()
         {
             ViewData["DigitalIdReportId"] = new SelectList(_context.DigitalIdReport, "DigitalIdReportId", "ReportType");
-            ViewData["DocumentIdReportId"] = new SelectList(_context.DocumentIdReport, "DocumentIdReportId", "DocumentIdReportType");
+            ViewData["DocumentIdReportId"] = new SelectList(_context.PanIdReport, "DocumentIdReportId", "DocumentIdReportType");
             ViewData["ReportQuestionaireId"] = new SelectList(_context.ReportQuestionaire, "ReportQuestionaireId", "Question");
             return View();
         }
@@ -79,7 +79,7 @@ namespace risk.control.system.Controllers
                 return RedirectToAction(nameof(Index));
             }
             ViewData["DigitalIdReportId"] = new SelectList(_context.DigitalIdReport, "DigitalIdReportId", "ReportType", reportTemplate.DigitalIdReportId);
-            ViewData["DocumentIdReportId"] = new SelectList(_context.DocumentIdReport, "DocumentIdReportId", "DocumentIdReportType", reportTemplate.DocumentIdReportId);
+            ViewData["DocumentIdReportId"] = new SelectList(_context.PanIdReport, "DocumentIdReportId", "DocumentIdReportType", reportTemplate.DocumentIdReportId);
             ViewData["ReportQuestionaireId"] = new SelectList(_context.ReportQuestionaire, "ReportQuestionaireId", "Question", reportTemplate.ReportQuestionaireId);
             return View(reportTemplate);
         }
@@ -98,7 +98,7 @@ namespace risk.control.system.Controllers
                 return NotFound();
             }
             ViewData["DigitalIdReportId"] = new SelectList(_context.DigitalIdReport, "DigitalIdReportId", "ReportType", reportTemplate.DigitalIdReportId);
-            ViewData["DocumentIdReportId"] = new SelectList(_context.DocumentIdReport, "DocumentIdReportId", "DocumentIdReportType", reportTemplate.DocumentIdReportId);
+            ViewData["DocumentIdReportId"] = new SelectList(_context.PanIdReport, "DocumentIdReportId", "DocumentIdReportType", reportTemplate.DocumentIdReportId);
             ViewData["ReportQuestionaireId"] = new SelectList(_context.ReportQuestionaire, "ReportQuestionaireId", "Question", reportTemplate.ReportQuestionaireId);
             return View(reportTemplate);
         }
@@ -141,7 +141,7 @@ namespace risk.control.system.Controllers
                 return RedirectToAction(nameof(Index));
             }
             ViewData["DigitalIdReportId"] = new SelectList(_context.DigitalIdReport, "DigitalIdReportId", "ReportType", reportTemplate.DigitalIdReportId);
-            ViewData["DocumentIdReportId"] = new SelectList(_context.DocumentIdReport, "DocumentIdReportId", "DocumentIdReportType", reportTemplate.DocumentIdReportId);
+            ViewData["DocumentIdReportId"] = new SelectList(_context.PanIdReport, "DocumentIdReportId", "DocumentIdReportType", reportTemplate.DocumentIdReportId);
             ViewData["ReportQuestionaireId"] = new SelectList(_context.ReportQuestionaire, "ReportQuestionaireId", "Question", reportTemplate.ReportQuestionaireId);
             return View(reportTemplate);
         }

@@ -1,32 +1,30 @@
 ﻿@model ClaimsInvestigationVendorsModel
 
-
 @{
-    if (@Model.AgencyReport?.DigitalIdReport?.DigitalIdImageData != null &&
-        @Model.AgencyReport?.DigitalIdReport?.DigitalIdImageLongLat != null &&
-        @Model.AgencyReport?.DigitalIdReport?.DigitalIdImageLocationUrl != null)
+    string digitalIdColor = "grey";
+    var borderColor = "";
+    if (Model.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime == null)
     {
-        string digitalIdColor = "grey";
-        var borderColor = "";
-        if (Model.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime == null)
-        {
-            digitalIdColor = "grey";
-            borderColor = "";
-        }
-        else if (Model.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime != null && string.IsNullOrWhiteSpace(@Model.AgencyReport?.DigitalIdReport?.DigitalIdImageMatchConfidence))
-        {
-            digitalIdColor = "#dc3545!important";
-            borderColor = "border-danger";
-        }
-        else if (Model.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime != null && !string.IsNullOrWhiteSpace(@Model.AgencyReport?.DigitalIdReport?.DigitalIdImageMatchConfidence))
-        {
-            borderColor = "border-success";
-            digitalIdColor = "green";
-        }
+        digitalIdColor = "grey";
+        borderColor = "";
+    }
+    else if (Model.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime != null && string.IsNullOrWhiteSpace(@Model.AgencyReport?.DigitalIdReport?.DigitalIdImageMatchConfidence))
+    {
+        digitalIdColor = "#dc3545!important";
+        borderColor = "border-danger";
+    }
+    else if (Model.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime != null && !string.IsNullOrWhiteSpace(@Model.AgencyReport?.DigitalIdReport?.DigitalIdImageMatchConfidence))
+    {
+        borderColor = "border-success";
+        digitalIdColor = "green";
+    }
 
+    if (@Model.AgencyReport?.DigitalIdReport?.DigitalIdImageData != null && @Model.AgencyReport?.DigitalIdReport?.DigitalIdImageLongLatTime != null)
+    {
         <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
             <div class="card bg-light d-flex flex-fill @borderColor">
                 <div class="card-header text-muted border-bottom-0">
+
                     <h3 class="card-title">
                         <i class="fas fa-portrait"></i> Photo ID
                         <span class="hover-text">
@@ -63,10 +61,12 @@
                         </span>
 
                     </div>
+
+
                 </div>
                 <div class="card-footer text-center">
                     <span class="badge badge-light"><i class="fas fa-portrait"></i> Match :  </span>
-                    @if (string.IsNullOrWhiteSpace(@Model.AgencyReport?.DigitalIdReport?.DigitalIdImageMatchConfidence))
+                    @if (string.IsNullOrWhiteSpace(@Model.AgencyReport?.DigitalIdReport?.DigitalIdImageMatchConfidence) && Model.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime != null)
                     {
                         <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i>
                     }
@@ -77,7 +77,7 @@
                 </div>
                 <div class="progress">
                     <i class="far fa-bookmark bookmark-green"></i>
-                    <div class="progress-bar" role="progressbar" style="width:100%;background-color:@digitalIdColor">
+                    <div class="progress-bar" role="progressbar" style="width:100%;background-color:@digitalIdColor;">
                         photo-id
                     </div>
                 </div>
@@ -90,12 +90,12 @@
                                 @{
                                     if (Model.AgencyReport?.DigitalIdReport?.DigitalIdImage != null)
                                     {
-                                        <img id="agentLocationPicture" class="img-fluid face-Image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.AgencyReport?.DigitalIdReport?.DigitalIdImage))" 
-                                        data-toggle="tooltip" title="Face Image">
+                                        <img id="agentLocationPicture" class="img-fluid face-Image" data-toggle="tooltip" title="Face Image"
+                                             src="data:image/*;base64,@(Convert.ToBase64String(@Model.AgencyReport?.DigitalIdReport?.DigitalIdImage))">
                                     }
                                     else
                                     {
-                                        <img id="agentLocationPicture" alt="face image" class="img-fluid  ocr-data" src=@Applicationsettings.NO_PHOTO_IMAGE data-toggle="tooltip" title="No Face Image">
+                                        <img data-toggle="tooltip" title="No Face Image" id="agentLocationPicture" alt="face image" class="img-fluid  no-Image" src=@Applicationsettings.NO_PHOTO_IMAGE>
                                     }
                                 }
                             </p>
@@ -122,15 +122,14 @@
                         </div>
                     </div>
                 </div>
-
-
             </div>
+
             <div class="card direct-chat direct-chat-warning collapsed-card">
                 <div class="card-header">
                     <i class="fas fa-film"></i><h3 class="card-title">Map<span class="badge badge-light">Expected and visited</span></h3>
 
                     <div class="card-tools">
-                        <span data-toggle="tooltip" title="Map Location" class="badge badge-light"> <i class='far fa-hand-point-right'></i></span>
+                        <span data-toggle="tooltip" title="Map Location: Expected and visited" class="badge badge-light"> <i class='far fa-hand-point-right'></i></span>
                         <button type="button" class="btn btn-tool" data-card-widget="collapse">
                             <i class="fas fa-plus"></i>
                         </button>
@@ -145,4 +144,5 @@
             </div>
         </div>
     }
+
 }

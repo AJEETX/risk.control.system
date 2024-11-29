@@ -1,16 +1,16 @@
 ﻿@model ClaimsInvestigationVendorsModel
 
 @{
-    var imageCapturedTime = @Model.AgencyReport?.DocumentIdReport?.DocumentIdImageLongLatTime != null ? @Model.AgencyReport?.DocumentIdReport?.DocumentIdImageLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt") : null;
+    var imageCapturedTime = @Model.AgencyReport?.PanIdReport?.DocumentIdImageLongLatTime != null ? @Model.AgencyReport?.PanIdReport?.DocumentIdImageLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt") : null;
 
     string documentIdColor = "grey";
     var borderColor = "";
-    if (Model.AgencyReport.DocumentIdReport?.DocumentIdImageLongLat == null)
+    if (Model.AgencyReport.PanIdReport?.DocumentIdImageLongLat == null)
     {
 
     }
-    else if (Model.AgencyReport.DocumentIdReport?.DocumentIdImageLongLat != null && (
-    Model.AgencyReport?.DocumentIdReport?.DocumentIdImageValid != null && Model.AgencyReport?.DocumentIdReport?.DocumentIdImageValid == true))
+    else if (Model.AgencyReport.PanIdReport?.DocumentIdImageLongLat != null && (
+    Model.AgencyReport?.PanIdReport?.DocumentIdImageValid != null && Model.AgencyReport?.PanIdReport?.DocumentIdImageValid == true))
     {
         documentIdColor = "green";
         borderColor = "border-success";
@@ -90,7 +90,7 @@
                 {
                     <i style='color:grey;' class='fa fa-times' aria-hidden='true'></i>
                 }
-                else if (@Model.AgencyReport?.DocumentIdReport?.DocumentIdImageValid.Value ?? false)
+                else if (@Model.AgencyReport?.PanIdReport?.DocumentIdImageValid.Value ?? false)
                 {
                     <i style='color:green;' class='fas fa-check-circle'></i>
                 }
@@ -113,10 +113,10 @@
                             <span class="badge badge-light"><i class="fas fa-film"></i> Pan card Image</span>:
                             <br />
                             @{
-                                if (Model.AgencyReport?.DocumentIdReport?.DocumentIdImage != null)
+                                if (Model.AgencyReport?.PanIdReport?.DocumentIdImage != null)
                                 {
                                     <img id="agentOcrPicture" class="img-fluid ocr-Image" data-toggle="tooltip" title="PAN card Image"
-                                         src="data:image/*;base64,@(Convert.ToBase64String(@Model.AgencyReport?.DocumentIdReport?.DocumentIdImage))">
+                                         src="data:image/*;base64,@(Convert.ToBase64String(@Model.AgencyReport?.PanIdReport?.DocumentIdImage))">
                                 }
                                 else
                                 {
@@ -129,7 +129,7 @@
 
                             <span class="badge badge-light"><i class="fas fa-info"></i> Image Scan Info</span>
                             <br />
-                            <label class="img-fluid ocr-data"> @Model.AgencyReport?.DocumentIdReport?.DocumentIdImageData</label>
+                            <label class="img-fluid ocr-data"> @Model.AgencyReport?.PanIdReport?.DocumentIdImageData</label>
                         </p>
                     </div>
                     <div class="col-6 text">
@@ -137,9 +137,9 @@
                         <p class="text-muted text-sm">
                             <span class="badge badge-light"><i class="fas fa-map-pin"></i> Location visited</span>
                             <br />
-                            @if (@Model.AgencyReport?.DocumentIdReport?.DocumentIdImageLocationUrl != null)
+                            @if (@Model.AgencyReport?.PanIdReport?.DocumentIdImageLocationUrl != null)
                             {
-                                <img class="img-fluid olocationImage" src="@Model.AgencyReport?.DocumentIdReport?.DocumentIdImageLocationUrl" data-toggle="tooltip" title="Map Location" />
+                                <img class="img-fluid olocationImage" src="@Model.AgencyReport?.PanIdReport?.DocumentIdImageLocationUrl" data-toggle="tooltip" title="Map Location" />
                             }
                             else
                             {
@@ -151,14 +151,14 @@
 
                             <span class="badge badge-light"><i class="fas fa-map-marker-alt"></i> Address visited</span>
                             <br />
-                            <label class="img-fluid ocr-data"> @Model.AgencyReport?.DocumentIdReport?.DocumentIdImageLocationAddress</label>
+                            <label class="img-fluid ocr-data"> @Model.AgencyReport?.PanIdReport?.DocumentIdImageLocationAddress</label>
                         </p>
                     </div>
                 </div>
             </div>
 
         </div>
-        @if (@Model.AgencyReport?.DocumentIdReport?.DocumentIdImageLocationUrl != null)
+        @if (@Model.AgencyReport?.PanIdReport?.DocumentIdImageLocationUrl != null)
         {
             <div class="card direct-chat direct-chat-warning collapsed-card">
                 <div class="card-header">

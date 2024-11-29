@@ -270,7 +270,7 @@ namespace risk.control.system.Controllers.Api
                 var claim = _context.ClaimsInvestigation
                  .Include(c => c.AgencyReport)
                  .Include(c => c.AgencyReport.DigitalIdReport)
-                 .Include(c => c.AgencyReport.DocumentIdReport)
+                 .Include(c => c.AgencyReport.PanIdReport)
                  .Include(c => c.PolicyDetail)
                  .ThenInclude(c => c.LineOfBusiness)
                  .Include(c => c.PolicyDetail)
@@ -296,8 +296,8 @@ namespace risk.control.system.Controllers.Api
 
                     if (type.ToLower() == "ocr")
                     {
-                        var image = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claim.AgencyReport?.DocumentIdReport?.DocumentIdImage));
-                        return Ok(new { Image = image, Valid = claim.AgencyReport.DocumentIdReport?.DocumentIdImageValid.ToString() });
+                        var image = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claim.AgencyReport?.PanIdReport?.DocumentIdImage));
+                        return Ok(new { Image = image, Valid = claim.AgencyReport.PanIdReport?.DocumentIdImageValid.ToString() });
                     }
                 }
             }
@@ -610,12 +610,12 @@ namespace risk.control.system.Controllers.Api
                             LocationImage = claim?.AgencyReport?.DigitalIdReport?.DigitalIdImage != null ?
                             string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claim?.AgencyReport?.DigitalIdReport?.DigitalIdImage)) :
                             string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noDataimage)),
-                            OcrImage = claim?.AgencyReport?.DocumentIdReport?.DocumentIdImage != null ?
-                            string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claim?.AgencyReport?.DocumentIdReport?.DocumentIdImage)) :
+                            OcrImage = claim?.AgencyReport?.PanIdReport?.DocumentIdImage != null ?
+                            string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claim?.AgencyReport?.PanIdReport?.DocumentIdImage)) :
                             string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noDataimage)),
-                            OcrData = claim?.AgencyReport?.DocumentIdReport?.DocumentIdImageData,
+                            OcrData = claim?.AgencyReport?.PanIdReport?.DocumentIdImageData,
                             LocationLongLat = claim?.AgencyReport?.DigitalIdReport?.DigitalIdImageLongLat,
-                            OcrLongLat = claim?.AgencyReport?.DocumentIdReport?.DocumentIdImageLongLat,
+                            OcrLongLat = claim?.AgencyReport?.PanIdReport?.DocumentIdImageLongLat,
                         },
                         Remarks = claim?.AgencyReport?.AgentRemarks
                     });

@@ -46,5 +46,6 @@ namespace risk.control.system.Models
         ADHAAR,
         PAN,
         DRIVING_LICENSE,
+        PASSPORT
     }
 }

@@ -146,7 +146,7 @@ namespace risk.control.system.Controllers.Api.Claims
         {
             var claim = claimsService.GetClaims()
                 .Include(c=>c.AgencyReport)
-                .Include(c=>c.AgencyReport.DocumentIdReport)
+                .Include(c=>c.AgencyReport.PanIdReport)
                 .Include(c=>c.AgencyReport.DigitalIdReport)
                 .FirstOrDefault(c=> c.ClaimsInvestigationId == claimId);
 
@@ -173,11 +173,11 @@ namespace risk.control.system.Controllers.Api.Claims
 
             string ocrUrl = $"https://maps.googleapis.com/maps/api/staticmap?center=32.661839,-97.263680&zoom=14&size=150x200&maptype=roadmap&markers=color:red%7Clabel:S%7C32.661839,-97.263680&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
             string ocrAddress = string.Empty;
-            if (!string.IsNullOrWhiteSpace(claim.AgencyReport?.DocumentIdReport?.DocumentIdImageLongLat))
+            if (!string.IsNullOrWhiteSpace(claim.AgencyReport?.PanIdReport?.DocumentIdImageLongLat))
             {
-                var ocrlongLat = claim.AgencyReport.DocumentIdReport.DocumentIdImageLongLat.IndexOf("/");
-                ocrLatitude = claim.AgencyReport.DocumentIdReport.DocumentIdImageLongLat.Substring(0, ocrlongLat)?.Trim();
-                ocrLongitude = claim.AgencyReport.DocumentIdReport.DocumentIdImageLongLat.Substring(ocrlongLat + 1)?.Trim();
+                var ocrlongLat = claim.AgencyReport.PanIdReport.DocumentIdImageLongLat.IndexOf("/");
+                ocrLatitude = claim.AgencyReport.PanIdReport.DocumentIdImageLongLat.Substring(0, ocrlongLat)?.Trim();
+                ocrLongitude = claim.AgencyReport.PanIdReport.DocumentIdImageLongLat.Substring(ocrlongLat + 1)?.Trim();
                 var ocrLongLatString = ocrLatitude + "," + ocrLongitude;
                 ocrAddress = await httpClientService.GetRawAddress((ocrLatitude), (ocrLongitude));
                 ocrUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={ocrLongLatString}&zoom=18&size=300x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{ocrLongLatString}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
@@ -186,15 +186,15 @@ namespace risk.control.system.Controllers.Api.Claims
             var data = new
             {
                 Title = "Investigation Data",
-                QrData = claim.AgencyReport?.DocumentIdReport?.DocumentIdImageData,
+                QrData = claim.AgencyReport?.PanIdReport?.DocumentIdImageData,
                 LocationData = claim.AgencyReport?.DigitalIdReport?.DigitalIdImageData ?? "Location Data",
                 LatLong = mapUrl,
                 ImageAddress = imageAddress,
                 Location = claim.AgencyReport?.DigitalIdReport?.DigitalIdImage != null ?
                 string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claim.AgencyReport?.DigitalIdReport?.DigitalIdImage)) :
                 string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noDataimage)),
-                OcrData = claim.AgencyReport?.DocumentIdReport?.DocumentIdImage != null ?
-                string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claim.AgencyReport?.DocumentIdReport?.DocumentIdImage)) :
+                OcrData = claim.AgencyReport?.PanIdReport?.DocumentIdImage != null ?
+                string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claim.AgencyReport?.PanIdReport?.DocumentIdImage)) :
                 string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noDataimage)),
                 OcrLatLong = ocrUrl,
                 OcrAddress = ocrAddress,
@@ -330,7 +330,7 @@ namespace risk.control.system.Controllers.Api.Claims
         {
             var claim = claimsService.GetClaims()
                 .Include(c => c.AgencyReport)
-                .Include(c => c.AgencyReport.DocumentIdReport)
+                .Include(c => c.AgencyReport.PanIdReport)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimid);
 
             if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
@@ -338,11 +338,11 @@ namespace risk.control.system.Controllers.Api.Claims
                 var center = new { Lat = decimal.Parse(claim.CustomerDetail.PinCode.Latitude), Lng = decimal.Parse(claim.CustomerDetail.PinCode.Longitude) };
                 var dakota = new { Lat = decimal.Parse(claim.CustomerDetail.PinCode.Latitude), Lng = decimal.Parse(claim.CustomerDetail.PinCode.Longitude) };
 
-                if (claim.AgencyReport is not null && claim.AgencyReport?.DocumentIdReport?.DocumentIdImageLongLat is not null)
+                if (claim.AgencyReport is not null && claim.AgencyReport?.PanIdReport?.DocumentIdImageLongLat is not null)
                 {
-                    var longLat = claim.AgencyReport.DocumentIdReport.DocumentIdImageLongLat.IndexOf("/");
-                    var latitude = claim.AgencyReport?.DocumentIdReport?.DocumentIdImageLongLat.Substring(0, longLat)?.Trim();
-                    var longitude = claim.AgencyReport?.DocumentIdReport?.DocumentIdImageLongLat.Substring(longLat + 1)?.Trim();
+                    var longLat = claim.AgencyReport.PanIdReport.DocumentIdImageLongLat.IndexOf("/");
+                    var latitude = claim.AgencyReport?.PanIdReport?.DocumentIdImageLongLat.Substring(0, longLat)?.Trim();
+                    var longitude = claim.AgencyReport?.PanIdReport?.DocumentIdImageLongLat.Substring(longLat + 1)?.Trim();
 
                     var frick = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) };
                     return Ok(new { center, dakota, frick });
@@ -353,11 +353,11 @@ namespace risk.control.system.Controllers.Api.Claims
                 var center = new { Lat = decimal.Parse(claim.BeneficiaryDetail.PinCode.Latitude), Lng = decimal.Parse(claim.BeneficiaryDetail.PinCode.Longitude) };
                 var dakota = new { Lat = decimal.Parse(claim.BeneficiaryDetail.PinCode.Latitude), Lng = decimal.Parse(claim.BeneficiaryDetail.PinCode.Longitude) };
 
-                if (claim.AgencyReport is not null && claim.AgencyReport?.DocumentIdReport?.DocumentIdImageLongLat is not null)
+                if (claim.AgencyReport is not null && claim.AgencyReport?.PanIdReport?.DocumentIdImageLongLat is not null)
                 {
-                    var longLat = claim.AgencyReport.DocumentIdReport.DocumentIdImageLongLat.IndexOf("/");
-                    var latitude = claim.AgencyReport?.DocumentIdReport?.DocumentIdImageLongLat.Substring(0, longLat)?.Trim();
-                    var longitude = claim.AgencyReport?.DocumentIdReport?.DocumentIdImageLongLat.Substring(longLat + 1)?.Trim();
+                    var longLat = claim.AgencyReport.PanIdReport.DocumentIdImageLongLat.IndexOf("/");
+                    var latitude = claim.AgencyReport?.PanIdReport?.DocumentIdImageLongLat.Substring(0, longLat)?.Trim();
+                    var longitude = claim.AgencyReport?.PanIdReport?.DocumentIdImageLongLat.Substring(longLat + 1)?.Trim();
 
                     var frick = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) };
                     return Ok(new { center, dakota, frick });

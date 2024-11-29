@@ -1074,7 +1074,7 @@ namespace risk.control.system.Services
                 .Include(c => c.PreviousClaimReports)
                 .Include(c => c.AgencyReport)
                 .Include(c => c.AgencyReport.DigitalIdReport)
-                .Include(c => c.AgencyReport.DocumentIdReport)
+                .Include(c => c.AgencyReport.PanIdReport)
                 .Include(c => c.AgencyReport.ReportQuestionaire)
                 .Include(c => c.PolicyDetail)
                 .FirstOrDefault(v => v.ClaimsInvestigationId == claimsInvestigationId);
@@ -1091,7 +1091,7 @@ namespace risk.control.system.Services
                 ClaimsInvestigationId = claimsInvestigationId,
                 AgentEmail = claimsCaseToReassign.AgencyReport.AgentEmail,
                 DigitalIdReport = claimsCaseToReassign.AgencyReport.DigitalIdReport,
-                DocumentIdReport = claimsCaseToReassign.AgencyReport.DocumentIdReport,
+                PanIdReport = claimsCaseToReassign.AgencyReport.PanIdReport,
                 AgentRemarks = claimsCaseToReassign.AgencyReport.AgentRemarks,
                 AgentRemarksUpdated = claimsCaseToReassign.AgencyReport.AssessorRemarksUpdated,
                 AssessorEmail = claimsCaseToReassign.AgencyReport.AssessorEmail,
@@ -1111,12 +1111,14 @@ namespace risk.control.system.Services
             var newReport = new AgencyReport
             {
                 ReportQuestionaire = new ReportQuestionaire(),
-                DocumentIdReport = new DocumentIdReport(),
+                PanIdReport = new DocumentIdReport(),
+                PassportIdReport = new DocumentIdReport(),
                 DigitalIdReport = new DigitalIdReport()
             };
             claimsCaseToReassign.PreviousClaimReports.Add(saveReport);
             claimsCaseToReassign.AgencyReport.DigitalIdReport = new DigitalIdReport();
-            claimsCaseToReassign.AgencyReport.DocumentIdReport = new DocumentIdReport();
+            claimsCaseToReassign.AgencyReport.PanIdReport = new DocumentIdReport();
+            claimsCaseToReassign.AgencyReport.PassportIdReport = new DocumentIdReport();
             claimsCaseToReassign.AgencyReport.ReportQuestionaire = new ReportQuestionaire();
 
             claimsCaseToReassign.AssignedToAgency = false;

@@ -32,6 +32,7 @@ namespace risk.control.system.Services
         Task<AppiCheckifyResponse> PostFaceId(string userEmail, string claimId, string latitude, string longitude, byte[]? image = null);
 
         Task<AppiCheckifyResponse> PostDocumentId(string userEmail, string claimId, string latitude, string longitude, byte[]? image = null);
+        Task<AppiCheckifyResponse> PostPassportId(string userEmail, string claimId, string latitude, string longitude, byte[]? image = null);
     }
 
     public class ClaimsVendorService : IClaimsVendorService
@@ -74,6 +75,20 @@ namespace risk.control.system.Services
                 OcrLongLat = locationLongLat
             };
             var result = await checkifyService.GetDocumentId(data);
+            return result;
+        }
+        public async Task<AppiCheckifyResponse> PostPassportId(string userEmail, string claimId, string latitude, string longitude, byte[]? image = null)
+        {
+            var locationLongLat = string.IsNullOrWhiteSpace(latitude) || string.IsNullOrWhiteSpace(longitude) ? string.Empty : $"{latitude}/{longitude}";
+
+            var data = new DocumentData
+            {
+                Email = userEmail,
+                ClaimId = claimId,
+                OcrImage = Convert.ToBase64String(image),
+                OcrLongLat = locationLongLat
+            };
+            var result = await checkifyService.GetPassportId(data);
             return result;
         }
 
@@ -165,15 +180,18 @@ namespace risk.control.system.Services
         {
             var claim = claimsService.GetClaims()
                 .Include(c => c.ClaimNotes)
+                .Include(c => c.ClientCompany)
                 .Include(c => c.AgencyReport)
                 .ThenInclude(c => c.DigitalIdReport)
                 .Include(c => c.AgencyReport)
-                .ThenInclude(c => c.DocumentIdReport)
+                .ThenInclude(c => c.PanIdReport)
+                .Include(c => c.AgencyReport)
+                .ThenInclude(c => c.PassportIdReport)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == selectedcase);
 
             if(claim.AgencyReport == null || claim.AgencyReport.AgentEmail != userEmail &&
-                claim.AgencyReport.DocumentIdReport?.DocumentIdImageLongLat == null &&
-                claim.AgencyReport.DocumentIdReport?.DocumentIdImageLongLat == null)
+                claim.AgencyReport.PanIdReport?.DocumentIdImageLongLat == null &&
+                claim.AgencyReport.PanIdReport?.DocumentIdImageLongLat == null)
             {
                 claim.AgencyReport = new AgencyReport();
                 claim.AgencyReport.AgentEmail = userEmail;
@@ -198,7 +216,8 @@ namespace risk.control.system.Services
                 .ThenInclude(c=>c.EnquiryRequest)
                 .Include(c => c.AgencyReport.DigitalIdReport)
                 .Include(c => c.AgencyReport.ReportQuestionaire)
-                .Include(c => c.AgencyReport.DocumentIdReport)
+                .Include(c => c.AgencyReport.PanIdReport)
+                .Include(c => c.AgencyReport.PassportIdReport)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == selectedcase);
 
             var beneficiaryDetails =await _context.BeneficiaryDetail
@@ -226,7 +245,8 @@ namespace risk.control.system.Services
                 .Include(c=>c.AgencyReport)
                 .ThenInclude(c=>c.EnquiryRequest)
                 .Include(c=>c.AgencyReport.DigitalIdReport)
-                .Include(c=>c.AgencyReport.DocumentIdReport)
+                .Include(c=>c.AgencyReport.PanIdReport)
+                .Include(c=>c.AgencyReport.PassportIdReport)
                 .Include(c=>c.AgencyReport.ReportQuestionaire)
                 .Include(c=>c.ClaimNotes)
                 .FirstOrDefault(m => m.ClaimsInvestigationId == selectedcase);

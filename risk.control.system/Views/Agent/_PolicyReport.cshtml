@@ -6,7 +6,7 @@
         digitalIdColor = "green";
     }
     string documentIdColor = "grey";
-    if (Model.AgencyReport.DocumentIdReport?.DocumentIdImageLongLat != null)
+    if (Model.AgencyReport.PanIdReport?.DocumentIdImageLongLat != null)
     {
         documentIdColor = "green";
     }
@@ -43,6 +43,10 @@
         <div class="row">
             <partial name="_DigitalIdReport" model="@Model" />
             <partial name="_DocumentIdReport" model="@Model" />
+            @if(Model.ClaimsInvestigation.ClientCompany.EnablePassport)
+            {
+                <partial name="_PassportIdReport" model="@Model" />
+            }
             <partial name="_Questionaire" model="@Model" />
         </div>
     </div>

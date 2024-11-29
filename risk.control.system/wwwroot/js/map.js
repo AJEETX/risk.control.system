@@ -73,8 +73,96 @@ function initReportMap() {
     if (ocrHtml) {
         initOcrMap(ocenter, odakota, ofrick);
     }
+
+    var passportResponse = $.ajax({
+        type: "GET",
+        url: "/api/ClaimsInvestigation/GetPassportDetail?claimId=" + claimId,
+        async: false
+    }).responseText;
+
+    if (passportResponse) {
+        var pdata = JSON.parse(passportResponse);
+        if (pdata && pdata.center && pdata.dakota && pdata.frick) {
+            ocenter = pdata.center;
+            odakota = pdata.dakota;
+            ofrick = pdata.frick
+        }
+    }
+
+    var passportHtml = document.getElementById('passport-map');
+    if (passportHtml) {
+        initPassportMap(ocenter, odakota, ofrick);
+    }
 }
 
+function initPassportMap(center, dakota, frick) {
+    const options = {
+        scaleControl: true,
+        center: center,
+        mapId: "4504f8b37365c3d0",
+        mapTypeId: google.maps.MapTypeId.ROADMAP,
+    };
+    map = new google.maps.Map(
+        document.getElementById('passport-map'),
+        options);
+
+    // The markers for The Dakota and The Frick Collection
+    var mk1 = new
+        google.maps.Marker({
+            position: dakota,
+            map: map
+        });
+    var mk2 = new
+        google.maps.Marker({
+            position: frick,
+            map: map
+        });
+
+    var bounds = new google.maps.LatLngBounds();
+    bounds.extend(dakota);
+    bounds.extend(frick);
+
+    // Draw a line showing the straight distance between the markers
+    var line = new google.maps.Polyline({ path: [dakota, frick], map: map });
+
+    // Calculate and display the distance between markers
+    var distance = haversine_distance(mk1, mk2);
+    document.getElementById('passport-msg').innerHTML = "Distance between expected vs visited location: " + distance.toFixed(2) + " km.";
+    let directionsService = new google.maps.DirectionsService();
+    let directionsRenderer = new google.maps.DirectionsRenderer();
+    directionsRenderer.setMap(map); // Existing map object displays directions
+    // Create route from existing points used for markers
+    const route = {
+        origin: dakota,
+        destination: frick,
+        travelMode: 'DRIVING'
+    }
+
+    directionsService.route(route,
+        function (response, status) { // anonymous function to capture directions
+            if (status !== 'OK') {
+                console.log('Directions request failed due to ' + status);
+                return;
+            } else {
+                directionsRenderer.setDirections(response); // Add route to the map
+                var directionsData = response.routes[0].legs[0]; // Get data about the mapped route
+                if (!directionsData) {
+                    window.alert('Directions request failed');
+                    return;
+                }
+                else {
+                    document.getElementById('passport-msg').innerHTML += "<br>";
+                    document.getElementById('passport-msg').innerHTML += " Driving distance is " + directionsData.distance.text + " (" + directionsData.duration.text + ").";
+                }
+            }
+        });
+    map.fitBounds(bounds);
+    map.setCenter(bounds.getCenter());
+    map.setZoom(map.getZoom() - 1);
+    if (map.getZoom() > 18) {
+        map.setZoom(18);
+    }
+}
 function initFaceMap(center, dakota, frick) {
     const options = {
         scaleControl: true,

@@ -45,11 +45,13 @@ namespace risk.control.system.Services
                 .OrderByDescending(c => c.HopCount)?.ToListAsync();
 
             var claimsInvestigation = await _context.ClaimsInvestigation
+              .Include(c => c.ClientCompany)
               .Include(c => c.AgencyReport)
                     .ThenInclude(c => c.EnquiryRequest)
               .Include(c => c.PreviousClaimReports)
               .Include(c => c.AgencyReport.DigitalIdReport)
-              .Include(c => c.AgencyReport.DocumentIdReport)
+              .Include(c => c.AgencyReport.PanIdReport)
+              .Include(c => c.AgencyReport.PassportIdReport)
               .Include(c => c.AgencyReport.ReportQuestionaire)
               .Include(c => c.PolicyDetail)
               .Include(c => c.ClientCompany)
@@ -119,11 +121,13 @@ namespace risk.control.system.Services
         public async Task<ClaimsInvestigation> GetAssignDetails(string id)
         {
             var claimsInvestigation = await _context.ClaimsInvestigation
+                .Include(c => c.ClientCompany)
                 .Include(c => c.AgencyReport)
                     .ThenInclude(c => c.EnquiryRequest)
               .Include(c => c.PreviousClaimReports)
               .Include(c => c.AgencyReport.DigitalIdReport)
-              .Include(c => c.AgencyReport.DocumentIdReport)
+              .Include(c => c.AgencyReport.PanIdReport)
+              .Include(c => c.AgencyReport.PassportIdReport)
               .Include(c => c.AgencyReport.ReportQuestionaire)
                 .Include(c => c.PolicyDetail)
                 .Include(c => c.ClientCompany)
@@ -170,11 +174,13 @@ namespace risk.control.system.Services
                 .OrderByDescending(c => c.HopCount)?.ToListAsync();
 
             var claimsInvestigation = await _context.ClaimsInvestigation
+                .Include(c => c.ClientCompany)
                 .Include(c => c.AgencyReport)
                     .ThenInclude(c => c.EnquiryRequest)
               .Include(c => c.PreviousClaimReports)
               .Include(c => c.AgencyReport.DigitalIdReport)
-              .Include(c => c.AgencyReport.DocumentIdReport)
+              .Include(c => c.AgencyReport.PanIdReport)
+              .Include(c => c.AgencyReport.PassportIdReport)
               .Include(c => c.AgencyReport.ReportQuestionaire)
                 .Include(c => c.PolicyDetail)
                 .Include(c => c.ClientCompany)
@@ -232,13 +238,15 @@ namespace risk.control.system.Services
         public ClaimsInvestigationVendorsModel GetInvestigateReport(string currentUserEmail, string selectedcase)
         {
             var claimsInvestigation = _context.ClaimsInvestigation
+                .Include(c => c.ClientCompany)
                 .Include(c => c.PreviousClaimReports)
                 .Include(c => c.AgencyReport)
                 .ThenInclude(c => c.EnquiryRequest)
                 .Include(c => c.AgencyReport)
                 .ThenInclude(c => c.EnquiryRequests)
                 .Include(c => c.AgencyReport.DigitalIdReport)
-                .Include(c => c.AgencyReport.DocumentIdReport)
+                .Include(c => c.AgencyReport.PanIdReport)
+                .Include(c => c.AgencyReport.PassportIdReport)
                 .Include(c => c.AgencyReport.ReportQuestionaire)
                 .Include(c => c.ClaimMessages)
                 .Include(c => c.PolicyDetail)
@@ -293,7 +301,7 @@ namespace risk.control.system.Services
                 .Include(r=>r.Vendor)
                 .Include(r=>r.ClaimsInvestigation)
                 .Include(r=>r.DigitalIdReport)
-                .Include(r=>r.DocumentIdReport)
+                .Include(r=>r.PanIdReport)
                 .Include(r=>r.ReportQuestionaire)
                 .FirstOrDefault(r => r.PreviousClaimReportId == id);
             return report;

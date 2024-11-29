@@ -20,7 +20,7 @@ namespace risk.control.system.Controllers
         {
             var userEmail = HttpContext?.User?.Identity?.Name;
             var user = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
-            var model = await _context.DocumentIdReport
+            var model = await _context.PanIdReport
                 .Include(d => d.ClientCompany)
                 .Where(c => c.ClientCompanyId == user.ClientCompanyId)?.ToListAsync();
 
@@ -30,12 +30,12 @@ namespace risk.control.system.Controllers
         // GET: DocumentIdReports/Details/5
         public async Task<IActionResult> Details(long id)
         {
-            if (id == null || _context.DocumentIdReport == null)
+            if (id == null || _context.PanIdReport == null)
             {
                 return NotFound();
             }
 
-            var documentIdReport = await _context.DocumentIdReport
+            var documentIdReport = await _context.PanIdReport
                 .FirstOrDefaultAsync(m => m.DocumentIdReportId == id);
             if (documentIdReport == null)
             {
@@ -76,12 +76,12 @@ namespace risk.control.system.Controllers
         // GET: DocumentIdReports/Edit/5
         public async Task<IActionResult> Edit(string id)
         {
-            if (id == null || _context.DocumentIdReport == null)
+            if (id == null || _context.PanIdReport == null)
             {
                 return NotFound();
             }
 
-            var documentIdReport = await _context.DocumentIdReport.FindAsync(id);
+            var documentIdReport = await _context.PanIdReport.FindAsync(id);
             if (documentIdReport == null)
             {
                 return NotFound();
@@ -132,12 +132,12 @@ namespace risk.control.system.Controllers
         // GET: DocumentIdReports/Delete/5
         public async Task<IActionResult> Delete(long id)
         {
-            if (id == null || _context.DocumentIdReport == null)
+            if (id == null || _context.PanIdReport == null)
             {
                 return NotFound();
             }
 
-            var documentIdReport = await _context.DocumentIdReport
+            var documentIdReport = await _context.PanIdReport
                 .FirstOrDefaultAsync(m => m.DocumentIdReportId == id);
             if (documentIdReport == null)
             {
@@ -152,14 +152,14 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            if (_context.DocumentIdReport == null)
+            if (_context.PanIdReport == null)
             {
                 return Problem("Entity set 'ApplicationDbContext.DocumentIdReport'  is null.");
             }
-            var documentIdReport = await _context.DocumentIdReport.FindAsync(id);
+            var documentIdReport = await _context.PanIdReport.FindAsync(id);
             if (documentIdReport != null)
             {
-                _context.DocumentIdReport.Remove(documentIdReport);
+                _context.PanIdReport.Remove(documentIdReport);
             }
 
             await _context.SaveChangesAsync();
@@ -168,7 +168,7 @@ namespace risk.control.system.Controllers
 
         private bool DocumentIdReportExists(long id)
         {
-            return (_context.DocumentIdReport?.Any(e => e.DocumentIdReportId == id)).GetValueOrDefault();
+            return (_context.PanIdReport?.Any(e => e.DocumentIdReportId == id)).GetValueOrDefault();
         }
     }
 }

@@ -33,12 +33,15 @@ namespace risk.control.system.Services
         public async Task SaveReport(FaceData data)
         {
             var claim = claimsService.GetClaims()
+                               .Include(c => c.ClientCompany)
                                .Include(c => c.AgencyReport)
                                .ThenInclude(c => c.DigitalIdReport)
                                .Include(c => c.AgencyReport)
                                .ThenInclude(c => c.ReportQuestionaire)
                                .Include(c => c.AgencyReport)
-                               .ThenInclude(c => c.DocumentIdReport)
+                               .ThenInclude(c => c.PanIdReport)
+                               .Include(c => c.AgencyReport)
+                               .ThenInclude(c => c.PassportIdReport)
                                .FirstOrDefault(c => c.ClaimsInvestigationId == data.ClaimId);
 
             claim.AgencyReport.DigitalIdReport.DigitalIdImageLongLatTime = DateTime.Now;

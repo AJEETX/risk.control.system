@@ -20,6 +20,7 @@ namespace risk.control.system.Services
     {
         Task<AppiCheckifyResponse> GetFaceId(FaceData data);
         Task<AppiCheckifyResponse> GetDocumentId(DocumentData data);
+        Task<AppiCheckifyResponse> GetPassportId(DocumentData data);
         Task GetAudio(AudioData data);
         Task GetVideo(VideoData data);
         Task<bool> WhitelistIP(IPWhitelistRequest request);
@@ -28,7 +29,9 @@ namespace risk.control.system.Services
     public class ICheckifyService : IICheckifyService
     {
         private static Regex panRegex = new Regex(@"[A-Z]{5}\d{4}[A-Z]{1}");
-        private static string txt2Find = "Permanent Account Number";
+        private static Regex passportRegex = new Regex(@"[A-Z]{1,2}[0-9]{6,7}");
+        private static string panNumber2Find = "Permanent Account Number";
+        private static string passportNumber2Find = "Passport No.";
         private readonly ApplicationDbContext _context;
         private readonly IGoogleApi googleApi;
         private readonly IGoogleMaskHelper googleHelper;
@@ -158,20 +161,20 @@ namespace risk.control.system.Services
         {
             try
             {
-                var claim = claimsService.GetClaims().Include(c => c.AgencyReport).ThenInclude(c => c.DocumentIdReport).FirstOrDefault(c => c.ClaimsInvestigationId == data.ClaimId);
+                var claim = claimsService.GetClaims().Include(c => c.AgencyReport).ThenInclude(c => c.PanIdReport).FirstOrDefault(c => c.ClaimsInvestigationId == data.ClaimId);
                 if (claim.AgencyReport == null)
                 {
                     claim.AgencyReport = new AgencyReport();
                 }
                 claim.AgencyReport.AgentEmail = data.Email;
-                claim.AgencyReport.DocumentIdReport.DocumentIdImageLongLat = data.OcrLongLat;
-                claim.AgencyReport.DocumentIdReport.DocumentIdImageLongLatTime = DateTime.Now;
-                var longLat = claim.AgencyReport.DocumentIdReport.DocumentIdImageLongLat.IndexOf("/");
-                var latitude = claim.AgencyReport.DocumentIdReport.DocumentIdImageLongLat.Substring(0, longLat)?.Trim();
-                var longitude = claim.AgencyReport.DocumentIdReport.DocumentIdImageLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
+                claim.AgencyReport.PanIdReport.DocumentIdImageLongLat = data.OcrLongLat;
+                claim.AgencyReport.PanIdReport.DocumentIdImageLongLatTime = DateTime.Now;
+                var longLat = claim.AgencyReport.PanIdReport.DocumentIdImageLongLat.IndexOf("/");
+                var latitude = claim.AgencyReport.PanIdReport.DocumentIdImageLongLat.Substring(0, longLat)?.Trim();
+                var longitude = claim.AgencyReport.PanIdReport.DocumentIdImageLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
                 var latLongString = latitude + "," + longitude;
                 var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
-                claim.AgencyReport.DocumentIdReport.DocumentIdImageLocationUrl = url;
+                claim.AgencyReport.PanIdReport.DocumentIdImageLocationUrl = url;
                 var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claim.ClientCompanyId);
 
                 #region PAN IMAGE PROCESSING
@@ -192,12 +195,12 @@ namespace risk.control.system.Services
                 if(imageReadOnly !=null && imageReadOnly.Count > 0)
                 {
                     var allPanText = imageReadOnly.FirstOrDefault().Description;
-                    var panTextPre = allPanText.IndexOf(txt2Find);
-                    var panNumber = allPanText.Substring(panTextPre + txt2Find.Length + 1, 10);
+                    var panTextPre = allPanText.IndexOf(panNumber2Find);
+                    var panNumber = allPanText.Substring(panTextPre + panNumber2Find.Length + 1, 10);
 
 
-                    var ocrImaged = googleHelper.MaskTextInImage(byteimage, imageReadOnly);
-                    var docyTypePan = allPanText.IndexOf(txt2Find) > 0 && allPanText.Length > allPanText.IndexOf(txt2Find) ? "PAN" : "UNKNOWN";
+                    var ocrImaged = googleHelper.MaskPanTextInImage(byteimage, imageReadOnly, panNumber2Find);
+                    var docyTypePan = allPanText.IndexOf(panNumber2Find) > 0 && allPanText.Length > allPanText.IndexOf(panNumber2Find) ? "PAN" : "UNKNOWN";
                     var maskedImage = new FaceImageDetail
                     {
                         DocType = docyTypePan,
@@ -208,7 +211,7 @@ namespace risk.control.system.Services
                     try
                     {
                         #region// PAN VERIFICATION ::: //test PAN FNLPM8635N, BYSPP5796F
-                        if (company.VerifyOcr)
+                        if (company.VerifyPan)
                         {
                             //var body = await httpClientService.VerifyPan(maskedImage.DocumentId, company.PanIdfyUrl, company.RapidAPIKey, company.RapidAPITaskId, company.RapidAPIGroupId);
                             //company.RapidAPIPanRemainCount = body?.count_remain;
@@ -220,26 +223,26 @@ namespace risk.control.system.Services
                             var panResponse = await httpClientService.VerifyPanNew(maskedImage.DocumentId);
                             if (panResponse != null && panResponse.valid) {
                                 var panMatch = panRegex.Match(maskedImage.DocumentId);
-                                claim.AgencyReport.DocumentIdReport.DocumentIdImageValid = panMatch.Success && panResponse.valid ? true : false;
+                                claim.AgencyReport.PanIdReport.DocumentIdImageValid = panMatch.Success && panResponse.valid ? true : false;
                             }
                         }
                         else
                         {
                             var panMatch = panRegex.Match(maskedImage.DocumentId);
-                            claim.AgencyReport.DocumentIdReport.DocumentIdImageValid = panMatch.Success ? true : false;
+                            claim.AgencyReport.PanIdReport.DocumentIdImageValid = panMatch.Success ? true : false;
                         }
 
                         #endregion PAN IMAGE PROCESSING
 
                         var image = Convert.FromBase64String(maskedImage.MaskedImage);
                         var savedMaskedImage = CompressImage.ProcessCompress(image);
-                        claim.AgencyReport.DocumentIdReport.DocumentIdImage = savedMaskedImage;
-                        claim.AgencyReport.DocumentIdReport.DocumentIdImageType = maskedImage.DocType;
-                        claim.AgencyReport.DocumentIdReport.DocumentIdImageData = maskedImage.DocType + " data: ";
+                        claim.AgencyReport.PanIdReport.DocumentIdImage = savedMaskedImage;
+                        claim.AgencyReport.PanIdReport.DocumentIdImageType = maskedImage.DocType;
+                        claim.AgencyReport.PanIdReport.DocumentIdImageData = maskedImage.DocType + " data: ";
 
                         if (!string.IsNullOrWhiteSpace(maskedImage.OcrData))
                         {
-                            claim.AgencyReport.DocumentIdReport.DocumentIdImageData = maskedImage.DocType + " data:. \r\n " +
+                            claim.AgencyReport.PanIdReport.DocumentIdImageData = maskedImage.DocType + " data:. \r\n " +
                                 "" + maskedImage.OcrData.Replace(maskedImage.DocumentId, "xxxxxxxxxx");
                         }
                     }
@@ -247,9 +250,9 @@ namespace risk.control.system.Services
                     {
                         Console.WriteLine(ex.StackTrace);
                         var image = Convert.FromBase64String(maskedImage.MaskedImage);
-                        claim.AgencyReport.DocumentIdReport.DocumentIdImage = CompressImage.ProcessCompress(image);
-                        claim.AgencyReport.DocumentIdReport.DocumentIdImageLongLatTime = DateTime.Now;
-                        claim.AgencyReport.DocumentIdReport.DocumentIdImageData = "no data: ";
+                        claim.AgencyReport.PanIdReport.DocumentIdImage = CompressImage.ProcessCompress(image);
+                        claim.AgencyReport.PanIdReport.DocumentIdImageLongLatTime = DateTime.Now;
+                        claim.AgencyReport.PanIdReport.DocumentIdImageData = "no data: ";
                     }
                 }
                 //=================END GOOGLE VISION  API =========================
@@ -257,16 +260,16 @@ namespace risk.control.system.Services
                 else
                 {
                     var image = Convert.FromBase64String(data.OcrImage);
-                    claim.AgencyReport.DocumentIdReport.DocumentIdImage = CompressImage.ProcessCompress(image);
-                    claim.AgencyReport.DocumentIdReport.DocumentIdImageValid = false;
-                    claim.AgencyReport.DocumentIdReport.DocumentIdImageLongLatTime = DateTime.Now;
-                    claim.AgencyReport.DocumentIdReport.DocumentIdImageData = "no data: ";
+                    claim.AgencyReport.PanIdReport.DocumentIdImage = CompressImage.ProcessCompress(image);
+                    claim.AgencyReport.PanIdReport.DocumentIdImageValid = false;
+                    claim.AgencyReport.PanIdReport.DocumentIdImageLongLatTime = DateTime.Now;
+                    claim.AgencyReport.PanIdReport.DocumentIdImageData = "no data: ";
                 }
 
                 #endregion PAN IMAGE PROCESSING
                 var rawAddress = await addressTask;
-                claim.AgencyReport.DocumentIdReport.DocumentIdImageLocationAddress = rawAddress;
-                claim.AgencyReport.DocumentIdReport.ValidationExecuted = true;
+                claim.AgencyReport.PanIdReport.DocumentIdImageLocationAddress = rawAddress;
+                claim.AgencyReport.PanIdReport.ValidationExecuted = true;
 
                 _context.ClaimsInvestigation.Update(claim);
 
@@ -278,12 +281,12 @@ namespace risk.control.system.Services
                 return new AppiCheckifyResponse
                 {
                     BeneficiaryId = claim.BeneficiaryDetail.BeneficiaryDetailId,
-                    OcrImage = claim.AgencyReport.DocumentIdReport?.DocumentIdImage != null ?
-                    Convert.ToBase64String(claim.AgencyReport.DocumentIdReport?.DocumentIdImage) :
+                    OcrImage = claim.AgencyReport.PanIdReport?.DocumentIdImage != null ?
+                    Convert.ToBase64String(claim.AgencyReport.PanIdReport?.DocumentIdImage) :
                     Convert.ToBase64String(noDataimage),
-                    OcrLongLat = claim.AgencyReport.DocumentIdReport?.DocumentIdImageLongLat,
-                    OcrTime = claim.AgencyReport.DocumentIdReport?.DocumentIdImageLongLatTime,
-                    PanValid = claim.AgencyReport.DocumentIdReport?.DocumentIdImageValid
+                    OcrLongLat = claim.AgencyReport.PanIdReport?.DocumentIdImageLongLat,
+                    OcrTime = claim.AgencyReport.PanIdReport?.DocumentIdImageLongLatTime,
+                    PanValid = claim.AgencyReport.PanIdReport?.DocumentIdImageValid
                 };
             }
             catch (Exception ex)
@@ -335,6 +338,154 @@ namespace risk.control.system.Services
             claim.AgencyReport.ReportQuestionaire.VideoUrl = videoPath;
             _context.ClaimsInvestigation.Update(claim);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<AppiCheckifyResponse> GetPassportId(DocumentData data)
+        {
+            try
+            {
+                var claim = claimsService.GetClaims().Include(c => c.AgencyReport).ThenInclude(c => c.PassportIdReport).FirstOrDefault(c => c.ClaimsInvestigationId == data.ClaimId);
+                if (claim.AgencyReport == null)
+                {
+                    claim.AgencyReport = new AgencyReport();
+                }
+                claim.AgencyReport.AgentEmail = data.Email;
+                claim.AgencyReport.PassportIdReport.DocumentIdImageLongLat = data.OcrLongLat;
+                claim.AgencyReport.PassportIdReport.DocumentIdImageLongLatTime = DateTime.Now;
+                var longLat = claim.AgencyReport.PassportIdReport.DocumentIdImageLongLat.IndexOf("/");
+                var latitude = claim.AgencyReport.PassportIdReport.DocumentIdImageLongLat.Substring(0, longLat)?.Trim();
+                var longitude = claim.AgencyReport.PassportIdReport.DocumentIdImageLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
+                var latLongString = latitude + "," + longitude;
+                var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+                claim.AgencyReport.PassportIdReport.DocumentIdImageLocationUrl = url;
+                var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claim.ClientCompanyId);
+
+                #region Passport IMAGE PROCESSING
+
+                //=================GOOGLE VISION API =========================
+
+                var byteimage = Convert.FromBase64String(data.OcrImage);
+
+                //await CompareFaces.DetectSampleAsync(byteimage);
+
+                var googleDetecTask = googleApi.DetectTextAsync(byteimage);
+
+                var addressTask = httpClientService.GetRawAddress(latitude, longitude);
+
+                await Task.WhenAll(googleDetecTask, addressTask);
+
+                var imageReadOnly = await googleDetecTask;
+                if (imageReadOnly != null && imageReadOnly.Count > 0)
+                {
+                    var allPassportText = imageReadOnly.FirstOrDefault().Description;
+                    var passportTextPre = allPassportText.IndexOf(passportNumber2Find);
+
+                    var passportNumber = allPassportText.Substring(passportTextPre + passportNumber2Find.Length + 1, 8);
+
+                    var passportMatch = passportRegex.Match(passportNumber);
+                    if (!passportMatch.Success)
+                    {
+                        passportNumber = passportRegex.Match(allPassportText).Value;
+                    }
+                    
+
+
+                    var ocrImaged = googleHelper.MaskPassportTextInImage(byteimage, imageReadOnly, passportNumber);
+                    var docyTypePassport = allPassportText.IndexOf(passportNumber2Find) > 0 && allPassportText.Length > allPassportText.IndexOf(passportNumber2Find) ? "Passport" : "UNKNOWN";
+                    var maskedImage = new FaceImageDetail
+                    {
+                        DocType = docyTypePassport,
+                        DocumentId = passportNumber,
+                        MaskedImage = Convert.ToBase64String(ocrImaged),
+                        OcrData = allPassportText
+                    };
+                    try
+                    {
+                        #region// PAN VERIFICATION ::: //test PAN FNLPM8635N, BYSPP5796F
+                        if (company.VerifyPassport)
+                        {
+                            //var body = await httpClientService.VerifyPan(maskedImage.DocumentId, company.PanIdfyUrl, company.RapidAPIKey, company.RapidAPITaskId, company.RapidAPIGroupId);
+                            //company.RapidAPIPanRemainCount = body?.count_remain;
+
+                            //if (body != null && body?.status == "completed" &&
+                            //    body?.result != null &&
+                            //    body.result?.source_output != null
+                            //    && body.result?.source_output?.status == "id_found")
+                            var panResponse = await httpClientService.VerifyPanNew(maskedImage.DocumentId);
+                            if (panResponse != null && panResponse.valid)
+                            {
+                                var panMatch = passportRegex.Match(maskedImage.DocumentId);
+                                claim.AgencyReport.PassportIdReport.DocumentIdImageValid = panMatch.Success && panResponse.valid ? true : false;
+                            }
+                        }
+                        else
+                        {
+                            var panMatch = passportRegex.Match(maskedImage.DocumentId);
+                            claim.AgencyReport.PassportIdReport.DocumentIdImageValid = panMatch.Success ? true : false;
+                        }
+
+                        #endregion PAN IMAGE PROCESSING
+
+                        var image = Convert.FromBase64String(maskedImage.MaskedImage);
+                        var savedMaskedImage = CompressImage.ProcessCompress(image);
+                        claim.AgencyReport.PassportIdReport.DocumentIdImage = savedMaskedImage;
+                        claim.AgencyReport.PassportIdReport.DocumentIdImageType = maskedImage.DocType;
+                        claim.AgencyReport.PassportIdReport.DocumentIdImageData = maskedImage.DocType + " data: ";
+
+                        if (!string.IsNullOrWhiteSpace(maskedImage.OcrData))
+                        {
+                            claim.AgencyReport.PassportIdReport.DocumentIdImageData = maskedImage.DocType + " data:. \r\n " +
+                                "" + maskedImage.OcrData.Replace(maskedImage.DocumentId, "xxxxxxxxxx");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.StackTrace);
+                        var image = Convert.FromBase64String(maskedImage.MaskedImage);
+                        claim.AgencyReport.PassportIdReport.DocumentIdImage = CompressImage.ProcessCompress(image);
+                        claim.AgencyReport.PassportIdReport.DocumentIdImageLongLatTime = DateTime.Now;
+                        claim.AgencyReport.PassportIdReport.DocumentIdImageData = "no data: ";
+                    }
+                }
+                //=================END GOOGLE VISION  API =========================
+
+                else
+                {
+                    var image = Convert.FromBase64String(data.OcrImage);
+                    claim.AgencyReport.PassportIdReport.DocumentIdImage = CompressImage.ProcessCompress(image);
+                    claim.AgencyReport.PassportIdReport.DocumentIdImageValid = false;
+                    claim.AgencyReport.PassportIdReport.DocumentIdImageLongLatTime = DateTime.Now;
+                    claim.AgencyReport.PassportIdReport.DocumentIdImageData = "no data: ";
+                }
+
+                #endregion PAN IMAGE PROCESSING
+                var rawAddress = await addressTask;
+                claim.AgencyReport.PassportIdReport.DocumentIdImageLocationAddress = rawAddress;
+                claim.AgencyReport.PassportIdReport.ValidationExecuted = true;
+
+                _context.ClaimsInvestigation.Update(claim);
+
+                var rows = await _context.SaveChangesAsync();
+
+                var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-photo.jpg");
+
+                var noDataimage = await File.ReadAllBytesAsync(noDataImagefilePath);
+                return new AppiCheckifyResponse
+                {
+                    BeneficiaryId = claim.BeneficiaryDetail.BeneficiaryDetailId,
+                    OcrImage = claim.AgencyReport.PassportIdReport?.DocumentIdImage != null ?
+                    Convert.ToBase64String(claim.AgencyReport.PassportIdReport?.DocumentIdImage) :
+                    Convert.ToBase64String(noDataimage),
+                    OcrLongLat = claim.AgencyReport.PassportIdReport?.DocumentIdImageLongLat,
+                    OcrTime = claim.AgencyReport.PassportIdReport?.DocumentIdImageLongLatTime,
+                    PanValid = claim.AgencyReport.PassportIdReport?.DocumentIdImageValid
+                };
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                throw;
+            }
         }
     }
 }

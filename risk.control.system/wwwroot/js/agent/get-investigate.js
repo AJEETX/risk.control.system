@@ -5,6 +5,7 @@
             fbtn = $('#UploadFaceImageButton');
         val ? fbtn.removeAttr("disabled") : fbtn.attr("disabled");
     });
+
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(success);
     } else {
@@ -18,6 +19,9 @@
 
         $('#documentIdLatitude').val(coordinates.latitude);
         $('#documentIdLongitude').val(coordinates.longitude);
+
+        $('#passportIdLatitude').val(coordinates.latitude);
+        $('#passportIdLongitude').val(coordinates.longitude);
     }
     var currentImage;
     var currentImageEl = document.getElementById('face-Image');
@@ -185,6 +189,89 @@
             );
         }
     });
+
+    var passportImage;
+    var passportImageEl = document.getElementById('passport-Image');
+    if (passportImageEl) {
+        passportImage = passportImageEl.src;
+    }
+    $("#passportImage").on('change', function () {
+        var MaxSizeInBytes = 2097152;
+        //Get count of selected files
+        var countFiles = $(this)[0].files.length;
+
+        var imgPath = $(this)[0].value;
+        var extn = imgPath.substring(imgPath.lastIndexOf('.') + 1).toLowerCase();
+
+        if (extn == "gif" || extn == "png" || extn == "jpg" || extn == "jpeg") {
+            if (typeof (FileReader) != "undefined") {
+
+                //loop for each file selected for uploaded.
+                for (var i = 0; i < countFiles; i++) {
+                    var fileSize = $(this)[0].files[i].size;
+                    if (fileSize > MaxSizeInBytes) {
+                        if (passportImage && passportImage.startsWith('https://') && passportImage.endsWith('/img/no-image.png')) {
+                            document.getElementById('passport-Image').src = '/img/no-image.png';
+                            document.getElementById('passportImage').value = '';
+                        }
+                        $.alert(
+                            {
+                                title: " Image UPLOAD issue !",
+                                content: " <i class='fa fa-upload'></i> Upload Image size limit exceeded. <br />Max file size is 2 MB!",
+                                icon: 'fas fa-exclamation-triangle',
+                                type: 'red',
+                                closeIcon: true,
+                                buttons: {
+                                    cancel: {
+                                        text: "CLOSE",
+                                        btnClass: 'btn-danger'
+                                    }
+                                }
+                            }
+                        );
+                    }
+                    else {
+                        document.getElementById('passport-Image').src = window.URL.createObjectURL($(this)[0].files[i]);
+                    }
+                }
+
+            } else {
+                $.alert(
+                    {
+                        title: "Outdated Browser !",
+                        content: "This browser does not support FileReader. Try on modern browser!",
+                        icon: 'fas fa-exclamation-triangle',
+
+                        type: 'red',
+                        closeIcon: true,
+                        buttons: {
+                            cancel: {
+                                text: "CLOSE",
+                                btnClass: 'btn-danger'
+                            }
+                        }
+                    }
+                );
+            }
+        } else {
+            $.alert(
+                {
+                    title: "FILE UPLOAD TYPE !!",
+                    content: "Pls select only image with extension jpg, png,gif ! ",
+                    icon: 'fas fa-exclamation-triangle',
+
+                    type: 'red',
+                    closeIcon: true,
+                    buttons: {
+                        cancel: {
+                            text: "CLOSE",
+                            btnClass: 'btn-danger'
+                        }
+                    }
+                }
+            );
+        }
+    });
     let askFaceUploadConfirmation = true;
     $('#upload-face').on('submit',function (e) {
         if (askFaceUploadConfirmation) {
@@ -243,6 +330,12 @@
         val ? fbtn.removeAttr("disabled") : fbtn.attr("disabled");
     });
 
+    $('#passportImage').on("change", function () {
+        var val = $(this).val(),
+            fbtn = $('#UploadPassportImageButton');
+        val ? fbtn.removeAttr("disabled") : fbtn.attr("disabled");
+    });
+
     let askPanUploadConfirmation = true;
 
     $('#upload-pan').on('submit',function (e) {
@@ -295,6 +388,57 @@
         
     });
 
+    let askPassportUploadConfirmation = true;
+
+    $('#upload-passport').on('submit', function (e) {
+        if (askPassportUploadConfirmation) {
+            e.preventDefault();
+            $.confirm({
+                title: "Confirm Upload",
+                content: "Are you sure to upload Passport?",
+                icon: 'fa fa-upload',
+
+                type: 'green',
+                closeIcon: true,
+                buttons: {
+                    confirm: {
+                        text: "Upload",
+                        btnClass: 'btn-success',
+                        action: function () {
+                            askPassportUploadConfirmation = false;
+                            $("body").addClass("submit-progress-bg");
+                            // Wrap in setTimeout so the UI
+                            // can update the spinners
+                            setTimeout(function () {
+                                $(".submit-progress").removeClass("hidden");
+                            }, 1);
+                            $('#UploadPassportImageButton').attr('disabled', 'disabled');
+                            $('#UploadPassportImageButton').html("<i class='fas fa-sync fa-spin'></i> Uploading");
+
+                            $('#upload-passport').submit();
+                            $('#back').attr('disabled', 'disabled');
+
+                            $('html *').css('cursor', 'not-allowed');
+                            $('html a *, html button *').css('pointer-events', 'none')
+
+                            var article = document.getElementById("article");
+                            if (article) {
+                                var nodes = article.getElementsByTagName('*');
+                                for (var i = 0; i < nodes.length; i++) {
+                                    nodes[i].disabled = true;
+                                }
+                            }
+                        }
+                    },
+                    cancel: {
+                        text: "Cancel",
+                        btnClass: 'btn-default'
+                    }
+                }
+            });
+        }
+
+    });
     $('#terms_and_conditions').click(function () {
         //If the checkbox is checked.
         var report = $('#remarks').val();

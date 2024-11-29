@@ -148,7 +148,7 @@
                                             <div class="form-check form-switch">
 
                                                 <label class="form-check-label" for="flexRadioDefault1">
-                                                    @if (@Model.ClaimsInvestigation.AgencyReport.DocumentIdReport?.DocumentIdImageValid != null && @Model.ClaimsInvestigation.AgencyReport.DocumentIdReport.DocumentIdImageValid.Value)
+                                                    @if (@Model.ClaimsInvestigation.AgencyReport.PanIdReport?.DocumentIdImageValid != null && @Model.ClaimsInvestigation.AgencyReport.PanIdReport.DocumentIdImageValid.Value)
                                                     {
                                                         <i style='color:green;' class='fas fa-check-circle'></i>
                                                     }
@@ -160,6 +160,26 @@
                                                 </label>
                                             </div>
                                         </div>
+                                        @if(Model.ClaimsInvestigation.ClientCompany.EnablePassport)
+                                        {
+                                            <div class="form-group">
+                                                <div class="form-check form-switch">
+
+                                                    <label class="form-check-label" for="flexRadioDefault1">
+                                                        @if (@Model.ClaimsInvestigation.AgencyReport.PassportIdReport?.DocumentIdImageValid != null && @Model.ClaimsInvestigation.AgencyReport.PassportIdReport.DocumentIdImageValid.Value)
+                                                        {
+                                                            <i style='color:green;' class='fas fa-check-circle'></i>
+                                                        }
+                                                        else
+                                                        {
+                                                            <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i>
+                                                        } <span class="process-case"></span>
+                                                        <i class="far fa-image"></i>  <b>  Passport Valid </b>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        }
+                                        
                                         <div class="form-group">
                                             <div class="form-check form-switch">
 
@@ -204,8 +224,8 @@
                                                 </div>
                                             </div>
                                             @if (string.IsNullOrWhiteSpace(@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImageMatchConfidence) ||
-                                           @Model.ClaimsInvestigation.AgencyReport.DocumentIdReport?.DocumentIdImageValid == null ||
-                                           !@Model.ClaimsInvestigation.AgencyReport.DocumentIdReport.DocumentIdImageValid.Value)
+                                           @Model.ClaimsInvestigation.AgencyReport.PanIdReport?.DocumentIdImageValid == null ||
+                                           !@Model.ClaimsInvestigation.AgencyReport.PanIdReport.DocumentIdImageValid.Value)
                                             {
                                                 <div class="form-group">
                                                     <div class="form-check form-switch">
@@ -270,8 +290,8 @@
                                                 </div>
                                             }
                                             @if (string.IsNullOrWhiteSpace(@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImageMatchConfidence) ||
-                                           @Model.ClaimsInvestigation.AgencyReport.DocumentIdReport?.DocumentIdImageValid == null ||
-                                           !@Model.ClaimsInvestigation.AgencyReport.DocumentIdReport.DocumentIdImageValid.Value)
+                                           @Model.ClaimsInvestigation.AgencyReport.PanIdReport?.DocumentIdImageValid == null ||
+                                           !@Model.ClaimsInvestigation.AgencyReport.PanIdReport.DocumentIdImageValid.Value)
                                             {
                                                 <div class="form-group">
                                                     <div class="form-check form-switch">
