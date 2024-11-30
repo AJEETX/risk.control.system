@@ -345,7 +345,7 @@
                             @{
                                 <partial name="_AgentSubmittedDigitalIdReport" model="@Model" />
                                 <partial name="_AgentSubmittedDocumentIdReport" model="@Model" />
-                                if (Model.ClaimsInvestigation.ClientCompany.EnablePassport)
+                                if (Model.ClaimsInvestigation.EnablePassport)
                                 {
                                     <partial name="_AgentSubmittedPassportIdReport" model="@Model" />
                                 }

@@ -34,7 +34,7 @@
                 <div class="row">
                     <partial name="_AgencyDigitalReport" model="@Model" />
                     <partial name="_AgencyDocumentReport" model="@Model" />
-                    @if(Model.ClaimsInvestigation.ClientCompany.EnablePassport)
+                    @if(Model.ClaimsInvestigation.EnablePassport)
                     {
                         <partial name="_AgencyPassportIdReport" model="@Model" />
                     }

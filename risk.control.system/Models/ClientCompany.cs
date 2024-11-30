@@ -64,26 +64,20 @@ namespace risk.control.system.Models
 
         public string? DocumentUrl { get; set; } = default!;
 
-        [Display(Name = "Document")]
-        [NotMapped]
-        public IFormFile? Document { get; set; }
-
         [Display(Name = "Document url")]
         public byte[]? DocumentImage { get; set; } = default!;
 
         public List<ClientCompanyApplicationUser>? CompanyApplicationUser { get; set; }
 
         public List<Vendor>? EmpanelledVendors { get; set; } = new();
-        public List<ClaimsInvestigation> ClaimsInvestigations { get; set; } = new();
         public bool AutoAllocation { get; set; } = false;
         public bool VerifyPan { get; set; } = false;
         public bool VerifyPassport { get; set; } = false;
         public bool EnablePassport { get; set; } = false;
         public string ApiBaseUrl { get; set; } = "https://2j2sgigd3l.execute-api.ap-southeast-2.amazonaws.com/Development/icheckify";
-        public string PanIdfyUrl { get; set; } = "https://idfy-verification-suite.p.rapidapi.com";
+        public string PanIdfyUrl { get; set; } = "https://pan-card-verification-at-lowest-price.p.rapidapi.com/verification/marketing/pan";
         public string RapidAPIKey { get; set; } = "df0893831fmsh54225589d7b9ad1p15ac51jsnb4f768feed6f";
-        public string RapidAPITaskId { get; set; } = "74f4c926-250c-43ca-9c53-453e87ceacd1";
-        public string RapidAPIGroupId { get; set; } = "8e16424a-58fc-4ba4-ab20-5bc8e7c3c41e";
+        public string RapidAPIHost { get; set; } = "pan-card-verification-at-lowest-price.p.rapidapi.com";
         public string? RapidAPIPanRemainCount { get; set; }
         public bool SendSMS { get; set; } = false;
         public bool CanChangePassword { get; set; } = false;

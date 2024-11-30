@@ -13,6 +13,7 @@ using Amazon.Textract;
 using System.Xml;
 using System.Text.RegularExpressions;
 using risk.control.system.Controllers.Api.Claims;
+using static Google.Apis.Requests.BatchRequest;
 
 namespace risk.control.system.Services
 {
@@ -220,7 +221,7 @@ namespace risk.control.system.Services
                             //    body?.result != null &&
                             //    body.result?.source_output != null
                             //    && body.result?.source_output?.status == "id_found")
-                            var panResponse = await httpClientService.VerifyPanNew(maskedImage.DocumentId);
+                            var panResponse = await httpClientService.VerifyPanNew(maskedImage.DocumentId, company.PanIdfyUrl, company.RapidAPIKey, company.RapidAPIHost);
                             if (panResponse != null && panResponse.valid) {
                                 var panMatch = panRegex.Match(maskedImage.DocumentId);
                                 claim.AgencyReport.PanIdReport.DocumentIdImageValid = panMatch.Success && panResponse.valid ? true : false;
@@ -401,22 +402,12 @@ namespace risk.control.system.Services
                     };
                     try
                     {
-                        #region// PAN VERIFICATION ::: //test PAN FNLPM8635N, BYSPP5796F
+                        #region// PASSPORT VERIFICATION ::: //test 
                         if (company.VerifyPassport)
                         {
-                            //var body = await httpClientService.VerifyPan(maskedImage.DocumentId, company.PanIdfyUrl, company.RapidAPIKey, company.RapidAPITaskId, company.RapidAPIGroupId);
-                            //company.RapidAPIPanRemainCount = body?.count_remain;
-
-                            //if (body != null && body?.status == "completed" &&
-                            //    body?.result != null &&
-                            //    body.result?.source_output != null
-                            //    && body.result?.source_output?.status == "id_found")
-                            var panResponse = await httpClientService.VerifyPanNew(maskedImage.DocumentId);
-                            if (panResponse != null && panResponse.valid)
-                            {
-                                var panMatch = passportRegex.Match(maskedImage.DocumentId);
-                                claim.AgencyReport.PassportIdReport.DocumentIdImageValid = panMatch.Success && panResponse.valid ? true : false;
-                            }
+                            //to-do
+                            var panMatch = passportRegex.Match(maskedImage.DocumentId);
+                            claim.AgencyReport.PassportIdReport.DocumentIdImageValid = panMatch.Success ? true : false;
                         }
                         else
                         {

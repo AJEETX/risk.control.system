@@ -14,9 +14,9 @@ namespace risk.control.system.Controllers.Api
     {
         private readonly IHttpClientService httpClientService;
         private static string BaseUrl = "http://icheck-webSe-kOnc2X2NMOwe-196777346.ap-southeast-2.elb.amazonaws.com";
-        private static string PanIdfyUrl = "https://idfy-verification-suite.p.rapidapi.com";
+        private static string PanIdfyUrl = "https://pan-card-verification-at-lowest-price.p.rapidapi.com/verification/marketing/pan";
         private static string RapidAPIKey = "df0893831fmsh54225589d7b9ad1p15ac51jsnb4f768feed6f";
-        private static string PanTask_id = "74f4c926-250c-43ca-9c53-453e87ceacd1";
+        private static string PanTask_id = "pan-card-verification-at-lowest-price.p.rapidapi.com";
         private static string PanGroup_id = "8e16424a-58fc-4ba4-ab20-5bc8e7c3c41e";
 
         public IcheckifyApiController(IHttpClientService httpClientService)
@@ -43,7 +43,7 @@ namespace risk.control.system.Controllers.Api
         [HttpGet("pan")]
         public async Task<IActionResult> Pan(string pan = "FNLPM8635N")
         {
-            var verifiedPanResponse = await httpClientService.VerifyPan(pan, PanIdfyUrl, RapidAPIKey, PanTask_id, PanGroup_id);
+            var verifiedPanResponse = await httpClientService.VerifyPanNew(pan, PanIdfyUrl, RapidAPIKey, PanTask_id);
 
             return Ok(verifiedPanResponse);
         }

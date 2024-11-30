@@ -65,6 +65,7 @@ namespace risk.control.system.Models
             return $"Case Id: {ClaimsInvestigationId}, <br /> ";
         }
 
+        public bool EnablePassport { get; set; } = false;
         public bool IsReviewCase { get; set; } = false;
         public bool NotWithdrawable { get; set; } = false;
         public bool NotDeclinable { get; set; } = false;

@@ -641,7 +641,7 @@ namespace risk.control.system.Services
         public async Task<ClaimsInvestigation> AllocateToVendor(string userEmail, string claimsInvestigationId, long vendorId, long caseLocationId, bool AutoAllocated = true)
         {
             var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == vendorId);
-            var currentUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == userEmail);
+            var currentUser = _context.ClientCompanyApplicationUser.Include(c=>c.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
 
             var supervisor = await GetSupervisor(vendorId);
             var inProgress = _context.InvestigationCaseStatus.FirstOrDefault(
@@ -658,6 +658,7 @@ namespace risk.control.system.Services
                 claimsCaseToAllocateToVendor.UpdatedBy = currentUser.FirstName + " " + currentUser.LastName + " (" + currentUser.Email + ")";
                 claimsCaseToAllocateToVendor.CurrentUserEmail = userEmail;
                 claimsCaseToAllocateToVendor.CurrentClaimOwner = supervisor.Email;
+                claimsCaseToAllocateToVendor.EnablePassport = currentUser.ClientCompany.EnablePassport;
 
                 claimsCaseToAllocateToVendor.InvestigationCaseSubStatusId = allocatedToVendor.InvestigationCaseSubStatusId;
                 claimsCaseToAllocateToVendor.UserEmailActioned = userEmail;

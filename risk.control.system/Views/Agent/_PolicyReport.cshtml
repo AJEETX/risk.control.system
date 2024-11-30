@@ -41,9 +41,10 @@
             <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
         </div>
         <div class="row">
+
             <partial name="_DigitalIdReport" model="@Model" />
             <partial name="_DocumentIdReport" model="@Model" />
-            @if(Model.ClaimsInvestigation.ClientCompany.EnablePassport)
+            @if(Model.ClaimsInvestigation.EnablePassport)
             {
                 <partial name="_PassportIdReport" model="@Model" />
             }

@@ -23,7 +23,7 @@ namespace risk.control.system.Services
         Task<FaceMatchDetail> GetFaceMatch(MatchImage image, string baseUrl);
 
         Task<PanVerifyResponse?> VerifyPan(string pan, string panUrl, string rapidAPIKey, string task_id, string group_id);
-        Task<PanResponse?> VerifyPanNew(string pan);
+        Task<PanResponse?> VerifyPanNew(string pan, string panUrl, string key, string host);
 
         Task<RootObject> GetAddress(string lat, string lon);
         Task<string> GetRawAddress(string lat, string lon);
@@ -244,17 +244,17 @@ namespace risk.control.system.Services
 
         }
 
-        public async Task<PanResponse?> VerifyPanNew(string pan)
+        public async Task<PanResponse?> VerifyPanNew(string pan, string panUrl, string key, string host)
         {
             var payload = new PanRequest { PAN = pan };
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Post,
-                RequestUri = new Uri("https://pan-card-verification-at-lowest-price.p.rapidapi.com/verification/marketing/pan"),
+                RequestUri = new Uri(panUrl),
                 Headers =
                 {
-                    { "x-rapidapi-key", "df0893831fmsh54225589d7b9ad1p15ac51jsnb4f768feed6f" },
-                    { "x-rapidapi-host", "pan-card-verification-at-lowest-price.p.rapidapi.com" },
+                    { "x-rapidapi-key", key },
+                    { "x-rapidapi-host", host },
                 },
                 Content = new StringContent(JsonConvert.SerializeObject(payload))
                 {
