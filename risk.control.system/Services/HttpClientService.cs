@@ -5,6 +5,8 @@ using System.Runtime.Serialization.Json;
 
 using Azure;
 
+using Highsoft.Web.Mvc.Charts;
+
 using Newtonsoft.Json;
 
 using risk.control.system.AppConstant;
@@ -22,7 +24,6 @@ namespace risk.control.system.Services
 
         Task<FaceMatchDetail> GetFaceMatch(MatchImage image, string baseUrl);
 
-        Task<PanVerifyResponse?> VerifyPan(string pan, string panUrl, string rapidAPIKey, string task_id, string group_id);
         Task<PanResponse?> VerifyPanNew(string pan, string panUrl, string key, string host);
 
         Task<RootObject> GetAddress(string lat, string lon);
@@ -30,6 +31,10 @@ namespace risk.control.system.Services
 
         Task<LocationDetails_IpApi> GetAddressFromIp(string ipAddress);
         Task<bool> WhitelistIP(string url, string domain, string ipaddress);
+
+        Task<bool> VerifyPassport(string passport, string dateOfBirth);
+
+        Task<PassportOcrData> GetPassportOcrResult(byte[] imageBytes);
     }
 
     public class HttpClientService : IHttpClientService
@@ -37,7 +42,12 @@ namespace risk.control.system.Services
         private HttpClient httpClient = new HttpClient();
         private static string RapidAPIHost = "idfy-verification-suite.p.rapidapi.com";
         private static string PinCodeBaseUrl = "https://india-pincode-with-latitude-and-longitude.p.rapidapi.com/api/v1/pincode";
+        private readonly IWebHostEnvironment webHostEnvironment;
 
+        public HttpClientService(IWebHostEnvironment webHostEnvironment)
+        {
+            this.webHostEnvironment = webHostEnvironment;
+        }
         public async Task<List<PincodeApiData>> GetPinCodeLatLng(string pinCode)
         {
             var request = new HttpRequestMessage
@@ -94,47 +104,6 @@ namespace risk.control.system.Services
             catch (Exception ex)
             {
                 Console.WriteLine(ex.StackTrace);
-            }
-            return null!;
-        }
-
-
-        public async Task<PanVerifyResponse?> VerifyPan(string pan, string panUrl, string rapidAPIKey, string task_id, string group_id)
-        {
-            var requestPayload = new PanVerifyRequest
-            {
-                task_id = task_id,
-                group_id = group_id,
-                data = new PanNumber
-                {
-                    id_number = pan
-                }
-            };
-
-            var request2 = new HttpRequestMessage
-            {
-                Method = HttpMethod.Post,
-                RequestUri = new Uri(panUrl + "/v3/tasks/sync/verify_with_source/ind_pan"),
-                Headers =
-                {
-                    { "X-RapidAPI-Key", rapidAPIKey },
-                    { "X-RapidAPI-Host", RapidAPIHost },
-                },
-                Content = new StringContent(JsonConvert.SerializeObject(requestPayload)) { Headers = { ContentType = new MediaTypeHeaderValue("application/json") } },
-            };
-
-            using var response2 = await httpClient.SendAsync(request2);
-            if (response2.StatusCode == HttpStatusCode.OK)
-            {
-                var body = await response2.Content.ReadAsStringAsync();
-                var verifiedPanResponse = JsonConvert.DeserializeObject<PanVerifyResponse>(body);
-                HttpHeaders headers = response2.Headers;
-                IEnumerable<string> values;
-                if (headers.TryGetValues("x-ratelimit-requests-remaining", out values))
-                {
-                    verifiedPanResponse.count_remain = values.First();
-                }
-                return verifiedPanResponse;
             }
             return null!;
         }
@@ -272,6 +241,137 @@ namespace risk.control.system.Services
                 var panResponse = JsonConvert.DeserializeObject<PanResponse>(body);
                 return panResponse;
             }
+        }
+
+        public async Task<bool> VerifyPassport(string passport, string dateOfBirth)
+        {
+
+            var requestId = await StartVerifyPassport(passport, dateOfBirth);
+
+            var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri($"https://passport-verification.p.rapidapi.com/v3/tasks?request_id={requestId}"),
+                Headers =
+                {
+                    { "x-rapidapi-key", "327fd8beb9msh8a441504790e80fp142ea8jsnf74b9208776a" },
+                    { "x-rapidapi-host", "passport-verification.p.rapidapi.com" },
+                },
+            };
+            using (var response = await httpClient.SendAsync(request))
+            {
+                response.EnsureSuccessStatusCode();
+                var body = await response.Content.ReadAsStringAsync();
+                Console.WriteLine(body);
+            }
+            return true;
+        }
+
+        public async Task<PassportOcrData> GetPassportOcrResult(byte[] imageBytes)
+        {
+            var extension = GetImageExtension(imageBytes);
+            // Convert the byte array to a Base64 string
+
+            string filePath = $"outputImage.{extension}";
+            string path = Path.Combine(webHostEnvironment.WebRootPath, "passport");
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+            var imagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "passport", filePath);
+            // Write the byte array to a file
+            File.WriteAllBytes(imagefilePath, imageBytes);
+
+            var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Post,
+                RequestUri = new Uri("https://document-ocr1.p.rapidapi.com/idr"),
+                Headers =
+                {
+                    { "x-rapidapi-key", "327fd8beb9msh8a441504790e80fp142ea8jsnf74b9208776a" },
+                    { "x-rapidapi-host", "document-ocr1.p.rapidapi.com" },
+                },
+                Content = new MultipartFormDataContent
+                {
+                    new StringContent(imagefilePath)
+                    {
+                        Headers =
+                        {
+                            ContentDisposition = new ContentDispositionHeaderValue("form-data")
+                            {
+                                Name = "inputimage",
+                            }
+                        }
+                    },
+                },
+            };
+            using (var response = await httpClient.SendAsync(request))
+            {
+                response.EnsureSuccessStatusCode();
+                var body = await response.Content.ReadAsStringAsync();
+                var passportOcrData = JsonConvert.DeserializeObject<PassportOcrData>(body);
+                Console.WriteLine(body);
+                return passportOcrData;
+            }
+        }
+        private async Task<string> StartVerifyPassport(string passport, string date_of_birth)
+        {
+            var content = new
+            {
+                task_id = "74f4c926-250c-43ca-9c53-453e87ceacd1",
+                group_id = "8e16424a-58fc-4ba4-ab20-5bc8e7c3c41e",
+                data = new
+                {
+                    passport_file_number = passport,
+                    date_of_birth = date_of_birth
+                }
+            };
+            var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Post,
+                RequestUri = new Uri("https://passport-verification.p.rapidapi.com/v3/tasks/async/verify_with_source/ind_passport"),
+                Headers =
+                {
+                    { "x-rapidapi-key", "327fd8beb9msh8a441504790e80fp142ea8jsnf74b9208776a" },
+                    { "x-rapidapi-host", "passport-verification.p.rapidapi.com" },
+                },
+
+                Content = new StringContent(JsonConvert.SerializeObject(content))
+                {
+                    Headers =
+                    {
+                        ContentType = new MediaTypeHeaderValue("application/json")
+                    }
+                }
+            };
+            using (var response = await httpClient.SendAsync(request))
+            {
+                response.EnsureSuccessStatusCode();
+                var body = await response.Content.ReadAsStringAsync();
+                Console.WriteLine(body);
+                var requestId = JsonConvert.DeserializeObject<List<PassportResult>>(body).FirstOrDefault()?.request_id;
+                return requestId;
+            }
+        }
+
+        static string GetImageExtension(byte[] imageBytes)
+        {
+            // Check the magic numbers for common image formats
+            if (imageBytes.Length > 4)
+            {
+                if (imageBytes[0] == 0x89 && imageBytes[1] == 0x50 && imageBytes[2] == 0x4E && imageBytes[3] == 0x47) // PNG
+                    return "png";
+                if (imageBytes[0] == 0xFF && imageBytes[1] == 0xD8 && imageBytes[2] == 0xFF) // JPEG
+                    return "jpg";
+                if (imageBytes[0] == 0x47 && imageBytes[1] == 0x49 && imageBytes[2] == 0x46) // GIF
+                    return "gif";
+                if (imageBytes[0] == 0x42 && imageBytes[1] == 0x4D) // BMP
+                    return "bmp";
+                if (imageBytes[0] == 0x52 && imageBytes[1] == 0x49 && imageBytes[2] == 0x46 && imageBytes[3] == 0x46) // WebP (RIFF header)
+                    return "webp";
+            }
+
+            return null; // Unknown format
         }
     }
 }

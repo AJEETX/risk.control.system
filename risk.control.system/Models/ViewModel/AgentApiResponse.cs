@@ -91,6 +91,7 @@
     {
         public string DocType { get; set; }
         public string DocumentId { get; set; }
+        public string DateOfBirth { get; set; }
         public string MaskedImage { get; set; }
         public string? OcrData { get; set; }
     }

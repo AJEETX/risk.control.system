@@ -33,6 +33,7 @@ namespace risk.control.system.Services
         private static Regex passportRegex = new Regex(@"[A-Z]{1,2}[0-9]{6,7}");
         private static string panNumber2Find = "Permanent Account Number";
         private static string passportNumber2Find = "Passport No.";
+        private static string dateOfBirth2Find = "Date Of Birth";
         private readonly ApplicationDbContext _context;
         private readonly IGoogleApi googleApi;
         private readonly IGoogleMaskHelper googleHelper;
@@ -367,7 +368,7 @@ namespace risk.control.system.Services
 
                 var byteimage = Convert.FromBase64String(data.OcrImage);
 
-                //await CompareFaces.DetectSampleAsync(byteimage);
+                var passportdata = await httpClientService.GetPassportOcrResult(byteimage);
 
                 var googleDetecTask = googleApi.DetectTextAsync(byteimage);
 
@@ -379,26 +380,29 @@ namespace risk.control.system.Services
                 if (imageReadOnly != null && imageReadOnly.Count > 0)
                 {
                     var allPassportText = imageReadOnly.FirstOrDefault().Description;
-                    var passportTextPre = allPassportText.IndexOf(passportNumber2Find);
+                    //var passportTextPre = allPassportText.IndexOf(passportNumber2Find);
+                    //var dateOfBirth2FindTextPre = allPassportText.IndexOf(dateOfBirth2Find);
 
-                    var passportNumber = allPassportText.Substring(passportTextPre + passportNumber2Find.Length + 1, 8);
+                    //var passportNumber = allPassportText.Substring(passportTextPre + passportNumber2Find.Length + 1, 8);
+                    //var dateOfBirthNumber = allPassportText.Substring(dateOfBirth2FindTextPre + dateOfBirth2Find.Length + 1, 8);
 
-                    var passportMatch = passportRegex.Match(passportNumber);
-                    if (!passportMatch.Success)
-                    {
-                        passportNumber = passportRegex.Match(allPassportText).Value;
-                    }
-                    
+                    //var passportMatch = passportRegex.Match(passportNumber);
+                    //if (!passportMatch.Success)
+                    //{
+                    //    passportNumber = passportRegex.Match(allPassportText).Value;
+                    //}
 
 
-                    var ocrImaged = googleHelper.MaskPassportTextInImage(byteimage, imageReadOnly, passportNumber);
+
+                    var ocrImaged = googleHelper.MaskPassportTextInImage(byteimage, imageReadOnly, passportdata.data.ocr.documentNumber);
                     var docyTypePassport = allPassportText.IndexOf(passportNumber2Find) > 0 && allPassportText.Length > allPassportText.IndexOf(passportNumber2Find) ? "Passport" : "UNKNOWN";
                     var maskedImage = new FaceImageDetail
                     {
                         DocType = docyTypePassport,
-                        DocumentId = passportNumber,
+                        DocumentId = passportdata.data.ocr.documentNumber,
                         MaskedImage = Convert.ToBase64String(ocrImaged),
-                        OcrData = allPassportText
+                        OcrData = allPassportText,
+                        DateOfBirth = passportdata.data.ocr.dateOfBirth
                     };
                     try
                     {
@@ -406,6 +410,7 @@ namespace risk.control.system.Services
                         if (company.VerifyPassport)
                         {
                             //to-do
+                            //var passportResponse = await httpClientService.VerifyPassport(maskedImage.DocumentId, maskedImage.DateOfBirth);
                             var panMatch = passportRegex.Match(maskedImage.DocumentId);
                             claim.AgencyReport.PassportIdReport.DocumentIdImageValid = panMatch.Success ? true : false;
                         }
