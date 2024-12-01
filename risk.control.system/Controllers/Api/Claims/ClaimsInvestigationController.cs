@@ -169,7 +169,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 faceLng = claim.AgencyReport.DigitalIdReport.DigitalIdImageLongLat.Substring(longLat + 1)?.Trim();
                 var longLatString = faceLat + "," + faceLng;
                 imageAddress = await httpClientService.GetRawAddress((faceLat), (faceLng));
-                mapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={longLatString}&zoom=18&size=300x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{longLatString}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+                mapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={longLatString}&zoom=14&size=300x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{longLatString}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
             }
 
             string ocrUrl = $"https://maps.googleapis.com/maps/api/staticmap?center=32.661839,-97.263680&zoom=14&size=150x200&maptype=roadmap&markers=color:red%7Clabel:S%7C32.661839,-97.263680&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
@@ -181,7 +181,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 ocrLongitude = claim.AgencyReport.PanIdReport.DocumentIdImageLongLat.Substring(ocrlongLat + 1)?.Trim();
                 var ocrLongLatString = ocrLatitude + "," + ocrLongitude;
                 ocrAddress = await httpClientService.GetRawAddress((ocrLatitude), (ocrLongitude));
-                ocrUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={ocrLongLatString}&zoom=18&size=300x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{ocrLongLatString}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+                ocrUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={ocrLongLatString}&zoom=14&size=300x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{ocrLongLatString}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
             }
 
             string passportUrl = $"https://maps.googleapis.com/maps/api/staticmap?center=32.661839,-97.263680&zoom=14&size=150x200&maptype=roadmap&markers=color:red%7Clabel:S%7C32.661839,-97.263680&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
@@ -194,7 +194,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 passportLng = claim.AgencyReport.PassportIdReport.DocumentIdImageLongLat.Substring(passportlongLat + 1)?.Trim();
                 var passportLongLatString = passportLat + "," + passportLng;
                 passportAddress = await httpClientService.GetRawAddress((passportLat), (passportLng));
-                passportUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={passportLongLatString}&zoom=18&size=300x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{passportLongLatString}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+                passportUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={passportLongLatString}&zoom=14&size=300x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{passportLongLatString}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
             }
             var data = new
             {
@@ -263,7 +263,7 @@ namespace risk.control.system.Controllers.Api.Claims
 
             var longLatString = latitude + "," + longitude;
             var imageAddress = await httpClientService.GetRawAddress((latitude), (longitude));
-            var customerMapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={longLatString}&zoom=18&size=300x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{longLatString}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+            var customerMapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={longLatString}&zoom=14&size=300x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{longLatString}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
             var data = new
             {
                 profileMap = customer.CustomerLocationMap,
@@ -298,7 +298,7 @@ namespace risk.control.system.Controllers.Api.Claims
 
             var longLatString = latitude + "," + longitude;
             var imageAddress = await httpClientService.GetRawAddress((latitude), (longitude));
-            var customerMapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={longLatString}&zoom=18&size=300x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{longLatString}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+            var customerMapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={longLatString}&zoom=14&size=300x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{longLatString}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
             var data = new
             {
                 profileMap = beneficiary.BeneficiaryLocationMap,
