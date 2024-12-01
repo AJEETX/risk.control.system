@@ -321,7 +321,7 @@ $(document).ready(function () {
                     method: 'get'
                 }).done(function (response) {
                     data = response;
-                    self.setTitle('<i class="fas fa-portrait"></i> Photo <span class="badge badge-light">Uploaded</span>');
+                    self.setTitle('<i class="fas fa-portrait"></i> Photo <span class="badge badge-light">uploaded</span>');
                     self.setContent('<span class="badge badge-light"><i class="far fa-image"></i> Photo Scanned Image</span>');
                     self.setContentAppend('<br><img id="agentLocationPicture" class="img-fluid investigation-actual-image" src="' + response.location + '" /> ');
                     self.setContentAppend('<br><span class="badge badge-light"><i class="fas fa-info"></i> Location Info</span> ');
@@ -332,10 +332,7 @@ $(document).ready(function () {
                 });
             },
             onContentReady: function () {
-                if (showFaceMap) {
-                    showFaceMap = false;
-                    initPopMap(data.position, data.address);
-                }
+                
             }
         })
     })
@@ -364,10 +361,10 @@ $(document).ready(function () {
                     method: 'get'
                 }).done(function (response) {
                     data = response;
-                    self.setTitle('<i class="fas fa-portrait"></i> Photo <span class="badge badge-light">Uploaded</span>');
+                    self.setTitle('<i class="fas fa-portrait"></i> Photo <span class="badge badge-light">Uploaded location</span>');
                     self.setContent('<span class="badge badge-light"><i class="fas fa-map-pin"></i> Location visited</span>:');
                     self.setContentAppend('<div id="maps"></div>')
-                    self.setContentAppend('<br><div id="pop-face-map"></div>')
+                    self.setContentAppend('<br><div id="pop-map"></div>')
                     self.setContentAppend('</div>')
                     self.setContentAppend('<span class="badge badge-light"><i class="fas fa-map-marker-alt"></i> Address visited</span>:');
                     self.setContentAppend('<br><i>' + response.imageAddress + '</i>');
@@ -409,13 +406,13 @@ $(document).ready(function () {
                     method: 'get'
                 }).done(function (response) {
                     data = response;
-                    self.setTitle('<i class="fas fa-portrait"></i> Pan card <span class="badge badge-light">uploaded</span>');
+                    self.setTitle('<i class="fas fa-portrait"></i> Pan card <span class="badge badge-light">uploaded location</span>');
                     self.setContent('<span class="badge badge-light"><i class="fas fa-map-pin"></i> Location visited</span>:');
                     self.setContentAppend('<div id="maps"></div>')
-                    self.setContentAppend('<br><div id="pop-face-map"></div>')
+                    self.setContentAppend('<br><div id="pop-map"></div>')
                     self.setContentAppend('</div>')
                     self.setContentAppend('<span class="badge badge-light"><i class="fas fa-map-marker-alt"></i> Address visited</span>:');
-                    self.setContentAppend('<br><i>' + response.imageAddress + '</i>');
+                    self.setContentAppend('<br><i>' + response.ocrAddress + '</i>');
                     showOcrMap = true;
                 }).fail(function () {
                     self.setContent('Something went wrong.');
@@ -425,6 +422,51 @@ $(document).ready(function () {
                 if (showOcrMap) {
                     showOcrMap = false;
                     initPopMap(data.ocrPosition, data.ocrAddress);
+                }
+            }
+        })
+    })
+
+    $('.passportlocationImage').click(function () {
+        var data;
+        $.confirm({
+            type: 'green',
+            closeIcon: true,
+            columnClass: 'medium',
+
+            buttons: {
+                confirm: {
+                    text: "Ok",
+                    btnClass: 'btn-secondary',
+                    action: function () {
+                        askConfirmation = false;
+                    }
+                }
+            },
+            content: function () {
+                var self = this;
+                return $.ajax({
+                    url: '/api/ClaimsInvestigation/GetInvestigationData?id=' + $('#beneficiaryId').val() + '&claimId=' + $('#claimId').val(),
+                    dataType: 'json',
+                    method: 'get'
+                }).done(function (response) {
+                    data = response;
+                    self.setTitle('<i class="fas fa-portrait"></i> Passport <span class="badge badge-light">uploaded location</span>');
+                    self.setContent('<span class="badge badge-light"><i class="fas fa-map-pin"></i> Location visited</span>:');
+                    self.setContentAppend('<div id="maps"></div>')
+                    self.setContentAppend('<br><div id="pop-map"></div>')
+                    self.setContentAppend('</div>')
+                    self.setContentAppend('<span class="badge badge-light"><i class="fas fa-map-marker-alt"></i> Address visited</span>:');
+                    self.setContentAppend('<br><i>' + response.passportAddress + '</i>');
+                    showOcrMap = true;
+                }).fail(function () {
+                    self.setContent('Something went wrong.');
+                });
+            },
+            onContentReady: function () {
+                if (showOcrMap) {
+                    showOcrMap = false;
+                    initPopMap(data.passportPosition, data.passportAddress);
                 }
             }
         })
@@ -457,7 +499,7 @@ $(document).ready(function () {
                     self.setTitle('<i class="fas fa-mobile-alt"></i> <b>Customer Address Location</b>');
                     self.setContent('<b><span class="badge badge-light"><i class="fas fa-map-pin"></i> Map Location</span></b>:');
                     self.setContentAppend('<div id="maps"></div>')
-                    self.setContentAppend('<br><div id="pop-face-map"></div>')
+                    self.setContentAppend('<br><div id="pop-map"></div>')
                     self.setContentAppend('</div>')
                     self.setContentAppend('<span class="badge badge-light"><i class="fas fa-map-marker-alt"></i> Address</span>:');
                     self.setContentAppend('<br><i>' + response.address + '</i>');
@@ -503,7 +545,7 @@ $(document).ready(function () {
                     self.setTitle('<i class="fas fa-mobile-alt"></i> <b>Beneficiary Address Location</b>');
                     self.setContent('<b><span class="badge badge-light"><i class="fas fa-map-pin"></i> Map Location</span></b>:');
                     self.setContentAppend('<div id="maps"></div>')
-                    self.setContentAppend('<br><div id="pop-face-map"></div>')
+                    self.setContentAppend('<br><div id="pop-map"></div>')
                     self.setContentAppend('</div>')
                     self.setContentAppend('<span class="badge badge-light"><i class="fas fa-map-marker-alt"></i> Address</span>:');
                     self.setContentAppend('<br><i>' + response.address + '</i>');
@@ -549,6 +591,39 @@ $(document).ready(function () {
                     self.setContentAppend('<br><img id="agentOcrPicture" class="img-fluid investigation-actual-image" src="' + response.ocrData + '" /> ');
                     self.setContentAppend('<br><span class="badge badge-light"><i class="fas fa-info"></i> Image Scan Info</span> ');
                     self.setContentAppend('<br><i>' + response.qrData + '</i>');
+                }).fail(function () {
+                    self.setContent('Something went wrong.');
+                });
+            }
+        })
+    })
+
+    $('.passport-Image').click(function () {
+        $.confirm({
+            type: 'green',
+            closeIcon: true,
+
+            buttons: {
+                confirm: {
+                    text: "Ok",
+                    btnClass: 'btn-secondary',
+                    action: function () {
+                        askConfirmation = false;
+                    }
+                }
+            },
+            content: function () {
+                var self = this;
+                return $.ajax({
+                    url: '/api/ClaimsInvestigation/GetInvestigationData?id=' + $('#beneficiaryId').val() + '&claimId=' + $('#claimId').val(),
+                    dataType: 'json',
+                    method: 'get'
+                }).done(function (response) {
+                    self.setTitle('<i class="fas fa-portrait"></i> Passport <span class="badge badge-light">Uploaded</span>');
+                    self.setContent('<span class="badge badge-light"><i class="fas fa-film"></i> Passport scanned Image</span>');
+                    self.setContentAppend('<br><img id="agentPassportPicture" class="img-fluid investigation-actual-image" src="' + response.passportImage + '" /> ');
+                    self.setContentAppend('<br><span class="badge badge-light"><i class="fas fa-info"></i> Image Scan Info</span> ');
+                    self.setContentAppend('<br><i>' + response.passportData + '</i>');
                 }).fail(function () {
                     self.setContent('Something went wrong.');
                 });
@@ -1093,7 +1168,7 @@ async function initPopMap(_position, title) {
     if (_position) {
         position = _position;
     }
-    var element = document.getElementById("pop-face-map");
+    var element = document.getElementById("pop-map");
     // The map, centered at Uluru
     mapz = new Map(element, {
         scaleControl: true,

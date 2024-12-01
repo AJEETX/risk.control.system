@@ -147,6 +147,7 @@ namespace risk.control.system.Controllers.Api.Claims
             var claim = claimsService.GetClaims()
                 .Include(c=>c.AgencyReport)
                 .Include(c=>c.AgencyReport.PanIdReport)
+                .Include(c=>c.AgencyReport.PassportIdReport)
                 .Include(c=>c.AgencyReport.DigitalIdReport)
                 .FirstOrDefault(c=> c.ClaimsInvestigationId == claimId);
 
@@ -183,6 +184,18 @@ namespace risk.control.system.Controllers.Api.Claims
                 ocrUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={ocrLongLatString}&zoom=18&size=300x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{ocrLongLatString}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
             }
 
+            string passportUrl = $"https://maps.googleapis.com/maps/api/staticmap?center=32.661839,-97.263680&zoom=14&size=150x200&maptype=roadmap&markers=color:red%7Clabel:S%7C32.661839,-97.263680&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+            string passportAddress = string.Empty;
+            string passportLat = string.Empty, passportLng = string.Empty;
+            if (!string.IsNullOrWhiteSpace(claim.AgencyReport?.PassportIdReport?.DocumentIdImageLongLat))
+            {
+                var passportlongLat = claim.AgencyReport.PassportIdReport.DocumentIdImageLongLat.IndexOf("/");
+                passportLat = claim.AgencyReport.PassportIdReport.DocumentIdImageLongLat.Substring(0, passportlongLat)?.Trim();
+                passportLng = claim.AgencyReport.PassportIdReport.DocumentIdImageLongLat.Substring(passportlongLat + 1)?.Trim();
+                var passportLongLatString = passportLat + "," + passportLng;
+                passportAddress = await httpClientService.GetRawAddress((passportLat), (passportLng));
+                passportUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={passportLongLatString}&zoom=18&size=300x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{passportLongLatString}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+            }
             var data = new
             {
                 Title = "Investigation Data",
@@ -209,7 +222,19 @@ namespace risk.control.system.Controllers.Api.Claims
                 {
                     Lat = string.IsNullOrWhiteSpace(ocrLatitude) ? decimal.Parse("-37.0000") : decimal.Parse(ocrLatitude),
                     Lng = string.IsNullOrWhiteSpace(ocrLongitude) ? decimal.Parse("140.00") : decimal.Parse(ocrLongitude)
-                }
+                },
+                PassportData = claim.AgencyReport?.PassportIdReport?.DocumentIdImageData ?? "Passport Data",
+                PassportImage = claim.AgencyReport?.PassportIdReport?.DocumentIdImage != null ?
+                string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claim.AgencyReport?.PassportIdReport?.DocumentIdImage)) :
+                string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noDataimage)),
+                PassportLatLong = passportUrl,
+                PassportAddress = passportAddress,
+                PassportPosition =
+                new
+                {
+                    Lat = string.IsNullOrWhiteSpace(passportLat) ? decimal.Parse("-37.0000") : decimal.Parse(passportLat),
+                    Lng = string.IsNullOrWhiteSpace(passportLng) ? decimal.Parse("140.00") : decimal.Parse(passportLng)
+                },
             };
 
             return Ok(data);

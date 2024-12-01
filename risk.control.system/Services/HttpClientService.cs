@@ -34,7 +34,7 @@ namespace risk.control.system.Services
 
         Task<bool> VerifyPassport(string passport, string dateOfBirth);
 
-        Task<PassportOcrData> GetPassportOcrResult(byte[] imageBytes);
+        Task<PassportOcrData> GetPassportOcrResult(byte[] imageBytes, string url, string key, string host);
     }
 
     public class HttpClientService : IHttpClientService
@@ -267,12 +267,12 @@ namespace risk.control.system.Services
             return true;
         }
 
-        public async Task<PassportOcrData> GetPassportOcrResult(byte[] imageBytes)
+        public async Task<PassportOcrData> GetPassportOcrResult(byte[] imageBytes, string url, string key, string host)
         {
             var extension = GetImageExtension(imageBytes);
             // Convert the byte array to a Base64 string
 
-            string filePath = $"outputImage.{extension}";
+            string filePath = $"{Guid.NewGuid()}.{extension}";
             string path = Path.Combine(webHostEnvironment.WebRootPath, "passport");
             if (!Directory.Exists(path))
             {
@@ -285,11 +285,11 @@ namespace risk.control.system.Services
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Post,
-                RequestUri = new Uri("https://document-ocr1.p.rapidapi.com/idr"),
+                RequestUri = new Uri(url),
                 Headers =
                 {
-                    { "x-rapidapi-key", "327fd8beb9msh8a441504790e80fp142ea8jsnf74b9208776a" },
-                    { "x-rapidapi-host", "document-ocr1.p.rapidapi.com" },
+                    { "x-rapidapi-key", key },
+                    { "x-rapidapi-host", host },
                 },
                 Content = new MultipartFormDataContent
                 {
@@ -305,13 +305,20 @@ namespace risk.control.system.Services
                     },
                 },
             };
-            using (var response = await httpClient.SendAsync(request))
+            try
             {
-                response.EnsureSuccessStatusCode();
-                var body = await response.Content.ReadAsStringAsync();
-                var passportOcrData = JsonConvert.DeserializeObject<PassportOcrData>(body);
-                Console.WriteLine(body);
-                return passportOcrData;
+                using (var response = await httpClient.SendAsync(request))
+                {
+                    response.EnsureSuccessStatusCode();
+                    var body = await response.Content.ReadAsStringAsync();
+                    var passportOcrData = JsonConvert.DeserializeObject<PassportOcrData>(body);
+                    Console.WriteLine(body);
+                    return passportOcrData;
+                }
+            }
+            catch (Exception ex)
+            {
+                return null!;
             }
         }
         private async Task<string> StartVerifyPassport(string passport, string date_of_birth)

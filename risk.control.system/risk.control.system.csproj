@@ -83,6 +83,7 @@
     <Folder Include="wwwroot\company\" />
     <Folder Include="wwwroot\customer-document\" />
     <Folder Include="wwwroot\download-ftp\" />
+    <Folder Include="wwwroot\passport\" />
     <Folder Include="wwwroot\upload-file\" />
     <Folder Include="wwwroot\upload-ftp\" />
   </ItemGroup>

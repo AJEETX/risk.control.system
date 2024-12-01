@@ -207,7 +207,7 @@ a.table-link {
          * Always set the map height explicitly to define the size of the div element
          * that contains the map.
          */
-#pop-face-map {
+#pop-map {
     width: auto;
     height: 500px;
     position: relative;
@@ -225,6 +225,9 @@ a.table-link {
 #agentOcrPicture {
     cursor: pointer;
 }
+#agentPassportPicture {
+    cursor: pointer;
+}
 
 .ocr-Image {
     height: 200px;
@@ -233,6 +236,12 @@ a.table-link {
     border-radius: 5px;
 }
 
+.passport-Image {
+    height: 200px;
+    width: 200px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
 #documentImage {
     width: 350px;
     height: 150px;
@@ -255,6 +264,13 @@ a.table-link {
 }
 
 .olocationImage {
+    height: 200px;
+    width: 200px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.passportlocationImage {
     height: 200px;
     width: 200px;
     border: 1px solid #ccc;

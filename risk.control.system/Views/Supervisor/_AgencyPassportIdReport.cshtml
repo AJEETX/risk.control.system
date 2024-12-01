@@ -115,12 +115,12 @@
                             @{
                                 if (Model.AgencyReport?.PassportIdReport?.DocumentIdImage != null)
                                 {
-                                    <img id="agentOcrPicture" class="img-fluid ocr-Image" data-toggle="tooltip" title="Passport Image" 
+                                    <img id="agentPassportPicture" class="img-fluid passport-Image" data-toggle="tooltip" title="Passport Image" 
                                     src="data:image/*;base64,@(Convert.ToBase64String(@Model.AgencyReport?.PassportIdReport?.DocumentIdImage))">
                                 }
                                 else
                                 {
-                                    <img id="agentOcrPicture" class="img-fluid no-Image" data-toggle="tooltip" title="No PAN card Image"
+                                    <img id="agentPassportPicture" class="img-fluid no-Image" data-toggle="tooltip" title="No PASSPORT Image"
                                          src=@Applicationsettings.NO_PHOTO_IMAGE>
                                 }
                             }
@@ -139,7 +139,7 @@
                             <br />
                             @if (@Model.AgencyReport?.PassportIdReport?.DocumentIdImageLocationUrl != null)
                             {
-                                <img class="img-fluid olocationImage" src="@Model.AgencyReport?.PassportIdReport?.DocumentIdImageLocationUrl" data-toggle="tooltip" title="Map Location" />
+                                <img class="img-fluid passportlocationImage" src="@Model.AgencyReport?.PassportIdReport?.DocumentIdImageLocationUrl" data-toggle="tooltip" title="Map Location" />
                             }
                             else
                             {

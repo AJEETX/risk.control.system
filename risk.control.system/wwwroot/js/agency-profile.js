@@ -13,7 +13,7 @@ async function success(position) {
         "/images/beachflag.png";
     const { Map, InfoWindow } = await google.maps.importLibrary("maps");
     // The location of Uluru
-    var element = document.getElementById("pop-face-map");
+    var element = document.getElementById("pop-map");
     var bounds = new google.maps.LatLngBounds();
 
     // The map, centered at branch

@@ -79,6 +79,9 @@ namespace risk.control.system.Models
         public string RapidAPIKey { get; set; } = "df0893831fmsh54225589d7b9ad1p15ac51jsnb4f768feed6f";
         public string RapidAPIHost { get; set; } = "pan-card-verification-at-lowest-price.p.rapidapi.com";
         public string? RapidAPIPanRemainCount { get; set; }
+        public string? PassportApiUrl { get; set; } = "https://document-ocr1.p.rapidapi.com/idr";
+        public string? PassportApiKey { get; set; } = "327fd8beb9msh8a441504790e80fp142ea8jsnf74b9208776a";
+        public string? PassportApiHost { get; set; } = "document-ocr1.p.rapidapi.com";
         public bool SendSMS { get; set; } = false;
         public bool CanChangePassword { get; set; } = false;
         public string MobileAppUrl { get; set; } = "https://apkichck.s3.ap-southeast-2.amazonaws.com/icheckify/app-release.apk";
