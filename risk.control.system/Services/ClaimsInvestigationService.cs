@@ -659,6 +659,7 @@ namespace risk.control.system.Services
                 claimsCaseToAllocateToVendor.CurrentUserEmail = userEmail;
                 claimsCaseToAllocateToVendor.CurrentClaimOwner = supervisor.Email;
                 claimsCaseToAllocateToVendor.EnablePassport = currentUser.ClientCompany.EnablePassport;
+                claimsCaseToAllocateToVendor.EnableMedia = currentUser.ClientCompany.EnableMedia;
 
                 claimsCaseToAllocateToVendor.InvestigationCaseSubStatusId = allocatedToVendor.InvestigationCaseSubStatusId;
                 claimsCaseToAllocateToVendor.UserEmailActioned = userEmail;

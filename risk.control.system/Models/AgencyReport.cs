@@ -17,6 +17,8 @@ namespace risk.control.system.Models
 
         public DocumentIdReport? PanIdReport { get; set; } = new();
         public DocumentIdReport? PassportIdReport { get; set; } = new();
+        public DocumentIdReport? AudioReport { get; set; } = new();
+        public DocumentIdReport? VideoReport { get; set; } = new();
 
         public string? AgentEmail { get; set; }
         public DateTime? AgentRemarksUpdated { get; set; }

@@ -1,7 +1,7 @@
 ﻿@model ClaimsInvestigationVendorsModel
 @{
     string digitalIdColor = "grey";
-    if(Model.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime != null)
+    if (Model.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime != null)
     {
         digitalIdColor = "green";
     }
@@ -44,9 +44,13 @@
 
             <partial name="_DigitalIdReport" model="@Model" />
             <partial name="_DocumentIdReport" model="@Model" />
-            @if(Model.ClaimsInvestigation.EnablePassport)
+            @if (Model.ClaimsInvestigation.EnablePassport)
             {
                 <partial name="_PassportIdReport" model="@Model" />
+            }
+            @if (Model.ClaimsInvestigation.EnableMedia)
+            {
+                <partial name="_AudioReport" model="@Model" />
             }
             <partial name="_Questionaire" model="@Model" />
         </div>

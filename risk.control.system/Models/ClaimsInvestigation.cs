@@ -66,6 +66,7 @@ namespace risk.control.system.Models
         }
 
         public bool EnablePassport { get; set; } = false;
+        public bool EnableMedia { get; set; } = false;
         public bool IsReviewCase { get; set; } = false;
         public bool NotWithdrawable { get; set; } = false;
         public bool NotDeclinable { get; set; } = false;

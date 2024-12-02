@@ -14,6 +14,7 @@ using System.Xml;
 using System.Text.RegularExpressions;
 using risk.control.system.Controllers.Api.Claims;
 using static Google.Apis.Requests.BatchRequest;
+using System.Threading.Tasks;
 
 namespace risk.control.system.Services
 {
@@ -22,8 +23,8 @@ namespace risk.control.system.Services
         Task<AppiCheckifyResponse> GetFaceId(FaceData data);
         Task<AppiCheckifyResponse> GetDocumentId(DocumentData data);
         Task<AppiCheckifyResponse> GetPassportId(DocumentData data);
-        Task GetAudio(AudioData data);
-        Task GetVideo(VideoData data);
+        Task<AppiCheckifyResponse> GetAudio(AudioData data);
+        Task<AppiCheckifyResponse> GetVideo(VideoData data);
         Task<bool> WhitelistIP(IPWhitelistRequest request);
     }
 
@@ -97,8 +98,6 @@ namespace risk.control.system.Services
 
                 var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
                 claim.AgencyReport.DigitalIdReport.DigitalIdImageLocationUrl = url;
-
-                var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claim.ClientCompanyId);
 
                 #region FACE IMAGE PROCESSING
 
@@ -299,48 +298,115 @@ namespace risk.control.system.Services
             }
         }
 
-        public async Task GetAudio(AudioData data)
+        public async Task<AppiCheckifyResponse> GetAudio(AudioData data)
         {
-            var claim = _context.ClaimsInvestigation
+            var claim = claimsService.GetClaims()
                 .Include(c => c.AgencyReport)
-                .Include(c => c.AgencyReport.ReportQuestionaire)
+                .ThenInclude(c => c.AudioReport)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == data.ClaimId);
+            if (claim.AgencyReport == null)
+            {
+                claim.AgencyReport = new AgencyReport();
+            }
+            claim.AgencyReport.AgentEmail = data.Email;
+            claim.AgencyReport.AudioReport.DocumentIdImageLongLat = data.LongLat;
+            claim.AgencyReport.AudioReport.DocumentIdImageLongLatTime = DateTime.Now;
+            var longLat = claim.AgencyReport.AudioReport.DocumentIdImageLongLat.IndexOf("/");
+            var latitude = claim.AgencyReport.AudioReport.DocumentIdImageLongLat.Substring(0, longLat)?.Trim();
+            var longitude = claim.AgencyReport.AudioReport.DocumentIdImageLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
+            var latLongString = latitude + "," + longitude;
+            var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+            claim.AgencyReport.AudioReport.DocumentIdImageLocationUrl = url;
 
-            using var dataStream = new MemoryStream();
-            data.Uri.CopyTo(dataStream);
+            var rawAddress = await httpClientService.GetRawAddress(latitude, longitude);
+
+            claim.AgencyReport.AudioReport.DocumentIdImageLocationAddress = rawAddress;
+
+            claim.AgencyReport.AudioReport.ValidationExecuted = true;
+            
+            claim.AgencyReport.AudioReport.DocumentIdImage = data.Mediabytes;
+
+            //TO-DO: AWS : SPEECH TO TEXT;
             string audioDirectory = Path.Combine(webHostEnvironment.WebRootPath, "audio");
             if (!Directory.Exists(audioDirectory))
             {
                 Directory.CreateDirectory(audioDirectory);
             }
-            var audioPath = Path.Combine(audioDirectory, $"{Guid.NewGuid()}.mp3");
-            File.WriteAllBytes(audioPath, dataStream.ToArray());
-            claim.AgencyReport.ReportQuestionaire.Audio = dataStream.ToArray();
-            claim.AgencyReport.ReportQuestionaire.AudioUrl = audioPath;
-            _context.ClaimsInvestigation.Update(claim);
+            var filePath = Path.Combine(webHostEnvironment.WebRootPath, "audio", data.Name);
+            await File.WriteAllBytesAsync(filePath, data.Mediabytes);
+            claim.AgencyReport.AudioReport.DocumentIdImagePath = filePath;
+            //END :: TO-DO: AWS : SPEECH TO TEXT;
+
+            var updatedClaim = _context.ClaimsInvestigation.Update(claim);
             await _context.SaveChangesAsync();
+            var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-photo.jpg");
+
+            var noDataimage = await File.ReadAllBytesAsync(noDataImagefilePath);
+            return new AppiCheckifyResponse
+            {
+                BeneficiaryId = updatedClaim.Entity.BeneficiaryDetail.BeneficiaryDetailId,
+                OcrImage = claim.AgencyReport.AudioReport?.DocumentIdImage != null ?
+                Convert.ToBase64String(claim.AgencyReport.AudioReport?.DocumentIdImage) :
+                Convert.ToBase64String(noDataimage),
+                OcrLongLat = claim.AgencyReport.AudioReport?.DocumentIdImageLongLat,
+                OcrTime = claim.AgencyReport.AudioReport?.DocumentIdImageLongLatTime,
+                PanValid = claim.AgencyReport.AudioReport?.DocumentIdImageValid
+            };
         }
 
-        public async Task GetVideo(VideoData data)
+        public async Task<AppiCheckifyResponse> GetVideo(VideoData data)
         {
-            var claim = _context.ClaimsInvestigation
-                            .Include(c => c.AgencyReport)
-                            .Include(c => c.AgencyReport.ReportQuestionaire)
-                            .FirstOrDefault(c => c.ClaimsInvestigationId == data.ClaimId);
-
-            using var dataStream = new MemoryStream();
-            data.Uri.CopyTo(dataStream);
-            string videoDirectory = Path.Combine(webHostEnvironment.WebRootPath, "video");
-            if (!Directory.Exists(videoDirectory))
+            var claim = claimsService.GetClaims()
+                .Include(c => c.AgencyReport)
+                .ThenInclude(c => c.VideoReport)
+                .FirstOrDefault(c => c.ClaimsInvestigationId == data.ClaimId);
+            if (claim.AgencyReport == null)
             {
-                Directory.CreateDirectory(videoDirectory);
+                claim.AgencyReport = new AgencyReport();
             }
-            var videoPath = Path.Combine(videoDirectory, $"{Guid.NewGuid()}.mp4");
-            File.WriteAllBytes(videoPath, dataStream.ToArray());
-            claim.AgencyReport.ReportQuestionaire.Video = dataStream.ToArray();
-            claim.AgencyReport.ReportQuestionaire.VideoUrl = videoPath;
+            claim.AgencyReport.AgentEmail = data.Email;
+            claim.AgencyReport.VideoReport.DocumentIdImageLongLat = data.LongLat;
+            claim.AgencyReport.VideoReport.DocumentIdImageLongLatTime = DateTime.Now;
+            var longLat = claim.AgencyReport.VideoReport.DocumentIdImageLongLat.IndexOf("/");
+            var latitude = claim.AgencyReport.VideoReport.DocumentIdImageLongLat.Substring(0, longLat)?.Trim();
+            var longitude = claim.AgencyReport.VideoReport.DocumentIdImageLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
+            var latLongString = latitude + "," + longitude;
+            var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+            claim.AgencyReport.VideoReport.DocumentIdImageLocationUrl = url;
+
+            var rawAddress = await httpClientService.GetRawAddress(latitude, longitude);
+
+            claim.AgencyReport.VideoReport.DocumentIdImageLocationAddress = rawAddress;
+
+            claim.AgencyReport.VideoReport.ValidationExecuted = true;
+            claim.AgencyReport.VideoReport.DocumentIdImage = data.Mediabytes;
+
+            //TO-DO: AWS : SPEECH TO TEXT;
+
+            string audioDirectory = Path.Combine(webHostEnvironment.WebRootPath, "video");
+            if (!Directory.Exists(audioDirectory))
+            {
+                Directory.CreateDirectory(audioDirectory);
+            }
+            //END :: TO-DO: AWS : SPEECH TO TEXT;
+
+
             _context.ClaimsInvestigation.Update(claim);
             await _context.SaveChangesAsync();
+
+            var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-photo.jpg");
+
+            var noDataimage = await File.ReadAllBytesAsync(noDataImagefilePath);
+            return new AppiCheckifyResponse
+            {
+                BeneficiaryId = claim.BeneficiaryDetail.BeneficiaryDetailId,
+                OcrImage = claim.AgencyReport.VideoReport?.DocumentIdImage != null ?
+                Convert.ToBase64String(claim.AgencyReport.VideoReport?.DocumentIdImage) :
+                Convert.ToBase64String(noDataimage),
+                OcrLongLat = claim.AgencyReport.VideoReport?.DocumentIdImageLongLat,
+                OcrTime = claim.AgencyReport.VideoReport?.DocumentIdImageLongLatTime,
+                PanValid = claim.AgencyReport.VideoReport?.DocumentIdImageValid
+            };
         }
 
         public async Task<AppiCheckifyResponse> GetPassportId(DocumentData data)

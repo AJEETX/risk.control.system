@@ -229,5 +229,110 @@ namespace risk.control.system.Controllers
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
+
+        [HttpPost]
+        [RequestSizeLimit(5_000_000)] // Checking for 2 MB
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AudioUpload(string selectedclaim, IFormFile audioFile, string audioLatitude, string audioLongitude)
+        {
+            try
+            {
+
+                var userEmail = HttpContext.User?.Identity?.Name;
+
+                if (string.IsNullOrWhiteSpace(userEmail) ||
+                    (audioFile == null) ||
+                    string.IsNullOrWhiteSpace(audioLatitude) ||
+                    string.IsNullOrWhiteSpace(audioLongitude) ||
+                    Path.GetInvalidFileNameChars() == null ||
+                    string.IsNullOrWhiteSpace(Path.GetFileName(audioFile.FileName)) ||
+                    string.IsNullOrWhiteSpace(Path.GetExtension(Path.GetFileName(audioFile.FileName))) ||
+                    string.IsNullOrWhiteSpace(Path.GetFileName(audioFile.Name))
+                    )
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                if (string.IsNullOrWhiteSpace(selectedclaim))
+                {
+                    notifyService.Custom($"No claim selected!!!. ", 3, "orange", "fas fa-mobile-alt");
+                    return Redirect("/Agent/GetInvestigate?selectedcase=" + selectedclaim);
+                }
+
+                using (var ds = new MemoryStream())
+                {
+                    audioFile.CopyTo(ds);
+                    var imageByte = ds.ToArray();
+                    var response = await vendorService.PostAudio(userEmail, selectedclaim, audioLatitude, audioLongitude, Path.GetFileName(audioFile.FileName), imageByte);
+
+                    notifyService.Custom($"Audio Uploaded", 3, "green", "fas fa-mobile-alt");
+                    return Redirect("/Agent/GetInvestigate?selectedcase=" + selectedclaim);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+        }
+
+        public IActionResult GetAudioFile(string fileName)
+        {
+            var filePath = Path.Combine("wwwroot/audio", fileName);
+            if (!System.IO.File.Exists(filePath))
+            {
+                return NotFound();
+            }
+
+            var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+            return File(fileStream, "audio/mpeg"); // MIME type for MP3
+        }
+        [HttpPost]
+        [RequestSizeLimit(2_000_000)] // Checking for 2 MB
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> VideoUpload(string selectedclaim, IFormFile videoFile, string videoLatitude, string videoLongitude)
+        {
+            try
+            {
+
+                var userEmail = HttpContext.User?.Identity?.Name;
+
+                if (string.IsNullOrWhiteSpace(userEmail) ||
+                    (videoFile == null) ||
+                    string.IsNullOrWhiteSpace(videoLatitude) ||
+                    string.IsNullOrWhiteSpace(videoLongitude) ||
+                    Path.GetInvalidFileNameChars() == null ||
+                    string.IsNullOrWhiteSpace(Path.GetFileName(videoFile.FileName)) ||
+                    string.IsNullOrWhiteSpace(Path.GetExtension(Path.GetFileName(videoFile.FileName))) ||
+                    string.IsNullOrWhiteSpace(Path.GetFileName(videoFile.Name))
+                    )
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                if (string.IsNullOrWhiteSpace(selectedclaim))
+                {
+                    notifyService.Custom($"No claim selected!!!. ", 3, "orange", "fas fa-mobile-alt");
+                    return Redirect("/Agent/GetInvestigate?selectedcase=" + selectedclaim);
+                }
+
+                using (var ds = new MemoryStream())
+                {
+                    videoFile.CopyTo(ds);
+                    var imageByte = ds.ToArray();
+                    var response = await vendorService.PostVideo(userEmail, selectedclaim, videoLatitude, videoLongitude, imageByte);
+
+                    notifyService.Custom($"Video Uploaded", 3, "green", "fas fa-mobile-alt");
+                    return Redirect("/Agent/GetInvestigate?selectedcase=" + selectedclaim);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+        }
     }
 }

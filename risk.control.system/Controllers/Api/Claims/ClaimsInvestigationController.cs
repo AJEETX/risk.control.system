@@ -390,5 +390,87 @@ namespace risk.control.system.Controllers.Api.Claims
             }
             return Ok();
         }
+
+        [HttpGet("GetPassportDetail")]
+        public IActionResult GetPassportDetail(string claimid)
+        {
+            var claim = claimsService.GetClaims()
+                .Include(c => c.AgencyReport)
+                .Include(c => c.AgencyReport.PassportIdReport)
+                .FirstOrDefault(c => c.ClaimsInvestigationId == claimid);
+
+            if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
+            {
+                var center = new { Lat = decimal.Parse(claim.CustomerDetail.PinCode.Latitude), Lng = decimal.Parse(claim.CustomerDetail.PinCode.Longitude) };
+                var dakota = new { Lat = decimal.Parse(claim.CustomerDetail.PinCode.Latitude), Lng = decimal.Parse(claim.CustomerDetail.PinCode.Longitude) };
+
+                if (claim.AgencyReport is not null && claim.AgencyReport?.PassportIdReport?.DocumentIdImageLongLat is not null)
+                {
+                    var longLat = claim.AgencyReport.PassportIdReport.DocumentIdImageLongLat.IndexOf("/");
+                    var latitude = claim.AgencyReport?.PassportIdReport?.DocumentIdImageLongLat.Substring(0, longLat)?.Trim();
+                    var longitude = claim.AgencyReport?.PassportIdReport?.DocumentIdImageLongLat.Substring(longLat + 1)?.Trim();
+
+                    var frick = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) };
+                    return Ok(new { center, dakota, frick });
+                }
+            }
+            else
+            {
+                var center = new { Lat = decimal.Parse(claim.BeneficiaryDetail.PinCode.Latitude), Lng = decimal.Parse(claim.BeneficiaryDetail.PinCode.Longitude) };
+                var dakota = new { Lat = decimal.Parse(claim.BeneficiaryDetail.PinCode.Latitude), Lng = decimal.Parse(claim.BeneficiaryDetail.PinCode.Longitude) };
+
+                if (claim.AgencyReport is not null && claim.AgencyReport?.PassportIdReport?.DocumentIdImageLongLat is not null)
+                {
+                    var longLat = claim.AgencyReport.PassportIdReport.DocumentIdImageLongLat.IndexOf("/");
+                    var latitude = claim.AgencyReport?.PassportIdReport?.DocumentIdImageLongLat.Substring(0, longLat)?.Trim();
+                    var longitude = claim.AgencyReport?.PassportIdReport?.DocumentIdImageLongLat.Substring(longLat + 1)?.Trim();
+
+                    var frick = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) };
+                    return Ok(new { center, dakota, frick });
+                }
+            }
+            return Ok();
+        }
+
+        [HttpGet("GetAudioDetail")]
+        public IActionResult GetAudioDetail(string claimid)
+        {
+            var claim = claimsService.GetClaims()
+                .Include(c => c.AgencyReport)
+                .Include(c => c.AgencyReport.AudioReport)
+                .FirstOrDefault(c => c.ClaimsInvestigationId == claimid);
+
+            if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
+            {
+                var center = new { Lat = decimal.Parse(claim.CustomerDetail.PinCode.Latitude), Lng = decimal.Parse(claim.CustomerDetail.PinCode.Longitude) };
+                var dakota = new { Lat = decimal.Parse(claim.CustomerDetail.PinCode.Latitude), Lng = decimal.Parse(claim.CustomerDetail.PinCode.Longitude) };
+
+                if (claim.AgencyReport is not null && claim.AgencyReport?.AudioReport?.DocumentIdImageLongLat is not null)
+                {
+                    var longLat = claim.AgencyReport.AudioReport.DocumentIdImageLongLat.IndexOf("/");
+                    var latitude = claim.AgencyReport?.AudioReport?.DocumentIdImageLongLat.Substring(0, longLat)?.Trim();
+                    var longitude = claim.AgencyReport?.AudioReport?.DocumentIdImageLongLat.Substring(longLat + 1)?.Trim();
+
+                    var frick = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) };
+                    return Ok(new { center, dakota, frick });
+                }
+            }
+            else
+            {
+                var center = new { Lat = decimal.Parse(claim.BeneficiaryDetail.PinCode.Latitude), Lng = decimal.Parse(claim.BeneficiaryDetail.PinCode.Longitude) };
+                var dakota = new { Lat = decimal.Parse(claim.BeneficiaryDetail.PinCode.Latitude), Lng = decimal.Parse(claim.BeneficiaryDetail.PinCode.Longitude) };
+
+                if (claim.AgencyReport is not null && claim.AgencyReport?.AudioReport?.DocumentIdImageLongLat is not null)
+                {
+                    var longLat = claim.AgencyReport.AudioReport.DocumentIdImageLongLat.IndexOf("/");
+                    var latitude = claim.AgencyReport?.AudioReport?.DocumentIdImageLongLat.Substring(0, longLat)?.Trim();
+                    var longitude = claim.AgencyReport?.AudioReport?.DocumentIdImageLongLat.Substring(longLat + 1)?.Trim();
+
+                    var frick = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) };
+                    return Ok(new { center, dakota, frick });
+                }
+            }
+            return Ok();
+        }
     }
 }

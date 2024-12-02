@@ -269,7 +269,7 @@ namespace risk.control.system.Services
 
         public async Task<PassportOcrData> GetPassportOcrResult(byte[] imageBytes, string url, string key, string host)
         {
-            var extension = GetImageExtension(imageBytes);
+            var extension = risk.control.system.Helpers.Extensions.GetImageExtension(imageBytes);
             // Convert the byte array to a Base64 string
 
             string filePath = $"{Guid.NewGuid()}.{extension}";
@@ -361,24 +361,6 @@ namespace risk.control.system.Services
             }
         }
 
-        static string GetImageExtension(byte[] imageBytes)
-        {
-            // Check the magic numbers for common image formats
-            if (imageBytes.Length > 4)
-            {
-                if (imageBytes[0] == 0x89 && imageBytes[1] == 0x50 && imageBytes[2] == 0x4E && imageBytes[3] == 0x47) // PNG
-                    return "png";
-                if (imageBytes[0] == 0xFF && imageBytes[1] == 0xD8 && imageBytes[2] == 0xFF) // JPEG
-                    return "jpg";
-                if (imageBytes[0] == 0x47 && imageBytes[1] == 0x49 && imageBytes[2] == 0x46) // GIF
-                    return "gif";
-                if (imageBytes[0] == 0x42 && imageBytes[1] == 0x4D) // BMP
-                    return "bmp";
-                if (imageBytes[0] == 0x52 && imageBytes[1] == 0x49 && imageBytes[2] == 0x46 && imageBytes[3] == 0x46) // WebP (RIFF header)
-                    return "webp";
-            }
-
-            return null; // Unknown format
-        }
+        
     }
 }

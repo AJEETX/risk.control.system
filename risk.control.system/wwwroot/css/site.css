@@ -249,7 +249,12 @@ a.table-link {
     border: 1px solid #ccc;
     border-radius: 5px;
 }
-
+#audioPlayer {
+    height: 150px;
+    object-fit: cover;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
 .locationImage {
     height: 200px;
     width: 200px;
@@ -278,11 +283,23 @@ a.table-link {
     cursor: pointer;
 }
 
+
+.audiolocationImage {
+    height: 200px;
+    width: 200px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+}
 #face-map {
     height: 300px;
     width: auto;
 }
 
+#audio-map {
+    height: 300px;
+    width: auto;
+}
 #notesDetail {
     cursor: pointer;
 }

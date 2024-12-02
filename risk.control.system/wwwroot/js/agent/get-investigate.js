@@ -1,11 +1,4 @@
 ﻿$(document).ready(function () {
-    let askConfirmation = false;
-    $('#digitalImage').on("change", function () {
-        var val = $(this).val(),
-            fbtn = $('#UploadFaceImageButton');
-        val ? fbtn.removeAttr("disabled") : fbtn.attr("disabled");
-    });
-
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(success);
     } else {
@@ -22,13 +15,24 @@
 
         $('#passportIdLatitude').val(coordinates.latitude);
         $('#passportIdLongitude').val(coordinates.longitude);
+
+        $('#audioLatitude').val(coordinates.latitude);
+        $('#audioLongitude').val(coordinates.longitude);
     }
+
+    //FACE IMAGE
+    let askConfirmation = false;
+    let askFaceUploadConfirmation = true;
     var currentImage;
     var currentImageEl = document.getElementById('face-Image');
     if (currentImageEl) {
         currentImage = currentImageEl.src;
     }
-
+    $('#digitalImage').on("change", function () {
+        var val = $(this).val(),
+            fbtn = $('#UploadFaceImageButton');
+        val ? fbtn.removeAttr("disabled") : fbtn.attr("disabled");
+    });
     $("#digitalImage").on('change', function () {
         var MaxSizeInBytes = 2097152;
         //Get count of selected files
@@ -75,7 +79,7 @@
                         title: "Outdated Browser !",
                         content: "This browser does not support FileReader. Try on modern browser!",
                         icon: 'fas fa-exclamation-triangle',
-            
+
                         type: 'red',
                         closeIcon: true,
                         buttons: {
@@ -93,7 +97,7 @@
                     title: "FILE UPLOAD TYPE !!",
                     content: "Pls select only image with extension jpg, png,gif ! ",
                     icon: 'fas fa-exclamation-triangle',
-        
+
                     type: 'red',
                     closeIcon: true,
                     buttons: {
@@ -106,12 +110,69 @@
             );
         }
     });
+    $('#upload-face').on('submit', function (e) {
+        if (askFaceUploadConfirmation) {
+            e.preventDefault();
+            $.confirm({
+                title: "Confirm Upload",
+                content: "Are you sure to upload Face Image?",
+                icon: 'fa fa-upload',
 
+                type: 'green',
+                closeIcon: true,
+                buttons: {
+                    confirm: {
+                        text: "Upload",
+                        btnClass: 'btn-success',
+                        action: function () {
+                            askFaceUploadConfirmation = false;
+                            $("body").addClass("submit-progress-bg");
+                            setTimeout(function () {
+                                $(".submit-progress").removeClass("hidden");
+                            }, 1);
+                            $('#UploadFaceImageButton').attr('disabled', 'disabled');
+                            $('#UploadFaceImageButton').html("<i class='fas fa-sync fa-spin'></i> Uploading");
+
+                            $('#upload-face').submit();
+                            $('html *').css('cursor', 'not-allowed');
+                            $('html a').css('pointer-events', 'none');
+                            $('html a').css('cursor', 'none');
+                            $('html button').attr('disabled', true);
+                            $('#back').attr('disabled', true);
+
+                            $('html a *, html button *').css('pointer-events', 'none');
+
+                            var article = document.getElementById("article");
+                            if (article) {
+                                var nodes = article.getElementsByTagName('*');
+                                for (var i = 0; i < nodes.length; i++) {
+                                    nodes[i].disabled = true;
+                                }
+                            }
+                        }
+                    },
+                    cancel: {
+                        text: "Cancel",
+                        btnClass: 'btn-default'
+                    }
+                }
+            });
+        }
+
+    });
+
+    //PAN IMAGE
+    let askPanUploadConfirmation = true;
     var panImage;
     var panImageEl = document.getElementById('pan-Image');
     if (panImageEl) {
         panImage = panImageEl.src;
     }
+    $('#panImage').on("change", function () {
+        var val = $(this).val(),
+            fbtn = $('#UploadPanImageButton');
+        val ? fbtn.removeAttr("disabled") : fbtn.attr("disabled");
+    });
     $("#panImage").on('change', function () {
         var MaxSizeInBytes = 2097152;
         //Get count of selected files
@@ -189,12 +250,69 @@
             );
         }
     });
+    $('#upload-pan').on('submit', function (e) {
+        if (askPanUploadConfirmation) {
+            e.preventDefault();
+            $.confirm({
+                title: "Confirm Upload",
+                content: "Are you sure to upload PAN Card?",
+                icon: 'fa fa-upload',
 
+                type: 'green',
+                closeIcon: true,
+                buttons: {
+                    confirm: {
+                        text: "Upload",
+                        btnClass: 'btn-success',
+                        action: function () {
+                            askPanUploadConfirmation = false;
+                            $("body").addClass("submit-progress-bg");
+                            // Wrap in setTimeout so the UI
+                            // can update the spinners
+                            setTimeout(function () {
+                                $(".submit-progress").removeClass("hidden");
+                            }, 1);
+                            $('#UploadPanImageButton').attr('disabled', 'disabled');
+                            $('#UploadPanImageButton').html("<i class='fas fa-sync fa-spin'></i> Uploading");
+
+                            $('#upload-pan').submit();
+                            $('#back').attr('disabled', 'disabled');
+
+                            $('html *').css('cursor', 'not-allowed');
+                            $('html a *, html button *').css('pointer-events', 'none')
+
+                            var article = document.getElementById("article");
+                            if (article) {
+                                var nodes = article.getElementsByTagName('*');
+                                for (var i = 0; i < nodes.length; i++) {
+                                    nodes[i].disabled = true;
+                                }
+                            }
+                        }
+                    },
+                    cancel: {
+                        text: "Cancel",
+                        btnClass: 'btn-default'
+                    }
+                }
+            });
+        }
+
+    });
+
+    //PASSPORT IMAGE
+    let askPassportUploadConfirmation = true;
     var passportImage;
     var passportImageEl = document.getElementById('passport-Image');
     if (passportImageEl) {
         passportImage = passportImageEl.src;
     }
+
+    $('#passportImage').on("change", function () {
+        var val = $(this).val(),
+            fbtn = $('#UploadPassportImageButton');
+        val ? fbtn.removeAttr("disabled") : fbtn.attr("disabled");
+    });
     $("#passportImage").on('change', function () {
         var MaxSizeInBytes = 2097152;
         //Get count of selected files
@@ -272,124 +390,6 @@
             );
         }
     });
-    let askFaceUploadConfirmation = true;
-    $('#upload-face').on('submit',function (e) {
-        if (askFaceUploadConfirmation) {
-            e.preventDefault();
-            $.confirm({
-                title: "Confirm Upload",
-                content: "Are you sure to upload Face Image?",
-                icon: 'fa fa-upload',
-    
-                type: 'green',
-                closeIcon: true,
-                buttons: {
-                    confirm: {
-                        text: "Upload",
-                        btnClass: 'btn-success',
-                        action: function () {
-                            askFaceUploadConfirmation = false;
-                            $("body").addClass("submit-progress-bg");
-                            setTimeout(function () {
-                                $(".submit-progress").removeClass("hidden");
-                            }, 1);
-                            $('#UploadFaceImageButton').attr('disabled', 'disabled');
-                            $('#UploadFaceImageButton').html("<i class='fas fa-sync fa-spin'></i> Uploading");
-
-                            $('#upload-face').submit();
-                            $('html *').css('cursor', 'not-allowed');
-                            $('html a').css('pointer-events', 'none');
-                            $('html a').css('cursor', 'none');
-                            $('html button').attr('disabled', true);
-                            $('#back').attr('disabled', true);
-
-                            $('html a *, html button *').css('pointer-events', 'none');
-
-                            var article = document.getElementById("article");
-                            if (article) {
-                                var nodes = article.getElementsByTagName('*');
-                                for (var i = 0; i < nodes.length; i++) {
-                                    nodes[i].disabled = true;
-                                }
-                            }
-                        }
-                    },
-                    cancel: {
-                        text: "Cancel",
-                        btnClass: 'btn-default'
-                    }
-                }
-            });
-        }
-        
-    });
-
-    $('#panImage').on("change", function () {
-        var val = $(this).val(),
-            fbtn = $('#UploadPanImageButton');
-        val ? fbtn.removeAttr("disabled") : fbtn.attr("disabled");
-    });
-
-    $('#passportImage').on("change", function () {
-        var val = $(this).val(),
-            fbtn = $('#UploadPassportImageButton');
-        val ? fbtn.removeAttr("disabled") : fbtn.attr("disabled");
-    });
-
-    let askPanUploadConfirmation = true;
-
-    $('#upload-pan').on('submit',function (e) {
-        if (askPanUploadConfirmation) {
-            e.preventDefault();
-            $.confirm({
-                title: "Confirm Upload",
-                content: "Are you sure to upload PAN Card?",
-                icon: 'fa fa-upload',
-    
-                type: 'green',
-                closeIcon: true,
-                buttons: {
-                    confirm: {
-                        text: "Upload",
-                        btnClass: 'btn-success',
-                        action: function () {
-                            askPanUploadConfirmation = false;
-                            $("body").addClass("submit-progress-bg");
-                            // Wrap in setTimeout so the UI
-                            // can update the spinners
-                            setTimeout(function () {
-                                $(".submit-progress").removeClass("hidden");
-                            }, 1);
-                            $('#UploadPanImageButton').attr('disabled', 'disabled');
-                            $('#UploadPanImageButton').html("<i class='fas fa-sync fa-spin'></i> Uploading");
-
-                            $('#upload-pan').submit();
-                            $('#back').attr('disabled', 'disabled');
-
-                            $('html *').css('cursor', 'not-allowed');
-                            $('html a *, html button *').css('pointer-events', 'none')
-
-                            var article = document.getElementById("article");
-                            if (article) {
-                                var nodes = article.getElementsByTagName('*');
-                                for (var i = 0; i < nodes.length; i++) {
-                                    nodes[i].disabled = true;
-                                }
-                            }
-                        }
-                    },
-                    cancel: {
-                        text: "Cancel",
-                        btnClass: 'btn-default'
-                    }
-                }
-            });
-        }
-        
-    });
-
-    let askPassportUploadConfirmation = true;
-
     $('#upload-passport').on('submit', function (e) {
         if (askPassportUploadConfirmation) {
             e.preventDefault();
@@ -439,6 +439,138 @@
         }
 
     });
+
+    //AUDIO FILE
+    let askAudioUploadConfirmation = true;
+    
+    $('#audioFile').on("change", function () {
+        var val = $(this).val(),
+            fbtn = $('#UploadAudioButton');
+        val ? fbtn.removeAttr("disabled") : fbtn.attr("disabled");
+    });
+    $("#audioFile").on('change', function () {
+        var MaxSizeInBytes = 2297152;
+        //Get count of selected files
+        var countFiles = $(this)[0].files.length;
+
+        var imgPath = $(this)[0].value;
+        var extn = imgPath.substring(imgPath.lastIndexOf('.') + 1).toLowerCase();
+
+        if (extn == "mp3") {
+            if (typeof (FileReader) != "undefined") {
+
+                //loop for each file selected for uploaded.
+                for (var i = 0; i < countFiles; i++) {
+                    var fileSize = $(this)[0].files[i].size;
+                    if (fileSize > MaxSizeInBytes) {
+                         var btn = $('#UploadAudioButton');
+                        btn.attr("disabled");
+                        $.alert(
+                            {
+                                title: " UPLOAD issue !",
+                                content: " <i class='fa fa-upload'></i> Upload File size limit exceeded. <br />Max file size is 1 MB!",
+                                icon: 'fas fa-exclamation-triangle',
+                                type: 'red',
+                                closeIcon: true,
+                                buttons: {
+                                    cancel: {
+                                        text: "CLOSE",
+                                        btnClass: 'btn-danger'
+                                    }
+                                }
+                            }
+                        );
+                        
+                    }
+                }
+
+            } else {
+                $.alert(
+                    {
+                        title: "Outdated Browser !",
+                        content: "This browser does not support FileReader. Try on modern browser!",
+                        icon: 'fas fa-exclamation-triangle',
+
+                        type: 'red',
+                        closeIcon: true,
+                        buttons: {
+                            cancel: {
+                                text: "CLOSE",
+                                btnClass: 'btn-danger'
+                            }
+                        }
+                    }
+                );
+            }
+        } else {
+            $.alert(
+                {
+                    title: "FILE UPLOAD TYPE !!",
+                    content: "Pls select only image with extension mp3 ! ",
+                    icon: 'fas fa-exclamation-triangle',
+
+                    type: 'red',
+                    closeIcon: true,
+                    buttons: {
+                        cancel: {
+                            text: "CLOSE",
+                            btnClass: 'btn-danger'
+                        }
+                    }
+                }
+            );
+        }
+    });
+    $('#upload-audio').on('submit', function (e) {
+        if (askAudioUploadConfirmation) {
+            e.preventDefault();
+            $.confirm({
+                title: "Confirm Upload",
+                content: "Are you sure to upload Audio?",
+                icon: 'fa fa-upload',
+
+                type: 'green',
+                closeIcon: true,
+                buttons: {
+                    confirm: {
+                        text: "Upload",
+                        btnClass: 'btn-success',
+                        action: function () {
+                            askAudioUploadConfirmation = false;
+                            $("body").addClass("submit-progress-bg");
+                            // Wrap in setTimeout so the UI
+                            // can update the spinners
+                            setTimeout(function () {
+                                $(".submit-progress").removeClass("hidden");
+                            }, 1);
+                            $('#UploadAudioButton').attr('disabled', 'disabled');
+                            $('#UploadAudioButton').html("<i class='fas fa-sync fa-spin'></i> Uploading");
+
+                            $('#upload-audio').submit();
+                            $('#back').attr('disabled', 'disabled');
+
+                            $('html *').css('cursor', 'not-allowed');
+                            $('html a *, html button *').css('pointer-events', 'none')
+
+                            var article = document.getElementById("article");
+                            if (article) {
+                                var nodes = article.getElementsByTagName('*');
+                                for (var i = 0; i < nodes.length; i++) {
+                                    nodes[i].disabled = true;
+                                }
+                            }
+                        }
+                    },
+                    cancel: {
+                        text: "Cancel",
+                        btnClass: 'btn-default'
+                    }
+                }
+            });
+        }
+
+    });
+
     $('#terms_and_conditions').click(function () {
         //If the checkbox is checked.
         var report = $('#remarks').val();
@@ -556,6 +688,20 @@
     });
 });
 
+const audioPlayer = document.getElementById("audioPlayer");
+const playBtn = document.getElementById("playBtn");
+const pauseBtn = document.getElementById("pauseBtn");
+if (audioPlayer && playBtn) {
+    playBtn.addEventListener("click", () => {
+        audioPlayer.play();
+    });
+}
+
+if (audioPlayer && pauseBtn) {
+    pauseBtn.addEventListener("click", () => {
+        audioPlayer.pause();
+    });
+}
 question4.max = new Date().toISOString().split("T")[0];
 
 //var nodes = document.getElementById("audio-video").getElementsByTagName('*');

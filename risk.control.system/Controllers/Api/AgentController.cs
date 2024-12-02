@@ -659,7 +659,6 @@ namespace risk.control.system.Controllers.Api
             return Ok(response);
         }
 
-        [ApiExplorerSettings(IgnoreApi = true)]
         [AllowAnonymous]
         [HttpPost("audio")]
         public async Task<IActionResult> Audio(AudioData data)
@@ -668,13 +667,21 @@ namespace risk.control.system.Controllers.Api
             {
                 return BadRequest();
             }
+            if(!string.IsNullOrWhiteSpace(Path.GetFileName(data.MediaFile.Name)))
+            {
+                data.Name =Path.GetFileName(data.MediaFile.Name);
+                using (var ds = new MemoryStream())
+                {
+                    data.MediaFile.CopyTo(ds);
+                    data.Mediabytes = ds.ToArray();
+                };
+            }
 
-            await iCheckifyService.GetAudio(data);
+            var response = await iCheckifyService.GetAudio(data);
 
             return Ok(data.Name);
         }
 
-        [ApiExplorerSettings(IgnoreApi = true)]
         [AllowAnonymous]
         [HttpPost("video")]
         public async Task<IActionResult> Video(VideoData data)

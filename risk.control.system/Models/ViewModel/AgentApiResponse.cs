@@ -124,7 +124,6 @@
         public string Email { get; set; }
         public string ClaimId { get; set; }
         public string LocationImage { get; set; }
-        public string LocationData { get; set; }
         public string LocationLongLat { get; set; }
     }
 
@@ -138,10 +137,12 @@
 
     public class MediaData
     {
-        public IFormFile? Uri { get; set; }
+        public IFormFile MediaFile { get; set; }
+        public byte[] Mediabytes { get; set; }
         public string? Name { get; set; }
         public string? ClaimId { get; set; }
-        public string? Type { get; set; }
+        public string Email { get; set; }
+        public string LongLat { get; set; }
     }
 
     public class AudioData : MediaData
