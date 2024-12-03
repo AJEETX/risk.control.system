@@ -491,6 +491,10 @@
                                     {
                                         <partial name="_AgentSubmittedPassportIdReport" model="@Model" />
                                     }
+                                    if (Model.ClaimsInvestigation.EnableMedia)
+                                    {
+                                        <partial name="_AgentSubmittedAudioReport" model="@Model" />
+                                    }
                                 }
 
                                 @if (!string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.AgencyReport?.AgentRemarks))

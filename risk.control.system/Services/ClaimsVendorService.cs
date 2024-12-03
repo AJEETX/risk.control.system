@@ -31,7 +31,7 @@ namespace risk.control.system.Services
 
         Task<AppiCheckifyResponse> PostFaceId(string userEmail, string claimId, string latitude, string longitude, byte[]? image = null);
         Task<AppiCheckifyResponse> PostAudio(string userEmail, string claimId, string latitude, string longitude, string filename, byte[]? image = null);
-        Task<AppiCheckifyResponse> PostVideo(string userEmail, string claimId, string latitude, string longitude, byte[]? image = null);
+        Task<AppiCheckifyResponse> PostVideo(string userEmail, string claimId, string latitude, string longitude, string filename, byte[]? image = null);
         Task<AppiCheckifyResponse> PostDocumentId(string userEmail, string claimId, string latitude, string longitude, byte[]? image = null);
         Task<AppiCheckifyResponse> PostPassportId(string userEmail, string claimId, string latitude, string longitude, byte[]? image = null);
     }
@@ -81,7 +81,7 @@ namespace risk.control.system.Services
         }
 
 
-        public async Task<AppiCheckifyResponse> PostVideo(string userEmail, string claimId, string latitude, string longitude, byte[]? image = null)
+        public async Task<AppiCheckifyResponse> PostVideo(string userEmail, string claimId, string latitude, string longitude, string filename, byte[]? image = null)
         {
             var locationLongLat = string.IsNullOrWhiteSpace(latitude) || string.IsNullOrWhiteSpace(longitude) ? string.Empty : $"{latitude}/{longitude}";
 
@@ -90,7 +90,8 @@ namespace risk.control.system.Services
                 Email = userEmail,
                 ClaimId = claimId,
                 Mediabytes = image,
-                LongLat = locationLongLat
+                LongLat = locationLongLat,
+                Name = filename
             };
             var result = await checkifyService.GetVideo(data);
             return result;
@@ -222,11 +223,16 @@ namespace risk.control.system.Services
                 .ThenInclude(c => c.PassportIdReport)
                 .Include(c => c.AgencyReport)
                 .ThenInclude(c => c.AudioReport)
+                .Include(c => c.AgencyReport)
+                .ThenInclude(c => c.VideoReport)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == selectedcase);
 
             if(claim.AgencyReport == null || claim.AgencyReport.AgentEmail != userEmail &&
                 claim.AgencyReport.PanIdReport?.DocumentIdImageLongLat == null &&
-                claim.AgencyReport.PanIdReport?.DocumentIdImageLongLat == null)
+                claim.AgencyReport.PassportIdReport?.DocumentIdImageLongLat == null &&
+                claim.AgencyReport.AudioReport?.DocumentIdImageLongLat == null &&
+                claim.AgencyReport.VideoReport?.DocumentIdImageLongLat == null &&
+                claim.AgencyReport.DigitalIdReport?.DigitalIdImageLongLat == null)
             {
                 claim.AgencyReport = new AgencyReport();
                 claim.AgencyReport.AgentEmail = userEmail;

@@ -229,6 +229,13 @@ a.table-link {
     cursor: pointer;
 }
 
+#audioPlayer {
+    cursor: pointer;
+}
+
+#videoPlayer {
+    cursor: pointer;
+}
 .ocr-Image {
     height: 200px;
     width: 200px;
@@ -236,6 +243,20 @@ a.table-link {
     border-radius: 5px;
 }
 
+.audio-Image {
+    height: 200px;
+    width: 200px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+
+.video-Image {
+    height: 200px;
+    width: 200px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
 .passport-Image {
     height: 200px;
     width: 200px;
@@ -249,12 +270,7 @@ a.table-link {
     border: 1px solid #ccc;
     border-radius: 5px;
 }
-#audioPlayer {
-    height: 150px;
-    object-fit: cover;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-}
+
 .locationImage {
     height: 200px;
     width: 200px;
@@ -291,12 +307,26 @@ a.table-link {
     border-radius: 5px;
     cursor: pointer;
 }
+
+.videolocationImage {
+    height: 200px;
+    width: 200px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+}
 #face-map {
     height: 300px;
     width: auto;
 }
 
 #audio-map {
+    height: 300px;
+    width: auto;
+}
+
+
+#video-map {
     height: 300px;
     width: auto;
 }

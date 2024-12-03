@@ -317,8 +317,7 @@ namespace risk.control.system.Controllers
                         model.Error = "Invalid login attempt.";
                         model.ShowUserOnLogin = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
                         ViewData["Users"] = new SelectList(_context.Users.OrderBy(o => o.Email), "Email", "Email");
-                            notifyService.Error("Invalid login attempt");
-                            return RedirectToAction("Login", "Account");
+                            return View(model);
                     }
                 }
             }

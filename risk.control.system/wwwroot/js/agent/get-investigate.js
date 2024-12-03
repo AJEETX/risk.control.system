@@ -18,6 +18,9 @@
 
         $('#audioLatitude').val(coordinates.latitude);
         $('#audioLongitude').val(coordinates.longitude);
+
+        $('#videoLatitude').val(coordinates.latitude);
+        $('#videoLongitude').val(coordinates.longitude);
     }
 
     //FACE IMAGE
@@ -449,7 +452,7 @@
         val ? fbtn.removeAttr("disabled") : fbtn.attr("disabled");
     });
     $("#audioFile").on('change', function () {
-        var MaxSizeInBytes = 2297152;
+        var MaxSizeInBytes = 5297152;
         //Get count of selected files
         var countFiles = $(this)[0].files.length;
 
@@ -547,6 +550,137 @@
                             $('#UploadAudioButton').html("<i class='fas fa-sync fa-spin'></i> Uploading");
 
                             $('#upload-audio').submit();
+                            $('#back').attr('disabled', 'disabled');
+
+                            $('html *').css('cursor', 'not-allowed');
+                            $('html a *, html button *').css('pointer-events', 'none')
+
+                            var article = document.getElementById("article");
+                            if (article) {
+                                var nodes = article.getElementsByTagName('*');
+                                for (var i = 0; i < nodes.length; i++) {
+                                    nodes[i].disabled = true;
+                                }
+                            }
+                        }
+                    },
+                    cancel: {
+                        text: "Cancel",
+                        btnClass: 'btn-default'
+                    }
+                }
+            });
+        }
+
+    });
+
+    //VIDEO FILE
+    let askVideoUploadConfirmation = true;
+
+    $('#videoFile').on("change", function () {
+        var val = $(this).val(),
+            fbtn = $('#UploadVideoButton');
+        val ? fbtn.removeAttr("disabled") : fbtn.attr("disabled");
+    });
+    $("#videoFile").on('change', function () {
+        var MaxSizeInBytes = 5297152;
+        //Get count of selected files
+        var countFiles = $(this)[0].files.length;
+
+        var imgPath = $(this)[0].value;
+        var extn = imgPath.substring(imgPath.lastIndexOf('.') + 1).toLowerCase();
+
+        if (extn == "mp4") {
+            if (typeof (FileReader) != "undefined") {
+
+                //loop for each file selected for uploaded.
+                for (var i = 0; i < countFiles; i++) {
+                    var fileSize = $(this)[0].files[i].size;
+                    if (fileSize > MaxSizeInBytes) {
+                        var btn = $('#UploadVideoButton');
+                        btn.attr("disabled");
+                        $.alert(
+                            {
+                                title: " UPLOAD issue !",
+                                content: " <i class='fa fa-upload'></i> Upload File size limit exceeded. <br />Max file size is 5 MB!",
+                                icon: 'fas fa-exclamation-triangle',
+                                type: 'red',
+                                closeIcon: true,
+                                buttons: {
+                                    cancel: {
+                                        text: "CLOSE",
+                                        btnClass: 'btn-danger'
+                                    }
+                                }
+                            }
+                        );
+
+                    }
+                }
+
+            } else {
+                $.alert(
+                    {
+                        title: "Outdated Browser !",
+                        content: "This browser does not support FileReader. Try on modern browser!",
+                        icon: 'fas fa-exclamation-triangle',
+
+                        type: 'red',
+                        closeIcon: true,
+                        buttons: {
+                            cancel: {
+                                text: "CLOSE",
+                                btnClass: 'btn-danger'
+                            }
+                        }
+                    }
+                );
+            }
+        } else {
+            $.alert(
+                {
+                    title: "FILE UPLOAD TYPE !!",
+                    content: "Pls select only image with extension mp4 ! ",
+                    icon: 'fas fa-exclamation-triangle',
+
+                    type: 'red',
+                    closeIcon: true,
+                    buttons: {
+                        cancel: {
+                            text: "CLOSE",
+                            btnClass: 'btn-danger'
+                        }
+                    }
+                }
+            );
+        }
+    });
+    $('#upload-video').on('submit', function (e) {
+        if (askVideoUploadConfirmation) {
+            e.preventDefault();
+            $.confirm({
+                title: "Confirm Upload",
+                content: "Are you sure to upload Video?",
+                icon: 'fa fa-upload',
+
+                type: 'green',
+                closeIcon: true,
+                buttons: {
+                    confirm: {
+                        text: "Upload",
+                        btnClass: 'btn-success',
+                        action: function () {
+                            askVideoUploadConfirmation = false;
+                            $("body").addClass("submit-progress-bg");
+                            // Wrap in setTimeout so the UI
+                            // can update the spinners
+                            setTimeout(function () {
+                                $(".submit-progress").removeClass("hidden");
+                            }, 1);
+                            $('#UploadVideoButton').attr('disabled', 'disabled');
+                            $('#UploadVideoButton').html("<i class='fas fa-sync fa-spin'></i> Uploading");
+
+                            $('#upload-video').submit();
                             $('#back').attr('disabled', 'disabled');
 
                             $('html *').css('cursor', 'not-allowed');
@@ -702,7 +836,24 @@ if (audioPlayer && pauseBtn) {
         audioPlayer.pause();
     });
 }
-question4.max = new Date().toISOString().split("T")[0];
+
+const videoPlayer = document.getElementById("videoPlayer");
+const playVideoBtn = document.getElementById("playVideoBtn");
+const pauseVideoBtn = document.getElementById("pauseVideoBtn");
+if (audioPlayer && pauseVideoBtn) {
+    playVideoBtn.addEventListener("click", () => {
+        videoPlayer.play();
+    });
+}
+
+if (audioPlayer && pauseVideoBtn) {
+    pauseVideoBtn.addEventListener("click", () => {
+        videoPlayer.pause();
+    });
+}
+if (question4) {
+    question4.max = new Date().toISOString().split("T")[0];
+}
 
 //var nodes = document.getElementById("audio-video").getElementsByTagName('*');
 //for (var i = 0; i < nodes.length; i++) {

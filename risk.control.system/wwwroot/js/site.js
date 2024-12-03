@@ -472,6 +472,96 @@ $(document).ready(function () {
         })
     })
 
+    $('.audiolocationImage').click(function () {
+        var data;
+        $.confirm({
+            type: 'green',
+            closeIcon: true,
+            columnClass: 'medium',
+
+            buttons: {
+                confirm: {
+                    text: "Ok",
+                    btnClass: 'btn-secondary',
+                    action: function () {
+                        askConfirmation = false;
+                    }
+                }
+            },
+            content: function () {
+                var self = this;
+                return $.ajax({
+                    url: '/api/ClaimsInvestigation/GetInvestigationData?id=' + $('#beneficiaryId').val() + '&claimId=' + $('#claimId').val(),
+                    dataType: 'json',
+                    method: 'get'
+                }).done(function (response) {
+                    data = response;
+                    self.setTitle('<i class="fas fa-portrait"></i> Audio <span class="badge badge-light">uploaded location</span>');
+                    self.setContent('<span class="badge badge-light"><i class="fas fa-map-pin"></i> Location visited</span>:');
+                    self.setContentAppend('<div id="maps"></div>')
+                    self.setContentAppend('<br><div id="pop-map"></div>')
+                    self.setContentAppend('</div>')
+                    self.setContentAppend('<span class="badge badge-light"><i class="fas fa-map-marker-alt"></i> Address visited</span>:');
+                    self.setContentAppend('<br><i>' + response.audioAddress + '</i>');
+                    showOcrMap = true;
+                }).fail(function () {
+                    self.setContent('Something went wrong.');
+                });
+            },
+            onContentReady: function () {
+                if (showOcrMap) {
+                    showOcrMap = false;
+                    initPopMap(data.audioPosition, data.audioAddress);
+                }
+            }
+        })
+    })
+
+
+    $('.videolocationImage').click(function () {
+        var data;
+        $.confirm({
+            type: 'green',
+            closeIcon: true,
+            columnClass: 'medium',
+
+            buttons: {
+                confirm: {
+                    text: "Ok",
+                    btnClass: 'btn-secondary',
+                    action: function () {
+                        askConfirmation = false;
+                    }
+                }
+            },
+            content: function () {
+                var self = this;
+                return $.ajax({
+                    url: '/api/ClaimsInvestigation/GetInvestigationData?id=' + $('#beneficiaryId').val() + '&claimId=' + $('#claimId').val(),
+                    dataType: 'json',
+                    method: 'get'
+                }).done(function (response) {
+                    data = response;
+                    self.setTitle('<i class="fas fa-portrait"></i> Video <span class="badge badge-light">uploaded location</span>');
+                    self.setContent('<span class="badge badge-light"><i class="fas fa-map-pin"></i> Location visited</span>:');
+                    self.setContentAppend('<div id="maps"></div>')
+                    self.setContentAppend('<br><div id="pop-map"></div>')
+                    self.setContentAppend('</div>')
+                    self.setContentAppend('<span class="badge badge-light"><i class="fas fa-map-marker-alt"></i> Address visited</span>:');
+                    self.setContentAppend('<br><i>' + response.videoAddress + '</i>');
+                    showOcrMap = true;
+                }).fail(function () {
+                    self.setContent('Something went wrong.');
+                });
+            },
+            onContentReady: function () {
+                if (showOcrMap) {
+                    showOcrMap = false;
+                    initPopMap(data.videoPosition, data.videoAddress);
+                }
+            }
+        })
+    })
     $('#profileImageMap').click(function () {
         var data;
         $.confirm({
@@ -597,6 +687,7 @@ $(document).ready(function () {
             }
         })
     })
+
 
     $('.passport-Image').click(function () {
         $.confirm({

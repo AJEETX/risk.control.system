@@ -31,6 +31,8 @@
         public static readonly string NO_POLICY_IMAGE = "/img/no-policy.jpg";
         public static readonly string POLICY_BLANK_IMAGE = "/img/blank-document.png";
         public static readonly string NO_PHOTO_IMAGE = "/img/no-photo.png";
+        public static readonly string NO_AUDIO = "/img/no-audio.png";
+        public static readonly string NO_VIDEO = "/img/no-video.png";
 
         //LOGIN
         public const string WEBSITE_LOGIN = "Log in: iCheckify";

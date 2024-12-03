@@ -103,6 +103,26 @@ function initReportMap() {
     if (audioHtml && audioMsgHtml) {
         initLocationMap(center, dakota, frick, audioHtml, audioMsgHtml);
     }
+
+    //VIDEO ID
+    var videoResponse = $.ajax({
+        type: "GET",
+        url: "/api/ClaimsInvestigation/GetVideoDetail?claimId=" + claimId,
+        async: false
+    }).responseText;
+    if (videoResponse) {
+        var pdata = JSON.parse(videoResponse);
+        if (pdata && pdata.center && pdata.dakota && pdata.frick) {
+            center = pdata.center;
+            dakota = pdata.dakota;
+            frick = pdata.frick
+        }
+    }
+    var videoHtml = document.getElementById('video-map');
+    var videoMsgHtml = document.getElementById('video-msg');
+    if (videoHtml && videoMsgHtml) {
+        initLocationMap(center, dakota, frick, videoHtml, videoMsgHtml);
+    }
 }
 
 function initLocationMap(center, dakota, frick, mapHtml, msgHtml) {

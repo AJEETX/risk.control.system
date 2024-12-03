@@ -1,0 +1,192 @@
+﻿@model ClaimTransactionModel
+
+@{
+    if (Model.ClaimsInvestigation.AgencyReport?.AudioReport?.DocumentIdImageData != null && @Model.ClaimsInvestigation.AgencyReport?.AudioReport?.DocumentIdImageLongLatTime != null)
+    {
+        var imageCapturedTime = @Model.ClaimsInvestigation.AgencyReport?.AudioReport?.DocumentIdImageLongLatTime != null ? @Model.ClaimsInvestigation.AgencyReport?.AudioReport?.DocumentIdImageLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt") : null;
+
+        string audioColor = "grey";
+        var audioBorderColor = "";
+        if (Model.ClaimsInvestigation.AgencyReport.AudioReport?.DocumentIdImageLongLat == null)
+        {
+
+        }
+        else if (Model.ClaimsInvestigation.AgencyReport.AudioReport?.DocumentIdImageLongLat != null && (
+        Model.ClaimsInvestigation.AgencyReport?.AudioReport?.DocumentIdImageValid != null && Model.ClaimsInvestigation.AgencyReport?.AudioReport?.DocumentIdImageValid == true))
+        {
+            audioColor = "green";
+            audioBorderColor = "border-success";
+        }
+        else
+        {
+            audioColor = "#dc3545!important";
+            audioBorderColor = "border-danger";
+        }
+
+        <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
+            <div class="card bg-light d-flex flex-fill @audioBorderColor">
+                <div class="card-header text-muted border-bottom-0">
+                    <h3 class="card-title">
+                        <i class="fas fa-mobile-alt"></i> PASSPORT
+                        <span class="hover-text">
+                            <i class="fas fa-info-circle"></i>
+
+                            @if (audioBorderColor == "border-danger")
+                            {
+                                <span class="tooltip-text" id="beneficiary-information">
+                                    <div>
+                                        <i class='far fa-hand-point-right'></i>
+                                        <b> Upload</b> Max image size 2 MB
+                                    </div>
+                                    <div>
+                                        <i class='far fa-thumbs-down'></i> <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i> UnMatched PASSPORT
+                                    </div>
+                                </span>
+                            }
+                            else if (audioBorderColor == "border-success")
+                            {
+                                <span class="tooltip-text" id="beneficiary-information">
+                                    <div>
+                                        <i class='far fa-hand-point-right'></i>
+                                        <b> Upload</b> Max image size 2 MB
+                                    </div>
+                                    <div>
+                                        <i class='far fa-thumbs-up'></i> <i style='color:green;' class='fas fa-check-circle'></i> Matched PASSPORT
+                                    </div>
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="tooltip-text" id="beneficiary-information">
+                                    <div>
+                                        <i class='far fa-hand-point-right'></i>
+                                        <b> Upload</b> Max image size 2 MB
+                                    </div>
+                                    <div>
+                                        <i class='far fa-hand-point-right'></i>
+                                        <button class='btn btn-info btn-xs'>
+                                            <span class='badge badge-info btn-xs'>
+                                                <i class='fa fa-upload'></i>
+                                            </span> Upload
+                                        </button>  AUDIO
+                                    </div>
+                                </span>
+
+                            }
+
+                        </span>
+                    </h3>
+                    <div class="card-tools">
+                        <span data-toggle="tooltip" title="Agent report # : @Model.ClaimsInvestigation.AgencyReport.AgentEmail" class="badge badge-light">
+                            <i class="nav-icon fas fa-clock"></i>
+                            @imageCapturedTime
+                        </span>
+
+                    </div>
+
+                </div>
+
+                <div class="card-footer text-center">
+                    <span class="badge badge-light"><i class="far fa-image"></i> Valid : </span>
+                    @if (@audioColor == "grey")
+                    {
+                        <i style='color:grey;' class='fa fa-times' aria-hidden='true'></i>
+                    }
+                    else if (@Model.ClaimsInvestigation.AgencyReport?.AudioReport?.DocumentIdImageValid.Value ?? false)
+                    {
+                        <i style='color:green;' class='fas fa-check-circle'></i>
+                    }
+
+                    else
+                    {
+                        <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i>
+                    }
+                </div>
+                <div class="progress">
+                    <i class="far fa-bookmark bookmark-green"></i>
+                    <div class="progress-bar" role="progressbar" style="width:100%;background-color:@audioColor;">
+                        audio
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-6">
+                            <p class="text-muted text-sm">
+                                <span class="badge badge-light"><i class="fas fa-film"></i> AUDIO Image</span>:
+                                <br />
+                                @{
+                                    if (Model.ClaimsInvestigation.AgencyReport?.AudioReport?.DocumentIdImage != null)
+                                    {
+                                        <audio id="audioPlayer" controls class="img-fluid audio-Image" data-toggle="tooltip" title="Audio File">
+                                            <source src="/Uploads/GetAudioFile?fileName=@Model.ClaimsInvestigation.AgencyReport.AudioReport.DocumentIdImagePath" type="audio/mpeg">
+                                            Your browser does not support the audio element.
+                                        </audio>
+
+                                        <!-- Play/Pause Buttons -->
+                                        <button class="btn btn-primary" id="playBtn">Play</button>
+                                        <button class="btn btn-secondary" id="pauseBtn">Pause</button>
+                                    }
+                                    else
+                                    {
+                                        <img id="audioPlayer" class="img-fluid no-Image" data-toggle="tooltip" title="No Audio"
+                                             src=@Applicationsettings.NO_AUDIO>
+                                    }
+                                }
+                            </p>
+                            <p class="text-muted text-sm">
+
+                                <span class="badge badge-light"><i class="fas fa-info"></i> Image Scan Info</span>
+                                <br />
+                                <label class="img-fluid ocr-data"> @Model.ClaimsInvestigation.AgencyReport?.AudioReport?.DocumentIdImageData</label>
+                            </p>
+                        </div>
+                        <div class="col-6 text">
+
+                            <p class="text-muted text-sm">
+                                <span class="badge badge-light"><i class="fas fa-map-pin"></i> Location visited</span>
+                                <br />
+                                @if (@Model.ClaimsInvestigation.AgencyReport?.AudioReport?.DocumentIdImageLocationUrl != null)
+                                {
+                                    <img class="img-fluid passportlocationImage" src="@Model.ClaimsInvestigation.AgencyReport?.AudioReport?.DocumentIdImageLocationUrl" data-toggle="tooltip" title="Map Location" />
+                                }
+                                else
+                                {
+                                    <img class="img-fluid no-Image" src="@Applicationsettings.NO_MAP" data-toggle="tooltip" title="No Map Location" />
+                                }
+                            </p>
+
+                            <p class="text-muted text-sm">
+
+                                <span class="badge badge-light"><i class="fas fa-map-marker-alt"></i> Address visited</span>
+                                <br />
+                                <label class="img-fluid ocr-data"> @Model.ClaimsInvestigation.AgencyReport?.AudioReport?.DocumentIdImageLocationAddress</label>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @if (@Model.ClaimsInvestigation.AgencyReport?.AudioReport?.DocumentIdImageLocationUrl != null)
+            {
+                <div class="card direct-chat direct-chat-warning collapsed-card">
+                    <div class="card-header">
+                        <i class="fas fa-film"></i> <h3 class="card-title">Map<span class="badge badge-light">Expected and visited</span></h3>
+
+                        <div class="card-tools">
+                            <span data-toggle="tooltip" title="Map Location: Expected and visited" class="badge badge-light"> <i class='far fa-hand-point-right'></i></span>
+                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="audio-map">
+                        </div>
+                        <div id="audio-msg">
+                        </div>
+                    </div>
+                </div>
+
+            }
+        </div>
+    }
+}

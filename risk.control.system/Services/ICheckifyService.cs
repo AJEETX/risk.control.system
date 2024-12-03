@@ -155,6 +155,7 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
+                Console.WriteLine(ex.StackTrace);
                 throw ex;
             }
         }
@@ -300,6 +301,9 @@ namespace risk.control.system.Services
 
         public async Task<AppiCheckifyResponse> GetAudio(AudioData data)
         {
+            try
+            {
+
             var claim = claimsService.GetClaims()
                 .Include(c => c.AgencyReport)
                 .ThenInclude(c => c.AudioReport)
@@ -332,7 +336,7 @@ namespace risk.control.system.Services
             {
                 Directory.CreateDirectory(audioDirectory);
             }
-            var filePath = Path.Combine(webHostEnvironment.WebRootPath, "audio", data.Name);
+            var filePath = Path.Combine(webHostEnvironment.WebRootPath, "audio", data.Email + data.Name);
             await File.WriteAllBytesAsync(filePath, data.Mediabytes);
             claim.AgencyReport.AudioReport.DocumentIdImagePath = filePath;
             //END :: TO-DO: AWS : SPEECH TO TEXT;
@@ -352,10 +356,20 @@ namespace risk.control.system.Services
                 OcrTime = claim.AgencyReport.AudioReport?.DocumentIdImageLongLatTime,
                 PanValid = claim.AgencyReport.AudioReport?.DocumentIdImageValid
             };
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                throw;
+            }
         }
 
         public async Task<AppiCheckifyResponse> GetVideo(VideoData data)
         {
+            try
+            {
+
             var claim = claimsService.GetClaims()
                 .Include(c => c.AgencyReport)
                 .ThenInclude(c => c.VideoReport)
@@ -383,11 +397,14 @@ namespace risk.control.system.Services
 
             //TO-DO: AWS : SPEECH TO TEXT;
 
-            string audioDirectory = Path.Combine(webHostEnvironment.WebRootPath, "video");
-            if (!Directory.Exists(audioDirectory))
+            string videooDirectory = Path.Combine(webHostEnvironment.WebRootPath, "video");
+            if (!Directory.Exists(videooDirectory))
             {
-                Directory.CreateDirectory(audioDirectory);
+                Directory.CreateDirectory(videooDirectory);
             }
+            var filePath = Path.Combine(webHostEnvironment.WebRootPath, "video", data.Email + data.Name);
+            await File.WriteAllBytesAsync(filePath, data.Mediabytes);
+            claim.AgencyReport.VideoReport.DocumentIdImagePath = filePath;
             //END :: TO-DO: AWS : SPEECH TO TEXT;
 
 
@@ -407,6 +424,13 @@ namespace risk.control.system.Services
                 OcrTime = claim.AgencyReport.VideoReport?.DocumentIdImageLongLatTime,
                 PanValid = claim.AgencyReport.VideoReport?.DocumentIdImageValid
             };
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                throw;
+            }
         }
 
         public async Task<AppiCheckifyResponse> GetPassportId(DocumentData data)

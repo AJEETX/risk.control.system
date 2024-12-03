@@ -321,7 +321,7 @@ namespace risk.control.system.Controllers
                 {
                     videoFile.CopyTo(ds);
                     var imageByte = ds.ToArray();
-                    var response = await vendorService.PostVideo(userEmail, selectedclaim, videoLatitude, videoLongitude, imageByte);
+                    var response = await vendorService.PostVideo(userEmail, selectedclaim, videoLatitude, videoLongitude, Path.GetFileName(videoFile.FileName), imageByte);
 
                     notifyService.Custom($"Video Uploaded", 3, "green", "fas fa-mobile-alt");
                     return Redirect("/Agent/GetInvestigate?selectedcase=" + selectedclaim);
@@ -333,6 +333,18 @@ namespace risk.control.system.Controllers
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
+        }
+
+        public IActionResult GetVideoFile(string fileName)
+        {
+            var filePath = Path.Combine("wwwroot/video", fileName);
+            if (!System.IO.File.Exists(filePath))
+            {
+                return NotFound();
+            }
+
+            var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+            return File(fileStream, "video/mp4"); // MIME type for MP4
         }
     }
 }

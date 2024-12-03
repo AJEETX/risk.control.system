@@ -1,35 +1,35 @@
 ﻿@model ClaimsInvestigationVendorsModel
 
 @{
-    var imageCapturedTime = @Model.AgencyReport?.AudioReport?.DocumentIdImageLongLatTime != null ? @Model.AgencyReport?.AudioReport?.DocumentIdImageLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt") : null;
+    var imageCapturedTime = @Model.AgencyReport?.VideoReport?.DocumentIdImageLongLatTime != null ? @Model.AgencyReport?.VideoReport?.DocumentIdImageLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt") : null;
 
-    string audioIdColor = "grey";
-    var audioIdColorBorderColor = "";
-    if (Model.AgencyReport.AudioReport?.DocumentIdImageLongLat == null)
+    string videoIdColor = "grey";
+    var videoIdColorBorderColor = "";
+    if (Model.AgencyReport.VideoReport?.DocumentIdImageLongLat == null)
     {
 
     }
-    else if (Model.AgencyReport.AudioReport?.DocumentIdImageLongLat != null && (
-    Model.AgencyReport?.AudioReport?.DocumentIdImageValid != null && Model.AgencyReport?.AudioReport?.DocumentIdImageValid == true))
+    else if (Model.AgencyReport.VideoReport?.DocumentIdImageLongLat != null && (
+    Model.AgencyReport?.VideoReport?.DocumentIdImageValid != null && Model.AgencyReport?.VideoReport?.DocumentIdImageValid == true))
     {
-        audioIdColor = "green";
-        audioIdColorBorderColor = "border-success";
+        videoIdColor = "green";
+        videoIdColorBorderColor = "border-success";
     }
     else
     {
-        audioIdColor = "#dc3545!important";
-        audioIdColorBorderColor = "border-danger";
+        videoIdColor = "#dc3545!important";
+        videoIdColorBorderColor = "border-danger";
     }
 
     <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
-        <div class="card bg-light d-flex flex-fill @audioIdColorBorderColor">
+        <div class="card bg-light d-flex flex-fill @videoIdColorBorderColor">
             <div class="card-header text-muted border-bottom-0">
                 <h3 class="card-title">
-                    <i class="fas fa-mobile-alt"></i> AUDIO
+                    <i class="fas fa-mobile-alt"></i> VIDEO
                     <span class="hover-text">
                         <i class="fas fa-info-circle"></i>
 
-                        @if (audioIdColorBorderColor == "border-danger")
+                        @if (videoIdColorBorderColor == "border-danger")
                         {
                             <span class="tooltip-text" id="beneficiary-information">
                                 <div>
@@ -37,11 +37,11 @@
                                     <b> Upload</b> Max image size 2 MB
                                 </div>
                             <div>
-                                    <i class='far fa-thumbs-down'></i> <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i> Valid Audio
+                                    <i class='far fa-thumbs-down'></i> <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i> Valid Video
                                 </div>
                             </span>
                         }
-                        else if (audioIdColorBorderColor == "border-success")
+                        else if (videoIdColorBorderColor == "border-success")
                         {
                             <span class="tooltip-text" id="beneficiary-information">
                                 <div>
@@ -49,7 +49,7 @@
                                     <b> Upload</b> Max image size 2 MB
                                 </div>
                                 <div>
-                                    <i class='far fa-thumbs-up'></i> <i style='color:green;' class='fas fa-check-circle'></i> InValid Audio
+                                    <i class='far fa-thumbs-up'></i> <i style='color:green;' class='fas fa-check-circle'></i> InValid Video
                                 </div>
                             </span>
                         }
@@ -66,7 +66,7 @@
                                         <span class='badge badge-info btn-xs'>
                                             <i class='fa fa-upload'></i>
                                     </span> Upload
-                                    </button>  Audio
+                                    </button>  Video
                                 </div>
                             </span>
 
@@ -86,11 +86,11 @@
 
             <div class="card-footer text-center">
                 <span class="badge badge-light"><i class="far fa-image"></i> Valid : </span>
-                @if (@audioIdColor == "grey")
+                @if (@videoIdColor == "grey")
                 {
                     <i style='color:grey;' class='fa fa-times' aria-hidden='true'></i>
                 }
-                else if (@Model.AgencyReport?.AudioReport?.DocumentIdImageValid.Value ?? false)
+                else if (@Model.AgencyReport?.VideoReport?.DocumentIdImageValid.Value ?? false)
                 {
                     <i style='color:green;' class='fas fa-check-circle'></i>
                 }
@@ -102,32 +102,32 @@
             </div>
             <div class="progress">
                 <i class="far fa-bookmark bookmark-green"></i>
-                <div class="progress-bar" role="progressbar" style="width:100%;background-color:@audioIdColor;">
-                    audio
+                <div class="progress-bar" role="progressbar" style="width:100%;background-color:@videoIdColor;">
+                    video
                 </div>
             </div>
             <div class="card-body">
                 <div class="row">
                     <div class="col-6">
                         <p class="text-muted text-sm">
-                            <span class="badge badge-light"><i class="fas fa-film"></i> Audio File</span>:
+                            <span class="badge badge-light"><i class="fas fa-film"></i> Video File</span>:
                             <br />
                             @{
-                                if (Model.AgencyReport?.AudioReport?.DocumentIdImage != null)
+                                if (Model.AgencyReport?.VideoReport?.DocumentIdImage != null)
                                 {
-                                    <audio id="audioPlayer" controls class="img-fluid audio-Image" data-toggle="tooltip" title="Audio File">
-                                        <source src="/Uploads/GetAudioFile?fileName=@Model.AgencyReport.AudioReport.DocumentIdImagePath" type="audio/mpeg">
-                                        Your browser does not support the audio element.
-                                    </audio>
+                                    <video id="videoPlayer" controls class="img-fluid vidio-Image" data-toggle="tooltip" title="Video File">
+                                        <source src="/Uploads/GetVideoFile?fileName=@Model.AgencyReport.VideoReport.DocumentIdImagePath" type="video/mpeg">
+                                        Your browser does not support the video element.
+                                    </video>
 
                                     <!-- Play/Pause Buttons -->
-                                    <button class="btn btn-primary" id="playBtn">Play</button>
-                                    <button class="btn btn-secondary" id="pauseBtn">Pause</button>
+                                    <button class="btn btn-primary" id="playVideoBtn">Play</button>
+                                    <button class="btn btn-secondary" id="pauseVideoBtn">Pause</button>
                                 }
                                 else
                                 {
-                                                            <img id="audioPlayer" class="img-fluid no-Image" data-toggle="tooltip" title="No Audio"
-                                         src=@Applicationsettings.NO_AUDIO>
+                                                            <img id="videoPlayer" class="img-fluid no-Image" data-toggle="tooltip" title="No Video"
+                                         src=@Applicationsettings.NO_VIDEO>
                                 }
                             }
                         </p>
@@ -135,7 +135,7 @@
 
                             <span class="badge badge-light"><i class="fas fa-info"></i> Image Scan Info</span>
                             <br />
-                            <label class="img-fluid ocr-data"> @Model.AgencyReport?.AudioReport?.DocumentIdImageData</label>
+                            <label class="img-fluid ocr-data"> @Model.AgencyReport?.VideoReport?.DocumentIdImageData</label>
                         </p>
                     </div>
                     <div class="col-6 text">
@@ -143,9 +143,9 @@
                         <p class="text-muted text-sm">
                             <span class="badge badge-light"><i class="fas fa-map-pin"></i> Location visited</span>
                             <br />
-                            @if (@Model.AgencyReport?.AudioReport?.DocumentIdImageLocationUrl != null)
+                            @if (@Model.AgencyReport?.VideoReport?.DocumentIdImageLocationUrl != null)
                             {
-                                <img class="img-fluid audiolocationImage" src="@Model.AgencyReport?.AudioReport?.DocumentIdImageLocationUrl" data-toggle="tooltip" title="Map Location" />
+                                <img class="img-fluid videolocationImage" src="@Model.AgencyReport?.VideoReport?.DocumentIdImageLocationUrl" data-toggle="tooltip" title="Map Location" />
                             }
                             else
                             {
@@ -157,30 +157,30 @@
 
                             <span class="badge badge-light"><i class="fas fa-map-marker-alt"></i> Address visited</span>
                             <br />
-                            <label class="img-fluid ocr-data"> @Model.AgencyReport?.AudioReport?.DocumentIdImageLocationAddress</label>
+                            <label class="img-fluid ocr-data"> @Model.AgencyReport?.VideoReport?.DocumentIdImageLocationAddress</label>
                         </p>
                     </div>
                 </div>
             </div>
 
-            <form id="upload-audio" method="post" enctype="multipart/form-data" asp-controller="Uploads" asp-action="AudioUpload">
-                <input type="hidden" id="audioLatitude" name="audioLatitude" />
-                <input type="hidden" id="audioLongitude" name="audioLongitude" />
+            <form id="upload-video" method="post" enctype="multipart/form-data" asp-controller="Uploads" asp-action="VideoUpload">
+                <input type="hidden" id="videoLatitude" name="videoLatitude" />
+                <input type="hidden" id="videoLongitude" name="videoLongitude" />
                 <input type="hidden" id="selectedclaim" name="selectedclaim" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
                 <div class="card-footer">
 
                     <div class="form-group">
-                        <span class="input-group-label"> Upload AUDIO : </span>
+                        <span class="input-group-label"> Upload VIDEO : </span>
                         <div class="input-group mb-3">
-                            <img class="form-Image" id="audio-Image" src="@Applicationsettings.NO_IMAGE" title="Audio" />
-                            <input accept=".mp3" type="file" class="form-control remarks" name="audioFile" id="audioFile" data-toggle="tooltip" title="Upload Audio" />
-                            <button id="UploadAudioButton" disabled type="submit" class="btn btn-info upload"><i class="nav-icon fa fa-upload"></i> Upload</button>
+                            <img class="form-Image" id="video-Image" src="@Applicationsettings.NO_IMAGE" title="Video" />
+                            <input accept=".mp4" type="file" class="form-control remarks" name="videoFile" id="videoFile" data-toggle="tooltip" title="Upload Video" />
+                            <button id="UploadVideoButton" disabled type="submit" class="btn btn-info upload"><i class="nav-icon fa fa-upload"></i> Upload</button>
                         </div>
                     </div>
                 </div>
             </form>
         </div>
-        @if (@Model.AgencyReport?.AudioReport?.DocumentIdImageLocationUrl != null)
+        @if (@Model.AgencyReport?.VideoReport?.DocumentIdImageLocationUrl != null)
         {
             <div class="card direct-chat direct-chat-warning collapsed-card">
                 <div class="card-header">
@@ -194,9 +194,9 @@
                     </div>
                 </div>
                 <div class="card-body">
-                    <div id="audio-map">
+                    <div id="video-map">
                     </div>
-                            <div id="audio-msg">
+                            <div id="video-msg">
                     </div>
                 </div>
             </div>

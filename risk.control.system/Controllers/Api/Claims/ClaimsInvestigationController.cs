@@ -149,6 +149,8 @@ namespace risk.control.system.Controllers.Api.Claims
                 .Include(c=>c.AgencyReport.PanIdReport)
                 .Include(c=>c.AgencyReport.PassportIdReport)
                 .Include(c=>c.AgencyReport.DigitalIdReport)
+                .Include(c=>c.AgencyReport.AudioReport)
+                .Include(c=>c.AgencyReport.VideoReport)
                 .FirstOrDefault(c=> c.ClaimsInvestigationId == claimId);
 
             var beneficiary = await _context.BeneficiaryDetail
@@ -196,6 +198,34 @@ namespace risk.control.system.Controllers.Api.Claims
                 passportAddress = await httpClientService.GetRawAddress((passportLat), (passportLng));
                 passportUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={passportLongLatString}&zoom=14&size=300x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{passportLongLatString}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
             }
+
+            string audioUrl = $"https://maps.googleapis.com/maps/api/staticmap?center=32.661839,-97.263680&zoom=14&size=150x200&maptype=roadmap&markers=color:red%7Clabel:S%7C32.661839,-97.263680&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+            string audioAddress = string.Empty;
+            string audioLat = string.Empty, audioLng = string.Empty;
+            if (!string.IsNullOrWhiteSpace(claim.AgencyReport?.AudioReport?.DocumentIdImageLongLat))
+            {
+                var audiolongLat = claim.AgencyReport.AudioReport.DocumentIdImageLongLat.IndexOf("/");
+                audioLat = claim.AgencyReport.AudioReport.DocumentIdImageLongLat.Substring(0, audiolongLat)?.Trim();
+                audioLng = claim.AgencyReport.AudioReport.DocumentIdImageLongLat.Substring(audiolongLat + 1)?.Trim();
+                var passportLongLatString = audioLat + "," + audioLng;
+                audioAddress = await httpClientService.GetRawAddress((audioLat), (audioLng));
+                audioUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={passportLongLatString}&zoom=14&size=300x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{passportLongLatString}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+            }
+
+            string videoUrl = $"https://maps.googleapis.com/maps/api/staticmap?center=32.661839,-97.263680&zoom=14&size=150x200&maptype=roadmap&markers=color:red%7Clabel:S%7C32.661839,-97.263680&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+            string videoAddress = string.Empty;
+            string videoLat = string.Empty, videoLng = string.Empty;
+            if (!string.IsNullOrWhiteSpace(claim.AgencyReport?.VideoReport?.DocumentIdImageLongLat))
+            {
+                var videolongLat = claim.AgencyReport.VideoReport.DocumentIdImageLongLat.IndexOf("/");
+                videoLat = claim.AgencyReport.VideoReport.DocumentIdImageLongLat.Substring(0, videolongLat)?.Trim();
+                videoLng = claim.AgencyReport.VideoReport.DocumentIdImageLongLat.Substring(videolongLat + 1)?.Trim();
+                var videoLongLatString = videoLat + "," + videoLng;
+                videoAddress = await httpClientService.GetRawAddress((videoLat), (videoLng));
+                videoUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={videoLongLatString}&zoom=14&size=300x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{videoLongLatString}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+            }
+
+
             var data = new
             {
                 Title = "Investigation Data",
@@ -235,6 +265,30 @@ namespace risk.control.system.Controllers.Api.Claims
                     Lat = string.IsNullOrWhiteSpace(passportLat) ? decimal.Parse("-37.0000") : decimal.Parse(passportLat),
                     Lng = string.IsNullOrWhiteSpace(passportLng) ? decimal.Parse("140.00") : decimal.Parse(passportLng)
                 },
+                AudioData = claim.AgencyReport?.AudioReport?.DocumentIdImageData ?? "Audio Data",
+                AudioImage = claim.AgencyReport?.AudioReport?.DocumentIdImage != null ?
+                string.Format("data:audio/*;base64,{0}", Convert.ToBase64String(claim.AgencyReport?.AudioReport?.DocumentIdImage)) :
+                string.Format("data:audio/*;base64,{0}", Convert.ToBase64String(noDataimage)),
+                AudioLatLong = audioUrl,
+                AudioAddress = audioAddress,
+                AudioPosition =
+                new
+                {
+                    Lat = string.IsNullOrWhiteSpace(audioLat) ? decimal.Parse("-37.0000") : decimal.Parse(audioLat),
+                    Lng = string.IsNullOrWhiteSpace(audioLng) ? decimal.Parse("140.00") : decimal.Parse(audioLng)
+                },
+                VideoData = claim.AgencyReport?.VideoReport?.DocumentIdImageData ?? "Video Data",
+                VideoImage = claim.AgencyReport?.VideoReport?.DocumentIdImage != null ?
+                string.Format("data:video/*;base64,{0}", Convert.ToBase64String(claim.AgencyReport?.VideoReport?.DocumentIdImage)) :
+                string.Format("data:video/*;base64,{0}", Convert.ToBase64String(noDataimage)),
+                VideoLatLong = videoUrl,
+                VideoAddress = videoAddress,
+                VideoPosition =
+                new
+                {
+                    Lat = string.IsNullOrWhiteSpace(videoLat) ? decimal.Parse("-37.0000") : decimal.Parse(videoLat),
+                    Lng = string.IsNullOrWhiteSpace(videoLng) ? decimal.Parse("140.00") : decimal.Parse(videoLng)
+                }
             };
 
             return Ok(data);
@@ -465,6 +519,48 @@ namespace risk.control.system.Controllers.Api.Claims
                     var longLat = claim.AgencyReport.AudioReport.DocumentIdImageLongLat.IndexOf("/");
                     var latitude = claim.AgencyReport?.AudioReport?.DocumentIdImageLongLat.Substring(0, longLat)?.Trim();
                     var longitude = claim.AgencyReport?.AudioReport?.DocumentIdImageLongLat.Substring(longLat + 1)?.Trim();
+
+                    var frick = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) };
+                    return Ok(new { center, dakota, frick });
+                }
+            }
+            return Ok();
+        }
+
+
+        [HttpGet("GetVideoDetail")]
+        public IActionResult GetVideoDetail(string claimid)
+        {
+            var claim = claimsService.GetClaims()
+                .Include(c => c.AgencyReport)
+                .Include(c => c.AgencyReport.VideoReport)
+                .FirstOrDefault(c => c.ClaimsInvestigationId == claimid);
+
+            if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
+            {
+                var center = new { Lat = decimal.Parse(claim.CustomerDetail.PinCode.Latitude), Lng = decimal.Parse(claim.CustomerDetail.PinCode.Longitude) };
+                var dakota = new { Lat = decimal.Parse(claim.CustomerDetail.PinCode.Latitude), Lng = decimal.Parse(claim.CustomerDetail.PinCode.Longitude) };
+
+                if (claim.AgencyReport is not null && claim.AgencyReport?.VideoReport?.DocumentIdImageLongLat is not null)
+                {
+                    var longLat = claim.AgencyReport.VideoReport.DocumentIdImageLongLat.IndexOf("/");
+                    var latitude = claim.AgencyReport?.VideoReport?.DocumentIdImageLongLat.Substring(0, longLat)?.Trim();
+                    var longitude = claim.AgencyReport?.VideoReport?.DocumentIdImageLongLat.Substring(longLat + 1)?.Trim();
+
+                    var frick = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) };
+                    return Ok(new { center, dakota, frick });
+                }
+            }
+            else
+            {
+                var center = new { Lat = decimal.Parse(claim.BeneficiaryDetail.PinCode.Latitude), Lng = decimal.Parse(claim.BeneficiaryDetail.PinCode.Longitude) };
+                var dakota = new { Lat = decimal.Parse(claim.BeneficiaryDetail.PinCode.Latitude), Lng = decimal.Parse(claim.BeneficiaryDetail.PinCode.Longitude) };
+
+                if (claim.AgencyReport is not null && claim.AgencyReport?.VideoReport?.DocumentIdImageLongLat is not null)
+                {
+                    var longLat = claim.AgencyReport.VideoReport.DocumentIdImageLongLat.IndexOf("/");
+                    var latitude = claim.AgencyReport?.VideoReport?.DocumentIdImageLongLat.Substring(0, longLat)?.Trim();
+                    var longitude = claim.AgencyReport?.VideoReport?.DocumentIdImageLongLat.Substring(longLat + 1)?.Trim();
 
                     var frick = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) };
                     return Ok(new { center, dakota, frick });
