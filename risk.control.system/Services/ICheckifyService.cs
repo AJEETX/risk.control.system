@@ -322,11 +322,20 @@ namespace risk.control.system.Services
             var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
             claim.AgencyReport.AudioReport.DocumentIdImageLocationUrl = url;
 
-            var rawAddress = await httpClientService.GetRawAddress(latitude, longitude);
+                var rawAddress = await httpClientService.GetRawAddress(latitude, longitude);
 
             claim.AgencyReport.AudioReport.DocumentIdImageLocationAddress = rawAddress;
+                var weatherUrl = $"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current=temperature_2m,windspeed_10m&hourly=temperature_2m,relativehumidity_2m,windspeed_10m";
+                var weatherData =await httpClient.GetFromJsonAsync<Weather>(weatherUrl);
+                string weatherCustomData = $"Temperature:{weatherData.current.temperature_2m} {weatherData.current_units.temperature_2m}." +
+                    $"\r\n" +
+                    $"\r\nWindspeed:{weatherData.current.windspeed_10m} {weatherData.current_units.windspeed_10m}" +
+                    $"\r\n" +
+                    $"\r\nElevation(sea level):{weatherData.elevation} metres";
 
-            claim.AgencyReport.AudioReport.ValidationExecuted = true;
+                claim.AgencyReport.AudioReport.DocumentIdImageData = weatherCustomData;
+                claim.AgencyReport.AudioReport.ValidationExecuted = true;
+                claim.AgencyReport.AudioReport.DocumentIdImageValid = true;
             
             claim.AgencyReport.AudioReport.DocumentIdImage = data.Mediabytes;
 
@@ -389,10 +398,20 @@ namespace risk.control.system.Services
             claim.AgencyReport.VideoReport.DocumentIdImageLocationUrl = url;
 
             var rawAddress = await httpClientService.GetRawAddress(latitude, longitude);
+                var weatherUrl = $"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current=temperature_2m,windspeed_10m&hourly=temperature_2m,relativehumidity_2m,windspeed_10m";
 
-            claim.AgencyReport.VideoReport.DocumentIdImageLocationAddress = rawAddress;
+                var weatherData = await httpClient.GetFromJsonAsync<Weather>(weatherUrl);
+                string weatherCustomData = $"Temperature:{weatherData.current.temperature_2m} {weatherData.current_units.temperature_2m}." +
+                    $"\r\n" +
+                    $"\r\nWindspeed:{weatherData.current.windspeed_10m} {weatherData.current_units.windspeed_10m}" +
+                    $"\r\n" +
+                    $"\r\nElevation(sea level):{weatherData.elevation} metres";
+
+                claim.AgencyReport.VideoReport.DocumentIdImageData = weatherCustomData;
+                claim.AgencyReport.VideoReport.DocumentIdImageLocationAddress = rawAddress;
 
             claim.AgencyReport.VideoReport.ValidationExecuted = true;
+            claim.AgencyReport.VideoReport.DocumentIdImageValid = true;
             claim.AgencyReport.VideoReport.DocumentIdImage = data.Mediabytes;
 
             //TO-DO: AWS : SPEECH TO TEXT;

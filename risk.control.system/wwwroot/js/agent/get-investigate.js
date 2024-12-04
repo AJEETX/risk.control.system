@@ -822,35 +822,6 @@
     });
 });
 
-const audioPlayer = document.getElementById("audioPlayer");
-const playBtn = document.getElementById("playBtn");
-const pauseBtn = document.getElementById("pauseBtn");
-if (audioPlayer && playBtn) {
-    playBtn.addEventListener("click", () => {
-        audioPlayer.play();
-    });
-}
-
-if (audioPlayer && pauseBtn) {
-    pauseBtn.addEventListener("click", () => {
-        audioPlayer.pause();
-    });
-}
-
-const videoPlayer = document.getElementById("videoPlayer");
-const playVideoBtn = document.getElementById("playVideoBtn");
-const pauseVideoBtn = document.getElementById("pauseVideoBtn");
-if (audioPlayer && pauseVideoBtn) {
-    playVideoBtn.addEventListener("click", () => {
-        videoPlayer.play();
-    });
-}
-
-if (audioPlayer && pauseVideoBtn) {
-    pauseVideoBtn.addEventListener("click", () => {
-        videoPlayer.pause();
-    });
-}
 if (question4) {
     question4.max = new Date().toISOString().split("T")[0];
 }
