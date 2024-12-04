@@ -13,6 +13,8 @@ namespace risk.control.system.Models
         public ReportQuestionaire ReportQuestionaire { get; set; } = new ReportQuestionaire();
 
         public DocumentIdReport? PanIdReport { get; set; } = new DocumentIdReport();
+        public DocumentIdReport? AudioReport { get; set; } = new DocumentIdReport();
+        public DocumentIdReport? VideoReport { get; set; } = new DocumentIdReport();
         public DocumentIdReport? PassportIdReport { get; set; } = new DocumentIdReport();
 
         public string? AgentEmail { get; set; }

@@ -180,6 +180,41 @@
                                             </div>
                                         }
                                         
+                                        @if (Model.ClaimsInvestigation.EnableMedia)
+                                        {
+                                            <div class="form-group">
+                                                <div class="form-check form-switch">
+
+                                                    <label class="form-check-label" for="flexRadioDefault1">
+                                                        @if (@Model.ClaimsInvestigation.AgencyReport.AudioReport?.DocumentIdImageValid != null && @Model.ClaimsInvestigation.AgencyReport.AudioReport.DocumentIdImageValid.Value)
+                                                        {
+                                                            <i style='color:green;' class='fas fa-check-circle'></i>
+                                                        }
+                                                        else
+                                                        {
+                                                            <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i>
+                                                        } <span class="process-case"></span>
+                                                        <i class="far fa-image"></i>  <b>  Audio Valid </b>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <div class="form-check form-switch">
+
+                                                    <label class="form-check-label" for="flexRadioDefault1">
+                                                        @if (@Model.ClaimsInvestigation.AgencyReport.VideoReport?.DocumentIdImageValid != null && @Model.ClaimsInvestigation.AgencyReport.VideoReport.DocumentIdImageValid.Value)
+                                                        {
+                                                            <i style='color:green;' class='fas fa-check-circle'></i>
+                                                        }
+                                                        else
+                                                        {
+                                                            <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i>
+                                                        } <span class="process-case"></span>
+                                                        <i class="far fa-image"></i>  <b>  Video Valid </b>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        }
                                         <div class="form-group">
                                             <div class="form-check form-switch">
 

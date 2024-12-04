@@ -183,6 +183,8 @@ namespace risk.control.system.Services
               .Include(c => c.AgencyReport.DigitalIdReport)
               .Include(c => c.AgencyReport.PanIdReport)
               .Include(c => c.AgencyReport.PassportIdReport)
+              .Include(c => c.AgencyReport.AudioReport)
+              .Include(c => c.AgencyReport.VideoReport)
               .Include(c => c.AgencyReport.ReportQuestionaire)
                 .Include(c => c.PolicyDetail)
                 .Include(c => c.ClientCompany)
@@ -249,6 +251,8 @@ namespace risk.control.system.Services
                 .Include(c => c.AgencyReport.DigitalIdReport)
                 .Include(c => c.AgencyReport.PanIdReport)
                 .Include(c => c.AgencyReport.PassportIdReport)
+                .Include(c => c.AgencyReport.AudioReport)
+                .Include(c => c.AgencyReport.VideoReport)
                 .Include(c => c.AgencyReport.ReportQuestionaire)
                 .Include(c => c.ClaimMessages)
                 .Include(c => c.PolicyDetail)
@@ -304,6 +308,9 @@ namespace risk.control.system.Services
                 .Include(r=>r.ClaimsInvestigation)
                 .Include(r=>r.DigitalIdReport)
                 .Include(r=>r.PanIdReport)
+                .Include(r=>r.AudioReport)
+                .Include(r=>r.VideoReport)
+                .Include(r=>r.PassportIdReport)
                 .Include(r=>r.ReportQuestionaire)
                 .FirstOrDefault(r => r.PreviousClaimReportId == id);
             return report;

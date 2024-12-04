@@ -259,6 +259,8 @@ namespace risk.control.system.Services
                 .Include(c => c.AgencyReport.ReportQuestionaire)
                 .Include(c => c.AgencyReport.PanIdReport)
                 .Include(c => c.AgencyReport.PassportIdReport)
+                .Include(c => c.AgencyReport.AudioReport)
+                .Include(c => c.AgencyReport.VideoReport)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == selectedcase);
 
             var beneficiaryDetails =await _context.BeneficiaryDetail
@@ -288,6 +290,8 @@ namespace risk.control.system.Services
                 .Include(c=>c.AgencyReport.DigitalIdReport)
                 .Include(c=>c.AgencyReport.PanIdReport)
                 .Include(c=>c.AgencyReport.PassportIdReport)
+                .Include(c=>c.AgencyReport.AudioReport)
+                .Include(c=>c.AgencyReport.VideoReport)
                 .Include(c=>c.AgencyReport.ReportQuestionaire)
                 .Include(c=>c.ClaimNotes)
                 .FirstOrDefault(m => m.ClaimsInvestigationId == selectedcase);

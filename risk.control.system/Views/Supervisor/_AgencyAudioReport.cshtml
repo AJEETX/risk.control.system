@@ -1,35 +1,35 @@
 ﻿@model ClaimsInvestigationVendorsModel
 
 @{
-    var imageCapturedTime = @Model.AgencyReport?.PassportIdReport?.DocumentIdImageLongLatTime != null ? @Model.AgencyReport?.PassportIdReport?.DocumentIdImageLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt") : null;
+    var imageCapturedTime = @Model.AgencyReport?.AudioReport?.DocumentIdImageLongLatTime != null ? @Model.AgencyReport?.AudioReport?.DocumentIdImageLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt") : null;
 
-    string documentIdColor = "grey";
-    var borderColor = "";
-    if (Model.AgencyReport.PassportIdReport?.DocumentIdImageLongLat == null)
+    string audioIdColor = "grey";
+    var audioIdColorBorderColor = "";
+    if (Model.AgencyReport.AudioReport?.DocumentIdImageLongLat == null)
     {
 
     }
-    else if (Model.AgencyReport.PassportIdReport?.DocumentIdImageLongLat != null && (
-    Model.AgencyReport?.PassportIdReport?.DocumentIdImageValid != null && Model.AgencyReport?.PassportIdReport?.DocumentIdImageValid == true))
+    else if (Model.AgencyReport.AudioReport?.DocumentIdImageLongLat != null && (
+    Model.AgencyReport?.AudioReport?.DocumentIdImageValid != null && Model.AgencyReport?.AudioReport?.DocumentIdImageValid == true))
     {
-        documentIdColor = "green";
-        borderColor = "border-success";
+        audioIdColor = "green";
+        audioIdColorBorderColor = "border-success";
     }
     else
     {
-        documentIdColor = "#dc3545!important";
-        borderColor = "border-danger";
+        audioIdColor = "#dc3545!important";
+        audioIdColorBorderColor = "border-danger";
     }
 
     <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
-        <div class="card bg-light d-flex flex-fill @borderColor">
+        <div class="card bg-light d-flex flex-fill @audioIdColorBorderColor">
             <div class="card-header text-muted border-bottom-0">
                 <h3 class="card-title">
-                    <i class="fas fa-mobile-alt"></i> PASSPORT
+                    <i class="fas fa-mobile-alt"></i> AUDIO
                     <span class="hover-text">
                         <i class="fas fa-info-circle"></i>
 
-                        @if (@borderColor == "border-danger")
+                        @if (audioIdColorBorderColor == "border-danger")
                         {
                             <span class="tooltip-text" id="beneficiary-information">
                                 <div>
@@ -37,11 +37,11 @@
                                     <b> Upload</b> Max image size 2 MB
                                 </div>
                             <div>
-                                    <i class='far fa-thumbs-down'></i> <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i> UnMatched PASSPORT
+                                    <i class='far fa-thumbs-down'></i> <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i> Valid Audio
                                 </div>
                             </span>
                         }
-                        else if (@borderColor == "border-success")
+                        else if (audioIdColorBorderColor == "border-success")
                         {
                             <span class="tooltip-text" id="beneficiary-information">
                                 <div>
@@ -49,7 +49,7 @@
                                     <b> Upload</b> Max image size 2 MB
                                 </div>
                                 <div>
-                                    <i class='far fa-thumbs-up'></i> <i style='color:green;' class='fas fa-check-circle'></i> Matched PASSPORT
+                                    <i class='far fa-thumbs-up'></i> <i style='color:green;' class='fas fa-check-circle'></i> InValid Audio
                                 </div>
                             </span>
                         }
@@ -66,7 +66,7 @@
                                         <span class='badge badge-info btn-xs'>
                                             <i class='fa fa-upload'></i>
                                     </span> Upload
-                                    </button>  PASSPORT
+                                    </button>  Audio
                                 </div>
                             </span>
 
@@ -86,11 +86,11 @@
 
             <div class="card-footer text-center">
                 <span class="badge badge-light"><i class="far fa-image"></i> Valid : </span>
-                @if (@documentIdColor == "grey")
+                @if (@audioIdColor == "grey")
                 {
                     <i style='color:grey;' class='fa fa-times' aria-hidden='true'></i>
                 }
-                else if (@Model.AgencyReport?.PassportIdReport?.DocumentIdImageValid.Value ?? false)
+                else if (@Model.AgencyReport?.AudioReport?.DocumentIdImageValid.Value ?? false)
                 {
                     <i style='color:green;' class='fas fa-check-circle'></i>
                 }
@@ -102,26 +102,28 @@
             </div>
             <div class="progress">
                 <i class="far fa-bookmark bookmark-green"></i>
-                <div class="progress-bar" role="progressbar" style="width:100%;background-color:@documentIdColor;">
-                    passport
+                <div class="progress-bar" role="progressbar" style="width:100%;background-color:@audioIdColor;">
+                    audio
                 </div>
             </div>
             <div class="card-body">
                 <div class="row">
                     <div class="col-6">
                         <p class="text-muted text-sm">
-                            <span class="badge badge-light"><i class="fas fa-film"></i> PASSPORT Image</span>:
+                            <span class="badge badge-light"><i class="fas fa-film"></i> Audio File</span>:
                             <br />
                             @{
-                                if (Model.AgencyReport?.PassportIdReport?.DocumentIdImage != null)
+                                if (Model.AgencyReport?.AudioReport?.DocumentIdImage != null)
                                 {
-                                    <img id="agentPassportPicture" class="img-fluid passport-Image" data-toggle="tooltip" title="Passport Image" 
-                                    src="data:image/*;base64,@(Convert.ToBase64String(@Model.AgencyReport?.PassportIdReport?.DocumentIdImage))">
+                                    <audio id="audioPlayer" controls class="img-fluid audio-Image" data-toggle="tooltip" title="Audio File">
+                                        <source src="/Uploads/GetAudioFile?fileName=@Model.AgencyReport.AudioReport.DocumentIdImagePath" type="audio/mpeg">
+                                        Your browser does not support the audio element.
+                                    </audio>
                                 }
                                 else
                                 {
-                                    <img id="agentPassportPicture" class="img-fluid no-Image" data-toggle="tooltip" title="No PASSPORT Image"
-                                         src=@Applicationsettings.NO_PHOTO_IMAGE>
+                                                            <img id="audioPlayer" class="img-fluid no-Image" data-toggle="tooltip" title="No Audio"
+                                         src=@Applicationsettings.NO_AUDIO>
                                 }
                             }
                         </p>
@@ -129,7 +131,7 @@
 
                             <span class="badge badge-light"><i class="fas fa-info"></i> Image Scan Info</span>
                             <br />
-                            <label class="img-fluid ocr-data"> @Model.AgencyReport?.PassportIdReport?.DocumentIdImageData</label>
+                            <label class="img-fluid ocr-data"> @Model.AgencyReport?.AudioReport?.DocumentIdImageData</label>
                         </p>
                     </div>
                     <div class="col-6 text">
@@ -137,9 +139,9 @@
                         <p class="text-muted text-sm">
                             <span class="badge badge-light"><i class="fas fa-map-pin"></i> Location visited</span>
                             <br />
-                            @if (@Model.AgencyReport?.PassportIdReport?.DocumentIdImageLocationUrl != null)
+                            @if (@Model.AgencyReport?.AudioReport?.DocumentIdImageLocationUrl != null)
                             {
-                                <img class="img-fluid passportlocationImage" src="@Model.AgencyReport?.PassportIdReport?.DocumentIdImageLocationUrl" data-toggle="tooltip" title="Map Location" />
+                                <img class="img-fluid audiolocationImage" src="@Model.AgencyReport?.AudioReport?.DocumentIdImageLocationUrl" data-toggle="tooltip" title="Map Location" />
                             }
                             else
                             {
@@ -151,13 +153,13 @@
 
                             <span class="badge badge-light"><i class="fas fa-map-marker-alt"></i> Address visited</span>
                             <br />
-                            <label class="img-fluid ocr-data"> @Model.AgencyReport?.PassportIdReport?.DocumentIdImageLocationAddress</label>
+                            <label class="img-fluid ocr-data"> @Model.AgencyReport?.AudioReport?.DocumentIdImageLocationAddress</label>
                         </p>
                     </div>
                 </div>
             </div>
         </div>
-        @if (@Model.AgencyReport?.PassportIdReport?.DocumentIdImageLocationUrl != null)
+        @if (@Model.AgencyReport?.AudioReport?.DocumentIdImageLocationUrl != null)
         {
             <div class="card direct-chat direct-chat-warning collapsed-card">
                 <div class="card-header">
@@ -171,9 +173,9 @@
                     </div>
                 </div>
                 <div class="card-body">
-                    <div id="passport-map">
+                    <div id="audio-map">
                     </div>
-                            <div id="passport-msg">
+                            <div id="audio-msg">
                     </div>
                 </div>
             </div>

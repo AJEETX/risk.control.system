@@ -39,6 +39,11 @@
                     {
                         <partial name="_AgencyPassportReport" model="@Model" />
                     }
+                    @if (Model.ClaimsInvestigation.EnableMedia)
+                    {
+                        <partial name="_AgencyAudioReport" model="@Model" />
+                        <partial name="_AgencyVideoReport" model="@Model" />
+                    }
                     <partial name="_AgencyAgentAnswer" model="@Model" />
                     <partial name="_AgencySupervisorAnswer" model="@Model" />
 
