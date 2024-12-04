@@ -100,7 +100,18 @@
                                             </span>
                                             Address:  @Model.Addressline @Model.District.Name @Model.State.Name @Model.PinCode.Code
                                         </li>
-
+                                        <li class="small">
+                                            <span class="fa-li">
+                                                <i class="fas fa-code"></i>
+                                            </span>
+                                            Mobile App Url : <i class="fas fa-code"></i> <a href="#">  @Model.MobileAppUrl</a>
+                                        </li>
+                                        <li class="small">
+                                            <span class="fa-li">
+                                                <i class="fas fa-key"></i>
+                                            </span>
+                                            Edit Profile <b>@Html.DisplayFor(model => model.CanChangePassword) </b>
+                                        </li>
 
                                     </ul>
                                 </div>
