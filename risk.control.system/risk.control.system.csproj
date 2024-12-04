@@ -87,6 +87,7 @@
     <Folder Include="wwwroot\passport\" />
     <Folder Include="wwwroot\upload-file\" />
     <Folder Include="wwwroot\upload-ftp\" />
+    <Folder Include="wwwroot\video\" />
   </ItemGroup>
   <ItemGroup>
     <Content Update="Views\Agent\_AudioReport.cshtml">

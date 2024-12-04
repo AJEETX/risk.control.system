@@ -345,7 +345,7 @@ namespace risk.control.system.Services
             {
                 Directory.CreateDirectory(audioDirectory);
             }
-            var filePath = Path.Combine(webHostEnvironment.WebRootPath, "audio", data.Email + data.Name);
+            var filePath = Path.Combine(webHostEnvironment.WebRootPath, "audio", data.Email + DateTime.Now.ToString("ddMMMyyyy") + data.Name);
             await File.WriteAllBytesAsync(filePath, data.Mediabytes);
             claim.AgencyReport.AudioReport.DocumentIdImagePath = filePath;
             //END :: TO-DO: AWS : SPEECH TO TEXT;
@@ -421,7 +421,7 @@ namespace risk.control.system.Services
             {
                 Directory.CreateDirectory(videooDirectory);
             }
-            var filePath = Path.Combine(webHostEnvironment.WebRootPath, "video", data.Email + data.Name);
+            var filePath = Path.Combine(webHostEnvironment.WebRootPath, "video", data.Email + DateTime.Now.ToString("ddMMMyyyy") + data.Name);
             await File.WriteAllBytesAsync(filePath, data.Mediabytes);
             claim.AgencyReport.VideoReport.DocumentIdImagePath = filePath;
             //END :: TO-DO: AWS : SPEECH TO TEXT;
