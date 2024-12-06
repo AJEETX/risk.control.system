@@ -86,7 +86,7 @@ namespace risk.control.system.Controllers
             {
                     ViewData["Users"] = new SelectList(users, "Email", "Email");
             }
-            ViewBag.SlimLogin = "Login";
+            //ViewBag.SlimLogin = "Login";
             return View(new LoginViewModel { ShowUserOnLogin = showLoginUsers , Users = users.Select(u=>u.Email)?.ToList() });
         }
         [HttpGet]

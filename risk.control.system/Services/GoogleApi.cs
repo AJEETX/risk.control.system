@@ -1,11 +1,10 @@
 ﻿using Google.Apis.Auth.OAuth2;
 using Google.Cloud.Vision.V1;
-
 using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-namespace risk.control.system.Helpers
+namespace risk.control.system.Services
 {
     public interface IGoogleApi
     {

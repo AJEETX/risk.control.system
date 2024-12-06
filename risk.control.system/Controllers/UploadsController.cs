@@ -231,7 +231,7 @@ namespace risk.control.system.Controllers
         }
 
         [HttpPost]
-        [RequestSizeLimit(5_000_000)] // Checking for 2 MB
+        [RequestSizeLimit(5_000_000)] // Checking for 5 MB
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AudioUpload(string selectedclaim, IFormFile audioFile, string audioLatitude, string audioLongitude)
         {
@@ -289,7 +289,7 @@ namespace risk.control.system.Controllers
             return File(fileStream, "audio/mpeg"); // MIME type for MP3
         }
         [HttpPost]
-        [RequestSizeLimit(2_000_000)] // Checking for 2 MB
+        [RequestSizeLimit(5_000_000)] // Checking for 5 MB
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> VideoUpload(string selectedclaim, IFormFile videoFile, string videoLatitude, string videoLongitude)
         {

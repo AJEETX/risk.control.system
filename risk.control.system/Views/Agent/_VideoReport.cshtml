@@ -129,7 +129,7 @@
                         </p>
                         <p class="text-muted text-sm">
 
-                            <span class="badge badge-light"><i class="fas fa-info"></i> Image Scan Info</span>
+                            <span class="badge badge-light"><i class="fas fa-info"></i> Video Scan Info</span>
                             <br />
                             <label class="img-fluid ocr-data"> @Model.AgencyReport?.VideoReport?.DocumentIdImageData</label>
                         </p>
@@ -168,7 +168,7 @@
                     <div class="form-group">
                         <span class="input-group-label"> Upload VIDEO : </span>
                         <div class="input-group mb-3">
-                            <img class="form-Image" id="video-Image" src="@Applicationsettings.NO_IMAGE" title="Video" />
+                            <img class="form-Image" id="video-Image" src="@Applicationsettings.VIDEO_UPLOAD_IMAGE" title="Video" />
                             <input accept=".mp4" type="file" class="form-control remarks" name="videoFile" id="videoFile" data-toggle="tooltip" title="Upload Video" />
                             <button id="UploadVideoButton" disabled type="submit" class="btn btn-info upload"><i class="nav-icon fa fa-upload"></i> Upload</button>
                         </div>
@@ -196,7 +196,6 @@
                     </div>
                 </div>
             </div>
-
         }
     </div>
 }

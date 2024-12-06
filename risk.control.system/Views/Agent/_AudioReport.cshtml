@@ -129,7 +129,7 @@
                         </p>
                         <p class="text-muted text-sm">
 
-                            <span class="badge badge-light"><i class="fas fa-info"></i> Image Scan Info</span>
+                            <span class="badge badge-light"><i class="fas fa-info"></i> Audio Scan Info</span>
                             <br />
                             <label class="img-fluid ocr-data"> @Model.AgencyReport?.AudioReport?.DocumentIdImageData</label>
                         </p>
@@ -168,7 +168,7 @@
                     <div class="form-group">
                         <span class="input-group-label"> Upload AUDIO : </span>
                         <div class="input-group mb-3">
-                            <img class="form-Image" id="audio-Image" src="@Applicationsettings.NO_IMAGE" title="Audio" />
+                            <img class="form-Image" id="audio-Image" src="@Applicationsettings.AUDIO_UPLOAD_IMAGE" title="Audio" />
                             <input accept=".mp3" type="file" class="form-control remarks" name="audioFile" id="audioFile" data-toggle="tooltip" title="Upload Audio" />
                             <button id="UploadAudioButton" disabled type="submit" class="btn btn-info upload"><i class="nav-icon fa fa-upload"></i> Upload</button>
                         </div>

@@ -26,6 +26,7 @@
         public static readonly string FTP_SITE = "ftp://ftp.drivehq.com/holosync/";
         public static readonly string FTP_SITE_LOG = "its.aby@email.com";
         public static readonly string FTP_SITE_DATA = "C0##ect10n";
+        public static readonly string REVERRSE_GEOCODING = "f2a54c0ec9ba4dfdbd450116509c6313";
 
         public static readonly string IP_SITE = "http://ip-api.com/json/";
         public static readonly string NO_POLICY_IMAGE = "/img/no-policy.jpg";
@@ -218,6 +219,8 @@
         public const string AGENCY3DOMAIN = "investigate.com";
 
         public const string NO_IMAGE = "/img/no-image.png";
+        public const string AUDIO_UPLOAD_IMAGE = "/img/upload-audio.png";
+        public const string VIDEO_UPLOAD_IMAGE = "/img/upload-video.png";
         public const string NO_USER = "/img/no-user.png";
         public const string NO_MAP = "/img/no-map.jpeg";
         public const string MAP_MARKER = "/img/map-marker-icon.png";

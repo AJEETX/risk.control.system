@@ -1,12 +1,11 @@
 ﻿using Google.Cloud.Vision.V1;
-
 using SkiaSharp;
 using SkiaSharp.Views.Desktop;
 
 using System.Collections.Generic;
 using System.IO;
 
-namespace risk.control.system.Helpers
+namespace risk.control.system.Services
 {
     public interface IGoogleMaskHelper
     {
@@ -31,9 +30,9 @@ namespace risk.control.system.Helpers
 
                 var panTextPre = allText.IndexOf(txt2Find);
 
-                var panNumber = allText.Substring(panTextPre + txt2Find.Length +1, 10);
+                var panNumber = allText.Substring(panTextPre + txt2Find.Length + 1, 10);
 
-                var annotation = textAnnotations.FirstOrDefault(t=>t.Description.Trim().ToUpperInvariant() == panNumber.Trim().ToUpperInvariant());
+                var annotation = textAnnotations.FirstOrDefault(t => t.Description.Trim().ToUpperInvariant() == panNumber.Trim().ToUpperInvariant());
 
                 var allVertices = annotation.BoundingPoly.Vertices;
 
@@ -41,11 +40,11 @@ namespace risk.control.system.Helpers
 
                 var top = allVertices[1].Y;
 
-                var right = allVertices[2].X;   
+                var right = allVertices[2].X;
 
                 var bottom = allVertices[3].Y;
 
-                var rect = new SKRect(left,top, right, bottom);
+                var rect = new SKRect(left, top, right, bottom);
 
                 canvas.DrawRect(rect, paint);
 

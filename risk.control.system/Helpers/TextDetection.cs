@@ -14,7 +14,7 @@ public class TextDetection
     {
         var awsAccessKeyId = Environment.GetEnvironmentVariable("aws_id");
         var awsSecretAccessKey = Environment.GetEnvironmentVariable("aws_secret");
-        using var textractClient = new AmazonTextractClient(awsAccessKeyId, awsSecretAccessKey, Amazon.RegionEndpoint.USEast1);
+        using var textractClient = new AmazonTextractClient(awsAccessKeyId, awsSecretAccessKey);
         var request = new DetectDocumentTextRequest
         {
             Document = new Document { Bytes = new MemoryStream(bytes) }

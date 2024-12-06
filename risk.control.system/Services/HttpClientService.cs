@@ -2,17 +2,20 @@
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Runtime.Serialization.Json;
-
+using Amazon.TranscribeService;
+using Amazon.TranscribeService.Model;
 using Azure;
-
 using Highsoft.Web.Mvc.Charts;
-
 using Newtonsoft.Json;
-
 using risk.control.system.AppConstant;
 using risk.control.system.Controllers.Api;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
+using Amazon.S3;
+using Amazon.S3.Model;
+using Amazon;
+using Amazon.S3.Transfer;
+using Amazon.Textract;
 
 namespace risk.control.system.Services
 {
@@ -35,6 +38,8 @@ namespace risk.control.system.Services
         Task<bool> VerifyPassport(string passport, string dateOfBirth);
 
         Task<PassportOcrData> GetPassportOcrResult(byte[] imageBytes, string url, string key, string host);
+
+        Task<AudioTranscript> TranscribeAsync(string bucketName, string fileName, string filePath);
     }
 
     public class HttpClientService : IHttpClientService
@@ -43,10 +48,13 @@ namespace risk.control.system.Services
         private static string RapidAPIHost = "idfy-verification-suite.p.rapidapi.com";
         private static string PinCodeBaseUrl = "https://india-pincode-with-latitude-and-longitude.p.rapidapi.com/api/v1/pincode";
         private readonly IWebHostEnvironment webHostEnvironment;
-
-        public HttpClientService(IWebHostEnvironment webHostEnvironment)
+        private readonly IAmazonTranscribeService _amazonTranscribeService;
+        private readonly IAmazonS3 s3Client;
+        public HttpClientService(IWebHostEnvironment webHostEnvironment, IAmazonTranscribeService amazonTranscribeService, IAmazonS3 s3Client)
         {
             this.webHostEnvironment = webHostEnvironment;
+            _amazonTranscribeService = amazonTranscribeService;
+            this.s3Client = s3Client;
         }
         public async Task<List<PincodeApiData>> GetPinCodeLatLng(string pinCode)
         {
@@ -113,12 +121,7 @@ namespace risk.control.system.Services
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri("https://feroeg-reverse-geocoding.p.rapidapi.com/address?lat=-37.839820319527&lon=145.16481562890925&lang=en&mode=text&format='%5BSN%5B%2C%20%5D%20-%20%5B23456789ab%5B%2C%20%5D'"),
-                Headers =
-                {
-                    { "x-rapidapi-key", "327fd8beb9msh8a441504790e80fp142ea8jsnf74b9208776a" },
-                    { "x-rapidapi-host", "feroeg-reverse-geocoding.p.rapidapi.com" },
-                },
+                RequestUri = new Uri($"https://api.geoapify.com/v1/geocode/reverse?lat={lat}&lon={lon}&apiKey={Applicationsettings.REVERRSE_GEOCODING}"),
             };
             try
             {
@@ -126,14 +129,15 @@ namespace risk.control.system.Services
                 {
                     response.EnsureSuccessStatusCode();
                     var body = await response.Content.ReadAsStringAsync();
-                    return (body);
+                    var addressData = JsonConvert.DeserializeObject<MapAddress>(body);
+                    return (addressData.features.FirstOrDefault().properties.formatted);
                 }
             }
             catch (Exception)
             {
                 return "Troy Court, Forest Hill, Melbourne, City of Whitehorse, Victoria, 3131, Australia";
             }
-            
+
         }
 
         public async Task<RootObject> GetAddress(string lat, string lon)
@@ -157,7 +161,7 @@ namespace risk.control.system.Services
                     display_name = "Troy Court, Forest Hill, Melbourne, City of Whitehorse, Victoria, 3131, Australia"
                 };
             }
-            
+
         }
         public async Task<LocationDetails_IpApi> GetAddressFromIp(string ipAddress)
         {
@@ -321,6 +325,131 @@ namespace risk.control.system.Services
                 return null!;
             }
         }
+
+        public async Task<AudioTranscript> TranscribeAsync(string bucketName, string fileName, string filePath)
+        {
+            try
+            {
+                await UploadS3Async(bucketName, fileName, filePath);
+
+                var mediaFileUri = $"https://s3.{RegionEndpoint.APSoutheast2.SystemName}.amazonaws.com/{bucketName}/{fileName}";
+                var jobRequest = new StartTranscriptionJobRequest
+                {
+                    TranscriptionJobName = $"audio2text-{DateTime.UtcNow:yyyyMMddHHmmss}",
+                    LanguageCode = "en-US",
+                    MediaFormat = "mp3",
+                    Media = new Media
+                    {
+                        MediaFileUri = mediaFileUri
+                    },
+                    OutputBucketName = bucketName
+                };
+
+
+                // Start the transcription job
+                var jobResponse = await _amazonTranscribeService.StartTranscriptionJobAsync(jobRequest);
+                Console.WriteLine($"Transcription job started. Job Status: {jobResponse.TranscriptionJob.TranscriptionJobStatus}");
+
+                // Check if the job started successfully
+                if (jobResponse.HttpStatusCode == HttpStatusCode.OK && jobResponse.TranscriptionJob.TranscriptionJobStatus == TranscriptionJobStatus.IN_PROGRESS)
+                {
+                    Console.WriteLine("Transcription job is in progress...");
+                }
+                else
+                {
+                    Console.WriteLine("Failed to start transcription job.");
+                    return null;
+                }
+
+                TranscriptionJobStatus jobStatus;
+                GetTranscriptionJobResponse jobResponseCompleted;
+                do
+                {
+                    // Fetch the current status of the job using GetTranscriptionJobAsync
+                    jobResponseCompleted = await _amazonTranscribeService.GetTranscriptionJobAsync(new GetTranscriptionJobRequest
+                    {
+                        TranscriptionJobName = jobRequest.TranscriptionJobName
+                    });
+
+                    jobStatus = jobResponseCompleted.TranscriptionJob.TranscriptionJobStatus;
+
+                    // Wait for 5 seconds before checking the status again
+                    if (jobStatus == TranscriptionJobStatus.IN_PROGRESS)
+                    {
+                        Console.WriteLine("Transcription job is still in progress...");
+                        await Task.Delay(500); // Wait 5 seconds before checking again
+                    }
+
+                } while (jobStatus == TranscriptionJobStatus.IN_PROGRESS);
+
+                if (jobStatus == TranscriptionJobStatus.COMPLETED)
+                {
+                    Console.WriteLine("Transcription job completed successfully");
+                    var getObjectRequest = new GetObjectRequest
+                    {
+                        BucketName = bucketName,
+                        Key = jobRequest.TranscriptionJobName + ".json"
+                    };
+
+                    using (var response = await s3Client.GetObjectAsync(getObjectRequest))
+                    using (var responseStream = response.ResponseStream)
+                    using (var reader = new StreamReader(responseStream))
+                    {
+                        string transcriptionText = await reader.ReadToEndAsync();
+                        var transcriptionResult = JsonConvert.DeserializeObject<AudioTranscript>(transcriptionText);
+                        Console.WriteLine("Transcription Text: ");
+                        Console.WriteLine(transcriptionText);
+                        return transcriptionResult;
+                        // Process the transcription text as needed
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Transcription job failed or was cancelled.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred: {ex.Message}");
+            }
+            return null;
+        }
+        public async Task UploadS3Async(string bucketName, string fileName, string filePath)
+        {
+            var putRequest = new PutObjectRequest
+            {
+                BucketName = bucketName,
+                Key = fileName,
+                FilePath = filePath
+            };
+            try
+            {
+                //await CreateBucketAsync(putRequest.BucketName);
+
+
+                var transferUtility = new TransferUtility(s3Client);
+
+                await transferUtility.UploadAsync(filePath, bucketName);
+                var response = await s3Client.PutObjectAsync(putRequest);
+
+                if (response.HttpStatusCode == HttpStatusCode.OK)
+                {
+                    Console.WriteLine("File uploaded successfully");
+                }
+                //var bucketResponse = await s3Client.ListObjectsV2Async(new ListObjectsV2Request
+                //{
+                //    BucketName = bucketName
+                //});
+                //foreach (var obj in bucketResponse.S3Objects)
+                //{
+                //    Console.WriteLine($"Object Key: {obj.Key}");
+                //}
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+            }
+        }
         private async Task<string> StartVerifyPassport(string passport, string date_of_birth)
         {
             var content = new
@@ -361,6 +490,48 @@ namespace risk.control.system.Services
             }
         }
 
-        
+        private async Task CreateBucketAsync(string bucketName)
+        {
+            // Check if bucket already exists
+            //if (await DoesBucketExistAsync(bucketName))
+            //{
+            //    Console.WriteLine($"Bucket '{bucketName}' already exists.");
+            //    return;
+            //}
+
+            // Create the bucket
+            try
+            {
+
+                var putBucketRequest = new PutBucketRequest
+                {
+                    BucketName = bucketName,
+                    UseClientRegion = true // Automatically uses the region of the client
+                };
+
+                var response = await s3Client.PutBucketAsync(putBucketRequest);
+
+                Console.WriteLine($"Bucket created with HTTP status code: {response.HttpStatusCode}");
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+            }
+        }
+
+        private async Task<bool> DoesBucketExistAsync(string bucketName)
+        {
+            try
+            {
+                return await Amazon.S3.Util.AmazonS3Util.DoesS3BucketExistV2Async(s3Client, bucketName);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception thrown: {ex.Message}");
+                return false;
+            }
+            //return await s3Client.DoesS3BucketExistAsync(bucketName);
+        }
     }
 }

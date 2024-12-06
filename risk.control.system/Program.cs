@@ -4,6 +4,10 @@ using System.Net.WebSockets;
 using System.Reflection;
 using System.Threading.RateLimiting;
 
+using Amazon.Runtime;
+using Amazon.S3;
+using Amazon.TranscribeService;
+
 using AspNetCoreHero.ToastNotification;
 using AspNetCoreHero.ToastNotification.Extensions;
 
@@ -119,6 +123,16 @@ builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProv
 builder.Services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
 builder.Services.AddTransient<CustomCookieAuthenticationEvents>();
 builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
+
+var awsOptions = new Amazon.Extensions.NETCore.Setup.AWSOptions
+{
+    Credentials = new BasicAWSCredentials(Environment.GetEnvironmentVariable("aws_id"), Environment.GetEnvironmentVariable("aws_secret")),
+    Region = Amazon.RegionEndpoint.APSoutheast2 // Specify the region as needed
+};
+
+// Register AWS Transcribe Service with the configured options
+builder.Services.AddAWSService<IAmazonTranscribeService>(awsOptions);
+builder.Services.AddAWSService<IAmazonS3>(awsOptions);
 //builder.Services.AddTransient<IMailService, MailService>();
 // Add services to the container.
 builder.Services.AddControllersWithViews()
