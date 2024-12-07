@@ -60,46 +60,82 @@ namespace risk.control.system.Controllers
 
         public async Task<IActionResult> Details(long? id)
         {
-            if (id == null || _context.VendorApplicationUser == null)
+            try
             {
-                return NotFound();
-            }
+                if (id == null || _context.VendorApplicationUser == null)
+                {
+                    notifyService.Error("OOPs !!!..Id Not Found");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (currentUserEmail == null)
+                {
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var vendorApplicationUser = await _context.VendorApplicationUser
+                    .Include(v => v.Country)
+                    .Include(v => v.District)
+                    .Include(v => v.PinCode)
+                    .Include(v => v.State)
+                    .Include(v => v.Vendor)
+                    .FirstOrDefaultAsync(m => m.Id == id);
+                if (vendorApplicationUser == null)
+                {
+                    notifyService.Error($"Error: User Not Found", 3);
+                    return RedirectToAction(nameof(Details), new { id = id });
+                }
+                var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "Agencies");
+                var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Manage Agency") { Parent = agencysPage, RouteValues = new { id = id } };
+                var usersPage = new MvcBreadcrumbNode("Index", "VendorApplicationUsers", $"Manage Users") { Parent = agencyPage, RouteValues = new { id = id } };
+                var editPage = new MvcBreadcrumbNode("Details", "VendorApplicationUsers", $"User Details") { Parent = usersPage, RouteValues = new { id = id } };
+                ViewData["BreadcrumbNode"] = editPage;
 
-            var vendorApplicationUser = await _context.VendorApplicationUser
-                .Include(v => v.Country)
-                .Include(v => v.District)
-                .Include(v => v.PinCode)
-                .Include(v => v.State)
-                .Include(v => v.Vendor)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (vendorApplicationUser == null)
+                return View(vendorApplicationUser);
+            }
+            catch (Exception ex)
             {
-                return NotFound();
+                Console.WriteLine(ex.StackTrace);
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
             }
-            var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "Agencies");
-            var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Manage Agency") { Parent = agencysPage, RouteValues = new { id = id } };
-            var usersPage = new MvcBreadcrumbNode("Index", "VendorApplicationUsers", $"Manage Users") { Parent = agencyPage, RouteValues = new { id = id } };
-            var editPage = new MvcBreadcrumbNode("Details", "VendorApplicationUsers", $"User Details") { Parent = usersPage, RouteValues = new { id = id } };
-            ViewData["BreadcrumbNode"] = editPage;
-
-            return View(vendorApplicationUser);
         }
 
         // GET: VendorApplicationUsers/Create
 
         public IActionResult Create(long id)
         {
-            var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == id);
-            var model = new VendorApplicationUser { Vendor = vendor };
-            ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
+            try
+            {
+                if (id == null || _context.VendorApplicationUser == null)
+                {
+                    notifyService.Error("OOPs !!!..Id Not Found");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (currentUserEmail == null)
+                {
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == id);
+                var model = new VendorApplicationUser { Vendor = vendor };
+                ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
 
-            var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "Agencies");
-            var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Manage Agency") { Parent = agencysPage, RouteValues = new { id = id } };
-            var usersPage = new MvcBreadcrumbNode("Index", "VendorUser", $"Manage Users") { Parent = agencyPage, RouteValues = new { id = id } };
-            var editPage = new MvcBreadcrumbNode("Create", "VendorApplicationUsers", $"Add User") { Parent = usersPage, RouteValues = new { id = id } };
-            ViewData["BreadcrumbNode"] = editPage;
+                var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "Agencies");
+                var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Manage Agency") { Parent = agencysPage, RouteValues = new { id = id } };
+                var usersPage = new MvcBreadcrumbNode("Index", "VendorUser", $"Manage Users") { Parent = agencyPage, RouteValues = new { id = id } };
+                var editPage = new MvcBreadcrumbNode("Create", "VendorApplicationUsers", $"Add User") { Parent = usersPage, RouteValues = new { id = id } };
+                ViewData["BreadcrumbNode"] = editPage;
 
-            return View(model);
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
         }
 
         // POST: VendorApplicationUsers/Create
@@ -110,65 +146,90 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(VendorApplicationUser user, string emailSuffix)
         {
-            if (user.ProfileImage != null && user.ProfileImage.Length > 0)
+            try
             {
-                string newFileName = Guid.NewGuid().ToString();
-                string fileExtension = Path.GetExtension(Path.GetFileName(user.ProfileImage.FileName));
-                newFileName += fileExtension;
-                string path = Path.Combine(webHostEnvironment.WebRootPath, "agency");
-                if (!Directory.Exists(path))
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (currentUserEmail == null)
                 {
-                    Directory.CreateDirectory(path);
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
+                    return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var upload = Path.Combine(webHostEnvironment.WebRootPath, "agency", newFileName);
-                user.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
-                user.ProfilePictureUrl = "/agency/" + newFileName;
-
-                using var dataStream = new MemoryStream();
-                user.ProfileImage.CopyTo(dataStream);
-                user.ProfilePicture = dataStream.ToArray();
-            }
-            var userFullEmail = user.Email.Trim().ToLower() + "@" + emailSuffix;
-            //DEMO
-            user.Password = Applicationsettings.Password;
-            user.Email = userFullEmail;
-            user.EmailConfirmed = true;
-            user.UserName = userFullEmail;
-            user.Mailbox = new Mailbox { Name = userFullEmail };
-            user.Updated = DateTime.Now;
-            user.UpdatedBy = HttpContext.User?.Identity?.Name;
-            IdentityResult result = await userManager.CreateAsync(user, user.Password);
-
-            if (result.Succeeded)
-            {
-                if (!user.Active)
+                if (user == null)
                 {
-                    var createdUser = await userManager.FindByEmailAsync(user.Email);
-                    var lockUser = await userManager.SetLockoutEnabledAsync(createdUser, true);
-                    var lockDate = await userManager.SetLockoutEndDateAsync(createdUser, DateTime.MaxValue);
-
-                    if (lockUser.Succeeded && lockDate.Succeeded)
+                    notifyService.Error("OOPs !!!..User not found");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                if (string.IsNullOrWhiteSpace(emailSuffix))
+                {
+                    notifyService.Error("OOPs !!!..Email suffix not found");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                if (user.ProfileImage != null && user.ProfileImage.Length > 0)
+                {
+                    string newFileName = Guid.NewGuid().ToString();
+                    string fileExtension = Path.GetExtension(Path.GetFileName(user.ProfileImage.FileName));
+                    newFileName += fileExtension;
+                    string path = Path.Combine(webHostEnvironment.WebRootPath, "agency");
+                    if (!Directory.Exists(path))
                     {
-                        await smsService.DoSendSmsAsync(user.PhoneNumber, "Agency user created and locked. Email : " + user.Email);
-                        notifyService.Custom($"User edited and locked.", 3, "orange", "fas fa-user-lock");
+                        Directory.CreateDirectory(path);
                     }
+                    var upload = Path.Combine(webHostEnvironment.WebRootPath, "agency", newFileName);
+                    user.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
+                    user.ProfilePictureUrl = "/agency/" + newFileName;
+
+                    using var dataStream = new MemoryStream();
+                    user.ProfileImage.CopyTo(dataStream);
+                    user.ProfilePicture = dataStream.ToArray();
+                }
+                var userFullEmail = user.Email.Trim().ToLower() + "@" + emailSuffix;
+                //DEMO
+                user.Password = Applicationsettings.Password;
+                user.Email = userFullEmail;
+                user.EmailConfirmed = true;
+                user.UserName = userFullEmail;
+                user.Mailbox = new Mailbox { Name = userFullEmail };
+                user.Updated = DateTime.Now;
+                user.UpdatedBy = HttpContext.User?.Identity?.Name;
+                IdentityResult result = await userManager.CreateAsync(user, user.Password);
+
+                if (result.Succeeded)
+                {
+                    if (!user.Active)
+                    {
+                        var createdUser = await userManager.FindByEmailAsync(user.Email);
+                        var lockUser = await userManager.SetLockoutEnabledAsync(createdUser, true);
+                        var lockDate = await userManager.SetLockoutEndDateAsync(createdUser, DateTime.MaxValue);
+
+                        if (lockUser.Succeeded && lockDate.Succeeded)
+                        {
+                            await smsService.DoSendSmsAsync(user.PhoneNumber, "Agency user created and locked. Email : " + user.Email);
+                            notifyService.Custom($"User edited and locked.", 3, "orange", "fas fa-user-lock");
+                        }
+                    }
+                    else
+                    {
+                        await smsService.DoSendSmsAsync(user.PhoneNumber, "Agency user created. Email : " + user.Email);
+                        notifyService.Custom($"User created successfully.", 3, "green", "fas fa-user-plus");
+                    }
+                    return RedirectToAction(nameof(VendorUserController.Index), "VendorUser", new { id = user.VendorId });
                 }
                 else
                 {
-                    await smsService.DoSendSmsAsync(user.PhoneNumber, "Agency user created. Email : " + user.Email);
-                    notifyService.Custom($"User created successfully.", 3, "green", "fas fa-user-plus");
+                    toastNotification.AddErrorToastMessage("Error to create user!");
+                    foreach (IdentityError error in result.Errors)
+                        ModelState.AddModelError("", error.Description);
                 }
-                return RedirectToAction(nameof(VendorUserController.Index), "VendorUser", new { id = user.VendorId });
+                GetCountryStateEdit(user);
+                notifyService.Custom($"User created successfully.", 3, "green", "fas fa-user-plus");
+                return View(user);
             }
-            else
+            catch (Exception ex)
             {
-                toastNotification.AddErrorToastMessage("Error to create user!");
-                foreach (IdentityError error in result.Errors)
-                    ModelState.AddModelError("", error.Description);
+                Console.WriteLine(ex.StackTrace);
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
             }
-            GetCountryStateEdit(user);
-            notifyService.Custom($"User created successfully.", 3, "green", "fas fa-user-plus");
-            return View(user);
         }
 
         private void GetCountryStateEdit(VendorApplicationUser? user)
@@ -183,46 +244,62 @@ namespace risk.control.system.Controllers
 
         public async Task<IActionResult> Edit(long? userId)
         {
-            if (userId == null || _context.VendorApplicationUser == null)
+            try
             {
-                toastNotification.AddErrorToastMessage("user not found!");
-                return NotFound();
-            }
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (currentUserEmail == null)
+                {
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
 
-            var vendorApplicationUser = _context.VendorApplicationUser
-                .Include(v => v.Mailbox).Where(v => v.Id == userId)
-                ?.FirstOrDefault();
-            if (vendorApplicationUser == null)
+                if (userId == null || _context.VendorApplicationUser == null)
+                {
+                    notifyService.Error("OOPs !!!..Id Not found");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+
+                var vendorApplicationUser = _context.VendorApplicationUser
+                    .Include(v => v.Mailbox).Where(v => v.Id == userId)
+                    ?.FirstOrDefault();
+                if (vendorApplicationUser == null)
+                {
+                    notifyService.Error("OOPs !!!..User Not found");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var vendor = await _context.Vendor.FirstOrDefaultAsync(v => v.VendorId == vendorApplicationUser.VendorId);
+
+                if (vendor == null)
+                {
+                    notifyService.Error("OOPs !!!..Agency Not found");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                vendorApplicationUser.Vendor = vendor;
+
+                var country = _context.Country.OrderBy(o => o.Name);
+                var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == vendorApplicationUser.CountryId).OrderBy(d => d.Name);
+                var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == vendorApplicationUser.StateId).OrderBy(d => d.Name);
+                var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == vendorApplicationUser.DistrictId).OrderBy(d => d.Name);
+
+                ViewData["CountryId"] = new SelectList(country.OrderBy(c => c.Name), "CountryId", "Name", vendorApplicationUser.CountryId);
+                ViewData["StateId"] = new SelectList(relatedStates, "StateId", "Name", vendorApplicationUser.StateId);
+                ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", vendorApplicationUser.DistrictId);
+                ViewData["PinCodeId"] = new SelectList(pincodes, "PinCodeId", "Code", vendorApplicationUser.PinCodeId);
+
+                var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "Agencies");
+                var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Manage Agency") { Parent = agencysPage, RouteValues = new { id = vendor.VendorId } };
+                var usersPage = new MvcBreadcrumbNode("Index", "VendorUser", $"Manage Users") { Parent = agencyPage, RouteValues = new { id = vendor.VendorId } };
+                var editPage = new MvcBreadcrumbNode("Edit", "VendorApplicationUsers", $"Edit User") { Parent = usersPage, RouteValues = new { id = userId } };
+                ViewData["BreadcrumbNode"] = editPage;
+
+                return View(vendorApplicationUser);
+            }
+            catch (Exception ex)
             {
-                toastNotification.AddErrorToastMessage("user not found!");
-                return NotFound();
+                Console.WriteLine(ex.StackTrace);
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
             }
-            var vendor =await _context.Vendor.FirstOrDefaultAsync(v => v.VendorId == vendorApplicationUser.VendorId);
-
-            if (vendor == null)
-            {
-                toastNotification.AddErrorToastMessage("vendor not found");
-                return NotFound();
-            }
-            vendorApplicationUser.Vendor = vendor;
-
-            var country = _context.Country.OrderBy(o => o.Name);
-            var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == vendorApplicationUser.CountryId).OrderBy(d => d.Name);
-            var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == vendorApplicationUser.StateId).OrderBy(d => d.Name);
-            var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == vendorApplicationUser.DistrictId).OrderBy(d => d.Name);
-
-            ViewData["CountryId"] = new SelectList(country.OrderBy(c => c.Name), "CountryId", "Name", vendorApplicationUser.CountryId);
-            ViewData["StateId"] = new SelectList(relatedStates, "StateId", "Name", vendorApplicationUser.StateId);
-            ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", vendorApplicationUser.DistrictId);
-            ViewData["PinCodeId"] = new SelectList(pincodes, "PinCodeId", "Code", vendorApplicationUser.PinCodeId);
-
-            var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "Agencies");
-            var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Manage Agency") { Parent = agencysPage, RouteValues = new { id = vendor.VendorId } };
-            var usersPage = new MvcBreadcrumbNode("Index", "VendorUser", $"Manage Users") { Parent = agencyPage, RouteValues = new { id = vendor.VendorId } };
-            var editPage = new MvcBreadcrumbNode("Edit", "VendorApplicationUsers", $"Edit User") { Parent = usersPage, RouteValues = new { id = userId } };
-            ViewData["BreadcrumbNode"] = editPage;
-
-            return View(vendorApplicationUser);
         }
 
         // POST: VendorApplicationUsers/Edit/5
@@ -233,100 +310,96 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(string id, VendorApplicationUser applicationUser)
         {
-            if (applicationUser is not null)
+            try
             {
-                try
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (currentUserEmail == null)
                 {
-                    var user = await userManager.FindByIdAsync(id);
-                    if (applicationUser?.ProfileImage != null && applicationUser.ProfileImage.Length > 0)
-                    {
-                        string newFileName = user.Email + Guid.NewGuid().ToString();
-                        string fileExtension = Path.GetExtension(Path.GetFileName(applicationUser.ProfileImage.FileName));
-                        newFileName += fileExtension;
-                        string path = Path.Combine(webHostEnvironment.WebRootPath, "agency");
-                        if (!Directory.Exists(path))
-                        {
-                            Directory.CreateDirectory(path);
-                        }
-                        var upload = Path.Combine(webHostEnvironment.WebRootPath, "agency", newFileName);
-                        applicationUser.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
-                        applicationUser.ProfilePictureUrl = "/agency/" + newFileName;
-                        using var dataStream = new MemoryStream();
-                        applicationUser.ProfileImage.CopyTo(dataStream);
-                        applicationUser.ProfilePicture = dataStream.ToArray();
-                    }
-
-                    if (user != null)
-                    {
-                        user.ProfileImage = applicationUser?.ProfileImage ?? user.ProfileImage;
-                        user.ProfilePictureUrl = applicationUser?.ProfilePictureUrl ?? user.ProfilePictureUrl;
-                        user.PhoneNumber = applicationUser?.PhoneNumber ?? user.PhoneNumber;
-                        user.FirstName = applicationUser?.FirstName;
-                        user.LastName = applicationUser?.LastName;
-                        if (!string.IsNullOrWhiteSpace(applicationUser?.Password))
-                        {
-                            user.Password = applicationUser.Password;
-                        }
-                        user.Addressline = applicationUser.Addressline;
-                        user.Active = applicationUser.Active;
-                        user.Country = applicationUser.Country;
-                        user.CountryId = applicationUser.CountryId;
-                        user.State = applicationUser.State;
-                        user.StateId = applicationUser.StateId;
-                        user.PinCode = applicationUser.PinCode;
-                        user.PinCodeId = applicationUser.PinCodeId;
-                        user.Updated = DateTime.Now;
-                        user.Comments = applicationUser.Comments;
-                        user.PhoneNumber = applicationUser.PhoneNumber;
-                        user.UpdatedBy = HttpContext.User?.Identity?.Name;
-                        user.SecurityStamp = DateTime.Now.ToString();
-                        var result = await userManager.UpdateAsync(user);
-                        if (result.Succeeded)
-                        {
-                            if (!user.Active)
-                            {
-                                var createdUser = await userManager.FindByEmailAsync(user.Email);
-                                var lockUser = await userManager.SetLockoutEnabledAsync(createdUser, true);
-                                var lockDate = await userManager.SetLockoutEndDateAsync(createdUser, DateTime.MaxValue);
-
-                                if (lockUser.Succeeded && lockDate.Succeeded)
-                                {
-                                    await smsService.DoSendSmsAsync(user.PhoneNumber, "Agency user edited and locked. Email : " + user.Email);
-                                    notifyService.Custom($"User edited and locked.", 3, "orange", "fas fa-user-lock");
-                                }
-                            }
-                            else
-                            {
-                                var createdUser = await userManager.FindByEmailAsync(user.Email);
-                                var lockUser = await userManager.SetLockoutEnabledAsync(createdUser, true);
-                                var lockDate = await userManager.SetLockoutEndDateAsync(createdUser, DateTime.Now);
-
-                                if (lockUser.Succeeded && lockDate.Succeeded)
-                                {
-                                    await smsService.DoSendSmsAsync(user.PhoneNumber, "Agency user edited and unlocked. Email : " + user.Email);
-                                    notifyService.Custom($"User edited and unlocked.", 3, "green", "fas fa-user-check");
-                                }
-                            }
-                            return RedirectToAction(nameof(VendorUserController.Index), "VendorUser", new { id = applicationUser.VendorId });
-                        }
-                        toastNotification.AddErrorToastMessage("Error !!. The user con't be edited!");
-                        Errors(result);
-                    }
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
+                    return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                catch (DbUpdateConcurrencyException)
+                var user = await userManager.FindByIdAsync(id);
+                if (applicationUser?.ProfileImage != null && applicationUser.ProfileImage.Length > 0)
                 {
-                    if (!VendorApplicationUserExists(applicationUser.Id))
+                    string newFileName = user.Email + Guid.NewGuid().ToString();
+                    string fileExtension = Path.GetExtension(Path.GetFileName(applicationUser.ProfileImage.FileName));
+                    newFileName += fileExtension;
+                    string path = Path.Combine(webHostEnvironment.WebRootPath, "agency");
+                    if (!Directory.Exists(path))
                     {
-                        return NotFound();
+                        Directory.CreateDirectory(path);
                     }
-                    else
+                    var upload = Path.Combine(webHostEnvironment.WebRootPath, "agency", newFileName);
+                    applicationUser.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
+                    applicationUser.ProfilePictureUrl = "/agency/" + newFileName;
+                    using var dataStream = new MemoryStream();
+                    applicationUser.ProfileImage.CopyTo(dataStream);
+                    applicationUser.ProfilePicture = dataStream.ToArray();
+                }
+
+                if (user != null)
+                {
+                    user.ProfileImage = applicationUser?.ProfileImage ?? user.ProfileImage;
+                    user.ProfilePictureUrl = applicationUser?.ProfilePictureUrl ?? user.ProfilePictureUrl;
+                    user.PhoneNumber = applicationUser?.PhoneNumber ?? user.PhoneNumber;
+                    user.FirstName = applicationUser?.FirstName;
+                    user.LastName = applicationUser?.LastName;
+                    if (!string.IsNullOrWhiteSpace(applicationUser?.Password))
                     {
-                        throw;
+                        user.Password = applicationUser.Password;
+                    }
+                    user.Addressline = applicationUser.Addressline;
+                    user.Active = applicationUser.Active;
+                    user.Country = applicationUser.Country;
+                    user.CountryId = applicationUser.CountryId;
+                    user.State = applicationUser.State;
+                    user.StateId = applicationUser.StateId;
+                    user.PinCode = applicationUser.PinCode;
+                    user.PinCodeId = applicationUser.PinCodeId;
+                    user.Updated = DateTime.Now;
+                    user.Comments = applicationUser.Comments;
+                    user.PhoneNumber = applicationUser.PhoneNumber;
+                    user.UpdatedBy = HttpContext.User?.Identity?.Name;
+                    user.SecurityStamp = DateTime.Now.ToString();
+                    var result = await userManager.UpdateAsync(user);
+                    if (result.Succeeded)
+                    {
+                        if (!user.Active)
+                        {
+                            var createdUser = await userManager.FindByEmailAsync(user.Email);
+                            var lockUser = await userManager.SetLockoutEnabledAsync(createdUser, true);
+                            var lockDate = await userManager.SetLockoutEndDateAsync(createdUser, DateTime.MaxValue);
+
+                            if (lockUser.Succeeded && lockDate.Succeeded)
+                            {
+                                await smsService.DoSendSmsAsync(user.PhoneNumber, "Agency user edited and locked. Email : " + user.Email);
+                                notifyService.Custom($"User edited and locked.", 3, "orange", "fas fa-user-lock");
+                            }
+                        }
+                        else
+                        {
+                            var createdUser = await userManager.FindByEmailAsync(user.Email);
+                            var lockUser = await userManager.SetLockoutEnabledAsync(createdUser, true);
+                            var lockDate = await userManager.SetLockoutEndDateAsync(createdUser, DateTime.Now);
+
+                            if (lockUser.Succeeded && lockDate.Succeeded)
+                            {
+                                await smsService.DoSendSmsAsync(user.PhoneNumber, "Agency user edited and unlocked. Email : " + user.Email);
+                                notifyService.Custom($"User edited and unlocked.", 3, "green", "fas fa-user-check");
+                            }
+                        }
+                        return RedirectToAction(nameof(VendorUserController.Index), "VendorUser", new { id = applicationUser.VendorId });
                     }
                 }
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
 
-            toastNotification.AddErrorToastMessage("Error to create agency user!");
+            notifyService.Error("Error !!. The user can't be edited!");
             return RedirectToAction(nameof(VendorUserController.Index), "VendorUser", new { id = applicationUser.VendorId });
         }
 
@@ -381,21 +454,48 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Update(string userId, VendorUserRolesViewModel model)
         {
-            var user = await userManager.FindByIdAsync(userId);
-            if (user == null)
+            try
             {
-                return NotFound();
-            }
-            user.SecurityStamp = Guid.NewGuid().ToString();
-            user.Updated = DateTime.Now;
-            user.UpdatedBy = HttpContext.User?.Identity?.Name;
-            var roles = await userManager.GetRolesAsync(user);
-            var result = await userManager.RemoveFromRolesAsync(user, roles);
-            result = await userManager.AddToRolesAsync(user, model.VendorUserRoleViewModel.
-                Where(x => x.Selected).Select(y => y.RoleName));
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (currentUserEmail == null)
+                {
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                if (string.IsNullOrWhiteSpace(userId))
+                {
+                    notifyService.Error("OOPs !!!..User not found");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
 
-            notifyService.Custom($"User role(s) updated successfully.", 3, "orange", "fas fa-user-cog");
-            return RedirectToAction(nameof(VendorUserController.Index), "VendorUser", new { id = model.VendorId });
+                if (model == null)
+                {
+                    notifyService.Error("OOPs !!!..Model not found");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var user = await userManager.FindByIdAsync(userId);
+                if (user == null)
+                {
+                    return NotFound();
+                }
+                user.SecurityStamp = Guid.NewGuid().ToString();
+                user.Updated = DateTime.Now;
+                user.UpdatedBy = HttpContext.User?.Identity?.Name;
+                var roles = await userManager.GetRolesAsync(user);
+                var result = await userManager.RemoveFromRolesAsync(user, roles);
+                result = await userManager.AddToRolesAsync(user, model.VendorUserRoleViewModel.
+                    Where(x => x.Selected).Select(y => y.RoleName));
+
+                notifyService.Custom($"User role(s) updated successfully.", 3, "orange", "fas fa-user-cog");
+                return RedirectToAction(nameof(VendorUserController.Index), "VendorUser", new { id = model.VendorId });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+
         }
 
         public async Task<IActionResult> Delete(long? id)
@@ -431,13 +531,20 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(long id)
         {
-            if (_context.VendorApplicationUser == null)
+            try
             {
-                return Problem("Entity set 'ApplicationDbContext.VendorApplicationUser'  is null.");
-            }
-            var vendorApplicationUser = await _context.VendorApplicationUser.FindAsync(id);
-            if (vendorApplicationUser != null)
-            {
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (currentUserEmail == null)
+                {
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var vendorApplicationUser = await _context.VendorApplicationUser.FindAsync(id);
+                if (vendorApplicationUser == null)
+                {
+                    notifyService.Error($"Err User delete. Try again", 3);
+                    return RedirectToAction(nameof(Index));
+                }
                 vendorApplicationUser.Updated = DateTime.Now;
                 vendorApplicationUser.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.VendorApplicationUser.Remove(vendorApplicationUser);
@@ -445,20 +552,12 @@ namespace risk.control.system.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-
-            notifyService.Error($"Err User delete. Try again", 3);
-            return RedirectToAction(nameof(Index));
-        }
-
-        private void Errors(IdentityResult result)
-        {
-            foreach (IdentityError error in result.Errors)
-                ModelState.AddModelError("", error.Description);
-        }
-
-        private bool VendorApplicationUserExists(long id)
-        {
-            return (_context.VendorApplicationUser?.Any(e => e.Id == id)).GetValueOrDefault();
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
         }
     }
 }

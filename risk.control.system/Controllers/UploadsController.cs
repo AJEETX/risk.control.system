@@ -366,20 +366,29 @@ namespace risk.control.system.Controllers
 
         public IActionResult GetVideoFile(string fileName)
         {
-            var currentUserEmail = HttpContext.User?.Identity?.Name;
-            if (currentUserEmail == null)
+            try
             {
-                notifyService.Error("OOPs !!!..Unauthenticated Access");
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (currentUserEmail == null)
+                {
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var filePath = Path.Combine("wwwroot/video", fileName);
+                if (!System.IO.File.Exists(filePath))
+                {
+                    return NotFound();
+                }
+
+                var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+                return File(fileStream, "video/mp4"); // MIME type for MP4
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
-            var filePath = Path.Combine("wwwroot/video", fileName);
-            if (!System.IO.File.Exists(filePath))
-            {
-                return NotFound();
-            }
-
-            var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
-            return File(fileStream, "video/mp4"); // MIME type for MP4
         }
     }
 }
