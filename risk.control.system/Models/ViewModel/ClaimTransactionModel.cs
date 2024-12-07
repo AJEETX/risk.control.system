@@ -15,5 +15,6 @@
         public int? AvailableCount { get; set; } = 0;
         public int? TotalCount { get; set; } = 0;
         public bool Trial { get; set; }
+        public string? ReportAiSummary { get; set; }
     }
 }

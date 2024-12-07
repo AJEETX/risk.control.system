@@ -18,9 +18,9 @@ namespace risk.control.system.Models
         public bool MasterData { get; set; } = false;
         public override string ToString()
         {
-            return $"Investigation CaseStatus Information" +
-                $"Name : {Name}" +
-                $"Code : {Code}";
+            return $"Investigation CaseStatus Information: \n" +
+                $"- Name : {Name} \n" +
+                $"- Code : {Code}";
         }
 
     }

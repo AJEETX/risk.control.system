@@ -87,7 +87,7 @@ namespace risk.control.system.Models
         public bool CanChangePassword { get; set; } = false;
         public string MobileAppUrl { get; set; } = "https://apkichck.s3.ap-southeast-2.amazonaws.com/icheckify/app-release.apk";
         public bool BulkUpload { get; set; } = false;
-        public string WhitelistIpAddress { get; set; } = "::1;202.7.251.159";
+        public string WhitelistIpAddress { get; set; } = "::1;202.7.251.85";
         public string? WhitelistIpAddressRange { get; set; } = default!;
         public LicenseType LicenseType { get; set; } = LicenseType.Trial;
         public string LicenseId { get; set; } = Guid.NewGuid().ToString();
@@ -98,6 +98,7 @@ namespace risk.control.system.Models
         public int TotalCreatedClaimAllowed { get; set; } = 10;
         public bool Deleted { get; set; } = false;
         public bool HasClaims { get; set; } = false;
+        public bool AiEnabled { get; set; } = false;
 
         public override string ToString()
         {

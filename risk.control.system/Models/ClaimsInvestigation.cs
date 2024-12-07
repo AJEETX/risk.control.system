@@ -62,18 +62,19 @@ namespace risk.control.system.Models
         public CREATEDBY CREATEDBY { get; set; } = CREATEDBY.MANUAL;
         public ORIGIN ORIGIN { get; set; } = ORIGIN.USER;
 
+        public bool AiEnabled { get; set; } = false;
         public override string ToString()
         {
-            return $"Claim Information," +
-            $"Claim Id: {ClaimsInvestigationId}" +
-            $"Policy Detail: {PolicyDetail.ToString()}" +
-            $"Customer: {CustomerDetail.ToString()}" +
-            $"Beneficiary: {BeneficiaryDetail.ToString()}" +
-            $"Agency report: {AgencyReport.ToString()}" +
-            $"Case creation type: {CREATEDBY.GetEnumDisplayName()}" +
-            $"Case created by: {ORIGIN.GetEnumDisplayName()}" +
-            $"Case Status: {InvestigationCaseStatus}" +
-            $"Case SubStatus: {InvestigationCaseSubStatus}";
+            return $"Claim Information:\n" +
+            $"- Claim Id: {ClaimsInvestigationId}\n" +
+            $"- Policy Detail: {PolicyDetail.ToString()}\n" +
+            $"- Customer: {CustomerDetail.ToString()} \n" +
+            $"- Beneficiary: {BeneficiaryDetail.ToString()} \n" +
+            $"- Agency report: {AgencyReport.ToString()} \n" +
+            $"- Case creation type: {CREATEDBY.GetEnumDisplayName()} \n" +
+            $"- Case created by: {ORIGIN.GetEnumDisplayName()}\n" +
+            $"- Case Status: {InvestigationCaseStatus} \n" +
+            $"- Case SubStatus: {InvestigationCaseSubStatus}";
         }
 
         public bool EnablePassport { get; set; } = false;

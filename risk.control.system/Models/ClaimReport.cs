@@ -37,7 +37,7 @@ namespace risk.control.system.Models
         {
             return $"Claim Report Information:\n" +
                 $"- Agent Email: {AgentEmail}\n" +
-                $"- Agent Remarks Updatedtime: {AgentRemarksUpdated}\n" +
+                $"- Agent Remarks Updated time: {AgentRemarksUpdated}\n" +
                 $"- Agent Remarks: {AgentRemarks}\n" +
                 $"- Supervisor Remarks Updated time: {SupervisorRemarksUpdated}\n" +
                 $"- Supervisor Email: {SupervisorEmail}\n" +

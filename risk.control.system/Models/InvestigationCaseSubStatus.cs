@@ -21,9 +21,9 @@ namespace risk.control.system.Models
 
         public override string ToString()
         {
-            return $"Investigation Case SubStatus Information" +
-                $"Name : {Name}" +
-                $"Code : {Code}";
+            return $"Investigation Case SubStatus Information: \n" +
+                $"- Name : {Name}" +
+                $"- Code : {Code}";
         }
 
     }

@@ -40,8 +40,8 @@ namespace risk.control.system.Models
 
         public override string ToString()
         {
-            return $"Digital Id Information" +
-                $"Valid: {MatchExecuted}";
+            return $"Digital Id Information: \n" +
+                $"- Valid: {MatchExecuted}";
         }
     }
 

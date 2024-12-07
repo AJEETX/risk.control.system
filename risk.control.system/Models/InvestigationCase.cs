@@ -30,11 +30,11 @@ namespace risk.control.system.Models
         public InvestigationCaseStatus? InvestigationCaseStatus { get; set; } = default!;
         public override string ToString()
         {
-            return $"Investigation Case Information" +
-                $"Name : {Name}" +
-                $"Description : {Description}" +
-                $"Line Of Business : {LineOfBusiness}" +
-                $"Investigation Service Type : {InvestigationServiceType}" +
+            return $"Investigation Case Information: \n" +
+                $"Name : {Name} \n" +
+                $"Description : {Description} \n" +
+                $"Line Of Business : {LineOfBusiness}  \n" +
+                $"Investigation Service Type : {InvestigationServiceType}  \n" +
                 $"Investigation Case Status : {InvestigationCaseStatus}";
         }
     }

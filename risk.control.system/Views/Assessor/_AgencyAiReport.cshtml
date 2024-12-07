@@ -3,19 +3,20 @@
 <div class="col-12 d-flex align-items-stretch flex-column">
     <div class="card bg-light border-success">
         <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-user-edit"></i> Supervisor : <span class="badge badge-light"> @Model?.AgencyReport?.SupervisorEmail</span>
+            <h3 class="card-title">
+                <i class="fas fa-user-edit"></i> <span class="badge badge-light"> AI comments</span>
                 <span class="hover-text">
                     <i class="fas fa-info-circle"></i>
                     <span class="tooltip-text" id="information">
                         <span>
-                            <i class="fas fa-user-shield"></i><b> @Model?.AgencyReport?.SupervisorEmail</b> remark
+                            <i class="fas fa-user-shield"></i><b> AI comments</b> remark
                         </span>
 
                     </span>
                 </span>
             </h3>
             <div class="card-tools">
-                <span data-toggle="tooltip" title=" Supervisor :  @Model?.AgencyReport?.SupervisorEmail" class="badge badge-light">
+                <span data-toggle="tooltip" title=" AI comments" class="badge badge-light">
                     <i class="nav-icon fas fa-clock"></i> @Model.AgencyReport?.SupervisorRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt")</span>
             </div>
 
@@ -25,7 +26,7 @@
                 <div class="col-12">
                     <p class="text-muted text-sm">
 
-                        <span>Supervisor comments: </span>
+                        <span>AI comments: </span>
                     </p>
                     <table id="customerTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
                         <thead>
@@ -34,7 +35,7 @@
                                     Time
                                 </th>
                                 <th>
-                                    Supervisor Response
+                                    AI Response
                                 </th>
                                 <th>
                                     Document
@@ -59,8 +60,7 @@
                                     <span class="badge badge-light">@displayTime</span>
                                 </td>
                                 <td>
-                                    @ViewBag.InvestigationSummary
-
+                                    @Model.ReportAiSummary
                                 </td>
                                 <td>
                                     @if (Model.AgencyReport?.SupervisorAttachment != null)

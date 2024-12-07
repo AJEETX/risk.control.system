@@ -80,6 +80,26 @@ namespace risk.control.system.Models
         public DateTime? LastActivityDate { get; set; }
         public bool HasClaims { get; set; } = false;
 
+        public override string ToString()
+        {
+            return $"User Information:\n" +
+                $"- First Name: {FirstName}\n" +
+                $"- Last Name: {LastName}\n" +
+                $"- PinCode: {PinCode}\n" +
+                $"- State: {State}\n" +
+                $"- Country: {Country}\n" +
+                $"- District: {District}\n" +
+                $"- Address Line: {Addressline}\n" +
+                $"- Created: {Created}\n" +
+                $"- Updated: {Updated}\n" +
+                $"- Updated By: {UpdatedBy}\n" +
+                $"- Active: {Active}\n" +
+                $"- Deleted: {Deleted}\n" +
+                $"- Role: {Role}\n" +
+                $"- Last Activity Date: {LastActivityDate}\n" +
+                $"- Has Claims: {HasClaims}";
+        }
+
     }
 
     public class ApplicationRole : IdentityRole<long>

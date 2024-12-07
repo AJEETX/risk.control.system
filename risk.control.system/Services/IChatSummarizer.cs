@@ -11,7 +11,7 @@ public interface IChatSummarizer
 {
     Task<string> SummarizeObjectDataAsync(ClaimsInvestigation claimsInvestigation);
 
-    Task<string> SummarizeDataAsync(ClaimsInvestigation claimsInvestigation);
+    Task<string> SummarizeDataAsync(ClaimsInvestigation claimsInvestigation, string inputText = "Long text to summarize...");
 }
 public class OpenAISummarizer : IChatSummarizer
 {
@@ -54,28 +54,34 @@ public class OpenAISummarizer : IChatSummarizer
         }
     }
 
-    public async Task<string> SummarizeDataAsync(ClaimsInvestigation claimsInvestigation)
+    public async Task<string> SummarizeDataAsync(ClaimsInvestigation claimsInvestigation, string inputText = "Long text to summarize...")
     {
         try
         {
+            var product = new Product
+            {
+                Name = "Wireless Mouse",
+                Description = "A high-precision wireless mouse with ergonomic design.",
+                Price = 25.99m,
+                Category = "Electronics"
+            };
 
-        string inputText = FormatObjectData(claimsInvestigation);
-        var requestData = new { inputs = inputText };
-        var requestContent = new StringContent(JsonConvert.SerializeObject(claimsInvestigation.AgencyReport, Formatting.None, new JsonSerializerSettings
-        {
-            ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-            NullValueHandling = NullValueHandling.Ignore
-        }), Encoding.UTF8, "application/json");
-        _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {Environment.GetEnvironmentVariable("HUGING_FACE")}");
+            string requestData = FormatObjectData(product);
+            if (!string.IsNullOrEmpty(inputText))
+            {
+                requestData = inputText;
+            }
+            var requestContent = new StringContent(System.Text.Json.JsonSerializer.Serialize(requestData), Encoding.UTF8, "application/json");
 
-        HttpResponseMessage response = await _httpClient.PostAsync("https://api-inference.huggingface.co/models/facebook/bart-large-cnn", requestContent);
-        if (!response.IsSuccessStatusCode)
-            throw new Exception("Error while summarizing data: " + response.ReasonPhrase);
+            _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {Environment.GetEnvironmentVariable("HUGING_FACE")}");
+            HttpResponseMessage response = await _httpClient.PostAsync("https://api-inference.huggingface.co/models/facebook/bart-large-cnn", requestContent);
+            if (!response.IsSuccessStatusCode)
+                throw new Exception("Error while summarizing data: " + response.ReasonPhrase);
 
-        string responseContent = await response.Content.ReadAsStringAsync();
-        dynamic result = JsonConvert.DeserializeObject(responseContent);
+            string responseContent = await response.Content.ReadAsStringAsync();
+            dynamic result = JsonConvert.DeserializeObject(responseContent);
 
-        return result[0].summary_text;
+            return result[0].summary_text;
 
         }
         catch (Exception ex)
@@ -86,12 +92,18 @@ public class OpenAISummarizer : IChatSummarizer
     }
     static string FormatObjectData(ClaimsInvestigation claimsInvestigation)
     {
-
-
-        return JsonConvert.SerializeObject(claimsInvestigation, Formatting.None, new JsonSerializerSettings
-        {
-            ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-            NullValueHandling = NullValueHandling.Ignore
-        });
+        return claimsInvestigation.ToString();
     }
+    private string FormatObjectData(Product product)
+    {
+        // Customize the formatting based on your Product class
+        return $"Name: {product.Name}\nPrice: {product.Price}\nDescription: {product.Description}";
+    }
+}
+public class Product
+{
+    public string Name { get; set; }
+    public string Description { get; set; }
+    public decimal Price { get; set; }
+    public string Category { get; set; }
 }

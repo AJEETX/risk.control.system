@@ -492,7 +492,20 @@
                                             </span>
                                         </div>
                                     </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <span class="input-group-label"> Enable AI:</span>
+                                            <div class="input-group mb-3">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text" id="ai-enabled"><i class="fas fa-crosshairs"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                                </div>
 
+                                                <span class="checkbox">
+                                                    <input asp-for="AiEnabled" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
 
                                 </div>
                                 <div class="col-md-3">

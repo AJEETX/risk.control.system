@@ -41,8 +41,8 @@ namespace risk.control.system.Models
         public DocumentIdReportType DocumentIdReportType { get; set; } = DocumentIdReportType.PAN;
         public override string ToString()
         {
-            return $"Report Information" +
-                $"Valid: {ValidationExecuted}";
+            return $"Report Information: \n" +
+                $"- Valid: {ValidationExecuted}";
         }
     }
 

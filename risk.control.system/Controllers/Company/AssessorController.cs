@@ -83,8 +83,11 @@ namespace risk.control.system.Controllers.Company
                     return RedirectToAction(nameof(Index));
                 }
                 var model = investigationReportService.GetInvestigateReport(currentUserEmail, selectedcase);
-                var investigationSummary = await chatSummarizer.SummarizeDataAsync(model.ClaimsInvestigation);
-                ViewBag.InvestigationSummary = investigationSummary;
+                if(model != null && model.ClaimsInvestigation != null && model.ClaimsInvestigation.AiEnabled)
+                {
+                    var investigationSummary = await chatSummarizer.SummarizeDataAsync(model.ClaimsInvestigation);
+                    model.ReportAiSummary = investigationSummary;
+                }
                 return View(model);
             }
             catch (Exception ex)
@@ -266,8 +269,11 @@ namespace risk.control.system.Controllers.Company
 
 
                 var model = await investigationReportService.SubmittedDetail(id);
-                var investigationSummary = await chatSummarizer.SummarizeDataAsync(model.ClaimsInvestigation);
-                ViewBag.InvestigationSummary = investigationSummary;
+                if (model != null && model.ClaimsInvestigation != null && model.ClaimsInvestigation.AiEnabled)
+                {
+                    var investigationSummary = await chatSummarizer.SummarizeDataAsync(model.ClaimsInvestigation);
+                    model.ReportAiSummary = investigationSummary;
+                }
                 return View(model);
             }
             catch (Exception ex)

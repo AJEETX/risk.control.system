@@ -46,7 +46,10 @@
                     }
                     <partial name="_AgencyAgentAnswer" model="@Model" />
                     <partial name="_AgencySupervisorAnswer" model="@Model" />
-                    <partial name="_ReportSummary" model="@Model" />
+                    @if (Model.ClaimsInvestigation.AiEnabled)
+                    {
+                        <partial name="_AgencyAiReport" model="@Model" />
+                    }
 
                 </div>
             </div>

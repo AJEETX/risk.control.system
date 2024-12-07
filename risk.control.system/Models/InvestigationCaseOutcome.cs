@@ -14,5 +14,12 @@ namespace risk.control.system.Models
         [Display(Name = "Case outcome")]
         [Required]
         public string Code { get; set; } = default!;
+
+        public override string ToString()
+        {
+            return $"Investigation Case Outcome Information: \n" +
+                $"Name : {Name} \n" +
+                $"Code : {Code}";
+        }
     }
 }
