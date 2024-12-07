@@ -53,10 +53,10 @@ namespace risk.control.system.Controllers
         {
             try
             {
-                var userEmail = HttpContext.User.Identity.Name;
-                if (string.IsNullOrWhiteSpace(userEmail))
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (currentUserEmail == null)
                 {
-                    notifyService.Error("OOPs !!!..Contact Admin");
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var file = await _context.FilesOnFileSystem.Where(x => x.Id == id).FirstOrDefaultAsync();
@@ -98,9 +98,14 @@ namespace risk.control.system.Controllers
         {
             try
             {
-                var userEmail = HttpContext.User?.Identity?.Name;
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (currentUserEmail == null)
+                {
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
 
-                if (string.IsNullOrWhiteSpace(userEmail) || 
+                if (string.IsNullOrWhiteSpace(currentUserEmail) || 
                     (digitalImage == null) || 
                     string.IsNullOrWhiteSpace(selectedcase) ||
                     string.IsNullOrWhiteSpace(digitalIdLatitude) || 
@@ -122,7 +127,7 @@ namespace risk.control.system.Controllers
                 {
                     digitalImage.CopyTo(ds);
                     var imageByte = ds.ToArray();
-                    var response = await vendorService.PostFaceId(userEmail, selectedcase, digitalIdLatitude, digitalIdLongitude, imageByte);
+                    var response = await vendorService.PostFaceId(currentUserEmail, selectedcase, digitalIdLatitude, digitalIdLongitude, imageByte);
 
                     notifyService.Custom($"Photo Image Uploaded", 3, "green", "fas fa-portrait");
                     return Redirect("/Agent/GetInvestigate?selectedcase=" + selectedcase);
@@ -144,9 +149,14 @@ namespace risk.control.system.Controllers
             try
             {
 
-                var userEmail = HttpContext.User?.Identity?.Name;
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (currentUserEmail == null)
+                {
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
 
-                if (string.IsNullOrWhiteSpace(userEmail) ||
+                if (string.IsNullOrWhiteSpace(currentUserEmail) ||
                     (panImage == null) || 
                     string.IsNullOrWhiteSpace(documentIdLatitude) || 
                     string.IsNullOrWhiteSpace(documentIdLongitude) ||
@@ -169,7 +179,7 @@ namespace risk.control.system.Controllers
                 {
                     panImage.CopyTo(ds);
                     var imageByte = ds.ToArray();
-                    var response = await vendorService.PostDocumentId(userEmail, selectedclaim, documentIdLatitude, documentIdLongitude, imageByte);
+                    var response = await vendorService.PostDocumentId(currentUserEmail, selectedclaim, documentIdLatitude, documentIdLongitude, imageByte);
 
                     notifyService.Custom($"Pan card Image Uploaded", 3, "green", "fas fa-mobile-alt");
                     return Redirect("/Agent/GetInvestigate?selectedcase=" + selectedclaim);
@@ -190,10 +200,14 @@ namespace risk.control.system.Controllers
         {
             try
             {
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (currentUserEmail == null)
+                {
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
 
-                var userEmail = HttpContext.User?.Identity?.Name;
-
-                if (string.IsNullOrWhiteSpace(userEmail) ||
+                if (string.IsNullOrWhiteSpace(currentUserEmail) ||
                     (passportImage == null) ||
                     string.IsNullOrWhiteSpace(passportIdLatitude) ||
                     string.IsNullOrWhiteSpace(passportIdLongitude) ||
@@ -216,7 +230,7 @@ namespace risk.control.system.Controllers
                 {
                     passportImage.CopyTo(ds);
                     var imageByte = ds.ToArray();
-                    var response = await vendorService.PostPassportId(userEmail, selectedclaim, passportIdLatitude, passportIdLongitude, imageByte);
+                    var response = await vendorService.PostPassportId(currentUserEmail, selectedclaim, passportIdLatitude, passportIdLongitude, imageByte);
 
                     notifyService.Custom($"Passport Image Uploaded", 3, "green", "fas fa-mobile-alt");
                     return Redirect("/Agent/GetInvestigate?selectedcase=" + selectedclaim);
@@ -237,10 +251,14 @@ namespace risk.control.system.Controllers
         {
             try
             {
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (currentUserEmail == null)
+                {
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
 
-                var userEmail = HttpContext.User?.Identity?.Name;
-
-                if (string.IsNullOrWhiteSpace(userEmail) ||
+                if (string.IsNullOrWhiteSpace(currentUserEmail) ||
                     (audioFile == null) ||
                     string.IsNullOrWhiteSpace(audioLatitude) ||
                     string.IsNullOrWhiteSpace(audioLongitude) ||
@@ -263,7 +281,7 @@ namespace risk.control.system.Controllers
                 {
                     audioFile.CopyTo(ds);
                     var imageByte = ds.ToArray();
-                    var response = await vendorService.PostAudio(userEmail, selectedclaim, audioLatitude, audioLongitude, Path.GetFileName(audioFile.FileName), imageByte);
+                    var response = await vendorService.PostAudio(currentUserEmail, selectedclaim, audioLatitude, audioLongitude, Path.GetFileName(audioFile.FileName), imageByte);
 
                     notifyService.Custom($"Audio Uploaded", 3, "green", "fas fa-mobile-alt");
                     return Redirect("/Agent/GetInvestigate?selectedcase=" + selectedclaim);
@@ -279,6 +297,13 @@ namespace risk.control.system.Controllers
 
         public IActionResult GetAudioFile(string fileName)
         {
+            var currentUserEmail = HttpContext.User?.Identity?.Name;
+            if (currentUserEmail == null)
+            {
+                notifyService.Error("OOPs !!!..Unauthenticated Access");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+
             var filePath = Path.Combine("wwwroot/audio", fileName);
             if (!System.IO.File.Exists(filePath))
             {
@@ -295,10 +320,14 @@ namespace risk.control.system.Controllers
         {
             try
             {
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (currentUserEmail == null)
+                {
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
 
-                var userEmail = HttpContext.User?.Identity?.Name;
-
-                if (string.IsNullOrWhiteSpace(userEmail) ||
+                if (string.IsNullOrWhiteSpace(currentUserEmail) ||
                     (videoFile == null) ||
                     string.IsNullOrWhiteSpace(videoLatitude) ||
                     string.IsNullOrWhiteSpace(videoLongitude) ||
@@ -321,7 +350,7 @@ namespace risk.control.system.Controllers
                 {
                     videoFile.CopyTo(ds);
                     var imageByte = ds.ToArray();
-                    var response = await vendorService.PostVideo(userEmail, selectedclaim, videoLatitude, videoLongitude, Path.GetFileName(videoFile.FileName), imageByte);
+                    var response = await vendorService.PostVideo(currentUserEmail, selectedclaim, videoLatitude, videoLongitude, Path.GetFileName(videoFile.FileName), imageByte);
 
                     notifyService.Custom($"Video Uploaded", 3, "green", "fas fa-mobile-alt");
                     return Redirect("/Agent/GetInvestigate?selectedcase=" + selectedclaim);
@@ -337,6 +366,12 @@ namespace risk.control.system.Controllers
 
         public IActionResult GetVideoFile(string fileName)
         {
+            var currentUserEmail = HttpContext.User?.Identity?.Name;
+            if (currentUserEmail == null)
+            {
+                notifyService.Error("OOPs !!!..Unauthenticated Access");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
             var filePath = Path.Combine("wwwroot/video", fileName);
             if (!System.IO.File.Exists(filePath))
             {

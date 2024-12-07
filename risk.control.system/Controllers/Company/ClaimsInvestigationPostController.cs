@@ -7,6 +7,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 
 using NToastNotify;
+
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
@@ -118,10 +119,8 @@ namespace risk.control.system.Controllers.Company
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(CreatorManualController.New), "CreatorManual");
-
             }
-
-                        return RedirectToAction(nameof(ClaimsActiveController.Active), "ClaimsActive");
+            return RedirectToAction(nameof(ClaimsActiveController.Active), "ClaimsActive");
         }
 
         [ValidateAntiForgeryToken]
@@ -137,26 +136,29 @@ namespace risk.control.system.Controllers.Company
             //set claim as manual assigned
             try
             {
-                var userEmail = HttpContext.User?.Identity?.Name;
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (currentUserEmail == null)
+                {
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
 
-                var policy = await claimsInvestigationService.AllocateToVendor(userEmail, claimId, selectedcase, caseLocationId, false);
+                var policy = await claimsInvestigationService.AllocateToVendor(currentUserEmail, claimId, selectedcase, caseLocationId, false);
 
-                await mailboxService.NotifyClaimAllocationToVendor(userEmail, policy.PolicyDetail.ContractNumber, claimId, selectedcase, caseLocationId);
+                await mailboxService.NotifyClaimAllocationToVendor(currentUserEmail, policy.PolicyDetail.ContractNumber, claimId, selectedcase, caseLocationId);
 
                 var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == selectedcase);
 
                 notifyService.Custom($"Policy #{policy.PolicyDetail.ContractNumber} assigned to {vendor.Name}", 3, "green", "far fa-file-powerpoint");
 
-                        return RedirectToAction(nameof(ClaimsActiveController.Active), "ClaimsActive");
+                return RedirectToAction(nameof(ClaimsActiveController.Active), "ClaimsActive");
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(CreatorManualController.New), "CreatorManual");
-
             }
-
         }
 
         [HttpPost]
@@ -166,21 +168,21 @@ namespace risk.control.system.Controllers.Company
         {
             try
             {
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (currentUserEmail == null)
+                {
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
                 if (model == null || string.IsNullOrWhiteSpace(claimId))
                 {
                     notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                string userEmail = HttpContext?.User?.Identity.Name;
-                if (string.IsNullOrWhiteSpace(userEmail))
-                {
-                    notifyService.Error("OOPs !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
 
-                var isAutoAllocationOn = await claimsInvestigationService.WithdrawCaseByCompany(userEmail, model, claimId);
+                var isAutoAllocationOn = await claimsInvestigationService.WithdrawCaseByCompany(currentUserEmail, model, claimId);
 
-                await mailboxService.NotifyClaimWithdrawlToCompany(userEmail, claimId);
+                await mailboxService.NotifyClaimWithdrawlToCompany(currentUserEmail, claimId);
                 notifyService.Custom($"Claim #{policyNumber}  withdrawn successfully", 3, "green", "far fa-file-powerpoint");
                 return RedirectToAction(nameof(CreatorManualController.New), "CreatorManual");
             }
@@ -188,7 +190,7 @@ namespace risk.control.system.Controllers.Company
             {
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return RedirectToAction(nameof(CreatorManualController.New), "CreatorManual");
             }
         }
 
@@ -204,13 +206,18 @@ namespace risk.control.system.Controllers.Company
             }
             try
             {
-                string userEmail = HttpContext?.User?.Identity.Name;
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (string.IsNullOrWhiteSpace(currentUserEmail))
+                {
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
 
                 AssessorRemarkType reportUpdateStatus = (AssessorRemarkType)Enum.Parse(typeof(AssessorRemarkType), assessorRemarkType, true);
 
-                var claim = await claimsInvestigationService.ProcessCaseReport(userEmail, assessorRemarks, caseLocationId, claimId, reportUpdateStatus);
+                var claim = await claimsInvestigationService.ProcessCaseReport(currentUserEmail, assessorRemarks, caseLocationId, claimId, reportUpdateStatus);
 
-                await mailboxService.NotifyClaimReportProcess(userEmail, claimId, caseLocationId);
+                await mailboxService.NotifyClaimReportProcess(currentUserEmail, claimId, caseLocationId);
 
                 if (reportUpdateStatus == AssessorRemarkType.OK)
                 {
@@ -295,7 +302,7 @@ namespace risk.control.system.Controllers.Company
                     notifyService.Success("Query Sent to Agency");
                     return RedirectToAction(nameof(AssessorController.Assessor), "Assessor");
                 }
-                notifyService.Error("OOPs !!!..Contact Admin");
+                notifyService.Error("OOPs !!!..Error sending query");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
             catch (Exception ex)
@@ -318,7 +325,6 @@ namespace risk.control.system.Controllers.Company
                     notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                
 
                 var model = await claimsInvestigationService.SubmitNotes(currentUserEmail, claimId, name);
                 if (model)
@@ -326,7 +332,7 @@ namespace risk.control.system.Controllers.Company
                     notifyService.Success("Notes added");
                     return Ok();
                 }
-                notifyService.Error("OOPs !!!..Contact Admin");
+                notifyService.Error("OOPs !!!..Error adding notes");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
             catch (Exception ex)

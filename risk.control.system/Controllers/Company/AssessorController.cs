@@ -53,7 +53,7 @@ namespace risk.control.system.Controllers.Company
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
-                    notifyService.Error("OOPs !!!..Contact Admin");
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 return View();
@@ -74,12 +74,12 @@ namespace risk.control.system.Controllers.Company
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
-                    notifyService.Error("OOPs !!!..Contact Admin");
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 if (selectedcase == null)
                 {
-                    notifyService.Error("NOT FOUND !!!..");
+                    notifyService.Error("OOPS !!! Claim Not Found !!!..");
                     return RedirectToAction(nameof(Index));
                 }
                 var model = investigationReportService.GetInvestigateReport(currentUserEmail, selectedcase);
@@ -105,12 +105,12 @@ namespace risk.control.system.Controllers.Company
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
-                    notifyService.Error("OOPs !!!..Contact Admin");
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 if (selectedcase == null)
                 {
-                    notifyService.Error("NOT FOUND !!!..");
+                    notifyService.Error("OOPS !!! Claim Not Found !!!..");
                     return RedirectToAction(nameof(Index));
                 }
                 var model = investigationReportService.GetInvestigateReport(currentUserEmail, selectedcase);
@@ -141,12 +141,13 @@ namespace risk.control.system.Controllers.Company
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
-                    notifyService.Error("OOPs !!!..Contact Admin");
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
+                
                 if (id == 0)
                 {
-                    notifyService.Error("NOT FOUND !!!..");
+                    notifyService.Error("OOPS !!! Claim Not Found !!!..");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
@@ -169,7 +170,7 @@ namespace risk.control.system.Controllers.Company
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
-                    notifyService.Error("OOPs !!!..Contact Admin");
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 return View();
@@ -189,12 +190,12 @@ namespace risk.control.system.Controllers.Company
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
-                    notifyService.Error("OOPs !!!..Contact Admin");
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                if (id == null)
+                if (string.IsNullOrWhiteSpace(id))
                 {
-                    notifyService.Error("NOT FOUND !!!..");
+                    notifyService.Error("OOPS !!! Claim Not Found !!!..");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
@@ -220,16 +221,15 @@ namespace risk.control.system.Controllers.Company
         {
             try
             {
-                if (id == null)
-                {
-                    notifyService.Error("NOT FOUND !!!..");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-
                 if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
-                    notifyService.Error("OOPs !!!..Contact Admin");
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                if (string.IsNullOrWhiteSpace(id))
+                {
+                    notifyService.Error("OOPS !!! Claim Not Found !!!..");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
@@ -254,20 +254,17 @@ namespace risk.control.system.Controllers.Company
         {
             try
             {
-                if (id == null)
-                {
-                    notifyService.Error("NOT FOUND !!!..");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-
                 if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
-                    notifyService.Error("OOPs !!!..Contact Admin");
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-
-
+                if (string.IsNullOrWhiteSpace(id))
+                {
+                    notifyService.Error("OOPS !!! Claim Not Found !!!..");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
                 var model = await investigationReportService.SubmittedDetail(id);
                 if (model != null && model.ClaimsInvestigation != null && model.ClaimsInvestigation.AiEnabled)
                 {
@@ -293,10 +290,15 @@ namespace risk.control.system.Controllers.Company
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
-                    notifyService.Error("OOPs !!!..Contact Admin");
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                
+                if (id==0)
+                {
+                    notifyService.Error("OOPS !!! Claim Not Found !!!..");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+
                 var invoice = await invoiceService.GetInvoice(id);
 
                 var claimsPage = new MvcBreadcrumbNode("Assessor", "Assessor", "Claims");
@@ -321,7 +323,17 @@ namespace risk.control.system.Controllers.Company
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-               
+                if (string.IsNullOrWhiteSpace(currentUserEmail))
+                {
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                if (id == 0)
+                {
+                    notifyService.Error("OOPS !!! Claim Not Found !!!..");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+
                 var invoice = await invoiceService.GetInvoice(id);
 
                 return View(invoice);

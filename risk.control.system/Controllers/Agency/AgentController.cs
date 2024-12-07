@@ -34,6 +34,12 @@ namespace risk.control.system.Controllers.Agency
         [Breadcrumb(" Tasks")]
         public IActionResult Agent()
         {
+            var currentUserEmail = HttpContext.User?.Identity?.Name;
+            if (currentUserEmail == null)
+            {
+                notifyService.Error("OOPs !!!..Unauthenticated Access");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
             return View();
         }
 
@@ -48,15 +54,14 @@ namespace risk.control.system.Controllers.Agency
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                var userEmail = HttpContext.User?.Identity?.Name;
-
-                if (string.IsNullOrWhiteSpace(userEmail))
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (currentUserEmail == null)
                 {
-                    notifyService.Error("OOPs !!!..Contact Admin");
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                var model = await vendorService.GetInvestigate(userEmail, selectedcase, uploaded);
+                var model = await vendorService.GetInvestigate(currentUserEmail, selectedcase, uploaded);
 
                 return View(model);
             }
@@ -71,6 +76,12 @@ namespace risk.control.system.Controllers.Agency
         [Breadcrumb(title: " Submitted")]
         public IActionResult Submitted()
         {
+            var currentUserEmail = HttpContext.User?.Identity?.Name;
+            if (currentUserEmail == null)
+            {
+                notifyService.Error("OOPs !!!..Unauthenticated Access");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
             return View();
         }
         [Breadcrumb(title: " Detail", FromAction = "Submitted")]
@@ -83,8 +94,12 @@ namespace risk.control.system.Controllers.Agency
             }
             try
             {
-
-
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (currentUserEmail == null)
+                {
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
                 var model = await investigationReportService.SubmittedDetail(id);
 
                 return View(model);

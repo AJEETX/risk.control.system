@@ -55,11 +55,10 @@ namespace risk.control.system.Controllers.Agency
                     notifyService.Error($"No case selected!!!. Please select case to be allocate.", 3);
                     return RedirectToAction(nameof(SupervisorController.Allocate), "Supervisor");
                 }
-
-                var userEmail = HttpContext.User?.Identity?.Name;
-                if (string.IsNullOrWhiteSpace(userEmail))
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (currentUserEmail == null)
                 {
-                    notifyService.Error("OOPs !!!..Contact Admin");
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var vendorAgent = _context.VendorApplicationUser.FirstOrDefault(c => c.Id.ToString() == selectedcase);
@@ -69,13 +68,13 @@ namespace risk.control.system.Controllers.Agency
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                var claim = await claimsInvestigationService.AssignToVendorAgent(vendorAgent.Email, userEmail, vendorAgent.VendorId.Value, claimId);
+                var claim = await claimsInvestigationService.AssignToVendorAgent(vendorAgent.Email, currentUserEmail, vendorAgent.VendorId.Value, claimId);
                 if (claim == null)
                 {
                     notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                await mailboxService.NotifyClaimAssignmentToVendorAgent(userEmail, claimId, vendorAgent.Email, vendorAgent.VendorId.Value, caseLocationId);
+                await mailboxService.NotifyClaimAssignmentToVendorAgent(currentUserEmail, claimId, vendorAgent.Email, vendorAgent.VendorId.Value, caseLocationId);
 
                 notifyService.Custom($"Claim #{claim.PolicyDetail.ContractNumber} tasked to {vendorAgent.Email}", 3, "green", "far fa-file-powerpoint");
 
@@ -95,6 +94,12 @@ namespace risk.control.system.Controllers.Agency
         {
             try
             {
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (currentUserEmail == null)
+                {
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
+                    return RedirectToAction(nameof(AgentController.GetInvestigate), "\"Agent\"", new { selectedcase = claimId });
+                }
                 if (string.IsNullOrWhiteSpace(remarks) ||
                     string.IsNullOrWhiteSpace(claimId) ||
                     caseLocationId < 1 ||
@@ -106,14 +111,6 @@ namespace risk.control.system.Controllers.Agency
                 {
                     notifyService.Error($"No Agent remarks entered!!!. Please enter remarks.", 3);
                     return RedirectToAction(nameof(AgentController.GetInvestigate), "\"Agent\"", new { selectedcase = claimId });
-                }
-
-                string userEmail = HttpContext?.User?.Identity.Name;
-
-                if (string.IsNullOrWhiteSpace(userEmail))
-                {
-                    notifyService.Error("OOPs !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
                 //END : POST FACE IMAGE AND DOCUMENT
@@ -129,7 +126,7 @@ namespace risk.control.system.Controllers.Agency
                     Income question2Enum = (Income)Enum.Parse(typeof(Income), question2, true);
                     question2 = question2Enum.GetEnumDisplayName();
                 }
-                var claim = await claimsInvestigationService.SubmitToVendorSupervisor(userEmail, caseLocationId, claimId,
+                var claim = await claimsInvestigationService.SubmitToVendorSupervisor(currentUserEmail, caseLocationId, claimId,
                     WebUtility.HtmlDecode(remarks),
                     WebUtility.HtmlDecode(question1),
                     WebUtility.HtmlDecode(question2),
@@ -141,7 +138,7 @@ namespace risk.control.system.Controllers.Agency
                     return RedirectToAction(nameof(AgentController.GetInvestigate), "\"Agent\"", new { selectedcase = claimId });
 
                 }
-                await mailboxService.NotifyClaimReportSubmitToVendorSupervisor(userEmail, claimId, caseLocationId);
+                await mailboxService.NotifyClaimReportSubmitToVendorSupervisor(currentUserEmail, claimId, caseLocationId);
 
                 notifyService.Custom($"Claim #{claim.PolicyDetail.ContractNumber}  report submitted to supervisor", 3, "green", "far fa-file-powerpoint");
 
@@ -171,9 +168,8 @@ namespace risk.control.system.Controllers.Agency
                 string userEmail = HttpContext?.User?.Identity.Name;
                 if (string.IsNullOrWhiteSpace(userEmail))
                 {
-                    notifyService.Error("OOPs !!!..Contact Admin");
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(SupervisorController.GetInvestigateReport), new { selectedcase = claimId });
-
                 }
 
                 var reportUpdateStatus = SupervisorRemarkType.OK;
@@ -215,7 +211,7 @@ namespace risk.control.system.Controllers.Agency
                 string userEmail = HttpContext?.User?.Identity.Name;
                 if (string.IsNullOrWhiteSpace(userEmail))
                 {
-                    notifyService.Error("OOPs !!!..Contact Admin");
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(SupervisorController.Allocate), "Supervisor");
 
                 }
@@ -246,9 +242,8 @@ namespace risk.control.system.Controllers.Agency
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
-                    notifyService.Error("OOPs !!!..Contact Admin");
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(SupervisorController.Allocate), "Supervisor");
-
                 }
                 if (request == null)
                 {
@@ -278,7 +273,6 @@ namespace risk.control.system.Controllers.Agency
                 Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(SupervisorController.Allocate), "Supervisor");
-
             }
         }
     }

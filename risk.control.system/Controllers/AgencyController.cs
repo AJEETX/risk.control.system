@@ -76,7 +76,7 @@ namespace risk.control.system.Controllers
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
-                    notifyService.Error("User Not Found!!!..Contact Admin");
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == currentUserEmail);
@@ -124,7 +124,7 @@ namespace risk.control.system.Controllers
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
-                    notifyService.Error("User Not found!!!..Contact Admin");
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == currentUserEmail);
@@ -597,7 +597,7 @@ namespace risk.control.system.Controllers
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 if (currentUserEmail == null)
                 {
-                    notifyService.Error("Not Found!!!..Contact Admin");
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var model = await _context.VendorApplicationUser.Include(v=>v.Country).Include(v => v.State).Include(v => v.District).Include(v => v.PinCode).FirstOrDefaultAsync(c => c.Id == userId);
@@ -636,7 +636,7 @@ namespace risk.control.system.Controllers
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 if (currentUserEmail == null)
                 {
-                    notifyService.Error("Not Found!!!..Contact Admin");
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 if (string.IsNullOrWhiteSpace(email))
@@ -670,6 +670,12 @@ namespace risk.control.system.Controllers
         [Breadcrumb("Edit Role", FromAction = "Users")]
         public async Task<IActionResult> UserRoles(string userId)
         {
+            var currentUserEmail = HttpContext.User?.Identity?.Name;
+            if (currentUserEmail == null)
+            {
+                notifyService.Error("OOPs !!!..Unauthenticated Access");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
             var userRoles = new List<VendorUserRoleViewModel>();
             VendorApplicationUser user = await userManager.FindByIdAsync(userId);
             if (user == null)
@@ -712,6 +718,12 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Update(string userId, VendorUserRolesViewModel model)
         {
+            var currentUserEmail = HttpContext.User?.Identity?.Name;
+            if (currentUserEmail == null)
+            {
+                notifyService.Error("OOPs !!!..Unauthenticated Access");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
             var user = await userManager.FindByIdAsync(userId);
             if (user == null)
             {
@@ -767,8 +779,13 @@ namespace risk.control.system.Controllers
         {
             try
             {
-                var userEmail = HttpContext.User?.Identity?.Name;
-                var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (currentUserEmail == null)
+                {
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == currentUserEmail);
                 var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == vendorUser.VendorId);
 
                 ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name");
@@ -791,18 +808,19 @@ namespace risk.control.system.Controllers
         {
             try
             {
-                if(vendorInvestigationServiceType is null)
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (currentUserEmail == null)
+                {
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                if (vendorInvestigationServiceType is null)
                 {
                     notifyService.Custom($"Error to create service.", 3, "red", "fas fa-truck");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var userEmail = HttpContext.User?.Identity?.Name;
-                if (userEmail is null)
-                {
-                    notifyService.Custom($"Error to create service.", 3, "red", "fas fa-truck");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-                var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+                
+                var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == currentUserEmail);
 
                 if (vendorUser == null)
                 {
@@ -857,10 +875,10 @@ namespace risk.control.system.Controllers
         {
             try
             {
-                var userEmail = HttpContext.User?.Identity?.Name;
-                if (userEmail is null)
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (currentUserEmail == null)
                 {
-                    notifyService.Custom($"Error to edit service.", 3, "red", "fas fa-truck");
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 if (id == 0 || _context.VendorInvestigationServiceType == null)
@@ -928,6 +946,12 @@ namespace risk.control.system.Controllers
         {
             try
             {
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (currentUserEmail == null)
+                {
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
                 if (vendorInvestigationServiceTypeId != vendorInvestigationServiceType.VendorInvestigationServiceTypeId)
                 {
                     notifyService.Custom($"Error to edit service.", 3, "red", "fas fa-truck");
@@ -979,7 +1003,12 @@ namespace risk.control.system.Controllers
         {
             try
             {
-
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (currentUserEmail == null)
+                {
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
                 if (id == 0 || _context.VendorInvestigationServiceType == null)
                 {
                     notifyService.Custom($"NOT FOUND.", 3, "red", "fas fa-truck");
@@ -1018,6 +1047,12 @@ namespace risk.control.system.Controllers
         {
             try
             {
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (currentUserEmail == null)
+                {
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
                 if (_context.VendorInvestigationServiceType == null || id == 0)
                 {
                     return Problem("Entity set 'ApplicationDbContext.VendorInvestigationServiceType'  is null.");
@@ -1049,6 +1084,12 @@ namespace risk.control.system.Controllers
         {
             try
             {
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (currentUserEmail == null)
+                {
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
                 if (id == 0 || _context.VendorInvestigationServiceType == null)
                 {
                     notifyService.Error("NOT FOUND !!!..Contact Admin");
@@ -1083,6 +1124,12 @@ namespace risk.control.system.Controllers
         [Breadcrumb("Agent Load", FromAction = "Users")]
         public IActionResult AgentLoad()
         {
+            var currentUserEmail = HttpContext.User?.Identity?.Name;
+            if (currentUserEmail == null)
+            {
+                notifyService.Error("OOPs !!!..Unauthenticated Access");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
             return View();
         }
 

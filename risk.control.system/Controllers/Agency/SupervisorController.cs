@@ -34,10 +34,10 @@ namespace risk.control.system.Controllers.Agency
         {
             try
             {
-                var userEmail = HttpContext.User?.Identity?.Name;
-                if (string.IsNullOrWhiteSpace(userEmail))
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
-                    notifyService.Error("OOPs !!!..Contact Admin");
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 return RedirectToAction("Allocate");
@@ -55,10 +55,10 @@ namespace risk.control.system.Controllers.Agency
         {
             try
             {
-                var userEmail = HttpContext.User?.Identity?.Name;
-                if (string.IsNullOrWhiteSpace(userEmail))
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
-                    notifyService.Error("OOPs !!!..Contact Admin");
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 return View();
@@ -83,14 +83,13 @@ namespace risk.control.system.Controllers.Agency
                     return RedirectToAction(nameof(SelectVendorAgent), new { selectedcase = selectedcase });
                 }
 
-                var userEmail = HttpContext.User?.Identity?.Name;
-
-                if (string.IsNullOrWhiteSpace(userEmail))
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
-                    notifyService.Error("OOPs !!!..Contact Admin");
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var model = await vendorService.SelectVendorAgent(userEmail, selectedcase);
+                var model = await vendorService.SelectVendorAgent(currentUserEmail, selectedcase);
 
                 return View(model);
             }
@@ -115,15 +114,13 @@ namespace risk.control.system.Controllers.Agency
                     notifyService.Error("No case selected!!!. Please select case to be allocate.");
                     return RedirectToAction(nameof(SelectVendorAgent), new { selectedcase = selectedcase });
                 }
-
-                var userEmail = HttpContext.User?.Identity?.Name;
-
-                if (string.IsNullOrWhiteSpace(userEmail))
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
-                    notifyService.Error("OOPs !!!..Contact Admin");
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var model = await vendorService.ReSelectVendorAgent(userEmail, selectedcase);
+                var model = await vendorService.ReSelectVendorAgent(currentUserEmail, selectedcase);
 
                 return View(model);
             }
@@ -138,6 +135,12 @@ namespace risk.control.system.Controllers.Agency
         [Breadcrumb("Submit(report)")]
         public IActionResult ClaimReport()
         {
+            var currentUserEmail = HttpContext.User?.Identity?.Name;
+            if (string.IsNullOrWhiteSpace(currentUserEmail))
+            {
+                notifyService.Error("OOPs !!!..Unauthenticated Access");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
             return View();
         }
 
@@ -153,15 +156,12 @@ namespace risk.control.system.Controllers.Agency
                     notifyService.Error("No case selected!!!. Please select case.");
                     return RedirectToAction(nameof(ClaimReport));
                 }
-
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-
                 if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
-                    notifyService.Error("OOPs !!!..Contact Admin");
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-
                 var model = await vendorService.GetInvestigateReport(currentUserEmail, selectedcase);
 
                 return View(model);
@@ -178,6 +178,12 @@ namespace risk.control.system.Controllers.Agency
         [Breadcrumb(" Active")]
         public IActionResult Open()
         {
+            var currentUserEmail = HttpContext.User?.Identity?.Name;
+            if (string.IsNullOrWhiteSpace(currentUserEmail))
+            {
+                notifyService.Error("OOPs !!!..Unauthenticated Access");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
             return View();
         }
 
@@ -192,10 +198,9 @@ namespace risk.control.system.Controllers.Agency
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-
                 if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
-                    notifyService.Error("OOPs !!!..Contact Admin");
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var model = await vendorService.GetClaimsDetails(currentUserEmail, id);
@@ -220,10 +225,9 @@ namespace risk.control.system.Controllers.Agency
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-
                 if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
-                    notifyService.Error("OOPs !!!..Contact Admin");
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var model = await vendorService.GetClaimsDetails(currentUserEmail, id);
@@ -240,6 +244,12 @@ namespace risk.control.system.Controllers.Agency
         [Breadcrumb(title: " Completed")]
         public IActionResult Completed()
         {
+            var currentUserEmail = HttpContext.User?.Identity?.Name;
+            if (string.IsNullOrWhiteSpace(currentUserEmail))
+            {
+                notifyService.Error("OOPs !!!..Unauthenticated Access");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
             return View();
         }
 
@@ -254,6 +264,12 @@ namespace risk.control.system.Controllers.Agency
             }
             try
             {
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (string.IsNullOrWhiteSpace(currentUserEmail))
+                {
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
                 var model = await investigationReportService.SubmittedDetail(id);
                 return View(model);
             }
@@ -271,10 +287,10 @@ namespace risk.control.system.Controllers.Agency
             var currentUserEmail = HttpContext.User?.Identity?.Name;
             if (string.IsNullOrWhiteSpace(currentUserEmail))
             {
-                notifyService.Error("OOPs !!!..Contact Admin");
+                notifyService.Error("OOPs !!!..Unauthenticated Access");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
-            if (id == null)
+            if (string.IsNullOrWhiteSpace(id))
             {
                 notifyService.Error("NOT FOUND !!!..");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -293,7 +309,7 @@ namespace risk.control.system.Controllers.Agency
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
-                    notifyService.Error("OOPs !!!..Contact Admin");
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 if (id < 1)
@@ -328,7 +344,7 @@ namespace risk.control.system.Controllers.Agency
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 if (string.IsNullOrWhiteSpace(currentUserEmail) || 1 > id)
                 {
-                    notifyService.Error("OOPs !!!..Contact Admin");
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 

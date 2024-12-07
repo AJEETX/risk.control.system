@@ -60,6 +60,12 @@ namespace risk.control.system.Controllers.Company
         {
             try
             {
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (string.IsNullOrWhiteSpace(currentUserEmail))
+                {
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
                 object _;
                 if (!Enum.TryParse(typeof(UploadType), uploadtype, true, out _))
                 {
@@ -76,19 +82,14 @@ namespace risk.control.system.Controllers.Company
 
                     return RedirectToAction("New", "CreatorManual");
                 }
-                var userEmail = HttpContext.User.Identity.Name;
-                if (string.IsNullOrWhiteSpace(userEmail))
-                {
-                    notifyService.Error("OOPs !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-                if (postedFile != null && !string.IsNullOrWhiteSpace(userEmail))
+
+                if (postedFile != null)
                 {
                     UploadType uploadType = (UploadType)Enum.Parse(typeof(UploadType), uploadtype, true);
 
                     if (uploadType == UploadType.FTP)
                     {
-                        var processed = await ftpService.UploadFtpFile(userEmail, postedFile, uploadingway);
+                        var processed = await ftpService.UploadFtpFile(currentUserEmail, postedFile, uploadingway);
                         if (processed)
                         {
                             notifyService.Custom($"FTP download complete ", 3, "green", "fa fa-upload");
@@ -102,7 +103,7 @@ namespace risk.control.system.Controllers.Company
                     if (uploadType == UploadType.FILE && Path.GetExtension(postedFile.FileName) == ".zip")
                     {
 
-                        var processed = await ftpService.UploadFile(userEmail, postedFile, uploadingway);
+                        var processed = await ftpService.UploadFile(currentUserEmail, postedFile, uploadingway);
                         if (processed)
                         {
                             notifyService.Custom($"File upload complete", 3, "green", "fa fa-upload");
@@ -113,7 +114,9 @@ namespace risk.control.system.Controllers.Company
                         }
 
                     }
+                    return RedirectToAction("New", "CreatorManual");
                 }
+                notifyService.Custom($"File Upload Error.", 3, "red", "fa fa-upload");
                 return RedirectToAction("New", "CreatorManual");
             }
             catch (Exception ex)
@@ -130,22 +133,22 @@ namespace risk.control.system.Controllers.Company
         {
             try
             {
-                if (claimsInvestigation == null)
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
-                    notifyService.Error("OOPs !!!..Contact Admin");
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var userEmail = HttpContext.User.Identity.Name;
-                if (string.IsNullOrWhiteSpace(userEmail))
+                if (claimsInvestigation == null)
                 {
-                    notifyService.Error("OOPs !!!..Contact Admin");
+                    notifyService.Error("OOPs !!!..Claim Not Found");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+                var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == currentUserEmail);
                 if (companyUser == null)
                 {
-                    notifyService.Error("OOPs !!!..Contact Admin");
+                    notifyService.Error("OOPs !!!..User Not Found");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 claimsInvestigation.ClientCompanyId = companyUser?.ClientCompanyId;
@@ -174,10 +177,10 @@ namespace risk.control.system.Controllers.Company
                     }
                 }
 
-                var claim = await claimsInvestigationService.CreatePolicy(userEmail, claimsInvestigation, documentFile, profileFile, false);
+                var claim = await claimsInvestigationService.CreatePolicy(currentUserEmail, claimsInvestigation, documentFile, profileFile, false);
                 if (claim == null)
                 {
-                    notifyService.Error("OOPs !!!..Contact Admin");
+                    notifyService.Error("OOPs !!!..Error creating policy");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 notifyService.Custom($"Policy #{claim.PolicyDetail.ContractNumber} created successfully", 3, "green", "far fa-file-powerpoint");
@@ -200,22 +203,22 @@ namespace risk.control.system.Controllers.Company
         {
             try
             {
-                if (claimsInvestigation == null || string.IsNullOrWhiteSpace(claimsInvestigationId) || claimtype == null)
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
-                    notifyService.Error("OOPs !!!..Contact Admin");
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var userEmail = HttpContext.User.Identity.Name;
-                if (string.IsNullOrWhiteSpace(userEmail))
+                if (claimsInvestigation == null || string.IsNullOrWhiteSpace(claimsInvestigationId) || claimtype == null)
                 {
-                    notifyService.Error("OOPs !!!..Contact Admin");
+                    notifyService.Error("OOPs !!!..Claim Not found");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+                var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == currentUserEmail);
                 if (companyUser == null)
                 {
-                    notifyService.Error("OOPs !!!..Contact Admin");
+                    notifyService.Error("OOPs !!!..User Not Found");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
@@ -237,8 +240,12 @@ namespace risk.control.system.Controllers.Company
                     }
                 }
 
-                var claim = await claimsInvestigationService.EdiPolicy(userEmail, claimsInvestigation, documentFile);
-
+                var claim = await claimsInvestigationService.EdiPolicy(currentUserEmail, claimsInvestigation, documentFile);
+                if (claim == null)
+                {
+                    notifyService.Error("OOPs !!!..Error editing policy");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
                 notifyService.Custom($"Policy #{claim.PolicyDetail.ContractNumber} edited successfully", 3, "orange", "far fa-file-powerpoint");
                 if (string.IsNullOrWhiteSpace(claimtype) || claimtype.Equals("draft", StringComparison.OrdinalIgnoreCase))
                 {
@@ -272,22 +279,22 @@ namespace risk.control.system.Controllers.Company
         {
             try
             {
-                if (claimsInvestigation == null || string.IsNullOrWhiteSpace(claimsInvestigationId))
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
-                    notifyService.Error("OOPs !!!..Contact Admin");
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var userEmail = HttpContext.User.Identity.Name;
-                if (string.IsNullOrWhiteSpace(userEmail))
+                if (claimsInvestigation == null || string.IsNullOrWhiteSpace(claimsInvestigationId))
                 {
-                    notifyService.Error("OOPs !!!..Contact Admin");
+                    notifyService.Error("OOPs !!!..Claim Not Found");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+                var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == currentUserEmail);
                 if (companyUser == null)
                 {
-                    notifyService.Error("OOPs !!!..Contact Admin");
+                    notifyService.Error("OOPs !!!..User Not Found");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
@@ -310,10 +317,10 @@ namespace risk.control.system.Controllers.Company
                     }
                 }
 
-                var claim = await claimsInvestigationService.CreateCustomer(userEmail, claimsInvestigation, documentFile, profileFile, create);
+                var claim = await claimsInvestigationService.CreateCustomer(currentUserEmail, claimsInvestigation, documentFile, profileFile, create);
                 if (claim == null)
                 {
-                    notifyService.Error("OOPs !!!..Contact Admin");
+                    notifyService.Error("OOPs !!!..Error creating customer");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 notifyService.Custom($"Customer {claim.CustomerDetail.Name} added successfully", 3, "green", "fas fa-user-plus");
@@ -335,22 +342,22 @@ namespace risk.control.system.Controllers.Company
         {
             try
             {
-                if (claimsInvestigation == null || string.IsNullOrWhiteSpace(claimsInvestigationId) || claimtype == null || string.IsNullOrWhiteSpace(claimtype))
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
-                    notifyService.Error("OOPs !!!..Contact Admin");
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var userEmail = HttpContext.User.Identity.Name;
-                if (string.IsNullOrWhiteSpace(userEmail))
+                if (claimsInvestigation == null || string.IsNullOrWhiteSpace(claimsInvestigationId))
                 {
-                    notifyService.Error("OOPs !!!..Contact Admin");
+                    notifyService.Error("OOPs !!!..Claim Not Found");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+                var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == currentUserEmail);
                 if (companyUser == null)
                 {
-                    notifyService.Error("OOPs !!!..Contact Admin");
+                    notifyService.Error("OOPs !!!..User Not Found");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
@@ -372,10 +379,10 @@ namespace risk.control.system.Controllers.Company
                     }
                 }
 
-                var claim = await claimsInvestigationService.EditCustomer(userEmail, claimsInvestigation, profileFile);
+                var claim = await claimsInvestigationService.EditCustomer(currentUserEmail, claimsInvestigation, profileFile);
                 if (claim == null)
                 {
-                    notifyService.Error("OOPs !!!..Contact Admin");
+                    notifyService.Error("OOPs !!!..Error edting customer");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 notifyService.Custom($"Customer {claim.CustomerDetail.Name} edited successfully", 3, "orange", "fas fa-user-plus");
@@ -406,9 +413,15 @@ namespace risk.control.system.Controllers.Company
         {
             try
             {
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (string.IsNullOrWhiteSpace(currentUserEmail))
+                {
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
                 if (string.IsNullOrWhiteSpace(claimId) || caseLocation is null)
                 {
-                    notifyService.Error("NOT FOUND  !!!..Contact Admin");
+                    notifyService.Error("NOT FOUND  !!!..Claim Not Found");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 caseLocation.Updated = DateTime.Now;
@@ -458,6 +471,12 @@ namespace risk.control.system.Controllers.Company
         {
             try
             {
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (string.IsNullOrWhiteSpace(currentUserEmail))
+                {
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
                 if (id != ecaseLocation.BeneficiaryDetailId && beneficiaryDetailId != ecaseLocation.BeneficiaryDetailId)
                 {
                     notifyService.Error("NOT FOUND!!!..Contact Admin");
@@ -532,9 +551,9 @@ namespace risk.control.system.Controllers.Company
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (currentUserEmail == null)
+                if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
-                    notifyService.Error("Not Found!!!..Contact Admin");
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 if (model is null)
