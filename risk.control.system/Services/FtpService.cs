@@ -329,14 +329,14 @@ namespace risk.control.system.Services
                                         dt.Rows[dt.Rows.Count - 1][21] = $"{Convert.ToBase64String(customerNewImage)}";
                                         claim.CustomerDetail = new CustomerDetail
                                         {
-                                            CustomerName = rowData[10]?.Trim(),
+                                            Name = rowData[10]?.Trim(),
                                             CustomerType = (CustomerType)Enum.Parse(typeof(CustomerType), rowData[11]?.Trim()),
                                             Gender = (Gender)Enum.Parse(typeof(Gender), rowData[12]?.Trim()),
-                                            CustomerDateOfBirth = DateTime.Now.AddYears(-20),
+                                            DateOfBirth = DateTime.Now.AddYears(-20),
                                             ContactNumber = Convert.ToInt64(rowData[14]?.Trim()),
-                                            CustomerEducation = (Education)Enum.Parse(typeof(Education), rowData[15]?.Trim()),
-                                            CustomerOccupation = (Occupation)Enum.Parse(typeof(Occupation), rowData[16]?.Trim()),
-                                            CustomerIncome = (Income)Enum.Parse(typeof(Income), rowData[17]?.Trim()),
+                                            Education = (Education)Enum.Parse(typeof(Education), rowData[15]?.Trim()),
+                                            Occupation = (Occupation)Enum.Parse(typeof(Occupation), rowData[16]?.Trim()),
+                                            Income = (Income)Enum.Parse(typeof(Income), rowData[17]?.Trim()),
                                             Addressline = rowData[18]?.Trim(),
                                             CountryId = country.CountryId,
                                             PinCodeId = pinCode.PinCodeId,
@@ -383,11 +383,11 @@ namespace risk.control.system.Services
 
                                     var beneficairy = new BeneficiaryDetail
                                     {
-                                        BeneficiaryName = rowData[22]?.Trim(),
+                                        Name = rowData[22]?.Trim(),
                                         BeneficiaryRelationId = relation.BeneficiaryRelationId,
-                                        BeneficiaryDateOfBirth = DateTime.Now.AddYears(-22),
-                                        BeneficiaryIncome = (Income)Enum.Parse(typeof(Income), rowData[25]?.Trim()),
-                                        BeneficiaryContactNumber = Convert.ToInt64(rowData[26]?.Trim()),
+                                        DateOfBirth = DateTime.Now.AddYears(-22),
+                                        Income = (Income)Enum.Parse(typeof(Income), rowData[25]?.Trim()),
+                                        ContactNumber = Convert.ToInt64(rowData[26]?.Trim()),
                                         Addressline = rowData[27]?.Trim(),
                                         PinCodeId = benePinCode.PinCodeId,
                                         DistrictId = beneDistrict.DistrictId,

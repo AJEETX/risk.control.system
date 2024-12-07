@@ -50,5 +50,16 @@ namespace risk.control.system.Models
         public string? QrData { get; set; }
 
         public string? LongLat { get; set; }
+        public override string ToString()
+        {
+            return $"Agent Report Information:\n" +
+                $"- Agent Email: {AgentEmail}\n" +
+                $"- Agent Remarks Updated time: {AgentRemarksUpdated}\n" +
+                $"- Agent Remarks: {AgentRemarks}\n" +
+                $"- Agent Address Location Picture Url: {AgentLocationPictureUrl}\n" +
+                $"- Agent Document url: {AgentOcrUrl}\n" +
+                $"- Agent Face Url: {AgentQrUrl}\n" +
+                $"- Longitude and Latitude: {LongLat}";
+        }
     }
 }

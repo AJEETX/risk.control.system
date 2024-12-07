@@ -16,5 +16,11 @@ namespace risk.control.system.Models
         [Display(Name = "Case enabler code")]
         [Required]
         public string Code { get; set; } = default!;
+        public override string ToString()
+        {
+            return $"Case enabler Information:\n" +
+                $"- Name: {Name}\n" +
+                $"- Code: {Code}";
+        }
     }
 }

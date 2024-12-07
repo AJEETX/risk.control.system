@@ -23,16 +23,19 @@ namespace risk.control.system.Controllers.Company
         private readonly INotyfService notifyService;
         private readonly IClaimPolicyService claimPolicyService;
         private readonly IInvoiceService invoiceService;
+        private readonly IChatSummarizer chatSummarizer;
         private readonly IInvestigationReportService investigationReportService;
 
         public AssessorController(INotyfService notifyService,
             IClaimPolicyService claimPolicyService,
             IInvoiceService invoiceService,
+            IChatSummarizer chatSummarizer,
             IInvestigationReportService investigationReportService)
         {
             this.notifyService = notifyService;
             this.claimPolicyService = claimPolicyService;
             this.invoiceService = invoiceService;
+            this.chatSummarizer = chatSummarizer;
             this.investigationReportService = investigationReportService;
         }
         public IActionResult Index()
@@ -64,7 +67,7 @@ namespace risk.control.system.Controllers.Company
 
         }
         [Breadcrumb(title: "Report", FromAction = "Assessor")]
-        public IActionResult GetInvestigateReport(string selectedcase)
+        public async Task<IActionResult> GetInvestigateReport(string selectedcase)
         {
             try
             {
@@ -80,7 +83,8 @@ namespace risk.control.system.Controllers.Company
                     return RedirectToAction(nameof(Index));
                 }
                 var model = investigationReportService.GetInvestigateReport(currentUserEmail, selectedcase);
-
+                var investigationSummary = await chatSummarizer.SummarizeDataAsync(model.ClaimsInvestigation);
+                ViewBag.InvestigationSummary = investigationSummary;
                 return View(model);
             }
             catch (Exception ex)
@@ -262,7 +266,8 @@ namespace risk.control.system.Controllers.Company
 
 
                 var model = await investigationReportService.SubmittedDetail(id);
-
+                var investigationSummary = await chatSummarizer.SummarizeDataAsync(model.ClaimsInvestigation);
+                ViewBag.InvestigationSummary = investigationSummary;
                 return View(model);
             }
             catch (Exception ex)

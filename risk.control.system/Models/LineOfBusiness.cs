@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Xml.Linq;
 
 namespace risk.control.system.Models
 {
@@ -19,5 +20,12 @@ namespace risk.control.system.Models
 
         public List<InvestigationServiceType>? InvestigationServiceTypes { get; set; } = default!;
         public bool MasterData { get; set; } = false;
+        public override string ToString()
+        {
+            return $"Line Of Business Information:\n" +
+           $"- Name: {Name}\n" +
+           $"- Code: {Code}\n" +
+           $"- Investigation Services Type: {InvestigationServiceTypes}";
+        }
     }
 }

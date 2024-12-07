@@ -92,8 +92,8 @@ namespace risk.control.system.Controllers.Api.Company
                     string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail?.DocumentImage)) : Applicationsettings.NO_POLICY_IMAGE,
                     Customer = a.CustomerDetail?.ProfilePicture != null ?
                     string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail?.ProfilePicture)) : Applicationsettings.NO_USER,
-                    Name = a.CustomerDetail?.CustomerName != null ?
-                    a.CustomerDetail?.CustomerName : "<span class=\"badge badge-light\"> <i class=\"fas fa-question\" ></i>  </span>",
+                    Name = a.CustomerDetail?.Name != null ?
+                    a.CustomerDetail?.Name : "<span class=\"badge badge-light\"> <i class=\"fas fa-question\" ></i>  </span>",
                     Policy = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail?.LineOfBusiness.Name + "</span>"),
                     Status = string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseStatus.Name + "</span>"),
                     SubStatus = string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseSubStatus.Name + "</span>"),
@@ -108,13 +108,13 @@ namespace risk.control.system.Controllers.Api.Company
                     BeneficiaryPhoto = a.BeneficiaryDetail?.ProfilePicture != null ?
                                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.BeneficiaryDetail.ProfilePicture)) :
                                       Applicationsettings.NO_USER,
-                    BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.BeneficiaryName) ?
+                    BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.Name) ?
                         "<span class=\"badge badge-light\"> <i class=\"fas fa-question\" ></i>  </span>" :
-                        a.BeneficiaryDetail.BeneficiaryName,
+                        a.BeneficiaryDetail.Name,
                     TimeElapsed = DateTime.Now.Subtract(a.Created).TotalSeconds,
                     IsNewAssigned = a.AutoNew <= 1,
-                    BeneficiaryFullName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.BeneficiaryName) ? "?" : a.BeneficiaryDetail.BeneficiaryName,
-                    CustomerFullName = string.IsNullOrWhiteSpace(a.CustomerDetail?.CustomerName) ? "?" : a.CustomerDetail.CustomerName,
+                    BeneficiaryFullName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.Name) ? "?" : a.BeneficiaryDetail.Name,
+                    CustomerFullName = string.IsNullOrWhiteSpace(a.CustomerDetail?.Name) ? "?" : a.CustomerDetail.Name,
 
                 })?
                 .ToList();
@@ -197,7 +197,7 @@ namespace risk.control.system.Controllers.Api.Company
                         Document = a.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : Applicationsettings.NO_POLICY_IMAGE,
                         Customer = a.CustomerDetail?.ProfilePicture != null ?
                         string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail?.ProfilePicture)) : Applicationsettings.NO_USER,
-                        Name = a.CustomerDetail?.CustomerName != null ? a.CustomerDetail?.CustomerName : "<span class=\"badge badge-light\"> <i class=\"fas fa-question\" ></i>  </span>",
+                        Name = a.CustomerDetail?.Name != null ? a.CustomerDetail?.Name : "<span class=\"badge badge-light\"> <i class=\"fas fa-question\" ></i>  </span>",
                         Policy = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail?.LineOfBusiness.Name + "</span>"),
                         Status = string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseStatus.Name + "</span>"),
                         ServiceType = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail?.ClaimType.GetEnumDisplayName() + "</span>"),
@@ -209,14 +209,14 @@ namespace risk.control.system.Controllers.Api.Company
                         BeneficiaryPhoto = a.BeneficiaryDetail?.ProfilePicture != null ?
                                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.BeneficiaryDetail.ProfilePicture)) :
                                       Applicationsettings.NO_USER,
-                        BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.BeneficiaryName) ?
+                        BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.Name) ?
                         "<span class=\"badge badge-light\"> <i class=\"fas fa-question\" ></i>  </span>" :
-                        a.BeneficiaryDetail.BeneficiaryName,
+                        a.BeneficiaryDetail.Name,
                         TimeElapsed = DateTime.Now.Subtract(a.Created).TotalSeconds,
                         IsNewAssigned = a.ManualNew <= 1,
                         Ready2Assign = a.IsReady2Assign,
-                        BeneficiaryFullName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.BeneficiaryName) ? "?" : a.BeneficiaryDetail.BeneficiaryName,
-                        CustomerFullName = string.IsNullOrWhiteSpace(a.CustomerDetail?.CustomerName) ? "?" : a.CustomerDetail.CustomerName,
+                        BeneficiaryFullName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.Name) ? "?" : a.BeneficiaryDetail.Name,
+                        CustomerFullName = string.IsNullOrWhiteSpace(a.CustomerDetail?.Name) ? "?" : a.CustomerDetail.Name,
                         AgencyDeclineComment = a.InvestigationCaseSubStatus == withdrawnByCompany ? a.CompanyWithdrawlComment : a.InvestigationCaseSubStatus == withdrawnByAgency ? a.AgencyDeclineComment : a.InvestigationCaseSubStatus == reAssignedStatus ? a.CompanyWithdrawlComment : ""
                     })
                     ?.ToList();
@@ -287,8 +287,8 @@ namespace risk.control.system.Controllers.Api.Company
                     {
                         Id = a.ClaimsInvestigationId,
                         AutoAllocated = a.AutoAllocated,
-                        CustomerFullName = string.IsNullOrWhiteSpace(a.CustomerDetail?.CustomerName) ? "" : a.CustomerDetail.CustomerName,
-                        BeneficiaryFullName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.BeneficiaryName) ? "" : a.BeneficiaryDetail.BeneficiaryName,
+                        CustomerFullName = string.IsNullOrWhiteSpace(a.CustomerDetail?.Name) ? "" : a.CustomerDetail.Name,
+                        BeneficiaryFullName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.Name) ? "" : a.BeneficiaryDetail.Name,
                         PolicyId = a.PolicyDetail.ContractNumber,
                         Amount = string.Format(hindiNFO, "{0:c}", a.PolicyDetail.SumAssuredValue),
                         AssignedToAgency = a.AssignedToAgency,
@@ -300,8 +300,8 @@ namespace risk.control.system.Controllers.Api.Company
                         string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail?.DocumentImage)) : NO_POLICY_IMAGE,
                         Customer = a.CustomerDetail?.ProfilePicture != null ?
                         string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail?.ProfilePicture)) : NO_USER,
-                        Name = a.CustomerDetail?.CustomerName != null ?
-                        a.CustomerDetail?.CustomerName : "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>",
+                        Name = a.CustomerDetail?.Name != null ?
+                        a.CustomerDetail?.Name : "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>",
                         Policy = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail?.LineOfBusiness.Name + "</span>"),
                         Status = string.Join("", "ORIGIN of Claim: " + a.ORIGIN.GetEnumDisplayName() + ""),
                         SubStatus = string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseSubStatus.Name + "</span>"),
@@ -316,9 +316,9 @@ namespace risk.control.system.Controllers.Api.Company
                         BeneficiaryPhoto = a.BeneficiaryDetail?.ProfilePicture != null ?
                                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.BeneficiaryDetail.ProfilePicture)) :
                                       NO_USER,
-                        BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.BeneficiaryName) ?
+                        BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.Name) ?
                         "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>" :
-                        a.BeneficiaryDetail.BeneficiaryName,
+                        a.BeneficiaryDetail.Name,
                         TimeElapsed = DateTime.Now.Subtract(a.Created).TotalSeconds,
                         IsNewAssigned = a.ActiveView <= 1
                     })?

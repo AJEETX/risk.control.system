@@ -98,8 +98,48 @@ namespace risk.control.system.Models
         public int TotalCreatedClaimAllowed { get; set; } = 10;
         public bool Deleted { get; set; } = false;
         public bool HasClaims { get; set; } = false;
-    }
 
+        public override string ToString()
+        {
+            return $"Client Company Information:\n" +
+                $"- Name: {Name}\n" +
+                $"- Code: {Code}\n" +
+                $"- Description: {Description}\n" +
+                $"- Phone Number: {PhoneNumber}\n" +
+                $"- Email: {Email}\n" +
+                $"- Branch: {Branch}\n" +
+                $"- Address Line: {Addressline}\n" +
+                $"- State: {State}\n" +
+                $"- Country: {Country}\n" +
+                $"- Pincode: {PinCode}\n" +
+                $"- District: {District}\n" +
+                $"- Bank Name: {BankName}\n" +
+                $"- Bank Account Number: {BankAccountNumber}\n" +
+                $"- IFSC Code: {IFSCCode}\n" +
+                $"- Agreement Date: {AgreementDate}\n" +
+                $"- Activated Date: {ActivatedDate}\n" +
+                $"- Status: {Status}\n" +
+                $"- Document URL: {DocumentUrl}\n" +
+                $"- Company Application User: {CompanyApplicationUser}\n" +
+                $"- Empanelled Vendors: {EmpanelledVendors}\n" +
+                $"- Auto Allocation: {AutoAllocation}\n" +
+                $"- Verify Pan: {VerifyPan}\n" +
+                $"- Verify Passport: {VerifyPassport}\n" +
+                $"- Enable Passport: {EnablePassport}\n" +
+                $"- Enable Media: {EnableMedia}\n" +
+                $"- API Base URL: {ApiBaseUrl}\n" +
+                $"- Pan IDfy URL: {PanIdfyUrl}\n" +
+                $"- Rapid API Key: {RapidAPIKey}\n" +
+                $"- Rapid API Host: {RapidAPIHost}\n" +
+                $"- Rapid API Pan Remain Count: {RapidAPIPanRemainCount}\n" +
+                $"- Passport API URL: {PassportApiUrl}\n" +
+                $"- Passport API Key: {PassportApiKey}\n" +
+                $"- Passport API Host: {PassportApiHost}\n" +
+                $"- Send SMS: {SendSMS}\n" +
+                $"- Can Change Password: {CanChangePassword}\n" +
+                $"- Mobile App URL: {MobileAppUrl}";
+        }
+    }
     public enum CompanyStatus
     {
         ACTIVE,

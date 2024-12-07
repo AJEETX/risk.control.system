@@ -316,7 +316,7 @@ namespace risk.control.system.Controllers.Company
                     notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                notifyService.Custom($"Customer {claim.CustomerDetail.CustomerName} added successfully", 3, "green", "fas fa-user-plus");
+                notifyService.Custom($"Customer {claim.CustomerDetail.Name} added successfully", 3, "green", "fas fa-user-plus");
 
                 return RedirectToAction(nameof(CreatorManualController.Details), "CreatorManual", new { id = claim.ClaimsInvestigationId });
             }
@@ -378,7 +378,7 @@ namespace risk.control.system.Controllers.Company
                     notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                notifyService.Custom($"Customer {claim.CustomerDetail.CustomerName} edited successfully", 3, "orange", "fas fa-user-plus");
+                notifyService.Custom($"Customer {claim.CustomerDetail.Name} edited successfully", 3, "orange", "fas fa-user-plus");
                 if (claimtype.Equals("auto", StringComparison.OrdinalIgnoreCase))
                 {
                     return RedirectToAction(nameof(CreatorAutoController.Details), "CreatorAuto", new { id = claim.ClaimsInvestigationId });
@@ -439,7 +439,7 @@ namespace risk.control.system.Controllers.Company
 
                 _context.ClaimsInvestigation.Update(claimsInvestigation);
                 await _context.SaveChangesAsync();
-                notifyService.Custom($"Beneficiary {caseLocation.BeneficiaryName} added successfully", 3, "green", "fas fa-user-tie");
+                notifyService.Custom($"Beneficiary {caseLocation.Name} added successfully", 3, "green", "fas fa-user-tie");
 
                 return RedirectToAction(nameof(CreatorManualController.Details), "CreatorManual", new { id = caseLocation.ClaimsInvestigationId });
             }
@@ -473,10 +473,10 @@ namespace risk.control.system.Controllers.Company
                 caseLocation.Updated = DateTime.Now;
                 caseLocation.UpdatedBy = HttpContext.User?.Identity?.Name;
                 caseLocation.Addressline = ecaseLocation.Addressline;
-                caseLocation.BeneficiaryContactNumber = ecaseLocation.BeneficiaryContactNumber;
-                caseLocation.BeneficiaryDateOfBirth = ecaseLocation.BeneficiaryDateOfBirth;
-                caseLocation.BeneficiaryIncome = ecaseLocation.BeneficiaryIncome;
-                caseLocation.BeneficiaryName = ecaseLocation.BeneficiaryName;
+                caseLocation.ContactNumber = ecaseLocation.ContactNumber;
+                caseLocation.DateOfBirth = ecaseLocation.DateOfBirth;
+                caseLocation.Income = ecaseLocation.Income;
+                caseLocation.Name = ecaseLocation.Name;
                 caseLocation.BeneficiaryRelation = ecaseLocation.BeneficiaryRelation;
                 caseLocation.BeneficiaryRelationId = ecaseLocation.BeneficiaryRelationId;
                 caseLocation.ClaimsInvestigationId = ecaseLocation.ClaimsInvestigationId;
@@ -514,7 +514,7 @@ namespace risk.control.system.Controllers.Company
 
                 _context.Update(caseLocation);
                 await _context.SaveChangesAsync();
-                notifyService.Custom($"Beneficiary {caseLocation.BeneficiaryName} edited successfully", 3, "orange", "fas fa-user-tie");
+                notifyService.Custom($"Beneficiary {caseLocation.Name} edited successfully", 3, "orange", "fas fa-user-tie");
                 return RedirectToAction(nameof(CreatorManualController.Details), "CreatorManual", new { id = caseLocation.ClaimsInvestigationId });
             }
             catch (Exception ex)

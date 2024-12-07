@@ -37,6 +37,12 @@ namespace risk.control.system.Models
         public string? DigitalIdImageLongLat { get; set; }
         public DateTime? DigitalIdImageLongLatTime { get; set; }
         public DigitalIdReportType ReportType { get; set; } = DigitalIdReportType.SINGLE_FACE;
+
+        public override string ToString()
+        {
+            return $"Digital Id Information" +
+                $"Valid: {MatchExecuted}";
+        }
     }
 
     public enum DigitalIdReportType

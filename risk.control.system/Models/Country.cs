@@ -15,4 +15,10 @@ public class Country : BaseEntity
     [Display(Name = "Country code")]
     [Required]
     public string Code { get; set; } = default!;
+    public override string ToString()
+    {
+        return $"Country Information:\n" +
+       $"- Name: {Name}\n" +
+       $"- City code: {Code}";
+    }
 }

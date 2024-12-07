@@ -10,7 +10,7 @@ namespace risk.control.system.Models
         public long BeneficiaryDetailId { get; set; }
 
         [Display(Name = "Beneficiary name")]
-        public string BeneficiaryName { get; set; }
+        public string Name { get; set; }
 
         [Display(Name = "BRelation")]
         public long BeneficiaryRelationId { get; set; }
@@ -20,10 +20,10 @@ namespace risk.control.system.Models
 
         [DataType(DataType.PhoneNumber)]
         [Display(Name = "Phone")]
-        public long BeneficiaryContactNumber { get; set; }
+        public long ContactNumber { get; set; }
 
         [Display(Name = "Income")]
-        public Income? BeneficiaryIncome { get; set; }
+        public Income? Income { get; set; }
 
         [FileExtensions(Extensions = "jpg,jpeg,png")]
         [Display(Name = "Beneficiary Photo")]
@@ -38,7 +38,7 @@ namespace risk.control.system.Models
 
         [Display(Name = "Date of birth")]
         [DataType(DataType.Date)]
-        public DateTime BeneficiaryDateOfBirth { get; set; }
+        public DateTime DateOfBirth { get; set; }
 
         [Display(Name = "Country name")]
         public long? CountryId { get; set; } = default!;
@@ -68,5 +68,19 @@ namespace risk.control.system.Models
         public List<PreviousClaimReport> PreviousClaimReports { get; set; } = new List<PreviousClaimReport>();
         public string? ClaimsInvestigationId { get; set; }
         public ClaimsInvestigation? ClaimsInvestigation { get; set; }
+
+        public override string ToString()
+        {
+            return $"Beneficiary Information:\n" +
+           $"- Name: {Name}\n" +
+           $"- Date of birth: {DateOfBirth}\n" +
+           $"- Relation: ${BeneficiaryRelation}\n" +
+           $"- Address line: {Addressline}\n" +
+           $"- City: {District}\n" +
+           $"- State: {State}\n" +
+           $"- Country: {Country}\n" +
+           $"- Contact number: {ContactNumber}\n" +
+           $"- Income: {Income}";
+        }
     }
 }

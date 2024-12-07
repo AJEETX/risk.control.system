@@ -18,5 +18,13 @@ namespace risk.control.system.Models
         public string? InvestigationCaseStatusId { get; set; }
         public InvestigationCaseStatus? InvestigationCaseStatus { get; set; }
         public bool MasterData { get; set; } = false;
+
+        public override string ToString()
+        {
+            return $"Investigation Case SubStatus Information" +
+                $"Name : {Name}" +
+                $"Code : {Code}";
+        }
+
     }
 }

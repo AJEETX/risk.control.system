@@ -7,7 +7,7 @@ namespace risk.control.system.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string FileAttachmentId { get; set; } = Guid.NewGuid().ToString();
+        public long FileAttachmentId { get; set; }
 
         public string Name { get; set; }
 

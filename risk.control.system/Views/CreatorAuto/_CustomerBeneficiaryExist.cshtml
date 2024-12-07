@@ -16,14 +16,14 @@
         baddress = @Model.Location != null ? @Model.Location?.Addressline + " " +
         @Model.Location?.District?.Name + " " + @Model.Location?.State?.Name + " " +
         @Model.Location?.Country?.Name + " " + @Model.Location?.PinCode?.Code : string.Empty;
-        if (Model.ClaimsInvestigation?.CustomerDetail.CustomerDateOfBirth != null)
+        if (Model.ClaimsInvestigation?.CustomerDetail.DateOfBirth != null)
         {
-            var age = DateTime.Now.Subtract(Model.ClaimsInvestigation.CustomerDetail.CustomerDateOfBirth).TotalDays;
+            var age = DateTime.Now.Subtract(Model.ClaimsInvestigation.CustomerDetail.DateOfBirth).TotalDays;
             currentAgeinYrs = (int)age / 365;
         }
-        if (Model.Location?.BeneficiaryDateOfBirth != null)
+        if (Model.Location?.DateOfBirth != null)
         {
-            var age = DateTime.Now.Subtract(Model.Location.BeneficiaryDateOfBirth).TotalDays;
+            var age = DateTime.Now.Subtract(Model.Location.DateOfBirth).TotalDays;
             currentBAgeinYrs = (int)age / 365;
         }
     }
@@ -98,7 +98,7 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-7">
-                        <h2 class="lead"><b>@Model.Location?.BeneficiaryName</b></h2>
+                        <h2 class="lead"><b>@Model.Location?.Name</b></h2>
                         <p class="text-muted text-sm">
                             <b>Relation: </b> @Model.Location?.BeneficiaryRelation.Name
                         </p>
@@ -107,7 +107,7 @@
                                 <span class="fa-li">
                                     <i class="fas fa-rupee-sign"></i>
                                 </span>
-                                Income: @Model.Location?.BeneficiaryIncome
+                                Income: @Model.Location?.Income
                             </li>
                             <li class="small">
                                 <span class="fa-li">
@@ -125,7 +125,7 @@
                                 <span class="fa-li">
                                     <i class="fas fa-lg fa-phone"></i>
                                 </span>
-                                Phone #: + @Model.Location?.BeneficiaryContactNumber
+                                Phone #: + @Model.Location?.ContactNumber
                             </li>
                         </ul>
                     </div>

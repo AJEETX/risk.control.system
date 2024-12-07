@@ -39,6 +39,11 @@ namespace risk.control.system.Models
         public bool ValidationExecuted { get; set; } = false;
 
         public DocumentIdReportType DocumentIdReportType { get; set; } = DocumentIdReportType.PAN;
+        public override string ToString()
+        {
+            return $"Report Information" +
+                $"Valid: {ValidationExecuted}";
+        }
     }
 
     public enum DocumentIdReportType

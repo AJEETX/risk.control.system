@@ -12,5 +12,12 @@ namespace risk.control.system.Models
         public ApplicationUser? FromUser { get; set; }
         public ApplicationUser? ToUser { get; set; }
         public List<string>? ActiveUsers { get; set; }
+
+        public override string ToString()
+        {
+            return $"ChatMessage Information:\n" +
+                $"Sms From User:{FromUser}\n" +
+                $"- From User Email: {FromUserEmail}";
+        }
     }
 }

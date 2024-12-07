@@ -1,6 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
+using risk.control.system.Helpers;
+
 namespace risk.control.system.Models
 {
     public class ClaimsInvestigation : BaseEntity
@@ -62,7 +64,16 @@ namespace risk.control.system.Models
 
         public override string ToString()
         {
-            return $"Case Id: {ClaimsInvestigationId}, <br /> ";
+            return $"Claim Information," +
+            $"Claim Id: {ClaimsInvestigationId}" +
+            $"Policy Detail: {PolicyDetail.ToString()}" +
+            $"Customer: {CustomerDetail.ToString()}" +
+            $"Beneficiary: {BeneficiaryDetail.ToString()}" +
+            $"Agency report: {AgencyReport.ToString()}" +
+            $"Case creation type: {CREATEDBY.GetEnumDisplayName()}" +
+            $"Case created by: {ORIGIN.GetEnumDisplayName()}" +
+            $"Case Status: {InvestigationCaseStatus}" +
+            $"Case SubStatus: {InvestigationCaseSubStatus}";
         }
 
         public bool EnablePassport { get; set; } = false;

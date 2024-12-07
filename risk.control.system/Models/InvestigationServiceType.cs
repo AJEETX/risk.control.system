@@ -22,5 +22,12 @@ namespace risk.control.system.Models
 
         public LineOfBusiness LineOfBusiness { get; set; } = default!;
         public bool MasterData { get; set; } = false;
+
+        public override string ToString()
+        {
+            return $"Investigation Service Type Information:\n" +
+           $"- Name: {Name}\n" +
+           $"- Code: {Code}";
+        }
     }
 }

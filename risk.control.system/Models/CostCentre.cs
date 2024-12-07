@@ -16,5 +16,11 @@ namespace risk.control.system.Models
         [Display(Name = "CostCentre code")]
         [Required]
         public string Code { get; set; } = default!;
+        public override string ToString()
+        {
+            return $"Cost centre Information:\n" +
+           $"- Name: {Name}\n" +
+           $"- Code: {Code}";
+        }
     }
 }

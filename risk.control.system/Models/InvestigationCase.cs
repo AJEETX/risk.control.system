@@ -1,6 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
+using Google.Rpc;
+
 namespace risk.control.system.Models
 {
     public class InvestigationCase : BaseEntity
@@ -26,5 +28,14 @@ namespace risk.control.system.Models
 
         [Display(Name = "Case status")]
         public InvestigationCaseStatus? InvestigationCaseStatus { get; set; } = default!;
+        public override string ToString()
+        {
+            return $"Investigation Case Information" +
+                $"Name : {Name}" +
+                $"Description : {Description}" +
+                $"Line Of Business : {LineOfBusiness}" +
+                $"Investigation Service Type : {InvestigationServiceType}" +
+                $"Investigation Case Status : {InvestigationCaseStatus}";
+        }
     }
 }

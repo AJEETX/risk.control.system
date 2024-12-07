@@ -36,5 +36,16 @@ namespace risk.control.system.Models
 
         [Display(Name = "Country name")]
         public Country Country { get; set; } = default!;
+        public override string ToString()
+        {
+            return $"Pincode Information:\n" +
+           $"- Name: {Name}\n" +
+           $"- pincode: {Code}\n" +
+           $"- Latitude: ${Latitude}\n" +
+           $"- Longitude: {Longitude}\n" +
+           $"- City: {District}\n" +
+           $"- State: {State}\n" +
+           $"- Country: {Country}";
+        }
     }
 }

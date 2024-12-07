@@ -1,6 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
+using Google.Rpc;
+using Google.Type;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
+
 namespace risk.control.system.Models
 {
     public class VendorInvestigationServiceType : BaseEntity
@@ -48,5 +52,18 @@ namespace risk.control.system.Models
         public long VendorId { get; set; }
         public Vendor Vendor { get; set; }
         public bool Deleted { get; set; } = false;
+        public override string ToString()
+        {
+            return $"Vendor Investigation Service Type Information:\n" +
+                $"- Investigation Service Type: {InvestigationServiceType}\n" +
+                $"- Line Of Business: {LineOfBusiness}\n" +
+                $"- Country: {Country}\n" +
+                $"- State: {State}\n" +
+                $"- District: {District}\n" +
+                $"- Price: {Price}\n" +
+                $"- Serviced Pincodes: {PincodeServices}\n" +
+                $"- Vendor: {Vendor}\n" +
+                $"- Deleted: {Deleted}";
+        }
     }
 }

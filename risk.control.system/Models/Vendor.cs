@@ -1,6 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Xml.Linq;
 
+using risk.control.system.Helpers;
 using risk.control.system.Models.ViewModel;
 
 namespace risk.control.system.Models
@@ -58,8 +60,6 @@ namespace risk.control.system.Models
         [Display(Name = "IFSC code")]
         public string IFSCCode { get; set; } = default!;
 
-        public string City { get; set; } = "KANPUR CITY";
-
         [Display(Name = "Agreement date")]
         [DataType(DataType.Date)]
         public DateTime? AgreementDate { get; set; } = DateTime.Now;
@@ -68,15 +68,8 @@ namespace risk.control.system.Models
         [DataType(DataType.Date)]
         public DateTime? ActivatedDate { get; set; } = DateTime.Now;
 
-        [Display(Name = "Delist date")]
-        [DataType(DataType.Date)]
-        public DateTime? DeListedDate { get; set; }
-
         public VendorStatus? Status { get; set; } = VendorStatus.ACTIVE;
         public Domain? DomainName { get; set; } = Domain.com;
-
-        [Display(Name = "Delist reason")]
-        public string? DelistReason { get; set; } = default!;
 
         [Display(Name = "Document")]
         public string? DocumentUrl { get; set; } = default!;
@@ -122,7 +115,28 @@ namespace risk.control.system.Models
         public bool CanChangePassword { get; set; } = false;
         public bool HasClaims { get; set; } = false;
 
-
+        public override string ToString()
+        {
+            return $"Investigation Agency Information:\n" +
+           $"- Domain name: {DomainName}\n" +
+           $"- Name: {Name}\n" +
+           $"- Code: {Code}\n" +
+           $"- Description: {Description}\n" +
+           $"- Phone Number: ${PhoneNumber}\n" +
+           $"- Domain name: {Email}\n" +
+           $"- Branch name: {Branch}\n" +
+           $"- Address line: {Addressline}\n" +
+           $"- City: {District}\n" +
+           $"- State: {State}\n" +
+           $"- Country: {Country}\n" +
+           $"- Investigation Service Types: {VendorInvestigationServiceTypes}\n" +
+           $"- Bank Name: {BankName}\n" +
+           $"- Bank Account Number: {BankAccountNumber}\n" +
+           $"- IFSC Code: {IFSCCode}\n" +
+           $"- Agreement Date: {AgreementDate}\n" +
+           $"- Activated Date: {ActivatedDate}\n" +
+           $"- Status: {Status.GetEnumDisplayName()}";
+        }
     }
 
     public enum VendorStatus

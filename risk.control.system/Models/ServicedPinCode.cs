@@ -16,5 +16,12 @@ namespace risk.control.system.Models
         public long VendorInvestigationServiceTypeId { get; set; } = default!;
 
         public VendorInvestigationServiceType VendorInvestigationServiceType { get; set; } = default!;
+        public override string ToString()
+        {
+            return $"Investigation ServiceType Information:\n" +
+                $"- Name: {Name}\n" +
+                $"- Pincode: {Pincode}\n" +
+                $"- VendorInvestigationServiceType: {VendorInvestigationServiceType}";
+        }
     }
 }

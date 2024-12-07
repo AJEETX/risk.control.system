@@ -32,5 +32,20 @@ namespace risk.control.system.Models
         public string ClaimsInvestigationId { get; set; }
         public ClaimsInvestigation ClaimsInvestigation { get; set; }
         public virtual ServiceReportTemplate? ServiceReportTemplate { get; set; }
+
+        public override string ToString()
+        {
+            return $"Claim Report Information:\n" +
+                $"- Agent Email: {AgentEmail}\n" +
+                $"- Agent Remarks Updatedtime: {AgentRemarksUpdated}\n" +
+                $"- Agent Remarks: {AgentRemarks}\n" +
+                $"- Supervisor Remarks Updated time: {SupervisorRemarksUpdated}\n" +
+                $"- Supervisor Email: {SupervisorEmail}\n" +
+                $"- Supervisor Remarks: {SupervisorRemarks}\n" +
+                $"- Assessor Remarks Updated time: {AssessorRemarksUpdated}\n" +
+                $"- Assessor Email: {AssessorEmail}\n" +
+                $"- Assessor Remarks: {AssessorRemarks}\n" +
+                $"- Claim Id: {ClaimsInvestigationId}";
+        }
     }
 }

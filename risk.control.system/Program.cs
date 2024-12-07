@@ -113,6 +113,7 @@ builder.Services.AddScoped<IFaceMatchService, FaceMatchService>();
 builder.Services.AddScoped<IGoogleApi, GoogleApi>();
 builder.Services.AddScoped<IGoogleMaskHelper, GoogleMaskHelper>();
 builder.Services.AddScoped<IImageService, ImageService>();
+builder.Services.AddScoped<IChatSummarizer, OpenAISummarizer>();
 
 builder.Services.AddScoped<IInboxMailService, InboxMailService>();
 builder.Services.AddScoped<ISentMailService, SentMailService>();

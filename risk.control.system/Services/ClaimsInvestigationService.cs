@@ -369,11 +369,11 @@ namespace risk.control.system.Services
                 existingPolicy.CustomerDetail.Description = claimsInvestigation.CustomerDetail.Description;
                 existingPolicy.CustomerDetail.ContactNumber = claimsInvestigation.CustomerDetail.ContactNumber;
                 existingPolicy.CustomerDetail.CountryId = claimsInvestigation.CustomerDetail.CountryId;
-                existingPolicy.CustomerDetail.CustomerDateOfBirth = claimsInvestigation.CustomerDetail.CustomerDateOfBirth;
-                existingPolicy.CustomerDetail.CustomerEducation = claimsInvestigation.CustomerDetail.CustomerEducation;
-                existingPolicy.CustomerDetail.CustomerIncome = claimsInvestigation.CustomerDetail.CustomerIncome;
-                existingPolicy.CustomerDetail.CustomerName = claimsInvestigation.CustomerDetail.CustomerName;
-                existingPolicy.CustomerDetail.CustomerOccupation = claimsInvestigation.CustomerDetail.CustomerOccupation;
+                existingPolicy.CustomerDetail.DateOfBirth = claimsInvestigation.CustomerDetail.DateOfBirth;
+                existingPolicy.CustomerDetail.Education = claimsInvestigation.CustomerDetail.Education;
+                existingPolicy.CustomerDetail.Income = claimsInvestigation.CustomerDetail.Income;
+                existingPolicy.CustomerDetail.Name = claimsInvestigation.CustomerDetail.Name;
+                existingPolicy.CustomerDetail.Occupation = claimsInvestigation.CustomerDetail.Occupation;
                 existingPolicy.CustomerDetail.CustomerType = claimsInvestigation.CustomerDetail.CustomerType;
                 existingPolicy.CustomerDetail.Gender = claimsInvestigation.CustomerDetail.Gender;
                 existingPolicy.CustomerDetail.PinCodeId = claimsInvestigation.CustomerDetail.PinCodeId;

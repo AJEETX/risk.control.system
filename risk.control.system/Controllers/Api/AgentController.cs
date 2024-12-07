@@ -384,7 +384,7 @@ namespace risk.control.system.Controllers.Api
                         claimType = c.PolicyDetail.ClaimType.GetEnumDisplayName(),
                         DocumentPhoto = c.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(c.PolicyDetail.DocumentImage)) :
                         string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noDocumentimage)),
-                        CustomerName = c.CustomerDetail.CustomerName,
+                        CustomerName = c.CustomerDetail.Name,
                         CustomerEmail = email,
                         PolicyNumber = c.PolicyDetail.ContractNumber,
                         Gender = c.CustomerDetail.Gender.GetEnumDisplayName(),
@@ -402,7 +402,7 @@ namespace risk.control.system.Controllers.Api
                             Photo = c.BeneficiaryDetail?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(c.BeneficiaryDetail.ProfilePicture)) :
                             string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noCustomerimage)),
                             c.BeneficiaryDetail.Country.Name,
-                            c.BeneficiaryDetail.BeneficiaryName,
+                            BeneficiaryName = c.BeneficiaryDetail.Name,
                             c.BeneficiaryDetail.Addressline,
                             c.BeneficiaryDetail.PinCode.Code,
                             District = c.BeneficiaryDetail.District.Name,
@@ -580,26 +580,26 @@ namespace risk.control.system.Controllers.Api
                         beneficiary = new
                         {
                             BeneficiaryId = claimCase.BeneficiaryDetailId,
-                            Name = claimCase.BeneficiaryName,
+                            Name = claimCase.Name,
                             Photo = claimCase.ProfilePicture != null ?
                             string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claimCase.ProfilePicture)) :
                             string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noCustomerimage)),
                             Relation = claimCase.BeneficiaryRelation.Name,
-                            Income = claimCase.BeneficiaryIncome.GetEnumDisplayName(),
-                            Phone = claimCase.BeneficiaryContactNumber,
-                            DateOfBirth = claimCase.BeneficiaryDateOfBirth.ToString("dd-MMM-yyyy"),
+                            Income = claimCase.Income.GetEnumDisplayName(),
+                            Phone = claimCase.ContactNumber,
+                            DateOfBirth = claimCase.DateOfBirth.ToString("dd-MMM-yyyy"),
                             Address = claimCase.Addressline + " " + claimCase.District.Name + " " + claimCase.State.Name + " " + claimCase.Country.Name + " " + claimCase.PinCode.Code
                         },
                         Customer = new
                         {
-                            Name = claim.CustomerDetail.CustomerName,
-                            Occupation = claim.CustomerDetail.CustomerOccupation.GetEnumDisplayName(),
+                            Name = claim.CustomerDetail.Name,
+                            Occupation = claim.CustomerDetail.Occupation.GetEnumDisplayName(),
                             Photo = claim.CustomerDetail.ProfilePicture != null ?
                             string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claim.CustomerDetail.ProfilePicture)) :
                             string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noCustomerimage)),
-                            Income = claim.CustomerDetail.CustomerIncome.GetEnumDisplayName(),
+                            Income = claim.CustomerDetail.Income.GetEnumDisplayName(),
                             Phone = claim.CustomerDetail.ContactNumber,
-                            DateOfBirth = claim.CustomerDetail.CustomerDateOfBirth.ToString("dd-MMM-yyyy"),
+                            DateOfBirth = claim.CustomerDetail.DateOfBirth.ToString("dd-MMM-yyyy"),
                             Address = claim.CustomerDetail.Addressline + " " + claim.CustomerDetail.District.Name + " " + claim.CustomerDetail.State.Name + " " + claim.CustomerDetail.Country.Name + " " + claim.CustomerDetail.PinCode.Code
                         },
                         InvestigationData = new

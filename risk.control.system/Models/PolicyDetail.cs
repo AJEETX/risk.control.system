@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using risk.control.system.Helpers;
 
 namespace risk.control.system.Models
 {
@@ -67,5 +68,21 @@ namespace risk.control.system.Models
 
         [Display(Name = "Claim remarks")]
         public string? Comments { get; set; }
+
+        public override string ToString()
+        {
+            return $"Claim Information:\n" +
+           $"- Contract Number: {ContractNumber}\n" +
+           $"- Line Of Business: {LineOfBusiness}\n" +
+           $"- Investigation Service Type: {InvestigationServiceType}\n" +
+           $"- Contract Issue Date: ${ContractIssueDate}\n" +
+           $"- Claim Type: {ClaimType.GetEnumDisplayName()}\n" +
+           $"- Date Of Incident: {DateOfIncident}\n" +
+           $"- Cause Of Loss: {CauseOfLoss}\n" +
+           $"- Sum Assured Value: {SumAssuredValue}\n" +
+           $"- Cost Centre: {CostCentre}\n" +
+           $"- Case Enabler: {CaseEnabler}\n" +
+           $"- Remarks: {Comments}";
+        }
     }
 }

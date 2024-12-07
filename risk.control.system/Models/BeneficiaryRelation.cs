@@ -14,5 +14,11 @@ namespace risk.control.system.Models
         [Display(Name = "Beneficiary relation code")]
         [Required]
         public string Code { get; set; } = default!;
+        public override string ToString()
+        {
+            return $"Beneficiary relation Information:\n" +
+                $"- Name: {Name}\n" +
+                $"- Code: {Code}";
+        }
     }
 }

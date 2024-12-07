@@ -7,7 +7,7 @@ namespace risk.control.system.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string InvestigationTransactionId { get; set; } = Guid.NewGuid().ToString();
+        public long InvestigationTransactionId { get; set; }
 
         public string? ClaimsInvestigationId { get; set; }
         public virtual ClaimsInvestigation? ClaimsInvestigation { get; set; }

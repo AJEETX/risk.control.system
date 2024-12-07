@@ -17,5 +17,16 @@ namespace risk.control.system.Models
         public string? Message { get; set; }
         public string? ClaimsInvestigationId { get; set; }
         public long? PreviousClaimMessageId { get; set; }
+        public override string ToString()
+        {
+            return $"Claim Message Information:\n" +
+                $"- Sender Email: {SenderEmail}\n" +
+                $"- Sender Phone: {SenderPhone}\n" +
+                $"- Recepicient Email: {RecepicientEmail}\n" +
+                $"- Recepicient Phone: {RecepicientPhone}\n" +
+                $"- Schedule Time: {ScheduleTime}\n" +
+                $"- Message: {Message}\n" +
+                $"- Claim Id: {ClaimsInvestigationId}";
+        }
     }
 }

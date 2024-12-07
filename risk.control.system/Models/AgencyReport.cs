@@ -40,5 +40,23 @@ namespace risk.control.system.Models
         public long? EnquiryRequestId { get; set; }
         public EnquiryRequest? EnquiryRequest { get; set; }
         public List<EnquiryRequest> EnquiryRequests { get; set; } = new List<EnquiryRequest>();
+        public override string ToString()
+        {
+            return $"Agency Report Information:\n" +
+                $"- Agent Email: {AgentEmail}\n" +
+                $"- Agent Remarks Updatedtime: {AgentRemarksUpdated}\n" +
+                $"- Agent Remarks: {AgentRemarks}\n" +
+                $"- Supervisor Remarks Updated time: {SupervisorRemarksUpdated}\n" +
+                $"- Supervisor Email: {SupervisorEmail}\n" +
+                $"- Supervisor Remarks: {SupervisorRemarks}\n" +
+                $"- Supervisor Attachment: {SupervisorAttachment}\n" +
+                $"- Supervisor Attached FileName: {SupervisorFileName}\n" +
+                $"- Supervisor Attached FileType: {SupervisorFileType}\n" +
+                $"- Supervisor Attached FileExtension: {SupervisorFileExtension}\n" +
+                $"- Assessor Remarks Updated time: {AssessorRemarksUpdated}\n" +
+                $"- Assessor Email: {AssessorEmail}\n" +
+                $"- Assessor Remarks: {AssessorRemarks}\n" +
+                $"- Claim Id: {ClaimsInvestigationId}";
+        }
     }
 }

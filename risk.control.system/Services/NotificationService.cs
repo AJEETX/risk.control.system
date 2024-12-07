@@ -126,14 +126,14 @@ namespace risk.control.system.Services
             if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
             {
                 mobile = claim.CustomerDetail.ContactNumber.ToString();
-                recepientName = claim.CustomerDetail.CustomerName;
+                recepientName = claim.CustomerDetail.Name;
                 recepientPhone = claim.CustomerDetail.ContactNumber.ToString();
             }
             else if (claim.PolicyDetail.ClaimType == ClaimType.DEATH)
             {
-                mobile = beneficiary.BeneficiaryContactNumber.ToString();
-                recepientName = beneficiary.BeneficiaryName;
-                recepientPhone = beneficiary.BeneficiaryContactNumber.ToString();
+                mobile = beneficiary.ContactNumber.ToString();
+                recepientName = beneficiary.Name;
+                recepientPhone = beneficiary.ContactNumber.ToString();
             }
 
             string device = "0";
@@ -237,13 +237,13 @@ namespace risk.control.system.Services
             string recepientPhone = string.Empty;
             if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
             {
-                recepientName = claim.CustomerDetail.CustomerName;
+                recepientName = claim.CustomerDetail.Name;
                 recepientPhone = claim.CustomerDetail.ContactNumber.ToString();
             }
             else if (claim.PolicyDetail.ClaimType == ClaimType.DEATH)
             {
-                recepientName = beneficiary.BeneficiaryName;
-                recepientPhone = beneficiary.BeneficiaryContactNumber.ToString();
+                recepientName = beneficiary.Name;
+                recepientPhone = beneficiary.ContactNumber.ToString();
             }
 
             if (confirm.ToUpper() == "Y")
@@ -318,12 +318,12 @@ namespace risk.control.system.Services
             if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
             {
                 mobile = claim.CustomerDetail.ContactNumber.ToString();
-                recepientName = claim.CustomerDetail.CustomerName;
+                recepientName = claim.CustomerDetail.Name;
             }
             else if (claim.PolicyDetail.ClaimType == ClaimType.DEATH)
             {
-                mobile = beneficiary.BeneficiaryContactNumber.ToString();
-                recepientName = beneficiary.BeneficiaryName;
+                mobile = beneficiary.ContactNumber.ToString();
+                recepientName = beneficiary.Name;
             }
 
             //var path = Path.Combine(webHostEnvironment.WebRootPath, "form", "ConfirmAcountRegister.html");
@@ -394,7 +394,7 @@ namespace risk.control.system.Services
             {
                 return string.Empty;
             }
-            var message = $"Dear {claim.CustomerDetail.CustomerName}";
+            var message = $"Dear {claim.CustomerDetail.Name}";
             message += "                                                                                ";
             message += $"{sms}";
             message += "                                                                                ";
@@ -420,7 +420,7 @@ namespace risk.control.system.Services
             claim.ClaimMessages.Add(scheduleMessage);
             context.SaveChanges();
             await smsService.DoSendSmsAsync("+" + mobile, message);
-            return claim.CustomerDetail.CustomerName;
+            return claim.CustomerDetail.Name;
         }
 
         public async Task<string> SendSms2Beneficiary(string currentUser, string claimId, string sms)
@@ -428,7 +428,7 @@ namespace risk.control.system.Services
             var beneficiary =await context.BeneficiaryDetail.Include(b => b.ClaimsInvestigation).ThenInclude(c => c.PolicyDetail)
                .FirstOrDefaultAsync(c => c.ClaimsInvestigationId == claimId);
 
-            var mobile = beneficiary.BeneficiaryContactNumber.ToString();
+            var mobile = beneficiary.ContactNumber.ToString();
             var user = context.ApplicationUser.FirstOrDefault(u => u.Email == currentUser);
 
             var isInsurerUser = user is ClientCompanyApplicationUser;
@@ -451,7 +451,7 @@ namespace risk.control.system.Services
             {
                 return string.Empty;
             }
-            var message = $"Dear {beneficiary.BeneficiaryName}";
+            var message = $"Dear {beneficiary.Name}";
             message += "                                                                                ";
             message += $"{sms}";
             message += "                                                                                ";
@@ -469,7 +469,7 @@ namespace risk.control.system.Services
             {
                 Message = message,
                 ClaimsInvestigationId = claimId,
-                RecepicientEmail = beneficiary.BeneficiaryName,
+                RecepicientEmail = beneficiary.Name,
                 SenderEmail = user.Email,
                 UpdatedBy = user.Email,
                 Updated = DateTime.Now
@@ -483,7 +483,7 @@ namespace risk.control.system.Services
             claim.ClaimMessages.Add(scheduleMessage);
             context.SaveChanges();
             await smsService.DoSendSmsAsync("+" + mobile, message);
-            return beneficiary.BeneficiaryName;
+            return beneficiary.Name;
         }
     }
 }

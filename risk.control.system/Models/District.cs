@@ -28,5 +28,13 @@ namespace risk.control.system.Models
 
         [Display(Name = "Country name")]
         public Country Country { get; set; } = default!;
+        public override string ToString()
+        {
+            return $"City Information:\n" +
+           $"- Name: {Name}\n" +
+           $"- City code: {Code}\n" +
+           $"- State: ${State}\n" +
+           $"- Country: {Country}";
+        }
     }
 }

@@ -1,5 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using Google.Cloud.Vision.V1;
+using risk.control.system.Helpers;
 
 namespace risk.control.system.Models
 {
@@ -7,16 +9,16 @@ namespace risk.control.system.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string CustomerDetailId { get; set; } = Guid.NewGuid().ToString();
+        public long CustomerDetailId { get; set; }
 
         [Required]
         [Display(Name = "Name")]
-        public string CustomerName { get; set; }
+        public string Name { get; set; }
 
         [Required]
         [Display(Name = "Date of birth")]
         [DataType(DataType.Date)]
-        public DateTime CustomerDateOfBirth { get; set; }
+        public DateTime DateOfBirth { get; set; }
 
         public Gender? Gender { get; set; }
 
@@ -59,15 +61,15 @@ namespace risk.control.system.Models
 
         [Required]
         [Display(Name = "Income")]
-        public Income? CustomerIncome { get; set; }
+        public Income? Income { get; set; }
 
         [Required]
         [Display(Name = "Occupation")]
-        public Occupation? CustomerOccupation { get; set; }
+        public Occupation? Occupation { get; set; }
 
         [Required]
         [Display(Name = "Education")]
-        public Education? CustomerEducation { get; set; }
+        public Education? Education { get; set; }
 
         [FileExtensions(Extensions = "jpg,jpeg,png")]
         public string? ProfilePictureUrl { get; set; }
@@ -80,5 +82,23 @@ namespace risk.control.system.Models
 
         public string? Description { get; set; }
         public string? CustomerLocationMap { get; set; }
+
+        public override string ToString()
+        {
+            return $"Customer Information:\n" +
+           $"- Name: {Name}\n" +
+           $"- Date of birth: {DateOfBirth}\n" +
+           $"- Gender: ${Gender}\n" +
+           $"- Address line: {Addressline}\n" +
+           $"- City: {District}\n" +
+           $"- State: {State}\n" +
+           $"- Country: {Country}\n" +
+           $"- Contact Number: {ContactNumber}\n" +
+           $"- Customer Type: {CustomerType.GetEnumDisplayName()}\n" +
+           $"- Income: {Income}\n" +
+           $"- Occupation: {Occupation.GetEnumDisplayName}\n" +
+           $"- Education: {Education.GetEnumDisplayName}\n" +
+           $"- Remarks: {Description}";
+        }
     }
 }

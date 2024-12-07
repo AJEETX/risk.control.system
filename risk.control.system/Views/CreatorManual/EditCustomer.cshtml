@@ -66,8 +66,8 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text" asp-for="CustomerName"><i class="fa fa-user-plus"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <input id="customer-name" required asp-for="CustomerDetail.CustomerName" class="form-control remarks title-name" type="text" placeholder="Customer Name" maxlength="30" />
-                                <span asp-validation-for="CustomerDetail.CustomerName" class="text-danger"></span>
+                                <input id="customer-name" required asp-for="CustomerDetail.Name" class="form-control remarks title-name" type="text" placeholder="Customer Name" maxlength="30" />
+                                <span asp-validation-for="CustomerDetail.Name" class="text-danger"></span>
                             </div>
                         </div>
                         <div class="form-group">
@@ -76,8 +76,8 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text" asp-for="CustomerDateOfBirth"><i class="far fa-calendar-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <input required asp-for="CustomerDetail.CustomerDateOfBirth" id="dateCustomerId" class="form-control remarks" type="date" />
-                                <span asp-validation-for="CustomerDetail.CustomerDateOfBirth" class="text-danger"></span>
+                                <input required asp-for="CustomerDetail.DateOfBirth" id="dateCustomerId" class="form-control remarks" type="date" />
+                                <span asp-validation-for="CustomerDetail.DateOfBirth" class="text-danger"></span>
                             </div>
                         </div>
                         <div class="form-group">
@@ -124,10 +124,10 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text" asp-for="CustomerIncome"><i class="far fa-money-bill-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <select required asp-for="CustomerDetail.CustomerIncome" class="form-control remarks" asp-items="Html.GetEnumSelectList<Income>()">
+                                <select required asp-for="CustomerDetail.Income" class="form-control remarks" asp-items="Html.GetEnumSelectList<Income>()">
                                     <option value="">--- SELECT ---</option>
                                 </select>
-                                <span asp-validation-for="CustomerDetail.CustomerIncome" class="text-danger"></span>
+                                <span asp-validation-for="CustomerDetail.Income" class="text-danger"></span>
 
                             </div>
                         </div>
@@ -138,10 +138,10 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text" asp-for="CustomerOccupation"><i class="fas fa-business-time"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <select required asp-for="CustomerDetail.CustomerOccupation" class="form-control remarks" asp-items="Html.GetEnumSelectList<Occupation>()">
+                                <select required asp-for="CustomerDetail.Occupation" class="form-control remarks" asp-items="Html.GetEnumSelectList<Occupation>()">
                                     <option value="">--- SELECT ---</option>
                                 </select>
-                                <span asp-validation-for="CustomerDetail.CustomerOccupation" class="text-danger"></span>
+                                <span asp-validation-for="CustomerDetail.Occupation" class="text-danger"></span>
 
                             </div>
                         </div>
@@ -151,10 +151,10 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text" asp-for="CustomerEducation"><i class="fas fa-graduation-cap"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <select required asp-for="CustomerDetail.CustomerEducation" class="form-control remarks" asp-items="Html.GetEnumSelectList<Education>()">
+                                <select required asp-for="CustomerDetail.Education" class="form-control remarks" asp-items="Html.GetEnumSelectList<Education>()">
                                     <option value="">--- SELECT ---</option>
                                 </select>
-                                <span asp-validation-for="CustomerDetail.CustomerEducation" class="text-danger"></span>
+                                <span asp-validation-for="CustomerDetail.Education" class="text-danger"></span>
 
                             </div>
                         </div>

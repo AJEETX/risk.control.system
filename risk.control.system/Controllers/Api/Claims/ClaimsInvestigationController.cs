@@ -83,7 +83,7 @@ namespace risk.control.system.Controllers.Api.Claims
             return Ok(response);
         }
         [HttpGet("GetCustomerDetail")]
-        public async Task<IActionResult> GetCustomerDetail(string id)
+        public async Task<IActionResult> GetCustomerDetail(long id)
         {
             var customer = await _context.CustomerDetail
                 .Include(c => c.Country)
@@ -101,13 +101,13 @@ namespace risk.control.system.Controllers.Api.Claims
                 {
                     Customer = customer?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(customer.ProfilePicture)) :
                     string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noDataimage)),
-                    CustomerName = customer.CustomerName,
+                    CustomerName = customer.Name,
                     ContactNumber = customer.ContactNumber,
                     Address = customer.Addressline + "  " + customer.District.Name + "  " + customer.State.Name + "  " + customer.Country.Name + "  " + customer.PinCode.Code,
-                    Occupation = customer.CustomerOccupation.GetEnumDisplayName(),
-                    Income = customer.CustomerIncome.GetEnumDisplayName(),
-                    Education = customer.CustomerEducation.GetEnumDisplayName(),
-                    DateOfBirth = customer.CustomerDateOfBirth,
+                    Occupation = customer.Occupation.GetEnumDisplayName(),
+                    Income = customer.Income.GetEnumDisplayName(),
+                    Education = customer.Education.GetEnumDisplayName(),
+                    DateOfBirth = customer.DateOfBirth,
                 }
                 );
         }
@@ -131,12 +131,12 @@ namespace risk.control.system.Controllers.Api.Claims
             {
                 Beneficiary = beneficiary?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(beneficiary.ProfilePicture)) :
                     string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noDataimage)),
-                BeneficiaryName = beneficiary.BeneficiaryName,
-                Dob = (int)beneficiary.BeneficiaryDateOfBirth.Subtract(DateTime.Now).TotalDays / 365,
-                Income = beneficiary.BeneficiaryIncome.GetEnumDisplayName(),
+                BeneficiaryName = beneficiary.Name,
+                Dob = (int)beneficiary.DateOfBirth.Subtract(DateTime.Now).TotalDays / 365,
+                Income = beneficiary.Income.GetEnumDisplayName(),
                 BeneficiaryRelation = beneficiary.BeneficiaryRelation.Name,
                 Address = beneficiary.Addressline + "  " + beneficiary.District.Name + "  " + beneficiary.State.Name + "  " + beneficiary.Country.Name + "  " + beneficiary.PinCode.Code,
-                ContactNumber = beneficiary.BeneficiaryContactNumber
+                ContactNumber = beneficiary.ContactNumber
             }
             );
         }
@@ -295,7 +295,7 @@ namespace risk.control.system.Controllers.Api.Claims
         }
 
         [HttpGet("GetCustomerMap")]
-        public async Task<IActionResult> GetCustomerMap(string id)
+        public async Task<IActionResult> GetCustomerMap(long id)
         {
             var customer = await _context.CustomerDetail
                 .Include(c => c.Country)

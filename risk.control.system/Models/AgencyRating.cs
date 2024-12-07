@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using Google.Rpc;
 
 namespace risk.control.system.Models
 {
@@ -14,5 +15,11 @@ namespace risk.control.system.Models
         public long VendorId { get; set; }
 
         public virtual Vendor? Vendor { get; set; }
+        public override string ToString()
+        {
+            return $"AgencyRating Information:\n" +
+           $"- Rate: {Rate}\n" +
+           $"- IpAddress: {IpAddress}";
+        }
     }
 }
