@@ -95,7 +95,10 @@
                 <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
             </div>
         </div>
-
+        @if (Model.ClaimsInvestigation.AiEnabled)
+        {
+            <partial name="_AgencyAiReport" model="@Model" />
+        }
         <div class="card card-secondary">
 
             <div class="card-header">

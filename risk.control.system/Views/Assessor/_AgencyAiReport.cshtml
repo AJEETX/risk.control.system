@@ -17,7 +17,8 @@
             </h3>
             <div class="card-tools">
                 <span data-toggle="tooltip" title=" AI comments" class="badge badge-light">
-                    <i class="nav-icon fas fa-clock"></i> @Model.AgencyReport?.SupervisorRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt")</span>
+                    <i class="nav-icon fas fa-clock"></i> @Model.AgencyReport?.AiSummaryUpdated.Value.ToString("dd-MMM-yy hh:mm tt")
+                </span>
             </div>
 
         </div>
@@ -37,9 +38,7 @@
                                 <th>
                                     AI Response
                                 </th>
-                                <th>
-                                    Document
-                                </th>
+                                
                             </tr>
                         </thead>
                         <tbody>
@@ -47,7 +46,7 @@
                                 <td>
                                     @{
                                         string displayTime = string.Empty;
-                                        var time = @Model.AgencyReport?.SupervisorRemarksUpdated;
+                                        var time = @Model.AgencyReport?.AiSummaryUpdated;
                                         if (time is not null)
                                         {
                                             displayTime = time.Value.ToString("dd-MMM-yyy HH:mm");
@@ -62,19 +61,6 @@
                                 <td>
                                     @Model.ReportAiSummary
                                 </td>
-                                <td>
-                                    @if (Model.AgencyReport?.SupervisorAttachment != null)
-                                    {
-                                        <img title="enquiry document" id="enquiryDocument" class="img-fluid doc-profile-image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.AgencyReport?.SupervisorAttachment))">
-                                        <a asp-controller="Download" asp-action="SupervisorFileAttachment" target="_blank"
-                                           asp-route-id="@Model.AgencyReport.AgencyReportId" class="mailbox-attachment-name"><i class="fas fa-paperclip"></i> </a>
-                                    }
-                                    else
-                                    {
-                                        <img title="enquiry document" id="enquiryDocument" alt="face image" class="img-fluid doc-profile-image" src=@Applicationsettings.NO_IMAGE>
-                                    }
-                                </td>
-                                
                             </tr>
                         </tbody>
                     </table>

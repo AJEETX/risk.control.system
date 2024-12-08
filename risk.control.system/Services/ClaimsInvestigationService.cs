@@ -852,9 +852,6 @@ namespace risk.control.system.Services
 
         public async Task<ClaimsInvestigation> ProcessCaseReport(string userEmail, string assessorRemarks, long caseLocationId, string claimsInvestigationId, AssessorRemarkType reportUpdateStatus, string reportAiSummary)
         {
-            var claim = _context.ClaimsInvestigation
-                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimsInvestigationId);
-
             if (reportUpdateStatus == AssessorRemarkType.OK)
             {
                 return await ApproveCaseReport(userEmail, assessorRemarks, caseLocationId, claimsInvestigationId, reportUpdateStatus, reportAiSummary);

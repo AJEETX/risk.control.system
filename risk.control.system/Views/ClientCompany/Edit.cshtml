@@ -340,31 +340,34 @@
                                                     <span asp-validation-for="RapidAPIHost" class="text-danger"></span>
                                                 </div>
                                             </div>
-                                            <div class="col-md-6">
-                                                <div class="form-group">
-                                                    <span class="input-group-label"> Verify Pan:</span>
-                                                    <div class="input-group mb-3">
-                                                        <div class="input-group-prepend">
-                                                            <span class="input-group-text" id="pan-verify"><i class="fas fa-crosshairs"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                                        </div>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <span class="input-group-label"> Verify Pan:</span>
+                                                        <div class="input-group mb-3">
+                                                            <div class="input-group-prepend">
+                                                                <span class="input-group-text" id="pan-verify"><i class="fas fa-crosshairs"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                                            </div>
 
-                                                        <span class="checkbox">
-                                                            <input asp-for="VerifyPan" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
-                                                        </span>
+                                                            <span class="checkbox">
+                                                                <input asp-for="VerifyPan" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
+                                                            </span>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-group">
-                                                    <span class="input-group-label"> Enable Media:</span>
-                                                    <div class="input-group mb-3">
-                                                        <div class="input-group-prepend">
-                                                            <span class="input-group-text" id="media-verify"><i class="fas fa-crosshairs"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                                        </div>
+                                                <div class="col-md-6">
 
-                                                        <span class="checkbox">
-                                                            <input asp-for="EnableMedia" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
-                                                        </span>
+                                                    <div class="form-group">
+                                                        <span class="input-group-label"> Enable Media:</span>
+                                                        <div class="input-group mb-3">
+                                                            <div class="input-group-prepend">
+                                                                <span class="input-group-text" id="media-verify"><i class="fas fa-crosshairs"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                                            </div>
+
+                                                            <span class="checkbox">
+                                                                <input asp-for="EnableMedia" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
+                                                            </span>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -404,36 +407,40 @@
                                                     <span asp-validation-for="PassportApiHost" class="text-danger"></span>
                                                 </div>
                                             </div>
-                                            <div class="col-md-5">
-                                                <div class="form-group">
-                                                    <span class="input-group-label"> Verify Passport:</span>
-                                                    <div class="input-group mb-3">
-                                                        <div class="input-group-prepend">
-                                                            <span class="input-group-text" id="passport-verify"><i class="fas fa-crosshairs"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                                        </div>
 
-                                                        <span class="checkbox">
-                                                            <input asp-for="VerifyPassport" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
-                                                        </span>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <span class="input-group-label"> Verify Passport:</span>
+                                                        <div class="input-group mb-3">
+                                                            <div class="input-group-prepend">
+                                                                <span class="input-group-text" id="passport-verify"><i class="fas fa-crosshairs"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                                            </div>
+
+                                                            <span class="checkbox">
+                                                                <input asp-for="VerifyPassport" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <span class="input-group-label"> Enable Passport:</span>
+                                                        <div class="input-group mb-3">
+                                                            <div class="input-group-prepend">
+                                                                <span class="input-group-text" id="enable-passport"><i class="fas fa-crosshairs"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                                            </div>
+
+                                                            <span class="checkbox">
+                                                                <input asp-for="EnablePassport" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
+                                                            </span>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="col-md-5">
-                                                <div class="form-group">
-                                                    <span class="input-group-label"> Enable Passport:</span>
-                                                    <div class="input-group mb-3">
-                                                        <div class="input-group-prepend">
-                                                            <span class="input-group-text" id="enable-passport"><i class="fas fa-crosshairs"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                                        </div>
 
-                                                        <span class="checkbox">
-                                                            <input asp-for="EnablePassport" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </div>
                                         </div>
-                                        
+
                                     </div>
                                 </div>
                             </div>
@@ -492,21 +499,6 @@
                                             </span>
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <span class="input-group-label"> Enable AI:</span>
-                                            <div class="input-group mb-3">
-                                                <div class="input-group-prepend">
-                                                    <span class="input-group-text" id="ai-enabled"><i class="fas fa-crosshairs"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                                </div>
-
-                                                <span class="checkbox">
-                                                    <input asp-for="AiEnabled" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>
-
                                 </div>
                                 <div class="col-md-3">
 
@@ -546,8 +538,18 @@
                                             <span asp-validation-for="TotalCreatedClaimAllowed" class="text-danger"></span>
                                         </div>
                                     </div>
+                                    <div class="form-group">
+                                        <span class="input-group-label"> Enable AI:</span>
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text" id="ai-enabled"><i class="fas fa-crosshairs"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                            </div>
 
-
+                                            <span class="checkbox">
+                                                <input asp-for="AiEnabled" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
+                                            </span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 

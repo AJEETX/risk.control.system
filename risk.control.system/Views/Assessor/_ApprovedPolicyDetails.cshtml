@@ -589,12 +589,13 @@
                         {
                             <partial name="_EnquiryReport" model="@Model" />
                         }
-                        @if (Model.ClaimsInvestigation.AiEnabled)
-                        {
-                            <partial name="_ReportSubmittedAiSummary" model="@Model" />
-                        }
+                        
                     </div>
                 </div>
+                @if (Model.ClaimsInvestigation.AiEnabled)
+                {
+                    <partial name="_ReportSubmittedAiSummary" model="@Model" />
+                }
                 @if (!Model.ClaimsInvestigation.IsQueryCase && !string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.AgencyReport.AssessorRemarks))
                 {
                     <div class="row">

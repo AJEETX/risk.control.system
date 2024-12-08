@@ -42,6 +42,7 @@ namespace risk.control.system.Models
         public List<EnquiryRequest> EnquiryRequests { get; set; } = new List<EnquiryRequest>();
 
         public string? AiSummary { get; set; }
+        public DateTime? AiSummaryUpdated { get; set; }
 
         public override string ToString()
         {
