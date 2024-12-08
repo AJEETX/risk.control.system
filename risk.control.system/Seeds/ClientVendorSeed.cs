@@ -14,6 +14,15 @@ namespace risk.control.system.Seeds
         {
             string noCompanyImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", @Applicationsettings.NO_IMAGE);
 
+            var globalSetting = new GlobalSettings
+            {
+                EnableMailbox = true
+            };
+            var newGlobalSetting = await context.GlobalSettings.AddAsync(globalSetting);
+            await context.SaveChangesAsync(null, false);
+            var globalSettings = context.GlobalSettings.FirstOrDefault();
+
+            var enableMailbox = globalSettings?.EnableMailbox ?? false;
             //CREATE VENDOR COMPANY
 
             var checkerPinCode = context.PinCode.Include(p => p.District).FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE2);
@@ -50,7 +59,8 @@ namespace risk.control.system.Seeds
                 DocumentUrl = "/img/checker.png",
                 DocumentImage = checkerImage,
                 Updated = DateTime.Now,
-                Status = VendorStatus.ACTIVE
+                Status = VendorStatus.ACTIVE,
+                EnableMailbox = enableMailbox
             };
 
             var checkerAgency = await context.Vendor.AddAsync(checker);
@@ -89,6 +99,7 @@ namespace risk.control.system.Seeds
                 DocumentImage = verifyImage,
                 Status = VendorStatus.ACTIVE,
                 Updated = DateTime.Now,
+                EnableMailbox = enableMailbox
             };
 
             var verifyAgency = await context.Vendor.AddAsync(verify);
@@ -127,6 +138,7 @@ namespace risk.control.system.Seeds
                 DocumentImage = investigateImage,
                 Status = VendorStatus.ACTIVE,
                 Updated = DateTime.Now,
+                EnableMailbox = enableMailbox
             };
 
             var investigateAgency = await context.Vendor.AddAsync(investigate);
@@ -277,7 +289,8 @@ namespace risk.control.system.Seeds
                  AutoAllocation = true,
                  BulkUpload = true,
                 Updated = DateTime.Now,
-                Deleted = false
+                Deleted = false,
+                EnableMailbox = enableMailbox
             };
 
             var insurerCompany = await context.ClientCompany.AddAsync(insurer);

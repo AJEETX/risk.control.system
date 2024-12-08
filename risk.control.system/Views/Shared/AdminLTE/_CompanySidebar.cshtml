@@ -1,5 +1,4 @@
-﻿@using risk.control.system.Helpers;
-@using risk.control.system.Models;
+﻿@using risk.control.system.Models;
 @model ClientCompany
 
 <aside class="main-sidebar elevation-2 sidebar-light-primary">
@@ -12,7 +11,10 @@
                 <!-- Add icons to the links using the .nav-icon class with font-awesome or any other icon font library -->
                 <partial name="AdminLTE/_CompanySidebarDashboard" />
                 <partial name="AdminLTE/_CompanySidebarClaims" />
-                <partial name="AdminLTE/_CompanySidebarMailbox" />
+                @if(Model.EnableMailbox)
+                {
+                    <partial name="AdminLTE/_CompanySidebarMailbox" />
+                }
 
                 <partial name="AdminLTE/_CompanySidebarAdmin" />
             </ul>

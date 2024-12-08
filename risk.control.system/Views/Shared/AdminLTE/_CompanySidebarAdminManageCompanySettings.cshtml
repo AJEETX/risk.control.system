@@ -1,10 +1,4 @@
-﻿@using Microsoft.EntityFrameworkCore;
-@using risk.control.system.Helpers;
-@using risk.control.system.Models;
-@inject SignInManager<ApplicationUser> SignInManager
-@inject ApplicationDbContext context
-@inject UserManager<ApplicationUser> UserManager
-@model ClientCompany
+﻿@using risk.control.system.Helpers;
 @{
     if (User.IsInRole(AppRoles.COMPANY_ADMIN.ToString()))
     {

@@ -1,8 +1,6 @@
-﻿@using Microsoft.EntityFrameworkCore;
-@using risk.control.system.Helpers;
+﻿@using risk.control.system.Helpers;
 @using risk.control.system.Models;
 @inject SignInManager<ApplicationUser> SignInManager
-@inject ApplicationDbContext context
 @inject UserManager<ApplicationUser> UserManager
 @model Vendor
 <aside class="main-sidebar elevation-2 sidebar-light-primary">
@@ -84,7 +82,10 @@
                         </li>
                     }
                 }
-                <partial name="AdminLTE/_VendorSidebarMailbox" />
+                @if(Model.EnableMailbox)
+                {
+                    <partial name="AdminLTE/_VendorSidebarMailbox" />
+                }
 
             </ul>
         </nav>

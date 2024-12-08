@@ -75,7 +75,6 @@ namespace risk.control.system.Models
         public bool VerifyPassport { get; set; } = false;
         public bool EnablePassport { get; set; } = false;
         public bool EnableMedia { get; set; } = false;
-        public string ApiBaseUrl { get; set; } = "https://2j2sgigd3l.execute-api.ap-southeast-2.amazonaws.com/Development/icheckify";
         public string PanIdfyUrl { get; set; } = "https://pan-card-verification-at-lowest-price.p.rapidapi.com/verification/marketing/pan";
         public string RapidAPIKey { get; set; } = "df0893831fmsh54225589d7b9ad1p15ac51jsnb4f768feed6f";
         public string RapidAPIHost { get; set; } = "pan-card-verification-at-lowest-price.p.rapidapi.com";
@@ -84,8 +83,9 @@ namespace risk.control.system.Models
         public string? PassportApiKey { get; set; } = "327fd8beb9msh8a441504790e80fp142ea8jsnf74b9208776a";
         public string? PassportApiHost { get; set; } = "document-ocr1.p.rapidapi.com";
         public bool SendSMS { get; set; } = false;
+        public bool EnableMailbox { get; set; } = true;
         public bool CanChangePassword { get; set; } = false;
-        public string MobileAppUrl { get; set; } = "https://apkichck.s3.ap-southeast-2.amazonaws.com/icheckify/app-release.apk";
+        public string MobileAppUrl { get; set; } = "https://ickeckify-apk.s3.ap-southeast-2.amazonaws.com/demo/app-release.apk";
         public bool BulkUpload { get; set; } = false;
         public string WhitelistIpAddress { get; set; } = "::1;202.7.251.85";
         public string? WhitelistIpAddressRange { get; set; } = default!;
@@ -102,7 +102,7 @@ namespace risk.control.system.Models
 
         public override string ToString()
         {
-            return $"Client Company Information:\n" +
+            return $"Insurance Company Information:\n" +
                 $"- Name: {Name}\n" +
                 $"- Code: {Code}\n" +
                 $"- Description: {Description}\n" +
@@ -128,7 +128,6 @@ namespace risk.control.system.Models
                 $"- Verify Passport: {VerifyPassport}\n" +
                 $"- Enable Passport: {EnablePassport}\n" +
                 $"- Enable Media: {EnableMedia}\n" +
-                $"- API Base URL: {ApiBaseUrl}\n" +
                 $"- Pan IDfy URL: {PanIdfyUrl}\n" +
                 $"- Rapid API Key: {RapidAPIKey}\n" +
                 $"- Rapid API Host: {RapidAPIHost}\n" +

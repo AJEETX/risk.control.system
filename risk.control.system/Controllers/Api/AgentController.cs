@@ -707,12 +707,14 @@ namespace risk.control.system.Controllers.Api
                     throw new ArgumentNullException("Argument(s) can't be null");
                 }
 
-                await claimsInvestigationService.SubmitToVendorSupervisor(
+                var (vendor, contract) = await claimsInvestigationService.SubmitToVendorSupervisor(
                     data.Email, data.BeneficiaryId,
                     data.ClaimId,
                     data.Remarks, data.Question1, data.Question2, data.Question3, data.Question4);
-
-                await mailboxService.NotifyClaimReportSubmitToVendorSupervisor(data.Email, data.ClaimId, data.BeneficiaryId);
+                if(vendor.EnableMailbox)
+                {
+                    await mailboxService.NotifyClaimReportSubmitToVendorSupervisor(data.Email, data.ClaimId, data.BeneficiaryId);
+                }
 
                 return Ok(new { data });
             }

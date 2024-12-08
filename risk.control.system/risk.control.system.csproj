@@ -41,7 +41,7 @@
     <PackageReference Include="Microsoft.FeatureManagement" Version="3.5.0" />
     <PackageReference Include="Microsoft.FeatureManagement.AspNetCore" Version="3.5.0" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.6" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.7" />
     <PackageReference Include="Net8.Licensing" Version="1.0.0" />
     <PackageReference Include="NToastNotify" Version="8.0.0" />
     <PackageReference Include="NuGet.Common" Version="6.11.1" />

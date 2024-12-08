@@ -28,18 +28,6 @@
             var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
             var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-            @* var activeUsers = _context.Users.Where(u => u.Email != userEmail).AsEnumerable();
-
-            var allUsers = activeUsers.Where(u => u.LastActivityDate.HasValue &&
-            u.LastActivityDate.Value.AddMinutes(Applicationsettings.ACTIVE_USER_TIMESPAN) > DateTime.Now)?.Select(u => u.Email)?.ToList(); 
-            var chat = new ChatMessage
-                {
-                    FromUser = applicationUser,
-                    FromUserEmail = userEmail,
-                    ActiveUsers = allUsers
-                }
-            ; *@
-
             ClientCompany company = null!;
             if (companyUser is not null)
             {

@@ -29,7 +29,6 @@ namespace risk.control.system.Services
 
         Task<PanResponse?> VerifyPanNew(string pan, string panUrl, string key, string host);
 
-        Task<RootObject> GetAddress(string lat, string lon);
         Task<string> GetRawAddress(string lat, string lon);
 
         Task<LocationDetails_IpApi> GetAddressFromIp(string ipAddress);
@@ -140,29 +139,6 @@ namespace risk.control.system.Services
 
         }
 
-        public async Task<RootObject> GetAddress(string lat, string lon)
-        {
-            httpClient.DefaultRequestHeaders.Add("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
-            httpClient.DefaultRequestHeaders.Add("Referer", "http://www.microsoft.com");
-            var result = await httpClient.GetAsync("http://nominatim.openstreetmap.org/reverse?format=json&lat=" + lat + "&lon=" + lon);
-            //var rootObject = await httpClient.GetFromJsonAsync<RootObject>("http://nominatim.openstreetmap.org/reverse?format=json&lat=" + lat + "&lon=" + lon);
-            var responseBody = await result.Content.ReadAsStringAsync();
-            try
-            {
-                var rootObject = JsonConvert.DeserializeObject<RootObject>(responseBody);
-                //DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(RootObject));
-                //RootObject rootObject = (RootObject)ser.ReadObject(new MemoryStream(jsonData));
-                return rootObject;
-            }
-            catch (Exception)
-            {
-                return new RootObject
-                {
-                    display_name = "Troy Court, Forest Hill, Melbourne, City of Whitehorse, Victoria, 3131, Australia"
-                };
-            }
-
-        }
         public async Task<LocationDetails_IpApi> GetAddressFromIp(string ipAddress)
         {
             var Ip_Api_Url = $"{Applicationsettings.IP_SITE}{ipAddress}"; // 206.189.139.232 - This is a sample IP address. You can pass yours if you want to test

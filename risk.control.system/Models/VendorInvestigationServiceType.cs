@@ -54,7 +54,7 @@ namespace risk.control.system.Models
         public bool Deleted { get; set; } = false;
         public override string ToString()
         {
-            return $"Vendor Investigation Service Type Information:\n" +
+            return $"Agency Investigation Service Type Information:\n" +
                 $"- Investigation Service Type: {InvestigationServiceType}\n" +
                 $"- Line Of Business: {LineOfBusiness}\n" +
                 $"- Country: {Country}\n" +
