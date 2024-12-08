@@ -33,7 +33,7 @@ namespace risk.control.system.Services
 
         Task<ClaimsInvestigation> ProcessAgentReport(string userEmail, string supervisorRemarks, long caseLocationId, string claimsInvestigationId, SupervisorRemarkType remarks, IFormFile? claimDocument = null);
 
-        Task<ClaimsInvestigation> ProcessCaseReport(string userEmail, string assessorRemarks, long caseLocationId, string claimsInvestigationId, AssessorRemarkType assessorRemarkType);
+        Task<ClaimsInvestigation> ProcessCaseReport(string userEmail, string assessorRemarks, long caseLocationId, string claimsInvestigationId, AssessorRemarkType assessorRemarkType, string reportAiSummary);
 
         List<VendorCaseModel> GetAgencyLoad(List<Vendor> existingVendors);
 
@@ -850,28 +850,28 @@ namespace risk.control.system.Services
             }
         }
 
-        public async Task<ClaimsInvestigation> ProcessCaseReport(string userEmail, string assessorRemarks, long caseLocationId, string claimsInvestigationId, AssessorRemarkType reportUpdateStatus)
+        public async Task<ClaimsInvestigation> ProcessCaseReport(string userEmail, string assessorRemarks, long caseLocationId, string claimsInvestigationId, AssessorRemarkType reportUpdateStatus, string reportAiSummary)
         {
             var claim = _context.ClaimsInvestigation
                  .FirstOrDefault(c => c.ClaimsInvestigationId == claimsInvestigationId);
 
             if (reportUpdateStatus == AssessorRemarkType.OK)
             {
-                return await ApproveCaseReport(userEmail, assessorRemarks, caseLocationId, claimsInvestigationId, reportUpdateStatus);
+                return await ApproveCaseReport(userEmail, assessorRemarks, caseLocationId, claimsInvestigationId, reportUpdateStatus, reportAiSummary);
             }
             else if (reportUpdateStatus == AssessorRemarkType.REJECT)
             {
                 //PUT th case back in review list :: Assign back to Agent
-                return await RejectCaseReport(userEmail, assessorRemarks, caseLocationId, claimsInvestigationId, reportUpdateStatus);
+                return await RejectCaseReport(userEmail, assessorRemarks, caseLocationId, claimsInvestigationId, reportUpdateStatus, reportAiSummary);
             }
             else
             {
                 //PUT th case back in review list :: Assign back to Agent
-                return await ReAssignToCreator(userEmail, claimsInvestigationId, caseLocationId, assessorRemarks, reportUpdateStatus);
+                return await ReAssignToCreator(userEmail, claimsInvestigationId, caseLocationId, assessorRemarks, reportUpdateStatus, reportAiSummary);
             }
         }
 
-        private async Task<ClaimsInvestigation> RejectCaseReport(string userEmail, string assessorRemarks, long caseLocationId, string claimsInvestigationId, AssessorRemarkType assessorRemarkType)
+        private async Task<ClaimsInvestigation> RejectCaseReport(string userEmail, string assessorRemarks, long caseLocationId, string claimsInvestigationId, AssessorRemarkType assessorRemarkType, string reportAiSummary)
         {
             var rejected = _context.InvestigationCaseSubStatus
                 .FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR);
@@ -885,6 +885,7 @@ namespace risk.control.system.Services
                     .Include(p => p.ClientCompany)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimsInvestigationId);
 
+                claim.AgencyReport.AiSummary = reportAiSummary;
                 claim.AgencyReport.AssessorRemarkType = assessorRemarkType;
                 claim.AgencyReport.AssessorRemarks = assessorRemarks;
                 claim.AgencyReport.AssessorRemarksUpdated = DateTime.Now;
@@ -961,7 +962,7 @@ namespace risk.control.system.Services
             }
             return null!;
         }
-        private async Task<ClaimsInvestigation> ApproveCaseReport(string userEmail, string assessorRemarks, long caseLocationId, string claimsInvestigationId, AssessorRemarkType assessorRemarkType)
+        private async Task<ClaimsInvestigation> ApproveCaseReport(string userEmail, string assessorRemarks, long caseLocationId, string claimsInvestigationId, AssessorRemarkType assessorRemarkType, string reportAiSummary)
         {
             var approved = _context.InvestigationCaseSubStatus
                 .FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR);
@@ -975,6 +976,7 @@ namespace risk.control.system.Services
                     .Include(c => c.AgencyReport)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimsInvestigationId);
 
+                claim.AgencyReport.AiSummary = reportAiSummary;
                 claim.AgencyReport.AssessorRemarkType = assessorRemarkType;
                 claim.AgencyReport.AssessorRemarks = assessorRemarks;
                 claim.AgencyReport.AssessorRemarksUpdated = DateTime.Now;
@@ -1070,7 +1072,7 @@ namespace risk.control.system.Services
             return null!;
         }
 
-        private async Task<ClaimsInvestigation> ReAssignToCreator(string userEmail, string claimsInvestigationId, long caseLocationId, string assessorRemarks, AssessorRemarkType assessorRemarkType)
+        private async Task<ClaimsInvestigation> ReAssignToCreator(string userEmail, string claimsInvestigationId, long caseLocationId, string assessorRemarks, AssessorRemarkType assessorRemarkType, string reportAiSummary)
         {
             var currentUser = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
 
@@ -1084,6 +1086,7 @@ namespace risk.control.system.Services
                 .FirstOrDefault(v => v.ClaimsInvestigationId == claimsInvestigationId);
 
 
+            claimsCaseToReassign.AgencyReport.AiSummary = reportAiSummary;
             claimsCaseToReassign.AgencyReport.AssessorRemarkType = assessorRemarkType;
             claimsCaseToReassign.AgencyReport.AssessorRemarks = assessorRemarks;
             claimsCaseToReassign.AgencyReport.AssessorRemarksUpdated = DateTime.Now;

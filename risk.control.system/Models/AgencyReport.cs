@@ -40,6 +40,9 @@ namespace risk.control.system.Models
         public long? EnquiryRequestId { get; set; }
         public EnquiryRequest? EnquiryRequest { get; set; }
         public List<EnquiryRequest> EnquiryRequests { get; set; } = new List<EnquiryRequest>();
+
+        public string? AiSummary { get; set; }
+
         public override string ToString()
         {
             return $"Agency Report Information:\n" +

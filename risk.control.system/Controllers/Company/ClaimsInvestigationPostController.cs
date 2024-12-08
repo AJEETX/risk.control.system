@@ -197,7 +197,7 @@ namespace risk.control.system.Controllers.Company
         [ValidateAntiForgeryToken]
         [HttpPost]
         [Authorize(Roles = ASSESSOR.DISPLAY_NAME)]
-        public async Task<IActionResult> ProcessCaseReport(string assessorRemarks, string assessorRemarkType, string claimId, long caseLocationId)
+        public async Task<IActionResult> ProcessCaseReport(string assessorRemarks, string assessorRemarkType, string claimId, long caseLocationId, string reportAiSummary)
         {
             if (string.IsNullOrWhiteSpace(assessorRemarks) || caseLocationId < 1 || string.IsNullOrWhiteSpace(claimId) || string.IsNullOrWhiteSpace(assessorRemarkType))
             {
@@ -215,7 +215,7 @@ namespace risk.control.system.Controllers.Company
 
                 AssessorRemarkType reportUpdateStatus = (AssessorRemarkType)Enum.Parse(typeof(AssessorRemarkType), assessorRemarkType, true);
 
-                var claim = await claimsInvestigationService.ProcessCaseReport(currentUserEmail, assessorRemarks, caseLocationId, claimId, reportUpdateStatus);
+                var claim = await claimsInvestigationService.ProcessCaseReport(currentUserEmail, assessorRemarks, caseLocationId, claimId, reportUpdateStatus, reportAiSummary);
 
                 await mailboxService.NotifyClaimReportProcess(currentUserEmail, claimId, caseLocationId);
 
@@ -246,7 +246,7 @@ namespace risk.control.system.Controllers.Company
         [ValidateAntiForgeryToken]
         [HttpPost]
         [Authorize(Roles = ASSESSOR.DISPLAY_NAME)]
-        public async Task<IActionResult> ReProcessCaseReport(string assessorRemarks, string assessorRemarkType, string claimId, long caseLocationId)
+        public async Task<IActionResult> ReProcessCaseReport(string assessorRemarks, string assessorRemarkType, string claimId, long caseLocationId, string reportAiSummary)
         {
             if (string.IsNullOrWhiteSpace(assessorRemarks) || caseLocationId < 1 || string.IsNullOrWhiteSpace(claimId))
             {
@@ -255,13 +255,18 @@ namespace risk.control.system.Controllers.Company
             }
             try
             {
-                string userEmail = HttpContext?.User?.Identity.Name;
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (string.IsNullOrWhiteSpace(currentUserEmail))
+                {
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
 
                 var reportUpdateStatus = AssessorRemarkType.REVIEW;
 
-                var claim = await claimsInvestigationService.ProcessCaseReport(userEmail, assessorRemarks, caseLocationId, claimId, reportUpdateStatus);
+                var claim = await claimsInvestigationService.ProcessCaseReport(currentUserEmail, assessorRemarks, caseLocationId, claimId, reportUpdateStatus, reportAiSummary);
 
-                await mailboxService.NotifyClaimReportProcess(userEmail, claimId, caseLocationId);
+                await mailboxService.NotifyClaimReportProcess(currentUserEmail, claimId, caseLocationId);
 
                 return RedirectToAction(nameof(AssessorController.Assessor), "Assessor");
             }
@@ -279,17 +284,18 @@ namespace risk.control.system.Controllers.Company
         {
             try
             {
+                if (request == null || string.IsNullOrWhiteSpace(claimId) || string.IsNullOrWhiteSpace(reply))
+                {
+                    notifyService.Error("Bad Request..");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
-                    notifyService.Error("OOPs !!!..Contact Admin");
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                if (request == null)
-                {
-                    notifyService.Error("NOT FOUND !!!..");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
+                
                 request.AgencyReport.EnquiryRequest.Description = HttpUtility.HtmlEncode(request.AgencyReport.EnquiryRequest.Description);
 
                 IFormFile? messageDocument = Request.Form?.Files?.FirstOrDefault();
@@ -322,7 +328,7 @@ namespace risk.control.system.Controllers.Company
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
-                    notifyService.Error("OOPs !!!..Contact Admin");
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 

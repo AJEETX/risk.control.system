@@ -28,11 +28,10 @@ public class OpenAISummarizer : IChatSummarizer
         {
             _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {Environment.GetEnvironmentVariable("OPEN_API")}");
 
-            string inputText = FormatObjectData(claimsInvestigation);
             var requestData = new
             {
                 model = "gpt-3.5-turbo",
-                messages = new[] { new { role = "user", content = $"Summarize the following claim investigation information:\n{inputText}" } },
+                messages = new[] { new { role = "user", content = $"Summarize the following claim investigation information:\n{claimsInvestigation.ToString()}" } },
                 max_tokens = 100
             };
             var requestContent = new StringContent(JsonConvert.SerializeObject(requestData), Encoding.UTF8, "application/json");
@@ -50,7 +49,7 @@ public class OpenAISummarizer : IChatSummarizer
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
-            return null;
+            return "Error ||| Could not Summarise";
         }
     }
 
@@ -58,20 +57,7 @@ public class OpenAISummarizer : IChatSummarizer
     {
         try
         {
-            var product = new Product
-            {
-                Name = "Wireless Mouse",
-                Description = "A high-precision wireless mouse with ergonomic design.",
-                Price = 25.99m,
-                Category = "Electronics"
-            };
-
-            string requestData = FormatObjectData(product);
-            if (!string.IsNullOrEmpty(inputText))
-            {
-                requestData = inputText;
-            }
-            var requestContent = new StringContent(System.Text.Json.JsonSerializer.Serialize(requestData), Encoding.UTF8, "application/json");
+            var requestContent = new StringContent(System.Text.Json.JsonSerializer.Serialize(claimsInvestigation.ToString()), Encoding.UTF8, "application/json");
 
             _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {Environment.GetEnvironmentVariable("HUGING_FACE")}");
             HttpResponseMessage response = await _httpClient.PostAsync("https://api-inference.huggingface.co/models/facebook/bart-large-cnn", requestContent);
@@ -87,23 +73,7 @@ public class OpenAISummarizer : IChatSummarizer
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
+            return "Error ||| Could not Summarise";
         }
-        return null;
     }
-    static string FormatObjectData(ClaimsInvestigation claimsInvestigation)
-    {
-        return claimsInvestigation.ToString();
-    }
-    private string FormatObjectData(Product product)
-    {
-        // Customize the formatting based on your Product class
-        return $"Name: {product.Name}\nPrice: {product.Price}\nDescription: {product.Description}";
-    }
-}
-public class Product
-{
-    public string Name { get; set; }
-    public string Description { get; set; }
-    public decimal Price { get; set; }
-    public string Category { get; set; }
 }

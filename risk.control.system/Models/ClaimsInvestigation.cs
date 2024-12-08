@@ -65,8 +65,8 @@ namespace risk.control.system.Models
         public bool AiEnabled { get; set; } = false;
         public override string ToString()
         {
-            return $"Claim Information:\n" +
-            $"- Claim Id: {ClaimsInvestigationId}\n" +
+            return $"Insurance Claim Investigation Information:\n" +
+            $"- Investigation Id: {ClaimsInvestigationId}\n" +
             $"- Policy Detail: {PolicyDetail.ToString()}\n" +
             $"- Customer: {CustomerDetail.ToString()} \n" +
             $"- Beneficiary: {BeneficiaryDetail.ToString()} \n" +

@@ -70,7 +70,7 @@ namespace risk.control.system.Controllers.Api.Claims
         }
 
         [HttpGet("GetPolicyNotes")]
-        public async Task<IActionResult> GetPolicyNotes(string claimId)
+        public IActionResult GetPolicyNotes(string claimId)
         {
             var claim = claimsService.GetClaims()
                 .Include(c => c.ClaimNotes)
@@ -288,6 +288,231 @@ namespace risk.control.system.Controllers.Api.Claims
                 {
                     Lat = string.IsNullOrWhiteSpace(videoLat) ? decimal.Parse("-37.0000") : decimal.Parse(videoLat),
                     Lng = string.IsNullOrWhiteSpace(videoLng) ? decimal.Parse("140.00") : decimal.Parse(videoLng)
+                }
+            };
+
+            return Ok(data);
+        }
+
+        [HttpGet("GetInvestigationFaceIdData")]
+        public async Task<IActionResult> GetInvestigationFaceIdData(string claimId)
+        {
+            var claim = claimsService.GetClaims()
+                .Include(c => c.AgencyReport)
+                .Include(c => c.AgencyReport.PanIdReport)
+                .FirstOrDefault(c => c.ClaimsInvestigationId == claimId);
+
+            var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-photo.jpg");
+
+            var noDataimage = await System.IO.File.ReadAllBytesAsync(noDataImagefilePath);
+
+            string mapUrl = "https://maps.googleapis.com/maps/api/staticmap?center=32.661839,-97.263680&zoom=14&size=150x200&maptype=roadmap&markers=color:red%7Clabel:S%7C32.661839,-97.263680&key={Applicationsettings.GMAPData}";
+            string imageAddress = string.Empty;
+            string faceLat = string.Empty, faceLng = string.Empty;
+            if (!string.IsNullOrWhiteSpace(claim.AgencyReport?.DigitalIdReport?.DigitalIdImageLongLat))
+            {
+                var longLat = claim.AgencyReport.DigitalIdReport.DigitalIdImageLongLat.IndexOf("/");
+                faceLat = claim.AgencyReport.DigitalIdReport.DigitalIdImageLongLat.Substring(0, longLat)?.Trim();
+                faceLng = claim.AgencyReport.DigitalIdReport.DigitalIdImageLongLat.Substring(longLat + 1)?.Trim();
+                var longLatString = faceLat + "," + faceLng;
+                imageAddress = await httpClientService.GetRawAddress((faceLat), (faceLng));
+                mapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={longLatString}&zoom=14&size=300x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{longLatString}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+            }
+
+            var data = new
+            {
+                Title = "Investigation Data",
+                LocationData = claim.AgencyReport?.DigitalIdReport?.DigitalIdImageData ?? "Location Data",
+                LatLong = mapUrl,
+                ImageAddress = imageAddress,
+                Location = claim.AgencyReport?.DigitalIdReport?.DigitalIdImage != null ?
+                string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claim.AgencyReport?.DigitalIdReport?.DigitalIdImage)) :
+                string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noDataimage)),
+                FacePosition =
+                new
+                {
+                    Lat = string.IsNullOrWhiteSpace(faceLat) ? decimal.Parse("-37.00") : decimal.Parse(faceLat),
+                    Lng = string.IsNullOrWhiteSpace(faceLng) ? decimal.Parse("140.00") : decimal.Parse(faceLng)
+                }
+            };
+
+            return Ok(data);
+        }
+
+        [HttpGet("GetInvestigationPanData")]
+        public async Task<IActionResult> GetInvestigationPanData(string claimId)
+        {
+            var claim = claimsService.GetClaims()
+                .Include(c => c.AgencyReport)
+                .Include(c => c.AgencyReport.PanIdReport)
+                .FirstOrDefault(c => c.ClaimsInvestigationId == claimId);
+
+            var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-photo.jpg");
+
+            var noDataimage = await System.IO.File.ReadAllBytesAsync(noDataImagefilePath);
+
+            string panLatitude = string.Empty, panLongitude = string.Empty;
+            string panLocationUrl = $"https://maps.googleapis.com/maps/api/staticmap?center=32.661839,-97.263680&zoom=14&size=150x200&maptype=roadmap&markers=color:red%7Clabel:S%7C32.661839,-97.263680&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+            string panAddressAddress = string.Empty;
+            if (!string.IsNullOrWhiteSpace(claim.AgencyReport?.PanIdReport?.DocumentIdImageLongLat))
+            {
+                var ocrlongLat = claim.AgencyReport.PanIdReport.DocumentIdImageLongLat.IndexOf("/");
+                panLatitude = claim.AgencyReport.PanIdReport.DocumentIdImageLongLat.Substring(0, ocrlongLat)?.Trim();
+                panLongitude = claim.AgencyReport.PanIdReport.DocumentIdImageLongLat.Substring(ocrlongLat + 1)?.Trim();
+                var ocrLongLatString = panLatitude + "," + panLongitude;
+                panAddressAddress = await httpClientService.GetRawAddress((panLatitude), (panLongitude));
+                panLocationUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={ocrLongLatString}&zoom=14&size=300x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{ocrLongLatString}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+            }
+
+            var data = new
+            {
+                Title = "Investigation Data",
+                QrData = claim.AgencyReport?.PanIdReport?.DocumentIdImageData,
+                OcrData = claim.AgencyReport?.PanIdReport?.DocumentIdImage != null ?
+                string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claim.AgencyReport?.PanIdReport?.DocumentIdImage)) :
+                string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noDataimage)),
+                OcrLatLong = panLocationUrl,
+                OcrAddress = panAddressAddress,
+                OcrPosition =
+                new
+                {
+                    Lat = string.IsNullOrWhiteSpace(panLatitude) ? decimal.Parse("-37.0000") : decimal.Parse(panLatitude),
+                    Lng = string.IsNullOrWhiteSpace(panLongitude) ? decimal.Parse("140.00") : decimal.Parse(panLongitude)
+                }
+            };
+
+            return Ok(data);
+        }
+
+        [HttpGet("GetInvestigationPassportData")]
+        public async Task<IActionResult> GetInvestigationPassportData(string claimId)
+        {
+            var claim = claimsService.GetClaims()
+                .Include(c => c.AgencyReport)
+                .Include(c => c.AgencyReport.PassportIdReport)
+                .FirstOrDefault(c => c.ClaimsInvestigationId == claimId);
+
+            var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-photo.jpg");
+            var noDataimage = await System.IO.File.ReadAllBytesAsync(noDataImagefilePath);
+
+            string passportUrl = $"https://maps.googleapis.com/maps/api/staticmap?center=32.661839,-97.263680&zoom=14&size=150x200&maptype=roadmap&markers=color:red%7Clabel:S%7C32.661839,-97.263680&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+            string passportAddress = string.Empty;
+            string passportLat = string.Empty, passportLng = string.Empty;
+            if (!string.IsNullOrWhiteSpace(claim.AgencyReport?.PassportIdReport?.DocumentIdImageLongLat))
+            {
+                var passportlongLat = claim.AgencyReport.PassportIdReport.DocumentIdImageLongLat.IndexOf("/");
+                passportLat = claim.AgencyReport.PassportIdReport.DocumentIdImageLongLat.Substring(0, passportlongLat)?.Trim();
+                passportLng = claim.AgencyReport.PassportIdReport.DocumentIdImageLongLat.Substring(passportlongLat + 1)?.Trim();
+                var passportLongLatString = passportLat + "," + passportLng;
+                passportAddress = await httpClientService.GetRawAddress((passportLat), (passportLng));
+                passportUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={passportLongLatString}&zoom=14&size=300x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{passportLongLatString}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+            }
+
+            var data = new
+            {
+                Title = "Investigation Data",
+
+                PassportData = claim.AgencyReport?.PassportIdReport?.DocumentIdImageData ?? "Passport Data",
+                PassportImage = claim.AgencyReport?.PassportIdReport?.DocumentIdImage != null ?
+                string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claim.AgencyReport?.PassportIdReport?.DocumentIdImage)) :
+                string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noDataimage)),
+                PassportLatLong = passportUrl,
+                PassportAddress = passportAddress,
+                PassportPosition =
+                new
+                {
+                    Lat = string.IsNullOrWhiteSpace(passportLat) ? decimal.Parse("-37.0000") : decimal.Parse(passportLat),
+                    Lng = string.IsNullOrWhiteSpace(passportLng) ? decimal.Parse("140.00") : decimal.Parse(passportLng)
+                }
+            };
+
+            return Ok(data);
+        }
+
+        [HttpGet("GetInvestigationVideoData")]
+        public async Task<IActionResult> GetInvestigationVideoData(string claimId)
+        {
+            var claim = claimsService.GetClaims()
+                .Include(c => c.AgencyReport)
+                .Include(c => c.AgencyReport.VideoReport)
+                .FirstOrDefault(c => c.ClaimsInvestigationId == claimId);
+
+            var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-photo.jpg");
+
+            var noDataimage = await System.IO.File.ReadAllBytesAsync(noDataImagefilePath);
+            string videoUrl = $"https://maps.googleapis.com/maps/api/staticmap?center=32.661839,-97.263680&zoom=14&size=150x200&maptype=roadmap&markers=color:red%7Clabel:S%7C32.661839,-97.263680&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+            string videoAddress = string.Empty;
+            string videoLat = string.Empty, videoLng = string.Empty;
+            if (!string.IsNullOrWhiteSpace(claim.AgencyReport?.VideoReport?.DocumentIdImageLongLat))
+            {
+                var videolongLat = claim.AgencyReport.VideoReport.DocumentIdImageLongLat.IndexOf("/");
+                videoLat = claim.AgencyReport.VideoReport.DocumentIdImageLongLat.Substring(0, videolongLat)?.Trim();
+                videoLng = claim.AgencyReport.VideoReport.DocumentIdImageLongLat.Substring(videolongLat + 1)?.Trim();
+                var videoLongLatString = videoLat + "," + videoLng;
+                videoAddress = await httpClientService.GetRawAddress((videoLat), (videoLng));
+                videoUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={videoLongLatString}&zoom=14&size=300x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{videoLongLatString}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+            }
+
+
+            var data = new
+            {
+                Title = "Investigation Data",
+                VideoData = claim.AgencyReport?.VideoReport?.DocumentIdImageData ?? "Video Data",
+                VideoImage = claim.AgencyReport?.VideoReport?.DocumentIdImage != null ?
+                string.Format("data:video/*;base64,{0}", Convert.ToBase64String(claim.AgencyReport?.VideoReport?.DocumentIdImage)) :
+                string.Format("data:video/*;base64,{0}", Convert.ToBase64String(noDataimage)),
+                VideoLatLong = videoUrl,
+                VideoAddress = videoAddress,
+                VideoPosition =
+                new
+                {
+                    Lat = string.IsNullOrWhiteSpace(videoLat) ? decimal.Parse("-37.0000") : decimal.Parse(videoLat),
+                    Lng = string.IsNullOrWhiteSpace(videoLng) ? decimal.Parse("140.00") : decimal.Parse(videoLng)
+                }
+            };
+
+            return Ok(data);
+        }
+
+        [HttpGet("GetInvestigationAudioData")]
+        public async Task<IActionResult> GetInvestigationAudioData(string claimId)
+        {
+            var claim = claimsService.GetClaims()
+                .Include(c => c.AgencyReport)
+                .Include(c => c.AgencyReport.AudioReport)
+                .FirstOrDefault(c => c.ClaimsInvestigationId == claimId);
+
+            var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-photo.jpg");
+
+            var noDataimage = await System.IO.File.ReadAllBytesAsync(noDataImagefilePath);
+
+            string audioUrl = $"https://maps.googleapis.com/maps/api/staticmap?center=32.661839,-97.263680&zoom=14&size=150x200&maptype=roadmap&markers=color:red%7Clabel:S%7C32.661839,-97.263680&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+            string audioAddress = string.Empty;
+            string audioLat = string.Empty, audioLng = string.Empty;
+            if (!string.IsNullOrWhiteSpace(claim.AgencyReport?.AudioReport?.DocumentIdImageLongLat))
+            {
+                var audiolongLat = claim.AgencyReport.AudioReport.DocumentIdImageLongLat.IndexOf("/");
+                audioLat = claim.AgencyReport.AudioReport.DocumentIdImageLongLat.Substring(0, audiolongLat)?.Trim();
+                audioLng = claim.AgencyReport.AudioReport.DocumentIdImageLongLat.Substring(audiolongLat + 1)?.Trim();
+                var passportLongLatString = audioLat + "," + audioLng;
+                audioAddress = await httpClientService.GetRawAddress((audioLat), (audioLng));
+                audioUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={passportLongLatString}&zoom=14&size=300x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{passportLongLatString}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+            }
+
+            var data = new
+            {
+                Title = "Investigation Data",
+                AudioData = claim.AgencyReport?.AudioReport?.DocumentIdImageData ?? "Audio Data",
+                AudioImage = claim.AgencyReport?.AudioReport?.DocumentIdImage != null ?
+                string.Format("data:audio/*;base64,{0}", Convert.ToBase64String(claim.AgencyReport?.AudioReport?.DocumentIdImage)) :
+                string.Format("data:audio/*;base64,{0}", Convert.ToBase64String(noDataimage)),
+                AudioLatLong = audioUrl,
+                AudioAddress = audioAddress,
+                AudioPosition =
+                new
+                {
+                    Lat = string.IsNullOrWhiteSpace(audioLat) ? decimal.Parse("-37.0000") : decimal.Parse(audioLat),
+                    Lng = string.IsNullOrWhiteSpace(audioLng) ? decimal.Parse("140.00") : decimal.Parse(audioLng)
                 }
             };
 
