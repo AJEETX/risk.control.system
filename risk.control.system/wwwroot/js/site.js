@@ -316,7 +316,7 @@ $(document).ready(function () {
             content: function () {
                 var self = this;
                 return $.ajax({
-                    url: '/api/ClaimsInvestigation/GetInvestigationData?id=' + $('#beneficiaryId').val() + '&claimId=' + $('#claimId').val(),
+                    url: '/api/ClaimsInvestigation/GetInvestigationFaceIdData?claimId=' + $('#claimId').val(),
                     dataType: 'json',
                     method: 'get'
                 }).done(function (response) {
@@ -356,7 +356,7 @@ $(document).ready(function () {
             content: function () {
                 var self = this;
                 return $.ajax({
-                    url: '/api/ClaimsInvestigation/GetInvestigationData?id=' + $('#beneficiaryId').val() + '&claimId=' + $('#claimId').val(),
+                    url: '/api/ClaimsInvestigation/GetInvestigationFaceIdData?claimId=' + $('#claimId').val(),
                     dataType: 'json',
                     method: 'get'
                 }).done(function (response) {
@@ -401,7 +401,7 @@ $(document).ready(function () {
             content: function () {
                 var self = this;
                 return $.ajax({
-                    url: '/api/ClaimsInvestigation/GetInvestigationData?id=' + $('#beneficiaryId').val() + '&claimId=' + $('#claimId').val(),
+                    url: '/api/ClaimsInvestigation/GetInvestigationPanData?claimId=' + $('#claimId').val(),
                     dataType: 'json',
                     method: 'get'
                 }).done(function (response) {
@@ -446,7 +446,7 @@ $(document).ready(function () {
             content: function () {
                 var self = this;
                 return $.ajax({
-                    url: '/api/ClaimsInvestigation/GetInvestigationData?id=' + $('#beneficiaryId').val() + '&claimId=' + $('#claimId').val(),
+                    url: '/api/ClaimsInvestigation/GetInvestigationPassportData?claimId=' + $('#claimId').val(),
                     dataType: 'json',
                     method: 'get'
                 }).done(function (response) {
@@ -491,7 +491,7 @@ $(document).ready(function () {
             content: function () {
                 var self = this;
                 return $.ajax({
-                    url: '/api/ClaimsInvestigation/GetInvestigationData?id=' + $('#beneficiaryId').val() + '&claimId=' + $('#claimId').val(),
+                    url: '/api/ClaimsInvestigation/GetInvestigationAudioData?claimId=' + $('#claimId').val(),
                     dataType: 'json',
                     method: 'get'
                 }).done(function (response) {
@@ -517,7 +517,6 @@ $(document).ready(function () {
         })
     })
 
-
     $('.videolocationImage').click(function () {
         var data;
         $.confirm({
@@ -537,7 +536,7 @@ $(document).ready(function () {
             content: function () {
                 var self = this;
                 return $.ajax({
-                    url: '/api/ClaimsInvestigation/GetInvestigationData?id=' + $('#beneficiaryId').val() + '&claimId=' + $('#claimId').val(),
+                    url: '/api/ClaimsInvestigation/GetInvestigationVideoData?claimId=' + $('#claimId').val(),
                     dataType: 'json',
                     method: 'get'
                 }).done(function (response) {
@@ -562,6 +561,7 @@ $(document).ready(function () {
             }
         })
     })
+
     $('#profileImageMap').click(function () {
         var data;
         $.confirm({
@@ -672,7 +672,7 @@ $(document).ready(function () {
             content: function () {
                 var self = this;
                 return $.ajax({
-                    url: '/api/ClaimsInvestigation/GetInvestigationData?id=' + $('#beneficiaryId').val() + '&claimId=' + $('#claimId').val(),
+                    url: '/api/ClaimsInvestigation/GetInvestigationPanData?claimId=' + $('#claimId').val(),
                     dataType: 'json',
                     method: 'get'
                 }).done(function (response) {
@@ -706,7 +706,7 @@ $(document).ready(function () {
             content: function () {
                 var self = this;
                 return $.ajax({
-                    url: '/api/ClaimsInvestigation/GetInvestigationData?id=' + $('#beneficiaryId').val() + '&claimId=' + $('#claimId').val(),
+                    url: '/api/ClaimsInvestigation/GetInvestigationPassportData?claimId=' + $('#claimId').val(),
                     dataType: 'json',
                     method: 'get'
                 }).done(function (response) {

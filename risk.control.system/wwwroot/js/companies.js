@@ -158,12 +158,20 @@ async function success(position) {
     }).responseText;
 
     var b_current_data = JSON.parse(b_response);
-
     var b_LatLng = new google.maps.LatLng(b_lat, b_lng);
-    var b_marker = new google.maps.Marker({
-        position: b_LatLng,
-        title: "Branch Location: " + b_current_data.results[0].formatted_address
-    });
+    var b_marker;
+    if (b_current_data) {
+
+        b_marker = new google.maps.Marker({
+            position: b_LatLng,
+            title: "Branch Location: " + b_current_data.results[0].formatted_address
+        });
+    } else {
+        b_marker = new google.maps.Marker({
+            position: b_LatLng,
+            title: "Branch Location: Location Unknown"
+        });
+    }
     b_marker.setMap(map);
     var b_getInfoWindow = new google.maps.InfoWindow({
         content: "<b>Branch Location</b><br/> " +

@@ -76,7 +76,7 @@ namespace risk.control.system.Controllers
 
                 var userMailboxMessages = await inboxMailService.GetInboxMessages(userEmail);
 
-                return View("Index", userMailboxMessages);
+                return View(userMailboxMessages);
 
             }
             catch (Exception ex)

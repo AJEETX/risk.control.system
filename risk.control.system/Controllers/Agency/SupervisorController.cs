@@ -9,10 +9,12 @@ using risk.control.system.Services;
 using SmartBreadcrumbs.Attributes;
 using SmartBreadcrumbs.Nodes;
 
+using static risk.control.system.AppConstant.Applicationsettings;
+
 namespace risk.control.system.Controllers.Agency
 {
     [Breadcrumb(" Claims")]
-    [Authorize(Roles = "AGENCY_ADMIN,SUPERVISOR")]
+    [Authorize(Roles = $"{AGENCY_ADMIN.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME}")]
     public class SupervisorController : Controller
     {
         private readonly INotyfService notifyService;
@@ -306,15 +308,15 @@ namespace risk.control.system.Controllers.Agency
         {
             try
             {
+                if (id < 1)
+                {
+                    notifyService.Error("NOT FOUND !!!..");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
                     notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-                if (id < 1)
-                {
-                    notifyService.Error("NOT FOUND !!!..");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var invoice = await invoiceService.GetInvoice(id);
@@ -341,6 +343,11 @@ namespace risk.control.system.Controllers.Agency
         {
             try
             {
+                if (id < 1)
+                {
+                    notifyService.Error("NOT FOUND !!!..");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 if (string.IsNullOrWhiteSpace(currentUserEmail) || 1 > id)
                 {

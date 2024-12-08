@@ -63,8 +63,13 @@ namespace risk.control.system.Controllers.Company
             }
             try
             {
-                var userEmail = HttpContext.User.Identity.Name;
-                var companyUser = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (string.IsNullOrWhiteSpace(currentUserEmail))
+                {
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var companyUser = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(u => u.Email == currentUserEmail);
 
                 var company = _context.ClientCompany
                     .Include(c => c.EmpanelledVendors)
@@ -78,7 +83,7 @@ namespace risk.control.system.Controllers.Company
                 //IF AUTO ALLOCATION TRUE
                 if (company.AutoAllocation)
                 {
-                    var autoAllocatedClaims = await claimsInvestigationService.ProcessAutoAllocation(claims, company, userEmail);
+                    var autoAllocatedClaims = await claimsInvestigationService.ProcessAutoAllocation(claims, company, currentUserEmail);
 
                     if (claims.Count == autoAllocatedClaims.Count)
                     {

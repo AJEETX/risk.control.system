@@ -24,6 +24,7 @@ namespace risk.control.system.Controllers.Api.Company
     [ApiExplorerSettings(IgnoreApi = true)]
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = $"{CREATOR.DISPLAY_NAME}")]
     public class CreatorController : ControllerBase
     {
         private static CultureInfo hindi = new CultureInfo("hi-IN");

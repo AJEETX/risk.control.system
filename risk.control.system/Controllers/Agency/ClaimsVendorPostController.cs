@@ -17,9 +17,11 @@ using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
 
+using static risk.control.system.AppConstant.Applicationsettings;
+
 namespace risk.control.system.Controllers.Agency
 {
-    [Authorize(Roles = "AGENCY_ADMIN,SUPERVISOR,AGENT")]
+    [Authorize(Roles = $"{AGENCY_ADMIN.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME},{AGENT.DISPLAY_NAME}")]
     public class ClaimsVendorPostController : Controller
     {
         public List<UsersViewModel> UserList;
@@ -46,7 +48,7 @@ namespace risk.control.system.Controllers.Agency
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "AGENCY_ADMIN,SUPERVISOR")]
+        [Authorize(Roles = $"{AGENCY_ADMIN.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME}")]
         public async Task<IActionResult> AllocateToVendorAgent(string selectedcase, string claimId, long caseLocationId)
         {
             try
@@ -65,14 +67,14 @@ namespace risk.control.system.Controllers.Agency
                 var vendorAgent = _context.VendorApplicationUser.Include(a=>a.Vendor).FirstOrDefault(c => c.Id.ToString() == selectedcase);
                 if (vendorAgent == null)
                 {
-                    notifyService.Error("OOPs !!!..Contact Admin");
+                    notifyService.Error("OOPs !!!..User Not Found");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
                 var claim = await claimsInvestigationService.AssignToVendorAgent(vendorAgent.Email, currentUserEmail, vendorAgent.VendorId.Value, claimId);
                 if (claim == null)
                 {
-                    notifyService.Error("OOPs !!!..Contact Admin");
+                    notifyService.Error("OOPs !!!..Error occurred.");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 if(vendorAgent.Vendor.EnableMailbox)
@@ -94,6 +96,7 @@ namespace risk.control.system.Controllers.Agency
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = $"{AGENT.DISPLAY_NAME}")]
         public async Task<IActionResult> SubmitReport(string remarks, string question1, string question2, string question3, string question4, string claimId, long caseLocationId)
         {
             try
@@ -161,7 +164,7 @@ namespace risk.control.system.Controllers.Agency
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "AGENCY_ADMIN,SUPERVISOR")]
+        [Authorize(Roles = $"{AGENCY_ADMIN.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME}")]
         public async Task<IActionResult> ProcessReport(string supervisorRemarks, string supervisorRemarkType, string claimId, long caseLocationId)
         {
             try
@@ -206,7 +209,7 @@ namespace risk.control.system.Controllers.Agency
         }
 
         [HttpPost]
-        [Authorize(Roles = "AGENCY_ADMIN,SUPERVISOR")]
+        [Authorize(Roles = $"{AGENCY_ADMIN.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME}")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> WithdrawCase(ClaimTransactionModel model, string claimId, string policyNumber)
         {
@@ -247,7 +250,7 @@ namespace risk.control.system.Controllers.Agency
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "AGENCY_ADMIN,SUPERVISOR")]
+        [Authorize(Roles = $"{AGENCY_ADMIN.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME}")]
         public async Task<IActionResult> ReplyQuery(string claimId, ClaimsInvestigationVendorsModel request, List<string> flexRadioDefault)
         {
             try

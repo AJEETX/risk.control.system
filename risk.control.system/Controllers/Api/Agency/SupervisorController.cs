@@ -24,7 +24,7 @@ namespace risk.control.system.Controllers.Api.Agency
     [ApiExplorerSettings(IgnoreApi = true)]
     [Route("api/agency/[controller]")]
     [ApiController]
-    [Authorize(Roles = "AGENCY_ADMIN,SUPERVISOR,AGENT")]
+    [Authorize(Roles = $"{AGENCY_ADMIN.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME}")]
     public class SupervisorController : ControllerBase
     {
         private static CultureInfo hindi = new CultureInfo("hi-IN");

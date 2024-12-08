@@ -16,7 +16,7 @@ namespace risk.control.system.Controllers.Api
     [ApiExplorerSettings(IgnoreApi = true)]
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "PORTAL_ADMIN")]
+    [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME}")]
     public class UserController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
