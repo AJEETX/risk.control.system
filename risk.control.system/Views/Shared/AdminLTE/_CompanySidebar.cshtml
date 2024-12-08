@@ -11,12 +11,11 @@
                 <!-- Add icons to the links using the .nav-icon class with font-awesome or any other icon font library -->
                 <partial name="AdminLTE/_CompanySidebarDashboard" />
                 <partial name="AdminLTE/_CompanySidebarClaims" />
-                @if(Model.EnableMailbox)
+                <partial name="AdminLTE/_CompanySidebarAdmin" />
+                @if (Model.EnableMailbox)
                 {
                     <partial name="AdminLTE/_CompanySidebarMailbox" />
                 }
-
-                <partial name="AdminLTE/_CompanySidebarAdmin" />
             </ul>
         </nav>
         <!-- /.sidebar-menu -->

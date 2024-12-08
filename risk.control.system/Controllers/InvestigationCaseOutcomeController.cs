@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 using NToastNotify;
@@ -8,9 +9,12 @@ using risk.control.system.Models;
 
 using SmartBreadcrumbs.Attributes;
 
+using static risk.control.system.AppConstant.Applicationsettings;
+
 namespace risk.control.system.Controllers
 {
     [Breadcrumb("Case Outcome")]
+    [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME}")]
     public class InvestigationCaseOutcomeController : Controller
     {
         private readonly ApplicationDbContext _context;

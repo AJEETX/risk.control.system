@@ -2,6 +2,7 @@
 
 using AspNetCoreHero.ToastNotification.Abstractions;
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -19,8 +20,11 @@ using risk.control.system.Services;
 using SmartBreadcrumbs.Attributes;
 using SmartBreadcrumbs.Nodes;
 
+using static risk.control.system.AppConstant.Applicationsettings;
+
 namespace risk.control.system.Controllers
 {
+    [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME}")]
     public class VendorsController : Controller
     {
         private readonly ApplicationDbContext _context;

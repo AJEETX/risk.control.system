@@ -13,10 +13,13 @@ using AspNetCoreHero.ToastNotification.Abstractions;
 using Microsoft.FeatureManagement;
 using Microsoft.AspNetCore.Http;
 using risk.control.system.AppConstant;
+using Microsoft.AspNetCore.Authorization;
+using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers
 {
     [Breadcrumb("User Profile ")]
+    [Authorize(Roles = $"{AGENCY_ADMIN.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME}, {AGENT.DISPLAY_NAME}")]
     public class AgencyUserProfileController : Controller
     {
         public List<UsersViewModel> UserList;

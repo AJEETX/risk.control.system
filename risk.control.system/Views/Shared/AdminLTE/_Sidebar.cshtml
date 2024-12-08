@@ -99,8 +99,8 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a is-active-page asp-controller="ContactMessage" asp-action="Index" class="actual-link nav-link 
-                        @Url.MakeActiveClass("ContactMessage","Index") @Url.MakeActiveClass("ContactMessage","InboxDetails") @Url.MakeActiveClass("ContactMessage","InboxDetailsReply")">
+                    <a is-active-page asp-controller="ContactMessage" asp-action="Inbox" class="actual-link nav-link 
+                        @Url.MakeActiveClass("ContactMessage","Inbox") @Url.MakeActiveClass("ContactMessage","InboxDetails") @Url.MakeActiveClass("ContactMessage","InboxDetailsReply")">
                         <i class="fas fa-envelope-open nav-icon"></i>
                         <p>
                             @Applicationsettings.INBOX <span class="badge badge-danger">@newInboxMessgeDisplay</span>
@@ -139,101 +139,90 @@
                         </p>
                     </a>
                 </li>
-              
-                @{
-                    
-                    if (User.IsInRole(AppRoles.PORTAL_ADMIN.ToString()) || User.IsInRole(AppRoles.COMPANY_ADMIN.ToString()))
-                    {
-                        <li class="nav-item">
-                            <a asp-controller="ClientCompany" asp-action="Index" is-active-page class="navlink-border nav-link @Url.MakeActiveClass("ClientCompany","") @Url.MakeActiveClass("Vendors","") @Url.MakeActiveClass("CompanyUser","") @Url.MakeActiveClass("CompanyUserRoles","") @Url.MakeActiveClass("VendorUser","") @Url.MakeActiveClass("VendorService","")">
-                                <i class="nav-icon fas fa-shield-alt"></i>
-                                <p class="sidebar-menu-header-label">
-                                    @Applicationsettings.ADMIN_SETTINGS
-                                    <i class="right fas fa-angle-right"></i>
-                                </p>
-                            </a>
-                        </li>
-                        //<li class="nav-item">
-                        //    <a is-active-page asp-controller="Claim" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Claim","")">
-                        //        <i class="fas fa-rupee-sign nav-icon"></i>
-                        //        <p>
-                        //            @Applicationsettings.INVESTIGATION_CLAIM ^
-                        //        </p>
-                        //    </a>
-                        //</li>
-                        //<li class="nav-item">
-                        //    <a is-active-page asp-controller="Underwriting" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Underwriting","")">
-                        //        <i class="fas fa-handshake nav-icon"></i>
-                        //        <p>
-                        //            @Applicationsettings.INVESTIGATION_UNDERWRITINGS ^
-                        //        </p>
-                        //    </a>
-                        //</li>
-                        if (User.IsInRole(AppRoles.PORTAL_ADMIN.ToString()))
-                        {
-                            <li class="nav-item">
-                                <a is-active-page asp-controller="ClientCompany" asp-action="Companies" class="actual-link nav-link @Url.MakeActiveClass("ClientCompany","Index")
-                                                @Url.MakeActiveClass("ClientCompany","Details")
-                                                @Url.MakeActiveClass("ClientCompany","Delete")
-                                            @Url.MakeActiveClass("ClientCompany","Companies")
-                                        @Url.MakeActiveClass("ClientCompany","Edit")
-                                @Url.MakeActiveClass("CompanyUser","") @Url.MakeActiveClass("CompanyUserRoles","")">
-                                    <i class="nav-icon fas fa-building"></i>
-                                    <p>
-                                        Companies
-                                    </p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a is-active-page asp-controller="ClientCompany" asp-action="Create" class="actual-link nav-link @Url.MakeActiveClass("ClientCompany","Create")
-                                    ">
-                                    <i class="nav-icon fas fa-plus"></i>
-                                    <p>
-                                       Add Company
-                                    </p>
-                                </a>
-                            </li>
-                        }
-                        <li class="nav-item">
-                            <a is-active-page asp-controller="Vendors" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Vendors","") 
-                            @Url.MakeActiveClass("VendorUser","") @Url.MakeActiveClass("VendorService","")">
-                                <i class="nav-icon fas fa-building"></i>
-                                <p>
-                                    Agencies
-                                </p>
-                            </a>
-                        </li>
-                    }
-                    if (User.IsInRole(AppRoles.PORTAL_ADMIN.ToString()))
-                    {
-                        <li class="nav-item">
-                            <a asp-controller="User" asp-action="Index" is-active-page class="navlink-border nav-link @Url.MakeActiveClass("User","") @Url.MakeActiveClass("Roles","")">
-                                <i class="nav-icon fas fa-user-cog"></i>
-                                <p class="sidebar-menu-header-label">
-                                    @Applicationsettings.USER_ROLES
-                                    <i class="right fas fa-angle-right"></i>
-                                </p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a is-active-page asp-controller="User" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("User","")">
-                                <i class="fas fa-user-friends nav-icon"></i>
-                                <p>
-                                    Users
-                                </p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a is-active-page asp-controller="Roles" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Roles","")">
-                                <i class="fas fa-user-lock nav-icon"></i>
-                                <p>
-                                    @Applicationsettings.ROLE
+                <li class="nav-item">
+                    <a asp-controller="ClientCompany" asp-action="Index" is-active-page class="navlink-border nav-link @Url.MakeActiveClass("ClientCompany","") @Url.MakeActiveClass("Vendors","") @Url.MakeActiveClass("CompanyUser","") @Url.MakeActiveClass("CompanyUserRoles","") @Url.MakeActiveClass("VendorUser","") @Url.MakeActiveClass("VendorService","")">
+                        <i class="nav-icon fas fa-shield-alt"></i>
+                        <p class="sidebar-menu-header-label">
+                            @Applicationsettings.ADMIN_SETTINGS
+                            <i class="right fas fa-angle-right"></i>
+                        </p>
+                    </a>
+                </li>
+                @*
+                <li class="nav-item">
+                     <a is-active-page asp-controller="Claim" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Claim","")">
+                     <i class="fas fa-rupee-sign nav-icon"></i>
+                     <p>
+                      @Applicationsettings.INVESTIGATION_CLAIM ^
+                        </p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a is-active-page asp-controller="Underwriting" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Underwriting","")">
+                            <i class="fas fa-handshake nav-icon"></i>
+                          <p>
+                              @Applicationsettings.INVESTIGATION_UNDERWRITINGS ^
+                        </p>
+                    </a>
+                </li>
+                *@
+                <li class="nav-item">
+                    <a is-active-page asp-controller="ClientCompany" asp-action="Companies" class="actual-link nav-link @Url.MakeActiveClass("ClientCompany","Index")
+                                                    @Url.MakeActiveClass("ClientCompany","Details")
+                                                    @Url.MakeActiveClass("ClientCompany","Delete")
+                                                @Url.MakeActiveClass("ClientCompany","Companies")
+                                            @Url.MakeActiveClass("ClientCompany","Edit")
+                                    @Url.MakeActiveClass("CompanyUser","") @Url.MakeActiveClass("CompanyUserRoles","")">
+                        <i class="nav-icon fas fa-building"></i>
+                        <p>
+                            Companies
+                        </p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a is-active-page asp-controller="ClientCompany" asp-action="Create" class="actual-link nav-link @Url.MakeActiveClass("ClientCompany","Create")
+                                            ">
+                        <i class="nav-icon fas fa-plus"></i>
+                        <p>
+                            Add Company
+                        </p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a is-active-page asp-controller="Vendors" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Vendors","")
+                                    @Url.MakeActiveClass("VendorUser","") @Url.MakeActiveClass("VendorService","")">
+                        <i class="nav-icon fas fa-building"></i>
+                        <p>
+                            Agencies
+                        </p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a asp-controller="User" asp-action="Index" is-active-page class="navlink-border nav-link @Url.MakeActiveClass("User","") @Url.MakeActiveClass("Roles","")">
+                        <i class="nav-icon fas fa-user-cog"></i>
+                        <p class="sidebar-menu-header-label">
+                            @Applicationsettings.USER_ROLES
+                            <i class="right fas fa-angle-right"></i>
+                        </p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a is-active-page asp-controller="User" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("User","")">
+                        <i class="fas fa-user-friends nav-icon"></i>
+                        <p>
+                            Users
+                        </p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a is-active-page asp-controller="Roles" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Roles","")">
+                        <i class="fas fa-user-lock nav-icon"></i>
+                        <p>
+                            @Applicationsettings.ROLE
 
-                                </p>
-                            </a>
-                        </li>
-                    }
-                }
+                        </p>
+                    </a>
+                </li>
                 <li class="nav-item">
                     <a asp-controller="LineOfBusiness" asp-action="Index" is-active-page class="navlink-border nav-link @Url.MakeActiveClass("LineOfBusiness","") @Url.MakeActiveClass("InvestigationServiceTypes","")
                     @Url.MakeActiveClass("InvestigationCaseStatus","") @Url.MakeActiveClass("CaseEnabler","") @Url.MakeActiveClass("Costcentre","") 
@@ -311,73 +300,63 @@
                         </p>
                     </a>
                 </li>
-                @{
-                    if (User.IsInRole(AppRoles.PORTAL_ADMIN.ToString()) || User.IsInRole(AppRoles.COMPANY_ADMIN.ToString()))
-                    {
-                        if (User.IsInRole(AppRoles.PORTAL_ADMIN.ToString()))
-                        {
-                            <li class="nav-item">
-                                <a asp-controller="Country" asp-action="Index" is-active-page class="navlink-border nav-link @Url.MakeActiveClass("Country","") @Url.MakeActiveClass("State","") @Url.MakeActiveClass("District","") @Url.MakeActiveClass("PinCodes","") @Url.MakeActiveClass("File","") @Url.MakeActiveClass("Uploads","") @Url.MakeActiveClass("Audit","")">
-                                    <i class="nav-icon fas fa-wrench"></i>
-                                    <p class="sidebar-menu-header-label">
-                                        @Applicationsettings.GENERAL_SETUP
-                                        <i class="right fas fa-angle-right"></i>
-                                    </p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a is-active-page asp-controller="Country" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Country","")">
-                                    <i class="nav-icon fas fa-map-marked-alt"></i>
-                                    <p>
-                                        @Applicationsettings.COUNTRY
-                                    </p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a is-active-page asp-controller="State" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("State","")">
-                                    <i class="nav-icon fas fa-map-marker-alt"></i>
-                                    <p>
-                                        @Applicationsettings.STATE
-                                    </p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a is-active-page asp-controller="District" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("District","")">
-                                    <i class="nav-icon fas fa-city"></i>
-                                    <p>
-                                        @Applicationsettings.DISTRICT
-                                    </p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a is-active-page asp-controller="PinCodes" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("PinCodes","")">
-                                    <i class="nav-icon fas fa-file"></i>
-                                    <p>
-                                        @Applicationsettings.PINCODE
-                                    </p>
-                                </a>
-                            </li>
-
-                        }
-                        <li class="nav-item">
-                            <a is-active-page asp-controller="IpAddress" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("IpAddress","")">
-                                <i class="fas fa-sitemap nav-icon"></i>
-                                <p>
-                                    IP Tracking
-                                </p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a is-active-page asp-controller="Audit" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Audit","")">
-                                <i class="nav-icon fa fa-align-center"></i>
-                                <p>
-                                    @Applicationsettings.AUDIT_LOG
-                                </p>
-                            </a>
-                        </li>
-
-                    }
-                }
+                <li class="nav-item">
+                    <a asp-controller="Country" asp-action="Index" is-active-page class="navlink-border nav-link @Url.MakeActiveClass("Country","") @Url.MakeActiveClass("State","") @Url.MakeActiveClass("District","") @Url.MakeActiveClass("PinCodes","") @Url.MakeActiveClass("File","") @Url.MakeActiveClass("Uploads","") @Url.MakeActiveClass("Audit","")">
+                        <i class="nav-icon fas fa-wrench"></i>
+                        <p class="sidebar-menu-header-label">
+                            @Applicationsettings.GENERAL_SETUP
+                            <i class="right fas fa-angle-right"></i>
+                        </p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a is-active-page asp-controller="Country" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Country","")">
+                        <i class="nav-icon fas fa-map-marked-alt"></i>
+                        <p>
+                            @Applicationsettings.COUNTRY
+                        </p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a is-active-page asp-controller="State" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("State","")">
+                        <i class="nav-icon fas fa-map-marker-alt"></i>
+                        <p>
+                            @Applicationsettings.STATE
+                        </p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a is-active-page asp-controller="District" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("District","")">
+                        <i class="nav-icon fas fa-city"></i>
+                        <p>
+                            @Applicationsettings.DISTRICT
+                        </p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a is-active-page asp-controller="PinCodes" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("PinCodes","")">
+                        <i class="nav-icon fas fa-file"></i>
+                        <p>
+                            @Applicationsettings.PINCODE
+                        </p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a is-active-page asp-controller="IpAddress" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("IpAddress","")">
+                        <i class="fas fa-sitemap nav-icon"></i>
+                        <p>
+                            IP Tracking
+                        </p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a is-active-page asp-controller="Audit" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Audit","")">
+                        <i class="nav-icon fa fa-align-center"></i>
+                        <p>
+                            @Applicationsettings.AUDIT_LOG
+                        </p>
+                    </a>
+                </li>
             </ul>
         </nav>
         <!-- /.sidebar-menu -->

@@ -15,9 +15,12 @@ using System.Data;
 using AspNetCoreHero.ToastNotification.Abstractions;
 using System.IO.Compression;
 using risk.control.system.Controllers.Company;
+using Microsoft.AspNetCore.Authorization;
+using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers
 {
+    [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME},{AGENCY_ADMIN.DISPLAY_NAME},{CREATOR.DISPLAY_NAME},{ASSESSOR.DISPLAY_NAME},{MANAGER.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME},{AGENT.DISPLAY_NAME}")]
     public class UploadsController : Controller
     {
         private static string NO_DATA = " NO - DATA ";

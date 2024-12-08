@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 using NToastNotify;
@@ -10,9 +11,12 @@ using risk.control.system.Models.ViewModel;
 using SmartBreadcrumbs.Attributes;
 using SmartBreadcrumbs.Nodes;
 
+using static risk.control.system.AppConstant.Applicationsettings;
+
 namespace risk.control.system.Controllers
 {
     [Breadcrumb(" Agency")]
+    [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME}")]
     public class VendorUserController : Controller
     {
         public List<UsersViewModel> UserList;

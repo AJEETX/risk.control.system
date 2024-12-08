@@ -1,6 +1,7 @@
 ﻿using AspNetCoreHero.ToastNotification.Abstractions;
 using AspNetCoreHero.ToastNotification.Notyf;
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -17,9 +18,12 @@ using risk.control.system.Services;
 using SmartBreadcrumbs.Attributes;
 using SmartBreadcrumbs.Nodes;
 
+using static risk.control.system.AppConstant.Applicationsettings;
+
 namespace risk.control.system.Controllers
 {
     [Breadcrumb(" Users", FromAction = "Details", FromController = typeof(ClientCompanyController))]
+    [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME}")]
     public class CompanyUserController : Controller
     {
         public List<UsersViewModel> UserList;
