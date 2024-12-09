@@ -91,7 +91,7 @@ namespace risk.control.system.Controllers.Api.Company
                 Service = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail.InvestigationServiceType.Name + "</span>"),
                 Location = string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseSubStatus.Name + "</span>"),
                 Created = string.Join("", "<span class='badge badge-light'>" + a.Created.ToString("dd-MM-yyyy") + "</span>"),
-                timePending = a.GetTimePending(),
+                timePending = a.GetManagerTimePending(),
                 PolicyNum = a.GetPolicyNum(),
                 BeneficiaryPhoto = a.BeneficiaryDetail.ProfilePicture != null ?
                                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.BeneficiaryDetail.ProfilePicture)) :
@@ -172,7 +172,7 @@ namespace risk.control.system.Controllers.Api.Company
                         Service = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail.InvestigationServiceType.Name + "</span>"),
                         Location = string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseSubStatus.Name + "</span>"),
                         Created = string.Join("", "<span class='badge badge-light'>" + a.Created.ToString("dd-MM-yyyy") + "</span>"),
-                        timePending = a.GetTimePending(),
+                        timePending = a.GetManagerTimePending(),
                         Withdrawable = !a.NotWithdrawable,
                         PolicyNum = a.GetPolicyNum(),
                         BeneficiaryPhoto = a.BeneficiaryDetail?.ProfilePicture != null ?
@@ -239,7 +239,7 @@ namespace risk.control.system.Controllers.Api.Company
                 Service = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail.InvestigationServiceType.Name + "</span>"),
                 Location = string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseSubStatus.Name + "</span>"),
                 Created = string.Join("", "<span class='badge badge-light'>" + a.Created.ToString("dd-MM-yyyy") + "</span>"),
-                timePending = a.GetTimePending(),
+                timePending = a.GetManagerTimePending(),
                 PolicyNum = a.GetPolicyNum(),
                 BeneficiaryPhoto = a.BeneficiaryDetail?.ProfilePicture != null ?
                                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.BeneficiaryDetail.ProfilePicture)) :
@@ -299,7 +299,7 @@ namespace risk.control.system.Controllers.Api.Company
                 Service = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail.InvestigationServiceType.Name + "</span>"),
                 Location = string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseSubStatus.Name + "</span>"),
                 Created = string.Join("", "<span class='badge badge-light'>" + a.Created.ToString("dd-MM-yyyy") + "</span>"),
-                timePending = a.GetTimePending(),
+                timePending = a.GetManagerTimePending(),
                 PolicyNum = a.GetPolicyNum(),
                 BeneficiaryPhoto = a.BeneficiaryDetail?.ProfilePicture != null ?
                                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.BeneficiaryDetail.ProfilePicture)) :

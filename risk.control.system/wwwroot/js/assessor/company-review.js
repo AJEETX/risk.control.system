@@ -93,9 +93,9 @@
                     if (row.assignedToAgency) {
                         buttons += '<span class="checkbox">';
                         if (row.autoAllocated) {
-                            buttons += '<i class="fa fa-toggle-on"></i>';
+                            buttons += '<i class="fas fa-cog fa-spin" title="AUTO ALLOCATION" data-toggle="tooltip"></i>';
                         } else {
-                            buttons += '<i class="fa fa-toggle-off"></i>';
+                            buttons += '<i class="fas fa-user-tag" title="MANUAL ALLOCATION" data-toggle="tooltip"></i>';
                         }
                         buttons += '</span>';
                     } else {

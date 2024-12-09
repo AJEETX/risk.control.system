@@ -21,7 +21,6 @@ namespace risk.control.system.Controllers.Api.Claims
     public interface IClaimsService
     {
         IQueryable<ClaimsInvestigation> GetClaims();
-        List<ClaimsInvesgationResponse> ToResponseModel(List<ClaimsInvestigation> claimsSubmitted);
         decimal? GetLat(ClaimType? claimType, CustomerDetail a, BeneficiaryDetail location);
         decimal? GetLng(ClaimType? claimType, CustomerDetail a, BeneficiaryDetail location);
     }
@@ -100,55 +99,6 @@ namespace risk.control.system.Controllers.Api.Claims
                     return null;
                 return decimal.Parse(location.PinCode.Longitude);
             }
-        }
-
-        public List<ClaimsInvesgationResponse> ToResponseModel(List<ClaimsInvestigation> claimsSubmitted)
-        {
-            var allocateToVendorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
-            var response = claimsSubmitted
-                   .Select(a => new ClaimsInvesgationResponse
-                   {
-                       Id = a.ClaimsInvestigationId,
-                       AutoAllocated = a.AutoAllocated,
-                       CustomerFullName = string.IsNullOrWhiteSpace(a.CustomerDetail?.Name) ? "" : a.CustomerDetail.Name,
-                       BeneficiaryFullName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.Name) ? "" : a.BeneficiaryDetail.Name,
-                       PolicyId = a.PolicyDetail.ContractNumber,
-                       Amount = String.Format(new CultureInfo("hi-IN"), "{0:C}", a.PolicyDetail.SumAssuredValue),
-                       AssignedToAgency = a.AssignedToAgency,
-                       Agent = !string.IsNullOrWhiteSpace(a.UserEmailActionedTo) ?
-                       string.Join("", "<span class='badge badge-light'>" + a.UserEmailActionedTo + "</span>") :
-                       string.Join("", "<span class='badge badge-light'>" + a.UserRoleActionedTo + "</span>"),
-                       Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
-                       PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
-                       Document = a.PolicyDetail?.DocumentImage != null ?
-                       string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail?.DocumentImage)) : Applicationsettings.NO_POLICY_IMAGE,
-                       Customer = a.CustomerDetail?.ProfilePicture != null ?
-                       string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail?.ProfilePicture)) : Applicationsettings.NO_USER,
-                       Name = a.CustomerDetail?.Name != null ?
-                       a.CustomerDetail?.Name : "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>",
-                       Policy = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail?.LineOfBusiness.Name + "</span>"),
-                       Status = string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseStatus.Name + "</span>"),
-                       SubStatus = string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseSubStatus.Name + "</span>"),
-                       Ready2Assign = a.IsReady2Assign,
-                       ServiceType = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail?.ClaimType.GetEnumDisplayName() + "(" + a.PolicyDetail.InvestigationServiceType.Name + ")</span>"),
-                       Service = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail.InvestigationServiceType.Name + "</span>"),
-                       Location = string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseSubStatus.Name + "</span>"),
-                       Created = string.Join("", "<span class='badge badge-light'>" + a.Created.ToString("dd-MM-yyyy") + "</span>"),
-                       timePending = a.GetTimePending(),
-                       Withdrawable = !a.NotWithdrawable,
-                       PolicyNum = a.GetPolicyNum(),
-                       BeneficiaryPhoto = a.BeneficiaryDetail?.ProfilePicture != null ?
-                                      string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.BeneficiaryDetail.ProfilePicture)) :
-                                     Applicationsettings.NO_USER,
-                       BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.Name) ?
-                       "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>" :
-                       a.BeneficiaryDetail.Name,
-                       TimeElapsed = DateTime.Now.Subtract(a.Created).TotalSeconds,
-                       IsNewAssigned = a.ActiveView <= 1
-                   })?
-                   .ToList();
-            return response;
         }
     }
 }

@@ -9,7 +9,7 @@ namespace risk.control.system.Helpers
 {
     public static class ClaimsInvestigationExtension
     {
-        public static string GetTimePending(this ClaimsInvestigation a)
+        public static string GetCreatorTimePending(this ClaimsInvestigation a)
         {
             if (DateTime.Now.Subtract(a.Created).Days >= 7)
                 return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Created).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Hurry up, {DateTime.Now.Subtract(a.Created).Days} days since created!\"></i>");
@@ -18,12 +18,119 @@ namespace risk.control.system.Helpers
                 return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Created).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Caution : {DateTime.Now.Subtract(a.Created).Days} day since created.\"></i>");
 
             if (DateTime.Now.Subtract(a.Created).Days >= 1)
-                return string.Join("", "<span class='badge badge-light'>" + DateTime.Now.Subtract(a.Created).Days + " day</span>");
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Created).Days} day</span>");
 
             if (DateTime.Now.Subtract(a.Created).Hours < 24 &&
                 DateTime.Now.Subtract(a.Created).Hours > 0)
             {
-                return string.Join("", "<span class='badge badge-light'>" + DateTime.Now.Subtract(a.Created).Hours + " hr</span>");
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Created).Hours} hr </span>");
+            }
+            if (DateTime.Now.Subtract(a.Created).Hours == 0 && DateTime.Now.Subtract(a.Created).Minutes > 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Created).Minutes} min </span>");
+            }
+            if (DateTime.Now.Subtract(a.Created).Minutes == 0 && DateTime.Now.Subtract(a.Created).Seconds > 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Created).Seconds} sec </span>");
+            }
+            return string.Join("", "<span class='badge badge-light'>now</span>");
+        }
+
+        public static string GetAgentTimePending(this ClaimsInvestigation a)
+        {
+            if (DateTime.Now.Subtract(a.Created).Days >= 7)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Created).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Hurry up, {DateTime.Now.Subtract(a.Created).Days} days since created!\"></i>");
+
+            if (DateTime.Now.Subtract(a.Created).Days >= 3)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Created).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Caution : {DateTime.Now.Subtract(a.Created).Days} day since created.\"></i>");
+
+            if (DateTime.Now.Subtract(a.Created).Days >= 1)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Created).Days} day</span>");
+
+            if (DateTime.Now.Subtract(a.Created).Hours < 24 &&
+                DateTime.Now.Subtract(a.Created).Hours > 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Created).Hours} hr </span>");
+            }
+            if (DateTime.Now.Subtract(a.Created).Hours == 0 && DateTime.Now.Subtract(a.Created).Minutes > 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Created).Minutes} min </span>");
+            }
+            if (DateTime.Now.Subtract(a.Created).Minutes == 0 && DateTime.Now.Subtract(a.Created).Seconds > 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Created).Seconds} sec </span>");
+            }
+            return string.Join("", "<span class='badge badge-light'>now</span>");
+        }
+
+        public static string GetSupervisorTimePending(this ClaimsInvestigation a)
+        {
+            if (DateTime.Now.Subtract(a.Created).Days >= 7)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Created).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Hurry up, {DateTime.Now.Subtract(a.Created).Days} days since created!\"></i>");
+
+            if (DateTime.Now.Subtract(a.Created).Days >= 3)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Created).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Caution : {DateTime.Now.Subtract(a.Created).Days} day since created.\"></i>");
+
+            if (DateTime.Now.Subtract(a.Created).Days >= 1)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Created).Days} day</span>");
+
+            if (DateTime.Now.Subtract(a.Created).Hours < 24 &&
+                DateTime.Now.Subtract(a.Created).Hours > 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Created).Hours} hr </span>");
+            }
+            if (DateTime.Now.Subtract(a.Created).Hours == 0 && DateTime.Now.Subtract(a.Created).Minutes > 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Created).Minutes} min </span>");
+            }
+            if (DateTime.Now.Subtract(a.Created).Minutes == 0 && DateTime.Now.Subtract(a.Created).Seconds > 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Created).Seconds} sec </span>");
+            }
+            return string.Join("", "<span class='badge badge-light'>now</span>");
+        }
+
+        public static string GetAssessorTimePending(this ClaimsInvestigation a)
+        {
+            if (DateTime.Now.Subtract(a.Created).Days >= 7)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Created).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Hurry up, {DateTime.Now.Subtract(a.Created).Days} days since created!\"></i>");
+
+            if (DateTime.Now.Subtract(a.Created).Days >= 3)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Created).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Caution : {DateTime.Now.Subtract(a.Created).Days} day since created.\"></i>");
+
+            if (DateTime.Now.Subtract(a.Created).Days >= 1)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Created).Days} day</span>");
+
+            if (DateTime.Now.Subtract(a.Created).Hours < 24 &&
+                DateTime.Now.Subtract(a.Created).Hours > 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Created).Hours} hr </span>");
+            }
+            if (DateTime.Now.Subtract(a.Created).Hours == 0 && DateTime.Now.Subtract(a.Created).Minutes > 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Created).Minutes} min </span>");
+            }
+            if (DateTime.Now.Subtract(a.Created).Minutes == 0 && DateTime.Now.Subtract(a.Created).Seconds > 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Created).Seconds} sec </span>");
+            }
+            return string.Join("", "<span class='badge badge-light'>now</span>");
+        }
+        public static string GetManagerTimePending(this ClaimsInvestigation a)
+        {
+            if (DateTime.Now.Subtract(a.Created).Days >= 7)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Created).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Hurry up, {DateTime.Now.Subtract(a.Created).Days} days since created!\"></i>");
+
+            if (DateTime.Now.Subtract(a.Created).Days >= 3)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Created).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Caution : {DateTime.Now.Subtract(a.Created).Days} day since created.\"></i>");
+
+            if (DateTime.Now.Subtract(a.Created).Days >= 1)
+                return string.Join("", $"<span class='badge badge-light'>{ DateTime.Now.Subtract(a.Created).Days} day</span>");
+
+            if (DateTime.Now.Subtract(a.Created).Hours < 24 &&
+                DateTime.Now.Subtract(a.Created).Hours > 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{ DateTime.Now.Subtract(a.Created).Hours} hr </span>");
             }
             if (DateTime.Now.Subtract(a.Created).Hours == 0 && DateTime.Now.Subtract(a.Created).Minutes > 0)
             {
