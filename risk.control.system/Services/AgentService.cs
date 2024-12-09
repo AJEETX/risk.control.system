@@ -49,7 +49,7 @@ namespace risk.control.system.Services
             var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.AGENT.ToString()));
 
             var user2Onboard = _context.VendorApplicationUser.FirstOrDefault(
-                u => u.PhoneNumber == mobile && !string.IsNullOrWhiteSpace(u.MobileUId));
+                u => u.PhoneNumber.TrimStart('+') == mobile.TrimStart('+') && !string.IsNullOrWhiteSpace(u.MobileUId));
 
             if (user2Onboard == null)
                 return null!;

@@ -1,12 +1,17 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.IdentityModel.Tokens.Jwt;
 using System.Net;
+using System.Security.Claims;
+using System.Text;
 using System.Text.RegularExpressions;
 
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
@@ -28,6 +33,7 @@ namespace risk.control.system.Controllers.Api
         private static string PanGroup_id = "8e16424a-58fc-4ba4-ab20-5bc8e7c3c41e";
         private readonly ApplicationDbContext _context;
         private readonly IHttpClientService httpClientService;
+        private readonly IConfiguration configuration;
         private readonly UserManager<VendorApplicationUser> userVendorManager;
         private readonly IAgentService agentService;
         private readonly ISmsService smsService;
@@ -40,6 +46,7 @@ namespace risk.control.system.Controllers.Api
         private string portal_base_url = string.Empty;
         //test PAN FNLPM8635N
         public AgentController(ApplicationDbContext context, IHttpClientService httpClientService,
+            IConfiguration configuration,
             UserManager<VendorApplicationUser> userVendorManager,
              IHttpContextAccessor httpContextAccessor,
             IAgentService agentService,
@@ -49,6 +56,7 @@ namespace risk.control.system.Controllers.Api
         {
             this._context = context;
             this.httpClientService = httpClientService;
+            this.configuration = configuration;
             this.userVendorManager = userVendorManager;
             this.agentService = agentService;
             smsService = SmsService;
@@ -62,6 +70,47 @@ namespace risk.control.system.Controllers.Api
         }
 
         [AllowAnonymous]
+        [HttpPost("Login")]
+        public IActionResult Login([FromBody] LoginModel model)
+        {
+            // Validate user credentials (e.g., via a database)
+            if (model.Username == "mobileUser" && model.Password == "password") // Replace with actual validation
+            {
+                var token = GenerateJwtToken(model.Username);
+                return Ok(new { Token = token });
+            }
+
+            return Unauthorized();
+        }
+
+        private string GenerateJwtToken(string userId)
+        {
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_KEY")));
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+            var claims = new[]
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, userId),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            };
+
+            var token = new JwtSecurityToken(
+                issuer: configuration["Jwt:Issuer"],
+                audience: configuration["Jwt:Audience"],
+                claims: claims,
+                expires: DateTime.UtcNow.AddHours(1),
+                signingCredentials: credentials
+            );
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        public class LoginModel
+        {
+            public string Username { get; set; }
+            public string Password { get; set; }
+        }
+        [AllowAnonymous]
         [HttpPost("ResetUid")]
         public async Task<IActionResult> ResetUid([Required] string mobile, bool sendSMS = false)
         {
@@ -71,7 +120,7 @@ namespace risk.control.system.Controllers.Api
                 {
                     return BadRequest($"Empty mobile number");
                 }
-                var user2Onboard = await agentService.ResetUid(mobile, sendSMS);
+                var user2Onboard = await agentService.ResetUid(mobile.TrimStart('+'), sendSMS);
 
                 if (user2Onboard == null)
                 {
@@ -109,7 +158,7 @@ namespace risk.control.system.Controllers.Api
 
                 var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.AGENT.ToString()));
                 var user2Onboards = _context.VendorApplicationUser.Where(
-                    u => u.PhoneNumber == request.Mobile);
+                    u => u.PhoneNumber.TrimStart('+') == request.Mobile.TrimStart('+'));
                 foreach (var user2Onboard in user2Onboards)
                 {
                     var isAgent = await userVendorManager.IsInRoleAsync(user2Onboard, agentRole?.Name);
@@ -419,7 +468,6 @@ namespace risk.control.system.Controllers.Api
                 Console.WriteLine(ex.ToString());
                 return StatusCode(500, ex.StackTrace);
             }
-
         }
 
         [AllowAnonymous]
