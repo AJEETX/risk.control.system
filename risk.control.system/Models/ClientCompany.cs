@@ -82,12 +82,12 @@ namespace risk.control.system.Models
         public string? PassportApiUrl { get; set; } = "https://document-ocr1.p.rapidapi.com/idr";
         public string? PassportApiKey { get; set; } = "327fd8beb9msh8a441504790e80fp142ea8jsnf74b9208776a";
         public string? PassportApiHost { get; set; } = "document-ocr1.p.rapidapi.com";
-        public bool SendSMS { get; set; } = false;
+        public bool SendSMS { get; set; } = true;
         public bool EnableMailbox { get; set; } = true;
         public bool CanChangePassword { get; set; } = false;
         public string MobileAppUrl { get; set; } = "https://ickeckify-apk.s3.ap-southeast-2.amazonaws.com/demo/app-release.apk";
         public bool BulkUpload { get; set; } = false;
-        public string WhitelistIpAddress { get; set; } = "::1;202.7.251.85";
+        public string WhitelistIpAddress { get; set; } = "::1;202.7.251.15";
         public string? WhitelistIpAddressRange { get; set; } = default!;
         public LicenseType LicenseType { get; set; } = LicenseType.Trial;
         public string LicenseId { get; set; } = Guid.NewGuid().ToString();

@@ -145,7 +145,7 @@
         },
         "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
             if (aData.isNewAssigned) {
-                $('td', nRow).css('background-color', '#ffa');
+                $('td', nRow).css('background-color', '#FCFCC4');
             }
         },
         error: function (xhr, status, error) { alert('err ' + error) }

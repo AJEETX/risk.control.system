@@ -15,95 +15,186 @@
                 </div>
                 <div class="row">
                     <div class="col-md-6">
-                        <div class="card bg-light">
+                        <div class="card card-light">
                             <div class="col-md-12">
                                 <div class="form-group">
-                                    <span class="input-group-label"> Enable Mailbox:</span>
+                                    <span class="input-group-label"> Address Api Uri:</span>
                                     <div class="input-group mb-3">
                                         <div class="input-group-prepend">
-                                            <span class="input-group-text" id="EnableMailbox"><i class="far fa-comment-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                            <span class="input-group-text" id="AddressUri"><i class="fas fa-code-branch"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                         </div>
-
-                                        <span class="checkbox">
-                                            <input asp-for="EnableMailbox" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
-                                        </span>
+                                        <input type="text" asp-for="AddressUri" class="form-control remarks" placeholder="pan verify url" />
+                                        <span asp-validation-for="AddressUri" class="text-danger"></span>
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <span class="input-group-label"> Show Detail Footer:</span>
+                                    <span class="input-group-label"> Address Api Data Key:</span>
                                     <div class="input-group mb-3">
                                         <div class="input-group-prepend">
-                                            <span class="input-group-text" id="ShowDetailFooter"><i class="far fa-comment-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                            <span class="input-group-text" id="AddressUriData"><i class="fa fa-key"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                         </div>
-
-                                        <span class="checkbox">
-                                            <input asp-for="ShowDetailFooter" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
-                                        </span>
+                                        <input type="text" asp-for="AddressUriData" class="form-control remarks" placeholder="pan verify url" />
+                                        <span asp-validation-for="AddressUriData" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <span class="input-group-label"> Ftp API Host:</span>
+                                    <div class="input-group mb-3">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text" id="FtpUri"><i class="fa fa-key"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                        </div>
+                                        <input type="text" asp-for="FtpUri" class="form-control remarks" placeholder="pan verify url" />
+                                        <span asp-validation-for="FtpUri" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <span class="input-group-label"> Ftp API User:</span>
+                                    <div class="input-group mb-3">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text" id="FtpUser"><i class="fa fa-key"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                        </div>
+                                        <input type="text" asp-for="FtpUser" class="form-control remarks" placeholder="pan verify url" />
+                                        <span asp-validation-for="FtpUser" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <span class="input-group-label"> Ftp API Key:</span>
+                                    <div class="input-group mb-3">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text" id="FtpUser"><i class="fa fa-key"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                        </div>
+                                        <input type="text" asp-for="FtpData" class="form-control remarks" placeholder="pan verify url" />
+                                        <span asp-validation-for="FtpData" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <span class="input-group-label"> Weather Uri API:</span>
+                                    <div class="input-group mb-3">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text" id="WeatherUri"><i class="fas fa-code-branch"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                        </div>
+                                        <input type="text" asp-for="WeatherUri" class="form-control remarks" placeholder="passport verify url" />
+                                        <span asp-validation-for="WeatherUri" class="text-danger"></span>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <div class="card bg-light">
+                        <div class="card card-light">
                             <div class="col-md-12">
-                                <div class="form-group">
-                                    <span class="input-group-label"> Enable Profile Update:</span>
-                                    <div class="input-group mb-3">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text" id="CanChangePassword"><i class="far fa-comment-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                        </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <span class="input-group-label"> Enable Claim Module:</span>
+                                            <div class="input-group mb-3">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text" id="EnableClaim"><i class="fas fa-crosshairs"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                                </div>
 
-                                        <span class="checkbox">
-                                            <input asp-for="CanChangePassword" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
-                                        </span>
+                                                <span class="checkbox">
+                                                    <input asp-for="EnableClaim" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+
+                                        <div class="form-group">
+                                            <span class="input-group-label"> Enable Underwriting:</span>
+                                            <div class="input-group mb-3">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text" id="EnableUnderwriting"><i class="fas fa-crosshairs"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                                </div>
+
+                                                <span class="checkbox">
+                                                    <input asp-for="EnableUnderwriting" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
+                                                </span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <span class="input-group-label"> Enable Mailbox:</span>
+                                            <div class="input-group mb-3">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text" id="EnableMailbox"><i class="fas fa-crosshairs"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                                </div>
 
-                                <div class="form-group">
-                                    <span class="input-group-label"> Show Timer:</span>
-                                    <div class="input-group mb-3">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text" id="ShowTimer"><i class="far fa-comment-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                                <span class="checkbox">
+                                                    <input asp-for="EnableMailbox" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
+                                                </span>
+                                            </div>
                                         </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <span class="input-group-label"> Enable SMS:</span>
+                                            <div class="input-group mb-3">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text" id="SendSMS"><i class="fas fa-crosshairs"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                                </div>
 
-                                        <span class="checkbox">
-                                            <input asp-for="ShowTimer" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
-                                        </span>
+                                                <span class="checkbox">
+                                                    <input asp-for="SendSMS" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
+                                                </span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <span class="input-group-label"> Enable Profile Update:</span>
+                                            <div class="input-group mb-3">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text" id="CanChangePassword"><i class="fas fa-crosshairs"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                                </div>
+
+                                                <span class="checkbox">
+                                                    <input asp-for="CanChangePassword" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <span class="input-group-label"> Show Detail Footer:</span>
+                                            <div class="input-group mb-3">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text" id="ShowDetailFooter"><i class="fas fa-crosshairs"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                                </div>
+
+                                                <span class="checkbox">
+                                                    <input asp-for="ShowDetailFooter" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <span class="input-group-label"> Display Timer clock:</span>
+                                            <div class="input-group mb-3">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text" id="ShowTimer"><i class="fas fa-crosshairs"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                                </div>
+
+                                                <span class="checkbox">
+                                                    <input asp-for="ShowTimer" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+
                             </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="card bg-light">
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <span class="input-group-label"> Enable Claim:</span>
-                                    <div class="input-group mb-3">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text" id="EnableClaim"><i class="far fa-comment-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                        </div>
 
-                                        <span class="checkbox">
-                                            <input asp-for="EnableClaim" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
-                                        </span>
-                                    </div>
-                                </div>
-
-                                <div class="form-group">
-                                    <span class="input-group-label"> Enable UnderWriting:</span>
-                                    <div class="input-group mb-3">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text" id="EnableUnderwriting"><i class="far fa-comment-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                        </div>
-
-                                        <span class="checkbox">
-                                            <input asp-for="EnableUnderwriting" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -112,7 +203,7 @@
             <div class="card-footer">
                 <div class="row float-right">
                     <div class="col-md-12">
-                        <a id="back" asp-controller="Dashboard" class="btn btn-secondary">
+                        <a id="back" asp-controller="Dashboard" asp-action="Index" class="btn btn-secondary">
                             <i class="fa fa-window-close"></i>
                             @Applicationsettings.BACK
                         </a>

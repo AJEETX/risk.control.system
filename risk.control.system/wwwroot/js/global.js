@@ -4,7 +4,7 @@
             title: "Confirm Edit global-settings",
             content: "Are you sure to edit?",
 
-            icon: 'fas fa-user-plus',
+            icon: 'fas fa-wrench',
             type: 'orange',
             closeIcon: true,
             buttons: {
