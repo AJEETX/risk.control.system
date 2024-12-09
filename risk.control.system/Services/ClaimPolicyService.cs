@@ -117,6 +117,7 @@ namespace risk.control.system.Services
                 .Include(c => c.CustomerDetail)
                 .ThenInclude(c => c.State)
                 .Include(c =>c.ClaimNotes)
+                .Include(c =>c.ClaimMessages)
                 .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == id);
 
             claimsInvestigation.CompanyWithdrawlComment = string.Empty;
@@ -188,7 +189,7 @@ namespace risk.control.system.Services
                 .Include(c => c.CustomerDetail)
                 .ThenInclude(c => c.State)
                 .Include(c=>c.ClaimNotes)
-                .Include(c=>c.ClaimNotes)
+                .Include(c=>c.ClaimMessages)
                 .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == id);
             var submittedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);

@@ -158,6 +158,7 @@
         public const string INVESTIGATION_UNDERWRITINGS = "Underwriting";
         public const string USER_ROLES = "USERS/ROLES";
         public const string ADMIN_SETTINGS = "ADMIN SETTINGS";
+        public const string GLOBAL_SETTINGS = "Global-settings";
         public const string GENERAL_SETUP = "GENERAL SETUP";
         public const string UPLOAD_FILE = "UPLOAD FILE";
         public const string UPLOAD_DATABASE = "UPLOAD DB";

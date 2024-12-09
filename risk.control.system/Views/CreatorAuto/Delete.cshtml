@@ -289,9 +289,19 @@
                                         <div class="card-footer">
                                             <div class="row">
                                                 <div class="col-6 text-left">
-                                                    <button id="customer-comments" class="btn btn-sm bg-teal">
+                                                    @if (Model.ClaimsInvestigation.CustomerDetail != null && Model.ClaimsInvestigation.CustomerDetail.ContactNumber > 0 )
+                                                    {
+                                                        <button id="customer-comments" class="btn btn-sm bg-teal">
+                                                            <i class="fas fa-comments"></i>
+                                                        </button>
+                                                    }
+                                                    else
+                                                    {
+                                                        <button disabled id="customer-comments" class="btn btn-sm bg-teal">
                                                         <i class="fas fa-comments"></i>
-                                                    </button>
+                                                    </button>                                                        
+                                                    }
+
                                                 </div>
                                                 <div class="col-6 text-right">
                                                     <button id="customer-detail" class="btn btn-sm btn-warning">
@@ -372,9 +382,19 @@
                                         <div class="card-footer">
                                             <div class="row">
                                                 <div class="col-6 text-left">
-                                                    <button id="beneficiary-comments" class="btn btn-sm bg-teal">
-                                                        <i class="fas fa-comments"></i>
-                                                    </button>
+                                                    @if (Model.ClaimsInvestigation.BeneficiaryDetail != null && Model.ClaimsInvestigation.BeneficiaryDetail.ContactNumber > 0 )
+                                                    {
+                                                        <button id="beneficiary-comments" class="btn btn-sm bg-teal">
+                                                            <i class="fas fa-comments"></i>
+                                                        </button>
+                                                    }
+                                                    else
+                                                    {
+                                                        <button disabled id="beneficiary-comments" class="btn btn-sm bg-teal">
+                                                            <i class="fas fa-comments"></i>
+                                                        </button>
+                                                    }
+
                                                 </div>
                                                 <div class="col-6 text-right">
                                                     <button id="beneficiary-detail" class="btn btn-sm btn-success">

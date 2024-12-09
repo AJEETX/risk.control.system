@@ -252,6 +252,7 @@ namespace risk.control.system.Services
         public async Task<ClaimsInvestigationVendorsModel> GetInvestigateReport(string userEmail, string selectedcase)
         {
             var claimsInvestigation = claimsService.GetClaims()
+                .Include(c => c.ClaimMessages)
                 .Include(c => c.ClaimNotes)
                 .Include(c => c.AgencyReport)
                 .ThenInclude(c=>c.EnquiryRequest)
@@ -294,6 +295,7 @@ namespace risk.control.system.Services
                 .Include(c=>c.AgencyReport.VideoReport)
                 .Include(c=>c.AgencyReport.ReportQuestionaire)
                 .Include(c=>c.ClaimNotes)
+                .Include(c=>c.ClaimMessages)
                 .FirstOrDefault(m => m.ClaimsInvestigationId == selectedcase);
             
             claimsInvestigation.AgencyDeclineComment = string.Empty;

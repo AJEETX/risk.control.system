@@ -81,6 +81,7 @@ namespace risk.control.system.Services
               .Include(c => c.CustomerDetail)
               .ThenInclude(c => c.State)
               .Include(c => c.ClaimNotes)
+              .Include(c => c.ClaimMessages)
                 .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == selectedcase);
 
             var location = await _context.BeneficiaryDetail
@@ -218,6 +219,7 @@ namespace risk.control.system.Services
                 .Include(c => c.CustomerDetail)
                 .ThenInclude(c => c.State)
                 .Include(c=>c.ClaimNotes)
+                .Include(c=>c.ClaimMessages)
                 .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == id);
 
             var location = claimsInvestigation.BeneficiaryDetail;

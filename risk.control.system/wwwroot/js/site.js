@@ -1096,60 +1096,30 @@ $(document).ready(function () {
                             return false;
                         }
                         else {
-                            $.confirm({
-                                icon: 'far fa-comments',
-                                closeIcon: true,
-                                title: 'Send SMS!',
-                                type: 'green',
-                                content: 'Are you sure to send SMS!',
-                                autoClose: 'smsUser|10000',
-                                buttons: {
-                                    smsUser: {
-                                        text: 'Send SMS',
-                                        action: function () {
-                                            $.alert({
-                                                title: 'Sms Sent',
-                                                icon: 'far fa-comments',
-                                                closeIcon: true,
-                                                type: 'green',
-                                                content: 'SMS is sent successsfully',
-                                                autoClose: 'ok|2000',
-                                                buttons: {
-                                                    ok: {
-                                                        text: 'Close',
-                                                    }
-                                                }
-                                            });
-                                            return $.ajax({
-                                                url: '/Confirm/SendSms2Customer?claimId=' + claimId + '&name=' + name,
-                                                method: 'get'
-                                            }).done(function (response) {
-                                                $.alert({
-                                                    title: 'Message Status!',
-                                                    closeIcon: true,
-                                                    type: 'green',
-                                                    icon: 'far fa-comments',
-                                                    content: 'Status: ' + response.message,
-                                                    autoClose: 'ok|2000',
-                                                    buttons: {
-                                                        ok: {
-                                                            text: 'Close',
-                                                        }
-                                                    }
-                                                });
-                                            }).fail(function (response) {
-                                                $.alert({
-                                                    title: 'Message Status!',
-                                                    content: 'Status: failed',
-                                                });
-                                            }).always(function () {
-
-                                            });
+                            return $.ajax({
+                                url: '/Confirm/SendSms2Customer?claimId=' + claimId + '&name=' + name,
+                                method: 'get'
+                            }).done(function (response) {
+                                $.alert({
+                                    title: 'Message Status!',
+                                    closeIcon: true,
+                                    type: 'green',
+                                    icon: 'far fa-comments',
+                                    content: 'Status: ' + response.message,
+                                    autoClose: 'ok|2000',
+                                    buttons: {
+                                        ok: {
+                                            text: 'Close',
                                         }
-                                    },
-                                    cancel: function () {
                                     }
-                                }
+                                });
+                            }).fail(function (response) {
+                                $.alert({
+                                    title: 'Message Status!',
+                                    content: 'Status: failed',
+                                });
+                            }).always(function () {
+
                             });
                         }
 
@@ -1208,60 +1178,30 @@ $(document).ready(function () {
                             return false;
                         }
                         else {
-                            $.confirm({
-                                icon: 'far fa-comments',
-                                closeIcon: true,
-                                title: 'Send SMS!',
-                                type: 'green',
-                                content: 'Are you sure to send SMS!',
-                                autoClose: 'smsUser|10000',
-                                buttons: {
-                                    smsUser: {
-                                        text: 'Send SMS',
-                                        action: function () {
-                                            $.alert({
-                                                title: 'Sms Sent',
-                                                icon: 'far fa-comments',
-                                                closeIcon: true,
-                                                type: 'green',
-                                                content: 'SMS is sent successsfully',
-                                                autoClose: 'ok|2000',
-                                                buttons: {
-                                                    ok: {
-                                                        text: 'Close',
-                                                    }
-                                                }
-                                            });
-                                            return $.ajax({
-                                                url: '/Confirm/SendSms2Beneficiary?claimId=' + claimId + '&name=' + name,
-                                                method: 'get'
-                                            }).done(function (response) {
-                                                $.alert({
-                                                    title: 'Message Status!',
-                                                    closeIcon: true,
-                                                    type: 'green',
-                                                    icon: 'fa fa-user-tie',
-                                                    content: 'Status: ' + response.message,
-                                                    autoClose: 'ok|2000',
-                                                    buttons: {
-                                                        ok: {
-                                                            text: 'Close',
-                                                        }
-                                                    }
-                                                });
-                                            }).fail(function (response) {
-                                                $.alert({
-                                                    title: 'Message Status!',
-                                                    content: 'Status: failed',
-                                                });
-                                            }).always(function () {
-
-                                            });
+                            return $.ajax({
+                                url: '/Confirm/SendSms2Beneficiary?claimId=' + claimId + '&name=' + name,
+                                method: 'get'
+                            }).done(function (response) {
+                                $.alert({
+                                    title: 'Message Status!',
+                                    closeIcon: true,
+                                    type: 'green',
+                                    icon: 'fa fa-user-tie',
+                                    content: 'Status: ' + response.message,
+                                    autoClose: 'ok|2000',
+                                    buttons: {
+                                        ok: {
+                                            text: 'Close',
                                         }
-                                    },
-                                    cancel: function () {
                                     }
-                                }
+                                });
+                            }).fail(function (response) {
+                                $.alert({
+                                    title: 'Message Status!',
+                                    content: 'Status: failed',
+                                });
+                            }).always(function () {
+
                             });
                         }
                     }

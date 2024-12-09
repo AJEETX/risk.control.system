@@ -511,15 +511,14 @@ namespace risk.control.system.Services
 
                 var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claimsInvestigation.ClientCompanyId);
 
-                var clientAdminrRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.COMPANY_ADMIN.ToString()));
+                var managerRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.MANAGER.ToString()));
                 var creatorRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.CREATOR.ToString()));
-                //var assignerRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Assigner.ToString()));
 
                 List<ClientCompanyApplicationUser> users = new List<ClientCompanyApplicationUser>();
                 foreach (var user in companyUsers)
                 {
-                    var isAdmin = await userManager.IsInRoleAsync(user, clientAdminrRole?.Name);
-                    if (isAdmin)
+                    var isManager = await userManager.IsInRoleAsync(user, managerRole?.Name);
+                    if (isManager)
                     {
                         users.Add(user);
                     }
