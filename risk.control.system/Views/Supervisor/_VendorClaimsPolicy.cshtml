@@ -32,178 +32,68 @@
                     </span>
                 </h3>
             </div>
-                <article>
-                    <div class="bb-blog-inner">
-                        <div class="card card-light collapsed-card">
-                            <div class="card-header">
-                                <h3 class="card-title">
-                                    Claim: <span class="badge badge-light">
-                                        <i class="far fa-file-powerpoint"></i>
-                                        @Model.ClaimsInvestigation?.PolicyDetail?.ContractNumber
+            <article>
+                <div class="bb-blog-inner">
+                    <div class="card card-light collapsed-card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                Claim: <span class="badge badge-light">
+                                    <i class="far fa-file-powerpoint"></i>
+                                    @Model.ClaimsInvestigation?.PolicyDetail?.ContractNumber
+                                </span>
+                                <span class="hover-text">
+                                    <i class="fas fa-info-circle"></i>
+                                    <span class="tooltip-text" id="policy-information">
+                                        <li>
+                                            <i class='far fa-file-powerpoint'></i> Policy details.
+                                        </li>
+                                        <li>
+                                            <i class='fa fa-user-plus'></i> Customer details
+                                        </li>
+                                        <li> <i class='fas fa-user-tie'></i> Beneficiary details </li>
+
                                     </span>
-                                    <span class="hover-text">
-                                        <i class="fas fa-info-circle"></i>
-                                        <span class="tooltip-text" id="policy-information">
-                                            <li>
-                                                <i class='far fa-file-powerpoint'></i> Policy details.
-                                            </li>
-                                            <li>
-                                                <i class='fa fa-user-plus'></i> Customer details
-                                            </li>
-                                            <li> <i class='fas fa-user-tie'></i> Beneficiary details </li>
-
-                                        </span>
-                                    </span>
-                                </h3>
-                                <div class="card-tools">
-                                    <span data-toggle="tooltip" title="Claim # : @Model.ClaimsInvestigation?.PolicyDetail?.ContractNumber" class="badge badge-light">
-                                        <i class='far fa-hand-point-right'></i>
-                                    </span>
-                                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                        <i class="fas fa-plus"></i>
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div class="card-body">
-
-                                <div class="row">
-                                    <partial name="_ClaimPolicyDetails" model="@Model" />
-                                    @if(Model.ClaimsInvestigation.PolicyDetail.ClaimType == ClaimType.HEALTH)
-                                {
-                                    <partial name="_ClaimCustomerDetails" model="@Model" />
-                                }
-                                @if(Model.ClaimsInvestigation.PolicyDetail.ClaimType == ClaimType.DEATH)
-                                {
-                                    <partial name="_ClaimBeneficairyDetails" model="@Model" />
-                                }
-                                    
-                                </div>
-                            </div>
-                        </div>
-                    </div> <!-- class bb-blog-inner -->
-                </article>
-
-                <form id="radioButtons" method="post" asp-controller="ClaimsVendorPost" asp-action="AllocateToVendorAgent" enctype="multipart/form-data">
-                    <input type="hidden" id="policyDetailId" value="@Model.ClaimsInvestigation?.PolicyDetail.PolicyDetailId" />
-                    <input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail.CustomerDetailId" />
-                    <input type="hidden" id="caseLocationId" value="@Model.CaseLocation?.BeneficiaryDetailId" />
-                    <input type="hidden" id="beneficiaryId" value="@Model.CaseLocation?.BeneficiaryDetailId" />
-                    <input type="hidden" id="claimId" value="@Model.ClaimsInvestigation?.ClaimsInvestigationId" />
-                    <div class="card-body">
-                        <div class="submit-progress hidden">
-                            <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
-                        </div>
-                        <div class="row">
-                            <div class="table-responsive mailbox-messages">
-                                <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
-                                <input type="hidden" id="CaseLocationId" name="CaseLocationId" value="@Model.CaseLocation.BeneficiaryDetailId" />
-                                <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
-                                    <thead>
-                                        <tr>
-                                            <th data-orderable="false" >
-                                                <img class="action-image" src="~/headers/arrow-down.gif" data-toggle="tooltip" title="Select Agent" />
-                                            </th>
-
-                                            <th data-orderable="false">
-                                                Agent Photo
-                                            </th>
-                                            <th>
-                                                Agent Name
-                                            </th>
-                                            <th data-orderable="false">
-                                                Phone #
-                                            </th>
-                                            <th>
-                                                Email
-                                            </th>
-                                            <th data-orderable="false">
-                                                Address
-                                            </th>
-                                            <th>
-                                                District
-                                            </th>
-                                            <th>
-                                                State
-                                            </th>
-                                            <th>
-                                                Country
-                                            </th>
-                                            <th>
-                                                Pincode
-                                            </th>
-                                            <th>
-                                                Case(s)
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach (var item in Model.VendorUserClaims)
-                                        {
-                                            <tr>
-                                                <td>
-                                                @{
-                                                        var title = @item?.AgencyUser.FirstName + ' ' + @item.AgencyUser?.LastName;
-                                                }
-                                                    <input id="@item.AgencyUser.Id" name="selectedcase" class="selected-case" type="radio" value="@item.AgencyUser.Id" data-toggle="tooltip" title="Select Agent @title" />
-                                                </td>
-                                                <td>
-                                                    @if (item?.AgencyUser.ProfilePictureUrl is not null)
-                                                    {
-                                                        <img id="profileImage" title="@title" class="form-Image table-profile-image" src="@item?.AgencyUser.ProfilePictureUrl" data-toggle="tooltip" />
-                                                    }
-                                                    else
-                                                    {
-                                                        <img id="profileImage" title="..." class="form-Image  table-profile-image" src="@Applicationsettings.NO_USER" data-toggle="tooltip" />
-                                                    }
-                                                </td>
-                                                <td>
-                                                    @item.AgencyUser.FirstName @item.AgencyUser.LastName
-                                                </td>
-
-                                                <td>
-                                                    @Html.DisplayFor(modelItem => item.AgencyUser.PhoneNumber)
-                                                </td>
-                                                <td>
-                                                    <a href="#">  @Html.DisplayFor(modelItem => item.AgencyUser.Email)</a>
-                                                </td>
-                                                <td>
-                                                    @Html.DisplayFor(modelItem => item.AgencyUser.Addressline)
-                                                </td>
-                                                <td>
-                                                    @Html.DisplayFor(modelItem => item.AgencyUser.District.Name)
-                                                </td>
-                                                <td>
-                                                    @Html.DisplayFor(modelItem => item.AgencyUser.State.Name)
-                                                </td>
-                                                <td>
-                                                    @Html.DisplayFor(modelItem => item.AgencyUser.Country.Name)
-                                                </td>
-                                                <td>
-                                                    @Html.DisplayFor(modelItem => item.AgencyUser.PinCode.Code)
-                                                </td>
-                                                <td>
-                                                    @Html.DisplayFor(modelItem => item.CurrentCaseCount)
-                                                </td>
-                                            </tr>
-                                        }
-                                    </tbody>
-
-                                </table>
-
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-footer">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <a id="back" asp-controller="SuperVisor" asp-action="Allocate" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
-                                <button disabled="disabled" id="allocate-case" type="submit" class="btn btn-danger">
-                                    <span class="badge badge-danger"> <i class="fas fa-external-link-alt"></i> </span> Allocate <sub>agent</sub>
+                                </span>
+                            </h3>
+                            <div class="card-tools">
+                                <span data-toggle="tooltip" title="Claim # : @Model.ClaimsInvestigation?.PolicyDetail?.ContractNumber" class="badge badge-light">
+                                    <i class='far fa-hand-point-right'></i>
+                                </span>
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                    <i class="fas fa-plus"></i>
                                 </button>
                             </div>
                         </div>
+
+                        <div class="card-body">
+
+                            <div class="row">
+                                <partial name="_ClaimPolicyDetails" model="@Model" />
+                                @if (Model.ClaimsInvestigation.PolicyDetail.ClaimType == ClaimType.HEALTH)
+                                {
+                                    <partial name="_ClaimCustomerDetails" model="@Model" />
+                                }
+                                @if (Model.ClaimsInvestigation.PolicyDetail.ClaimType == ClaimType.DEATH)
+                                {
+                                    <partial name="_ClaimBeneficairyDetails" model="@Model" />
+                                }
+
+                            </div>
+                        </div>
                     </div>
-                </form>
+                </div> <!-- class bb-blog-inner -->
+            </article>
+            @{
+                var pmodel = new ClaimsInvestigationVendorAgentModel
+            {
+                VendorUserClaims = Model.VendorUserClaims,
+                ClaimsInvestigation = Model.ClaimsInvestigation,
+                CaseLocation = Model.CaseLocation
+            };
+
+            }
+            <partial name="_AgentList" model="@pmodel" />
+
         </div>
     </div>
+</div>

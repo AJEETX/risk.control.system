@@ -1,58 +1,6 @@
 ﻿@model ClaimsInvestigationVendorsModel
 
 @{
-    string address = string.Empty;
-    string baddress = string.Empty;
-    int currentAgeinYrs = 0;
-    int currentBAgeinYrs = 0;
-    bool customerExist = false;
-    bool beneficiaryExist = false;
-    if (Model.ClaimsInvestigation != null && Model.ClaimsInvestigation.CustomerDetail != null)
-    {
-        address = @Model.ClaimsInvestigation?.CustomerDetail.Addressline + " " + @Model.ClaimsInvestigation?.CustomerDetail.District.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.State.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.Country.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.PinCode.Code;
-        baddress = @Model.Location != null ? @Model.Location?.Addressline + " " +
-        @Model.Location?.District?.Name + " " + @Model.Location?.State?.Name + " " +
-        @Model.Location?.Country?.Name + " " + @Model.Location?.PinCode?.Code : string.Empty;
-        if (Model.ClaimsInvestigation?.CustomerDetail.DateOfBirth != null)
-        {
-            var age = DateTime.Now.Subtract(Model.ClaimsInvestigation.CustomerDetail.DateOfBirth).TotalDays;
-            currentAgeinYrs = (int)age / 365;
-        }
-
-        if (Model.Location?.DateOfBirth != null)
-        {
-            var age = DateTime.Now.Subtract(Model.Location.DateOfBirth).TotalDays;
-            currentBAgeinYrs = (int)age / 365;
-        }
-
-    }
-    if (!string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.PolicyDetail?.ContractNumber))
-    {
-        customerExist = true;
-    }
-    if (Model.Location?.BeneficiaryDetailId > 0)
-    {
-        beneficiaryExist = true;
-    }
-    string customerProgressColor = "grey";
-    if (@customerExist)
-    {
-        customerProgressColor = "green";
-    }
-    string benficiaryProgressColor = "lightgrey";
-    if (@customerExist && @beneficiaryExist)
-    {
-        benficiaryProgressColor = "green";
-    }
-    if (@customerExist && !@beneficiaryExist)
-    {
-        benficiaryProgressColor = "grey";
-    }
-    if (!@customerExist && !@beneficiaryExist)
-    {
-        benficiaryProgressColor = "lightgrey";
-    }
-
     <input type="hidden" id="policyDetailId" value="@Model.ClaimsInvestigation?.PolicyDetail.PolicyDetailId" />
     <input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail.CustomerDetailId" />
     <input type="hidden" id="beneficiaryId" value="@Model.Location?.BeneficiaryDetailId" />
