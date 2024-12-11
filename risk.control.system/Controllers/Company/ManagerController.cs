@@ -164,7 +164,7 @@ namespace risk.control.system.Controllers.Company
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                var model = await investigationReportService.SubmittedDetail(id);
+                var model = await investigationReportService.SubmittedDetail(id, currentUserEmail);
 
                 return View(model);
             }
@@ -205,7 +205,7 @@ namespace risk.control.system.Controllers.Company
                     notifyService.Error("Claim Not Found !!!..");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var model = await investigationReportService.SubmittedDetail(id);
+                var model = await investigationReportService.SubmittedDetail(id, currentUserEmail);
 
                 return View(model);
             }

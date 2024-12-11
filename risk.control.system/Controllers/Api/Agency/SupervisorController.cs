@@ -349,7 +349,7 @@ namespace risk.control.system.Controllers.Api.Agency
                          Price = a.PolicyDetail.SumAssuredValue,
                          Type = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? "home" : "building",
                          Bed = a.CustomerDetail.Income.GetEnumDisplayName(),
-                         Bath = a.CustomerDetail.ContactNumber,
+                         Bath =long.Parse(a.CustomerDetail.ContactNumber),
                          Size = a.CustomerDetail.Description,
                          Position = new Position
                          {

@@ -149,7 +149,6 @@ namespace risk.control.system.Services
                     message += $"                                          ";
                     message += $"{clientCompanyUser.Email}";
                     message += $"                                          ";
-                    message += $"{BaseUrl}";
                     await smsService.DoSendSmsAsync(userEmailToSend.PhoneNumber, message);
                 }
                 //SMS ::END
@@ -246,7 +245,6 @@ namespace risk.control.system.Services
                     message += $"                                          ";
                     message += $"{applicationUser.Email}";
                     message += $"                                          ";
-                    message += $"{BaseUrl}";
                     await smsService.DoSendSmsAsync(userEmailToSend.PhoneNumber, message);
                 }
                 //SMS ::END
@@ -338,7 +336,6 @@ namespace risk.control.system.Services
                         message += $"                                          ";
                         message += $"{senderUserEmail})";
                         message += $"                                           ";
-                        message += $"{BaseUrl}";
                         await smsService.DoSendSmsAsync(user.PhoneNumber, message);
                     }
                 }
@@ -412,7 +409,6 @@ namespace risk.control.system.Services
                     message += $"                                          ";
                     message += $"{userEmail}";
                     message += $"                                          ";
-                    message += $"{BaseUrl}";
                     await smsService.DoSendSmsAsync(recepientUser.PhoneNumber, message);
                 }
             }
@@ -578,7 +574,6 @@ namespace risk.control.system.Services
                         message += $"                                          ";
                         message += $"{senderUserEmail}";
                         message += $"                                          ";
-                        message += $"{BaseUrl}";
                         await smsService.DoSendSmsAsync(user.PhoneNumber, message);
                     }
                 }
@@ -665,7 +660,6 @@ namespace risk.control.system.Services
                         message += $"                                          ";
                         message += $"{senderUserEmail}";
                         message += $"                                          ";
-                        message += $"{BaseUrl}";
                         await smsService.DoSendSmsAsync(user.PhoneNumber, message);
                     }
                 }
@@ -756,7 +750,6 @@ namespace risk.control.system.Services
                     message += $"                                          ";
                     message += $"{senderUserEmail}";
                     message += $"                                          ";
-                    message += $"{BaseUrl}";
                     await smsService.DoSendSmsAsync(user.PhoneNumber, message);
                 }
             }
@@ -853,7 +846,6 @@ namespace risk.control.system.Services
                     message += $"                                          ";
                     message += $"{clientCompanyUser.Email}";
                     message += $"                                          ";
-                    message += $"{BaseUrl}";
                     await smsService.DoSendSmsAsync(userEmailToSend.PhoneNumber, message);
                 }
                 //SMS ::END
@@ -941,7 +933,6 @@ namespace risk.control.system.Services
                         message += $"                                          ";
                         message += $"{senderUserEmail}";
                         message += $"                                          ";
-                        message += $"{BaseUrl}";
                         await smsService.DoSendSmsAsync(user.PhoneNumber, message);
                     }
                 }

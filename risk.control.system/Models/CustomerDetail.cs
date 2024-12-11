@@ -25,7 +25,7 @@ namespace risk.control.system.Models
         [Required]
         [Display(Name = "Contact number")]
         [DataType(DataType.PhoneNumber)]
-        public long ContactNumber { get; set; }
+        public string ContactNumber { get; set; }
 
         [Required]
         [Display(Name = "Address line")]

@@ -201,6 +201,11 @@ namespace risk.control.system.Services
                 }
             }
 
+            var maskedCustomerContact = new string('*', claimsAllocate2Agent.CustomerDetail.ContactNumber.ToString().Length - 4) + claimsAllocate2Agent.CustomerDetail.ContactNumber.ToString().Substring(claimsAllocate2Agent.CustomerDetail.ContactNumber.ToString().Length - 4);
+            claimsAllocate2Agent.CustomerDetail.ContactNumber = maskedCustomerContact;
+            var maskedBeneficiaryContact = new string('*', beneficiaryDetail.ContactNumber.ToString().Length - 4) + beneficiaryDetail.ContactNumber.ToString().Substring(beneficiaryDetail.ContactNumber.ToString().Length - 4);
+            claimsAllocate2Agent.BeneficiaryDetail.ContactNumber = maskedBeneficiaryContact;
+            beneficiaryDetail.ContactNumber = maskedBeneficiaryContact;
             var model = new ClaimsInvestigationVendorAgentModel
             {
                 CaseLocation = beneficiaryDetail,
@@ -227,7 +232,14 @@ namespace risk.control.system.Services
                 .ThenInclude(c => c.VideoReport)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == selectedcase);
 
-            if(claim.AgencyReport == null || claim.AgencyReport.AgentEmail != userEmail &&
+            var customerContactMasked = new string('*', claim.CustomerDetail.ContactNumber.ToString().Length - 4) + claim.CustomerDetail.ContactNumber.ToString().Substring(claim.CustomerDetail.ContactNumber.ToString().Length - 4);
+            claim.CustomerDetail.ContactNumber = customerContactMasked;
+
+            var beneficairyContactMasked = new string('*', claim.BeneficiaryDetail.ContactNumber.ToString().Length - 4) + claim.BeneficiaryDetail.ContactNumber.ToString().Substring(claim.BeneficiaryDetail.ContactNumber.ToString().Length - 4);
+
+            claim.BeneficiaryDetail.ContactNumber = beneficairyContactMasked;
+
+            if (claim.AgencyReport == null || claim.AgencyReport.AgentEmail != userEmail &&
                 claim.AgencyReport.PanIdReport?.DocumentIdImageLongLat == null &&
                 claim.AgencyReport.PassportIdReport?.DocumentIdImageLongLat == null &&
                 claim.AgencyReport.AudioReport?.DocumentIdImageLongLat == null &&
@@ -253,7 +265,6 @@ namespace risk.control.system.Services
         {
             var claimsInvestigation = claimsService.GetClaims()
                 .Include(c => c.ClaimMessages)
-                .Include(c => c.ClaimNotes)
                 .Include(c => c.AgencyReport)
                 .ThenInclude(c=>c.EnquiryRequest)
                 .Include(c => c.AgencyReport.DigitalIdReport)
@@ -264,6 +275,7 @@ namespace risk.control.system.Services
                 .Include(c => c.AgencyReport.VideoReport)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == selectedcase);
 
+
             var beneficiaryDetails =await _context.BeneficiaryDetail
                 .Include(c => c.ClaimsInvestigation)
                 .Include(c => c.PinCode)
@@ -272,7 +284,14 @@ namespace risk.control.system.Services
                 .Include(c => c.Country)
                 .Include(c => c.State)
                 .FirstOrDefaultAsync(c => c.ClaimsInvestigationId == selectedcase);
-            
+            var customerContactMasked = new string('*', claimsInvestigation.CustomerDetail.ContactNumber.ToString().Length - 4) + claimsInvestigation.CustomerDetail.ContactNumber.ToString().Substring(claimsInvestigation.CustomerDetail.ContactNumber.ToString().Length - 4);
+            claimsInvestigation.CustomerDetail.ContactNumber = customerContactMasked;
+
+            var beneficairyContactMasked = new string('*', claimsInvestigation.BeneficiaryDetail.ContactNumber.ToString().Length - 4) + claimsInvestigation.BeneficiaryDetail.ContactNumber.ToString().Substring(claimsInvestigation.BeneficiaryDetail.ContactNumber.ToString().Length - 4);
+
+            claimsInvestigation.BeneficiaryDetail.ContactNumber = beneficairyContactMasked;
+
+            beneficiaryDetails.ContactNumber = beneficairyContactMasked;
             if (claimsInvestigation.IsReviewCase)
             {
                 claimsInvestigation.AgencyReport.SupervisorRemarks = null;
@@ -297,7 +316,14 @@ namespace risk.control.system.Services
                 .Include(c=>c.ClaimNotes)
                 .Include(c=>c.ClaimMessages)
                 .FirstOrDefault(m => m.ClaimsInvestigationId == selectedcase);
-            
+
+            var customerContactMasked = new string('*', claimsInvestigation.CustomerDetail.ContactNumber.ToString().Length - 4) + claimsInvestigation.CustomerDetail.ContactNumber.ToString().Substring(claimsInvestigation.CustomerDetail.ContactNumber.ToString().Length - 4);
+            claimsInvestigation.CustomerDetail.ContactNumber = customerContactMasked;
+
+            var beneficairyContactMasked = new string('*', claimsInvestigation.BeneficiaryDetail.ContactNumber.ToString().Length - 4) + claimsInvestigation.BeneficiaryDetail.ContactNumber.ToString().Substring(claimsInvestigation.BeneficiaryDetail.ContactNumber.ToString().Length - 4);
+
+            claimsInvestigation.BeneficiaryDetail.ContactNumber = beneficairyContactMasked;
+
             claimsInvestigation.AgencyDeclineComment = string.Empty;
             return new ClaimTransactionModel
             {

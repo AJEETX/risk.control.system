@@ -12,44 +12,32 @@ namespace risk.control.system.Helpers
         {
             string ticketJsonFile = CheckFile(Path.Combine("Files", "concert-ticket-data.json"));
             string ticketJsonContent = File.ReadAllText(ticketJsonFile);
-            TicketData ticketData =
-               JsonConvert.DeserializeObject<TicketData>(ticketJsonContent);
+            TicketData ticketData = JsonConvert.DeserializeObject<TicketData>(ticketJsonContent);
 
             string jsonFile = CheckFile(Path.Combine("Files", "concert-data.json"));
             string jsonContent = File.ReadAllText(jsonFile);
+            ConcertData concertData = JsonConvert.DeserializeObject<ConcertData>(jsonContent);
 
-            ConcertData concertData =
-               JsonConvert.DeserializeObject<ConcertData>(jsonContent);
-
-            PdfReportBuilder ConcertTicketBuilder =
-                new PdfReportBuilder();
-
-            ConcertTicketBuilder.TicketData = ticketData;
-            ConcertTicketBuilder.ConcertData = concertData;
-
-            var ticketJsonFile1 = CheckFile(
-                Path.Combine("Files", "bp-ticket-data.json"));
-            string boardingJsonFile = CheckFile(
-                Path.Combine("Files", "boarding-data.json"));
-
-            var ticketJsonContent1 = File.ReadAllText(ticketJsonFile1);
+            string boardingJsonFile = CheckFile(Path.Combine("Files", "boarding-data.json"));
             string boardingJsonContent = File.ReadAllText(boardingJsonFile);
-            var ticketData1 =
-                JsonConvert.DeserializeObject<TicketData1>(ticketJsonContent1);
-            BoardingData boardingData =
-                JsonConvert.DeserializeObject<BoardingData>(boardingJsonContent);
+            BoardingData boardingData = JsonConvert.DeserializeObject<BoardingData>(boardingJsonContent);
+
+            var ticketJsonFile1 = CheckFile(Path.Combine("Files", "bp-ticket-data.json"));
+            var ticketJsonContent1 = File.ReadAllText(ticketJsonFile1);
+            var ticketData1 = JsonConvert.DeserializeObject<TicketData1>(ticketJsonContent1);
 
             string ticketJsonFile0 = CheckFile(Path.Combine("Files", "bp-ticket-data1.json"));
             string ticketJsonContent0 = File.ReadAllText(ticketJsonFile0);
-            TicketData1 ticketData0 =
-               JsonConvert.DeserializeObject<TicketData1>(ticketJsonContent0);
+            TicketData1 ticketData0 = JsonConvert.DeserializeObject<TicketData1>(ticketJsonContent0);
 
-            string boardingJsonFile0 = CheckFile(
-                Path.Combine("Files", "boarding-data1.json"));
+            string boardingJsonFile0 = CheckFile(Path.Combine("Files", "boarding-data1.json"));
             string boardingJsonContent0 = File.ReadAllText(boardingJsonFile0);
-            BoardingData boardingData0 =
-                JsonConvert.DeserializeObject<BoardingData>(boardingJsonContent0);
+            BoardingData boardingData0 = JsonConvert.DeserializeObject<BoardingData>(boardingJsonContent0);
 
+            PdfReportBuilder ConcertTicketBuilder = new PdfReportBuilder();
+
+            ConcertTicketBuilder.TicketData = ticketData;
+            ConcertTicketBuilder.ConcertData = concertData;
             ConcertTicketBuilder.BoardingData = boardingData;
             ConcertTicketBuilder.BoardingData0 = boardingData0;
             ConcertTicketBuilder.TicketData1 = ticketData1;

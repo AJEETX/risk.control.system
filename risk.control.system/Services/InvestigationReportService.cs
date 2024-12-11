@@ -11,7 +11,7 @@ namespace risk.control.system.Services
     {
         ClaimsInvestigationVendorsModel GetInvestigateReport(string currentUserEmail, string selectedcase);
 
-        Task<ClaimTransactionModel> SubmittedDetail(string selectedcase);
+        Task<ClaimTransactionModel> SubmittedDetail(string selectedcase, string currentUserEmail);
 
         Task<ClaimTransactionModel> GetClaimDetails(string currentUserEmail, string id);
 
@@ -30,7 +30,7 @@ namespace risk.control.system.Services
             this._context = context;
         }
 
-        public async Task<ClaimTransactionModel> SubmittedDetail(string selectedcase)
+        public async Task<ClaimTransactionModel> SubmittedDetail(string selectedcase, string currentUserEmail)
         {
             var caseLogs = await _context.InvestigationTransaction
                 .Include(i => i.InvestigationCaseStatus)
@@ -83,10 +83,22 @@ namespace risk.control.system.Services
               .Include(c => c.ClaimNotes)
               .Include(c => c.ClaimMessages)
                 .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == selectedcase);
+            var isAgencyUser = _context.VendorApplicationUser.Any(u => u.Email == currentUserEmail);
 
             var location = await _context.BeneficiaryDetail
                 .FirstOrDefaultAsync(l => l.ClaimsInvestigationId == selectedcase);
+            if (isAgencyUser)
+            {
+                var customerContactMasked = new string('*', claimsInvestigation.CustomerDetail.ContactNumber.Length - 4) + claimsInvestigation.CustomerDetail.ContactNumber.Substring(claimsInvestigation.CustomerDetail.ContactNumber.Length - 4);
+                claimsInvestigation.CustomerDetail.ContactNumber = customerContactMasked;
 
+                var beneficairyContactMasked = new string('*', claimsInvestigation.BeneficiaryDetail.ContactNumber.ToString().Length - 4) + claimsInvestigation.BeneficiaryDetail.ContactNumber.ToString().Substring(claimsInvestigation.BeneficiaryDetail.ContactNumber.ToString().Length - 4);
+
+                claimsInvestigation.BeneficiaryDetail.ContactNumber = beneficairyContactMasked;
+
+                location.ContactNumber = beneficairyContactMasked;
+            }
+            
             var invoice = _context.VendorInvoice.FirstOrDefault(i => i.AgencyReportId == claimsInvestigation.AgencyReport.AgencyReportId);
             var model = new ClaimTransactionModel
             {

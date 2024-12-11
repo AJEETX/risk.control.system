@@ -100,5 +100,11 @@ namespace risk.control.system.Models
         public int VerifyView { get; set; } = 0;
         public int AssessView { get; set; } = 0;
         public int ManagerActiveView { get; set; } = 0;
+
+        public DateTime? AllocatedToAgencyTime { get; set; }
+        public DateTime? TaskToAgentTime { get; set; }
+        public DateTime? SubmittedToSupervisorTime { get; set; }
+        public DateTime? SubmittedToAssessorTime { get; set; }
+        public DateTime? ProcessedByAssessorTime { get; set; }
     }
 }

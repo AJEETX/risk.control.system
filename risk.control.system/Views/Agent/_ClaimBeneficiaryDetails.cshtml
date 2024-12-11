@@ -1,0 +1,152 @@
+﻿@model ClaimsInvestigationVendorsModel
+
+@{
+    string address = string.Empty;
+    string baddress = string.Empty;
+    int currentAgeinYrs = 0;
+    int currentBAgeinYrs = 0;
+    bool customerExist = false;
+    bool beneficiaryExist = false;
+    if (Model.ClaimsInvestigation != null && Model.ClaimsInvestigation.CustomerDetail != null)
+    {
+        address = @Model.ClaimsInvestigation?.CustomerDetail.Addressline + " " + @Model.ClaimsInvestigation?.CustomerDetail.District.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.State.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.Country.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.PinCode.Code;
+        baddress = @Model.Location != null ? @Model.Location?.Addressline + " " +
+        @Model.Location?.District?.Name + " " + @Model.Location?.State?.Name + " " +
+        @Model.Location?.Country?.Name + " " + @Model.Location?.PinCode?.Code : string.Empty;
+        if (Model.ClaimsInvestigation?.CustomerDetail.DateOfBirth != null)
+        {
+            var age = DateTime.Now.Subtract(Model.ClaimsInvestigation.CustomerDetail.DateOfBirth).TotalDays;
+            currentAgeinYrs = (int)age / 365;
+        }
+
+        if (Model.Location?.DateOfBirth != null)
+        {
+            var age = DateTime.Now.Subtract(Model.Location.DateOfBirth).TotalDays;
+            currentBAgeinYrs = (int)age / 365;
+        }
+
+    }
+    if (!string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.PolicyDetail?.ContractNumber))
+    {
+        customerExist = true;
+    }
+    if (Model.Location?.BeneficiaryDetailId > 0)
+    {
+        beneficiaryExist = true;
+    }
+    string customerProgressColor = "grey";
+    if (@customerExist)
+    {
+        customerProgressColor = "green";
+    }
+    string benficiaryProgressColor = "lightgrey";
+    if (@customerExist && @beneficiaryExist)
+    {
+        benficiaryProgressColor = "green";
+    }
+    if (@customerExist && !@beneficiaryExist)
+    {
+        benficiaryProgressColor = "grey";
+    }
+    if (!@customerExist && !@beneficiaryExist)
+    {
+        benficiaryProgressColor = "lightgrey";
+    }
+    <div class="col-12 col-sm-6 d-flex align-items-stretch flex-column">
+        <div class="card bg-light d-flex flex-fill">
+            <div class="card-header text-muted border-bottom-0">
+                <i class="fas fa-user-tie"></i>  Beneficiary Details
+                <span class="hover-text">
+                    <i class="fas fa-info-circle"></i>
+                    <span class="tooltip-text" id="beneficiary-information">
+                        <li>
+                            <i class='fas fa-user-tie'></i> Beneficiary details
+                        </li>
+                        <li>
+                            <i class='far fa-hand-point-right'></i>
+                            <div class="btn btn-xs bg-teal">
+                                <i class="fas fa-comments"></i>
+                            </div> Send SMS to Beneficiary
+
+                        </li>
+                        <li>
+                            <i class='far fa-hand-point-right'></i>
+                            <div class="btn btn-xs btn-success">
+                                <i class="fas fa-user-tie"></i> ...
+                            </div> Show Beneficiary Details
+
+                        </li>
+                    </span>
+                </span>
+            </div>
+            <div class="progress">
+                <i class="far fa-bookmark bookmark-green"></i>
+                <div class="progress-bar" role="progressbar" style="width:100%;background-color:green;">
+                    <i class="fas fa-user-tie"></i>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-7">
+                        <h2 class="lead"><b>@Model.Location?.Name</b></h2>
+                        <p class="text-muted text-sm">
+                            <b>Relation: </b> @Model.Location?.BeneficiaryRelation.Name
+                        </p>
+                        <ul class="ml-4 mb-0 fa-ul text-muted">
+                            <li class="small">
+                                <span class="fa-li">
+                                    <i class="fas fa-user-clock"></i>
+                                </span>
+                                Age: @currentBAgeinYrs
+                            </li>
+                            <li class="small">
+                                <span class="fa-li">
+                                    <i class="fas fa-rupee-sign"></i>
+                                </span>
+                                Income: @Model.Location?.Income
+                            </li>
+                            <li class="small">
+                                <span class="fa-li">
+                                    <i class="fas fa-lg fa-building"></i>
+                                </span>
+                                Address: @baddress
+                            </li>
+                            <li class="small">
+                                <span class="fa-li">
+                                    <i class="fas fa-lg fa-phone"></i>
+                                </span>
+                                Phone #: + @Model.Location?.ContactNumber
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-5 text-center">
+                        <p class="text-muted text-sm">
+                            @if (Model?.Location?.ProfilePicture is not null)
+                            {
+                                <img id="bImage" class="img-fluid block-data" src="data:image/*;base64,@(Convert.ToBase64String(Model?.Location?.ProfilePicture))" data-toggle="tooltip" title="Beneficiary Photo">
+                            }
+                            else
+                            {
+                                <img id="bImage" class="img-fluid block-data" src="@Applicationsettings.NO_USER" data-toggle="tooltip" title="No Beneficiary Photo">
+                            }
+                        </p>
+                        <p class="text-muted text-sm">
+                            <img id="bImageMap" class="img-fluid block-data" src="@Model?.Location?.BeneficiaryLocationMap" data-toggle="tooltip" title="Display Beneficiary Address in map">
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="text-right">
+                    <a id="beneficiary-comments" class="btn btn-sm bg-teal" data-toggle="tooltip" title="Send SMS to Beneficiary">
+                        <i class="fas fa-comments"></i>
+                    </a>
+
+                    <a id="beneficiary-detail" class="btn btn-sm btn-success" data-toggle="tooltip" title="Show Beneficiary Details">
+                        <i class="fas fa-user-tie"></i> ...
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+}

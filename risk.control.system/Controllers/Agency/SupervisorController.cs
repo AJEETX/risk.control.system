@@ -272,7 +272,7 @@ namespace risk.control.system.Controllers.Agency
                     notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var model = await investigationReportService.SubmittedDetail(id);
+                var model = await investigationReportService.SubmittedDetail(id, currentUserEmail);
                 return View(model);
             }
             catch (Exception ex)
@@ -284,7 +284,7 @@ namespace risk.control.system.Controllers.Agency
         }
         [Breadcrumb(" Reply Enquiry", FromAction = "Allocate")]
 
-        public IActionResult ReplyEnquiry(string id)
+        public async Task<IActionResult> ReplyEnquiry(string id)
         {
             var currentUserEmail = HttpContext.User?.Identity?.Name;
             if (string.IsNullOrWhiteSpace(currentUserEmail))
@@ -297,7 +297,7 @@ namespace risk.control.system.Controllers.Agency
                 notifyService.Error("NOT FOUND !!!..");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
-            var model = investigationReportService.GetInvestigateReport(currentUserEmail, id);
+            var model = await vendorService.GetInvestigateReport(currentUserEmail, id);
             ViewData["claimId"] = id;
 
             return View(model);

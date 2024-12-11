@@ -165,15 +165,15 @@ namespace risk.control.system.Helpers
             row7Builder.AddCell();
             row7Builder.AddCell();
             row7Builder.AddCell();
-            row7Builder.AddCell(TicketData.Eticket).SetFont(FNT10);
+            row7Builder.AddCell(TicketData.AgencyName).SetFont(FNT10);
         }
 
         private void AddConcertData(TableCellBuilder cellBuilder)
         {
             cellBuilder
-                .AddParagraph("Investigation Report").SetFont(FNT19B);
+                .AddParagraph(TicketData.ReportTitle).SetFont(FNT19B);
             cellBuilder
-                .AddParagraph("07/11/2023  9:00PM").SetFont(FNT12)
+                .AddParagraph(DateTime.Now.ToString("dd-MMM-yyyy HH:mm:ss")).SetFont(FNT12)
                 .SetBorderStroke(strokeLeft: Stroke.None, strokeTop: Stroke.None, strokeRight: Stroke.None, strokeBottom: Stroke.Solid)
                 .SetBorderWidth(2);
         }
@@ -189,20 +189,20 @@ namespace risk.control.system.Helpers
         private void No(TableCellBuilder cellBuilder)
         {
             cellBuilder
-               .AddParagraph("Agency Name");
+               .AddParagraph(TicketData.AgencyNameTitle);
             cellBuilder
-                .AddParagraph(TicketData.Eticket).SetLineSpacing(1.5f);
+                .AddParagraph(TicketData.AgencyName).SetLineSpacing(1.5f);
             cellBuilder
-                .AddQRCodeUrl("https://icheckify.co.in/", 4,
+                .AddQRCodeUrl(TicketData.ReportQr, 4,
                               Color.Black, Color.White, false).SetHeight(100);
         }
 
         private void FillRuleA(int start, int end, TableCellBuilder cellBuilder)
         {
-            cellBuilder.AddParagraph(ConcertData.TitleRulesOfAttendance).SetFont(FNT12B).SetMargins(10, 10, 1, 4);
+            cellBuilder.AddParagraph(ConcertData.AgentReportTitle).SetFont(FNT12B).SetMargins(10, 10, 1, 4);
             cellBuilder.SetBorderStroke(strokeLeft: Stroke.Solid, strokeTop: Stroke.Solid, strokeRight: Stroke.None, strokeBottom: Stroke.Solid);
 
-            foreach (var item in ConcertData.RulesOfAttendance)
+            foreach (var item in ConcertData.ReportSummaryDescription)
             {
                 cellBuilder.AddParagraph(item).SetFont(FNT9).SetMargins(20, 0, 10, 2);
             }
@@ -210,59 +210,60 @@ namespace risk.control.system.Helpers
 
         private void FillRuleP(TableCellBuilder cellBuilder)
         {
-            cellBuilder.AddParagraph(ConcertData.TitleRulesOfPurchase).SetFont(FNT12B).SetMargins(10, 10, 1, 4);
+            cellBuilder.AddParagraph(ConcertData.SupervisorCommentsTitle).SetFont(FNT12B).SetMargins(10, 10, 1, 4);
             cellBuilder.SetBorderStroke(strokeLeft: Stroke.None, strokeTop: Stroke.Solid,
                     strokeRight: Stroke.Solid, strokeBottom: Stroke.Solid);
-            cellBuilder.AddParagraph(ConcertData.RulesOfPurchase).SetFont(FNT9).SetLineSpacing(1.2f).SetMargins(10, 0, 10, 4);
+            cellBuilder.AddParagraph(ConcertData.ReportSummary).SetFont(FNT9).SetLineSpacing(1.2f).SetMargins(10, 0, 10, 4);
         }
 
         private void FillBandlist(TableCellBuilder cellBuilder)
         {
             cellBuilder.SetBorderStroke(Stroke.None);
-            cellBuilder.AddParagraph(ConcertData.TitleBandsList).SetFont(FNT12B).SetMargins(0, 20, 1, 4);
-            cellBuilder.AddParagraph(ConcertData.BandsList).SetFont(FNT9).SetLineSpacing(1.2f).SetMargins(0, 0, 30, 4);
+            cellBuilder.AddParagraph(ConcertData.AssessmentDescriptionTitle).SetFont(FNT12B).SetMargins(0, 20, 1, 4);
+            cellBuilder.AddParagraph(ConcertData.WeatherDetail).SetFont(FNT9).SetLineSpacing(1.2f).SetMargins(0, 0, 30, 4);
             cellBuilder.AddParagraph("");
         }
 
         private void AddContactInfo(TableCellBuilder cellBuilder)
         {
             cellBuilder.SetBorderStroke(Stroke.None).SetPadding(11, 11, 0, 0);
-            cellBuilder.AddParagraph(ConcertData.TitleHowtoFind).SetFont(FNT12B).SetMargins(0, 9, 1, 4);
-            cellBuilder.AddParagraph(ConcertData.HowToFind).SetFont(FNT9);
-            cellBuilder.AddParagraph(ConcertData.TitleLearn).SetFont(FNT12B).SetMarginTop(10);
+            cellBuilder.AddParagraph(ConcertData.AddressVisitedTitle).SetFont(FNT12B).SetMargins(0, 9, 1, 4);
+            cellBuilder.AddParagraph(ConcertData.AddressVisited).SetFont(FNT9);
+            cellBuilder.AddParagraph(ConcertData.ContactAgencyTitle).SetFont(FNT12B).SetMarginTop(10);
             cellBuilder.AddParagraph("").SetFont(FNT9)
                 .SetAlignment(HorizontalAlignment.Left)
-                .AddUrl(ConcertData.Facebook);
+                .AddUrl(ConcertData.SupervisorEmail);
             cellBuilder.AddParagraph("").SetFont(FNT9)
                 .SetAlignment(HorizontalAlignment.Left)
-                .AddUrl(ConcertData.Twitter);
-            cellBuilder.AddParagraph(ConcertData.Instagram).SetFont(FNT9)
+                .AddUrl(ConcertData.AgencyDomain);
+            cellBuilder.AddParagraph(ConcertData.AgencyContact).SetFont(FNT9)
                 .SetAlignment(HorizontalAlignment.Left);
         }
 
         private void FillTicketData(TableCellBuilder cellBuilder)
         {
-            cellBuilder.AddParagraph("Policy #").SetLineSpacing(1.4f);
-            cellBuilder.AddParagraph("Claim Type").SetLineSpacing(1.4f);
-            cellBuilder.AddParagraph("Insured Amount").SetLineSpacing(1.4f);
-            cellBuilder.AddParagraph("Customer Name").SetLineSpacing(1.4f);
-            cellBuilder.AddParagraph("Reason").SetLineSpacing(1.4f);
-            cellBuilder.AddParagraph("Verified Address").SetLineSpacing(1.4f);
+            cellBuilder.AddParagraph(TicketData.PolicyNumTitle).SetLineSpacing(1.4f);
+            cellBuilder.AddParagraph(TicketData.ClaimTypeTitle).SetLineSpacing(1.4f);
+            cellBuilder.AddParagraph(TicketData.InsuredAmountTitle).SetLineSpacing(1.4f);
+            cellBuilder.AddParagraph(TicketData.PersonOfInterestNameTitle).SetLineSpacing(1.4f);
+            cellBuilder.AddParagraph(TicketData.Reason2VerifyTitle).SetLineSpacing(1.4f);
+            cellBuilder.AddParagraph(TicketData.VerifyAddressTitle).SetLineSpacing(1.4f);
+            cellBuilder.AddParagraph().SetLineSpacing(1.4f);
         }
 
         private void FillPersonalInfo(TableCellBuilder cellBuilder)
         {
-            cellBuilder.AddParagraph(TicketData.Admission).SetLineSpacing(1.4f);
-            cellBuilder.AddParagraph(TicketData.TicketType).SetLineSpacing(1.4f);
-            cellBuilder.AddParagraph(TicketData.Price).SetLineSpacing(1.4f);
-            cellBuilder.AddParagraph(TicketData.Name).SetLineSpacing(1.4f);
-            cellBuilder.AddParagraph(TicketData.Venue).SetLineSpacing(1.4f);
-            cellBuilder.AddParagraph(TicketData.Address).SetLineSpacing(1.4f);
+            cellBuilder.AddParagraph(TicketData.PolicyNum).SetLineSpacing(1.4f);
+            cellBuilder.AddParagraph(TicketData.ClaimType).SetLineSpacing(1.4f);
+            cellBuilder.AddParagraph(TicketData.InsuredAmount).SetLineSpacing(1.4f);
+            cellBuilder.AddParagraph(TicketData.PersonOfInterestName).SetLineSpacing(1.4f);
+            cellBuilder.AddParagraph(TicketData.Reason2Verify).SetLineSpacing(1.4f);
+            cellBuilder.AddParagraph(TicketData.VerifyAddress).SetLineSpacing(1.4f);
         }
 
         private void YourTicket(TableCellBuilder cellBuilder)
         {
-            cellBuilder.AddParagraph(ConcertData.CounterFoil).SetFont(FNT9).SetMarginRight(30);
+            cellBuilder.AddParagraph(ConcertData.ReportDisclaimer).SetFont(FNT9).SetMarginRight(30);
         }
 
         private void FillTicketDataCounterFoil(TableCellBuilder cellBuilder)
@@ -277,10 +278,10 @@ namespace risk.control.system.Helpers
         private void FillPersonalInfoCounterFoil(TableCellBuilder cellBuilder)
         {
             cellBuilder.SetBorderStroke(Stroke.None).SetBold(true);
-            cellBuilder.AddParagraph(TicketData.Admission).SetLineSpacing(1.4f);
-            cellBuilder.AddParagraph(TicketData.TicketType).SetLineSpacing(1.4f);
-            cellBuilder.AddParagraph(TicketData.Price).SetLineSpacing(1.4f);
-            cellBuilder.AddParagraph(TicketData.Name).SetLineSpacing(1.4f);
+            cellBuilder.AddParagraph(TicketData.PolicyNum).SetLineSpacing(1.4f);
+            cellBuilder.AddParagraph(TicketData.ClaimType).SetLineSpacing(1.4f);
+            cellBuilder.AddParagraph(TicketData.InsuredAmount).SetLineSpacing(1.4f);
+            cellBuilder.AddParagraph(TicketData.PersonOfInterestName).SetLineSpacing(1.4f);
         }
 
         private void FillBoardingHandBugTable(TableBuilder tableBuilder, BoardingCell[,] boardingItems, BoardingCell[,] boardingItems0)

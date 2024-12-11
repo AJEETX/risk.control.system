@@ -279,7 +279,7 @@ namespace risk.control.system.Controllers.Company
                 claimsInvestigation.CustomerDetail = new CustomerDetail
                 {
                     Addressline = random.Next(100, 999) + " GOOD STREET",
-                    ContactNumber = random.NextInt64(5555555555, 9999999999),
+                    ContactNumber = "61432854196",
                     Country = country,
                     DateOfBirth = DateTime.Now.AddYears(-random.Next(25, 77)).AddDays(20),
                     Education = Education.PROFESSIONAL,
@@ -434,7 +434,7 @@ namespace risk.control.system.Controllers.Company
                     StateId = state.StateId,
                     DistrictId = district.DistrictId,
                     PinCodeId = pinCode.PinCodeId,
-                    ContactNumber = random.NextInt64(5555555555, 9999999999),
+                    ContactNumber = "61432854196",
                 };
 
                 var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == country.CountryId).OrderBy(d => d.Name);

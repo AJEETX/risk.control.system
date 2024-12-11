@@ -100,7 +100,7 @@ namespace risk.control.system.Controllers.Agency
                     notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var model = await investigationReportService.SubmittedDetail(id);
+                var model = await investigationReportService.SubmittedDetail(id, currentUserEmail);
 
                 return View(model);
             }

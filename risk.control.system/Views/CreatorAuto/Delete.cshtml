@@ -289,7 +289,7 @@
                                         <div class="card-footer">
                                             <div class="row">
                                                 <div class="col-6 text-left">
-                                                    @if (Model.ClaimsInvestigation.CustomerDetail != null && Model.ClaimsInvestigation.CustomerDetail.ContactNumber > 0 )
+                                                    @if (Model.ClaimsInvestigation.CustomerDetail != null && !string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.CustomerDetail.ContactNumber))
                                                     {
                                                         <button id="customer-comments" class="btn btn-sm bg-teal">
                                                             <i class="fas fa-comments"></i>
@@ -382,7 +382,7 @@
                                         <div class="card-footer">
                                             <div class="row">
                                                 <div class="col-6 text-left">
-                                                    @if (Model.ClaimsInvestigation.BeneficiaryDetail != null && Model.ClaimsInvestigation.BeneficiaryDetail.ContactNumber > 0 )
+                                                    @if (Model.ClaimsInvestigation.BeneficiaryDetail != null && !string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.BeneficiaryDetail.ContactNumber))
                                                     {
                                                         <button id="beneficiary-comments" class="btn btn-sm bg-teal">
                                                             <i class="fas fa-comments"></i>

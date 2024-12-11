@@ -20,7 +20,7 @@ namespace risk.control.system.Models
 
         [DataType(DataType.PhoneNumber)]
         [Display(Name = "Phone")]
-        public long ContactNumber { get; set; }
+        public string ContactNumber { get; set; }
 
         [Display(Name = "Income")]
         public Income? Income { get; set; }

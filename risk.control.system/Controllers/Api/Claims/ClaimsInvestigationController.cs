@@ -85,13 +85,19 @@ namespace risk.control.system.Controllers.Api.Claims
         [HttpGet("GetCustomerDetail")]
         public async Task<IActionResult> GetCustomerDetail(long id)
         {
+            var currentUserEmail = HttpContext.User.Identity.Name;
+            var isAgencyUser = _context.VendorApplicationUser.Any(u => u.Email == currentUserEmail);
+
             var customer = await _context.CustomerDetail
                 .Include(c => c.Country)
                 .Include(c => c.State)
                 .Include(c => c.District)
                 .Include(c => c.PinCode)
                 .FirstOrDefaultAsync(p => p.CustomerDetailId == id);
-
+            if(isAgencyUser)
+            {
+                customer.ContactNumber = new string('*', customer.ContactNumber.Length - 4) + customer.ContactNumber.Substring(customer.ContactNumber.Length - 4);
+            }
             var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "user.png");
 
             var noDataimage = await System.IO.File.ReadAllBytesAsync(noDataImagefilePath);
@@ -107,7 +113,7 @@ namespace risk.control.system.Controllers.Api.Claims
                     Occupation = customer.Occupation.GetEnumDisplayName(),
                     Income = customer.Income.GetEnumDisplayName(),
                     Education = customer.Education.GetEnumDisplayName(),
-                    DateOfBirth = customer.DateOfBirth,
+                    DateOfBirth = customer.DateOfBirth.ToString("dd-MM-yyyy"),
                 }
                 );
         }
@@ -122,7 +128,12 @@ namespace risk.control.system.Controllers.Api.Claims
                 .Include(c => c.District)
                 .Include(c => c.PinCode)
                 .FirstOrDefaultAsync(p => p.BeneficiaryDetailId == id && p.ClaimsInvestigationId == claimId);
-
+            var currentUserEmail = HttpContext.User.Identity.Name;
+            var isAgencyUser = _context.VendorApplicationUser.Any(u => u.Email == currentUserEmail);
+            if(isAgencyUser)
+            {
+                beneficiary.ContactNumber = new string('*', beneficiary.ContactNumber.Length - 4) + beneficiary.ContactNumber.Substring(beneficiary.ContactNumber.Length - 4);
+            }
             var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "user.png");
 
             var noDataimage = await System.IO.File.ReadAllBytesAsync(noDataImagefilePath);

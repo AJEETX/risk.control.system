@@ -2,25 +2,35 @@
 {
     public class TicketData
     {
-        public string Eticket { get; set; }
+        public string ReportTitle { get; set; }
+        public string ReportQr { get; set; }
+        public string AgencyNameTitle { get; set; }
+        public string AgencyName { get; set; }
+        public string AgencyLogo { get; set; }
+        public string ClaimTypeTitle { get; set; }
 
-        public string Admission { get; set; }
-        public string TicketType { get; set; }
-        public string Price { get; set; }
-        public string Name { get; set; }
-        public string Venue { get; set; }
-        public string Address { get; set; }
+        public string PolicyNumTitle { get; set; }
+        public string PolicyNum { get; set; }
+        public string ClaimType { get; set; }
+        public string InsuredAmountTitle { get; set; }
+        public string InsuredAmount { get; set; }
+        public string PersonOfInterestNameTitle { get; set; }
+        public string PersonOfInterestName { get; set; }
+        public string Reason2VerifyTitle { get; set; }
+        public string Reason2Verify { get; set; }
+        public string VerifyAddressTitle { get; set; }
+        public string VerifyAddress { get; set; }
 
         public override string ToString()
         {
             return "TicketData{" +
-                    "Eticket=" + Eticket +
-                     ", Admission=" + Admission +
-                    ", TicketType=" + TicketType +
-                    ", Price=" + Price +
-                    ", Name=" + Name +
-                    ", Venue=" + Venue +
-                    ", Address=" + Address +
+                    "AgencyName=" + AgencyName +
+                     ", Policy Number=" + PolicyNum +
+                    ", Claim Type=" + ClaimType +
+                    ", Insured Amount=" + InsuredAmount +
+                    ", Person Name=" + PersonOfInterestName +
+                    ", Reason 2 Verify=" + Reason2Verify +
+                    ", VerifyAddress=" + VerifyAddress +
                      "}";
         }
     }

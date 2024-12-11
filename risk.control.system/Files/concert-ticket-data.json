@@ -1,9 +1,19 @@
 {
-  "Eticket": "verify.com",
-  "Admission": "POLX2039",
-  "TicketType": "HEALTH",
-  "Price": "Rs. 45000",
-  "Name": "John Smith",
-  "Venue": "Doubtful background",
-  "Address": "205 1st St. Vermont VIC 3133"
+  "ReportTitle": "Investigation Report",
+  "ReportQr": "https://icheckify.co.in/",
+  "AgencyNameTitle": "Agency Name",
+  "AgencyName": "verify.com",
+  "AgencyLogo": "verify.png",
+  "ClaimTypeTitle": "Claim Type",
+  "PolicyNumTitle": "Policy #",
+  "PolicyNum": "POLX2039",
+  "ClaimType": "HEALTH",
+  "InsuredAmountTitle": "Insured Amount",
+  "InsuredAmount": "Rs. 45000",
+  "PersonOfInterestName": "John Smith",
+  "PersonOfInterestNameTitle": "Person Name",
+  "Reason2VerifyTitle": "Reason to verify",
+  "Reason2Verify": "Doubtful background",
+  "VerifyAddressTitle": "Verified Address",
+  "VerifyAddress": "205 1st St. Vermont VIC 3133"
 }
