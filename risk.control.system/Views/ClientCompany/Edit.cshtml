@@ -299,17 +299,6 @@
                                 <div class="col-md-6">
                                     <div class="card card-light">
                                         <div class="col-md-12">
-
-                                            @* <div class="form-group">
-                                            <span class="input-group-label"> Whitelist IP AddressRange:</span>
-                                            <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                            <span class="input-group-text" id="WhitelistIpAddressRange"><i class="fas fa-sitemap"></i> <i class="fa fa-asterisk asterik-style" style="color:#e9ecef;"></i></span>
-                                            </div>
-                                            <input type="text" asp-for="WhitelistIpAddressRange" class="form-control remarks title-name" placeholder="202.7.251.21/24">
-                                            <span asp-validation-for="WhitelistIpAddressRange" class="text-danger"></span>
-                                            </div>
-                                            </div> *@
                                             <div class="form-group">
                                                 <span class="input-group-label"> Pan API:</span>
                                                 <div class="input-group mb-3">
@@ -548,6 +537,59 @@
                                             <span class="checkbox">
                                                 <input asp-for="AiEnabled" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
                                             </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <span class="input-group-label"> Creator SLA (day(s):</span>
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text" id="CreatorSla"><i class="fas fa-clock"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                            </div>
+                                            <input type="text" asp-for="CreatorSla" class="form-control remarks" placeholder="Creator sla (day(s)" />
+                                            <span asp-validation-for="CreatorSla" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+                                <div class="col-md-3">
+
+                                    <div class="form-group">
+                                        <span class="input-group-label"> Assessor SLA (day(s):</span>
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text" id="AssessorSla"><i class="fas fa-clock"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                            </div>
+                                            <input type="text" asp-for="AssessorSla" class="form-control remarks" placeholder="Assessor Sla (day(s)" />
+                                            <span asp-validation-for="AssessorSla" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+
+                                    <div class="form-group">
+                                        <span class="input-group-label"> Supervisor SLA (day(s)):</span>
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text" id="SupervisorSla"><i class="fas fa-clock"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                            </div>
+                                            <input type="text" asp-for="SupervisorSla" class="form-control remarks" placeholder="Supervisor Sla (day(s)" />
+                                            <span asp-validation-for="SupervisorSla" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <span class="input-group-label"> Agent SLA (day(s):</span>
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text" id="AgentSla"><i class="fas fa-clock"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                            </div>
+                                            <input type="text" asp-for="AgentSla" class="form-control remarks" placeholder="Agent Sla (day(s)" />
+                                            <span asp-validation-for="AgentSla" class="text-danger"></span>
                                         </div>
                                     </div>
                                 </div>

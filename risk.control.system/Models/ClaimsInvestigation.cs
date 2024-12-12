@@ -106,5 +106,12 @@ namespace risk.control.system.Models
         public DateTime? SubmittedToSupervisorTime { get; set; }
         public DateTime? SubmittedToAssessorTime { get; set; }
         public DateTime? ProcessedByAssessorTime { get; set; }
+
+        public int CreatorSla { get; set; } = 5;
+        public int AssessorSla { get; set; } = 5;
+        public int SupervisorSla { get; set; } = 5;
+        public int AgentSla { get; set; } = 5;
+
+        public bool UpdateAgentReport { get; set; } = false;
     }
 }

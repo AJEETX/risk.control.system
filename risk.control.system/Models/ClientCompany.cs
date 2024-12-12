@@ -100,6 +100,10 @@ namespace risk.control.system.Models
         public bool HasClaims { get; set; } = false;
         public bool AiEnabled { get; set; } = false;
 
+        public int CreatorSla { get; set; } = 5;
+        public int AssessorSla { get; set; } = 5;
+        public int SupervisorSla { get; set; } = 5;
+        public int AgentSla { get; set; } = 5;
         public override string ToString()
         {
             return $"Insurance Company Information:\n" +

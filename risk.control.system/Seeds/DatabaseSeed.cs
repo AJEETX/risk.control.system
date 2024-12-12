@@ -15,7 +15,6 @@ namespace risk.control.system.Seeds
             using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             var webHostEnvironment = scope.ServiceProvider.GetRequiredService<IWebHostEnvironment>();
             var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-            var httpClientService = scope.ServiceProvider.GetRequiredService<IHttpClientService>();
             var vendorUserManager = scope.ServiceProvider.GetRequiredService<UserManager<VendorApplicationUser>>();
             var clientUserManager = scope.ServiceProvider.GetRequiredService<UserManager<ClientCompanyApplicationUser>>();
             var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<ApplicationRole>>();

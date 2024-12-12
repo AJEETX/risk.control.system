@@ -676,6 +676,10 @@ namespace risk.control.system.Services
                 claimsCaseToAllocateToVendor.AllocateView = 0;
                 claimsCaseToAllocateToVendor.AutoAllocated = AutoAllocated;
                 claimsCaseToAllocateToVendor.AllocatedToAgencyTime = DateTime.Now;
+                claimsCaseToAllocateToVendor.CreatorSla = currentUser.ClientCompany.CreatorSla;
+                claimsCaseToAllocateToVendor.AssessorSla = currentUser.ClientCompany.AssessorSla;
+                claimsCaseToAllocateToVendor.SupervisorSla = currentUser.ClientCompany.SupervisorSla;
+                claimsCaseToAllocateToVendor.AgentSla = currentUser.ClientCompany.AgentSla;
                 _context.ClaimsInvestigation.Update(claimsCaseToAllocateToVendor);
                 var lastLog = _context.InvestigationTransaction.Where(i =>
                 i.ClaimsInvestigationId == claimsCaseToAllocateToVendor.ClaimsInvestigationId).OrderByDescending(o => o.Created)?.FirstOrDefault();

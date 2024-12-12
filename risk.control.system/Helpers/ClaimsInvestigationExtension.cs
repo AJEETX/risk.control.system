@@ -9,14 +9,24 @@ namespace risk.control.system.Helpers
 {
     public static class ClaimsInvestigationExtension
     {
-        public static string GetCreatorTimePending(this ClaimsInvestigation a)
+        public static string GetCreatorTimePending(this ClaimsInvestigation a, bool active = false)
         {
-            if (DateTime.Now.Subtract(a.Created).Days >= 7)
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Created).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Hurry up, {DateTime.Now.Subtract(a.Created).Days} days since created!\"></i>");
+            if (!active)
+            {
+                if (DateTime.Now.Subtract(a.Created).Days >= a.CreatorSla)
+                    return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Created).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Hurry up, {DateTime.Now.Subtract(a.Created).Days} days since created!\"></i>");
 
-            if (DateTime.Now.Subtract(a.Created).Days >= 3)
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Created).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Caution : {DateTime.Now.Subtract(a.Created).Days} day since created.\"></i>");
+                if (DateTime.Now.Subtract(a.Created).Days >= 3 || DateTime.Now.Subtract(a.Created).Days >= a.CreatorSla)
+                    return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Created).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Caution : {DateTime.Now.Subtract(a.Created).Days} day since created.\"></i>");
+            }
+            else
+            {
+                if (DateTime.Now.Subtract(a.Created).Days >= a.CreatorSla)
+                    return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Created).Days} day</span>");
 
+                if (DateTime.Now.Subtract(a.Created).Days >= 3 || DateTime.Now.Subtract(a.Created).Days >= a.CreatorSla)
+                    return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Created).Days} day</span>");
+            }
             if (DateTime.Now.Subtract(a.Created).Days >= 1)
                 return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Created).Days} day</span>");
 
@@ -43,11 +53,22 @@ namespace risk.control.system.Helpers
             {
                 timeToCompare = a.SubmittedToSupervisorTime.Value;
             }
-            if (DateTime.Now.Subtract(timeToCompare).Days >= 7)
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Hurry up, {DateTime.Now.Subtract(a.Created).Days} days since created!\"></i>");
+            if (!open)
+            {
+                if (DateTime.Now.Subtract(timeToCompare).Days >= a.AgentSla)
+                    return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Hurry up, {DateTime.Now.Subtract(a.Created).Days} days since created!\"></i>");
 
-            if (DateTime.Now.Subtract(timeToCompare).Days >= 3)
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Caution : {DateTime.Now.Subtract(a.Created).Days} day since created.\"></i>");
+                if (DateTime.Now.Subtract(timeToCompare).Days >= 3 || DateTime.Now.Subtract(timeToCompare).Days >= a.AgentSla)
+                    return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Caution : {DateTime.Now.Subtract(a.Created).Days} day since created.\"></i>");
+            }
+            else
+            {
+                if (DateTime.Now.Subtract(timeToCompare).Days >= a.AgentSla)
+                    return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Days} day</span>");
+
+                if (DateTime.Now.Subtract(timeToCompare).Days >= 3 || DateTime.Now.Subtract(timeToCompare).Days >= a.AgentSla)
+                    return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Days} day</span>");
+            }
 
             if (DateTime.Now.Subtract(timeToCompare).Days >= 1)
                 return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Days} day</span>");
@@ -74,26 +95,44 @@ namespace risk.control.system.Helpers
             if(newClaim)
             {
                 timeToCompare = a.AllocatedToAgencyTime.Value;
+                if (DateTime.Now.Subtract(timeToCompare).Days >= a.SupervisorSla)
+                    return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Hurry up, {DateTime.Now.Subtract(timeToCompare).Days} days since created!\"></i>");
+
+                if (DateTime.Now.Subtract(timeToCompare).Days >= 3 || DateTime.Now.Subtract(timeToCompare).Days >= a.SupervisorSla)
+                    return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Caution : {DateTime.Now.Subtract(timeToCompare).Days} day since created.\"></i>");
             }
             else if(taskedToAgent)
             {
                 timeToCompare = a.TaskToAgentTime.Value;
+                if (DateTime.Now.Subtract(timeToCompare).Days >= a.SupervisorSla)
+                    return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Days} day</span>");
+
+                if (DateTime.Now.Subtract(timeToCompare).Days >= 3 || DateTime.Now.Subtract(timeToCompare).Days >= a.SupervisorSla)
+                    return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Days} day</span>");
+
             }
             else if(submitted)
             {
                 timeToCompare = a.SubmittedToSupervisorTime.Value;
+                if (DateTime.Now.Subtract(timeToCompare).Days >= a.SupervisorSla)
+                    return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Hurry up, {DateTime.Now.Subtract(timeToCompare).Days} days since created!\"></i>");
+
+                if (DateTime.Now.Subtract(timeToCompare).Days >= 3 || DateTime.Now.Subtract(timeToCompare).Days >= a.SupervisorSla)
+                    return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Caution : {DateTime.Now.Subtract(timeToCompare).Days} day since created.\"></i>");
+
             }
             else if(completed)
             {
                 timeToCompare = a.SubmittedToAssessorTime.Value;
+                timeToCompare = a.TaskToAgentTime.Value;
+                if (DateTime.Now.Subtract(timeToCompare).Days >= a.SupervisorSla)
+                    return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Days} day</span>");
+
+                if (DateTime.Now.Subtract(timeToCompare).Days >= 3 || DateTime.Now.Subtract(timeToCompare).Days >= a.SupervisorSla)
+                    return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Days} day</span>");
             }
 
-            if (DateTime.Now.Subtract(timeToCompare).Days >= 7)
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Hurry up, {DateTime.Now.Subtract(timeToCompare).Days} days since created!\"></i>");
-
-            if (DateTime.Now.Subtract(timeToCompare).Days >= 3)
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Caution : {DateTime.Now.Subtract(timeToCompare).Days} day since created.\"></i>");
-
+            
             if (DateTime.Now.Subtract(timeToCompare).Days >= 1)
                 return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Days} day</span>");
 
@@ -118,17 +157,24 @@ namespace risk.control.system.Helpers
             if (assess)
             {
                 time2Compare = a.SubmittedToAssessorTime.Value;
+                if (DateTime.Now.Subtract(time2Compare).Days >= a.AssessorSla)
+                    return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Hurry up, {DateTime.Now.Subtract(time2Compare).Days} days since created!\"></i>");
+
+                if (DateTime.Now.Subtract(time2Compare).Days >= 3 || DateTime.Now.Subtract(time2Compare).Days >= a.AssessorSla)
+                    return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Caution : {DateTime.Now.Subtract(time2Compare).Days} day since created.\"></i>");
+
             }
             else if(processed)
             {
                 time2Compare = a.ProcessedByAssessorTime.Value;
+                if (DateTime.Now.Subtract(time2Compare).Days >= a.AssessorSla)
+                    return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Days} day</span>");
+
+                if (DateTime.Now.Subtract(time2Compare).Days >= 3 || DateTime.Now.Subtract(time2Compare).Days >= a.AssessorSla)
+                    return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Days} day</span>");
+
             }
 
-            if (DateTime.Now.Subtract(time2Compare).Days >= 7)
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Hurry up, {DateTime.Now.Subtract(time2Compare).Days} days since created!\"></i>");
-
-            if (DateTime.Now.Subtract(time2Compare).Days >= 3)
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Caution : {DateTime.Now.Subtract(time2Compare).Days} day since created.\"></i>");
 
             if (DateTime.Now.Subtract(time2Compare).Days >= 1)
                 return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Days} day</span>");
