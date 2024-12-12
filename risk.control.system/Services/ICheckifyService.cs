@@ -78,9 +78,10 @@ public class ICheckifyService : IICheckifyService
 
     public async Task<AppiCheckifyResponse> GetFaceId(FaceData data)
     {
+        ClaimsInvestigation claim = null;
         try
         {
-            var claim = claimsService.GetClaims().Include(c => c.AgencyReport).ThenInclude(c => c.DigitalIdReport).FirstOrDefault(c => c.ClaimsInvestigationId == data.ClaimId);
+            claim = claimsService.GetClaims().Include(c => c.AgencyReport).ThenInclude(c => c.DigitalIdReport).FirstOrDefault(c => c.ClaimsInvestigationId == data.ClaimId);
 
             if (claim.AgencyReport == null)
             {
@@ -157,15 +158,34 @@ public class ICheckifyService : IICheckifyService
         catch (Exception ex)
         {
             Console.WriteLine(ex.StackTrace);
-            throw ex;
+            claim.AgencyReport.DigitalIdReport.DigitalIdImageData = "No Weather Data";
+            claim.AgencyReport.DigitalIdReport.DigitalIdImage = Convert.FromBase64String(data.LocationImage);
+            claim.AgencyReport.DigitalIdReport.DigitalIdImageMatchConfidence = string.Empty;
+            claim.AgencyReport.DigitalIdReport.DigitalIdImageLocationAddress = "No Address data";
+            claim.AgencyReport.DigitalIdReport.MatchExecuted = true;
+            var updateClaim = _context.ClaimsInvestigation.Update(claim);
+            var rows = await _context.SaveChangesAsync();
+            var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-photo.jpg");
+            var noData = await File.ReadAllBytesAsync(noDataImagefilePath);
+            return new AppiCheckifyResponse
+            {
+                BeneficiaryId = updateClaim.Entity.BeneficiaryDetail.BeneficiaryDetailId,
+                LocationImage = updateClaim.Entity.AgencyReport?.DigitalIdReport?.DigitalIdImage != null ?
+                Convert.ToBase64String(claim.AgencyReport?.DigitalIdReport?.DigitalIdImage) :
+                Convert.ToBase64String(noData),
+                LocationLongLat = claim.AgencyReport.DigitalIdReport?.DigitalIdImageLongLat,
+                LocationTime = claim.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime,
+                FacePercent = claim.AgencyReport.DigitalIdReport?.DigitalIdImageMatchConfidence
+            };
         }
     }
 
     public async Task<AppiCheckifyResponse> GetDocumentId(DocumentData data)
     {
+        ClaimsInvestigation claim = null;
         try
         {
-            var claim = claimsService.GetClaims().Include(c => c.AgencyReport).ThenInclude(c => c.PanIdReport).FirstOrDefault(c => c.ClaimsInvestigationId == data.ClaimId);
+            claim = claimsService.GetClaims().Include(c => c.AgencyReport).ThenInclude(c => c.PanIdReport).FirstOrDefault(c => c.ClaimsInvestigationId == data.ClaimId);
             if (claim.AgencyReport == null)
             {
                 claim.AgencyReport = new AgencyReport();
@@ -297,7 +317,27 @@ public class ICheckifyService : IICheckifyService
         catch (Exception ex)
         {
             Console.WriteLine(ex.StackTrace);
-            throw;
+            var image = Convert.FromBase64String(data.OcrImage);
+            claim.AgencyReport.PanIdReport.DocumentIdImage = CompressImage.ProcessCompress(image);
+            claim.AgencyReport.PanIdReport.DocumentIdImageLongLatTime = DateTime.Now;
+            claim.AgencyReport.PanIdReport.DocumentIdImageData = "no data: ";
+                claim.AgencyReport.PanIdReport.DocumentIdImageValid = false;
+            _context.ClaimsInvestigation.Update(claim);
+
+            var rows = await _context.SaveChangesAsync();
+            var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-photo.jpg");
+
+            var noDataimage = await File.ReadAllBytesAsync(noDataImagefilePath);
+            return new AppiCheckifyResponse
+            {
+                BeneficiaryId = claim.BeneficiaryDetail.BeneficiaryDetailId,
+                OcrImage = claim.AgencyReport.PanIdReport?.DocumentIdImage != null ?
+                Convert.ToBase64String(claim.AgencyReport.PanIdReport?.DocumentIdImage) :
+                Convert.ToBase64String(noDataimage),
+                OcrLongLat = claim.AgencyReport.PanIdReport?.DocumentIdImageLongLat,
+                OcrTime = claim.AgencyReport.PanIdReport?.DocumentIdImageLongLatTime,
+                PanValid = claim.AgencyReport.PanIdReport?.DocumentIdImageValid
+            };
         }
     }
 

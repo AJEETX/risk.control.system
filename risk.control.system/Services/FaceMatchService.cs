@@ -13,15 +13,16 @@ namespace risk.control.system.Services
         public async Task<(string, byte[])> GetFaceMatchAsync(byte[] registeredImage, string faceImage)
         {
             string ImageData = string.Empty;
+            byte[] face2Verify = null;
             try
             {
-                var face2Verify = Convert.FromBase64String(faceImage);
+                face2Verify = Convert.FromBase64String(faceImage);
                 var matched = await CompareFaces.Do(registeredImage, face2Verify);
                 return matched ? ("99", CompressImage.ProcessCompress(face2Verify)) : (string.Empty, CompressImage.ProcessCompress(face2Verify));
             }
             catch (Exception ex)
             {
-                return (string.Empty, CompressImage.ProcessCompress(registeredImage));
+                return (string.Empty, CompressImage.ProcessCompress(face2Verify));
             }
         }
     }

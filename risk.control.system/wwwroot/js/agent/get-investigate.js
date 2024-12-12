@@ -35,6 +35,8 @@
         var val = $(this).val(),
             fbtn = $('#UploadFaceImageButton');
         val ? fbtn.removeAttr("disabled") : fbtn.attr("disabled");
+        var uploadType = $('#digitalImage').val();
+        uploadType && (uploadType.endsWith("png") || uploadType.endsWith("jpg") || uploadType.endsWith("jpeg")) ? fbtn.attr("disabled", false) : fbtn.removeAttr("disabled");
     });
     $("#digitalImage").on('change', function () {
         var MaxSizeInBytes = 2097152;
@@ -175,6 +177,8 @@
         var val = $(this).val(),
             fbtn = $('#UploadPanImageButton');
         val ? fbtn.removeAttr("disabled") : fbtn.attr("disabled");
+        var uploadType = $('#panImage').val();
+        uploadType && (uploadType.endsWith("png") || uploadType.endsWith("jpg") || uploadType.endsWith("jpeg")) ? fbtn.attr("disabled", false) : fbtn.removeAttr("disabled");
     });
     $("#panImage").on('change', function () {
         var MaxSizeInBytes = 2097152;
@@ -315,6 +319,8 @@
         var val = $(this).val(),
             fbtn = $('#UploadPassportImageButton');
         val ? fbtn.removeAttr("disabled") : fbtn.attr("disabled");
+        var uploadType = $('#passportImage').val();
+        uploadType && (uploadType.endsWith("png") || uploadType.endsWith("jpg") || uploadType.endsWith("jpeg")) ? fbtn.attr("disabled", false) : fbtn.removeAttr("disabled");
     });
     $("#passportImage").on('change', function () {
         var MaxSizeInBytes = 2097152;
@@ -450,6 +456,8 @@
         var val = $(this).val(),
             fbtn = $('#UploadAudioButton');
         val ? fbtn.removeAttr("disabled") : fbtn.attr("disabled");
+        var uploadType = $('#audioFile').val();
+        uploadType && uploadType.endsWith("mp3") ? fbtn.attr("disabled", false) : fbtn.removeAttr("disabled");
     });
     $("#audioFile").on('change', function () {
         var MaxSizeInBytes = 5297152;
@@ -581,6 +589,8 @@
         var val = $(this).val(),
             fbtn = $('#UploadVideoButton');
         val ? fbtn.removeAttr("disabled") : fbtn.attr("disabled");
+        var uploadType = $('#videoFile').val();
+        uploadType && uploadType.endsWith("mp4") ? fbtn.attr("disabled", false) : fbtn.removeAttr("disabled");
     });
     $("#videoFile").on('change', function () {
         var MaxSizeInBytes = 5297152;
