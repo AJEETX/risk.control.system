@@ -203,6 +203,24 @@ namespace risk.control.system.Helpers
             }
         }
 
+        public static string GetPersonPhoto(ClaimType? claimType, CustomerDetail cdetail, BeneficiaryDetail beneficiary)
+        {
+            if (claimType == ClaimType.HEALTH)
+            {
+                if (cdetail is not null)
+                {
+                    return string.Format("data:image/*;base64,{0}", Convert.ToBase64String(cdetail.ProfilePicture));
+                }
+            }
+            if (claimType == ClaimType.DEATH)
+            {
+                if(beneficiary is not null)
+                {
+                    return string.Format("data:image/*;base64,{0}", Convert.ToBase64String(beneficiary.ProfilePicture));
+                }
+            }
+            return Applicationsettings.NO_USER;
+        }
         public static string GetPincodeName(ClaimType? claimType, CustomerDetail cdetail, BeneficiaryDetail location)
         {
             if (claimType == ClaimType.HEALTH)

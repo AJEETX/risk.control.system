@@ -20,7 +20,7 @@
             url: '/api/agency/agent/GetSubmitted',
             dataSrc: ''
         },
-        order: [[11, 'desc']],
+        order: [[9, 'desc']],
         fixedHeader: true,
         processing: true,
         paging: true,
@@ -52,15 +52,6 @@
                 }
             },
             { "data": "name" },
-            {
-                "sDefaultContent": "",
-                "bSortable": false,
-                "mRender": function (data, type, row) {
-                    var img = '<img alt="' + row.beneficiaryName + '" title="' + row.beneficiaryName + '" src="' + row.beneficiaryPhoto + '" class="table-profile-image" data-toggle="tooltip"/>';
-                    return img;
-                }
-            },
-            { "data": "beneficiaryName" },
             { "data": "serviceType" },
             { "data": "service" },
             {

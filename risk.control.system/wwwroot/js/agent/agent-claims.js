@@ -52,7 +52,7 @@ $(document).ready(function () {
                 return '<input type="checkbox" name="selectedcase[]" value="' + $('<div/>').text(data).html() + '">';
             }
         }],
-        order: [[11, 'asc']],
+        order: [[9, 'asc']],
         fixedHeader: true,
         processing: true,
         paging: true,
@@ -92,15 +92,6 @@ $(document).ready(function () {
                 }
             },
             { "data": "name" },
-            {
-                "sDefaultContent": "",
-                "bSortable": false,
-                "mRender": function (data, type, row) {
-                    var img = '<img alt="' + row.beneficiaryName + '" title="' + row.beneficiaryName + '" src="' + row.beneficiaryPhoto + '" class="table-profile-image" data-toggle="tooltip"/>';
-                    return img;
-                }
-            },
-            { "data": "beneficiaryName" },
             { "data": "serviceType" },
             { "data": "service" },
             {

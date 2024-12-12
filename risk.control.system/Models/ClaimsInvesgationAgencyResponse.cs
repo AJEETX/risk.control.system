@@ -1,6 +1,6 @@
 ﻿namespace risk.control.system.Models
 {
-    public class ClaimsInvestigationResponse
+    public class ClaimsInvestigationAgencyResponse
     {
         public string Id { get; set; }
         public bool AssignedToAgency { get; set; }

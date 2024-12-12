@@ -86,7 +86,7 @@ namespace risk.control.system.Controllers.Api.Agency
 
                 var claimsSubmitted = applicationDbContext?.ToList();
                 var response = claimsSubmitted?
-                   .Select(a => new ClaimsInvesgationResponse
+                   .Select(a => new ClaimsInvestigationResponse
                    {
                        Id = a.ClaimsInvestigationId,
                        AssignedToAgency = a.AssignedToAgency,
@@ -131,7 +131,7 @@ namespace risk.control.system.Controllers.Api.Agency
 
                 var claimsSubmitted = applicationDbContext?.ToList();
                 var response = claimsSubmitted?
-                   .Select(a => new ClaimsInvesgationResponse
+                   .Select(a => new ClaimsInvestigationResponse
                    {
                        Id = a.ClaimsInvestigationId,
                        AssignedToAgency = a.AssignedToAgency,
@@ -261,7 +261,7 @@ namespace risk.control.system.Controllers.Api.Agency
             }
 
             var response = claims
-                   .Select(a => new ClaimsInvesgationResponse
+                   .Select(a => new ClaimsInvestigationAgencyResponse
                    {
                        Id = a.ClaimsInvestigationId,
                        PolicyId = a.PolicyDetail.ContractNumber,
@@ -271,8 +271,8 @@ namespace risk.control.system.Controllers.Api.Agency
                        PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
                        AssignedToAgency = a.AssignedToAgency,
                        Document = a.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : Applicationsettings.NO_POLICY_IMAGE,
-                       Customer = a.CustomerDetail.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail.ProfilePicture)) : Applicationsettings.NO_USER,
-                       Name = a.CustomerDetail.Name,
+                       Customer = ClaimsInvestigationExtension.GetPersonPhoto(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
+                       Name = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? a.CustomerDetail.Name : a.BeneficiaryDetail.Name,
                        Policy = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail?.LineOfBusiness.Name + "</span>"),
                        Status = string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseStatus.Name + "</span>"),
                        ServiceType = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail?.ClaimType.GetEnumDisplayName() + "</span>"),
@@ -423,7 +423,7 @@ namespace risk.control.system.Controllers.Api.Agency
                 _context.SaveChanges();
             }
             var response = claimsSubmitted
-                   .Select(a => new ClaimsInvesgationResponse
+                   .Select(a => new ClaimsInvestigationAgencyResponse
                    {
                        Id = a.ClaimsInvestigationId,
                        PolicyId = a.PolicyDetail.ContractNumber,
@@ -433,8 +433,8 @@ namespace risk.control.system.Controllers.Api.Agency
                        PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
                        Company = a.ClientCompany.Name,
                        Document = a.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : Applicationsettings.NO_POLICY_IMAGE,
-                       Customer = a.CustomerDetail.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail.ProfilePicture)) : Applicationsettings.NO_USER,
-                       Name = a.CustomerDetail.Name,
+                       Customer = ClaimsInvestigationExtension.GetPersonPhoto(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
+                       Name = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? a.CustomerDetail.Name : a.BeneficiaryDetail.Name,
                        Policy = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail?.LineOfBusiness.Name + "</span>"),
                        Status = string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseStatus.Name + "</span>"),
                        ServiceType = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail?.ClaimType.GetEnumDisplayName() + "</span>"),
@@ -507,7 +507,7 @@ namespace risk.control.system.Controllers.Api.Agency
                     }
                 }
                 var response = claimsSubmitted
-                       .Select(a => new ClaimsInvesgationResponse
+                       .Select(a => new ClaimsInvestigationAgencyResponse
                        {
                            Id = a.ClaimsInvestigationId,
                            PolicyId = a.PolicyDetail.ContractNumber,
@@ -517,8 +517,8 @@ namespace risk.control.system.Controllers.Api.Agency
                            PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
                            Company = a.ClientCompany.Name,
                            Document = a.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : Applicationsettings.NO_POLICY_IMAGE,
-                           Customer = a.CustomerDetail.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail.ProfilePicture)) : Applicationsettings.NO_USER,
-                           Name = a.CustomerDetail.Name,
+                           Customer = ClaimsInvestigationExtension.GetPersonPhoto(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
+                           Name = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? a.CustomerDetail.Name : a.BeneficiaryDetail.Name,
                            Policy = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail?.LineOfBusiness.Name + "</span>"),
                            Status = string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseStatus.Name + "</span>"),
                            ServiceType = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail?.ClaimType.GetEnumDisplayName() + "</span>"),
@@ -569,7 +569,7 @@ namespace risk.control.system.Controllers.Api.Agency
                     }
                 }
                 var response = claimsSubmitted
-                       .Select(a => new ClaimsInvesgationResponse
+                       .Select(a => new ClaimsInvestigationAgencyResponse
                        {
                            Id = a.ClaimsInvestigationId,
                            PolicyId = a.PolicyDetail.ContractNumber,
@@ -579,8 +579,8 @@ namespace risk.control.system.Controllers.Api.Agency
                            PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
                            Company = a.ClientCompany.Name,
                            Document = a.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : Applicationsettings.NO_POLICY_IMAGE,
-                           Customer = a.CustomerDetail.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail.ProfilePicture)) : Applicationsettings.NO_USER,
-                           Name = a.CustomerDetail.Name,
+                           Customer = ClaimsInvestigationExtension.GetPersonPhoto(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
+                           Name = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? a.CustomerDetail.Name : a.BeneficiaryDetail.Name,
                            Policy = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail?.LineOfBusiness.Name + "</span>"),
                            Status = string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseStatus.Name + "</span>"),
                            ServiceType = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail?.ClaimType.GetEnumDisplayName() + "</span>"),

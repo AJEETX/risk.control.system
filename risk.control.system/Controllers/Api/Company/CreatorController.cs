@@ -78,7 +78,7 @@ namespace risk.control.system.Controllers.Api.Company
             }
 
             var response = claimsAssigned
-                .Select(a => new ClaimsInvesgationResponse
+                .Select(a => new ClaimsInvestigationResponse
                 {
                     Id = a.ClaimsInvestigationId,
                     Amount = String.Format(hindiNFO, "{0:C}", a.PolicyDetail.SumAssuredValue),
@@ -183,7 +183,7 @@ namespace risk.control.system.Controllers.Api.Company
                 _context.SaveChanges();
             }
             var response = claimsAssigned?
-                    .Select(a => new ClaimsInvesgationResponse
+                    .Select(a => new ClaimsInvestigationResponse
                     {
                         Id = a.ClaimsInvestigationId,
                         AutoAllocated = a.AutoAllocated,
@@ -284,7 +284,7 @@ namespace risk.control.system.Controllers.Api.Company
             profilebuilder.Append("<i class='fas fa-portrait'></i> Profile Image <span class='badge badge-light'></span>");
 
             var response = claimsSubmitted
-                    .Select(a => new ClaimsInvesgationResponse
+                    .Select(a => new ClaimsInvestigationResponse
                     {
                         Id = a.ClaimsInvestigationId,
                         AutoAllocated = a.AutoAllocated,

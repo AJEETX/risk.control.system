@@ -81,7 +81,7 @@ namespace risk.control.system.Controllers.Api.Company
                 _context.SaveChanges();
             }
             var response = claimsAssigned
-            .Select(a => new ClaimsInvesgationResponse
+            .Select(a => new ClaimsInvestigationResponse
             {
                 Id = a.ClaimsInvestigationId,
                 AutoAllocated = a.AutoAllocated,
@@ -181,7 +181,7 @@ namespace risk.control.system.Controllers.Api.Company
                 }
             }
             var response = claimsSubmitted
-                    .Select(a => new ClaimsInvesgationResponse
+                    .Select(a => new ClaimsInvestigationResponse
                     {
                         Id = a.ClaimsInvestigationId,
                         AutoAllocated = a.AutoAllocated,
@@ -270,7 +270,7 @@ namespace risk.control.system.Controllers.Api.Company
             }
             var response =
                 claimsSubmitted
-            .Select(a => new ClaimsInvesgationResponse
+            .Select(a => new ClaimsInvestigationResponse
             {
                 Id = a.ClaimsInvestigationId,
                 AutoAllocated = a.AutoAllocated,
@@ -344,7 +344,7 @@ namespace risk.control.system.Controllers.Api.Company
             }
             var response =
                 claimsSubmitted
-            .Select(a => new ClaimsInvesgationResponse
+            .Select(a => new ClaimsInvestigationResponse
             {
                 Id = a.ClaimsInvestigationId,
                 AutoAllocated = a.AutoAllocated,
