@@ -113,9 +113,25 @@ namespace risk.control.system.Controllers
                 }
 
                 var claim = _context.ClaimsInvestigation
+                    .Include(c => c.Vendor)
                     .Include(c => c.PolicyDetail)
+                    .ThenInclude(c => c.CaseEnabler)
                     .Include(c => c.CustomerDetail)
+                    .ThenInclude(c => c.Country)
+                    .Include(c => c.CustomerDetail)
+                    .ThenInclude(c => c.State)
+                    .Include(c => c.CustomerDetail)
+                    .ThenInclude(c => c.District)
+                    .Include(c => c.CustomerDetail)
+                    .ThenInclude(c => c.PinCode)
                     .Include(c => c.BeneficiaryDetail)
+                    .ThenInclude(c => c.Country)
+                    .Include(c => c.BeneficiaryDetail)
+                    .ThenInclude(c => c.State)
+                    .Include(c => c.BeneficiaryDetail)
+                    .ThenInclude(c => c.District)
+                    .Include(c => c.BeneficiaryDetail)
+                    .ThenInclude(c => c.PinCode)
                     .FirstOrDefault(c => c.ClaimsInvestigationId == id);
 
                 var policy = claim.PolicyDetail;
@@ -133,7 +149,7 @@ namespace risk.control.system.Controllers
 
                 var filePath = Path.Combine(webHostEnvironment.WebRootPath, "report", filename);
 
-                PdfReportRunner.Run(webHostEnvironment.WebRootPath).Build(filePath); ;
+                PdfReportRunner.Run(webHostEnvironment.WebRootPath, claim).Build(filePath); ;
                 var memory = new MemoryStream();
                 using var stream = new FileStream(filePath, FileMode.Open);
                 await stream.CopyToAsync(memory);

@@ -112,9 +112,17 @@ namespace risk.control.system.Helpers
             }
             return string.Join("", "<span class='badge badge-light'>now</span>");
         }
-        public static string GetAssessorTimePending(this ClaimsInvestigation a)
+        public static string GetAssessorTimePending(this ClaimsInvestigation a, bool assess = false,bool processed= false)
         {
-            DateTime time2Compare = a.SubmittedToAssessorTime.Value;
+            DateTime time2Compare = a.Created;
+            if (assess)
+            {
+                time2Compare = a.SubmittedToAssessorTime.Value;
+            }
+            else if(processed)
+            {
+                time2Compare = a.ProcessedByAssessorTime.Value;
+            }
 
             if (DateTime.Now.Subtract(time2Compare).Days >= 7)
                 return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(time2Compare).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Hurry up, {DateTime.Now.Subtract(time2Compare).Days} days since created!\"></i>");

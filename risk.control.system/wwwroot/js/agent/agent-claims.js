@@ -52,7 +52,7 @@ $(document).ready(function () {
                 return '<input type="checkbox" name="selectedcase[]" value="' + $('<div/>').text(data).html() + '">';
             }
         }],
-        order: [[9, 'asc']],
+        order: [[12, 'asc']],
         fixedHeader: true,
         processing: true,
         paging: true,
@@ -103,6 +103,7 @@ $(document).ready(function () {
             { "data": "location" },
             { "data": "created" },
             { "data": "timePending" },
+            { "data": "timeElapsed", "bVisible": false }
         ],
         "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
             if (aData.isNewAssigned) {

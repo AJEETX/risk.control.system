@@ -71,28 +71,23 @@
                             <div class="card-body">
 
                                 <div class="row">
-                                    @{
-                                        var pmodel = new ClaimsInvestigationVendorAgentModel
-                                        {
-                                            ClaimsInvestigation = Model.ClaimsInvestigation,
-                                            CaseLocation = Model.CaseLocation
-                                        };
-
-                                        <partial name="_ClaimPolicyDetails" model="@pmodel" />
-                                        @if (Model.ClaimsInvestigation.PolicyDetail.ClaimType == ClaimType.HEALTH)
-                                        {
-                                            <partial name="_ClaimCustomerDetails" model="@pmodel" />
-                                        }
-                                        @if (Model.ClaimsInvestigation.PolicyDetail.ClaimType == ClaimType.DEATH)
-                                        {
-                                            <partial name="_ClaimBeneficairyDetails" model="@pmodel" />
-                                        }
-                                    }
+                                <partial name="_ClaimPolicyDetails" model="@Model" />
+                                @if (Model.ClaimsInvestigation.PolicyDetail.ClaimType == ClaimType.HEALTH)
+                                {
+                                    <partial name="_ClaimCustomerDetails" model="@Model" />
+                                }
+                                @if (Model.ClaimsInvestigation.PolicyDetail.ClaimType == ClaimType.DEATH)
+                                {
+                                    <partial name="_ClaimBeneficairyDetails" model="@Model" />
+                                }
                                 </div>
                             </div>
                         </div>
                     </div> <!-- class bb-blog-inner -->
                 </article>
+            @{
+                Model.ReSelect = true;
+            }
                 <partial name="_AgentList" model="@Model" />
         </div>
     </div>

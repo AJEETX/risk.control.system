@@ -20,7 +20,7 @@
             url: '/api/agency/Supervisor/GetOpen',
             dataSrc: ''
         },
-        order: [[9, 'asc']],
+        order: [[13, 'asc']],
         fixedHeader: true,
         processing: true,
         paging: true,
@@ -78,7 +78,8 @@
                     buttons += '<a id="details' + row.id + '" onclick="showdetails(`' + row.id + '`)" href="Detail?Id=' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Detail</a>&nbsp;'
                     return buttons;
                 }
-            }
+            },
+            { "data": "timeElapsed", "bVisible": false }
         ],
         error: function (xhr, status, error) { alert('err ' + error) }
     });

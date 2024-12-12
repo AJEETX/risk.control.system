@@ -114,7 +114,8 @@ namespace risk.control.system.Controllers.Api.Agency
                        BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail.Name) ?
                         "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>" :
                         a.BeneficiaryDetail.Name,
-                       TimeElapsed = DateTime.Now.Subtract(a.Created).TotalSeconds
+                       TimeElapsed = DateTime.Now.Subtract(a.InvestigationCaseSubStatus == assignedToAgentStatus ? 
+                       a.TaskToAgentTime.Value: a.InvestigationCaseSubStatus == submittedToAssesssorStatus ? a.SubmittedToAssessorTime.Value: a.Created).TotalSeconds
                    })?
                    .ToList();
 
@@ -151,7 +152,7 @@ namespace risk.control.system.Controllers.Api.Agency
                        Service = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail.InvestigationServiceType.Name + "</span>"),
                        Location = string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseSubStatus.Name + "</span>"),
                        Created = string.Join("", "<span class='badge badge-light'>" + a.Created.ToString("dd-MM-yyyy") + "</span>"),
-                       timePending = a.GetSupervisorTimePending(false, a.InvestigationCaseSubStatus == assignedToAgentStatus, a.InvestigationCaseSubStatus == submittedToAssesssorStatus),
+                       timePending = a.GetSupervisorTimePending(false, a.InvestigationCaseSubStatus == assignedToAgentStatus, false, a.InvestigationCaseSubStatus == submittedToAssesssorStatus),
                        PolicyNum = a.PolicyDetail.ContractNumber,
                        BeneficiaryPhoto = a.BeneficiaryDetail.ProfilePicture != null ?
                                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.BeneficiaryDetail.ProfilePicture)) :
@@ -159,7 +160,8 @@ namespace risk.control.system.Controllers.Api.Agency
                        BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail.Name) ?
                         "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>" :
                         a.BeneficiaryDetail.Name,
-                       TimeElapsed = DateTime.Now.Subtract(a.Created).TotalSeconds
+                       TimeElapsed = DateTime.Now.Subtract(a.InvestigationCaseSubStatus == assignedToAgentStatus ?
+                       a.TaskToAgentTime.Value : a.InvestigationCaseSubStatus == submittedToAssesssorStatus ? a.SubmittedToAssessorTime.Value : a.Created).TotalSeconds
                    })?
                    .ToList();
 
@@ -287,7 +289,7 @@ namespace risk.control.system.Controllers.Api.Agency
                        BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail.Name) ?
                         "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>" :
                         a.BeneficiaryDetail.Name,
-                       TimeElapsed = DateTime.Now.Subtract(a.Created).TotalSeconds,
+                       TimeElapsed = DateTime.Now.Subtract(a.AllocatedToAgencyTime.Value).TotalSeconds,
                        IsNewAssigned = a.AllocateView <= 1 ,
                        IsQueryCase = a.InvestigationCaseSubStatusId == requestedStatus.InvestigationCaseSubStatusId
                    })
@@ -449,7 +451,7 @@ namespace risk.control.system.Controllers.Api.Agency
                        BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail.Name) ?
                         "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>" :
                         a.BeneficiaryDetail.Name,
-                       TimeElapsed = DateTime.Now.Subtract(a.Created).TotalSeconds,
+                       TimeElapsed = DateTime.Now.Subtract(a.SubmittedToSupervisorTime.Value).TotalSeconds,
                        IsNewAssigned = a.VerifyView <= 1
                    })
                     ?.ToList();
@@ -533,7 +535,7 @@ namespace risk.control.system.Controllers.Api.Agency
                            BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail.Name) ?
                         "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>" :
                         a.BeneficiaryDetail.Name,
-                           TimeElapsed = DateTime.Now.Subtract(a.Created).TotalSeconds
+                           TimeElapsed = DateTime.Now.Subtract(a.SubmittedToAssessorTime.Value).TotalSeconds
                        })
                         ?.ToList();
 
@@ -595,7 +597,7 @@ namespace risk.control.system.Controllers.Api.Agency
                            BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail.Name) ?
                         "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>" :
                         a.BeneficiaryDetail.Name,
-                           TimeElapsed = DateTime.Now.Subtract(a.Created).TotalSeconds
+                           TimeElapsed = DateTime.Now.Subtract(a.SubmittedToAssessorTime.Value).TotalSeconds
                        })
                         ?.ToList();
 

@@ -29,7 +29,7 @@ $(document).ready(function () {
                 return '<input type="checkbox" name="selectedcase[]" value="' + $('<div/>').text(data).html() + '">';
             }
         }],
-        order: [[13, 'asc']],
+        order: [[15, 'asc']],
         fixedHeader: true,
         processing: true,
         paging: true,
@@ -110,6 +110,7 @@ $(document).ready(function () {
                 }
             },
             { "data": "timePending" },
+            { "data": "timeElapsed", "bVisible": false }
         ],
         "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
             if (aData.isNewAssigned) {

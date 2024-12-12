@@ -20,7 +20,7 @@
             url: '/api/agency/agent/GetSubmitted',
             dataSrc: ''
         },
-        order: [[9, 'desc']],
+        order: [[12, 'asc']],
         fixedHeader: true,
         processing: true,
         paging: true,
@@ -71,7 +71,8 @@
                     buttons += '<a id="details' + row.id + '" onclick="getdetails(`' + row.id + '`)" href="/Agent/SubmittedDetail?Id=' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Detail</a>&nbsp;'
                     return buttons;
                 }
-            }
+            },
+            { "data": "timeElapsed", "bVisible": false }
         ],
         error: function (xhr, status, error) { alert('err ' + error) }
     });

@@ -20,7 +20,7 @@
             url: '/api/Assessor/GetReport',
             dataSrc: ''
         },
-        order: [[11, 'asc']],
+        order: [[15, 'asc']],
         fixedHeader: true,
         processing: true,
         paging: true,
@@ -102,7 +102,8 @@
                     buttons += '<a href="/Report/PrintPdfReport?Id=' + row.id + '" class="btn btn-xs btn-danger"><i class="far fa-file-pdf"></i> PDF</a>'
                     return buttons;
                 }
-            }
+            },
+            { "data": "timeElapsed", "bVisible": false }
         ],
         error: function (xhr, status, error) { alert('err ' + error) }
     });

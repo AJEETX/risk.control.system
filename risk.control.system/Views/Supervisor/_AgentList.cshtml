@@ -101,10 +101,20 @@
     <div class="card-footer">
         <div class="row">
             <div class="col-md-12">
-                <a id="back" asp-action="ClaimReport" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
-                <button disabled="disabled" id="allocate-case" type="submit" class="btn btn-danger">
-                    <i class="fas fa-external-link-alt" aria-hidden="true"></i> Re-Allocate
-                </button>
+                @if(Model.ReSelect)
+                {
+                    <a id="back" asp-action="GetInvestigateReport" asp-route-selectedcase="@Model.ClaimsInvestigation.ClaimsInvestigationId" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
+                    <button disabled="disabled" id="allocate-case" type="submit" class="btn btn-danger">
+                        <i class="fas fa-external-link-alt" aria-hidden="true"></i> Re-Allocate
+                    </button>
+                }
+                else
+                {
+                    <a id="back" asp-action="Allocate" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
+                    <button disabled="disabled" id="allocate-case" type="submit" class="btn btn-danger">
+                        <i class="fas fa-external-link-alt" aria-hidden="true"></i> Allocate
+                    </button>
+                }
             </div>
         </div>
     </div>

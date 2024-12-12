@@ -84,15 +84,9 @@
                 </div> <!-- class bb-blog-inner -->
             </article>
             @{
-                var pmodel = new ClaimsInvestigationVendorAgentModel
-            {
-                VendorUserClaims = Model.VendorUserClaims,
-                ClaimsInvestigation = Model.ClaimsInvestigation,
-                CaseLocation = Model.CaseLocation
-            };
-
+                Model.ReSelect = false;
             }
-            <partial name="_AgentList" model="@pmodel" />
+            <partial name="_AgentList" model="@Model" />
 
         </div>
     </div>

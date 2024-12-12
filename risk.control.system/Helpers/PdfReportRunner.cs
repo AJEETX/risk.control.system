@@ -2,18 +2,35 @@
 
 using Newtonsoft.Json;
 
+using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 
 namespace risk.control.system.Helpers
 {
     public class PdfReportRunner
     {
-        public static DocumentBuilder Run(string imagePath)
+        public static DocumentBuilder Run(string imagePath, ClaimsInvestigation claim)
         {
             string ticketJsonFile = CheckFile(Path.Combine("Files", "concert-ticket-data.json"));
             string ticketJsonContent = File.ReadAllText(ticketJsonFile);
             TicketData ticketData = JsonConvert.DeserializeObject<TicketData>(ticketJsonContent);
 
+            ticketData.PolicyNum = claim.PolicyDetail.ContractNumber;
+            ticketData.AgencyName = claim.Vendor.Email;
+            ticketData.ClaimType = claim.PolicyDetail.ClaimType.GetEnumDisplayName();
+            ticketData.InsuredAmount = claim.PolicyDetail.SumAssuredValue.ToString();
+                ticketData.Reason2Verify = claim.PolicyDetail.CaseEnabler.Name.ToLower();
+            if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
+            {
+                ticketData.PersonOfInterestName = claim.CustomerDetail.Name;
+                ticketData.VerifyAddress = claim.CustomerDetail.Addressline + "," + claim.CustomerDetail.District.Name +"," +claim.CustomerDetail.State.Code + "," + claim.CustomerDetail.Country.Code +"," + claim.CustomerDetail.PinCode.Code;
+            }
+            else
+            {
+                ticketData.PersonOfInterestName = claim.BeneficiaryDetail.Name;
+                ticketData.VerifyAddress = claim.BeneficiaryDetail.Addressline + "," + claim.BeneficiaryDetail.District.Name + "," + claim.BeneficiaryDetail.State.Code + "," + claim.BeneficiaryDetail.Country.Code + "," + claim.BeneficiaryDetail.PinCode.Code;
+
+            }
             string jsonFile = CheckFile(Path.Combine("Files", "concert-data.json"));
             string jsonContent = File.ReadAllText(jsonFile);
             ConcertData concertData = JsonConvert.DeserializeObject<ConcertData>(jsonContent);
