@@ -2,6 +2,14 @@
 {
     public class BoardingData
     {
+        public string? PersonAddressImage { get; set; }
+        public string? PhotoIdMapPath { get; set; }
+        public string? PhotoIdPath { get; set; }
+        public string? PhotoIdMapUrl { get; set; }
+
+        public string? PanPhotoPath { get; set; }
+        public string? PanMapPath { get; set; }
+        public string? PanMapUrl { get; set; }
         public string Flight { get; set; }
         public string DepartureAirport { get; set; }
         public string DepartureAbvr { get; set; }

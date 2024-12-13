@@ -9,7 +9,9 @@ namespace risk.control.system.Helpers
 {
     public class PdfReportRunner
     {
-        public static DocumentBuilder Run(string imagePath, ClaimsInvestigation claim)
+        static string googleImagePath = $"google-map-{DateTime.Now.ToString("ddMMMyyyHHmmsss")}.png";
+
+        public static async Task<DocumentBuilder> Run(string imagePath, ClaimsInvestigation claim)
         {
             string boardingJsonFile = CheckFile(Path.Combine("Files", "boarding-data.json"));
             string boardingJsonContent = File.ReadAllText(boardingJsonFile);
@@ -17,12 +19,13 @@ namespace risk.control.system.Helpers
 
             var photoMatch = claim.AgencyReport.DigitalIdReport.Similarity > 70;
             boardingData.Flight = photoMatch ? "YES" : "NO";
-            
 
+             
             string ticketJsonFile = CheckFile(Path.Combine("Files", "concert-ticket-data.json"));
             string ticketJsonContent = File.ReadAllText(ticketJsonFile);
             TicketData ticketData = JsonConvert.DeserializeObject<TicketData>(ticketJsonContent);
 
+            ticketData.ReportTime = claim.ProcessedByAssessorTime?.ToString("dd-MMM-yyyy HH:mm:ss");
             ticketData.PolicyNum = claim.PolicyDetail.ContractNumber;
             ticketData.AgencyName = claim.Vendor.Email;
             ticketData.ClaimType = claim.PolicyDetail.ClaimType.GetEnumDisplayName();
@@ -30,41 +33,56 @@ namespace risk.control.system.Helpers
                 ticketData.Reason2Verify = claim.PolicyDetail.CaseEnabler.Name.ToLower();
 
             string filePath = claim.ClientCompany.DocumentUrl;
-
-            // Get the file name
             string fileName = Path.GetFileName(filePath); // "image.jpg"
-
-            // Get the folder path
             string folderPath = Path.GetDirectoryName(filePath); // "/img"
             string folderName = Path.GetFileName(folderPath);
-
             ticketData.InsurerLogo = Path.Combine(imagePath, folderName, fileName);
-
+            
             filePath = claim.Vendor.DocumentUrl;
-
-            // Get the file name
             fileName = Path.GetFileName(filePath); // "image.jpg"
-
-            // Get the folder path
             folderPath = Path.GetDirectoryName(filePath); // "/img"
             folderName = Path.GetFileName(folderPath);    // "img"
-
             ticketData.AgencyLogo = Path.Combine(imagePath, folderName, fileName);
 
+            var photoIdPath = $"photo-id-{DateTime.Now.ToString("ddMMMyyyHHmmsss")}.jpg";
+            await File.WriteAllBytesAsync(Path.Combine(imagePath, "report", photoIdPath), claim.AgencyReport.DigitalIdReport.DigitalIdImage);
+            boardingData.PhotoIdPath = Path.Combine(imagePath, "report", photoIdPath);
+
+
+            var panCardFileName = $"pan-card-{DateTime.Now.ToString("ddMMMyyyHHmmsss")}.jpg";
+            await File.WriteAllBytesAsync(Path.Combine(imagePath, "report", panCardFileName), claim.AgencyReport.PanIdReport.DocumentIdImage);
+            boardingData.PanPhotoPath = Path.Combine(imagePath, "report", panCardFileName);
+
+            googleImagePath = Path.Combine(imagePath, "report", googleImagePath);
+
+
+            var path = await DownloadMapImageAsync(claim.AgencyReport.DigitalIdReport.DigitalIdImageLocationUrl, googleImagePath);
+            boardingData.PhotoIdMapUrl = claim.AgencyReport.DigitalIdReport.DigitalIdImageLocationUrl;
+            boardingData.PhotoIdMapPath = path;
+
+            path = await DownloadMapImageAsync(claim.AgencyReport.PanIdReport.DocumentIdImageLocationUrl, googleImagePath);
+            boardingData.PanMapUrl = claim.AgencyReport.PanIdReport.DocumentIdImageLocationUrl;
+            boardingData.PanMapPath = path;
+
+            string personAddressUrl = string.Empty;
             string contactNumer = string.Empty;
             if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
             {
                 ticketData.PersonOfInterestName = claim.CustomerDetail.Name;
                 ticketData.VerifyAddress = claim.CustomerDetail.Addressline + "," + claim.CustomerDetail.District.Name +"," +claim.CustomerDetail.State.Code + "," + claim.CustomerDetail.Country.Code +"," + claim.CustomerDetail.PinCode.Code;
                 contactNumer = claim.CustomerDetail.ContactNumber;
+                personAddressUrl = claim.CustomerDetail.CustomerLocationMap;
             }
             else
             {
                 ticketData.PersonOfInterestName = claim.BeneficiaryDetail.Name;
                 ticketData.VerifyAddress = claim.BeneficiaryDetail.Addressline + "," + claim.BeneficiaryDetail.District.Name + "," + claim.BeneficiaryDetail.State.Code + "," + claim.BeneficiaryDetail.Country.Code + "," + claim.BeneficiaryDetail.PinCode.Code;
                 contactNumer = claim.BeneficiaryDetail.ContactNumber;
+                personAddressUrl = claim.BeneficiaryDetail.BeneficiaryLocationMap;
             }
+            path = await DownloadMapImageAsync(personAddressUrl, googleImagePath);
 
+            boardingData.PersonAddressImage = path;
             boardingData.DepartureAirport = ticketData.PersonOfInterestName;
             boardingData.DepartureAbvr = "MR/MS";
             boardingData.BoardingGate = contactNumer;
@@ -130,6 +148,21 @@ namespace risk.control.system.Helpers
                 throw new IOException("File not found: " + Path.GetFullPath(file));
             }
             return file;
+        }
+        static async Task<string> DownloadMapImageAsync(string url, string outputFilePath)
+        {
+            using HttpClient client = new HttpClient();
+            var response = await client.GetAsync(url);
+            if (response.IsSuccessStatusCode)
+            {
+                var imageBytes = await response.Content.ReadAsByteArrayAsync();
+                await File.WriteAllBytesAsync(outputFilePath, imageBytes);
+                return outputFilePath;
+            }
+            else
+            {
+                throw new Exception($"Failed to download map image. Status: {response.StatusCode}");
+            }
         }
     }
 }

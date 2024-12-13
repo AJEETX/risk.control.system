@@ -11,6 +11,7 @@
         public string AgencyLogo { get; set; }
         public string ClaimTypeTitle { get; set; }
 
+        public string ReportTime { get; set; }
         public string PolicyNumTitle { get; set; }
         public string PolicyNum { get; set; }
         public string ClaimType { get; set; }

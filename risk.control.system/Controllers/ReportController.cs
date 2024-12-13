@@ -136,7 +136,7 @@ namespace risk.control.system.Controllers
 
                 var filePath = Path.Combine(webHostEnvironment.WebRootPath, "report", filename);
 
-                PdfReportRunner.Run(webHostEnvironment.WebRootPath, claim).Build(filePath); ;
+                (await PdfReportRunner.Run(webHostEnvironment.WebRootPath, claim)).Build(filePath); ;
                 var memory = new MemoryStream();
                 using var stream = new FileStream(filePath, FileMode.Open);
                 await stream.CopyToAsync(memory);

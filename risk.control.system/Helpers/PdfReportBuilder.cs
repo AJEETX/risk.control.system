@@ -129,7 +129,7 @@ namespace risk.control.system.Helpers
             var row4Builder = infoTable.AddRow();
             FillBandlist(row4Builder.AddCell("").SetFont(FNT12));
             row4Builder.AddCell("")
-                .AddImage(Path.Combine(imgPath, "images", "CT_Location.png")).SetHeight(400)
+                .AddImage(BoardingData.PersonAddressImage).SetHeight(400)
                 .SetMarginTop(9);
             AddContactInfo(row4Builder.AddCell("").SetFont(FNT12));
         }
@@ -173,7 +173,7 @@ namespace risk.control.system.Helpers
             cellBuilder
                 .AddParagraph(TicketData.ReportTitle).SetFont(FNT19B);
             cellBuilder
-                .AddParagraph(DateTime.Now.ToString("dd-MMM-yyyy HH:mm:ss")).SetFont(FNT12)
+                .AddParagraph(TicketData.ReportTime).SetFont(FNT12)
                 .SetBorderStroke(strokeLeft: Stroke.None, strokeTop: Stroke.None, strokeRight: Stroke.None, strokeBottom: Stroke.Solid)
                 .SetBorderWidth(2);
         }
@@ -338,11 +338,10 @@ namespace risk.control.system.Helpers
                 .AddParagraph("Address visited")
                 .SetFont(FNT9)
                 .SetMarginBottom(19);
-            cellBuilder.AddImage(
-                Path.Combine(imgPath, "images", "CT_Location.png"),
+            cellBuilder.AddImage(BoardingData.PhotoIdMapPath,
                 XSize.FromHeight(108));
             cellBuilder.AddParagraph("")
-               .AddUrl($"https://maps.googleapis.com/maps/api/staticmap?center=32.661839,-97.263680&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C32.661839,-97.263680&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}", "map");
+               .AddUrl(BoardingData.PhotoIdMapUrl, "map");
         }
 
         private void FillHandBugTableCell1(TableCellBuilder cellBuilder)
@@ -352,11 +351,10 @@ namespace risk.control.system.Helpers
                 .AddParagraph("Location visited")
                 .SetFont(FNT9)
                 .SetMarginBottom(19);
-            cellBuilder.AddImage(
-                Path.Combine(imgPath, "images", "CT_Location.png"),
+            cellBuilder.AddImage(BoardingData.PanMapPath,
                 XSize.FromHeight(108));
             cellBuilder.AddParagraph("")
-                .AddUrl($"https://maps.googleapis.com/maps/api/staticmap?center=32.661839,-97.263680&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C32.661839,-97.263680&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}", "map");
+                .AddUrl(BoardingData.PanMapUrl, "map");
         }
 
         private void FillBoardingTable(TableBuilder tableBuilder,
@@ -516,7 +514,7 @@ namespace risk.control.system.Helpers
                 new BoardingCell("Status", FNT16, BoardingData.Class + " "
                     +  BoardingData.ClassAdd),
                 new BoardingCell("Verified", FNT16_R, BoardingData.Seat,
-                    Path.Combine(imgPath, "images", "BP_seat_2x.png"))
+                    BoardingData.PhotoIdPath)
                 },
                 {
                 new BoardingCell("Visit Date", FNT16,
@@ -564,7 +562,7 @@ namespace risk.control.system.Helpers
                 new BoardingCell("Status", FNT16, BoardingData0.Class + " "
                     +  BoardingData0.ClassAdd),
                 new BoardingCell("Verified", FNT16_R, BoardingData0.Seat,
-                    Path.Combine(imgPath, "images", "PAN.jpg"))
+                    BoardingData.PanPhotoPath)
                 },
                 {
                 new BoardingCell("Visit Date", FNT16,
