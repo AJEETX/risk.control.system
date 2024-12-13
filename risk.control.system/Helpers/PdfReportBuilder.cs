@@ -155,11 +155,11 @@ namespace risk.control.system.Helpers
 
             var row6Builder = counterFoil.AddRow();
             row6Builder.AddCell()
-                .AddImage(Path.Combine(imgPath, "img", "insurer.jpg")).SetHeight(100);
+                .AddImage(TicketData.InsurerLogo).SetHeight(100);
             FillTicketDataCounterFoil(row6Builder.AddCell());
             FillPersonalInfoCounterFoil(row6Builder.AddCell());
             row6Builder.AddCell()
-                .AddQRCodeUrl("https://icheckify.co.in/", 4, Color.Black, Color.White, false).SetWidth(153);
+                .AddQRCodeUrl(TicketData.ReportQr, 4, Color.Black, Color.White, false).SetWidth(153);
 
             var row7Builder = counterFoil.AddRow();
             row7Builder.AddCell();

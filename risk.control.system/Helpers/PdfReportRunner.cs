@@ -28,7 +28,29 @@ namespace risk.control.system.Helpers
             ticketData.ClaimType = claim.PolicyDetail.ClaimType.GetEnumDisplayName();
             ticketData.InsuredAmount = claim.PolicyDetail.SumAssuredValue.ToString();
                 ticketData.Reason2Verify = claim.PolicyDetail.CaseEnabler.Name.ToLower();
-            ticketData.AgencyLogo= claim.Vendor.DocumentUrl;
+
+            string filePath = claim.ClientCompany.DocumentUrl;
+
+            // Get the file name
+            string fileName = Path.GetFileName(filePath); // "image.jpg"
+
+            // Get the folder path
+            string folderPath = Path.GetDirectoryName(filePath); // "/img"
+            string folderName = Path.GetFileName(folderPath);
+
+            ticketData.InsurerLogo = Path.Combine(imagePath, folderName, fileName);
+
+            filePath = claim.Vendor.DocumentUrl;
+
+            // Get the file name
+            fileName = Path.GetFileName(filePath); // "image.jpg"
+
+            // Get the folder path
+            folderPath = Path.GetDirectoryName(filePath); // "/img"
+            folderName = Path.GetFileName(folderPath);    // "img"
+
+            ticketData.AgencyLogo = Path.Combine(imagePath, folderName, fileName);
+
             string contactNumer = string.Empty;
             if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
             {
@@ -83,7 +105,7 @@ namespace risk.control.system.Helpers
                 claim.AgencyReport.PanIdReport.DocumentIdImageData;
             boardingData0.DepartureAbvr = "PAN/CARD";
             boardingData0.BoardingGate = contactNumer;
-            boardingData0.BoardingTill = claim.AgencyReport.PanIdReport.Updated.GetValueOrDefault();
+            boardingData0.BoardingTill = claim.AgencyReport.PanIdReport.Created;
             boardingData0.DepartureTime = claim.AgencyReport.PanIdReport.Created;
             boardingData0.Arrival = claim.AgencyReport.Created;
             boardingData0.ArrivalAirport = "";

@@ -6,6 +6,8 @@
         public string ReportQr { get; set; }
         public string AgencyNameTitle { get; set; }
         public string AgencyName { get; set; }
+        public string InsurerName { get; set; }
+        public string InsurerLogo { get; set; }
         public string AgencyLogo { get; set; }
         public string ClaimTypeTitle { get; set; }
 
