@@ -103,6 +103,7 @@ namespace risk.control.system.Controllers
                 var showgtrialUsers = await featureManager.IsEnabledAsync(FeatureFlags.TrialVersion);
                 if(showgtrialUsers)
                 {
+                    var xx = _context.Users.ToList();
                     ViewData["Users"] = new SelectList(_context.Users.Where(u=>!u.Deleted && !u.Email.StartsWith("admin")).OrderBy(o => o.Email), "Email", "Email");
                 }
                 else

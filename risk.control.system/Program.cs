@@ -1,11 +1,12 @@
 using System;
 using System.Net;
-using System.Net.WebSockets;
 using System.Reflection;
 using System.Threading.RateLimiting;
 
+using Amazon;
 using Amazon.Runtime;
 using Amazon.S3;
+using Amazon.S3.Model;
 using Amazon.TranscribeService;
 
 using AspNetCoreHero.ToastNotification;
@@ -125,12 +126,23 @@ builder.Services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler
 builder.Services.AddTransient<CustomCookieAuthenticationEvents>();
 builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
 
+var s3Config = new AmazonS3Config
+{
+    RegionEndpoint = RegionEndpoint.APSoutheast2, // Set your AWS region
+    Timeout = TimeSpan.FromMinutes(5),             // Set the request timeout
+    ReadWriteTimeout = TimeSpan.FromMinutes(5),    // Set the read/write timeout
+    MaxErrorRetry = 3,                             // Set the maximum number of retries
+    LogMetrics = true,                             // Enable metrics logging (optional)
+    LogResponse = true, // Enable detailed logging for requests and responses (optional)
+};
+
 var awsOptions = new Amazon.Extensions.NETCore.Setup.AWSOptions
 {
     Credentials = new BasicAWSCredentials(Environment.GetEnvironmentVariable("aws_id"), Environment.GetEnvironmentVariable("aws_secret")),
-    Region = Amazon.RegionEndpoint.APSoutheast2 // Specify the region as needed
+    Region = Amazon.RegionEndpoint.APSoutheast2 // Specify the region as needed,
 };
 
+builder.Services.AddSingleton(s3Config);
 // Register AWS Transcribe Service with the configured options
 builder.Services.AddAWSService<IAmazonTranscribeService>(awsOptions);
 builder.Services.AddAWSService<IAmazonS3>(awsOptions);

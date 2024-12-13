@@ -104,6 +104,7 @@ namespace risk.control.system.Models
         public int AssessorSla { get; set; } = 5;
         public int SupervisorSla { get; set; } = 5;
         public int AgentSla { get; set; } = 5;
+        public bool UpdateAgentReport { get; set; } = false;
         public override string ToString()
         {
             return $"Insurance Company Information:\n" +
