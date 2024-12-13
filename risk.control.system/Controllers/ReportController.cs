@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Authorization;
 using static risk.control.system.AppConstant.Applicationsettings;
 using SmartBreadcrumbs.Nodes;
 using risk.control.system.Controllers.Company;
+using risk.control.system.Controllers.Api.Claims;
 
 namespace risk.control.system.Controllers
 {
@@ -24,19 +25,21 @@ namespace risk.control.system.Controllers
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly INotyfService notifyService;
         private readonly IToastNotification toastNotification;
-        private readonly IHttpClientService httpClientService;
+        private readonly IClaimsService claimsService;
         private static HttpClient _httpClient = new();
         private Regex longLatRegex = new Regex("(?<lat>[-|+| ]\\d+.\\d+)\\s* \\/\\s*(?<lon>\\d+.\\d+)");
 
-        public ReportController(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment,
+        public ReportController(ApplicationDbContext context, 
+            IWebHostEnvironment webHostEnvironment,
             INotyfService notifyService,
-            IToastNotification toastNotification, IHttpClientService httpClientService)
+            IToastNotification toastNotification,
+            IClaimsService claimsService)
         {
             this._context = context;
             this.webHostEnvironment = webHostEnvironment;
             this.notifyService = notifyService;
             this.toastNotification = toastNotification;
-            this.httpClientService = httpClientService;
+            this.claimsService = claimsService;
         }
 
 
@@ -112,26 +115,10 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                var claim = _context.ClaimsInvestigation
-                    .Include(c => c.Vendor)
-                    .Include(c => c.PolicyDetail)
-                    .ThenInclude(c => c.CaseEnabler)
-                    .Include(c => c.CustomerDetail)
-                    .ThenInclude(c => c.Country)
-                    .Include(c => c.CustomerDetail)
-                    .ThenInclude(c => c.State)
-                    .Include(c => c.CustomerDetail)
-                    .ThenInclude(c => c.District)
-                    .Include(c => c.CustomerDetail)
-                    .ThenInclude(c => c.PinCode)
-                    .Include(c => c.BeneficiaryDetail)
-                    .ThenInclude(c => c.Country)
-                    .Include(c => c.BeneficiaryDetail)
-                    .ThenInclude(c => c.State)
-                    .Include(c => c.BeneficiaryDetail)
-                    .ThenInclude(c => c.District)
-                    .Include(c => c.BeneficiaryDetail)
-                    .ThenInclude(c => c.PinCode)
+                var claim = claimsService.GetClaims()
+                    .Include(r=>r.AgencyReport)
+                    .Include(r=>r.AgencyReport.DigitalIdReport)
+                    .Include(r=>r.AgencyReport.PanIdReport)
                     .FirstOrDefault(c => c.ClaimsInvestigationId == id);
 
                 var policy = claim.PolicyDetail;

@@ -11,6 +11,14 @@ namespace risk.control.system.Helpers
     {
         public static DocumentBuilder Run(string imagePath, ClaimsInvestigation claim)
         {
+            string boardingJsonFile = CheckFile(Path.Combine("Files", "boarding-data.json"));
+            string boardingJsonContent = File.ReadAllText(boardingJsonFile);
+            BoardingData boardingData = JsonConvert.DeserializeObject<BoardingData>(boardingJsonContent);
+
+            var photoMatch = claim.AgencyReport.DigitalIdReport.Similarity > 70;
+            boardingData.Flight = photoMatch ? "YES" : "NO";
+            
+
             string ticketJsonFile = CheckFile(Path.Combine("Files", "concert-ticket-data.json"));
             string ticketJsonContent = File.ReadAllText(ticketJsonFile);
             TicketData ticketData = JsonConvert.DeserializeObject<TicketData>(ticketJsonContent);
@@ -20,29 +28,47 @@ namespace risk.control.system.Helpers
             ticketData.ClaimType = claim.PolicyDetail.ClaimType.GetEnumDisplayName();
             ticketData.InsuredAmount = claim.PolicyDetail.SumAssuredValue.ToString();
                 ticketData.Reason2Verify = claim.PolicyDetail.CaseEnabler.Name.ToLower();
+            ticketData.AgencyLogo= claim.Vendor.DocumentUrl;
+            string contactNumer = string.Empty;
             if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
             {
                 ticketData.PersonOfInterestName = claim.CustomerDetail.Name;
                 ticketData.VerifyAddress = claim.CustomerDetail.Addressline + "," + claim.CustomerDetail.District.Name +"," +claim.CustomerDetail.State.Code + "," + claim.CustomerDetail.Country.Code +"," + claim.CustomerDetail.PinCode.Code;
+                contactNumer = claim.CustomerDetail.ContactNumber;
             }
             else
             {
                 ticketData.PersonOfInterestName = claim.BeneficiaryDetail.Name;
                 ticketData.VerifyAddress = claim.BeneficiaryDetail.Addressline + "," + claim.BeneficiaryDetail.District.Name + "," + claim.BeneficiaryDetail.State.Code + "," + claim.BeneficiaryDetail.Country.Code + "," + claim.BeneficiaryDetail.PinCode.Code;
-
+                contactNumer = claim.BeneficiaryDetail.ContactNumber;
             }
+
+            boardingData.DepartureAirport = ticketData.PersonOfInterestName;
+            boardingData.DepartureAbvr = "MR/MS";
+            boardingData.BoardingGate = contactNumer;
+            boardingData.BoardingTill = claim.AgencyReport.DigitalIdReport.Updated.Value;
+            boardingData.DepartureTime = claim.AgencyReport.DigitalIdReport.Created;
+            boardingData.Arrival = claim.AgencyReport.Created;
+            boardingData.ArrivalAirport = "";
+            boardingData.ArrivalAbvr = claim.AgencyReport.DigitalIdReport.DigitalIdImageLocationAddress;
+
             string jsonFile = CheckFile(Path.Combine("Files", "concert-data.json"));
             string jsonContent = File.ReadAllText(jsonFile);
             ConcertData concertData = JsonConvert.DeserializeObject<ConcertData>(jsonContent);
 
-            string boardingJsonFile = CheckFile(Path.Combine("Files", "boarding-data.json"));
-            string boardingJsonContent = File.ReadAllText(boardingJsonFile);
-            BoardingData boardingData = JsonConvert.DeserializeObject<BoardingData>(boardingJsonContent);
+            concertData.ReportSummary = claim.AgencyReport?.AgentRemarks;
+            concertData.AgencyDomain = claim.Vendor.Email;
+            concertData.AgencyContact = claim.Vendor.PhoneNumber;
+            concertData.SupervisorEmail = claim.AgencyReport?.SupervisorEmail;
+            concertData.AddressVisited = ticketData.VerifyAddress;
+            concertData.WeatherDetail = claim.AgencyReport.SupervisorRemarks;
+            concertData.ReportSummaryDescription =new List<string> { claim.AgencyReport?.AssessorRemarks };
 
             var ticketJsonFile1 = CheckFile(Path.Combine("Files", "bp-ticket-data.json"));
             var ticketJsonContent1 = File.ReadAllText(ticketJsonFile1);
             var ticketData1 = JsonConvert.DeserializeObject<TicketData1>(ticketJsonContent1);
 
+            
             string ticketJsonFile0 = CheckFile(Path.Combine("Files", "bp-ticket-data1.json"));
             string ticketJsonContent0 = File.ReadAllText(ticketJsonFile0);
             TicketData1 ticketData0 = JsonConvert.DeserializeObject<TicketData1>(ticketJsonContent0);
@@ -50,6 +76,18 @@ namespace risk.control.system.Helpers
             string boardingJsonFile0 = CheckFile(Path.Combine("Files", "boarding-data1.json"));
             string boardingJsonContent0 = File.ReadAllText(boardingJsonFile0);
             BoardingData boardingData0 = JsonConvert.DeserializeObject<BoardingData>(boardingJsonContent0);
+            var panValid = claim.AgencyReport.PanIdReport.DocumentIdImageValid.GetValueOrDefault();
+            boardingData0.Flight = panValid ? "YES" : "NO";
+            boardingData0.DepartureAirport = claim.AgencyReport.PanIdReport.DocumentIdImageData.Length > 30 ? 
+                claim.AgencyReport.PanIdReport.DocumentIdImageData.Substring(0,30) + "...": 
+                claim.AgencyReport.PanIdReport.DocumentIdImageData;
+            boardingData0.DepartureAbvr = "PAN/CARD";
+            boardingData0.BoardingGate = contactNumer;
+            boardingData0.BoardingTill = claim.AgencyReport.PanIdReport.Updated.GetValueOrDefault();
+            boardingData0.DepartureTime = claim.AgencyReport.PanIdReport.Created;
+            boardingData0.Arrival = claim.AgencyReport.Created;
+            boardingData0.ArrivalAirport = "";
+            boardingData0.ArrivalAbvr = claim.AgencyReport.PanIdReport.DocumentIdImageLocationAddress;
 
             PdfReportBuilder ConcertTicketBuilder = new PdfReportBuilder();
 

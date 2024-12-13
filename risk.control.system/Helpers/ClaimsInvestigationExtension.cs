@@ -198,29 +198,40 @@ namespace risk.control.system.Helpers
             }
             return string.Join("", "<span class='badge badge-light'>now</span>");
         }
-        public static string GetManagerTimePending(this ClaimsInvestigation a)
+        public static string GetManagerTimePending(this ClaimsInvestigation a, bool assess= false, bool completed = false)
         {
-            if (DateTime.Now.Subtract(a.Created).Days >= 7)
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Created).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Hurry up, {DateTime.Now.Subtract(a.Created).Days} days since created!\"></i>");
-
-            if (DateTime.Now.Subtract(a.Created).Days >= 3)
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Created).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Caution : {DateTime.Now.Subtract(a.Created).Days} day since created.\"></i>");
-
-            if (DateTime.Now.Subtract(a.Created).Days >= 1)
-                return string.Join("", $"<span class='badge badge-light'>{ DateTime.Now.Subtract(a.Created).Days} day</span>");
-
-            if (DateTime.Now.Subtract(a.Created).Hours < 24 &&
-                DateTime.Now.Subtract(a.Created).Hours > 0)
+            DateTime timeToCompare = a.Created;
+            if (assess)
             {
-                return string.Join("", $"<span class='badge badge-light'>{ DateTime.Now.Subtract(a.Created).Hours} hr </span>");
+                timeToCompare = a.SubmittedToAssessorTime.Value;
+                if (DateTime.Now.Subtract(timeToCompare).Days >= a.AssessorSla)
+                    return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Hurry up, {DateTime.Now.Subtract(timeToCompare).Days} days since created!\"></i>");
             }
-            if (DateTime.Now.Subtract(a.Created).Hours == 0 && DateTime.Now.Subtract(a.Created).Minutes > 0)
+            else if(completed)
             {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Created).Minutes} min </span>");
+                timeToCompare = a.ProcessedByAssessorTime.Value;
+                if (DateTime.Now.Subtract(timeToCompare).Days >= a.AssessorSla)
+                    return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Hurry up, {DateTime.Now.Subtract(timeToCompare).Days} days since created!\"></i>");
             }
-            if (DateTime.Now.Subtract(a.Created).Minutes == 0 && DateTime.Now.Subtract(a.Created).Seconds > 0)
+
+            if (DateTime.Now.Subtract(timeToCompare).Days >= 3 || DateTime.Now.Subtract(timeToCompare).Days >= a.AssessorSla)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Caution : {DateTime.Now.Subtract(a.Created).Days} day since created.\"></i>");
+
+            if (DateTime.Now.Subtract(timeToCompare).Days >= 1)
+                return string.Join("", $"<span class='badge badge-light'>{ DateTime.Now.Subtract(timeToCompare).Days} day</span>");
+
+            if (DateTime.Now.Subtract(timeToCompare).Hours < 24 &&
+                DateTime.Now.Subtract(timeToCompare).Hours > 0)
             {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Created).Seconds} sec </span>");
+                return string.Join("", $"<span class='badge badge-light'>{ DateTime.Now.Subtract(timeToCompare).Hours} hr </span>");
+            }
+            if (DateTime.Now.Subtract(timeToCompare).Hours == 0 && DateTime.Now.Subtract(timeToCompare).Minutes > 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Minutes} min </span>");
+            }
+            if (DateTime.Now.Subtract(timeToCompare).Minutes == 0 && DateTime.Now.Subtract(a.Created).Seconds > 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Seconds} sec </span>");
             }
             return string.Join("", "<span class='badge badge-light'>now</span>");
         }

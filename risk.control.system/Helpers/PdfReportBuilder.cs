@@ -183,7 +183,7 @@ namespace risk.control.system.Helpers
             cellBuilder
                 .SetPadding(2, 2, 2, 0);
             cellBuilder
-                .AddImage(Path.Combine(imgPath, "images", "verify.png")).SetHeight(340);
+                .AddImage(TicketData.AgencyLogo).SetHeight(340);
         }
 
         private void No(TableCellBuilder cellBuilder)
