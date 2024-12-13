@@ -291,7 +291,7 @@ namespace risk.control.system.Services
                 claimsInvestigation.CurrentClaimOwner = currentUser.Email;
                 claimsInvestigation.InvestigationCaseStatusId = initiatedStatus.InvestigationCaseStatusId;
                 claimsInvestigation.InvestigationCaseSubStatusId = create? createdStatus.InvestigationCaseSubStatusId:assigned2AssignerStatus.InvestigationCaseSubStatusId;
-
+                claimsInvestigation.CreatorSla = currentUser.ClientCompany.CreatorSla;
                 var aaddedClaimId = _context.ClaimsInvestigation.Add(claimsInvestigation);
                 var log = new InvestigationTransaction
                 {
@@ -304,7 +304,7 @@ namespace risk.control.system.Services
                     Time2Update = 0,
                     InvestigationCaseStatusId = initiatedStatus.InvestigationCaseStatusId,
                     InvestigationCaseSubStatusId = create ? createdStatus.InvestigationCaseSubStatusId : assigned2AssignerStatus.InvestigationCaseSubStatusId,
-                    UpdatedBy = userEmail
+                    UpdatedBy = userEmail,
                 };
                 _context.InvestigationTransaction.Add(log);
 
@@ -688,6 +688,7 @@ namespace risk.control.system.Services
                 var lastLogHop = _context.InvestigationTransaction
                         .Where(i => i.ClaimsInvestigationId == claimsInvestigationId)
                         .AsNoTracking().Max(s => s.HopCount);
+                string timeElapsed = GetTimeElaspedFromLog(lastLog);
 
                 var log = new InvestigationTransaction
                 {
@@ -701,7 +702,8 @@ namespace risk.control.system.Services
                     InvestigationCaseStatusId = inProgress.InvestigationCaseStatusId,
                     InvestigationCaseSubStatusId = allocatedToVendor.InvestigationCaseSubStatusId,
                     UpdatedBy = currentUser.Email,
-                    Updated = DateTime.Now
+                    Updated = DateTime.Now,
+                    TimeElapsed = timeElapsed
                 };
                 _context.InvestigationTransaction.Add(log);
 
@@ -742,6 +744,7 @@ namespace risk.control.system.Services
                 var lastLogHop = _context.InvestigationTransaction
                                         .Where(i => i.ClaimsInvestigationId == claim.ClaimsInvestigationId)
                                         .AsNoTracking().Max(s => s.HopCount);
+                string timeElapsed = GetTimeElaspedFromLog(lastLog);
 
                 var log = new InvestigationTransaction
                 {
@@ -755,7 +758,8 @@ namespace risk.control.system.Services
                     InvestigationCaseStatusId = inProgress.InvestigationCaseStatusId,
                     InvestigationCaseSubStatusId = assignedToAgent.InvestigationCaseSubStatusId,
                     UpdatedBy = supervisor.FirstName + " " + supervisor.LastName + " (" + supervisor.Email + ")",
-                    Updated = DateTime.Now
+                    Updated = DateTime.Now,
+                    TimeElapsed = timeElapsed
                 };
                 _context.InvestigationTransaction.Add(log);
             }
@@ -833,7 +837,8 @@ namespace risk.control.system.Services
                 InvestigationCaseStatusId = inProgress.InvestigationCaseStatusId,
                 InvestigationCaseSubStatusId = submitted2Supervisor.InvestigationCaseSubStatusId,
                 UpdatedBy = agent.Email,
-                Updated = DateTime.Now
+                Updated = DateTime.Now,
+                TimeElapsed = GetTimeElaspedFromLog(lastLog)
             };
             _context.InvestigationTransaction.Add(log);
 
@@ -914,6 +919,8 @@ namespace risk.control.system.Services
                 var finalHop = _context.InvestigationTransaction
                                    .Where(i => i.ClaimsInvestigationId == claimsInvestigationId)
                                     .AsNoTracking().Max(s => s.HopCount);
+                var lastLog = _context.InvestigationTransaction.Where(i =>
+              i.ClaimsInvestigationId == claimsInvestigationId).OrderByDescending(o => o.Created)?.FirstOrDefault();
 
                 var finalLog = new InvestigationTransaction
                 {
@@ -927,7 +934,8 @@ namespace risk.control.system.Services
                     InvestigationCaseStatusId = finished.InvestigationCaseStatusId,
                     InvestigationCaseSubStatusId = rejected.InvestigationCaseSubStatusId,
                     UpdatedBy = userEmail,
-                    Updated = DateTime.Now
+                    Updated = DateTime.Now,
+                    TimeElapsed = GetTimeElaspedFromLog(lastLog)
                 };
 
                 _context.InvestigationTransaction.Add(finalLog);
@@ -1007,6 +1015,8 @@ namespace risk.control.system.Services
                 var finalHop = _context.InvestigationTransaction
                                    .Where(i => i.ClaimsInvestigationId == claimsInvestigationId)
                                     .AsNoTracking().Max(s => s.HopCount);
+                var lastLog = _context.InvestigationTransaction.Where(i =>
+                             i.ClaimsInvestigationId == claimsInvestigationId).OrderByDescending(o => o.Created)?.FirstOrDefault();
 
                 var finalLog = new InvestigationTransaction
                 {
@@ -1020,7 +1030,8 @@ namespace risk.control.system.Services
                     InvestigationCaseStatusId = finished.InvestigationCaseStatusId,
                     InvestigationCaseSubStatusId = approved.InvestigationCaseSubStatusId,
                     UpdatedBy = userEmail,
-                    Updated = DateTime.Now
+                    Updated = DateTime.Now,
+                    TimeElapsed = GetTimeElaspedFromLog(lastLog)
                 };
 
                 _context.InvestigationTransaction.Add(finalLog);
@@ -1186,7 +1197,8 @@ namespace risk.control.system.Services
                 InvestigationCaseSubStatusId = reAssigned.InvestigationCaseSubStatusId,
                 UpdatedBy = userEmail,
                 CurrentClaimOwner = currentUser.Email,
-                Updated = DateTime.Now
+                Updated = DateTime.Now,
+                TimeElapsed = GetTimeElaspedFromLog(lastLog)
             };
             _context.InvestigationTransaction.Add(log);
 
@@ -1255,7 +1267,8 @@ namespace risk.control.system.Services
                 InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS).InvestigationCaseStatusId,
                 InvestigationCaseSubStatusId = submitted2Assessor.InvestigationCaseSubStatusId,
                 UpdatedBy = userEmail,
-                Updated = DateTime.Now
+                Updated = DateTime.Now,
+                TimeElapsed = GetTimeElaspedFromLog(lastLog)
             };
             _context.InvestigationTransaction.Add(log);
             _context.ClaimsInvestigation.Update(claim);
@@ -1314,7 +1327,8 @@ namespace risk.control.system.Services
                 InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS).InvestigationCaseStatusId,
                 InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT).InvestigationCaseSubStatusId,
                 UpdatedBy = userEmail,
-                Updated = DateTime.Now
+                Updated = DateTime.Now,
+                TimeElapsed = GetTimeElaspedFromLog(lastLog)
             };
             _context.InvestigationTransaction.Add(log);
 
@@ -1373,7 +1387,8 @@ namespace risk.control.system.Services
                 InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS).InvestigationCaseStatusId,
                 InvestigationCaseSubStatusId = requestedByAssessor.InvestigationCaseSubStatusId,
                 UpdatedBy = userEmail,
-                Updated = DateTime.Now
+                Updated = DateTime.Now,
+                TimeElapsed = GetTimeElaspedFromLog(lastLog)
             };
             _context.InvestigationTransaction.Add(log);
 
@@ -1466,7 +1481,8 @@ namespace risk.control.system.Services
                 InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS).InvestigationCaseStatusId,
                 InvestigationCaseSubStatusId = replyByAgency.InvestigationCaseSubStatusId,
                 UpdatedBy = userEmail,
-                Updated = DateTime.Now
+                Updated = DateTime.Now,
+                TimeElapsed = GetTimeElaspedFromLog(lastLog)
             };
             _context.InvestigationTransaction.Add(log);
 
@@ -1496,6 +1512,32 @@ namespace risk.control.system.Services
             });
             _context.ClaimsInvestigation.Update(claim);
             return await _context.SaveChangesAsync() > 0;
+        }
+
+        private string GetTimeElaspedFromLog(InvestigationTransaction lastLog)
+        {
+            string timeElapsed = string.Empty;
+            if (DateTime.Now.Subtract(lastLog.Created).Days >= 1)
+            {
+                timeElapsed = DateTime.Now.Subtract(lastLog.Created).Days.ToString() + " days";
+            }
+            else if (DateTime.Now.Subtract(lastLog.Created).Hours >= 1)
+            {
+                timeElapsed = DateTime.Now.Subtract(lastLog.Created).Hours.ToString() + " hours";
+            }
+            else if (DateTime.Now.Subtract(lastLog.Created).Minutes >= 1)
+            {
+                timeElapsed = DateTime.Now.Subtract(lastLog.Created).Minutes.ToString() + " minutes";
+            }
+            else if (DateTime.Now.Subtract(lastLog.Created).Seconds >= 1)
+            {
+                timeElapsed = DateTime.Now.Subtract(lastLog.Created).Seconds.ToString() + " seconds";
+            }
+            else
+            {
+                timeElapsed = "Just Now";
+            }
+            return timeElapsed;
         }
     }
 }

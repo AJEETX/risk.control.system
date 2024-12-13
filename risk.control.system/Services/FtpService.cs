@@ -276,7 +276,8 @@ namespace risk.control.system.Services
                                     CREATEDBY = createdAsMethod,
                                     ORIGIN = uploadingway,
                                     ClientCompanyId = companyUser.ClientCompanyId,
-                                    UserRoleActionedTo = $"{companyUser.ClientCompany.Email}"
+                                    UserRoleActionedTo = $"{companyUser.ClientCompany.Email}",
+                                    CreatorSla = companyUser.ClientCompany.CreatorSla
                             };
 
                                 var servicetype = _context.InvestigationServiceType.FirstOrDefault(s => s.Code.ToLower() == (rowData[4].Trim().ToLower()));

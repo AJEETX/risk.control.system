@@ -13,6 +13,10 @@ namespace risk.control.system.Helpers
         {
             if (!active)
             {
+                if(a.CreatorSla == 0)
+                {
+                    return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Created).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Hurry up, {DateTime.Now.Subtract(a.Created).Days} days since created!\"></i>");
+                }
                 if (DateTime.Now.Subtract(a.Created).Days >= a.CreatorSla)
                     return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Created).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Hurry up, {DateTime.Now.Subtract(a.Created).Days} days since created!\"></i>");
 
@@ -21,6 +25,10 @@ namespace risk.control.system.Helpers
             }
             else
             {
+                if (a.CreatorSla == 0)
+                {
+                    return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Created).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Hurry up, {DateTime.Now.Subtract(a.Created).Days} days since created!\"></i>");
+                }
                 if (DateTime.Now.Subtract(a.Created).Days >= a.CreatorSla)
                     return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Created).Days} day</span>");
 
