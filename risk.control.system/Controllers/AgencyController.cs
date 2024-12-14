@@ -307,10 +307,9 @@ namespace risk.control.system.Controllers
                 IdentityResult result = await userManager.CreateAsync(user, user.Password);
                 if (result.Succeeded)
                 {
+                    var roleResult = await userManager.AddToRolesAsync(user, new List<string> { user.UserRole.ToString() });
                     var roles = await userManager.GetRolesAsync(user);
-                    var roleResult = await userManager.RemoveFromRolesAsync(user, roles);
-                    roleResult = await userManager.AddToRolesAsync(user, new List<string> { user.UserRole.ToString() });
-                    
+
                     if (!user.Active)
                     {
                         var createdUser = await userManager.FindByEmailAsync(user.Email);

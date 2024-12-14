@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Highsoft.Web.Mvc.Charts;
+
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -206,7 +208,10 @@ namespace risk.control.system.Controllers.Api.Agency
                 {
                     Id = u.Id,
                     Name = u.FirstName + " " + u.LastName,
-                    Email = "<a href=/Vendors/EditUser?userId=" + u.Id +">" + u.Email + "</a>",
+                    //Email = "<a href=/Vendors/EditUser?userId=" + u.Id +">" + u.Email + "</a>",
+                    Email = (u.UserRole == AgencyRole.AGENT && !string.IsNullOrWhiteSpace(u.MobileUId) || u.UserRole != AgencyRole.AGENT) ?
+                    "<a href=/Vendors/EditUser?userId=" + u.Id + ">" + u.Email + "</a>" :
+                    "<a href=/Vendors/EditUser?userId=" + u.Id + ">" + u.Email + "</a><span title=\"Onboarding incomplete !!!\" data-toggle=\"tooltip\"><i class='fa fa-asterisk asterik-style'></i></span>",
                     Phone = u.PhoneNumber,
                     Photo = string.IsNullOrWhiteSpace(u.ProfilePictureUrl) ? noUserImagefilePath : u.ProfilePictureUrl,
                     Addressline = "<span class='badge badge-light'>" + u.Addressline + ", " + u.District.Name + ", " + u.State.Name + ", " + u.Country.Code + "</span>",
@@ -215,7 +220,8 @@ namespace risk.control.system.Controllers.Api.Agency
                     Roles = u.UserRole != null ? $"<span class=\"badge badge-light\">{u.UserRole.GetEnumDisplayName()}</span>" : "<span class=\"badge badge-light\">...</span>",
                     Updated = u.Updated.HasValue ? u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy"),
                     UpdateBy = u.UpdatedBy,
-                    Role = u.UserRole.GetEnumDisplayName()
+                    Role = u.UserRole.GetEnumDisplayName(),
+                    AgentOnboarded = (u.UserRole == AgencyRole.AGENT && !string.IsNullOrWhiteSpace(u.MobileUId) || u.UserRole != AgencyRole.AGENT)
                 });
 
             return Ok(result?.ToArray());
@@ -268,7 +274,9 @@ namespace risk.control.system.Controllers.Api.Agency
                 {
                     Id = u.AgencyUser.Id,
                     Photo = string.IsNullOrWhiteSpace(u.AgencyUser.ProfilePictureUrl) ? noUserImagefilePath : u.AgencyUser.ProfilePictureUrl,
-                    Email = "<a href=/Agency/EditUser?userId=" +u.AgencyUser.Id +">" + u.AgencyUser.Email + "</a>",
+                    Email = (u.AgencyUser.UserRole == AgencyRole.AGENT && !string.IsNullOrWhiteSpace(u.AgencyUser.MobileUId) || u.AgencyUser.UserRole != AgencyRole.AGENT) ?
+                    "<a href=/Agency/EditUser?userId=" +u.AgencyUser.Id +">" + u.AgencyUser.Email + "</a>":
+                    "<a href=/Agency/EditUser?userId=" + u.AgencyUser.Id + ">" + u.AgencyUser.Email + "</a><span title=\"Onboarding incomplete !!!\" data-toggle=\"tooltip\"><i class='fa fa-asterisk asterik-style'></i></span>",
                     Name = u.AgencyUser.FirstName + " " + u.AgencyUser.LastName,
                     Phone = u.AgencyUser.PhoneNumber,
                     Addressline = "<span class='badge badge-light'>" + u.AgencyUser.Addressline +", "+ u.AgencyUser.District.Name + ", " +u.AgencyUser.State.Name +", "+u.AgencyUser.Country.Code + ", "+u.AgencyUser.PinCode.Code+" </span>",
@@ -276,7 +284,8 @@ namespace risk.control.system.Controllers.Api.Agency
                     Roles = u.AgencyUser.UserRole != null ? $"<span class=\"badge badge-light\">{u.AgencyUser.UserRole.GetEnumDisplayName()}</span>" : "<span class=\"badge badge-light\">...</span>",
                     Count = u.CurrentCaseCount,
                     UpdateBy = u.AgencyUser.UpdatedBy,
-                    Role = u.AgencyUser.UserRole.GetEnumDisplayName()
+                    Role = u.AgencyUser.UserRole.GetEnumDisplayName(),
+                    AgentOnboarded =(u.AgencyUser.UserRole == AgencyRole.AGENT && !string.IsNullOrWhiteSpace(u.AgencyUser.MobileUId) || u.AgencyUser.UserRole != AgencyRole.AGENT)
                 });
             return Ok(agentWithLoad?.ToArray());
         }

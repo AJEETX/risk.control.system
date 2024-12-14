@@ -19,10 +19,16 @@
                 "data": "id", "name": "Id", "bVisible": false
             },
             {
-                "sDefaultContent": "",
+                "sDefaultContent": '<i class="fa fa-toggle-on"></i>',
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    var img = '<img alt="' + row.name + '" title="' + row.name + '" src="' + row.photo + '" class="table-profile-image" />';
+                    var img;
+                    if (row.active) {
+                        img = '<img alt="' + row.name + '" title="' + row.name + '" src="' + row.photo + '" class="table-profile-image" data-toggle="tooltip"/>';
+                    }
+                    else {
+                        img = '<img alt="' + row.name + '" title="Inactive !!! ' + row.name + '" src="' + row.photo + '" class="table-profile-image-user-inactive" data-toggle="tooltip"/>';
+                    }
                     return img;
                 }
             },
@@ -63,6 +69,12 @@
                 }
             }
         ],
+        "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+            if (!aData.active) {
+                $('td', nRow).css('background-color', '#FCFCEF');
+                $('td', nRow).css('color', 'lightgrey');
+            }
+        },
         error: function (xhr, status, error) { alert('err ' + error) }
     });
     $('#customerTable').on('draw.dt', function () {

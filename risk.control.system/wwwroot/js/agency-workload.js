@@ -18,15 +18,20 @@
                 "data": "id", "name": "Id", "bVisible": false
             },
             {
-                "sDefaultContent": "",
+                "sDefaultContent": '<i class="fa fa-toggle-on"></i>',
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    var img = '<img alt="' + row.name + '" title="' + row.name + '" src="' + row.photo + '" class="table-profile-image" data-toggle="tooltip"/>';
+                    var img;
+                    if (row.agentOnboarded) {
+                        img = '<img alt="' + row.name + '" title="' + row.name + '" src="' + row.photo + '" class="table-profile-image" data-toggle="tooltip"/>';
+                    }
+                    else {
+                        img = '<img alt="' + row.name + '" title="Onboarding incomplete !!! ' + row.name + '" src="' + row.photo + '" class="table-profile-image-agent-onboard" data-toggle="tooltip"/>';
+                    }
                     return img;
                 }
             },
             { "data": "email" },
-            { "data": "name" },
             { "data": "phone" },
             { "data": "addressline" , bSortable:false },
             {
@@ -64,6 +69,16 @@
                 }
             }
         ],
+        "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+            if (!aData.agentOnboarded) {
+                $('td', nRow).css('background-color', '#FCFCEF');
+                $('td', nRow).css('color', 'lightgrey');
+            }
+            if (!aData.active) {
+                $('td', nRow).css('background-color', '#FCFCEF');
+                $('td', nRow).css('color', 'lightgrey');
+            }
+        },
         error: function (xhr, status, error) { alert('err ' + error) }
     });
 

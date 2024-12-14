@@ -239,9 +239,8 @@ namespace risk.control.system.Controllers
 
                 if (result.Succeeded)
                 {
+                    var roleResult = await userManager.AddToRolesAsync(user, new List<string> { user.UserRole.ToString() });
                     var roles = await userManager.GetRolesAsync(user);
-                    var roleResult = await userManager.RemoveFromRolesAsync(user, roles);
-                    roleResult = await userManager.AddToRolesAsync(user, new List<string> { user.UserRole.ToString() });
 
                     if (!user.Active)
                     {
