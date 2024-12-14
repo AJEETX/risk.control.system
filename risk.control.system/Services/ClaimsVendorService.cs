@@ -42,7 +42,6 @@ namespace risk.control.system.Services
         private readonly UserManager<VendorApplicationUser> userManager;
         private readonly ApplicationDbContext _context;
         private readonly IDashboardService dashboardService;
-        private readonly IHttpClientService httpClientService;
         private readonly IClaimsService claimsService;
 
         //private static string latitude = "-37.839542";
@@ -53,14 +52,12 @@ namespace risk.control.system.Services
             UserManager<VendorApplicationUser> userManager,
             ApplicationDbContext context,
             IDashboardService dashboardService,
-            IHttpClientService httpClientService,
             IClaimsService claimsService)
         {
             this.checkifyService = checkifyService;
             this.userManager = userManager;
             this._context = context;
             this.dashboardService = dashboardService;
-            this.httpClientService = httpClientService;
             this.claimsService = claimsService;
         }
 

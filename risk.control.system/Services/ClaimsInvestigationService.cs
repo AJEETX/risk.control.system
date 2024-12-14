@@ -896,9 +896,38 @@ namespace risk.control.system.Services
             try
             {
                 var claim = _context.ClaimsInvestigation
-                    .Include(c => c.PolicyDetail)
-                    .Include(c => c.AgencyReport)
-                    .Include(p => p.ClientCompany)
+                    .Include(c => c.ClientCompany)
+               .Include(c => c.BeneficiaryDetail)
+               .ThenInclude(c => c.BeneficiaryRelation)
+               .Include(c => c.PolicyDetail)
+               .ThenInclude(c => c.CaseEnabler)
+               .Include(c => c.PolicyDetail)
+               .ThenInclude(c => c.CostCentre)
+               .Include(c => c.BeneficiaryDetail)
+               .ThenInclude(c => c.PinCode)
+               .Include(c => c.BeneficiaryDetail)
+                .ThenInclude(c => c.District)
+                .Include(c => c.BeneficiaryDetail)
+                .ThenInclude(c => c.State)
+               .Include(c => c.CustomerDetail)
+               .ThenInclude(c => c.Country)
+               .Include(c => c.CustomerDetail)
+               .ThenInclude(c => c.District)
+               .Include(c => c.InvestigationCaseStatus)
+               .Include(c => c.InvestigationCaseSubStatus)
+               .Include(c => c.PolicyDetail)
+               .ThenInclude(c => c.InvestigationServiceType)
+               .Include(c => c.PolicyDetail)
+               .ThenInclude(c => c.LineOfBusiness)
+               .Include(c => c.CustomerDetail)
+               .ThenInclude(c => c.PinCode)
+               .Include(c => c.CustomerDetail)
+               .ThenInclude(c => c.State)
+               .Include(c => c.Vendor)
+               .Include(c => c.ClaimNotes)
+                .Include(r => r.AgencyReport)
+                .Include(r => r.AgencyReport.DigitalIdReport)
+                .Include(r => r.AgencyReport.PanIdReport)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimsInvestigationId);
 
                 claim.AgencyReport.AiSummary = reportAiSummary;
@@ -973,6 +1002,20 @@ namespace risk.control.system.Services
 
                 _context.VendorInvoice.Add(invoice);
 
+                string folder = Path.Combine(webHostEnvironment.WebRootPath, "report");
+
+                if (!Directory.Exists(folder))
+                {
+                    Directory.CreateDirectory(folder);
+                }
+
+                var filename = "report" + claimsInvestigationId + ".pdf";
+
+                var filePath = Path.Combine(webHostEnvironment.WebRootPath, "report", filename);
+
+                (await PdfReportRunner.Run(webHostEnvironment.WebRootPath, claim)).Build(filePath);
+
+                claim.AgencyReport.PdfReportFilePath = filePath;
                 var saveCount = await _context.SaveChangesAsync();
 
                 return saveCount > 0 ? (currentUser.ClientCompany, claim.PolicyDetail.ContractNumber) : (null!, string.Empty);
@@ -992,9 +1035,38 @@ namespace risk.control.system.Services
             try
             {
                 var claim = _context.ClaimsInvestigation
-                    .Include(p => p.PolicyDetail)
-                    .Include(p => p.ClientCompany)
-                    .Include(c => c.AgencyReport)
+                    .Include(c => c.ClientCompany)
+               .Include(c => c.BeneficiaryDetail)
+               .ThenInclude(c => c.BeneficiaryRelation)
+               .Include(c => c.PolicyDetail)
+               .ThenInclude(c => c.CaseEnabler)
+               .Include(c => c.PolicyDetail)
+               .ThenInclude(c => c.CostCentre)
+               .Include(c => c.BeneficiaryDetail)
+               .ThenInclude(c => c.PinCode)
+               .Include(c => c.BeneficiaryDetail)
+                .ThenInclude(c => c.District)
+                .Include(c => c.BeneficiaryDetail)
+                .ThenInclude(c => c.State)
+               .Include(c => c.CustomerDetail)
+               .ThenInclude(c => c.Country)
+               .Include(c => c.CustomerDetail)
+               .ThenInclude(c => c.District)
+               .Include(c => c.InvestigationCaseStatus)
+               .Include(c => c.InvestigationCaseSubStatus)
+               .Include(c => c.PolicyDetail)
+               .ThenInclude(c => c.InvestigationServiceType)
+               .Include(c => c.PolicyDetail)
+               .ThenInclude(c => c.LineOfBusiness)
+               .Include(c => c.CustomerDetail)
+               .ThenInclude(c => c.PinCode)
+               .Include(c => c.CustomerDetail)
+               .ThenInclude(c => c.State)
+               .Include(c => c.Vendor)
+               .Include(c => c.ClaimNotes)
+                .Include(r => r.AgencyReport)
+                .Include(r => r.AgencyReport.DigitalIdReport)
+                .Include(r => r.AgencyReport.PanIdReport)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimsInvestigationId);
 
                 claim.AgencyReport.AiSummary = reportAiSummary;
@@ -1069,6 +1141,22 @@ namespace risk.control.system.Services
 
                 _context.VendorInvoice.Add(invoice);
 
+                //create and save report
+
+                string folder = Path.Combine(webHostEnvironment.WebRootPath, "report");
+
+                if (!Directory.Exists(folder))
+                {
+                    Directory.CreateDirectory(folder);
+                }
+
+                var filename = "report" + claimsInvestigationId + ".pdf";
+
+                var filePath = Path.Combine(webHostEnvironment.WebRootPath, "report", filename);
+
+                (await PdfReportRunner.Run(webHostEnvironment.WebRootPath, claim)).Build(filePath);
+
+                claim.AgencyReport.PdfReportFilePath = filePath;
                 var saveCount = await _context.SaveChangesAsync();
 
                 return saveCount > 0 ? (currentUser.ClientCompany, claim.PolicyDetail.ContractNumber) : (null!, string.Empty);

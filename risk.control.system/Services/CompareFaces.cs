@@ -7,16 +7,24 @@ using Amazon.Textract;
 
 namespace risk.control.system.Services
 {
-    public class CompareFaces
+    public interface ICompareFaces
     {
-        private static string awsAccessKeyId = Environment.GetEnvironmentVariable("aws_id");
-        private static string awsSecretAccessKey = Environment.GetEnvironmentVariable("aws_secret");
-        public static async Task<bool> Do(byte[] data, byte[] tdata)
+        Task<(bool, float)> Do(byte[] data, byte[] tdata);
+    }
+    public class CompareFaces : ICompareFaces
+    {
+        private readonly IAmazonRekognition rekognitionClient;
+        private readonly IAmazonTextract textractClient;
+
+        public CompareFaces(IAmazonRekognition rekognitionClient, IAmazonTextract textractClient)
+        {
+            this.rekognitionClient = rekognitionClient;
+            this.textractClient = textractClient;
+        }
+        public async Task<(bool, float)> Do(byte[] data, byte[] tdata)
         {
             float similarityThreshold = 70F;
             
-            var rekognitionClient = new AmazonRekognitionClient(awsAccessKeyId, awsSecretAccessKey, RegionEndpoint.APSoutheast2);
-
             Amazon.Rekognition.Model.Image imageSource = new Amazon.Rekognition.Model.Image();
 
             try
@@ -28,7 +36,7 @@ namespace risk.control.system.Services
             {
                 Console.WriteLine(ex.StackTrace);
                 Console.WriteLine($"Failed to load source image:");
-                return false;
+                return (false, 0);
             }
 
             Amazon.Rekognition.Model.Image imageTarget = new Amazon.Rekognition.Model.Image();
@@ -42,7 +50,7 @@ namespace risk.control.system.Services
             {
                 Console.WriteLine(ex.StackTrace);
                 Console.WriteLine($"Failed to load source image:");
-                return false;
+                return (false, 0);
             }
 
             var compareFacesRequest = new CompareFacesRequest
@@ -66,26 +74,23 @@ namespace risk.control.system.Services
             //});
 
             //Console.WriteLine($"Found {compareFacesResponse.UnmatchedFaces.Count} face(s) that did not match.");
-            return result;
+            return (result, compareFacesResponse.FaceMatches[0].Similarity);
         }
 
-        public static async Task DetectSampleAsync(byte[] bytes)
+        public async Task DetectSampleAsync(byte[] bytes)
         {
-            using (var textractClient = new AmazonTextractClient(awsAccessKeyId, awsSecretAccessKey, RegionEndpoint.APSoutheast2))
+            Console.WriteLine("Detect Document Text");
+            var detectResponse = await textractClient.DetectDocumentTextAsync(new DetectDocumentTextRequest
             {
-                Console.WriteLine("Detect Document Text");
-                var detectResponse = await textractClient.DetectDocumentTextAsync(new DetectDocumentTextRequest
+                Document = new Document
                 {
-                    Document = new Document
-                    {
-                        Bytes = new MemoryStream(bytes)
-                    }
-                });
-
-                foreach (var block in detectResponse.Blocks)
-                {
-                    Console.WriteLine($"Type {block.BlockType}, Text: {block.Text}");
+                    Bytes = new MemoryStream(bytes)
                 }
+            });
+
+            foreach (var block in detectResponse.Blocks)
+            {
+                Console.WriteLine($"Type {block.BlockType}, Text: {block.Text}");
             }
         }
     }

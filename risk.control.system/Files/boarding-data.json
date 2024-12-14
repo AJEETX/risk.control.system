@@ -1,8 +1,8 @@
 {
-  "Flight": "YES",
-  "DepartureAirport": "SINGH",
-  "DepartureAbvr": "MR AMEX",
-  "BoardingGate": "98798798798",
+  "FaceMatchStatus": "YES",
+  "PersonName": "SINGH",
+  "Salutation": "MR AMEX",
+  "PersonContact": "98798798798",
   "BoardingTill": "2020-06-16T06:35:00",
   "DepartureTime": "2020-06-16T07:05:00",
   "Arrival": "2020-06-16T14:00:00",
@@ -10,5 +10,5 @@
   "ArrivalAbvr": " VIC 3131",
   "Class": "OK",
   "ClassAdd": "(T)",
-  "Seat": "Confirmed"
+  "PhotoIdRemarks": "Confirmed"
 }

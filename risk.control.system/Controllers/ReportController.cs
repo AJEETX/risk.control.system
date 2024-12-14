@@ -117,32 +117,17 @@ namespace risk.control.system.Controllers
 
                 var claim = claimsService.GetClaims()
                     .Include(r=>r.AgencyReport)
-                    .Include(r=>r.AgencyReport.DigitalIdReport)
-                    .Include(r=>r.AgencyReport.PanIdReport)
+                    //.Include(r=>r.AgencyReport.DigitalIdReport)
+                    //.Include(r=>r.AgencyReport.PanIdReport)
                     .FirstOrDefault(c => c.ClaimsInvestigationId == id);
 
-                var policy = claim.PolicyDetail;
-                var customer = claim.CustomerDetail;
-                var beneficiary = claim.BeneficiaryDetail;
-
-                string folder = Path.Combine(webHostEnvironment.WebRootPath, "report");
-
-                if (!Directory.Exists(folder))
-                {
-                    Directory.CreateDirectory(folder);
-                }
-
-                var filename = "report" + id + ".pdf";
-
-                var filePath = Path.Combine(webHostEnvironment.WebRootPath, "report", filename);
-
-                (await PdfReportRunner.Run(webHostEnvironment.WebRootPath, claim)).Build(filePath); ;
+                var filePath = Path.Combine(webHostEnvironment.WebRootPath, "report", claim.AgencyReport.PdfReportFilePath);
                 var memory = new MemoryStream();
                 using var stream = new FileStream(filePath, FileMode.Open);
                 await stream.CopyToAsync(memory);
                 memory.Position = 0;
-                notifyService.Success($"Policy {policy.ContractNumber} Report download success !!!");
-                return File(memory, "application/pdf", filename);
+                notifyService.Success($"Policy {claim.PolicyDetail.ContractNumber} Report download success !!!");
+                return File(memory, "application/pdf", claim.AgencyReport.PdfReportFilePath);
             }
             catch (Exception ex)
             {

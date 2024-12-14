@@ -31,17 +31,15 @@ namespace risk.control.system.Controllers.Api.Agency
         private static NumberFormatInfo hindiNFO = (NumberFormatInfo)hindi.NumberFormat.Clone();
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment webHostEnvironment;
-        private readonly IDashboardService dashboardService;
         private readonly UserManager<VendorApplicationUser> userManager;
 
         public SupervisorController(ApplicationDbContext context,
              IWebHostEnvironment webHostEnvironment, 
-             IDashboardService dashboardService, UserManager<VendorApplicationUser> userManager)
+             UserManager<VendorApplicationUser> userManager)
         {
             hindiNFO.CurrencySymbol = string.Empty;
             _context = context;
             this.webHostEnvironment = webHostEnvironment;
-            this.dashboardService = dashboardService;
             this.userManager = userManager;
         }
 

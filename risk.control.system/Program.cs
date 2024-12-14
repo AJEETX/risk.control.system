@@ -4,9 +4,11 @@ using System.Reflection;
 using System.Threading.RateLimiting;
 
 using Amazon;
+using Amazon.Rekognition;
 using Amazon.Runtime;
 using Amazon.S3;
 using Amazon.S3.Model;
+using Amazon.Textract;
 using Amazon.TranscribeService;
 
 using AspNetCoreHero.ToastNotification;
@@ -94,6 +96,7 @@ builder.Services.Configure<ForwardedHeadersOptions>(options => {
 
 builder.Services.AddFeatureManagement().AddFeatureFilter<TimeWindowFilter>();
 builder.Services.AddScoped<IAgencyService, AgencyService>();
+builder.Services.AddScoped<ICompareFaces, CompareFaces>();
 builder.Services.AddScoped<ISmsService, SmsService>();
 builder.Services.AddScoped<ICreatorService, CreatorService>();
 builder.Services.AddScoped<IInvoiceService, InvoiceService>();
@@ -137,6 +140,8 @@ builder.Services.AddDefaultAWSOptions(awsOptions);
 // Register AWS Transcribe Service with the configured options
 builder.Services.AddAWSService<IAmazonTranscribeService>();
 builder.Services.AddAWSService<IAmazonS3>();
+builder.Services.AddAWSService<IAmazonRekognition>();
+builder.Services.AddAWSService<IAmazonTextract>();
 //builder.Services.AddTransient<IMailService, MailService>();
 // Add services to the container.
 builder.Services.AddControllersWithViews()

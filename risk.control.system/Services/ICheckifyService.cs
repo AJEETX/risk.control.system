@@ -121,7 +121,7 @@ public class ICheckifyService : IICheckifyService
 
             await Task.WhenAll(faceMatchTask, addressTask, weatherTask);
 
-            var (confidence, compressImage) = await faceMatchTask;
+            var (confidence, compressImage, similarity) = await faceMatchTask;
             var address = await addressTask;
             var weatherData = await weatherTask;
 
@@ -136,8 +136,8 @@ public class ICheckifyService : IICheckifyService
             claim.AgencyReport.DigitalIdReport.DigitalIdImageMatchConfidence = confidence;
             claim.AgencyReport.DigitalIdReport.DigitalIdImageLocationAddress = address;
             claim.AgencyReport.DigitalIdReport.MatchExecuted = true;
-
-            var updateClaim = _context.ClaimsInvestigation.Update(claim);
+            claim.AgencyReport.DigitalIdReport.Similarity = similarity;
+           var updateClaim = _context.ClaimsInvestigation.Update(claim);
 
             var rows = await _context.SaveChangesAsync();
 

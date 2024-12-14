@@ -10,34 +10,34 @@
         public string? PanPhotoPath { get; set; }
         public string? PanMapPath { get; set; }
         public string? PanMapUrl { get; set; }
-        public string Flight { get; set; }
-        public string DepartureAirport { get; set; }
-        public string DepartureAbvr { get; set; }
-        public string BoardingGate { get; set; }
+        public string FaceMatchStatus { get; set; }
+        public string PersonName { get; set; }
+        public string Salutation { get; set; }
+        public string PersonContact { get; set; }
         public DateTime BoardingTill { get; set; }
-        public DateTime DepartureTime { get; set; }
-        public DateTime Arrival { get; set; }
+        public DateTime PhotoIdTime { get; set; }
+        public string WeatherData { get; set; }
         public string ArrivalAirport { get; set; }
         public string ArrivalAbvr { get; set; }
         public string Class { get; set; }
         public string ClassAdd { get; set; }
-        public string Seat { get; set; }
+        public string PhotoIdRemarks { get; set; }
 
         public override string ToString()
         {
             return "BoardingData{" +
-                    "Flight=" + Flight +
-                    ", DepartureAirport=" + DepartureAirport +
-                    ", DepartureAbvr=" + DepartureAbvr +
-                    ", BoardingGate=" + BoardingGate +
+                    "Flight=" + FaceMatchStatus +
+                    ", DepartureAirport=" + PersonName +
+                    ", DepartureAbvr=" + Salutation +
+                    ", BoardingGate=" + PersonContact +
                     ", BoardingTill=" + BoardingTill +
-                    ", DepartureTime=" + DepartureTime +
-                    ", Arrival=" + Arrival +
+                    ", DepartureTime=" + PhotoIdTime +
+                    ", Arrival=" + WeatherData +
                     ", ArrivalAirport=" + ArrivalAirport +
                     ", ArrivalAbvr=" + ArrivalAbvr +
                     ", Class=" + Class +
                     ", ClassAdd=" + ClassAdd +
-                    ", Seat=" + Seat +
+                    ", Seat=" + PhotoIdRemarks +
                      "}";
         }
     }

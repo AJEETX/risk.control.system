@@ -44,6 +44,8 @@ namespace risk.control.system.Models
         public string? AiSummary { get; set; }
         public DateTime? AiSummaryUpdated { get; set; }
 
+        public string? PdfReportFilePath { get; set; }
+
         public override string ToString()
         {
             return $"Agency Report Information:\n" +

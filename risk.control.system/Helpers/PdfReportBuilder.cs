@@ -227,7 +227,7 @@ namespace risk.control.system.Helpers
         private void AddContactInfo(TableCellBuilder cellBuilder)
         {
             cellBuilder.SetBorderStroke(Stroke.None).SetPadding(11, 11, 0, 0);
-            cellBuilder.AddParagraph(ConcertData.AddressVisitedTitle).SetFont(FNT12B).SetMargins(0, 9, 1, 4);
+            cellBuilder.AddParagraph(ConcertData.ExpectedAddressTitle).SetFont(FNT12B).SetMargins(0, 9, 1, 4);
             cellBuilder.AddParagraph(ConcertData.AddressVisited).SetFont(FNT9);
             cellBuilder.AddParagraph(ConcertData.ContactAgencyTitle).SetFont(FNT12B).SetMarginTop(10);
             cellBuilder.AddParagraph("").SetFont(FNT9)
@@ -269,10 +269,10 @@ namespace risk.control.system.Helpers
         private void FillTicketDataCounterFoil(TableCellBuilder cellBuilder)
         {
             cellBuilder.SetBorderStroke(Stroke.None);
-            cellBuilder.AddParagraph("Policy #").SetLineSpacing(1.4f);
-            cellBuilder.AddParagraph("Claim type").SetLineSpacing(1.4f);
-            cellBuilder.AddParagraph("Insured Amount").SetLineSpacing(1.4f);
-            cellBuilder.AddParagraph("Customer Name").SetLineSpacing(1.4f);
+            cellBuilder.AddParagraph(TicketData.PolicyNumTitle).SetLineSpacing(1.4f);
+            cellBuilder.AddParagraph(TicketData.ClaimTypeTitle).SetLineSpacing(1.4f);
+            cellBuilder.AddParagraph(TicketData.InsuredAmountTitle).SetLineSpacing(1.4f);
+            cellBuilder.AddParagraph(TicketData.PersonOfInterestNameTitle).SetLineSpacing(1.4f);
         }
 
         private void FillPersonalInfoCounterFoil(TableCellBuilder cellBuilder)
@@ -335,7 +335,7 @@ namespace risk.control.system.Helpers
         {
             cellBuilder
                 .SetPadding(19, 6, 0, 0)
-                .AddParagraph("Address visited")
+                .AddParagraph(ConcertData.AddressVisitedTitle)
                 .SetFont(FNT9)
                 .SetMarginBottom(19);
             cellBuilder.AddImage(BoardingData.PhotoIdMapPath,
@@ -348,7 +348,7 @@ namespace risk.control.system.Helpers
         {
             cellBuilder
                 .SetPadding(19, 6, 0, 0)
-                .AddParagraph("Location visited")
+                .AddParagraph(ConcertData.AddressVisitedTitle)
                 .SetFont(FNT9)
                 .SetMarginBottom(19);
             cellBuilder.AddImage(BoardingData.PanMapPath,
@@ -498,8 +498,8 @@ namespace risk.control.system.Helpers
                 },
                 {
                 new BoardingCell("Person Name", new FontText[] {
-                    new FontText (FNT12, BoardingData.DepartureAirport + " / "),
-                    new FontText (FNT12B, BoardingData.DepartureAbvr)
+                    new FontText (FNT12, BoardingData.PersonName + " / "),
+                    new FontText (FNT12B, BoardingData.Salutation)
                 }, 2),
                 EMPTY_ITEM,
                 new BoardingCell("Address", new FontText[] {
@@ -509,25 +509,22 @@ namespace risk.control.system.Helpers
                 EMPTY_ITEM
                 },
                 {
-                new BoardingCell("Match", FNT16_R, BoardingData.Flight),
-                new BoardingCell("Contact Number", FNT16, BoardingData.BoardingGate),
-                new BoardingCell("Status", FNT16, BoardingData.Class + " "
-                    +  BoardingData.ClassAdd),
-                new BoardingCell("Verified", FNT16_R, BoardingData.Seat,
-                    BoardingData.PhotoIdPath)
+                new BoardingCell("Match", FNT16_R, BoardingData.FaceMatchStatus),
+                new BoardingCell("Contact Number", FNT16, BoardingData.PersonContact),
+                new BoardingCell("", FNT16, ""),
+                new BoardingCell("Verified", FNT16_R, BoardingData.PhotoIdRemarks)
                 },
                 {
                 new BoardingCell("Visit Date", FNT16,
-                    BoardingData.DepartureTime.ToString(
+                    BoardingData.PhotoIdTime.ToString(
                                 "dd MMMM", DocumentLocale)),
                 new BoardingCell("Time", FNT16,
                     BoardingData.BoardingTill.ToString(
                                 "HH:mm", DocumentLocale)),
-                new BoardingCell("", FNT16,
-                    ""),
-                new BoardingCell("Weather", FNT16,
-                    BoardingData.Arrival.ToString(
-                                "HH:mm", DocumentLocale))
+                new BoardingCell("Photo", FNT16,
+                    "",BoardingData.PhotoIdPath),
+                new BoardingCell("Weather", FNT8,
+                    BoardingData.WeatherData)
                 }
             };
             return result;
@@ -546,8 +543,8 @@ namespace risk.control.system.Helpers
                 },
                 {
                 new BoardingCell("Document Name", new FontText[] {
-                    new FontText (FNT12, BoardingData0.DepartureAirport + " / "),
-                    new FontText (FNT12B, BoardingData0.DepartureAbvr)
+                    new FontText (FNT12, " / "),
+                    new FontText (FNT12B, BoardingData0.Salutation)
                 }, 2),
                 EMPTY_ITEM,
                 new BoardingCell("Address", new FontText[] {
@@ -557,25 +554,22 @@ namespace risk.control.system.Helpers
                 EMPTY_ITEM
                 },
                 {
-                new BoardingCell("Match", FNT16_R, BoardingData0.Flight),
-                new BoardingCell("PAN Number", FNT16, BoardingData0.BoardingGate),
-                new BoardingCell("Status", FNT16, BoardingData0.Class + " "
-                    +  BoardingData0.ClassAdd),
-                new BoardingCell("Verified", FNT16_R, BoardingData0.Seat,
-                    BoardingData.PanPhotoPath)
+                new BoardingCell("Match", FNT16_R, BoardingData0.FaceMatchStatus),
+                new BoardingCell("Contact Number", FNT16, BoardingData0.PersonContact),
+                new BoardingCell("", FNT16, " "),
+                new BoardingCell("Verified", FNT16_R, BoardingData0.PhotoIdRemarks)
                 },
                 {
                 new BoardingCell("Visit Date", FNT16,
-                    BoardingData0.DepartureTime.ToString(
+                    BoardingData0.PhotoIdTime.ToString(
                                 "dd MMMM", DocumentLocale)),
                 new BoardingCell("Time", FNT16,
                     BoardingData0.BoardingTill.ToString(
                                 "HH:mm", DocumentLocale)),
-                new BoardingCell("", FNT16,
-                    ""),
-                new BoardingCell("Weather", FNT16,
-                    BoardingData0.Arrival.ToString(
-                                "HH:mm", DocumentLocale))
+                new BoardingCell("Image", FNT16,
+                    "", BoardingData.PanPhotoPath),
+                new BoardingCell("Pan Scanned Info", FNT8,
+                    BoardingData0.WeatherData)
                 }
             };
             return result;

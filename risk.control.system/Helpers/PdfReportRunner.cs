@@ -9,7 +9,9 @@ namespace risk.control.system.Helpers
 {
     public class PdfReportRunner
     {
-        static string googleImagePath = $"google-map-{DateTime.Now.ToString("ddMMMyyyHHmmsss")}.png";
+        static string googlePhotoImagePath = $"google-photo-map-{DateTime.Now.ToString("ddMMMyyyHHmmsss")}.png";
+        static string googlePanImagePath = $"google-pan-map-{DateTime.Now.ToString("ddMMMyyyHHmmsss")}.png";
+        static string googlePersonAddressImagePath = $"google-person-address-map-{DateTime.Now.ToString("ddMMMyyyHHmmsss")}.png";
 
         public static async Task<DocumentBuilder> Run(string imagePath, ClaimsInvestigation claim)
         {
@@ -18,7 +20,7 @@ namespace risk.control.system.Helpers
             BoardingData boardingData = JsonConvert.DeserializeObject<BoardingData>(boardingJsonContent);
 
             var photoMatch = claim.AgencyReport.DigitalIdReport.Similarity > 70;
-            boardingData.Flight = photoMatch ? "YES" : "NO";
+            boardingData.FaceMatchStatus = photoMatch ? "YES" : "NO";
 
              
             string ticketJsonFile = CheckFile(Path.Combine("Files", "concert-ticket-data.json"));
@@ -44,25 +46,21 @@ namespace risk.control.system.Helpers
             folderName = Path.GetFileName(folderPath);    // "img"
             ticketData.AgencyLogo = Path.Combine(imagePath, folderName, fileName);
 
-            var photoIdPath = $"photo-id-{DateTime.Now.ToString("ddMMMyyyHHmmsss")}.jpg";
-            await File.WriteAllBytesAsync(Path.Combine(imagePath, "report", photoIdPath), claim.AgencyReport.DigitalIdReport.DigitalIdImage);
-            boardingData.PhotoIdPath = Path.Combine(imagePath, "report", photoIdPath);
-
+            var photoIdFilename = $"photo-id-{DateTime.Now.ToString("ddMMMyyyHHmmsss")}.jpg";
+            await File.WriteAllBytesAsync(Path.Combine(imagePath, "report", photoIdFilename), claim.AgencyReport.DigitalIdReport.DigitalIdImage);
+            boardingData.PhotoIdPath = Path.Combine(imagePath, "report", photoIdFilename);
 
             var panCardFileName = $"pan-card-{DateTime.Now.ToString("ddMMMyyyHHmmsss")}.jpg";
             await File.WriteAllBytesAsync(Path.Combine(imagePath, "report", panCardFileName), claim.AgencyReport.PanIdReport.DocumentIdImage);
             boardingData.PanPhotoPath = Path.Combine(imagePath, "report", panCardFileName);
 
-            googleImagePath = Path.Combine(imagePath, "report", googleImagePath);
-
-
-            var path = await DownloadMapImageAsync(claim.AgencyReport.DigitalIdReport.DigitalIdImageLocationUrl, googleImagePath);
+            var photoPath = await DownloadMapImageAsync(claim.AgencyReport.DigitalIdReport.DigitalIdImageLocationUrl, googlePhotoImagePath);
             boardingData.PhotoIdMapUrl = claim.AgencyReport.DigitalIdReport.DigitalIdImageLocationUrl;
-            boardingData.PhotoIdMapPath = path;
+            boardingData.PhotoIdMapPath = photoPath;
 
-            path = await DownloadMapImageAsync(claim.AgencyReport.PanIdReport.DocumentIdImageLocationUrl, googleImagePath);
+            var panPath = await DownloadMapImageAsync(claim.AgencyReport.PanIdReport.DocumentIdImageLocationUrl, googlePanImagePath);
             boardingData.PanMapUrl = claim.AgencyReport.PanIdReport.DocumentIdImageLocationUrl;
-            boardingData.PanMapPath = path;
+            boardingData.PanMapPath = panPath;
 
             string personAddressUrl = string.Empty;
             string contactNumer = string.Empty;
@@ -80,29 +78,29 @@ namespace risk.control.system.Helpers
                 contactNumer = claim.BeneficiaryDetail.ContactNumber;
                 personAddressUrl = claim.BeneficiaryDetail.BeneficiaryLocationMap;
             }
-            path = await DownloadMapImageAsync(personAddressUrl, googleImagePath);
+            var addressPath = await DownloadMapImageAsync(personAddressUrl, googlePersonAddressImagePath);
 
-            boardingData.PersonAddressImage = path;
-            boardingData.DepartureAirport = ticketData.PersonOfInterestName;
-            boardingData.DepartureAbvr = "MR/MS";
-            boardingData.BoardingGate = contactNumer;
+            boardingData.PersonAddressImage = addressPath;
+            boardingData.PersonName = ticketData.PersonOfInterestName;
+            boardingData.Salutation = "MR/MS";
+            boardingData.PersonContact = contactNumer;
             boardingData.BoardingTill = claim.AgencyReport.DigitalIdReport.Updated.Value;
-            boardingData.DepartureTime = claim.AgencyReport.DigitalIdReport.Created;
-            boardingData.Arrival = claim.AgencyReport.Created;
+            boardingData.PhotoIdTime = claim.AgencyReport.DigitalIdReport.Created;
+            boardingData.WeatherData = claim.AgencyReport.DigitalIdReport.DigitalIdImageData;
             boardingData.ArrivalAirport = "";
             boardingData.ArrivalAbvr = claim.AgencyReport.DigitalIdReport.DigitalIdImageLocationAddress;
-
+            //boardingData.PhotoIdRemarks = claim.AgencyReport.DigitalIdReport.DigitalIdImageLocationAddress;
             string jsonFile = CheckFile(Path.Combine("Files", "concert-data.json"));
             string jsonContent = File.ReadAllText(jsonFile);
             ConcertData concertData = JsonConvert.DeserializeObject<ConcertData>(jsonContent);
 
-            concertData.ReportSummary = claim.AgencyReport?.AgentRemarks;
+            concertData.ReportSummary = claim.AgencyReport?.SupervisorRemarks;
             concertData.AgencyDomain = claim.Vendor.Email;
             concertData.AgencyContact = claim.Vendor.PhoneNumber;
             concertData.SupervisorEmail = claim.AgencyReport?.SupervisorEmail;
             concertData.AddressVisited = ticketData.VerifyAddress;
-            concertData.WeatherDetail = claim.AgencyReport.SupervisorRemarks;
-            concertData.ReportSummaryDescription =new List<string> { claim.AgencyReport?.AssessorRemarks };
+            concertData.WeatherDetail = claim.AgencyReport.AssessorRemarks;
+            concertData.ReportSummaryDescription =new List<string> { claim.AgencyReport?.AgentRemarks };
 
             var ticketJsonFile1 = CheckFile(Path.Combine("Files", "bp-ticket-data.json"));
             var ticketJsonContent1 = File.ReadAllText(ticketJsonFile1);
@@ -117,15 +115,15 @@ namespace risk.control.system.Helpers
             string boardingJsonContent0 = File.ReadAllText(boardingJsonFile0);
             BoardingData boardingData0 = JsonConvert.DeserializeObject<BoardingData>(boardingJsonContent0);
             var panValid = claim.AgencyReport.PanIdReport.DocumentIdImageValid.GetValueOrDefault();
-            boardingData0.Flight = panValid ? "YES" : "NO";
-            boardingData0.DepartureAirport = claim.AgencyReport.PanIdReport.DocumentIdImageData.Length > 30 ? 
+            boardingData0.FaceMatchStatus = panValid ? "YES" : "NO";
+            boardingData0.PersonName = claim.AgencyReport.PanIdReport.DocumentIdImageData.Length > 30 ? 
                 claim.AgencyReport.PanIdReport.DocumentIdImageData.Substring(0,30) + "...": 
                 claim.AgencyReport.PanIdReport.DocumentIdImageData;
-            boardingData0.DepartureAbvr = "PAN/CARD";
-            boardingData0.BoardingGate = contactNumer;
+            boardingData0.Salutation = "PAN/CARD";
+            boardingData0.PersonContact = contactNumer;
             boardingData0.BoardingTill = claim.AgencyReport.PanIdReport.Created;
-            boardingData0.DepartureTime = claim.AgencyReport.PanIdReport.Created;
-            boardingData0.Arrival = claim.AgencyReport.Created;
+            boardingData0.PhotoIdTime = claim.AgencyReport.PanIdReport.Created;
+            boardingData0.WeatherData = claim.AgencyReport.PanIdReport.DocumentIdImageData;
             boardingData0.ArrivalAirport = "";
             boardingData0.ArrivalAbvr = claim.AgencyReport.PanIdReport.DocumentIdImageLocationAddress;
 

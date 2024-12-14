@@ -11,6 +11,7 @@
         public string WeatherDetail { get; set; }
 
         public string AddressVisitedTitle { get; set; }
+        public string ExpectedAddressTitle { get; set; }
         public string AddressVisited { get; set; }
         public string ContactAgencyTitle { get; set; }
         public string SupervisorEmail { get; set; }
