@@ -33,7 +33,10 @@ namespace risk.control.system.Services
                 var panNumber = allText.Substring(panTextPre + txt2Find.Length + 1, 10);
 
                 var annotation = textAnnotations.FirstOrDefault(t => t.Description.Trim().ToUpperInvariant() == panNumber.Trim().ToUpperInvariant());
-
+                if(annotation is null)
+                {
+                    return inputImage;
+                }
                 var allVertices = annotation.BoundingPoly.Vertices;
 
                 var left = allVertices[0].X;

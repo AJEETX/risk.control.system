@@ -22,6 +22,23 @@ $(document).ready(function () {
             url: '/api/Manager/GetActive',
             dataSrc: ''
         },
+        columnDefs: [
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 1                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-number', // Apply the CSS class,
+                targets: 2                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 4                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 6                      // Index of the column to style
+            }],
         order: [[12, 'desc']],
         fixedHeader: true,
         processing: true,

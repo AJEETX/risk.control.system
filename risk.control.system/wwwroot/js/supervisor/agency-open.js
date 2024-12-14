@@ -20,6 +20,19 @@
             url: '/api/agency/Supervisor/GetOpen',
             dataSrc: ''
         },
+        columnDefs: [
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 1                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-number', // Apply the CSS class,
+                targets: 2                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 4                      // Index of the column to style
+            }],
         order: [[13, 'asc']],
         fixedHeader: true,
         processing: true,

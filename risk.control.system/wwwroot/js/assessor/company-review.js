@@ -21,6 +21,23 @@
             url: '/api/Assessor/GetReview',
             dataSrc: ''
         },
+        columnDefs: [
+        {
+            className: 'max-width-column-name', // Apply the CSS class,
+            targets: 2                      // Index of the column to style
+        },
+        {
+            className: 'max-width-column-number', // Apply the CSS class,
+            targets: 3                      // Index of the column to style
+        },
+        {
+            className: 'max-width-column-name', // Apply the CSS class,
+            targets: 5                      // Index of the column to style
+        },
+        {
+            className: 'max-width-column-name', // Apply the CSS class,
+            targets: 7                      // Index of the column to style
+        }],
         order: [[13, 'desc']],
         fixedHeader: true,
         processing: true,

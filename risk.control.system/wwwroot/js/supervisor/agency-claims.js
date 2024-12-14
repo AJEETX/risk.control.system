@@ -65,7 +65,19 @@
             'render': function (data, type, full, meta) {
                 return '<input type="checkbox" name="selectedcase[]" value="' + $('<div/>').text(data).html() + '">';
             }
-        }],
+        },
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 2                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-number', // Apply the CSS class,
+                targets: 3                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 5                      // Index of the column to style
+            }],
         order: [[13, 'asc']],
         fixedHeader: true,
         processing: true,

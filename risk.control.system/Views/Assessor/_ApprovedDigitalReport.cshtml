@@ -13,7 +13,7 @@
     {
         borderColor = "";
     }
-    else if (string.IsNullOrWhiteSpace(@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImageMatchConfidence) && @digitalIdColor == "green")
+    else if (@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.Similarity < 70 && @digitalIdColor == "green")
     {
         borderColor = "border-danger";
     }
@@ -29,7 +29,7 @@
             </div>
             <div class="card-footer text-center">
                 <span class="badge badge-light"><i class="fas fa-portrait"></i> Match :  </span>
-                @if (string.IsNullOrWhiteSpace(@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImageMatchConfidence))
+                @if (@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.Similarity < 70)
                 {
                     <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i>
                 }

@@ -20,7 +20,20 @@
             url: '/api/agency/Supervisor/GetCompleted',
             dataSrc: ''
         },
-        order: [[11, 'desc']],
+        columnDefs: [
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 1                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-number', // Apply the CSS class,
+                targets: 2                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 4                      // Index of the column to style
+            }],
+        order: [[12, 'desc']],
         fixedHeader: true,
         processing: true,
         paging: true,
@@ -52,15 +65,6 @@
                 }
             },
             { "data": "name" },
-            {
-                "sDefaultContent": "",
-                "bSortable": false,
-                "mRender": function (data, type, row) {
-                    var img = '<img alt="' + row.beneficiaryName + '" title="' + row.beneficiaryName + '" src="' + row.beneficiaryPhoto + '" class="table-profile-image" data-toggle="tooltip"/>';
-                    return img;
-                }
-            },
-            { "data": "beneficiaryName" },
             { "data": "serviceType" },
             { "data": "service" },
             {
@@ -81,7 +85,8 @@
                     buttons += '<a href="/Report/PrintPdfReport?Id=' + row.id + '" class="btn btn-xs btn-danger"><i class="far fa-file-pdf"></i> PDF</a>&nbsp;'
                     return buttons;
                 }
-            }
+            },
+            { "data": "timeElapsed", "bVisible": false }
         ],
         error: function (xhr, status, error) { alert('err ' + error) }
     });

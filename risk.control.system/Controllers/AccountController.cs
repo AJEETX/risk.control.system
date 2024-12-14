@@ -160,13 +160,13 @@ namespace risk.control.system.Controllers
             {
                 var email = HttpUtility.HtmlEncode(model.Email);
                 var pwd = HttpUtility.HtmlEncode(model.Password);
-                var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
+                var result = await _signInManager.PasswordSignInAsync(email, pwd, model.RememberMe, lockoutOnFailure: false);
                 var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
                 var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
                 var BaseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
                 if (result.Succeeded)
                 {
-                    var user = await _userManager.FindByEmailAsync(model.Email);
+                    var user = await _userManager.FindByEmailAsync(email);
                     var roles = await _userManager.GetRolesAsync(user);
                     if (roles != null && roles.Count > 0)
                     {
@@ -184,7 +184,7 @@ namespace risk.control.system.Controllers
                         {
                             vendorIsActive = _context.Vendor.Any(c => c.VendorId == vendorUser.VendorId && c.Status == Models.VendorStatus.ACTIVE);
                         }
-                        if (companyIsActive && user.Active || vendorIsActive && user.Active || companyUser == null && vendorUser == null)
+                        if (companyIsActive && user.Active || vendorIsActive && user.Active || companyUser == null && vendorUser == null || (vendorUser.Role == AppRoles.AGENT && !string.IsNullOrWhiteSpace(user.MobileUId)))
                         {
                             var claims = new List<Claim> {
                             new Claim(ClaimTypes.NameIdentifier, model.Email) ,

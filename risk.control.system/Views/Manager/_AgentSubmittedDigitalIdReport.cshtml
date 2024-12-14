@@ -12,13 +12,13 @@
                                             borderColor = "";
                                         }
                                         else if (Model.ClaimsInvestigation.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime != null &&
-                                        string.IsNullOrWhiteSpace(@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImageMatchConfidence))
+         @Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.Similarity < 70)
                                         {
                                             digitalIdColor = "#dc3545!important";
                                             borderColor = "border-danger";
                                         }
                                         else if (Model.ClaimsInvestigation.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime != null &&
-                                        !string.IsNullOrWhiteSpace(@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImageMatchConfidence))
+         @Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.Similarity >= 70)
                                         {
                                             borderColor = "border-success";
                                             digitalIdColor = "green";
@@ -47,7 +47,7 @@
         </div>
         <div class="card-footer text-center">
             <span class="badge badge-light"><i class="fas fa-portrait"></i> Match :  </span>
-            @if (string.IsNullOrWhiteSpace(@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImageMatchConfidence))
+                    @if (@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.Similarity < 70)
             {
                 <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i>
             }
