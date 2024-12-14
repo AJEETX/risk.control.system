@@ -2,6 +2,9 @@
 
 <form id="radioButtons" method="post" asp-controller="ClaimsVendorPost" asp-action="AllocateToVendorAgent" enctype="multipart/form-data">
     <div class="card-body">
+        <div class="submit-progress hidden">
+            <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+        </div>
         <div class="table-responsive mailbox-messages">
             <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
             <input type="hidden" id="CaseLocationId" name="CaseLocationId" value="@Model.CaseLocation.BeneficiaryDetailId" />

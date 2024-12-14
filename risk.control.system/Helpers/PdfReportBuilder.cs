@@ -191,7 +191,7 @@ namespace risk.control.system.Helpers
             cellBuilder
                .AddParagraph(TicketData.AgencyNameTitle);
             cellBuilder
-                .AddParagraph(TicketData.AgencyName).SetLineSpacing(1.5f);
+                .AddParagraph("").SetLineSpacing(1.5f).AddUrl(ConcertData.AgencyDomain);
             cellBuilder
                 .AddQRCodeUrl(TicketData.ReportQr, 4,
                               Color.Black, Color.White, false).SetHeight(100);

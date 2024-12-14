@@ -84,12 +84,19 @@ namespace risk.control.system.Helpers
             boardingData.PersonName = ticketData.PersonOfInterestName;
             boardingData.Salutation = "MR/MS";
             boardingData.PersonContact = contactNumer;
-            boardingData.BoardingTill = claim.AgencyReport.DigitalIdReport.Updated.Value;
-            boardingData.PhotoIdTime = claim.AgencyReport.DigitalIdReport.Created;
+            boardingData.BoardingTill = claim.AgencyReport.DigitalIdReport.DigitalIdImageLongLatTime.GetValueOrDefault();
+            boardingData.PhotoIdTime = claim.AgencyReport.DigitalIdReport.DigitalIdImageLongLatTime.GetValueOrDefault();
             boardingData.WeatherData = claim.AgencyReport.DigitalIdReport.DigitalIdImageData;
             boardingData.ArrivalAirport = "";
             boardingData.ArrivalAbvr = claim.AgencyReport.DigitalIdReport.DigitalIdImageLocationAddress;
-            //boardingData.PhotoIdRemarks = claim.AgencyReport.DigitalIdReport.DigitalIdImageLocationAddress;
+            if(photoMatch)
+            {
+                boardingData.PhotoIdRemarks = $"CONFIRM";
+            }
+            else
+            {
+                boardingData.PhotoIdRemarks = $"NOT SURE";
+            }
             string jsonFile = CheckFile(Path.Combine("Files", "concert-data.json"));
             string jsonContent = File.ReadAllText(jsonFile);
             ConcertData concertData = JsonConvert.DeserializeObject<ConcertData>(jsonContent);
@@ -105,7 +112,6 @@ namespace risk.control.system.Helpers
             var ticketJsonFile1 = CheckFile(Path.Combine("Files", "bp-ticket-data.json"));
             var ticketJsonContent1 = File.ReadAllText(ticketJsonFile1);
             var ticketData1 = JsonConvert.DeserializeObject<TicketData1>(ticketJsonContent1);
-
             
             string ticketJsonFile0 = CheckFile(Path.Combine("Files", "bp-ticket-data1.json"));
             string ticketJsonContent0 = File.ReadAllText(ticketJsonFile0);
@@ -121,12 +127,12 @@ namespace risk.control.system.Helpers
                 claim.AgencyReport.PanIdReport.DocumentIdImageData;
             boardingData0.Salutation = "PAN/CARD";
             boardingData0.PersonContact = contactNumer;
-            boardingData0.BoardingTill = claim.AgencyReport.PanIdReport.Created;
-            boardingData0.PhotoIdTime = claim.AgencyReport.PanIdReport.Created;
+            boardingData0.BoardingTill = claim.AgencyReport.PanIdReport.DocumentIdImageLongLatTime.GetValueOrDefault();
+            boardingData0.PhotoIdTime = claim.AgencyReport.PanIdReport.DocumentIdImageLongLatTime.GetValueOrDefault();
             boardingData0.WeatherData = claim.AgencyReport.PanIdReport.DocumentIdImageData;
             boardingData0.ArrivalAirport = "";
             boardingData0.ArrivalAbvr = claim.AgencyReport.PanIdReport.DocumentIdImageLocationAddress;
-
+            boardingData0.PhotoIdRemarks = panValid ? "CONFIRM" : "NOT SURE";
             PdfReportBuilder ConcertTicketBuilder = new PdfReportBuilder();
 
             ConcertTicketBuilder.TicketData = ticketData;
