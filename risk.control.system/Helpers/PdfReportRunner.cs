@@ -9,9 +9,6 @@ namespace risk.control.system.Helpers
 {
     public class PdfReportRunner
     {
-        static string googlePhotoImagePath = $"google-photo-map-{DateTime.Now.ToString("ddMMMyyyHHmmsss")}.png";
-        static string googlePanImagePath = $"google-pan-map-{DateTime.Now.ToString("ddMMMyyyHHmmsss")}.png";
-        static string googlePersonAddressImagePath = $"google-person-address-map-{DateTime.Now.ToString("ddMMMyyyHHmmsss")}.png";
 
         public static async Task<DocumentBuilder> Run(string imagePath, ClaimsInvestigation claim)
         {
@@ -54,10 +51,12 @@ namespace risk.control.system.Helpers
             await File.WriteAllBytesAsync(Path.Combine(imagePath, "report", panCardFileName), claim.AgencyReport.PanIdReport.DocumentIdImage);
             boardingData.PanPhotoPath = Path.Combine(imagePath, "report", panCardFileName);
 
+            string googlePhotoImagePath = Path.Combine(imagePath, "report", $"google-photo-map-{DateTime.Now.ToString("ddMMMyyyHHmmsss")}.png"); 
             var photoPath = await DownloadMapImageAsync(claim.AgencyReport.DigitalIdReport.DigitalIdImageLocationUrl, googlePhotoImagePath);
             boardingData.PhotoIdMapUrl = claim.AgencyReport.DigitalIdReport.DigitalIdImageLocationUrl;
             boardingData.PhotoIdMapPath = photoPath;
 
+            string googlePanImagePath = Path.Combine(imagePath, "report", $"google-pan-map-{DateTime.Now.ToString("ddMMMyyyHHmmsss")}.png");
             var panPath = await DownloadMapImageAsync(claim.AgencyReport.PanIdReport.DocumentIdImageLocationUrl, googlePanImagePath);
             boardingData.PanMapUrl = claim.AgencyReport.PanIdReport.DocumentIdImageLocationUrl;
             boardingData.PanMapPath = panPath;
@@ -78,6 +77,7 @@ namespace risk.control.system.Helpers
                 contactNumer = claim.BeneficiaryDetail.ContactNumber;
                 personAddressUrl = claim.BeneficiaryDetail.BeneficiaryLocationMap;
             }
+            string googlePersonAddressImagePath = Path.Combine(imagePath, "report", $"google-person-address-map-{DateTime.Now.ToString("ddMMMyyyHHmmsss")}.png");
             var addressPath = await DownloadMapImageAsync(personAddressUrl, googlePersonAddressImagePath);
 
             boardingData.PersonAddressImage = addressPath;

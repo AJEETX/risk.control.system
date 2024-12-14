@@ -490,7 +490,7 @@ namespace risk.control.system.Helpers
             BoardingCell[,] result =
             {
                 {
-                new BoardingCell("Investigation Type", FNT18,
+                new BoardingCell("Investigation Type", FNT15,
                     TicketData1.Passenger, 4),
                     EMPTY_ITEM,
                     EMPTY_ITEM,
@@ -535,7 +535,7 @@ namespace risk.control.system.Helpers
             BoardingCell[,] result =
             {
                 {
-                new BoardingCell("Investigation Type", FNT18,
+                new BoardingCell("Investigation Type", FNT15,
                     TicketData0.Passenger, 4),
                     EMPTY_ITEM,
                     EMPTY_ITEM,
