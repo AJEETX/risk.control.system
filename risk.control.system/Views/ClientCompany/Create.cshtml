@@ -25,7 +25,7 @@
                                 <span class="input-group-text" id="emailid"><i class="fa fa-globe"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                             </div>
                             <input asp-for="Email" id="emailAddress" class="form-control email-address remarks" type="text" value="" onblur="CheckIfEmailValid();" required
-                                   placeholder="domain name" maxlength="10" onkeydown='return alphaOnly(event);' onClick="this.select();" autocomplete="off">
+                                   placeholder="domain name" maxlength="15" onkeydown='return alphaOnly(event);' onClick="this.select();" autocomplete="off">
                             <div class="input-group-append">
                                 <select id="domain" name="domain" asp-for="Email" required class="form-control remarks" asp-items="Html.GetEnumSelectList<Domain>()">
                                 </select>
@@ -107,7 +107,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text" id="Branch"><i class="far fa-building"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <input type="text" asp-for="Branch" class="form-control remarks title-name" required placeholder="Branch Name" maxlength="20" value="Forest Hill Chase">
+                                <input type="text" asp-for="Branch" class="form-control remarks title-name" required placeholder="Branch Name" maxlength="30" value="Forest Hill Chase">
                                 <span asp-validation-for="Branch" class="text-danger"></span>
                             </div>
                         </div>
@@ -118,7 +118,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text" id="BankName"> <i class="fas fa-landmark"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <input type="text" asp-for="BankName" class="form-control remarks title-name" required placeholder="Bank Name" maxlength="20" value="Westpac">
+                                <input type="text" asp-for="BankName" class="form-control remarks title-name" required placeholder="Bank Name" maxlength="30" value="Westpac">
                                 <span asp-validation-for="BankName" class="text-danger"></span>
                             </div>
                         </div>
@@ -128,7 +128,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text" id="BankAccountNumber"><i class="fab fa-btc"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <input type="number" asp-for="BankAccountNumber" class="form-control remarks" required placeholder="Bank Account #">
+                                <input type="text" asp-for="BankAccountNumber" class="form-control remarks" required placeholder="Bank Account #" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" maxlength="20">
                                 <span asp-validation-for="BankAccountNumber" class="text-danger"></span>
                             </div>
                         </div>
@@ -217,7 +217,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text" id="Addressline"><i class="fa fa-home"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <input type="text" asp-for="Addressline" class="form-control remarks" placeholder="Address" maxlength="30" />
+                                <input type="text" asp-for="Addressline" class="form-control remarks" placeholder="Address" maxlength="50" />
                                 <span asp-validation-for="Addressline" class="text-danger"></span>
                             </div>
                         </div>
@@ -233,7 +233,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text" id="Comments"><i class="fas fa-edit"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <input type="text" asp-for="Description" class="form-control remarks" placeholder="Note" maxlength="30" />
+                                <input type="text" asp-for="Description" class="form-control remarks" placeholder="Note" maxlength="50" />
                                 <span asp-validation-for="Description" class="text-danger"></span>
                             </div>
                         </div>

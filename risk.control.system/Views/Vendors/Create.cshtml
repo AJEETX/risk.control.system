@@ -24,7 +24,7 @@
                                 <span class="input-group-text" id="emailid"><i class="fa fa-globe"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                             </div>
                             <input asp-for="Email" id="emailAddress" class="form-control email-address remarks" type="text" value="" onblur="CheckIfEmailValid();" required
-                                   placeholder="domain name" maxlength="10" onkeydown='return alphaOnly(event);' onClick="this.select();" autocomplete="name">
+                                   placeholder="domain name" maxlength="15" onkeydown='return alphaOnly(event);' onClick="this.select();" autocomplete="name">
                             <div class="input-group-append">
                                 <select id="domain" name="domain" asp-for="DomainName" required class="form-control remarks" asp-items="Html.GetEnumSelectList<Domain>()">
                                 </select>
@@ -112,7 +112,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text" id="BankName"> <i class="fas fa-landmark"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <input type="text" asp-for="BankName" class="form-control remarks title-name" required placeholder="Bank Name" value="Commonwealth" maxlength="20">
+                                <input type="text" asp-for="BankName" class="form-control remarks title-name" required placeholder="Bank Name" value="Commonwealth" maxlength="30">
                                 <span asp-validation-for="BankName" class="text-danger"></span>
                             </div>
                         </div>
@@ -123,7 +123,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text" id="BankAccountNumber"><i class="fab fa-btc"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <input type="number" asp-for="BankAccountNumber" class="form-control remarks" required placeholder="Bank Account #" value="12345" min="1" maxlength="20">
+                                <input type="text" asp-for="BankAccountNumber" class="form-control remarks" required placeholder="Bank Account #" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" maxlength="20">
                                 <span asp-validation-for="BankAccountNumber" class="text-danger"></span>
                             </div>
                         </div>
@@ -233,7 +233,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text" id="Addressline"><i class="fas fa-home"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <input type="text" asp-for="Addressline" class="form-control remarks" placeholder="Address line" required maxlength="20" value="99 Great Avenue" />
+                                <input type="text" asp-for="Addressline" class="form-control remarks" placeholder="Address line" required maxlength="50" value="99 Great Avenue" />
                                 <span asp-validation-for="Addressline" class="text-danger"></span>
                             </div>
                         </div>
@@ -246,7 +246,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text" id="Description"><i class="fas fa-pencil-alt"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <input type="text" asp-for="Description" class="form-control remarks" value="Add new Agency" placeholder="Remarks" required maxlength="30" />
+                                <input type="text" asp-for="Description" class="form-control remarks" value="Add new Agency" placeholder="Remarks" required maxlength="50" />
                                 <span asp-validation-for="Description" class="text-danger"></span>
                             </div>
                         </div>

@@ -36,7 +36,7 @@
                                             <span class="input-group-text" id="emailid"><i class="fas fa-at"></i> <i class="fa fa-asterisk asterik-style"></i> </span>
                                         </div>
                                         <input type="text" asp-for="Email" id="emailAddress" class="form-control email-address" value="" onblur="CheckIfEmailValid();" required
-                                               placeholder="Enter User Email prefix" maxlength="20" onkeydown='return alphaOnly(event);' onClick="this.select();" autocomplete="name">
+                                               placeholder="Enter User Email prefix" maxlength="15" onkeydown='return alphaOnly(event);' onClick="this.select();" autocomplete="name">
                                         <div class="input-group-append">
                                             <span class="input-group-text" id="Email">@@@email</span>
                                         </div>
@@ -133,7 +133,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" id="Comments"> <i class="fa fa-asterisk asterik-style" style="color:#e9ecef;"></i><i class="fas fa-comment"></i> </span>
                                             </div>
-                                            <input type="text" asp-for="Comments" class="form-control remarks" placeholder="Remarks (optional)" maxlength="20" autocomplete="off" />
+                                            <input type="text" asp-for="Comments" class="form-control remarks" placeholder="Remarks (optional)" maxlength="50" autocomplete="off" />
                                         </div>
                                     </div>
                                     <div class="form-group">
@@ -212,7 +212,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" id="Addressline"><i class="fa fa-home"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
-                                            <input type="text" asp-for="Addressline" class="form-control remarks" placeholder="Enter Address line" required maxlength="20" autocomplete="off" />
+                                            <input type="text" asp-for="Addressline" class="form-control remarks" placeholder="Enter Address line" required maxlength="50" autocomplete="off" />
                                             <span asp-validation-for="Addressline" class="text-danger"></span>
                                         </div>
                                     </div>

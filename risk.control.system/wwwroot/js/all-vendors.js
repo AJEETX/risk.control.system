@@ -5,6 +5,19 @@
             url: '/api/Agency/AllAgencies',
             dataSrc: ''
         },
+        columnDefs: [
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 2                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column', // Apply the CSS class,
+                targets: 5                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 9                      // Index of the column to style
+            }],
         order: [[2, 'asc']],
         fixedHeader: true,
         processing: true,
@@ -30,7 +43,16 @@
             { "data": "domain" },
             { "data": "code" },
             { "data": "phone" },
-            { "data": "address", bSortable: false },
+            {
+                {
+                "data": "addressline",
+                bSortable: false,
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.addressline + '" data-toggle="tooltip">' + row.addressline + '</span>'
+                }
+            }, ,
+                bSortable: false
+            },
             { "data": "pincode" },
             { "data": "status" },
             { "data": "updated" },

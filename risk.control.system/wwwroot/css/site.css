@@ -385,6 +385,7 @@ a.table-link {
     border: .1px ridge #ccc;
 }
 
+
 .report-image {
     width: 16rem;
     height: 5rem;
@@ -1160,6 +1161,12 @@ img.table-profile-image-user-inactive {
     width: 2.5rem;
     border: 2px solid orange;
 }
+img.table-profile-image-no-user {
+    border-radius: 50%;
+    height: 2.5rem;
+    width: 2.5rem;
+    border: 2px solid red;
+}
 
 img.doc-profile-image {
     height: 2.5rem;
@@ -1476,6 +1483,12 @@ ul#messagesList {
     overflow: hidden; /* Ensures overflow is hidden */
     text-overflow: ellipsis; /* Adds ellipsis if text overflows */
 }
+.max-width-column-email {
+    max-width: 150px;
+    white-space: nowrap; /* Prevents text wrapping */
+    overflow: hidden; /* Ensures overflow is hidden */
+    text-overflow: ellipsis; /* Adds ellipsis if text overflows */
+}
 .max-width-column-name {
     max-width: 100px;
     white-space: nowrap; /* Prevents text wrapping */
@@ -1484,6 +1497,12 @@ ul#messagesList {
 }
 .max-width-column-number {
     max-width: 100px;
+    white-space: nowrap; /* Prevents text wrapping */
+    overflow: hidden; /* Ensures overflow is hidden */
+    text-overflow: ellipsis; /* Adds ellipsis if text overflows */
+}
+.max-width-column-claim {
+    max-width: 60px;
     white-space: nowrap; /* Prevents text wrapping */
     overflow: hidden; /* Ensures overflow is hidden */
     text-overflow: ellipsis; /* Adds ellipsis if text overflows */

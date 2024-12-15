@@ -4,6 +4,23 @@
             url: '/api/Agency/GetAgentLoad',
             dataSrc: ''
         },
+        columnDefs: [
+            {
+                className: 'max-width-column-email', // Apply the CSS class,
+                targets: 2                      // Index of the column to style
+            },
+        {
+            className: 'max-width-column', // Apply the CSS class,
+            targets: 4                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-claim', // Apply the CSS class,
+                targets: 7                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 8                      // Index of the column to style
+            }],
         fixedHeader: true,
         processing: true,
         paging: true,
@@ -22,18 +39,32 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var img;
-                    if (row.agentOnboarded) {
+                    if (row.agentOnboarded && row.active) {
                         img = '<img alt="' + row.name + '" title="' + row.name + '" src="' + row.photo + '" class="table-profile-image" data-toggle="tooltip"/>';
                     }
-                    else {
+                    else if (!row.agentOnboarded) {
                         img = '<img alt="' + row.name + '" title="Onboarding incomplete !!! ' + row.name + '" src="' + row.photo + '" class="table-profile-image-agent-onboard" data-toggle="tooltip"/>';
+                    }
+                    else {
+                        img = '<img alt="' + row.name + '" title="Inactive !!! ' + row.name + '" src="' + row.photo + '" class="table-profile-image-agent-onboard" data-toggle="tooltip"/>';
                     }
                     return img;
                 }
             },
-            { "data": "email" },
+            {
+                "data": "email",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.rawEmail + '" data-toggle="tooltip">' + data + '</span>'
+                }
+            },
             { "data": "phone" },
-            { "data": "addressline" , bSortable:false },
+            {
+                "data": "address",
+                bSortable: false,
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.address + '" data-toggle="tooltip">' + row.address + '</span>'
+                }
+            },
             {
                 "sDefaultContent": "",
                 "bSortable": false,

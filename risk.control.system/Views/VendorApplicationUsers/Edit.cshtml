@@ -84,7 +84,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text" id="Comments"><i class="fas fa-comment"></i> <i class="fa fa-asterisk asterik-style-none"></i></span>
                                 </div>
-                                <input type="text" asp-for="Comments" class="form-control remarks" placeholder="Note (optional)" maxlength="20" />
+                                <input type="text" asp-for="Comments" class="form-control remarks" placeholder="Note (optional)" maxlength="50" />
                             </div>
                         </div>
                     </div>
@@ -151,7 +151,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text" id="Addressline"><i class="fa fa-home"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <input type="text" asp-for="Addressline" class="form-control remarks" placeholder="Enter Address line" maxlength="30" required />
+                                <input type="text" asp-for="Addressline" class="form-control remarks" placeholder="Enter Address line" maxlength="50" required />
                                 <span asp-validation-for="Addressline" class="text-danger"></span>
                             </div>
                         </div>

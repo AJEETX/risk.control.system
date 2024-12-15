@@ -183,8 +183,16 @@ namespace risk.control.system.Controllers
                         else if (vendorUser != null)
                         {
                             vendorIsActive = _context.Vendor.Any(c => c.VendorId == vendorUser.VendorId && c.Status == Models.VendorStatus.ACTIVE);
+                            if (await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED) && vendorIsActive)
+                            {
+                                var userIsAgent = vendorUser.Role == AppRoles.AGENT;
+                                if(userIsAgent)
+                                {
+                                    vendorIsActive = !string.IsNullOrWhiteSpace(user.MobileUId);
+                                }
+                            }
                         }
-                        if (companyIsActive && user.Active || vendorIsActive && user.Active || companyUser == null && vendorUser == null || (vendorUser.Role == AppRoles.AGENT && !string.IsNullOrWhiteSpace(user.MobileUId)))
+                        if (companyIsActive && user.Active || vendorIsActive && user.Active || companyUser == null && vendorUser == null )
                         {
                             var claims = new List<Claim> {
                             new Claim(ClaimTypes.NameIdentifier, model.Email) ,
