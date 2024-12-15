@@ -44,14 +44,11 @@
             { "data": "code" },
             { "data": "phone" },
             {
-                {
-                "data": "addressline",
+                "data": "address",
                 bSortable: false,
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.addressline + '" data-toggle="tooltip">' + row.addressline + '</span>'
+                    return '<span title="' + row.address + '" data-toggle="tooltip">' + row.address + '</span>'
                 }
-            }, ,
-                bSortable: false
             },
             { "data": "pincode" },
             { "data": "status" },
