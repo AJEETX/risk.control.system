@@ -32,36 +32,6 @@
                     </span>
                 </h3>
             </div>
-            @{
-                bool policyExist = true;
-                bool customerExist = Model.CustomerDetail != null;
-                bool beneficiaryExist = Model.BeneficiaryDetail != null;
-
-                string customerProgressColor = "steps2";
-                string customerLineColor = "line";
-                if (Model.PolicyDetail?.ContractNumber != null)
-                {
-                    customerLineColor = "line0";
-                }
-                if (@customerExist)
-                {
-                    customerProgressColor = "steps";
-                    customerLineColor = "line0";
-                }
-                string benficiaryProgressColor = "steps3";
-                string beneficiaryLineColor = "line";
-
-                if (@customerExist)
-                {
-                    benficiaryProgressColor = "steps2";
-                    beneficiaryLineColor = "line0";
-                }
-                if (@customerExist && @beneficiaryExist)
-                {
-                    benficiaryProgressColor = "steps";
-                    beneficiaryLineColor = "line1";
-                }
-            }
             <div class="container d-flex justify-content-center align-items-center">
                 <div class="progresses">
 
@@ -107,7 +77,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text" asp-for="SumAssuredValue"><i class="fas fa-rupee-sign"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <input required asp-for="PolicyDetail.SumAssuredValue" class="form-control remarks" type="text" placeholder="Assured Amount" min="1" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" />
+                                <input required asp-for="PolicyDetail.SumAssuredValue" class="form-control remarks" type="text" placeholder="Assured Amount" min="1" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" maxlength="10" />
                                 <span asp-validation-for="PolicyDetail.SumAssuredValue" class="text-danger"></span>
                             </div>
                         </div>
