@@ -96,10 +96,12 @@ $(document).ready(function () {
                 }
             },
             {
-                "data": "location",
+                "data": "agency",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.status + '" data-toggle="tooltip">' + data + '</span>'
+                    var img = '<img alt="' + row.agency + '" title="' + row.agency + '" src="' + row.ownerDetail + '" class="profile-image doc-profile-image" data-toggle="tooltip"/>';
+                    return img;
                 }
+                ///<button type="button" class="btn btn-lg btn-danger" data-toggle="popover" title="Popover title" data-content="And here's some amazing content. It's very engaging. Right?">Click to toggle popover</button>
             },
             { "data": "created" },
             {

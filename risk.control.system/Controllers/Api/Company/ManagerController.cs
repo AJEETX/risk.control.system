@@ -100,6 +100,8 @@ namespace risk.control.system.Controllers.Api.Company
                         "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>" :
                         a.BeneficiaryDetail.Name,
                 TimeElapsed = DateTime.Now.Subtract(a.Created).TotalSeconds,
+                Agency = a.Vendor?.Name,
+                OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.Vendor.DocumentImage)),
                 IsNewAssigned = a.AssessView <= 1
             })?.ToList();
 
@@ -248,6 +250,7 @@ namespace risk.control.system.Controllers.Api.Company
                         "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>" :
                         a.BeneficiaryDetail.Name,
                 Agency = a.Vendor?.Name,
+                        OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.Vendor.DocumentImage)),
                 TimeElapsed = DateTime.Now.Subtract(a.Created).TotalSeconds
             })?.ToList();
 
@@ -307,6 +310,7 @@ namespace risk.control.system.Controllers.Api.Company
                 BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.Name) ?
                         "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>" :
                         a.BeneficiaryDetail.Name,
+                        OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.Vendor.DocumentImage)),
                 Agency = a.Vendor?.Name,
                 TimeElapsed = DateTime.Now.Subtract(a.Created).TotalSeconds
             })?.ToList();

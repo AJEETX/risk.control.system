@@ -98,7 +98,7 @@ $(document).ready(function () {
             {
                 "data": "agent",
                 "mRender": function (data, type, row) {
-                    var img = '<img alt="' + row.agent + '" title="' + row.agent + '" src="' + row.ownerDetail + '" class="table-profile-image" data-toggle="tooltip"/>';
+                    var img = '<img alt="' + row.agent + '" title="' + row.agent + '" src="' + row.ownerDetail + '" class="profile-image doc-profile-image" data-toggle="tooltip"/>';
                     return img;
                 }
             },

@@ -311,7 +311,7 @@ namespace risk.control.system.Controllers.Api.Company
                         Service = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail.InvestigationServiceType.Name + "</span>"),
                         Location = string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseSubStatus.Name + "</span>"),
                         Created = string.Join("", "<span class='badge badge-light'>" + a.Created.ToString("dd-MM-yyyy") + "</span>"),
-                        timePending = a.GetCreatorTimePending(),
+                        timePending = a.GetCreatorTimePending(true),
                         Withdrawable = !a.NotWithdrawable,
                         PolicyNum = a.GetPolicyNum(),
                         BeneficiaryPhoto = a.BeneficiaryDetail?.ProfilePicture != null ?

@@ -1141,6 +1141,11 @@ table#customerTable {
         background-color: whitesmoke;
     }
 
+img.table-agency-image {
+    height: 2.5rem;
+    width: 2.5rem;
+    border: 2px solid green;
+}
 img.table-profile-image {
     border-radius: 50%;
     height: 2.5rem;

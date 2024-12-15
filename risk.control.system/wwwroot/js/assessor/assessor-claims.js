@@ -45,7 +45,7 @@ $(document).ready(function () {
                 className: 'max-width-column-name', // Apply the CSS class,
                 targets: 7                      // Index of the column to style
             }],
-        order: [[15, 'asc']],
+        order: [[16, 'asc']],
         fixedHeader: true,
         processing: true,
         paging: true,
@@ -126,6 +126,14 @@ $(document).ready(function () {
                 }
             },
             { "data": "timePending" },
+            {
+                "data": "agent",
+                "mRender": function (data, type, row) {
+                    var img = '<img alt="' + row.agent + '" title="' + row.agent + '" src="' + row.ownerDetail + '" class="profile-image doc-profile-image" data-toggle="tooltip"/>';
+                    return img;
+                }
+                ///<button type="button" class="btn btn-lg btn-danger" data-toggle="popover" title="Popover title" data-content="And here's some amazing content. It's very engaging. Right?">Click to toggle popover</button>
+            },
             { "data": "timeElapsed", "bVisible": false }
         ],
         "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {

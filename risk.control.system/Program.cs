@@ -142,6 +142,12 @@ builder.Services.AddAWSService<IAmazonTranscribeService>();
 builder.Services.AddAWSService<IAmazonS3>();
 builder.Services.AddAWSService<IAmazonRekognition>();
 builder.Services.AddAWSService<IAmazonTextract>();
+
+AWSConfigs.LoggingConfig.LogTo = LoggingOptions.Console;
+AWSConfigs.LoggingConfig.LogMetrics = true;
+AWSConfigs.LoggingConfig.LogResponses = ResponseLoggingOption.Always;
+
+
 //builder.Services.AddTransient<IMailService, MailService>();
 // Add services to the container.
 builder.Services.AddControllersWithViews()
