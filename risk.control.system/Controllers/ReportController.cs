@@ -125,7 +125,7 @@ namespace risk.control.system.Controllers
                 using var stream = new FileStream(claim.AgencyReport.PdfReportFilePath, FileMode.Open);
                 await stream.CopyToAsync(memory);
                 memory.Position = 0;
-                notifyService.Success($"Policy {claim.PolicyDetail.ContractNumber} Report download success !!!");
+                //notifyService.Success($"Policy {claim.PolicyDetail.ContractNumber} Report download success !!!");
                 return File(memory, "application/pdf", fileName);
             }
             catch (Exception ex)

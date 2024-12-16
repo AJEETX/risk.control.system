@@ -91,7 +91,12 @@
                     return img;
                 }
             },
-            { "data": "beneficiaryName" },
+            {
+                "data": "beneficiaryName",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.beneficiaryName + '" data-toggle="tooltip">' + data + '</span>'
+                }
+            },
             { "data": "serviceType" },
             { "data": "service" },
             {
