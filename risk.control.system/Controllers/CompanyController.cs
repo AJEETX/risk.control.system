@@ -28,7 +28,6 @@ namespace risk.control.system.Controllers
         private readonly INotyfService notifyService;
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ClientCompanyApplicationUser> userManager;
-        private readonly IHttpClientService httpClientService;
         private readonly RoleManager<ApplicationRole> roleManager;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly ISmsService smsService;
@@ -36,7 +35,6 @@ namespace risk.control.system.Controllers
 
         public CompanyController(ApplicationDbContext context,
             UserManager<ClientCompanyApplicationUser> userManager,
-            IHttpClientService httpClientService,
             SignInManager<ApplicationUser> signInManager,
             INotyfService notifyService,
             RoleManager<ApplicationRole> roleManager,
@@ -48,7 +46,6 @@ namespace risk.control.system.Controllers
             this.signInManager = signInManager;
             this.notifyService = notifyService;
             this.userManager = userManager;
-            this.httpClientService = httpClientService;
             this.roleManager = roleManager;
             this.webHostEnvironment = webHostEnvironment;
             smsService = SmsService;

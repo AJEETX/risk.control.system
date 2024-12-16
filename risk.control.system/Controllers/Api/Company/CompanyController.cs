@@ -196,9 +196,7 @@ namespace risk.control.system.Controllers.Api.Company
 
             var availableVendors = _context.Vendor
                 .Where(v =>
-                !v.Clients.Any(c => c.ClientCompanyId == companyUser.ClientCompanyId) &&
-                v.Status == VendorStatus.ACTIVE  &&
-                (v.VendorInvestigationServiceTypes != null) && v.VendorInvestigationServiceTypes.Count > 0)
+                !v.Clients.Any(c => c.ClientCompanyId == companyUser.ClientCompanyId))
                 .Include(v => v.Country)
                 .Include(v => v.PinCode)
                 .Include(v => v.District)
@@ -230,8 +228,8 @@ namespace risk.control.system.Controllers.Api.Company
                     State = u.State.Name,
                     Country = u.Country.Name,
                     Updated = u.Updated.HasValue ? u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy"),
-                    UpdateBy = u.UpdatedBy
-
+                    UpdateBy = u.UpdatedBy,
+                    CanOnboard = u.Status == VendorStatus.ACTIVE && u.VendorInvestigationServiceTypes != null && u.VendorInvestigationServiceTypes.Count > 0
                 });
             return Ok(result?.ToArray());
         }

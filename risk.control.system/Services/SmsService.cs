@@ -12,7 +12,7 @@ namespace risk.control.system.Services
 {
     public interface ISmsService
     {
-        Task DoSendSmsAsync(string mobile, string message);
+        Task DoSendSmsAsync(string mobile, string message, bool onboard= false);
     }
     public class SmsService : ISmsService
     {
@@ -23,9 +23,9 @@ namespace risk.control.system.Services
         {
             this.featureManager = featureManager;
         }
-        public async Task DoSendSmsAsync(string mobile, string message)
+        public async Task DoSendSmsAsync(string mobile, string message, bool onboard = false)
         {
-            if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
+            if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN) || onboard)
             {
                 await SendSmsAsync(mobile, message);
             }

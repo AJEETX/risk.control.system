@@ -12,6 +12,10 @@
             'render': function (data, type, full, meta) {
                 return '<input type="checkbox" name="id[]" value="' + $('<div/>').text(data).html() + '">';
             }
+        },
+        {
+            className: 'max-width-column-name', // Apply the CSS class,
+            targets: 3                      // Index of the column to style
         }],
         order: [[1, 'asc']],
         fixedHeader: true,
@@ -25,11 +29,13 @@
             /* Name of the keys from
             data file source */
             {
-                "sDefaultContent": "",
+                "sDefaultContent": "<i class='far fa-edit' data-toggle='tooltip' title='No service available'></i>",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    var img = '<input class="vendors" name="vendors" type="checkbox" id="' + row.id + '"  value="' + row.id + '"  />';
-                    return img;
+                    if (row.canOnboard){
+                        var img = '<input class="vendors" name="vendors" type="checkbox" id="' + row.id + '"  value="' + row.id + '"  />';
+                        return img;
+                    }
                 }
             },
             {
@@ -53,6 +59,17 @@
             { "data": "country" },
             { "data": "updated" },
             { "data": "updateBy" },
+            {
+                "sDefaultContent": "",
+                "bSortable": false,
+                "mRender": function (data, type, row) {
+                    var buttons = "";
+                    //buttons += '<a id=details' + row.id + ' onclick="showdetails(' + row.id + ')" href="/Vendors/Details?Id=' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Details</a>&nbsp;'
+                    //buttons += '<a onclick="showedit()" href="/Vendors/Edit?Id=' + row.id + '"  class="btn btn-xs btn-warning"><i class="fas fa-pen"></i> Edit</a>&nbsp;'
+                    buttons += '<a id=delete' + row.id + ' onclick="getdetails(' + row.id + ')" href="/Vendors/Delete?Id=' + row.id + '"  class="btn btn-xs btn-danger"><i class="fas fa-trash"></i></i> Delete</a>'
+                    return buttons;
+                }
+            }
         ],
         "drawCallback": function (settings, start, end, max, total, pre) {
             var rowCount = (this.fnSettings().fnRecordsTotal()); // total number of rows
@@ -173,3 +190,21 @@
         }
     });
 });
+
+function getdetails(id) {
+    $("body").addClass("submit-progress-bg");
+    // Wrap in setTimeout so the UI
+    // can update the spinners
+    setTimeout(function () {
+        $(".submit-progress").removeClass("hidden");
+    }, 1);
+    $('a.btn').attr('disabled', 'disabled');
+    $('a#delete' + id + '.btn.btn-xs.btn-danger').html("<i class='fas fa-sync fa-spin'></i> Delete");
+    var article = document.getElementById("article");
+    if (article) {
+        var nodes = article.getElementsByTagName('*');
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].disabled = true;
+        }
+    }
+}

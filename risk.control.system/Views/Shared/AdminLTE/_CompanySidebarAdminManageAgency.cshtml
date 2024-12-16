@@ -17,19 +17,6 @@
         </li>
 
         <li class="nav-item">
-            <a is-active-page asp-controller="Vendors" asp-action="Agencies" class="actual-link nav-link @Url.MakeActiveClass("Vendors","Agencies") @Url.MakeActiveClass("Vendors","Details")
-                                                    @Url.MakeActiveClass("Vendors","Edit") @Url.MakeActiveClass("Vendors","Service") 
-                                                        @Url.MakeActiveClass("Vendors","Users")
-                                                        @Url.MakeActiveClass("Vendors","Delete")
-                                                                    @Url.MakeActiveClass("Vendors","CreateUser") @Url.MakeActiveClass("Vendors","EditUser") @Url.MakeActiveClass("Vendors","UserRoles")
-                                            @Url.MakeActiveClass("VendorService","") @Url.MakeActiveClass("VendorApplicationUsers","")">
-                <i class="nav-icon fas fa-building"></i>
-                <p>
-                    Agencies
-                </p>
-            </a>
-        </li>
-        <li class="nav-item">
             <a is-active-page asp-controller="Company" asp-action="EmpanelledVendors" class="actual-link nav-link
                                                  @Url.MakeActiveClass("Company","EmpanelledVendors")">
                 <i class="nav-icon fas fa-handshake"></i>
@@ -40,8 +27,13 @@
         </li>
         <li class="nav-item">
             <a is-active-page asp-controller="Company" asp-action="AvailableVendors" class="actual-link nav-link @Url.MakeActiveClass("Company","AvailableVendors")
-                                            ">
-                <i class="nav-icon fas fa-hand-pointer"></i>
+                      @Url.MakeActiveClass("Vendors","Details")
+                                                        @Url.MakeActiveClass("Vendors","Edit") @Url.MakeActiveClass("Vendors","Service")
+                                                            @Url.MakeActiveClass("Vendors","Users")
+                                                            @Url.MakeActiveClass("Vendors","Delete")
+                                                                        @Url.MakeActiveClass("Vendors","CreateUser") @Url.MakeActiveClass("Vendors","EditUser") @Url.MakeActiveClass("Vendors","UserRoles")
+                                                @Url.MakeActiveClass("VendorService","") @Url.MakeActiveClass("VendorApplicationUsers","")                          ">
+                <i class="nav-icon fas fa-building"></i>
                 <p>
                     Available Agencies
                 </p>

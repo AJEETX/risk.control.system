@@ -86,7 +86,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: Vendors/Details/5
-        [Breadcrumb(" Manage Agency", FromAction = "Agencies")]
+        [Breadcrumb(" Manage Agency", FromAction = "AvailableVendors", FromController =typeof(CompanyController))]
         public async Task<IActionResult> Details(long id)
         {
             try
@@ -148,8 +148,8 @@ namespace risk.control.system.Controllers
             }
             ViewData["vendorId"] = id;
 
-            var agencysPage = new MvcBreadcrumbNode("Agencies", "Vendors", "Manager Agency(s)");
-            var agency2Page = new MvcBreadcrumbNode("Agencies", "Vendors", "Agencies") { Parent = agencysPage, };
+            var agencysPage = new MvcBreadcrumbNode("AvailableVendors", "Company", "Manager Agency(s)");
+            var agency2Page = new MvcBreadcrumbNode("AvailableVendors", "Company", "Available Agencies") { Parent = agencysPage, };
             var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Manage Agency") { Parent = agency2Page, RouteValues = new { id = id } };
             var editPage = new MvcBreadcrumbNode("Users", "Vendors", $"Manager Users") { Parent = agencyPage, RouteValues = new { id = id } };
             ViewData["BreadcrumbNode"] = editPage;
@@ -175,8 +175,8 @@ namespace risk.control.system.Controllers
             var model = new VendorApplicationUser { Vendor = vendor };
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
 
-            var agencysPage = new MvcBreadcrumbNode("Agencies", "Vendors", "Manager Agency(s)");
-            var agency2Page = new MvcBreadcrumbNode("Agencies", "Vendors", "Agencies") { Parent = agencysPage, };
+            var agencysPage = new MvcBreadcrumbNode("AvailableVendors", "Company", "Manager Agency(s)");
+            var agency2Page = new MvcBreadcrumbNode("AvailableVendors", "Company", "Available Agencies") { Parent = agencysPage, };
             var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Manage Agency") { Parent = agency2Page, RouteValues = new { id = id } };
             var usersPage = new MvcBreadcrumbNode("Users", "Vendors", $"Manager Users") { Parent = agencyPage, RouteValues = new { id = id } };
             var editPage = new MvcBreadcrumbNode("CreateUser", "Vendors", $"Add User") { Parent = usersPage, RouteValues = new { id = id } };
@@ -279,7 +279,7 @@ namespace risk.control.system.Controllers
                             message += "                                                                                ";
                             message += $"https://icheckify.co.in";
 
-                            await smsService.DoSendSmsAsync(user.PhoneNumber, message);
+                            await smsService.DoSendSmsAsync(user.PhoneNumber, message, true);
                             notifyService.Custom($"Agent onboarding initiated.", 3, "green", "fas fa-user-check");
                         }
                         else
@@ -348,8 +348,8 @@ namespace risk.control.system.Controllers
 
 
 
-                var agencysPage = new MvcBreadcrumbNode("Agencies", "Vendors", "Manager Agency(s)");
-                var agency2Page = new MvcBreadcrumbNode("Agencies", "Vendors", "Agencies") { Parent = agencysPage, };
+                var agencysPage = new MvcBreadcrumbNode("AvailableVendors", "Company", "Manager Agency(s)");
+                var agency2Page = new MvcBreadcrumbNode("AvailableVendors", "Company", "Available Agencies") { Parent = agencysPage, };
                 var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Manage Agency") { Parent = agency2Page, RouteValues = new { id = vendor.VendorId } };
                 var usersPage = new MvcBreadcrumbNode("Users", "Vendors", $"Manager Users") { Parent = agencyPage, RouteValues = new { id = vendor.VendorId } };
                 var editPage = new MvcBreadcrumbNode("EditUser", "Vendors", $"Edit User") { Parent = usersPage, RouteValues = new { id = userId } };
@@ -477,7 +477,7 @@ namespace risk.control.system.Controllers
                                 message += $"Thanks";
                                 message += "                                                                                ";
                                 message += $"https://icheckify.co.in";
-                                await smsService.DoSendSmsAsync(user.PhoneNumber, message);
+                                await smsService.DoSendSmsAsync(user.PhoneNumber, message, true);
                                 notifyService.Custom($"Agent onboarding initiated.", 3, "green", "fas fa-user-check");
                             }
                             else
@@ -700,8 +700,8 @@ namespace risk.control.system.Controllers
             }
             ViewData["vendorId"] = id;
 
-            var agencysPage = new MvcBreadcrumbNode("Agencies", "Vendors", "Manager Agency(s)");
-            var agency2Page = new MvcBreadcrumbNode("Agencies", "Vendors", "Agencies") { Parent = agencysPage, };
+            var agencysPage = new MvcBreadcrumbNode("AvailableVendors", "Company", "Manager Agency(s)");
+            var agency2Page = new MvcBreadcrumbNode("AvailableVendors", "Company", "Available Agencies") { Parent = agencysPage, };
             var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Manage Agency") { Parent = agency2Page, RouteValues = new { id = id } };
             var servicesPage = new MvcBreadcrumbNode("Service", "Vendors", $"Manager Service") { Parent = agencyPage, RouteValues = new { id = id } };
             ViewData["BreadcrumbNode"] = servicesPage;
@@ -764,11 +764,11 @@ namespace risk.control.system.Controllers
                     vendorDocument.CopyTo(dataStream);
                     vendor.DocumentImage = dataStream.ToArray();
                 }
-                vendor.Status = VendorStatus.ACTIVE;
+                vendor.Status = vendor.Status;
                 vendor.ActivatedDate = DateTime.Now;
                 vendor.DomainName = domainData;
                 vendor.Updated = DateTime.Now;
-                vendor.UpdatedBy = HttpContext.User?.Identity?.Name;
+                vendor.UpdatedBy = currentUserEmail;
 
                 _context.Add(vendor);
                 await _context.SaveChangesAsync();
@@ -776,7 +776,7 @@ namespace risk.control.system.Controllers
                 await smsService.DoSendSmsAsync(vendor.PhoneNumber, "Agency created. Domain : " + vendor.Email);
 
                 notifyService.Custom($"Agency created successfully.", 3, "green", "fas fa-building");
-                return RedirectToAction(nameof(VendorsController.Agencies));
+                return RedirectToAction(nameof(CompanyController.AvailableVendors), "Company");
             }
             catch (Exception ex)
             {
@@ -821,8 +821,8 @@ namespace risk.control.system.Controllers
                 ViewData["PinCodeId"] = new SelectList(pincodes, "PinCodeId", "Code", vendor.PinCodeId);
 
 
-                var agencysPage = new MvcBreadcrumbNode("Agencies", "Vendors", "Manager Agency(s)");
-                var agency2Page = new MvcBreadcrumbNode("Agencies", "Vendors", "Agencies") { Parent = agencysPage, };
+                var agencysPage = new MvcBreadcrumbNode("AvailableVendors", "Company", "Manager Agency(s)");
+                var agency2Page = new MvcBreadcrumbNode("AvailableVendors", "Company", "Available Agencies") { Parent = agencysPage, };
                 var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Manage Agency") { Parent = agency2Page, RouteValues = new { id = id } };
                 var editPage = new MvcBreadcrumbNode("Edit", "Vendors", $"Edit Agency") { Parent = agencyPage } ;
                 ViewData["BreadcrumbNode"] = editPage;
@@ -951,8 +951,8 @@ namespace risk.control.system.Controllers
                     ).Select(s => s.InvestigationCaseSubStatusId).ToList();
 
                 var hasClaims = _context.ClaimsInvestigation.Any(c => agencySubStatuses.Contains(c.InvestigationCaseSubStatus.InvestigationCaseSubStatusId) && c.VendorId == id );
-                var agencysPage = new MvcBreadcrumbNode("Agencies", "Vendors", "Manager Agency(s)");
-                var agencyPage = new MvcBreadcrumbNode("Agencies", "Vendors", "Agencies") { Parent = agencysPage, };
+                var agencysPage = new MvcBreadcrumbNode("AvailableVendors", "Company", "Manager Agency(s)");
+                var agencyPage = new MvcBreadcrumbNode("AvailableVendors", "Company", "Available Agencies") { Parent = agencysPage, };
                 var editPage = new MvcBreadcrumbNode("Delete", "Vendors", $"Delete Agency") { Parent = agencyPage, RouteValues = new { id = id } };
                 ViewData["BreadcrumbNode"] = editPage;
                 vendor.HasClaims = hasClaims;
@@ -1000,7 +1000,7 @@ namespace risk.control.system.Controllers
                 _context.Vendor.Update(vendor);
                 await _context.SaveChangesAsync();
                 notifyService.Custom($"Agency {vendor.Email} deleted successfully.", 3, "red", "fas fa-building");
-                return RedirectToAction(nameof(Agencies));
+                return RedirectToAction(nameof(CompanyController.AvailableVendors), "Company");
             }
             catch (Exception ex)
             {

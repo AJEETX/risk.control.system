@@ -25,7 +25,7 @@ using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers
 {
-    [Authorize(Roles = $"{AGENCY_ADMIN.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME}")]
+    [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME},{AGENCY_ADMIN.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME}")]
     public class AgencyController : Controller
     {
         public List<UsersViewModel> UserList;
@@ -357,7 +357,7 @@ namespace risk.control.system.Controllers
                                 message += $"Thanks";
                                 message += "                                                                                ";
                                 message += $"https://icheckify.co.in";
-                                await smsService.DoSendSmsAsync(user.PhoneNumber, message);
+                                await smsService.DoSendSmsAsync(user.PhoneNumber, message, true);
                                 notifyService.Custom($"Agent {user.Email} onboarding initiated.", 3, "green", "fas fa-user-check");
                             }
                             else
@@ -561,7 +561,7 @@ namespace risk.control.system.Controllers
                                     message += $"Thanks";
                                     message += "                                                                                ";
                                     message += $"https://icheckify.co.in";
-                                    await smsService.DoSendSmsAsync(user.PhoneNumber, message);
+                                    await smsService.DoSendSmsAsync(user.PhoneNumber, message, true);
                                     notifyService.Custom($"Agent onboarding initiated.", 3, "green", "fas fa-user-check");
                                 }
                                 else
