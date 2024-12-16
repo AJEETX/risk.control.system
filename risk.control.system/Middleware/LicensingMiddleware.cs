@@ -74,7 +74,15 @@ namespace risk.control.system.Middleware
                     }
                 }
             }
-            await _next.Invoke(context);
+            try
+            {
+                await _next.Invoke(context);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                return;
+            }
         }
     }
 }

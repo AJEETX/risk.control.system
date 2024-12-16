@@ -45,7 +45,6 @@ namespace risk.control.system.Controllers.Company
         }
 
         [Breadcrumb(" Assess(report)")]
-        [Authorize(Roles = ASSESSOR.DISPLAY_NAME)]
         public IActionResult Assessor()
         {
             try

@@ -4,7 +4,27 @@
         ajax: {
             url: '/api/Company/AllUsers',
             dataSrc: ''
+        }, columnDefs: [{
+            'targets': 0,
+            'searchable': false,
+            'orderable': false,
+            'className': 'dt-body-center',
+            'render': function (data, type, full, meta) {
+                return '<input type="checkbox" name="id[]" value="' + $('<div/>').text(data).html() + '">';
+            }
         },
+        {
+            className: 'max-width-column-name', // Apply the CSS class,
+            targets: 2                      // Index of the column to style
+        },
+        {
+            className: 'max-width-column', // Apply the CSS class,
+            targets: 4                      // Index of the column to style
+        },
+        {
+            className: 'max-width-column-name', // Apply the CSS class,
+            targets: 9                      // Index of the column to style
+        }],
         fixedHeader: true,
         processing: true,
         paging: true,
@@ -32,9 +52,20 @@
                     return img;
                 }
             },
-            { "data": "email" },
+            {
+                "data": "email",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.rawEmail + '" data-toggle="tooltip">' + data + '</span>'
+                }
+            },
             { "data": "phone" },
-            { "data": "addressline", bSortable: false },
+            {
+                "data": "addressline",
+                bSortable: false,
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.rawAddress + '" data-toggle="tooltip">' + data + '</span>'
+                }
+            },
             { "data": "pincode" },
             {
                 "sDefaultContent": "",
@@ -53,7 +84,12 @@
             },
             { "data": "roles" },
             { "data": "updated" },
-            { "data": "updateBy" },
+            {
+                "data": "updateBy",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.updateBy + '" data-toggle="tooltip">' + data + '</span>'
+                }
+            },
             {
                 "sDefaultContent": "",
                 "bSortable": false,

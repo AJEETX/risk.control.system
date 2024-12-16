@@ -24,7 +24,19 @@
         ajax: {
             url: '/api/Agency/GetCompanyAgencyUser?id=' + $('#vendorId').val(),
             dataSrc: ''
-        },
+        }, columnDefs: [
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 2                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column', // Apply the CSS class,
+                targets: 4                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 7                      // Index of the column to style
+            }],
         fixedHeader: true,
         processing: true,
         paging: true,
@@ -52,9 +64,20 @@
                     return img;
                 }
             },
-            { "data": "email" },
+            {
+                "data": "email",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.rawEmail + '" data-toggle="tooltip">' + data + '</span>'
+                }
+            },
             { "data": "phone" },
-            { "data": "addressline", bSortable:false },
+            {
+                "data": "addressline",
+                bSortable: false,
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.addressline + '" data-toggle="tooltip">' + data + '</span>'
+                }
+            },
             { "data": "pincode" },
             {
                 "sDefaultContent": "",
@@ -72,7 +95,12 @@
                 }
             },
             { "data": "roles" },
-            { "data": "updateBy" },
+            {
+                "data": "updateBy",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.updateBy + '" data-toggle="tooltip">' + data + '</span>'
+                }
+            },
             {
                 "sDefaultContent": "",
                 "bSortable": false,
@@ -101,6 +129,13 @@
             }
         },
         error: function (xhr, status, error) { alert('err ' + error) }
+    });
+    $('#customerTable').on('draw.dt', function () {
+        $('[data-toggle="tooltip"]').tooltip({
+            animated: 'fade',
+            placement: 'bottom',
+            html: true
+        });
     });
 });
 

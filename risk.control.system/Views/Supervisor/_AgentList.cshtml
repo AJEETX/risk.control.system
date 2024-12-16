@@ -65,17 +65,17 @@
                                     <img id="profileImage" title="..." class="form-Image  table-profile-image" src="@Applicationsettings.NO_USER" data-toggle="tooltip" />
                                 }
                             </td>
-                            <td>
+                            <td class="max-width-column-name">
                                 @item.AgencyUser.FirstName @item.AgencyUser.LastName
                             </td>
 
                             <td>
                                 @Html.DisplayFor(modelItem => item.AgencyUser.PhoneNumber)
                             </td>
-                            <td>
+                            <td class="max-width-column-name">
                                 <a href="#">  @Html.DisplayFor(modelItem => item.AgencyUser.Email)</a>
                             </td>
-                            <td>
+                            <td class="max-width-column">
                                 @Html.DisplayFor(modelItem => item.AgencyUser.Addressline)
                             </td>
                             <td>

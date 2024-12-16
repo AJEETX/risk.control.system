@@ -16,7 +16,19 @@
         {
             className: 'max-width-column-name', // Apply the CSS class,
             targets: 3                      // Index of the column to style
-        }],
+            },
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 4                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column', // Apply the CSS class,
+                targets: 7                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 12                      // Index of the column to style
+            }],
         order: [[1, 'asc']],
         fixedHeader: true,
         processing: true,
@@ -29,7 +41,7 @@
             /* Name of the keys from
             data file source */
             {
-                "sDefaultContent": "<i class='far fa-edit' data-toggle='tooltip' title='No service available'></i>",
+                "sDefaultContent": "<span><i class='far fa-edit' data-toggle='tooltip' title='NOT ACTIVE and/or No service available'></i></span>",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     if (row.canOnboard){
@@ -45,20 +57,41 @@
                 "sDefaultContent": "",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    var img = '<img alt="' + row.name + '" title="' + row.name + '" src="' + row.document + '" class="profile-image doc-profile-image" />';
+                    var img = '<img alt="' + row.name + '" title="' + row.name + '" src="' + row.document + '" class="profile-image doc-profile-image" data-toggle="tooltip"/>';
                     return img;
                 }
             },
-            { "data": "domain" },
-            { "data": "name" },
+            {
+                "data": "domain",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.vendorName + '" data-toggle="tooltip">' + data + '</span>'
+                }
+            },
+            {
+                "data": "name",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.name + '" data-toggle="tooltip">' + data + '</span>'
+                }
+            },
             { "data": "code" },
             { "data": "phone" },
-            { "data": "address" },
+            {
+                "data": "address",
+                "bSortable": false,
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.address + '" data-toggle="tooltip">' + data + '</span>'
+                }
+            },
             { "data": "district" },
             { "data": "state" },
             { "data": "country" },
             { "data": "updated" },
-            { "data": "updateBy" },
+            {
+                "data": "updateBy",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.updateBy + '" data-toggle="tooltip">' + data + '</span>'
+                }
+            },
             {
                 "sDefaultContent": "",
                 "bSortable": false,
@@ -79,6 +112,15 @@
         },
         error: function (xhr, status, error) { alert('err ' + error) }
     });
+
+    $('#customerTable').on('draw.dt', function () {
+        $('[data-toggle="tooltip"]').tooltip({
+            animated: 'fade',
+            placement: 'top',
+            html: true
+        });
+    });
+
     // Handle click on "Select all" control
     $('#checkall').on('click', function () {
         // Get all rows with search applied

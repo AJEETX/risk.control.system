@@ -82,7 +82,12 @@
             },
             { "data": "roles" },
             { "data": "count" },
-            { "data": "updateBy" },
+            {
+                "data": "updateBy",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.updateBy + '" data-toggle="tooltip">' + data + '</span>'
+                }
+            },
             {
                 "sDefaultContent": "",
                 "bSortable": false,

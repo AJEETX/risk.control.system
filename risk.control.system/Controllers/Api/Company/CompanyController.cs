@@ -138,8 +138,9 @@ namespace risk.control.system.Controllers.Api.Company
                     Pincode = u.PinCode.Code,
                     Updated = u.Updated.HasValue ?  u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy"),
                     UpdateBy = u.UpdatedBy,
-                    Role = u.UserRole.GetEnumDisplayName()
-
+                    Role = u.UserRole.GetEnumDisplayName(),
+                    RawEmail = u.Email,
+                    RawAddress = u.Addressline + ", " + u.District.Name + ", " + u.State.Name + ", " + u.Country.Code
                 })?.ToArray();
             return Ok(result);
         }
@@ -177,8 +178,8 @@ namespace risk.control.system.Controllers.Api.Company
                     State = u.State.Name,
                     Country = u.Country.Name,
                     Updated = u.Updated.HasValue ? u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy"),
-                    UpdateBy = u.UpdatedBy
-
+                    UpdateBy = u.UpdatedBy,
+                    VendorName = u.Email
                 });
 
             return Ok(result?.ToArray());
@@ -229,7 +230,8 @@ namespace risk.control.system.Controllers.Api.Company
                     Country = u.Country.Name,
                     Updated = u.Updated.HasValue ? u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy"),
                     UpdateBy = u.UpdatedBy,
-                    CanOnboard = u.Status == VendorStatus.ACTIVE && u.VendorInvestigationServiceTypes != null && u.VendorInvestigationServiceTypes.Count > 0
+                    CanOnboard = u.Status == VendorStatus.ACTIVE && u.VendorInvestigationServiceTypes != null && u.VendorInvestigationServiceTypes.Count > 0,
+                    VendorName = u.Email
                 });
             return Ok(result?.ToArray());
         }

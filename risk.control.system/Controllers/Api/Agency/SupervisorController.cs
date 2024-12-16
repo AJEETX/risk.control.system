@@ -44,7 +44,6 @@ namespace risk.control.system.Controllers.Api.Agency
         }
 
         [HttpGet("GetOpen")]
-        [Authorize(Roles = "AGENCY_ADMIN,SUPERVISOR")]
         public IActionResult GetOpen()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
@@ -269,6 +268,7 @@ namespace risk.control.system.Controllers.Api.Agency
                        PolicyId = a.PolicyDetail.ContractNumber,
                        Amount = string.Format(hindiNFO, "{0:C}", a.PolicyDetail.SumAssuredValue),
                        Company = a.ClientCompany.Name,
+                       OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.ClientCompany.DocumentImage)),
                        Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
                        PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
                        AssignedToAgency = a.AssignedToAgency,
@@ -386,7 +386,6 @@ namespace risk.control.system.Controllers.Api.Agency
         }
 
         [HttpGet("GetReport")]
-        [Authorize(Roles = "AGENCY_ADMIN,SUPERVISOR")]
         public IActionResult GetReport()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
@@ -434,6 +433,7 @@ namespace risk.control.system.Controllers.Api.Agency
                        Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
                        PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
                        Company = a.ClientCompany.Name,
+                       OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.ClientCompany.DocumentImage)),
                        Document = a.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : Applicationsettings.NO_POLICY_IMAGE,
                        Customer = ClaimsInvestigationExtension.GetPersonPhoto(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
                        Name = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? a.CustomerDetail.Name : a.BeneficiaryDetail.Name,
@@ -442,6 +442,7 @@ namespace risk.control.system.Controllers.Api.Agency
                        ServiceType = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail?.ClaimType.GetEnumDisplayName() + "</span>"),
                        Service = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail.InvestigationServiceType.Name + "</span>"),
                        Location = string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseSubStatus.Name + "</span>"),
+                       RawStatus =  a.InvestigationCaseSubStatus.Name,
                        Created = string.Join("", "<span class='badge badge-light'>" + a.Created.ToString("dd-MM-yyyy") + "</span>"),
                        timePending = a.GetSupervisorTimePending(false,false,true, false),
                        PolicyNum = a.PolicyDetail.ContractNumber,
@@ -461,7 +462,6 @@ namespace risk.control.system.Controllers.Api.Agency
 
 
         [HttpGet("GetCompleted")]
-        [Authorize(Roles = "AGENCY_ADMIN,SUPERVISOR")]
         public IActionResult GetCompleted()
         {
 

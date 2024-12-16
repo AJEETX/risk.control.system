@@ -78,7 +78,7 @@
                 className: 'max-width-column-name', // Apply the CSS class,
                 targets: 5                      // Index of the column to style
             }],
-        order: [[13, 'asc']],
+        order: [[14, 'asc']],
         fixedHeader: true,
         processing: true,
         paging: true,
@@ -133,6 +133,14 @@
             { "data": "location" },
             { "data": "created" },
             { "data": "timePending" },
+            {
+                "data": "company",
+                "mRender": function (data, type, row) {
+                    var img = '<img alt="' + row.company + '" title="' + row.company + '" src="' + row.ownerDetail + '" class="profile-image doc-profile-image" data-toggle="tooltip"/>';
+                    return img;
+                }
+            },
+
             {
                 "sDefaultContent": "",
                 "bSortable": false,

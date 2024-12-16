@@ -40,7 +40,12 @@
                     return img;
                 }
             },
-            { "data": "domain" },
+            {
+                "data": "domain",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.vendorName + '" data-toggle="tooltip">' + data + '</span>'
+                }
+            },
             { "data": "code" },
             { "data": "phone" },
             {

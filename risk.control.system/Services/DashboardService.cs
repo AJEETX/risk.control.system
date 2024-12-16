@@ -94,7 +94,7 @@ namespace risk.control.system.Services
 
             data.SecondBlockName = "Agencies";
             data.SecondBlockCount = allAgenciesCount;
-            data.SecondBlockUrl = "/Vendors/Agencies";
+            data.SecondBlockUrl = "/Company/AvailableVendors";
 
             data.ThirdBlockName = "Users";
             data.ThirdBlockCount = AllUsersCount;
@@ -285,8 +285,7 @@ namespace risk.control.system.Services
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == userEmail);
             var availableVendors = _context.Vendor.Include(a=>a.VendorInvestigationServiceTypes)
                            .Count(v =>
-                           !v.Clients.Any(c => c.ClientCompanyId == companyUser.ClientCompanyId) &&
-                           (v.VendorInvestigationServiceTypes != null) && v.VendorInvestigationServiceTypes.Count > 0 &&  !v.Deleted && v.Status == VendorStatus.ACTIVE);
+                           !v.Clients.Any(c => c.ClientCompanyId == companyUser.ClientCompanyId));
             return availableVendors;
         }
         private int GetEmpanelledAgencies(string userEmail)

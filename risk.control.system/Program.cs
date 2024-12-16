@@ -96,6 +96,7 @@ builder.Services.Configure<ForwardedHeadersOptions>(options => {
 
 builder.Services.AddFeatureManagement().AddFeatureFilter<TimeWindowFilter>();
 builder.Services.AddScoped<IAgencyService, AgencyService>();
+builder.Services.AddScoped<IClaimsAgentService, ClaimsAgentService>();
 builder.Services.AddScoped<ICompareFaces, CompareFaces>();
 builder.Services.AddScoped<ISmsService, SmsService>();
 builder.Services.AddScoped<ICreatorService, CreatorService>();

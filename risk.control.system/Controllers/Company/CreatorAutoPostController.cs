@@ -127,7 +127,6 @@ namespace risk.control.system.Controllers.Company
         [HttpPost]
         [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
         public async Task<IActionResult> CreatePolicy(ClaimsInvestigation claimsInvestigation)
         {
             try
@@ -199,7 +198,6 @@ namespace risk.control.system.Controllers.Company
         [ValidateAntiForgeryToken]
         [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [HttpPost]
-        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
         public async Task<IActionResult> EditPolicy(string claimsInvestigationId, ClaimsInvestigation claimsInvestigation, string claimtype)
         {
             try
@@ -276,7 +274,6 @@ namespace risk.control.system.Controllers.Company
         [ValidateAntiForgeryToken]
         [HttpPost]
         [RequestSizeLimit(2_000_000)] // Checking for 2 MB
-        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
         public async Task<IActionResult> CreateCustomer(string claimsInvestigationId, ClaimsInvestigation claimsInvestigation, bool create = true)
         {
             try
@@ -339,7 +336,6 @@ namespace risk.control.system.Controllers.Company
 
         [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
         [HttpPost]
         public async Task<IActionResult> EditCustomer(string claimsInvestigationId, ClaimsInvestigation claimsInvestigation, string claimtype, bool create = true)
         {

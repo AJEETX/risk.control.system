@@ -35,6 +35,7 @@
         public bool? IsQueryCase { get; set; }
         public string OwnerDetail { get; set; }
         public string AgencyDeclineComment { get; set; }
+        public string? RawStatus { get; set; }
 
     }
 }

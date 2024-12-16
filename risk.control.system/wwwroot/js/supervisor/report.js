@@ -64,7 +64,7 @@
                 className: 'max-width-column-name', // Apply the CSS class,
                 targets: 4                      // Index of the column to style
             }],
-        order: [[12, 'asc']],
+        order: [[13, 'asc']],
         fixedHeader: true,
         processing: true,
         paging: true,
@@ -103,7 +103,12 @@
                     return img;
                 }
             },
-            { "data": "name" },
+            {
+                "data": "name",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.name + '" data-toggle="tooltip">' + data + '</span>'
+                }
+            },
             { "data": "serviceType" },
             { "data": "service" },
             {
@@ -112,9 +117,21 @@
                     return '<span title="' + row.pincodeName + '" data-toggle="tooltip">' + data + '</span>'
                 }
             },
-            { "data": "location" },
+            {
+                "data": "location",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.rawStatus + '" data-toggle="tooltip">' + data + '</span>'
+                }
+            },
             { "data": "created" },
             { "data": "timePending" },
+            {
+                "data": "company",
+                "mRender": function (data, type, row) {
+                    var img = '<img alt="' + row.company + '" title="' + row.company + '" src="' + row.ownerDetail + '" class="profile-image doc-profile-image" data-toggle="tooltip"/>';
+                    return img;
+                }
+            },
             { "data": "timeElapsed", "bVisible": false }
         ],
         "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {

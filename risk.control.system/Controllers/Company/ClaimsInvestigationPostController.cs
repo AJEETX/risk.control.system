@@ -343,6 +343,7 @@ namespace risk.control.system.Controllers.Company
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME},{AGENCY_ADMIN.DISPLAY_NAME},{CREATOR.DISPLAY_NAME},{ASSESSOR.DISPLAY_NAME},{MANAGER.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME},{AGENT.DISPLAY_NAME}")]
         public async Task<IActionResult> SubmitNotes(string claimId, string name)
         {
             try

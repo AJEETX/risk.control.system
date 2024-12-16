@@ -58,7 +58,6 @@ namespace risk.control.system.Controllers.Company
 
         }
         [Breadcrumb(title: " Details", FromAction = "Assessor")]
-        [Authorize(Roles = MANAGER.DISPLAY_NAME)]
         public async Task<IActionResult> AssessorDetail(string id)
         {
             try
@@ -87,7 +86,6 @@ namespace risk.control.system.Controllers.Company
             }
         }
         [Breadcrumb(title: "Active")]
-        [Authorize(Roles = MANAGER.DISPLAY_NAME)]
         public IActionResult Active()
         {
             try
@@ -108,7 +106,6 @@ namespace risk.control.system.Controllers.Company
             }
         }
         [Breadcrumb(title: " Details", FromAction = "Active")]
-        [Authorize(Roles = MANAGER.DISPLAY_NAME)]
         public async Task<IActionResult> ActiveDetail(string id)
         {
             try

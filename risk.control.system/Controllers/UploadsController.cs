@@ -27,21 +27,21 @@ namespace risk.control.system.Controllers
         private readonly ApplicationDbContext _context;
         private readonly IFtpService ftpService;
         private readonly INotyfService notifyService;
-        private readonly IClaimsVendorService vendorService;
+        private readonly IClaimsAgentService agentService;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly IToastNotification toastNotification;
 
         public UploadsController(ApplicationDbContext context,
             IFtpService ftpService,
             INotyfService notifyService,
-            IClaimsVendorService vendorService,
+            IClaimsAgentService agentService,
             IWebHostEnvironment webHostEnvironment,
             IToastNotification toastNotification)
         {
             _context = context;
             this.ftpService = ftpService;
             this.notifyService = notifyService;
-            this.vendorService = vendorService;
+            this.agentService = agentService;
             this.webHostEnvironment = webHostEnvironment;
             this.toastNotification = toastNotification;
         }
@@ -130,7 +130,7 @@ namespace risk.control.system.Controllers
                 {
                     digitalImage.CopyTo(ds);
                     var imageByte = ds.ToArray();
-                    var response = await vendorService.PostFaceId(currentUserEmail, selectedcase, digitalIdLatitude, digitalIdLongitude, imageByte);
+                    var response = await agentService.PostFaceId(currentUserEmail, selectedcase, digitalIdLatitude, digitalIdLongitude, imageByte);
 
                     notifyService.Custom($"Photo Image Uploaded", 3, "green", "fas fa-portrait");
                     return Redirect("/Agent/GetInvestigate?selectedcase=" + selectedcase);
@@ -182,7 +182,7 @@ namespace risk.control.system.Controllers
                 {
                     panImage.CopyTo(ds);
                     var imageByte = ds.ToArray();
-                    var response = await vendorService.PostDocumentId(currentUserEmail, selectedclaim, documentIdLatitude, documentIdLongitude, imageByte);
+                    var response = await agentService.PostDocumentId(currentUserEmail, selectedclaim, documentIdLatitude, documentIdLongitude, imageByte);
 
                     notifyService.Custom($"Pan card Image Uploaded", 3, "green", "fas fa-mobile-alt");
                     return Redirect("/Agent/GetInvestigate?selectedcase=" + selectedclaim);
@@ -233,7 +233,7 @@ namespace risk.control.system.Controllers
                 {
                     passportImage.CopyTo(ds);
                     var imageByte = ds.ToArray();
-                    var response = await vendorService.PostPassportId(currentUserEmail, selectedclaim, passportIdLatitude, passportIdLongitude, imageByte);
+                    var response = await agentService.PostPassportId(currentUserEmail, selectedclaim, passportIdLatitude, passportIdLongitude, imageByte);
 
                     notifyService.Custom($"Passport Image Uploaded", 3, "green", "fas fa-mobile-alt");
                     return Redirect("/Agent/GetInvestigate?selectedcase=" + selectedclaim);
@@ -284,7 +284,7 @@ namespace risk.control.system.Controllers
                 {
                     audioFile.CopyTo(ds);
                     var imageByte = ds.ToArray();
-                    var response = await vendorService.PostAudio(currentUserEmail, selectedclaim, audioLatitude, audioLongitude, Path.GetFileName(audioFile.FileName), imageByte);
+                    var response = await agentService.PostAudio(currentUserEmail, selectedclaim, audioLatitude, audioLongitude, Path.GetFileName(audioFile.FileName), imageByte);
 
                     notifyService.Custom($"Audio Uploaded", 3, "green", "fas fa-mobile-alt");
                     return Redirect("/Agent/GetInvestigate?selectedcase=" + selectedclaim);
@@ -353,7 +353,7 @@ namespace risk.control.system.Controllers
                 {
                     videoFile.CopyTo(ds);
                     var imageByte = ds.ToArray();
-                    var response = await vendorService.PostVideo(currentUserEmail, selectedclaim, videoLatitude, videoLongitude, Path.GetFileName(videoFile.FileName), imageByte);
+                    var response = await agentService.PostVideo(currentUserEmail, selectedclaim, videoLatitude, videoLongitude, Path.GetFileName(videoFile.FileName), imageByte);
 
                     notifyService.Custom($"Video Uploaded", 3, "green", "fas fa-mobile-alt");
                     return Redirect("/Agent/GetInvestigate?selectedcase=" + selectedclaim);
