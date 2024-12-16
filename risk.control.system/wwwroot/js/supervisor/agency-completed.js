@@ -48,7 +48,7 @@
                 "sDefaultContent": "",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    var img = '<img alt="' + row.policyId + '" title="' + row.policyId + '" src="' + row.document + '"class="doc-profile-image" data-toggle="tooltip"/>';
+                    var img = '<img alt="' + row.policyId + '" title="' + row.policyId + '" src="' + row.document + '"class="profile-image doc-profile-image" data-toggle="tooltip"/>';
                     return img;
                 }
             },
@@ -75,6 +75,14 @@
             },
             { "data": "location" },
             { "data": "created" },
+            {
+                "data": "company",
+                "mRender": function (data, type, row) {
+                    var img = '<img alt="' + row.company + '" title="' + row.company + '" src="' + row.ownerDetail + '" class="profile-image doc-profile-image" data-toggle="tooltip"/>';
+
+                    return img;
+                }
+            },
             { "data": "timePending" },
             {
                 "sDefaultContent": "",

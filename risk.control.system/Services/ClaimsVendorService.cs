@@ -3,6 +3,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.FeatureManagement;
 
 using risk.control.system.AppConstant;
 using risk.control.system.Controllers.Api.Claims;
@@ -42,6 +43,7 @@ namespace risk.control.system.Services
         private readonly UserManager<VendorApplicationUser> userManager;
         private readonly ApplicationDbContext _context;
         private readonly IDashboardService dashboardService;
+        private readonly IFeatureManager featureManager;
         private readonly IClaimsService claimsService;
 
         //private static string latitude = "-37.839542";
@@ -52,12 +54,14 @@ namespace risk.control.system.Services
             UserManager<VendorApplicationUser> userManager,
             ApplicationDbContext context,
             IDashboardService dashboardService,
+            IFeatureManager featureManager,
             IClaimsService claimsService)
         {
             this.checkifyService = checkifyService;
             this.userManager = userManager;
             this._context = context;
             this.dashboardService = dashboardService;
+            this.featureManager = featureManager;
             this.claimsService = claimsService;
         }
 
@@ -203,6 +207,11 @@ namespace risk.control.system.Services
             var maskedBeneficiaryContact = new string('*', beneficiaryDetail.ContactNumber.ToString().Length - 4) + beneficiaryDetail.ContactNumber.ToString().Substring(beneficiaryDetail.ContactNumber.ToString().Length - 4);
             claimsAllocate2Agent.BeneficiaryDetail.ContactNumber = maskedBeneficiaryContact;
             beneficiaryDetail.ContactNumber = maskedBeneficiaryContact;
+            var onboardingEnabled = await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED);
+            if(onboardingEnabled)
+            {
+                agents = agents.Where(a => a.AgencyUser.Role != AppRoles.AGENT || a.AgencyUser.Role == AppRoles.AGENT && !string.IsNullOrWhiteSpace(a.AgencyUser.MobileUId))?.ToList();
+            }
             var model = new ClaimsInvestigationVendorAgentModel
             {
                 CaseLocation = beneficiaryDetail,

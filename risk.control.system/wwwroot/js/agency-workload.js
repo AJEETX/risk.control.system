@@ -59,10 +59,10 @@
             },
             { "data": "phone" },
             {
-                "data": "address",
+                "data": "addressline",
                 bSortable: false,
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.address + '" data-toggle="tooltip">' + row.address + '</span>'
+                    return '<span title="' + row.addressline + '" data-toggle="tooltip">' + row.addressline + '</span>'
                 }
             },
             {

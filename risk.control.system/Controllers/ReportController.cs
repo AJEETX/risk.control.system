@@ -120,13 +120,13 @@ namespace risk.control.system.Controllers
                     //.Include(r=>r.AgencyReport.DigitalIdReport)
                     //.Include(r=>r.AgencyReport.PanIdReport)
                     .FirstOrDefault(c => c.ClaimsInvestigationId == id);
-
+                var fileName = Path.GetFileName(claim.AgencyReport.PdfReportFilePath);
                 var memory = new MemoryStream();
                 using var stream = new FileStream(claim.AgencyReport.PdfReportFilePath, FileMode.Open);
                 await stream.CopyToAsync(memory);
                 memory.Position = 0;
                 notifyService.Success($"Policy {claim.PolicyDetail.ContractNumber} Report download success !!!");
-                return File(memory, "application/pdf", claim.AgencyReport.PdfReportFilePath);
+                return File(memory, "application/pdf", fileName);
             }
             catch (Exception ex)
             {
