@@ -502,7 +502,7 @@
                                         Address
                                     </th>
 
-                                    
+
                                     <th data-orderable="false">
                                         <span class="badge badge-light">Service</span> : <span class="badge badge-light">Pincodes</span>
                                     </th>
@@ -517,7 +517,7 @@
                                     var vendorId = item.Vendor.VendorId;
                                     <tr>
                                         <td>
-                                            <input id="@item.Vendor.VendorId" name="selectedcase" class="selected-case" type="radio" value="@item.Vendor.VendorId" data-toggle="tooltip" title="Select Agency"/>
+                                            <input id="@item.Vendor.VendorId" name="selectedcase" class="selected-case" type="radio" value="@item.Vendor.VendorId" data-toggle="tooltip" title="Select Agency" />
                                         </td>
 
                                         <td>
@@ -530,7 +530,7 @@
                                                 <img title="..." id="profileImage" class="form-Image" src="@Applicationsettings.NO_IMAGE" data-toggle="tooltip" />
                                             }
                                         </td>
-                                        <td>
+                                        <td class="max-width-column-name" data-toggle="tooltip" title="@item.Vendor.Email">
                                             <a id="@item.Vendor.VendorId" onclick="showVendor(@item.Vendor.VendorId)"
                                                class="link-underline-primary" asp-action="VendorDetail" asp-route-selectedcase="@Model.ClaimsInvestigation.ClaimsInvestigationId"
                                                asp-route-id="@item.Vendor.VendorId">
@@ -560,11 +560,11 @@
                                         <td>
                                             @Html.DisplayFor(modelItem => item.Vendor.PhoneNumber)
                                         </td>
-
-                                        <td class="max-width-column">
-                                            @{
-                                                var vendorAddress = item.Vendor.Addressline + ", " + item.Vendor.District.Name + ", " + item.Vendor.State.Name;
-                                            }
+                                        @{
+                                            var vendorAddress = item.Vendor.Addressline + ", " + item.Vendor.District.Name + ", " + item.Vendor.State.Name;
+                                        }
+                                        <td class="max-width-column" data-toggle="tooltip" title="@vendorAddress">
+                                            
                                             @Html.DisplayFor(modelItem => vendorAddress)
                                         </td>
 

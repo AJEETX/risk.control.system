@@ -76,7 +76,7 @@ namespace risk.control.system.Middleware
             }
             try
             {
-                await _next.Invoke(context);
+                await _next(context).ConfigureAwait(false);
             }
             catch (Exception ex)
             {

@@ -92,7 +92,15 @@ namespace risk.control.system.Middleware
             }
             var timeout = double.Parse(config["SESSION_TIMEOUT_SEC"]) - 30;
             context.Items.Add("timeout", timeout);
-            await _next.Invoke(context);
+            try
+            {
+                await _next(context).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                return;
+            }
         }
     }
 }

@@ -42,7 +42,15 @@ namespace risk.control.system.Middleware
                     "frame-ancestors 'self' https://maps.googleapis.com;" +
                     "upgrade-insecure-requests;");
             }
-            await _next(context).ConfigureAwait(false);
+            try
+            {
+                await _next(context).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                return;
+            }
         }
     }
 }

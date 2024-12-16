@@ -19,14 +19,12 @@
                             Agent Photo
                         </th>
                         <th>
-                            Agent Name
+                            Email
                         </th>
                         <th data-orderable="false">
                             Phone #
                         </th>
-                        <th>
-                            Email
-                        </th>
+                        
                         <th data-orderable="false">
                             Address
                         </th>
@@ -54,7 +52,7 @@
                             <td>
                                 <input id="@item.AgencyUser.Id" name="selectedcase" class="selected-case" type="radio" value="@item.AgencyUser.Id" />
                             </td>
-                            <td>
+                            <td class="max-width-column-claim">
                                 @if (item?.AgencyUser.ProfilePictureUrl is not null)
                                 {
                                     var title = @item?.AgencyUser.FirstName + ' ' + @item.AgencyUser?.LastName;
@@ -65,17 +63,14 @@
                                     <img id="profileImage" title="..." class="form-Image  table-profile-image" src="@Applicationsettings.NO_USER" data-toggle="tooltip" />
                                 }
                             </td>
-                            <td class="max-width-column-name">
-                                @item.AgencyUser.FirstName @item.AgencyUser.LastName
+                            <td data-toggle="tooltip" title="@item.AgencyUser.Email">
+                                <a href="#">  @Html.DisplayFor(modelItem => item.AgencyUser.Email)</a>
                             </td>
-
                             <td>
                                 @Html.DisplayFor(modelItem => item.AgencyUser.PhoneNumber)
                             </td>
-                            <td class="max-width-column-name">
-                                <a href="#">  @Html.DisplayFor(modelItem => item.AgencyUser.Email)</a>
-                            </td>
-                            <td class="max-width-column">
+
+                            <td class="max-width-column" data-toggle="tooltip" title="@item.AgencyUser.Addressline">
                                 @Html.DisplayFor(modelItem => item.AgencyUser.Addressline)
                             </td>
                             <td>

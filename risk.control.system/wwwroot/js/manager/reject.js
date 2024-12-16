@@ -56,9 +56,18 @@
                     return img;
                 }
             },
-            { "data": "policyNum", "bSortable": false },
             {
-                "data": "amount"
+                "data": "policyNum",
+                "bSortable": false,
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.policyId + '" data-toggle="tooltip">' + data + '</span>';
+                }
+            },
+            {
+                "data": "amount",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.amount + '" data-toggle="tooltip">' + data + '</span>';
+                }
             },
             {
                 "sDefaultContent": "",
@@ -67,8 +76,12 @@
                     var img = '<img alt="' + row.name + '" title="' + row.name + '" src="' + row.customer + '" class="table-profile-image" data-toggle="tooltip"/>';
                     return img;
                 }
+            }, {
+                "data": "name",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.name + '" data-toggle="tooltip">' + data + '</span>';
+                }
             },
-            { "data": "name" },
             {
                 "sDefaultContent": "",
                 "bSortable": false,
@@ -77,7 +90,12 @@
                     return img;
                 }
             },
-            { "data": "beneficiaryName" },
+            {
+                "data": "beneficiaryName",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.beneficiaryName + '" data-toggle="tooltip">' + data + '</span>'
+                }
+            },
             { "data": "serviceType" },
             { "data": "service" },
             {

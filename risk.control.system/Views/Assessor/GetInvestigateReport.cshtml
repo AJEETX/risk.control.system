@@ -135,7 +135,7 @@
                                             <div class="form-check form-switch">
 
                                                 <label class="form-check-label" for="flexRadioDefault2">
-                                                    @if (string.IsNullOrWhiteSpace(@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImageMatchConfidence))
+                                                    @if (@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.Similarity <= 70)
                                                     {
                                                         <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i>
                                                     }
@@ -262,7 +262,7 @@
                                                     </label>
                                                 </div>
                                             </div>
-                                            @if (string.IsNullOrWhiteSpace(@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImageMatchConfidence) ||
+                                            @if (@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.Similarity < 70 ||
                                            @Model.ClaimsInvestigation.AgencyReport.PanIdReport?.DocumentIdImageValid == null ||
                                            !@Model.ClaimsInvestigation.AgencyReport.PanIdReport.DocumentIdImageValid.Value)
                                             {
@@ -328,7 +328,7 @@
                                                     </div>
                                                 </div>
                                             }
-                                            @if (string.IsNullOrWhiteSpace(@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImageMatchConfidence) ||
+                                            @if (@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.Similarity < 70 ||
                                            @Model.ClaimsInvestigation.AgencyReport.PanIdReport?.DocumentIdImageValid == null ||
                                            !@Model.ClaimsInvestigation.AgencyReport.PanIdReport.DocumentIdImageValid.Value)
                                             {
