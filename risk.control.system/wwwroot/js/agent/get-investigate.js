@@ -831,9 +831,9 @@
         }
     });
 });
-
-if (question4) {
-    question4.max = new Date().toISOString().split("T")[0];
+var questionDate = document.getElementById("question4");
+if (questionDate) {
+    questionDate.max = new Date().toISOString().split("T")[0];
 }
 
 //var nodes = document.getElementById("audio-video").getElementsByTagName('*');

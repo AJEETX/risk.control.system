@@ -56,7 +56,7 @@
                                     </div>
                                     <select name="question1" id="question1" required asp-for="AgencyReport.ReportQuestionaire.Answer1" data-toggle="tooltip" title="Select Ownership of Residence" 
                                     class="form-control remarks" asp-items="Html.GetEnumSelectList<DwellType>()">
-                                        <option value="">--- SELECT ---</option>
+                                        <option>--- SELECT ---</option>
                                     </select>
                                     <span asp-validation-for="AgencyReport.ReportQuestionaire.Answer1" class="text-danger"></span>
                                 </div>
@@ -69,7 +69,7 @@
                                     </div>
                                     <select name="question2" id="question2" required asp-for="AgencyReport.ReportQuestionaire.Answer2" data-toggle="tooltip" title="Select Perceived financial status"
                                             class="form-control remarks" asp-items="Html.GetEnumSelectList<Income>()">
-                                        <option value="">--- SELECT---</option>
+                                        <option>--- SELECT---</option>
                                     </select>
                                     <span asp-validation-for="AgencyReport.ReportQuestionaire.Answer2" class="text-danger"></span>
                                 </div>
