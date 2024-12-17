@@ -165,7 +165,15 @@
             <div class="row">
                 <div class="col-md-12">
                     <div class="form-group">
-                        <a id="back" asp-action="Agencies" class="btn btn-secondary"><i class="fa fa-window-close"></i>  @Applicationsettings.CANCEL </a> &nbsp;
+                            @if (Model.SelectedByCompany)
+                            {
+                                <a id="back" asp-controller="Vendors" asp-action="Agencies" class="btn btn-secondary"><i class="fa fa-window-close"></i>  @Applicationsettings.CANCEL </a>
+                            }
+                            else
+                            {
+                                <a id="back" asp-controller="Company" asp-action="AvailableVendors" class="btn btn-secondary"><i class="fa fa-window-close"></i>  @Applicationsettings.CANCEL </a>
+                            }
+                            &nbsp;
                         @if(Model.HasClaims)
                         {
                                 <span id="withdraw-information-popup" class="badge badge-light">

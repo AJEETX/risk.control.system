@@ -94,7 +94,7 @@ namespace risk.control.system.Services
 
             data.SecondBlockName = "Agencies";
             data.SecondBlockCount = allAgenciesCount;
-            data.SecondBlockUrl = "/Company/AvailableVendors";
+            data.SecondBlockUrl = "/Vendors/Agencies";
 
             data.ThirdBlockName = "Users";
             data.ThirdBlockCount = AllUsersCount;
@@ -252,7 +252,7 @@ namespace risk.control.system.Services
         public DashboardData GetCompanyAdminCount(string userEmail, string role)
         {
             var companyUsersCount = GetCompanyUsers(userEmail);
-            var allAgenciesCount = GetAllAgencies(userEmail);
+            //var allAgenciesCount = GetAllAgencies(userEmail);
             var empanelledAgenciesCount = GetEmpanelledAgencies(userEmail);
             var availableAgenciesCount = GetAvailableAgencies(userEmail);
 
@@ -261,9 +261,9 @@ namespace risk.control.system.Services
             data.FirstBlockCount = companyUsersCount;
             data.FirstBlockUrl = "/Company/Users";
 
-            data.SecondBlockName = "Agencies";
-            data.SecondBlockCount = allAgenciesCount;
-            data.SecondBlockUrl = "/Vendors/Agencies";
+            //data.SecondBlockName = "Agencies";
+            //data.SecondBlockCount = allAgenciesCount;
+            //data.SecondBlockUrl = "/Vendors/Agencies";
 
             data.ThirdBlockName = "Empanelled Agencies";
             data.ThirdBlockCount = empanelledAgenciesCount;
@@ -285,7 +285,7 @@ namespace risk.control.system.Services
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == userEmail);
             var availableVendors = _context.Vendor.Include(a=>a.VendorInvestigationServiceTypes)
                            .Count(v =>
-                           !v.Clients.Any(c => c.ClientCompanyId == companyUser.ClientCompanyId));
+                           !v.Clients.Any(c => c.ClientCompanyId == companyUser.ClientCompanyId) && !v.Deleted);
             return availableVendors;
         }
         private int GetEmpanelledAgencies(string userEmail)

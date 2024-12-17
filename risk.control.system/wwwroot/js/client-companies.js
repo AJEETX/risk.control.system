@@ -4,6 +4,19 @@
             url: '/api/Company/AllCompanies',
             dataSrc: ''
         },
+        columnDefs: [
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 2                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column', // Apply the CSS class,
+                targets: 5                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 10                      // Index of the column to style
+            }],
         fixedHeader: true,
         processing: true,
         paging: true,
@@ -25,10 +38,22 @@
                     return img;
                 }
             },
-            { "data": "domain" },
+            {
+                "data": "domain",
+                bSortable: false,
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.name + '" data-toggle="tooltip">' + data + '</span>'
+                }
+            },
             { "data": "code" },
             { "data": "phone" },
-            { "data": "address" },
+            {
+                "data": "address",
+                bSortable: false,
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.address + '" data-toggle="tooltip">' + data + '</span>'
+                }
+            },
             { "data": "district" },
             { "data": "state" },
             { "data": "country" },
@@ -48,7 +73,13 @@
                 }
             },
             { "data": "updated" },
-            { "data": "updatedBy" },
+            {
+                "data": "updatedBy",
+                bSortable: false,
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.updatedBy + '" data-toggle="tooltip">' + data + '</span>'
+                }
+            },
             {
                 "sDefaultContent": "",
                 "bSortable": false,

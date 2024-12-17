@@ -56,7 +56,21 @@
                 }
             },
             { "data": "pincode" },
-            { "data": "status" },
+            {
+                "sDefaultContent": "",
+                "bSortable": false,
+                "mRender": function (data, type, row) {
+                    var buttons = "";
+                    buttons += '<span class="checkbox">'
+                    if (row.rawStatus == 'ACTIVE') {
+                        buttons += '<i class="fa fa-toggle-on"></i>';
+                    } else {
+                        buttons += '<i class="fa fa-toggle-off"></i>';
+                    }
+                    buttons += '</span>'
+                    return buttons;
+                }
+            },
             { "data": "updated" },
             { "data": "update" },
             {

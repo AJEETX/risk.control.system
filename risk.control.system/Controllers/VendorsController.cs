@@ -124,8 +124,12 @@ namespace risk.control.system.Controllers
                     notifyService.Error("OOPS !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
+                var superAdminUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == currentUserEmail);
 
-
+                if(superAdminUser.IsSuperAdmin)
+                {
+                    vendor.SelectedByCompany = true;
+                }
                 return View(vendor);
             }
             catch (Exception ex)
@@ -956,6 +960,12 @@ namespace risk.control.system.Controllers
                 var editPage = new MvcBreadcrumbNode("Delete", "Vendors", $"Delete Agency") { Parent = agencyPage, RouteValues = new { id = id } };
                 ViewData["BreadcrumbNode"] = editPage;
                 vendor.HasClaims = hasClaims;
+                var superAdminUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == currentUserEmail);
+
+                if (superAdminUser.IsSuperAdmin)
+                {
+                    vendor.SelectedByCompany = true;
+                }
                 return View(vendor);
             }
             catch (Exception ex)
@@ -1000,7 +1010,15 @@ namespace risk.control.system.Controllers
                 _context.Vendor.Update(vendor);
                 await _context.SaveChangesAsync();
                 notifyService.Custom($"Agency {vendor.Email} deleted successfully.", 3, "red", "fas fa-building");
-                return RedirectToAction(nameof(CompanyController.AvailableVendors), "Company");
+                var superAdminUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == currentUserEmail);
+                if (superAdminUser.IsSuperAdmin)
+                {
+                    return RedirectToAction(nameof(Agencies), "Vendors");
+                }
+                else
+                {
+                    return RedirectToAction(nameof(CompanyController.AvailableVendors), "Company");
+                }
             }
             catch (Exception ex)
             {

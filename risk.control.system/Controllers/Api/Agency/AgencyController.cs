@@ -104,7 +104,8 @@ namespace risk.control.system.Controllers.Api.Agency
                     Status = "<span class='badge badge-light'>"+ u.Status.GetEnumDisplayName() + "</span>",
                     Updated = u.Updated.HasValue ? u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy"),
                     Update = u.UpdatedBy,
-                    VendorName = u.Email
+                    VendorName = u.Email,
+                    RawStatus = u.Status.GetEnumDisplayName()
                 })
                 ?.OrderBy(a => a.Name);
 

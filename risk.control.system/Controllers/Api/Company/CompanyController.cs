@@ -189,96 +189,51 @@ namespace risk.control.system.Controllers.Api.Company
         public async Task<IActionResult> GetAvailableVendors()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
-            var superAdminUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
-
             var companyUser = await _context.ClientCompanyApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
-            if(superAdminUser.IsSuperAdmin)
-            {
-                var availableVendors = _context.Vendor
-                   .Include(v => v.Country)
-                   .Include(v => v.PinCode)
-                   .Include(v => v.District)
-                   .Include(v => v.State)
-                   .Include(v => v.VendorInvestigationServiceTypes)
-                   .ThenInclude(v => v.District)
-                   .Include(v => v.VendorInvestigationServiceTypes)
-                   .ThenInclude(v => v.LineOfBusiness)
-                   .Include(v => v.VendorInvestigationServiceTypes)
-                   .ThenInclude(v => v.InvestigationServiceType)
-                   .Include(v => v.VendorInvestigationServiceTypes)
-                   .ThenInclude(v => v.PincodeServices)
-                   .Where(v => !v.Deleted)
-                   .OrderBy(u => u.Name)
-                   .AsQueryable();
-
-                var result =
-                    availableVendors?.Select(u =>
-                    new
-                    {
-                        Id = u.VendorId,
-                        Document = string.IsNullOrWhiteSpace(u.DocumentUrl) ? Applicationsettings.NO_IMAGE : u.DocumentUrl,
-                        Domain = "<a href=/Vendors/Details?id=" + u.VendorId + ">" + u.Email + "</a>",
-                        Name = u.Name,
-                        Code = u.Code,
-                        Phone = u.PhoneNumber,
-                        Address = u.Addressline,
-                        District = u.District.Name,
-                        State = u.State.Name,
-                        Country = u.Country.Name,
-                        Updated = u.Updated.HasValue ? u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy"),
-                        UpdateBy = u.UpdatedBy,
-                        CanOnboard = u.Status == VendorStatus.ACTIVE && u.VendorInvestigationServiceTypes != null && u.VendorInvestigationServiceTypes.Count > 0,
-                        VendorName = u.Email
-                    });
-                return Ok(result?.ToArray());
-            }
-            else
-            {
-                var company = _context.ClientCompany
+            var company = _context.ClientCompany
                 .Include(c => c.CompanyApplicationUser)
                 .FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
 
-                var availableVendors = _context.Vendor
-                    .Where(v =>
-                    !v.Clients.Any(c => c.ClientCompanyId == companyUser.ClientCompanyId))
-                    .Include(v => v.Country)
-                    .Include(v => v.PinCode)
-                    .Include(v => v.District)
-                    .Include(v => v.State)
-                    .Include(v => v.VendorInvestigationServiceTypes)
-                    .ThenInclude(v => v.District)
-                    .Include(v => v.VendorInvestigationServiceTypes)
-                    .ThenInclude(v => v.LineOfBusiness)
-                    .Include(v => v.VendorInvestigationServiceTypes)
-                    .ThenInclude(v => v.InvestigationServiceType)
-                    .Include(v => v.VendorInvestigationServiceTypes)
-                    .ThenInclude(v => v.PincodeServices)
-                    .Where(v => !v.Deleted)
-                    .OrderBy(u => u.Name)
-                    .AsQueryable();
+            var availableVendors = _context.Vendor
+                .Where(v =>
+                !v.Clients.Any(c => c.ClientCompanyId == companyUser.ClientCompanyId))
+                .Include(v => v.Country)
+                .Include(v => v.PinCode)
+                .Include(v => v.District)
+                .Include(v => v.State)
+                .Include(v => v.VendorInvestigationServiceTypes)
+                .ThenInclude(v => v.District)
+                .Include(v => v.VendorInvestigationServiceTypes)
+                .ThenInclude(v => v.LineOfBusiness)
+                .Include(v => v.VendorInvestigationServiceTypes)
+                .ThenInclude(v => v.InvestigationServiceType)
+                .Include(v => v.VendorInvestigationServiceTypes)
+                .ThenInclude(v => v.PincodeServices)
+                .Where(v => !v.Deleted)
+                .OrderBy(u => u.Name)
+                .AsQueryable();
 
-                var result =
-                    availableVendors?.Select(u =>
-                    new
-                    {
-                        Id = u.VendorId,
-                        Document = string.IsNullOrWhiteSpace(u.DocumentUrl) ? Applicationsettings.NO_IMAGE : u.DocumentUrl,
-                        Domain = "<a href=/Vendors/Details?id=" + u.VendorId + ">" + u.Email + "</a>",
-                        Name = u.Name,
-                        Code = u.Code,
-                        Phone = u.PhoneNumber,
-                        Address = u.Addressline,
-                        District = u.District.Name,
-                        State = u.State.Name,
-                        Country = u.Country.Name,
-                        Updated = u.Updated.HasValue ? u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy"),
-                        UpdateBy = u.UpdatedBy,
-                        CanOnboard = u.Status == VendorStatus.ACTIVE && u.VendorInvestigationServiceTypes != null && u.VendorInvestigationServiceTypes.Count > 0,
-                        VendorName = u.Email
-                    });
-                return Ok(result?.ToArray());
-            }
-            
+            var result =
+                availableVendors?.Select(u =>
+                new
+                {
+                    Id = u.VendorId,
+                    Document = string.IsNullOrWhiteSpace(u.DocumentUrl) ? Applicationsettings.NO_IMAGE : u.DocumentUrl,
+                    Domain = "<a href=/Vendors/Details?id=" + u.VendorId + ">" + u.Email + "</a>",
+                    Name = u.Name,
+                    Code = u.Code,
+                    Phone = u.PhoneNumber,
+                    Address = u.Addressline,
+                    District = u.District.Name,
+                    State = u.State.Name,
+                    Country = u.Country.Name,
+                    Updated = u.Updated.HasValue ? u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy"),
+                    UpdateBy = u.UpdatedBy,
+                    CanOnboard = u.Status == VendorStatus.ACTIVE && u.VendorInvestigationServiceTypes != null && u.VendorInvestigationServiceTypes.Count > 0,
+                    VendorName = u.Email
+                });
+            return Ok(result?.ToArray());
+
         }
 
         [HttpGet("AllServices")]
