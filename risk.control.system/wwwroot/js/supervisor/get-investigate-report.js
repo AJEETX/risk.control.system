@@ -98,7 +98,7 @@
     });
 
     let askConfirmation = false;
-    $('#create-form').on('submit', function (e) {
+    $('#supervisor-form').on('submit', function (e) {
         var report = $('#supervisorRemarks').val();
 
         if (report == '') {
@@ -147,7 +147,7 @@
                             $('#allocate-case').attr('disabled', 'disabled');
                             $('#allocate-case').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> SUBMIT");
 
-                            $('#create-form').submit();
+                            $('#supervisor-form').submit();
 
                             var createForm = document.getElementById("create-form");
                             if (createForm) {

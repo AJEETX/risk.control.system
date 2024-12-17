@@ -25,25 +25,19 @@ namespace risk.control.system.Controllers
     {
         private static string NO_DATA = " NO - DATA ";
         private readonly ApplicationDbContext _context;
-        private readonly IFtpService ftpService;
         private readonly INotyfService notifyService;
         private readonly IClaimsAgentService agentService;
         private readonly IWebHostEnvironment webHostEnvironment;
-        private readonly IToastNotification toastNotification;
 
         public UploadsController(ApplicationDbContext context,
-            IFtpService ftpService,
             INotyfService notifyService,
             IClaimsAgentService agentService,
-            IWebHostEnvironment webHostEnvironment,
-            IToastNotification toastNotification)
+            IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
-            this.ftpService = ftpService;
             this.notifyService = notifyService;
             this.agentService = agentService;
             this.webHostEnvironment = webHostEnvironment;
-            this.toastNotification = toastNotification;
         }
 
         public IActionResult Index()
@@ -97,7 +91,7 @@ namespace risk.control.system.Controllers
         [HttpPost]
         [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> FaceUpload(string selectedcase, IFormFile digitalImage, string digitalIdLatitude, string digitalIdLongitude)
+        public async Task<IActionResult> FaceUpload(string selectedcase, IFormFile digitalImage, string digitalIdLatitude, string digitalIdLongitude, bool supervisorPhotoIdUpdate = false)
         {
             try
             {
@@ -108,10 +102,10 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                if (string.IsNullOrWhiteSpace(currentUserEmail) || 
-                    (digitalImage == null) || 
+                if (string.IsNullOrWhiteSpace(currentUserEmail) ||
+                    (digitalImage == null) ||
                     string.IsNullOrWhiteSpace(selectedcase) ||
-                    string.IsNullOrWhiteSpace(digitalIdLatitude) || 
+                    string.IsNullOrWhiteSpace(digitalIdLatitude) ||
                     string.IsNullOrWhiteSpace(Path.GetFileName(digitalImage.FileName)) ||
                     string.IsNullOrWhiteSpace(Path.GetExtension(Path.GetFileName(digitalImage.FileName))) ||
                     string.IsNullOrWhiteSpace(Path.GetFileName(digitalImage.Name)) ||
@@ -133,7 +127,14 @@ namespace risk.control.system.Controllers
                     var response = await agentService.PostFaceId(currentUserEmail, selectedcase, digitalIdLatitude, digitalIdLongitude, imageByte);
 
                     notifyService.Custom($"Photo Image Uploaded", 3, "green", "fas fa-portrait");
-                    return Redirect("/Agent/GetInvestigate?selectedcase=" + selectedcase);
+                    if (supervisorPhotoIdUpdate)
+                    {
+                        return Redirect("/Supervisor/GetInvestigateReport?selectedcase=" + selectedcase);
+                    }
+                    else
+                    {
+                        return Redirect("/Agent/GetInvestigate?selectedcase=" + selectedcase);
+                    }
                 }
             }
             catch (Exception ex)
@@ -147,7 +148,7 @@ namespace risk.control.system.Controllers
         [HttpPost]
         [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> PanUpload(string selectedclaim, IFormFile panImage, string documentIdLatitude, string documentIdLongitude)
+        public async Task<IActionResult> PanUpload(string selectedclaim, IFormFile panImage, string documentIdLatitude, string documentIdLongitude, bool supervisorPanUpdate = false)
         {
             try
             {
@@ -160,8 +161,8 @@ namespace risk.control.system.Controllers
                 }
 
                 if (string.IsNullOrWhiteSpace(currentUserEmail) ||
-                    (panImage == null) || 
-                    string.IsNullOrWhiteSpace(documentIdLatitude) || 
+                    (panImage == null) ||
+                    string.IsNullOrWhiteSpace(documentIdLatitude) ||
                     string.IsNullOrWhiteSpace(documentIdLongitude) ||
                     Path.GetInvalidFileNameChars() == null ||
                     string.IsNullOrWhiteSpace(Path.GetFileName(panImage.FileName)) ||
@@ -185,7 +186,14 @@ namespace risk.control.system.Controllers
                     var response = await agentService.PostDocumentId(currentUserEmail, selectedclaim, documentIdLatitude, documentIdLongitude, imageByte);
 
                     notifyService.Custom($"Pan card Image Uploaded", 3, "green", "fas fa-mobile-alt");
-                    return Redirect("/Agent/GetInvestigate?selectedcase=" + selectedclaim);
+                    if (supervisorPanUpdate)
+                    {
+                        return Redirect("/Supervisor/GetInvestigateReport?selectedcase=" + selectedclaim);
+                    }
+                    else
+                    {
+                        return Redirect("/Agent/GetInvestigate?selectedcase=" + selectedclaim);
+                    }
                 }
             }
             catch (Exception ex)
@@ -199,7 +207,7 @@ namespace risk.control.system.Controllers
         [HttpPost]
         [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> PassportUpload(string selectedclaim, IFormFile passportImage, string passportIdLatitude, string passportIdLongitude)
+        public async Task<IActionResult> PassportUpload(string selectedclaim, IFormFile passportImage, string passportIdLatitude, string passportIdLongitude, bool supervisorPassportUpdate = false)
         {
             try
             {
@@ -236,7 +244,14 @@ namespace risk.control.system.Controllers
                     var response = await agentService.PostPassportId(currentUserEmail, selectedclaim, passportIdLatitude, passportIdLongitude, imageByte);
 
                     notifyService.Custom($"Passport Image Uploaded", 3, "green", "fas fa-mobile-alt");
-                    return Redirect("/Agent/GetInvestigate?selectedcase=" + selectedclaim);
+                    if (supervisorPassportUpdate)
+                    {
+                        return Redirect("/Supervisor/GetInvestigateReport?selectedcase=" + selectedclaim);
+                    }
+                    else
+                    {
+                        return Redirect("/Agent/GetInvestigate?selectedcase=" + selectedclaim);
+                    }
                 }
             }
             catch (Exception ex)
@@ -250,7 +265,7 @@ namespace risk.control.system.Controllers
         [HttpPost]
         [RequestSizeLimit(5_000_000)] // Checking for 5 MB
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AudioUpload(string selectedclaim, IFormFile audioFile, string audioLatitude, string audioLongitude)
+        public async Task<IActionResult> AudioUpload(string selectedclaim, IFormFile audioFile, string audioLatitude, string audioLongitude, bool supervisorAudioUpdate = false)
         {
             try
             {
@@ -277,7 +292,14 @@ namespace risk.control.system.Controllers
                 if (string.IsNullOrWhiteSpace(selectedclaim))
                 {
                     notifyService.Custom($"No claim selected!!!. ", 3, "orange", "fas fa-mobile-alt");
-                    return Redirect("/Agent/GetInvestigate?selectedcase=" + selectedclaim);
+                    if (supervisorAudioUpdate)
+                    {
+                        return Redirect("/Supervisor/GetInvestigateReport?selectedcase=" + selectedclaim);
+                    }
+                    else
+                    {
+                        return Redirect("/Agent/GetInvestigate?selectedcase=" + selectedclaim);
+                    }
                 }
 
                 using (var ds = new MemoryStream())
@@ -319,7 +341,7 @@ namespace risk.control.system.Controllers
         [HttpPost]
         [RequestSizeLimit(5_000_000)] // Checking for 5 MB
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> VideoUpload(string selectedclaim, IFormFile videoFile, string videoLatitude, string videoLongitude)
+        public async Task<IActionResult> VideoUpload(string selectedclaim, IFormFile videoFile, string videoLatitude, string videoLongitude, bool supervisorVideoUpdate = false)
         {
             try
             {
@@ -356,7 +378,14 @@ namespace risk.control.system.Controllers
                     var response = await agentService.PostVideo(currentUserEmail, selectedclaim, videoLatitude, videoLongitude, Path.GetFileName(videoFile.FileName), imageByte);
 
                     notifyService.Custom($"Video Uploaded", 3, "green", "fas fa-mobile-alt");
-                    return Redirect("/Agent/GetInvestigate?selectedcase=" + selectedclaim);
+                    if (supervisorVideoUpdate)
+                    {
+                        return Redirect("/Supervisor/GetInvestigateReport?selectedcase=" + selectedclaim);
+                    }
+                    else
+                    {
+                        return Redirect("/Agent/GetInvestigate?selectedcase=" + selectedclaim);
+                    }
                 }
             }
             catch (Exception ex)

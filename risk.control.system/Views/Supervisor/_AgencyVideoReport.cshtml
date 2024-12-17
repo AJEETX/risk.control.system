@@ -158,6 +158,27 @@
                     </div>
                 </div>
             </div>
+
+            @if (Model.ClaimsInvestigation.UpdateAgentReport)
+            {
+                <form id="upload-video" method="post" enctype="multipart/form-data" asp-controller="Uploads" asp-action="VideoUpload">
+                    <input type="hidden" id="videoLatitude" name="videoLatitude" />
+                    <input type="hidden" id="videoLongitude" name="videoLongitude" />
+                    <input type="hidden" id="supervisorVideoUpdate" name="supervisorVideoUpdate" value="true" />
+                    <input type="hidden" id="selectedclaim" name="selectedclaim" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
+                    <div class="card-footer">
+
+                        <div class="form-group">
+                            <span class="input-group-label"> Upload VIDEO : </span>
+                            <div class="input-group mb-3">
+                                <img class="form-Image" id="video-Image" src="@Applicationsettings.VIDEO_UPLOAD_IMAGE" title="Video" />
+                                <input accept=".mp4" type="file" class="form-control remarks" name="videoFile" id="videoFile" data-toggle="tooltip" title="Upload Video" />
+                                <button id="UploadVideoButton" disabled type="submit" class="btn btn-info upload"><i class="nav-icon fa fa-upload"></i> Upload</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            }
         </div>
         @if (@Model.AgencyReport?.VideoReport?.DocumentIdImageLocationUrl != null)
         {

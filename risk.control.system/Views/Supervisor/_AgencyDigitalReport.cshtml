@@ -122,26 +122,27 @@
                         </div>
                     </div>
                 </div>
-                @if(Model.ClaimsInvestigation.UpdateAgentReport)
+                @if (Model.ClaimsInvestigation.UpdateAgentReport)
                 {
-                               <form id="upload-face" asp-controller="Uploads" asp-action="FaceUpload" method="post" enctype="multipart/form-data">
-                            <input type="hidden" id="digitalIdLatitude" name="digitalIdLatitude" />
-                            <input type="hidden" id="digitalIdLongitude" name="digitalIdLongitude" />
-                            <input type="hidden" id="selectedcase" name="selectedcase" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
-                            <div class="card-footer">
+                    <form id="upload-face" asp-controller="Uploads" asp-action="FaceUpload" method="post" enctype="multipart/form-data">
+                        <input type="hidden" id="digitalIdLatitude" name="digitalIdLatitude" />
+                        <input type="hidden" id="digitalIdLongitude" name="digitalIdLongitude" />
+                        <input type="hidden" id="supervisorPhotoIdUpdate" name="supervisorPhotoIdUpdate" value="true" />
+                        <input type="hidden" id="selectedcase" name="selectedcase" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
+                        <div class="card-footer">
 
-                                <div class="form-group">
-                                    <span class="input-group-label"> Upload PHOTO ID : </span>
-                                    <div class="input-group mb-3">
-                                        <img class="form-Image" id="face-Image" src="@Applicationsettings.NO_USER" title="Digital Id Image" />
-                                        <input accept=".jpg,jpeg,png" type="file" class="form-control remarks" name="digitalImage" id="digitalImage" data-toggle="tooltip" title="Upload Face Image" />
-                                        <button id="UploadFaceImageButton" disabled type="submit" class="btn btn-info upload"><i class="nav-icon fa fa-upload"></i> Upload</button>
-                                    </div>
+                            <div class="form-group">
+                                <span class="input-group-label"> Upload PHOTO ID : </span>
+                                <div class="input-group mb-3">
+                                    <img class="form-Image" id="face-Image" src="@Applicationsettings.NO_USER" title="Digital Id Image" />
+                                    <input accept=".jpg,jpeg,png" type="file" class="form-control remarks" name="digitalImage" id="digitalImage" data-toggle="tooltip" title="Upload Face Image" />
+                                    <button id="UploadFaceImageButton" disabled type="submit" class="btn btn-info upload"><i class="nav-icon fa fa-upload"></i> Upload</button>
                                 </div>
                             </div>
-                        </form> 
+                        </div>
+                    </form>
                 }
-                
+
             </div>
 
             <div class="card direct-chat direct-chat-warning collapsed-card">

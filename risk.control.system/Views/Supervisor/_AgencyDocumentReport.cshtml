@@ -126,6 +126,7 @@
                     <form id="upload-pan" method="post" enctype="multipart/form-data" asp-controller="Uploads" asp-action="PanUpload">
                         <input type="hidden" id="documentIdLatitude" name="documentIdLatitude" />
                         <input type="hidden" id="documentIdLongitude" name="documentIdLongitude" />
+                        <input type="hidden" id="supervisorPanUpdate" name="supervisorPanUpdate" value="true" />
                         <input type="hidden" id="selectedclaim" name="selectedclaim" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
                         <div class="card-footer">
 

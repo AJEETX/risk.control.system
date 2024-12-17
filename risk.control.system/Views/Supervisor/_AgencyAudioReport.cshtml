@@ -36,7 +36,7 @@
                                     <i class='far fa-hand-point-right'></i>
                                     <b> Upload</b> Max image size 2 MB
                                 </div>
-                            <div>
+                                <div>
                                     <i class='far fa-thumbs-down'></i> <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i> Valid Audio
                                 </div>
                             </span>
@@ -61,11 +61,11 @@
                                     <b> Upload</b> Max image size 2 MB
                                 </div>
                                 <div>
-                                <i class='far fa-hand-point-right'></i>
-                                <button class='btn btn-info btn-xs'>
+                                    <i class='far fa-hand-point-right'></i>
+                                    <button class='btn btn-info btn-xs'>
                                         <span class='badge badge-info btn-xs'>
                                             <i class='fa fa-upload'></i>
-                                    </span> Upload
+                                        </span> Upload
                                     </button>  Audio
                                 </div>
                             </span>
@@ -81,7 +81,7 @@
                     </span>
 
                 </div>
-                
+
             </div>
 
             <div class="card-footer text-center">
@@ -122,7 +122,7 @@
                                 }
                                 else
                                 {
-                                                            <img id="audioPlayer" class="img-fluid no-Image" data-toggle="tooltip" title="No Audio"
+                                    <img id="audioPlayer" class="img-fluid no-Image" data-toggle="tooltip" title="No Audio"
                                          src=@Applicationsettings.NO_AUDIO>
                                 }
                             }
@@ -158,6 +158,26 @@
                     </div>
                 </div>
             </div>
+            @if (Model.ClaimsInvestigation.UpdateAgentReport)
+            {
+                <form id="upload-audio" method="post" enctype="multipart/form-data" asp-controller="Uploads" asp-action="AudioUpload">
+                    <input type="hidden" id="audioLatitude" name="audioLatitude" />
+                    <input type="hidden" id="audioLongitude" name="audioLongitude" />
+                    <input type="hidden" id="supervisorAudioUpdate" name="supervisorAudioUpdate" value="true" />
+                    <input type="hidden" id="selectedclaim" name="selectedclaim" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
+                    <div class="card-footer">
+
+                        <div class="form-group">
+                            <span class="input-group-label"> Upload AUDIO : </span>
+                            <div class="input-group mb-3">
+                                <img class="form-Image" id="audio-Image" src="@Applicationsettings.AUDIO_UPLOAD_IMAGE" title="Audio" />
+                                <input accept=".mp3" type="file" class="form-control remarks" name="audioFile" id="audioFile" data-toggle="tooltip" title="Upload Audio" />
+                                <button id="UploadAudioButton" disabled type="submit" class="btn btn-info upload"><i class="nav-icon fa fa-upload"></i> Upload</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            }
         </div>
         @if (@Model.AgencyReport?.AudioReport?.DocumentIdImageLocationUrl != null)
         {
@@ -175,7 +195,7 @@
                 <div class="card-body">
                     <div id="audio-map">
                     </div>
-                            <div id="audio-msg">
+                    <div id="audio-msg">
                     </div>
                 </div>
             </div>
