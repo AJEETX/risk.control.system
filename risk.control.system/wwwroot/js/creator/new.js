@@ -77,7 +77,7 @@
                 className: 'max-width-column-name', // Apply the CSS class,
                 targets: 7                      // Index of the column to style
             }],
-        order: [[12, 'desc']],
+        order: [[15, 'asc']],
         fixedHeader: true,
         processing: true,
         paging: true,
@@ -180,7 +180,8 @@
                     buttons += '<a id="details' + row.id + '" onclick="getdetails(`' + row.id + '`)" href="Delete?Id=' + row.id + '" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i> Delete </a>'
                     return buttons;
                 }
-            }
+            },
+            { "data": "timeElapsed", bVisible: false }
         ],
         "drawCallback": function (settings, start, end, max, total, pre) {
             var rowCount = (this.fnSettings().fnRecordsTotal()); // total number of rows

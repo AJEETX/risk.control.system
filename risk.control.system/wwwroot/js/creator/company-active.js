@@ -38,7 +38,7 @@
             className: 'max-width-column-name', // Apply the CSS class,
             targets: 6                      // Index of the column to style
         }],
-        order: [[12, 'desc']],
+        order: [[15, 'asc']],
         fixedHeader: true,
         processing: true,
         paging: true,
@@ -158,7 +158,8 @@
                     //}
                     return buttons;
                 }
-            }
+            },
+            { "data":"timeElapsed", bVisible: false}
         ],
         "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
             if (aData.isNewAssigned) {

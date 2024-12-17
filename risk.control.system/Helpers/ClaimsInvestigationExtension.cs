@@ -22,36 +22,54 @@ namespace risk.control.system.Helpers
 
                 else if (DateTime.Now.Subtract(a.Created).Days >= 3 || DateTime.Now.Subtract(a.Created).Days >= a.CreatorSla)
                     return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Created).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Caution : {DateTime.Now.Subtract(a.Created).Days} day since created.\"></i>");
+                if (DateTime.Now.Subtract(a.Created).Days >= 1)
+                    return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Created).Days} day</span>");
+
+                if (DateTime.Now.Subtract(a.Created).Hours < 24 &&
+                    DateTime.Now.Subtract(a.Created).Hours > 0)
+                {
+                    return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Created).Hours} hr </span>");
+                }
+                if (DateTime.Now.Subtract(a.Created).Hours == 0 && DateTime.Now.Subtract(a.Created).Minutes > 0)
+                {
+                    return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Created).Minutes} min </span>");
+                }
+                if (DateTime.Now.Subtract(a.Created).Minutes == 0 && DateTime.Now.Subtract(a.Created).Seconds > 0)
+                {
+                    return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Created).Seconds} sec </span>");
+                }
+                return string.Join("", "<span class='badge badge-light'>now</span>");
             }
             else
             {
                 if (a.CreatorSla == 0)
                 {
-                    return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Created).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Hurry up, {DateTime.Now.Subtract(a.Created).Days} days since created!\"></i>");
+                    return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Hurry up, {DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Days} days since created!\"></i>");
                 }
-                if (DateTime.Now.Subtract(a.Created).Days >= a.CreatorSla)
-                    return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Created).Days} day</span>");
+                if (DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Days >= a.CreatorSla)
+                    return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Days} day</span>");
 
-                else if (DateTime.Now.Subtract(a.Created).Days >= 3 || DateTime.Now.Subtract(a.Created).Days >= a.CreatorSla)
-                    return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Created).Days} day</span>");
-            }
-            if (DateTime.Now.Subtract(a.Created).Days >= 1)
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Created).Days} day</span>");
+                else if (DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Days >= 3 || DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Days >= a.CreatorSla)
+                    return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Days} day</span>");
+                if (DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Days >= 1)
+                    return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Days} day</span>");
 
-            if (DateTime.Now.Subtract(a.Created).Hours < 24 &&
-                DateTime.Now.Subtract(a.Created).Hours > 0)
-            {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Created).Hours} hr </span>");
+                if (DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Hours < 24 &&
+                    DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Hours > 0)
+                {
+                    return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Hours} hr </span>");
+                }
+                if (DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Hours == 0 && DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Minutes > 0)
+                {
+                    return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Minutes} min </span>");
+                }
+                if (DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Minutes == 0 && DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Seconds > 0)
+                {
+                    return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Seconds} sec </span>");
+                }
+                return string.Join("", "<span class='badge badge-light'>now</span>");
             }
-            if (DateTime.Now.Subtract(a.Created).Hours == 0 && DateTime.Now.Subtract(a.Created).Minutes > 0)
-            {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Created).Minutes} min </span>");
-            }
-            if (DateTime.Now.Subtract(a.Created).Minutes == 0 && DateTime.Now.Subtract(a.Created).Seconds > 0)
-            {
-                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.Created).Seconds} sec </span>");
-            }
-            return string.Join("", "<span class='badge badge-light'>now</span>");
+            
         }
 
         public static string GetAgentTimePending(this ClaimsInvestigation a, bool open = false)
