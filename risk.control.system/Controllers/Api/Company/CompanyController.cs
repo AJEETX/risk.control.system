@@ -16,7 +16,7 @@ namespace risk.control.system.Controllers.Api.Company
 {
     [ApiExplorerSettings(IgnoreApi = true)]
     [Route("api/[controller]")]
-    [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME}")]
+    [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME}, {CREATOR.DISPLAY_NAME}")]
     [ApiController]
     public class CompanyController : ControllerBase
     {
@@ -148,40 +148,44 @@ namespace risk.control.system.Controllers.Api.Company
         [HttpGet("GetEmpanelledVendors")]
         public async Task<IActionResult> GetEmpanelledVendors()
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
-            var companyUser = await _context.ClientCompanyApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
-
+            var userEmail = HttpContext.User?.Identity?.Name; var companyUser = await _context.ClientCompanyApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
+            var allocatedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR); 
+            var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT); 
+            var submitted2SuperStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR);
+            var claimsCases = _context.ClaimsInvestigation
+                .Where(c => c.ClientCompanyId == companyUser.ClientCompanyId && 
+                (c.InvestigationCaseSubStatusId == allocatedStatus.InvestigationCaseSubStatusId || 
+                c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId || 
+                c.InvestigationCaseSubStatusId == submitted2SuperStatus.InvestigationCaseSubStatusId))
+                ?.ToList();
             var company = _context.ClientCompany
                 .Include(c => c.CompanyApplicationUser)
-                .Include(c => c.EmpanelledVendors)
-                .ThenInclude(c => c.State)
-                .Include(c => c.EmpanelledVendors)
-                .ThenInclude(c => c.District)
-                .Include(c => c.EmpanelledVendors)
-                .ThenInclude(c => c.Country)
+                .Include(c => c.EmpanelledVendors).ThenInclude(c => c.State)
+                .Include(c => c.EmpanelledVendors).ThenInclude(c => c.District)
+                .Include(c => c.EmpanelledVendors).ThenInclude(c => c.Country)
+                .Include(c => c.EmpanelledVendors).ThenInclude(c => c.PinCode)
+                .Include(c => c.EmpanelledVendors).ThenInclude(c => c.ratings)
                 .FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
-
-            var result =
-                company.EmpanelledVendors?.Where(v => !v.Deleted && v.Status == VendorStatus.ACTIVE)
-                .OrderBy(u => u.Name)
-                .Select(u =>
-                new
-                {
-                    Id = u.VendorId,
-                    Document = string.IsNullOrWhiteSpace(u.DocumentUrl) ? Applicationsettings.NO_IMAGE : u.DocumentUrl,
-                    Domain = "<a href=/Vendors/Details?id=" + u.VendorId + ">" + u.Email + "</a>",
-                    Name = u.Name,
-                    Code = u.Code,
-                    Phone = u.PhoneNumber,
-                    Address = u.Addressline,
-                    District = u.District.Name,
-                    State = u.State.Name,
-                    Country = u.Country.Name,
-                    Updated = u.Updated.HasValue ? u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy"),
-                    UpdateBy = u.UpdatedBy,
-                    VendorName = u.Email
+            var result = company.EmpanelledVendors?.Where(v => !v.Deleted && v.Status == VendorStatus.ACTIVE)
+                .OrderBy(u => u.Name).Select(u => new 
+                { 
+                    Id = u.VendorId, 
+                    Document = string.IsNullOrWhiteSpace(u.DocumentUrl) ? Applicationsettings.NO_IMAGE : u.DocumentUrl, 
+                    Domain = companyUser.Role == AppRoles.COMPANY_ADMIN ? "<a href=/Vendors/Details?id=" + u.VendorId + ">" + u.Email + "</a>" : u.Email, 
+                    Name = u.Name, 
+                    Code = u.Code, 
+                    Phone = u.PhoneNumber, 
+                    Address = u.Addressline, 
+                    District = u.District.Name, 
+                    State = u.State.Name, 
+                    Country = u.Country.Name, 
+                    Updated = u.Updated.HasValue ? u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy"), 
+                    UpdateBy = u.UpdatedBy, 
+                    CaseCount = claimsCases.Count(c => c.VendorId == u.VendorId), 
+                    RateCount = u.RateCount, 
+                    RateTotal = u.RateTotal ,
+                    RawAddress = u.Addressline + ","+ u.District.Name +", " + u.State.Code + ", "+u.Country.Code
                 });
-
             return Ok(result?.ToArray());
         }
 

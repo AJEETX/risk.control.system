@@ -469,137 +469,41 @@
                 </div> <!-- class bb-blog-inner -->
             </article>
 
-            <form id="radioButtons" method="post" asp-controller="ClaimsInvestigationPost" asp-action="CaseAllocatedToVendor" enctype="multipart/form-data">
-
+            <form id="radioButtons" method="post" asp-controller="ClaimsInvestigationPost" asp-action="CaseAllocatedToVendor">
                 <div class="card-body">
-
                     <div class="submit-progress hidden">
                         <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
                     </div>
                     <div class="table-responsive mailbox-messages">
                         <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
                         <input type="hidden" id="CaseLocationId" name="CaseLocationId" value="@Model.Location.BeneficiaryDetailId" />
-                        <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
+                        <table id="customerTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
                             <thead>
                                 <tr>
-                                    <th data-orderable="false"><img class="action-image" src="~/headers/arrow-down.gif" data-toggle="tooltip" title="Select Agency" /></th>
-
                                     <th data-orderable="false">
-                                        Agency
+                                        <img class="action-image" src="~/headers/arrow-down.gif" title="Select Agency" alt="Select Agency" />
                                     </th>
-                                    <th>
-                                        Domain
-                                    </th>
-                                    <th>
-                                        Name
-                                    </th>
-
                                     <th data-orderable="false">
-                                        Phone #
+                                        <span> <i class="far fa-file-word"></i></span>
                                     </th>
-
-                                    <th data-orderable="false">
-                                        Address
-                                    </th>
-
-
-                                    <th data-orderable="false">
-                                        <span class="badge badge-light">Service</span> : <span class="badge badge-light">Pincodes</span>
-                                    </th>
-                                    <th>
-                                        Case(s)
-                                    </th>
+                                    <th>Domain</th>
+                                    <th>Name</th>
+                                    <th>Phone</th>
+                                    <th>Address</th>
+                                    <th>District</th>
+                                    <th>State</th>
+                                    <th>Country</th>
+                                    <th>Case load</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                @foreach (var item in Model.Vendors)
-                                {
-                                    var vendorId = item.Vendor.VendorId;
-                                    <tr>
-                                        <td>
-                                            <input id="@item.Vendor.VendorId" name="selectedcase" class="selected-case" type="radio" value="@item.Vendor.VendorId" data-toggle="tooltip" title="Select Agency" />
-                                        </td>
-
-                                        <td>
-                                            @if (item?.Vendor.DocumentUrl is not null)
-                                            {
-                                                <img title="@item.Vendor.Name" id="profileImage" class="form-Image" src="@item?.Vendor.DocumentUrl" data-toggle="tooltip" />
-                                            }
-                                            else
-                                            {
-                                                <img title="..." id="profileImage" class="form-Image" src="@Applicationsettings.NO_IMAGE" data-toggle="tooltip" />
-                                            }
-                                        </td>
-                                        <td class="max-width-column-name" data-toggle="tooltip" title="@item.Vendor.Email">
-                                            <a id="@item.Vendor.VendorId" onclick="showVendor(@item.Vendor.VendorId)"
-                                               class="link-underline-primary" asp-action="VendorDetail" asp-route-selectedcase="@Model.ClaimsInvestigation.ClaimsInvestigationId"
-                                               asp-route-id="@item.Vendor.VendorId">
-                                                @Html.DisplayFor(modelItem => item.Vendor.Email)
-                                            </a>
-                                        </td>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.Vendor.Name)
-                                            <br />
-                                            <img src="~/images/StarFade.gif" alt="Star Rating" align="middle" id="1" class="rating" vendorId="@vendorId" />
-                                            <img src="~/images/StarFade.gif" alt="Star Rating" align="middle" id="2" class="rating" vendorId="@vendorId" />
-                                            <img src="~/images/StarFade.gif" alt="Star Rating" align="middle" id="3" class="rating" vendorId="@vendorId" />
-                                            <img src="~/images/StarFade.gif" alt="Star Rating" align="middle" id="4" class="rating" vendorId="@vendorId" />
-                                            <img src="~/images/StarFade.gif" alt="Star Rating" align="middle" id="5" class="rating" vendorId="@vendorId" />
-                                            <span class="badge badge-light">
-                                                (@item.Vendor.RateCount)
-                                            </span>
-                                            @if (item.Vendor.RateCount != null && item.Vendor.RateCount > 0)
-                                            {
-                                                decimal a = @item.Vendor.RateTotal.Value / @item.Vendor.RateCount.Value;
-                                                <span class="avr"> @a</span>
-                                            }
-                                            <span class="badge badge-light">
-                                                <span class="result"></span>
-                                            </span>
-                                        </td>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.Vendor.PhoneNumber)
-                                        </td>
-                                        @{
-                                            var vendorAddress = item.Vendor.Addressline + ", " + item.Vendor.District.Name + ", " + item.Vendor.State.Name;
-                                        }
-                                        <td class="max-width-column" data-toggle="tooltip" title="@vendorAddress">
-                                            
-                                            @Html.DisplayFor(modelItem => vendorAddress)
-                                        </td>
-
-                                        <td class="max-width-column-picodes">
-                                            @foreach (var service in item.Vendor.VendorInvestigationServiceTypes)
-                                            {
-                                                <span class="badge badge-light">
-                                                    @service.LineOfBusiness.Name - @service.InvestigationServiceType.Name
-                                                    @foreach (var pincode in service.PincodeServices)
-                                                    {
-                                                        <span class="badge badge-light">@pincode.Pincode</span>
-                                                    }
-                                                </span>
-
-                                                <br />
-                                            }
-                                        </td>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.CaseCount)
-                                        </td>
-
-                                    </tr>
-                                }
-                            </tbody>
                         </table>
-
                     </div>
-
-                </div>
+                </div>    
                 <div class="card-footer">
                     <div class="row">
                         <div class="col-md-12">
                             <a id="back" asp-action="New" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> Back</a>
-
-                            <button disabled="disabled" id="allocate-case" type="submit" class="btn btn-danger">
+                            <button disabled="disabled" id="allocatedcase" type="submit" class="btn btn-danger">
                                 <i class="fas fa-external-link-alt" aria-hidden="true"></i> <b> Assign </b><sub>manual</sub>
                             </button>
                         </div>
