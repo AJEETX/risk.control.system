@@ -59,7 +59,7 @@
             {
                 "data": "domain",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.vendorName + '" data-toggle="tooltip">' + data + '</span>'
+                    return '<span title="' + row.name + '" data-toggle="tooltip">' + data + '</span>'
                 }
             },
             {
@@ -80,6 +80,12 @@
             { "data": "district" },
             { "data": "state" },
             { "data": "country" },
+            {
+                "data": "caseCount",
+                "mRender": function (data, type, row) {
+                    return '<span title="Total number of current cases = ' + row.caseCount + '" data-toggle="tooltip">' + data + '</span>';
+                }
+            },
             { "data": "updated" },
             {
                 "data": "updateBy",

@@ -96,8 +96,18 @@
                     return '<span title="' + row.beneficiaryName + '" data-toggle="tooltip">' + data + '</span>'
                 }
             },
-            { "data": "serviceType" },
-            { "data": "service" },
+            {
+                "data": "serviceType",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.serviceType + '" data-toggle="tooltip">' + data + '</span>'
+                }
+            },
+            {
+                "data": "service",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.service + '" data-toggle="tooltip">' + data + '</span>'
+                }
+            },
             {
                 "data": "pincode",
                 "mRender": function (data, type, row) {
@@ -112,7 +122,12 @@
                 }
                 ///<button type="button" class="btn btn-lg btn-danger" data-toggle="popover" title="Popover title" data-content="And here's some amazing content. It's very engaging. Right?">Click to toggle popover</button>
             },
-            { "data": "created" },
+            {
+                "data": "created",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.created + '" data-toggle="tooltip">' + data + '</span>'
+                }
+            },
             { "data": "timePending" },
             {
                 "sDefaultContent": "",

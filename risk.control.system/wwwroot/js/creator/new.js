@@ -160,17 +160,39 @@
                     return '<span title="' + row.beneficiaryFullName + '" data-toggle="tooltip">' + data + '</span>'
                 }
             },
-            { "data": "serviceType" },
-            { "data": "service" },
+            {
+                "data": "serviceType",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.serviceType + '" data-toggle="tooltip">' + data + '</span>'
+                }
+            },
+            {
+                "data": "service",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.service + '" data-toggle="tooltip">' + data + '</span>'
+                }
+            },
             {
                 "data": "pincode",
                 "mRender": function (data, type, row) {
                     return '<span title="' + row.pincodeName + '" data-toggle="tooltip">' + data + '</span>'
                 }
             },
-            { "data": "location" },
-            { "data": "created" },
-            { "data": "timePending" },
+            {
+                "data": "location",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.location + '" data-toggle="tooltip">' + data + '</span>'
+                }
+            },
+            {
+                "data": "created",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.created + '" data-toggle="tooltip">' + data + '</span>'
+                }
+            },
+            {
+                "data": "timePending"
+            },
             {
                 "sDefaultContent": "",
                 "bSortable": false,

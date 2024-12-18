@@ -98,7 +98,12 @@
                     return '<span title="' + row.beneficiaryName + '" data-toggle="tooltip">' + data + '</span>'
                 }
             },
-            { "data": "serviceType" },
+            {
+                "data": "serviceType",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.serviceType + '" data-toggle="tooltip">' + data + '</span>'
+                }
+            },
             {
                 "data": "pincode",
                 "mRender": function (data, type, row) {
@@ -111,8 +116,18 @@
                     return '<span title="' + row.status + '" data-toggle="tooltip">' + data + '</span>'
                 }
             },
-            { "data": "created" },
-            { "data": "timePending" },
+            {
+                "data": "created",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.created + '" data-toggle="tooltip">' + data + '</span>'
+                }
+            },
+            {
+                "data": "timePending",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.timePending + '" data-toggle="tooltip">' + data + '</span>'
+                }
+            },
             {
                 "data": "agent",
                 "mRender": function (data, type, row) {

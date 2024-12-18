@@ -160,8 +160,7 @@ async function success(position) {
     var b_current_data = JSON.parse(b_response);
     var b_LatLng = new google.maps.LatLng(b_lat, b_lng);
     var b_marker;
-    if (b_current_data) {
-
+    if (b_current_data && b_current_data.results && b_current_data.results.length > 0 && b_current_data.results[0].formatted_address) {
         b_marker = new google.maps.Marker({
             position: b_LatLng,
             title: "Branch Location: " + b_current_data.results[0].formatted_address
@@ -172,11 +171,20 @@ async function success(position) {
             title: "Branch Location: Location Unknown"
         });
     }
+    var b_getInfoWindow;
     b_marker.setMap(map);
-    var b_getInfoWindow = new google.maps.InfoWindow({
-        content: "<b>Branch Location</b><br/> " +
-            b_current_data.results[0].formatted_address + ""
-    });
+    if (b_current_data && b_current_data.results && b_current_data.results.length > 0 && b_current_data.results[0].formatted_address) {
+        b_getInfoWindow = new google.maps.InfoWindow({
+            content: "<b>Branch Location</b><br/> " +
+                b_current_data.results[0].formatted_address + ""
+        });
+    }
+    else {
+        b_getInfoWindow = new google.maps.InfoWindow({
+            content: "<b>Branch Location</b><br/> " +
+                "Location Unknown"
+        });
+    }
     b_getInfoWindow.open(map, b_marker);
 
     var lat = parseFloat(position.coords.latitude);
@@ -192,13 +200,13 @@ async function success(position) {
     var marker = new google.maps.Marker({
         position: LatLng,
         icon: image,
-        title: "You are here: " + current_data.results[0].formatted_address
+        title: current_data && current_data.results && current_data.results.length > 0 && current_data.results[0].formatted_address ? "You are here: " + current_data.results[0].formatted_address :"Location Unknown"
     });
 
     marker.setMap(map);
     var getInfoWindow = new google.maps.InfoWindow({
         content: "<b>Your Current Location</b><br/> " +
-            current_data.results[0].formatted_address + ""
+            current_data && current_data.results && current_data.results.length > 0 && current_data.results[0].formatted_address ? current_data.results[0].formatted_address + "" :"Location Unknown"
     });
     getInfoWindow.open(map, marker);
 

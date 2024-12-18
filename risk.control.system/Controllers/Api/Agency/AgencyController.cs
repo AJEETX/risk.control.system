@@ -180,6 +180,7 @@ namespace risk.control.system.Controllers.Api.Agency
                     Pincodes = s.PincodeServices.Count == 0 ?
                     "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>" :
                      string.Join("", s.PincodeServices.Select(c => "<span class='badge badge-light'>" + c.Pincode + "</span> ")),
+                     RawPincodes = string.Join(", ", s.PincodeServices.Select(c =>  c.Pincode)),
                     Rate = s.Price,
                     UpdatedBy = s.UpdatedBy,
                     Updated = s.Updated.HasValue ? s.Updated.Value.ToString("dd-MM-yyyy") :  s.Created.ToString("dd-MM-yyyy"),

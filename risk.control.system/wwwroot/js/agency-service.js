@@ -27,6 +27,10 @@
             {
                 className: 'max-width-column', // Apply the CSS class,
                 targets: 7                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 8                      // Index of the column to style
             }],
         fixedHeader: true,
         processing: true,
@@ -41,15 +45,60 @@
             {
                 "data": "id", "name": "Id", "bVisible": false
             },
-            { "data": "caseType" },
-            { "data": "serviceType" },
-            { "data": "rate" },
-            { "data": "district" },
-            { "data": "state" },
-            { "data": "country" },
-            { "data": "pincodes" },
-            { "data": "updatedBy" },
-            { "data": "updated" },
+            {
+                "data": "caseType",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.caseType + '" data-toggle="tooltip">' + data + '</span>';
+                }
+            },
+            {
+                "data": "serviceType",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.serviceType + '" data-toggle="tooltip">' + data + '</span>';
+                }
+            },
+            {
+                "data": "rate",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.rate + '" data-toggle="tooltip">' + data + '</span>';
+                }
+            },
+            {
+                "data": "district",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.district + '" data-toggle="tooltip">' + data + '</span>';
+                }
+            },
+            {
+                "data": "state",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.state + '" data-toggle="tooltip">' + data + '</span>';
+                }
+            },
+            {
+                "data": "country",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.country + '" data-toggle="tooltip">' + data + '</span>';
+                }
+            },
+            {
+                "data": "pincodes",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.rawPincodes + '" data-toggle="tooltip">' + data + '</span>';
+                }
+            },
+            {
+                "data": "updatedBy",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.updatedBy + '" data-toggle="tooltip">' + data + '</span>';
+                }
+            },
+            {
+                "data": "updated",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.updated + '" data-toggle="tooltip">' + data + '</span>';
+                }
+            },
             {
                 "sDefaultContent": "",
                 "bSortable": false,
@@ -63,6 +112,13 @@
             }
         ],
         error: function (xhr, status, error) { alert('err ' + error) }
+    });
+    $('#customerTable').on('draw.dt', function () {
+        $('[data-toggle="tooltip"]').tooltip({
+            animated: 'fade',
+            placement: 'bottom',
+            html: true
+        });
     });
 });
 
