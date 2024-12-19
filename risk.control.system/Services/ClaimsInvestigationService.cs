@@ -33,7 +33,7 @@ namespace risk.control.system.Services
 
         Task<ClaimsInvestigation> ProcessAgentReport(string userEmail, string supervisorRemarks, long caseLocationId, string claimsInvestigationId, SupervisorRemarkType remarks, IFormFile? claimDocument = null);
 
-        Task<(ClientCompany,string)> ProcessCaseReport(string userEmail, string assessorRemarks, long caseLocationId, string claimsInvestigationId, AssessorRemarkType assessorRemarkType, string reportAiSummary);
+        Task<(ClientCompany, string)> ProcessCaseReport(string userEmail, string assessorRemarks, long caseLocationId, string claimsInvestigationId, AssessorRemarkType assessorRemarkType, string reportAiSummary);
 
         List<VendorCaseModel> GetAgencyLoad(List<Vendor> existingVendors);
 
@@ -51,16 +51,19 @@ namespace risk.control.system.Services
     {
         private readonly ApplicationDbContext _context;
         private readonly RoleManager<ApplicationRole> roleManager;
+        private readonly ICustomApiCLient customApiCLient;
         private readonly IMailboxService mailboxService;
         private readonly UserManager<ApplicationUser> userManager;
         private readonly IWebHostEnvironment webHostEnvironment;
 
         public ClaimsInvestigationService(ApplicationDbContext context, RoleManager<ApplicationRole> roleManager,
+            ICustomApiCLient customApiCLient,
             IMailboxService mailboxService, IWebHostEnvironment webHostEnvironment,
             UserManager<ApplicationUser> userManager)
         {
             this._context = context;
             this.roleManager = roleManager;
+            this.customApiCLient = customApiCLient;
             this.mailboxService = mailboxService;
             this.userManager = userManager;
             this.webHostEnvironment = webHostEnvironment;
@@ -182,7 +185,7 @@ namespace risk.control.system.Services
                         var policy = await AllocateToVendor(userEmail, claimsInvestigation.ClaimsInvestigationId, selectedVendor.Vendor.VendorId, beneficiary.BeneficiaryDetailId);
 
                         autoAllocatedClaims.Add(claim);
-                        if(selectedVendor.Vendor.EnableMailbox)
+                        if (selectedVendor.Vendor.EnableMailbox)
                             await mailboxService.NotifyClaimAllocationToVendor(userEmail, policy.PolicyDetail.ContractNumber, claimsInvestigation.ClaimsInvestigationId, selectedVendor.Vendor.VendorId, beneficiary.BeneficiaryDetailId);
                     }
                 }
@@ -290,7 +293,7 @@ namespace risk.control.system.Services
                 claimsInvestigation.CurrentUserEmail = userEmail;
                 claimsInvestigation.CurrentClaimOwner = currentUser.Email;
                 claimsInvestigation.InvestigationCaseStatusId = initiatedStatus.InvestigationCaseStatusId;
-                claimsInvestigation.InvestigationCaseSubStatusId = create? createdStatus.InvestigationCaseSubStatusId:assigned2AssignerStatus.InvestigationCaseSubStatusId;
+                claimsInvestigation.InvestigationCaseSubStatusId = create ? createdStatus.InvestigationCaseSubStatusId : assigned2AssignerStatus.InvestigationCaseSubStatusId;
                 claimsInvestigation.CreatorSla = currentUser.ClientCompany.CreatorSla;
                 var aaddedClaimId = _context.ClaimsInvestigation.Add(claimsInvestigation);
                 var log = new InvestigationTransaction
@@ -384,11 +387,23 @@ namespace risk.control.system.Services
                 existingPolicy.CurrentUserEmail = userEmail;
                 existingPolicy.CurrentClaimOwner = userEmail;
 
-                var pincode = _context.PinCode.FirstOrDefault(p => p.PinCodeId == claimsInvestigation.CustomerDetail.PinCodeId);
-                claimsInvestigation.CustomerDetail.PinCode = pincode;
-                var customerLatLong = pincode.Latitude + "," + pincode.Longitude;
+                var pincode = _context.PinCode
+                        .Include(p => p.District)
+                        .Include(p => p.State)
+                        .Include(p => p.Country)
+                        .FirstOrDefault(p => p.PinCodeId == claimsInvestigation.CustomerDetail.PinCodeId);
 
-                var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+                claimsInvestigation.CustomerDetail.PinCode = pincode;
+                var address = claimsInvestigation.CustomerDetail.Addressline + ", " +
+                    pincode.District.Name + ", " +
+                    pincode.State.Name + ", " +
+                    pincode.Country.Code;
+
+                var latLong = await customApiCLient.GetCoordinatesFromAddressAsync(address);
+                var customerLatLong = latLong.Latitude + ","+latLong.Longitude;
+                pincode.Latitude = latLong.Latitude;
+                pincode.Longitude = latLong.Longitude;
+                    var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
                 existingPolicy.CustomerDetail.CustomerLocationMap = url;
 
                 if (customerDocument is not null)
@@ -397,7 +412,6 @@ namespace risk.control.system.Services
                     customerDocument.CopyTo(dataStream);
                     existingPolicy.CustomerDetail.ProfilePicture = dataStream.ToArray();
                 }
-
                 _context.ClaimsInvestigation.Update(existingPolicy);
 
                 await _context.SaveChangesAsync();
@@ -418,7 +432,6 @@ namespace risk.control.system.Services
                 {
                     var existingPolicy = await _context.ClaimsInvestigation
                         .Include(c => c.CustomerDetail)
-                        .ThenInclude(c => c.PinCode)
                         .AsNoTracking()
                             .FirstOrDefaultAsync(c => c.ClaimsInvestigationId == claimsInvestigation.ClaimsInvestigationId);
                     if (customerDocument is not null)
@@ -428,12 +441,22 @@ namespace risk.control.system.Services
 
                         claimsInvestigation.CustomerDetail.ProfilePicture = dataStream.ToArray();
                     }
-                    var pincode = _context.PinCode.FirstOrDefault(p => p.PinCodeId == claimsInvestigation.CustomerDetail.PinCodeId);
+                    var pincode = _context.PinCode
+                        .Include(p => p.District)
+                        .Include(p => p.State)
+                        .Include(p => p.Country)
+                        .FirstOrDefault(p => p.PinCodeId == claimsInvestigation.CustomerDetail.PinCodeId);
 
                     claimsInvestigation.CustomerDetail.PinCode = pincode;
+                    var address = claimsInvestigation.CustomerDetail.Addressline + ", " +
+                        pincode.District.Name + ", " +
+                        pincode.State.Name + ", " +
+                        pincode.Country.Code;
 
-                    var customerLatLong = claimsInvestigation.CustomerDetail.PinCode.Latitude + "," + claimsInvestigation.CustomerDetail.PinCode.Longitude;
-                    var key = Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY");
+                    var latLong = await customApiCLient.GetCoordinatesFromAddressAsync(address);
+                    var customerLatLong = latLong.Latitude + "," + latLong.Longitude;
+                    pincode.Latitude = latLong.Latitude;
+                    pincode.Longitude = latLong.Longitude;
                     var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
                     claimsInvestigation.CustomerDetail.CustomerLocationMap = url;
 
@@ -578,7 +601,7 @@ namespace risk.control.system.Services
         }
         public async Task<Vendor> WithdrawCase(string userEmail, ClaimTransactionModel model, string claimId)
         {
-            var currentUser = _context.VendorApplicationUser.Include(u=>u.Vendor).FirstOrDefault(u => u.Email == userEmail);
+            var currentUser = _context.VendorApplicationUser.Include(u => u.Vendor).FirstOrDefault(u => u.Email == userEmail);
             var claimsInvestigation = _context.ClaimsInvestigation
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimId);
             var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claimsInvestigation.ClientCompanyId);
@@ -645,7 +668,7 @@ namespace risk.control.system.Services
         public async Task<ClaimsInvestigation> AllocateToVendor(string userEmail, string claimsInvestigationId, long vendorId, long caseLocationId, bool AutoAllocated = true)
         {
             var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == vendorId);
-            var currentUser = _context.ClientCompanyApplicationUser.Include(c=>c.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
+            var currentUser = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
 
             var supervisor = await GetSupervisor(vendorId);
             var inProgress = _context.InvestigationCaseStatus.FirstOrDefault(
@@ -655,7 +678,7 @@ namespace risk.control.system.Services
             if (vendor != null)
             {
                 var claimsCaseToAllocateToVendor = _context.ClaimsInvestigation
-                    .Include(c=>c.PolicyDetail)
+                    .Include(c => c.PolicyDetail)
                     .FirstOrDefault(v => v.ClaimsInvestigationId == claimsInvestigationId);
                 claimsCaseToAllocateToVendor.AssignedToAgency = true;
                 claimsCaseToAllocateToVendor.Updated = DateTime.Now;
@@ -887,7 +910,7 @@ namespace risk.control.system.Services
             }
         }
 
-        private async Task<(ClientCompany,string)> RejectCaseReport(string userEmail, string assessorRemarks, long caseLocationId, string claimsInvestigationId, AssessorRemarkType assessorRemarkType, string reportAiSummary)
+        private async Task<(ClientCompany, string)> RejectCaseReport(string userEmail, string assessorRemarks, long caseLocationId, string claimsInvestigationId, AssessorRemarkType assessorRemarkType, string reportAiSummary)
         {
             var rejected = _context.InvestigationCaseSubStatus
                 .FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR);
@@ -1334,7 +1357,7 @@ namespace risk.control.system.Services
                 report.SupervisorFileExtension = Path.GetExtension(claimDocument.FileName);
                 report.SupervisorFileType = claimDocument.ContentType;
             }
-            
+
             report.Vendor = claim.Vendor;
             _context.AgencyReport.Update(report);
             _context.ClaimsInvestigation.Update(claim);
@@ -1592,8 +1615,8 @@ namespace risk.control.system.Services
                .FirstOrDefault(c => c.ClaimsInvestigationId == claimId);
             claim.ClaimNotes.Add(new ClaimNote
             {
-                 Comment = notes,
-                 Sender = userEmail,
+                Comment = notes,
+                Sender = userEmail,
                 Created = DateTime.Now,
                 Updated = DateTime.Now,
                 UpdatedBy = userEmail

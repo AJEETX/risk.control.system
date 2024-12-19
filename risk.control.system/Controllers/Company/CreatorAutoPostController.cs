@@ -25,6 +25,7 @@ namespace risk.control.system.Controllers.Company
     {
         private readonly ApplicationDbContext _context;
         private readonly IEmpanelledAgencyService empanelledAgencyService;
+        private readonly ICustomApiCLient customApiCLient;
         private readonly IClaimsInvestigationService claimsInvestigationService;
         private readonly ICreatorService creatorService;
         private readonly IFtpService ftpService;
@@ -34,6 +35,7 @@ namespace risk.control.system.Controllers.Company
 
         public CreatorAutoPostController(ApplicationDbContext context,
             IEmpanelledAgencyService empanelledAgencyService,
+            ICustomApiCLient customApiCLient,
             IClaimsInvestigationService claimsInvestigationService,
             ICreatorService creatorService,
             IFtpService ftpService,
@@ -44,6 +46,7 @@ namespace risk.control.system.Controllers.Company
             _context = context;
             this.claimPolicyService = claimPolicyService;
             this.empanelledAgencyService = empanelledAgencyService;
+            this.customApiCLient = customApiCLient;
             this.claimsInvestigationService = claimsInvestigationService;
             this.creatorService = creatorService;
             this.ftpService = ftpService;
@@ -79,7 +82,7 @@ namespace risk.control.system.Controllers.Company
 
                     return RedirectToAction("New", "CreatorAuto");
                 }
-                
+
                 if (postedFile != null)
                 {
                     UploadType uploadType = (UploadType)Enum.Parse(typeof(UploadType), uploadtype, true);
@@ -111,7 +114,7 @@ namespace risk.control.system.Controllers.Company
                         }
 
                     }
-                   return RedirectToAction("New", "CreatorAuto");
+                    return RedirectToAction("New", "CreatorAuto");
                 }
                 notifyService.Custom($"File Upload Error.", 3, "red", "fa fa-upload");
                 return RedirectToAction("New", "CreatorAuto");
@@ -240,7 +243,7 @@ namespace risk.control.system.Controllers.Company
                 }
 
                 var claim = await claimsInvestigationService.EdiPolicy(currentUserEmail, claimsInvestigation, documentFile);
-                if(claim == null)
+                if (claim == null)
                 {
                     notifyService.Error("OOPs !!!..Error editing policy");
                     return RedirectToAction(nameof(Index), "Dashboard");
@@ -289,7 +292,7 @@ namespace risk.control.system.Controllers.Company
                     notifyService.Error("OOPs !!!..Claim Not Found");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-               
+
                 var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == currentUserEmail);
                 if (companyUser == null)
                 {
@@ -435,14 +438,21 @@ namespace risk.control.system.Controllers.Company
                 }
 
                 caseLocation.ClaimsInvestigationId = claimId;
-                var pincode = _context.PinCode.FirstOrDefault(p => p.PinCodeId == caseLocation.PinCodeId);
+                var pincode = _context.PinCode
+                    .Include(p => p.District)
+                        .Include(p => p.State)
+                        .Include(p => p.Country)
+                    .FirstOrDefault(p => p.PinCodeId == caseLocation.PinCodeId);
 
-                caseLocation.PinCode = pincode;
-
-                var customerLatLong = caseLocation.PinCode.Latitude + "," + caseLocation.PinCode.Longitude;
+                var address = caseLocation.Addressline + ", " + pincode.District.Name + ", " + pincode.State.Name + ", " + pincode.Country.Code;
+                var latlong = await customApiCLient.GetCoordinatesFromAddressAsync(address);
+                var customerLatLong = latlong.Latitude + "," + latlong.Longitude;
                 var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
                 caseLocation.BeneficiaryLocationMap = url;
-                _context.Add(caseLocation);
+                pincode.Latitude = latlong.Latitude;
+                pincode.Longitude = latlong.Longitude;
+                caseLocation.PinCode = pincode;
+                _context.BeneficiaryDetail.Add(caseLocation);
                 await _context.SaveChangesAsync();
 
                 var claimsInvestigation = await _context.ClaimsInvestigation
@@ -502,9 +512,17 @@ namespace risk.control.system.Controllers.Company
                 caseLocation.DistrictId = ecaseLocation.DistrictId;
                 caseLocation.PinCodeId = ecaseLocation.PinCodeId;
                 caseLocation.StateId = ecaseLocation.StateId;
-                var pincode = _context.PinCode.FirstOrDefault(p => p.PinCodeId == caseLocation.PinCodeId);
-                caseLocation.PinCode = pincode;
-                var customerLatLong = pincode.Latitude + "," + pincode.Longitude;
+                var pincode = _context.PinCode
+                    .Include(p => p.District)
+                        .Include(p => p.State)
+                        .Include(p => p.Country)
+                    .FirstOrDefault(p => p.PinCodeId == caseLocation.PinCodeId);
+
+                var address = caseLocation.Addressline + ", " + pincode.District.Name + ", " + pincode.State.Name + ", " + pincode.Country.Code;
+                var latlong = await customApiCLient.GetCoordinatesFromAddressAsync(address);
+                var customerLatLong = latlong.Latitude + "," + latlong.Longitude;
+                pincode.Latitude = latlong.Latitude;
+                pincode.Longitude = latlong.Longitude;
                 var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
                 caseLocation.BeneficiaryLocationMap = url;
 
@@ -526,11 +544,9 @@ namespace risk.control.system.Controllers.Company
                     }
                 }
 
-                var pinCode = _context.PinCode.FirstOrDefault(p => p.PinCodeId == caseLocation.PinCodeId);
-                caseLocation.PinCode.Latitude = pinCode.Latitude;
-                caseLocation.PinCode.Longitude = pinCode.Longitude;
+                caseLocation.PinCode = pincode;
 
-                _context.Update(caseLocation);
+                _context.BeneficiaryDetail.Update(caseLocation);
                 await _context.SaveChangesAsync();
                 notifyService.Custom($"Beneficiary {caseLocation.Name} edited successfully", 3, "orange", "fas fa-user-tie");
                 return RedirectToAction(nameof(CreatorAutoController.Details), "CreatorAuto", new { id = caseLocation.ClaimsInvestigationId });

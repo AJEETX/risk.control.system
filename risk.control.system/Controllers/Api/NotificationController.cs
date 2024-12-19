@@ -37,63 +37,23 @@ namespace risk.control.system.Controllers.Api
                 var ipAddress = HttpContext.GetServerVariable("HTTP_X_FORWARDED_FOR") ?? HttpContext.Connection.RemoteIpAddress?.ToString();
                 var ipAddressWithoutPort = ipAddress?.Split(':')[0];
                 var isWhiteListed = service.IsWhiteListIpAddress(HttpContext.Connection.RemoteIpAddress);
-                var lat = latlong.Substring(0, latlong.IndexOf(","));
-                var lng = latlong.Substring(latlong.IndexOf(",")+1);
-                var address =await httpClientService.GetAddress(lat, lng);
-
-                var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct, decodedUrl,user, isAuthenticated);
-                var longLatString = ipApiResponse?.lat.GetValueOrDefault().ToString() + "," + ipApiResponse?.lon.GetValueOrDefault().ToString();
-                var mapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={latlong}&zoom=14&size=560x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{latlong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+                var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct, decodedUrl,user, isAuthenticated, latlong);
+                if(ipApiResponse == null)
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError, "Error getting IP address");
+                }
                 var response = new
                 {
                     IpAddress = string.IsNullOrWhiteSpace(ipAddressWithoutPort) ? ipApiResponse?.query : ipAddressWithoutPort,
-                    Country = address?.features[0].properties.country,
-                    Region = address?.features[0].properties?.state,
-                    City = address?.features[0].properties?.county,
-                    District = address?.features[0].properties?.city,
-                    PostCode = address?.features[0].properties?.postcode,
-                    Isp = ipApiResponse?.isp,
-                    Longitude = address?.features[0].properties.lon,
-                    Latitude = address?.features[0].properties.lat,
-                    mapUrl = mapUrl,
-                    whiteListed = false,
-                };
-
-                return Ok(response);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-            }
-        }
-
-        [AllowAnonymous]
-        [HttpGet("GetClientSystemIp")]
-        public async Task<ActionResult> GetClientSystemIp(CancellationToken ct, string url = "")
-        {
-            try
-            {
-                var decodedUrl = HttpUtility.UrlDecode(url);
-                var user = HttpContext.User.Identity.Name;
-                var isAuthenticated = HttpContext.User.Identity.IsAuthenticated;
-                var ipAddress = HttpContext.GetServerVariable("HTTP_X_FORWARDED_FOR") ?? HttpContext.Connection.RemoteIpAddress?.ToString();
-                var ipAddressWithoutPort = ipAddress?.Split(':')[0];
-                var isWhiteListed = service.IsWhiteListIpAddress(HttpContext.Connection.RemoteIpAddress);
-                var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct, decodedUrl, user, isAuthenticated);
-                var longLatString = ipApiResponse?.lat.GetValueOrDefault().ToString() + "," + ipApiResponse?.lon.GetValueOrDefault().ToString();
-                var mapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={longLatString}&zoom=14&size=560x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{longLatString}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
-                var response = new
-                {
-                    IpAddress = string.IsNullOrWhiteSpace(ipAddressWithoutPort) ? ipApiResponse?.query : ipAddressWithoutPort,
-                    Country = ipApiResponse?.country,
+                    Country = ipApiResponse.country,
                     Region = ipApiResponse?.regionName,
                     City = ipApiResponse?.city,
-                    District = ipApiResponse?.district,
+                    District = ipApiResponse?.district ?? ipApiResponse?.city,
                     PostCode = ipApiResponse?.zip,
                     Isp = ipApiResponse?.isp,
-                    Longitude = ipApiResponse?.lon.GetValueOrDefault(),
-                    Latitude = ipApiResponse?.lat.GetValueOrDefault(),
-                    mapUrl = mapUrl,
+                    Longitude = ipApiResponse.lon,
+                    Latitude = ipApiResponse.lat,
+                    mapUrl = ipApiResponse.MapUrl,
                     whiteListed = false,
                 };
 
@@ -104,6 +64,7 @@ namespace risk.control.system.Controllers.Api
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
+
         [AllowAnonymous]
         [HttpPost("schedule")]
         public async Task<IActionResult> Schedule(ClientSchedulingMessage message)

@@ -18,7 +18,7 @@ namespace risk.control.system.Services
 
         Task<ClaimsInvestigation> ReplyVerifySchedule(string id, string confirm = "N");
 
-        Task<IpApiResponse?> GetClientIp(string? ipAddress, CancellationToken ct, string page, string userEmail = "", bool isAuthenticated = false);
+        Task<IpApiResponse?> GetClientIp(string? ipAddress, CancellationToken ct, string page, string userEmail = "", bool isAuthenticated = false, string latlong = "");
 
         Task<(ClaimMessage message, string yes, string no)> GetClaim(string baseUrl, string id);
 
@@ -33,6 +33,7 @@ namespace risk.control.system.Services
         private readonly ApplicationDbContext context;
         private readonly ISmsService smsService;
         private readonly IWebHostEnvironment webHostEnvironment;
+        private readonly IHttpClientService httpClientService;
         private readonly IFeatureManager featureManager;
         private static string logo = "https://icheckify.co.in";
         private static System.Net.WebClient client = new System.Net.WebClient();
@@ -42,46 +43,71 @@ namespace risk.control.system.Services
 
         public NotificationService(ApplicationDbContext context,
             ISmsService SmsService,
-            IWebHostEnvironment webHostEnvironment, IFeatureManager featureManager)
+            IWebHostEnvironment webHostEnvironment,
+            IHttpClientService httpClientService,
+            IFeatureManager featureManager)
         {
             this.context = context;
             smsService = SmsService;
             this.webHostEnvironment = webHostEnvironment;
+            this.httpClientService = httpClientService;
             this.featureManager = featureManager;
         }
 
-        public async Task<IpApiResponse?> GetClientIp(string? ipAddress, CancellationToken ct, string page, string userEmail = "", bool isAuthenticated = false)
+        public async Task<IpApiResponse?> GetClientIp(string? ipAddress, CancellationToken ct, string page, string userEmail = "", bool isAuthenticated = false, string latlong = "")
         {
             try
             {
-                var curTimeZone = TimeZone.CurrentTimeZone;
-
-                var route = $"{IP_BASE_URL}/json/{ipAddress}";
-                page = page == "/" ? "dashboard" : page;
-                var response = await _httpClient.GetFromJsonAsync<IpApiResponse>(route, ct);
-                var longLatString = response?.lat.GetValueOrDefault().ToString() + "," + response?.lon.GetValueOrDefault().ToString();
-                var mapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={longLatString}&zoom=6&size=560x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{longLatString}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
-
-                if (response != null && (await featureManager.IsEnabledAsync(FeatureFlags.IPTracking)))
+                if (!string.IsNullOrWhiteSpace(latlong))
                 {
-                    if ((isAuthenticated && !string.IsNullOrWhiteSpace(userEmail) && !userEmail.StartsWith("admin")) || !isAuthenticated)
+                    var route = $"{IP_BASE_URL}/json/{ipAddress}";
+                    page = page == "/" ? "dashboard" : page;
+                    var response = await _httpClient.GetFromJsonAsync<IpApiResponse>(route, ct);
+                    var lat = latlong.Substring(0, latlong.IndexOf(","));
+                    var lng = latlong.Substring(latlong.IndexOf(",") + 1);
+                    var address = await httpClientService.GetAddress(lat, lng);
+                    var mapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={latlong}&zoom=14&size=560x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{latlong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+
+                    if (response != null && (await featureManager.IsEnabledAsync(FeatureFlags.IPTracking)))
                     {
-                        response.page = page;
-                        response.user = userEmail;
-                        response.isAuthenticated = isAuthenticated;
-                        response.MapUrl = mapUrl;
-                        context.IpApiResponse.Add(response);
-                        await context.SaveChangesAsync();
+                        if ((isAuthenticated && !string.IsNullOrWhiteSpace(userEmail) && !userEmail.StartsWith("admin")) || !isAuthenticated)
+                        {
+                            response.country = address?.features[0].properties.country;
+                            response.regionName = address?.features[0].properties?.state;
+                            response.city = address?.features[0].properties?.county;
+                            response.district = address?.features[0].properties?.city;
+                            response.zip = address?.features[0].properties?.postcode;
+                            response.lat = address?.features[0].properties.lat;
+                            response.lon = address?.features[0].properties.lon;
+                            response.user = !string.IsNullOrWhiteSpace(userEmail) ? userEmail : "Guest";
+                            response.isAuthenticated = isAuthenticated;
+                            response.MapUrl = mapUrl;
+                            response.page = page;
+                            response.isAuthenticated = isAuthenticated;
+                            context.IpApiResponse.Add(response);
+                            await context.SaveChangesAsync();
+                            return response;
+                        }
                     }
                 }
-                return response;
+                //else
+                //{
+                //    var longLatString = response?.lat.GetValueOrDefault().ToString() + "," + response?.lon.GetValueOrDefault().ToString();
+                //    var mapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={longLatString}&zoom=6&size=560x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{longLatString}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+                //    response.page = page;
+                //    response.user = userEmail;
+                //    response.isAuthenticated = isAuthenticated;
+                //    response.MapUrl = mapUrl;
+                //    context.IpApiResponse.Add(response);
+                //    await context.SaveChangesAsync();
+                //}
+
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.StackTrace);
-                return null!;
             }
-            
+            return null!;
         }
         public bool IsWhiteListIpAddress(IPAddress remoteIp)
         {
@@ -296,7 +322,7 @@ namespace risk.control.system.Services
 
         public async Task<(ClaimMessage message, string yes, string no)> GetClaim(string baseUrl, string id)
         {
-            var claim =await context.ClaimsInvestigation
+            var claim = await context.ClaimsInvestigation
              .Include(c => c.ClaimMessages)
              .Include(c => c.PolicyDetail)
              .Include(c => c.CustomerDetail)
@@ -425,7 +451,7 @@ namespace risk.control.system.Services
 
         public async Task<string> SendSms2Beneficiary(string currentUser, string claimId, string sms)
         {
-            var beneficiary =await context.BeneficiaryDetail.Include(b => b.ClaimsInvestigation).ThenInclude(c => c.PolicyDetail)
+            var beneficiary = await context.BeneficiaryDetail.Include(b => b.ClaimsInvestigation).ThenInclude(c => c.PolicyDetail)
                .FirstOrDefaultAsync(c => c.ClaimsInvestigationId == claimId);
 
             var mobile = beneficiary.ContactNumber.ToString();

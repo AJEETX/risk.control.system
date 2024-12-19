@@ -398,9 +398,6 @@ namespace risk.control.system.Controllers.Api.Claims
             var weatherData = await httpClient.GetFromJsonAsync<Weather>(weatherUrl);
             string weatherCustomData = $"Temperature:{weatherData.current.temperature_2m} {weatherData.current_units.temperature_2m}.\r\nWindspeed:{weatherData.current.windspeed_10m} {weatherData.current_units.windspeed_10m} \r\nElevation(sea level):{weatherData.elevation} metres";
 
-            var longLatString = latitude + "," + longitude;
-            var imageAddress = await httpClientService.GetRawAddress((latitude), (longitude));
-            var customerMapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={longLatString}&zoom=14&size=300x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{longLatString}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
             var data = new
             {
                 profileMap = customer.CustomerLocationMap,
@@ -433,9 +430,6 @@ namespace risk.control.system.Controllers.Api.Claims
             var weatherData = await httpClient.GetFromJsonAsync<Weather>(weatherUrl);
             string weatherCustomData = $"Temperature:{weatherData.current.temperature_2m} {weatherData.current_units.temperature_2m}.\r\nWindspeed:{weatherData.current.windspeed_10m} {weatherData.current_units.windspeed_10m} \r\nElevation(sea level):{weatherData.elevation} metres";
 
-            var longLatString = latitude + "," + longitude;
-            var imageAddress = await httpClientService.GetRawAddress((latitude), (longitude));
-            var customerMapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={longLatString}&zoom=14&size=300x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{longLatString}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
             var data = new
             {
                 profileMap = beneficiary.BeneficiaryLocationMap,

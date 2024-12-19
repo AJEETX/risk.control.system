@@ -29,15 +29,16 @@ namespace risk.control.system.Services
         private static Regex regex = new Regex("\\\"(.*?)\\\"");
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment webHostEnvironment;
-
+        private readonly ICustomApiCLient customApiCLient;
         private static WebClient client = new WebClient
         {
             Credentials = new NetworkCredential(Applicationsettings.FTP_SITE_LOG, Applicationsettings.FTP_SITE_DATA),
         };
-        public FtpService(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment)
+        public FtpService(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, ICustomApiCLient customApiCLient)
         {
             _context = context;
             this.webHostEnvironment = webHostEnvironment;
+            this.customApiCLient = customApiCLient;
         }
 
         public async Task<bool> UploadFtpFile(string userEmail, IFormFile postedFile, string uploadingway)
@@ -350,24 +351,29 @@ namespace risk.control.system.Services
                                 }
 
                                 claim.CustomerDetail.PinCode = pinCode;
-                                claim.CustomerDetail.PinCode.Latitude = pinCode.Latitude;
-                                claim.CustomerDetail.PinCode.Longitude = pinCode.Longitude;
-                                var customerLatLong = pinCode.Latitude + "," + pinCode.Longitude;
+                                var address = claim.CustomerDetail.Addressline + ", " +
+                                    pinCode.District.Name + ", " +
+                                    pinCode.State.Name + ", " +
+                                    pinCode.Country.Code + ", " + 
+                                    pinCode.Code;
+
+                                var coordinates = await customApiCLient.GetCoordinatesFromAddressAsync(address);
+                                claim.CustomerDetail.PinCode.Latitude = coordinates.Latitude;
+                                claim.CustomerDetail.PinCode.Longitude = coordinates.Longitude;
+                                var customerLatLong = claim.CustomerDetail.PinCode.Latitude + "," + claim.CustomerDetail.PinCode.Longitude;
 
                                 var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
                                 claim.CustomerDetail.CustomerLocationMap = url;
+                                pinCode.Latitude = coordinates.Latitude;
+                                pinCode.Longitude = coordinates.Longitude;
+                                claim.CustomerDetail.PinCode = pinCode;
+
 
                                 var benePinCode = _context.PinCode
                                     .Include(p => p.District)
                                     .Include(p => p.State)
                                     .Include(p => p.Country)
                                     .FirstOrDefault(p => p.Code == rowData[28].Trim());
-
-                                var beneDistrict = _context.District.FirstOrDefault(c => c.DistrictId == benePinCode.District.DistrictId);
-
-                                var beneState = _context.State.FirstOrDefault(s => s.StateId == benePinCode.State.StateId);
-
-                                var beneCountry = _context.Country.FirstOrDefault(c => c.CountryId == benePinCode.Country.CountryId);
 
                                 var relation = _context.BeneficiaryRelation.FirstOrDefault(b => b.Code.ToLower() == rowData[23].Trim().ToLower());
 
@@ -391,9 +397,9 @@ namespace risk.control.system.Services
                                         ContactNumber = (rowData[26]?.Trim()),
                                         Addressline = rowData[27]?.Trim(),
                                         PinCodeId = benePinCode.PinCodeId,
-                                        DistrictId = beneDistrict.DistrictId,
-                                        StateId = beneState.StateId,
-                                        CountryId = beneCountry.CountryId,
+                                        DistrictId = benePinCode.District.DistrictId,
+                                        StateId = benePinCode.State.StateId,
+                                        CountryId = benePinCode.Country.CountryId,
                                         ProfilePicture = beneficiaryNewImage,
                                         Updated = DateTime.Now,
                                         UpdatedBy = userEmail,
@@ -401,10 +407,19 @@ namespace risk.control.system.Services
                                     };
                                     beneficairy.ClaimsInvestigationId = claim.ClaimsInvestigationId;
 
+                                    var address2 = beneficairy.Addressline + ", " +
+                                        benePinCode.District.Name + ", " +
+                                        benePinCode.State.Name + ", " +
+                                        benePinCode.Country.Code + ", " +
+                                        benePinCode.Code;
+
+                                    var beneCoordinates = await customApiCLient.GetCoordinatesFromAddressAsync(address2);
+
+                                    var beneLatLong = beneCoordinates.Latitude + "," + beneCoordinates.Longitude;
+                                    benePinCode.Latitude = beneCoordinates.Latitude;
+                                    benePinCode.Longitude = beneCoordinates.Longitude;
+
                                     beneficairy.PinCode = benePinCode;
-                                    beneficairy.PinCode.Latitude = benePinCode.Latitude;
-                                    beneficairy.PinCode.Longitude = benePinCode.Longitude;
-                                    var beneLatLong = benePinCode.Latitude + "," + benePinCode.Longitude;
 
                                     var beneUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={beneLatLong}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{beneLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
                                     beneficairy.BeneficiaryLocationMap = beneUrl;
