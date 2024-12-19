@@ -112,7 +112,8 @@ namespace risk.control.system.Controllers.Api.Agency
                         a.BeneficiaryDetail.Name,
                        TimeElapsed = DateTime.Now.Subtract(a.TaskToAgentTime.Value).TotalSeconds,
                        IsNewAssigned = a.InvestigateView <= 1,
-                       IsQueryCase = a.InvestigationCaseSubStatusId == requestedStatus.InvestigationCaseSubStatusId
+                       IsQueryCase = a.InvestigationCaseSubStatusId == requestedStatus.InvestigationCaseSubStatusId,
+                       PersonMapAddressUrl = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? a.CustomerDetail.CustomerLocationMap : a.BeneficiaryDetail.BeneficiaryLocationMap
                    })
                     ?.ToList();
 
@@ -176,7 +177,8 @@ namespace risk.control.system.Controllers.Api.Agency
                        BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail.Name) ?
                         "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>" :
                         a.BeneficiaryDetail.Name,
-                       TimeElapsed = DateTime.Now.Subtract(a.SubmittedToSupervisorTime.Value).TotalSeconds
+                       TimeElapsed = DateTime.Now.Subtract(a.SubmittedToSupervisorTime.Value).TotalSeconds,
+                       PersonMapAddressUrl = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? a.CustomerDetail.CustomerLocationMap : a.BeneficiaryDetail.BeneficiaryLocationMap
                    })
                     ?.ToList();
 

@@ -104,10 +104,20 @@
                     return '<span title="' + row.serviceType + '" data-toggle="tooltip">' + data + '</span>'
                 }
             },
+            //{
+            //    "data": "pincode",
+            //    "mRender": function (data, type, row) {
+            //        return '<span title="' + row.pincodeName + '" data-toggle="tooltip">' + data + '</span>'
+            //    }
+            //},
             {
                 "data": "pincode",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.pincodeName + '" data-toggle="tooltip">' + data + '</span>'
+                    var img = '<div class="map-thumbnail profile-image doc-profile-image">';
+                    img += '<img src="' + row.personMapAddressUrl + '" class="thumbnail profile-image doc-profile-image" />'; // Thumbnail image with class 'thumbnail'
+                    img += '<img src="' + row.personMapAddressUrl + '" class="full-map" title="' + row.pincodeName + '" data-toggle="tooltip"/>'; // Full map image with class 'full-map'
+                    img += '</div>';
+                    return img;
                 }
             },
             {
@@ -183,6 +193,14 @@
         },
         error: function (xhr, status, error) { alert('err ' + error) }
     });
+    // Show the full map on hover and hide it when the mouse leaves
+    $('#customerTable').on('mouseenter', '.map-thumbnail', function () {
+        $(this).find('.full-map-title').show(); // Show full map
+        $(this).find('.full-map').show(); // Show full map
+    }).on('mouseleave', '.map-thumbnail', function () {
+        $(this).find('.full-map-title').hide(); // Hide full map
+        $(this).find('.full-map').hide(); // Hide full map
+    });
     $('#customerTable').on('draw.dt', function () {
         $('[data-toggle="tooltip"]').tooltip({
             animated: 'fade',
@@ -190,11 +208,6 @@
             html: true
         });
     });
-    //$('[data-toggle="tooltip"]').tooltip({
-    //    animated: 'fade',
-    //    placement: 'bottom',
-    //    html: true
-    //});
     $('#customerTable tbody').hide();
     $('#customerTable tbody').fadeIn(2000);
 

@@ -36,6 +36,7 @@
         public string OwnerDetail { get; set; }
         public string AgencyDeclineComment { get; set; }
         public string? RawStatus { get; set; }
+        public string PersonMapAddressUrl { get; set; }
 
     }
 }

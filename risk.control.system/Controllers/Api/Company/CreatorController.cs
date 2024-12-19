@@ -115,7 +115,8 @@ namespace risk.control.system.Controllers.Api.Company
                     IsNewAssigned = a.AutoNew <= 1,
                     BeneficiaryFullName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.Name) ? "?" : a.BeneficiaryDetail.Name,
                     CustomerFullName = string.IsNullOrWhiteSpace(a.CustomerDetail?.Name) ? "?" : a.CustomerDetail.Name,
-
+                    PersonMapAddressUrl = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail) != "..." ?
+                    a.PolicyDetail.ClaimType == ClaimType.HEALTH ? a.CustomerDetail.CustomerLocationMap : a.BeneficiaryDetail.BeneficiaryLocationMap : null
                 })?
                 .ToList();
 
@@ -215,7 +216,11 @@ namespace risk.control.system.Controllers.Api.Company
                         Ready2Assign = a.IsReady2Assign,
                         BeneficiaryFullName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.Name) ? "?" : a.BeneficiaryDetail.Name,
                         CustomerFullName = string.IsNullOrWhiteSpace(a.CustomerDetail?.Name) ? "?" : a.CustomerDetail.Name,
-                        AgencyDeclineComment = a.InvestigationCaseSubStatus == withdrawnByCompany ? a.CompanyWithdrawlComment : a.InvestigationCaseSubStatus == withdrawnByAgency ? a.AgencyDeclineComment : a.InvestigationCaseSubStatus == reAssignedStatus ? a.CompanyWithdrawlComment : ""
+                        AgencyDeclineComment = a.InvestigationCaseSubStatus == withdrawnByCompany ? 
+                        a.CompanyWithdrawlComment : a.InvestigationCaseSubStatus == withdrawnByAgency ? 
+                        a.AgencyDeclineComment : a.InvestigationCaseSubStatus == reAssignedStatus ? a.CompanyWithdrawlComment : "",
+                        PersonMapAddressUrl = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail) != "..." ?
+                    a.PolicyDetail.ClaimType == ClaimType.HEALTH ? a.CustomerDetail.CustomerLocationMap : a.BeneficiaryDetail.BeneficiaryLocationMap : null
                     })
                     ?.ToList();
 
@@ -319,7 +324,8 @@ namespace risk.control.system.Controllers.Api.Company
                         "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>" :
                         a.BeneficiaryDetail.Name,
                         TimeElapsed = DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).TotalSeconds,
-                        IsNewAssigned = a.ActiveView <= 1
+                        IsNewAssigned = a.ActiveView <= 1,
+                        PersonMapAddressUrl = a.PolicyDetail.ClaimType == ClaimType.HEALTH? a.CustomerDetail.CustomerLocationMap : a.BeneficiaryDetail.BeneficiaryLocationMap
                     })?
                     .ToList();
 

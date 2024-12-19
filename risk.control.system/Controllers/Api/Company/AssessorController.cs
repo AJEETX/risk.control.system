@@ -110,7 +110,8 @@ namespace risk.control.system.Controllers.Api.Company
                 TimeElapsed = DateTime.Now.Subtract(a.SubmittedToAssessorTime.Value).TotalSeconds,
                 OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.Vendor.DocumentImage)),
                 Agent = a.Vendor.Name,
-                IsNewAssigned = a.AssessView <= 1
+                IsNewAssigned = a.AssessView <= 1,
+                PersonMapAddressUrl = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? a.CustomerDetail.CustomerLocationMap : a.BeneficiaryDetail.BeneficiaryLocationMap
             })?.ToList();
 
             return Ok(response);
@@ -219,7 +220,8 @@ namespace risk.control.system.Controllers.Api.Company
                         BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.Name) ?
                         "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>" :
                         a.BeneficiaryDetail.Name,
-                        TimeElapsed = DateTime.Now.Subtract(a.SubmittedToAssessorTime.Value).TotalSeconds // TOD-DO: Check if this is the correct time to use
+                        TimeElapsed = DateTime.Now.Subtract(a.SubmittedToAssessorTime.Value).TotalSeconds, // TOD-DO: Check if this is the correct time to use,
+                        PersonMapAddressUrl = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? a.CustomerDetail.CustomerLocationMap : a.BeneficiaryDetail.BeneficiaryLocationMap
                     })?
                     .ToList();
 
@@ -303,7 +305,8 @@ namespace risk.control.system.Controllers.Api.Company
                         a.BeneficiaryDetail.Name,
                 OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.Vendor.DocumentImage)),
                 Agency = a.Vendor?.Name,
-                TimeElapsed = DateTime.Now.Subtract(a.ProcessedByAssessorTime.Value).TotalSeconds
+                TimeElapsed = DateTime.Now.Subtract(a.ProcessedByAssessorTime.Value).TotalSeconds,
+                PersonMapAddressUrl = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? a.CustomerDetail.CustomerLocationMap : a.BeneficiaryDetail.BeneficiaryLocationMap
             })?.ToList();
 
             return Ok(response);
@@ -378,7 +381,8 @@ namespace risk.control.system.Controllers.Api.Company
                         a.BeneficiaryDetail.Name,
                 OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.Vendor.DocumentImage)),
                 Agency = a.Vendor?.Name,
-                TimeElapsed = DateTime.Now.Subtract(a.ProcessedByAssessorTime.Value).TotalSeconds
+                TimeElapsed = DateTime.Now.Subtract(a.ProcessedByAssessorTime.Value).TotalSeconds,
+                PersonMapAddressUrl = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? a.CustomerDetail.CustomerLocationMap : a.BeneficiaryDetail.BeneficiaryLocationMap
             })?.ToList();
 
             return Ok(response);

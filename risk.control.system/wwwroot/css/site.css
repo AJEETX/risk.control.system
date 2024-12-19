@@ -1535,3 +1535,35 @@ ul#messagesList {
     transform: translateY(-50%);
     color: white; /* Icon color */
 }
+.map-thumbnail {
+    position: relative;
+    display: inline-block;
+    width: 2.5rem;
+    height: 2.5rem;
+}
+
+    /* CSS class for the thumbnail image size */
+    .map-thumbnail img.thumbnail {
+        cursor: pointer;
+        width: 2.5rem;
+        height: 2.5rem;
+    }
+
+/* CSS class for the full map (hidden by default) */
+.full-map {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 300px;
+    height: 300px;
+    display: none; /* Initially hidden */
+    border:1px solid #ddd;
+    z-index:999;
+}
+.full-map-title {
+    top: 0;
+    position: absolute;
+    display: none; /* Initially hidden */
+    background:none;
+    z-index: 999;
+}

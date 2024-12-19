@@ -9,15 +9,15 @@
         columnDefs: [
             {
                 className: 'max-width-column-name', // Apply the CSS class,
-                targets: 6                      // Index of the column to style
-            },
-            {
-                className: 'max-width-column-name', // Apply the CSS class,
-                targets: 8                      // Index of the column to style
+                targets: 7                      // Index of the column to style
             },
             {
                 className: 'max-width-column-name', // Apply the CSS class,
                 targets: 9                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 10                      // Index of the column to style
             },
             {
                 className: 'max-width-column-name', // Apply the CSS class,
@@ -34,6 +34,17 @@
         columns: [
             /* Name of the keys from
             data file source */
+
+            {
+                "data": "mapUrl",
+                "mRender": function (data, type, row) {
+                    var img = '<div class="map-thumbnail profile-image doc-profile-image">';
+                    img += '<img src="' + row.mapUrl + '" class="thumbnail" />'; // Thumbnail image with class 'thumbnail'
+                    img += '<img src="' + row.mapUrl + '" class="full-map" />'; // Full map image with class 'full-map'
+                    img += '</div>';
+                    return img;
+                }
+            },
             {
                 "data": "country",
                 "mRender": function (data, type, row) {
@@ -96,13 +107,6 @@
                 }
             },
             {
-                "data": "mapUrl",
-                "mRender": function (data, type, row) {
-                    var img = '<img title="' + row.city + '" src="' + row.mapUrl + '" class="doc-profile-image" data-toggle="tooltip"/>';
-                    return img;
-                }
-            },
-            {
                 "data": "dated",
                 "mRender": function (data, type, row) {
                     return '<span title="' + row.dated + '" data-toggle="tooltip">' + data + '</span>'
@@ -118,6 +122,13 @@
             placement: 'top',
             html: true
         });
+    });
+
+    // Show the full map on hover and hide it when the mouse leaves
+    $('#customerTable').on('mouseenter', '.map-thumbnail', function () {
+        $(this).find('.full-map').show(); // Show full map
+    }).on('mouseleave', '.map-thumbnail', function () {
+        $(this).find('.full-map').hide(); // Hide full map
     });
 });
 
