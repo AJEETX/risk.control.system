@@ -56,58 +56,60 @@ function focusLogin() {
     }
 
 }
-var latlong = ""; // To store the latitude and longitude
 
 // Success function to handle geolocation success
 function success(position) {
     var lat = position.coords.latitude;
     var long = position.coords.longitude;
-    latlong = lat + "," + long; // Store lat and long in the latlong variable
+    var latlong = lat + "," + long; // Store lat and long in the latlong variable
 
     // Call fetchIpInfo only after we have the geolocation
-    fetchIpInfo();
+    fetchIpInfo(latlong);
 }
 
 // Error function to handle geolocation failure
-function error() {
-    console.error('Geolocation request failed or was denied.');
+function error(err) {
+    console.error('Geolocation request failed or was denied.' + err);
     // You may want to handle a default location or notify the user here
     fetchIpInfo(); // Optionally, still send the request even without location data
 }
-async function fetchIpInfo() {
+async function fetchIpInfo(latlong) {
     try {
-        // Prepare the URL with the latlong parameter if available
-        const url = "/api/Notification/GetClientIp?url=" + encodeURIComponent(window.location.pathname) + "&latlong=" + encodeURIComponent(latlong);
+        if (latlong) {
+            // Prepare the URL with the latlong parameter if available
+            const url = "/api/Notification/GetClientIp?url=" + encodeURIComponent(window.location.pathname) + "&latlong=" + encodeURIComponent(latlong);
 
-        // Make the fetch call
-        const response = await fetch(url);
+            // Make the fetch call
+            const response = await fetch(url);
 
-        // Handle if the response is not OK
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
+            // Handle if the response is not OK
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+
+            // Parse the response data as JSON
+            const data = await response.json();
+
+            // Update the page with the received data
+            document.querySelector('#ipAddress .info-data').textContent = data.ipAddress || 'Not available';
+            document.querySelector('#ipAddress1 .info-data').textContent = data.ipAddress || 'Not available';
         }
-
-        // Parse the response data as JSON
-        const data = await response.json();
-
-        // Update the page with the received data
-        document.querySelector('#ipAddress .info-data').textContent = data.ipAddress || 'Not available';
-        document.querySelector('#ipAddress1 .info-data').textContent = data.ipAddress || 'Not available';
-
     } catch (error) {
         console.error('There has been a problem with your fetch operation:', error);
     }
 }
-$(document).ready(function () {
-    $("#login-form").validate();
-    $("#reset-form").validate();
-});
+
 if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(success, error);
 } else {
     console.error('Geolocation is not supported by this browser.');
     fetchIpInfo(); // Optionally call fetchIpInfo even if geolocation is not available
 }
+$(document).ready(function () {
+    $("#login-form").validate();
+    $("#reset-form").validate();
+});
+
 function onlyDigits(el) {
     el.value = el.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');
 }

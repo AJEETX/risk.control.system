@@ -151,7 +151,7 @@ namespace risk.control.system.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [AllowAnonymous]
-        public async Task<IActionResult> Login(CancellationToken ct, LoginViewModel model)
+        public async Task<IActionResult> Login(CancellationToken ct, LoginViewModel model, string latlong = "")
         {
             var ipAddress = HttpContext.GetServerVariable("HTTP_X_FORWARDED_FOR") ?? HttpContext.Connection.RemoteIpAddress?.ToString();
             var ipAddressWithoutPort = ipAddress?.Split(':')[0];
@@ -210,7 +210,7 @@ namespace risk.control.system.Controllers
 
                             if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN) && user?.Email != null && !user.Email.StartsWith("admin"))
                             {
-                                var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct, "login-success", model.Email, isAuthenticated);
+                                var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct, "login-success", model.Email, isAuthenticated, latlong);
                                 var admin = _context.ApplicationUser.FirstOrDefault(u => u.IsSuperAdmin);
                                 string message = string.Empty;
                                 if (admin != null)
@@ -256,7 +256,7 @@ namespace risk.control.system.Controllers
                         }
                     }
 
-                    var ipApiFailedResponse = await service.GetClientIp(ipAddressWithoutPort, ct, "login-failed", model.Email, false);
+                    var ipApiFailedResponse = await service.GetClientIp(ipAddressWithoutPort, ct, "login-failed", model.Email, false, latlong);
                     if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN) && !user.Email.StartsWith("admin"))
                     {
                         var adminForFailed = _context.ApplicationUser.FirstOrDefault(u => u.IsSuperAdmin);
@@ -279,7 +279,7 @@ namespace risk.control.system.Controllers
                 else if (result.IsLockedOut)
                 {
                     var isAuthenticated = HttpContext.User.Identity.IsAuthenticated;
-                    var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct, "login-locked", model.Email, isAuthenticated);
+                    var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct, "login-locked", model.Email, isAuthenticated, latlong);
                     if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
                     {
                         var admin = _context.ApplicationUser.FirstOrDefault(u => u.IsSuperAdmin);
@@ -306,7 +306,7 @@ namespace risk.control.system.Controllers
                 {
                     var isAuthenticated = HttpContext.User.Identity.IsAuthenticated;
 
-                    var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct, "login-failed", model.Email, isAuthenticated);
+                    var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct, "login-failed", model.Email, isAuthenticated, latlong);
                     if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
                     {
                         var admin = _context.ApplicationUser.FirstOrDefault(u => u.IsSuperAdmin);

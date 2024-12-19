@@ -33,6 +33,7 @@ namespace risk.control.system.Services
         private readonly ApplicationDbContext context;
         private readonly ISmsService smsService;
         private readonly IWebHostEnvironment webHostEnvironment;
+        //private readonly ICustomApiCLient customerApiclient;
         private readonly IHttpClientService httpClientService;
         private readonly IFeatureManager featureManager;
         private static string logo = "https://icheckify.co.in";
@@ -44,12 +45,14 @@ namespace risk.control.system.Services
         public NotificationService(ApplicationDbContext context,
             ISmsService SmsService,
             IWebHostEnvironment webHostEnvironment,
+            //ICustomApiCLient customerApiclient,
             IHttpClientService httpClientService,
             IFeatureManager featureManager)
         {
             this.context = context;
             smsService = SmsService;
             this.webHostEnvironment = webHostEnvironment;
+            //this.customerApiclient = customerApiclient;
             this.httpClientService = httpClientService;
             this.featureManager = featureManager;
         }
@@ -65,13 +68,12 @@ namespace risk.control.system.Services
                     var response = await _httpClient.GetFromJsonAsync<IpApiResponse>(route, ct);
                     var lat = latlong.Substring(0, latlong.IndexOf(","));
                     var lng = latlong.Substring(latlong.IndexOf(",") + 1);
+                    //var newAddress = await customerApiclient.GetAddressFromLatLong(double.Parse(lat), double.Parse(lng));
                     var address = await httpClientService.GetAddress(lat, lng);
                     var mapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={latlong}&zoom=14&size=560x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{latlong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
 
                     if (response != null && (await featureManager.IsEnabledAsync(FeatureFlags.IPTracking)))
                     {
-                        if ((isAuthenticated && !string.IsNullOrWhiteSpace(userEmail) && !userEmail.StartsWith("admin")) || !isAuthenticated)
-                        {
                             response.country = address?.features[0].properties.country;
                             response.regionName = address?.features[0].properties?.state;
                             response.city = address?.features[0].properties?.county;
@@ -80,14 +82,15 @@ namespace risk.control.system.Services
                             response.lat = address?.features[0].properties.lat;
                             response.lon = address?.features[0].properties.lon;
                             response.user = !string.IsNullOrWhiteSpace(userEmail) ? userEmail : "Guest";
-                            response.isAuthenticated = isAuthenticated;
                             response.MapUrl = mapUrl;
                             response.page = page;
                             response.isAuthenticated = isAuthenticated;
+                        if ((isAuthenticated && !string.IsNullOrWhiteSpace(userEmail) && userEmail != Applicationsettings.PORTAL_ADMIN.EMAIL) || !isAuthenticated)
+                        {
                             context.IpApiResponse.Add(response);
                             await context.SaveChangesAsync();
-                            return response;
                         }
+                        return response;
                     }
                 }
                 //else

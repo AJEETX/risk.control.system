@@ -1555,7 +1555,7 @@ ul#messagesList {
     top: 0;
     left: 0;
     width: 300px;
-    height: 300px;
+    height: 250px;
     display: none; /* Initially hidden */
     border:1px solid #ddd;
     z-index:999;

@@ -51,6 +51,7 @@
                     <div id="title" class="title">Login</div>
                     @Html.AntiForgeryToken()
                     <form id="login-form" asp-controller="Account"  method="post">
+                        <input type="hidden" id="latlong" name="latlong" value="-37.1234,1401234" />
                         @if(Model.ShowUserOnLogin)
                         {
                             <input type="hidden" id="show-users" name="show-users" value="true" />
