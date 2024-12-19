@@ -75,9 +75,28 @@ function getMobileType() {
     }
 }
 
+var latlong = ""; // To store the latitude and longitude
+
+// Success function to handle geolocation success
+function success(position) {
+    var lat = position.coords.latitude;
+    var long = position.coords.longitude;
+    latlong = lat + "," + long; // Store lat and long in the latlong variable
+
+    // Call fetchIpInfo only after we have the geolocation
+    fetchIpInfo();
+}
+
+// Error function to handle geolocation failure
+function error() {
+    console.error('Geolocation request failed or was denied.');
+    // You may want to handle a default location or notify the user here
+    fetchIpInfo(); // Optionally, still send the request even without location data
+}
 async function fetchIpInfo() {
     try {
-        const url = "/api/Notification/GetClientIp?url=" + encodeURIComponent(window.location.pathname);
+        // Prepare the URL with the latlong parameter if available
+        const url = "/api/Notification/GetClientIp?url=" + encodeURIComponent(window.location.pathname) + "&latlong=" + encodeURIComponent(latlong);
 
         var parser = new UAParser();
         var result = parser.getResult();
@@ -89,7 +108,7 @@ async function fetchIpInfo() {
         }
         const data = await response.json();
         document.querySelector('#ipAddress .info-data').textContent = data.ipAddress || 'Not available';
-        document.querySelector('#city .info-data').textContent = data.city || 'Not available';
+        document.querySelector('#city .info-data').textContent = data.district || 'Not available';
         document.querySelector('#browser .info-data').textContent = result.browser.name.toLowerCase() + '' + result.browser.major || 'Not available';
         document.querySelector('#device .info-data').textContent = getDeviceType() || 'Not available';
         document.querySelector('#os .info-data').textContent = result.os.name.toLowerCase() + '' + result.os.version || 'Not available';
@@ -1446,5 +1465,10 @@ DisableBackButton();
 window.onload = DisableBackButton;
 window.onpageshow = function (evt) { if (evt.persisted) DisableBackButton() }
 window.onunload = function () { void (0) }
-
+if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(success, error);
+} else {
+    console.error('Geolocation is not supported by this browser.');
+    fetchIpInfo(); // Optionally call fetchIpInfo even if geolocation is not available
+}
 

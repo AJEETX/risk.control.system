@@ -1,73 +1,41 @@
-//loadScript();
-//function initialize() {
+var latlong = ""; // To store the latitude and longitude
 
-//    if (navigator.geolocation) {
-//        navigator.geolocation.getCurrentPosition(success);
-//    }
-//    else {
-//        fetchIpInfo();
-//    }
-//}
-var hexData = 'AIzaSyCYPyGotbPJAcE9Ap_ATSKkKOrXCQC4ops';
-
-function loadScript() {
-    var script = document.createElement('script');
-    script.type = 'text/javascript';
-    script.src = "https://maps.googleapis.com/maps/api/js?key=" + hexData + "&sensor=false&callback=initialize";
-    document.body.appendChild(script);
-}
-async function success(position) {
-    const { Map, InfoWindow } = await google.maps.importLibrary("maps");
-    const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
-    var bounds = new google.maps.LatLngBounds();
+// Success function to handle geolocation success
+function success(position) {
     var lat = position.coords.latitude;
     var long = position.coords.longitude;
-    var center = {
-        lat: position.coords.latitude,
-        lng: position.coords.longitude
-    };
-    const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${long}&sensor=false&key=${hexData}`);
-    const mapUrlData = await response.json();
+    latlong = lat + "," + long; // Store lat and long in the latlong variable
 
+    // Call fetchIpInfo only after we have the geolocation
+    fetchIpInfo();
+}
 
-    var LatLng = new google.maps.LatLng(lat, long);
-    var mapOptions = {
-        center: LatLng,
-        zoom: 14,
-        mapId: "4504f8b37365c3d0",
-        mapTypeId: google.maps.MapTypeId.ROADMAP
-    };
-
-    var map = new google.maps.Map(document.getElementById("maps"), mapOptions);
-    var marker = new google.maps.Marker({
-        icon: "../images/beachflag.png",
-        position: LatLng,
-        title: "You are here: " + mapUrlData.results[0].formatted_address
-    });
-
-    marker.setMap(map);
-    var getInfoWindow = new google.maps.InfoWindow({
-        content: "<b>Your Current Location</b><br/> " +
-            mapUrlData.results[0].formatted_address + ""
-    });
-    getInfoWindow.open(map, marker);
-    map.fitBounds(bounds);
-    map.setCenter(bounds.getCenter());
+// Error function to handle geolocation failure
+function error() {
+    console.error('Geolocation request failed or was denied.');
+    // You may want to handle a default location or notify the user here
+    fetchIpInfo(); // Optionally, still send the request even without location data
 }
 async function fetchIpInfo() {
     try {
-        const url = "/api/Notification/GetClientIp?url="+ encodeURIComponent(window.location.pathname);
-        //const url = "/api/Notification/GetClientIp";
+        // Prepare the URL with the latlong parameter if available
+        const url = "/api/Notification/GetClientIp?url=" + encodeURIComponent(window.location.pathname) + "&latlong=" + encodeURIComponent(latlong);
+
+        // Make the fetch call
         const response = await fetch(url);
+
+        // Handle if the response is not OK
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
+
+        // Parse the response data as JSON
         const data = await response.json();
         // Update each element with the respective data
         document.querySelector('#ipAddress .info-data').textContent = data.ipAddress || 'Not available';
         document.querySelector('#country .info-data').textContent = data.country || 'Not available';
         document.querySelector('#region .info-data').textContent = data.region || 'Not available';
-        document.querySelector('#city .info-data').textContent = data.city || 'Not available';
+        document.querySelector('#city .info-data').textContent = data.district ||data.city || 'Not available';
         document.querySelector('#postCode .info-data').textContent = data.postCode || 'Not available';
         document.querySelector('#isp .info-data').textContent = data.isp || 'Not available';
         document.querySelector('#latLong .info-data').textContent = data.longitude ? data.latitude + "/" + data.longitude : 'Not available';
@@ -77,4 +45,10 @@ async function fetchIpInfo() {
         console.error('There has been a problem with your fetch operation:', error);
     }
 }
-window.onload = fetchIpInfo;
+
+if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(success, error);
+} else {
+    console.error('Geolocation is not supported by this browser.');
+    fetchIpInfo(); // Optionally call fetchIpInfo even if geolocation is not available
+}

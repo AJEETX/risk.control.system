@@ -25,12 +25,12 @@ namespace risk.control.system.Seeds
             var district = context.District.FirstOrDefault(c => c.DistrictId == pinCode.District.DistrictId);
             var state = context.State.Include(s=>s.Country).FirstOrDefault(s => s.StateId == pinCode.State.StateId);
 
-            string adminImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "portal-admin.jpeg");
+            string adminImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(PORTAL_ADMIN.PROFILE_IMAGE));
             var adminImage = File.ReadAllBytes(adminImagePath);
 
             if (adminImage == null)
             {
-                adminImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "user.png");
+                adminImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(USER_PHOTO));
                 adminImage = File.ReadAllBytes(adminImagePath);
             }
             //Seed portal admin

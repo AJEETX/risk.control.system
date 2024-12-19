@@ -29,6 +29,8 @@ namespace risk.control.system.Services
 
         Task<PanResponse?> VerifyPanNew(string pan, string panUrl, string key, string host);
 
+        Task<MapAddress> GetAddress(string lat, string lon);
+
         Task<string> GetRawAddress(string lat, string lon);
 
         Task<LocationDetails_IpApi> GetAddressFromIp(string ipAddress);
@@ -135,6 +137,29 @@ namespace risk.control.system.Services
             catch (Exception)
             {
                 return "Troy Court, Forest Hill, Melbourne, City of Whitehorse, Victoria, 3131, Australia";
+            }
+
+        }
+        public async Task<MapAddress> GetAddress(string lat, string lon)
+        {
+            var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri($"https://api.geoapify.com/v1/geocode/reverse?lat={lat}&lon={lon}&apiKey={Applicationsettings.REVERRSE_GEOCODING}"),
+            };
+            try
+            {
+                using (var response = await httpClient.SendAsync(request))
+                {
+                    response.EnsureSuccessStatusCode();
+                    var body = await response.Content.ReadAsStringAsync();
+                    var addressData = JsonConvert.DeserializeObject<MapAddress>(body);
+                    return (addressData);
+                }
+            }
+            catch (Exception)
+            {
+                return null;
             }
 
         }

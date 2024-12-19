@@ -29,7 +29,7 @@ namespace risk.control.system.Seeds
             var state = context.State.Include(s => s.Country).FirstOrDefault(s => s.StateId == pinCode.State.StateId);
             var countryId = context.Country.FirstOrDefault(s => s.CountryId == state.Country.CountryId)?.CountryId ?? default!;
 
-            string adminImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "company-admin.jpeg");
+            string adminImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(COMPANY_ADMIN.PROFILE_IMAGE));
             var adminImage = File.ReadAllBytes(adminImagePath);
 
             if (adminImage == null)
@@ -94,7 +94,7 @@ namespace risk.control.system.Seeds
                 Name = creatorEmailwithSuffix
             };
 
-            string creatorImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "creator.jpeg");
+            string creatorImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(CREATOR.PROFILE_IMAGE));
 
             var creatorImage = File.ReadAllBytes(creatorImagePath);
 
@@ -147,7 +147,7 @@ namespace risk.control.system.Seeds
             {
                 Name = managererEmailwithSuffix
             };
-            string managerImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "assigner.jpeg");
+            string managerImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(MANAGER.PROFILE_IMAGE));
 
             var managerImage = File.ReadAllBytes(managerImagePath);
 
@@ -202,7 +202,7 @@ namespace risk.control.system.Seeds
                 Name = assessorEmailwithSuffix
             };
 
-            string assessorImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "assessor.jpeg");
+            string assessorImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(ASSESSOR.PROFILE_IMAGE));
             var assessorImage = File.ReadAllBytes(assessorImagePath);
 
             if (assessorImage == null)

@@ -72,7 +72,8 @@
                 "sDefaultContent": "",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    var img = '<img alt="' + row.name + '" title="' + row.name + '" src="' + row.document + '" class="profile-image doc-profile-image" data-toggle="tooltip"/>'; return img;
+                    var img = '<img alt="' + row.name + '" title="' + row.name + '" src="' + row.document + '" class="profile-image doc-profile-image" data-toggle="tooltip"/>';
+                    return img;
                 }
             },
             {
@@ -84,14 +85,14 @@
                     }
 
                     // Add the rate count badge
-                    img += ' <span class="badge badge-light"> (' + row.rateCount + ') </span>';
+                    img += ' <span title="(Total count of user rated) star ratings" class="badge badge-light" data-toggle="tooltip"> (' + row.rateCount + ')';
 
                     // Calculate and display the average rating if available
                     if (row.rateCount && row.rateCount > 0) {
                         var averageRating = row.rateTotal / row.rateCount;
-                        img += '<span class="avr">' + averageRating + '</span>';  // Ensure the rating is shown with two decimals
+                        img += '<span class="avr"><sup>' + averageRating + '</sup></span>';
                     }
-
+                    img += '</span>';
                     // Add the result span
                     img += '<br /> <span class="result"></span>';
 
@@ -142,11 +143,35 @@
                 }
             }],
         "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
-            if (aData.caseCount > 1) {
+            if (aData.caseCount > 10) {
                 $('td', nRow).css('background-color', '#ffa');
             }
         }, error: function (xhr, status, error) { alert('err ' + error) }
     });
+    table.on('draw', function () {
+        // Loop through each row of the table after it has been redrawn
+        $("#customerTable > tbody > tr").each(function () {
+            var av = parseFloat($(this).find("span.avr").text()); // Get the average rating
+            if (!isNaN(av) && av > 0) {  // Ensure it's a valid rating
+                var stars = $(this).find("img.rating");  // Get all star images in the row
+
+                // Loop through each star and highlight them based on the average rating
+                stars.each(function (index) {
+                    var star = $(this);
+                    if (index < Math.floor(av)) {  // Fully filled stars
+                        star.attr("src", "/images/FilledStar.jpeg");
+                    } else if (index === Math.floor(av) && av % 1 !== 0) {  // Handle half-filled stars
+                        star.attr("src", "/images/HalfStar.jpeg");  // You need a half-star image
+                    } else {
+                        star.attr("src", "/images/StarFade.gif");  // Faded stars
+                    }
+                });
+            }
+        });
+    });
+
+    // Initial draw to set the stars when the table first loads
+    table.draw();
     $('#customerTable').on('draw.dt', function () {
         $('[data-toggle="tooltip"]').tooltip({
             animated: 'fade',
@@ -157,12 +182,46 @@
     $('#customerTable tbody').hide();
     $('#customerTable tbody').fadeIn(2000);
     $('#customerTable tbody').on('mouseover', 'img.rating', function () {
-        var starId = $(this).attr('id'); // Get the ID of the hovered star        
-        var vendorId = $(this).attr('vendorId'); // Get the vendorId for additional logic
-        giveRating($(this), "FilledStar.jpeg"); $(this).css("cursor", "pointer");
+        var starImage = $(this);
+
+        if (!starImage.data('bs.tooltip')) {
+            // Set the title attribute for the tooltip text
+            starImage.attr("title", "Rate this agency");
+
+            // Set data-toggle to enable the tooltip
+            starImage.attr("data-toggle", "tooltip");
+            new bootstrap.Tooltip(starImage[0]);
+        }
+        // Get the ID and vendorId for additional logic
+        var starId = starImage.attr('id'); // Get the ID of the hovered star
+        var vendorId = starImage.attr('vendorId'); // Get the vendorId for additional logic
+
+        // Call a function to update the star image (this function should be defined elsewhere)
+        giveRating(starImage, "FilledStar.jpeg");
+
+        // Change the cursor to pointer when hovering over the star
+        starImage.css("cursor", "pointer");
+
+        // Initialize the tooltip (this should be called after setting the attributes)
+        var tooltip = bootstrap.Tooltip.getInstance ? bootstrap.Tooltip.getInstance(starImage[0]) : null;
+
+        if (tooltip) {
+            tooltip.show();
+        }
     });
     $('#customerTable tbody').on('mouseleave', 'img.rating', function () {
-        giveRating($(this), "StarFade.gif"); refilRating($(this));
+        var starImage = $(this);
+
+        // Dispose of the tooltip only if it has been initialized
+        var tooltip = bootstrap.Tooltip.getInstance ? bootstrap.Tooltip.getInstance(starImage[0]) : null;
+
+        if (tooltip) {
+            tooltip.dispose();
+        }
+
+        // Call functions to reset the star rating
+        giveRating(starImage, "StarFade.gif");
+        refilRating(starImage);
     });
     $('#customerTable tbody').on('click', 'img.rating', function (e) {
         var starId = $(this).attr('id');

@@ -210,18 +210,22 @@
         public const string AGENCY1NAME = "Checker";
         public const string AGENCY1CODE = "CHA";
         public const string AGENCY1DOMAIN = "checker.com";
+        public const string AGENCY1PHOTO = "/img/checker.png";
 
         public const string AGENCY2NAME = "Verify";
         public const string AGENCY2CODE = "VEA";
         public const string AGENCY2DOMAIN = "verify.com";
+        public const string AGENCY2PHOTO = "/img/verify.png";
 
         public const string AGENCY3NAME = "Investigate";
         public const string AGENCY3CODE = "INA";
         public const string AGENCY3DOMAIN = "investigate.com";
+        public const string AGENCY3PHOTO = "/img/investigate.png";
 
         public const string NO_IMAGE = "/img/no-image.png";
         public const string AUDIO_UPLOAD_IMAGE = "/img/upload-audio.png";
         public const string VIDEO_UPLOAD_IMAGE = "/img/upload-video.png";
+        public const string USER_PHOTO = "/img/user.png";
         public const string NO_USER = "/img/no-user.png";
         public const string NO_MAP = "/img/no-map.jpeg";
         public const string MAP_MARKER = "/img/map-marker-icon.png";
@@ -317,6 +321,33 @@
             public const string FIRST_NAME = "Denny";
             public const string LAST_NAME = "Travolta";
             public const string PROFILE_IMAGE = "/img/agent.jpeg";
+        }
+        public static class AGENTZ
+        {
+            public const string DISPLAY_NAME = "AGENT";
+            public const string CODE = "agentz";
+            public const string USERNAME = "agentz";
+            public const string FIRST_NAME = "Zenny";
+            public const string LAST_NAME = "Tobbs";
+            public const string PROFILE_IMAGE = "/img/assigner.jpeg";
+        }
+        public static class AGENTX
+        {
+            public const string DISPLAY_NAME = "AGENT";
+            public const string CODE = "agentx";
+            public const string USERNAME = "agentx";
+            public const string FIRST_NAME = "Xavier";
+            public const string LAST_NAME = "Piccasso";
+            public const string PROFILE_IMAGE = "/img/creator.jpeg";
+        }
+        public static class AGENTY
+        {
+            public const string DISPLAY_NAME = "AGENT";
+            public const string CODE = "agenty";
+            public const string USERNAME = "agenty";
+            public const string FIRST_NAME = "Jason";
+            public const string LAST_NAME = "Trantor";
+            public const string PROFILE_IMAGE = "/img/company-admin.jpeg";
         }
     }
 }

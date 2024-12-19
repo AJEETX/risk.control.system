@@ -156,73 +156,76 @@ namespace risk.control.system.Services
                 .Include(v => v.VendorInvestigationServiceTypes)
                 .ThenInclude(v => v.PincodeServices)?
                 .ToListAsync();
-            if (claimsInvestigation.IsReviewCase)
-            {
-                existingVendors = existingVendors.Where(v => v.VendorId != claimsInvestigation.VendorId)?.ToList();
-            }
+            //if (claimsInvestigation.IsReviewCase)
+            //{
+            //    existingVendors = existingVendors.Where(v => v.VendorId != claimsInvestigation.VendorId)?.ToList();
+            //}
 
-            var allocatedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
-            var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
-            var submitted2SuperStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR);
+            //var allocatedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+            //            i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
+            //var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+            //            i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
+            //var submitted2SuperStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+            //            i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR);
 
-            var claimsCases = _context.ClaimsInvestigation
-                .Include(c=>c.BeneficiaryDetail)
-                .Where(c => 
-                (c.InvestigationCaseSubStatusId == allocatedStatus.InvestigationCaseSubStatusId ||
-                                    c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId ||
-                                    c.InvestigationCaseSubStatusId == submitted2SuperStatus.InvestigationCaseSubStatusId)
-                )?.ToList();
+            //var claimsCases = _context.ClaimsInvestigation
+            //    .Include(c=>c.BeneficiaryDetail)
+            //    .Where(c => 
+            //    (c.InvestigationCaseSubStatusId == allocatedStatus.InvestigationCaseSubStatusId ||
+            //                        c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId ||
+            //                        c.InvestigationCaseSubStatusId == submitted2SuperStatus.InvestigationCaseSubStatusId)
+            //    )?.ToList();
 
-            var vendorCaseCount = new Dictionary<string, int>();
+            //var vendorCaseCount = new Dictionary<string, int>();
 
-            int countOfCases = 0;
-            foreach (var claimsCase in claimsCases)
-            {
-                if (claimsCase.BeneficiaryDetail.BeneficiaryDetailId > 0)
-                {
-                    if (claimsCase.VendorId.HasValue)
-                    {
-                        if (!vendorCaseCount.TryGetValue(claimsCase.VendorId.ToString(), out countOfCases))
-                        {
-                            vendorCaseCount.Add(claimsCase.VendorId.ToString(), 1);
-                        }
-                        else
-                        {
-                            int currentCount = vendorCaseCount[claimsCase.VendorId.ToString()];
-                            ++currentCount;
-                            vendorCaseCount[claimsCase.VendorId.ToString()] = currentCount;
-                        }
-                    }
-                }
-            }
+            //int countOfCases = 0;
+            //foreach (var claimsCase in claimsCases)
+            //{
+            //    if (claimsCase.BeneficiaryDetail.BeneficiaryDetailId > 0)
+            //    {
+            //        if (claimsCase.VendorId.HasValue)
+            //        {
+            //            if (!vendorCaseCount.TryGetValue(claimsCase.VendorId.ToString(), out countOfCases))
+            //            {
+            //                vendorCaseCount.Add(claimsCase.VendorId.ToString(), 1);
+            //            }
+            //            else
+            //            {
+            //                int currentCount = vendorCaseCount[claimsCase.VendorId.ToString()];
+            //                ++currentCount;
+            //                vendorCaseCount[claimsCase.VendorId.ToString()] = currentCount;
+            //            }
+            //        }
+            //    }
+            //}
 
-            List<VendorCaseModel> vendorWithCaseCounts = new();
+            //List<VendorCaseModel> vendorWithCaseCounts = new();
 
-            foreach (var existingVendor in existingVendors)
-            {
-                var vendorCase = vendorCaseCount.FirstOrDefault(v => v.Key == existingVendor.VendorId.ToString());
-                if (vendorCase.Key == existingVendor.VendorId.ToString())
-                {
-                    vendorWithCaseCounts.Add(new VendorCaseModel
-                    {
-                        CaseCount = vendorCase.Value,
-                        Vendor = existingVendor,
-                    });
-                }
-                else
-                {
-                    vendorWithCaseCounts.Add(new VendorCaseModel
-                    {
-                        CaseCount = 0,
-                        Vendor = existingVendor,
-                    });
-                }
-            }
+            //foreach (var existingVendor in existingVendors)
+            //{
+            //    var vendorCase = vendorCaseCount.FirstOrDefault(v => v.Key == existingVendor.VendorId.ToString());
+            //    if (vendorCase.Key == existingVendor.VendorId.ToString())
+            //    {
+            //        vendorWithCaseCounts.Add(new VendorCaseModel
+            //        {
+            //            CaseCount = vendorCase.Value,
+            //            Vendor = existingVendor,
+            //        });
+            //    }
+            //    else
+            //    {
+            //        vendorWithCaseCounts.Add(new VendorCaseModel
+            //        {
+            //            CaseCount = 0,
+            //            Vendor = existingVendor,
+            //        });
+            //    }
+            //}
 
-            return new ClaimsInvestigationVendorsModel { Location = claimCase, Vendors = vendorWithCaseCounts, ClaimsInvestigation = claimsInvestigation };
+            return new ClaimsInvestigationVendorsModel { 
+                Location = claimCase, 
+                //Vendors = vendorWithCaseCounts, 
+                ClaimsInvestigation = claimsInvestigation };
         }
 
         public async Task<ClaimsInvestigation> GetReAllocateToVendor(string selectedcase)

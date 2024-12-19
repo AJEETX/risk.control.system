@@ -1,4 +1,8 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using System.Diagnostics.Metrics;
+
+using Google.Api;
+
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 
 using risk.control.system.AppConstant;
@@ -29,7 +33,7 @@ namespace risk.control.system.Seeds
             var checkerDistrict = context.District.Include(d => d.State).FirstOrDefault(s => s.DistrictId == checkerPinCode.District.DistrictId);
             var checkerState = context.State.Include(s => s.Country).FirstOrDefault(s => s.StateId == checkerDistrict.State.StateId);
             var checkerCountry = context.Country.FirstOrDefault(s => s.CountryId == checkerState.Country.CountryId) ?? default!;
-            string checkerImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "checker.png");
+            string checkerImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(Applicationsettings.AGENCY1PHOTO));
             var checkerImage = File.ReadAllBytes(checkerImagePath);
 
             if (checkerImage == null)
@@ -56,7 +60,7 @@ namespace risk.control.system.Seeds
                 Description = "HEAD OFFICE ",
                 Email = Applicationsettings.AGENCY1DOMAIN,
                 PhoneNumber = "8888004739",
-                DocumentUrl = "/img/checker.png",
+                DocumentUrl = Applicationsettings.AGENCY1PHOTO,
                 DocumentImage = checkerImage,
                 Updated = DateTime.Now,
                 Status = VendorStatus.ACTIVE,
@@ -69,7 +73,7 @@ namespace risk.control.system.Seeds
             var verifyDistrict = context.District.Include(d => d.State).FirstOrDefault(s => s.DistrictId == verifyPinCode.District.DistrictId);
             var verifyState = context.State.Include(s => s.Country).FirstOrDefault(s => s.StateId == verifyDistrict.State.StateId);
             var verifyCountry = context.Country.FirstOrDefault(s => s.CountryId == verifyState.Country.CountryId) ?? default!;
-            string verifyImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "verify.png");
+            string verifyImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(Applicationsettings.AGENCY2PHOTO));
             var verifyImage = File.ReadAllBytes(verifyImagePath);
 
             if (verifyImage == null)
@@ -95,7 +99,7 @@ namespace risk.control.system.Seeds
                 Description = "HEAD OFFICE ",
                 Email = Applicationsettings.AGENCY2DOMAIN,
                 PhoneNumber = "4444404739",
-                DocumentUrl = "/img/verify.png",
+                DocumentUrl = Applicationsettings.AGENCY2PHOTO,
                 DocumentImage = verifyImage,
                 Status = VendorStatus.ACTIVE,
                 Updated = DateTime.Now,
@@ -108,7 +112,7 @@ namespace risk.control.system.Seeds
             var investigateDistrict = context.District.Include(d => d.State).FirstOrDefault(s => s.DistrictId == investigatePinCode.District.DistrictId);
             var investigateState = context.State.Include(s => s.Country).FirstOrDefault(s => s.StateId == investigateDistrict.State.StateId);
             var investigateCountry = context.Country.FirstOrDefault(s => s.CountryId == investigateState.Country.CountryId) ?? default!;
-            string investigateImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "investigate.png");
+            string investigateImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(Applicationsettings.AGENCY3PHOTO));
             var investigateImage = File.ReadAllBytes(investigateImagePath);
 
             if (investigateImage == null)
@@ -134,7 +138,7 @@ namespace risk.control.system.Seeds
                 Description = "HEAD OFFICE ",
                 Email = Applicationsettings.AGENCY3DOMAIN,
                 PhoneNumber = "7964404160",
-                DocumentUrl = "/img/investigate.png",
+                DocumentUrl = Applicationsettings.AGENCY3PHOTO,
                 DocumentImage = investigateImage,
                 Status = VendorStatus.ACTIVE,
                 Updated = DateTime.Now,
@@ -256,7 +260,7 @@ namespace risk.control.system.Seeds
             //var tataCompany = await context.ClientCompany.AddAsync(tata);
 
             //CREATE COMPANY1
-            string insurerImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "insurer.jpg");
+            string insurerImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(Applicationsettings.INSURERLOGO));
             var insurerImage = File.ReadAllBytes(insurerImagePath);
 
             if (insurerImage == null)

@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Google.Api;
+
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
@@ -12,10 +15,10 @@ namespace risk.control.system.Seeds
 {
     public static class VendorApplicationUserSeed
     {
+         private static string noUserImagePath = string.Empty;
         public static async Task Seed(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, UserManager<VendorApplicationUser> userManager, Vendor vendor)
         {
-            string noUserImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", @Applicationsettings.NO_USER);
-
+            noUserImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", @Applicationsettings.NO_USER);
             string adminEmailwithSuffix = AGENCY_ADMIN.CODE + "@" + vendor.Email;
             //Seed Vendor Admin
             var vaMailBox = new Mailbox
@@ -28,7 +31,7 @@ namespace risk.control.system.Seeds
             var state = context.State.Include(s => s.Country).FirstOrDefault(s => s.StateId == pinCode.State.StateId);
             var countryId = context.Country.FirstOrDefault(s => s.CountryId == state.Country.CountryId)?.CountryId ?? default!;
 
-            string adminImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "agency-admin.jpeg");
+            string adminImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(AGENCY_ADMIN.PROFILE_IMAGE));
             var adminImage = File.ReadAllBytes(adminImagePath);
 
             if (adminImage == null)
@@ -91,7 +94,7 @@ namespace risk.control.system.Seeds
                 Name = supervisorEmailwithSuffix
             };
 
-            string supervisorImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "supervisor.jpeg");
+            string supervisorImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(SUPERVISOR.PROFILE_IMAGE));
             var supervisorImage = File.ReadAllBytes(supervisorImagePath);
 
             if (supervisorImage == null)
@@ -143,12 +146,39 @@ namespace risk.control.system.Seeds
 
             //Seed Vendor Agent
             string agentEmailwithSuffix = AGENT.CODE + "@" + vendor.Email;
+            var pinCode1 = context.PinCode.Include(p => p.District).Include(p => p.State).FirstOrDefault(p => p.Code == CURRENT_PINCODE2);
+            var createAgent = SeedAgent(context,agentEmailwithSuffix, webHostEnvironment, userManager, vendor, pinCode1, Applicationsettings.AGENT.PROFILE_IMAGE);
+
+
+            //string agent2EmailwithSuffix = AGENTZ.CODE + "@" + vendor.Email;
+            //var pinCode2 = context.PinCode.Include(p => p.District).Include(p => p.State).FirstOrDefault(p => p.Code == CURRENT_PINCODE3);
+            //var createAgent2 = SeedAgent(context, agent2EmailwithSuffix, webHostEnvironment, userManager, vendor, pinCode2, Applicationsettings.AGENTZ.PROFILE_IMAGE);
+
+
+            //string agent3EmailwithSuffix = AGENTX.CODE + "@" + vendor.Email;
+            //var pinCode3 = context.PinCode.Include(p => p.District).Include(p => p.State).FirstOrDefault(p => p.Code == CURRENT_PINCODE4);
+            //var createAgent3 = SeedAgent(context, agent3EmailwithSuffix, webHostEnvironment, userManager, vendor, pinCode3, Applicationsettings.AGENTX.PROFILE_IMAGE);
+
+
+            //string agent4EmailwithSuffix = AGENTY.CODE + "@" + vendor.Email;
+            //var pinCode4 = context.PinCode.Include(p => p.District).Include(p => p.State).FirstOrDefault(p => p.Code == CURRENT_PINCODE5);
+            //var createAgent4 = SeedAgent(context, agent4EmailwithSuffix, webHostEnvironment, userManager, vendor, pinCode4, Applicationsettings.AGENTY.PROFILE_IMAGE);
+        }
+
+        private static async Task SeedAgent(ApplicationDbContext context, string agentEmailwithSuffix, 
+            IWebHostEnvironment webHostEnvironment,
+            UserManager<VendorApplicationUser> userManager, 
+            Vendor vendor,PinCode pinCode, string photo)
+        {
+            var district = context.District.FirstOrDefault(c => c.DistrictId == pinCode.District.DistrictId);
+            var state = context.State.Include(s => s.Country).FirstOrDefault(s => s.StateId == pinCode.State.StateId);
+            var countryId = context.Country.FirstOrDefault(s => s.CountryId == state.Country.CountryId)?.CountryId ?? default!;
             var faMailBox = new Mailbox
             {
                 Name = agentEmailwithSuffix
             };
-
-            string agentImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "agent.jpeg");
+            var noUserImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", @Applicationsettings.NO_USER);
+            string agentImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(photo));
             var agentImage = File.ReadAllBytes(agentImagePath);
 
             if (agentImage == null)
@@ -176,7 +206,7 @@ namespace risk.control.system.Seeds
                 DistrictId = district?.DistrictId ?? default!,
                 StateId = state?.StateId ?? default!,
                 PinCodeId = pinCode?.PinCodeId ?? default!,
-                ProfilePictureUrl = AGENT.PROFILE_IMAGE,
+                ProfilePictureUrl = photo,
                 ProfilePicture = agentImage,
                 Role = AppRoles.AGENT,
                 UserRole = AgencyRole.AGENT,
