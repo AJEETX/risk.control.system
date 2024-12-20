@@ -16,13 +16,13 @@
             },
             
             {
+                className: 'max-width-column-number', // Apply the CSS class,
+                targets: 0                      // Index of the column to style
+            },
+            {
                 className: 'max-width-column-name', // Apply the CSS class,
                 targets: 2                      // Index of the column to style
             },
-            //{
-            //    className: 'max-width-column-name', // Apply the CSS class,
-            //    targets: 3                      // Index of the column to style
-            //},
             {
                 className: 'max-width-column-number', // Apply the CSS class,
                 targets: 4                      // Index of the column to style
@@ -58,7 +58,7 @@
         columns: [
             /* Name of the keys from            data file source */
             {
-                "sDefaultContent": "",
+                "sDefaultContent": '<i class="fas fa-sync fa-spin fa-4x fa-fw"></i><span class="sr-only">Loading...</span>',
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var img = '<input name="selectedcase" class="selected-case" type="radio" id="' + row.id + '"  value="' + row.id + '" data-toggle="tooltip" title="Select Agency" />';
@@ -77,8 +77,9 @@
                 }
             },
             {
-                "data": "domain"
-                , "mRender": function (data, type, row) {
+                "data": "domain",
+                "bSortable": false,
+                "mRender": function (data, type, row) {
                     var img = '';
                     for (var i = 1; i <= 5; i++) {
                         img += '<img id="' + i + '" src="/images/StarFade.gif" class="rating" vendorId="' + row.id + '"/>';
@@ -148,6 +149,14 @@
             }
         }, error: function (xhr, status, error) { alert('err ' + error) }
     });
+    $('#customerTable').on('draw.dt', function () {
+        $('[data-toggle="tooltip"]').tooltip({
+            animated: 'fade',
+            placement: 'bottom',
+            html: true
+        });
+    });
+
 
     $('#customerTable').on('mouseenter', '.map-thumbnail', function () {
         $(this).find('.full-map-title').show(); // Show full map

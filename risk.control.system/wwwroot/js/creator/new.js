@@ -101,6 +101,7 @@
             },
             {
                 "data": "pincode",
+                "bSortable": false,
                 "mRender": function (data, type, row) {
                     if (row.pincodeName != '...') {
                         var img = '<div class="map-thumbnail profile-image doc-profile-image">';

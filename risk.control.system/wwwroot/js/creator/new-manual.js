@@ -99,6 +99,7 @@
             },
             {
                 "data": "pincode",
+                "bSortable": false,
                 "mRender": function (data, type, row) {
                     if (row.pincodeName != '...') {
                         var img = '<div class="map-thumbnail profile-image doc-profile-image">';
@@ -455,6 +456,6 @@ function getdetails(id) {
         for (var i = 0; i < nodes.length; i++) {
             nodes[i].disabled = true;
         }
-    } nodes[i].disabled = true;
+    } 
 }
 

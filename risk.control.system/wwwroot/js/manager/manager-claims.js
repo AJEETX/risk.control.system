@@ -58,6 +58,7 @@ $(document).ready(function () {
             data file source */
             {
                 "data": "agency",
+                "bSortable": false,
                 "mRender": function (data, type, row) {
                     var img = '<div class="map-thumbnail profile-image doc-profile-image">';
                     img += '<img src="' + row.ownerDetail + '" class="full-map" title="' + row.agency + '" data-toggle="tooltip"/>'; // Full map image with class 'full-map'
@@ -69,6 +70,7 @@ $(document).ready(function () {
             },
             {
                 "data": "pincode",
+                "bSortable": false,
                 "mRender": function (data, type, row) {
                     var img = '<div class="map-thumbnail profile-image doc-profile-image">';
                     img += '<img src="' + row.personMapAddressUrl + '" class="thumbnail profile-image doc-profile-image" />'; // Thumbnail image with class 'thumbnail'

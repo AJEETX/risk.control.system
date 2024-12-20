@@ -46,6 +46,7 @@
             data file source */
             {
                 "data": "agent",
+                "bSortable": false,
                 "mRender": function (data, type, row) {
                     if (row.caseWithPerson) {
                         var img = '<div class="map-thumbnail-customer table-profile-image">';
@@ -65,6 +66,7 @@
             },
             {
                 "data": "pincode",
+                "bSortable": false,
                 "mRender": function (data, type, row) {
                     var img = '<div class="map-thumbnail profile-image doc-profile-image">';
                     img += '<img src="' + row.personMapAddressUrl + '" class="thumbnail profile-image doc-profile-image" />'; // Thumbnail image with class 'thumbnail'

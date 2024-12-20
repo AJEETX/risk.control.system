@@ -183,6 +183,7 @@ public class ICheckifyService : IICheckifyService
     public async Task<AppiCheckifyResponse> GetDocumentId(DocumentData data)
     {
         ClaimsInvestigation claim = null;
+        Task<string> addressTask = null;
         try
         {
             claim = claimsService.GetClaims().Include(c => c.AgencyReport).ThenInclude(c => c.PanIdReport).FirstOrDefault(c => c.ClaimsInvestigationId == data.ClaimId);
@@ -211,7 +212,7 @@ public class ICheckifyService : IICheckifyService
 
             var googleDetecTask = googleApi.DetectTextAsync(byteimage);
 
-            var addressTask = httpClientService.GetRawAddress(latitude, longitude);
+            addressTask = httpClientService.GetRawAddress(latitude, longitude);
 
             await Task.WhenAll(googleDetecTask, addressTask);
 
@@ -321,7 +322,9 @@ public class ICheckifyService : IICheckifyService
             claim.AgencyReport.PanIdReport.DocumentIdImage = CompressImage.ProcessCompress(image);
             claim.AgencyReport.PanIdReport.DocumentIdImageLongLatTime = DateTime.Now;
             claim.AgencyReport.PanIdReport.DocumentIdImageData = "no data: ";
-                claim.AgencyReport.PanIdReport.DocumentIdImageValid = false;
+            var rawAddress = await addressTask;
+            claim.AgencyReport.PanIdReport.DocumentIdImageLocationAddress = rawAddress;
+            claim.AgencyReport.PanIdReport.DocumentIdImageValid = false;
             _context.ClaimsInvestigation.Update(claim);
 
             var rows = await _context.SaveChangesAsync();
