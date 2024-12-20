@@ -24,19 +24,19 @@
         columnDefs: [
         {
             className: 'max-width-column-name', // Apply the CSS class,
-            targets: 2                      // Index of the column to style
-        },
-        {
-            className: 'max-width-column-number', // Apply the CSS class,
             targets: 3                      // Index of the column to style
         },
         {
-            className: 'max-width-column-name', // Apply the CSS class,
-            targets: 5                      // Index of the column to style
+            className: 'max-width-column-number', // Apply the CSS class,
+            targets: 4                      // Index of the column to style
         },
         {
             className: 'max-width-column-name', // Apply the CSS class,
-            targets: 7                      // Index of the column to style
+            targets: 6                      // Index of the column to style
+        },
+        {
+            className: 'max-width-column-name', // Apply the CSS class,
+            targets: 8                      // Index of the column to style
         }],
         order: [[15, 'asc']],
         fixedHeader: true,
@@ -49,6 +49,26 @@
         columns: [
             /* Name of the keys from
             data file source */
+            {
+                "data": "agent",
+                "mRender": function (data, type, row) {
+                    if (row.caseWithPerson) {
+                        var img = '<div class="map-thumbnail-customer table-profile-image">';
+                        img += '<img src="' + row.ownerDetail + '" class="thumbnail table-profile-image" />'; // Thumbnail image with class 'thumbnail'
+                        img += '<img src="' + row.ownerDetail + '" class="full-map-customer" title="' + row.agent + '" data-toggle="tooltip"/>'; // Full map image with class 'full-map'
+                        img += '</div>';
+                        return img;
+                    }
+                    else {
+                        var img = '<div class="map-thumbnail profile-image doc-profile-image">';
+                        img += '<img src="' + row.ownerDetail + '" class="full-map" title="' + row.agent + '" data-toggle="tooltip"/>'; // Full map image with class 'full-map'
+                        img += '<img src="' + row.ownerDetail + '" class="thumbnail profile-image doc-profile-image" />'; // Thumbnail image with class 'thumbnail'
+                        img += '</div>';
+                        return img;
+                    }
+                }
+                ///<button type="button" class="btn btn-lg btn-danger" data-toggle="popover" title="Popover title" data-content="And here's some amazing content. It's very engaging. Right?">Click to toggle popover</button>
+            },
             {
                 "data": "pincode",
                 "mRender": function (data, type, row) {
@@ -136,29 +156,7 @@
                     return '<span title="' + row.created + '" data-toggle="tooltip">' + data + '</span>'
                 }
             },
-            {
-                "data": "timePending"
-            },
-            {
-                "data": "agent",
-                "mRender": function (data, type, row) {
-                    if (row.caseWithPerson) {
-                        var img = '<div class="map-thumbnail-customer table-profile-image">';
-                        img += '<img src="' + row.ownerDetail + '" class="thumbnail table-profile-image" />'; // Thumbnail image with class 'thumbnail'
-                        img += '<img src="' + row.ownerDetail + '" class="full-map-customer" title="' + row.agent + '" data-toggle="tooltip"/>'; // Full map image with class 'full-map'
-                        img += '</div>';
-                        return img;
-                    }
-                    else {
-                        var img = '<div class="map-thumbnail profile-image doc-profile-image">';
-                        img += '<img src="' + row.ownerDetail + '" class="full-map" title="' + row.agent + '" data-toggle="tooltip"/>'; // Full map image with class 'full-map'
-                        img += '<img src="' + row.ownerDetail + '" class="thumbnail profile-image doc-profile-image" />'; // Thumbnail image with class 'thumbnail'
-                        img += '</div>';
-                        return img;
-                    }
-                }
-                ///<button type="button" class="btn btn-lg btn-danger" data-toggle="popover" title="Popover title" data-content="And here's some amazing content. It's very engaging. Right?">Click to toggle popover</button>
-            },
+            
             {
                 "sDefaultContent": "",
                 "bSortable": false,
@@ -174,6 +172,9 @@
                     
                     return buttons;
                 }
+            },
+            {
+                "data": "timePending"
             },
             {
                 "sDefaultContent": "",

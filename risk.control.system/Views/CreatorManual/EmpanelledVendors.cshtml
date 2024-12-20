@@ -474,30 +474,28 @@
                     <div class="submit-progress hidden">
                         <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
                     </div>
-                    <div class="table-responsive mailbox-messages">
-                        <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
-                        <input type="hidden" id="CaseLocationId" name="CaseLocationId" value="@Model.Location.BeneficiaryDetailId" />
-                        <table id="customerTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
-                            <thead>
-                                <tr>
-                                    <th data-orderable="false">
-                                        <img class="action-image" src="~/headers/arrow-down.gif" title="Select Agency" alt="Select Agency" />
-                                    </th>
-                                    <th data-orderable="false">
-                                        <span> <i class="far fa-file-word"></i></span>
-                                    </th>
-                                    <th>Domain</th>
-                                    <th>Name</th>
-                                    <th>Phone</th>
-                                    <th>Address</th>
-                                    <th>District</th>
-                                    <th>State</th>
-                                    <th>Country</th>
-                                    <th>Case load</th>
-                                </tr>
-                            </thead>
-                        </table>
-                    </div>
+                    <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
+                    <input type="hidden" id="CaseLocationId" name="CaseLocationId" value="@Model.Location.BeneficiaryDetailId" />
+                    <table id="customerTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
+                        <thead>
+                            <tr>
+                                <th data-orderable="false">
+                                    <img class="action-image" src="~/headers/arrow-down.gif" title="Select Agency" alt="Select Agency" />
+                                </th>
+                                <th data-orderable="false">
+                                    <span> <i class="far fa-file-word"></i></span>
+                                </th>
+                                <th>Domain</th>
+                                <th>Name</th>
+                                <th>Phone</th>
+                                <th>Address</th>
+                                <th>District</th>
+                                <th>State</th>
+                                <th>Country</th>
+                                <th>Case load</th>
+                            </tr>
+                        </thead>
+                    </table>
                 </div>    
                 <div class="card-footer">
                     <div class="row">

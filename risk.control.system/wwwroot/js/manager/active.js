@@ -25,19 +25,19 @@ $(document).ready(function () {
         columnDefs: [
             {
                 className: 'max-width-column-name', // Apply the CSS class,
-                targets: 2                      // Index of the column to style
-            },
-            {
-                className: 'max-width-column-number', // Apply the CSS class,
                 targets: 3                      // Index of the column to style
             },
             {
-                className: 'max-width-column-name', // Apply the CSS class,
-                targets: 5                      // Index of the column to style
+                className: 'max-width-column-number', // Apply the CSS class,
+                targets: 4                      // Index of the column to style
             },
             {
                 className: 'max-width-column-name', // Apply the CSS class,
-                targets: 7                      // Index of the column to style
+                targets: 6                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 8                      // Index of the column to style
             }],
         order: [[12, 'desc']],
         fixedHeader: true,
@@ -50,6 +50,25 @@ $(document).ready(function () {
         columns: [
             /* Name of the keys from
             data file source */
+            {
+                "data": "agent",
+                "mRender": function (data, type, row) {
+                    if (row.caseWithPerson) {
+                        var img = '<div class="map-thumbnail-customer table-profile-image">';
+                        img += '<img src="' + row.ownerDetail + '" class="thumbnail table-profile-image" />'; // Thumbnail image with class 'thumbnail'
+                        img += '<img src="' + row.ownerDetail + '" class="full-map-customer" title="' + row.agent + '" data-toggle="tooltip"/>'; // Full map image with class 'full-map'
+                        img += '</div>';
+                        return img;
+                    }
+                    else {
+                        var img = '<div class="map-thumbnail profile-image doc-profile-image">';
+                        img += '<img src="' + row.ownerDetail + '" class="full-map" title="' + row.agent + '" data-toggle="tooltip"/>'; // Full map image with class 'full-map'
+                        img += '<img src="' + row.ownerDetail + '" class="thumbnail profile-image doc-profile-image" />'; // Thumbnail image with class 'thumbnail'
+                        img += '</div>';
+                        return img;
+                    }
+                }
+            },
             {
                 "data": "pincode",
                 "mRender": function (data, type, row) {
@@ -64,7 +83,10 @@ $(document).ready(function () {
                 "sDefaultContent": "",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    var img = '<img alt="' + row.policyId + '" title="' + row.policyId + '" src="' + row.document + '" class="profile-image doc-profile-image" data-toggle="tooltip"/>';
+                    var img = '<div class="map-thumbnail profile-image doc-profile-image">';
+                    img += '<img src="' + row.document + '" class="full-map" title="' + row.policyId + '" data-toggle="tooltip"/>'; // Full map image with class 'full-map'
+                    img += '<img src="' + row.document + '" class="thumbnail profile-image doc-profile-image" />'; // Thumbnail image with class 'thumbnail'
+                    img += '</div>';
                     return img;
                 }
             },
@@ -85,7 +107,10 @@ $(document).ready(function () {
                 "sDefaultContent": "",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    var img = '<img alt="' + row.customerFullName + '" title="' + row.customerFullName + '" src="' + row.customer + '" class="table-profile-image" data-toggle="tooltip"/>';
+                    var img = '<div class="map-thumbnail-customer table-profile-image">';
+                    img += '<img src="' + row.customer + '" class="full-map-customer" title="' + row.customerFullName + '" data-toggle="tooltip"/>'; // Full map image with class 'full-map'
+                    img += '<img src="' + row.customer + '" class="thumbnail table-profile-image" />'; // Thumbnail image with class 'thumbnail'
+                    img += '</div>';
                     return img;
                 }
             },
@@ -99,7 +124,10 @@ $(document).ready(function () {
                 "sDefaultContent": "",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    var img = '<img alt="' + row.beneficiaryFullName + '" title="' + row.beneficiaryFullName + '" src="' + row.beneficiaryPhoto + '" class="table-profile-image" data-toggle="tooltip"/>';
+                    var img = '<div class="map-thumbnail-customer table-profile-image">';
+                    img += '<img src="' + row.beneficiaryPhoto + '" class="thumbnail table-profile-image" />'; // Thumbnail image with class 'thumbnail'
+                    img += '<img src="' + row.beneficiaryPhoto + '" class="full-map-customer" title="' + row.beneficiaryFullName + '" data-toggle="tooltip"/>'; // Full map image with class 'full-map'
+                    img += '</div>';
                     return img;
                 }
             },
@@ -127,20 +155,7 @@ $(document).ready(function () {
                     return '<span title="' + row.created + '" data-toggle="tooltip">' + data + '</span>'
                 }
             },
-            { "data": "timePending" },
-            {
-                "data": "agent",
-                "mRender": function (data, type, row) {
-                    var img = '';
-                    if (row.caseWithPerson) {
-                        img = '<img alt="' + row.agent + '" title="' + row.agent + '" src="' + row.ownerDetail + '" class="table-profile-image" data-toggle="tooltip"/>';
-                    }
-                    else {
-                        img = '<img alt="' + row.agent + '" title="' + row.agent + '" src="' + row.ownerDetail + '" class="profile-image doc-profile-image" data-toggle="tooltip"/>';
-                    }
-                    return img;
-                }
-            },
+            
             {
                 "sDefaultContent": "",
                 "bSortable": false,
@@ -157,6 +172,7 @@ $(document).ready(function () {
                     return buttons;
                 }
             },
+            { "data": "timePending" },
             {
                 "sDefaultContent": "",
                 "bSortable": false,
@@ -175,11 +191,15 @@ $(document).ready(function () {
         error: function (xhr, status, error) { alert('err ' + error) }
     });
     $('#customerTable').on('mouseenter', '.map-thumbnail', function () {
-        $(this).find('.full-map-title').show(); // Show full map
         $(this).find('.full-map').show(); // Show full map
     }).on('mouseleave', '.map-thumbnail', function () {
-        $(this).find('.full-map-title').hide(); // Hide full map
         $(this).find('.full-map').hide(); // Hide full map
+    });
+
+    $('#customerTable').on('mouseenter', '.map-thumbnail-customer', function () {
+        $(this).find('.full-map-customer').show(); // Show full map
+    }).on('mouseleave', '.map-thumbnail-customer', function () {
+        $(this).find('.full-map-customer').hide(); // Hide full map
     });
     $('#customerTable').on('draw.dt', function () {
         $('[data-toggle="tooltip"]').tooltip({

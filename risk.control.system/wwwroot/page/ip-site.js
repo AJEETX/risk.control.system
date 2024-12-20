@@ -25,20 +25,28 @@ async function fetchIpInfo(latlong) {
 
             // Handle if the response is not OK
             if (!response.ok) {
-                throw new Error('Network response was not ok');
+                console.error('There has been a problem with your ip fetch operation');
+                document.querySelector('#country .info-data').textContent = 'Not available';
+                document.querySelector('#region .info-data').textContent = 'Not available';
+                document.querySelector('#city .info-data').textContent = data.city || 'Not available';
+                document.querySelector('#postCode .info-data').textContent = 'Not available';
+                document.querySelector('#isp .info-data').textContent = 'Not available';
+                document.querySelector('#latLong .info-data').textContent = 'Not available';
+                document.querySelector('#maps .info-data #location-map').src ='/img/no-map.jpeg';
             }
-
-            // Parse the response data as JSON
-            const data = await response.json();
-            // Update each element with the respective data
-            document.querySelector('#ipAddress .info-data').textContent = data.ipAddress || 'Not available';
-            document.querySelector('#country .info-data').textContent = data.country || 'Not available';
-            document.querySelector('#region .info-data').textContent = data.region || 'Not available';
-            document.querySelector('#city .info-data').textContent = data.district || data.city || 'Not available';
-            document.querySelector('#postCode .info-data').textContent = data.postCode || 'Not available';
-            document.querySelector('#isp .info-data').textContent = data.isp || 'Not available';
-            document.querySelector('#latLong .info-data').textContent = data.longitude ? data.latitude + "/" + data.longitude : 'Not available';
-            document.querySelector('#maps .info-data #location-map').src = data.mapUrl || '/img/no-map.jpeg';
+            else {
+                // Parse the response data as JSON
+                const data = await response.json();
+                // Update each element with the respective data
+                document.querySelector('#ipAddress .info-data').textContent = data.ipAddress || 'Not available';
+                document.querySelector('#country .info-data').textContent = data.country || 'Not available';
+                document.querySelector('#region .info-data').textContent = data.region || 'Not available';
+                document.querySelector('#city .info-data').textContent = data.district || data.city || 'Not available';
+                document.querySelector('#postCode .info-data').textContent = data.postCode || 'Not available';
+                document.querySelector('#isp .info-data').textContent = data.isp || 'Not available';
+                document.querySelector('#latLong .info-data').textContent = data.longitude ? data.latitude + "/" + data.longitude : 'Not available';
+                document.querySelector('#maps .info-data #location-map').src = data.mapUrl || '/img/no-map.jpeg';
+            }
         }
 
     } catch (error) {

@@ -1559,7 +1559,7 @@ ul#messagesList {
 .map-thumbnail-customer img.thumbnail {
     cursor: pointer;
     width: 2.5rem;
-    border-radius: 50%;
+    border-radius: 25%;
 }
 
 /* CSS class for the full map (hidden by default) */
@@ -1581,7 +1581,7 @@ ul#messagesList {
     width: 250px;
     height: 250px;
     display: none; /* Initially hidden */
-    border-radius: 10%;
+    border-radius: 5%;
     border: 1px solid green;
     z-index: 999;
 }

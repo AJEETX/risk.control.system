@@ -14,10 +14,7 @@
                     return '<input type="checkbox" name="id[]" value="' + $('<div/>').text(data).html() + '">';
                 }
             },
-            {
-                className: 'max-width-column-name', // Apply the CSS class,
-                targets: 1                      // Index of the column to style
-            },
+            
             {
                 className: 'max-width-column-name', // Apply the CSS class,
                 targets: 2                      // Index of the column to style
@@ -72,7 +69,10 @@
                 "sDefaultContent": "",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    var img = '<img alt="' + row.name + '" title="' + row.name + '" src="' + row.document + '" class="profile-image doc-profile-image" data-toggle="tooltip"/>';
+                    var img = '<div class="map-thumbnail profile-image doc-profile-image">';
+                    img += '<img src="' + row.document + '" class="thumbnail profile-image doc-profile-image" />'; // Thumbnail image with class 'thumbnail'
+                    img += '<img src="' + row.document + '" class="full-map" title="' + row.name + '" data-toggle="tooltip"/>'; // Full map image with class 'full-map'
+                    img += '</div>';
                     return img;
                 }
             },
@@ -147,6 +147,14 @@
                 $('td', nRow).css('background-color', '#ffa');
             }
         }, error: function (xhr, status, error) { alert('err ' + error) }
+    });
+
+    $('#customerTable').on('mouseenter', '.map-thumbnail', function () {
+        $(this).find('.full-map-title').show(); // Show full map
+        $(this).find('.full-map').show(); // Show full map
+    }).on('mouseleave', '.map-thumbnail', function () {
+        $(this).find('.full-map-title').hide(); // Hide full map
+        $(this).find('.full-map').hide(); // Hide full map
     });
     table.on('draw', function () {
         // Loop through each row of the table after it has been redrawn

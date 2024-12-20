@@ -84,15 +84,19 @@ async function fetchIpInfo(latlong) {
 
             // Handle if the response is not OK
             if (!response.ok) {
-                throw new Error('Network response was not ok');
+                console.error('There has been a problem with your ip fetch operation');
+                document.querySelector('#ipAddress .info-data').textContent = data.ipAddress || 'Not available';
+                document.querySelector('#ipAddress1 .info-data').textContent = data.ipAddress || 'Not available';
             }
 
-            // Parse the response data as JSON
-            const data = await response.json();
+            else {
+                // Parse the response data as JSON
+                const data = await response.json();
 
-            // Update the page with the received data
-            document.querySelector('#ipAddress .info-data').textContent = data.ipAddress || 'Not available';
-            document.querySelector('#ipAddress1 .info-data').textContent = data.ipAddress || 'Not available';
+                // Update the page with the received data
+                document.querySelector('#ipAddress .info-data').textContent = data.ipAddress || 'Not available';
+                document.querySelector('#ipAddress1 .info-data').textContent = data.ipAddress || 'Not available';
+            }
         }
     } catch (error) {
         console.error('There has been a problem with your fetch operation:', error);

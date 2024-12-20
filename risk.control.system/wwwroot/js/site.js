@@ -83,11 +83,16 @@ async function fetchIpInfo(latlong) {
             var result = parser.getResult();
             const response = await fetch(url);
             if (!response.ok) {
-                throw new Error('Network response was not ok');
+                const data = {};
+                console.error('There has been a problem with your ip fetch operation');
+                document.querySelector('#ipAddress .info-data').textContent = 'Not available';
+                document.querySelector('#city .info-data').textContent = 'Not available';
             }
-            const data = await response.json();
-            document.querySelector('#ipAddress .info-data').textContent = data.ipAddress || 'Not available';
-            document.querySelector('#city .info-data').textContent = data.district || 'Not available';
+            else {
+                const data = await response.json();
+                document.querySelector('#ipAddress .info-data').textContent = data.ipAddress || 'Not available';
+                document.querySelector('#city .info-data').textContent = data.district || 'Not available';
+            }
             document.querySelector('#browser .info-data').textContent = result.browser.name.toLowerCase() + '' + result.browser.major || 'Not available';
             document.querySelector('#device .info-data').textContent = getDeviceType() || 'Not available';
             document.querySelector('#os .info-data').textContent = result.os.name.toLowerCase() + '' + result.os.version || 'Not available';
