@@ -62,19 +62,19 @@
         },
             {
                 className: 'max-width-column-name', // Apply the CSS class,
-                targets: 2                      // Index of the column to style
-            },
-            {
-                className: 'max-width-column-number', // Apply the CSS class,
                 targets: 3                      // Index of the column to style
             },
             {
-                className: 'max-width-column-name', // Apply the CSS class,
-                targets: 5                      // Index of the column to style
+                className: 'max-width-column-number', // Apply the CSS class,
+                targets: 4                      // Index of the column to style
             },
             {
                 className: 'max-width-column-name', // Apply the CSS class,
-                targets: 7                      // Index of the column to style
+                targets: 6                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 8                      // Index of the column to style
             }],
         order: [[15, 'asc']],
         fixedHeader: true,
@@ -98,14 +98,32 @@
                 }
             },
             {
-                "sDefaultContent": "",
-                "bSortable": false,
+                "data": "pincode",
                 "mRender": function (data, type, row) {
-                    var img = '<img alt="' + row.policyId + '" title="' + row.policyId + '" src="' + row.document + '"class="profile-image doc-profile-image" data-toggle="tooltip"/>';
-                    return img;
+                    if (row.pincodeName != '...') {
+                        var img = '<div class="map-thumbnail profile-image doc-profile-image">';
+                        img += '<img src="' + row.personMapAddressUrl + '" class="thumbnail profile-image doc-profile-image" />'; // Thumbnail image with class 'thumbnail'
+                        img += '<img src="' + row.personMapAddressUrl + '" class="full-map" title="' + row.pincodeName + '" data-toggle="tooltip"/>'; // Full map image with class 'full-map'
+                        img += '</div>';
+                        return img;
+                    }
+                    else {
+
+                        return '<span title="' + row.pincodeName + '" data-toggle="tooltip">' + data + '</span>'
+                    }
                 }
             },
             {
+                "sDefaultContent": "",
+                "bSortable": false,
+                "mRender": function (data, type, row) {
+                    var img = '<div class="map-thumbnail profile-image doc-profile-image">';
+                    img += '<img src="' + row.document + '" class="full-map" title="' + row.policyId + '" data-toggle="tooltip"/>'; // Full map image with class 'full-map'
+                    img += '<img src="' + row.document + '" class="thumbnail profile-image doc-profile-image" />'; // Thumbnail image with class 'thumbnail'
+                    img += '</div>';
+                    return img;
+                }
+            },            {
                 "data": "policyNum", "bSortable": false,
                 "mRender": function (data, type, row) {
                     return '<span title="' + row.agencyDeclineComment + '" data-toggle="tooltip">' + data + '</span>'
@@ -121,14 +139,17 @@
                 "sDefaultContent": "",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    var img = '';
                     if (row.customerFullName == "?") {
-                        img = '<img alt="' + row.customerFullName + '" title="' + row.customerFullName + '" src="' + row.customer + '" class="table-profile-image-no-user" data-toggle="tooltip"/>';
+                        var img = '<img alt="' + row.customerFullName + '" title="' + row.customerFullName + '" src="' + row.customer + '" class="table-profile-image-no-user" data-toggle="tooltip"/>';
+                        return img;
                     }
                     else {
-                        img = '<img alt="' + row.customerFullName + '" title="' + row.customerFullName + '" src="' + row.customer + '" class="table-profile-image" data-toggle="tooltip"/>';
+                        var img = '<div class="map-thumbnail-customer table-profile-image">';
+                        img += '<img src="' + row.customer + '" class="full-map-customer" title="' + row.customerFullName + '" data-toggle="tooltip"/>'; // Full map image with class 'full-map'
+                        img += '<img src="' + row.customer + '" class="thumbnail table-profile-image" />'; // Thumbnail image with class 'thumbnail'
+                        img += '</div>';
+                        return img;
                     }
-                    return img;
                 }
             },
             {
@@ -141,14 +162,17 @@
                 "sDefaultContent": "",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    var img = '';
                     if (row.beneficiaryFullName == "?") {
-                        img = '<img alt="' + row.beneficiaryFullName + '" title="' + row.beneficiaryFullName + '" src="' + row.beneficiaryPhoto + '" class="table-profile-image-no-user" data-toggle="tooltip"/>';
+                        var img = '<img alt="' + row.beneficiaryFullName + '" title="' + row.beneficiaryFullName + '" src="' + row.beneficiaryPhoto + '" class="table-profile-image-no-user" data-toggle="tooltip"/>';
+                        return img;
                     }
                     else {
-                        img = '<img alt="' + row.beneficiaryFullName + '" title="' + row.beneficiaryFullName + '" src="' + row.beneficiaryPhoto + '" class="table-profile-image" data-toggle="tooltip"/>';
+                        var img = '<div class="map-thumbnail-customer table-profile-image">';
+                        img += '<img src="' + row.beneficiaryPhoto + '" class="thumbnail table-profile-image" />'; // Thumbnail image with class 'thumbnail'
+                        img += '<img src="' + row.beneficiaryPhoto + '" class="full-map-customer" title="' + row.beneficiaryFullName + '" data-toggle="tooltip"/>'; // Full map image with class 'full-map'
+                        img += '</div>';
+                        return img;
                     }
-                    return img;
                 }
             },
             {
@@ -169,22 +193,7 @@
                     return '<span title="' + row.service + '" data-toggle="tooltip">' + data + '</span>'
                 }
             },
-            {
-                "data": "pincode",
-                "mRender": function (data, type, row) {
-                    if (row.pincodeName != '...') {
-                        var img = '<div class="map-thumbnail profile-image doc-profile-image">';
-                        img += '<img src="' + row.personMapAddressUrl + '" class="thumbnail profile-image doc-profile-image" />'; // Thumbnail image with class 'thumbnail'
-                        img += '<img src="' + row.personMapAddressUrl + '" class="full-map" title="' + row.pincodeName + '" data-toggle="tooltip"/>'; // Full map image with class 'full-map'
-                        img += '</div>';
-                        return img;
-                    }
-                    else {
-
-                        return '<span title="' + row.pincodeName + '" data-toggle="tooltip">' + data + '</span>'
-                    }
-                }
-            },
+           
             {
                 "data": "location",
                 "mRender": function (data, type, row) {
@@ -220,11 +229,15 @@
         error: function (xhr, status, error) { alert('err ' + error) }
     });
     $('#customerTable').on('mouseenter', '.map-thumbnail', function () {
-        $(this).find('.full-map-title').show(); // Show full map
         $(this).find('.full-map').show(); // Show full map
     }).on('mouseleave', '.map-thumbnail', function () {
-        $(this).find('.full-map-title').hide(); // Hide full map
         $(this).find('.full-map').hide(); // Hide full map
+    });
+
+    $('#customerTable').on('mouseenter', '.map-thumbnail-customer', function () {
+        $(this).find('.full-map-customer').show(); // Show full map
+    }).on('mouseleave', '.map-thumbnail-customer', function () {
+        $(this).find('.full-map-customer').hide(); // Hide full map
     });
     $('#customerTable').on('draw.dt', function () {
         $('[data-toggle="tooltip"]').tooltip({

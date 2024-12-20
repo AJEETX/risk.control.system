@@ -30,20 +30,20 @@ $(document).ready(function () {
             }
         },
             {
-                className: 'max-width-column-name', // Apply the CSS class,
-                targets: 2                      // Index of the column to style
+                className: 'max-width-column-number', // Apply the CSS class,
+                targets: 4                      // Index of the column to style
             },
             {
                 className: 'max-width-column-number', // Apply the CSS class,
-                targets: 3                      // Index of the column to style
-            },
-            {
-                className: 'max-width-column-name', // Apply the CSS class,
                 targets: 5                      // Index of the column to style
             },
             {
                 className: 'max-width-column-name', // Apply the CSS class,
                 targets: 7                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 9                      // Index of the column to style
             }],
         order: [[16, 'asc']],
         fixedHeader: true,
@@ -65,10 +65,34 @@ $(document).ready(function () {
                 }
             },
             {
+                "data": "agent",
+                "mRender": function (data, type, row) {
+                    var img = '<div class="map-thumbnail profile-image doc-profile-image">';
+                    img += '<img src="' + row.ownerDetail + '" class="thumbnail profile-image doc-profile-image" />'; // Thumbnail image with class 'thumbnail'
+                    img += '<img src="' + row.ownerDetail + '" class="full-map" title="' + row.agent + '" data-toggle="tooltip"/>'; // Full map image with class 'full-map'
+                    img += '</div>';
+                    return img;
+                }
+                ///<button type="button" class="btn btn-lg btn-danger" data-toggle="popover" title="Popover title" data-content="And here's some amazing content. It's very engaging. Right?">Click to toggle popover</button>
+            },
+            {
+                "data": "pincode",
+                "mRender": function (data, type, row) {
+                    var img = '<div class="map-thumbnail profile-image doc-profile-image">';
+                    img += '<img src="' + row.personMapAddressUrl + '" class="thumbnail profile-image doc-profile-image" />'; // Thumbnail image with class 'thumbnail'
+                    img += '<img src="' + row.personMapAddressUrl + '" class="full-map" title="' + row.pincodeName + '" data-toggle="tooltip"/>'; // Full map image with class 'full-map'
+                    img += '</div>';
+                    return img;
+                }
+            },
+            {
                 "sDefaultContent": "",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    var img = '<img alt="' + row.policyId + '" title="' + row.policyId + '" src="' + row.document + '" class="profile-image doc-profile-image" data-toggle="tooltip"/>';
+                    var img = '<div class="map-thumbnail profile-image doc-profile-image">';
+                    img += '<img src="' + row.document + '" class="full-map" title="' + row.policyId + '" data-toggle="tooltip"/>'; // Full map image with class 'full-map'
+                    img += '<img src="' + row.document + '" class="thumbnail profile-image doc-profile-image" />'; // Thumbnail image with class 'thumbnail'
+                    img += '</div>';
                     return img;
                 }
             },
@@ -89,7 +113,10 @@ $(document).ready(function () {
                 "sDefaultContent": "",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    var img = '<img alt="' + row.name + '" title="' + row.name + '" src="' + row.customer + '" class="table-profile-image" data-toggle="tooltip"/>';
+                    var img = '<div class="map-thumbnail-customer table-profile-image">';
+                    img += '<img src="' + row.customer + '" class="full-map-customer" title="' + row.name + '" data-toggle="tooltip"/>'; // Full map image with class 'full-map'
+                    img += '<img src="' + row.customer + '" class="thumbnail table-profile-image" />'; // Thumbnail image with class 'thumbnail'
+                    img += '</div>';
                     return img;
                 }
             },
@@ -103,7 +130,10 @@ $(document).ready(function () {
                 "sDefaultContent": "",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    var img = '<img alt="' + row.beneficiaryName + '" title="' + row.beneficiaryName + '" src="' + row.beneficiaryPhoto + '" class="table-profile-image" data-toggle="tooltip"/>';
+                    var img = '<div class="map-thumbnail-customer table-profile-image">';
+                    img += '<img src="' + row.beneficiaryPhoto + '" class="thumbnail table-profile-image" />'; // Thumbnail image with class 'thumbnail'
+                    img += '<img src="' + row.beneficiaryPhoto + '" class="full-map-customer" title="' + row.beneficiaryName + '" data-toggle="tooltip"/>'; // Full map image with class 'full-map'
+                    img += '</div>';
                     return img;
                 }
             },
@@ -123,16 +153,6 @@ $(document).ready(function () {
                 "data": "service",
                 "mRender": function (data, type, row) {
                     return '<span title="' + row.service + '" data-toggle="tooltip">' + data + '</span>'
-                }
-            },
-            {
-                "data": "pincode",
-                "mRender": function (data, type, row) {
-                    var img = '<div class="map-thumbnail profile-image doc-profile-image">';
-                    img += '<img src="' + row.personMapAddressUrl + '" class="thumbnail profile-image doc-profile-image" />'; // Thumbnail image with class 'thumbnail'
-                    img += '<img src="' + row.personMapAddressUrl + '" class="full-map" title="' + row.pincodeName + '" data-toggle="tooltip"/>'; // Full map image with class 'full-map'
-                    img += '</div>';
-                    return img;
                 }
             },
             {
@@ -164,14 +184,7 @@ $(document).ready(function () {
                 }
             },
             { "data": "timePending" },
-            {
-                "data": "agent",
-                "mRender": function (data, type, row) {
-                    var img = '<img alt="' + row.agent + '" title="' + row.agent + '" src="' + row.ownerDetail + '" class="profile-image doc-profile-image" data-toggle="tooltip"/>';
-                    return img;
-                }
-                ///<button type="button" class="btn btn-lg btn-danger" data-toggle="popover" title="Popover title" data-content="And here's some amazing content. It's very engaging. Right?">Click to toggle popover</button>
-            },
+            
             { "data": "timeElapsed", "bVisible": false }
         ],
         "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
@@ -181,6 +194,13 @@ $(document).ready(function () {
         },
         error: function (xhr, status, error) { alert('err ' + error) }
     });
+
+    $('#customerTable').on('mouseenter', '.map-thumbnail-customer', function () {
+        $(this).find('.full-map-customer').show(); // Show full map
+    }).on('mouseleave', '.map-thumbnail-customer', function () {
+        $(this).find('.full-map-customer').hide(); // Hide full map
+    });
+
     $('#customerTable').on('mouseenter', '.map-thumbnail', function () {
         $(this).find('.full-map-title').show(); // Show full map
         $(this).find('.full-map').show(); // Show full map

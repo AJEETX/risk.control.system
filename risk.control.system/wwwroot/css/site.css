@@ -1150,7 +1150,7 @@ img.table-profile-image {
     border-radius: 50%;
     height: 2.5rem;
     width: 2.5rem;
-    border: 2px solid green;
+    border: 1px solid green;
 }
 
 img.table-profile-image-agent-onboard {
@@ -1542,24 +1542,50 @@ ul#messagesList {
     height: 2.5rem;
 }
 
+.map-thumbnail-customer {
+    position: relative;
+    display: inline-block;
+    width: 2.5rem;
+    border-radius: 50%;
+}
+
     /* CSS class for the thumbnail image size */
     .map-thumbnail img.thumbnail {
         cursor: pointer;
         width: 2.5rem;
         height: 2.5rem;
     }
+/* CSS class for the thumbnail image size */
+.map-thumbnail-customer img.thumbnail {
+    cursor: pointer;
+    width: 2.5rem;
+    border-radius: 50%;
+}
 
 /* CSS class for the full map (hidden by default) */
 .full-map {
     position: absolute;
     top: 0;
     left: 0;
-    width: 300px;
+    width: 250px;
     height: 250px;
     display: none; /* Initially hidden */
-    border:1px solid #ddd;
+    border:1px solid #C38787;
     z-index:999;
 }
+
+.full-map-customer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 250px;
+    height: 250px;
+    display: none; /* Initially hidden */
+    border-radius: 10%;
+    border: 1px solid green;
+    z-index: 999;
+}
+
 .full-map-title {
     top: 0;
     position: absolute;

@@ -31,19 +31,19 @@ $(document).ready(function () {
         },
             {
                 className: 'max-width-column-name', // Apply the CSS class,
-                targets: 1                      // Index of the column to style
-            },
-            {
-                className: 'max-width-column-number', // Apply the CSS class,
                 targets: 2                      // Index of the column to style
             },
             {
-                className: 'max-width-column-name', // Apply the CSS class,
-                targets: 4                      // Index of the column to style
+                className: 'max-width-column-number', // Apply the CSS class,
+                targets: 3                      // Index of the column to style
             },
             {
                 className: 'max-width-column-name', // Apply the CSS class,
-                targets: 6                      // Index of the column to style
+                targets: 5                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 7                      // Index of the column to style
             }],
         order: [[12, 'asc']],
         fixedHeader: true,
@@ -56,7 +56,16 @@ $(document).ready(function () {
         columns: [
             /* Name of the keys from
             data file source */
-
+            {
+                "data": "pincode",
+                "mRender": function (data, type, row) {
+                    var img = '<div class="map-thumbnail profile-image doc-profile-image">';
+                    img += '<img src="' + row.personMapAddressUrl + '" class="thumbnail profile-image doc-profile-image" />'; // Thumbnail image with class 'thumbnail'
+                    img += '<img src="' + row.personMapAddressUrl + '" class="full-map" title="' + row.pincodeName + '" data-toggle="tooltip"/>'; // Full map image with class 'full-map'
+                    img += '</div>';
+                    return img;
+                }
+            },
             {
                 "sDefaultContent": "",
                 "bSortable": false,
@@ -115,16 +124,6 @@ $(document).ready(function () {
                 "data": "service",
                 "mRender": function (data, type, row) {
                     return '<span title="' + row.service + '" data-toggle="tooltip">' + data + '</span>'
-                }
-            },
-            {
-                "data": "pincode",
-                "mRender": function (data, type, row) {
-                    var img = '<div class="map-thumbnail profile-image doc-profile-image">';
-                    img += '<img src="' + row.personMapAddressUrl + '" class="thumbnail profile-image doc-profile-image" />'; // Thumbnail image with class 'thumbnail'
-                    img += '<img src="' + row.personMapAddressUrl + '" class="full-map" title="' + row.pincodeName + '" data-toggle="tooltip"/>'; // Full map image with class 'full-map'
-                    img += '</div>';
-                    return img;
                 }
             },
             {
