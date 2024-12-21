@@ -13,13 +13,11 @@ namespace risk.control.system.Helpers
 {
     public class PdfReportBuilder
     {
-        public BoardingData BoardingData { get; internal set; }
-        public TicketData1 TicketData1 { get; internal set; }
-        public BoardingData BoardingData0 { get; internal set; }
-        public TicketData1 TicketData0 { get; internal set; }
+        public IdData PhotoIdData { get; internal set; }
+        public IdData PanData { get; internal set; }
         public List<string> WhatsNextData { get; internal set; }
-        public TicketData TicketData { get; internal set; }
-        public ConcertData ConcertData { get; internal set; }
+        public DetailedReport DetailedReport { get; internal set; }
+        public AgencyDetailData AgencyDetailData { get; internal set; }
 
         internal static readonly CultureInfo DocumentLocale
             = new CultureInfo("en-US");
@@ -56,11 +54,12 @@ namespace risk.control.system.Helpers
 
         internal static readonly FontBuilder FNT16_R =
             Fonts.Helvetica(16f).SetColor(Color.Red);
-
+        internal static readonly FontBuilder FNT16_G =
+            Fonts.Helvetica(16f).SetColor(Color.Green);
         internal static readonly FontBuilder FNT17 = Fonts.Helvetica(17f);
         internal static readonly FontBuilder FNT18 = Fonts.Helvetica(18f);
 
-        internal static readonly BoardingCell EMPTY_ITEM = new BoardingCell("", new FontText[0]);
+        internal static readonly IdInfo EMPTY_ITEM = new IdInfo("", new FontText[0]);
         private string imgPath = string.Empty;
 
         internal DocumentBuilder Build(string imagePath)
@@ -68,22 +67,22 @@ namespace risk.control.system.Helpers
             imgPath = imagePath;
             DocumentBuilder documentBuilder = DocumentBuilder.New();
             var concertSection = documentBuilder.AddSection();
-            BoardingCell[,] boardingItems = GetBoardingItems();
-            BoardingCell[,] boardingItems0 = GetBoardingItems0();
+            IdInfo[,] photoItems = GetPhotoItems();
+            IdInfo[,] panItems = GetPanItems();
 
             concertSection
                  .SetOrientation(Orientation)
                  .SetMargins(Margins);
 
-            addConcertTable(concertSection);
-            FillBoardingHandBugTable(concertSection.AddTable(), boardingItems, boardingItems0);
-            addInfoTable(concertSection);
-            addCounterFoil(concertSection);
+            addTopTable(concertSection);
+            FillIdData(concertSection.AddTable(), photoItems, panItems);
+            addAssessorInfoTable(concertSection);
+            addFrame(concertSection);
 
             return documentBuilder;
         }
 
-        public void addConcertTable(SectionBuilder section)
+        public void addTopTable(SectionBuilder section)
         {
             var concertTable = section.AddTable()
                 .SetContentRowStyleBorder(borderBuilder =>
@@ -98,18 +97,18 @@ namespace risk.control.system.Helpers
 
             var row1Builder = concertTable.AddRow();
             AddLogoImage(row1Builder.AddCell("", 0, 2));
-            AddConcertData(row1Builder.AddCell("", 3, 0)
+            AddTopTitleData(row1Builder.AddCell("", 3, 0)
                 .SetPadding(32, 0, 0, 0));
 
             var row2Builder = concertTable.AddRow();
             row2Builder.AddCell();
             No(row2Builder.AddCell("").SetFont(FNT10)
                 .SetPadding(32, 0, 0, 0));
-            FillTicketData(row2Builder.AddCell());
-            FillPersonalInfo(row2Builder.AddCell());
+            FillHeaderFooterData(row2Builder.AddCell());
+            FillTitleInfo(row2Builder.AddCell());
         }
 
-        public void addInfoTable(SectionBuilder section)
+        public void addAssessorInfoTable(SectionBuilder section)
         {
             var infoTable = section.AddTable()
                 .SetContentRowStyleBorder(borderBuilder =>
@@ -123,18 +122,18 @@ namespace risk.control.system.Helpers
                 .AddColumnPercentToTable("", 25);
 
             var row3Builder = infoTable.AddRow();
-            FillRuleA(start: 0, end: 10, row3Builder.AddCell("").SetFont(FNT10));
-            FillRuleP(row3Builder.AddCell("", 2, 0).SetFont(FNT10));
+            FillAssessorRemarks(start: 0, end: 10, row3Builder.AddCell("").SetFont(FNT10));
+            FillReportSummaryule(row3Builder.AddCell("", 2, 0).SetFont(FNT10));
 
             var row4Builder = infoTable.AddRow();
-            FillBandlist(row4Builder.AddCell("").SetFont(FNT12));
+            FillAssessmentData(row4Builder.AddCell("").SetFont(FNT12));
             row4Builder.AddCell("")
-                .AddImage(BoardingData.PersonAddressImage).SetHeight(400)
+                .AddImage(PhotoIdData.PersonAddressImage).SetHeight(400)
                 .SetMarginTop(9);
             AddContactInfo(row4Builder.AddCell("").SetFont(FNT12));
         }
 
-        private void addCounterFoil(SectionBuilder section)
+        private void addFrame(SectionBuilder section)
         {
             var counterFoil = section.AddTable()
                 .SetContentRowStyleBorder(borderBuilder =>
@@ -149,31 +148,31 @@ namespace risk.control.system.Helpers
                 .AddColumnPercentToTable("", 14);
 
             var row5Builder = counterFoil.AddRow();
-            YourTicket(row5Builder.AddCell("")
+            SetDisclaimer(row5Builder.AddCell("")
                 .SetPadding(0, 2, 0, 0));
-            AddConcertData(row5Builder.AddCell("", 3, 0));
+            AddTopTitleData(row5Builder.AddCell("", 3, 0));
 
             var row6Builder = counterFoil.AddRow();
             row6Builder.AddCell()
-                .AddImage(TicketData.InsurerLogo).SetHeight(100);
-            FillTicketDataCounterFoil(row6Builder.AddCell());
+                .AddImage(DetailedReport.InsurerLogo).SetHeight(100);
+            FillTitle(row6Builder.AddCell());
             FillPersonalInfoCounterFoil(row6Builder.AddCell());
             row6Builder.AddCell()
-                .AddQRCodeUrl(TicketData.ReportQr, 4, Color.Black, Color.White, false).SetWidth(153);
+                .AddQRCodeUrl(DetailedReport.ReportQr, 4, Color.Black, Color.White, false).SetWidth(153);
 
             var row7Builder = counterFoil.AddRow();
             row7Builder.AddCell();
             row7Builder.AddCell();
             row7Builder.AddCell();
-            row7Builder.AddCell(TicketData.AgencyName).SetFont(FNT10);
+            row7Builder.AddCell(DetailedReport.AgencyName).SetFont(FNT10);
         }
 
-        private void AddConcertData(TableCellBuilder cellBuilder)
+        private void AddTopTitleData(TableCellBuilder cellBuilder)
         {
             cellBuilder
-                .AddParagraph(TicketData.ReportTitle).SetFont(FNT19B);
+                .AddParagraph(DetailedReport.ReportTitle).SetFont(FNT19B);
             cellBuilder
-                .AddParagraph(TicketData.ReportTime).SetFont(FNT12)
+                .AddParagraph(DetailedReport.ReportTime).SetFont(FNT12)
                 .SetBorderStroke(strokeLeft: Stroke.None, strokeTop: Stroke.None, strokeRight: Stroke.None, strokeBottom: Stroke.Solid)
                 .SetBorderWidth(2);
         }
@@ -183,122 +182,122 @@ namespace risk.control.system.Helpers
             cellBuilder
                 .SetPadding(2, 2, 2, 0);
             cellBuilder
-                .AddImage(TicketData.AgencyLogo).SetHeight(340);
+                .AddImage(DetailedReport.AgencyLogo).SetHeight(340);
         }
 
         private void No(TableCellBuilder cellBuilder)
         {
             cellBuilder
-               .AddParagraph(TicketData.AgencyNameTitle);
+               .AddParagraph(DetailedReport.AgencyNameTitle);
             cellBuilder
-                .AddParagraph("").SetLineSpacing(1.5f).AddUrl(ConcertData.AgencyDomain);
+                .AddParagraph("").SetLineSpacing(1.5f).AddUrl(AgencyDetailData.AgencyDomain);
             cellBuilder
-                .AddQRCodeUrl(TicketData.ReportQr, 4,
+                .AddQRCodeUrl(DetailedReport.ReportQr, 4,
                               Color.Black, Color.White, false).SetHeight(100);
         }
 
-        private void FillRuleA(int start, int end, TableCellBuilder cellBuilder)
+        private void FillAssessorRemarks(int start, int end, TableCellBuilder cellBuilder)
         {
-            cellBuilder.AddParagraph(ConcertData.AgentReportTitle).SetFont(FNT12B).SetMargins(10, 10, 1, 4);
+            cellBuilder.AddParagraph(AgencyDetailData.AgentReportTitle).SetFont(FNT12B).SetMargins(10, 10, 1, 4);
             cellBuilder.SetBorderStroke(strokeLeft: Stroke.Solid, strokeTop: Stroke.Solid, strokeRight: Stroke.None, strokeBottom: Stroke.Solid);
 
-            foreach (var item in ConcertData.ReportSummaryDescription)
+            foreach (var item in AgencyDetailData.ReportSummaryDescription)
             {
                 cellBuilder.AddParagraph(item).SetFont(FNT9).SetMargins(20, 0, 10, 2);
             }
         }
 
-        private void FillRuleP(TableCellBuilder cellBuilder)
+        private void FillReportSummaryule(TableCellBuilder cellBuilder)
         {
-            cellBuilder.AddParagraph(ConcertData.SupervisorCommentsTitle).SetFont(FNT12B).SetMargins(10, 10, 1, 4);
+            cellBuilder.AddParagraph(AgencyDetailData.SupervisorCommentsTitle).SetFont(FNT12B).SetMargins(10, 10, 1, 4);
             cellBuilder.SetBorderStroke(strokeLeft: Stroke.None, strokeTop: Stroke.Solid,
                     strokeRight: Stroke.Solid, strokeBottom: Stroke.Solid);
-            cellBuilder.AddParagraph(ConcertData.ReportSummary).SetFont(FNT9).SetLineSpacing(1.2f).SetMargins(10, 0, 10, 4);
+            cellBuilder.AddParagraph(AgencyDetailData.ReportSummary).SetFont(FNT9).SetLineSpacing(1.2f).SetMargins(10, 0, 10, 4);
         }
 
-        private void FillBandlist(TableCellBuilder cellBuilder)
+        private void FillAssessmentData(TableCellBuilder cellBuilder)
         {
             cellBuilder.SetBorderStroke(Stroke.None);
-            cellBuilder.AddParagraph(ConcertData.AssessmentDescriptionTitle).SetFont(FNT12B).SetMargins(0, 20, 1, 4);
-            cellBuilder.AddParagraph(ConcertData.WeatherDetail).SetFont(FNT9).SetLineSpacing(1.2f).SetMargins(0, 0, 30, 4);
+            cellBuilder.AddParagraph(AgencyDetailData.AssessmentDescriptionTitle).SetFont(FNT12B).SetMargins(0, 20, 1, 4);
+            cellBuilder.AddParagraph(AgencyDetailData.WeatherDetail).SetFont(FNT9).SetLineSpacing(1.2f).SetMargins(0, 0, 30, 4);
             cellBuilder.AddParagraph("");
         }
 
         private void AddContactInfo(TableCellBuilder cellBuilder)
         {
             cellBuilder.SetBorderStroke(Stroke.None).SetPadding(11, 11, 0, 0);
-            cellBuilder.AddParagraph(ConcertData.ExpectedAddressTitle).SetFont(FNT12B).SetMargins(0, 9, 1, 4);
-            cellBuilder.AddParagraph(ConcertData.AddressVisited).SetFont(FNT9);
-            cellBuilder.AddParagraph(ConcertData.ContactAgencyTitle).SetFont(FNT12B).SetMarginTop(10);
+            cellBuilder.AddParagraph(AgencyDetailData.ExpectedAddressTitle).SetFont(FNT12B).SetMargins(0, 9, 1, 4);
+            cellBuilder.AddParagraph(AgencyDetailData.AddressVisited).SetFont(FNT9);
+            cellBuilder.AddParagraph(AgencyDetailData.ContactAgencyTitle).SetFont(FNT12B).SetMarginTop(10);
             cellBuilder.AddParagraph("").SetFont(FNT9)
                 .SetAlignment(HorizontalAlignment.Left)
-                .AddUrl(ConcertData.SupervisorEmail);
+                .AddUrl(AgencyDetailData.SupervisorEmail);
             cellBuilder.AddParagraph("").SetFont(FNT9)
                 .SetAlignment(HorizontalAlignment.Left)
-                .AddUrl(ConcertData.AgencyDomain);
-            cellBuilder.AddParagraph(ConcertData.AgencyContact).SetFont(FNT9)
+                .AddUrl(AgencyDetailData.AgencyDomain);
+            cellBuilder.AddParagraph(AgencyDetailData.AgencyContact).SetFont(FNT9)
                 .SetAlignment(HorizontalAlignment.Left);
         }
 
-        private void FillTicketData(TableCellBuilder cellBuilder)
+        private void FillHeaderFooterData(TableCellBuilder cellBuilder)
         {
-            cellBuilder.AddParagraph(TicketData.PolicyNumTitle).SetLineSpacing(1.4f);
-            cellBuilder.AddParagraph(TicketData.ClaimTypeTitle).SetLineSpacing(1.4f);
-            cellBuilder.AddParagraph(TicketData.InsuredAmountTitle).SetLineSpacing(1.4f);
-            cellBuilder.AddParagraph(TicketData.PersonOfInterestNameTitle).SetLineSpacing(1.4f);
-            cellBuilder.AddParagraph(TicketData.Reason2VerifyTitle).SetLineSpacing(1.4f);
-            cellBuilder.AddParagraph(TicketData.VerifyAddressTitle).SetLineSpacing(1.4f);
+            cellBuilder.AddParagraph(DetailedReport.PolicyNumTitle).SetLineSpacing(1.4f);
+            cellBuilder.AddParagraph(DetailedReport.ClaimTypeTitle).SetLineSpacing(1.4f);
+            cellBuilder.AddParagraph(DetailedReport.InsuredAmountTitle).SetLineSpacing(1.4f);
+            cellBuilder.AddParagraph(DetailedReport.PersonOfInterestNameTitle).SetLineSpacing(1.4f);
+            cellBuilder.AddParagraph(DetailedReport.Reason2VerifyTitle).SetLineSpacing(1.4f);
+            cellBuilder.AddParagraph(DetailedReport.VerifyAddressTitle).SetLineSpacing(1.4f);
             cellBuilder.AddParagraph().SetLineSpacing(1.4f);
         }
 
-        private void FillPersonalInfo(TableCellBuilder cellBuilder)
+        private void FillTitleInfo(TableCellBuilder cellBuilder)
         {
-            cellBuilder.AddParagraph(TicketData.PolicyNum).SetLineSpacing(1.4f);
-            cellBuilder.AddParagraph(TicketData.ClaimType).SetLineSpacing(1.4f);
-            cellBuilder.AddParagraph(TicketData.InsuredAmount).SetLineSpacing(1.4f);
-            cellBuilder.AddParagraph(TicketData.PersonOfInterestName).SetLineSpacing(1.4f);
-            cellBuilder.AddParagraph(TicketData.Reason2Verify).SetLineSpacing(1.4f);
-            cellBuilder.AddParagraph(TicketData.VerifyAddress).SetLineSpacing(1.4f);
+            cellBuilder.AddParagraph(DetailedReport.PolicyNum).SetLineSpacing(1.4f);
+            cellBuilder.AddParagraph(DetailedReport.ClaimType).SetLineSpacing(1.4f);
+            cellBuilder.AddParagraph(DetailedReport.InsuredAmount).SetLineSpacing(1.4f);
+            cellBuilder.AddParagraph(DetailedReport.PersonOfInterestName).SetLineSpacing(1.4f);
+            cellBuilder.AddParagraph(DetailedReport.Reason2Verify).SetLineSpacing(1.4f);
+            cellBuilder.AddParagraph(DetailedReport.VerifyAddress).SetLineSpacing(1.4f);
         }
 
-        private void YourTicket(TableCellBuilder cellBuilder)
+        private void SetDisclaimer(TableCellBuilder cellBuilder)
         {
-            cellBuilder.AddParagraph(ConcertData.ReportDisclaimer).SetFont(FNT9).SetMarginRight(30);
+            cellBuilder.AddParagraph(AgencyDetailData.ReportDisclaimer).SetFont(FNT9).SetMarginRight(30);
         }
 
-        private void FillTicketDataCounterFoil(TableCellBuilder cellBuilder)
+        private void FillTitle(TableCellBuilder cellBuilder)
         {
             cellBuilder.SetBorderStroke(Stroke.None);
-            cellBuilder.AddParagraph(TicketData.PolicyNumTitle).SetLineSpacing(1.4f);
-            cellBuilder.AddParagraph(TicketData.ClaimTypeTitle).SetLineSpacing(1.4f);
-            cellBuilder.AddParagraph(TicketData.InsuredAmountTitle).SetLineSpacing(1.4f);
-            cellBuilder.AddParagraph(TicketData.PersonOfInterestNameTitle).SetLineSpacing(1.4f);
+            cellBuilder.AddParagraph(DetailedReport.PolicyNumTitle).SetLineSpacing(1.4f);
+            cellBuilder.AddParagraph(DetailedReport.ClaimTypeTitle).SetLineSpacing(1.4f);
+            cellBuilder.AddParagraph(DetailedReport.InsuredAmountTitle).SetLineSpacing(1.4f);
+            cellBuilder.AddParagraph(DetailedReport.PersonOfInterestNameTitle).SetLineSpacing(1.4f);
         }
 
         private void FillPersonalInfoCounterFoil(TableCellBuilder cellBuilder)
         {
             cellBuilder.SetBorderStroke(Stroke.None).SetBold(true);
-            cellBuilder.AddParagraph(TicketData.PolicyNum).SetLineSpacing(1.4f);
-            cellBuilder.AddParagraph(TicketData.ClaimType).SetLineSpacing(1.4f);
-            cellBuilder.AddParagraph(TicketData.InsuredAmount).SetLineSpacing(1.4f);
-            cellBuilder.AddParagraph(TicketData.PersonOfInterestName).SetLineSpacing(1.4f);
+            cellBuilder.AddParagraph(DetailedReport.PolicyNum).SetLineSpacing(1.4f);
+            cellBuilder.AddParagraph(DetailedReport.ClaimType).SetLineSpacing(1.4f);
+            cellBuilder.AddParagraph(DetailedReport.InsuredAmount).SetLineSpacing(1.4f);
+            cellBuilder.AddParagraph(DetailedReport.PersonOfInterestName).SetLineSpacing(1.4f);
         }
 
-        private void FillBoardingHandBugTable(TableBuilder tableBuilder, BoardingCell[,] boardingItems, BoardingCell[,] boardingItems0)
+        private void FillIdData(TableBuilder tableBuilder, IdInfo[,] boardingItems, IdInfo[,] boardingItems0)
         {
             tableBuilder
                 .SetWidth(XUnit.FromPercent(100))
                 .SetBorder(Stroke.None)
                 .AddColumnToTable("", 415.5f)
                 .AddColumn("", 138.5f);
-            FillBoardingTableFirstRow(tableBuilder, boardingItems[0, 0]);
+            FillIdTableFirstRow(tableBuilder, boardingItems[0, 0]);
             var rowBuilder = tableBuilder.AddRow();
             rowBuilder.AddCell().AddTable(builder =>
             {
                 builder.SetWidth(415.5f);
-                FillBoardingTable(builder, boardingItems, 1);
+                FillIdTable(builder, boardingItems, 1);
             });
-            rowBuilder.AddCell(FillHandBugTableCell);
+            rowBuilder.AddCell(FillPhotoMap);
 
             var rr = tableBuilder.AddRow();
             rr.AddCell().AddTable(b =>
@@ -310,19 +309,19 @@ namespace risk.control.system.Helpers
                 .AddColumnPercentToTable("", 25)
                 .AddColumnPercent("", 25);
             });
-            rr.AddCell(FillHandBugTableCell0);
+            rr.AddCell(FillBlank);
 
-            FillBoardingTableFirstRow(tableBuilder, boardingItems0[0, 0]);
+            FillIdTableFirstRow(tableBuilder, boardingItems0[0, 0]);
             var rb = tableBuilder.AddRow();
             rb.AddCell().AddTable(builder =>
             {
                 builder.SetWidth(415.5f);
-                FillBoardingTable(builder, boardingItems0, 1);
+                FillIdTable(builder, boardingItems0, 1);
             });
-            rb.AddCell(FillHandBugTableCell1);
+            rb.AddCell(FillPanMap);
         }
 
-        private void FillHandBugTableCell0(TableCellBuilder cellBuilder)
+        private void FillBlank(TableCellBuilder cellBuilder)
         {
             cellBuilder
                 .SetPadding(19, 6, 0, 0)
@@ -331,34 +330,34 @@ namespace risk.control.system.Helpers
                 .SetMarginBottom(19);
         }
 
-        private void FillHandBugTableCell(TableCellBuilder cellBuilder)
+        private void FillPhotoMap(TableCellBuilder cellBuilder)
         {
             cellBuilder
                 .SetPadding(19, 6, 0, 0)
-                .AddParagraph(ConcertData.AddressVisitedTitle)
+                .AddParagraph(AgencyDetailData.AddressVisitedTitle)
                 .SetFont(FNT9)
                 .SetMarginBottom(19);
-            cellBuilder.AddImage(BoardingData.PhotoIdMapPath,
+            cellBuilder.AddImage(PhotoIdData.PhotoIdMapPath,
                 XSize.FromHeight(108));
             cellBuilder.AddParagraph("")
-               .AddUrl(BoardingData.PhotoIdMapUrl, "map");
+               .AddUrl(PhotoIdData.PhotoIdMapUrl, "map");
         }
 
-        private void FillHandBugTableCell1(TableCellBuilder cellBuilder)
+        private void FillPanMap(TableCellBuilder cellBuilder)
         {
             cellBuilder
                 .SetPadding(19, 6, 0, 0)
-                .AddParagraph(ConcertData.AddressVisitedTitle)
+                .AddParagraph(AgencyDetailData.AddressVisitedTitle)
                 .SetFont(FNT9)
                 .SetMarginBottom(19);
-            cellBuilder.AddImage(BoardingData.PanMapPath,
+            cellBuilder.AddImage(PanData.PanMapPath,
                 XSize.FromHeight(108));
             cellBuilder.AddParagraph("")
-                .AddUrl(BoardingData.PanMapUrl, "map");
+                .AddUrl(PanData.PanMapUrl, "map");
         }
 
-        private void FillBoardingTable(TableBuilder tableBuilder,
-         BoardingCell[,] boardingItems, int startRow = 0)
+        private void FillIdTable(TableBuilder tableBuilder,
+         IdInfo[,] boardingItems, int startRow = 0)
         {
             tableBuilder
                 .SetBorder(Stroke.None)
@@ -391,7 +390,7 @@ namespace risk.control.system.Helpers
                     }
                     for (int j = 0; j < columns; j++)
                     {
-                        BoardingCell bi = boardingItems[i, j];
+                        IdInfo bi = boardingItems[i, j];
                         if (!bi.isEmpty())
                         {
                             var cellBuilder = rowBuilder.AddCell();
@@ -424,7 +423,7 @@ namespace risk.control.system.Helpers
             }
         }
 
-        private void ImageThenText(TableBuilder tableBuilder, BoardingCell bi)
+        private void ImageThenText(TableBuilder tableBuilder, IdInfo bi)
         {
             tableBuilder
                 .SetWidth(XUnit.FromPercent(100))
@@ -436,11 +435,11 @@ namespace risk.control.system.Helpers
                 .SetPadding(0, 4, 0, 0)
                 //.SetVerticalAlignment(VerticalAlignment.Bottom)
                 .AddImage(Path.Combine(imgPath, "images", bi.image),
-                    XSize.FromWidth(11));
+                    XSize.FromHeight(100));
             TextOnly(rowBuilder.AddCell().AddParagraph(), bi);
         }
 
-        private void TextOnly(ParagraphBuilder paragraphBuilder, BoardingCell bi)
+        private void TextOnly(ParagraphBuilder paragraphBuilder, IdInfo bi)
         {
             foreach (FontText ft in bi.fontTexts)
             {
@@ -448,8 +447,8 @@ namespace risk.control.system.Helpers
             }
         }
 
-        private void FillBoardingTableFirstRow(TableBuilder tableBuilder,
-                BoardingCell bi)
+        private void FillIdTableFirstRow(TableBuilder tableBuilder,
+                IdInfo bi)
         {
             for (int k = 0; k < 2; k++)
             {
@@ -485,108 +484,106 @@ namespace risk.control.system.Helpers
             }
         }
 
-        private BoardingCell[,] GetBoardingItems()
+        private IdInfo[,] GetPhotoItems()
         {
-            BoardingCell[,] result =
+            IdInfo[,] result =
             {
                 {
-                new BoardingCell("Investigation Type", FNT15,
-                    TicketData1.Passenger, 4),
+                new IdInfo("Investigation Type", FNT15,
+                    PhotoIdData.Passenger, 4),
                     EMPTY_ITEM,
                     EMPTY_ITEM,
                     EMPTY_ITEM
                 },
                 {
-                new BoardingCell("Person Name", new FontText[] {
-                    new FontText (FNT12, BoardingData.PersonName + " / "),
-                    new FontText (FNT12B, BoardingData.Salutation)
+                new IdInfo("Person Name", new FontText[] {
+                    new FontText (FNT12, PhotoIdData.PersonName + " / "),
+                    new FontText (FNT12B, PhotoIdData.Salutation)
                 }, 2),
                 EMPTY_ITEM,
-                new BoardingCell("Address", new FontText[] {
-                    new FontText (FNT12, BoardingData.ArrivalAirport + " / "),
-                    new FontText (FNT12B, BoardingData.ArrivalAbvr)
+                new IdInfo("Address Visited", new FontText[] {
+                    new FontText (FNT12, PhotoIdData.ArrivalAirport + " / "),
+                    new FontText (FNT12B, PhotoIdData.ArrivalAbvr)
                 }, 2),
                 EMPTY_ITEM
                 },
                 {
-                new BoardingCell("Match", FNT16_R, BoardingData.FaceMatchStatus),
-                new BoardingCell("Contact Number", FNT16, BoardingData.PersonContact),
-                new BoardingCell("", FNT16, ""),
-                new BoardingCell("Verified", FNT16_R, BoardingData.PhotoIdRemarks)
+                new IdInfo("Match", PhotoIdData.MatchFont, PhotoIdData.FaceMatchStatus),
+                new IdInfo("Photo", FNT16, "",PhotoIdData.PhotoIdPath),
+                new IdInfo("", FNT16, ""),
+                new IdInfo("Status", PhotoIdData.MatchFont, "", PhotoIdData.StatusImagePath)
                 },
                 {
-                new BoardingCell("Visit Date", FNT16,
-                    BoardingData.PhotoIdTime.ToString(
+                new IdInfo("Visit Date", FNT16,
+                    PhotoIdData.PhotoIdTime.ToString(
                                 "dd MMMM", DocumentLocale)),
-                new BoardingCell("Time", FNT16,
-                    BoardingData.BoardingTill.ToString(
+                new IdInfo("Time", FNT16,
+                    PhotoIdData.BoardingTill.ToString(
                                 "HH:mm", DocumentLocale)),
-                new BoardingCell("Photo", FNT16,
-                    "",BoardingData.PhotoIdPath),
-                new BoardingCell("Weather", FNT8,
-                    BoardingData.WeatherData)
+                new IdInfo("", FNT16, ""),
+                new IdInfo("Weather", FNT8,
+                    PhotoIdData.WeatherData)
                 }
             };
             return result;
         }
 
-        private BoardingCell[,] GetBoardingItems0()
+        private IdInfo[,] GetPanItems()
         {
-            BoardingCell[,] result =
+            IdInfo[,] result =
             {
                 {
-                new BoardingCell("Investigation Type", FNT15,
-                    TicketData0.Passenger, 4),
+                new IdInfo("Investigation Type", FNT15,
+                    PanData.Passenger, 4),
                     EMPTY_ITEM,
                     EMPTY_ITEM,
                     EMPTY_ITEM
                 },
                 {
-                new BoardingCell("Document Name", new FontText[] {
+                new IdInfo("Document Name", new FontText[] {
                     new FontText (FNT12, " / "),
-                    new FontText (FNT12B, BoardingData0.Salutation)
+                    new FontText (FNT12B, PanData.Salutation)
                 }, 2),
                 EMPTY_ITEM,
-                new BoardingCell("Address", new FontText[] {
-                    new FontText (FNT12, BoardingData0.ArrivalAirport + " / "),
-                    new FontText (FNT12B, BoardingData0.ArrivalAbvr)
+                new IdInfo("Address Visited", new FontText[] {
+                    new FontText (FNT12, PanData.ArrivalAirport + " / "),
+                    new FontText (FNT12B, PanData.ArrivalAbvr)
                 }, 2),
                 EMPTY_ITEM
                 },
                 {
-                new BoardingCell("Match", FNT16_R, BoardingData0.FaceMatchStatus),
-                new BoardingCell("Contact Number", FNT16, BoardingData0.PersonContact),
-                new BoardingCell("", FNT16, " "),
-                new BoardingCell("Verified", FNT16_R, BoardingData0.PhotoIdRemarks)
+                new IdInfo("Match", PanData.MatchFont, PanData.FaceMatchStatus),
+                new IdInfo("Image", FNT16, "", PanData.PanPhotoPath),
+                new IdInfo("", FNT16, " "),
+                new IdInfo("Status", PanData.MatchFont,"", PanData.StatusImagePath)
                 },
                 {
-                new BoardingCell("Visit Date", FNT16,
-                    BoardingData0.PhotoIdTime.ToString(
+                new IdInfo("Visit Date", FNT16,
+                    PanData.PhotoIdTime.ToString(
                                 "dd MMMM", DocumentLocale)),
-                new BoardingCell("Time", FNT16,
-                    BoardingData0.BoardingTill.ToString(
+                new IdInfo("Time", FNT16,
+                    PanData.BoardingTill.ToString(
                                 "HH:mm", DocumentLocale)),
-                new BoardingCell("Image", FNT16,
-                    "", BoardingData.PanPhotoPath),
-                new BoardingCell("Pan Scanned Info", FNT8,
-                    BoardingData0.WeatherData)
+                new IdInfo("", FNT16, ""),
+                new IdInfo("Pan Scanned Info", FNT8,
+                    PanData.WeatherData)
                 }
             };
             return result;
         }
 
-        internal struct BoardingCell
+        internal struct IdInfo
         {
             internal string name;
             internal FontText[] fontTexts;
             internal string image;
             internal int colSpan;
 
-            internal BoardingCell(string name, FontBuilder font, string text, int colSpan = 1) : this(name, font, text, null, colSpan)
+            internal IdInfo(string name, FontBuilder font, string text, int colSpan = 1) : this(name, font, text, null, colSpan)
             {
             }
 
-            internal BoardingCell(string name, FontBuilder font, string text, string image, int colSpan = 1)
+            internal IdInfo(string name, FontBuilder font, string text, string image, int colSpan = 1)
             {
                 this.name = name;
                 fontTexts = new FontText[] { new FontText(font, text) };
@@ -594,7 +591,7 @@ namespace risk.control.system.Helpers
                 this.colSpan = colSpan;
             }
 
-            internal BoardingCell(string name, FontText[] fontTexts, int colSpan = 1)
+            internal IdInfo(string name, FontText[] fontTexts, int colSpan = 1)
             {
                 this.name = name;
                 this.fontTexts = fontTexts;

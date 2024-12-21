@@ -1,7 +1,12 @@
-﻿namespace risk.control.system.Models.ViewModel
+﻿using Gehtsoft.PDFFlow.Builder;
+using Gehtsoft.PDFFlow.Models.Shared;
+using Gehtsoft.PDFFlow.Utils;
+
+namespace risk.control.system.Models.ViewModel
 {
-    public class BoardingData
+    public class IdData
     {
+        public string Passenger { get; set; }
         public string? PersonAddressImage { get; set; }
         public string? PhotoIdMapPath { get; set; }
         public string? PhotoIdPath { get; set; }
@@ -22,6 +27,9 @@
         public string Class { get; set; }
         public string ClassAdd { get; set; }
         public string PhotoIdRemarks { get; set; }
+        public FontBuilder MatchFont { get; set; } = Fonts.Helvetica(16f).SetColor(Color.Green);
+        public string StatusImagePath { get; set; } = "cancel.png";
+
 
         public override string ToString()
         {

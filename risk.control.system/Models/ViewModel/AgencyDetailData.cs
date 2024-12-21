@@ -1,6 +1,6 @@
 ﻿namespace risk.control.system.Models.ViewModel
 {
-    public class ConcertData
+    public class AgencyDetailData
     {
         public string SupervisorCommentsTitle { get; set; }
         public string AgentReportTitle { get; set; }

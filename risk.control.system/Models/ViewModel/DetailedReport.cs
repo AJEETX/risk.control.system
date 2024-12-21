@@ -1,6 +1,6 @@
 ﻿namespace risk.control.system.Models.ViewModel
 {
-    public class TicketData
+    public class DetailedReport
     {
         public string ReportTitle { get; set; }
         public string ReportQr { get; set; }

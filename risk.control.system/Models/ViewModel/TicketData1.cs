@@ -9,16 +9,5 @@
         public string ETK { get; set; }
         public string RegNo { get; set; }
 
-        public override string ToString()
-        {
-            return "BoardingData{" +
-                    "Company=" + Company +
-                    ", Site=" + Site +
-                    ", SiteTitle=" + SiteTitle +
-                    ", Passenger=" + Passenger +
-                    ", ETK=" + ETK +
-                    ", RegNo=" + RegNo +
-                     "}";
-        }
     }
 }

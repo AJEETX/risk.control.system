@@ -80,8 +80,9 @@ namespace risk.control.system.Services
                     .Include(c => c.PolicyDetail)
                     .Include(c => c.CustomerDetail)
                     .ThenInclude(c => c.PinCode)
+                    .Include(c => c.BeneficiaryDetail)
+                    .ThenInclude(c => c.PinCode)
                     .First(c => c.ClaimsInvestigationId == claim);
-                var beneficiary = _context.BeneficiaryDetail.Include(b => b.PinCode).FirstOrDefault(b => b.ClaimsInvestigationId == claim);
 
                 if (claimsInvestigation.PolicyDetail?.ClaimType == ClaimType.HEALTH)
                 {
@@ -89,7 +90,7 @@ namespace risk.control.system.Services
                 }
                 else
                 {
-                    pinCode2Verify = beneficiary.PinCode?.Code;
+                    pinCode2Verify = claimsInvestigation.BeneficiaryDetail.PinCode?.Code;
                 }
 
                 var vendorsInPincode = new List<Vendor>();
@@ -130,7 +131,7 @@ namespace risk.control.system.Services
                             {
                                 foreach (var pincodeService in serviceType.PincodeServices)
                                 {
-                                    if (pincodeService.Pincode.Contains(pinCode2Verify.Substring(0, pinCode2Verify.Length - 2)))
+                                    if (pincodeService.Pincode.StartsWith(pinCode2Verify.Substring(0, pinCode2Verify.Length - 2)))
                                     {
                                         vendorsInPincode.Add(empanelledVendor);
                                         continue;
@@ -182,11 +183,11 @@ namespace risk.control.system.Services
                     {
                         var selectedVendor = vendorsWithCaseLoad.FirstOrDefault();
 
-                        var policy = await AllocateToVendor(userEmail, claimsInvestigation.ClaimsInvestigationId, selectedVendor.Vendor.VendorId, beneficiary.BeneficiaryDetailId);
+                        var policy = await AllocateToVendor(userEmail, claimsInvestigation.ClaimsInvestigationId, selectedVendor.Vendor.VendorId, claimsInvestigation.BeneficiaryDetail.BeneficiaryDetailId);
 
                         autoAllocatedClaims.Add(claim);
                         if (selectedVendor.Vendor.EnableMailbox)
-                            await mailboxService.NotifyClaimAllocationToVendor(userEmail, policy.PolicyDetail.ContractNumber, claimsInvestigation.ClaimsInvestigationId, selectedVendor.Vendor.VendorId, beneficiary.BeneficiaryDetailId);
+                            await mailboxService.NotifyClaimAllocationToVendor(userEmail, policy.PolicyDetail.ContractNumber, claimsInvestigation.ClaimsInvestigationId, selectedVendor.Vendor.VendorId, claimsInvestigation.BeneficiaryDetail.BeneficiaryDetailId);
                     }
                 }
             }
@@ -670,7 +671,6 @@ namespace risk.control.system.Services
             var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == vendorId);
             var currentUser = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
 
-            var supervisor = await GetSupervisor(vendorId);
             var inProgress = _context.InvestigationCaseStatus.FirstOrDefault(
                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS);
             var allocatedToVendor = _context.InvestigationCaseSubStatus.FirstOrDefault(
@@ -684,7 +684,6 @@ namespace risk.control.system.Services
                 claimsCaseToAllocateToVendor.Updated = DateTime.Now;
                 claimsCaseToAllocateToVendor.UpdatedBy = currentUser.FirstName + " " + currentUser.LastName + " (" + currentUser.Email + ")";
                 claimsCaseToAllocateToVendor.CurrentUserEmail = userEmail;
-                claimsCaseToAllocateToVendor.CurrentClaimOwner = supervisor.Email;
 
                 claimsCaseToAllocateToVendor.EnablePassport = currentUser.ClientCompany.EnablePassport;
                 claimsCaseToAllocateToVendor.AiEnabled = currentUser.ClientCompany.AiEnabled;
@@ -739,7 +738,6 @@ namespace risk.control.system.Services
 
         public async Task<ClaimsInvestigation> AssignToVendorAgent(string vendorAgentEmail, string currentUser, long vendorId, string claimsInvestigationId)
         {
-            var supervisor = await GetSupervisor(vendorId);
             var inProgress = _context.InvestigationCaseStatus.FirstOrDefault(
                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS);
             var assignedToAgent = _context.InvestigationCaseSubStatus.FirstOrDefault(
@@ -753,7 +751,7 @@ namespace risk.control.system.Services
                 claim.UserEmailActionedTo = agentUser.Email;
                 claim.UserRoleActionedTo = $"{AppRoles.AGENT.GetEnumDisplayName()} ({agentUser.Vendor.Email})";
                 claim.Updated = DateTime.Now;
-                claim.UpdatedBy = supervisor.Email;
+                claim.UpdatedBy = currentUser;
                 claim.CurrentUserEmail = currentUser;
                 claim.InvestigateView = 0;
                 claim.NotWithdrawable = true;
@@ -780,7 +778,7 @@ namespace risk.control.system.Services
                     Time2Update = DateTime.Now.Subtract(lastLog.Created).Days,
                     InvestigationCaseStatusId = inProgress.InvestigationCaseStatusId,
                     InvestigationCaseSubStatusId = assignedToAgent.InvestigationCaseSubStatusId,
-                    UpdatedBy = supervisor.FirstName + " " + supervisor.LastName + " (" + supervisor.Email + ")",
+                    UpdatedBy = currentUser,
                     Updated = DateTime.Now,
                     TimeElapsed = timeElapsed
                 };
@@ -799,8 +797,6 @@ namespace risk.control.system.Services
             var submitted2Supervisor = _context.InvestigationCaseSubStatus
                 .FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR);
 
-            var supervisor = await GetSupervisor(agent.VendorId.Value);
-
             var claim = _context.ClaimsInvestigation
                 .Include(c => c.PolicyDetail)
                 .Include(c => c.AgencyReport)
@@ -815,7 +811,7 @@ namespace risk.control.system.Services
             claim.Updated = DateTime.Now;
             claim.UpdatedBy = agent.FirstName + " " + agent.LastName + "(" + agent.Email + ")";
             claim.CurrentUserEmail = userEmail;
-            claim.CurrentClaimOwner = supervisor.Email;
+            claim.CurrentClaimOwner = userEmail;
             claim.InvestigationCaseSubStatusId = submitted2Supervisor.InvestigationCaseSubStatusId;
             claim.SubmittedToSupervisorTime = DateTime.Now;
             var claimReport = claim.AgencyReport;
@@ -855,7 +851,7 @@ namespace risk.control.system.Services
                 UserEmailActioned = agent.Email,
                 UserRoleActionedTo = $"{agent.Vendor.Email}",
                 HopCount = lastLogHop + 1,
-                CurrentClaimOwner = supervisor.Email,
+                CurrentClaimOwner = userEmail,
                 Time2Update = DateTime.Now.Subtract(lastLog.Created).Days,
                 InvestigationCaseStatusId = inProgress.InvestigationCaseStatusId,
                 InvestigationCaseSubStatusId = submitted2Supervisor.InvestigationCaseSubStatusId,
@@ -919,38 +915,30 @@ namespace risk.control.system.Services
             try
             {
                 var claim = _context.ClaimsInvestigation
+                    .Include(c => c.CustomerDetail)
+                    .ThenInclude(c => c.District)
+                    .Include(c => c.CustomerDetail)
+                    .ThenInclude(c => c.State)
+                    .Include(c => c.CustomerDetail)
+                    .ThenInclude(c => c.Country)
+                    .Include(c => c.CustomerDetail)
+                    .ThenInclude(c=>c.PinCode)
+                    .Include(c => c.BeneficiaryDetail)
+                    .ThenInclude(c => c.District)
+                    .Include(c => c.BeneficiaryDetail)
+                    .ThenInclude(c => c.State)
+                    .Include(c => c.BeneficiaryDetail)
+                    .ThenInclude(c => c.Country)
+                    .Include(c => c.BeneficiaryDetail)
+                    .ThenInclude(c => c.PinCode)
                     .Include(c => c.ClientCompany)
-               .Include(c => c.BeneficiaryDetail)
-               .ThenInclude(c => c.BeneficiaryRelation)
                .Include(c => c.PolicyDetail)
                .ThenInclude(c => c.CaseEnabler)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.CostCentre)
-               .Include(c => c.BeneficiaryDetail)
-               .ThenInclude(c => c.PinCode)
-               .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.District)
-                .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.State)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.Country)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.District)
-               .Include(c => c.InvestigationCaseStatus)
-               .Include(c => c.InvestigationCaseSubStatus)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.InvestigationServiceType)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.LineOfBusiness)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.PinCode)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.State)
-               .Include(c => c.Vendor)
-               .Include(c => c.ClaimNotes)
                 .Include(r => r.AgencyReport)
-                .Include(r => r.AgencyReport.DigitalIdReport)
-                .Include(r => r.AgencyReport.PanIdReport)
+                .ThenInclude(r => r.DigitalIdReport)
+                .Include(r => r.AgencyReport)
+                .ThenInclude(r => r.PanIdReport)
+                .Include(r => r.Vendor)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimsInvestigationId);
 
                 claim.AgencyReport.AiSummary = reportAiSummary;
@@ -1058,38 +1046,34 @@ namespace risk.control.system.Services
             try
             {
                 var claim = _context.ClaimsInvestigation
+                    .Include(c => c.CustomerDetail)
+                    .ThenInclude(c => c.District)
+                    .Include(c => c.CustomerDetail)
+                    .ThenInclude(c => c.State)
+                    .Include(c => c.CustomerDetail)
+                    .ThenInclude(c => c.Country)
+                    .Include(c => c.CustomerDetail)
+                    .ThenInclude(c => c.PinCode)
+                    .Include(c => c.BeneficiaryDetail)
+                    .ThenInclude(c => c.District)
+                    .Include(c => c.BeneficiaryDetail)
+                    .ThenInclude(c => c.State)
+                    .Include(c => c.BeneficiaryDetail)
+                    .ThenInclude(c => c.Country)
+                    .Include(c => c.BeneficiaryDetail)
+                    .ThenInclude(c => c.PinCode)
                     .Include(c => c.ClientCompany)
-               .Include(c => c.BeneficiaryDetail)
-               .ThenInclude(c => c.BeneficiaryRelation)
                .Include(c => c.PolicyDetail)
                .ThenInclude(c => c.CaseEnabler)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.CostCentre)
-               .Include(c => c.BeneficiaryDetail)
-               .ThenInclude(c => c.PinCode)
-               .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.District)
-                .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.State)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.Country)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.District)
-               .Include(c => c.InvestigationCaseStatus)
-               .Include(c => c.InvestigationCaseSubStatus)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.InvestigationServiceType)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.LineOfBusiness)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.PinCode)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.State)
-               .Include(c => c.Vendor)
-               .Include(c => c.ClaimNotes)
                 .Include(r => r.AgencyReport)
-                .Include(r => r.AgencyReport.DigitalIdReport)
-                .Include(r => r.AgencyReport.PanIdReport)
+                .ThenInclude(r => r.DigitalIdReport)
+                .Include(r => r.AgencyReport)
+                .ThenInclude(r => r.PanIdReport)
+                .Include(r => r.Vendor)
+               .Include(c => c.PolicyDetail)
+               .ThenInclude(c => c.CaseEnabler)
+                .Include(r => r.AgencyReport)
+                .Include(r => r.Vendor)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimsInvestigationId);
 
                 claim.AgencyReport.AiSummary = reportAiSummary;
@@ -1189,24 +1173,6 @@ namespace risk.control.system.Services
                 Console.WriteLine(ex.StackTrace);
             }
             return (null!, string.Empty);
-        }
-
-        private async Task<VendorApplicationUser> GetSupervisor(long vendorId)
-        {
-            var vendorNonAdminUsers = _context.VendorApplicationUser.Where(u =>
-            u.VendorId == vendorId && !u.IsVendorAdmin);
-
-            var supervisor = roleManager.Roles.FirstOrDefault(r =>
-                r.Name.Contains(AppRoles.SUPERVISOR.ToString()));
-
-            foreach (var vendorNonAdminUser in vendorNonAdminUsers)
-            {
-                if (await userManager.IsInRoleAsync(vendorNonAdminUser, supervisor?.Name))
-                {
-                    return vendorNonAdminUser;
-                }
-            }
-            return null!;
         }
 
         private async Task<(ClientCompany, string)> ReAssignToCreator(string userEmail, string claimsInvestigationId, long caseLocationId, string assessorRemarks, AssessorRemarkType assessorRemarkType, string reportAiSummary)
