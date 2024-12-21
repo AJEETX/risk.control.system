@@ -73,7 +73,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text" asp-for="BeneficiaryDateOfBirth"><i class="far fa-calendar-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <input required asp-for="DateOfBirth" id="BeneficiaryDateOfBirthId" class="form-control remarks" type="date" />
+                                <input required asp-for="DateOfBirth" id="BeneficiaryDateOfBirthId" class="form-control remarks" type="date" value="@DateTime.Now.ToString("dd/MM/yyyy")"/>
                                 <span asp-validation-for="DateOfBirth" class="text-danger"></span>
                             </div>
                         </div>

@@ -1,5 +1,9 @@
 ﻿$("#BeneficiaryName").focus();
-BeneficiaryDateOfBirthId.max = new Date().toISOString().split("T")[0];
+
+var BeneficiaryDateOfBirthId = document.getElementById("BeneficiaryDateOfBirthId");
+if (BeneficiaryDateOfBirthId) {
+    BeneficiaryDateOfBirthId.max = new Date().toISOString().split("T")[0];
+}
 
 $.validator.setDefaults({
     submitHandler: function (form) {

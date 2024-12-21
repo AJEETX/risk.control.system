@@ -14,6 +14,7 @@ namespace risk.control.system.Seeds
     {
         private static string au_stateWisePincodeFilePath = @"au_postcodes.csv";
         private static string in_stateWisePincodeFilePath = @"india_pincodes.csv";
+        private static string all_india_pincodes = @"india_pincode.csv";
 
         //private static string stateWisePincodeFilePath = @"pincode.csv";
         private static string NO_DATA = " NO - DATA ";
@@ -169,22 +170,21 @@ namespace risk.control.system.Seeds
                                 Longitude = rowData[5] ?? NO_DATA,
                             };
                             var isDupicate = pincodes.FirstOrDefault(p => p.Code == pincodeState.Code);
-                            if (isDupicate is null)
-                            {
-                                pincodes.Add(pincodeState);
-                            }
+                            pincodes.Add(pincodeState);
                         }
                     }
                 }
             }
-            var smallerPincodes = pincodes.Where(p => p.StateCode == "VIC" || p.StateCode == "NSW")?.ToList();
-            return smallerPincodes.ToList();
+            return pincodes
+                .Where(p => p.StateCode == "VIC" || 
+                p.StateCode == "NSW"
+                )?.ToList();
         }
 
         public static async Task<List<PinCodeState>> CsvRead_India()
         {
             var pincodes = new List<PinCodeState>();
-            string csvData = await File.ReadAllTextAsync(in_stateWisePincodeFilePath);
+            string csvData = await File.ReadAllTextAsync(all_india_pincodes);
 
             bool firstRow = true;
             foreach (string row in csvData.Split('\n'))
@@ -203,24 +203,49 @@ namespace risk.control.system.Seeds
                             var rowData = output.Split(',').ToList();
                             var pincodeState = new PinCodeState
                             {
-                                Name = rowData[3] ?? NO_DATA,
-                                Code = rowData[4] ?? NO_DATA,
-                                District = rowData[7] ?? NO_DATA,
-                                StateName = rowData[8] ?? NO_DATA,
-                                StateCode = rowData[9] ?? NO_DATA,
-                                Latitude = rowData[10] ?? NO_DATA,
-                                Longitude = rowData[11] ?? NO_DATA,
+                                Name = rowData[1] ?? NO_DATA,
+                                Code = rowData[2] ?? NO_DATA,
+                                District = rowData[3] ?? NO_DATA,
+                                StateName = rowData[4] ?? NO_DATA,
+                                StateCode = GetInitials(rowData[4]) ?? NO_DATA,
+                                Latitude =  NO_DATA,
+                                Longitude = NO_DATA,
                             };
-                            var isDupicate = pincodes.FirstOrDefault(p => p.Code == pincodeState.Code);
-                            if (isDupicate is null)
-                            {
-                                pincodes.Add(pincodeState);
-                            }
+                            pincodes.Add(pincodeState);
                         }
                     }
                 }
             }
-            return pincodes.ToList();
+            return pincodes
+                .Where(p=>p.StateName.ToLower().StartsWith("haryana") ||
+                p.StateName.ToLower().StartsWith("delhi") ||
+                p.StateName.ToLower().StartsWith("uttar pradesh")
+                )?.ToList();
+        }
+        static string GetInitials(string input)
+        {
+            // Trim any extra spaces and split the string into words by space
+            string[] words = input.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+            string initials = string.Empty;
+
+            if (words.Length == 1)
+            {
+                // If only one word, take the first two letters (if available)
+                initials = words[0].Substring(0, Math.Min(2, words[0].Length)).ToUpper();
+            }
+            else if (words.Length == 2)
+            {
+                // If two words, take the first letter of each word
+                initials = words[0].Substring(0, 1).ToUpper() + words[1].Substring(0, 1).ToUpper();
+            }
+            else if (words.Length > 2)
+            {
+                // If more than two words, take the first letter of the first two words
+                initials = words[0].Substring(0, 1).ToUpper() + words[1].Substring(0, 1).ToUpper();
+            }
+
+            return initials;
         }
     }
 }

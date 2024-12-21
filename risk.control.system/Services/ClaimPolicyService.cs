@@ -9,7 +9,7 @@ namespace risk.control.system.Services
 {
     public interface IClaimPolicyService
     {
-        (ClaimsInvestigation claim, bool trial) AddClaimPolicy(string userEmail);
+        ClaimsInvestigation AddClaimPolicy(string userEmail, long? lineOfBusinessId);
 
         Task<ClaimTransactionModel> GetClaimDetail(string id);
         Task<ClaimTransactionModel> GetClaimSummary(string userEmail, string id);
@@ -26,11 +26,10 @@ namespace risk.control.system.Services
             this.numberService = numberService;
         }
 
-        public (ClaimsInvestigation claim,bool trial) AddClaimPolicy(string userEmail)
+        public ClaimsInvestigation AddClaimPolicy(string userEmail, long? lineOfBusinessId)
         {
             var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
-            var lineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == "claims").LineOfBusinessId;
             var contractNumber = numberService.GetNumberSequence("PX");
             var model = new ClaimsInvestigation
             {
@@ -55,8 +54,7 @@ namespace risk.control.system.Services
 
             var clientCompanyUser = _context.ClientCompanyApplicationUser.Include(u=>u.ClientCompany).FirstOrDefault(c => c.Email == userEmail);
 
-            model.ClientCompanyId = clientCompanyUser.ClientCompanyId;
-            return (model,clientCompanyUser.ClientCompany.LicenseType == Standard.Licensing.LicenseType.Trial);
+            return model;
         }
 
         public async Task<ClaimTransactionModel> GetClaimDetail(string id)

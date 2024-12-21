@@ -88,7 +88,7 @@
             /* Name of the keys from
             data file source */
             {
-                "sDefaultContent": "<i class='far fa-edit' data-toggle='tooltip' title='Complete the claim'></i>",
+                "sDefaultContent": "<i class='far fa-edit' data-toggle='tooltip' title='Incomplete claim !!!'></i>",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     if (row.ready2Assign) {
@@ -110,7 +110,7 @@
                     }
                     else {
 
-                        return '<span title="' + row.pincodeName + '" data-toggle="tooltip">' + data + '</span>'
+                        return '<img src="/img/no-map.jpeg" class="profile-image doc-profile-image" title="No address" data-toggle="tooltip" />'
                     }
                 }
             },

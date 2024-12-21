@@ -36,7 +36,7 @@
         public string OwnerDetail { get; set; }
         public string AgencyDeclineComment { get; set; }
         public bool CaseWithPerson { get; set; } = false;
-        public string PersonMapAddressUrl { get; set; }
+        public string? PersonMapAddressUrl { get; set; }
 
     }
 }

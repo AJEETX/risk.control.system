@@ -81,12 +81,9 @@
                             <span class="input-group-label"> Issue Date:</span>
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
-                                    <span class="input-group-text" asp-for="ContractIssueDate"><i class="nav-icon far fa-calendar-check"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                    <span class="input-group-text" asp-for="PolicyDetail.ContractIssueDate"><i class="nav-icon far fa-calendar-check"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                @{
-                                    var maxDate = @DateTime.Now.ToString("dd-MM-yyyy");
-                                }
-                                <input required asp-for="PolicyDetail.ContractIssueDate" id="dateContractId" class="form-control remarks date-width" min="2000-01-01" max="@maxDate" type="date" />
+                                <input required asp-for="PolicyDetail.ContractIssueDate" id="dateContractId" class="form-control remarks" type="date" value="@DateTime.Now.ToString("dd/MM/yyyy")" />
                                 <span asp-validation-for="PolicyDetail.ContractIssueDate" class="text-danger"></span>
                             </div>
                         </div>
@@ -122,9 +119,9 @@
                             <span class="input-group-label"> Incident Date:</span>
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
-                                    <span class="input-group-text" asp-for="DateOfIncident"><i class="nav-icon far fa-calendar-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                    <span class="input-group-text" asp-for="PolicyDetail.DateOfIncident"><i class="nav-icon far fa-calendar-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <input required asp-for="PolicyDetail.DateOfIncident" id="dateIncidentId" class="form-control remarks" min="2000-01-01" max="@maxDate" type="date" />
+                                <input required asp-for="PolicyDetail.DateOfIncident" id="dateIncidentId" class="form-control remarks" type="date" value="@DateTime.Now.ToString("dd/MM/yyyy")" />
                                 <span asp-validation-for="PolicyDetail.DateOfIncident" class="text-danger"></span>
                             </div>
                         </div>

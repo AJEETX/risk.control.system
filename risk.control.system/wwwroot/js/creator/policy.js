@@ -121,5 +121,15 @@ $(document).ready(function () {
 
 });
 
-dateContractId.max = new Date().toISOString().split("T")[0];
-dateIncidentId.max = new Date().toISOString().split("T")[0];
+var dateContractId = document.getElementById("dateContractId");
+if (dateContractId) {
+    dateContractId.max = new Date().toISOString().split("T")[0];
+}
+
+var dateIncidentId = document.getElementById("dateIncidentId");
+if (dateIncidentId) {
+    dateIncidentId.max = new Date().toISOString().split("T")[0];
+}
+
+//dateContractId.max = new Date().toISOString().split("T")[0];
+//dateIncidentId.max = new Date().toISOString().split("T")[0];
