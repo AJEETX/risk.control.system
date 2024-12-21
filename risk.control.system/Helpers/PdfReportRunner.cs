@@ -5,6 +5,8 @@ using Newtonsoft.Json;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 
+using Standard.Licensing;
+
 namespace risk.control.system.Helpers
 {
     public class PdfReportRunner
@@ -67,7 +69,7 @@ namespace risk.control.system.Helpers
             {
                 ticketData.PersonOfInterestName = claim.CustomerDetail.Name;
                 ticketData.VerifyAddress = claim.CustomerDetail.Addressline + "," + claim.CustomerDetail.District.Name +"," +claim.CustomerDetail.State.Code + "," + claim.CustomerDetail.Country.Code +"," + claim.CustomerDetail.PinCode.Code;
-                contactNumer = claim.CustomerDetail.ContactNumber;
+                contactNumer = new string('*', claim.CustomerDetail.ContactNumber.Length - 4) + claim.CustomerDetail.ContactNumber.Substring(claim.CustomerDetail.ContactNumber.Length - 4); 
                 personAddressUrl = claim.CustomerDetail.CustomerLocationMap;
             }
             else
