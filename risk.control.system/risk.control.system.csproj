@@ -70,6 +70,9 @@
     <None Update="au_postcodes.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="India_pincode.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="india_pincodes.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
