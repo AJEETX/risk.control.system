@@ -1,4 +1,5 @@
 ﻿var map;
+var markers = [];
 function haversine_distance(mk1, mk2) {
     var R = 3958.8; // Radius of the Earth in miles
     var rlat1 = mk1.position.lat() * (Math.PI / 180); // Convert degrees to radians
@@ -132,21 +133,25 @@ function initLocationMap(center, dakota, frick, mapHtml, msgHtml) {
         mapId: "4504f8b37365c3d0",
         mapTypeId: google.maps.MapTypeId.ROADMAP,
     };
-    map = new google.maps.Map(
-        mapHtml,
-        options);
+
+    // Create or reuse the map object
+    map = new google.maps.Map(mapHtml, options);
+
+    // Clear previous markers
+    clearMarkers();
 
     // The markers for The Dakota and The Frick Collection
-    var mk1 = new
-        google.maps.Marker({
-            position: dakota,
-            map: map
-        });
-    var mk2 = new
-        google.maps.Marker({
-            position: frick,
-            map: map
-        });
+    var mk1 = new google.maps.Marker({
+        position: dakota,
+        map: map
+    });
+    var mk2 = new google.maps.Marker({
+        position: frick,
+        map: map
+    });
+
+    // Add the markers to the global markers array
+    markers.push(mk1, mk2);
 
     var bounds = new google.maps.LatLngBounds();
     bounds.extend(dakota);
@@ -158,9 +163,11 @@ function initLocationMap(center, dakota, frick, mapHtml, msgHtml) {
     // Calculate and display the distance between markers
     var distance = haversine_distance(mk1, mk2);
     msgHtml.innerHTML = "Distance between expected vs visited location: " + distance.toFixed(2) + " km.";
+
     let directionsService = new google.maps.DirectionsService();
     let directionsRenderer = new google.maps.DirectionsRenderer();
     directionsRenderer.setMap(map); // Existing map object displays directions
+
     // Create route from existing points used for markers
     const route = {
         origin: dakota,
@@ -168,28 +175,35 @@ function initLocationMap(center, dakota, frick, mapHtml, msgHtml) {
         travelMode: 'DRIVING'
     }
 
-    directionsService.route(route,
-        function (response, status) { // anonymous function to capture directions
-            if (status !== 'OK') {
-                console.log('Directions request failed due to ' + status);
+    directionsService.route(route, function (response, status) { // anonymous function to capture directions
+        if (status !== 'OK') {
+            console.log('Directions request failed due to ' + status);
+            return;
+        } else {
+            directionsRenderer.setDirections(response); // Add route to the map
+            var directionsData = response.routes[0].legs[0]; // Get data about the mapped route
+            if (!directionsData) {
+                window.alert('Directions request failed');
                 return;
             } else {
-                directionsRenderer.setDirections(response); // Add route to the map
-                var directionsData = response.routes[0].legs[0]; // Get data about the mapped route
-                if (!directionsData) {
-                    window.alert('Directions request failed');
-                    return;
-                }
-                else {
-                    msgHtml.innerHTML += "<br>";
-                    msgHtml.innerHTML += " Driving distance is " + directionsData.distance.text + " (" + directionsData.duration.text + ").";
-                }
+                msgHtml.innerHTML += "<br>";
+                msgHtml.innerHTML += " Driving distance is " + directionsData.distance.text + " (" + directionsData.duration.text + ").";
             }
-        });
+        }
+    });
+
     map.fitBounds(bounds);
     map.setCenter(bounds.getCenter());
     map.setZoom(map.getZoom() - 1);
     if (map.getZoom() > 18) {
         map.setZoom(18);
     }
+}
+
+function clearMarkers() {
+    // Remove each marker from the map and from the markers array
+    for (let i = 0; i < markers.length; i++) {
+        markers[i].setMap(null);
+    }
+    markers = []; // Clear the array of markers
 }
