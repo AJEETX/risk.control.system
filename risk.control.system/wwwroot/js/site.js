@@ -100,6 +100,11 @@ async function fetchIpInfo(latlong) {
 
     } catch (error) {
         console.error('There has been a problem with your fetch operation:', error);
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(success, error);
+        } else {
+            console.error('Geolocation is not supported by this browser.');
+        }
     }
 }
 function success(position) {

@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Linq.Expressions;
+using System.Text.RegularExpressions;
+
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -33,12 +36,99 @@ namespace risk.control.system.Controllers
             return RedirectToAction("Profile");
         }
         [Breadcrumb("State")]
-        public async Task<IActionResult> Profile()
+        public IActionResult Profile()
         {
-            var statesResult = await _context.State.Include(s => s.Country).ToListAsync();
-            ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
-            return View(statesResult);
+            return View();
         }
+        [HttpGet]
+        public async Task<IActionResult> GetStates(int draw, int start, int length, string search, int? orderColumn, string orderDirection)
+        {
+            // Determine column to sort by
+            string sortColumn = orderColumn switch
+            {
+                0 => "Code",   // First column (index 0)
+                1 => "Name",   // Second column (index 1)
+                2 => "Country.Name",   // Third column (index 2)
+                _ => "Code"    // Default to "Code" if no column is specified
+            };
+
+            // Determine sort direction
+            bool isAscending = orderDirection?.ToLower() == "asc";
+            var query = _context.State
+                .Include(s => s.Country)
+                .AsQueryable();
+
+            // Apply search filter
+            if (!string.IsNullOrEmpty(search) && Regex.IsMatch(search, @"^[a-zA-Z0-9\s]*$"))
+            {
+                search = search.Trim().Replace("%", "[%]")
+                   .Replace("_", "[_]")
+                   .Replace("[", "[[]");
+                query = query.Where(p =>
+                    EF.Functions.Like(p.Code, $"%{search}%") ||
+                    EF.Functions.Like(p.Name, $"%{search}%") ||
+                    EF.Functions.Like(p.Country.Name, $"%{search}%"));
+            }
+
+            // Dynamically apply sorting using reflection
+            var parameter = Expression.Parameter(typeof(State), "p");
+
+            // Helper method to handle nested properties (e.g., "Country.Name")
+            Expression GetPropertyExpression(Expression parentExpression, string propertyName)
+            {
+                var property = Expression.Property(parentExpression, propertyName);
+                return property;
+            }
+
+            // Handle sorting by related entity (e.g., Country.Name)
+            Expression propertyExpression = parameter;
+
+            if (sortColumn.Contains('.'))
+            {
+                var parts = sortColumn.Split('.');
+                foreach (var part in parts)
+                {
+                    propertyExpression = GetPropertyExpression(propertyExpression, part); // Traverse nested properties
+                }
+            }
+            else
+            {
+                propertyExpression = GetPropertyExpression(propertyExpression, sortColumn); // Simple property (e.g., Code or Name)
+            }
+
+            var lambda = Expression.Lambda<Func<State, object>>(Expression.Convert(propertyExpression, typeof(object)), parameter);
+
+            // Apply sorting
+            query = isAscending ? query.OrderBy(lambda) : query.OrderByDescending(lambda);
+
+            // Get total records before filtering
+            var totalRecords = await query.CountAsync();
+
+            // Apply paging
+            var data = await query
+                .Skip(start)
+                .Take(length)
+                .Select(s => new
+                {
+                    s.StateId,
+                    s.Name,
+                    s.Code,
+                    CountryName = s.Country.Name
+                })
+                .ToListAsync();
+
+            // Prepare DataTables response
+            var response = new
+            {
+                draw = draw,
+                recordsTotal = totalRecords,
+                recordsFiltered = totalRecords,
+                data = data
+            };
+
+            return Json(response);
+        }
+
         // GET: RiskCaseStatus/Details/5
         [Breadcrumb("Details")]
         public async Task<IActionResult> Details(long id)

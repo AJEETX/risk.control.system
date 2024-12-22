@@ -48,7 +48,7 @@
                         <div class="form-group">
                             <label asp-for="ProfileImage" class="control-label"></label>
                             <img id="ProfileImage" class="form-Image">
-                            <input asp-for="ProfileImage" class="form-control remarks" type="file" onchange="document.getElementById('ProfileImage').src = window.URL.createObjectURL(this.files[0])" />
+                            <input asp-for="ProfileImage" class="form-control remarks" type="file" onchange="document.getElementById('ProfileImage').src = window.URL.createObjectURL(this.files[0])" required/>
                         </div>
                     </div>
                     <div class="col-md-6">

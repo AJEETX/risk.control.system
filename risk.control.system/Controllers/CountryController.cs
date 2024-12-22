@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Linq.Expressions;
+using System.Text.RegularExpressions;
+
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -32,7 +35,7 @@ namespace risk.control.system.Controllers
             return RedirectToAction("Profile");
         }
 
-         [Breadcrumb("Country")]
+        [Breadcrumb("Country")]
         public async Task<IActionResult> Profile()
         {
             var applicationDbContext = _context.Country.AsQueryable();
@@ -40,6 +43,70 @@ namespace risk.control.system.Controllers
             var applicationDbContextResult = await applicationDbContext.ToListAsync();
             return View(applicationDbContextResult);
         }
+
+
+        [HttpGet]
+        public async Task<IActionResult> GetCountries(int draw, int start, int length, string search, int? orderColumn, string orderDirection)
+        {
+            // Determine column to sort by
+            string sortColumn = orderColumn switch
+            {
+                0 => "Code",   // First column (index 0)
+                1 => "Name",   // Second column (index 1)
+                _ => "Code"    // Default to "Code" if no column is specified
+            };
+
+            // Determine sort direction
+            bool isAscending = orderDirection?.ToLower() == "asc";
+
+            var query = _context.Country.AsQueryable();
+
+            // Apply search filter
+            if (!string.IsNullOrEmpty(search) && Regex.IsMatch(search, @"^[a-zA-Z0-9\s]*$"))
+            {
+                search = search.Trim().Replace("%", "[%]")
+                   .Replace("_", "[_]")
+                   .Replace("[", "[[]");
+                query = query.Where(p =>
+                    EF.Functions.Like(p.Code, $"%{search}%") ||
+                    EF.Functions.Like(p.Name, $"%{search}%"));
+            }
+
+            // Dynamically apply sorting using reflection
+            var parameter = Expression.Parameter(typeof(Country), "p");
+            var property = Expression.Property(parameter, sortColumn);  // Get the property dynamically
+            var lambda = Expression.Lambda<Func<Country, object>>(Expression.Convert(property, typeof(object)), parameter);
+
+            // Apply sorting
+            query = isAscending ? query.OrderBy(lambda) : query.OrderByDescending(lambda);
+
+            // Get total records before filtering
+            var totalRecords = await query.CountAsync();
+
+            // Apply paging
+            var data = await query
+                .Skip(start)
+                .Take(length)
+                .Select(s => new
+                {
+                    s.CountryId,
+                    s.Name,
+                    s.Code
+                })
+                .ToListAsync();
+
+            // Prepare DataTables response
+            var response = new
+            {
+                draw = draw,
+                recordsTotal = totalRecords,
+                recordsFiltered = totalRecords,
+                data = data
+            };
+
+            return Json(response);
+        }
+
         // GET: RiskCaseStatus/Details/5
         [Breadcrumb("Details")]
         public async Task<IActionResult> Details(long id)
@@ -61,7 +128,7 @@ namespace risk.control.system.Controllers
             return View(country);
         }
 
-        [Breadcrumb("Add New", FromAction ="Profile")]
+        [Breadcrumb("Add New", FromAction = "Profile")]
         public IActionResult Create()
         {
             return View();

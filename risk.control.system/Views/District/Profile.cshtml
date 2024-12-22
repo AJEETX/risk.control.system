@@ -1,8 +1,7 @@
-﻿@model IEnumerable<risk.control.system.Models.District>
-
-@{
-    ViewData["Title"] = @Applicationsettings.DISTRICT;
+﻿@{
+    ViewData["Title"] = "District List";
 }
+
 <section class="content">
     <div class="card card-secondary border-secondary">
         <div class="submit-progress hidden">
@@ -10,48 +9,20 @@
         </div>
         <div class="card-header">
             <h3 class="card-title"><i class="fas fa-city"></i> District</h3>
-
         </div>
         <div class="card-body">
-            <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
+            <table id="customerTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
                 <thead>
                     <tr>
-                        <th>
-                            Name
-                        </th>
-                        <th>
-                            State
-                        </th>
-                        <th>
-                            Country
-                        </th>
-                        <th></th>
+                        <th>Code</th>
+                        <th>Name</th>
+                        <th>State</th>
+                        <th>Country</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var item in Model)
-                    {
-                        <tr>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.Name)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.State.Name)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.Country.Name)
-                            </td>
-                            <td>
-
-                                <a class="btn btn-xs btn-warning" asp-action="Edit" asp-route-id="@item.DistrictId">
-                                    <i class="fas fa-pen"></i>  @Applicationsettings.EDIT
-                                </a> &nbsp;
-                                <a class="btn btn-xs btn-danger" asp-action="Delete" asp-route-id="@item.DistrictId">
-                                    <i class="fas fa-trash"></i>  @Applicationsettings.DELETE
-                                </a>
-                            </td>
-                        </tr>
-                    }
+                    <!-- The table body will be populated dynamically by DataTables -->
                 </tbody>
             </table>
         </div>
@@ -59,11 +30,19 @@
             <div class="row">
                 <div class="col-md-12">
                     <div class="form-group">
-                        <a id="back" asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
-                        <a class="btn btn-success" asp-controller="District" asp-action="Create"><i class="fas fa-city"></i>  @Applicationsettings.CREATE New</a>
+                        <a id="back" asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left"></i> @Applicationsettings.BACK
+                        </a>
+                        <a class="btn btn-success" asp-controller="District" asp-action="Create">
+                            <i class="fas fa-city"></i> @Applicationsettings.CREATE New
+                        </a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
+
+@section Scripts {
+    <script src="~/js/district.js"></script>
+}

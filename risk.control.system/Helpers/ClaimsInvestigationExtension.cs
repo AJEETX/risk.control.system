@@ -114,7 +114,7 @@ namespace risk.control.system.Helpers
 
         public static string GetSupervisorTimePending(this ClaimsInvestigation a, bool newClaim = false, bool taskedToAgent = false, bool submitted = false, bool completed = false)
         {
-            DateTime timeToCompare = a.Created;
+            DateTime timeToCompare = a.AllocatedToAgencyTime.Value;
             if(newClaim)
             {
                 timeToCompare = a.AllocatedToAgencyTime.Value;
@@ -136,7 +136,7 @@ namespace risk.control.system.Helpers
             }
             else if(submitted)
             {
-                timeToCompare = a.SubmittedToSupervisorTime.Value;
+                timeToCompare = a.SubmittedToAssessorTime.Value;
                 if (DateTime.Now.Subtract(timeToCompare).Days >= a.SupervisorSla)
                     return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Hurry up, {DateTime.Now.Subtract(timeToCompare).Days} days since created!\"></i>");
 
@@ -146,7 +146,7 @@ namespace risk.control.system.Helpers
             }
             else if(completed)
             {
-                timeToCompare = a.SubmittedToAssessorTime.Value;
+                timeToCompare = a.ProcessedByAssessorTime.Value;
                 if (DateTime.Now.Subtract(timeToCompare).Days >= a.SupervisorSla)
                     return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Days} day</span>");
 
@@ -175,7 +175,7 @@ namespace risk.control.system.Helpers
         }
         public static string GetAssessorTimePending(this ClaimsInvestigation a, bool assess = false,bool processed= false)
         {
-            DateTime time2Compare = a.Created;
+            DateTime time2Compare = a.SubmittedToAssessorTime.Value;
             if (assess)
             {
                 time2Compare = a.SubmittedToAssessorTime.Value;

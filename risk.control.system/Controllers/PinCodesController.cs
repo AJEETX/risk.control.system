@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Text.RegularExpressions;
+
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -34,17 +36,61 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb("Pincode")]
-        public async Task<IActionResult> Profile()
+        public IActionResult Profile()
         {
-            var applicationDbContext = _context.PinCode.
-                Include(p => p.Country)
+            return View();
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetPincodes(int draw, int start, int length, string search)
+        {
+            var query = _context.PinCode
+                .Include(p => p.Country)
                 .Include(p => p.District)
-                .Include(p => p.State).AsQueryable();
+                .Include(p => p.State)
+                .AsQueryable();
 
-            var applicationDbContextResult = await applicationDbContext.ToListAsync();
-            ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
+            // Filter based on the search input (if provided)
+            if (!string.IsNullOrEmpty(search) && Regex.IsMatch(search, @"^[a-zA-Z0-9\s]*$"))
+            {
+                search = search.Trim().Replace("%", "[%]")
+                   .Replace("_", "[_]")
+                   .Replace("[", "[[]");
+                query = query.Where(p =>
+                    EF.Functions.Like(p.Code, $"%{search}%") ||
+                    EF.Functions.Like(p.Name, $"%{search}%") ||
+                    EF.Functions.Like(p.District.Name, $"%{search}%") ||
+                    EF.Functions.Like(p.State.Name, $"%{search}%") ||
+                    EF.Functions.Like(p.Country.Name, $"%{search}%"));
+            }
 
-            return View(applicationDbContextResult);
+            // Get the total number of records before paging
+            var totalRecords = await query.CountAsync();
+
+            // Apply paging
+            var data = await query
+                .Skip(start)
+                .Take(length)
+                .Select(p => new
+                {
+                    p.Code,
+                    p.Name,
+                    District = p.District.Name,
+                    State = p.State.Name,
+                    Country = p.Country.Name,
+                    p.PinCodeId
+                })
+                .ToListAsync();
+
+            // Prepare the DataTables response
+            var response = new
+            {
+                draw = draw,
+                recordsTotal = totalRecords,
+                recordsFiltered = totalRecords,
+                data = data
+            };
+
+            return Json(response);
         }
 
         // GET: PinCodes/Details/5

@@ -1,6 +1,4 @@
-﻿@model IEnumerable<risk.control.system.Models.PinCode>
-
-@{
+﻿@{
     ViewData["Title"] = @Applicationsettings.PINCODE;
 }
 <section class="content">
@@ -16,57 +14,19 @@
                         
                     </div>
                     <div class="card-body">
-                        <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
+                        <table id="customerTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
                             <thead>
                                 <tr>
-                                    <th>
-                                        Pincode
-                                    </th>
-                                    <th>
-                                        Pincode name
-                                    </th>
-                                    <th>
-                                        District
-                                    </th>
-                                    <th>
-                                        State
-                                    </th>
-                                    <th>
-                                        Country
-                                    </th>
-                                    <th></th>
+                                    <th>code</th>
+                                    <th>Name</th>
+                                    <th>District</th>
+                                    <th>State</th>
+                                    <th>Country</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach (var item in Model)
-                                {
-                                    <tr>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.Code)
-                                        </td>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.Name)
-                                        </td>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.District.Name)
-                                        </td>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.State.Name)
-                                        </td>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.Country.Name)
-                                        </td>
-                                        <td>
-
-                                            <a class="btn btn-xs btn-warning" asp-action="Edit" asp-route-id="@item.PinCodeId">
-                                                <i class="fas fa-pen"></i>  @Applicationsettings.EDIT
-                                            </a> &nbsp;
-                                            <a class="btn btn-xs btn-danger" asp-action="Delete" asp-route-id="@item.PinCodeId">
-                                                <i class="fas fa-trash"></i>  @Applicationsettings.DELETE
-                                            </a>
-                                        </td>
-                                    </tr>
-                                }
+                                <!-- The body will be dynamically populated by DataTables -->
                             </tbody>
                         </table>
                     </div>
@@ -84,6 +44,9 @@
                 </div>
             </div>
         </div>
-       
     </div>
 </section>
+@section Scripts {
+    <script src="~/js/pincode.js">
+    </script>
+}

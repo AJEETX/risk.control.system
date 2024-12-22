@@ -92,6 +92,7 @@
     <Folder Include="wwwroot\company\" />
     <Folder Include="wwwroot\customer-document\" />
     <Folder Include="wwwroot\download-ftp\" />
+    <Folder Include="wwwroot\js\company-admin\" />
     <Folder Include="wwwroot\passport\" />
     <Folder Include="wwwroot\report\" />
     <Folder Include="wwwroot\upload-file\" />

@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Linq.Expressions;
+using System.Text.RegularExpressions;
+
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -34,11 +37,88 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb("District")]
-        public async Task<IActionResult> Profile()
+        public IActionResult Profile()
         {
-            var applicationDbContext = await _context.District.Include(d => d.Country).Include(d => d.State).ToListAsync();
+            return View();
+        }
 
-            return View(applicationDbContext);
+        [HttpGet]
+        public async Task<IActionResult> GetDistricts(int draw, int start, int length, string search, int? orderColumn, string orderDirection)
+        {
+            var query = _context.District
+                .Include(p => p.Country)
+                .Include(p => p.State)
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(search) && Regex.IsMatch(search, @"^[a-zA-Z0-9\s]*$"))
+            {
+                search = search.Trim().Replace("%", "[%]")
+                   .Replace("_", "[_]")
+                   .Replace("[", "[[]");
+                query = query.Where(p =>
+                    EF.Functions.Like(p.Code, $"%{search}%") ||
+                    EF.Functions.Like(p.Name, $"%{search}%") ||
+                    EF.Functions.Like(p.State.Name, $"%{search}%") ||
+                    EF.Functions.Like(p.Country.Name, $"%{search}%"));
+            }
+            // Determine column to sort by
+            string sortColumn = orderColumn switch
+            {
+                0 => "Code",          // First column (index 0) - Code
+                1 => "Name",          // Second column (index 1) - Name
+                2 => "State.Name",    // Third column (index 2) - State
+                3 => "Country.Name",  // Fourth column (index 3) - Country
+                _ => "Code"           // Default to "Code" if no column is specified
+            };
+
+            // Determine sort direction
+            bool isAscending = orderDirection?.ToLower() == "asc";
+
+            // Dynamically apply sorting using reflection
+            var parameter = Expression.Parameter(typeof(District), "p");
+            Expression propertyExpression = parameter;
+
+            if (sortColumn.Contains('.'))
+            {
+                var parts = sortColumn.Split('.');
+                foreach (var part in parts)
+                {
+                    propertyExpression = Expression.Property(propertyExpression, part);
+                }
+            }
+            else
+            {
+                propertyExpression = Expression.Property(parameter, sortColumn);
+            }
+
+            var lambda = Expression.Lambda<Func<District, object>>(Expression.Convert(propertyExpression, typeof(object)), parameter);
+
+            // Apply sorting
+            query = isAscending ? query.OrderBy(lambda) : query.OrderByDescending(lambda);
+
+            var totalRecords = await query.CountAsync();
+            var data = await query
+                .Skip(start)
+                .Take(length)
+                .Select(p => new
+                {
+                    p.DistrictId,
+                    p.Code,
+                    p.Name,
+                    State = p.State.Name,
+                    Country = p.Country.Name
+                })
+                .ToListAsync();
+
+            var response = new
+            {
+                draw = draw,
+                recordsTotal = totalRecords,
+                recordsFiltered = totalRecords,
+                data = data
+            };
+
+            return Json(response);
         }
 
         // GET: District/Details/5

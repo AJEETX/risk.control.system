@@ -14,30 +14,17 @@
                         
                     </div>
                     <div class="card-body">
-                        <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
+                        <table id="customerTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
                             <thead>
                                 <tr>
-                                    <th>State name</th>
                                     <th>State code</th>
+                                    <th>State name</th>
                                     <th>Country name</th>
-                                    <th></th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach (var state in Model)
-                                {
-                                    <tr>
-                                        <td>@state.Name</td>
-                                        <td>@state.Code</td>
-                                        <td>@state.Country.Name</td>
-                                        <td>
-                                            <a class="btn btn-xs btn-warning" asp-action="Edit" asp-route-id="@state.StateId"><i class="fas fa-map-marker-alt"></i> @Applicationsettings.EDIT</a> &nbsp;
-                                            <a class="btn btn-xs btn-danger" asp-action="Delete" asp-route-id="@state.StateId"><i class="fas fa-trash"></i> @Applicationsettings.DELETE</a>
-                                            <input type="hidden" value="@state.StateId" />
-                                        </td>
-                                    </tr>
-                                }
-
+                                <!-- The body will be populated dynamically via DataTables -->
                             </tbody>
                         </table>
                     </div>
@@ -57,3 +44,8 @@
        
     </div>
 </section>
+@section Scripts {
+    <script src="~/js/state.js">
+
+    </script>
+}
