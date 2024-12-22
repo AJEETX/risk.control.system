@@ -176,8 +176,8 @@ namespace risk.control.system.Seeds
                 }
             }
             return pincodes
-                .Where(p => p.StateCode == "VIC" || 
-                p.StateCode == "NSW"
+                .Where(p => p.StateCode == "VIC"
+                //|| p.StateCode == "NSW"
                 )?.ToList();
         }
 
@@ -217,9 +217,9 @@ namespace risk.control.system.Seeds
                 }
             }
             return pincodes
-                .Where(p=>p.StateName.ToLower().StartsWith("haryana") ||
-                p.StateName.ToLower().StartsWith("delhi") ||
-                p.StateName.ToLower().StartsWith("uttar pradesh")
+                .Where(p=>p.StateName.ToLower().StartsWith("haryana")
+                || p.StateName.ToLower().StartsWith("delhi")
+                //|| p.StateName.ToLower().StartsWith("uttar pradesh")
                 )?.ToList();
         }
         static string GetInitials(string input)

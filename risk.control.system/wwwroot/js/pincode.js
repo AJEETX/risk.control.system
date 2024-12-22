@@ -9,6 +9,8 @@
             dataType: 'json',
             data: function (d) {
                 d.search = d.search.value; // Pass the search term
+                d.orderColumn = d.order[0].column; // Column index (0, 1, 2, etc.)
+                d.orderDirection = d.order[0].dir; // Sorting direction ("asc" or "desc")
             }
         },
         order: [[0, 'asc']],

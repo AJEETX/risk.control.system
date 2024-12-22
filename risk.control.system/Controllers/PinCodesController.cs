@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Linq.Expressions;
+using System.Text.RegularExpressions;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -41,7 +42,7 @@ namespace risk.control.system.Controllers
             return View();
         }
         [HttpGet]
-        public async Task<IActionResult> GetPincodes(int draw, int start, int length, string search)
+        public async Task<IActionResult> GetPincodes(int draw, int start, int length, string search, int orderColumn, string orderDirection)
         {
             var query = _context.PinCode
                 .Include(p => p.Country)
@@ -62,6 +63,40 @@ namespace risk.control.system.Controllers
                     EF.Functions.Like(p.State.Name, $"%{search}%") ||
                     EF.Functions.Like(p.Country.Name, $"%{search}%"));
             }
+            string sortColumn = orderColumn switch
+            {
+                0 => "Code",       // Column index 0 - Code
+                1 => "Name",       // Column index 1 - Name
+                2 => "District.Name", // Column index 2 - District Name
+                3 => "State.Name",    // Column index 3 - State Name
+                4 => "Country.Name",  // Column index 4 - Country Name
+                _ => "Code"          // Default to Code if index is invalid
+            };
+
+            // Determine sort direction
+            bool isAscending = orderDirection?.ToLower() == "asc";
+
+            // Dynamically apply sorting using reflection
+            var parameter = Expression.Parameter(typeof(PinCode), "p");
+            Expression propertyExpression = parameter;
+
+            if (sortColumn.Contains('.'))
+            {
+                var parts = sortColumn.Split('.');
+                foreach (var part in parts)
+                {
+                    propertyExpression = Expression.Property(propertyExpression, part);
+                }
+            }
+            else
+            {
+                propertyExpression = Expression.Property(parameter, sortColumn);
+            }
+
+            var lambda = Expression.Lambda<Func<PinCode, object>>(Expression.Convert(propertyExpression, typeof(object)), parameter);
+
+            // Apply sorting based on direction
+            query = isAscending ? query.OrderBy(lambda) : query.OrderByDescending(lambda);
 
             // Get the total number of records before paging
             var totalRecords = await query.CountAsync();

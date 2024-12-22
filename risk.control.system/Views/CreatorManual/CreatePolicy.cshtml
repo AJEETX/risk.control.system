@@ -1,5 +1,4 @@
-﻿@using risk.control.system.Helpers;
-@model risk.control.system.Models.ClaimsInvestigation
+﻿@model risk.control.system.Models.ClaimsInvestigation
 
 @{
     ViewData["Title"] = @Applicationsettings.CREATE;
@@ -9,7 +8,7 @@
 <section class="content">
     <form id="create-form" method="post" asp-controller="CreatorManualPost" asp-action="CreatePolicy" enctype="multipart/form-data">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-        <input type="hidden" asp-for="PolicyDetail.LineOfBusinessId" value="@Model.PolicyDetail.LineOfBusinessId" />
+        <input type="hidden" asp-for="PolicyDetail.LineOfBusinessId" value="@ViewBag.LineOfBusinessId" />
         <div id="article" class="card bg-light card-secondary">
             <div class="card-header">
                 <h3 class="card-title">
@@ -81,9 +80,9 @@
                             <span class="input-group-label"> Issue Date:</span>
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
-                                    <span class="input-group-text" asp-for="ContractIssueDate"><i class="nav-icon far fa-calendar-check"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                    <span class="input-group-text" asp-for="PolicyDetail.ContractIssueDate"><i class="far fa-calendar-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <input required asp-for="PolicyDetail.ContractIssueDate" id="dateContractId" class="form-control remarks" type="date" value="@DateTime.Now.ToString("dd/MM/yyyy")" />
+                                <input required asp-for="PolicyDetail.ContractIssueDate" id="dateContractId" class="form-control remarks" type="date" />
                                 <span asp-validation-for="PolicyDetail.ContractIssueDate" class="text-danger"></span>
                             </div>
                         </div>
@@ -119,9 +118,9 @@
                             <span class="input-group-label"> Incident Date:</span>
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
-                                    <span class="input-group-text" asp-for="DateOfIncident"><i class="nav-icon far fa-calendar-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                    <span class="input-group-text" asp-for="PolicyDetail.DateOfIncident"><i class="far fa-calendar-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <input required asp-for="PolicyDetail.DateOfIncident" id="dateIncidentId" class="form-control remarks" type="date" value="@DateTime.Now.ToString("dd/MM/yyyy")" />
+                                <input required asp-for="PolicyDetail.DateOfIncident" id="dateIncidentId" class="form-control remarks" type="date" />
                                 <span asp-validation-for="PolicyDetail.DateOfIncident" class="text-danger"></span>
                             </div>
                         </div>

@@ -25,7 +25,7 @@ using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers
 {
-    [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME},{AGENCY_ADMIN.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME}")]
+    [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME},{AGENCY_ADMIN.DISPLAY_NAME}")]
     public class AgencyController : Controller
     {
         public List<UsersViewModel> UserList;
@@ -338,8 +338,6 @@ namespace risk.control.system.Controllers
                         var onboardAgent = roles.Any(r => AppConstant.AppRoles.AGENT.ToString().Contains(r)) && string.IsNullOrWhiteSpace(user.MobileUId);
                         if (lockUser.Succeeded && lockDate.Succeeded)
                         {
-                            
-
                             if (onboardAgent)
                             {
                                 var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == user.VendorId);

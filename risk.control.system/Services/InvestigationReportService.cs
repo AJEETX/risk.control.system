@@ -189,6 +189,8 @@ namespace risk.control.system.Services
                 .OrderByDescending(c => c.HopCount)?.ToListAsync();
 
             var claimsInvestigation = await _context.ClaimsInvestigation
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.LineOfBusiness)
                 .Include(c => c.ClientCompany)
                 .Include(c => c.AgencyReport)
                     .ThenInclude(c => c.EnquiryRequest)

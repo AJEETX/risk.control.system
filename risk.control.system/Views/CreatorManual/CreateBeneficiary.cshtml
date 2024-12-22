@@ -6,7 +6,7 @@
 
 <section class="content">
     <form id="create-form" asp-controller="CreatorManualPost" asp-action="CreateBeneficiary" enctype="multipart/form-data">
-        <input type="hidden" name="claimId" value="@Model.ClaimsInvestigationId" />
+        <input type="hidden" name="claimId" value="@ViewBag.claimId" />
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <div id="article" class="card  bg-light card-secondary">
             <div class="card-header">
@@ -71,9 +71,9 @@
                             <span class="input-group-label"> Date Of Birth:</span>
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
-                                    <span class="input-group-text" asp-for="BeneficiaryDateOfBirth"><i class="far fa-calendar-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                    <span class="input-group-text" asp-for="DateOfBirth"><i class="far fa-calendar-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <input required asp-for="DateOfBirth" id="BeneficiaryDateOfBirthId" class="form-control remarks" type="date" value="@DateTime.Now.ToString("dd/MM/yyyy")" />
+                                <input required asp-for="DateOfBirth" id="BeneficiaryDateOfBirthId" class="form-control remarks" type="date" />
                                 <span asp-validation-for="DateOfBirth" class="text-danger"></span>
                             </div>
                         </div>
@@ -203,7 +203,7 @@
                     <button type="submit" onclick="clearAllInputs()" class="btn btn-outline-secondary">
                         <i class="fas fa-undo"></i> Reset
                     </button>
-                    <a id="back" asp-action="Details" asp-route-id="@Model.ClaimsInvestigationId" class="btn btn-secondary">
+                    <a id="back" asp-action="Details" asp-route-id="@ViewBag.claimId" class="btn btn-secondary">
                         <i class="fa fa-window-close"></i>
                         @Applicationsettings.CANCEL
                     </a>

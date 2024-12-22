@@ -224,7 +224,8 @@ namespace risk.control.system.Controllers.Api.Agency
                     Updated = u.Updated.HasValue ? u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy"),
                     UpdateBy = u.UpdatedBy,
                     Role = u.UserRole.GetEnumDisplayName(),
-                    AgentOnboarded = (u.UserRole == AgencyRole.AGENT && !string.IsNullOrWhiteSpace(u.MobileUId) || u.UserRole != AgencyRole.AGENT),
+                    AgentOnboarded = (u.Role == AppRoles.AGENT && !string.IsNullOrWhiteSpace(u.MobileUId) || u.Role != AppRoles.AGENT),
+                    Agent = u.Role == AppRoles.AGENT,
                     RawEmail = u.Email
                 });
 

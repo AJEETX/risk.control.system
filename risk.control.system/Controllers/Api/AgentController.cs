@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
@@ -397,15 +398,10 @@ namespace risk.control.system.Controllers.Api
                 .Include(c => c.CustomerDetail)
                 .ThenInclude(c => c.State);
 
-                var allocatedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                            i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
                 var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                             i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
 
-                var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c =>
-                c.Email == email &&
-                c.Active
-                );
+                var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == email && c.Role == AppRoles.AGENT);
 
                 if (vendorUser != null)
                 {
@@ -433,6 +429,7 @@ namespace risk.control.system.Controllers.Api
                     new
                     {
                         claimId = c.ClaimsInvestigationId,
+                        Registered = vendorUser.Active,
                         claimType = c.PolicyDetail.ClaimType.GetEnumDisplayName(),
                         DocumentPhoto = c.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(c.PolicyDetail.DocumentImage)) :
                         string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noDocumentimage)),
@@ -479,7 +476,6 @@ namespace risk.control.system.Controllers.Api
         {
             try
             {
-
                 IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
                     .Include(c => c.PolicyDetail)
                     .Include(c => c.ClientCompany)
@@ -517,7 +513,7 @@ namespace risk.control.system.Controllers.Api
                 var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                             i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
 
-                var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == email && c.Active);
+                var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == email && c.Role == AppRoles.AGENT);
 
                 if (vendorUser != null)
                 {
@@ -545,6 +541,7 @@ namespace risk.control.system.Controllers.Api
                     new
                     {
                         ClaimId = c.ClaimsInvestigationId,
+                        Registered= vendorUser.Active,
                         Coordinate = new
                         {
                             Lat = c.PolicyDetail.ClaimType == ClaimType.HEALTH ?
@@ -568,11 +565,10 @@ namespace risk.control.system.Controllers.Api
 
         [AllowAnonymous]
         [HttpGet("get")]
-        public async Task<IActionResult> Get(string claimId)
+        public async Task<IActionResult> Get(string claimId, string email = "agent@verify.com")
         {
             try
             {
-
                 var claim = _context.ClaimsInvestigation
                     .Include(c => c.AgencyReport)
                     .Include(c => c.PolicyDetail)
@@ -610,6 +606,7 @@ namespace risk.control.system.Controllers.Api
                 filePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-photo.png");
 
                 var noDataimage = await System.IO.File.ReadAllBytesAsync(filePath);
+                var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == email && c.Role == AppRoles.AGENT);
 
                 return Ok(
                     new
@@ -665,7 +662,8 @@ namespace risk.control.system.Controllers.Api
                             LocationLongLat = claim?.AgencyReport?.DigitalIdReport?.DigitalIdImageLongLat,
                             OcrLongLat = claim?.AgencyReport?.PanIdReport?.DocumentIdImageLongLat,
                         },
-                        Remarks = claim?.AgencyReport?.AgentRemarks
+                        Remarks = claim?.AgencyReport?.AgentRemarks,
+                        Registered = vendorUser.Active
                     });
             }
             catch (Exception ex)
@@ -686,9 +684,10 @@ namespace risk.control.system.Controllers.Api
             {
                 return BadRequest();
             }
+            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
 
             var response = await iCheckifyService.GetFaceId(data);
-
+            response.Registered = vendorUser.Active;
             return Ok(response);
         }
 
@@ -706,7 +705,8 @@ namespace risk.control.system.Controllers.Api
             }
 
             var response = await iCheckifyService.GetDocumentId(data);
-
+            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
+            response.Registered = vendorUser.Active;
             return Ok(response);
         }
 
@@ -729,8 +729,9 @@ namespace risk.control.system.Controllers.Api
             }
 
             var response = await iCheckifyService.GetAudio(data);
-
-            return Ok(data.Name);
+            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
+            response.Registered = vendorUser.Active;
+            return Ok(response);
         }
 
         [AllowAnonymous]
@@ -742,9 +743,11 @@ namespace risk.control.system.Controllers.Api
                 return BadRequest();
             }
 
-            await iCheckifyService.GetVideo(data);
+            var response = await iCheckifyService.GetVideo(data);
 
-            return Ok(data.Name);
+            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
+            response.Registered = vendorUser.Active;
+            return Ok(response);
         }
 
         [AllowAnonymous]
@@ -766,8 +769,9 @@ namespace risk.control.system.Controllers.Api
                 {
                     await mailboxService.NotifyClaimReportSubmitToVendorSupervisor(data.Email, data.ClaimId, data.BeneficiaryId);
                 }
+                var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
 
-                return Ok(new { data });
+                return Ok(new { data, Registered = vendorUser.Active });
             }
             catch (Exception ex)
             {
