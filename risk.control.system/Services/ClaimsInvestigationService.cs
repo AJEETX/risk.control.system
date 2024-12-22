@@ -703,6 +703,7 @@ namespace risk.control.system.Services
                 claimsCaseToAllocateToVendor.SupervisorSla = currentUser.ClientCompany.SupervisorSla;
                 claimsCaseToAllocateToVendor.AgentSla = currentUser.ClientCompany.AgentSla;
                 claimsCaseToAllocateToVendor.UpdateAgentReport = currentUser.ClientCompany.UpdateAgentReport;
+                claimsCaseToAllocateToVendor.UpdateAgentAnswer = currentUser.ClientCompany.UpdateAgentAnswer;
                 _context.ClaimsInvestigation.Update(claimsCaseToAllocateToVendor);
                 var lastLog = _context.InvestigationTransaction.Where(i =>
                 i.ClaimsInvestigationId == claimsCaseToAllocateToVendor.ClaimsInvestigationId).OrderByDescending(o => o.Created)?.FirstOrDefault();
@@ -818,20 +819,8 @@ namespace risk.control.system.Services
 
             claimReport.ReportQuestionaire.Answer1 = answer1;
 
-            if (answer2 == "0" || answer2 == "0.0")
-            {
-                answer2 = "Low";
-            }
-            else if (answer2 == ".5" || answer2 == "0.5")
-            {
-                answer2 = "Medium";
-            }
-            else if (answer2 == "1" || answer2 == "1.0")
-            {
-                answer2 = "High";
-            }
-
-            claimReport.ReportQuestionaire.Answer2 = answer2;
+            Income? income = HtmlHelperExtensions.GetEnumFromDisplayName<Income>(answer2);
+            claimReport.ReportQuestionaire.Answer2 = income.ToString();
             claimReport.ReportQuestionaire.Answer3 = answer3;
             claimReport.ReportQuestionaire.Answer4 = answer4;
             claimReport.AgentRemarks = remarks;

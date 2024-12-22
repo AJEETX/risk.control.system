@@ -55,7 +55,8 @@
                                             {
                                                 <img id="companyImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
                                             }
-                                            <input asp-for="DocumentImage" type="file" class="form-control remarks" id="documentImageInput" />
+                                            <i class="fa fa-asterisk asterik-style"></i>
+                                            <input asp-for="DocumentImage" type="file" class="form-control remarks" id="documentImageInput" required />
                                         </div>
                                     </div>
                                     <div class="form-group">
@@ -120,7 +121,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" id="BankAccountNumber"><i class="fab fa-btc"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
-                                <input type="text" asp-for="BankAccountNumber" class="form-control remarks" required placeholder="Bank Account #" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" maxlength="20">
+                                            <input type="text" asp-for="BankAccountNumber" class="form-control remarks" required placeholder="Bank Account #" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" maxlength="20">
                                             <span asp-validation-for="BankAccountNumber" class="text-danger"></span>
                                         </div>
                                     </div>
@@ -553,7 +554,7 @@
                                             <span asp-validation-for="CreatorSla" class="text-danger"></span>
                                         </div>
                                     </div>
-                                    
+
                                 </div>
                                 <div class="col-md-3">
 
@@ -595,7 +596,7 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-md-12">
+                                <div class="col-md-3">
                                     <div class="form-group">
                                         <span class="input-group-label"> Enable Mailbox:</span>
                                         <div class="input-group mb-3">
@@ -608,6 +609,8 @@
                                             </span>
                                         </div>
                                     </div>
+                                </div>
+                                <div class="col-md-3">
 
                                     <div class="form-group">
                                         <span class="input-group-label"> Enable Report update(Supervisor):</span>
@@ -621,6 +624,23 @@
                                             </span>
                                         </div>
                                     </div>
+                                </div>
+                                <div class="col-md-3">
+
+                                    <div class="form-group">
+                                        <span class="input-group-label"> Enable Agent Answer update(Supervisor):</span>
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text" id="UpdateAgentAnswer"><i class="fas fa-crosshairs"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                            </div>
+
+                                            <span class="checkbox">
+                                                <input asp-for="UpdateAgentAnswer" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
                                     <div class="form-group">
                                         <span class="input-group-label"> Set Sample data:</span>
                                         <div class="input-group mb-3">
@@ -638,21 +658,22 @@
                         </div>
                     </div>
                 </div>
+        </div>
 
-            </article>
-            <div class="card-footer">
-                <div class="row float-right">
-                    <div class="col-md-12">
-                        <a id="back" asp-action="Details" asp-route-id="@Model.ClientCompanyId" class="btn btn-secondary">
-                            <i class="fa fa-window-close"></i>
-                            @Applicationsettings.CANCEL
-                        </a>
-                        <button id="edit-company" type="submit" class="btn btn-warning">
-                            <i class="fas fa-building"></i>  @Applicationsettings.EDIT Company
-                        </button>
-                    </div>
+        </article>
+        <div class="card-footer">
+            <div class="row float-right">
+                <div class="col-md-12">
+                    <a id="back" asp-action="Details" asp-route-id="@Model.ClientCompanyId" class="btn btn-secondary">
+                        <i class="fa fa-window-close"></i>
+                        @Applicationsettings.CANCEL
+                    </a>
+                    <button id="edit-company" type="submit" class="btn btn-warning">
+                        <i class="fas fa-building"></i>  @Applicationsettings.EDIT Company
+                    </button>
                 </div>
             </div>
+        </div>
         </div>
     </form>
 </section>

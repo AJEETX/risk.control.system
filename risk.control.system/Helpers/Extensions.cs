@@ -103,6 +103,39 @@ namespace risk.control.system.Helpers
     }
     public static class HtmlHelperExtensions
     {
+        public static TEnum? GetEnumFromDisplayName<TEnum>(string displayName) where TEnum : struct, Enum
+        {
+            foreach (var field in typeof(TEnum).GetFields(BindingFlags.Public | BindingFlags.Static))
+            {
+                var displayAttribute = field.GetCustomAttribute<DisplayAttribute>();
+                if (displayAttribute != null && displayAttribute.Name == displayName)
+                {
+                    return (TEnum)field.GetValue(null);
+                }
+            }
+            return null; // Return null if no match is found
+        }
+
+
+        public static IEnumerable<SelectListItem> GetEnumSelectList<TEnum>() where TEnum : Enum
+        {
+            return Enum.GetValues(typeof(TEnum))
+                       .Cast<TEnum>()
+                       .Select(e => new SelectListItem
+                       {
+                           Text = e.GetDisplayName(), // Fetches Display Name if available
+                           Value = e.ToString() // Enum value as string
+                       });
+        }
+
+        private static string GetDisplayName(this Enum value)
+        {
+            var displayAttribute = value.GetType()
+                                        .GetField(value.ToString())
+                                        .GetCustomAttributes(typeof(System.ComponentModel.DataAnnotations.DisplayAttribute), false)
+                                        .FirstOrDefault() as System.ComponentModel.DataAnnotations.DisplayAttribute;
+            return displayAttribute != null ? displayAttribute.Name : value.ToString();
+        }
         public static IEnumerable<SelectListItem> GetEnumSelectListWithDefaultValue<TEnum>(this IHtmlHelper htmlHelper, TEnum defaultValue)
             where TEnum : struct
         {

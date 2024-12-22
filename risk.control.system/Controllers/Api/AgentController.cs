@@ -429,7 +429,7 @@ namespace risk.control.system.Controllers.Api
                     new
                     {
                         claimId = c.ClaimsInvestigationId,
-                        Registered = vendorUser.Active,
+                        Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId),
                         claimType = c.PolicyDetail.ClaimType.GetEnumDisplayName(),
                         DocumentPhoto = c.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(c.PolicyDetail.DocumentImage)) :
                         string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noDocumentimage)),
@@ -541,7 +541,7 @@ namespace risk.control.system.Controllers.Api
                     new
                     {
                         ClaimId = c.ClaimsInvestigationId,
-                        Registered= vendorUser.Active,
+                        Registered= vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId), 
                         Coordinate = new
                         {
                             Lat = c.PolicyDetail.ClaimType == ClaimType.HEALTH ?
@@ -663,7 +663,7 @@ namespace risk.control.system.Controllers.Api
                             OcrLongLat = claim?.AgencyReport?.PanIdReport?.DocumentIdImageLongLat,
                         },
                         Remarks = claim?.AgencyReport?.AgentRemarks,
-                        Registered = vendorUser.Active
+                        Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId)
                     });
             }
             catch (Exception ex)
@@ -687,7 +687,7 @@ namespace risk.control.system.Controllers.Api
             var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
 
             var response = await iCheckifyService.GetFaceId(data);
-            response.Registered = vendorUser.Active;
+            response.Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId);
             return Ok(response);
         }
 
@@ -706,7 +706,7 @@ namespace risk.control.system.Controllers.Api
 
             var response = await iCheckifyService.GetDocumentId(data);
             var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
-            response.Registered = vendorUser.Active;
+            response.Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId);
             return Ok(response);
         }
 
@@ -730,7 +730,7 @@ namespace risk.control.system.Controllers.Api
 
             var response = await iCheckifyService.GetAudio(data);
             var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
-            response.Registered = vendorUser.Active;
+            response.Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId);
             return Ok(response);
         }
 
@@ -746,7 +746,7 @@ namespace risk.control.system.Controllers.Api
             var response = await iCheckifyService.GetVideo(data);
 
             var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
-            response.Registered = vendorUser.Active;
+            response.Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId);
             return Ok(response);
         }
 
@@ -771,7 +771,7 @@ namespace risk.control.system.Controllers.Api
                 }
                 var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
 
-                return Ok(new { data, Registered = vendorUser.Active });
+                return Ok(new { data, Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId) });
             }
             catch (Exception ex)
             {

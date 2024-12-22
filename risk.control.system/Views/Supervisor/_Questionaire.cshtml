@@ -45,31 +45,49 @@
                 <input type="hidden" id="policyDetailId" value="@Model.ClaimsInvestigation?.PolicyDetail.PolicyDetailId" />
                 <input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail.CustomerDetailId" />
                 <input type="hidden" id="beneficiaryId" value="@Model.Location?.BeneficiaryDetailId" />
+                <input type="hidden" id="usertype" value="@Applicationsettings.SUPERVISOR.DISPLAY_NAME" />
                 <div class="card-body">
                     <div class="row">
                         <div class="col-12">
                             <div class="form-group">
-                                <span class="input-group-label"> Ownership of residence ?</span>
+                                <label for="question1" class="input-group-label">Ownership of residence?</label>
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text" asp-for="AgencyReport.ReportQuestionaire.Answer1"><i class="nav-icon fas fa-home"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                        <span class="input-group-text">
+                                            <i class="nav-icon fas fa-home"></i>
+                                            <i class="fa fa-asterisk asterik-style"></i>
+                                        </span>
                                     </div>
-                                    <select name="question1" id="question1" required asp-for="AgencyReport.ReportQuestionaire.Answer1" data-toggle="tooltip" title="Select Ownership of Residence" 
-                                    class="form-control remarks" asp-items="Html.GetEnumSelectList<DwellType>()">
-                                        <option>--- SELECT ---</option>
+                                    <select name="question1" id="question1"
+                                            required
+                                            asp-for="AgencyReport.ReportQuestionaire.Answer1"
+                                            data-toggle="tooltip"
+                                            title="Select Ownership of Residence"
+                                            class="form-control remarks"
+                                            asp-items="@ViewBag.DwellTypeList">
+                                        <option value="">--- SELECT ---</option>
                                     </select>
                                     <span asp-validation-for="AgencyReport.ReportQuestionaire.Answer1" class="text-danger"></span>
                                 </div>
                             </div>
+
                             <div class="form-group">
-                                <span class="input-group-label"> Perceived financial status ?</span>
+                                <span class="input-group-label"> Perceived financial status?</span>
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text" asp-for="AgencyReport.ReportQuestionaire.Answer2"><i class="far fa-money-bill-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                        <span class="input-group-text" asp-for="AgencyReport.ReportQuestionaire.Answer2">
+                                            <i class="far fa-money-bill-alt"></i>
+                                            <i class="fa fa-asterisk asterik-style"></i>
+                                        </span>
                                     </div>
-                                    <select name="question2" id="question2" required asp-for="AgencyReport.ReportQuestionaire.Answer2" data-toggle="tooltip" title="Select Perceived financial status"
-                                            class="form-control remarks" asp-items="Html.GetEnumSelectList<Income>()">
-                                        <option>--- SELECT---</option>
+                                    <select name="question2" id="question2"
+                                            required
+                                            asp-for="AgencyReport.ReportQuestionaire.Answer2"
+                                            data-toggle="tooltip"
+                                            title="Select Perceived Financial Status"
+                                            class="form-control remarks"
+                                            asp-items="ViewBag.IncomeList">
+                                        <option value="">--- SELECT ---</option>
                                     </select>
                                     <span asp-validation-for="AgencyReport.ReportQuestionaire.Answer2" class="text-danger"></span>
                                 </div>
@@ -111,6 +129,14 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+
+                    <div class="text-right">
+                        <button id="submit-case" type="submit" class="btn btn-danger">
+                            <i class="fa fa-binoculars" aria-hidden="true"></i> SUBMIT
+                        </button>
                     </div>
                 </div>
             </form>

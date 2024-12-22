@@ -4,7 +4,13 @@
     var questionTime = @Model.AgencyReport.AgentRemarksUpdated != null ?
     @Model.AgencyReport.AgentRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt") : null;
 }
-@if (!string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.AgencyReport.AgentRemarks))
+
+@if (Model.ClaimsInvestigation.UpdateAgentAnswer)
+{
+    <partial name="_Questionaire" model="@Model" />
+
+}
+else @if (!string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.AgencyReport.AgentRemarks))
 {
 
     <div class="col-12 col-sm-4 d-flex align-items-stretch flex-column">

@@ -83,7 +83,6 @@
                     return img;
                 }
             },
-
             {
                 "data": "company",
                 "bSortable": false,

@@ -136,7 +136,7 @@ namespace risk.control.system.Helpers
             }
             else if(submitted)
             {
-                timeToCompare = a.SubmittedToAssessorTime.Value;
+                timeToCompare = a.SubmittedToSupervisorTime.Value;
                 if (DateTime.Now.Subtract(timeToCompare).Days >= a.SupervisorSla)
                     return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Hurry up, {DateTime.Now.Subtract(timeToCompare).Days} days since created!\"></i>");
 

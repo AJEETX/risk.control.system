@@ -3,13 +3,17 @@ using AspNetCoreHero.ToastNotification.Notyf;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
+using System.ComponentModel.DataAnnotations;
+using System.Reflection;
+using risk.control.system.Helpers;
+using risk.control.system.Models;
 using risk.control.system.Services;
 
 using SmartBreadcrumbs.Attributes;
 using SmartBreadcrumbs.Nodes;
 
 using static risk.control.system.AppConstant.Applicationsettings;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace risk.control.system.Controllers.Agency
 {
@@ -164,6 +168,18 @@ namespace risk.control.system.Controllers.Agency
                     notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
+                ViewData["DwellTypeList"] = HtmlHelperExtensions.GetEnumSelectList<DwellType>();
+                ViewBag.IncomeList = Enum.GetValues(typeof(Income))
+                    .Cast<Income>()
+                    .Select(x => new SelectListItem
+                    {
+                        Value = x.ToString(), // Enum name (e.g., "TAXFREE_SLOT")
+                        Text = x.GetType()
+                               .GetField(x.ToString())
+                               .GetCustomAttribute<DisplayAttribute>()?.Name ?? x.ToString() // Display name or fallback to enum name
+                    })
+                    .ToList();
+
                 var model = await vendorService.GetInvestigateReport(currentUserEmail, selectedcase);
 
                 return View(model);

@@ -61,7 +61,7 @@
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCYPyGotbPJAcE9Ap_ATSKkKOrXCQC4ops&callback=initReportMap">
     </script>
     <script src="~/js/supervisor/get-investigate-report.js"></script>
-@if(Model.ClaimsInvestigation.UpdateAgentReport)
+    @if (Model.ClaimsInvestigation.UpdateAgentReport || Model.ClaimsInvestigation.UpdateAgentAnswer)
     {
         <script src="~/js/agent/get-investigate.js"></script>
     }

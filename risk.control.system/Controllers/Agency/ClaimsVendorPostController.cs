@@ -11,6 +11,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Extensions;
 
 using NToastNotify;
+
+using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
@@ -96,8 +98,8 @@ namespace risk.control.system.Controllers.Agency
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = $"{AGENT.DISPLAY_NAME}")]
-        public async Task<IActionResult> SubmitReport(string remarks, string question1, string question2, string question3, string question4, string claimId, long caseLocationId)
+        [Authorize(Roles = $"{AGENT.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME}")]
+        public async Task<IActionResult> SubmitReport(string remarks, string question1, string question2, string question3, string question4, string claimId, long caseLocationId, string usertype = Applicationsettings.SUPERVISOR.DISPLAY_NAME)
         {
             try
             {
@@ -105,7 +107,7 @@ namespace risk.control.system.Controllers.Agency
                 if (currentUserEmail == null)
                 {
                     notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(AgentController.GetInvestigate), "\"Agent\"", new { selectedcase = claimId });
+                    return RedirectToAction(nameof(AgentController.GetInvestigate), "Agent", new { selectedcase = claimId });
                 }
                 if (string.IsNullOrWhiteSpace(remarks) ||
                     string.IsNullOrWhiteSpace(claimId) ||
@@ -117,7 +119,7 @@ namespace risk.control.system.Controllers.Agency
                     )
                 {
                     notifyService.Error($"No Agent remarks entered!!!. Please enter remarks.", 3);
-                    return RedirectToAction(nameof(AgentController.GetInvestigate), "\"Agent\"", new { selectedcase = claimId });
+                    return RedirectToAction(nameof(AgentController.GetInvestigate), "Agent", new { selectedcase = claimId });
                 }
 
                 //END : POST FACE IMAGE AND DOCUMENT
@@ -142,8 +144,9 @@ namespace risk.control.system.Controllers.Agency
                 if (vendor == null)
                 {
                     notifyService.Error("OOPs !!!..Error submitting.");
-                    return RedirectToAction(nameof(AgentController.GetInvestigate), "\"Agent\"", new { selectedcase = claimId });
+                    return RedirectToAction(nameof(AgentController.GetInvestigate), "Agent", new { selectedcase = claimId });
                 }
+
                 if(vendor.EnableMailbox)
                 {
                     await mailboxService.NotifyClaimReportSubmitToVendorSupervisor(currentUserEmail, claimId, caseLocationId);
@@ -157,7 +160,7 @@ namespace risk.control.system.Controllers.Agency
             {
                 Console.WriteLine(ex.ToString());
                 notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(AgentController.GetInvestigate), "\"Agent\"", new { selectedcase = claimId });
+                return RedirectToAction(nameof(AgentController.GetInvestigate), "Agent", new { selectedcase = claimId });
 
             }
         }
