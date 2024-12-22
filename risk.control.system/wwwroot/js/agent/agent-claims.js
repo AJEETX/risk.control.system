@@ -83,7 +83,19 @@ $(document).ready(function () {
                     return img;
                 }
             },
-
+            {
+                "data": "policyNum",
+                "bSortable": false,
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.policyId + '" data-toggle="tooltip">' + data + '</span>';
+                }
+            },
+            {
+                "data": "amount",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.amount + '" data-toggle="tooltip">' + data + '</span>';
+                }
+            },
             {
                 "data": "pincode",
                 "bSortable": false,
@@ -104,19 +116,6 @@ $(document).ready(function () {
                     img += '<img src="' + row.document + '" class="thumbnail profile-image doc-profile-image" />'; // Thumbnail image with class 'thumbnail'
                     img += '</div>';
                     return img;
-                }
-            },
-            {
-                "data": "policyNum",
-                "bSortable": false,
-                "mRender": function (data, type, row) {
-                    return '<span title="' + row.policyId + '" data-toggle="tooltip">' + data + '</span>';
-                }
-            },
-            {
-                "data": "amount",
-                "mRender": function (data, type, row) {
-                    return '<span title="' + row.amount + '" data-toggle="tooltip">' + data + '</span>';
                 }
             },
             {

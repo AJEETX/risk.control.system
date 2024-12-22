@@ -54,11 +54,11 @@
         },
             {
                 className: 'max-width-column-number', // Apply the CSS class,
-                targets: 4                      // Index of the column to style
+                targets: 1                      // Index of the column to style
             },
             {
                 className: 'max-width-column-number', // Apply the CSS class,
-                targets: 5                      // Index of the column to style
+                targets: 2                      // Index of the column to style
             },
             {
                 className: 'max-width-column-name', // Apply the CSS class,
@@ -81,6 +81,19 @@
                 "mRender": function (data, type, row) {
                     var img = '<input name="selectedcase" class="selected-case" type="radio" id="' + row.id + '"  value="' + row.id + '" data-toggle="tooltip" title="Select Claim to submit (report)" />';
                     return img;
+                }
+            },
+            {
+                "data": "policyNum",
+                "bSortable": false,
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.policyId + '" data-toggle="tooltip">' + data + '</span>';
+                }
+            },
+            {
+                "data": "amount",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.amount + '" data-toggle="tooltip">' + data + '</span>';
                 }
             },
             {
@@ -114,20 +127,6 @@
                     img += '<img src="' + row.document + '" class="thumbnail profile-image doc-profile-image" />'; // Thumbnail image with class 'thumbnail'
                     img += '</div>';
                     return img;
-                }
-            },
-
-            {
-                "data": "policyNum",
-                "bSortable": false,
-                "mRender": function (data, type, row) {
-                    return '<span title="' + row.policyId + '" data-toggle="tooltip">' + data + '</span>';
-                }
-            },
-            {
-                "data": "amount",
-                "mRender": function (data, type, row) {
-                    return '<span title="' + row.amount + '" data-toggle="tooltip">' + data + '</span>';
                 }
             },
 

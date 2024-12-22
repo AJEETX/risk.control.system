@@ -23,11 +23,11 @@
         columnDefs: [
             {
                 className: 'max-width-column-name', // Apply the CSS class,
-                targets: 3                      // Index of the column to style
+                targets: 0                      // Index of the column to style
             },
             {
                 className: 'max-width-column-number', // Apply the CSS class,
-                targets: 4                      // Index of the column to style
+                targets: 1                      // Index of the column to style
             },
             {
                 className: 'max-width-column-name', // Apply the CSS class,
@@ -44,6 +44,19 @@
         columns: [
             /* Name of the keys from
             data file source */
+            {
+                "data": "policyNum",
+                "bSortable": false,
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.policyId + '" data-toggle="tooltip">' + data + '</span>';
+                }
+            },
+            {
+                "data": "amount",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.amount + '" data-toggle="tooltip">' + data + '</span>';
+                }
+            },
             {
                 "data": "company",
                 "bSortable": false,
@@ -75,19 +88,6 @@
                     img += '<img src="' + row.document + '" class="thumbnail profile-image doc-profile-image" />'; // Thumbnail image with class 'thumbnail'
                     img += '</div>';
                     return img;
-                }
-            },
-            {
-                "data": "policyNum",
-                "bSortable": false,
-                "mRender": function (data, type, row) {
-                    return '<span title="' + row.policyId + '" data-toggle="tooltip">' + data + '</span>';
-                }
-            },
-            {
-                "data": "amount",
-                "mRender": function (data, type, row) {
-                    return '<span title="' + row.amount + '" data-toggle="tooltip">' + data + '</span>';
                 }
             },
             {
