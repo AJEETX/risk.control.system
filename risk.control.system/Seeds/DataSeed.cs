@@ -10,7 +10,12 @@ namespace risk.control.system.Seeds
 {
     public static class DataSeed
     {
-        public static async Task SeedDetails(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, UserManager<ClientCompanyApplicationUser> clientUserManager, UserManager<VendorApplicationUser> vendorUserManager, ICustomApiCLient customApiCLient)
+        public static async Task SeedDetails(ApplicationDbContext context, 
+            IWebHostEnvironment webHostEnvironment, 
+            UserManager<ClientCompanyApplicationUser> clientUserManager, 
+            UserManager<VendorApplicationUser> vendorUserManager, 
+            ICustomApiCLient customApiCLient,
+            IHttpContextAccessor httpAccessor)
         {
             #region LINE OF BUSINESS
 
@@ -303,7 +308,7 @@ namespace risk.control.system.Seeds
             #region CLIENT/ VENDOR COMPANY
 
             var (vendors, companyIds) = await ClientVendorSeed.Seed(context, webHostEnvironment, claimComprehensiveService.Entity,
-                claimDiscreetService.Entity, claimDocumentCollectionService.Entity, claimCaseType.Entity);
+                claimDiscreetService.Entity, claimDocumentCollectionService.Entity, claimCaseType.Entity,httpAccessor);
 
             #endregion CLIENT/ VENDOR COMPANY
 
@@ -320,13 +325,13 @@ namespace risk.control.system.Seeds
 
             foreach (var companyId in companyIds)
             {
-                await ClientApplicationUserSeed.Seed(context, webHostEnvironment, clientUserManager, companyId);
+                await ClientApplicationUserSeed.Seed(context, webHostEnvironment, clientUserManager, companyId, httpAccessor);
             }
             await context.SaveChangesAsync(null, false);
 
             foreach (var vendor in vendors)
             {
-                await VendorApplicationUserSeed.Seed(context, webHostEnvironment, vendorUserManager, vendor, customApiCLient);
+                await VendorApplicationUserSeed.Seed(context, webHostEnvironment, vendorUserManager, vendor, customApiCLient, httpAccessor);
             }
 
             await context.SaveChangesAsync(null, false);

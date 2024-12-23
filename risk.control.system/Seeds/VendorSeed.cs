@@ -11,21 +11,13 @@ using risk.control.system.Models;
 
 namespace risk.control.system.Seeds
 {
-    public class ClientVendorSeed
+    public class VendorSeed
     {
         public static async Task<(List<Vendor> vendors, List<ClientCompany> companyIds)> Seed(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment,
-                    InvestigationServiceType investigationServiceType, InvestigationServiceType discreetServiceType, 
-                    InvestigationServiceType docServiceType, LineOfBusiness lineOfBusiness, IHttpContextAccessor httpAccessor)
+                    InvestigationServiceType investigationServiceType, InvestigationServiceType discreetServiceType, InvestigationServiceType docServiceType, LineOfBusiness lineOfBusiness)
         {
             string noCompanyImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", @Applicationsettings.NO_IMAGE);
 
-            var request = httpAccessor.HttpContext?.Request;
-            string host = request?.Host.Value;
-            var mobileAppUrl = Applicationsettings.APP_DEMO_URL;
-            if(host != null && host.Contains(Applicationsettings.AZURE_APP_URL))
-            {
-                mobileAppUrl = Applicationsettings.APP_URL;
-            }
             var globalSetting = new GlobalSettings
             {
                 EnableMailbox = true
@@ -72,8 +64,7 @@ namespace risk.control.system.Seeds
                 DocumentImage = checkerImage,
                 Updated = DateTime.Now,
                 Status = VendorStatus.ACTIVE,
-                EnableMailbox = enableMailbox,
-                MobileAppUrl = mobileAppUrl
+                EnableMailbox = enableMailbox
             };
 
             var checkerAgency = await context.Vendor.AddAsync(checker);
@@ -112,8 +103,7 @@ namespace risk.control.system.Seeds
                 DocumentImage = verifyImage,
                 Status = VendorStatus.ACTIVE,
                 Updated = DateTime.Now,
-                EnableMailbox = enableMailbox,
-                MobileAppUrl = mobileAppUrl
+                EnableMailbox = enableMailbox
             };
 
             var verifyAgency = await context.Vendor.AddAsync(verify);
@@ -152,8 +142,7 @@ namespace risk.control.system.Seeds
                 DocumentImage = investigateImage,
                 Status = VendorStatus.ACTIVE,
                 Updated = DateTime.Now,
-                EnableMailbox = enableMailbox,
-                MobileAppUrl = mobileAppUrl
+                EnableMailbox = enableMailbox
             };
 
             var investigateAgency = await context.Vendor.AddAsync(investigate);
@@ -202,8 +191,7 @@ namespace risk.control.system.Seeds
                  BulkUpload = true,
                 Updated = DateTime.Now,
                 Deleted = false,
-                EnableMailbox = enableMailbox,
-                MobileAppUrl = mobileAppUrl
+                EnableMailbox = enableMailbox
             };
 
             var insurerCompany = await context.ClientCompany.AddAsync(insurer);
@@ -226,8 +214,8 @@ namespace risk.control.system.Seeds
                     {
                         new ServicedPinCode
                         {
-                            Pincode = context.PinCode.FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE)?.Code ?? default !,
-                            Name = context.PinCode.FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE)?.Name ?? default !
+                            Pincode = context.PinCode.FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE4)?.Code ?? default !,
+                            Name = context.PinCode.FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE4)?.Name ?? default !
                         }
                     },
                     Updated = DateTime.Now,
@@ -244,8 +232,8 @@ namespace risk.control.system.Seeds
                     {
                         new ServicedPinCode
                         {
-                            Pincode = context.PinCode.FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE)?.Code ?? default !,
-                            Name = context.PinCode.FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE)?.Name ?? default !
+                            Pincode = context.PinCode.FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE4)?.Code ?? default !,
+                            Name = context.PinCode.FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE4)?.Name ?? default !
                         }
                     },
                     Updated = DateTime.Now,
@@ -266,8 +254,8 @@ namespace risk.control.system.Seeds
                     {
                         new ServicedPinCode
                         {
-                            Pincode = context.PinCode.FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE)?.Code ?? default !,
-                            Name = context.PinCode.FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE)?.Name ?? default !
+                            Pincode = context.PinCode.FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE4)?.Code ?? default !,
+                            Name = context.PinCode.FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE4)?.Name ?? default !
                         }
                     },
                     Updated = DateTime.Now,

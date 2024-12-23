@@ -1,6 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
+using risk.control.system.AppConstant;
+
 using Standard.Licensing;
 
 namespace risk.control.system.Models
@@ -85,7 +87,7 @@ namespace risk.control.system.Models
         public bool SendSMS { get; set; } = true;
         public bool EnableMailbox { get; set; } = true;
         public bool CanChangePassword { get; set; } = false;
-        public string MobileAppUrl { get; set; } = "https://ickeckify-apk.s3.ap-southeast-2.amazonaws.com/demo/app-release.apk";
+        public string? MobileAppUrl { get; set; }
         public bool BulkUpload { get; set; } = false;
         public string WhitelistIpAddress { get; set; } = "::1;202.7.251.15";
         public string? WhitelistIpAddressRange { get; set; } = default!;

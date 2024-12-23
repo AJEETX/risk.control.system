@@ -317,7 +317,10 @@ namespace risk.control.system.Controllers.Api.Agency
                 .Include(u => u.District)
                 .Include(u => u.PinCode)
                 .Where(c => c.VendorId == vendorUser.VendorId && !c.Deleted && c.Active && c.Role == AppRoles.AGENT);
-
+            if(onboardingEnabled)
+            {
+                vendorUsers = vendorUsers.Where(c => !string.IsNullOrWhiteSpace(c.MobileUId));
+            }
             var users = vendorUsers?
                 .OrderBy(u => u.FirstName)
                 .ThenBy(u => u.LastName)

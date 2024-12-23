@@ -14,7 +14,7 @@
             }
         },
             {
-                orderable: false, targets: [0, 1, 3, 4]
+                orderable: false, targets: [0, 2, 3, 4]
             }, // Disable ordering for specific columns
         ],
         order: [[1, 'asc']],
@@ -36,6 +36,12 @@
                 }
             },
             {
+                "data": "email",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.rawEmail + '" data-toggle="tooltip">' + row.rawEmail + '</span>';
+                }
+            },
+            {
                 "sDefaultContent": "",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
@@ -44,12 +50,6 @@
                     img += '<img src="' + row.photo + '" class="full-map" title="' + row.name + '" data-toggle="tooltip"/>'; // Full map image with class 'full-map'
                     img += '</div>';
                     return img;
-                }
-            },
-            {
-                "data": "email",
-                "mRender": function (data, type, row) {
-                    return '<span title="' + row.rawEmail + '" data-toggle="tooltip">' + row.rawEmail + '</span>';
                 }
             },
             {

@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Xml.Linq;
 
+using risk.control.system.AppConstant;
 using risk.control.system.Helpers;
 using risk.control.system.Models.ViewModel;
 
@@ -111,7 +112,7 @@ namespace risk.control.system.Models
         }
 
         public virtual ICollection<AgencyRating>? ratings { get; set; }
-        public string MobileAppUrl { get; set; } = "https://ickeckify-apk.s3.ap-southeast-2.amazonaws.com/demo/app-release.apk";
+        public string? MobileAppUrl { get; set; }
         public bool CanChangePassword { get; set; } = false;
         public bool HasClaims { get; set; } = false;
         public bool EnableMailbox { get; set; } = true;

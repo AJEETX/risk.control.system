@@ -13,7 +13,11 @@ namespace risk.control.system.Seeds
 {
     public static class ClientApplicationUserSeed
     {
-        public static async Task Seed(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, UserManager<ClientCompanyApplicationUser> userManager, ClientCompany clientCompany)
+        public static async Task Seed(ApplicationDbContext context, 
+            IWebHostEnvironment webHostEnvironment, 
+            UserManager<ClientCompanyApplicationUser> userManager, 
+            ClientCompany clientCompany,
+            IHttpContextAccessor httpAccessor)
         {
             //Seed client admin
             var company = context.ClientCompany.FirstOrDefault(c => c.Email == clientCompany.Email);
