@@ -5,111 +5,39 @@
         <div class="submit-progress hidden">
             <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
         </div>
-        <div class="table-responsive mailbox-messages">
-            <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
-            <input type="hidden" id="CaseLocationId" name="CaseLocationId" value="@Model.CaseLocation.BeneficiaryDetailId" />
-            <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
-                <thead>
-                    <tr>
-                        <th data-orderable="false">
-                            <img class="action-image" src="~/headers/arrow-down.gif" title="Action Type" alt="Action Type" />
-                        </th>
-
-                        <th data-orderable="false">
-                            Agent Photo
-                        </th>
-                        <th>
-                            Email
-                        </th>
-                        <th data-orderable="false">
-                            Phone #
-                        </th>
-                        
-                        <th data-orderable="false">
-                            Address
-                        </th>
-                        <th>
-                            District
-                        </th>
-                        <th>
-                            State
-                        </th>
-                        <th>
-                            Country
-                        </th>
-                        <th>
-                            Pincode
-                        </th>
-                        <th>
-                            Case(s)
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model.VendorUserClaims)
-                    {
-                        <tr>
-                            <td>
-                                <input id="@item.AgencyUser.Id" name="selectedcase" class="selected-case" type="radio" value="@item.AgencyUser.Id" />
-                            </td>
-                            <td class="max-width-column-claim">
-                                @if (item?.AgencyUser.ProfilePictureUrl is not null)
-                                {
-                                    var title = @item?.AgencyUser.FirstName + ' ' + @item.AgencyUser?.LastName;
-                                    <img id="profileImage" title="@title" class="form-Image table-profile-image" src="@item?.AgencyUser.ProfilePictureUrl" data-toggle="tooltip" />
-                                }
-                                else
-                                {
-                                    <img id="profileImage" title="..." class="form-Image  table-profile-image" src="@Applicationsettings.NO_USER" data-toggle="tooltip" />
-                                }
-                            </td>
-                            <td data-toggle="tooltip" title="@item.AgencyUser.Email">
-                                <a href="#">  @Html.DisplayFor(modelItem => item.AgencyUser.Email)</a>
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.AgencyUser.PhoneNumber)
-                            </td>
-
-                            <td class="max-width-column" data-toggle="tooltip" title="@item.AgencyUser.Addressline">
-                                @Html.DisplayFor(modelItem => item.AgencyUser.Addressline)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.AgencyUser.District.Name)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.AgencyUser.State.Name)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.AgencyUser.Country.Name)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.AgencyUser.PinCode.Code)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.CurrentCaseCount)
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-
-            </table>
-
-        </div>
+        <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
+        <input type="hidden" id="CaseLocationId" name="CaseLocationId" value="@Model.CaseLocation.BeneficiaryDetailId" />
+        <table id="customerTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
+            <thead>
+                <tr>
+                    <th>Select</th>
+                    <th>Agent Photo</th>
+                    <th>Email</th>
+                    <th>Phone #</th>
+                    <th> Map Address</th>
+                    <th>Address </th>
+                    <th>Case(s)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Add your dynamic data here -->
+            </tbody>
+        </table>
     </div>
     <div class="card-footer">
         <div class="row">
             <div class="col-md-12">
-                @if(Model.ReSelect)
+                @if (Model.ReSelect)
                 {
                     <a id="back" asp-action="GetInvestigateReport" asp-route-selectedcase="@Model.ClaimsInvestigation.ClaimsInvestigationId" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
-                    <button disabled="disabled" id="allocate-case" type="submit" class="btn btn-danger">
+                    <button disabled="disabled" id="allocatedcase" type="submit" class="btn btn-danger">
                         <i class="fas fa-external-link-alt" aria-hidden="true"></i> Re-Allocate
                     </button>
                 }
                 else
                 {
                     <a id="back" asp-action="Allocate" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
-                    <button disabled="disabled" id="allocate-case" type="submit" class="btn btn-danger">
+                    <button disabled="disabled" id="allocatedcase" type="submit" class="btn btn-danger">
                         <i class="fas fa-external-link-alt" aria-hidden="true"></i> Allocate
                     </button>
                 }

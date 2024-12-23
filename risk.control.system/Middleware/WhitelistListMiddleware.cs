@@ -56,19 +56,20 @@ namespace risk.control.system.Middleware
                         var safelist = string.Join(";", ipAddresses);
                         var ips = safelist.Split(';');
 
-                        _safelist = new byte[ips.Length][];
-                        for (var i = 0; i < ips.Length; i++)
-                        {
-                            _safelist[i] = IPAddress.Parse(ips[i]).GetAddressBytes();
-                        }
-                        foreach (var address in _safelist)
-                        {
-                            if (address.SequenceEqual(bytes))
-                            {
-                                badIp = false;
-                                break;
-                            }
-                        }
+                        badIp = !IsIpAllowed(remoteIp, ips?.ToList());
+                        //_safelist = new byte[ips.Length][];
+                        //for (var i = 0; i < ips.Length; i++)
+                        //{
+                        //    _safelist[i] = IPAddress.Parse(ips[i]).GetAddressBytes();
+                        //}
+                        //foreach (var address in _safelist)
+                        //{
+                        //    if (address.SequenceEqual(bytes))
+                        //    {
+                        //        badIp = false;
+                        //        break;
+                        //    }
+                        //}
                         //if(badIp)
                         //{
                         //    foreach (var ip in ips)
@@ -101,6 +102,52 @@ namespace risk.control.system.Middleware
                 Console.WriteLine(ex.StackTrace);
                 return;
             }
+        }
+        private bool IsIpAllowed(IPAddress remoteIp, List<string> allowedIpRanges)
+        {
+            foreach (var range in allowedIpRanges)
+            {
+                if (IPAddressRangeContains(range, remoteIp))
+                    return true;
+            }
+            return false;
+        }
+
+        private bool IPAddressRangeContains(string range, IPAddress address)
+        {
+            // Handle CIDR ranges
+            if (range.Contains("/"))
+            {
+                var parts = range.Split('/');
+                var baseIp = IPAddress.Parse(parts[0]);
+                var prefixLength = int.Parse(parts[1]);
+
+                var baseIpBytes = baseIp.GetAddressBytes();
+                var addressBytes = address.GetAddressBytes();
+
+                var mask = new byte[baseIpBytes.Length];
+                for (int i = 0; i < mask.Length; i++)
+                {
+                    int bits = Math.Max(0, Math.Min(8, prefixLength - (i * 8)));
+                    mask[i] = (byte)(0xFF << (8 - bits));
+                }
+
+                for (int i = 0; i < baseIpBytes.Length; i++)
+                {
+                    if ((baseIpBytes[i] & mask[i]) != (addressBytes[i] & mask[i]))
+                        return false;
+                }
+
+                return true;
+            }
+
+            // Handle individual IP addresses
+            if (range == address.ToString())
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }

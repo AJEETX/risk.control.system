@@ -18,6 +18,7 @@ namespace risk.control.system.Seeds
             var vendorUserManager = scope.ServiceProvider.GetRequiredService<UserManager<VendorApplicationUser>>();
             var clientUserManager = scope.ServiceProvider.GetRequiredService<UserManager<ClientCompanyApplicationUser>>();
             var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
+            var customApiCLient = scope.ServiceProvider.GetRequiredService<ICustomApiCLient>();
             //context.Database.EnsureDeleted();
             context.Database.EnsureCreated();
 
@@ -49,7 +50,7 @@ namespace risk.control.system.Seeds
 
             await PortalAdminSeed.Seed(context, webHostEnvironment, userManager, roleManager);
 
-            await DataSeed.SeedDetails(context, webHostEnvironment, clientUserManager, vendorUserManager);
+            await DataSeed.SeedDetails(context, webHostEnvironment, clientUserManager, vendorUserManager, customApiCLient);
         }
     }
 }

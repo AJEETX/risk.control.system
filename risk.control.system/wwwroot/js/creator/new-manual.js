@@ -99,7 +99,11 @@
             }, {
                 "data": "policyNum", "bSortable": false,
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.agencyDeclineComment + '" data-toggle="tooltip">' + data + '</span>'
+                    var popup = row.policyId;
+                    if (row.agencyDeclineComment != '') {
+                        popup += '\n' + row.agencyDeclineComment;
+                    }
+                    return '<span title="' + popup + '" data-toggle="tooltip">' + data + '</span>'
                 }
             },
             {

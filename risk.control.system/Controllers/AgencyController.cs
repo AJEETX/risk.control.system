@@ -2,6 +2,8 @@
 
 using AspNetCoreHero.ToastNotification.Abstractions;
 
+using Google.Api;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -9,6 +11,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 using NToastNotify;
+
+using Org.BouncyCastle.Utilities.Net;
 
 using risk.control.system.AppConstant;
 using risk.control.system.Controllers.Company;
@@ -35,6 +39,7 @@ namespace risk.control.system.Controllers
         private readonly INotyfService notifyService;
         private readonly RoleManager<ApplicationRole> roleManager;
         private readonly IDashboardService dashboardService;
+        private readonly ICustomApiCLient customApiCLient;
         private readonly ISmsService smsService;
         private readonly IToastNotification toastNotification;
         private readonly IAgencyService agencyService;
@@ -46,6 +51,7 @@ namespace risk.control.system.Controllers
             SignInManager<ApplicationUser> signInManager,
             RoleManager<ApplicationRole> roleManager,
             IDashboardService dashboardService,
+            ICustomApiCLient customApiCLient,
             ISmsService SmsService,
             IToastNotification toastNotification,
             IAgencyService agencyService,
@@ -57,6 +63,7 @@ namespace risk.control.system.Controllers
             this.notifyService = notifyService;
             this.roleManager = roleManager;
             this.dashboardService = dashboardService;
+            this.customApiCLient = customApiCLient;
             smsService = SmsService;
             this.toastNotification = toastNotification;
             this.agencyService = agencyService;
@@ -304,6 +311,15 @@ namespace risk.control.system.Controllers
                 user.UpdatedBy = HttpContext.User?.Identity?.Name;
                 user.Role = user.Role != null ? user.Role : (AppRoles)Enum.Parse(typeof(AppRoles), user.UserRole.ToString());
                 user.IsVendorAdmin = user.UserRole == AgencyRole.AGENCY_ADMIN;
+                if(user.Role == AppRoles.AGENT)
+                {
+                    var pincode = _context.PinCode.Include(p => p.District).Include(p => p.State).Include(p => p.Country).FirstOrDefault(c => c.PinCodeId == user.PinCodeId);
+                    var userAddress = $"{user.Addressline}, {pincode.Name}, {pincode.District.Name}, {pincode.State.Name}, {pincode.Country.Name}";
+                    var coordinates = await customApiCLient.GetCoordinatesFromAddressAsync(userAddress);
+                    var customerLatLong = coordinates.Latitude + "," + coordinates.Longitude;
+                    user.AddressMapLocation = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+                }
+
                 IdentityResult result = await userManager.CreateAsync(user, user.Password);
                 if (result.Succeeded)
                 {
@@ -338,6 +354,8 @@ namespace risk.control.system.Controllers
                         var onboardAgent = roles.Any(r => AppConstant.AppRoles.AGENT.ToString().Contains(r)) && string.IsNullOrWhiteSpace(user.MobileUId);
                         if (lockUser.Succeeded && lockDate.Succeeded)
                         {
+                            
+
                             if (onboardAgent)
                             {
                                 var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == user.VendorId);
@@ -513,7 +531,14 @@ namespace risk.control.system.Controllers
                     user.UserRole = applicationUser.UserRole;
                     user.Role = applicationUser.Role != null ? applicationUser.Role : (AppRoles)Enum.Parse(typeof(AppRoles), user.UserRole.ToString());
                     user.IsVendorAdmin = user.UserRole == AgencyRole.AGENCY_ADMIN;
-
+                    if (user.Role == AppRoles.AGENT)
+                    {
+                        var pincode = _context.PinCode.Include(p => p.District).Include(p => p.State).Include(p => p.Country).FirstOrDefault(c => c.PinCodeId == user.PinCodeId);
+                        var userAddress = $"{user.Addressline}, {pincode.Name}, {pincode.District.Name}, {pincode.State.Name}, {pincode.Country.Name}";
+                        var coordinates = await customApiCLient.GetCoordinatesFromAddressAsync(userAddress);
+                        var customerLatLong = coordinates.Latitude + "," + coordinates.Longitude;
+                        user.AddressMapLocation = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+                    }
                     var result = await userManager.UpdateAsync(user);
                     if (result.Succeeded)
                     {

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.FeatureManagement;
 
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
@@ -29,12 +30,18 @@ namespace risk.control.system.Controllers.Api.Agency
         private readonly UserManager<VendorApplicationUser> userManager;
         private readonly IDashboardService dashboardService;
         private readonly IWebHostEnvironment webHostEnvironment;
+        private readonly IFeatureManager featureManager;
 
-        public AgencyController(ApplicationDbContext context, UserManager<VendorApplicationUser> userManager, IWebHostEnvironment webHostEnvironment, IDashboardService dashboardService)
+        public AgencyController(ApplicationDbContext context,
+            UserManager<VendorApplicationUser> userManager, 
+            IWebHostEnvironment webHostEnvironment,
+            IFeatureManager featureManager,
+            IDashboardService dashboardService)
         {
             this.userManager = userManager;
             this.dashboardService = dashboardService;
             this.webHostEnvironment = webHostEnvironment;
+            this.featureManager = featureManager;
             _context = context;
             noUserImagefilePath = "/img/no-user.png";
             noDataImagefilePath = "/img/no-image.png";
@@ -232,8 +239,8 @@ namespace risk.control.system.Controllers.Api.Agency
             return Ok(result?.ToArray());
         }
 
-        [HttpGet("GetAgentLoad")]
-        public IActionResult GetAgentLoad()
+        [HttpGet("GetUsers")]
+        public IActionResult GetUsers()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
@@ -292,6 +299,72 @@ namespace risk.control.system.Controllers.Api.Agency
                     Role = u.AgencyUser.UserRole.GetEnumDisplayName(),
                     AgentOnboarded =(u.AgencyUser.UserRole == AgencyRole.AGENT && !string.IsNullOrWhiteSpace(u.AgencyUser.MobileUId) || u.AgencyUser.UserRole != AgencyRole.AGENT),
                     RawEmail = u.AgencyUser.Email
+                });
+            return Ok(agentWithLoad?.ToArray());
+        }
+
+        [HttpGet("GetAgentLoad")]
+        public async Task<IActionResult> GetAgentLoad()
+        {
+            var userEmail = HttpContext.User?.Identity?.Name;
+            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+            List<VendorUserClaim> agents = new List<VendorUserClaim>();
+            var onboardingEnabled = await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED);
+
+            var vendorUsers = _context.VendorApplicationUser
+                .Include(u => u.Country)
+                .Include(u => u.State)
+                .Include(u => u.District)
+                .Include(u => u.PinCode)
+                .Where(c => c.VendorId == vendorUser.VendorId && !c.Deleted && c.Active && c.Role == AppRoles.AGENT);
+
+            var users = vendorUsers?
+                .OrderBy(u => u.FirstName)
+                .ThenBy(u => u.LastName)
+                .AsQueryable();
+            var result = dashboardService.CalculateAgentCaseStatus(userEmail);
+
+            foreach (var user in users)
+            {
+                int claimCount = 0;
+                if (result.TryGetValue(user.Email, out claimCount))
+                {
+                    var agentData = new VendorUserClaim
+                    {
+                        AgencyUser = user,
+                        CurrentCaseCount = claimCount,
+                    };
+                    agents.Add(agentData);
+                }
+                else
+                {
+                    var agentData = new VendorUserClaim
+                    {
+                        AgencyUser = user,
+                        CurrentCaseCount = 0,
+                    };
+                    agents.Add(agentData);
+                }
+            }
+            var agentWithLoad = agents?
+                .Select(u => new
+                {
+                    Id = u.AgencyUser.Id,
+                    Photo = string.IsNullOrWhiteSpace(u.AgencyUser.ProfilePictureUrl) ? noUserImagefilePath : u.AgencyUser.ProfilePictureUrl,
+                    Email = (u.AgencyUser.UserRole == AgencyRole.AGENT && !string.IsNullOrWhiteSpace(u.AgencyUser.MobileUId) || u.AgencyUser.UserRole != AgencyRole.AGENT) ?
+                    "<a href=/Agency/EditUser?userId=" + u.AgencyUser.Id + ">" + u.AgencyUser.Email + "</a>" :
+                    "<a href=/Agency/EditUser?userId=" + u.AgencyUser.Id + ">" + u.AgencyUser.Email + "</a><span title=\"Onboarding incomplete !!!\" data-toggle=\"tooltip\"><i class='fa fa-asterisk asterik-style'></i></span>",
+                    Name = u.AgencyUser.FirstName + " " + u.AgencyUser.LastName,
+                    Phone = u.AgencyUser.PhoneNumber,
+                    Addressline = u.AgencyUser.Addressline + ", " + u.AgencyUser.District.Name + ", " + u.AgencyUser.State.Name + ", " + u.AgencyUser.Country.Code + ", " + u.AgencyUser.PinCode.Code,
+                    Active = u.AgencyUser.Active,
+                    Roles = u.AgencyUser.UserRole != null ? $"<span class=\"badge badge-light\">{u.AgencyUser.UserRole.GetEnumDisplayName()}</span>" : "<span class=\"badge badge-light\">...</span>",
+                    Count = u.CurrentCaseCount,
+                    UpdateBy = u.AgencyUser.UpdatedBy,
+                    Role = u.AgencyUser.UserRole.GetEnumDisplayName(),
+                    AgentOnboarded = (u.AgencyUser.UserRole == AgencyRole.AGENT && !string.IsNullOrWhiteSpace(u.AgencyUser.MobileUId) || u.AgencyUser.UserRole != AgencyRole.AGENT),
+                    RawEmail = u.AgencyUser.Email,
+                    PersonMapAddressUrl = u.AgencyUser.AddressMapLocation
                 });
             return Ok(agentWithLoad?.ToArray());
         }

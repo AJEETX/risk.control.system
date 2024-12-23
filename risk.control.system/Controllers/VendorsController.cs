@@ -32,6 +32,7 @@ namespace risk.control.system.Controllers
         private readonly RoleManager<ApplicationRole> roleManager;
         private readonly INotyfService notifyService;
         private readonly IToastNotification toastNotification;
+        private readonly ICustomApiCLient customApiCLient;
         private readonly ISmsService smsService;
         private readonly IWebHostEnvironment webHostEnvironment;
 
@@ -41,6 +42,7 @@ namespace risk.control.system.Controllers
             RoleManager<ApplicationRole> roleManager,
             INotyfService notifyService,
             IToastNotification toastNotification,
+            ICustomApiCLient customApiCLient,
             ISmsService SmsService,
             IWebHostEnvironment webHostEnvironment)
         {
@@ -49,6 +51,7 @@ namespace risk.control.system.Controllers
             this.roleManager = roleManager;
             this.notifyService = notifyService;
             this.toastNotification = toastNotification;
+            this.customApiCLient = customApiCLient;
             smsService = SmsService;
             this.webHostEnvironment = webHostEnvironment;
         }
@@ -239,6 +242,14 @@ namespace risk.control.system.Controllers
                 user.Updated = DateTime.Now;
                 user.UpdatedBy = HttpContext.User?.Identity?.Name;
                 user.IsVendorAdmin = user.UserRole == AgencyRole.AGENCY_ADMIN;
+                if (user.Role == AppRoles.AGENT)
+                {
+                    var pincode = _context.PinCode.Include(p => p.District).Include(p => p.State).Include(p => p.Country).FirstOrDefault(c => c.PinCodeId == user.PinCodeId);
+                    var userAddress = $"{user.Addressline}, {pincode.Name}, {pincode.District.Name}, {pincode.State.Name}, {pincode.Country.Name}";
+                    var coordinates = await customApiCLient.GetCoordinatesFromAddressAsync(userAddress);
+                    var customerLatLong = coordinates.Latitude + "," + coordinates.Longitude;
+                    user.AddressMapLocation = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+                }
                 IdentityResult result = await userManager.CreateAsync(user, user.Password);
 
                 if (result.Succeeded)
@@ -438,6 +449,14 @@ namespace risk.control.system.Controllers
                 user.IsVendorAdmin = user.UserRole == AgencyRole.AGENCY_ADMIN;
                 user.Role = applicationUser.Role != null ? applicationUser.Role : (AppRoles)Enum.Parse(typeof(AppRoles), user.UserRole.ToString());
 
+                if (user.Role == AppRoles.AGENT)
+                {
+                    var pincode = _context.PinCode.Include(p => p.District).Include(p => p.State).Include(p => p.Country).FirstOrDefault(c => c.PinCodeId == user.PinCodeId);
+                    var userAddress = $"{user.Addressline}, {pincode.Name}, {pincode.District.Name}, {pincode.State.Name}, {pincode.Country.Name}";
+                    var coordinates = await customApiCLient.GetCoordinatesFromAddressAsync(userAddress);
+                    var customerLatLong = coordinates.Latitude + "," + coordinates.Longitude;
+                    user.AddressMapLocation = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+                }
                 var result = await userManager.UpdateAsync(user);
                 if (result.Succeeded)
                 {

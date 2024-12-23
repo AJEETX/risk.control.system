@@ -4,12 +4,13 @@ using Microsoft.AspNetCore.Identity;
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
+using risk.control.system.Services;
 
 namespace risk.control.system.Seeds
 {
     public static class DataSeed
     {
-        public static async Task SeedDetails(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, UserManager<ClientCompanyApplicationUser> clientUserManager, UserManager<VendorApplicationUser> vendorUserManager)
+        public static async Task SeedDetails(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, UserManager<ClientCompanyApplicationUser> clientUserManager, UserManager<VendorApplicationUser> vendorUserManager, ICustomApiCLient customApiCLient)
         {
             #region LINE OF BUSINESS
 
@@ -325,7 +326,7 @@ namespace risk.control.system.Seeds
 
             foreach (var vendor in vendors)
             {
-                await VendorApplicationUserSeed.Seed(context, webHostEnvironment, vendorUserManager, vendor);
+                await VendorApplicationUserSeed.Seed(context, webHostEnvironment, vendorUserManager, vendor, customApiCLient);
             }
 
             await context.SaveChangesAsync(null, false);

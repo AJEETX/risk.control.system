@@ -1,4 +1,6 @@
-﻿using Google.Api;
+﻿using Amazon.Rekognition.Model;
+
+using Google.Api;
 
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -8,6 +10,9 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
+using risk.control.system.Services;
+
+using SkiaSharp;
 
 using static risk.control.system.AppConstant.Applicationsettings;
 
@@ -16,7 +21,7 @@ namespace risk.control.system.Seeds
     public static class VendorApplicationUserSeed
     {
          private static string noUserImagePath = string.Empty;
-        public static async Task Seed(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, UserManager<VendorApplicationUser> userManager, Vendor vendor)
+        public static async Task Seed(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, UserManager<VendorApplicationUser> userManager, Vendor vendor, ICustomApiCLient customApiCLient)
         {
             noUserImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", @Applicationsettings.NO_USER);
             string adminEmailwithSuffix = AGENCY_ADMIN.CODE + "@" + vendor.Email;
@@ -147,32 +152,28 @@ namespace risk.control.system.Seeds
             //Seed Vendor Agent
             string agentEmailwithSuffix = AGENT.CODE + "@" + vendor.Email;
             var pinCode1 = context.PinCode.Include(p => p.District).Include(p => p.State).FirstOrDefault(p => p.Code == CURRENT_PINCODE2);
-            var createAgent = SeedAgent(context,agentEmailwithSuffix, webHostEnvironment, userManager, vendor, pinCode1, Applicationsettings.AGENT.PROFILE_IMAGE);
-
+            await SeedAgent(context,agentEmailwithSuffix, webHostEnvironment, customApiCLient, userManager, vendor, pinCode1, Applicationsettings.AGENT.PROFILE_IMAGE);
 
             //string agent2EmailwithSuffix = AGENTZ.CODE + "@" + vendor.Email;
             //var pinCode2 = context.PinCode.Include(p => p.District).Include(p => p.State).FirstOrDefault(p => p.Code == CURRENT_PINCODE3);
-            //var createAgent2 = SeedAgent(context, agent2EmailwithSuffix, webHostEnvironment, userManager, vendor, pinCode2, Applicationsettings.AGENTZ.PROFILE_IMAGE);
+            //var createAgent2 = SeedAgent(context, agent2EmailwithSuffix, webHostEnvironment, customApiCLient, userManager, vendor, pinCode2, Applicationsettings.AGENTZ.PROFILE_IMAGE);
 
 
             //string agent3EmailwithSuffix = AGENTX.CODE + "@" + vendor.Email;
             //var pinCode3 = context.PinCode.Include(p => p.District).Include(p => p.State).FirstOrDefault(p => p.Code == CURRENT_PINCODE4);
-            //var createAgent3 = SeedAgent(context, agent3EmailwithSuffix, webHostEnvironment, userManager, vendor, pinCode3, Applicationsettings.AGENTX.PROFILE_IMAGE);
+            //var createAgent3 = SeedAgent(context, agent3EmailwithSuffix, webHostEnvironment, customApiCLient, userManager, vendor, pinCode3, Applicationsettings.AGENTX.PROFILE_IMAGE);
 
 
             //string agent4EmailwithSuffix = AGENTY.CODE + "@" + vendor.Email;
             //var pinCode4 = context.PinCode.Include(p => p.District).Include(p => p.State).FirstOrDefault(p => p.Code == CURRENT_PINCODE5);
-            //var createAgent4 = SeedAgent(context, agent4EmailwithSuffix, webHostEnvironment, userManager, vendor, pinCode4, Applicationsettings.AGENTY.PROFILE_IMAGE);
+            //var createAgent4 = SeedAgent(context, agent4EmailwithSuffix, webHostEnvironment, customApiCLient, userManager, vendor, pinCode4, Applicationsettings.AGENTY.PROFILE_IMAGE);
         }
 
         private static async Task SeedAgent(ApplicationDbContext context, string agentEmailwithSuffix, 
-            IWebHostEnvironment webHostEnvironment,
+            IWebHostEnvironment webHostEnvironment, ICustomApiCLient customApiCLient,
             UserManager<VendorApplicationUser> userManager, 
             Vendor vendor,PinCode pinCode, string photo)
         {
-            var district = context.District.FirstOrDefault(c => c.DistrictId == pinCode.District.DistrictId);
-            var state = context.State.Include(s => s.Country).FirstOrDefault(s => s.StateId == pinCode.State.StateId);
-            var countryId = context.Country.FirstOrDefault(s => s.CountryId == state.Country.CountryId)?.CountryId ?? default!;
             var faMailBox = new Mailbox
             {
                 Name = agentEmailwithSuffix
@@ -185,6 +186,13 @@ namespace risk.control.system.Seeds
             {
                 agentImage = File.ReadAllBytes(noUserImagePath);
             }
+            var pincode = context.PinCode.Include(p => p.District).Include(p => p.State).Include(p => p.Country).FirstOrDefault(c => c.PinCodeId == pinCode.PinCodeId);
+            var address = "23 Vincent Avenue" + ", "+ pincode.District.Name + ", " + pincode.State.Name + ", " + pincode.Country.Code;
+            var coordinates = await customApiCLient.GetCoordinatesFromAddressAsync(address);
+            var customerLatLong = coordinates.Latitude + "," + coordinates.Longitude;
+            var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+
+
             var vendorAgent = new VendorApplicationUser()
             {
                 Mailbox = faMailBox,
@@ -202,15 +210,16 @@ namespace risk.control.system.Seeds
                 IsClientAdmin = false,
                 IsVendorAdmin = false,
                 Addressline = "23 Vincent Avenue",
-                CountryId = countryId,
-                DistrictId = district?.DistrictId ?? default!,
-                StateId = state?.StateId ?? default!,
+                CountryId = pincode?.CountryId,
+                DistrictId = pincode?.DistrictId ?? default!,
+                StateId = pincode?.StateId ?? default!,
                 PinCodeId = pinCode?.PinCodeId ?? default!,
                 ProfilePictureUrl = photo,
                 ProfilePicture = agentImage,
                 Role = AppRoles.AGENT,
                 UserRole = AgencyRole.AGENT,
-                Updated = DateTime.Now
+                Updated = DateTime.Now,
+                AddressMapLocation = url
             };
             if (userManager.Users.All(u => u.Id != vendorAgent.Id))
             {

@@ -54,11 +54,11 @@ $(document).ready(function () {
         },
             {
                 className: 'max-width-column-name', // Apply the CSS class,
-                targets: 3                      // Index of the column to style
+                targets: 1                      // Index of the column to style
             },
             {
                 className: 'max-width-column-number', // Apply the CSS class,
-                targets: 4                      // Index of the column to style
+                targets: 2                     // Index of the column to style
             },
             {
                 className: 'max-width-column-name', // Apply the CSS class,

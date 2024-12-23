@@ -21,7 +21,7 @@
             },
             {
                 className: 'max-width-column-name', // Apply the CSS class,
-                targets: 2                      // Index of the column to style
+                targets: 1                      // Index of the column to style
             },
             {
                 className: 'max-width-column-number', // Apply the CSS class,
@@ -66,17 +66,6 @@
                 }
             },
             {
-                "sDefaultContent": "",
-                "bSortable": false,
-                "mRender": function (data, type, row) {
-                    var img = '<div class="map-thumbnail profile-image doc-profile-image">';
-                    img += '<img src="' + row.document + '" class="thumbnail profile-image doc-profile-image" />'; // Thumbnail image with class 'thumbnail'
-                    img += '<img src="' + row.document + '" class="full-map" title="' + row.name + '" data-toggle="tooltip"/>'; // Full map image with class 'full-map'
-                    img += '</div>';
-                    return img;
-                }
-            },
-            {
                 "data": "domain",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
@@ -99,6 +88,17 @@
 
                     // Return the domain with the appended rating images and information
                     return '<span title="' + row.name + '" data-toggle="tooltip">' + data + '</span>' + '<br /> ' + img;
+                }
+            },
+            {
+                "sDefaultContent": "",
+                "bSortable": false,
+                "mRender": function (data, type, row) {
+                    var img = '<div class="map-thumbnail profile-image doc-profile-image">';
+                    img += '<img src="' + row.document + '" class="thumbnail profile-image doc-profile-image" />'; // Thumbnail image with class 'thumbnail'
+                    img += '<img src="' + row.document + '" class="full-map" title="' + row.name + '" data-toggle="tooltip"/>'; // Full map image with class 'full-map'
+                    img += '</div>';
+                    return img;
                 }
             },
             {
@@ -189,13 +189,7 @@
 
     // Initial draw to set the stars when the table first loads
     table.draw();
-    $('#customerTable').on('draw.dt', function () {
-        $('[data-toggle="tooltip"]').tooltip({
-            animated: 'fade',
-            placement: 'top',
-            html: true
-        });
-    });
+ 
     $('#customerTable tbody').hide();
     $('#customerTable tbody').fadeIn(2000);
     $('#customerTable tbody').on('mouseover', 'img.rating', function () {
@@ -282,7 +276,10 @@
             var img = $(this).find("img[id='" + parseInt(av) + "']");
             img.attr("src", "/images/FilledStar.jpeg").prevAll("img.rating").attr("src", "/images/FilledStar.jpeg");
         }
-    }); var askConfirmation = true; $('#radioButtons').submit(function (e) {
+    });
+
+    var askConfirmation = true;
+    $('#radioButtons').submit(function (e) {
         if (askConfirmation) {
             e.preventDefault(); $.confirm({
                 title: "Confirm Assign", content: "Are you sure ?",

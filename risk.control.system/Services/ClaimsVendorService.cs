@@ -27,8 +27,6 @@ namespace risk.control.system.Services
         Task<ClaimsInvestigationVendorsModel> GetInvestigateReport(string userEmail, string selectedcase);
 
         Task<ClaimTransactionModel> GetClaimsDetails(string userEmail, string selectedcase);
-
-        Task<List<VendorUserClaim>> GetAgentLoad(string userEmail);
     }
 
     public class ClaimsVendorService : IClaimsVendorService
@@ -77,60 +75,16 @@ namespace risk.control.system.Services
                 .Include(c => c.Country)
                 .FirstOrDefault(c => c.BeneficiaryDetailId == claimsAllocate2Agent.BeneficiaryDetail.BeneficiaryDetailId);
 
-            var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.AGENT.ToString()));
-
-            var vendorUsers = _context.VendorApplicationUser
-                .Include(u => u.District)
-                .Include(u => u.State)
-                .Include(u => u.Country)
-                .Include(u => u.PinCode)
-                .Where(u => u.VendorId == claimsAllocate2Agent.VendorId && u.Active);
-
-            List<VendorUserClaim> agents = new List<VendorUserClaim>();
-            var result = dashboardService.CalculateAgentCaseStatus(userEmail);
-
-            foreach (var vendorUser in vendorUsers)
-            {
-                var isTrue = await userManager.IsInRoleAsync(vendorUser, agentRole?.Name);
-                if (isTrue)
-                {
-                    int claimCount = 0;
-                    if (result.TryGetValue(vendorUser.Email, out claimCount))
-                    {
-                        var agentData = new VendorUserClaim
-                        {
-                            AgencyUser = vendorUser,
-                            CurrentCaseCount = claimCount,
-                        };
-                        agents.Add(agentData);
-                    }
-                    else
-                    {
-                        var agentData = new VendorUserClaim
-                        {
-                            AgencyUser = vendorUser,
-                            CurrentCaseCount = 0,
-                        };
-                        agents.Add(agentData);
-                    }
-                }
-            }
-
             var maskedCustomerContact = new string('*', claimsAllocate2Agent.CustomerDetail.ContactNumber.ToString().Length - 4) + claimsAllocate2Agent.CustomerDetail.ContactNumber.ToString().Substring(claimsAllocate2Agent.CustomerDetail.ContactNumber.ToString().Length - 4);
             claimsAllocate2Agent.CustomerDetail.ContactNumber = maskedCustomerContact;
             var maskedBeneficiaryContact = new string('*', beneficiaryDetail.ContactNumber.ToString().Length - 4) + beneficiaryDetail.ContactNumber.ToString().Substring(beneficiaryDetail.ContactNumber.ToString().Length - 4);
             claimsAllocate2Agent.BeneficiaryDetail.ContactNumber = maskedBeneficiaryContact;
             beneficiaryDetail.ContactNumber = maskedBeneficiaryContact;
-            var onboardingEnabled = await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED);
-            if(onboardingEnabled)
-            {
-                agents = agents.Where(a => a.AgencyUser.Role != AppRoles.AGENT || a.AgencyUser.Role == AppRoles.AGENT && !string.IsNullOrWhiteSpace(a.AgencyUser.MobileUId))?.ToList();
-            }
+            
             var model = new ClaimsInvestigationVendorAgentModel
             {
                 CaseLocation = beneficiaryDetail,
                 ClaimsInvestigation = claimsAllocate2Agent,
-                VendorUserClaims = agents
             };
             return model;
         }
@@ -251,48 +205,6 @@ namespace risk.control.system.Services
                 Location = claimsInvestigation.BeneficiaryDetail,
                 NotWithdrawable = claimsInvestigation.NotDeclinable,
             };
-        }
-
-        public async Task<List<VendorUserClaim>> GetAgentLoad(string userEmail)
-        {
-            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-            var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.AGENT.ToString()));
-            List<VendorUserClaim> agents = new List<VendorUserClaim>();
-
-            var vendor = _context.Vendor
-                .Include(c => c.VendorApplicationUser)
-                .FirstOrDefault(c => c.VendorId == vendorUser.VendorId);
-
-            var users = vendor.VendorApplicationUser.AsQueryable();
-            var result = dashboardService.CalculateAgentCaseStatus(userEmail);
-
-            foreach (var user in users)
-            {
-                var isAgent = await userManager.IsInRoleAsync(user, agentRole?.Name);
-                if (isAgent)
-                {
-                    int claimCount = 0;
-                    if (result.TryGetValue(user.Email, out claimCount))
-                    {
-                        var agentData = new VendorUserClaim
-                        {
-                            AgencyUser = user,
-                            CurrentCaseCount = claimCount,
-                        };
-                        agents.Add(agentData);
-                    }
-                    else
-                    {
-                        var agentData = new VendorUserClaim
-                        {
-                            AgencyUser = user,
-                            CurrentCaseCount = 0,
-                        };
-                        agents.Add(agentData);
-                    }
-                }
-            }
-            return agents;
         }
 
         public async Task<ClaimsInvestigationVendorAgentModel> ReSelectVendorAgent(string userEmail, string selectedcase)

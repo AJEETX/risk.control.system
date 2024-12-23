@@ -1,7 +1,7 @@
 ﻿$(document).ready(function () {
     $("#customerTable").DataTable({
         ajax: {
-            url: '/api/Agency/GetAgentLoad',
+            url: '/api/Agency/GetUsers',
             dataSrc: ''
         },
         columnDefs: [
