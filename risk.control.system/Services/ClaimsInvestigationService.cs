@@ -31,7 +31,7 @@ namespace risk.control.system.Services
 
         Task<(Vendor, string)> SubmitToVendorSupervisor(string userEmail, long caseLocationId, string claimsInvestigationId, string remarks, string? answer1, string? answer2, string? answer3, string? answer4);
 
-        Task<ClaimsInvestigation> ProcessAgentReport(string userEmail, string supervisorRemarks, long caseLocationId, string claimsInvestigationId, SupervisorRemarkType remarks, IFormFile? claimDocument = null);
+        Task<ClaimsInvestigation> ProcessAgentReport(string userEmail, string supervisorRemarks, long caseLocationId, string claimsInvestigationId, SupervisorRemarkType remarks, IFormFile? claimDocument = null, string editRemarks = "");
 
         Task<(ClientCompany, string)> ProcessCaseReport(string userEmail, string assessorRemarks, long caseLocationId, string claimsInvestigationId, AssessorRemarkType assessorRemarkType, string reportAiSummary);
 
@@ -864,11 +864,11 @@ namespace risk.control.system.Services
             }
         }
 
-        public async Task<ClaimsInvestigation> ProcessAgentReport(string userEmail, string supervisorRemarks, long caseLocationId, string claimsInvestigationId, SupervisorRemarkType reportUpdateStatus, IFormFile? claimDocument = null)
+        public async Task<ClaimsInvestigation> ProcessAgentReport(string userEmail, string supervisorRemarks, long caseLocationId, string claimsInvestigationId, SupervisorRemarkType reportUpdateStatus, IFormFile? claimDocument = null, string editRemarks = "")
         {
             if (reportUpdateStatus == SupervisorRemarkType.OK)
             {
-                return await ApproveAgentReport(userEmail, claimsInvestigationId, caseLocationId, supervisorRemarks, reportUpdateStatus, claimDocument);
+                return await ApproveAgentReport(userEmail, claimsInvestigationId, caseLocationId, supervisorRemarks, reportUpdateStatus, claimDocument, editRemarks);
             }
             else
             {
@@ -1271,7 +1271,7 @@ namespace risk.control.system.Services
             return await _context.SaveChangesAsync() > 0 ? (currentUser.ClientCompany, claimsCaseToReassign.PolicyDetail.ContractNumber) : (null!, string.Empty);
         }
 
-        private async Task<ClaimsInvestigation> ApproveAgentReport(string userEmail, string claimsInvestigationId, long caseLocationId, string supervisorRemarks, SupervisorRemarkType reportUpdateStatus, IFormFile? claimDocument = null)
+        private async Task<ClaimsInvestigation> ApproveAgentReport(string userEmail, string claimsInvestigationId, long caseLocationId, string supervisorRemarks, SupervisorRemarkType reportUpdateStatus, IFormFile? claimDocument = null, string editRemarks = "")
         {
             var claim = _context.ClaimsInvestigation
                 .Include(c => c.AgencyReport)
@@ -1298,6 +1298,13 @@ namespace risk.control.system.Services
             claim.InvestigationCaseSubStatusId = submitted2Assessor.InvestigationCaseSubStatusId;
             claim.SubmittedToAssessorTime = DateTime.Now;
             var report = claim.AgencyReport;
+            var edited = report.AgentRemarks.Trim() != editRemarks.Trim();
+            if(edited)
+            {
+                report.AgentRemarksEdit = editRemarks;
+                report.AgentRemarksEditUpdated = DateTime.Now;
+            }
+            
             report.SupervisorRemarkType = reportUpdateStatus;
             report.SupervisorRemarks = supervisorRemarks;
             report.SupervisorRemarksUpdated = DateTime.Now;
@@ -1334,7 +1341,8 @@ namespace risk.control.system.Services
                 InvestigationCaseSubStatusId = submitted2Assessor.InvestigationCaseSubStatusId,
                 UpdatedBy = userEmail,
                 Updated = DateTime.Now,
-                TimeElapsed = GetTimeElaspedFromLog(lastLog)
+                TimeElapsed = GetTimeElaspedFromLog(lastLog),
+                AgentAnswerEdited = edited
             };
             _context.InvestigationTransaction.Add(log);
             _context.ClaimsInvestigation.Update(claim);

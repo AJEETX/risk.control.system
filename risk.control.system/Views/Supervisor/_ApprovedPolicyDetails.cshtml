@@ -391,6 +391,7 @@
                                             </div>
                                         </div>
                                         <div class="card-body">
+                                            <partial name="_AgentChat" model="@Model" />
 
                                             <div class="row">
                                                 <div class="col-7">
@@ -474,7 +475,18 @@
                                                                 <span class="fa-li">
                                                                     <i class="far fa-comment"></i>
                                                                 </span>
-                                                                @Model.ClaimsInvestigation.AgencyReport?.AgentRemarks
+                                                                @{
+                                                                    var remarks = Model.ClaimsInvestigation.AgencyReport?.AgentRemarks;
+                                                                    if(Model.ClaimsInvestigation.UpdateAgentAnswer)
+                                                                    {
+                                                                        var edited = Model.ClaimsInvestigation.AgencyReport?.AgentRemarks != Model.ClaimsInvestigation.AgencyReport?.AgentRemarksEdit;
+                                                                        if (edited)
+                                                                        {
+                                                                            remarks = Model.ClaimsInvestigation.AgencyReport?.AgentRemarksEdit; ;
+                                                                        }
+                                                                    }
+                                                                }
+                                                                @remarks
                                                             </li>
                                                         </ul>
                                                     </p>
@@ -483,7 +495,6 @@
 
                                         </div>
                                     </div>
-                                    <partial name="_AgentChat" model="@Model" />
 
                                 </div>
                             }

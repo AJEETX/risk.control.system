@@ -393,6 +393,7 @@
                                             </div>
                                         </div>
                                         <div class="card-body">
+                                            <partial name="_AgentChat" model="@Model" />
 
                                             <div class="row">
                                                 <div class="col-7">
@@ -434,6 +435,16 @@
                                                                     <i class="far fa-comment"></i>
                                                                 </span>
                                                             </li>
+                                                            @if (Model.ClaimsInvestigation.UpdateAgentAnswer)
+                                                            {
+                                                                <br />
+                                                                <li class="small">
+                                                                    Edited Remarks?
+                                                                    <span class="fa-li">
+                                                                        <i class="far fa-comment"></i>
+                                                                    </span>
+                                                                </li>
+                                                            }
                                                         </ul>
                                                     </p>
                                                 </div>
@@ -471,6 +482,7 @@
                                                                 </span>
                                                                 @Model.ClaimsInvestigation.AgencyReport?.ReportQuestionaire?.Answer4
                                                             </li>
+                                                            
                                                             <br />
                                                             <li class="small">
                                                                 <span class="fa-li">
@@ -478,6 +490,16 @@
                                                                 </span>
                                                                 @Model.ClaimsInvestigation.AgencyReport?.AgentRemarks
                                                             </li>
+                                                            @if (Model.ClaimsInvestigation.UpdateAgentAnswer)
+                                                            {
+                                                                <br />
+                                                                <li class="small">
+                                                                    <span class="fa-li">
+                                                                        <i class="far fa-comment"></i>
+                                                                    </span>
+                                                                    @Model.ClaimsInvestigation.AgencyReport?.AgentRemarksEdit
+                                                                </li>
+                                                            }
                                                         </ul>
                                                     </p>
                                                 </div>
@@ -485,7 +507,6 @@
 
                                         </div>
                                     </div>
-                                    <partial name="_AgentChat" model="@Model" />
 
                                 </div>
                             }

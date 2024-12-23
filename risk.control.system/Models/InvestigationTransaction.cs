@@ -23,5 +23,6 @@ namespace risk.control.system.Models
         public string? UserRoleActionedTo { get; set; }
         public string? UserEmailActionedTo { get; set; }
         public bool IsReviewCase { get; set; } = false;
+        public bool AgentAnswerEdited { get; set; } = false;
     }
 }

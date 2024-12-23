@@ -42,9 +42,7 @@ else @if (!string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.AgencyReport.Agen
                 </div>
             </div>
             <div class="card-body">
-
-                @* <partial name="_MediaDetails" model="@Model.ClaimsInvestigation" />*@
-
+                <partial name="_Chat" model="@Model" />
                 <div class="row">
                     <div class="col-6">
                         <p class="text-muted text-sm">
@@ -134,7 +132,6 @@ else @if (!string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.AgencyReport.Agen
                 </div>
             </div>
         </div>
-        <partial name="_Chat" model="@Model" />
 
     </div>
 }

@@ -99,7 +99,7 @@ namespace risk.control.system.Controllers.Agency
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = $"{AGENT.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME}")]
-        public async Task<IActionResult> SubmitReport(string remarks, string question1, string question2, string question3, string question4, string claimId, long caseLocationId, string usertype = Applicationsettings.SUPERVISOR.DISPLAY_NAME)
+        public async Task<IActionResult> SubmitReport(string remarks, string question1, string question2, string question3, string question4, string claimId, long caseLocationId)
         {
             try
             {
@@ -168,7 +168,7 @@ namespace risk.control.system.Controllers.Agency
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = $"{AGENCY_ADMIN.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME}")]
-        public async Task<IActionResult> ProcessReport(string supervisorRemarks, string supervisorRemarkType, string claimId, long caseLocationId)
+        public async Task<IActionResult> ProcessReport(string supervisorRemarks, string supervisorRemarkType, string claimId, long caseLocationId, string remarks = "")
         {
             try
             {
@@ -186,7 +186,7 @@ namespace risk.control.system.Controllers.Agency
 
                 var reportUpdateStatus = SupervisorRemarkType.OK;
 
-                var success = await claimsInvestigationService.ProcessAgentReport(userEmail, supervisorRemarks, caseLocationId, claimId, reportUpdateStatus, Request.Form.Files.FirstOrDefault());
+                var success = await claimsInvestigationService.ProcessAgentReport(userEmail, supervisorRemarks, caseLocationId, claimId, reportUpdateStatus, Request.Form.Files.FirstOrDefault(), remarks);
 
                 if (success != null)
                 {

@@ -1,7 +1,6 @@
 ﻿@model ClaimsInvestigationVendorsModel
 
 @{
-    var imageCapturedTime = @Model.AgencyReport?.DigitalIdReport?.DigitalIdImageLongLatTime != null ? @Model.AgencyReport?.DigitalIdReport?.DigitalIdImageLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt") : null;
     string digitalIdColor = "grey";
     var borderColor = "";
     if (Model.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime == null)
@@ -9,172 +8,147 @@
         digitalIdColor = "grey";
         borderColor = "";
     }
-    else if (Model.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime != null &&  @Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.Similarity < 70)
+    else if (Model.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime != null && @Model.AgencyReport?.DigitalIdReport?.Similarity < 70)
     {
         digitalIdColor = "#dc3545!important";
         borderColor = "border-danger";
     }
-    else if (Model.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime != null &&  @Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.Similarity >= 70)
+    else if (Model.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime != null && @Model.AgencyReport?.DigitalIdReport?.Similarity >= 70)
     {
         borderColor = "border-success";
         digitalIdColor = "green";
     }
 
+    if (@Model.AgencyReport?.DigitalIdReport?.DigitalIdImageData != null && @Model.AgencyReport?.DigitalIdReport?.DigitalIdImageLongLatTime != null)
+    {
+        <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
+            <div class="card bg-light d-flex flex-fill @borderColor">
+                <div class="card-header text-muted border-bottom-0">
 
-    <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
-        <div class="card bg-light d-flex flex-fill @borderColor">
-
-            <div class="card-header text-muted border-bottom-0">
-                <h3 class="card-title">
-                    <i class="fas fa-portrait"></i> Photo ID
-
-                    <span class="hover-text">
-                        <i class="fas fa-info-circle"></i>
-                        @if (borderColor == "")
-                        {
-                            <div class="tooltip-text" id="beneficiary-information">
-                                <div>
+                    <h3 class="card-title">
+                        <i class="fas fa-portrait"></i> Photo ID
+                        <span class="hover-text">
+                            <i class="fas fa-info-circle"></i>
+                            @if (borderColor == "")
+                            {
+                                <span class="tooltip-text" id="beneficiary-information">
                                     <i class='far fa-hand-point-right'></i>
-                                    <b> Upload</b> Max image size 2 MB
-                                </div>
-                                <div>
-                                    <i class='far fa-hand-point-right'></i>
-                                    <button class='btn btn-info btn-xs'>
+                                    <button class='badge badge-info btn-xs'>
                                         <span class='badge badge-info btn-xs'>
-                                            <i class='fa fa-upload'></i> Upload
-                                        </span>
+                                            <i class='fa fa-upload'></i>
+                                        </span> Upload <i style='color:grey;' class='fa fa-times' aria-hidden='true'></i>
                                     </button> Photo ID
-                                </div>
-
-                            </div>
-                        }
-                        else if (borderColor == "border-danger")
-                        {
-                            <div class="tooltip-text" id="beneficiary-information">
-                                <div>
-                                    <i class='far fa-hand-point-right'></i>
-                                    <b> Upload</b> Max image size 2 MB
-                                </div>
-                                <div>
-                                    <i class='far fa-thumbs-down'></i> <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i> UnMatched Photo ID
-                                </div>
-                            </div>
-                        }
-                        else if (borderColor == "border-success")
-                        {
-                            <div class="tooltip-text" id="beneficiary-information">
-                                <div>
-                                    <i class='far fa-hand-point-right'></i>
-                                    <b> Upload</b> Max image size 2 MB
-                                </div>
-                                <div>
-                                    <i class='far fa-thumbs-up'></i> <i style='color:green;' class='fas fa-check-circle'></i> Matched Photo ID
-                                </div>
-                            </div>
-                        }
-
-                    </span>
-                </h3>
-                <div class="card-tools">
-                    <span data-toggle="tooltip" title="Agent report # : @Model.AgencyReport.AgentEmail" class="badge badge-light">
-                        <i class="nav-icon fas fa-clock"></i>
-                        @imageCapturedTime
-                    </span>
-
-                </div>
-            </div>
-
-            <div class="card-footer text-center">
-                <span class="badge badge-light"><i class="fas fa-portrait"></i> Match :  </span>
-                @if (@Model.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime == null)
-                {
-                    <i style='color:grey;' class='fa fa-times' aria-hidden='true'></i>
-                }
-                else if (@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.Similarity < 70 && @Model.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime != null)
-                {
-                    <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i>
-                }
-
-                else
-                {
-                    <i style='color:green;' class='fas fa-check-circle'></i>
-                }
-            </div>
-            <div class="progress">
-                <i class="far fa-bookmark bookmark-green"></i>
-                <div class="progress-bar" role="progressbar" style="width:100%;background-color:@digitalIdColor;">
-                    photo-id
-                </div>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-6">
-                        <p class="text-muted text-sm">
-                            <span class="badge badge-light"><i class="far fa-image"></i> Photo Id Image</span>:
-                            <br />
-                            @{
-                                if (Model.AgencyReport?.DigitalIdReport?.DigitalIdImage != null)
-                                {
-                                    <img data-toggle="tooltip" title="Face Image" id="agentLocationPicture" class="img-fluid face-Image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.AgencyReport?.DigitalIdReport?.DigitalIdImage))">
-                                }
-                                else
-                                {
-                                    <img id="agentLocationPicture" alt="face image" class="img-fluid no-Image" src=@Applicationsettings.NO_PHOTO_IMAGE data-toggle="tooltip" title="No Face Image">
-                                }
+                                </span>
                             }
-                        </p>
-                        <p class="text-muted text-sm">
-
-                            <span class="badge badge-light"><i class="fas fa-info"></i> Location Info</span>
-                            <br />
-                            <label class="ocr-data img-fluid"> @Model?.AgencyReport?.DigitalIdReport?.DigitalIdImageData</label>
-
-                        </p>
-                    </div>
-                    <div class="col-6">
-                        <p class="text-muted text-sm">
-                            <span class="badge badge-light"><i class="fas fa-map-pin"></i> Location visited</span>
-                            <br />
-                            @if (@Model.AgencyReport?.DigitalIdReport?.DigitalIdImageLocationUrl != null)
+                            else if (borderColor == "border-danger")
                             {
-                                <img class="img-fluid locationImage" src="@Model.AgencyReport?.DigitalIdReport?.DigitalIdImageLocationUrl" data-toggle="tooltip" title="Map Location" />
+                                <span class="tooltip-text" id="beneficiary-information">
+                                    <i class='far fa-thumbs-down'></i> Verify <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i> UnMatched Photo ID
+                                </span>
                             }
-                            else
+                            else if (borderColor == "border-success")
                             {
-                                <img class="img-fluid no-Image" src="@Applicationsettings.NO_MAP" data-toggle="tooltip" title="No Map Location" />
+                                <span class="tooltip-text" id="beneficiary-information">
+                                    <i class='far fa-thumbs-up'></i> Verify  <i style='color:green;' class='fas fa-check-circle'></i> Matched Photo ID
+                                </span>
                             }
-                        </p>
-                        <p class="text-muted text-sm">
-
-                            <span class="badge badge-light"><i class="fas fa-map-marker-alt"></i> Address visited</span>
-                            <br />
-                            <label class="img-fluid ocr-data"> @Model.AgencyReport?.DigitalIdReport?.DigitalIdImageLocationAddress</label>
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-        @if (@Model.AgencyReport?.DigitalIdReport?.DigitalIdImageLocationUrl != null)
-        {
-            <div class="card direct-chat direct-chat-warning collapsed-card">
-                <div class="card-header">
-                    <i class="fas fa-film"></i><h3 class="card-title">Map<span class="badge badge-light">Expected and visited</span></h3>
-
+                        </span>
+                    </h3>
                     <div class="card-tools">
-                        <span data-toggle="tooltip" title="Map Location: Expected and visited" class="badge badge-light"> <i class='far fa-hand-point-right'></i></span>
-                        <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                            <i class="fas fa-plus"></i>
-                        </button>
+                        <span data-toggle="tooltip" title="Agent report # : @Model.AgencyReport.AgentEmail" class="badge badge-light">
+                            <i class="nav-icon fas fa-clock"></i>
+                            @Model.AgencyReport?.DigitalIdReport?.DigitalIdImageLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt")
+                        </span>
+
+                    </div>
+
+
+                </div>
+                <div class="card-footer text-center">
+                    <span class="badge badge-light"><i class="fas fa-portrait"></i> Match :  </span>
+                    @if (@Model.AgencyReport?.DigitalIdReport?.Similarity < 70 && Model.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime != null)
+                    {
+                        <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i>
+                    }
+                    else
+                    {
+                        <i style='color:green;' class='fas fa-check-circle'></i>
+                    }
+                </div>
+                <div class="progress">
+                    <i class="far fa-bookmark bookmark-green"></i>
+                    <div class="progress-bar" role="progressbar" style="width:100%;background-color:@digitalIdColor;">
+                        photo-id
                     </div>
                 </div>
                 <div class="card-body">
-                    <div id="face-map">
+                    <div class="card collapsed-card">
+                        <div class="card-header">
+                            <i class="fas fa-film"></i><h3 class="card-title">Map<span class="badge badge-light">Expected and visited</span></h3>
+
+                            <div class="card-tools">
+                                <span data-toggle="tooltip" title="Map Location: Expected and visited" class="badge badge-light"> <i class='far fa-hand-point-right'></i></span>
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="face-map">
+                            </div>
+                            <div id="face-msg">
+                            </div>
+                        </div>
                     </div>
-                    <div id="face-msg">
+                    <div class="row">
+                        <div class="col-6">
+                            <p class="text-muted text-sm">
+                                <span class="badge badge-light"><i class="far fa-image"></i> Photo Id Image</span>:
+                                <br />
+                                @{
+                                    if (Model.AgencyReport?.DigitalIdReport?.DigitalIdImage != null)
+                                    {
+                                        <img id="agentLocationPicture" class="img-fluid face-Image @borderColor" data-toggle="tooltip" title="Face Image"
+                                             src="data:image/*;base64,@(Convert.ToBase64String(@Model.AgencyReport?.DigitalIdReport?.DigitalIdImage))">
+                                    }
+                                    else
+                                    {
+                                        <img data-toggle="tooltip" title="No Face Image" id="agentLocationPicture" alt="face image" class="img-fluid  no-Image" src=@Applicationsettings.NO_PHOTO_IMAGE>
+                                    }
+                                }
+                            </p>
+
+                        </div>
+                        <div class="col-6">
+                            <p class="text-muted text-sm">
+
+                                <span class="badge badge-light"><i class="fas fa-info"></i> Location Info</span>
+                                <br />
+                                <label class="ocr-data img-fluid"> @Model.AgencyReport?.DigitalIdReport?.DigitalIdImageData</label>
+
+                            </p>
+                            <p class="text-muted text-sm">
+
+                                <span class="badge badge-light"><i class="fas fa-map-marker-alt"></i> Address visited</span>
+                                <br />
+                                <label class="img-fluid ocr-data"> @Model.AgencyReport?.DigitalIdReport?.DigitalIdImageLocationAddress</label>
+                            </p>
+                        </div>
+
                     </div>
+                    <p class="text-center">
+                        <span class="badge badge-light"> Match :  </span>
+                        @if (@Model.AgencyReport?.DigitalIdReport?.Similarity < 70 && Model.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime != null)
+                        {
+                            <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i>
+                        }
+                        else
+                        {
+                            <i style='color:green;' class='fas fa-check-circle'></i>
+                        }
+                    </p>
                 </div>
             </div>
-        }
-    </div>
+        </div>
+    }
 }

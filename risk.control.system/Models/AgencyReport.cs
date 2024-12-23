@@ -23,6 +23,9 @@ namespace risk.control.system.Models
         public string? AgentEmail { get; set; }
         public DateTime? AgentRemarksUpdated { get; set; }
         public string? AgentRemarks { get; set; }
+
+        public DateTime? AgentRemarksEditUpdated { get; set; }
+        public string? AgentRemarksEdit { get; set; }
         public DateTime? SupervisorRemarksUpdated { get; set; }
         public string? SupervisorEmail { get; set; }
         public string? SupervisorRemarks { get; set; }

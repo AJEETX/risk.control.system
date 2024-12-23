@@ -171,9 +171,9 @@ a.table-link {
 }
 
 .face-Image {
-    height: 200px;
+    height: 250px;
     width: 200px;
-    border: 1px solid #ccc;
+    border: 1px solid #CCCCCC;
     border-radius: 5px;
 }
 
@@ -237,7 +237,7 @@ a.table-link {
     cursor: pointer;
 }
 .ocr-Image {
-    height: 200px;
+    height: 250px;
     width: 200px;
     border: 1px solid #ccc;
     border-radius: 5px;

@@ -82,6 +82,24 @@
                     </div>
                 </div>
                 <div class="card-body">
+                    <div class="card collapsed-card">
+                        <div class="card-header">
+                            <i class="fas fa-film"></i><h3 class="card-title">Map<span class="badge badge-light">Expected and visited</span></h3>
+
+                            <div class="card-tools">
+                                <span data-toggle="tooltip" title="Map Location: Expected and visited" class="badge badge-light"> <i class='far fa-hand-point-right'></i></span>
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="face-map">
+                            </div>
+                            <div id="face-msg">
+                            </div>
+                        </div>
+                    </div>
                     <div class="row">
                         <div class="col-6">
                             <p class="text-muted text-sm">
@@ -90,7 +108,7 @@
                                 @{
                                     if (Model.AgencyReport?.DigitalIdReport?.DigitalIdImage != null)
                                     {
-                                        <img id="agentLocationPicture" class="img-fluid face-Image" data-toggle="tooltip" title="Face Image"
+                                        <img id="agentLocationPicture" class="img-fluid face-Image @borderColor" data-toggle="tooltip" title="Face Image"
                                              src="data:image/*;base64,@(Convert.ToBase64String(@Model.AgencyReport?.DigitalIdReport?.DigitalIdImage))">
                                     }
                                     else
@@ -99,19 +117,15 @@
                                     }
                                 }
                             </p>
+                            
+                        </div>
+                        <div class="col-6">
                             <p class="text-muted text-sm">
 
                                 <span class="badge badge-light"><i class="fas fa-info"></i> Location Info</span>
                                 <br />
                                 <label class="ocr-data img-fluid"> @Model.AgencyReport?.DigitalIdReport?.DigitalIdImageData</label>
 
-                            </p>
-                        </div>
-                        <div class="col-6">
-                            <p class="text-muted text-sm">
-                                <span class="badge badge-light"><i class="fas fa-map-pin"></i> Location visited</span>
-                                <br />
-                                <img class="img-fluid locationImage" src="@Model.AgencyReport?.DigitalIdReport?.DigitalIdImageLocationUrl" data-toggle="tooltip" title="Map Location" />
                             </p>
                             <p class="text-muted text-sm">
 
@@ -120,8 +134,21 @@
                                 <label class="img-fluid ocr-data"> @Model.AgencyReport?.DigitalIdReport?.DigitalIdImageLocationAddress</label>
                             </p>
                         </div>
+
                     </div>
+                    <p class="text-center">
+                        <span class="badge badge-light"> Match :  </span>
+                        @if (@Model.AgencyReport?.DigitalIdReport?.Similarity < 70 && Model.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime != null)
+                        {
+                            <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i>
+                        }
+                        else
+                        {
+                            <i style='color:green;' class='fas fa-check-circle'></i>
+                        }
+                    </p>
                 </div>
+                
                 @if (Model.ClaimsInvestigation.UpdateAgentReport)
                 {
                     <form id="upload-face" asp-controller="Uploads" asp-action="FaceUpload" method="post" enctype="multipart/form-data">
@@ -145,24 +172,7 @@
 
             </div>
 
-            <div class="card direct-chat direct-chat-warning collapsed-card">
-                <div class="card-header">
-                    <i class="fas fa-film"></i><h3 class="card-title">Map<span class="badge badge-light">Expected and visited</span></h3>
-
-                    <div class="card-tools">
-                        <span data-toggle="tooltip" title="Map Location: Expected and visited" class="badge badge-light"> <i class='far fa-hand-point-right'></i></span>
-                        <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                            <i class="fas fa-plus"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div id="face-map">
-                    </div>
-                    <div id="face-msg">
-                    </div>
-                </div>
-            </div>
+            
         </div>
     }
 

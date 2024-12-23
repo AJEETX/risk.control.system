@@ -2,127 +2,156 @@
 
 @{
     if (@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImageData != null && @Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImageLongLatTime != null)
+    {
+
+        string digitalIdColor = "grey";
+        var borderColor = "";
+        if (Model.ClaimsInvestigation.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime == null)
+        {
+            digitalIdColor = "grey";
+            borderColor = "";
+        }
+        else if (Model.ClaimsInvestigation.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime != null &&
+@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.Similarity < 70)
+        {
+            digitalIdColor = "#dc3545!important";
+            borderColor = "border-danger";
+        }
+        else if (Model.ClaimsInvestigation.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime != null &&
+@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.Similarity >= 70)
+        {
+            borderColor = "border-success";
+            digitalIdColor = "green";
+        }
+
+        <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
+            <div class="card bg-light d-flex flex-fill @borderColor">
+                <div class="card-header text-muted border-bottom-0">
+
+                    <h3 class="card-title">
+                        <i class="fas fa-portrait"></i> Photo ID
+                        <span class="hover-text">
+                            <i class="fas fa-info-circle"></i>
+                            @if (borderColor == "")
+                            {
+                                <span class="tooltip-text" id="beneficiary-information">
+                                    <i class='far fa-hand-point-right'></i>
+                                    <button class='badge badge-info btn-xs'>
+                                        <span class='badge badge-info btn-xs'>
+                                            <i class='fa fa-upload'></i>
+                                        </span> Upload <i style='color:grey;' class='fa fa-times' aria-hidden='true'></i>
+                                    </button> Photo ID
+                                </span>
+                            }
+                            else if (borderColor == "border-danger")
+                            {
+                                <span class="tooltip-text" id="beneficiary-information">
+                                    <i class='far fa-thumbs-down'></i> Verify <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i> UnMatched Photo ID
+                                </span>
+                            }
+                            else if (borderColor == "border-success")
+                            {
+                                <span class="tooltip-text" id="beneficiary-information">
+                                    <i class='far fa-thumbs-up'></i> Verify  <i style='color:green;' class='fas fa-check-circle'></i> Matched Photo ID
+                                </span>
+                            }
+                        </span>
+                    </h3>
+                    <div class="card-tools">
+                        <span data-toggle="tooltip" title="Agent report # : @Model.ClaimsInvestigation.AgencyReport.AgentEmail" class="badge badge-light">
+                            <i class="nav-icon fas fa-clock"></i>
+                            @Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImageLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt")
+                        </span>
+
+                    </div>
+
+
+                </div>
+                <div class="card-footer text-center">
+                    <span class="badge badge-light"><i class="fas fa-portrait"></i> Match :  </span>
+                    @if (@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.Similarity < 70 && Model.ClaimsInvestigation.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime != null)
+                    {
+                        <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i>
+                    }
+                    else
+                    {
+                        <i style='color:green;' class='fas fa-check-circle'></i>
+                    }
+                </div>
+                <div class="progress">
+                    <i class="far fa-bookmark bookmark-green"></i>
+                    <div class="progress-bar" role="progressbar" style="width:100%;background-color:@digitalIdColor;">
+                        photo-id
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="card collapsed-card">
+                        <div class="card-header">
+                            <i class="fas fa-film"></i><h3 class="card-title">Map<span class="badge badge-light">Expected and visited</span></h3>
+
+                            <div class="card-tools">
+                                <span data-toggle="tooltip" title="Map Location: Expected and visited" class="badge badge-light"> <i class='far fa-hand-point-right'></i></span>
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="face-map">
+                            </div>
+                            <div id="face-msg">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <p class="text-muted text-sm">
+                                <span class="badge badge-light"><i class="far fa-image"></i> Photo Id Image</span>:
+                                <br />
+                                @{
+                                    if (Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImage != null)
                                     {
+                                        <img id="agentLocationPicture" class="img-fluid face-Image @borderColor" data-toggle="tooltip" title="Face Image"
+                                             src="data:image/*;base64,@(Convert.ToBase64String(@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImage))">
+                                    }
+                                    else
+                                    {
+                                        <img data-toggle="tooltip" title="No Face Image" id="agentLocationPicture" alt="face image" class="img-fluid  no-Image" src=@Applicationsettings.NO_PHOTO_IMAGE>
+                                    }
+                                }
+                            </p>
 
-                                        string digitalIdColor = "grey";
-                                        var borderColor = "";
-                                        if (Model.ClaimsInvestigation.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime == null)
-                                        {
-                                            digitalIdColor = "grey";
-                                            borderColor = "";
-                                        }
-                                        else if (Model.ClaimsInvestigation.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime != null &&
-        @Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.Similarity < 70)
-                                        {
-                                            digitalIdColor = "#dc3545!important";
-                                            borderColor = "border-danger";
-                                        }
-                                        else if (Model.ClaimsInvestigation.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime != null &&
-         @Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.Similarity >= 70)
-                                        {
-                                            borderColor = "border-success";
-                                            digitalIdColor = "green";
-                                        }
+                        </div>
+                        <div class="col-6">
+                            <p class="text-muted text-sm">
 
-<div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
-    <div class="card bg-light d-flex flex-fill @borderColor">
-        <div class="card-header text-muted border-bottom-0">
-            <h3 class="card-title">
-                <i class="fas fa-portrait"></i> Photo ID
-                <span class="hover-text">
-                    <i class="fas fa-info-circle"></i>
-                    <span class="tooltip-text" id="beneficiary-information">
+                                <span class="badge badge-light"><i class="fas fa-info"></i> Location Info</span>
+                                <br />
+                                <label class="ocr-data img-fluid"> @Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImageData</label>
 
-                        <b> <i class='fas fa-portrait'></i> Photo Image ID</b>
-                    </span>
-                </span>
-            </h3>
-            <div class="card-tools">
-                <span data-toggle="tooltip" title="Agent report # : @Model.ClaimsInvestigation.AgencyReport.AgentEmail" class="badge badge-light">
-                    <i class="nav-icon fas fa-clock"></i>
-                    @Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImageLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt")
-                </span>
+                            </p>
+                            <p class="text-muted text-sm">
 
-            </div>
-        </div>
-        <div class="card-footer text-center">
-            <span class="badge badge-light"><i class="fas fa-portrait"></i> Match :  </span>
-                    @if (@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.Similarity < 70)
-            {
-                <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i>
-            }
-            else
-            {
-                <i style='color:green;' class='fas fa-check-circle'></i>
-            }
-        </div>
-        <div class="progress">
-            <i class="far fa-bookmark bookmark-green"></i>
-            <div class="progress-bar" role="progressbar" style="width:100%;background-color:@digitalIdColor;">
-                photo-id
-            </div>
+                                <span class="badge badge-light"><i class="fas fa-map-marker-alt"></i> Address visited</span>
+                                <br />
+                                <label class="img-fluid ocr-data"> @Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImageLocationAddress</label>
+                            </p>
+                        </div>
 
-        </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-6">
-                    <p class="text-muted text-sm">
-                        <span class="badge badge-light"><i class="far fa-image"></i> Photo Id Image</span>:
-                        <br />
-                        @{
-                            if (Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImage != null)
-                            {
-                                <img data-toggle="tooltip" title="Face Image" id="agentLocationPicture" class="img-fluid face-Image"
-                                     src="data:image/*;base64,@(Convert.ToBase64String(@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImage))">
-                            }
-                            else
-                            {
-                                <img data-toggle="tooltip" title="No Face Image" id="agentLocationPicture" alt="face image" class="img-fluid  ocr-data" src=@Applicationsettings.NO_PHOTO_IMAGE>
-                            }
+                    </div>
+                    <p class="text-center">
+                        <span class="badge badge-light"> Match :  </span>
+                        @if (@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.Similarity < 70 && Model.ClaimsInvestigation.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime != null)
+                        {
+                            <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i>
+                        }
+                        else
+                        {
+                            <i style='color:green;' class='fas fa-check-circle'></i>
                         }
                     </p>
-                    <p class="text-muted text-sm">
-
-                        <span class="badge badge-light"><i class="fas fa-info"></i> Location Info</span>
-                        <br />
-                        <label class="ocr-data img-fluid"> @Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImageData</label>
-
-                    </p>
-                </div>
-                <div class="col-6">
-                    <p class="text-muted text-sm">
-                        <span class="badge badge-light"><i class="fas fa-map-pin"></i> Location visited</span>
-                        <br />
-                        <img class="img-fluid locationImage" src="@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImageLocationUrl" data-toggle="tooltip" title="Map Location" />
-                    </p>
-                    <p class="text-muted text-sm">
-
-                        <span class="badge badge-light"><i class="fas fa-map-marker-alt"></i> Address visited</span>
-                        <br />
-                        <label class="img-fluid ocr-data"> @Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImageLocationAddress</label>
-                    </p>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="card direct-chat direct-chat-warning collapsed-card">
-        <div class="card-header">
-            <i class="fas fa-film"></i><h3 class="card-title">Map<span class="badge badge-light">Expected and visited</span></h3>
-
-            <div class="card-tools">
-                <span data-toggle="tooltip" title="Map Location: Expected and visited" class="badge badge-light"> <i class='far fa-hand-point-right'></i></span>
-                <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                    <i class="fas fa-plus"></i>
-                </button>
-            </div>
-        </div>
-        <div class="card-body">
-            <div id="face-map">
-            </div>
-            <div id="face-msg">
-            </div>
-        </div>
-    </div>
-</div>
-                                    }
+    }
 }

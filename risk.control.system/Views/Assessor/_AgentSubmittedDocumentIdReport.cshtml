@@ -4,7 +4,7 @@
     if (@Model.ClaimsInvestigation.AgencyReport?.PanIdReport?.DocumentIdImageData != null && @Model.ClaimsInvestigation.AgencyReport?.PanIdReport?.DocumentIdImageLongLatTime != null)
     {
         string documentIdColor = "grey";
-        var borderColor = "";
+        var documentIdBorderColor = "";
         if (Model.ClaimsInvestigation.AgencyReport.PanIdReport?.DocumentIdImageLongLat == null)
         {
 
@@ -14,24 +14,43 @@
         Model.ClaimsInvestigation.AgencyReport?.PanIdReport?.DocumentIdImageValid == true))
         {
             documentIdColor = "green";
-            borderColor = "border-success";
+            documentIdBorderColor = "border-success";
         }
         else
         {
             documentIdColor = "#dc3545!important";
-            borderColor = "border-danger";
+            documentIdBorderColor = "border-danger";
         }
         <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
-            <div class="card bg-light d-flex flex-fill @borderColor">
+            <div class="card bg-light d-flex flex-fill @documentIdBorderColor">
                 <div class="card-header text-muted border-bottom-0">
                     <h3 class="card-title">
                         <i class="fas fa-mobile-alt"></i> PAN CARD
                         <span class="hover-text">
                             <i class="fas fa-info-circle"></i>
-                            <span class="tooltip-text" id="beneficiary-information">
-
-                                <b> <i class='fas fa-user-tie'></i> PAN CARD Image </b>
-                            </span>
+                            @if (documentIdBorderColor == "border-danger")
+                            {
+                                <span class="tooltip-text" id="beneficiary-information">
+                                    <i class='far fa-thumbs-down'></i> Verify <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i> UnMatched PAN CARD
+                                </span>
+                            }
+                            else if (documentIdBorderColor == "border-success")
+                            {
+                                <span class="tooltip-text" id="beneficiary-information">
+                                    <i class='far fa-thumbs-up'></i> Verify <i style='color:green;' class='fas fa-check-circle'></i> Matched PAN CARD
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="tooltip-text" id="beneficiary-information">
+                                    <i class='far fa-hand-point-right'></i>
+                                    <button class='badge badge-info btn-xs'>
+                                        <span class='badge badge-info btn-xs'>
+                                            <i class='fa fa-upload'></i>
+                                        </span> Upload
+                                    </button>  <i style='color:grey;' class='fa fa-times' aria-hidden='true'></i> PAN CARD
+                                </span>
+                            }
                         </span>
                     </h3>
                     <div class="card-tools">
@@ -59,9 +78,26 @@
                     <div class="progress-bar" role="progressbar" style="width:100%;background-color:@documentIdColor;">
                         pan-card
                     </div>
-
                 </div>
                 <div class="card-body">
+                    <div class="card collapsed-card">
+                        <div class="card-header">
+                            <i class="fas fa-film"></i> <h3 class="card-title">Map<span class="badge badge-light">Expected and visited</span></h3>
+
+                            <div class="card-tools">
+                                <span data-toggle="tooltip" title="Map Location: Expected and visited" class="badge badge-light"> <i class='far fa-hand-point-right'></i></span>
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="ocr-map">
+                            </div>
+                            <div id="ocr-msg">
+                            </div>
+                        </div>
+                    </div>
                     <div class="row">
                         <div class="col-6">
                             <p class="text-muted text-sm">
@@ -70,27 +106,23 @@
                                 @{
                                     if (Model.ClaimsInvestigation.AgencyReport?.PanIdReport?.DocumentIdImage != null)
                                     {
-                                        <img data-toggle="tooltip" title="PAN card Image" id="agentOcrPicture" class="img-fluid ocr-Image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.ClaimsInvestigation.AgencyReport?.PanIdReport?.DocumentIdImage))">
+                                        <img id="agentOcrPicture" class="img-fluid ocr-Image @documentIdBorderColor" data-toggle="tooltip" title="PAN card Image"
+                                             src="data:image/*;base64,@(Convert.ToBase64String(@Model.ClaimsInvestigation.AgencyReport?.PanIdReport?.DocumentIdImage))">
                                     }
                                     else
                                     {
-                                        <img data-toggle="tooltip" title="No PAN card Image" id="agentOcrPicture" alt="ocr-image" class="img-fluid ocr-data" src=@Applicationsettings.NO_PHOTO_IMAGE />
+                                        <img data-toggle="tooltip" title="No PAN card Image" id="agentOcrPicture" class="img-fluid no-Image" src=@Applicationsettings.NO_PHOTO_IMAGE>
                                     }
                                 }
                             </p>
+
+                        </div>
+                        <div class="col-6">
                             <p class="text-muted text-sm">
 
                                 <span class="badge badge-light"><i class="fas fa-info"></i> Image Scan Info</span>
                                 <br />
                                 <label class="img-fluid ocr-data"> @Model.ClaimsInvestigation.AgencyReport?.PanIdReport?.DocumentIdImageData</label>
-                            </p>
-                        </div>
-                        <div class="col-6">
-
-                            <p class="text-muted text-sm">
-                                <span class="badge badge-light"><i class="fas fa-map-pin"></i> Location visited</span>
-                                <br />
-                                <img class="img-fluid olocationImage" src="@Model.ClaimsInvestigation.AgencyReport?.PanIdReport?.DocumentIdImageLocationUrl" data-toggle="tooltip" title="Map Location" />
                             </p>
                             <p class="text-muted text-sm">
 
@@ -100,24 +132,17 @@
                             </p>
                         </div>
                     </div>
-                </div>
-            </div>
-            <div class="card direct-chat direct-chat-warning collapsed-card">
-                <div class="card-header">
-                    <i class="fas fa-film"></i> <h3 class="card-title">Map<span class="badge badge-light">Expected and visited</span></h3>
-
-                    <div class="card-tools">
-                        <span data-toggle="tooltip" title="Map Location: Expected and visited" class="badge badge-light"> <i class='far fa-hand-point-right'></i></span>
-                        <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                            <i class="fas fa-plus"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div id="ocr-map">
-                    </div>
-                    <div id="ocr-msg">
-                    </div>
+                    <p class="text-center">
+                        <span class="badge badge-light">Valid : </span>
+                        @if (@Model.ClaimsInvestigation.AgencyReport?.PanIdReport?.DocumentIdImageValid.Value ?? false)
+                        {
+                            <i style='color:green;' class='fas fa-check-circle'></i>
+                        }
+                        else
+                        {
+                            <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i>
+                        }
+                    </p>
                 </div>
             </div>
         </div>
