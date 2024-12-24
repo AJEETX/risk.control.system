@@ -44,6 +44,7 @@
             /* Name of the keys from     
             data file source */
             {
+                "data": "id", // "id" is the key from the data file
                 "sDefaultContent": '<i class="fas fa-sync fa-spin fa-4x fa-fw"></i><span class="sr-only">Loading...</span>',
                 "bSortable": false,
                 "mRender": function (data, type, row) {
@@ -90,7 +91,7 @@
                     }
 
 
-                    return '<span title="' + row.mapUrl + '" data-toggle="tooltip">' + data + '</span>';
+                    return '<span title="' + row.personMapAddressUrl + '" data-toggle="tooltip">' + data + '</span>';
                 }
             },
             {
@@ -100,9 +101,9 @@
                 }
             },
             {
-                "data": "pinode",
+                "data": "pinCode",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.pinode + '" data-toggle="tooltip">' + data + '</span>';
+                    return '<span title="' + row.pinCode + '" data-toggle="tooltip">' + data + '</span>';
                 }
             },
             {

@@ -330,24 +330,24 @@ namespace risk.control.system.Controllers.Api.Agency
                 .AsQueryable();
             var result = dashboardService.CalculateAgentCaseStatus(userEmail);
 
-            var claim  = _context.ClaimsInvestigation.Include(c=>c.PolicyDetail).Include(c => c.CustomerDetail).Include(c => c.BeneficiaryDetail).FirstOrDefault(c => c.ClaimsInvestigationId == id);
-            var LocationLatitude = string.Empty;
-            var LocationLongitude = string.Empty;
-            var addressOfInterest = string.Empty;
-            if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
-            {
-                addressOfInterest = claim.CustomerDetail.Addressline + ", " + claim.CustomerDetail.District.Name + ", " + claim.CustomerDetail.State.Name + ", " + claim.CustomerDetail.Country.Name + ", " + claim.CustomerDetail.PinCode;
-                var coordinates = await customApiCLient.GetCoordinatesFromAddressAsync(addressOfInterest);
-                LocationLatitude = coordinates.Latitude;
-                LocationLongitude = coordinates.Longitude;
-            }
-            else
-            {
-                addressOfInterest = claim.BeneficiaryDetail.Addressline + ", " + claim.BeneficiaryDetail.District.Name + ", " + claim.BeneficiaryDetail.State.Name + ", " + claim.BeneficiaryDetail.Country.Name + ", " + claim.BeneficiaryDetail.PinCode;
-                var coordinates = await customApiCLient.GetCoordinatesFromAddressAsync(addressOfInterest);
-                LocationLatitude = coordinates.Latitude;
-                LocationLongitude = coordinates.Longitude;
-            }
+            //var claim  = _context.ClaimsInvestigation.Include(c=>c.PolicyDetail).Include(c => c.CustomerDetail).Include(c => c.BeneficiaryDetail).FirstOrDefault(c => c.ClaimsInvestigationId == id);
+            //var LocationLatitude = string.Empty;
+            //var LocationLongitude = string.Empty;
+            //var addressOfInterest = string.Empty;
+            //if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
+            //{
+            //    addressOfInterest = claim.CustomerDetail.Addressline + ", " + claim.CustomerDetail.District.Name + ", " + claim.CustomerDetail.State.Name + ", " + claim.CustomerDetail.Country.Name + ", " + claim.CustomerDetail.PinCode;
+            //    var coordinates = await customApiCLient.GetCoordinatesFromAddressAsync(addressOfInterest);
+            //    LocationLatitude = coordinates.Latitude;
+            //    LocationLongitude = coordinates.Longitude;
+            //}
+            //else
+            //{
+            //    addressOfInterest = claim.BeneficiaryDetail.Addressline + ", " + claim.BeneficiaryDetail.District.Name + ", " + claim.BeneficiaryDetail.State.Name + ", " + claim.BeneficiaryDetail.Country.Name + ", " + claim.BeneficiaryDetail.PinCode;
+            //    var coordinates = await customApiCLient.GetCoordinatesFromAddressAsync(addressOfInterest);
+            //    LocationLatitude = coordinates.Latitude;
+            //    LocationLongitude = coordinates.Longitude;
+            //}
             foreach (var user in users)
             {
                 int claimCount = 0;
@@ -374,8 +374,8 @@ namespace risk.control.system.Controllers.Api.Agency
             var agentList = new List<AgentData>();
             foreach(var u in agents)
             {
-                var (distance, duration, map) =await customApiCLient.GetMap(double.Parse(u.AgencyUser.AddressLatitude), double.Parse(u.AgencyUser.AddressLongitude), double.Parse(LocationLatitude), double.Parse(LocationLongitude));
-                var mapDetails = $"{addressOfInterest} : Driving distance : {distance}, Duration : {duration}";
+                //var (distance, duration, map) =await customApiCLient.GetMap(double.Parse(u.AgencyUser.AddressLatitude), double.Parse(u.AgencyUser.AddressLongitude), double.Parse(LocationLatitude), double.Parse(LocationLongitude));
+                //var mapDetails = $"{addressOfInterest} : Driving distance : {distance}, Duration : {duration}";
                 var agentData = new AgentData
                 {
                     Id = u.AgencyUser.Id,
@@ -393,9 +393,9 @@ namespace risk.control.system.Controllers.Api.Agency
                     Role = u.AgencyUser.UserRole.GetEnumDisplayName(),
                     AgentOnboarded = (u.AgencyUser.UserRole == AgencyRole.AGENT && !string.IsNullOrWhiteSpace(u.AgencyUser.MobileUId) || u.AgencyUser.UserRole != AgencyRole.AGENT),
                     RawEmail = u.AgencyUser.Email,
-                    PersonMapAddressUrl = map,
-                    MapDetails = mapDetails,
-                    Pinode = u.AgencyUser.PinCode.Code
+                    PersonMapAddressUrl = u.AgencyUser.AddressMapLocation,
+                    MapDetails = u.AgencyUser.Addressline + ", " + u.AgencyUser.District.Name + ", " + u.AgencyUser.State.Code + ", " + u.AgencyUser.Country.Code,
+                    PinCode = u.AgencyUser.PinCode.Code
                 };
                 agentList.Add(agentData);
             }
@@ -421,6 +421,6 @@ namespace risk.control.system.Controllers.Api.Agency
         public string RawEmail { get; set; }
         public string? PersonMapAddressUrl { get; set; }
         public string? MapDetails { get; set; }
-        public string Pinode { get; set; }
+        public string PinCode { get; set; }
     }
 }

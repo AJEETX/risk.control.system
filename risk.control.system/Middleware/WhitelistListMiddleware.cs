@@ -91,7 +91,7 @@ namespace risk.control.system.Middleware
                     }
                 }
             }
-            var timeout = double.Parse(config["SESSION_TIMEOUT_SEC"]) - 30;
+            var timeout = double.Parse(config["SESSION_TIMEOUT_SEC"]);
             context.Items.Add("timeout", timeout);
             try
             {
