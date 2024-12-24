@@ -391,8 +391,8 @@ namespace risk.control.system.Controllers.Api.Claims
 
             var noDataimage = await System.IO.File.ReadAllBytesAsync(noDataImagefilePath);
 
-            var latitude = customer.PinCode.Latitude;
-            var longitude = customer.PinCode.Longitude.Trim();
+            var latitude = customer.Latitude;
+            var longitude = customer.Longitude.Trim();
             var latLongString = latitude + "," + longitude;
             var weatherUrl = $"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current=temperature_2m,windspeed_10m&hourly=temperature_2m,relativehumidity_2m,windspeed_10m";
             var weatherData = await httpClient.GetFromJsonAsync<Weather>(weatherUrl);
@@ -423,8 +423,8 @@ namespace risk.control.system.Controllers.Api.Claims
 
             var noDataimage = await System.IO.File.ReadAllBytesAsync(noDataImagefilePath);
 
-            var latitude = beneficiary.PinCode.Latitude;
-            var longitude = beneficiary.PinCode.Longitude.Trim();
+            var latitude = beneficiary.Latitude;
+            var longitude = beneficiary.Longitude.Trim();
             var latLongString = latitude + "," + longitude;
             var weatherUrl = $"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current=temperature_2m,windspeed_10m&hourly=temperature_2m,relativehumidity_2m,windspeed_10m";
             var weatherData = await httpClient.GetFromJsonAsync<Weather>(weatherUrl);
@@ -450,8 +450,8 @@ namespace risk.control.system.Controllers.Api.Claims
 
             if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
             {
-                var center = new { Lat = decimal.Parse(claim.CustomerDetail.PinCode.Latitude), Lng = decimal.Parse(claim.CustomerDetail.PinCode.Longitude) };
-                var dakota = new { Lat = decimal.Parse(claim.CustomerDetail.PinCode.Latitude), Lng = decimal.Parse(claim.CustomerDetail.PinCode.Longitude) };
+                var center = new { Lat = decimal.Parse(claim.CustomerDetail.Latitude), Lng = decimal.Parse(claim.CustomerDetail.Longitude) };
+                var dakota = new { Lat = decimal.Parse(claim.CustomerDetail.Latitude), Lng = decimal.Parse(claim.CustomerDetail.Longitude) };
 
                 if (claim.AgencyReport is not null && claim.AgencyReport?.DigitalIdReport?.DigitalIdImageLongLat is not null)
                 {
@@ -465,8 +465,8 @@ namespace risk.control.system.Controllers.Api.Claims
             }
             else
             {
-                var center = new { Lat = decimal.Parse(claim.BeneficiaryDetail.PinCode.Latitude), Lng = decimal.Parse(claim.BeneficiaryDetail.PinCode.Longitude) };
-                var dakota = new { Lat = decimal.Parse(claim.BeneficiaryDetail.PinCode.Latitude), Lng = decimal.Parse(claim.BeneficiaryDetail.PinCode.Longitude) };
+                var center = new { Lat = decimal.Parse(claim.BeneficiaryDetail.Latitude), Lng = decimal.Parse(claim.BeneficiaryDetail.Longitude) };
+                var dakota = new { Lat = decimal.Parse(claim.BeneficiaryDetail.Latitude), Lng = decimal.Parse(claim.BeneficiaryDetail.Longitude) };
 
                 if (claim.AgencyReport is not null && claim.AgencyReport?.DigitalIdReport?.DigitalIdImageLongLat is not null)
                 {
@@ -491,8 +491,8 @@ namespace risk.control.system.Controllers.Api.Claims
 
             if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
             {
-                var center = new { Lat = decimal.Parse(claim.CustomerDetail.PinCode.Latitude), Lng = decimal.Parse(claim.CustomerDetail.PinCode.Longitude) };
-                var dakota = new { Lat = decimal.Parse(claim.CustomerDetail.PinCode.Latitude), Lng = decimal.Parse(claim.CustomerDetail.PinCode.Longitude) };
+                var center = new { Lat = decimal.Parse(claim.CustomerDetail.Latitude), Lng = decimal.Parse(claim.CustomerDetail.Longitude) };
+                var dakota = new { Lat = decimal.Parse(claim.CustomerDetail.Latitude), Lng = decimal.Parse(claim.CustomerDetail.Longitude) };
 
                 if (claim.AgencyReport is not null && claim.AgencyReport?.PanIdReport?.DocumentIdImageLongLat is not null)
                 {
@@ -506,8 +506,8 @@ namespace risk.control.system.Controllers.Api.Claims
             }
             else
             {
-                var center = new { Lat = decimal.Parse(claim.BeneficiaryDetail.PinCode.Latitude), Lng = decimal.Parse(claim.BeneficiaryDetail.PinCode.Longitude) };
-                var dakota = new { Lat = decimal.Parse(claim.BeneficiaryDetail.PinCode.Latitude), Lng = decimal.Parse(claim.BeneficiaryDetail.PinCode.Longitude) };
+                var center = new { Lat = decimal.Parse(claim.BeneficiaryDetail.Latitude), Lng = decimal.Parse(claim.BeneficiaryDetail.Longitude) };
+                var dakota = new { Lat = decimal.Parse(claim.BeneficiaryDetail.Latitude), Lng = decimal.Parse(claim.BeneficiaryDetail.Longitude) };
 
                 if (claim.AgencyReport is not null && claim.AgencyReport?.PanIdReport?.DocumentIdImageLongLat is not null)
                 {
@@ -532,8 +532,8 @@ namespace risk.control.system.Controllers.Api.Claims
 
             if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
             {
-                var center = new { Lat = decimal.Parse(claim.CustomerDetail.PinCode.Latitude), Lng = decimal.Parse(claim.CustomerDetail.PinCode.Longitude) };
-                var dakota = new { Lat = decimal.Parse(claim.CustomerDetail.PinCode.Latitude), Lng = decimal.Parse(claim.CustomerDetail.PinCode.Longitude) };
+                var center = new { Lat = decimal.Parse(claim.CustomerDetail.Latitude), Lng = decimal.Parse(claim.CustomerDetail.Longitude) };
+                var dakota = new { Lat = decimal.Parse(claim.CustomerDetail.Latitude), Lng = decimal.Parse(claim.CustomerDetail.Longitude) };
 
                 if (claim.AgencyReport is not null && claim.AgencyReport?.PassportIdReport?.DocumentIdImageLongLat is not null)
                 {
@@ -547,8 +547,8 @@ namespace risk.control.system.Controllers.Api.Claims
             }
             else
             {
-                var center = new { Lat = decimal.Parse(claim.BeneficiaryDetail.PinCode.Latitude), Lng = decimal.Parse(claim.BeneficiaryDetail.PinCode.Longitude) };
-                var dakota = new { Lat = decimal.Parse(claim.BeneficiaryDetail.PinCode.Latitude), Lng = decimal.Parse(claim.BeneficiaryDetail.PinCode.Longitude) };
+                var center = new { Lat = decimal.Parse(claim.BeneficiaryDetail.Latitude), Lng = decimal.Parse(claim.BeneficiaryDetail.Longitude) };
+                var dakota = new { Lat = decimal.Parse(claim.BeneficiaryDetail.Latitude), Lng = decimal.Parse(claim.BeneficiaryDetail.Longitude) };
 
                 if (claim.AgencyReport is not null && claim.AgencyReport?.PassportIdReport?.DocumentIdImageLongLat is not null)
                 {
@@ -573,8 +573,8 @@ namespace risk.control.system.Controllers.Api.Claims
 
             if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
             {
-                var center = new { Lat = decimal.Parse(claim.CustomerDetail.PinCode.Latitude), Lng = decimal.Parse(claim.CustomerDetail.PinCode.Longitude) };
-                var dakota = new { Lat = decimal.Parse(claim.CustomerDetail.PinCode.Latitude), Lng = decimal.Parse(claim.CustomerDetail.PinCode.Longitude) };
+                var center = new { Lat = decimal.Parse(claim.CustomerDetail.Latitude), Lng = decimal.Parse(claim.CustomerDetail.Longitude) };
+                var dakota = new { Lat = decimal.Parse(claim.CustomerDetail.Latitude), Lng = decimal.Parse(claim.CustomerDetail.Longitude) };
 
                 if (claim.AgencyReport is not null && claim.AgencyReport?.AudioReport?.DocumentIdImageLongLat is not null)
                 {
@@ -588,8 +588,8 @@ namespace risk.control.system.Controllers.Api.Claims
             }
             else
             {
-                var center = new { Lat = decimal.Parse(claim.BeneficiaryDetail.PinCode.Latitude), Lng = decimal.Parse(claim.BeneficiaryDetail.PinCode.Longitude) };
-                var dakota = new { Lat = decimal.Parse(claim.BeneficiaryDetail.PinCode.Latitude), Lng = decimal.Parse(claim.BeneficiaryDetail.PinCode.Longitude) };
+                var center = new { Lat = decimal.Parse(claim.BeneficiaryDetail.Latitude), Lng = decimal.Parse(claim.BeneficiaryDetail.Longitude) };
+                var dakota = new { Lat = decimal.Parse(claim.BeneficiaryDetail.Latitude), Lng = decimal.Parse(claim.BeneficiaryDetail.Longitude) };
 
                 if (claim.AgencyReport is not null && claim.AgencyReport?.AudioReport?.DocumentIdImageLongLat is not null)
                 {
@@ -615,8 +615,8 @@ namespace risk.control.system.Controllers.Api.Claims
 
             if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
             {
-                var center = new { Lat = decimal.Parse(claim.CustomerDetail.PinCode.Latitude), Lng = decimal.Parse(claim.CustomerDetail.PinCode.Longitude) };
-                var dakota = new { Lat = decimal.Parse(claim.CustomerDetail.PinCode.Latitude), Lng = decimal.Parse(claim.CustomerDetail.PinCode.Longitude) };
+                var center = new { Lat = decimal.Parse(claim.CustomerDetail.Latitude), Lng = decimal.Parse(claim.CustomerDetail.Longitude) };
+                var dakota = new { Lat = decimal.Parse(claim.CustomerDetail.Latitude), Lng = decimal.Parse(claim.CustomerDetail.Longitude) };
 
                 if (claim.AgencyReport is not null && claim.AgencyReport?.VideoReport?.DocumentIdImageLongLat is not null)
                 {
@@ -630,8 +630,8 @@ namespace risk.control.system.Controllers.Api.Claims
             }
             else
             {
-                var center = new { Lat = decimal.Parse(claim.BeneficiaryDetail.PinCode.Latitude), Lng = decimal.Parse(claim.BeneficiaryDetail.PinCode.Longitude) };
-                var dakota = new { Lat = decimal.Parse(claim.BeneficiaryDetail.PinCode.Latitude), Lng = decimal.Parse(claim.BeneficiaryDetail.PinCode.Longitude) };
+                var center = new { Lat = decimal.Parse(claim.BeneficiaryDetail.Latitude), Lng = decimal.Parse(claim.BeneficiaryDetail.Longitude) };
+                var dakota = new { Lat = decimal.Parse(claim.BeneficiaryDetail.Latitude), Lng = decimal.Parse(claim.BeneficiaryDetail.Longitude) };
 
                 if (claim.AgencyReport is not null && claim.AgencyReport?.VideoReport?.DocumentIdImageLongLat is not null)
                 {

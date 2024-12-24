@@ -31,14 +31,14 @@ function startTimer(timeout, display) {
             askConfirmation = false; // Ensure confirmation dialog only shows once
             $.confirm({
                 title: "Session Expiring!",
-                content: `Your session is about to expire!<br />Click <b>REFRESH</b> to stay logged in.`,
+                content: `Your session is about to expire!<br />Click <b>CONTINUE</b> to stay logged in.`,
                 icon: 'fas fa-hourglass-end fa-spin',
                 type: 'orange',
                 closeIcon: true,
                 autoClose: `cancel|${timer * 1000}`,
                 buttons: {
                     confirm: {
-                        text: "REFRESH",
+                        text: "CONTINUE",
                         btnClass: 'btn-warning',
                         action: function () {
                             localStorage.removeItem("sessionTimer"); // Reset session timer

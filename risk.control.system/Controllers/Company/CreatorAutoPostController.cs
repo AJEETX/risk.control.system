@@ -449,9 +449,8 @@ namespace risk.control.system.Controllers.Company
                 var customerLatLong = latlong.Latitude + "," + latlong.Longitude;
                 var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
                 caseLocation.BeneficiaryLocationMap = url;
-                pincode.Latitude = latlong.Latitude;
-                pincode.Longitude = latlong.Longitude;
-                caseLocation.PinCode = pincode;
+                caseLocation.Latitude = latlong.Latitude;
+                caseLocation.Longitude = latlong.Longitude;
                 _context.BeneficiaryDetail.Add(caseLocation);
                 await _context.SaveChangesAsync();
 
@@ -521,8 +520,8 @@ namespace risk.control.system.Controllers.Company
                 var address = caseLocation.Addressline + ", " + pincode.District.Name + ", " + pincode.State.Name + ", " + pincode.Country.Code;
                 var latlong = await customApiCLient.GetCoordinatesFromAddressAsync(address);
                 var customerLatLong = latlong.Latitude + "," + latlong.Longitude;
-                pincode.Latitude = latlong.Latitude;
-                pincode.Longitude = latlong.Longitude;
+                caseLocation.Latitude = latlong.Latitude;
+                caseLocation.Longitude = latlong.Longitude;
                 var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
                 caseLocation.BeneficiaryLocationMap = url;
 
@@ -543,8 +542,6 @@ namespace risk.control.system.Controllers.Company
                         caseLocation.ProfilePictureUrl = existingLocation.ProfilePictureUrl;
                     }
                 }
-
-                caseLocation.PinCode = pincode;
 
                 _context.BeneficiaryDetail.Update(caseLocation);
                 await _context.SaveChangesAsync();

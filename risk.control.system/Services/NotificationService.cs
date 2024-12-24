@@ -76,7 +76,7 @@ namespace risk.control.system.Services
                     {
                             response.country = address?.features[0].properties.country;
                             response.regionName = address?.features[0].properties?.state;
-                            response.city = address?.features[0].properties?.county;
+                            response.city = address?.features[0].properties?.county ?? response.city;
                             response.district = address?.features[0].properties?.city;
                             response.zip = address?.features[0].properties?.postcode;
                             response.lat = address?.features[0].properties.lat;

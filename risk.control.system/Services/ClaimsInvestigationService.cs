@@ -394,7 +394,6 @@ namespace risk.control.system.Services
                         .Include(p => p.Country)
                         .FirstOrDefault(p => p.PinCodeId == claimsInvestigation.CustomerDetail.PinCodeId);
 
-                claimsInvestigation.CustomerDetail.PinCode = pincode;
                 var address = claimsInvestigation.CustomerDetail.Addressline + ", " +
                     pincode.District.Name + ", " +
                     pincode.State.Name + ", " +
@@ -402,8 +401,8 @@ namespace risk.control.system.Services
 
                 var latLong = await customApiCLient.GetCoordinatesFromAddressAsync(address);
                 var customerLatLong = latLong.Latitude + ","+latLong.Longitude;
-                pincode.Latitude = latLong.Latitude;
-                pincode.Longitude = latLong.Longitude;
+                claimsInvestigation.CustomerDetail.Latitude = latLong.Latitude;
+                claimsInvestigation.CustomerDetail.Longitude = latLong.Longitude;
                     var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
                 existingPolicy.CustomerDetail.CustomerLocationMap = url;
 
@@ -448,7 +447,6 @@ namespace risk.control.system.Services
                         .Include(p => p.Country)
                         .FirstOrDefault(p => p.PinCodeId == claimsInvestigation.CustomerDetail.PinCodeId);
 
-                    claimsInvestigation.CustomerDetail.PinCode = pincode;
                     var address = claimsInvestigation.CustomerDetail.Addressline + ", " +
                         pincode.District.Name + ", " +
                         pincode.State.Name + ", " +
@@ -456,8 +454,8 @@ namespace risk.control.system.Services
 
                     var latLong = await customApiCLient.GetCoordinatesFromAddressAsync(address);
                     var customerLatLong = latLong.Latitude + "," + latLong.Longitude;
-                    pincode.Latitude = latLong.Latitude;
-                    pincode.Longitude = latLong.Longitude;
+                    claimsInvestigation.CustomerDetail.Latitude = latLong.Latitude;
+                    claimsInvestigation.CustomerDetail.Longitude = latLong.Longitude;
                     var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
                     claimsInvestigation.CustomerDetail.CustomerLocationMap = url;
 

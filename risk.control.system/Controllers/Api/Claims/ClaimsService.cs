@@ -21,8 +21,6 @@ namespace risk.control.system.Controllers.Api.Claims
     public interface IClaimsService
     {
         IQueryable<ClaimsInvestigation> GetClaims();
-        decimal? GetLat(ClaimType? claimType, CustomerDetail a, BeneficiaryDetail location);
-        decimal? GetLng(ClaimType? claimType, CustomerDetail a, BeneficiaryDetail location);
     }
     public class ClaimsService : IClaimsService
     {
@@ -69,36 +67,5 @@ namespace risk.control.system.Controllers.Api.Claims
             return applicationDbContext.OrderByDescending(o => o.Created);
         }
 
-        public decimal? GetLat(ClaimType? claimType, CustomerDetail a, BeneficiaryDetail location)
-        {
-            if (claimType == ClaimType.HEALTH)
-            {
-                if (a is null)
-                    return null;
-                return decimal.Parse(a.PinCode.Latitude);
-            }
-            else
-            {
-                if (location is null)
-                    return null;
-                return decimal.Parse(location.PinCode.Latitude);
-            }
-        }
-
-        public decimal? GetLng(ClaimType? claimType, CustomerDetail a, BeneficiaryDetail location)
-        {
-            if (claimType == ClaimType.HEALTH)
-            {
-                if (a is null)
-                    return null;
-                return decimal.Parse(a.PinCode.Longitude);
-            }
-            else
-            {
-                if (location is null)
-                    return null;
-                return decimal.Parse(location.PinCode.Longitude);
-            }
-        }
     }
 }

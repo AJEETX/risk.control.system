@@ -82,6 +82,8 @@ namespace risk.control.system.Models
 
         public string? Description { get; set; }
         public string? CustomerLocationMap { get; set; }
+        public string? Latitude { get; set; }
+        public string? Longitude { get; set; }
 
         public override string ToString()
         {

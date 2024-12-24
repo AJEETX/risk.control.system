@@ -450,9 +450,8 @@ namespace risk.control.system.Controllers.Company
                 var customerLatLong = latlong.Latitude + "," + latlong.Longitude;
                 var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
                 caseLocation.BeneficiaryLocationMap = url;
-                pincode.Latitude = latlong.Latitude;
-                pincode.Longitude = latlong.Longitude;
-                caseLocation.PinCode = pincode;
+                caseLocation.Latitude = latlong.Latitude;
+                caseLocation.Longitude = latlong.Longitude;
                 _context.BeneficiaryDetail.Add(caseLocation);
                 await _context.SaveChangesAsync();
 
@@ -524,9 +523,8 @@ namespace risk.control.system.Controllers.Company
                 var customerLatLong = latlong.Latitude + "," + latlong.Longitude;
                 var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
                 caseLocation.BeneficiaryLocationMap = url;
-                pincode.Latitude = latlong.Latitude;
-                pincode.Longitude = latlong.Longitude;
-                caseLocation.PinCode = pincode;
+                caseLocation.Latitude = latlong.Latitude;
+                caseLocation.Longitude = latlong.Longitude;
 
                 IFormFile? customerDocument = Request.Form?.Files?.FirstOrDefault();
                 if (customerDocument is not null)
@@ -545,11 +543,6 @@ namespace risk.control.system.Controllers.Company
                         caseLocation.ProfilePictureUrl = existingLocation.ProfilePictureUrl;
                     }
                 }
-
-                pincode.Latitude = latlong.Latitude;
-                pincode.Longitude = latlong.Longitude;
-                caseLocation.PinCode = pincode;
-
 
                 _context.BeneficiaryDetail.Update(caseLocation);
                 await _context.SaveChangesAsync();

@@ -367,15 +367,12 @@ namespace risk.control.system.Services
                                 pinCode.Code;
 
                             var coordinates = await customApiCLient.GetCoordinatesFromAddressAsync(address);
-                            claim.CustomerDetail.PinCode.Latitude = coordinates.Latitude;
-                            claim.CustomerDetail.PinCode.Longitude = coordinates.Longitude;
-                            var customerLatLong = claim.CustomerDetail.PinCode.Latitude + "," + claim.CustomerDetail.PinCode.Longitude;
+                            claim.CustomerDetail.Latitude = coordinates.Latitude;
+                            claim.CustomerDetail.Longitude = coordinates.Longitude;
+                            var customerLatLong = claim.CustomerDetail.Latitude + "," + claim.CustomerDetail.Longitude;
 
                             var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
                             claim.CustomerDetail.CustomerLocationMap = url;
-                            pinCode.Latitude = coordinates.Latitude;
-                            pinCode.Longitude = coordinates.Longitude;
-                            claim.CustomerDetail.PinCode = pinCode;
 
                             var benePinCode = _context.PinCode
                                 .Include(p => p.District)
@@ -425,10 +422,8 @@ namespace risk.control.system.Services
                             var beneCoordinates = await customApiCLient.GetCoordinatesFromAddressAsync(address2);
 
                             var beneLatLong = beneCoordinates.Latitude + "," + beneCoordinates.Longitude;
-                            benePinCode.Latitude = beneCoordinates.Latitude;
-                            benePinCode.Longitude = beneCoordinates.Longitude;
-
-                            beneficairy.PinCode = benePinCode;
+                            beneficairy.Latitude = beneCoordinates.Latitude;
+                            beneficairy.Longitude = beneCoordinates.Longitude;
 
                             var beneUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={beneLatLong}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{beneLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
                             beneficairy.BeneficiaryLocationMap = beneUrl;

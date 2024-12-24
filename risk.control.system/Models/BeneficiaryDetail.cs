@@ -65,6 +65,8 @@ namespace risk.control.system.Models
         public string Addressline { get; set; }
 
         public string? BeneficiaryLocationMap { get; set; }
+        public string? Latitude { get; set; }
+        public string? Longitude { get; set; }
         public List<PreviousClaimReport> PreviousClaimReports { get; set; } = new List<PreviousClaimReport>();
         public string? ClaimsInvestigationId { get; set; }
         public ClaimsInvestigation? ClaimsInvestigation { get; set; }

@@ -34,7 +34,7 @@ namespace risk.control.system.Controllers.Api.Agency
         private readonly UserManager<VendorApplicationUser> userManager;
 
         public SupervisorController(ApplicationDbContext context,
-             IWebHostEnvironment webHostEnvironment, 
+             IWebHostEnvironment webHostEnvironment,
              UserManager<VendorApplicationUser> userManager)
         {
             hindiNFO.CurrencySymbol = string.Empty;
@@ -73,16 +73,30 @@ namespace risk.control.system.Controllers.Api.Agency
             var submittedToAssesssorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
 
+            IList<ClaimsInvestigation> claimsSubmitted = null!;
             if (userRole.Value.Contains(AppRoles.AGENCY_ADMIN.ToString()))
             {
                 applicationDbContext = applicationDbContext.Where(a => openSubstatusesForSupervisor.Contains(a.InvestigationCaseSubStatusId) &&
-                ( a.InvestigationCaseSubStatus == assignedToAgentStatus) ||
+                (a.InvestigationCaseSubStatus == assignedToAgentStatus) ||
                 a.InvestigationCaseSubStatus == replyStatus ||
-                ( a.InvestigationCaseSubStatus == submittedToAssesssorStatus)
+                (a.InvestigationCaseSubStatus == submittedToAssesssorStatus)
                 );
 
-                var claimsSubmitted = applicationDbContext?.ToList();
-                var response = claimsSubmitted?
+                claimsSubmitted = applicationDbContext?.ToList();
+
+            }
+            else if (userRole.Value.Contains(AppRoles.SUPERVISOR.ToString()))
+
+            {
+                applicationDbContext = applicationDbContext.Where(a => openSubstatusesForSupervisor.Contains(a.InvestigationCaseSubStatusId) &&
+                (a.UserEmailActioned == vendorUser.Email && a.InvestigationCaseSubStatus == replyStatus) ||
+                (a.UserEmailActioned == vendorUser.Email && a.InvestigationCaseSubStatus == assignedToAgentStatus) ||
+                (a.UserEmailActioned == vendorUser.Email && a.InvestigationCaseSubStatus == submittedToAssesssorStatus)
+                );
+
+                claimsSubmitted = applicationDbContext?.ToList();
+            }
+            var response = claimsSubmitted?
                    .Select(a => new ClaimsInvestigationResponse
                    {
                        Id = a.ClaimsInvestigationId,
@@ -104,55 +118,7 @@ namespace risk.control.system.Controllers.Api.Agency
                        Service = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail.InvestigationServiceType.Name + "</span>"),
                        Location = string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseSubStatus.Name + "</span>"),
                        Created = string.Join("", "<span class='badge badge-light'>" + a.Created.ToString("dd-MM-yyyy") + "</span>"),
-                       timePending = a.GetSupervisorTimePending(false, a.InvestigationCaseSubStatus == assignedToAgentStatus, a.InvestigationCaseSubStatus == submittedToAssesssorStatus,false, a.InvestigationCaseSubStatus == replyStatus),
-                       PolicyNum = a.PolicyDetail.ContractNumber,
-                       BeneficiaryPhoto = a.BeneficiaryDetail.ProfilePicture != null ?
-                                       string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.BeneficiaryDetail.ProfilePicture)) :
-                                      Applicationsettings.NO_USER,
-                       BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail.Name) ?
-                        "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>" :
-                        a.BeneficiaryDetail.Name,
-                       TimeElapsed = DateTime.Now.Subtract(a.InvestigationCaseSubStatus == assignedToAgentStatus ? 
-                       a.TaskToAgentTime.Value: a.InvestigationCaseSubStatus == submittedToAssesssorStatus ? a.SubmittedToAssessorTime.Value: a.Created).TotalSeconds,
-                       PersonMapAddressUrl = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? a.CustomerDetail.CustomerLocationMap : a.BeneficiaryDetail.BeneficiaryLocationMap
-                   })?
-                   .ToList();
-
-                return Ok(response);
-            }
-            else if(userRole.Value.Contains(AppRoles.SUPERVISOR.ToString()))
-            
-                    {
-                applicationDbContext = applicationDbContext.Where(a => openSubstatusesForSupervisor.Contains(a.InvestigationCaseSubStatusId) &&
-                (a.UserEmailActioned == vendorUser.Email && a.InvestigationCaseSubStatus == replyStatus) ||
-                (a.UserEmailActioned == vendorUser.Email && a.InvestigationCaseSubStatus == assignedToAgentStatus) ||
-                (a.UserEmailActioned == vendorUser.Email && a.InvestigationCaseSubStatus == submittedToAssesssorStatus)
-                );
-
-                var claimsSubmitted = applicationDbContext?.ToList();
-                var response = claimsSubmitted?
-                   .Select(a => new ClaimsInvestigationResponse
-                   {
-                       Id = a.ClaimsInvestigationId,
-                       AssignedToAgency = a.AssignedToAgency,
-                       PolicyId = a.PolicyDetail.ContractNumber,
-                       Amount = string.Format(hindiNFO, "{0:C}", a.PolicyDetail.SumAssuredValue),
-                       Agent = !string.IsNullOrWhiteSpace(a.UserEmailActionedTo) ? a.UserEmailActionedTo : a.UserRoleActionedTo,
-                       OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(GetOwner(a))),
-                       CaseWithPerson = !string.IsNullOrWhiteSpace(a.UserEmailActionedTo) ? true : false,
-                       Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
-                       PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
-                       Company = a.ClientCompany.Name,
-                       Document = a.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : Applicationsettings.NO_POLICY_IMAGE,
-                       Customer = a.CustomerDetail.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail.ProfilePicture)) : Applicationsettings.NO_USER,
-                       Name = a.CustomerDetail.Name,
-                       Policy = a.PolicyDetail.LineOfBusiness.Name,
-                       Status = a.InvestigationCaseStatus.Name,
-                       ServiceType = a.PolicyDetail.ClaimType.GetEnumDisplayName(),
-                       Service = a.PolicyDetail.InvestigationServiceType.Name,
-                       Location = a.InvestigationCaseSubStatus.Name,
-                       Created = a.Created.ToString("dd-MM-yyyy"),
-                       timePending = a.GetSupervisorTimePending(false, a.InvestigationCaseSubStatus == assignedToAgentStatus, false, a.InvestigationCaseSubStatus == submittedToAssesssorStatus),
+                       timePending = a.GetSupervisorTimePending(false, a.InvestigationCaseSubStatus == assignedToAgentStatus, false, a.InvestigationCaseSubStatus == submittedToAssesssorStatus, a.InvestigationCaseSubStatus == replyStatus),
                        PolicyNum = a.PolicyDetail.ContractNumber,
                        BeneficiaryPhoto = a.BeneficiaryDetail.ProfilePicture != null ?
                                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.BeneficiaryDetail.ProfilePicture)) :
@@ -166,9 +132,7 @@ namespace risk.control.system.Controllers.Api.Agency
                    })?
                    .ToList();
 
-                return Ok(response);
-            }
-            return Ok(null);
+            return Ok(response);
         }
 
         private byte[] GetOwner(ClaimsInvestigation a)
@@ -283,7 +247,7 @@ namespace risk.control.system.Controllers.Api.Agency
                        Service = a.PolicyDetail.InvestigationServiceType.Name,
                        Location = a.InvestigationCaseSubStatus.Name,
                        Created = a.Created.ToString("dd-MM-yyyy"),
-                       timePending = a.GetSupervisorTimePending(!a.IsReviewCase,false,false,false, a.IsReviewCase),
+                       timePending = a.GetSupervisorTimePending(!a.IsQueryCase, false, false, false, a.IsQueryCase),
                        PolicyNum = a.GetPolicyNumForAgency(requestedStatus.InvestigationCaseSubStatusId),
                        BeneficiaryPhoto = a.BeneficiaryDetail?.ProfilePicture != null ?
                                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.BeneficiaryDetail.ProfilePicture)) :
@@ -292,14 +256,14 @@ namespace risk.control.system.Controllers.Api.Agency
                         "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>" :
                         a.BeneficiaryDetail.Name,
                        TimeElapsed = DateTime.Now.Subtract(a.AllocatedToAgencyTime.Value).TotalSeconds,
-                       IsNewAssigned = a.AllocateView <= 1 ,
+                       IsNewAssigned = a.AllocateView <= 1,
                        IsQueryCase = a.InvestigationCaseSubStatusId == requestedStatus.InvestigationCaseSubStatusId,
                        PersonMapAddressUrl = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? a.CustomerDetail.CustomerLocationMap : a.BeneficiaryDetail.BeneficiaryLocationMap
                    })
                     ?.ToList();
 
-                return Ok(response);
-            }
+            return Ok(response);
+        }
 
         [HttpGet("GetNewMap")]
         public IActionResult GetNewMap()
@@ -323,7 +287,7 @@ namespace risk.control.system.Controllers.Api.Agency
                     .Include(a => a.PolicyDetail)
                     .ThenInclude(a => a.LineOfBusiness)
                     .Where(i => i.VendorId == vendorUser.VendorId);
-        }
+            }
             var claims = new List<ClaimsInvestigation>();
 
             if (userRole.Value.Contains(AppRoles.AGENCY_ADMIN.ToString()) || userRole.Value.Contains(AppRoles.SUPERVISOR.ToString()))
@@ -339,7 +303,7 @@ namespace risk.control.system.Controllers.Api.Agency
             {
                 foreach (var item in applicationDbContext)
                 {
-                    if(item.VendorId == vendorUser.VendorId && item.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId)
+                    if (item.VendorId == vendorUser.VendorId && item.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId)
                     {
                         claims.Add(item);
                     }
@@ -354,14 +318,14 @@ namespace risk.control.system.Controllers.Api.Agency
                          Price = a.PolicyDetail.SumAssuredValue,
                          Type = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? "home" : "building",
                          Bed = a.CustomerDetail.Income.GetEnumDisplayName(),
-                         Bath =long.Parse(a.CustomerDetail.ContactNumber),
+                         Bath = long.Parse(a.CustomerDetail.ContactNumber),
                          Size = a.CustomerDetail.Description,
                          Position = new Position
                          {
                              Lat = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
-                            decimal.Parse(a.CustomerDetail.PinCode.Latitude) : decimal.Parse(a.BeneficiaryDetail.PinCode.Latitude),
+                            decimal.Parse(a.CustomerDetail.Latitude) : decimal.Parse(a.BeneficiaryDetail.Latitude),
                              Lng = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
-                             decimal.Parse(a.CustomerDetail.PinCode.Longitude) : decimal.Parse(a.BeneficiaryDetail.PinCode.Longitude)
+                             decimal.Parse(a.CustomerDetail.Longitude) : decimal.Parse(a.BeneficiaryDetail.Longitude)
                          },
                          Url = "/ClaimsVendor/Detail?Id=" + a.ClaimsInvestigationId
                      })?
@@ -445,9 +409,9 @@ namespace risk.control.system.Controllers.Api.Agency
                        ServiceType = a.PolicyDetail?.ClaimType.GetEnumDisplayName(),
                        Service = a.PolicyDetail.InvestigationServiceType.Name,
                        Location = a.InvestigationCaseSubStatus.Name,
-                       RawStatus =  a.InvestigationCaseSubStatus.Name,
+                       RawStatus = a.InvestigationCaseSubStatus.Name,
                        Created = a.Created.ToString("dd-MM-yyyy"),
-                       timePending = a.GetSupervisorTimePending(false,false,true, false),
+                       timePending = a.GetSupervisorTimePending(false, false, true, false),
                        PolicyNum = a.PolicyDetail.ContractNumber,
                        BeneficiaryPhoto = a.BeneficiaryDetail?.ProfilePicture != null ?
                                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.BeneficiaryDetail.ProfilePicture)) :
@@ -496,63 +460,29 @@ namespace risk.control.system.Controllers.Api.Agency
                     i.InvestigationCaseSubStatusId == reassignedStatus.InvestigationCaseSubStatusId &&
                     i.UserEmailActionedTo == string.Empty)?.Distinct();
 
+            var claimsSubmitted = new List<ClaimsInvestigation>();
             if (agencyUser.IsVendorAdmin)
             {
-                var claimsSubmitted = new List<ClaimsInvestigation>();
                 foreach (var claim in applicationDbContext)
                 {
                     var reviewClaimIds = reviewCases.Select(r => r.ClaimsInvestigationId);
                     var previousReport = _context.PreviousClaimReport.Any(r => r.VendorId == claim.VendorId && claim.ClaimsInvestigationId == r.ClaimsInvestigationId);
-                    if ((claim.InvestigationCaseStatusId== finishedStatus.InvestigationCaseStatusId &&
-                        claim.VendorId == agencyUser.VendorId && 
-                        claim.InvestigationCaseSubStatusId== approvedStatus.InvestigationCaseSubStatusId ||
+                    if ((claim.InvestigationCaseStatusId == finishedStatus.InvestigationCaseStatusId &&
+                        claim.VendorId == agencyUser.VendorId &&
+                        claim.InvestigationCaseSubStatusId == approvedStatus.InvestigationCaseSubStatusId ||
                         claim.InvestigationCaseSubStatusId == rejectedStatus.InvestigationCaseSubStatusId) ||
                         (reviewClaimIds.Contains(claim.ClaimsInvestigationId)) && claim.ReviewCount == 1 && claim.IsReviewCase && previousReport)
                     {
                         claimsSubmitted.Add(claim);
                     }
                 }
-                var response = claimsSubmitted
-                       .Select(a => new ClaimsInvestigationAgencyResponse
-                       {
-                           Id = a.ClaimsInvestigationId,
-                           PolicyId = a.PolicyDetail.ContractNumber,
-                           Amount = string.Format(hindiNFO, "{0:C}", a.PolicyDetail.SumAssuredValue),
-                           AssignedToAgency = a.AssignedToAgency,
-                           Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
-                           PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
-                           Company = a.ClientCompany.Name,
-                           OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(GetOwner(a))),
-                           Document = a.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : Applicationsettings.NO_POLICY_IMAGE,
-                           Customer = ClaimsInvestigationExtension.GetPersonPhoto(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
-                           Name = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? a.CustomerDetail.Name : a.BeneficiaryDetail.Name,
-                           Policy = a.PolicyDetail?.LineOfBusiness.Name,
-                           Status = a.InvestigationCaseStatus.Name,
-                           ServiceType = a.PolicyDetail?.ClaimType.GetEnumDisplayName(),
-                           Service = a.PolicyDetail.InvestigationServiceType.Name,
-                           Location = a.InvestigationCaseSubStatus.Name,
-                           Created = a.Created.ToString("dd-MM-yyyy"),
-                           timePending = a.GetSupervisorTimePending(false,false,false, true),
-                           PolicyNum = a.PolicyDetail.ContractNumber,
-                           BeneficiaryPhoto =  a.BeneficiaryDetail?.ProfilePicture != null ?
-                                       string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.BeneficiaryDetail.ProfilePicture)) :
-                                      Applicationsettings.NO_USER,
-                           BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail.Name) ?
-                        "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>" :
-                        a.BeneficiaryDetail.Name,
-                           TimeElapsed = DateTime.Now.Subtract(a.SubmittedToAssessorTime.Value).TotalSeconds,
-                           PersonMapAddressUrl = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? a.CustomerDetail.CustomerLocationMap : a.BeneficiaryDetail.BeneficiaryLocationMap
-                       })
-                        ?.ToList();
-
-                return Ok(response);
+               
             }
             else
             {
                 var userAttendedClaims = _context.InvestigationTransaction.Where(t => (t.UserEmailActioned == agencyUser.Email &&
                             t.InvestigationCaseSubStatusId == submittedToAssessorStatus.InvestigationCaseSubStatusId))?.Select(c => c.ClaimsInvestigationId)?.Distinct();
 
-                var claimsSubmitted = new List<ClaimsInvestigation>();
                 foreach (var claim in applicationDbContext)
                 {
                     var previousReport = _context.PreviousClaimReport.Any(r => r.ClaimsInvestigationId == claim.ClaimsInvestigationId);
@@ -565,53 +495,52 @@ namespace risk.control.system.Controllers.Api.Agency
                      i.UserRoleActionedTo == $"{claim.ClientCompany.Email}");
 
                     if ((claim.InvestigationCaseStatus.Name == CONSTANTS.CASE_STATUS.FINISHED &&
-                        claim.VendorId == agencyUser.VendorId && 
+                        claim.VendorId == agencyUser.VendorId &&
                         claim.InvestigationCaseSubStatus.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR) ||
-                        (claim.InvestigationCaseSubStatus.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR) || 
-                        ( isReview && previousReport))
+                        (claim.InvestigationCaseSubStatus.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR) ||
+                        (isReview && previousReport))
                     {
-                        if (userAttendedClaims.Contains(claim.ClaimsInvestigationId) )
+                        if (userAttendedClaims.Contains(claim.ClaimsInvestigationId))
                         {
                             claimsSubmitted.Add(claim);
                         }
                     }
                 }
-                var response = claimsSubmitted
-                       .Select(a => new ClaimsInvestigationAgencyResponse
-                       {
-                           Id = a.ClaimsInvestigationId,
-                           PolicyId = a.PolicyDetail.ContractNumber,
-                           Amount = string.Format(hindiNFO, "{0:C}", a.PolicyDetail.SumAssuredValue),
-                           AssignedToAgency = a.AssignedToAgency,
-                           Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
-                           PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
-                           Company = a.ClientCompany.Name,
-                           OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.ClientCompany.DocumentImage)),
-                           Document = a.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : Applicationsettings.NO_POLICY_IMAGE,
-                           Customer = ClaimsInvestigationExtension.GetPersonPhoto(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
-                           Name = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? a.CustomerDetail.Name : a.BeneficiaryDetail.Name,
-                           Policy = a.PolicyDetail?.LineOfBusiness.Name,
-                           Status = a.InvestigationCaseStatus.Name,
-                           ServiceType = a.PolicyDetail?.ClaimType.GetEnumDisplayName(),
-                           Service = a.PolicyDetail.InvestigationServiceType.Name,
-                           Location = a.InvestigationCaseSubStatus.Name,
-                           Created = a.Created.ToString("dd-MM-yyyy"),
-                           timePending = a.GetSupervisorTimePending(false,false,false, true),
-                           PolicyNum = a.PolicyDetail.ContractNumber,
-                           BeneficiaryPhoto = a.BeneficiaryDetail?.ProfilePicture != null ?
-                                       string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.BeneficiaryDetail.ProfilePicture)) :
-                                      Applicationsettings.NO_USER,
-                           BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail.Name) ?
-                        "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>" :
-                        a.BeneficiaryDetail.Name,
-                           TimeElapsed = DateTime.Now.Subtract(a.SubmittedToAssessorTime.Value).TotalSeconds,
-                           PersonMapAddressUrl = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? a.CustomerDetail.CustomerLocationMap : a.BeneficiaryDetail.BeneficiaryLocationMap
-                       })
-                        ?.ToList();
-
-                return Ok(response);
             }
-            
+            var response = claimsSubmitted
+                      .Select(a => new ClaimsInvestigationAgencyResponse
+                      {
+                          Id = a.ClaimsInvestigationId,
+                          PolicyId = a.PolicyDetail.ContractNumber,
+                          Amount = string.Format(hindiNFO, "{0:C}", a.PolicyDetail.SumAssuredValue),
+                          AssignedToAgency = a.AssignedToAgency,
+                          Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
+                          PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
+                          Company = a.ClientCompany.Name,
+                          OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(GetOwner(a))),
+                          Document = a.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : Applicationsettings.NO_POLICY_IMAGE,
+                          Customer = ClaimsInvestigationExtension.GetPersonPhoto(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
+                          Name = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? a.CustomerDetail.Name : a.BeneficiaryDetail.Name,
+                          Policy = a.PolicyDetail?.LineOfBusiness.Name,
+                          Status = a.InvestigationCaseStatus.Name,
+                          ServiceType = a.PolicyDetail?.ClaimType.GetEnumDisplayName(),
+                          Service = a.PolicyDetail.InvestigationServiceType.Name,
+                          Location = a.InvestigationCaseSubStatus.Name,
+                          Created = a.Created.ToString("dd-MM-yyyy"),
+                          timePending = a.GetSupervisorTimePending(false, false, false, true),
+                          PolicyNum = a.PolicyDetail.ContractNumber,
+                          BeneficiaryPhoto = a.BeneficiaryDetail?.ProfilePicture != null ?
+                                      string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.BeneficiaryDetail.ProfilePicture)) :
+                                     Applicationsettings.NO_USER,
+                          BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail.Name) ?
+                       "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>" :
+                       a.BeneficiaryDetail.Name,
+                          TimeElapsed = DateTime.Now.Subtract(a.SubmittedToAssessorTime.Value).TotalSeconds,
+                          PersonMapAddressUrl = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? a.CustomerDetail.CustomerLocationMap : a.BeneficiaryDetail.BeneficiaryLocationMap
+                      })
+                       ?.ToList();
+
+            return Ok(response);
         }
 
         private IQueryable<ClaimsInvestigation> GetClaims()
@@ -620,7 +549,7 @@ namespace risk.control.system.Controllers.Api.Agency
                .Include(c => c.PolicyDetail)
                .Include(c => c.ClientCompany)
                .Include(c => c.BeneficiaryDetail)
-               .ThenInclude(b=>b.BeneficiaryRelation)
+               .ThenInclude(b => b.BeneficiaryRelation)
                .Include(c => c.PolicyDetail)
                .ThenInclude(c => c.CaseEnabler)
                .Include(c => c.PolicyDetail)

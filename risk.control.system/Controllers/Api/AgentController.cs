@@ -545,9 +545,9 @@ namespace risk.control.system.Controllers.Api
                         Coordinate = new
                         {
                             Lat = c.PolicyDetail.ClaimType == ClaimType.HEALTH ?
-                                decimal.Parse(c.CustomerDetail.PinCode.Latitude) : decimal.Parse(c.BeneficiaryDetail.PinCode.Latitude),
+                                decimal.Parse(c.CustomerDetail.Latitude) : decimal.Parse(c.BeneficiaryDetail.Latitude),
                             Lng = c.PolicyDetail.ClaimType == ClaimType.HEALTH ?
-                                 decimal.Parse(c.CustomerDetail.PinCode.Longitude) : decimal.Parse(c.BeneficiaryDetail.PinCode.Longitude)
+                                 decimal.Parse(c.CustomerDetail.Longitude) : decimal.Parse(c.BeneficiaryDetail.Longitude)
                         },
                         Address = LocationDetail.GetAddress(c.PolicyDetail.ClaimType, c.CustomerDetail, c.BeneficiaryDetail),
                         PolicyNumber = c.PolicyDetail.ContractNumber,
