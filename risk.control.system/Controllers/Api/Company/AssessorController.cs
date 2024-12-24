@@ -211,7 +211,7 @@ namespace risk.control.system.Controllers.Api.Company
                         Service = a.PolicyDetail.InvestigationServiceType.Name,
                         Location = a.InvestigationCaseSubStatus.Name,
                         Created = a.Created.ToString("dd-MM-yyyy"),
-                        timePending = a.GetAssessorTimePending(),
+                        timePending = a.GetAssessorTimePending(false,false,a.InvestigationCaseSubStatus == requestedByAssessor,a.IsReviewCase),
                         Withdrawable = !a.NotWithdrawable,
                         PolicyNum = a.GetPolicyNum(),
                         BeneficiaryPhoto = a.BeneficiaryDetail?.ProfilePicture != null ?

@@ -1,8 +1,4 @@
-﻿using Amazon.Rekognition.Model;
-
-using Google.Api;
-
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -11,8 +7,6 @@ using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
 using risk.control.system.Services;
-
-using SkiaSharp;
 
 using static risk.control.system.AppConstant.Applicationsettings;
 
@@ -95,80 +89,30 @@ namespace risk.control.system.Seeds
             }
 
             //Seed Vendor Supervisor
+            await SupervisorSeed.Seed(context, SUPERVISOR.CODE, webHostEnvironment, userManager, vendor, pinCode, Applicationsettings.SUPERVISOR.PROFILE_IMAGE,
+                Applicationsettings.SUPERVISOR.FIRST_NAME, Applicationsettings.SUPERVISOR.LAST_NAME);
 
-            string supervisorEmailwithSuffix = SUPERVISOR.CODE + "@" + vendor.Email;
-
-            var vsMailBox = new Mailbox
-            {
-                Name = supervisorEmailwithSuffix
-            };
-
-            string supervisorImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(SUPERVISOR.PROFILE_IMAGE));
-            var supervisorImage = File.ReadAllBytes(supervisorImagePath);
-
-            if (supervisorImage == null)
-            {
-                supervisorImage = File.ReadAllBytes(noUserImagePath);
-            }
-            var vendorSupervisor = new VendorApplicationUser()
-            {
-                Mailbox = vsMailBox,
-                UserName = supervisorEmailwithSuffix,
-                Email = supervisorEmailwithSuffix,
-                FirstName = SUPERVISOR.FIRST_NAME,
-                LastName = SUPERVISOR.LAST_NAME,
-                EmailConfirmed = true,
-                Active = true,
-                PhoneNumberConfirmed = true,
-                Password = Password,
-                PhoneNumber = Applicationsettings.PORTAL_ADMIN_MOBILE,
-                Vendor = vendor,
-                IsSuperAdmin = false,
-                IsClientAdmin = false,
-                Addressline = "55 Donvale Road",
-                IsVendorAdmin = false,
-                CountryId = countryId,
-                DistrictId = district?.DistrictId ?? default!,
-                StateId = state?.StateId ?? default!,
-                PinCodeId = pinCode?.PinCodeId ?? default!,
-                ProfilePictureUrl = SUPERVISOR.PROFILE_IMAGE,
-                ProfilePicture = supervisorImage,
-                Role = AppRoles.SUPERVISOR,
-                UserRole = AgencyRole.SUPERVISOR,
-                Updated = DateTime.Now
-            };
-            if (userManager.Users.All(u => u.Id != vendorSupervisor.Id))
-            {
-                var user = await userManager.FindByEmailAsync(vendorSupervisor.Email);
-                if (user == null)
-                {
-                    await userManager.CreateAsync(vendorSupervisor, Password);
-                    await userManager.AddToRoleAsync(vendorSupervisor, AppRoles.SUPERVISOR.ToString());
-                    //var vendorSuperVisorRole = new ApplicationRole(AppRoles.SUPERVISOR.ToString(), AppRoles.Supervisor.ToString());
-                    //vendorSupervisor.ApplicationRoles.Add(vendorSuperVisorRole);
-
-                    //await userManager.AddToRoleAsync(vendorSupervisor, AppRoles.AGENT.ToString());
-                    //var vendorAgentRole = new ApplicationRole(AppRoles.AGENT.ToString(), AppRoles.AGENT.ToString());
-                    //vendorSupervisor.ApplicationRoles.Add(vendorAgentRole);
-                }
-            }
 
             //Seed Vendor Agent
             string agentEmailwithSuffix = AGENT.CODE + "@" + vendor.Email;
             var pinCode1 = CURRENT_PINCODE2;
-            await SeedAgent.Seed(context,agentEmailwithSuffix, webHostEnvironment, customApiCLient, userManager, vendor, pinCode1, Applicationsettings.AGENT.PROFILE_IMAGE);
+            await AgentSeed.Seed(context,agentEmailwithSuffix, webHostEnvironment, customApiCLient, userManager, vendor, pinCode1, Applicationsettings.AGENT.PROFILE_IMAGE,
+                 Applicationsettings.AGENT.FIRST_NAME, Applicationsettings.AGENT.LAST_NAME);
 
             string agent2EmailwithSuffix = AGENTX.CODE + "@" + vendor.Email;
             var pinCode2 = CURRENT_PINCODE4;
-            await SeedAgent.Seed(context, agent2EmailwithSuffix, webHostEnvironment, customApiCLient, userManager, vendor, pinCode2, Applicationsettings.AGENTX.PROFILE_IMAGE);
+            await AgentSeed.Seed(context, agent2EmailwithSuffix, webHostEnvironment, customApiCLient, userManager, vendor, pinCode2, Applicationsettings.AGENTX.PROFILE_IMAGE,
+                                 Applicationsettings.AGENTX.FIRST_NAME, Applicationsettings.AGENTX.LAST_NAME);
 
             //string agent3EmailwithSuffix = AGENTY.CODE + "@" + vendor.Email;
             //var pinCode3 = CURRENT_PINCODE5;
-            //await SeedAgent.Seed(context, agent3EmailwithSuffix, webHostEnvironment, customApiCLient, userManager, vendor, pinCode3, Applicationsettings.AGENTY.PROFILE_IMAGE);
+            //await SeedAgent.Seed(context, agent3EmailwithSuffix, webHostEnvironment, customApiCLient, userManager, vendor, pinCode3, Applicationsettings.AGENTY.PROFILE_IMAGE,
+            //Applicationsettings.AGENTY.FIRST_NAME, Applicationsettings.AGENTX.LAST_NAME);
 
             //string agent4EmailwithSuffix = AGENTZ.CODE + "@" + vendor.Email;
             //var pinCode4 = CURRENT_PINCODE3;
-            //await SeedAgent.Seed(context, agent4EmailwithSuffix, webHostEnvironment, customApiCLient, userManager, vendor, pinCode4, Applicationsettings.AGENTZ.PROFILE_IMAGE);
+            //await SeedAgent.Seed(context, agent4EmailwithSuffix, webHostEnvironment, customApiCLient, userManager, vendor, pinCode4, Applicationsettings.AGENTZ.PROFILE_IMAGE,
+            //Applicationsettings.AGENTZ.FIRST_NAME, Applicationsettings.AGENTZ.LAST_NAME);
 
         }
     }

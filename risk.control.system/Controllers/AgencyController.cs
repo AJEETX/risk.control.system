@@ -317,6 +317,8 @@ namespace risk.control.system.Controllers
                     var userAddress = $"{user.Addressline}, {pincode.Name}, {pincode.District.Name}, {pincode.State.Name}, {pincode.Country.Name}";
                     var coordinates = await customApiCLient.GetCoordinatesFromAddressAsync(userAddress);
                     var customerLatLong = coordinates.Latitude + "," + coordinates.Longitude;
+                    user.AddressLatitude = coordinates.Latitude;
+                    user.AddressLongitude = coordinates.Longitude;
                     user.AddressMapLocation = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
                 }
 
@@ -537,6 +539,8 @@ namespace risk.control.system.Controllers
                         var userAddress = $"{user.Addressline}, {pincode.Name}, {pincode.District.Name}, {pincode.State.Name}, {pincode.Country.Name}";
                         var coordinates = await customApiCLient.GetCoordinatesFromAddressAsync(userAddress);
                         var customerLatLong = coordinates.Latitude + "," + coordinates.Longitude;
+                        user.AddressLatitude = coordinates.Latitude;
+                        user.AddressLongitude = coordinates.Longitude;
                         user.AddressMapLocation = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
                     }
                     var result = await userManager.UpdateAsync(user);

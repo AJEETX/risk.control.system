@@ -1,7 +1,7 @@
 ﻿$(document).ready(function () {
     var table = $('#customerTable').DataTable({
         ajax: {
-            url: '/api/Agency/GetAgentLoad',
+            url: '/api/Agency/GetAgentLoad?id=' + $('#claimId').val(),
             dataSrc: ''
         },
         columnDefs: [{
@@ -16,6 +16,22 @@
             {
                 orderable: false, targets: [0, 2, 3, 4]
             }, // Disable ordering for specific columns
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 1                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 1                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-number', // Apply the CSS class,
+                targets: 3                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column', // Apply the CSS class,
+                targets: 5                      // Index of the column to style
+            }
         ],
         order: [[1, 'asc']],
         fixedHeader: true,
@@ -63,8 +79,8 @@
                 "mRender": function (data, type, row) {
                     if (row.pincodeName != '...') {
                         var img = '<div class="map-thumbnail profile-image doc-profile-image">';
-                        img += '<img src="' + row.personMapAddressUrl + '" class="thumbnail profile-image doc-profile-image" />'; // Thumbnail image with class 'thumbnail'
-                        img += '<img src="' + row.personMapAddressUrl + '" class="full-map" title="' + row.addressline + '" data-toggle="tooltip"/>'; // Full map image with class 'full-map'
+                        img += '<img src="' + row.personMapAddressUrl + '" class="thumbnail profile-image doc-profile-image" data-toggle="tooltip"/>'; // Thumbnail image with class 'thumbnail'
+                        img += '<img src="' + row.personMapAddressUrl + '" class="full-map" title="' + row.mapDetails + '" data-toggle="tooltip"/>'; // Full map image with class 'full-map'
                         img += '</div>';
                         return img;
                     }
@@ -84,6 +100,12 @@
                 }
             },
             {
+                "data": "pinode",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.pinode + '" data-toggle="tooltip">' + data + '</span>';
+                }
+            },
+            {
                 "data": "count",
                 "mRender": function (data, type, row) {
                     return '<span title="' + row.count + '" data-toggle="tooltip">' + data + '</span>';
@@ -92,16 +114,10 @@
         ]
     });
 
-    $('#customerTable').on('mouseenter', '.map-thumbnail', function () {
-        $(this).find('.full-map').show(); // Show full map
-    }).on('mouseleave', '.map-thumbnail', function () {
-        $(this).find('.full-map').hide(); // Hide full map
-    });
-
     $('#customerTable').on('draw.dt', function () {
         $('[data-toggle="tooltip"]').tooltip({
             animated: 'fade',
-            placement: 'bottom',
+            placement: 'top',
             html: true
         });
     });

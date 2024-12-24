@@ -1182,6 +1182,7 @@ namespace risk.control.system.Services
             claimsCaseToReassign.AgencyReport.AssessorRemarkType = assessorRemarkType;
             claimsCaseToReassign.AgencyReport.AssessorRemarks = assessorRemarks;
             claimsCaseToReassign.AgencyReport.AssessorRemarksUpdated = DateTime.Now;
+            claimsCaseToReassign.ReviewByAssessorTime = DateTime.Now;
             claimsCaseToReassign.AgencyReport.AssessorEmail = userEmail;
             var reAssigned = _context.InvestigationCaseSubStatus.FirstOrDefault(
                     i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER);
@@ -1442,6 +1443,7 @@ namespace risk.control.system.Services
             claim.AgencyReport.UpdatedBy = userEmail;
             claim.AgencyReport.EnquiryRequest.Updated = DateTime.Now;
             claim.AgencyReport.EnquiryRequest.UpdatedBy = userEmail;
+            claim.EnquiredByAssessorTime = DateTime.Now;
             _context.QueryRequest.Update(request);
             _context.ClaimsInvestigation.Update(claim);
 
@@ -1500,6 +1502,8 @@ namespace risk.control.system.Services
             claim.AssignedToAgency = false;
             claim.AssessView = 0;
             claim.UserRoleActionedTo = $"{claim.ClientCompany.Email}";
+            claim.EnquiryReplyByAssessorTime = DateTime.Now;
+            claim.SubmittedToAssessorTime = DateTime.Now;
             var enquiryRequest = claim.AgencyReport.EnquiryRequest;
             enquiryRequest.Answer = request.Answer;
             if (flexRadioDefault[0] == "a")

@@ -77,6 +77,8 @@ namespace risk.control.system.Models
         public AppRoles? Role { get; set; }
         public DateTime? LastActivityDate { get; set; }
         public bool HasClaims { get; set; } = false;
+        public string? AddressLatitude { get; set; }
+        public string? AddressLongitude { get; set; }
         public string? AddressMapLocation { get; set; }
 
         public override string ToString()

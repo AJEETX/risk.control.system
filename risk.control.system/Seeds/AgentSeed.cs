@@ -9,12 +9,12 @@ using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Seeds
 {
-    public static class SeedAgent
+    public static class AgentSeed
     {
         public static async Task Seed(ApplicationDbContext context, string agentEmailwithSuffix,
             IWebHostEnvironment webHostEnvironment, ICustomApiCLient customApiCLient,
             UserManager<VendorApplicationUser> userManager,
-            Vendor vendor, string pinCode, string photo)
+            Vendor vendor, string pinCode, string photo, string firstName, string lastName)
         {
             var faMailBox = new Mailbox
             {
@@ -40,8 +40,8 @@ namespace risk.control.system.Seeds
                 Mailbox = faMailBox,
                 UserName = agentEmailwithSuffix,
                 Email = agentEmailwithSuffix,
-                FirstName = AGENT.FIRST_NAME,
-                LastName = AGENT.LAST_NAME,
+                FirstName = firstName,
+                LastName = lastName,
                 EmailConfirmed = true,
                 Active = true,
                 PhoneNumberConfirmed = true,
@@ -61,7 +61,9 @@ namespace risk.control.system.Seeds
                 Role = AppRoles.AGENT,
                 UserRole = AgencyRole.AGENT,
                 Updated = DateTime.Now,
-                AddressMapLocation = url
+                AddressMapLocation = url,
+                AddressLatitude = coordinates.Latitude,
+                AddressLongitude = coordinates.Longitude
             };
             if (userManager.Users.All(u => u.Id != vendorAgent.Id))
             {

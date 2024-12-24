@@ -104,7 +104,7 @@ namespace risk.control.system.Controllers.Api.Agency
                        Service = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail.InvestigationServiceType.Name + "</span>"),
                        Location = string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseSubStatus.Name + "</span>"),
                        Created = string.Join("", "<span class='badge badge-light'>" + a.Created.ToString("dd-MM-yyyy") + "</span>"),
-                       timePending = a.GetSupervisorTimePending(false, a.InvestigationCaseSubStatus == assignedToAgentStatus, a.InvestigationCaseSubStatus == submittedToAssesssorStatus),
+                       timePending = a.GetSupervisorTimePending(false, a.InvestigationCaseSubStatus == assignedToAgentStatus, a.InvestigationCaseSubStatus == submittedToAssesssorStatus,false, a.InvestigationCaseSubStatus == replyStatus),
                        PolicyNum = a.PolicyDetail.ContractNumber,
                        BeneficiaryPhoto = a.BeneficiaryDetail.ProfilePicture != null ?
                                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.BeneficiaryDetail.ProfilePicture)) :
@@ -283,7 +283,7 @@ namespace risk.control.system.Controllers.Api.Agency
                        Service = a.PolicyDetail.InvestigationServiceType.Name,
                        Location = a.InvestigationCaseSubStatus.Name,
                        Created = a.Created.ToString("dd-MM-yyyy"),
-                       timePending = a.GetSupervisorTimePending(true),
+                       timePending = a.GetSupervisorTimePending(!a.IsReviewCase,false,false,false, a.IsReviewCase),
                        PolicyNum = a.GetPolicyNumForAgency(requestedStatus.InvestigationCaseSubStatusId),
                        BeneficiaryPhoto = a.BeneficiaryDetail?.ProfilePicture != null ?
                                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.BeneficiaryDetail.ProfilePicture)) :

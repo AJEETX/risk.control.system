@@ -203,7 +203,7 @@ namespace risk.control.system.Controllers.Api.Company
                         Service = a.PolicyDetail.InvestigationServiceType.Name,
                         Location = a.ORIGIN.GetEnumDisplayName(),
                         Created = a.Created.ToString("dd-MM-yyyy"),
-                        timePending = a.GetCreatorTimePending(),
+                        timePending = a.GetCreatorTimePending(false, a.IsReviewCase),
                         PolicyNum = a.GetPolicyNum(),
                         BeneficiaryPhoto = a.BeneficiaryDetail?.ProfilePicture != null ?
                                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.BeneficiaryDetail.ProfilePicture)) :
