@@ -206,19 +206,6 @@ $(document).ready(function () {
         }
     })
 
-    $('#datatable thead th').css('background-color', '#e9ecef')
-    var datatable = $('#datatable').dataTable({
-        processing: true,
-        ordering: true,
-        paging: true,
-        searching: true,
-        //'fnDrawCallback': function (oSettings) {
-        //    $('.dataTables_filter').each(function () {
-        //        $(this).prepend('<button class="btn btn-success mr-xs pull-right" type="button"><i class="fas fa-plus"></i>  Add</button>');
-        //    });
-        //}
-    });
-
     $("#datepicker").datepicker({ maxDate: '0' });
 
     if ($(".selected-case:checked").length) {
@@ -1421,22 +1408,6 @@ function toggleChecked(status) {
         $(this).prop("checked", status);
     });
 }
-function readURL(input) {
-    var url = input.value;
-    var ext = url.substring(url.lastIndexOf('.') + 1).toLowerCase();
-    if (input.files && input.files[0] && (ext == "gif" || ext == "png" || ext == "jpeg" || ext == "jpg" || ext == "csv")) {
-        var reader = new FileReader();
-
-        reader.onload = function (e) {
-            $('#img').attr('src', e.target.result);
-        }
-
-        reader.readAsDataURL(input.files[0]);
-    } else {
-        $('#img').attr('src', '/img/no-image.png');
-    }
-}
-
 function loadRemainingPinCode(obj, showDefaultOption = true, caseId) {
     var value = obj.value;
     $.get("/api/MasterData/GetPincodesByDistrictIdWithoutPreviousSelected", { districtId: value, caseId: caseId }, function (data) {

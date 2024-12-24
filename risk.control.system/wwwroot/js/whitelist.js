@@ -9,21 +9,21 @@
         columnDefs: [
             {
                 className: 'max-width-column-name', // Apply the CSS class,
+                targets: 5                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
                 targets: 7                      // Index of the column to style
             },
             {
                 className: 'max-width-column-name', // Apply the CSS class,
+                targets: 8                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
                 targets: 9                      // Index of the column to style
-            },
-            {
-                className: 'max-width-column-name', // Apply the CSS class,
-                targets: 10                      // Index of the column to style
-            },
-            {
-                className: 'max-width-column-name', // Apply the CSS class,
-                targets: 11                      // Index of the column to style
             }],
-        order: [[11, 'desc']],
+        order: [[9, 'desc']],
         fixedHeader: true,
         processing: true,
         paging: true,
@@ -37,6 +37,7 @@
 
             {
                 "data": "mapUrl",
+                "bSortable": false,
                 "mRender": function (data, type, row) {
                     var img = '<div class="map-thumbnail profile-image doc-profile-image">';
                     img += '<img src="' + row.mapUrl + '" class="thumbnail" />'; // Thumbnail image with class 'thumbnail'
@@ -69,19 +70,7 @@
                     return '<span title="' + row.zip + '" data-toggle="tooltip">' + data + '</span>'
                 }
             },
-            {
-                "data": "lat",
-                "mRender": function (data, type, row) {
-                    return '<span title="' + row.lat + '" data-toggle="tooltip">' + data + '</span>'
-                }
-
-            },
-            {
-                "data": "lon",
-                "mRender": function (data, type, row) {
-                    return '<span title="' + row.lon + '" data-toggle="tooltip">' + data + '</span>'
-                }
-            },
+           
             {
                 "data": "isp",
                 "mRender": function (data, type, row) {

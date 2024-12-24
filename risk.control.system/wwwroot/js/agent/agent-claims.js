@@ -122,8 +122,8 @@ $(document).ready(function () {
                 "sDefaultContent": "",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    var img = '<div class="map-thumbnail-customer table-profile-image">';
-                    img += '<img src="' + row.customer + '" class="full-map-customer" title="' + row.name + '" data-toggle="tooltip"/>'; // Full map image with class 'full-map'
+                    var img = '<div class="map-thumbnail table-profile-image">';
+                    img += '<img src="' + row.customer + '" class="full-map" title="' + row.name + '" data-toggle="tooltip"/>'; // Full map image with class 'full-map'
                     img += '<img src="' + row.customer + '" class="thumbnail table-profile-image" />'; // Thumbnail image with class 'thumbnail'
                     img += '</div>';
                     return img;
@@ -169,19 +169,24 @@ $(document).ready(function () {
         },
         error: function (xhr, status, error) { alert('err ' + error) }
     });
-    $('#customerTable').on('mouseenter', '.map-thumbnail-customer', function () {
-        $(this).find('.full-map-customer').show(); // Show full map
-    }).on('mouseleave', '.map-thumbnail-customer', function () {
-        $(this).find('.full-map-customer').hide(); // Hide full map
-    });
+    $('#customerTable')
+        .on('mouseenter', '.map-thumbnail', function () {
+            const $this = $(this); // Cache the current element
 
-    $('#customerTable').on('mouseenter', '.map-thumbnail', function () {
-        $(this).find('.full-map-title').show(); // Show full map
-        $(this).find('.full-map').show(); // Show full map
-    }).on('mouseleave', '.map-thumbnail', function () {
-        $(this).find('.full-map-title').hide(); // Hide full map
-        $(this).find('.full-map').hide(); // Hide full map
-    });
+            // Set a timeout to show the full map after 1 second
+            hoverTimeout = setTimeout(function () {
+                $this.find('.full-map').show(); // Show full map
+            }, 1000); // Delay of 1 second
+        })
+        .on('mouseleave', '.map-thumbnail', function () {
+            const $this = $(this); // Cache the current element
+
+            // Clear the timeout to cancel showing the map
+            clearTimeout(hoverTimeout);
+
+            // Immediately hide the full map
+            $this.find('.full-map').hide();
+        });
 
     $('#customerTable').on('draw.dt', function () {
         $('[data-toggle="tooltip"]').tooltip({

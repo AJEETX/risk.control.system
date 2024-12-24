@@ -1,21 +1,4 @@
 ﻿@model ClaimsInvestigationVendorsModel
-@{
-    string digitalIdColor = "grey";
-    if (Model.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime != null)
-    {
-        digitalIdColor = "green";
-    }
-    string documentIdColor = "grey";
-    if (Model.AgencyReport.PanIdReport?.DocumentIdImageLongLat != null)
-    {
-        documentIdColor = "green";
-    }
-    string questionaire = "grey";
-    if (Model.AgencyReport.AgentRemarks != null)
-    {
-        questionaire = "green";
-    }
-}
 <div class="card bg-light card-light">
     <div class="card-header">
         <h3 class="card-title">

@@ -156,15 +156,24 @@
             html: true
         });
     });
+    $('#customerTable')
+        .on('mouseenter', '.map-thumbnail', function () {
+            const $this = $(this); // Cache the current element
 
+            // Set a timeout to show the full map after 1 second
+            hoverTimeout = setTimeout(function () {
+                $this.find('.full-map').show(); // Show full map
+            }, 1000); // Delay of 1 second
+        })
+        .on('mouseleave', '.map-thumbnail', function () {
+            const $this = $(this); // Cache the current element
 
-    $('#customerTable').on('mouseenter', '.map-thumbnail', function () {
-        $(this).find('.full-map-title').show(); // Show full map
-        $(this).find('.full-map').show(); // Show full map
-    }).on('mouseleave', '.map-thumbnail', function () {
-        $(this).find('.full-map-title').hide(); // Hide full map
-        $(this).find('.full-map').hide(); // Hide full map
-    });
+            // Clear the timeout to cancel showing the map
+            clearTimeout(hoverTimeout);
+
+            // Immediately hide the full map
+            $this.find('.full-map').hide();
+        });
     table.on('draw', function () {
         // Loop through each row of the table after it has been redrawn
         $("#customerTable > tbody > tr").each(function () {

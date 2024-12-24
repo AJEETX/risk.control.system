@@ -517,7 +517,7 @@ namespace risk.control.system.Controllers.Api.Agency
                           Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
                           PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
                           Company = a.ClientCompany.Name,
-                          OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(GetOwner(a))),
+                          OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.ClientCompany.DocumentImage)),
                           Document = a.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : Applicationsettings.NO_POLICY_IMAGE,
                           Customer = ClaimsInvestigationExtension.GetPersonPhoto(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
                           Name = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? a.CustomerDetail.Name : a.BeneficiaryDetail.Name,
