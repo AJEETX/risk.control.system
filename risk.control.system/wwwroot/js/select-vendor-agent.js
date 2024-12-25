@@ -21,16 +21,12 @@
                 targets: 1                      // Index of the column to style
             },
             {
-                className: 'max-width-column-name', // Apply the CSS class,
-                targets: 1                      // Index of the column to style
-            },
-            {
                 className: 'max-width-column-number', // Apply the CSS class,
                 targets: 3                      // Index of the column to style
             },
             {
                 className: 'max-width-column', // Apply the CSS class,
-                targets: 5                      // Index of the column to style
+                targets: 7                      // Index of the column to style
             }
         ],
         order: [[1, 'asc']],
@@ -81,7 +77,7 @@
                     if (row.pincodeName != '...') {
                         var img = '<div class="map-thumbnail profile-image doc-profile-image">';
                         img += '<img src="' + row.personMapAddressUrl + '" class="thumbnail profile-image doc-profile-image" data-toggle="tooltip"/>'; // Thumbnail image with class 'thumbnail'
-                        img += '<img src="' + row.personMapAddressUrl + '" class="full-map" title="' + row.mapDetails + '" data-toggle="tooltip"/>'; // Full map image with class 'full-map'
+                        img += '<img src="' + row.personMapAddressUrl + '" class="full-driving-map" title="' + row.mapDetails + '" data-toggle="tooltip"/>'; // Full map image with class 'full-map'
                         img += '</div>';
                         return img;
                     }
@@ -92,6 +88,18 @@
 
 
                     return '<span title="' + row.personMapAddressUrl + '" data-toggle="tooltip">' + data + '</span>';
+                }
+            },
+            {
+                "data": "distance",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.distance + '" data-toggle="tooltip">' + data + '</span>';
+                }
+            },
+            {
+                "data": "duration",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.duration + '" data-toggle="tooltip">' + data + '</span>';
                 }
             },
             {
@@ -127,11 +135,9 @@
     $('#customerTable tbody').fadeIn(2000);
 
     $('#customerTable').on('mouseenter', '.map-thumbnail', function () {
-        $(this).find('.full-map-title').show(); // Show full map
-        $(this).find('.full-map').show(); // Show full map
+        $(this).find('.full-driving-map').show(); // Show full map
     }).on('mouseleave', '.map-thumbnail', function () {
-        $(this).find('.full-map-title').hide(); // Hide full map
-        $(this).find('.full-map').hide(); // Hide full map
+        $(this).find('.full-driving-map').hide(); // Hide full map
     });
     // Handle click on checkbox to set state of "Select all" control    
     $('#customerTable tbody').on('change', 'input[type="radio"]', function () {

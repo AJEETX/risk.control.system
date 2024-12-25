@@ -401,8 +401,8 @@ namespace risk.control.system.Services
 
                 var latLong = await customApiCLient.GetCoordinatesFromAddressAsync(address);
                 var customerLatLong = latLong.Latitude + ","+latLong.Longitude;
-                claimsInvestigation.CustomerDetail.Latitude = latLong.Latitude;
-                claimsInvestigation.CustomerDetail.Longitude = latLong.Longitude;
+                existingPolicy.CustomerDetail.Latitude = latLong.Latitude;
+                existingPolicy.CustomerDetail.Longitude = latLong.Longitude;
                     var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
                 existingPolicy.CustomerDetail.CustomerLocationMap = url;
 

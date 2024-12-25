@@ -6,6 +6,9 @@
             <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
         </div>
         <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
+        <input type="hidden" id="policyDetailId" name="policyDetailId" value="@Model.ClaimsInvestigation.PolicyDetail.PolicyDetailId" />
+        <input type="hidden" id="customerDetailId" name="customerDetailId" value="@Model.ClaimsInvestigation.CustomerDetail.CustomerDetailId" />
+        <input type="hidden" id="beneficiaryId" name="beneficiaryId" value="@Model.CaseLocation.BeneficiaryDetailId" />
         <input type="hidden" id="CaseLocationId" name="CaseLocationId" value="@Model.CaseLocation.BeneficiaryDetailId" />
         <table id="customerTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
             <thead>
@@ -15,6 +18,8 @@
                     <th>Photo</th>
                     <th>Phone #</th>
                     <th>Map</th>
+                    <th>Distance</th>
+                    <th>Duration</th>
                     <th>Address </th>
                     <th>Pincode </th>
                     <th>Case(s)</th>

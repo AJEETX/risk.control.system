@@ -184,11 +184,11 @@ a.table-link {
     border-radius: 5px;
 }
 
-#profileImageMap {
+#customerGoogleMap {
     cursor: pointer;
 }
 
-#bImageMap {
+#beneficiaryGoogleMap {
     cursor: pointer;
 }
 
@@ -1591,5 +1591,16 @@ ul#messagesList {
     position: absolute;
     display: none; /* Initially hidden */
     background:none;
+    z-index: 999;
+}
+
+/* CSS class for the full map (hidden by default) */
+.full-driving-map {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 20em;
+    display: none; /* Initially hidden */
+    border: 1px solid #C38787;
     z-index: 999;
 }

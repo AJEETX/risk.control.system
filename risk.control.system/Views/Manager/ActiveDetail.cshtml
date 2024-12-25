@@ -363,7 +363,7 @@
                                                         }
                                                     </p>
                                                     <p class="text-muted text-sm">
-                                                        <img id="profileImageMap" class="img-fluid block-data" src="@Model?.ClaimsInvestigation?.CustomerDetail?.CustomerLocationMap" data-toggle="tooltip" title="Display Customer Address in map">
+                                                        <img id="customerGoogleMap" class="img-fluid block-data" src="@Model?.ClaimsInvestigation?.CustomerDetail?.CustomerLocationMap" data-toggle="tooltip" title="Display Customer Address in map">
                                                     </p>
                                                 </div>
                                             </div>
@@ -463,7 +463,7 @@
                                                         }
                                                     </p>
                                                     <p class="text-muted text-sm">
-                                                        <img id="bImageMap" class="img-fluid block-data" src="@Model?.Location?.BeneficiaryLocationMap" data-toggle="tooltip" title="Display Beneficiary Address in map">
+                                                        <img id="beneficiaryGoogleMap" class="img-fluid block-data" src="@Model?.Location?.BeneficiaryLocationMap" data-toggle="tooltip" title="Display Beneficiary Address in map">
                                                     </p>
 
                                                 </div>
@@ -516,5 +516,6 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
     <script src="~/js/policy-detail.js"></script>
+    <script src="~/js/claim-details.js"></script>
 
 }

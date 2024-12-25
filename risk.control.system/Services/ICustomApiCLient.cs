@@ -99,7 +99,7 @@ namespace risk.control.system.Services
                 var response = await client.GetStringAsync(directionsUrl);
                 var route = ParseRoute(response);
                 string encodedPolyline = WebUtility.UrlEncode(route); // URL-encode the polyline
-                var distanceMap = $"https://maps.googleapis.com/maps/api/staticmap?size=600x400&markers=color:red|label:S|{startLatitude},{startLongitude}&markers=color:green|label:E|{endLatitude},{endLongitude}&path=enc:{encodedPolyline}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+                var distanceMap = $"https://maps.googleapis.com/maps/api/staticmap?size=300x200&markers=color:red|label:S|{startLatitude},{startLongitude}&markers=color:green|label:E|{endLatitude},{endLongitude}&path=enc:{encodedPolyline}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
                 return (driving.Distance, driving.Duration, distanceMap);
             }
             catch (Exception ex)

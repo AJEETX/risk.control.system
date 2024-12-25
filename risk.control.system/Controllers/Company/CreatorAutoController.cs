@@ -574,8 +574,6 @@ namespace risk.control.system.Controllers.Company
                 }
 
                 var model = await investigationReportService.GetClaimDetails(currentUserEmail, id);
-                //< img id = "profileImageMap" class="img-fluid block-data" src="@Model?.ClaimsInvestigation?.CustomerDetail?.CustomerLocationMap" data-toggle="tooltip" title="Display Customer Address in map">
-                //<img id="bImageMap" class="img-fluid block-data" src="@Model?.Location?.BeneficiaryLocationMap" data-toggle="tooltip" title="Display Beneficiary Address in map">
                 return View(model);
             }
             catch (Exception ex)
