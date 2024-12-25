@@ -16,6 +16,7 @@ namespace risk.control.system.Data
             base.OnModelCreating(builder);
         }
 
+        public virtual DbSet<AgentDrivingMap> AgentDrivingMap { get; set; }
         public virtual DbSet<ChatMessage> ChatMessage { get; set; }
         public virtual DbSet<ImageDetails> ImageDetails { get; set; }
         public virtual DbSet<GlobalSettings> GlobalSettings { get; set; }

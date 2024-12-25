@@ -113,11 +113,11 @@ namespace risk.control.system.Controllers.Api.Agency
                        Customer = a.CustomerDetail.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail.ProfilePicture)) : Applicationsettings.NO_USER,
                        Name = a.CustomerDetail.Name,
                        Policy = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail.LineOfBusiness.Name + "</span>"),
-                       Status = string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseStatus.Name + "</span>"),
-                       ServiceType = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail.ClaimType.GetEnumDisplayName() + "</span>"),
-                       Service = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail.InvestigationServiceType.Name + "</span>"),
-                       Location = string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseSubStatus.Name + "</span>"),
-                       Created = string.Join("", "<span class='badge badge-light'>" + a.Created.ToString("dd-MM-yyyy") + "</span>"),
+                       Status =a.InvestigationCaseStatus.Name,
+                       ServiceType = a.PolicyDetail.ClaimType.GetEnumDisplayName(),
+                       Service =  a.PolicyDetail.InvestigationServiceType.Name,
+                       Location = a.InvestigationCaseSubStatus.Name ,
+                       Created = a.Created.ToString("dd-MM-yyyy"),
                        timePending = a.GetSupervisorTimePending(false, a.InvestigationCaseSubStatus == assignedToAgentStatus, false, a.InvestigationCaseSubStatus == submittedToAssesssorStatus, a.InvestigationCaseSubStatus == replyStatus),
                        PolicyNum = a.PolicyDetail.ContractNumber,
                        BeneficiaryPhoto = a.BeneficiaryDetail.ProfilePicture != null ?
@@ -128,7 +128,9 @@ namespace risk.control.system.Controllers.Api.Agency
                         a.BeneficiaryDetail.Name,
                        TimeElapsed = DateTime.Now.Subtract(a.InvestigationCaseSubStatus == assignedToAgentStatus ?
                        a.TaskToAgentTime.Value : a.InvestigationCaseSubStatus == submittedToAssesssorStatus ? a.SubmittedToAssessorTime.Value : a.Created).TotalSeconds,
-                       PersonMapAddressUrl = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? a.CustomerDetail.CustomerLocationMap : a.BeneficiaryDetail.BeneficiaryLocationMap
+                       PersonMapAddressUrl = a.SelectedAgentDrivingMap,
+                       Distance = a.SelectedAgentDrivingDistance,
+                       Duration = a.SelectedAgentDrivingDuration
                    })?
                    .ToList();
 
@@ -421,7 +423,9 @@ namespace risk.control.system.Controllers.Api.Agency
                         a.BeneficiaryDetail.Name,
                        TimeElapsed = DateTime.Now.Subtract(a.SubmittedToSupervisorTime.Value).TotalSeconds,
                        IsNewAssigned = a.VerifyView <= 1,
-                       PersonMapAddressUrl = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? a.CustomerDetail.CustomerLocationMap : a.BeneficiaryDetail.BeneficiaryLocationMap
+                       PersonMapAddressUrl = a.SelectedAgentDrivingMap,
+                       Distance = a.SelectedAgentDrivingDistance,
+                       Duration = a.SelectedAgentDrivingDuration
                    })
                     ?.ToList();
 
@@ -536,7 +540,9 @@ namespace risk.control.system.Controllers.Api.Agency
                        "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>" :
                        a.BeneficiaryDetail.Name,
                           TimeElapsed = DateTime.Now.Subtract(a.SubmittedToAssessorTime.Value).TotalSeconds,
-                          PersonMapAddressUrl = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? a.CustomerDetail.CustomerLocationMap : a.BeneficiaryDetail.BeneficiaryLocationMap
+                          PersonMapAddressUrl = a.SelectedAgentDrivingMap,
+                          Distance = a.SelectedAgentDrivingDistance,
+                          Duration = a.SelectedAgentDrivingDuration
                       })
                        ?.ToList();
 

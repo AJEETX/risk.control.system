@@ -31,9 +31,9 @@
             },
             {
                 className: 'max-width-column-name', // Apply the CSS class,
-                targets: 5                      // Index of the column to style
+                targets: 7                      // Index of the column to style
             }],
-        order: [[12, 'asc']],
+        order: [[13, 'asc']],
         fixedHeader: true,
         processing: true,
         paging: true,
@@ -66,6 +66,19 @@
                     img += '<img src="' + row.personMapAddressUrl + '" class="full-map" title="' + row.pincodeName + '" data-toggle="tooltip"/>'; // Full map image with class 'full-map'
                     img += '</div>';
                     return img;
+                }
+            },
+            {
+                "data": "distance",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.distance + '" data-toggle="tooltip">' + data + '</span>'
+                }
+            },
+
+            {
+                "data": "duration",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.duration + '" data-toggle="tooltip">' + data + '</span>'
                 }
             },
             {
@@ -106,12 +119,6 @@
                 "data": "service",
                 "mRender": function (data, type, row) {
                     return '<span title="' + row.service + '" data-toggle="tooltip">' + data + '</span>'
-                }
-            },
-            {
-                "data": "location",
-                "mRender": function (data, type, row) {
-                    return '<span title="' + row.location + '" data-toggle="tooltip">' + data + '</span>'
                 }
             },
             {

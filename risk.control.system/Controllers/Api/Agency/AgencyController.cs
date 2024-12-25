@@ -369,8 +369,30 @@ namespace risk.control.system.Controllers.Api.Agency
 
             var agentList = new List<AgentData>();
             foreach(var u in agents)
-            {
-                var (distance, duration, map) = await customApiCLient.GetMap(double.Parse(u.AgencyUser.AddressLatitude), double.Parse(u.AgencyUser.AddressLongitude), double.Parse(LocationLatitude), double.Parse(LocationLongitude));
+            { 
+                string distance, duration, map;
+                var agentExistingDrivingMap = _context.AgentDrivingMap.FirstOrDefault(a=>a.AgentId == u.AgencyUser.Id && a.ClaimsInvestigationId == id);
+
+                if(agentExistingDrivingMap == null)
+                {
+                    (distance, duration, map) = await customApiCLient.GetMap(double.Parse(u.AgencyUser.AddressLatitude), double.Parse(u.AgencyUser.AddressLongitude), double.Parse(LocationLatitude), double.Parse(LocationLongitude));
+
+                    var agentDrivingMap = new AgentDrivingMap
+                    {
+                        AgentId = u.AgencyUser.Id,
+                        ClaimsInvestigationId = id,
+                        Distance = distance,
+                        Duration = duration,
+                        DrivingMap = map
+                    };
+                    _context.AgentDrivingMap.Add(agentDrivingMap);
+                }
+                else
+                {
+                    distance = agentExistingDrivingMap.Distance;
+                    duration = agentExistingDrivingMap.Duration;
+                    map = agentExistingDrivingMap.DrivingMap;
+                }
                 var mapDetails = $"Driving distance : {distance}; Duration : {duration}";
                 var agentData = new AgentData
                 {
@@ -397,7 +419,7 @@ namespace risk.control.system.Controllers.Api.Agency
                 };
                 agentList.Add(agentData);
             }
-            
+            await _context.SaveChangesAsync();
             return Ok(agentList);
         }
 

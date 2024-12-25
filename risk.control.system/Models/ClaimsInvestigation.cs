@@ -117,5 +117,12 @@ namespace risk.control.system.Models
 
         public bool UpdateAgentReport { get; set; } = false;
         public bool UpdateAgentAnswer { get; set; } = false;
+
+        public string? SelectedAgentDrivingMap { get; set; }
+        [Display(Name = "Distance")]
+        public string? SelectedAgentDrivingDistance { get; set; } = default!;
+
+        [Display(Name = "Duration")]
+        public string? SelectedAgentDrivingDuration { get; set; } = default!;
     }
 }

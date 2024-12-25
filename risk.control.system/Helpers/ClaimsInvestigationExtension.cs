@@ -305,6 +305,14 @@ namespace risk.control.system.Helpers
             return string.Join("", "<span class='badge badge-light'>now</span>");
         }
 
+        public static string GetMapUrl(this ClaimsInvestigation claim,bool tasked2Agent = false, bool submitted2Supervisor = false, bool enquiry = false)
+        {
+            if(tasked2Agent || submitted2Supervisor || enquiry)
+            {
+                return claim.SelectedAgentDrivingMap;
+            }
+            return claim.PolicyDetail.ClaimType == ClaimType.HEALTH ? claim.CustomerDetail.CustomerLocationMap : claim.BeneficiaryDetail.BeneficiaryLocationMap;
+        }
         public static string GetPolicyNum(this ClaimsInvestigation a)
         {
             var claim = a;

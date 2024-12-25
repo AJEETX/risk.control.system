@@ -359,7 +359,6 @@ namespace risk.control.system.Services
                             };
 
 
-                            claim.CustomerDetail.PinCode = pinCode;
                             var address = claim.CustomerDetail.Addressline + ", " +
                                 pinCode.District.Name + ", " +
                                 pinCode.State.Name + ", " +
@@ -452,7 +451,15 @@ namespace risk.control.system.Services
                     }
                 }
             }
-            return _context.SaveChanges() > 0;
+            try
+            {
+                return _context.SaveChanges() > 0;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                return false;
+            }
         }
         private static List<string> GetFtpData()
         {

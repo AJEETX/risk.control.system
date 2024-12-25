@@ -31,9 +31,9 @@
             },
             {
                 className: 'max-width-column-name', // Apply the CSS class,
-                targets: 6                      // Index of the column to style
+                targets: 8                      // Index of the column to style
             }],
-        order: [[13, 'asc']],
+        order: [[14, 'asc']],
         fixedHeader: true,
         processing: true,
         paging: true,
@@ -89,6 +89,19 @@
                 }
             },
             {
+                "data": "distance",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.distance + '" data-toggle="tooltip">' + data + '</span>'
+                }
+            },
+
+            {
+                "data": "duration",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.duration + '" data-toggle="tooltip">' + data + '</span>'
+                }
+            },
+            {
                 "sDefaultContent": "",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
@@ -126,12 +139,6 @@
                 "data": "service",
                 "mRender": function (data, type, row) {
                     return '<span title="' + row.service + '" data-toggle="tooltip">' + data + '</span>'
-                }
-            },
-            {
-                "data": "location",
-                "mRender": function (data, type, row) {
-                    return '<span title="' + row.location + '" data-toggle="tooltip">' + data + '</span>'
                 }
             },
             {

@@ -111,7 +111,9 @@ namespace risk.control.system.Controllers.Api.Company
                 OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.Vendor.DocumentImage)),
                 Agent = a.Vendor.Name,
                 IsNewAssigned = a.AssessView <= 1,
-                PersonMapAddressUrl = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? a.CustomerDetail.CustomerLocationMap : a.BeneficiaryDetail.BeneficiaryLocationMap
+                PersonMapAddressUrl = a.SelectedAgentDrivingMap,
+                Distance = a.SelectedAgentDrivingDistance,
+                Duration = a.SelectedAgentDrivingDuration
             })?.ToList();
 
             return Ok(response);
@@ -221,7 +223,9 @@ namespace risk.control.system.Controllers.Api.Company
                         "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>" :
                         a.BeneficiaryDetail.Name,
                         TimeElapsed = DateTime.Now.Subtract(a.SubmittedToAssessorTime.Value).TotalSeconds, // TOD-DO: Check if this is the correct time to use,
-                        PersonMapAddressUrl = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? a.CustomerDetail.CustomerLocationMap : a.BeneficiaryDetail.BeneficiaryLocationMap
+                        PersonMapAddressUrl = a.SelectedAgentDrivingMap,
+                        Distance = a.SelectedAgentDrivingDistance,
+                        Duration = a.SelectedAgentDrivingDuration
                     })?
                     .ToList();
 
@@ -306,7 +310,9 @@ namespace risk.control.system.Controllers.Api.Company
                 OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.Vendor.DocumentImage)),
                 Agency = a.Vendor?.Name,
                 TimeElapsed = DateTime.Now.Subtract(a.ProcessedByAssessorTime.Value).TotalSeconds,
-                PersonMapAddressUrl = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? a.CustomerDetail.CustomerLocationMap : a.BeneficiaryDetail.BeneficiaryLocationMap
+                PersonMapAddressUrl = a.SelectedAgentDrivingMap,
+                Distance = a.SelectedAgentDrivingDistance,
+                Duration = a.SelectedAgentDrivingDuration
             })?.ToList();
 
             return Ok(response);
@@ -382,7 +388,9 @@ namespace risk.control.system.Controllers.Api.Company
                 OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.Vendor.DocumentImage)),
                 Agency = a.Vendor?.Name,
                 TimeElapsed = DateTime.Now.Subtract(a.ProcessedByAssessorTime.Value).TotalSeconds,
-                PersonMapAddressUrl = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? a.CustomerDetail.CustomerLocationMap : a.BeneficiaryDetail.BeneficiaryLocationMap
+                PersonMapAddressUrl = a.SelectedAgentDrivingMap,
+                Distance = a.SelectedAgentDrivingDistance,
+                Duration = a.SelectedAgentDrivingDuration
             })?.ToList();
 
             return Ok(response);

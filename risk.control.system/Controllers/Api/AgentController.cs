@@ -762,12 +762,12 @@ namespace risk.control.system.Controllers.Api
                 }
 
                 var (vendor, contract) = await claimsInvestigationService.SubmitToVendorSupervisor(
-                    data.Email, data.BeneficiaryId,
+                    data.Email, 
                     data.ClaimId,
                     data.Remarks, data.Question1, data.Question2, data.Question3, data.Question4);
                 if(vendor.EnableMailbox)
                 {
-                    await mailboxService.NotifyClaimReportSubmitToVendorSupervisor(data.Email, data.ClaimId, data.BeneficiaryId);
+                    await mailboxService.NotifyClaimReportSubmitToVendorSupervisor(data.Email, data.ClaimId);
                 }
                 var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
 

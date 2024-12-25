@@ -136,9 +136,9 @@ namespace risk.control.system.Controllers.Company
         [ValidateAntiForgeryToken]
         [HttpPost]
         [Authorize(Roles = CREATOR.DISPLAY_NAME)]
-        public async Task<IActionResult> CaseAllocatedToVendor(long selectedcase, string claimId, long caseLocationId)
+        public async Task<IActionResult> CaseAllocatedToVendor(long selectedcase, string claimId)
         {
-            if (selectedcase < 1 || caseLocationId < 1 || string.IsNullOrWhiteSpace(claimId))
+            if (selectedcase < 1 || string.IsNullOrWhiteSpace(claimId))
             {
                 notifyService.Custom($"Error!!! Try again", 3, "red", "far fa-file-powerpoint");
                 return RedirectToAction(nameof(CreatorManualController.New), "CreatorManual");
@@ -153,13 +153,13 @@ namespace risk.control.system.Controllers.Company
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                var policy = await claimsInvestigationService.AllocateToVendor(currentUserEmail, claimId, selectedcase, caseLocationId, false);
+                var policy = await claimsInvestigationService.AllocateToVendor(currentUserEmail, claimId, selectedcase, false);
 
                 var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == selectedcase);
                 var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(v => v.Email == currentUserEmail);
                 if (companyUser.ClientCompany.EnableMailbox)
                 {
-                    await mailboxService.NotifyClaimAllocationToVendor(currentUserEmail, policy.PolicyDetail.ContractNumber, claimId, selectedcase, caseLocationId);
+                    await mailboxService.NotifyClaimAllocationToVendor(currentUserEmail, policy.PolicyDetail.ContractNumber, claimId, selectedcase);
                 }
 
                 notifyService.Custom($"Policy #{policy.PolicyDetail.ContractNumber} assigned to {vendor.Name}", 3, "green", "far fa-file-powerpoint");
@@ -212,9 +212,9 @@ namespace risk.control.system.Controllers.Company
         [ValidateAntiForgeryToken]
         [HttpPost]
         [Authorize(Roles = ASSESSOR.DISPLAY_NAME)]
-        public async Task<IActionResult> ProcessCaseReport(string assessorRemarks, string assessorRemarkType, string claimId, long caseLocationId, string reportAiSummary)
+        public async Task<IActionResult> ProcessCaseReport(string assessorRemarks, string assessorRemarkType, string claimId, string reportAiSummary)
         {
-            if (string.IsNullOrWhiteSpace(assessorRemarks) || caseLocationId < 1 || string.IsNullOrWhiteSpace(claimId) || string.IsNullOrWhiteSpace(assessorRemarkType))
+            if (string.IsNullOrWhiteSpace(assessorRemarks) || string.IsNullOrWhiteSpace(claimId) || string.IsNullOrWhiteSpace(assessorRemarkType))
             {
                 notifyService.Custom($"Error!!! Try again", 3, "red", "far fa-file-powerpoint");
                 return RedirectToAction(nameof(AssessorController.Assessor), "Assessor");
@@ -230,11 +230,11 @@ namespace risk.control.system.Controllers.Company
 
                 AssessorRemarkType reportUpdateStatus = (AssessorRemarkType)Enum.Parse(typeof(AssessorRemarkType), assessorRemarkType, true);
 
-                var (company, contract) = await claimsInvestigationService.ProcessCaseReport(currentUserEmail, assessorRemarks, caseLocationId, claimId, reportUpdateStatus, reportAiSummary);
+                var (company, contract) = await claimsInvestigationService.ProcessCaseReport(currentUserEmail, assessorRemarks, claimId, reportUpdateStatus, reportAiSummary);
 
                 if(company.EnableMailbox)
                 {
-                    await mailboxService.NotifyClaimReportProcess(currentUserEmail, claimId, caseLocationId);
+                    await mailboxService.NotifyClaimReportProcess(currentUserEmail, claimId);
                 }
 
                 if (reportUpdateStatus == AssessorRemarkType.OK)
@@ -264,9 +264,9 @@ namespace risk.control.system.Controllers.Company
         [ValidateAntiForgeryToken]
         [HttpPost]
         [Authorize(Roles = ASSESSOR.DISPLAY_NAME)]
-        public async Task<IActionResult> ReProcessCaseReport(string assessorRemarks, string assessorRemarkType, string claimId, long caseLocationId, string reportAiSummary)
+        public async Task<IActionResult> ReProcessCaseReport(string assessorRemarks, string assessorRemarkType, string claimId, string reportAiSummary)
         {
-            if (string.IsNullOrWhiteSpace(assessorRemarks) || caseLocationId < 1 || string.IsNullOrWhiteSpace(claimId))
+            if (string.IsNullOrWhiteSpace(assessorRemarks) || string.IsNullOrWhiteSpace(claimId))
             {
                 notifyService.Custom($"Error!!! Try again", 3, "red", "far fa-file-powerpoint");
                 return RedirectToAction(nameof(AssessorController.Assessor), "Assessor");
@@ -282,10 +282,10 @@ namespace risk.control.system.Controllers.Company
 
                 var reportUpdateStatus = AssessorRemarkType.REVIEW;
 
-                var (company, contract) = await claimsInvestigationService.ProcessCaseReport(currentUserEmail, assessorRemarks, caseLocationId, claimId, reportUpdateStatus, reportAiSummary);
+                var (company, contract) = await claimsInvestigationService.ProcessCaseReport(currentUserEmail, assessorRemarks, claimId, reportUpdateStatus, reportAiSummary);
                 if(company.EnableMailbox)
                 {
-                    await mailboxService.NotifyClaimReportProcess(currentUserEmail, claimId, caseLocationId);
+                    await mailboxService.NotifyClaimReportProcess(currentUserEmail, claimId);
                 }
                 return RedirectToAction(nameof(AssessorController.Assessor), "Assessor");
             }

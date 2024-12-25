@@ -103,7 +103,9 @@ namespace risk.control.system.Controllers.Api.Company
                 Agency = a.Vendor?.Name,
                 OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.Vendor.DocumentImage)),
                 IsNewAssigned = a.AssessView <= 1,
-                PersonMapAddressUrl = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? a.CustomerDetail.CustomerLocationMap : a.BeneficiaryDetail.BeneficiaryLocationMap
+                PersonMapAddressUrl = a.SelectedAgentDrivingMap,
+                Distance = a.SelectedAgentDrivingDistance,
+                Duration = a.SelectedAgentDrivingDuration
             })?.ToList();
 
             return Ok(response);
@@ -122,6 +124,16 @@ namespace risk.control.system.Controllers.Api.Company
             var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
             var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
+
+            var taskedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
+
+            var submitted2SupervorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR);
+
+            var enquiryStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR);
+
             var assigned2AssignerStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
             var submitted2AssessorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
@@ -187,7 +199,7 @@ namespace risk.control.system.Controllers.Api.Company
                         a.BeneficiaryDetail.Name,
                         TimeElapsed = DateTime.Now.Subtract(a.Created).TotalSeconds,
                         IsNewAssigned = a.ManagerActiveView <= 1,
-                        PersonMapAddressUrl = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? a.CustomerDetail.CustomerLocationMap : a.BeneficiaryDetail.BeneficiaryLocationMap
+                        PersonMapAddressUrl = a.GetMapUrl(a.InvestigationCaseSubStatus == taskedStatus, a.InvestigationCaseSubStatus == submitted2SupervorStatus, a.InvestigationCaseSubStatus == enquiryStatus)
                     })?
                     .ToList();
             return Ok(response);
@@ -255,7 +267,9 @@ namespace risk.control.system.Controllers.Api.Company
                 Agency = a.Vendor?.Name,
                         OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.Vendor.DocumentImage)),
                 TimeElapsed = DateTime.Now.Subtract(a.Created).TotalSeconds,
-                PersonMapAddressUrl = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? a.CustomerDetail.CustomerLocationMap : a.BeneficiaryDetail.BeneficiaryLocationMap
+                PersonMapAddressUrl = a.SelectedAgentDrivingMap,
+                Distance = a.SelectedAgentDrivingDistance,
+                Duration = a.SelectedAgentDrivingDuration
             })?.ToList();
 
             return Ok(response);
@@ -317,7 +331,9 @@ namespace risk.control.system.Controllers.Api.Company
                         OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.Vendor.DocumentImage)),
                 Agency = a.Vendor?.Name,
                 TimeElapsed = DateTime.Now.Subtract(a.Created).TotalSeconds,
-                PersonMapAddressUrl = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? a.CustomerDetail.CustomerLocationMap : a.BeneficiaryDetail.BeneficiaryLocationMap
+                PersonMapAddressUrl = a.SelectedAgentDrivingMap,
+                Distance = a.SelectedAgentDrivingDistance,
+                Duration = a.SelectedAgentDrivingDuration
             })?.ToList();
 
             return Ok(response);

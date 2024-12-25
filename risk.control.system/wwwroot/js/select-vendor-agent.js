@@ -93,13 +93,13 @@
             {
                 "data": "distance",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.distance + '" data-toggle="tooltip">' + data + '</span>';
+                    return '<span class="distance" title="' + row.distance + '" data-toggle="tooltip">' + data + '</span>';
                 }
             },
             {
                 "data": "duration",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.duration + '" data-toggle="tooltip">' + data + '</span>';
+                    return '<span class="duration" title="' + row.duration + '" data-toggle="tooltip">' + data + '</span>';
                 }
             },
             {
@@ -135,6 +135,12 @@
     $('#customerTable tbody').fadeIn(2000);
 
     $('#customerTable').on('mouseenter', '.map-thumbnail', function () {
+        $(this).find('.full-map').show(); // Show full map
+    }).on('mouseleave', '.map-thumbnail', function () {
+        $(this).find('.full-map').hide(); // Hide full map
+    });
+
+    $('#customerTable').on('mouseenter', '.map-thumbnail', function () {
         $(this).find('.full-driving-map').show(); // Show full map
     }).on('mouseleave', '.map-thumbnail', function () {
         $(this).find('.full-driving-map').hide(); // Hide full map
@@ -143,6 +149,25 @@
     $('#customerTable tbody').on('change', 'input[type="radio"]', function () {
         // If checkbox is not checked        
         if (this.checked) {
+            // Get the selected row
+            var selectedRow = $(this).closest('tr');
+
+            var rowIndex = $(this).closest('tr').index();
+            var rowData = $('#customerTable').DataTable().row(rowIndex).data();
+
+            // Assuming the data object has `duration` and `distance` keys
+            var duration = rowData.duration; // "15 mins"
+            var distance = rowData.distance; // "10 km"
+
+
+            // Retrieve the map URL from the specific column (e.g., 5th column)
+            var mapUrl = selectedRow.find('.full-driving-map').attr('src');
+
+            // Assign the map URL to the hidden input field
+            $('#drivingMap').val(mapUrl);
+            $('#drivingDistance').val(distance);
+            $('#drivingDuration').val(duration);
+
             $("#allocatedcase").prop('disabled', false);
         } else {
             $("#allocatedcase").prop('disabled', true);

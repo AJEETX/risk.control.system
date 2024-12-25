@@ -62,7 +62,7 @@ $(document).ready(function () {
             },
             {
                 className: 'max-width-column-name', // Apply the CSS class,
-                targets: 6                      // Index of the column to style
+                targets: 8                      // Index of the column to style
             }],
         order: [[12, 'asc']],
         fixedHeader: true,
@@ -108,6 +108,19 @@ $(document).ready(function () {
                 }
             },
             {
+                "data": "distance",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.distance + '" data-toggle="tooltip">' + data + '</span>'
+                }
+            },
+
+            {
+                "data": "duration",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.duration + '" data-toggle="tooltip">' + data + '</span>'
+                }
+            },
+            {
                 "sDefaultContent": "",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
@@ -145,18 +158,6 @@ $(document).ready(function () {
                 "data": "service",
                 "mRender": function (data, type, row) {
                     return '<span title="' + row.service + '" data-toggle="tooltip">' + data + '</span>'
-                }
-            },
-            {
-                "data": "location",
-                "mRender": function (data, type, row) {
-                    return '<span title="' + row.location + '" data-toggle="tooltip">' + data + '</span>'
-                }
-            },
-            {
-                "data": "created",
-                "mRender": function (data, type, row) {
-                    return '<span title="' + row.created + '" data-toggle="tooltip">' + data + '</span>'
                 }
             },
             { "data": "timePending" },

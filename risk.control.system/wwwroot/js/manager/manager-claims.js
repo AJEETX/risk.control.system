@@ -39,13 +39,13 @@ $(document).ready(function () {
             },
             {
                 className: 'max-width-column-name', // Apply the CSS class,
-                targets: 6                      // Index of the column to style
+                targets: 8                      // Index of the column to style
             },
             {
                 className: 'max-width-column-name', // Apply the CSS class,
-                targets: 8                      // Index of the column to style
+                targets: 10                      // Index of the column to style
             }],
-        order: [[12, 'asc']],
+        order: [[14, 'asc']],
         fixedHeader: true,
         processing: true,
         paging: true,
@@ -90,6 +90,19 @@ $(document).ready(function () {
                     img += '<img src="' + row.personMapAddressUrl + '" class="full-map" title="' + row.pincodeName + '" data-toggle="tooltip"/>'; // Full map image with class 'full-map'
                     img += '</div>';
                     return img;
+                }
+            },
+
+            {
+                "data": "distance",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.distance + '" data-toggle="tooltip">' + data + '</span>'
+                }
+            },
+            {
+                "data": "duration",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.duration + '" data-toggle="tooltip">' + data + '</span>'
                 }
             },
             {

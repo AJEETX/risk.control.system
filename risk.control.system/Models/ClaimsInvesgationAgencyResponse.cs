@@ -37,6 +37,7 @@
         public string AgencyDeclineComment { get; set; }
         public string? RawStatus { get; set; }
         public string PersonMapAddressUrl { get; set; }
-
+        public string? Distance { get; set; }
+        public string? Duration { get; set; }
     }
 }

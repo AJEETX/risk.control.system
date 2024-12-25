@@ -1,6 +1,6 @@
 ﻿@model ClaimsInvestigationVendorAgentModel
 
-<form id="radioButtons" method="post" asp-controller="ClaimsVendorPost" asp-action="AllocateToVendorAgent" enctype="multipart/form-data">
+<form id="radioButtons" method="post" asp-controller="ClaimsVendorPost" asp-action="AllocateToVendorAgent">
     <div class="card-body">
         <div class="submit-progress hidden">
             <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
@@ -10,6 +10,9 @@
         <input type="hidden" id="customerDetailId" name="customerDetailId" value="@Model.ClaimsInvestigation.CustomerDetail.CustomerDetailId" />
         <input type="hidden" id="beneficiaryId" name="beneficiaryId" value="@Model.CaseLocation.BeneficiaryDetailId" />
         <input type="hidden" id="CaseLocationId" name="CaseLocationId" value="@Model.CaseLocation.BeneficiaryDetailId" />
+        <input type="hidden" id="drivingMap" name="drivingMap" />
+        <input type="hidden" id="drivingDistance" name="drivingDistance" />
+        <input type="hidden" id="drivingDuration" name="drivingDuration" />
         <table id="customerTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
             <thead>
                 <tr>

@@ -27,9 +27,8 @@
                     data = response;
                     self.setTitle('<i class="fas fa-mobile-alt"></i> <b>Customer Address Location</b>');
                     self.setContent('<b><span class="badge badge-light"><i class="fas fa-map-pin"></i> Map Location</span></b>:');
-                    self.setContentAppend('<div id="maps"></div>')
-                    self.setContentAppend('<br><div id="pop-map"></div>')
-                    self.setContentAppend('</div>')
+                    self.setContentAppend('<span class="badge badge-light"><i class="fas fa-map-marker-alt"></i> Address</span>:');
+                    self.setContentAppend('<br><img class="img-fluid investigation-actual-image" src="' + response.profileMap + '" /> ');
                     self.setContentAppend('<span class="badge badge-light"><i class="fas fa-map-marker-alt"></i> Address</span>:');
                     self.setContentAppend('<br><i>' + response.address + '</i>');
                     self.setContentAppend('<br><span class="badge badge-light"><i class="fas fa-info"></i> Location Info</span> :');
@@ -39,12 +38,12 @@
                     self.setContent('Something went wrong.');
                 });
             },
-            onContentReady: function () {
-                if (showCustomerMap) {
-                    showCustomerMap = false;
-                    initPopMap(data.position, data.address);
-                }
-            }
+            //onContentReady: function () {
+            //    if (showCustomerMap) {
+            //        showCustomerMap = false;
+            //        initPopMap(data.position, data.address);
+            //    }
+            //}
         })
     });
 
@@ -74,9 +73,7 @@
                     data = response;
                     self.setTitle('<i class="fas fa-mobile-alt"></i> <b>Beneficiary Address Location</b>');
                     self.setContent('<b><span class="badge badge-light"><i class="fas fa-map-pin"></i> Map Location</span></b>:');
-                    self.setContentAppend('<div id="maps"></div>')
-                    self.setContentAppend('<br><div id="pop-map"></div>')
-                    self.setContentAppend('</div>')
+                    self.setContentAppend('<br><img class="img-fluid investigation-actual-image" src="' + response.profileMap + '" /> ');
                     self.setContentAppend('<span class="badge badge-light"><i class="fas fa-map-marker-alt"></i> Address</span>:');
                     self.setContentAppend('<br><i>' + response.address + '</i>');
                     self.setContentAppend('<br><span class="badge badge-light"><i class="fas fa-info"></i> Location Info</span> :');
@@ -86,12 +83,12 @@
                     self.setContent('Something went wrong.');
                 });
             },
-            onContentReady: function () {
-                if (showBeneficiaryMap) {
-                    showBeneficiaryMap = false;
-                    initPopMap(data.position, data.address);
-                }
-            }
+            //onContentReady: function () {
+            //    if (showBeneficiaryMap) {
+            //        showBeneficiaryMap = false;
+            //        initPopMap(data.position, data.address);
+            //    }
+            //}
         })
     })
 

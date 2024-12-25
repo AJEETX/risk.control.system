@@ -20,19 +20,19 @@ namespace risk.control.system.Services
     {
         Task NotifyClaimCreation(string userEmail, ClaimsInvestigation claimsInvestigation);
 
-        Task NotifyClaimAllocationToVendor(string userEmail, string policy, string claimsInvestigationId, long vendorId, long caseLocationId);
+        Task NotifyClaimAllocationToVendor(string userEmail, string policy, string claimsInvestigationId, long vendorId);
 
         Task NotifyClaimAssignmentToAssigner(string userEmail, List<string> claims);
 
         Task NotifyClaimWithdrawlToCompany(string senderUserEmail, string claimId);
 
-        Task NotifyClaimAssignmentToVendorAgent(string senderUserEmail, string claimId, string agentEmail, long vendorId, long caseLocationId);
+        Task NotifyClaimAssignmentToVendorAgent(string senderUserEmail, string claimId, string agentEmail, long vendorId);
 
-        Task NotifyClaimReportSubmitToVendorSupervisor(string senderUserEmail, string claimId, long caseLocationId);
+        Task NotifyClaimReportSubmitToVendorSupervisor(string senderUserEmail, string claimIdd);
 
-        Task NotifyClaimReportSubmitToCompany(string senderUserEmail, string claimId, long caseLocationId);
+        Task NotifyClaimReportSubmitToCompany(string senderUserEmail, string claimId);
 
-        Task NotifyClaimReportProcess(string senderUserEmail, string claimId, long caseLocationId);
+        Task NotifyClaimReportProcess(string senderUserEmail, string claimId);
         Task NotifySubmitQueryToAgency(string senderUserEmail, string claimId);
         Task NotifySubmitReplyToCompany(string senderUserEmail, string claimId);
     }
@@ -68,7 +68,7 @@ namespace risk.control.system.Services
             this.userVendorManager = userVendorManager;
         }
 
-        public async Task NotifyClaimAllocationToVendor(string userEmail, string policy, string claimsInvestigationId, long vendorId, long caseLocationId)
+        public async Task NotifyClaimAllocationToVendor(string userEmail, string policy, string claimsInvestigationId, long vendorId)
         {
             //1. get vendor admin and supervisor email
 
@@ -350,7 +350,7 @@ namespace risk.control.system.Services
             }
         }
 
-        public async Task NotifyClaimAssignmentToVendorAgent(string userEmail, string claimId, string agentEmail, long vendorId, long caseLocationId)
+        public async Task NotifyClaimAssignmentToVendorAgent(string userEmail, string claimId, string agentEmail, long vendorId)
         {
             var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.AGENT.ToString()));
 
@@ -491,7 +491,7 @@ namespace risk.control.system.Services
             }
         }
 
-        public async Task NotifyClaimReportProcess(string senderUserEmail, string claimId, long caseLocationId)
+        public async Task NotifyClaimReportProcess(string senderUserEmail, string claimId)
         {
             var claim = _context.ClaimsInvestigation.Include(p => p.PolicyDetail).Where(c => c.ClaimsInvestigationId == claimId).FirstOrDefault();
             if (claim != null)
@@ -588,7 +588,7 @@ namespace risk.control.system.Services
             }
         }
 
-        public async Task NotifyClaimReportSubmitToCompany(string senderUserEmail, string claimId, long caseLocationId)
+        public async Task NotifyClaimReportSubmitToCompany(string senderUserEmail, string claimId)
         {
             var claim = _context.ClaimsInvestigation.Include(i => i.PolicyDetail).Where(c => c.ClaimsInvestigationId == claimId).FirstOrDefault();
             if (claim != null)
@@ -674,7 +674,7 @@ namespace risk.control.system.Services
             }
         }
 
-        public async Task NotifyClaimReportSubmitToVendorSupervisor(string senderUserEmail, string claimId, long caseLocationId)
+        public async Task NotifyClaimReportSubmitToVendorSupervisor(string senderUserEmail, string claimId)
         {
             var supervisorRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.SUPERVISOR.ToString()));
             var agencyAdminRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.AGENCY_ADMIN.ToString()));

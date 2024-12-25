@@ -51,11 +51,11 @@ namespace risk.control.system.Controllers.Agency
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = $"{AGENCY_ADMIN.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME}")]
-        public async Task<IActionResult> AllocateToVendorAgent(string selectedcase, string claimId, long caseLocationId)
+        public async Task<IActionResult> AllocateToVendorAgent(string selectedcase, string claimId, string drivingMap, string drivingDistance, string drivingDuration)
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(selectedcase) || string.IsNullOrWhiteSpace(claimId) || caseLocationId < 1)
+                if (string.IsNullOrWhiteSpace(selectedcase) || string.IsNullOrWhiteSpace(claimId))
                 {
                     notifyService.Error($"No case selected!!!. Please select case to be allocate.", 3);
                     return RedirectToAction(nameof(SupervisorController.Allocate), "Supervisor");
@@ -73,7 +73,7 @@ namespace risk.control.system.Controllers.Agency
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                var claim = await claimsInvestigationService.AssignToVendorAgent(vendorAgent.Email, currentUserEmail, vendorAgent.VendorId.Value, claimId);
+                var claim = await claimsInvestigationService.AssignToVendorAgent(vendorAgent.Email, currentUserEmail, vendorAgent.VendorId.Value, claimId, drivingMap,drivingDistance, drivingDuration);
                 if (claim == null)
                 {
                     notifyService.Error("OOPs !!!..Error occurred.");
@@ -81,7 +81,7 @@ namespace risk.control.system.Controllers.Agency
                 }
                 if(vendorAgent.Vendor.EnableMailbox)
                 {
-                    await mailboxService.NotifyClaimAssignmentToVendorAgent(currentUserEmail, claimId, vendorAgent.Email, vendorAgent.VendorId.Value, caseLocationId);
+                    await mailboxService.NotifyClaimAssignmentToVendorAgent(currentUserEmail, claimId, vendorAgent.Email, vendorAgent.VendorId.Value);
                 }
 
                 notifyService.Custom($"Claim #{claim.PolicyDetail.ContractNumber} tasked to {vendorAgent.Email}", 3, "green", "far fa-file-powerpoint");
@@ -135,7 +135,7 @@ namespace risk.control.system.Controllers.Agency
                     Income question2Enum = (Income)Enum.Parse(typeof(Income), question2, true);
                     question2 = question2Enum.GetEnumDisplayName();
                 }
-                var (vendor , contract )= await claimsInvestigationService.SubmitToVendorSupervisor(currentUserEmail, caseLocationId, claimId,
+                var (vendor , contract )= await claimsInvestigationService.SubmitToVendorSupervisor(currentUserEmail, claimId,
                     WebUtility.HtmlDecode(remarks),
                     WebUtility.HtmlDecode(question1),
                     WebUtility.HtmlDecode(question2),
@@ -149,7 +149,7 @@ namespace risk.control.system.Controllers.Agency
 
                 if(vendor.EnableMailbox)
                 {
-                    await mailboxService.NotifyClaimReportSubmitToVendorSupervisor(currentUserEmail, claimId, caseLocationId);
+                    await mailboxService.NotifyClaimReportSubmitToVendorSupervisor(currentUserEmail, claimId);
                 }
 
                 notifyService.Custom($"Claim # {contract}report submitted to supervisor", 3, "green", "far fa-file-powerpoint");
@@ -168,11 +168,11 @@ namespace risk.control.system.Controllers.Agency
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = $"{AGENCY_ADMIN.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME}")]
-        public async Task<IActionResult> ProcessReport(string supervisorRemarks, string supervisorRemarkType, string claimId, long caseLocationId, string remarks = "")
+        public async Task<IActionResult> ProcessReport(string supervisorRemarks, string supervisorRemarkType, string claimId, string remarks = "")
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(supervisorRemarks) || string.IsNullOrWhiteSpace(claimId) || caseLocationId < 1)
+                if (string.IsNullOrWhiteSpace(supervisorRemarks) || string.IsNullOrWhiteSpace(claimId))
                 {
                     notifyService.Error("No Supervisor remarks entered!!!. Please enter remarks.");
                     return RedirectToAction(nameof(SupervisorController.GetInvestigateReport), new { selectedcase = claimId });
@@ -186,14 +186,14 @@ namespace risk.control.system.Controllers.Agency
 
                 var reportUpdateStatus = SupervisorRemarkType.OK;
 
-                var success = await claimsInvestigationService.ProcessAgentReport(userEmail, supervisorRemarks, caseLocationId, claimId, reportUpdateStatus, Request.Form.Files.FirstOrDefault(), remarks);
+                var success = await claimsInvestigationService.ProcessAgentReport(userEmail, supervisorRemarks, claimId, reportUpdateStatus, Request.Form.Files.FirstOrDefault(), remarks);
 
                 if (success != null)
                 {
                     var agencyUser = _context.VendorApplicationUser.Include(a => a.Vendor).FirstOrDefault(c => c.Email == userEmail);
                     if (agencyUser.Vendor.EnableMailbox)
                     {
-                        await mailboxService.NotifyClaimReportSubmitToCompany(userEmail, claimId, caseLocationId);
+                        await mailboxService.NotifyClaimReportSubmitToCompany(userEmail, claimId);
                     }
                     notifyService.Custom($"Claim #{success.PolicyDetail.ContractNumber}  report submitted to Company", 3, "green", "far fa-file-powerpoint");
                 }

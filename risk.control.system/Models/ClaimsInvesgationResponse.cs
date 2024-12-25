@@ -37,6 +37,8 @@
         public string AgencyDeclineComment { get; set; }
         public bool CaseWithPerson { get; set; } = false;
         public string? PersonMapAddressUrl { get; set; }
+        public string? Distance { get; set; }
+        public string? Duration { get; set; }
 
     }
 }
