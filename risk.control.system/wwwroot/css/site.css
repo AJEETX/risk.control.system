@@ -319,6 +319,10 @@ a.table-link {
     height: 300px;
     width: auto;
 }
+#face-map-url{
+    height:100%;
+    width:100%;
+}
 
 #audio-map {
     height: 300px;
@@ -336,6 +340,10 @@ a.table-link {
 #ocr-map {
     height: 300px;
     width: auto;
+}
+#ocr-map-url {
+    height: 100%;
+    width: 100%;
 }
 
 #passport-map {

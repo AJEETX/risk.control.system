@@ -30,6 +30,9 @@ namespace risk.control.system.Models
         [Display(Name = "Document Id Location")]
         public string? DocumentIdImageLocationUrl { get; set; }
 
+        public string? Distance { get; set; }
+        public string? Duration { get; set; }
+
         [Display(Name = "Document Id Location Address")]
         public string? DocumentIdImageLocationAddress { get; set; } = "No Address data";
 

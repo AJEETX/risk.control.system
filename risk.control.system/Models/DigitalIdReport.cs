@@ -27,6 +27,9 @@ namespace risk.control.system.Models
         [Display(Name = "Digital Id Location")]
         public string? DigitalIdImageLocationUrl { get; set; }
 
+        public string? Distance { get; set; }
+        public string? Duration { get; set; }
+
         [Display(Name = "Digital Id Location Address")]
         public string? DigitalIdImageLocationAddress { get; set; } = "No Address data";
 

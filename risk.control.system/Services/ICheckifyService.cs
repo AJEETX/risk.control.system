@@ -41,6 +41,7 @@ public class ICheckifyService : IICheckifyService
     private readonly IGoogleApi googleApi;
     private readonly IGoogleMaskHelper googleHelper;
     private readonly IHttpClientService httpClientService;
+    private readonly ICustomApiCLient customApiCLient;
     private readonly IClaimsService claimsService;
     private readonly IFaceMatchService faceMatchService;
     private readonly IWebHostEnvironment webHostEnvironment;
@@ -49,7 +50,9 @@ public class ICheckifyService : IICheckifyService
 
     //test PAN FNLPM8635N
     public ICheckifyService(ApplicationDbContext context, IGoogleApi googleApi,
-        IGoogleMaskHelper googleHelper, IHttpClientService httpClientService,
+        IGoogleMaskHelper googleHelper, 
+        IHttpClientService httpClientService,
+        ICustomApiCLient customApiCLient,
         IClaimsService claimsService,
         IFaceMatchService faceMatchService,
         IWebHostEnvironment webHostEnvironment)
@@ -58,6 +61,7 @@ public class ICheckifyService : IICheckifyService
         this.googleApi = googleApi;
         this.googleHelper = googleHelper;
         this.httpClientService = httpClientService;
+        this.customApiCLient = customApiCLient;
         this.claimsService = claimsService;
         this.faceMatchService = faceMatchService;
         this.webHostEnvironment = webHostEnvironment;
@@ -98,32 +102,43 @@ public class ICheckifyService : IICheckifyService
             var latLongString = latitude + "," + longitude;
             var weatherUrl = $"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current=temperature_2m,windspeed_10m&hourly=temperature_2m,relativehumidity_2m,windspeed_10m";
 
-            var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
-            claim.AgencyReport.DigitalIdReport.DigitalIdImageLocationUrl = url;
-
-            #region FACE IMAGE PROCESSING
-
+            var expectedLat = string.Empty;
+            var expectedLong = string.Empty;
             byte[]? registeredImage = null;
-
             if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
             {
                 registeredImage = claim.CustomerDetail.ProfilePicture;
+                expectedLat = claim.CustomerDetail.Latitude ;
+                expectedLong =  claim.CustomerDetail.Longitude;
             }
             if (claim.PolicyDetail.ClaimType == ClaimType.DEATH)
             {
                 registeredImage = claim.BeneficiaryDetail.ProfilePicture;
+                expectedLat = claim.BeneficiaryDetail.Latitude;
+                expectedLong = claim.BeneficiaryDetail.Longitude;
             }
+
+            var mapTask = customApiCLient.GetMap(double.Parse(expectedLat),double.Parse(expectedLong),double.Parse(latitude),double.Parse(longitude));
+
+            #region FACE IMAGE PROCESSING
 
             var faceMatchTask = faceMatchService.GetFaceMatchAsync(registeredImage, data.LocationImage);
             var weatherTask = httpClient.GetFromJsonAsync<Weather>(weatherUrl);
             var addressTask = httpClientService.GetRawAddress(latitude, longitude);
             #endregion FACE IMAGE PROCESSING
 
-            await Task.WhenAll(faceMatchTask, addressTask, weatherTask);
+            await Task.WhenAll(faceMatchTask, addressTask, weatherTask, mapTask);
 
             var (confidence, compressImage, similarity) = await faceMatchTask;
             var address = await addressTask;
             var weatherData = await weatherTask;
+            var (distance, duration, map) = await mapTask;
+
+
+            claim.AgencyReport.DigitalIdReport.DigitalIdImageLocationUrl = map;
+            claim.AgencyReport.DigitalIdReport.Duration = duration;
+            claim.AgencyReport.DigitalIdReport.Distance = distance;
+
 
             string weatherCustomData = $"Temperature:{weatherData.current.temperature_2m} {weatherData.current_units.temperature_2m}." +
                 $"\r\n" +
@@ -199,8 +214,20 @@ public class ICheckifyService : IICheckifyService
             var longitude = claim.AgencyReport.PanIdReport.DocumentIdImageLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
             var latLongString = latitude + "," + longitude;
             var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
-            claim.AgencyReport.PanIdReport.DocumentIdImageLocationUrl = url;
-            var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claim.ClientCompanyId);
+
+            var expectedLat = string.Empty;
+            var expectedLong = string.Empty;
+            if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
+            {
+                expectedLat = claim.CustomerDetail.Latitude;
+                expectedLong = claim.CustomerDetail.Longitude;
+            }
+            if (claim.PolicyDetail.ClaimType == ClaimType.DEATH)
+            {
+                expectedLat = claim.BeneficiaryDetail.Latitude;
+                expectedLong = claim.BeneficiaryDetail.Longitude;
+            }
+            var mapTask = customApiCLient.GetMap(double.Parse(expectedLat), double.Parse(expectedLong), double.Parse(latitude), double.Parse(longitude));
 
             #region PAN IMAGE PROCESSING
 
@@ -214,8 +241,15 @@ public class ICheckifyService : IICheckifyService
 
             addressTask = httpClientService.GetRawAddress(latitude, longitude);
 
-            await Task.WhenAll(googleDetecTask, addressTask);
+            await Task.WhenAll(googleDetecTask, addressTask, mapTask);
 
+            var (distance, duration, map) = await mapTask;
+
+            claim.AgencyReport.PanIdReport.Duration = duration;
+            claim.AgencyReport.PanIdReport.Distance = distance;
+            claim.AgencyReport.PanIdReport.DocumentIdImageLocationUrl = map;
+
+            var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claim.ClientCompanyId);
             var imageReadOnly = await googleDetecTask;
             if (imageReadOnly != null && imageReadOnly.Count > 0)
             {
@@ -364,14 +398,25 @@ public class ICheckifyService : IICheckifyService
             var latitude = claim.AgencyReport.AudioReport.DocumentIdImageLongLat.Substring(0, longLat)?.Trim();
             var longitude = claim.AgencyReport.AudioReport.DocumentIdImageLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
             var latLongString = latitude + "," + longitude;
-            var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
-            claim.AgencyReport.AudioReport.DocumentIdImageLocationUrl = url;
+
+            var expectedLat = string.Empty;
+            var expectedLong = string.Empty;
+            if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
+            {
+                expectedLat = claim.CustomerDetail.Latitude;
+                expectedLong = claim.CustomerDetail.Longitude;
+            }
+            if (claim.PolicyDetail.ClaimType == ClaimType.DEATH)
+            {
+                expectedLat = claim.BeneficiaryDetail.Latitude;
+                expectedLong = claim.BeneficiaryDetail.Longitude;
+            }
+            var mapTask = customApiCLient.GetMap(double.Parse(expectedLat), double.Parse(expectedLong), double.Parse(latitude), double.Parse(longitude));
+
 
             var rawAddressTask = httpClientService.GetRawAddress(latitude, longitude);
             var weatherUrl = $"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current=temperature_2m,windspeed_10m&hourly=temperature_2m,relativehumidity_2m,windspeed_10m";
             var weatherDataTask = httpClient.GetFromJsonAsync<Weather>(weatherUrl);
-
-            
 
             claim.AgencyReport.AudioReport.ValidationExecuted = true;
             claim.AgencyReport.AudioReport.DocumentIdImageValid = true;
@@ -390,13 +435,18 @@ public class ICheckifyService : IICheckifyService
 
             var audio2Texttask = httpClientService.TranscribeAsync(audioS3FolderName, audioFileName, filePath);
 
-            await Task.WhenAll(rawAddressTask, weatherDataTask, audioFileTask, audio2Texttask);
+            await Task.WhenAll(rawAddressTask, weatherDataTask, audioFileTask, audio2Texttask, weatherDataTask);
             var rawAddress = await rawAddressTask;
             claim.AgencyReport.AudioReport.DocumentIdImageLocationAddress = rawAddress;
             await audioFileTask;
             var weatherData = await weatherDataTask;
             await audio2Texttask;
             var audioResult = await audio2Texttask;
+            var (distance, duration, map) = await mapTask;
+
+            claim.AgencyReport.AudioReport.Duration = duration;
+            claim.AgencyReport.AudioReport.Distance = distance;
+            claim.AgencyReport.AudioReport.DocumentIdImageLocationUrl = map;
             string audioData = "No data";
             if (weatherData != null && weatherData.current != null && weatherData.current.temperature_2m != null)
             {
@@ -445,7 +495,6 @@ public class ICheckifyService : IICheckifyService
     {
         try
         {
-
             var claim = claimsService.GetClaims()
                 .Include(c => c.AgencyReport)
                 .ThenInclude(c => c.VideoReport)
@@ -461,19 +510,45 @@ public class ICheckifyService : IICheckifyService
             var latitude = claim.AgencyReport.VideoReport.DocumentIdImageLongLat.Substring(0, longLat)?.Trim();
             var longitude = claim.AgencyReport.VideoReport.DocumentIdImageLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
             var latLongString = latitude + "," + longitude;
-            var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
-            claim.AgencyReport.VideoReport.DocumentIdImageLocationUrl = url;
 
-            var rawAddress = await httpClientService.GetRawAddress(latitude, longitude);
+
+            var expectedLat = string.Empty;
+            var expectedLong = string.Empty;
+            if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
+            {
+                expectedLat = claim.CustomerDetail.Latitude;
+                expectedLong = claim.CustomerDetail.Longitude;
+            }
+            if (claim.PolicyDetail.ClaimType == ClaimType.DEATH)
+            {
+                expectedLat = claim.BeneficiaryDetail.Latitude;
+                expectedLong = claim.BeneficiaryDetail.Longitude;
+            }
+            var mapTask = customApiCLient.GetMap(double.Parse(expectedLat), double.Parse(expectedLong), double.Parse(latitude), double.Parse(longitude));
+
+
+            var rawAddressTask = httpClientService.GetRawAddress(latitude, longitude);
             var weatherUrl = $"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current=temperature_2m,windspeed_10m&hourly=temperature_2m,relativehumidity_2m,windspeed_10m";
 
-            var weatherData = await httpClient.GetFromJsonAsync<Weather>(weatherUrl);
+            var weatherDataTask = httpClient.GetFromJsonAsync<Weather>(weatherUrl);
+
+            await Task.WhenAll(rawAddressTask, weatherDataTask, mapTask);
+
+            var (distance, duration, map) = await mapTask;
+            var rawAddress = await rawAddressTask;
+            var weatherData = await weatherDataTask;
+
+
             string weatherCustomData = $"Temperature:{weatherData.current.temperature_2m} {weatherData.current_units.temperature_2m}." +
                 $"\r\n" +
                 $"\r\nWindspeed:{weatherData.current.windspeed_10m} {weatherData.current_units.windspeed_10m}" +
                 $"\r\n" +
                 $"\r\nElevation(sea level):{weatherData.elevation} metres";
 
+
+            claim.AgencyReport.VideoReport.DocumentIdImageLocationUrl = map;
+            claim.AgencyReport.VideoReport.Duration = duration;
+            claim.AgencyReport.VideoReport.Distance = distance;
             claim.AgencyReport.VideoReport.DocumentIdImageData = weatherCustomData;
             claim.AgencyReport.VideoReport.DocumentIdImageLocationAddress = rawAddress;
 
@@ -535,8 +610,22 @@ public class ICheckifyService : IICheckifyService
             var latitude = claim.AgencyReport.PassportIdReport.DocumentIdImageLongLat.Substring(0, longLat)?.Trim();
             var longitude = claim.AgencyReport.PassportIdReport.DocumentIdImageLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
             var latLongString = latitude + "," + longitude;
-            var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
-            claim.AgencyReport.PassportIdReport.DocumentIdImageLocationUrl = url;
+
+
+            var expectedLat = string.Empty;
+            var expectedLong = string.Empty;
+            if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
+            {
+                expectedLat = claim.CustomerDetail.Latitude;
+                expectedLong = claim.CustomerDetail.Longitude;
+            }
+            if (claim.PolicyDetail.ClaimType == ClaimType.DEATH)
+            {
+                expectedLat = claim.BeneficiaryDetail.Latitude;
+                expectedLong = claim.BeneficiaryDetail.Longitude;
+            }
+            var mapTask = customApiCLient.GetMap(double.Parse(expectedLat), double.Parse(expectedLong), double.Parse(latitude), double.Parse(longitude));
+            
             var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claim.ClientCompanyId);
 
             #region Passport IMAGE PROCESSING
@@ -545,14 +634,15 @@ public class ICheckifyService : IICheckifyService
 
             var byteimage = Convert.FromBase64String(data.OcrImage);
 
-            var passportdata = await httpClientService.GetPassportOcrResult(byteimage, company.PassportApiUrl, company.PassportApiKey, company.PassportApiHost);
+            var passportdataTask = httpClientService.GetPassportOcrResult(byteimage, company.PassportApiUrl, company.PassportApiKey, company.PassportApiHost);
 
             var googleDetecTask = googleApi.DetectTextAsync(byteimage);
 
             var addressTask = httpClientService.GetRawAddress(latitude, longitude);
 
-            await Task.WhenAll(googleDetecTask, addressTask);
+            await Task.WhenAll(googleDetecTask, addressTask, passportdataTask, mapTask);
 
+            var passportdata = await passportdataTask;
             var imageReadOnly = await googleDetecTask;
             if (imageReadOnly != null && imageReadOnly.Count > 0)
             {
@@ -633,6 +723,9 @@ public class ICheckifyService : IICheckifyService
 
             #endregion PAN IMAGE PROCESSING
             var rawAddress = await addressTask;
+            var (distance, duration, map) = await mapTask;
+            claim.AgencyReport.PassportIdReport.Duration = duration;
+            claim.AgencyReport.PassportIdReport.Distance = distance;
             claim.AgencyReport.PassportIdReport.DocumentIdImageLocationAddress = rawAddress;
             claim.AgencyReport.PassportIdReport.ValidationExecuted = true;
 

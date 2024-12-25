@@ -24,7 +24,9 @@ function initReportMap() {
         lat: 40.771209,
         lng: -73.9673991
     };
-
+    var url;
+    var distance;
+    var duration;
     //FACE ID
     var response = $.ajax({
         type: "GET",
@@ -33,17 +35,30 @@ function initReportMap() {
     }).responseText;
     if (response) {
         var data = JSON.parse(response);
-        if (data && data.center && data.dakota && data.frick) {
-            center = data.center;
-            dakota = data.dakota;
-            frick = data.frick
+        if (data && data.center && data.dakota && data.frick && data.url && data.distance && data.duration) {
+
+            var faceMapUrl = document.getElementById('face-map-url');
+            if (faceMapUrl) {
+                faceMapUrl.src = data.url;
+            }
+            var faceMsg = document.getElementById('face-msg');
+            if (faceMsg) {
+                faceMsg.innerHTML = `<p>Distance: <em> ${data.distance} </em>, Duration <em>${data.duration}</em>.</p>`;
+            }
+            
+
+            //center = data.center;
+            //dakota = data.dakota;
+            //frick = data.frick,
+            //url = data.url,
+            //    distance = data.distance,
+            //duration = data.duration
         }
     }
-    var faceHtml = document.getElementById('face-map');
-    var faceMsgHtml = document.getElementById('face-msg');
-    if (faceHtml && faceMsgHtml) {
-        initLocationMap(center, dakota, frick, faceHtml , faceMsgHtml);
-    }
+    
+    //if (faceHtml && faceMsgHtml) {
+    //    initLocationMap(center, dakota, frick, faceHtml , faceMsgHtml);
+    //}
 
     // PAN ID
     var ocrResponse = $.ajax({
@@ -52,18 +67,28 @@ function initReportMap() {
         async: false
     }).responseText;
     if (ocrResponse) {
-        var odata = JSON.parse(ocrResponse);
-        if (odata && odata.center && odata.dakota && odata.frick) {
-            center = odata.center;
-            dakota = odata.dakota;
-            frick = odata.frick
+        var data = JSON.parse(ocrResponse);
+        if (data && data.center && data.dakota && data.frick && data.url && data.distance && data.duration) {
+
+            var ocrMapUrl = document.getElementById('ocr-map-url');
+            if (ocrMapUrl) {
+                ocrMapUrl.src = data.url;
+            }
+            var ocrMsg = document.getElementById('ocr-msg');
+            if (ocrMsg) {
+                ocrMsg.innerHTML = `<p>Distance: <em> ${data.distance} </em>, Duration <em>${data.duration}</em>.</p>`;
+            }
+
+            //center = odata.center;
+            //dakota = odata.dakota;
+            //frick = odata.frick
         }
     }
-    var ocrHtml = document.getElementById('ocr-map');
-    var ocrMsgHtml = document.getElementById('ocr-msg');
-    if (ocrHtml && ocrMsgHtml) {
-        initLocationMap(center, dakota, frick, ocrHtml, ocrMsgHtml);
-    }
+    //var ocrHtml = document.getElementById('ocr-map');
+    //var ocrMsgHtml = document.getElementById('ocr-msg');
+    //if (ocrHtml && ocrMsgHtml) {
+    //    initLocationMap(center, dakota, frick, ocrHtml, ocrMsgHtml);
+    //}
 
     //PASSPORT ID
     var passportResponse = $.ajax({

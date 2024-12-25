@@ -27,7 +27,7 @@ namespace risk.control.system.Controllers.Api.Claims
         private readonly IHttpClientService httpClientService;
         private static HttpClient httpClient = new HttpClient();
 
-        public ClaimsInvestigationController(ApplicationDbContext context, 
+        public ClaimsInvestigationController(ApplicationDbContext context,
             IClaimsService claimsService,
             IWebHostEnvironment webHostEnvironment, IHttpClientService httpClientService)
         {
@@ -46,7 +46,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 .Include(p => p.CaseEnabler)
                 .FirstOrDefaultAsync(p => p.PolicyDetailId == id);
 
-            var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath,"img", "no-policy.jpg");
+            var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-policy.jpg");
 
             var noDataimage = await System.IO.File.ReadAllBytesAsync(noDataImagefilePath);
 
@@ -94,7 +94,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 .Include(c => c.District)
                 .Include(c => c.PinCode)
                 .FirstOrDefaultAsync(p => p.CustomerDetailId == id);
-            if(isAgencyUser)
+            if (isAgencyUser)
             {
                 customer.ContactNumber = new string('*', customer.ContactNumber.Length - 4) + customer.ContactNumber.Substring(customer.ContactNumber.Length - 4);
             }
@@ -130,7 +130,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 .FirstOrDefaultAsync(p => p.BeneficiaryDetailId == id && p.ClaimsInvestigationId == claimId);
             var currentUserEmail = HttpContext.User.Identity.Name;
             var isAgencyUser = _context.VendorApplicationUser.Any(u => u.Email == currentUserEmail);
-            if(isAgencyUser)
+            if (isAgencyUser)
             {
                 beneficiary.ContactNumber = new string('*', beneficiary.ContactNumber.Length - 4) + beneficiary.ContactNumber.Substring(beneficiary.ContactNumber.Length - 4);
             }
@@ -181,7 +181,7 @@ namespace risk.control.system.Controllers.Api.Claims
             {
                 Title = "Investigation Data",
                 LocationData = claim.AgencyReport?.DigitalIdReport?.DigitalIdImageData ?? "Location Data",
-                LatLong = mapUrl,
+                LatLong = claim.AgencyReport.DigitalIdReport.DigitalIdImageLocationUrl,
                 ImageAddress = imageAddress,
                 Location = claim.AgencyReport?.DigitalIdReport?.DigitalIdImage != null ?
                 string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claim.AgencyReport?.DigitalIdReport?.DigitalIdImage)) :
@@ -229,7 +229,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 OcrData = claim.AgencyReport?.PanIdReport?.DocumentIdImage != null ?
                 string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claim.AgencyReport?.PanIdReport?.DocumentIdImage)) :
                 string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noDataimage)),
-                OcrLatLong = panLocationUrl,
+                OcrLatLong = claim.AgencyReport?.PanIdReport.DocumentIdImageLocationUrl,
                 OcrAddress = panAddressAddress,
                 OcrPosition =
                 new
@@ -274,7 +274,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 PassportImage = claim.AgencyReport?.PassportIdReport?.DocumentIdImage != null ?
                 string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claim.AgencyReport?.PassportIdReport?.DocumentIdImage)) :
                 string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noDataimage)),
-                PassportLatLong = passportUrl,
+                PassportLatLong = claim.AgencyReport?.PassportIdReport.DocumentIdImageLocationUrl,
                 PassportAddress = passportAddress,
                 PassportPosition =
                 new
@@ -319,7 +319,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 VideoImage = claim.AgencyReport?.VideoReport?.DocumentIdImage != null ?
                 string.Format("data:video/*;base64,{0}", Convert.ToBase64String(claim.AgencyReport?.VideoReport?.DocumentIdImage)) :
                 string.Format("data:video/*;base64,{0}", Convert.ToBase64String(noDataimage)),
-                VideoLatLong = videoUrl,
+                VideoLatLong = claim.AgencyReport?.VideoReport.DocumentIdImageLocationUrl,
                 VideoAddress = videoAddress,
                 VideoPosition =
                 new
@@ -364,7 +364,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 AudioImage = claim.AgencyReport?.AudioReport?.DocumentIdImage != null ?
                 string.Format("data:audio/*;base64,{0}", Convert.ToBase64String(claim.AgencyReport?.AudioReport?.DocumentIdImage)) :
                 string.Format("data:audio/*;base64,{0}", Convert.ToBase64String(noDataimage)),
-                AudioLatLong = audioUrl,
+                AudioLatLong = claim.AgencyReport?.AudioReport.DocumentIdImageLocationUrl,
                 AudioAddress = audioAddress,
                 AudioPosition =
                 new
@@ -397,10 +397,11 @@ namespace risk.control.system.Controllers.Api.Claims
             var weatherUrl = $"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current=temperature_2m,windspeed_10m&hourly=temperature_2m,relativehumidity_2m,windspeed_10m";
             var weatherData = await httpClient.GetFromJsonAsync<Weather>(weatherUrl);
             string weatherCustomData = $"Temperature:{weatherData.current.temperature_2m} {weatherData.current_units.temperature_2m}.\r\nWindspeed:{weatherData.current.windspeed_10m} {weatherData.current_units.windspeed_10m} \r\nElevation(sea level):{weatherData.elevation} metres";
+            var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=400x400&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
 
             var data = new
             {
-                profileMap = customer.CustomerLocationMap,
+                profileMap = url,
                 weatherData = weatherCustomData,
                 address = customer.Addressline + " " + customer.District.Name + " " + customer.State.Name + " " + customer.Country.Name + " " + customer.PinCode.Code,
                 position = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) }
@@ -430,9 +431,10 @@ namespace risk.control.system.Controllers.Api.Claims
             var weatherData = await httpClient.GetFromJsonAsync<Weather>(weatherUrl);
             string weatherCustomData = $"Temperature:{weatherData.current.temperature_2m} {weatherData.current_units.temperature_2m}.\r\nWindspeed:{weatherData.current.windspeed_10m} {weatherData.current_units.windspeed_10m} \r\nElevation(sea level):{weatherData.elevation} metres";
 
+            var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=400x400&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
             var data = new
             {
-                profileMap = beneficiary.BeneficiaryLocationMap,
+                profileMap = url,
                 weatherData = weatherCustomData,
                 address = beneficiary.Addressline + " " + beneficiary.District.Name + " " + beneficiary.State.Name + " " + beneficiary.Country.Name + " " + beneficiary.PinCode.Code,
                 position = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) }
@@ -444,8 +446,8 @@ namespace risk.control.system.Controllers.Api.Claims
         public IActionResult GetFaceDetail(string claimid)
         {
             var claim = claimsService.GetClaims()
-                .Include(c=>c.AgencyReport)
-                .Include(c=>c.AgencyReport.DigitalIdReport)
+                .Include(c => c.AgencyReport)
+                .Include(c => c.AgencyReport.DigitalIdReport)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimid);
 
             if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
@@ -459,8 +461,16 @@ namespace risk.control.system.Controllers.Api.Claims
                     var latitude = claim.AgencyReport?.DigitalIdReport?.DigitalIdImageLongLat.Substring(0, longLat)?.Trim();
                     var longitude = claim.AgencyReport?.DigitalIdReport?.DigitalIdImageLongLat.Substring(longLat + 1)?.Trim();
 
+                    var latLongString = latitude + "," + longitude;
+
                     var frick = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) };
-                    return Ok(new { center, dakota, frick });
+                    return Ok(new { 
+                        center, dakota, 
+                        frick, 
+                        url = claim.AgencyReport?.DigitalIdReport.DigitalIdImageLocationUrl, 
+                        distance = claim.AgencyReport.DigitalIdReport.Distance,
+                        duration = claim.AgencyReport.DigitalIdReport.Duration,
+                    });
                 }
             }
             else
@@ -475,7 +485,14 @@ namespace risk.control.system.Controllers.Api.Claims
                     var longitude = claim.AgencyReport?.DigitalIdReport?.DigitalIdImageLongLat.Substring(longLat + 1)?.Trim();
 
                     var frick = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) };
-                    return Ok(new { center, dakota, frick });
+                    return Ok(new { 
+                        center, 
+                        dakota, 
+                        frick, 
+                        url = claim.AgencyReport?.DigitalIdReport.DigitalIdImageLocationUrl,
+                        distance = claim.AgencyReport.DigitalIdReport.Distance,
+                        duration = claim.AgencyReport.DigitalIdReport.Duration,
+                    });
                 }
             }
             return Ok();
@@ -501,7 +518,14 @@ namespace risk.control.system.Controllers.Api.Claims
                     var longitude = claim.AgencyReport?.PanIdReport?.DocumentIdImageLongLat.Substring(longLat + 1)?.Trim();
 
                     var frick = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) };
-                    return Ok(new { center, dakota, frick });
+                    return Ok(new { 
+                        center, 
+                        dakota, 
+                        frick, 
+                        url = claim.AgencyReport?.PanIdReport?.DocumentIdImageLocationUrl,
+                        distance = claim.AgencyReport.PanIdReport.Distance,
+                        duration = claim.AgencyReport.PanIdReport.Duration,
+                    });
                 }
             }
             else
@@ -516,7 +540,14 @@ namespace risk.control.system.Controllers.Api.Claims
                     var longitude = claim.AgencyReport?.PanIdReport?.DocumentIdImageLongLat.Substring(longLat + 1)?.Trim();
 
                     var frick = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) };
-                    return Ok(new { center, dakota, frick });
+                    return Ok(new { 
+                        center, 
+                        dakota, 
+                        frick, 
+                        url = claim.AgencyReport?.PanIdReport?.DocumentIdImageLocationUrl,
+                        distance = claim.AgencyReport.PanIdReport.Distance,
+                        duration = claim.AgencyReport.PanIdReport.Duration,
+                    });
                 }
             }
             return Ok();
@@ -542,7 +573,14 @@ namespace risk.control.system.Controllers.Api.Claims
                     var longitude = claim.AgencyReport?.PassportIdReport?.DocumentIdImageLongLat.Substring(longLat + 1)?.Trim();
 
                     var frick = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) };
-                    return Ok(new { center, dakota, frick });
+                    return Ok(new { 
+                        center, 
+                        dakota, 
+                        frick, 
+                        url = claim.AgencyReport?.PassportIdReport?.DocumentIdImageLocationUrl,
+                        distance = claim.AgencyReport.PassportIdReport.Distance,
+                        duration = claim.AgencyReport.PassportIdReport.Duration,
+                    });
                 }
             }
             else
@@ -557,7 +595,14 @@ namespace risk.control.system.Controllers.Api.Claims
                     var longitude = claim.AgencyReport?.PassportIdReport?.DocumentIdImageLongLat.Substring(longLat + 1)?.Trim();
 
                     var frick = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) };
-                    return Ok(new { center, dakota, frick });
+                    return Ok(new { 
+                        center, 
+                        dakota, 
+                        frick, 
+                        url = claim.AgencyReport?.PassportIdReport?.DocumentIdImageLocationUrl,
+                        distance = claim.AgencyReport.PassportIdReport.Distance,
+                        duration = claim.AgencyReport.PassportIdReport.Duration,
+                    });
                 }
             }
             return Ok();
@@ -583,7 +628,14 @@ namespace risk.control.system.Controllers.Api.Claims
                     var longitude = claim.AgencyReport?.AudioReport?.DocumentIdImageLongLat.Substring(longLat + 1)?.Trim();
 
                     var frick = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) };
-                    return Ok(new { center, dakota, frick });
+                    return Ok(new { 
+                        center, 
+                        dakota, 
+                        frick, 
+                        url = claim.AgencyReport?.AudioReport?.DocumentIdImageLocationUrl,
+                        distance = claim.AgencyReport.AudioReport.Distance,
+                        duration = claim.AgencyReport.AudioReport.Duration,
+                    });
                 }
             }
             else
@@ -598,7 +650,15 @@ namespace risk.control.system.Controllers.Api.Claims
                     var longitude = claim.AgencyReport?.AudioReport?.DocumentIdImageLongLat.Substring(longLat + 1)?.Trim();
 
                     var frick = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) };
-                    return Ok(new { center, dakota, frick });
+                    return Ok(new
+                    {
+                        center,
+                        dakota,
+                        frick,
+                        url = claim.AgencyReport?.AudioReport?.DocumentIdImageLocationUrl,
+                        distance = claim.AgencyReport.AudioReport.Distance,
+                        duration = claim.AgencyReport.AudioReport.Duration,
+                    });
                 }
             }
             return Ok();
@@ -625,7 +685,14 @@ namespace risk.control.system.Controllers.Api.Claims
                     var longitude = claim.AgencyReport?.VideoReport?.DocumentIdImageLongLat.Substring(longLat + 1)?.Trim();
 
                     var frick = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) };
-                    return Ok(new { center, dakota, frick });
+                    return Ok(new { 
+                        center, 
+                        dakota, 
+                        frick, 
+                        url = claim.AgencyReport?.VideoReport?.DocumentIdImageLocationUrl,
+                        distance = claim.AgencyReport.VideoReport.Distance,
+                        duration = claim.AgencyReport.VideoReport.Duration,
+                    });
                 }
             }
             else
@@ -640,7 +707,15 @@ namespace risk.control.system.Controllers.Api.Claims
                     var longitude = claim.AgencyReport?.VideoReport?.DocumentIdImageLongLat.Substring(longLat + 1)?.Trim();
 
                     var frick = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) };
-                    return Ok(new { center, dakota, frick });
+                    return Ok(new
+                    {
+                        center,
+                        dakota,
+                        frick,
+                        url = claim.AgencyReport?.VideoReport?.DocumentIdImageLocationUrl,
+                        distance = claim.AgencyReport.VideoReport.Distance,
+                        duration = claim.AgencyReport.VideoReport.Duration,
+                    });
                 }
             }
             return Ok();
