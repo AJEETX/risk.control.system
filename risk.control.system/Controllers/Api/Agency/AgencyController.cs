@@ -1,4 +1,6 @@
-﻿using Highsoft.Web.Mvc.Charts;
+﻿using System.Net.Http;
+
+using Highsoft.Web.Mvc.Charts;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -32,6 +34,7 @@ namespace risk.control.system.Controllers.Api.Agency
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly IFeatureManager featureManager;
         private readonly ICustomApiCLient customApiCLient;
+        private static HttpClient httpClient = new();
 
         public AgencyController(ApplicationDbContext context,
             UserManager<VendorApplicationUser> userManager, 
@@ -375,7 +378,29 @@ namespace risk.control.system.Controllers.Api.Agency
                 int durationInSec;
                 var agentExistingDrivingMap = _context.AgentDrivingMap.FirstOrDefault(a=>a.AgentId == u.AgencyUser.Id && a.ClaimsInvestigationId == id);
 
-                if(agentExistingDrivingMap == null)
+                if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH && claim.CustomerDetail != null)
+                {
+                    var weatherUrl = $"https://api.open-meteo.com/v1/forecast?latitude={claim.CustomerDetail.Latitude}&longitude={claim.CustomerDetail.Longitude}&current=temperature_2m,windspeed_10m&hourly=temperature_2m,relativehumidity_2m,windspeed_10m";
+                    var weatherData = await httpClient.GetFromJsonAsync<Weather>(weatherUrl);
+                    string weatherCustomData = $"Temperature:{weatherData.current.temperature_2m} {weatherData.current_units.temperature_2m}." +
+                $"\r\n" +
+                $"\r\nWindspeed:{weatherData.current.windspeed_10m} {weatherData.current_units.windspeed_10m}" +
+                $"\r\n" +
+                $"\r\nElevation(sea level):{weatherData.elevation} metres";
+                    claim.CustomerDetail.AddressLocationInfo = weatherCustomData;
+                }
+                else if (claim.PolicyDetail.ClaimType == ClaimType.DEATH && claim.BeneficiaryDetail != null)
+                {
+                    var weatherUrl = $"https://api.open-meteo.com/v1/forecast?latitude={claim.BeneficiaryDetail.Latitude}&longitude={claim.BeneficiaryDetail.Longitude}&current=temperature_2m,windspeed_10m&hourly=temperature_2m,relativehumidity_2m,windspeed_10m";
+                    var weatherData = await httpClient.GetFromJsonAsync<Weather>(weatherUrl);
+                    string weatherCustomData = $"Temperature:{weatherData.current.temperature_2m} {weatherData.current_units.temperature_2m}." +
+                $"\r\n" +
+                $"\r\nWindspeed:{weatherData.current.windspeed_10m} {weatherData.current_units.windspeed_10m}" +
+                $"\r\n" +
+                $"\r\nElevation(sea level):{weatherData.elevation} metres";
+                    claim.BeneficiaryDetail.AddressLocationInfo = weatherCustomData;
+                }
+                if (agentExistingDrivingMap == null)
                 {
                     (distance, distanceInMetre, duration, durationInSec, map) = await customApiCLient.GetMap(double.Parse(u.AgencyUser.AddressLatitude), double.Parse(u.AgencyUser.AddressLongitude), double.Parse(LocationLatitude), double.Parse(LocationLongitude));
 
@@ -399,6 +424,7 @@ namespace risk.control.system.Controllers.Api.Agency
                     distanceInMetre = agentExistingDrivingMap.DistanceInMetres.GetValueOrDefault();
                     durationInSec = agentExistingDrivingMap.DurationInSeconds.GetValueOrDefault();
                 }
+
                 var mapDetails = $"Driving distance : {distance}; Duration : {duration}";
                 var agentData = new AgentData
                 {
@@ -424,9 +450,11 @@ namespace risk.control.system.Controllers.Api.Agency
                     DistanceInMetres = distanceInMetre,
                     Duration = duration,
                     DurationInSeconds = durationInSec,
+                    AddressLocationInfo = claim.PolicyDetail.ClaimType == ClaimType.HEALTH ? claim.CustomerDetail.AddressLocationInfo : claim.BeneficiaryDetail.AddressLocationInfo
                 };
                 agentList.Add(agentData);
             }
+            _context.ClaimsInvestigation.Update(claim);
             await _context.SaveChangesAsync();
             return Ok(agentList);
         }
@@ -454,5 +482,6 @@ namespace risk.control.system.Controllers.Api.Agency
         public float DistanceInMetres { get; set; }
         public string Duration { get; set; }
         public int DurationInSeconds { get; set; }
+        public string? AddressLocationInfo { get; set; }
     }
 }

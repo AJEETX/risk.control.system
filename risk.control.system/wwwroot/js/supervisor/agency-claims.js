@@ -77,6 +77,10 @@
             {
                 className: 'max-width-column-name', // Apply the CSS class,
                 targets: 7                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column', // Apply the CSS class,
+                targets: 10                      // Index of the column to style
             }],
         order: [[14, 'asc']],
         fixedHeader: true,
@@ -177,9 +181,9 @@
             },
             
             {
-                "data": "location",
+                "data": "addressLocationInfo",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.location + '" data-toggle="tooltip">' + data + '</span>'
+                    return '<span title="' + row.addressLocationInfo + '" data-toggle="tooltip">' + data + '</span>'
                 }
             },
             {

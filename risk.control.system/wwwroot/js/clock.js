@@ -7,28 +7,40 @@ var sessionTimer = localStorage.getItem("sessionTimer")
 
 function startTimer(timeout, display) {
     var timer = timeout;
+    var countdown;
 
-    var countdown = setInterval(function () {
+    function updateDisplay() {
         var minutes = parseInt(timer / 60, 10);
         var seconds = parseInt(timer % 60, 10);
 
-        // Pad minutes and seconds with leading zeros
         minutes = minutes < 10 ? "0" + minutes : minutes;
         seconds = seconds < 10 ? "0" + seconds : seconds;
 
-        // Update the timer display
-        display.textContent = minutes + ":" + seconds;
-
-        // If time is over, logout
-        if (timer <= 0) {
-            clearInterval(countdown);
-            localStorage.removeItem("sessionTimer"); // Clear session storage
-            window.location.href = logoutPath;
+        if (display) {
+            display.textContent = minutes + ":" + seconds;
         }
+    }
 
-        // Show session expiration confirmation when timer <= 15 seconds
-        else if (timer <= 15 && askConfirmation) {
-            askConfirmation = false; // Ensure confirmation dialog only shows once
+    function stopCountdown() {
+        clearInterval(countdown);
+    }
+
+    countdown = setInterval(function () {
+        // Fetch the latest timer value from localStorage
+        timer = parseInt(localStorage.getItem("sessionTimer"), 10) || timer;
+
+        // Update the display
+        updateDisplay();
+
+        if (timer <= 0) {
+            stopCountdown();
+            localStorage.removeItem("sessionTimer");
+            window.location.href = logoutPath; // Redirect to logout
+        } else if (timer <= 15 && askConfirmation) {
+            askConfirmation = false; // Prevent duplicate confirmation dialogs
+            stopCountdown(); // Pause the timer
+
+            // Show confirmation popup
             $.confirm({
                 title: "Session Expiring!",
                 content: `Your session is about to expire!<br />Click <b>CONTINUE</b> to stay logged in.`,
@@ -57,11 +69,11 @@ function startTimer(timeout, display) {
             });
         }
 
-        timer--; // Decrement timer every second
-        localStorage.setItem("sessionTimer", timer); // Update sessionTimer in localStorage
+        // Decrement the timer and store the updated value
+        timer--;
+        localStorage.setItem("sessionTimer", timer);
     }, 1000);
 }
-
 
 // Show current time in 12-hour format
 function showTime() {
@@ -94,16 +106,13 @@ function showTime() {
 // Detect when the tab becomes visible or hidden
 document.addEventListener("visibilitychange", function () {
     if (document.visibilityState === 'visible') {
-        // Tab becomes visible
         var lastTime = localStorage.getItem("lastTime");
         if (lastTime) {
             var elapsed = Math.floor((new Date().getTime() - lastTime) / 1000);
 
-            // Update sessionTimer based on elapsed time
             sessionTimer = parseInt(localStorage.getItem("sessionTimer"), 10) || sessionTimer;
             sessionTimer -= elapsed;
 
-            // Ensure timer doesn't go below zero
             if (sessionTimer <= 0) {
                 sessionTimer = 0;
                 localStorage.setItem("sessionTimer", sessionTimer);
@@ -111,26 +120,12 @@ document.addEventListener("visibilitychange", function () {
                 return;
             }
 
-            // Update localStorage with new sessionTimer value
             localStorage.setItem("sessionTimer", sessionTimer);
-
-            // Update the display with the adjusted timer
-            var display = document.querySelector('#time');
-            if (display) {
-                var minutes = parseInt(sessionTimer / 60, 10);
-                var seconds = parseInt(sessionTimer % 60, 10);
-                display.textContent =
-                    (minutes < 10 ? "0" : "") + minutes + ":" +
-                    (seconds < 10 ? "0" : "") + seconds;
-            }
         }
     } else {
-        // Tab becomes hidden
         localStorage.setItem("lastTime", new Date().getTime());
     }
 });
-
-
 window.onload = function () {
     var display = document.querySelector('#time');
     var timeoutElement = document.getElementById('timeout');
@@ -149,10 +144,12 @@ window.onload = function () {
 
     // Ensure sessionTimer is valid and not less than zero
     if (sessionTimer <= 0) {
-        sessionTimer = parseInt(timeoutElement ? timeoutElement.value : "15", 10); // Fallback to default 15 seconds if no timeout element
+        sessionTimer = parseInt(timeoutElement ? timeoutElement.value : "900", 10); // Default to 15 minutes
     }
 
-    // Initialize the timer
+    // Start the session timer
     startTimer(sessionTimer, display);
+
+    // Show current time
     showTime();
 };

@@ -12,6 +12,7 @@ using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
 
 using System.Globalization;
+using System.Net.Http;
 using System.Security.Claims;
 
 using static risk.control.system.AppConstant.Applicationsettings;
@@ -32,6 +33,7 @@ namespace risk.control.system.Controllers.Api.Agency
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly UserManager<VendorApplicationUser> userManager;
+        private static HttpClient httpClient = new();
 
         public SupervisorController(ApplicationDbContext context,
              IWebHostEnvironment webHostEnvironment,
@@ -189,7 +191,7 @@ namespace risk.control.system.Controllers.Api.Agency
 
         }
         [HttpGet("GetNew")]
-        public IActionResult GetNew()
+        public async Task<IActionResult> GetNew()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
 
@@ -225,44 +227,72 @@ namespace risk.control.system.Controllers.Api.Agency
             }
             if (newAllocateClaims.Count > 0)
             {
+                foreach(var claim in newAllocateClaims)
+                {
+                    if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH && claim.CustomerDetail != null)
+                    {
+                        var weatherUrl = $"https://api.open-meteo.com/v1/forecast?latitude={claim.CustomerDetail.Latitude}&longitude={claim.CustomerDetail.Longitude}&current=temperature_2m,windspeed_10m&hourly=temperature_2m,relativehumidity_2m,windspeed_10m";
+                        var weatherData = await httpClient.GetFromJsonAsync<Weather>(weatherUrl);
+                        string weatherCustomData = $"Temperature:{weatherData.current.temperature_2m} {weatherData.current_units.temperature_2m}." +
+                    $"\r\n" +
+                    $"\r\nWindspeed:{weatherData.current.windspeed_10m} {weatherData.current_units.windspeed_10m}" +
+                    $"\r\n" +
+                    $"\r\nElevation(sea level):{weatherData.elevation} metres";
+                        claim.CustomerDetail.AddressLocationInfo = weatherCustomData;
+                    }
+                    else if (claim.PolicyDetail.ClaimType == ClaimType.DEATH && claim.BeneficiaryDetail != null)
+                    {
+                        var weatherUrl = $"https://api.open-meteo.com/v1/forecast?latitude={claim.BeneficiaryDetail.Latitude}&longitude={claim.BeneficiaryDetail.Longitude}&current=temperature_2m,windspeed_10m&hourly=temperature_2m,relativehumidity_2m,windspeed_10m";
+                        var weatherData = await httpClient.GetFromJsonAsync<Weather>(weatherUrl);
+                        string weatherCustomData = $"Temperature:{weatherData.current.temperature_2m} {weatherData.current_units.temperature_2m}." +
+                    $"\r\n" +
+                    $"\r\nWindspeed:{weatherData.current.windspeed_10m} {weatherData.current_units.windspeed_10m}" +
+                    $"\r\n" +
+                    $"\r\nElevation(sea level):{weatherData.elevation} metres";
+                        claim.BeneficiaryDetail.AddressLocationInfo = weatherCustomData;
+                    }
+                }
                 _context.ClaimsInvestigation.UpdateRange(newAllocateClaims);
                 _context.SaveChanges();
             }
-
-            var response = claims
-                   .Select(a => new ClaimsInvestigationAgencyResponse
-                   {
-                       Id = a.ClaimsInvestigationId,
-                       PolicyId = a.PolicyDetail.ContractNumber,
-                       Amount = string.Format(hindiNFO, "{0:C}", a.PolicyDetail.SumAssuredValue),
-                       Company = a.ClientCompany.Name,
-                       OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.ClientCompany.DocumentImage)),
-                       Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
-                       PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
-                       AssignedToAgency = a.AssignedToAgency,
-                       Document = a.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : Applicationsettings.NO_POLICY_IMAGE,
-                       Customer = ClaimsInvestigationExtension.GetPersonPhoto(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
-                       Name = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? a.CustomerDetail.Name : a.BeneficiaryDetail.Name,
-                       Policy = a.PolicyDetail?.LineOfBusiness.Name,
-                       Status = a.InvestigationCaseStatus.Name,
-                       ServiceType = a.PolicyDetail?.ClaimType.GetEnumDisplayName(),
-                       Service = a.PolicyDetail.InvestigationServiceType.Name,
-                       Location = a.InvestigationCaseSubStatus.Name,
-                       Created = a.Created.ToString("dd-MM-yyyy"),
-                       timePending = a.GetSupervisorTimePending(!a.IsQueryCase, false, false, false, a.IsQueryCase),
-                       PolicyNum = a.GetPolicyNumForAgency(requestedStatus.InvestigationCaseSubStatusId),
-                       BeneficiaryPhoto = a.BeneficiaryDetail?.ProfilePicture != null ?
+            var response = new List<ClaimsInvestigationAgencyResponse>();
+            foreach(var a in claims)
+            {
+                var claimResponse = new ClaimsInvestigationAgencyResponse
+                {
+                    Id = a.ClaimsInvestigationId,
+                    PolicyId = a.PolicyDetail.ContractNumber,
+                    Amount = string.Format(hindiNFO, "{0:C}", a.PolicyDetail.SumAssuredValue),
+                    Company = a.ClientCompany.Name,
+                    OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.ClientCompany.DocumentImage)),
+                    Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
+                    PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
+                    AssignedToAgency = a.AssignedToAgency,
+                    Document = a.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : Applicationsettings.NO_POLICY_IMAGE,
+                    Customer = ClaimsInvestigationExtension.GetPersonPhoto(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
+                    Name = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? a.CustomerDetail.Name : a.BeneficiaryDetail.Name,
+                    Policy = a.PolicyDetail?.LineOfBusiness.Name,
+                    Status = a.InvestigationCaseStatus.Name,
+                    ServiceType = a.PolicyDetail?.ClaimType.GetEnumDisplayName(),
+                    Service = a.PolicyDetail.InvestigationServiceType.Name,
+                    Location = a.InvestigationCaseSubStatus.Name,
+                    Created = a.Created.ToString("dd-MM-yyyy"),
+                    timePending = a.GetSupervisorTimePending(!a.IsQueryCase, false, false, false, a.IsQueryCase),
+                    PolicyNum = a.GetPolicyNumForAgency(requestedStatus.InvestigationCaseSubStatusId),
+                    BeneficiaryPhoto = a.BeneficiaryDetail?.ProfilePicture != null ?
                                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.BeneficiaryDetail.ProfilePicture)) :
                                       Applicationsettings.NO_USER,
-                       BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail.Name) ?
+                    BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail.Name) ?
                         "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>" :
                         a.BeneficiaryDetail.Name,
-                       TimeElapsed = DateTime.Now.Subtract(a.AllocatedToAgencyTime.Value).TotalSeconds,
-                       IsNewAssigned = a.AllocateView <= 1,
-                       IsQueryCase = a.InvestigationCaseSubStatusId == requestedStatus.InvestigationCaseSubStatusId,
-                       PersonMapAddressUrl = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? a.CustomerDetail.CustomerLocationMap : a.BeneficiaryDetail.BeneficiaryLocationMap
-                   })
-                    ?.ToList();
+                    TimeElapsed = DateTime.Now.Subtract(a.AllocatedToAgencyTime.Value).TotalSeconds,
+                    IsNewAssigned = a.AllocateView <= 1,
+                    IsQueryCase = a.InvestigationCaseSubStatusId == requestedStatus.InvestigationCaseSubStatusId,
+                    PersonMapAddressUrl = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? a.CustomerDetail.CustomerLocationMap : a.BeneficiaryDetail.BeneficiaryLocationMap,
+                    AddressLocationInfo = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? a.CustomerDetail.AddressLocationInfo : a.BeneficiaryDetail.AddressLocationInfo
+                };
+                response.Add(claimResponse);
+            }
 
             return Ok(response);
         }

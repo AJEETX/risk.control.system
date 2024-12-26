@@ -26,10 +26,14 @@
             },
             {
                 className: 'max-width-column', // Apply the CSS class,
-                targets: 7                      // Index of the column to style
+                targets: 5                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column', // Apply the CSS class,
+                targets: 8                      // Index of the column to style
             }
         ],
-        order: [[10, 'asc']],
+        order: [[11, 'asc']],
         fixedHeader: true,
         processing: true,
         paging: true,
@@ -88,6 +92,12 @@
 
 
                     return '<span title="' + row.personMapAddressUrl + '" data-toggle="tooltip">' + data + '</span>';
+                }
+            },
+            {
+                "data": "addressLocationInfo",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.addressLocationInfo + '" data-toggle="tooltip">' + data + '</span>'
                 }
             },
             {

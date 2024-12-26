@@ -39,5 +39,7 @@
         public string PersonMapAddressUrl { get; set; }
         public string? Distance { get; set; }
         public string? Duration { get; set; }
+        public string? AddressLocationInfo { get; set; }
+
     }
 }

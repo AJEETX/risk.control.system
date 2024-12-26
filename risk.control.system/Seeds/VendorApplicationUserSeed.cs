@@ -94,15 +94,15 @@ namespace risk.control.system.Seeds
 
 
             //Seed Vendor Agent
-            string agentEmailwithSuffix = AGENT.CODE + "@" + vendor.Email;
-            var pinCode1 = CURRENT_PINCODE2;
-            await AgentSeed.Seed(context,agentEmailwithSuffix, webHostEnvironment, customApiCLient, userManager, vendor, pinCode1, Applicationsettings.AGENT.PROFILE_IMAGE,
-                 Applicationsettings.AGENT.FIRST_NAME, Applicationsettings.AGENT.LAST_NAME);
+            //string agentEmailwithSuffix = AGENT.CODE + "@" + vendor.Email;
+            //var pinCode1 = CURRENT_PINCODE2;
+            //await AgentSeed.Seed(context, agentEmailwithSuffix, webHostEnvironment, customApiCLient, userManager, vendor, pinCode1, Applicationsettings.AGENT.PROFILE_IMAGE,
+            //     Applicationsettings.AGENT.FIRST_NAME, Applicationsettings.AGENT.LAST_NAME,"Holland Road");
 
             string agent2EmailwithSuffix = AGENTX.CODE + "@" + vendor.Email;
             var pinCode2 = CURRENT_PINCODE4;
             await AgentSeed.Seed(context, agent2EmailwithSuffix, webHostEnvironment, customApiCLient, userManager, vendor, pinCode2, Applicationsettings.AGENTX.PROFILE_IMAGE,
-                                 Applicationsettings.AGENTX.FIRST_NAME, Applicationsettings.AGENTX.LAST_NAME);
+                                 Applicationsettings.AGENTX.FIRST_NAME, Applicationsettings.AGENTX.LAST_NAME,"44 Waverley Road");
 
             //string agent3EmailwithSuffix = AGENTY.CODE + "@" + vendor.Email;
             //var pinCode3 = CURRENT_PINCODE5;

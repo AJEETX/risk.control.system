@@ -14,7 +14,7 @@ namespace risk.control.system.Seeds
         public static async Task Seed(ApplicationDbContext context, string agentEmailwithSuffix,
             IWebHostEnvironment webHostEnvironment, ICustomApiCLient customApiCLient,
             UserManager<VendorApplicationUser> userManager,
-            Vendor vendor, string pinCode, string photo, string firstName, string lastName)
+            Vendor vendor, string pinCode, string photo, string firstName, string lastName, string addressLine= "")
         {
             var faMailBox = new Mailbox
             {
@@ -29,7 +29,7 @@ namespace risk.control.system.Seeds
                 agentImage = File.ReadAllBytes(noUserImagePath);
             }
             var pincode = context.PinCode.Include(p => p.District).Include(p => p.State).Include(p => p.Country).FirstOrDefault(c => c.Code == pinCode);
-            var address = "23 Vincent Avenue" + ", " + pincode.District.Name + ", " + pincode.State.Name + ", " + pincode.Country.Code;
+            var address = addressLine + ", " + pincode.District.Name + ", " + pincode.State.Name + ", " + pincode.Country.Code;
             var coordinates = await customApiCLient.GetCoordinatesFromAddressAsync(address);
             var customerLatLong = coordinates.Latitude + "," + coordinates.Longitude;
             var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
