@@ -371,18 +371,22 @@ namespace risk.control.system.Controllers.Api.Agency
             foreach(var u in agents)
             { 
                 string distance, duration, map;
+                float distanceInMetre;
+                int durationInSec;
                 var agentExistingDrivingMap = _context.AgentDrivingMap.FirstOrDefault(a=>a.AgentId == u.AgencyUser.Id && a.ClaimsInvestigationId == id);
 
                 if(agentExistingDrivingMap == null)
                 {
-                    (distance, duration, map) = await customApiCLient.GetMap(double.Parse(u.AgencyUser.AddressLatitude), double.Parse(u.AgencyUser.AddressLongitude), double.Parse(LocationLatitude), double.Parse(LocationLongitude));
+                    (distance, distanceInMetre, duration, durationInSec, map) = await customApiCLient.GetMap(double.Parse(u.AgencyUser.AddressLatitude), double.Parse(u.AgencyUser.AddressLongitude), double.Parse(LocationLatitude), double.Parse(LocationLongitude));
 
                     var agentDrivingMap = new AgentDrivingMap
                     {
                         AgentId = u.AgencyUser.Id,
                         ClaimsInvestigationId = id,
                         Distance = distance,
+                        DistanceInMetres = distanceInMetre,
                         Duration = duration,
+                        DurationInSeconds = durationInSec,
                         DrivingMap = map
                     };
                     _context.AgentDrivingMap.Add(agentDrivingMap);
@@ -392,6 +396,8 @@ namespace risk.control.system.Controllers.Api.Agency
                     distance = agentExistingDrivingMap.Distance;
                     duration = agentExistingDrivingMap.Duration;
                     map = agentExistingDrivingMap.DrivingMap;
+                    distanceInMetre = agentExistingDrivingMap.DistanceInMetres.GetValueOrDefault();
+                    durationInSec = agentExistingDrivingMap.DurationInSeconds.GetValueOrDefault();
                 }
                 var mapDetails = $"Driving distance : {distance}; Duration : {duration}";
                 var agentData = new AgentData
@@ -415,7 +421,9 @@ namespace risk.control.system.Controllers.Api.Agency
                     MapDetails = mapDetails,
                     PinCode = u.AgencyUser.PinCode.Code,
                     Distance = distance,
-                    Duration = duration
+                    DistanceInMetres = distanceInMetre,
+                    Duration = duration,
+                    DurationInSeconds = durationInSec,
                 };
                 agentList.Add(agentData);
             }
@@ -443,6 +451,8 @@ namespace risk.control.system.Controllers.Api.Agency
         public string? MapDetails { get; set; }
         public string PinCode { get; set; }
         public string Distance { get; set; }
+        public float DistanceInMetres { get; set; }
         public string Duration { get; set; }
+        public int DurationInSeconds { get; set; }
     }
 }

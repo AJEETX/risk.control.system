@@ -118,7 +118,7 @@ public class ICheckifyService : IICheckifyService
                 expectedLong = claim.BeneficiaryDetail.Longitude;
             }
 
-            var mapTask = customApiCLient.GetMap(double.Parse(expectedLat),double.Parse(expectedLong),double.Parse(latitude),double.Parse(longitude));
+            var mapTask = customApiCLient.GetMap(double.Parse(expectedLat),double.Parse(expectedLong),double.Parse(latitude),double.Parse(longitude),"A","X","300","300","green","red");
 
             #region FACE IMAGE PROCESSING
 
@@ -132,12 +132,14 @@ public class ICheckifyService : IICheckifyService
             var (confidence, compressImage, similarity) = await faceMatchTask;
             var address = await addressTask;
             var weatherData = await weatherTask;
-            var (distance, duration, map) = await mapTask;
+            var (distance, distanceInMetres, duration, durationInSecs, map) = await mapTask;
 
 
             claim.AgencyReport.DigitalIdReport.DigitalIdImageLocationUrl = map;
             claim.AgencyReport.DigitalIdReport.Duration = duration;
             claim.AgencyReport.DigitalIdReport.Distance = distance;
+            claim.AgencyReport.DigitalIdReport.DistanceInMetres = distanceInMetres;
+            claim.AgencyReport.DigitalIdReport.DurationInSeconds = durationInSecs;
 
 
             string weatherCustomData = $"Temperature:{weatherData.current.temperature_2m} {weatherData.current_units.temperature_2m}." +
@@ -227,7 +229,7 @@ public class ICheckifyService : IICheckifyService
                 expectedLat = claim.BeneficiaryDetail.Latitude;
                 expectedLong = claim.BeneficiaryDetail.Longitude;
             }
-            var mapTask = customApiCLient.GetMap(double.Parse(expectedLat), double.Parse(expectedLong), double.Parse(latitude), double.Parse(longitude));
+            var mapTask = customApiCLient.GetMap(double.Parse(expectedLat), double.Parse(expectedLong), double.Parse(latitude), double.Parse(longitude), "A", "X", "300", "300", "green", "red");
 
             #region PAN IMAGE PROCESSING
 
@@ -243,8 +245,9 @@ public class ICheckifyService : IICheckifyService
 
             await Task.WhenAll(googleDetecTask, addressTask, mapTask);
 
-            var (distance, duration, map) = await mapTask;
-
+            var (distance, distanceInMetres, duration, durationInSecs, map) = await mapTask;
+            claim.AgencyReport.PanIdReport.DistanceInMetres = distanceInMetres;
+            claim.AgencyReport.PanIdReport.DurationInSeconds = durationInSecs;
             claim.AgencyReport.PanIdReport.Duration = duration;
             claim.AgencyReport.PanIdReport.Distance = distance;
             claim.AgencyReport.PanIdReport.DocumentIdImageLocationUrl = map;
@@ -411,7 +414,7 @@ public class ICheckifyService : IICheckifyService
                 expectedLat = claim.BeneficiaryDetail.Latitude;
                 expectedLong = claim.BeneficiaryDetail.Longitude;
             }
-            var mapTask = customApiCLient.GetMap(double.Parse(expectedLat), double.Parse(expectedLong), double.Parse(latitude), double.Parse(longitude));
+            var mapTask = customApiCLient.GetMap(double.Parse(expectedLat), double.Parse(expectedLong), double.Parse(latitude), double.Parse(longitude), "A","X", "300", "300", "green", "red");
 
 
             var rawAddressTask = httpClientService.GetRawAddress(latitude, longitude);
@@ -442,8 +445,10 @@ public class ICheckifyService : IICheckifyService
             var weatherData = await weatherDataTask;
             await audio2Texttask;
             var audioResult = await audio2Texttask;
-            var (distance, duration, map) = await mapTask;
+            var (distance, distanceInMetres, duration, durationInSecs, map) = await mapTask;
 
+            claim.AgencyReport.AudioReport.DistanceInMetres = distanceInMetres;
+            claim.AgencyReport.AudioReport.DurationInSeconds = durationInSecs;
             claim.AgencyReport.AudioReport.Duration = duration;
             claim.AgencyReport.AudioReport.Distance = distance;
             claim.AgencyReport.AudioReport.DocumentIdImageLocationUrl = map;
@@ -524,7 +529,7 @@ public class ICheckifyService : IICheckifyService
                 expectedLat = claim.BeneficiaryDetail.Latitude;
                 expectedLong = claim.BeneficiaryDetail.Longitude;
             }
-            var mapTask = customApiCLient.GetMap(double.Parse(expectedLat), double.Parse(expectedLong), double.Parse(latitude), double.Parse(longitude));
+            var mapTask = customApiCLient.GetMap(double.Parse(expectedLat), double.Parse(expectedLong), double.Parse(latitude), double.Parse(longitude), "A", "X", "300", "300", "green", "red");
 
 
             var rawAddressTask = httpClientService.GetRawAddress(latitude, longitude);
@@ -534,7 +539,7 @@ public class ICheckifyService : IICheckifyService
 
             await Task.WhenAll(rawAddressTask, weatherDataTask, mapTask);
 
-            var (distance, duration, map) = await mapTask;
+            var (distance, distanceInMetres, duration, durationInSecs, map) = await mapTask;
             var rawAddress = await rawAddressTask;
             var weatherData = await weatherDataTask;
 
@@ -546,6 +551,8 @@ public class ICheckifyService : IICheckifyService
                 $"\r\nElevation(sea level):{weatherData.elevation} metres";
 
 
+            claim.AgencyReport.VideoReport.DistanceInMetres = distanceInMetres;
+            claim.AgencyReport.VideoReport.DurationInSeconds = durationInSecs;
             claim.AgencyReport.VideoReport.DocumentIdImageLocationUrl = map;
             claim.AgencyReport.VideoReport.Duration = duration;
             claim.AgencyReport.VideoReport.Distance = distance;
@@ -624,7 +631,7 @@ public class ICheckifyService : IICheckifyService
                 expectedLat = claim.BeneficiaryDetail.Latitude;
                 expectedLong = claim.BeneficiaryDetail.Longitude;
             }
-            var mapTask = customApiCLient.GetMap(double.Parse(expectedLat), double.Parse(expectedLong), double.Parse(latitude), double.Parse(longitude));
+            var mapTask = customApiCLient.GetMap(double.Parse(expectedLat), double.Parse(expectedLong), double.Parse(latitude), double.Parse(longitude), "A", "X", "300", "300", "green", "red");
             
             var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claim.ClientCompanyId);
 
@@ -723,7 +730,9 @@ public class ICheckifyService : IICheckifyService
 
             #endregion PAN IMAGE PROCESSING
             var rawAddress = await addressTask;
-            var (distance, duration, map) = await mapTask;
+            var (distance, distanceInMetres, duration, durationInSecs, map) = await mapTask;
+            claim.AgencyReport.PassportIdReport.DistanceInMetres = distanceInMetres;
+            claim.AgencyReport.PassportIdReport.DurationInSeconds = durationInSecs;
             claim.AgencyReport.PassportIdReport.Duration = duration;
             claim.AgencyReport.PassportIdReport.Distance = distance;
             claim.AgencyReport.PassportIdReport.DocumentIdImageLocationAddress = rawAddress;

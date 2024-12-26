@@ -9,7 +9,7 @@ namespace risk.control.system.Services
     {
         Task<(string Latitude, string Longitude)> GetCoordinatesFromAddressAsync(string address);
         Task<string> GetAddressFromLatLong(double latitude, double longitude);
-        Task<(string distance, string diration, string map)> GetMap(double startLat, double startLng, double endLat, double endLng);
+        Task<(string distance, float distanceInMetres, string duration, int durationInSeconds, string map)> GetMap(double startLat, double startLong, double endLat, double endLong, string startLbl = "S", string endLbl = "E", string mapHeight = "300", string mapWidth = "200", string startColor = "red", string endColor = "green");
     }
     public class CustomApiClient : ICustomApiCLient
     {
@@ -90,22 +90,22 @@ namespace risk.control.system.Services
             }
         }
 
-        public async Task<(string distance, string diration, string map)> GetMap(double startLatitude, double startLongitude, double endLatitude, double endLongitude)
+        public async Task<(string distance, float distanceInMetres, string duration, int durationInSeconds, string map)> GetMap(double startLat, double startLong, double endLat, double endLong, string startLbl = "S", string endLbl = "E", string mapHeight = "300", string mapWidth = "200", string startColor = "red", string endColor = "green")
         {
             try
             {
-                var driving = await GetDrivingDistance((startLatitude.ToString() +","+ startLongitude.ToString()),(endLatitude.ToString() +","+ endLongitude.ToString()));
-                string directionsUrl = $"https://maps.googleapis.com/maps/api/directions/json?origin={startLatitude},{startLongitude}&destination={endLatitude},{endLongitude}&mode=driving&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+                var driving = await GetDrivingDistance((startLat.ToString() +","+ startLong.ToString()),(endLat.ToString() +","+ endLong.ToString()));
+                string directionsUrl = $"https://maps.googleapis.com/maps/api/directions/json?origin={startLat},{startLong}&destination={endLat},{endLong}&mode=driving&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
                 var response = await client.GetStringAsync(directionsUrl);
                 var route = ParseRoute(response);
                 string encodedPolyline = WebUtility.UrlEncode(route); // URL-encode the polyline
-                var distanceMap = $"https://maps.googleapis.com/maps/api/staticmap?size=300x200&markers=color:red|label:S|{startLatitude},{startLongitude}&markers=color:green|label:E|{endLatitude},{endLongitude}&path=enc:{encodedPolyline}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
-                return (driving.Distance, driving.Duration, distanceMap);
+                var distanceMap = $"https://maps.googleapis.com/maps/api/staticmap?size={mapHeight}x{mapWidth}&markers=color:{startColor}|label:{startLbl}|{startLat},{startLong}&markers=color:{endColor}|label:{endLbl}|{endLat},{endLong}&path=enc:{encodedPolyline}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+                return (driving.Distance, driving.DistanceInMetres, driving.Duration, driving.DurationInTime, distanceMap);
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.StackTrace);
-                return (null,null, null);
+                return (null,0, null,0, null);
             }
             
         }
@@ -142,7 +142,7 @@ namespace risk.control.system.Services
                 return null; // Return null to indicate failure
             }
         }
-        static async Task<(string Distance, string Duration)> GetDrivingDistance(string origin, string destination)
+        static async Task<(string Distance, float DistanceInMetres, string Duration, int DurationInTime)> GetDrivingDistance(string origin, string destination)
         {
             string url = $"https://maps.googleapis.com/maps/api/distancematrix/json?origins={origin}&destinations={destination}&mode=driving&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
 
@@ -162,13 +162,15 @@ namespace risk.control.system.Services
                     if (firstElement.GetProperty("status").GetString() == "OK")
                     {
                         var distance = firstElement.GetProperty("distance").GetProperty("text").GetString();
+                        var distanceInMetre = float.Parse(firstElement.GetProperty("distance").GetProperty("value").ToString());
                         var duration = firstElement.GetProperty("duration").GetProperty("text").GetString();
-                        return (distance, duration);
+                        var durationInSeconds = int.Parse(firstElement.GetProperty("duration").GetProperty("value").ToString());
+                        return (distance, distanceInMetre, duration, durationInSeconds);
                     }
                 }
             }
 
-            return ("N/A", "N/A");
+            return ("N/A", 0, "N/A", 0);
         }
     }
 }

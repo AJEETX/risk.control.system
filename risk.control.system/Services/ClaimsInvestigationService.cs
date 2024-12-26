@@ -27,7 +27,7 @@ namespace risk.control.system.Services
 
         Task<ClaimsInvestigation> AllocateToVendor(string userEmail, string claimsInvestigationId, long vendorId, bool AutoAllocated = true);
 
-        Task<ClaimsInvestigation> AssignToVendorAgent(string vendorAgentEmail, string currentUser, long vendorId, string claimsInvestigationId, string drivingMap, string drivingDistance, string drivingDuration);
+        Task<ClaimsInvestigation> AssignToVendorAgent(string vendorAgentEmail, string currentUser, long vendorId, string claimsInvestigationId, string drivingMap, string drivingDistance, string drivingDuration, string distanceInMeters, string durationInSeconds);
 
         Task<(Vendor, string)> SubmitToVendorSupervisor(string userEmail, string claimsInvestigationId, string remarks, string? answer1, string? answer2, string? answer3, string? answer4);
 
@@ -404,7 +404,7 @@ namespace risk.control.system.Services
                 var customerLatLong = latLong.Latitude + ","+latLong.Longitude;
                 existingPolicy.CustomerDetail.Latitude = latLong.Latitude;
                 existingPolicy.CustomerDetail.Longitude = latLong.Longitude;
-                    var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+                    var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:A%7C{customerLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
                 existingPolicy.CustomerDetail.CustomerLocationMap = url;
 
                 if (customerDocument is not null)
@@ -457,7 +457,7 @@ namespace risk.control.system.Services
                     var customerLatLong = latLong.Latitude + "," + latLong.Longitude;
                     claimsInvestigation.CustomerDetail.Latitude = latLong.Latitude;
                     claimsInvestigation.CustomerDetail.Longitude = latLong.Longitude;
-                    var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+                    var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:A%7C{customerLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
                     claimsInvestigation.CustomerDetail.CustomerLocationMap = url;
 
                     var addedClaim = _context.CustomerDetail.Add(claimsInvestigation.CustomerDetail);
@@ -736,7 +736,8 @@ namespace risk.control.system.Services
             return null;
         }
 
-        public async Task<ClaimsInvestigation> AssignToVendorAgent(string vendorAgentEmail, string currentUser, long vendorId, string claimsInvestigationId, string drivingMap, string drivingDistance, string drivingDuration)
+        public async Task<ClaimsInvestigation> AssignToVendorAgent(string vendorAgentEmail, string currentUser, long vendorId, string claimsInvestigationId, string drivingMap, string drivingDistance, 
+            string drivingDuration, string distanceInMeters, string durationInSeconds)
         {
             var inProgress = _context.InvestigationCaseStatus.FirstOrDefault(
                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS);
@@ -760,6 +761,8 @@ namespace risk.control.system.Services
                 claim.InvestigationCaseSubStatusId = assignedToAgent.InvestigationCaseSubStatusId;
                 claim.SelectedAgentDrivingDistance = drivingDistance;
                 claim.SelectedAgentDrivingDuration = drivingDuration;
+                claim.SelectedAgentDrivingDistanceInMetres = float.Parse(distanceInMeters);
+                claim.SelectedAgentDrivingDurationInSeconds = int.Parse(durationInSeconds);
                 claim.SelectedAgentDrivingMap = drivingMap;
                 claim.TaskToAgentTime = DateTime.Now;
                 var lastLog = _context.InvestigationTransaction.Where(i =>

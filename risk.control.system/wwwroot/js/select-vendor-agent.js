@@ -29,7 +29,7 @@
                 targets: 7                      // Index of the column to style
             }
         ],
-        order: [[1, 'asc']],
+        order: [[10, 'asc']],
         fixedHeader: true,
         processing: true,
         paging: true,
@@ -120,6 +120,14 @@
                     return '<span title="' + row.count + '" data-toggle="tooltip">' + data + '</span>';
                 }
             },
+            {
+                "data": "durationInSeconds",
+                "bVisible": false
+            },
+            {
+                "data": "distanceInMetres",
+                "bVisible": false
+            }
         ]
     });
 
@@ -159,6 +167,8 @@
             var duration = rowData.duration; // "15 mins"
             var distance = rowData.distance; // "10 km"
 
+            var distanceInMeters = rowData.distanceInMetres;
+            var durationInSeconds = rowData.durationInSeconds;
 
             // Retrieve the map URL from the specific column (e.g., 5th column)
             var mapUrl = selectedRow.find('.full-driving-map').attr('src');
@@ -166,6 +176,8 @@
             // Assign the map URL to the hidden input field
             $('#drivingMap').val(mapUrl);
             $('#drivingDistance').val(distance);
+            $('#durationInSeconds').val(durationInSeconds);
+            $('#distanceInMeters').val(distanceInMeters);
             $('#drivingDuration').val(duration);
 
             $("#allocatedcase").prop('disabled', false);

@@ -121,8 +121,10 @@ namespace risk.control.system.Models
         public string? SelectedAgentDrivingMap { get; set; }
         [Display(Name = "Distance")]
         public string? SelectedAgentDrivingDistance { get; set; } = default!;
+        public float? SelectedAgentDrivingDistanceInMetres { get; set; } = default!;
 
         [Display(Name = "Duration")]
         public string? SelectedAgentDrivingDuration { get; set; } = default!;
+        public int? SelectedAgentDrivingDurationInSeconds { get; set; } = default!;
     }
 }

@@ -369,8 +369,7 @@ namespace risk.control.system.Services
                             claim.CustomerDetail.Latitude = coordinates.Latitude;
                             claim.CustomerDetail.Longitude = coordinates.Longitude;
                             var customerLatLong = claim.CustomerDetail.Latitude + "," + claim.CustomerDetail.Longitude;
-
-                            var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+                            var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:A%7C{customerLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
                             claim.CustomerDetail.CustomerLocationMap = url;
 
                             var benePinCode = _context.PinCode
@@ -424,7 +423,7 @@ namespace risk.control.system.Services
                             beneficairy.Latitude = beneCoordinates.Latitude;
                             beneficairy.Longitude = beneCoordinates.Longitude;
 
-                            var beneUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={beneLatLong}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{beneLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+                            var beneUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={beneLatLong}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:A%7C{beneLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
                             beneficairy.BeneficiaryLocationMap = beneUrl;
                             _context.BeneficiaryDetail.Add(beneficairy);
                             _context.ClaimsInvestigation.Add(claim);
