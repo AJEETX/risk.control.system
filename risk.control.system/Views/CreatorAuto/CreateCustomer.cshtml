@@ -207,9 +207,9 @@
                                     </span>
                                 </div>
                                 <input type="text" id="PinCodeId" class="form-control remarks"
-                                       placeholder="type pincode..." asp-for="CustomerDetail.PinCodeId" required />
+                                       placeholder="type pincode..." asp-for="CustomerDetail.PinCodeId" required value="" />
                                 <span asp-validation-for="CustomerDetail.PinCodeId" class="text-danger"></span>
-                                <input type="hidden" id="SelectedId" name="SelectedId" value="@Model.CustomerDetail.PinCodeId" />
+                                <input type="hidden" id="SelectedId" name="SelectedId" value="@Model?.CustomerDetail?.PinCodeId" />
                             </div>
                         </div>
 
@@ -286,4 +286,6 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
     <script src="~/js/creator/create-customer.js"></script>
+    <script src="~/js/company-admin/pincode.js"></script>
+
 }

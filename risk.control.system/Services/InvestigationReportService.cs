@@ -232,6 +232,8 @@ namespace risk.control.system.Services
                 .ThenInclude(c => c.PinCode)
                 .Include(c => c.CustomerDetail)
                 .ThenInclude(c => c.State)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.PinCode)
                 .Include(c=>c.ClaimNotes)
                 .Include(c=>c.ClaimMessages)
                 .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == id);

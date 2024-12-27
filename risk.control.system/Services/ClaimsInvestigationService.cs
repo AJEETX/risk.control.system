@@ -21,7 +21,7 @@ namespace risk.control.system.Services
 
         Task<ClaimsInvestigation> CreateCustomer(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? claimDocument, IFormFile? customerDocument, bool create = true, long SelectedId = 0);
 
-        Task<ClaimsInvestigation> EditCustomer(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? customerDocument);
+        Task<ClaimsInvestigation> EditCustomer(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? customerDocument, long SelectedId = 0);
 
         Task AssignToAssigner(string userEmail, List<string> claimsInvestigations);
 
@@ -361,19 +361,16 @@ namespace risk.control.system.Services
                 throw;
             }
         }
-
-        public async Task<ClaimsInvestigation> EditCustomer(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? customerDocument)
+            
+        public async Task<ClaimsInvestigation> EditCustomer(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? customerDocument, long SelectedId = 0)
         {
             try
             {
                 var existingPolicy = await _context.ClaimsInvestigation
                     .Include(c => c.CustomerDetail)
                         .FirstOrDefaultAsync(c => c.ClaimsInvestigationId == claimsInvestigation.ClaimsInvestigationId);
-                existingPolicy.CustomerDetail.DistrictId = claimsInvestigation.CustomerDetail.DistrictId;
-                existingPolicy.CustomerDetail.Addressline = claimsInvestigation.CustomerDetail.Addressline;
                 existingPolicy.CustomerDetail.Description = claimsInvestigation.CustomerDetail.Description;
                 existingPolicy.CustomerDetail.ContactNumber = claimsInvestigation.CustomerDetail.ContactNumber;
-                existingPolicy.CustomerDetail.CountryId = claimsInvestigation.CustomerDetail.CountryId;
                 existingPolicy.CustomerDetail.DateOfBirth = claimsInvestigation.CustomerDetail.DateOfBirth;
                 existingPolicy.CustomerDetail.Education = claimsInvestigation.CustomerDetail.Education;
                 existingPolicy.CustomerDetail.Income = claimsInvestigation.CustomerDetail.Income;
@@ -381,21 +378,27 @@ namespace risk.control.system.Services
                 existingPolicy.CustomerDetail.Occupation = claimsInvestigation.CustomerDetail.Occupation;
                 existingPolicy.CustomerDetail.CustomerType = claimsInvestigation.CustomerDetail.CustomerType;
                 existingPolicy.CustomerDetail.Gender = claimsInvestigation.CustomerDetail.Gender;
-                existingPolicy.CustomerDetail.PinCodeId = claimsInvestigation.CustomerDetail.PinCodeId;
-                existingPolicy.CustomerDetail.StateId = claimsInvestigation.CustomerDetail.StateId;
 
+                existingPolicy.CustomerDetail.Addressline = claimsInvestigation.CustomerDetail.Addressline;
+                existingPolicy.CustomerDetail.DistrictId = claimsInvestigation.CustomerDetail.DistrictId;
+                existingPolicy.CustomerDetail.StateId = claimsInvestigation.CustomerDetail.StateId;
+                existingPolicy.CustomerDetail.CountryId = claimsInvestigation.CustomerDetail.CountryId;
+                if (SelectedId > 0)
+                {
+                    existingPolicy.CustomerDetail.PinCodeId = SelectedId;
+                }
                 existingPolicy.Updated = DateTime.Now;
                 existingPolicy.UpdatedBy = userEmail;
                 existingPolicy.CurrentUserEmail = userEmail;
                 existingPolicy.CurrentClaimOwner = userEmail;
-
+                
                 var pincode = _context.PinCode
                         .Include(p => p.District)
                         .Include(p => p.State)
                         .Include(p => p.Country)
-                        .FirstOrDefault(p => p.PinCodeId == claimsInvestigation.CustomerDetail.PinCodeId);
+                        .FirstOrDefault(p => p.PinCodeId == existingPolicy.CustomerDetail.PinCodeId);
 
-                var address = claimsInvestigation.CustomerDetail.Addressline + ", " +
+                var address = existingPolicy.CustomerDetail.Addressline + ", " +
                     pincode.District.Name + ", " +
                     pincode.State.Name + ", " +
                     pincode.Country.Code;

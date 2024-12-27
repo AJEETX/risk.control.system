@@ -378,12 +378,12 @@ namespace risk.control.system.Controllers.Company
                 var country = _context.Country.OrderBy(o => o.Name);
                 var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == claimsInvestigation.CustomerDetail.CountryId).OrderBy(d => d.Name);
                 var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == claimsInvestigation.CustomerDetail.StateId).OrderBy(d => d.Name);
-                var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == claimsInvestigation.CustomerDetail.DistrictId).OrderBy(d => d.Name);
+                //var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == claimsInvestigation.CustomerDetail.DistrictId).OrderBy(d => d.Name);
 
                 ViewData["CountryId"] = new SelectList(country, "CountryId", "Name", claimsInvestigation.CustomerDetail.CountryId);
                 ViewData["StateId"] = new SelectList(relatedStates, "StateId", "Name", claimsInvestigation.CustomerDetail.StateId);
                 ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", claimsInvestigation.CustomerDetail.DistrictId);
-                ViewData["PinCodeId"] = new SelectList(pincodes.Select(p => new { PinCodeId = p.PinCodeId, DisplayText = $"{p.Name} - {p.Code}" }), "PinCodeId", "DisplayText", claimsInvestigation.CustomerDetail.PinCode.PinCodeId);
+                //ViewData["PinCodeId"] = new SelectList(pincodes.Select(p => new { PinCodeId = p.PinCodeId, DisplayText = $"{p.Name} - {p.Code}" }), "PinCodeId", "DisplayText", claimsInvestigation.CustomerDetail.PinCode.PinCodeId);
 
                 var claimsPage = new MvcBreadcrumbNode("New", "CreatorManual", "Claims");
                 var agencyPage = new MvcBreadcrumbNode("New", "CreatorManual", "Assign(manual)") { Parent = claimsPage, };
@@ -455,12 +455,12 @@ namespace risk.control.system.Controllers.Company
 
                     var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == country.CountryId).OrderBy(d => d.Name);
                     var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == state.StateId).OrderBy(d => d.Name);
-                    var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == district.DistrictId).OrderBy(d => d.Name);
+                    //var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == district.DistrictId).OrderBy(d => d.Name);
 
                     ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", model.CountryId);
                     ViewData["DistrictId"] = new SelectList(districts.OrderBy(s => s.Code), "DistrictId", "Name", model.DistrictId);
                     ViewData["StateId"] = new SelectList(relatedStates.OrderBy(s => s.Code), "StateId", "Name", model.StateId);
-                    ViewData["PinCodeId"] = new SelectList(pincodes.Select(p => new { PinCodeId = p.PinCodeId, DisplayText = $"{p.Name} - {p.Code}" }), "PinCodeId", "DisplayText", model.PinCodeId);
+                    //ViewData["PinCodeId"] = new SelectList(pincodes.Select(p => new { PinCodeId = p.PinCodeId, DisplayText = $"{p.Name} - {p.Code}" }), "PinCodeId", "DisplayText", model.PinCodeId);
                     return View(model);
                 }
                 else
@@ -511,12 +511,12 @@ namespace risk.control.system.Controllers.Company
                 var country = _context.Country.OrderBy(o => o.Name);
                 var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == beneficiary.CountryId).OrderBy(d => d.Name);
                 var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == beneficiary.StateId).OrderBy(d => d.Name);
-                var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == beneficiary.DistrictId).OrderBy(d => d.Name);
+                //var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == beneficiary.DistrictId).OrderBy(d => d.Name);
 
                 ViewData["CountryId"] = new SelectList(country, "CountryId", "Name", beneficiary.CountryId);
                 ViewData["StateId"] = new SelectList(relatedStates, "StateId", "Name", beneficiary.StateId);
                 ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", beneficiary.DistrictId);
-                ViewData["PinCodeId"] = new SelectList(pincodes.Select(p => new { PinCodeId = p.PinCodeId, DisplayText = $"{p.Name} - {p.Code}" }), "PinCodeId", "DisplayText", beneficiary.PinCodeId);
+                //ViewData["PinCodeId"] = new SelectList(pincodes.Select(p => new { PinCodeId = p.PinCodeId, DisplayText = $"{p.Name} - {p.Code}" }), "PinCodeId", "DisplayText", beneficiary.PinCodeId);
 
                 ViewData["BeneficiaryRelationId"] = new SelectList(_context.BeneficiaryRelation.OrderBy(s => s.Code), "BeneficiaryRelationId", "Name", beneficiary.BeneficiaryRelationId);
 

@@ -341,7 +341,7 @@ namespace risk.control.system.Controllers.Company
         [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
         [HttpPost]
-        public async Task<IActionResult> EditCustomer(string claimsInvestigationId, ClaimsInvestigation claimsInvestigation, string claimtype, bool create = true)
+        public async Task<IActionResult> EditCustomer(string claimsInvestigationId, ClaimsInvestigation claimsInvestigation, string claimtype, long SelectedId, bool create = true)
         {
             try
             {
@@ -382,7 +382,7 @@ namespace risk.control.system.Controllers.Company
                     }
                 }
 
-                var claim = await claimsInvestigationService.EditCustomer(currentUserEmail, claimsInvestigation, profileFile);
+                var claim = await claimsInvestigationService.EditCustomer(currentUserEmail, claimsInvestigation, profileFile, SelectedId);
                 if (claim == null)
                 {
                     notifyService.Error("OOPs !!!..Error edting customer");
@@ -412,7 +412,7 @@ namespace risk.control.system.Controllers.Company
         [HttpPost]
         [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateBeneficiary(string claimId, BeneficiaryDetail caseLocation)
+        public async Task<IActionResult> CreateBeneficiary(string claimId, BeneficiaryDetail caseLocation, long SelectedId)
         {
             try
             {
@@ -439,6 +439,10 @@ namespace risk.control.system.Controllers.Company
                 }
 
                 caseLocation.ClaimsInvestigationId = claimId;
+                if (SelectedId > 0)
+                {
+                    caseLocation.PinCodeId = SelectedId;
+                }
                 var pincode = _context.PinCode
                     .Include(p => p.District)
                         .Include(p => p.State)
@@ -476,7 +480,7 @@ namespace risk.control.system.Controllers.Company
         [HttpPost]
         [ValidateAntiForgeryToken]
         [RequestSizeLimit(2_000_000)] // Checking for 2 MB
-        public async Task<IActionResult> EditBeneficiary(long id, BeneficiaryDetail ecaseLocation, string claimtype, long beneficiaryDetailId)
+        public async Task<IActionResult> EditBeneficiary(long id, BeneficiaryDetail ecaseLocation, string claimtype, long beneficiaryDetailId, long SelectedId = 0)
         {
             try
             {
@@ -512,6 +516,10 @@ namespace risk.control.system.Controllers.Company
                 caseLocation.DistrictId = ecaseLocation.DistrictId;
                 caseLocation.PinCodeId = ecaseLocation.PinCodeId;
                 caseLocation.StateId = ecaseLocation.StateId;
+                if(SelectedId > 0)
+                {
+                    caseLocation.PinCodeId = SelectedId;
+                }
                 var pincode = _context.PinCode
                     .Include(p => p.District)
                         .Include(p => p.State)
