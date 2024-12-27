@@ -205,7 +205,7 @@ namespace risk.control.system.Services
                 .Include(c => c.ClientCompany)
                 .Include(c => c.PolicyDetail)
                 .ThenInclude(c => c.CaseEnabler)
-            .Include(c=> c.Vendor)
+                .Include(c=> c.Vendor)
                 .Include(c => c.BeneficiaryDetail)
                 .ThenInclude(c => c.PinCode)
                 .Include(c => c.BeneficiaryDetail)
@@ -232,8 +232,6 @@ namespace risk.control.system.Services
                 .ThenInclude(c => c.PinCode)
                 .Include(c => c.CustomerDetail)
                 .ThenInclude(c => c.State)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.PinCode)
                 .Include(c=>c.ClaimNotes)
                 .Include(c=>c.ClaimMessages)
                 .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == id);

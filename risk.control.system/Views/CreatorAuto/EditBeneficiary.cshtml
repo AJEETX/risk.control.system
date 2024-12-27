@@ -161,16 +161,18 @@
                         </div>
 
                         <div class="form-group">
-                            <span class="input-group-label"> District:</span>
-                            <div class="input-group mb-3">
+                            <span class="input-group-label" for="DistrictId">District:</span>
+                            <div class="input-group mb-3 autocomplete-wrapper">
                                 <div class="input-group-prepend">
-                                    <span class="input-group-text" for="DistrictId"><i class="fas fa-city"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                    <span class="input-group-text" for="DistrictId">
+                                        <i class="fas fa-city"></i>
+                                        <i class="fa fa-asterisk asterik-style"></i>
+                                    </span>
                                 </div>
-                                <select id="DistrictId" asp-for="DistrictId" class="form-control remarks" asp-items="ViewBag.DistrictId" onchange="loadPinCode(this)" required>
-                                    <option value="">--- SELECT ---</option>
-                                </select>
-
+                                <input type="text" id="DistrictId" class="form-control remarks auto-dropdown"
+                                       placeholder="Type district..." asp-for="DistrictId" required value="" />
                                 <span asp-validation-for="DistrictId" class="text-danger"></span>
+                                <input type="hidden" id="SelectedDistrictId" name="SelectedDistrictId" value="@Model?.DistrictId" />
                             </div>
                         </div>
 
@@ -183,7 +185,7 @@
                                         <i class="fa fa-asterisk asterik-style"></i>
                                     </span>
                                 </div>
-                                <input type="text" id="PinCodeId" class="form-control remarks"
+                                <input type="text" id="PinCodeId" class="form-control remarks auto-dropdown"
                                        placeholder="type pincode..." asp-for="PinCodeId" required value="" />
                                 <span asp-validation-for="PinCodeId" class="text-danger"></span>
                                 <input type="hidden" id="SelectedId" name="SelectedId" value="@Model?.PinCodeId" />

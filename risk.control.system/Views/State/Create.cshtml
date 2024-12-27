@@ -17,16 +17,19 @@
                             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                             <div class="form-group">
                                 <span class="input-group-label"> Country:</span>
-                                <div class="input-group mb-3">
+                                <div class="input-group mb-3 autocomplete-wrapper">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text" for="CountryId"><i class="fas fa-map-marked-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                    </div>    <select asp-for="CountryId" class="form-control remarks" id="CountryId" asp-items="ViewBag.CountryId"  required>
-                                        <option value="">--- SELECT ---</option>
-                                    </select>
+                                        <span class="input-group-text" for="CountryId">
+                                            <i class="fas fa-map-marked-alt"></i>
+                                            <i class="fa fa-asterisk asterik-style"></i>
+                                        </span>
+                                    </div>
+                                    <input type="text" id="CountryName" class="form-control remarks auto-dropdown" placeholder="Type country..." required />
+                                    <input type="hidden" id="CountryId" name="CountryId" asp-for="CountryId" />
                                     <span asp-validation-for="CountryId" class="text-danger"></span>
-
                                 </div>
                             </div>
+
                             <div class="form-group">
                                 <span class="input-group-label"> State:</span>
                                 <div class="input-group mb-3">
@@ -68,7 +71,7 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-    <script src="~/js/state.js">
+    <script src="~/js/company-admin/state.js">
         
     </script>
 }

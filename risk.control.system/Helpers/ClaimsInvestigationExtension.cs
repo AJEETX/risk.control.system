@@ -397,7 +397,7 @@ namespace risk.control.system.Helpers
             {
                 if (cdetail is null)
                     return "...";
-                return cdetail.Addressline + "," + cdetail.District.Name + ", " + cdetail.State.Name + ", " + cdetail.PinCode.Code;
+                return cdetail.Addressline + "," + cdetail.District?.Name + ", " + cdetail.State.Name + ", " + cdetail.PinCode.Code;
             }
             else
             {

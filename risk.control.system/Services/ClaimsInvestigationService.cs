@@ -19,9 +19,9 @@ namespace risk.control.system.Services
 
         Task<ClaimsInvestigation> EdiPolicy(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? claimDocument);
 
-        Task<ClaimsInvestigation> CreateCustomer(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? claimDocument, IFormFile? customerDocument, bool create = true, long SelectedId = 0);
+        Task<ClaimsInvestigation> CreateCustomer(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? claimDocument, IFormFile? customerDocument, bool create = true, long SelectedId = 0, long SelectedDistrictId = 0);
 
-        Task<ClaimsInvestigation> EditCustomer(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? customerDocument, long SelectedId = 0);
+        Task<ClaimsInvestigation> EditCustomer(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? customerDocument, long SelectedId = 0, long SelectedDistrictId = 0);
 
         Task AssignToAssigner(string userEmail, List<string> claimsInvestigations);
 
@@ -362,7 +362,7 @@ namespace risk.control.system.Services
             }
         }
             
-        public async Task<ClaimsInvestigation> EditCustomer(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? customerDocument, long SelectedId = 0)
+        public async Task<ClaimsInvestigation> EditCustomer(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? customerDocument, long SelectedId = 0, long SelectedDistrictId=0)
         {
             try
             {
@@ -386,6 +386,10 @@ namespace risk.control.system.Services
                 if (SelectedId > 0)
                 {
                     existingPolicy.CustomerDetail.PinCodeId = SelectedId;
+                }
+                if (SelectedDistrictId > 0)
+                {
+                    existingPolicy.CustomerDetail.DistrictId = SelectedDistrictId;
                 }
                 existingPolicy.Updated = DateTime.Now;
                 existingPolicy.UpdatedBy = userEmail;
@@ -428,7 +432,7 @@ namespace risk.control.system.Services
             }
         }
 
-        public async Task<ClaimsInvestigation> CreateCustomer(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? claimDocument, IFormFile? customerDocument, bool create = true, long SelectedId = 0)
+        public async Task<ClaimsInvestigation> CreateCustomer(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? claimDocument, IFormFile? customerDocument, bool create = true, long SelectedId = 0, long SelectedDistrictId = 0)
         {
             if (claimsInvestigation is not null)
             {
@@ -449,7 +453,10 @@ namespace risk.control.system.Services
                     {
                         claimsInvestigation.CustomerDetail.PinCodeId = SelectedId;
                     }
-
+                    if(SelectedDistrictId > 0)
+                    {
+                        claimsInvestigation.CustomerDetail.DistrictId = SelectedDistrictId;
+                    }
                     var pincode = _context.PinCode
                         .Include(p => p.District)
                         .Include(p => p.State)

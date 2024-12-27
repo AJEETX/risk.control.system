@@ -277,7 +277,7 @@ namespace risk.control.system.Controllers.Company
         [ValidateAntiForgeryToken]
         [HttpPost]
         [RequestSizeLimit(2_000_000)] // Checking for 2 MB
-        public async Task<IActionResult> CreateCustomer(string claimsInvestigationId, ClaimsInvestigation claimsInvestigation, long SelectedId, bool create = true)
+        public async Task<IActionResult> CreateCustomer(string claimsInvestigationId, ClaimsInvestigation claimsInvestigation, long SelectedId, long SelectedDistrictId, bool create = true)
         {
             try
             {
@@ -319,7 +319,7 @@ namespace risk.control.system.Controllers.Company
                     }
                 }
 
-                var claim = await claimsInvestigationService.CreateCustomer(currentUserEmail, claimsInvestigation, documentFile, profileFile, create,SelectedId);
+                var claim = await claimsInvestigationService.CreateCustomer(currentUserEmail, claimsInvestigation, documentFile, profileFile, create,SelectedId, SelectedDistrictId);
                 if (claim == null)
                 {
                     notifyService.Error("OOPs !!!..Error creating customer");
@@ -340,7 +340,7 @@ namespace risk.control.system.Controllers.Company
         [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
         [HttpPost]
-        public async Task<IActionResult> EditCustomer(string claimsInvestigationId, ClaimsInvestigation claimsInvestigation, string claimtype, long SelectedId = 0, bool create = true)
+        public async Task<IActionResult> EditCustomer(string claimsInvestigationId, ClaimsInvestigation claimsInvestigation, string claimtype, long SelectedId = 0, long SelectedDistrictId = 0, bool create = true)
         {
             try
             {
@@ -381,7 +381,7 @@ namespace risk.control.system.Controllers.Company
                     }
                 }
 
-                var claim = await claimsInvestigationService.EditCustomer(currentUserEmail, claimsInvestigation, profileFile, SelectedId);
+                var claim = await claimsInvestigationService.EditCustomer(currentUserEmail, claimsInvestigation, profileFile, SelectedId,SelectedDistrictId);
                 if (claim == null)
                 {
                     notifyService.Error("OOPs !!!..Error edting customer");
@@ -411,7 +411,7 @@ namespace risk.control.system.Controllers.Company
         [HttpPost]
         [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateBeneficiary(string claimId, BeneficiaryDetail caseLocation, long SelectedId)
+        public async Task<IActionResult> CreateBeneficiary(string claimId, BeneficiaryDetail caseLocation, long SelectedId, long SelectedDistrictId)
         {
             try
             {
@@ -441,6 +441,10 @@ namespace risk.control.system.Controllers.Company
                 if (SelectedId > 0)
                 {
                     caseLocation.PinCodeId = SelectedId;
+                }
+                if (SelectedDistrictId > 0)
+                {
+                    caseLocation.DistrictId = SelectedDistrictId;
                 }
                     var pincode = _context.PinCode
                     .Include(p => p.District)
@@ -479,7 +483,7 @@ namespace risk.control.system.Controllers.Company
         [HttpPost]
         [ValidateAntiForgeryToken]
         [RequestSizeLimit(2_000_000)] // Checking for 2 MB
-        public async Task<IActionResult> EditBeneficiary(long id, BeneficiaryDetail ecaseLocation, string claimtype, long beneficiaryDetailId, long SelectedId)
+        public async Task<IActionResult> EditBeneficiary(long id, BeneficiaryDetail ecaseLocation, string claimtype, long beneficiaryDetailId, long SelectedId, long SelectedDistrictId)
         {
             try
             {
@@ -518,6 +522,10 @@ namespace risk.control.system.Controllers.Company
                 if(SelectedId > 0)
                 {
                     caseLocation.PinCodeId = SelectedId;
+                }
+                if (SelectedDistrictId > 0)
+                {
+                    caseLocation.DistrictId = SelectedDistrictId;
                 }
                 var pincode = _context.PinCode
                     .Include(p => p.District)

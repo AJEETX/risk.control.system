@@ -12,7 +12,7 @@
     string beneficiaryProgressbarMessage = "beneficiary";
     if (Model.ClaimsInvestigation != null && Model.ClaimsInvestigation.CustomerDetail != null)
     {
-        address = @Model.ClaimsInvestigation?.CustomerDetail.Addressline + " " + @Model.ClaimsInvestigation?.CustomerDetail.District.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.State.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.Country.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.PinCode.Code;
+        address = @Model.ClaimsInvestigation?.CustomerDetail.Addressline + " " + @Model.ClaimsInvestigation?.CustomerDetail.District?.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.State?.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.Country?.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.PinCode?.Code;
         baddress = @Model.Location != null ? @Model.Location?.Addressline + " " +
         @Model.Location?.District?.Name + " " + @Model.Location?.State?.Name + " " +
         @Model.Location?.Country?.Name + " " + @Model.Location?.PinCode?.Code : string.Empty;
