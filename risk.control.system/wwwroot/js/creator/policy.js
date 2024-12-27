@@ -19,6 +19,11 @@ $.validator.setDefaults({
                             $(".submit-progress").removeClass("hidden");
                         }, 1);
                         $('#create-policy').attr('disabled', 'disabled');
+                        $('body').attr('disabled', 'disabled');
+                        $('html *').css('cursor', 'not-allowed');
+                        $('button').prop('disabled', true);
+                        $('a.btn *').removeAttr('href');
+                        $('html a *, html button *').css('pointer-events', 'none');
                         $('#create-policy').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Add Policy");
 
                         form.submit();

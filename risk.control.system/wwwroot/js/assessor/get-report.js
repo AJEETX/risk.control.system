@@ -148,6 +148,11 @@ $(document).ready(function () {
                             }, 1);
 
                             $('#approve-case').attr('disabled', 'disabled');
+                            $('body').attr('disabled', 'disabled');
+                            $('html *').css('cursor', 'not-allowed');
+                            $('button').prop('disabled', true);
+                            $('a.btn *').removeAttr('href');
+                            $('html a *, html button *').css('pointer-events', 'none');
                             $('#approve-case').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> APPROVE");
                             $('#create-form').submit();
 

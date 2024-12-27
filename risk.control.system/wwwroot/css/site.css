@@ -1612,3 +1612,45 @@ ul#messagesList {
     border: 1px solid #C38787;
     z-index: 999;
 }
+
+/* General styling for the input to resemble a dropdown */
+#PinCodeId {
+    cursor: pointer; /* Adds pointer cursor to mimic dropdown */
+    width: 100%; /* Takes full width of the container */
+    position: relative;
+}
+
+    /* Adding a dropdown arrow using a pseudo-element */
+    #PinCodeId::after {
+        position: absolute;
+        right: 12px; /* Position it on the right */
+        top: 50%; /* Vertically center it */
+        transform: translateY(-50%);
+        border-left: 5px solid transparent; /* Create the triangle shape */
+        border-right: 5px solid transparent;
+        border-top: 5px solid #333; /* Color of the arrow */
+        pointer-events: none; /* Prevent interaction */
+    }
+
+    /* Optional hover and focus styles */
+    #PinCodeId:hover,
+    #PinCodeId:focus {
+        border-color: #007bff; /* Highlighted border color */
+        outline: none; /* Removes focus outline */
+    }
+
+.autocomplete-wrapper {
+    position: relative;
+}
+
+    .autocomplete-wrapper::after {
+        content: ''; /* Arrow content */
+        position: absolute;
+        right: 12px; /* Align it to the right */
+        top: 50%; /* Vertically center it */
+        transform: translateY(-50%);
+        border-left: 5px solid transparent; /* Triangle shape */
+        border-right: 5px solid transparent;
+        border-top: 5px solid #333; /* Arrow color */
+        pointer-events: none; /* Prevent interaction */
+    }

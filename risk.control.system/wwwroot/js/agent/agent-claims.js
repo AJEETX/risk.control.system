@@ -9,9 +9,10 @@ $(document).ready(function () {
         }, 1);
 
         $('#allocatedcase').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Investigate");
-
+        $('body').attr('disabled', 'disabled');
         $('html *').css('cursor', 'not-allowed');
-        $('html a *, html button *').attr('disabled', 'disabled');
+        $('button').prop('disabled', true);
+        $('a.btn *').removeAttr('href');
         $('html a *, html button *').css('pointer-events', 'none');
         var article = document.getElementById("article");
         if (article) {

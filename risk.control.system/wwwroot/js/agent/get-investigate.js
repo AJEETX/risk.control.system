@@ -808,7 +808,11 @@
                             setTimeout(function () {
                                 $(".submit-progress").removeClass("hidden");
                             }, 1);
-
+                            $('body').attr('disabled', 'disabled');
+                            $('html *').css('cursor', 'not-allowed');
+                            $('button').prop('disabled', true);
+                            $('a.btn *').removeAttr('href');
+                            $('html a *, html button *').css('pointer-events', 'none');
                             $('#submit-case').attr('disabled', 'disabled');
                             $('#submit-case').html("<i class='fas fa-sync fa-spin'></i> SUBMIT");
                             $('#create-form').submit();

@@ -9,9 +9,11 @@
         }, 1);
         
         $('#allocatedcase').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Submit <sub>report</sub>");
+        $('body').attr('disabled', 'disabled');
         $('html *').css('cursor', 'not-allowed');
-        $('html a *, html button *').attr('disabled', 'disabled');
-        $('html a *, html button *').css('pointer-events', 'none')
+        $('button').prop('disabled', true);
+        $('a.btn *').removeAttr('href');
+        $('html a *, html button *').css('pointer-events', 'none');
         $('#allocatedcase').css('pointer-events', 'none')
 
         var article = document.getElementById("article");

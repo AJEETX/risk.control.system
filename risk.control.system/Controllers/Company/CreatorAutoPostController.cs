@@ -277,7 +277,7 @@ namespace risk.control.system.Controllers.Company
         [ValidateAntiForgeryToken]
         [HttpPost]
         [RequestSizeLimit(2_000_000)] // Checking for 2 MB
-        public async Task<IActionResult> CreateCustomer(string claimsInvestigationId, ClaimsInvestigation claimsInvestigation, bool create = true)
+        public async Task<IActionResult> CreateCustomer(string claimsInvestigationId, ClaimsInvestigation claimsInvestigation, long SelectedId, bool create = true)
         {
             try
             {
@@ -319,7 +319,7 @@ namespace risk.control.system.Controllers.Company
                     }
                 }
 
-                var claim = await claimsInvestigationService.CreateCustomer(currentUserEmail, claimsInvestigation, documentFile, profileFile, create);
+                var claim = await claimsInvestigationService.CreateCustomer(currentUserEmail, claimsInvestigation, documentFile, profileFile, create,SelectedId);
                 if (claim == null)
                 {
                     notifyService.Error("OOPs !!!..Error creating customer");

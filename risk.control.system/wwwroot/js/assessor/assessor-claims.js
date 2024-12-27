@@ -232,6 +232,11 @@ $(document).ready(function () {
         }, 1);
 
         $('#allocatedcase').attr('disabled', 'disabled');
+        $('body').attr('disabled', 'disabled');
+        $('html *').css('cursor', 'not-allowed');
+        $('button').prop('disabled', true);
+        $('a.btn *').removeAttr('href');
+        $('html a *, html button *').css('pointer-events', 'none');
         $('#allocatedcase').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Assess <sub>report</sub>");
 
         $('#checkboxes').submit();

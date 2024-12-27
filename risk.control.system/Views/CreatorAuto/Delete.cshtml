@@ -277,11 +277,14 @@
                                                         }
                                                         else
                                                         {
-                                                            <img id="profileImage" class="img-fluid block-data" src="@Applicationsettings.NO_USER">
+                                                            <img class="img-fluid block-data" src="@Applicationsettings.NO_USER">
                                                         }
                                                     </p>
                                                     <p class="text-muted text-sm">
-                                                        <img id="customerGoogleMap" class="img-fluid block-data" src="@Model?.ClaimsInvestigation?.CustomerDetail?.CustomerLocationMap">
+                                                        @if (@Model?.ClaimsInvestigation?.CustomerDetail?.CustomerLocationMap is not null)
+                                                        {
+                                                            <img id="customerGoogleMap" class="img-fluid block-data" src="@Model?.ClaimsInvestigation?.CustomerDetail?.CustomerLocationMap">
+                                                        }
                                                     </p>
                                                 </div>
                                             </div>
@@ -304,9 +307,18 @@
 
                                                 </div>
                                                 <div class="col-6 text-right">
-                                                    <button id="customer-detail" class="btn btn-sm btn-warning">
-                                                        <i class="fa fa-user-plus"></i> ...
-                                                    </button>
+                                                    @if (Model.ClaimsInvestigation.CustomerDetail != null && !string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.CustomerDetail.ContactNumber))
+                                                    {
+                                                        <button id="customer-detail" class="btn btn-sm btn-warning">
+                                                            <i class="fa fa-user-plus"></i> ...
+                                                        </button>
+                                                    }
+                                                    else
+                                                    {
+                                                        <button disabled class="btn btn-sm btn-warning">
+                                                            <i class="fa fa-user-plus"></i> ...
+                                                        </button>
+                                                    }
                                                 </div>
                                             </div>
 
@@ -368,13 +380,15 @@
                                                         }
                                                         else
                                                         {
-                                                            <img id="bImage" class="img-fluid block-data" src="@Applicationsettings.NO_USER">
+                                                            <img class="img-fluid block-data" src="@Applicationsettings.NO_USER">
                                                         }
                                                     </p>
                                                     <p class="text-muted text-sm">
-                                                        <img id="beneficiaryGoogleMap" class="img-fluid block-data" src="@Model?.Location?.BeneficiaryLocationMap">
+                                                    @if(Model?.Location?.BeneficiaryLocationMap != null)
+                                                        {
+                                                            <img id="beneficiaryGoogleMap" class="img-fluid block-data" src="@Model?.Location?.BeneficiaryLocationMap">
+                                                        }
                                                     </p>
-
                                                 </div>
                                             </div>
                                         </div>
@@ -397,9 +411,19 @@
 
                                                 </div>
                                                 <div class="col-6 text-right">
-                                                    <button id="beneficiary-detail" class="btn btn-sm btn-success">
-                                                        <i class="fas fa-user-tie"></i> ...
-                                                    </button>
+                                                    @if (Model.ClaimsInvestigation.BeneficiaryDetail != null && !string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.BeneficiaryDetail.ContactNumber))
+                                                    {
+                                                        <button id="beneficiary-detail" class="btn btn-sm btn-success">
+                                                            <i class="fas fa-user-tie"></i> ...
+                                                        </button>
+                                                    }
+                                                    else
+                                                    {
+                                                        <button disabled id="beneficiary-detail" class="btn btn-sm btn-success">
+                                                            <i class="fas fa-user-tie"></i> ...
+                                                        </button>
+                                                    }
+
                                                 </div>
                                             </div>
 
@@ -436,4 +460,6 @@
     <script src="~/js/creator/delete-claim.js">
 
     </script>
+    <script src="~/js/claim-details.js"></script>
+
 }

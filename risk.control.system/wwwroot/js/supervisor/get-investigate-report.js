@@ -6,10 +6,12 @@
         setTimeout(function () {
             $(".submit-progress").removeClass("hidden");
         }, 1);
-        $('body').attr('disabled', 'disabled');
         $(this).html("<i class='fas fa-sync fa-spin'></i> REVIEW");
 
+        $('body').attr('disabled', 'disabled');
         $('html *').css('cursor', 'not-allowed');
+        $('button').prop('disabled', true);
+        $('a.btn *').removeAttr('href');
         $('html a *, html button *').css('pointer-events', 'none');
 
         var section = document.getElementById("section");
@@ -145,6 +147,11 @@
                                 $(".submit-progress").removeClass("hidden");
                             }, 1);
                             $('#allocate-case').attr('disabled', 'disabled');
+                            $('body').attr('disabled', 'disabled');
+                            $('html *').css('cursor', 'not-allowed');
+                            $('button').prop('disabled', true);
+                            $('a.btn *').removeAttr('href');
+                            $('html a *, html button *').css('pointer-events', 'none');
                             $('#allocate-case').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> SUBMIT");
 
                             $('#supervisor-form').submit();

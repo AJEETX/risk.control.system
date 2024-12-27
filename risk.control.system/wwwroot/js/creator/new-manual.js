@@ -297,6 +297,11 @@
             $(".submit-progress").removeClass("hidden");
         }, 1);
         $('#allocatedcase').attr('disabled', 'disabled');
+        $('body').attr('disabled', 'disabled');
+        $('html *').css('cursor', 'not-allowed');
+        $('button').prop('disabled', true);
+        $('a.btn *').removeAttr('href');
+        $('html a *, html button *').css('pointer-events', 'none');
         $('#allocatedcase').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Assign <b> <sub>manual</sub></b>");
 
         $('#radioButtons').submit();
@@ -441,7 +446,11 @@ function showedit(id) {
     setTimeout(function () {
         $(".submit-progress").removeClass("hidden");
     }, 1);
-    $('a.btn *').attr('disabled', 'disabled');
+    $('body').attr('disabled', 'disabled');
+    $('html *').css('cursor', 'not-allowed');
+    $('button').prop('disabled', true);
+    $('a.btn *').removeAttr('href');
+    $('html a *, html button *').css('pointer-events', 'none');
     $('a#edit' + id + '.btn.btn-xs.btn-warning').html("<i class='fas fa-sync fa-spin'></i> Edit");
 
     var article = document.getElementById("article");
@@ -459,7 +468,11 @@ function getdetails(id) {
     setTimeout(function () {
         $(".submit-progress").removeClass("hidden");
     }, 1);
-    $('a.btn *').attr('disabled', 'disabled');
+    $('body').attr('disabled', 'disabled');
+    $('html *').css('cursor', 'not-allowed');
+    $('button').prop('disabled', true);
+    $('a.btn *').removeAttr('href');
+    $('html a *, html button *').css('pointer-events', 'none');
     $('a#details' + id + '.btn.btn-xs.btn-danger').html("<i class='fas fa-sync fa-spin'></i> Delete");
 
     var article = document.getElementById("article");

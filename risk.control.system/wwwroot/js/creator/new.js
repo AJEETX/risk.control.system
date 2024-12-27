@@ -354,6 +354,11 @@
                                 $(".submit-progress").removeClass("hidden");
                             }, 1);
                             $('#allocatedcase').attr('disabled', 'disabled');
+                            $('body').attr('disabled', 'disabled');
+                            $('html *').css('cursor', 'not-allowed');
+                            $('button').prop('disabled', true);
+                            $('a.btn *').removeAttr('href');
+                            $('html a *, html button *').css('pointer-events', 'none');
                             $('#allocatedcase').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Assign<span class='badge badge-warning'>(auto)</span>");
 
                             $('#checkboxes').submit();
@@ -473,11 +478,11 @@
                             $('#UploadFileButton').html("<i class='fas fa-sync fa-spin'></i> Uploading");
 
                             $('#upload-claims').submit();
-                            $('#back').attr('disabled', 'disabled');
-
+                            $('body').attr('disabled', 'disabled');
                             $('html *').css('cursor', 'not-allowed');
-                            $('html a *, html button *').css('pointer-events', 'none')
-
+                            $('button').prop('disabled', true);
+                            $('a.btn *').removeAttr('href');
+                            $('html a *, html button *').css('pointer-events', 'none');
                             var article = document.getElementById("article");
                             if (article) {
                                 var nodes = article.getElementsByTagName('*');
@@ -508,7 +513,11 @@ function showedit(id) {
     setTimeout(function () {
         $(".submit-progress").removeClass("hidden");
     }, 1);
-    $('a.btn *').attr('disabled', 'disabled');
+    $('body').attr('disabled', 'disabled');
+    $('html *').css('cursor', 'not-allowed');
+    $('button').prop('disabled', true);
+    $('a.btn *').removeAttr('href');
+    $('html a *, html button *').css('pointer-events', 'none');
     $('a#edit' + id + '.btn.btn-xs.btn-warning').html("<i class='fas fa-sync fa-spin'></i> EDIT");
 
     var article = document.getElementById("article");
@@ -526,7 +535,11 @@ function getdetails(id) {
     setTimeout(function () {
         $(".submit-progress").removeClass("hidden");
     }, 1);
-    $('a.btn *').attr('disabled', 'disabled');
+    $('body').attr('disabled', 'disabled');
+    $('html *').css('cursor', 'not-allowed');
+    $('button').prop('disabled', true);
+    $('a.btn *').removeAttr('href');
+    $('html a *, html button *').css('pointer-events', 'none');
     $('a#details' + id + '.btn.btn-xs.btn-danger').html("<i class='fas fa-sync fa-spin'></i> Delete");
 
     var article = document.getElementById("article");

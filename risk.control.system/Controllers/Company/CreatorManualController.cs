@@ -305,17 +305,18 @@ namespace risk.control.system.Controllers.Company
                         State = state,
                         District = district,
                         PinCode = pinCode,
+                        PinCodeId = pinCode.PinCodeId,
                         Gender = Gender.MALE,
                     };
 
                     var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == country.CountryId).OrderBy(d => d.Name);
                     var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == state.StateId).OrderBy(d => d.Name);
-                    var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == district.DistrictId).OrderBy(d => d.Name);
+                    //var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == district.DistrictId).OrderBy(d => d.Name);
 
                     ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", claimsInvestigation.CustomerDetail.Country.CountryId);
                     ViewData["StateId"] = new SelectList(relatedStates.OrderBy(s => s.Code), "StateId", "Name", claimsInvestigation.CustomerDetail.State.StateId);
                     ViewData["DistrictId"] = new SelectList(districts.OrderBy(d => d.Code), "DistrictId", "Name", claimsInvestigation.CustomerDetail.District.DistrictId);
-                    ViewData["PinCodeId"] = new SelectList(pincodes.Select(p => new { PinCodeId = p.PinCodeId, DisplayText = $"{p.Name} - {p.Code}" }), "PinCodeId", "DisplayText", claimsInvestigation.CustomerDetail.PinCode.PinCodeId);
+                    //ViewData["PinCodeId"] = new SelectList(pincodes.Select(p => new { PinCodeId = p.PinCodeId, DisplayText = $"{p.Name} - {p.Code}" }), "PinCodeId", "DisplayText", claimsInvestigation.CustomerDetail.PinCode.PinCodeId);
                 }
                 else
                 {

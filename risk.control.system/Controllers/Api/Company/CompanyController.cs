@@ -286,5 +286,32 @@ namespace risk.control.system.Controllers.Api.Company
 
             return Ok(result?.ToArray());
         }
+
+        [HttpGet("Search")]
+        public IActionResult Search(string term, long districtId, long stateId, long CountryId)
+        {
+            if (string.IsNullOrEmpty(term))
+                return Ok(new List<object>());
+
+            var result = _context.PinCode.Where(x => x.DistrictId == districtId && x.StateId == stateId && x.CountryId == CountryId)
+                                .ToList();
+
+            var results = result.Where(x => x.Name.ToLower().Contains(term.ToLower()) ||
+                x.Code.ToLower().Contains(term.ToLower())) // Filter based on user input
+                .OrderBy(x => x.Name)
+                .Take(10) // Limit the number of results
+                .Select(x => new { PincodeId = x.PinCodeId, PincodeName = $"{x.Name} - {x.Code}" })?.ToList(); // Format for jQuery UI Autocomplete
+
+            return Ok(results);
+        }
+
+        [HttpGet("GetPincodeName")]
+        public IActionResult GetPincodeName(long pincodeId)
+        {
+            var pincode = _context.PinCode.Where(x => x.PinCodeId == pincodeId) // Filter based on user input
+                .Select(x => new { PincodeId = x.PinCodeId, PincodeName = $"{x.Name} - {x.Code}" }).FirstOrDefault(); // Format for jQuery UI Autocomplete
+
+            return Ok(pincode);
+        }
     }
 }

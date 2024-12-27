@@ -677,6 +677,7 @@ function loadState(obj, showDefaultOption = true) {
         $("#StateId").empty();
         $("#DistrictId").empty();
         $("#PinCodeId").empty();
+        $("#PinCodeId").val('');
 
         $("#StateId").append("<option value=''>--- SELECT ---</option>");
         $("#DistrictId").append("<option value=''>--- SELECT ---</option>");
@@ -694,6 +695,7 @@ function loadDistrict(obj, showDefaultOption = true) {
     if (value == '') {
         $("#DistrictId").empty();
         $("#PinCodeId").empty();
+        $("#PinCodeId").val('');
 
         $("#DistrictId").append("<option value=''>--- SELECT ---</option>");
         $("#PinCodeId").append("<option value=''>--- SELECT ---</option>");
@@ -708,6 +710,7 @@ function loadPinCode(obj, showDefaultOption = true) {
     var value = obj.value;
     if (value == '') {
         $("#PinCodeId").empty();
+        $("#PinCodeId").val('');
 
         $("#PinCodeId").append("<option value=''>--- SELECT ---</option>");
     }
@@ -768,6 +771,7 @@ function PopulateInvestigationServices(dropDownId, list, option) {
 }
 function PopulateDistrictDropDown(pinCodedropDownId, districtDropdownId, list, pincodeOption, districtOption, showDefaultOption) {
     $(pinCodedropDownId).empty();
+    $(pinCodedropDownId).val('');
     $(pinCodedropDownId).append(pincodeOption)
 
     $(districtDropdownId).empty();
@@ -779,6 +783,7 @@ function PopulateDistrictDropDown(pinCodedropDownId, districtDropdownId, list, p
 }
 function PopulatePinCodeDropDown(dropDownId, list, option, showDefaultOption) {
     $(dropDownId).empty();
+    $(dropDownId).val('');
     if (showDefaultOption)
         $(dropDownId).append(option)
     if (list && list.length > 0) {
@@ -796,6 +801,7 @@ function PopulateStateDropDown(pinCodedropDownId, districtDropDownId, stateDropD
     $(stateDropDownId).empty();
     $(districtDropDownId).empty();
     $(pinCodedropDownId).empty();
+    $(pinCodedropDownId).val('');
 
     $(stateDropDownId).append(stateOption);
     $(districtDropDownId).append(districtOption);

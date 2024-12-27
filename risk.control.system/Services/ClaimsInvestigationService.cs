@@ -19,7 +19,7 @@ namespace risk.control.system.Services
 
         Task<ClaimsInvestigation> EdiPolicy(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? claimDocument);
 
-        Task<ClaimsInvestigation> CreateCustomer(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? claimDocument, IFormFile? customerDocument, bool create = true);
+        Task<ClaimsInvestigation> CreateCustomer(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? claimDocument, IFormFile? customerDocument, bool create = true, long SelectedId = 0);
 
         Task<ClaimsInvestigation> EditCustomer(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? customerDocument);
 
@@ -425,7 +425,7 @@ namespace risk.control.system.Services
             }
         }
 
-        public async Task<ClaimsInvestigation> CreateCustomer(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? claimDocument, IFormFile? customerDocument, bool create = true)
+        public async Task<ClaimsInvestigation> CreateCustomer(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? claimDocument, IFormFile? customerDocument, bool create = true, long SelectedId = 0)
         {
             if (claimsInvestigation is not null)
             {
@@ -442,12 +442,17 @@ namespace risk.control.system.Services
 
                         claimsInvestigation.CustomerDetail.ProfilePicture = dataStream.ToArray();
                     }
+                    if (SelectedId > 0)
+                    {
+                        claimsInvestigation.CustomerDetail.PinCodeId = SelectedId;
+                    }
+
                     var pincode = _context.PinCode
                         .Include(p => p.District)
                         .Include(p => p.State)
                         .Include(p => p.Country)
                         .FirstOrDefault(p => p.PinCodeId == claimsInvestigation.CustomerDetail.PinCodeId);
-
+                    
                     var address = claimsInvestigation.CustomerDetail.Addressline + ", " +
                         pincode.District.Name + ", " +
                         pincode.State.Name + ", " +
