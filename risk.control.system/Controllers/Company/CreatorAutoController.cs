@@ -256,31 +256,24 @@ namespace risk.control.system.Controllers.Company
                     return RedirectToAction(nameof(CreatePolicy));
                 }
 
-                var claimsInvestigation = await _context.ClaimsInvestigation
-                    .Include(c => c.PolicyDetail)
-                    .FirstOrDefaultAsync(i => i.ClaimsInvestigationId == id);
-
-                if (claimsInvestigation == null)
-                {
-                    notifyService.Error("OOPS!!!.Claim Not Found.Try Again");
-                    return RedirectToAction(nameof(CreatePolicy));
-                }
+                var claimsPage = new MvcBreadcrumbNode("New", "CreatorAuto", "Claims");
+                var agencyPage = new MvcBreadcrumbNode("New", "CreatorAuto", "Assign(auto)") { Parent = claimsPage, };
+                var detailsPage = new MvcBreadcrumbNode("Create", "CreatorAuto", $"Add New") { Parent = agencyPage };
+                var details1Page = new MvcBreadcrumbNode("Details", "CreatorAuto", $"Details") { Parent = detailsPage, RouteValues = new { id = id } };
+                var editPage = new MvcBreadcrumbNode("CreateCustomer", "CreatorAuto", $"Create Customer") { Parent = details1Page, RouteValues = new { id = id } };
+                ViewData["BreadcrumbNode"] = editPage;
+                ViewBag.ClaimId = id;
 
                 var currentUser = await _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
-
                 if (currentUser.ClientCompany.HasSampleData)
                 {
-                    var pinCode = _context.PinCode.Include(p => p.District).FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE2);
-                    var district = _context.District.Include(d => d.State).FirstOrDefault(d => d.DistrictId == pinCode.District.DistrictId);
-                    var state = _context.State.Include(s => s.Country).FirstOrDefault(s => s.StateId == district.State.StateId);
-                    var country = _context.Country.FirstOrDefault(c => c.CountryId == state.Country.CountryId);
+                    var pinCode = _context.PinCode.Include(p => p.District).Include(d => d.State).Include(s => s.Country).FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE2);
                     var random = new Random();
-                    claimsInvestigation.CustomerDetail = new CustomerDetail
+                    var customerDetail = new CustomerDetail
                     {
+                        ClaimsInvestigationId = id,
                         Addressline = random.Next(100, 999) + " GOOD STREET",
                         ContactNumber = "61432854196",
-                        Country = country,
-                        CountryId = country.CountryId,
                         DateOfBirth = DateTime.Now.AddYears(-random.Next(25, 77)).AddDays(20),
                         Education = Education.PROFESSIONAL,
                         Income = Income.UPPER_INCOME,
@@ -288,37 +281,28 @@ namespace risk.control.system.Controllers.Company
                         Occupation = Occupation.SELF_EMPLOYED,
                         CustomerType = CustomerType.HNI,
                         Description = "DODGY PERSON",
-                        State = state,
-                        StateId = state.StateId,
-                        District = district,
-                        DistrictId = district.DistrictId,
-                        PinCode = pinCode,
+                        CountryId = pinCode.CountryId,
+                        SelectedCountryId = pinCode.CountryId,
+                        StateId = pinCode.StateId,
+                        SelectedStateId = pinCode.StateId.GetValueOrDefault(),
+                        DistrictId = pinCode.DistrictId,
+                        SelectedDistrictId = pinCode.DistrictId.GetValueOrDefault(),
                         PinCodeId = pinCode.PinCodeId,
+                        SelectedPincodeId = pinCode.PinCodeId,
                         Gender = Gender.MALE,
                     };
+                    return View(customerDetail);
 
-                    var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == country.CountryId).OrderBy(d => d.Name);
+                    //var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == country.CountryId).OrderBy(d => d.Name);
                     //var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == state.StateId).OrderBy(d => d.Name);
                     //var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == district.DistrictId).OrderBy(d => d.Name);
 
-                    ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", claimsInvestigation.CustomerDetail.Country.CountryId);
-                    ViewData["StateId"] = new SelectList(relatedStates.OrderBy(s => s.Code), "StateId", "Name", claimsInvestigation.CustomerDetail.State.StateId);
+                    //ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", claimsInvestigation.CustomerDetail.Country.CountryId);
+                    //ViewData["StateId"] = new SelectList(relatedStates.OrderBy(s => s.Code), "StateId", "Name", claimsInvestigation.CustomerDetail.State.StateId);
                     //ViewData["DistrictId"] = new SelectList(districts.OrderBy(d => d.Code), "DistrictId", "Name", claimsInvestigation.CustomerDetail.District.DistrictId);
                     //ViewData["PinCodeId"] = new SelectList(pincodes.Select(p => new { PinCodeId = p.PinCodeId, DisplayText = $"{p.Name} - {p.Code}" }), "PinCodeId", "DisplayText", claimsInvestigation.CustomerDetail.PinCode.PinCodeId);
                 }
-                else
-                {
-                    ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
-                }
-
-                var claimsPage = new MvcBreadcrumbNode("New", "CreatorAuto", "Claims");
-                var agencyPage = new MvcBreadcrumbNode("New", "CreatorAuto", "Assign(auto)") { Parent = claimsPage, };
-                var detailsPage = new MvcBreadcrumbNode("Create", "CreatorAuto", $"Add New") { Parent = agencyPage };
-                var details1Page = new MvcBreadcrumbNode("Details", "CreatorAuto", $"Details") { Parent = detailsPage, RouteValues = new { id = id } };
-                var editPage = new MvcBreadcrumbNode("CreateCustomer", "CreatorAuto", $"Create Customer") { Parent = details1Page, RouteValues = new { id = id } };
-                ViewData["BreadcrumbNode"] = editPage;
-
-                return View(claimsInvestigation);
+                return View();
             }
             catch (Exception ex)
             {
@@ -345,30 +329,25 @@ namespace risk.control.system.Controllers.Company
                     return RedirectToAction(nameof(CreatePolicy));
                 }
 
-                var claimsInvestigation = await _context.ClaimsInvestigation
-                    .Include(c => c.PolicyDetail)
-                    .Include(c => c.CustomerDetail)
-                    .ThenInclude(c => c.PinCode)
-                    .Include(c => c.CustomerDetail)
-                    .ThenInclude(c => c.District)
-                    .Include(c => c.CustomerDetail)
-                    .ThenInclude(c => c.State)
-                    .Include(c => c.CustomerDetail)
-                    .ThenInclude(c => c.Country)
+                var customer = await _context.CustomerDetail
+                    .Include(c => c.PinCode)
+                    .Include(c => c.District)
+                    .Include(c => c.State)
+                    .Include(c => c.Country)
                     .FirstOrDefaultAsync(i => i.ClaimsInvestigationId == id);
 
-                if (claimsInvestigation == null)
+                if (customer == null)
                 {
                     notifyService.Error("OOPS!!!.Claim Not Found.Try Again");
                     return RedirectToAction(nameof(CreatePolicy));
                 }
-                var country = _context.Country.OrderBy(o => o.Name);
-                var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == claimsInvestigation.CustomerDetail.CountryId).OrderBy(d => d.Name);
+                //var country = _context.Country.OrderBy(o => o.Name);
+                //var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == claimsInvestigation.CustomerDetail.CountryId).OrderBy(d => d.Name);
                 //var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == claimsInvestigation.CustomerDetail.StateId).OrderBy(d => d.Name);
                 //var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == claimsInvestigation.CustomerDetail.DistrictId).OrderBy(d => d.Name);
 
-                ViewData["CountryId"] = new SelectList(country, "CountryId", "Name", claimsInvestigation.CustomerDetail.CountryId);
-                ViewData["StateId"] = new SelectList(relatedStates, "StateId", "Name", claimsInvestigation.CustomerDetail.StateId);
+                //ViewData["CountryId"] = new SelectList(country, "CountryId", "Name", claimsInvestigation.CustomerDetail.CountryId);
+                //ViewData["StateId"] = new SelectList(relatedStates, "StateId", "Name", claimsInvestigation.CustomerDetail.StateId);
                 //ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", claimsInvestigation.CustomerDetail.DistrictId);
                 //ViewData["PinCodeId"] = new SelectList(pincodes.Select(p => new { PinCodeId = p.PinCodeId, DisplayText = $"{p.Name} - {p.Code}" }), "PinCodeId", "DisplayText", claimsInvestigation.CustomerDetail.PinCode.PinCodeId);
 
@@ -378,7 +357,7 @@ namespace risk.control.system.Controllers.Company
                 var details1Page = new MvcBreadcrumbNode("Details", "CreatorAuto", $"Details") { Parent = detailsPage, RouteValues = new { id = id } };
                 var editPage = new MvcBreadcrumbNode("EditCustomer", "CreatorAuto", $"Edit Customer") { Parent = details1Page, RouteValues = new { id = id } };
                 ViewData["BreadcrumbNode"] = editPage;
-                return View(claimsInvestigation);
+                return View(customer);
             }
             catch (Exception ex)
             {
@@ -400,10 +379,7 @@ namespace risk.control.system.Controllers.Company
                     notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var claim = _context.ClaimsInvestigation
-                                .Include(i => i.PolicyDetail)
-                                .FirstOrDefault(v => v.ClaimsInvestigationId == id);
-                ViewData["claimId"] = claim.ClaimsInvestigationId;
+                
                 ViewData["BeneficiaryRelationId"] = new SelectList(_context.BeneficiaryRelation, "BeneficiaryRelationId", "Name");
 
                 var claimsPage = new MvcBreadcrumbNode("New", "CreatorAuto", "Claims");
@@ -412,48 +388,47 @@ namespace risk.control.system.Controllers.Company
                 var details1Page = new MvcBreadcrumbNode("Details", "CreatorAuto", $"Details") { Parent = detailsPage, RouteValues = new { id = id } };
                 var editPage = new MvcBreadcrumbNode("CreateBeneficiary", "CreatorAuto", $"Add beneficiary") { Parent = details1Page, RouteValues = new { id = id } };
                 ViewData["BreadcrumbNode"] = editPage;
-
+                ViewBag.ClaimId = id;
                 var currentUser = await _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
 
                 if (currentUser.ClientCompany.HasSampleData)
                 {
                     var beneRelationId = _context.BeneficiaryRelation.FirstOrDefault().BeneficiaryRelationId;
-                    var pinCode = _context.PinCode.Include(p => p.District).FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE2);
-                    var district = _context.District.Include(d => d.State).FirstOrDefault(d => d.DistrictId == pinCode.District.DistrictId);
-                    var state = _context.State.Include(s => s.Country).FirstOrDefault(s => s.StateId == district.State.StateId);
-                    var country = _context.Country.FirstOrDefault(c => c.CountryId == state.Country.CountryId);
+                    var pinCode = _context.PinCode.FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE2);
                     var random = new Random();
 
                     var model = new BeneficiaryDetail
                     {
-                        ClaimsInvestigation = claim,
                         ClaimsInvestigationId = id,
                         Addressline = random.Next(100, 999) + " GREAT ROAD",
                         DateOfBirth = DateTime.Now.AddYears(-random.Next(25, 77)).AddMonths(3),
                         Income = Income.MEDIUUM_INCOME,
                         Name = NameGenerator.GenerateName(),
                         BeneficiaryRelationId = beneRelationId,
-                        CountryId = country.CountryId,
-                        StateId = state.StateId,
-                        DistrictId = district.DistrictId,
-                        PinCode = pinCode,
+                        CountryId = pinCode.CountryId,
+                        SelectedCountryId = pinCode.CountryId,
+                        StateId = pinCode.StateId,
+                        SelectedStateId = pinCode.StateId.GetValueOrDefault(),
+                        DistrictId = pinCode.DistrictId,
+                        SelectedDistrictId = pinCode.DistrictId.GetValueOrDefault(),
                         PinCodeId = pinCode.PinCodeId,
+                        SelectedPincodeId = pinCode.PinCodeId,
                         ContactNumber = "61432854196",
                     };
 
-                    var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == country.CountryId).OrderBy(d => d.Name);
+                    //var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == country.CountryId).OrderBy(d => d.Name);
                     //var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == state.StateId).OrderBy(d => d.Name);
                     //var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == district.DistrictId).OrderBy(d => d.Name);
 
-                    ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", model.CountryId);
+                    //ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", model.CountryId);
                     //ViewData["DistrictId"] = new SelectList(districts.OrderBy(s => s.Code), "DistrictId", "Name", model.DistrictId);
-                    ViewData["StateId"] = new SelectList(relatedStates.OrderBy(s => s.Code), "StateId", "Name", model.StateId);
+                    //ViewData["StateId"] = new SelectList(relatedStates.OrderBy(s => s.Code), "StateId", "Name", model.StateId);
                     //ViewData["PinCodeId"] = new SelectList(pincodes.Select(p => new { PinCodeId = p.PinCodeId, DisplayText = $"{p.Name} - {p.Code}" }), "PinCodeId", "DisplayText", model.PinCodeId);
                     return View(model);
                 }
                 else
                 {
-                    ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
+                    //ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
                     return View();
                 }
             }
@@ -467,7 +442,7 @@ namespace risk.control.system.Controllers.Company
         }
 
         [Breadcrumb("Edit Beneficiary", FromAction = "Details")]
-        public async Task<IActionResult> EditBeneficiary(long? id)
+        public IActionResult EditBeneficiary(long? id)
         {
             try
             {
@@ -483,26 +458,21 @@ namespace risk.control.system.Controllers.Company
                     return RedirectToAction(nameof(CreatePolicy));
                 }
 
-                var beneficiary = await _context.BeneficiaryDetail.FindAsync(id);
-                if (beneficiary == null)
-                {
-                    notifyService.Error("OOPS!!!.Claim Not Found.Try Again");
-                    return RedirectToAction(nameof(CreatePolicy));
-                }
-
-                var services = _context.BeneficiaryDetail
-                    .Include(v => v.ClaimsInvestigation)
-                    .ThenInclude(c => c.PolicyDetail)
+                var beneficiary = _context.BeneficiaryDetail
+                    .Include(v => v.PinCode)
                     .Include(v => v.District)
+                    .Include(v => v.State)
+                    .Include(v => v.Country)
+                    .Include(v => v.BeneficiaryRelation)
                     .First(v => v.BeneficiaryDetailId == id);
 
-                var country = _context.Country.OrderBy(o => o.Name);
-                var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == beneficiary.CountryId).OrderBy(d => d.Name);
+                //var country = _context.Country.OrderBy(o => o.Name);
+                //var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == beneficiary.CountryId).OrderBy(d => d.Name);
                 //var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == beneficiary.StateId).OrderBy(d => d.Name);
                 //var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == beneficiary.DistrictId).OrderBy(d => d.Name);
 
-                ViewData["CountryId"] = new SelectList(country, "CountryId", "Name", beneficiary.CountryId);
-                ViewData["StateId"] = new SelectList(relatedStates, "StateId", "Name", beneficiary.StateId);
+                //ViewData["CountryId"] = new SelectList(country, "CountryId", "Name", beneficiary.CountryId);
+                //ViewData["StateId"] = new SelectList(relatedStates, "StateId", "Name", beneficiary.StateId);
                 //ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", beneficiary.DistrictId);
                 //ViewData["PinCodeId"] = new SelectList(pincodes.Select(p => new { PinCodeId = p.PinCodeId, DisplayText = $"{p.Name} - {p.Code}" }), "PinCodeId", "DisplayText", beneficiary.PinCodeId);
 
@@ -516,7 +486,7 @@ namespace risk.control.system.Controllers.Company
                 var editPage = new MvcBreadcrumbNode("CreateBeneficiary", "CreatorAuto", $"Edit beneficiary") { Parent = details1Page, RouteValues = new { id = id } };
                 ViewData["BreadcrumbNode"] = editPage;
 
-                return View(services);
+                return View(beneficiary);
             }
             catch (Exception ex)
             {

@@ -280,7 +280,6 @@ namespace risk.control.system.Services
                                 AssignedToAgency = false,
                                 IsReady2Assign = true,
                                 IsReviewCase = false,
-                                SelectedToAssign = false,
                                 UserEmailActioned = companyUser.Email,
                                 UserEmailActionedTo = companyUser.Email,
                                 CREATEDBY = createdAsMethod,

@@ -46,9 +46,6 @@ namespace risk.control.system.Models
         [Display(Name = "Case sub status")]
         public InvestigationCaseSubStatus? InvestigationCaseSubStatus { get; set; } = default!;
 
-        [NotMapped]
-        public bool SelectedToAssign { get; set; }
-
         public bool AssignedToAgency { get; set; } = false;
 
         public string? CurrentUserEmail { get; set; }

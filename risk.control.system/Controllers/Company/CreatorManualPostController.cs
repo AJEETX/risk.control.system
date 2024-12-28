@@ -27,32 +27,32 @@ namespace risk.control.system.Controllers.Company
     {
         private readonly ApplicationDbContext _context;
         private readonly IEmpanelledAgencyService empanelledAgencyService;
-        private readonly IClaimsInvestigationService claimsInvestigationService;
         private readonly ICreatorService creatorService;
         private readonly ICustomApiCLient customApiCLient;
         private readonly IFtpService ftpService;
         private readonly INotyfService notifyService;
+        private readonly IClaimCreationService creationService;
         private readonly IInvestigationReportService investigationReportService;
         private readonly IClaimPolicyService claimPolicyService;
 
         public CreatorManualPostController(ApplicationDbContext context,
             IEmpanelledAgencyService empanelledAgencyService,
-            IClaimsInvestigationService claimsInvestigationService,
             ICreatorService creatorService,
             ICustomApiCLient customApiCLient,
             IFtpService ftpService,
             INotyfService notifyService,
+            IClaimCreationService creationService,
             IInvestigationReportService investigationReportService,
             IClaimPolicyService claimPolicyService)
         {
             _context = context;
             this.claimPolicyService = claimPolicyService;
             this.empanelledAgencyService = empanelledAgencyService;
-            this.claimsInvestigationService = claimsInvestigationService;
             this.creatorService = creatorService;
             this.customApiCLient = customApiCLient;
             this.ftpService = ftpService;
             this.notifyService = notifyService;
+            this.creationService = creationService;
             this.investigationReportService = investigationReportService;
         }
 
@@ -180,7 +180,7 @@ namespace risk.control.system.Controllers.Company
                     }
                 }
 
-                var claim = await claimsInvestigationService.CreatePolicy(currentUserEmail, claimsInvestigation, documentFile, profileFile, false);
+                var claim = await creationService.CreatePolicy(currentUserEmail, claimsInvestigation, documentFile, profileFile, false);
                 if (claim == null)
                 {
                     notifyService.Error("OOPs !!!..Error creating policy");
@@ -243,7 +243,7 @@ namespace risk.control.system.Controllers.Company
                     }
                 }
 
-                var claim = await claimsInvestigationService.EdiPolicy(currentUserEmail, claimsInvestigation, documentFile);
+                var claim = await creationService.EdiPolicy(currentUserEmail, claimsInvestigation, documentFile);
                 if (claim == null)
                 {
                     notifyService.Error("OOPs !!!..Error editing policy");
@@ -278,57 +278,31 @@ namespace risk.control.system.Controllers.Company
         [ValidateAntiForgeryToken]
         [HttpPost]
         [RequestSizeLimit(2_000_000)] // Checking for 2 MB
-        public async Task<IActionResult> CreateCustomer(string claimsInvestigationId, ClaimsInvestigation claimsInvestigation, long SelectedId, long SelectedDistrictId, bool create = true)
+        public async Task<IActionResult> CreateCustomer(CustomerDetail customerDetail)
         {
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (string.IsNullOrWhiteSpace(currentUserEmail))
-                {
-                    notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-                if (claimsInvestigation == null || string.IsNullOrWhiteSpace(claimsInvestigationId))
-                {
-                    notifyService.Error("OOPs !!!..Claim Not Found");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-
-                var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == currentUserEmail);
-                if (companyUser == null)
-                {
-                    notifyService.Error("OOPs !!!..User Not Found");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-
-                IFormFile documentFile = null;
                 IFormFile profileFile = null;
                 var files = Request.Form?.Files;
-
                 if (files != null && files.Count > 0)
                 {
-                    //}
-                    var file = files.FirstOrDefault(f => f.FileName == claimsInvestigation.CustomerDetail?.ProfileImage?.FileName && f.Name == claimsInvestigation.CustomerDetail?.ProfileImage?.Name);
-                    if (file != null && file.Length > 2000000)
-                    {
-                        notifyService.Warning("Uploaded File size morer than 2MB !!! ");
-                        return RedirectToAction(nameof(CreatorManualController.CreatePolicy), "CreatorManual", new { claimsInvestigation });
-                    }
+                    var file = files.FirstOrDefault(f => f.FileName == customerDetail?.ProfileImage?.FileName && f.Name == customerDetail?.ProfileImage?.Name);
                     if (file != null)
                     {
                         profileFile = file;
                     }
                 }
 
-                var claim = await claimsInvestigationService.CreateCustomer(currentUserEmail, claimsInvestigation, documentFile, profileFile, create, SelectedId, SelectedDistrictId);
-                if (claim == null)
+                var claim = await creationService.CreateCustomer(currentUserEmail, customerDetail, profileFile);
+                if (!claim)
                 {
                     notifyService.Error("OOPs !!!..Error creating customer");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                notifyService.Custom($"Customer {claim.CustomerDetail.Name} added successfully", 3, "green", "fas fa-user-plus");
+                notifyService.Custom($"Customer {customerDetail.Name} added successfully", 3, "green", "fas fa-user-plus");
 
-                return RedirectToAction(nameof(CreatorManualController.Details), "CreatorManual", new { id = claim.ClaimsInvestigationId });
+                return RedirectToAction(nameof(CreatorManualController.Details), "CreatorManual", new { id = customerDetail.ClaimsInvestigationId });
             }
             catch (Exception ex)
             {
@@ -341,65 +315,41 @@ namespace risk.control.system.Controllers.Company
         [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
         [HttpPost]
-        public async Task<IActionResult> EditCustomer(string claimsInvestigationId, ClaimsInvestigation claimsInvestigation, string claimtype, long SelectedId, long SelectedDistrictId, bool create = true)
+        public async Task<IActionResult> EditCustomer(string claimsInvestigationId, CustomerDetail customerDetail, string claimtype, bool create = true)
         {
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (string.IsNullOrWhiteSpace(currentUserEmail))
-                {
-                    notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-                if (claimsInvestigation == null || string.IsNullOrWhiteSpace(claimsInvestigationId))
-                {
-                    notifyService.Error("OOPs !!!..Claim Not Found");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-
-                var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == currentUserEmail);
-                if (companyUser == null)
-                {
-                    notifyService.Error("OOPs !!!..User Not Found");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-
-                IFormFile documentFile = null;
                 IFormFile profileFile = null;
                 var files = Request.Form?.Files;
 
                 if (files != null && files.Count > 0)
                 {
-                    var file = files.FirstOrDefault(f => f.FileName == claimsInvestigation.PolicyDetail?.Document?.FileName && f.Name == claimsInvestigation.PolicyDetail?.Document?.Name);
-                    if (file != null)
-                    {
-                        documentFile = file;
-                    }
-                    file = files.FirstOrDefault(f => f.FileName == claimsInvestigation.CustomerDetail?.ProfileImage?.FileName && f.Name == claimsInvestigation.CustomerDetail?.ProfileImage?.Name);
+                    var file = files.FirstOrDefault(f => f.FileName == customerDetail?.ProfileImage?.FileName && f.Name == customerDetail?.ProfileImage?.Name);
                     if (file != null)
                     {
                         profileFile = file;
                     }
                 }
 
-                var claim = await claimsInvestigationService.EditCustomer(currentUserEmail, claimsInvestigation, profileFile, SelectedId, SelectedDistrictId);
-                if (claim == null)
+                var claim = await creationService.EditCustomer(currentUserEmail, customerDetail, profileFile);
+                if (!claim)
                 {
                     notifyService.Error("OOPs !!!..Error edting customer");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                notifyService.Custom($"Customer {claim.CustomerDetail.Name} edited successfully", 3, "orange", "fas fa-user-plus");
+                notifyService.Custom($"Customer {customerDetail.Name} edited successfully", 3, "orange", "fas fa-user-plus");
                 if (claimtype.Equals("auto", StringComparison.OrdinalIgnoreCase))
                 {
-                    return RedirectToAction(nameof(CreatorAutoController.Details), "CreatorAuto", new { id = claim.ClaimsInvestigationId });
+                    return RedirectToAction(nameof(CreatorAutoController.Details), "CreatorAuto", new { id = claimsInvestigationId });
 
                 }
                 else if (claimtype.Equals("manual", StringComparison.OrdinalIgnoreCase))
                 {
-                    return RedirectToAction(nameof(CreatorManualController.Details), "CreatorManual", new { id = claim.ClaimsInvestigationId });
+                    return RedirectToAction(nameof(CreatorManualController.Details), "CreatorManual", new { id = claimsInvestigationId });
 
                 }
-                return RedirectToAction(nameof(CreatorManualController.Details), "CreatorManual", new { id = claim.ClaimsInvestigationId });
+                return RedirectToAction(nameof(CreatorManualController.Details), "CreatorManual", new { id = claimsInvestigationId });
             }
             catch (Exception ex)
             {
@@ -412,7 +362,7 @@ namespace risk.control.system.Controllers.Company
         [HttpPost]
         [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateBeneficiary(string claimId, BeneficiaryDetail caseLocation, long SelectedId, long SelectedDistrictId)
+        public async Task<IActionResult> CreateBeneficiary(string ClaimsInvestigationId, BeneficiaryDetail beneficiary)
         {
             try
             {
@@ -422,56 +372,32 @@ namespace risk.control.system.Controllers.Company
                     notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                if (string.IsNullOrWhiteSpace(claimId) || caseLocation is null)
+                if (string.IsNullOrWhiteSpace(ClaimsInvestigationId) || beneficiary is null)
                 {
                     notifyService.Error("NOT FOUND  !!!..Claim Not Found");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                caseLocation.Updated = DateTime.Now;
-                caseLocation.UpdatedBy = HttpContext.User?.Identity?.Name;
+                IFormFile profileFile = null;
+                var files = Request.Form?.Files;
 
-                IFormFile? customerDocument = Request.Form?.Files?.FirstOrDefault();
-                if (customerDocument != null)
+                if (files != null && files.Count > 0)
                 {
-                    using var dataStream = new MemoryStream();
-                    customerDocument.CopyTo(dataStream);
-                    caseLocation.ProfilePicture = dataStream.ToArray();
+                    var file = files.FirstOrDefault(f => f.FileName == beneficiary?.ProfileImage?.FileName && f.Name == beneficiary?.ProfileImage?.Name);
+                    if (file != null)
+                    {
+                        profileFile = file;
+                    }
                 }
+                var created = await creationService.CreateBeneficiary(currentUserEmail, ClaimsInvestigationId, beneficiary, profileFile);
 
-                caseLocation.ClaimsInvestigationId = claimId;
-                if (SelectedId > 0)
+                if(created)
                 {
-                    caseLocation.PinCodeId = SelectedId;
+                    notifyService.Custom($"Beneficiary {beneficiary.Name} added successfully", 3, "green", "fas fa-user-tie");
+
+                    return RedirectToAction(nameof(CreatorManualController.Details), "CreatorManual", new { id = ClaimsInvestigationId });
                 }
-                if(SelectedDistrictId > 0)
-                {
-                    caseLocation.DistrictId = SelectedDistrictId;
-                }
-                var pincode = _context.PinCode
-                    .Include(p => p.District)
-                        .Include(p => p.State)
-                        .Include(p => p.Country)
-                    .FirstOrDefault(p => p.PinCodeId == caseLocation.PinCodeId);
-
-                var address = caseLocation.Addressline + ", " + pincode.District.Name + ", " + pincode.State.Name + ", " + pincode.Country.Code;
-                var latlong = await customApiCLient.GetCoordinatesFromAddressAsync(address);
-                var customerLatLong = latlong.Latitude + "," + latlong.Longitude;
-                var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:A%7C{customerLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
-                caseLocation.BeneficiaryLocationMap = url;
-                caseLocation.Latitude = latlong.Latitude;
-                caseLocation.Longitude = latlong.Longitude;
-                _context.BeneficiaryDetail.Add(caseLocation);
-                await _context.SaveChangesAsync();
-
-                var claimsInvestigation = await _context.ClaimsInvestigation
-                .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == claimId);
-                claimsInvestigation.IsReady2Assign = true;
-
-                _context.ClaimsInvestigation.Update(claimsInvestigation);
-                await _context.SaveChangesAsync();
-                notifyService.Custom($"Beneficiary {caseLocation.Name} added successfully", 3, "green", "fas fa-user-tie");
-
-                return RedirectToAction(nameof(CreatorManualController.Details), "CreatorManual", new { id = caseLocation.ClaimsInvestigationId });
+                notifyService.Error("OOPS !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
             }
             catch (Exception ex)
             {
@@ -483,91 +409,39 @@ namespace risk.control.system.Controllers.Company
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [RequestSizeLimit(2_000_000)] // Checking for 2 MB
-        public async Task<IActionResult> EditBeneficiary(long id, BeneficiaryDetail ecaseLocation, string claimtype, long beneficiaryDetailId, long SelectedId = 0, long SelectedDistrictId=0)
+        [RequestSizeLimit(2_000_000)] // Limit request size to 2 MB
+        public async Task<IActionResult> EditBeneficiary(long beneficiaryDetailId, BeneficiaryDetail beneficiary)
         {
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (string.IsNullOrWhiteSpace(currentUserEmail))
-                {
-                    notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-                if (id != ecaseLocation.BeneficiaryDetailId && beneficiaryDetailId != ecaseLocation.BeneficiaryDetailId)
-                {
-                    notifyService.Error("NOT FOUND!!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-                if (id == 0)
-                {
-                    id = beneficiaryDetailId;
-                }
-                var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
-                   i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
-                var caseLocation = _context.BeneficiaryDetail.FirstOrDefault(c => c.BeneficiaryDetailId == ecaseLocation.BeneficiaryDetailId);
-                caseLocation.Updated = DateTime.Now;
-                caseLocation.UpdatedBy = HttpContext.User?.Identity?.Name;
-                caseLocation.Addressline = ecaseLocation.Addressline;
-                caseLocation.ContactNumber = ecaseLocation.ContactNumber;
-                caseLocation.DateOfBirth = ecaseLocation.DateOfBirth;
-                caseLocation.Income = ecaseLocation.Income;
-                caseLocation.Name = ecaseLocation.Name;
-                caseLocation.BeneficiaryRelation = ecaseLocation.BeneficiaryRelation;
-                caseLocation.BeneficiaryRelationId = ecaseLocation.BeneficiaryRelationId;
-                caseLocation.ClaimsInvestigationId = ecaseLocation.ClaimsInvestigationId;
-                caseLocation.CountryId = ecaseLocation.CountryId;
-                caseLocation.DistrictId = ecaseLocation.DistrictId;
-                caseLocation.PinCodeId = ecaseLocation.PinCodeId;
-                caseLocation.StateId = ecaseLocation.StateId;
-                if(SelectedId > 0)
-                {
-                    caseLocation.PinCodeId = SelectedId;
-                }
-                if (SelectedDistrictId > 0)
-                {
-                    caseLocation.DistrictId = SelectedDistrictId;
-                }
-                var pincode = _context.PinCode
-                    .Include(p => p.District)
-                        .Include(p => p.State)
-                        .Include(p => p.Country)
-                    .FirstOrDefault(p => p.PinCodeId == caseLocation.PinCodeId);
 
-                var address = caseLocation.Addressline + ", " + pincode.District.Name + ", " + pincode.State.Name + ", " + pincode.Country.Code;
-                var latlong = await customApiCLient.GetCoordinatesFromAddressAsync(address);
-                var customerLatLong = latlong.Latitude + "," + latlong.Longitude;
-                var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:A%7C{customerLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
-                caseLocation.BeneficiaryLocationMap = url;
-                caseLocation.Latitude = latlong.Latitude;
-                caseLocation.Longitude = latlong.Longitude;
+                IFormFile profileFile = null;
+                var files = Request.Form?.Files;
 
-                IFormFile? customerDocument = Request.Form?.Files?.FirstOrDefault();
-                if (customerDocument is not null)
+                if (files != null && files.Count > 0)
                 {
-                    using var dataStream = new MemoryStream();
-                    customerDocument.CopyTo(dataStream);
-                    caseLocation.ProfilePicture = dataStream.ToArray();
-                }
-                else
-                {
-                    var existingLocation = _context.BeneficiaryDetail.AsNoTracking().Where(c =>
-                        c.BeneficiaryDetailId == caseLocation.BeneficiaryDetailId && c.BeneficiaryDetailId == id).FirstOrDefault();
-                    if (existingLocation.ProfilePicture != null || !string.IsNullOrWhiteSpace(existingLocation.ProfilePictureUrl))
+                    var file = files.FirstOrDefault(f => f.FileName == beneficiary?.ProfileImage?.FileName && f.Name == beneficiary?.ProfileImage?.Name);
+                    if (file != null)
                     {
-                        caseLocation.ProfilePicture = existingLocation.ProfilePicture;
-                        caseLocation.ProfilePictureUrl = existingLocation.ProfilePictureUrl;
+                        profileFile = file;
                     }
                 }
+                var created = await creationService.EditBeneficiary(currentUserEmail, beneficiaryDetailId, beneficiary, profileFile);
+                if (!created)
+                {
+                    notifyService.Error("OOPS !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
 
-                _context.BeneficiaryDetail.Update(caseLocation);
-                await _context.SaveChangesAsync();
-                notifyService.Custom($"Beneficiary {caseLocation.Name} edited successfully", 3, "orange", "fas fa-user-tie");
-                return RedirectToAction(nameof(CreatorManualController.Details), "CreatorManual", new { id = caseLocation.ClaimsInvestigationId });
+                // Notify success and redirect
+                notifyService.Custom($"Beneficiary {beneficiary.Name} edited successfully", 3, "orange", "fas fa-user-tie");
+                return RedirectToAction(nameof(CreatorAutoController.Details), "CreatorAuto", new { id = beneficiary.ClaimsInvestigationId });
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                // Log and notify error
+                Console.WriteLine($"Error: {ex.Message}\n{ex.StackTrace}");
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }

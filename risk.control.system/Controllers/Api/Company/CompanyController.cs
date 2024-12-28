@@ -287,86 +287,128 @@ namespace risk.control.system.Controllers.Api.Company
             return Ok(result?.ToArray());
         }
 
-        [HttpGet("SearchPincode")]
-        public IActionResult SearchPincode(string term, long districtId, long stateId, long CountryId)
-        {
-            if (string.IsNullOrEmpty(term))
-                return Ok(new List<object>());
-
-            var result = _context.PinCode.Where(x => x.DistrictId == districtId && x.StateId == stateId && x.CountryId == CountryId)
-                                .ToList();
-
-            var results = result.Where(x => x.Name.ToLower().Contains(term.ToLower()) ||
-                x.Code.ToLower().Contains(term.ToLower())) // Filter based on user input
-                .OrderBy(x => x.Name)
-                .Take(10) // Limit the number of results
-                .Select(x => new { PincodeId = x.PinCodeId, PincodeName = $"{x.Name} - {x.Code}" })?.ToList(); // Format for jQuery UI Autocomplete
-
-            return Ok(results);
-        }
-
-        [HttpGet("SearchDistrict")]
-        public IActionResult SearchDistrict(string term, long stateId, long CountryId)
-        {
-            if (string.IsNullOrEmpty(term))
-                return Ok(new List<object>());
-
-            var result = _context.District.Where(x => x.StateId == stateId && x.CountryId == CountryId)
-                                .ToList();
-
-            var results = result.Where(x => x.Name.ToLower().Contains(term.ToLower()) ||
-                x.Code.ToLower().Contains(term.ToLower())) // Filter based on user input
-                .OrderBy(x => x.Name)
-                .Take(10) // Limit the number of results
-                .Select(x => new { DistrictId = x.DistrictId, DistrictName = $"{x.Name}"})?.ToList(); // Format for jQuery UI Autocomplete
-
-            return Ok(results);
-        }
-
-        [HttpGet("GetPincodeName")]
-        public IActionResult GetPincodeName(long pincodeId)
-        {
-            var pincode = _context.PinCode.Where(x => x.PinCodeId == pincodeId) // Filter based on user input
-                .Select(x => new { PincodeId = x.PinCodeId, PincodeName = $"{x.Name} - {x.Code}" }).FirstOrDefault(); // Format for jQuery UI Autocomplete
-
-            return Ok(pincode);
-        }
         [HttpGet("SearchCountry")]
-        public IActionResult SearchCountry(string term)
+        public IActionResult SearchCountry(string term = "")
         {
             var allCountries = _context.Country.ToList();
+
+            if (string.IsNullOrEmpty(term))
+                return Ok(allCountries
+                    .OrderBy(x => x.Name)
+                 .Take(10)
+                 .Select(c => new
+                {
+                    Id = c.CountryId,
+                    Name = c.Name,
+                    Label = c.Name
+                })?
+                    .ToList());
+
             var countries = allCountries
                     .Where(c => c.Name.Contains(term, StringComparison.OrdinalIgnoreCase))
+                    .OrderBy(x => x.Name)
+                 .Take(10)
                     .Select(c => new
                     {
-                        id = c.CountryId,
-                        label = c.Name,
-                        value = c.Name
+                        Id = c.CountryId,
+                        Name = c.Name,
+                        Label = c.Name
                     })?
                     .ToList();
             return Ok(countries);
         }
-        [HttpGet("GetCountrName")]
-        public IActionResult GetCountrName(long countryId)
-        {
-            var pincode = _context.Country.Where(x => x.CountryId == countryId) // Filter based on user input
-                .Select(x => new { CountryId = x.CountryId, CountryName = $"{x.Name} - {x.Code}" }).FirstOrDefault(); // Format for jQuery UI Autocomplete
 
-            return Ok(pincode);
+        [HttpGet("SearchState")]
+        public IActionResult SearchState(long countryId, string term="")
+        {
+            if (string.IsNullOrEmpty(term?.Trim()))
+                return Ok(_context.State.Where(x => x.CountryId == countryId)?
+                    .OrderBy(x => x.Name)
+                 .Take(10)
+                 .Select(x => new { StateId = x.StateId, StateName = x.Name })?.ToList());
+
+            var states = _context.State.Where(x => x.CountryId == countryId && x.Name.ToLower().Contains(term.ToLower()))
+                    .OrderBy(x => x.Name)
+                 .Take(10)
+                    .Select(c => new
+                    {
+                        StateId = c.StateId,
+                        StateName = c.Name
+                    })?
+                    .ToList();
+            return Ok(states);
+        }
+
+        [HttpGet("SearchDistrict")]
+        public IActionResult SearchDistrict(long stateId, long countryId, string term = "")
+        {
+            if (string.IsNullOrEmpty(term?.Trim()))
+            {
+                _context.District.OrderBy(x => x.Name).Take(10)
+                .Select(x => new { DistrictId = x.DistrictId, DistrictName = $"{x.Name}" })?.ToList(); // Format for jQuery UI Autocomplete
+            }
+
+            var districts = _context.District
+                 .Where(x => x.CountryId == countryId && x.StateId == stateId && x.Name.ToLower().Contains(term.ToLower()))
+                 .OrderBy(x=>x.Name)
+                 .Take(10)
+                 .Select(x => new { DistrictId = x.DistrictId, DistrictName = $"{x.Name}" })?.ToList(); // Format for jQuery UI Autocomplete
+            return Ok(districts);
+        }
+
+        [HttpGet("SearchPincode")]
+        public IActionResult SearchPincode(long districtId, long stateId, long countryId, string term = "")
+        {
+            if (string.IsNullOrEmpty(term?.Trim()))
+            {
+                var allpincodes = _context.PinCode.Where(x => x.DistrictId == districtId && x.StateId == stateId && x.CountryId == countryId) // Filter based on user input
+                .OrderBy(x => x.Name)
+                .Take(10) // Limit the number of results
+                .Select(x => new { PincodeId = x.PinCodeId, PincodeName = $"{x.Name} - {x.Code}" })?.ToList();
+                return Ok(allpincodes);
+            }
+
+            var pincodes = _context.PinCode.Where(x => x.DistrictId == districtId && x.StateId == stateId && x.CountryId == countryId).ToList();
+            var filteredPincodes = pincodes.Where(x => x.Name.ToLower().Contains(term.ToLower()) || 
+                x.Code.ToLower().Contains(term.ToLower())) // Filter based on user input
+                .OrderBy(x => x.Name)
+                .Take(10) // Limit the number of results
+                .Select(x => new { PincodeId = x.PinCodeId, PincodeName = $"{x.Name} - {x.Code}" })?.ToList();
+
+            return Ok(filteredPincodes);
+        }
+       
+        [HttpGet("GetCountryName")]
+        public IActionResult GetCountryName(long id)
+        {
+            var country = _context.Country.Where(x => x.CountryId == id).OrderBy(x => x.Name).Take(10) // Filter based on user input
+                .Select(x => new { Id = x.CountryId, Name = $"{x.Name}" }).FirstOrDefault(); // Format for jQuery UI Autocomplete
+
+            return Ok(country);
+        }
+
+        [HttpGet("GetStateName")]
+        public IActionResult GetStateName(long id, long countryId)
+        {
+            var state = _context.State.Where(x => x.StateId == id && x.CountryId == countryId).OrderBy(x => x.Name).Take(10) // Filter based on user input
+                .Select(x => new { StateId = x.StateId, StateName = $"{x.Name}" }).FirstOrDefault(); // Format for jQuery UI Autocomplete
+
+            return Ok(state);
         }
         [HttpGet("GetDistrictName")]
-        public IActionResult GetDistrictName(long districtId)
+        public IActionResult GetDistrictName(long id, long stateId, long countryId)
         {
-            var pincode = _context.District.Where(x => x.DistrictId == districtId) // Filter based on user input
+            var pincode = _context.District.Where(x => x.DistrictId == id && x.StateId == stateId && x.CountryId == countryId).OrderBy(x => x.Name).Take(10) // Filter based on user input
                 .Select(x => new { DistrictId = x.DistrictId, DistrictName = $"{x.Name}" }).FirstOrDefault(); // Format for jQuery UI Autocomplete
 
             return Ok(pincode);
         }
-        [HttpGet("GetStateName")]
-        public IActionResult GetStateName(long stateId)
+
+        [HttpGet("GetPincodeName")]
+        public IActionResult GetPincodeName(long id, long districtId, long stateId, long countryId)
         {
-            var pincode = _context.State.Where(x => x.StateId == stateId) // Filter based on user input
-                .Select(x => new { StateId = x.StateId, StateName = $"{x.Name} - {x.Code}" }).FirstOrDefault(); // Format for jQuery UI Autocomplete
+            var pincode = _context.PinCode.Where(x => x.PinCodeId == id && x.DistrictId == districtId && x.StateId == stateId && x.CountryId == countryId).OrderBy(x => x.Name).Take(10) // Filter based on user input
+                .Select(x => new { PincodeId = x.PinCodeId, PincodeName = $"{x.Name} - {x.Code}" }).FirstOrDefault(); // Format for jQuery UI Autocomplete
 
             return Ok(pincode);
         }

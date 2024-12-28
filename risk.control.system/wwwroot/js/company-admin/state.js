@@ -4,7 +4,7 @@
 
     if (preloadedCountryId) {
         $.ajax({
-            url: '/api/Company/GetCountrName', // Endpoint to fetch PinCodeName
+            url: '/api/Company/GetCountryName', // Endpoint to fetch PinCodeName
             type: 'GET',
             data: { countryId: preloadedCountryId },
             success: function (response) {

@@ -64,6 +64,17 @@ namespace risk.control.system.Models
         [Display(Name = "Address")]
         public string Addressline { get; set; }
 
+
+        [NotMapped]
+        public long SelectedPincodeId { get; set; }
+        [NotMapped]
+        public long SelectedDistrictId { get; set; }
+        [NotMapped]
+        public long SelectedStateId { get; set; }
+        [NotMapped]
+        public long SelectedCountryId { get; set; }
+
+
         public string? BeneficiaryLocationMap { get; set; }
         public string? Latitude { get; set; }
         public string? Longitude { get; set; }

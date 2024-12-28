@@ -1618,18 +1618,19 @@ ul#messagesList {
     cursor: pointer; /* Adds pointer cursor to mimic dropdown */
     width: 100%; /* Takes full width of the container */
     position: relative;
+    background: #fafad2 url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="gray"><path d="M7 10l5 5 5-5z"/></svg>') no-repeat right 5px center;
 }
 
     /* Adding a dropdown arrow using a pseudo-element */
     .remarks.auto-dropdown::after {
         position: absolute;
-        right: 12px; /* Position it on the right */
-        top: 50%; /* Vertically center it */
-        transform: translateY(-50%);
-        border-left: 5px solid transparent; /* Create the triangle shape */
-        border-right: 5px solid transparent;
-        border-top: 5px solid #333; /* Color of the arrow */
-        pointer-events: none; /* Prevent interaction */
+        /*right: 12px;*/ /* Position it on the right */
+        /*top: 50%;*/ /* Vertically center it */
+        /*transform: translateY(-50%);
+        border-left: 5px solid transparent;*/ /* Create the triangle shape */
+        /*border-right: 5px solid transparent;
+        border-top: 5px solid #333;*/ /* Color of the arrow */
+        /*pointer-events: none;*/ /* Prevent interaction */
     }
 
     /* Optional hover and focus styles */
@@ -1646,19 +1647,41 @@ ul#messagesList {
     .autocomplete-wrapper::after {
         content: ''; /* Arrow content */
         position: absolute;
-        right: 12px; /* Align it to the right */
-        top: 50%; /* Vertically center it */
-        transform: translateY(-50%);
-        border-left: 5px solid transparent; /* Triangle shape */
-        border-right: 5px solid transparent;
-        border-top: 5px solid #333; /* Arrow color */
-        pointer-events: none; /* Prevent interaction */
+        /*right: 12px;*/ /* Align it to the right */
+        /*top: 50%;*/ /* Vertically center it */
+        /*transform: translateY(-50%);
+        border-left: 5px solid transparent;*/ /* Triangle shape */
+        /*border-right: 5px solid transparent;
+        border-top: 5px solid #333;*/ /* Arrow color */
+        /*pointer-events: none;*/ /* Prevent interaction */
     }
+/* Target the autocomplete popup container */
 .ui-autocomplete {
-    z-index: 1050; /* Ensure it appears above other elements */
-    max-height: 200px;
-    overflow-y: auto;
-    background-color: white;
-    border: 1px solid #ccc;
-    font-size: 14px;
+    background-color: #fff; /* White background */
+    border: 1px solid #ccc; /* Light gray border */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Shadow effect */
+    max-height: 200px; /* Limit the height */
+    overflow-y: auto; /* Scroll if content exceeds max-height */
+    z-index: 1000; /* Ensure it appears on top */
+    font-family: Arial, sans-serif; /* Font styling */
+    font-size: 1em; /* Font size */
+    padding: 5px 0; /* Spacing */
+    background: #fff url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="gray"><path d="M7 10l5 5 5-5z"/></svg>') no-repeat right 10px center;
+    background-size: 16px 16px;
+    cursor: pointer;
 }
+
+    /* Style individual items in the autocomplete list */
+    .ui-autocomplete li {
+        padding: 5px 10px; /* Add padding for each item */
+        cursor: pointer; /* Pointer cursor for better UX */
+    }
+
+        /* Style hover and active states for list items */
+        .ui-autocomplete li.ui-menu-item:hover,
+        .ui-autocomplete li.ui-state-active {
+            background-color: #f0f0f0; /* Light gray background on hover */
+            color: #15B01B; /* Text color */
+        }
+
+
