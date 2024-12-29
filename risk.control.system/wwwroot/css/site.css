@@ -1613,80 +1613,70 @@ ul#messagesList {
     z-index: 999;
 }
 
-/* General styling for the input to resemble a dropdown */
-.remarks.auto-dropdown {
-    cursor: pointer; /* Adds pointer cursor to mimic dropdown */
-    width: 100%; /* Takes full width of the container */
+.auto-dropdown {
+    cursor: pointer; /* Pointer cursor for better UX */
+    width: 100%; /* Full width of the container */
     position: relative;
-    background: #fafad2 url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="gray"><path d="M7 10l5 5 5-5z"/></svg>') no-repeat right 5px center;
+    background: #fafad2 url("data:image/svg+xml;charset=UTF-8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='currentColor' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M4 6l4 4 4-4'></path></svg>") no-repeat right 10px center;
+    border: 1px solid #ccc; /* Default border */
+    padding: 8px 35px 8px 10px; /* Adjust padding for the dropdown arrow and text */
+    border-radius: 4px; /* Rounded corners */
+    line-height: 1.5; /* Line height for better alignment */
+    color: #333; /* Dark text color for better contrast */
+    transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for focus */
 }
 
-    /* Adding a dropdown arrow using a pseudo-element */
-    .remarks.auto-dropdown::after {
+    .auto-dropdown:focus {
+        border-color: #007bff; /* Border color change on focus */
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.25); /* Subtle focus shadow */
+        outline: none; /* Remove default focus outline */
+    }
+
+    .remarks:hover, .auto-dropdown:hover {
+        border-color: #007bff; /* Border color change on focus */
+    }
+
+    /* When the loading spinner is active */
+    .auto-dropdown .loading-spinner {
         position: absolute;
-        /*right: 12px;*/ /* Position it on the right */
-        /*top: 50%;*/ /* Vertically center it */
-        /*transform: translateY(-50%);
-        border-left: 5px solid transparent;*/ /* Create the triangle shape */
-        /*border-right: 5px solid transparent;
-        border-top: 5px solid #333;*/ /* Color of the arrow */
-        /*pointer-events: none;*/ /* Prevent interaction */
+        top: 50%;
+        right: 10px;
+        transform: translateY(-50%);
+        font-size: 16px;
+        color: #007bff;
+        display: none;
     }
 
-    /* Optional hover and focus styles */
-    .remarks.auto-dropdown:hover{
-        border-color: #007bff; /* Highlighted border color */
-        outline: none; /* Removes focus outline */
-    }
-    .remarks.auto-dropdown:active,
-    .remarks.auto-dropdown:focus {
-        border-color: #007bff; /* Highlighted border color */
-        outline: none; /* Removes focus outline */
-        background: white url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="gray"><path d="M7 10l5 5 5-5z"/></svg>') no-repeat right 5px center;
-    }
-
-.autocomplete-wrapper {
-    position: relative;
-}
-
-    .autocomplete-wrapper::after {
-        content: ''; /* Arrow content */
-        position: absolute;
-        /*right: 12px;*/ /* Align it to the right */
-        /*top: 50%;*/ /* Vertically center it */
-        /*transform: translateY(-50%);
-        border-left: 5px solid transparent;*/ /* Triangle shape */
-        /*border-right: 5px solid transparent;
-        border-top: 5px solid #333;*/ /* Arrow color */
-        /*pointer-events: none;*/ /* Prevent interaction */
-    }
-/* Target the autocomplete popup container */
+/* Styling for the dropdown list that appears below the input */
 .ui-autocomplete {
-    background-color: #fff; /* White background */
-    border: 1px solid #ccc; /* Light gray border */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Shadow effect */
-    max-height: 200px; /* Limit the height */
-    overflow-y: auto; /* Scroll if content exceeds max-height */
-    z-index: 1000; /* Ensure it appears on top */
-    font-family: Arial, sans-serif; /* Font styling */
-    font-size: 1em; /* Font size */
-    padding: 5px 0; /* Spacing */
-    background-size: 16px 16px;
+    border: 1px solid #ccc;
+    max-height: 200px; /* Limit the height of the dropdown */
+    overflow-y: auto; /* Enable scrolling if dropdown is long */
+    font-size: 14px;
+    background-color: #fff;
+    border-radius: 4px;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.15);
+    z-index: 9999; /* Ensure the dropdown is on top */
+}
+
+/* Hover effect for dropdown items */
+.ui-menu .ui-menu-item:hover {
+    background-color: #007bff;
+    color: darkblue;
+}
+
+/* Selected item style */
+.ui-state-active {
+    background-color: #007bff !important;
+    color: white !important;
+}
+
+/* Adjust the font of the dropdown items */
+.ui-menu .ui-menu-item {
+    padding: 8px 12px;
     cursor: pointer;
 }
 
-    /* Style individual items in the autocomplete list */
-    .ui-autocomplete li {
-        padding: 5px 10px; /* Add padding for each item */
-        cursor: pointer; /* Pointer cursor for better UX */
-    }
-
-        /* Style hover and active states for list items */
-        .ui-autocomplete li.ui-menu-item:hover,
-        .ui-autocomplete li.ui-state-active {
-            background-color: #f0f0f0; /* Light gray background on hover */
-            color: #15B01B; /* Text color */
-        }
 
 .input-invalid {
     border: 1px solid red;
@@ -1695,3 +1685,20 @@ ul#messagesList {
     pointer-events: none;
     cursor: none;
 }
+.input-group {
+    position: relative;
+}
+
+.loading-spinner {
+    position: absolute;
+    top: 50%;
+    right: 2em;
+    transform: translateY(-50%);
+    display: none; /* Hide spinner initially */
+    color: #007bff; /* Adjust color if needed */
+    font-size: 1.2em; /* Adjust size if needed */
+}
+
+    .loading-spinner.active {
+        display: inline-block; /* Show spinner when active */
+    }

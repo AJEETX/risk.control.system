@@ -73,6 +73,13 @@ function loadPincodeData(countryId, stateId, districtId) {
  * Fetches a value from the server and sets it to the specified input field.
  */
 function fetchAndSetFieldValue(url, data, inputSelector, responseKey, callback) {
+    const $inputWrapper = $(inputSelector).closest('.input-group');  // Get the input container
+    const $spinner = $inputWrapper.find('.loading-spinner');         // Find the spinner inside the input container
+
+    if ($spinner.length) {
+        $spinner.addClass('active'); // Show spinner
+    }
+
     $.ajax({
         url,
         type: "GET",
@@ -85,6 +92,11 @@ function fetchAndSetFieldValue(url, data, inputSelector, responseKey, callback) 
         },
         error: function () {
             console.error(`Failed to fetch value for ${inputSelector}`);
+        },
+        complete: function () {
+            if ($spinner.length) {
+                $spinner.removeClass('active'); // Hide spinner after the request is complete
+            }
         }
     });
 }
@@ -144,8 +156,15 @@ function handleAutocompleteSelect(ui, inputSelector, hiddenSelector, dependentFi
  * Sets up an autocomplete field with dynamic data fetching.
  */
 function setAutocomplete(fieldSelector, url, extraDataCallback, onSelectCallback) {
+    const $wrapper = $(fieldSelector).closest('.autocomplete-wrapper');
+    const $spinner = $wrapper.find('.loading-spinner');
+
     $(fieldSelector).autocomplete({
         source: function (request, response) {
+            if ($spinner.length) {
+                $spinner.show(); // Show spinner while fetching data
+            }
+
             $.ajax({
                 url,
                 data: { term: request.term, ...extraDataCallback() },
@@ -158,6 +177,11 @@ function setAutocomplete(fieldSelector, url, extraDataCallback, onSelectCallback
                 },
                 error: function () {
                     response([{ label: "Error fetching data", value: "" }]);
+                },
+                complete: function () {
+                    if ($spinner.length) {
+                        $spinner.hide(); // Hide spinner after fetching
+                    }
                 }
             });
         },
