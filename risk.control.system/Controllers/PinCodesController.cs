@@ -156,7 +156,7 @@ namespace risk.control.system.Controllers
         [Breadcrumb("Add New", FromAction = "Profile")]
         public IActionResult Create()
         {
-            ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
+            //ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
             return View();
         }
 
@@ -169,7 +169,9 @@ namespace risk.control.system.Controllers
         {
             pinCode.Updated = DateTime.Now;
             pinCode.UpdatedBy = HttpContext.User?.Identity?.Name;
-
+            pinCode.CountryId = pinCode.SelectedCountryId;
+            pinCode.StateId = pinCode.SelectedStateId;
+            pinCode.DistrictId = pinCode.SelectedDistrictId;
             _context.Add(pinCode);
             await _context.SaveChangesAsync();
             toastNotification.AddSuccessToastMessage("pincode created successfully!");
@@ -214,21 +216,22 @@ namespace risk.control.system.Controllers
             {
                 pinCode.Updated = DateTime.Now;
                 pinCode.UpdatedBy = HttpContext.User?.Identity?.Name;
+                pinCode.CountryId = pinCode.SelectedCountryId;
+                pinCode.StateId = pinCode.SelectedStateId;
+                pinCode.DistrictId = pinCode.SelectedDistrictId;
+
                 _context.Update(pinCode);
-                await _context.SaveChangesAsync();
+                if( await _context.SaveChangesAsync() > 0)
+                {
+                    toastNotification.AddSuccessToastMessage("pincode edited successfully!");
+                    return RedirectToAction(nameof(Index));
+                }
             }
-            catch (DbUpdateConcurrencyException)
+            catch (Exception ex)
             {
-                if (!PinCodeExists(pinCode.PinCodeId))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+               Console.WriteLine(ex.ToString());
             }
-            toastNotification.AddSuccessToastMessage("pincode edited successfully!");
+            toastNotification.AddErrorToastMessage("An error occurred while updating the pincode!");
             return RedirectToAction(nameof(Index));
         }
 

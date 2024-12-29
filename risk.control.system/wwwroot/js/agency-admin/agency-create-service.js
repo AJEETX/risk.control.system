@@ -47,6 +47,7 @@ $.validator.setDefaults({
 });
 
 $(document).ready(function () {
+
     $("#create-form").validate();
 
     $('#PinCodeId').attr('data-live-search', true);

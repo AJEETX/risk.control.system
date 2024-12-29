@@ -198,9 +198,12 @@ function setAutocomplete(fieldSelector, url, extraDataCallback, onSelectCallback
     });
     // Trigger autocomplete on focus if the input field is empty
     $(fieldSelector).on("focus", function () {
-        const value = $(this).val().trim();
-        if (!value) {
-            $(this).autocomplete("search", ""); // Trigger autocomplete with an empty search term
+        const rawValue = $(this).val();
+        if (rawValue == '') {
+            const value = rawValue.trim();
+            if (!value) {
+                $(this).autocomplete("search", ""); // Trigger autocomplete with an empty search term
+            }
         }
     });
 }

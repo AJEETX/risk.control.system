@@ -821,7 +821,7 @@ namespace risk.control.system.Controllers
                 var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == vendorUser.VendorId);
 
                 ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name");
-                ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
+                //ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
                 var model = new VendorInvestigationServiceType { SelectedMultiPincodeId = new List<long>(), Vendor = vendor, PincodeServices = new List<ServicedPinCode>() };
                 return View(model);
             }
@@ -841,58 +841,30 @@ namespace risk.control.system.Controllers
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (currentUserEmail == null)
-                {
-                    notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-                if (vendorInvestigationServiceType is null)
-                {
-                    notifyService.Custom($"Error to create service.", 3, "red", "fas fa-truck");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-                
                 var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == currentUserEmail);
+                var pincodesServiced = await _context.PinCode.Where(p => vendorInvestigationServiceType.SelectedMultiPincodeId.Contains(p.PinCodeId)).ToListAsync();
+                var servicePinCodes = pincodesServiced.Select(p =>
+                new ServicedPinCode
+                {
+                    Name = p.Name,
+                    Pincode = p.Code,
+                    VendorInvestigationServiceTypeId = vendorInvestigationServiceType.VendorInvestigationServiceTypeId,
+                    VendorInvestigationServiceType = vendorInvestigationServiceType,
+                }).ToList();
+                vendorInvestigationServiceType.PincodeServices = servicePinCodes;
+                vendorInvestigationServiceType.Updated = DateTime.Now;
+                vendorInvestigationServiceType.UpdatedBy = HttpContext.User?.Identity?.Name;
+                vendorInvestigationServiceType.Created = DateTime.Now;
+                vendorInvestigationServiceType.VendorId = vendorUser.VendorId.GetValueOrDefault();
+                vendorInvestigationServiceType.CountryId = vendorInvestigationServiceType.SelectedCountryId;
+                vendorInvestigationServiceType.StateId = vendorInvestigationServiceType.SelectedStateId;
+                vendorInvestigationServiceType.DistrictId = vendorInvestigationServiceType.SelectedDistrictId;
 
-                if (vendorUser == null)
-                {
-                    notifyService.Custom($"Error to create service.", 3, "red", "fas fa-truck");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-                var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == vendorUser.VendorId);
-                if (vendor == null)
-                {
-                    notifyService.Custom($"Error to create service.", 3, "red", "fas fa-truck");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-                if (vendorInvestigationServiceType is not null)
-                {
-                    var pincodesServiced = await _context.PinCode.Where(p => vendorInvestigationServiceType.SelectedMultiPincodeId.Contains(p.PinCodeId)).ToListAsync();
-                    var servicePinCodes = pincodesServiced.Select(p =>
-                    new ServicedPinCode
-                    {
-                        Name = p.Name,
-                        Pincode = p.Code,
-                        VendorInvestigationServiceTypeId = vendorInvestigationServiceType.VendorInvestigationServiceTypeId,
-                        VendorInvestigationServiceType = vendorInvestigationServiceType,
-                    }).ToList();
-                    vendorInvestigationServiceType.PincodeServices = servicePinCodes;
-                    vendorInvestigationServiceType.Updated = DateTime.Now;
-                    vendorInvestigationServiceType.UpdatedBy = HttpContext.User?.Identity?.Name;
-                    vendorInvestigationServiceType.Created = DateTime.Now;
-                    vendorInvestigationServiceType.VendorId = vendor.VendorId;
-                    _context.Add(vendorInvestigationServiceType);
-                    await _context.SaveChangesAsync();
-                    notifyService.Custom($"Service created successfully.", 3, "green", "fas fa-truck");
+                _context.Add(vendorInvestigationServiceType);
+                await _context.SaveChangesAsync();
+                notifyService.Custom($"Service created successfully.", 3, "green", "fas fa-truck");
 
-                    return RedirectToAction(nameof(AgencyController.Service), "Agency");
-                }
-                ViewData["CountryId"] = new SelectList(_context.Country.OrderBy(c => c.Name), "CountryId", "Name", vendorInvestigationServiceType.CountryId);
-                ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", vendorInvestigationServiceType.LineOfBusinessId);
-                ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name", vendorInvestigationServiceType.DistrictId);
-                ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name", vendorInvestigationServiceType.StateId);
-                notifyService.Error("OOPS !!!..Contact Admin");
-                return View(vendorInvestigationServiceType);
+                return RedirectToAction(nameof(AgencyController.Service), "Agency");
             }
             catch (Exception ex)
             {
@@ -938,14 +910,14 @@ namespace risk.control.system.Controllers
                     .Where(i => i.LineOfBusiness.LineOfBusinessId == vendorInvestigationServiceType.LineOfBusinessId),
                     "InvestigationServiceTypeId", "Name", vendorInvestigationServiceType.InvestigationServiceTypeId);
 
-                var country = _context.Country.OrderBy(o => o.Name);
-                var states = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == vendorInvestigationServiceType.CountryId).OrderBy(d => d.Name);
-                var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == vendorInvestigationServiceType.StateId).OrderBy(d => d.Name);
+                //var country = _context.Country.OrderBy(o => o.Name);
+                //var states = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == vendorInvestigationServiceType.CountryId).OrderBy(d => d.Name);
+                //var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == vendorInvestigationServiceType.StateId).OrderBy(d => d.Name);
 
-                ViewData["CountryId"] = new SelectList(country, "CountryId", "Name", vendorInvestigationServiceType.CountryId);
-                ViewData["StateId"] = new SelectList(states, "StateId", "Name", vendorInvestigationServiceType.StateId);
-                ViewData["VendorId"] = new SelectList(_context.Vendor, "VendorId", "Name", vendorInvestigationServiceType.VendorId);
-                ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", vendorInvestigationServiceType.DistrictId);
+                //ViewData["CountryId"] = new SelectList(country, "CountryId", "Name", vendorInvestigationServiceType.CountryId);
+                //ViewData["StateId"] = new SelectList(states, "StateId", "Name", vendorInvestigationServiceType.StateId);
+                //ViewData["VendorId"] = new SelectList(_context.Vendor, "VendorId", "Name", vendorInvestigationServiceType.VendorId);
+                //ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", vendorInvestigationServiceType.DistrictId);
 
                 ViewBag.PinCodeId = _context.PinCode.Where(p => p.District.DistrictId == vendorInvestigationServiceType.DistrictId)
                     .Select(x => new SelectListItem
@@ -1007,7 +979,12 @@ namespace risk.control.system.Controllers
 
                     vendorInvestigationServiceType.PincodeServices = pinCodesWithId;
                     vendorInvestigationServiceType.Updated = DateTime.Now;
-                    vendorInvestigationServiceType.UpdatedBy = HttpContext.User?.Identity?.Name;
+                    vendorInvestigationServiceType.UpdatedBy = currentUserEmail;
+                    vendorInvestigationServiceType.CountryId = vendorInvestigationServiceType.SelectedCountryId;
+                    vendorInvestigationServiceType.StateId = vendorInvestigationServiceType.SelectedStateId;
+                    vendorInvestigationServiceType.DistrictId = vendorInvestigationServiceType.SelectedDistrictId;
+
+
                     _context.Update(vendorInvestigationServiceType);
                     await _context.SaveChangesAsync();
                     notifyService.Custom($"Service updated successfully.", 3, "orange", "fas fa-truck");
@@ -1015,9 +992,9 @@ namespace risk.control.system.Controllers
                 }
                 ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType, "InvestigationServiceTypeId", "Name", vendorInvestigationServiceType.InvestigationServiceTypeId);
                 ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", vendorInvestigationServiceType.LineOfBusinessId);
-                ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name", vendorInvestigationServiceType.StateId);
-                ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name", vendorInvestigationServiceType.DistrictId);
-                ViewData["VendorId"] = new SelectList(_context.Vendor, "VendorId", "Name", vendorInvestigationServiceType.VendorId);
+                //ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name", vendorInvestigationServiceType.StateId);
+                //ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name", vendorInvestigationServiceType.DistrictId);
+                //ViewData["VendorId"] = new SelectList(_context.Vendor, "VendorId", "Name", vendorInvestigationServiceType.VendorId);
                 return View(vendorInvestigationServiceType);
             }
             catch (Exception ex)

@@ -153,7 +153,7 @@ namespace risk.control.system.Controllers
         [Breadcrumb("Add New", FromAction ="Profile")]
         public IActionResult Create()
         {
-            ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
+            //ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
             return View();
         }
 
@@ -162,6 +162,7 @@ namespace risk.control.system.Controllers
         public async Task<IActionResult> Create(State state)
         {
             state.Updated = DateTime.Now;
+            state.CountryId = state.SelectedCountryId;
             state.UpdatedBy = HttpContext.User?.Identity?.Name;
             _context.Add(state);
             await _context.SaveChangesAsync();
@@ -185,7 +186,7 @@ namespace risk.control.system.Controllers
                 toastNotification.AddErrorToastMessage("state not found!");
                 return NotFound();
             }
-            ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", state.CountryId);
+            //ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", state.CountryId);
 
             return View(state);
         }
@@ -208,25 +209,19 @@ namespace risk.control.system.Controllers
                 try
                 {
                     state.Updated = DateTime.Now;
+                    state.CountryId = state.SelectedCountryId;
                     state.UpdatedBy = HttpContext.User?.Identity?.Name;
                     _context.Update(state);
                     await _context.SaveChangesAsync();
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (Exception ex)
                 {
-                    if (!StateExists(state.StateId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    Console.WriteLine(ex.ToString());
                 }
                 toastNotification.AddSuccessToastMessage("state edited successfully!");
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
+            //ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
 
             toastNotification.AddErrorToastMessage("Error to edit state!");
             return View(state);
