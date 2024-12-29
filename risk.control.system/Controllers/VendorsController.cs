@@ -180,7 +180,7 @@ namespace risk.control.system.Controllers
             }
             var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == id);
             var model = new VendorApplicationUser { Vendor = vendor };
-            ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
+            //ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
 
             var agencysPage = new MvcBreadcrumbNode("AvailableVendors", "Company", "Manager Agency(s)");
             var agency2Page = new MvcBreadcrumbNode("AvailableVendors", "Company", "Available Agencies") { Parent = agencysPage, };
@@ -238,6 +238,12 @@ namespace risk.control.system.Controllers
                 user.EmailConfirmed = true;
                 user.UserName = userFullEmail;
                 user.Mailbox = new Mailbox { Name = userFullEmail };
+
+                user.PinCodeId = user.SelectedPincodeId;
+                user.DistrictId = user.SelectedDistrictId;
+                user.StateId = user.SelectedStateId;
+                user.CountryId = user.SelectedCountryId;
+
                 user.Role = (AppRoles)Enum.Parse(typeof(AppRoles), user.UserRole.ToString());
                 user.Updated = DateTime.Now;
                 user.UpdatedBy = HttpContext.User?.Identity?.Name;
@@ -353,15 +359,15 @@ namespace risk.control.system.Controllers
                 }
                 vendorApplicationUser.Vendor = vendor;
 
-                var country = _context.Country.OrderBy(o => o.Name);
-                var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == vendorApplicationUser.CountryId).OrderBy(d => d.Name);
-                var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == vendorApplicationUser.StateId).OrderBy(d => d.Name);
-                var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == vendorApplicationUser.DistrictId).OrderBy(d => d.Name);
+                //var country = _context.Country.OrderBy(o => o.Name);
+                //var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == vendorApplicationUser.CountryId).OrderBy(d => d.Name);
+                //var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == vendorApplicationUser.StateId).OrderBy(d => d.Name);
+                //var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == vendorApplicationUser.DistrictId).OrderBy(d => d.Name);
 
-                ViewData["CountryId"] = new SelectList(country.OrderBy(c => c.Name), "CountryId", "Name", vendorApplicationUser.CountryId);
-                ViewData["StateId"] = new SelectList(relatedStates, "StateId", "Name", vendorApplicationUser.StateId);
-                ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", vendorApplicationUser.DistrictId);
-                ViewData["PinCodeId"] = new SelectList(pincodes, "PinCodeId", "Code", vendorApplicationUser.PinCodeId);
+                //ViewData["CountryId"] = new SelectList(country.OrderBy(c => c.Name), "CountryId", "Name", vendorApplicationUser.CountryId);
+                //ViewData["StateId"] = new SelectList(relatedStates, "StateId", "Name", vendorApplicationUser.StateId);
+                //ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", vendorApplicationUser.DistrictId);
+                //ViewData["PinCodeId"] = new SelectList(pincodes, "PinCodeId", "Code", vendorApplicationUser.PinCodeId);
 
 
 
@@ -436,12 +442,12 @@ namespace risk.control.system.Controllers
                 }
                 user.Addressline = applicationUser.Addressline;
                 user.Active = applicationUser.Active;
-                user.Country = applicationUser.Country;
-                user.CountryId = applicationUser.CountryId;
-                user.State = applicationUser.State;
-                user.StateId = applicationUser.StateId;
-                user.PinCode = applicationUser.PinCode;
-                user.PinCodeId = applicationUser.PinCodeId;
+
+                user.PinCodeId = applicationUser.SelectedPincodeId;
+                user.DistrictId = applicationUser.SelectedDistrictId;
+                user.StateId = applicationUser.SelectedStateId;
+                user.CountryId = applicationUser.SelectedCountryId;
+
                 user.Updated = DateTime.Now;
                 user.Comments = applicationUser.Comments;
                 user.PhoneNumber = applicationUser.PhoneNumber;
@@ -797,6 +803,11 @@ namespace risk.control.system.Controllers
                 vendor.Updated = DateTime.Now;
                 vendor.UpdatedBy = currentUserEmail;
 
+                vendor.PinCodeId = vendor.SelectedPincodeId;
+                vendor.DistrictId = vendor.SelectedDistrictId;
+                vendor.StateId = vendor.SelectedStateId;
+                vendor.CountryId = vendor.SelectedCountryId;
+
                 _context.Add(vendor);
                 await _context.SaveChangesAsync();
 
@@ -837,15 +848,15 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                var country = _context.Country.OrderBy(o => o.Name);
-                var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == vendor.CountryId).OrderBy(d => d.Name);
-                var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == vendor.StateId).OrderBy(d => d.Name);
-                var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == vendor.DistrictId).OrderBy(d => d.Name);
+                //var country = _context.Country.OrderBy(o => o.Name);
+                //var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == vendor.CountryId).OrderBy(d => d.Name);
+                //var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == vendor.StateId).OrderBy(d => d.Name);
+                //var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == vendor.DistrictId).OrderBy(d => d.Name);
 
-                ViewData["CountryId"] = new SelectList(country.OrderBy(c => c.Name), "CountryId", "Name", vendor.CountryId);
-                ViewData["StateId"] = new SelectList(relatedStates, "StateId", "Name", vendor.StateId);
-                ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", vendor.DistrictId);
-                ViewData["PinCodeId"] = new SelectList(pincodes, "PinCodeId", "Code", vendor.PinCodeId);
+                //ViewData["CountryId"] = new SelectList(country.OrderBy(c => c.Name), "CountryId", "Name", vendor.CountryId);
+                //ViewData["StateId"] = new SelectList(relatedStates, "StateId", "Name", vendor.StateId);
+                //ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", vendor.DistrictId);
+                //ViewData["PinCodeId"] = new SelectList(pincodes, "PinCodeId", "Code", vendor.PinCodeId);
 
 
                 var agencysPage = new MvcBreadcrumbNode("AvailableVendors", "Company", "Manager Agency(s)");
@@ -914,6 +925,11 @@ namespace risk.control.system.Controllers
                 }
                 vendor.Updated = DateTime.Now;
                 vendor.UpdatedBy = HttpContext.User?.Identity?.Name;
+
+                vendor.PinCodeId = vendor.SelectedPincodeId;
+                vendor.DistrictId = vendor.SelectedDistrictId;
+                vendor.StateId = vendor.SelectedStateId;
+                vendor.CountryId = vendor.SelectedCountryId;
 
                 _context.Vendor.Update(vendor);
 

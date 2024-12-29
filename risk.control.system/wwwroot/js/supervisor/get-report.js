@@ -147,13 +147,9 @@ $(document).ready(function () {
                                 $(".submit-progress").removeClass("hidden");
                             }, 1);
 
-                            $('#approve-case').attr('disabled', 'disabled');
-                            $('body').attr('disabled', 'disabled');
-                            $('html *').css('cursor', 'not-allowed');
-                            $('button').prop('disabled', true);
-                            $('a.btn *').removeAttr('href');
-                            $('html a *, html button *').css('pointer-events', 'none');
                             $('#approve-case').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> APPROVE");
+                            disableAllInteractiveElements();
+
                             $('#create-form').submit();
 
                             var createForm = document.getElementById("create-form");
@@ -196,13 +192,9 @@ $(document).ready(function () {
                                 $(".submit-progress").removeClass("hidden");
                             }, 1);
 
-                            $('#approve-case').attr('disabled', 'disabled');
-                            $('body').attr('disabled', 'disabled');
-                            $('html *').css('cursor', 'not-allowed');
-                            $('button').prop('disabled', true);
-                            $('a.btn *').removeAttr('href');
-                            $('html a *, html button *').css('pointer-events', 'none');
                             $('#approve-case').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i>  REVIEW");
+                            disableAllInteractiveElements();
+
                             $('#create-form').submit();
 
                             var createForm = document.getElementById("create-form");
@@ -245,13 +237,9 @@ $(document).ready(function () {
                                 $(".submit-progress").removeClass("hidden");
                             }, 1);
 
-                            $('#approve-case').attr('disabled', 'disabled');
-                            $('body').attr('disabled', 'disabled');
-                            $('html *').css('cursor', 'not-allowed');
-                            $('button').prop('disabled', true);
-                            $('a.btn *').removeAttr('href');
-                            $('html a *, html button *').css('pointer-events', 'none');
                             $('#approve-case').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i>  REJECT");
+                            disableAllInteractiveElements();
+
                             $('#create-form').submit();
 
                             var createForm = document.getElementById("create-form");
@@ -318,8 +306,9 @@ $(document).ready(function () {
                                 $(".submit-progress").removeClass("hidden");
                             }, 1);
 
-                            $('#send-query').attr('disabled', 'disabled');
                             $('#send-query').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Enquiring...");
+                            disableAllInteractiveElements();
+
                             $('#query-form').submit();
 
                             var createForm = document.getElementById("create-form");
@@ -372,13 +361,7 @@ function showenquiry() {
         $(".submit-progress").removeClass("hidden");
     }, 1);
     $('#enquire-case').html("<i class='fas fa-sync fa-spin'></i> ENQUIRE");
-
-    $('body').attr('disabled', 'disabled');
-    $('html *').css('cursor', 'not-allowed');
-    $('button').prop('disabled', true);
-    $('a.btn *').removeAttr('href');
-    $('html a *, html button *').css('pointer-events', 'none');
-    $('#enquire-case').css('pointer-events', 'none');
+    disableAllInteractiveElements();
 
     var createForm = document.getElementById("create-form");
     if (createForm) {

@@ -236,12 +236,6 @@ $(document).ready(function () {
             $(".submit-progress").removeClass("hidden");
         }, 1);
 
-        $('#allocatedcase').attr('disabled', 'disabled');
-        $('body').attr('disabled', 'disabled');
-        $('html *').css('cursor', 'not-allowed');
-        $('button').prop('disabled', true);
-        $('a.btn *').removeAttr('href');
-        $('html a *, html button *').css('pointer-events', 'none');
         $('#allocatedcase').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Assess");
 
         $('#checkboxes').submit();
@@ -320,11 +314,14 @@ function getdetails(id) {
     setTimeout(function () {
         $(".submit-progress").removeClass("hidden");
     }, 1);
-    $('body').attr('disabled', 'disabled');
-    $('html *').css('cursor', 'not-allowed');
-    $('button').prop('disabled', true);
-    $('a.btn *').removeAttr('href');
-    $('html a *, html button *').css('pointer-events', 'none');
+    // Disable all buttons, submit inputs, and anchors
+    $('button, input[type="submit"], a').prop('disabled', true);
+
+    // Add a class to visually indicate disabled state for anchors
+    $('a').addClass('disabled-anchor').on('click', function (e) {
+        e.preventDefault(); // Prevent default action for anchor clicks
+    });
+
     $('a#details' + id + '.btn.btn-xs.btn-info').html("<i class='fas fa-sync fa-spin'></i> Detail");
 
     var article = document.getElementById("article");

@@ -68,9 +68,9 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     if (row.caseWithPerson) {
-                        var img = '<div class="map-thumbnail-customer table-profile-image">';
+                        var img = '<div class="map-thumbnail table-profile-image">';
                         img += '<img src="' + row.ownerDetail + '" class="thumbnail table-profile-image" />'; // Thumbnail image with class 'thumbnail'
-                        img += '<img src="' + row.ownerDetail + '" class="full-map-customer" title="' + row.agent + '" data-toggle="tooltip"/>'; // Full map image with class 'full-map'
+                        img += '<img src="' + row.ownerDetail + '" class="full-map" title="' + row.agent + '" data-toggle="tooltip"/>'; // Full map image with class 'full-map'
                         img += '</div>';
                         return img;
                     }
@@ -244,10 +244,9 @@ function getdetails(id) {
     setTimeout(function () {
         $(".submit-progress").removeClass("hidden");
     }, 1);
-    $('button').prop('disabled', true);
-    $('a.btn *').removeAttr('href');
+    
     $('a#details' + id + '.btn.btn-xs.btn-info').html("<i class='fas fa-sync fa-spin'></i> Detail");
-
+    disableAllInteractiveElements()
     var article = document.getElementById("article");
     if (article) {
         var nodes = article.getElementsByTagName('*');
@@ -263,12 +262,9 @@ function showedit(id) {
     setTimeout(function () {
         $(".submit-progress").removeClass("hidden");
     }, 1);
-    $('body').attr('disabled', 'disabled');
-    $('html *').css('cursor', 'not-allowed');
-    $('button').prop('disabled', true);
-    $('a.btn *').removeAttr('href');
-    $('html a *, html button *').css('pointer-events', 'none');
+    
     $('a#edit' + id + '.btn.btn-xs.btn-warning').html("<i class='fas fa-sync fa-spin'></i> Edit");
+    disableAllInteractiveElements();
 
     var article = document.getElementById("article");
     if (article) {

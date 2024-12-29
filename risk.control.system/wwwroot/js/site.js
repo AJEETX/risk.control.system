@@ -634,6 +634,22 @@ $(document).ready(function () {
 
 });
 
+// Function to disable all interactive elements
+function disableAllInteractiveElements() {
+    // Disable buttons and inputs
+    $('button, input[type="submit"]').prop('disabled', true);
+
+    // Add visual disabled state for anchors
+    $('a').addClass('disabled-anchor').on('click', function (e) {
+        e.preventDefault();
+    });
+
+    // Apply CSS to make interactive elements unclickable
+    $('button, a, .text').css({
+        'pointer-events': 'none',
+        'cursor': 'not-allowed'
+    });
+}
 function checkIfAllChecked(elements) {
     var totalElmentCount = elements.length;
     var totalCheckedElements = elements.filter(":checked").length;

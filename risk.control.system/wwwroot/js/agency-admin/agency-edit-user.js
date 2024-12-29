@@ -1,15 +1,15 @@
 ﻿$.validator.setDefaults({
     submitHandler: function (form) {
         $.confirm({
-            title: "Confirm Edit",
-            content: "Are you sure to edit?",
-            icon: 'fas fa-user-plus',
+            title: "Confirm Edit User",
+            content: "Are you sure to edit ?",
 
+            icon: 'fas fa-user-plus',
             type: 'orange',
             closeIcon: true,
             buttons: {
                 confirm: {
-                    text: "Edit",
+                    text: "Edit User",
                     btnClass: 'btn-warning',
                     action: function () {
                         $("body").addClass("submit-progress-bg");
@@ -18,11 +18,17 @@
                         setTimeout(function () {
                             $(".submit-progress").removeClass("hidden");
                         }, 1);
-                        $('.btn').attr('disabled', 'disabled');
-                        $('html a *, html button *').css('pointer-events', 'none');
+                        // Disable all buttons, submit inputs, and anchors
+                        $('button, input[type="submit"], a').prop('disabled', true);
 
+                        // Add a class to visually indicate disabled state for anchors
+                        $('a').addClass('disabled-anchor').on('click', function (e) {
+                            e.preventDefault(); // Prevent default action for anchor clicks
+                        });
+                        $('button#edituser.btn.btn-warning').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Edit User");
+                        
                         form.submit();
-                        var createForm = document.getElementById("form");
+                        var createForm = document.getElementById("create-form");
                         if (createForm) {
                             var nodes = createForm.getElementsByTagName('*');
                             for (var i = 0; i < nodes.length; i++) {
@@ -46,7 +52,7 @@ $(document).ready(function () {
     if (currentImageElement) {
         currentImage = currentImageElement.src;
     }
-    $("#documentImageInput").on('change', function () {
+
     $("#documentImageInput").on('change', function () {
         var MaxSizeInBytes = 2097152;
         //Get count of selected files
@@ -82,6 +88,7 @@ $(document).ready(function () {
                             }
                         );
                     }
+
                     else {
                         document.getElementById('profileImage').src = window.URL.createObjectURL($(this)[0].files[i]);
                     }

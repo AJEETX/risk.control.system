@@ -303,6 +303,12 @@ namespace risk.control.system.Controllers
                 var userFullEmail = user.Email.Trim().ToLower() + "@" + emailSuffix;
                 //DEMO
                 user.Password = Applicationsettings.Password;
+
+                user.PinCodeId = user.SelectedPincodeId;
+                user.DistrictId = user.SelectedDistrictId;
+                user.StateId = user.SelectedStateId;
+                user.CountryId = user.SelectedCountryId;
+
                 user.Email = userFullEmail;
                 user.EmailConfirmed = true;
                 user.UserName = userFullEmail;
@@ -400,7 +406,6 @@ namespace risk.control.system.Controllers
                     foreach (IdentityError error in result.Errors)
                         ModelState.AddModelError("", error.Description);
                 }
-                GetCountryStateEdit(user);
                 notifyService.Custom($"Error to create user.", 3, "red", "fas fa-user-plus");
                 return View(user);
             }
@@ -517,14 +522,13 @@ namespace risk.control.system.Controllers
                     {
                         user.Password = applicationUser.Password;
                     }
+                    user.PinCodeId = applicationUser.SelectedPincodeId;
+                    user.DistrictId = applicationUser.SelectedDistrictId;
+                    user.StateId = applicationUser.SelectedStateId;
+                    user.CountryId = applicationUser.SelectedCountryId;
+
                     user.Addressline = applicationUser.Addressline;
                     user.Active = applicationUser.Active;
-                    user.Country = applicationUser.Country;
-                    user.CountryId = applicationUser.CountryId;
-                    user.State = applicationUser.State;
-                    user.StateId = applicationUser.StateId;
-                    user.PinCode = applicationUser.PinCode;
-                    user.PinCodeId = applicationUser.PinCodeId;
                     user.Updated = DateTime.Now;
                     user.Comments = applicationUser.Comments;
                     user.PhoneNumber = applicationUser.PhoneNumber;
@@ -1159,14 +1163,6 @@ namespace risk.control.system.Controllers
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
             return View();
-        }
-
-        private void GetCountryStateEdit(VendorApplicationUser? user)
-        {
-            ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", user?.CountryId);
-            ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name", user?.DistrictId);
-            ViewData["StateId"] = new SelectList(_context.State.Where(s => s.CountryId == user.CountryId), "StateId", "Name", user?.StateId);
-            ViewData["PinCodeId"] = new SelectList(_context.PinCode.Where(s => s.StateId == user.StateId), "PinCodeId", "Name", user?.PinCodeId);
         }
     }
 }

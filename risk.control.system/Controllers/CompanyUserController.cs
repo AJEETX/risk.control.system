@@ -149,6 +149,12 @@ namespace risk.control.system.Controllers
             user.EmailConfirmed = true;
             user.UserName = userFullEmail;
             user.Mailbox = new Mailbox { Name = userFullEmail };
+            
+            user.PinCodeId = user.SelectedPincodeId;
+            user.DistrictId = user.SelectedDistrictId;
+            user.StateId = user.SelectedStateId;
+            user.CountryId = user.SelectedCountryId;
+
             user.Updated = DateTime.Now;
             user.UpdatedBy = HttpContext.User?.Identity?.Name;
             user.Id = 0;
@@ -166,22 +172,22 @@ namespace risk.control.system.Controllers
             }
             else
             {
-                toastNotification.AddErrorToastMessage("Error to create user!");
+                notifyService.Error("Error to create user!");
                 foreach (IdentityError error in result.Errors)
                     ModelState.AddModelError("", error.Description);
             }
-            GetCountryStateEdit(user);
+            //GetCountryStateEdit(user);
             notifyService.Error($"Err User create.", 3);
             return View(user);
         }
 
-        private void GetCountryStateEdit(ClientCompanyApplicationUser? user)
-        {
-            ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", user?.CountryId);
-            ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name", user?.DistrictId);
-            ViewData["StateId"] = new SelectList(_context.State.Where(s => s.CountryId == user.CountryId), "StateId", "Name", user?.StateId);
-            ViewData["PinCodeId"] = new SelectList(_context.PinCode.Where(s => s.StateId == user.StateId), "PinCodeId", "Name", user?.PinCodeId);
-        }
+        //private void GetCountryStateEdit(ClientCompanyApplicationUser? user)
+        //{
+        //    ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", user?.CountryId);
+        //    ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name", user?.DistrictId);
+        //    ViewData["StateId"] = new SelectList(_context.State.Where(s => s.CountryId == user.CountryId), "StateId", "Name", user?.StateId);
+        //    ViewData["PinCodeId"] = new SelectList(_context.PinCode.Where(s => s.StateId == user.StateId), "PinCodeId", "Name", user?.PinCodeId);
+        //}
 
         // GET: ClientCompanyApplicationUser/Edit/5
         [Breadcrumb("Edit ")]
@@ -189,33 +195,33 @@ namespace risk.control.system.Controllers
         {
             if (userId == null || _context.ClientCompanyApplicationUser == null)
             {
-                toastNotification.AddErrorToastMessage("company not found");
+                notifyService.Error("company not found");
                 return NotFound();
             }
 
             var clientCompanyApplicationUser = await _context.ClientCompanyApplicationUser.FindAsync(userId);
             if (clientCompanyApplicationUser == null)
             {
-                toastNotification.AddErrorToastMessage("company not found");
+                notifyService.Error("company not found");
                 return NotFound();
             }
             var clientCompany = _context.ClientCompany.FirstOrDefault(v => v.ClientCompanyId == clientCompanyApplicationUser.ClientCompanyId);
 
             if (clientCompany == null)
             {
-                toastNotification.AddErrorToastMessage("company not found");
+                notifyService.Error("company not found");
                 return NotFound();
             }
             clientCompanyApplicationUser.ClientCompany = clientCompany;
-            var country = _context.Country.OrderBy(o => o.Name);
-            var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == clientCompanyApplicationUser.CountryId).OrderBy(d => d.Name);
-            var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == clientCompanyApplicationUser.StateId).OrderBy(d => d.Name);
-            var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == clientCompanyApplicationUser.DistrictId).OrderBy(d => d.Name);
+            //var country = _context.Country.OrderBy(o => o.Name);
+            //var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == clientCompanyApplicationUser.CountryId).OrderBy(d => d.Name);
+            //var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == clientCompanyApplicationUser.StateId).OrderBy(d => d.Name);
+            //var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == clientCompanyApplicationUser.DistrictId).OrderBy(d => d.Name);
 
-            ViewData["CountryId"] = new SelectList(country.OrderBy(c => c.Name), "CountryId", "Name", clientCompanyApplicationUser.CountryId);
-            ViewData["StateId"] = new SelectList(relatedStates, "StateId", "Name", clientCompanyApplicationUser.StateId);
-            ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", clientCompanyApplicationUser.DistrictId);
-            ViewData["PinCodeId"] = new SelectList(pincodes, "PinCodeId", "Code", clientCompanyApplicationUser.PinCodeId);
+            //ViewData["CountryId"] = new SelectList(country.OrderBy(c => c.Name), "CountryId", "Name", clientCompanyApplicationUser.CountryId);
+            //ViewData["StateId"] = new SelectList(relatedStates, "StateId", "Name", clientCompanyApplicationUser.StateId);
+            //ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", clientCompanyApplicationUser.DistrictId);
+            //ViewData["PinCodeId"] = new SelectList(pincodes, "PinCodeId", "Code", clientCompanyApplicationUser.PinCodeId);
 
 
             var agencysPage = new MvcBreadcrumbNode("Companies", "ClientCompany", "Admin Settings");
@@ -236,98 +242,74 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(long id, ClientCompanyApplicationUser applicationUser)
         {
-            if (id != applicationUser.Id)
+            try
             {
-                toastNotification.AddErrorToastMessage("company not found!");
-                return NotFound();
-            }
-
-            if (applicationUser is not null)
-            {
-                try
+                var user = await userManager.FindByIdAsync(id.ToString());
+                if (applicationUser?.ProfileImage != null && applicationUser.ProfileImage.Length > 0)
                 {
-                    var user = await userManager.FindByIdAsync(id.ToString());
-                    if (applicationUser?.ProfileImage != null && applicationUser.ProfileImage.Length > 0)
+                    string newFileName = user.Email + Guid.NewGuid().ToString();
+                    string fileExtension = Path.GetExtension(Path.GetFileName(applicationUser.ProfileImage.FileName));
+                    newFileName += fileExtension;
+                    string path = Path.Combine(webHostEnvironment.WebRootPath, "company");
+                    if (!Directory.Exists(path))
                     {
-                        string newFileName = user.Email + Guid.NewGuid().ToString();
-                        string fileExtension = Path.GetExtension(Path.GetFileName(applicationUser.ProfileImage.FileName));
-                        newFileName += fileExtension;
-                        string path = Path.Combine(webHostEnvironment.WebRootPath, "company");
-                        if (!Directory.Exists(path))
-                        {
-                            Directory.CreateDirectory(path);
-                        }
-                        var upload = Path.Combine(webHostEnvironment.WebRootPath, "company", newFileName);
-                        applicationUser.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
-                        using var dataStream = new MemoryStream();
-                        applicationUser.ProfileImage.CopyTo(dataStream);
-                        applicationUser.ProfilePicture = dataStream.ToArray();
-                        applicationUser.ProfilePictureUrl = "/company/" + newFileName;
+                        Directory.CreateDirectory(path);
                     }
-
-                    if (user != null)
-                    {
-                        user.ProfilePicture = applicationUser?.ProfilePicture ?? user.ProfilePicture;
-                        user.ProfilePictureUrl = applicationUser?.ProfilePictureUrl ?? user.ProfilePictureUrl;
-                        user.PhoneNumber = applicationUser?.PhoneNumber ?? user.PhoneNumber;
-                        user.FirstName = applicationUser?.FirstName;
-                        user.LastName = applicationUser?.LastName;
-                        if (!string.IsNullOrWhiteSpace(applicationUser?.Password))
-                        {
-                            user.Password = applicationUser.Password;
-                        }
-                        user.Addressline = applicationUser.Addressline;
-                        user.Active = applicationUser.Active;
-                        user.Country = applicationUser.Country;
-                        user.CountryId = applicationUser.CountryId;
-                        user.State = applicationUser.State;
-                        user.StateId = applicationUser.StateId;
-                        user.PinCode = applicationUser.PinCode;
-                        user.PinCodeId = applicationUser.PinCodeId;
-                        user.Updated = DateTime.Now;
-                        user.Comments = applicationUser.Comments;
-                        user.UserRole = applicationUser.UserRole;
-                        user.Role = (AppRoles)Enum.Parse(typeof(AppRoles), user.UserRole.ToString());
-                        user.PhoneNumber = applicationUser.PhoneNumber;
-                        user.UpdatedBy = HttpContext.User?.Identity?.Name;
-                        user.SecurityStamp = DateTime.Now.ToString();
-                        var result = await userManager.UpdateAsync(user);
-                        if (result.Succeeded)
-                        {
-                            var roles = await userManager.GetRolesAsync(user);
-                            var roleResult = await userManager.RemoveFromRolesAsync(user, roles);
-                            await userManager.AddToRoleAsync(user, user.UserRole.ToString());
-                            notifyService.Custom($"Company user edited successfully.", 3, "orange", "fas fa-user-check");
-                            await smsService.DoSendSmsAsync(user.PhoneNumber, "Company account edited. Domain : " + user.Email);
-
-                            return RedirectToAction(nameof(CompanyUserController.Index), "CompanyUser", new { id = applicationUser.ClientCompanyId });
-                        }
-                        toastNotification.AddErrorToastMessage("Error !!. The user con't be edited!");
-                        Errors(result);
-                    }
+                    var upload = Path.Combine(webHostEnvironment.WebRootPath, "company", newFileName);
+                    applicationUser.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
+                    using var dataStream = new MemoryStream();
+                    applicationUser.ProfileImage.CopyTo(dataStream);
+                    applicationUser.ProfilePicture = dataStream.ToArray();
+                    applicationUser.ProfilePictureUrl = "/company/" + newFileName;
                 }
-                catch (DbUpdateConcurrencyException)
+
+                if (user != null)
                 {
-                    if (!VendorApplicationUserExists(applicationUser.Id))
+                    user.ProfilePicture = applicationUser?.ProfilePicture ?? user.ProfilePicture;
+                    user.ProfilePictureUrl = applicationUser?.ProfilePictureUrl ?? user.ProfilePictureUrl;
+                    user.PhoneNumber = applicationUser?.PhoneNumber ?? user.PhoneNumber;
+                    user.FirstName = applicationUser?.FirstName;
+                    user.LastName = applicationUser?.LastName;
+                    if (!string.IsNullOrWhiteSpace(applicationUser?.Password))
                     {
-                        return NotFound();
+                        user.Password = applicationUser.Password;
                     }
-                    else
+                    user.Addressline = applicationUser.Addressline;
+                    user.Active = applicationUser.Active;
+
+                    user.CountryId = applicationUser.SelectedCountryId;
+                    user.StateId = applicationUser.SelectedStateId;
+                    user.DistrictId = applicationUser.SelectedDistrictId;
+                    user.PinCodeId = applicationUser.SelectedPincodeId;
+
+                    user.Updated = DateTime.Now;
+                    user.Comments = applicationUser.Comments;
+                    user.UserRole = applicationUser.UserRole;
+                    user.Role = (AppRoles)Enum.Parse(typeof(AppRoles), user.UserRole.ToString());
+                    user.PhoneNumber = applicationUser.PhoneNumber;
+                    user.UpdatedBy = HttpContext.User?.Identity?.Name;
+                    user.SecurityStamp = DateTime.Now.ToString();
+                    var result = await userManager.UpdateAsync(user);
+                    if (result.Succeeded)
                     {
-                        throw;
+                        var roles = await userManager.GetRolesAsync(user);
+                        var roleResult = await userManager.RemoveFromRolesAsync(user, roles);
+                        await userManager.AddToRoleAsync(user, user.UserRole.ToString());
+                        notifyService.Custom($"Company user edited successfully.", 3, "orange", "fas fa-user-check");
+                        await smsService.DoSendSmsAsync(user.PhoneNumber, "Company account edited. Domain : " + user.Email);
+
+                        return RedirectToAction(nameof(CompanyUserController.Index), "CompanyUser", new { id = applicationUser.ClientCompanyId });
                     }
                 }
             }
-
-            toastNotification.AddErrorToastMessage("Error to create Company user!");
-            return RedirectToAction(nameof(CompanyUserController.Index), "CompanyUser", new { id = applicationUser.ClientCompany });
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            notifyService.Error("OOPS !!!..Contact Admin");
+            return RedirectToAction(nameof(Index), "Dashboard");
         }
 
-        private void Errors(IdentityResult result)
-        {
-            foreach (IdentityError error in result.Errors)
-                ModelState.AddModelError("", error.Description);
-        }
 
         // GET: VendorApplicationUsers/Delete/5
         [Breadcrumb("Delete")]
@@ -373,11 +355,6 @@ namespace risk.control.system.Controllers
             await _context.SaveChangesAsync();
             notifyService.Error($"User deleted successfully.", 3);
             return RedirectToAction(nameof(CompanyUserController.Index), "CompanyUser", new { id = clientCompanyApplicationUser.ClientCompanyId });
-        }
-
-        private bool VendorApplicationUserExists(long id)
-        {
-            return (_context.VendorApplicationUser?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

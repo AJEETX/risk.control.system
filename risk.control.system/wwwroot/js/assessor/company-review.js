@@ -237,9 +237,9 @@ function getdetails(id) {
     setTimeout(function () {
         $(".submit-progress").removeClass("hidden");
     }, 1);
-    $('button').prop('disabled', true);
-    $('a.btn *').removeAttr('href');
+    
     $('a#details' + id + '.btn.btn-xs.btn-info').html("<i class='fas fa-sync fa-spin'></i> Detail");
+    disableAllInteractiveElements();
 
     var article = document.getElementById("article");
     if (article) {
@@ -256,12 +256,9 @@ function showedit(id) {
     setTimeout(function () {
         $(".submit-progress").removeClass("hidden");
     }, 1);
-    $('body').attr('disabled', 'disabled');
-    $('html *').css('cursor', 'not-allowed');
-    $('button').prop('disabled', true);
-    $('a.btn *').removeAttr('href');
-    $('html a *, html button *').css('pointer-events', 'none');
+    
     $('a#edit' + id + '.btn.btn-xs.btn-warning').html("<i class='fas fa-sync fa-spin'></i> Edit");
+    disableAllInteractiveElements();
 
     var article = document.getElementById("article");
     if (article) {

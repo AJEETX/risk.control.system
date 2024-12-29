@@ -129,15 +129,15 @@ namespace risk.control.system.Controllers
                     notifyService.Error("OOPs !!!..Company Not Found");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var country = _context.Country.OrderBy(o => o.Name);
-                var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == clientCompany.CountryId).OrderBy(d => d.Name);
-                var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == clientCompany.StateId).OrderBy(d => d.Name);
-                var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == clientCompany.DistrictId).OrderBy(d => d.Name);
+                //var country = _context.Country.OrderBy(o => o.Name);
+                //var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == clientCompany.CountryId).OrderBy(d => d.Name);
+                //var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == clientCompany.StateId).OrderBy(d => d.Name);
+                //var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == clientCompany.DistrictId).OrderBy(d => d.Name);
 
-                ViewData["CountryId"] = new SelectList(country.OrderBy(c => c.Name), "CountryId", "Name", clientCompany.CountryId);
-                ViewData["StateId"] = new SelectList(relatedStates, "StateId", "Name", clientCompany.StateId);
-                ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", clientCompany.DistrictId);
-                ViewData["PinCodeId"] = new SelectList(pincodes, "PinCodeId", "Code", clientCompany.PinCodeId);
+                //ViewData["CountryId"] = new SelectList(country.OrderBy(c => c.Name), "CountryId", "Name", clientCompany.CountryId);
+                //ViewData["StateId"] = new SelectList(relatedStates, "StateId", "Name", clientCompany.StateId);
+                //ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", clientCompany.DistrictId);
+                //ViewData["PinCodeId"] = new SelectList(pincodes, "PinCodeId", "Code", clientCompany.PinCodeId);
                 return View(clientCompany);
             }
             catch (Exception ex)
@@ -211,6 +211,11 @@ namespace risk.control.system.Controllers
                 existCompany.Addressline = clientCompany.Addressline;
                 existCompany.Description = clientCompany.Description;
 
+                existCompany.PinCodeId = clientCompany.SelectedPincodeId;
+                existCompany.DistrictId = clientCompany.SelectedDistrictId;
+                existCompany.StateId = clientCompany.SelectedStateId;
+                existCompany.CountryId = clientCompany.SelectedCountryId;
+
                 existCompany.Updated = DateTime.Now;
                 existCompany.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.ClientCompany.Update(existCompany);
@@ -264,7 +269,7 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var model = new ClientCompanyApplicationUser { ClientCompany = company };
-                ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
+                //ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
                 return View(model);
             }
             catch (Exception ex)
@@ -315,6 +320,12 @@ namespace risk.control.system.Controllers
                 user.EmailConfirmed = true;
                 user.UserName = userFullEmail;
                 user.Mailbox = new Mailbox { Name = userFullEmail };
+
+                user.CountryId = user.SelectedCountryId;
+                user.StateId = user.SelectedStateId;
+                user.DistrictId = user.SelectedDistrictId;
+                user.PinCodeId = user.SelectedPincodeId;
+
                 user.Updated = DateTime.Now;
                 user.UpdatedBy = HttpContext.User?.Identity?.Name;
                 user.Role = (AppRoles)Enum.Parse(typeof(AppRoles), user.UserRole.ToString());
@@ -396,15 +407,15 @@ namespace risk.control.system.Controllers
                 }
                 clientCompanyApplicationUser.ClientCompany = clientCompany;
 
-                var country = _context.Country.OrderBy(o => o.Name);
-                var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == clientCompanyApplicationUser.CountryId).OrderBy(d => d.Name);
-                var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == clientCompanyApplicationUser.StateId).OrderBy(d => d.Name);
-                var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == clientCompanyApplicationUser.DistrictId).OrderBy(d => d.Name);
+                //var country = _context.Country.OrderBy(o => o.Name);
+                //var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == clientCompanyApplicationUser.CountryId).OrderBy(d => d.Name);
+                //var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == clientCompanyApplicationUser.StateId).OrderBy(d => d.Name);
+                //var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == clientCompanyApplicationUser.DistrictId).OrderBy(d => d.Name);
 
-                ViewData["CountryId"] = new SelectList(country.OrderBy(c => c.Name), "CountryId", "Name", clientCompanyApplicationUser.CountryId);
-                ViewData["StateId"] = new SelectList(relatedStates, "StateId", "Name", clientCompanyApplicationUser.StateId);
-                ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", clientCompanyApplicationUser.DistrictId);
-                ViewData["PinCodeId"] = new SelectList(pincodes, "PinCodeId", "Code", clientCompanyApplicationUser.PinCodeId);
+                //ViewData["CountryId"] = new SelectList(country.OrderBy(c => c.Name), "CountryId", "Name", clientCompanyApplicationUser.CountryId);
+                //ViewData["StateId"] = new SelectList(relatedStates, "StateId", "Name", clientCompanyApplicationUser.StateId);
+                //ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", clientCompanyApplicationUser.DistrictId);
+                //ViewData["PinCodeId"] = new SelectList(pincodes, "PinCodeId", "Code", clientCompanyApplicationUser.PinCodeId);
 
                 return View(clientCompanyApplicationUser);
             }
@@ -469,12 +480,12 @@ namespace risk.control.system.Controllers
                     }
                     user.Active = applicationUser.Active;
                     user.Addressline = applicationUser.Addressline;
-                    user.Country = applicationUser.Country;
-                    user.CountryId = applicationUser.CountryId;
-                    user.State = applicationUser.State;
-                    user.StateId = applicationUser.StateId;
-                    user.PinCode = applicationUser.PinCode;
-                    user.PinCodeId = applicationUser.PinCodeId;
+
+                    user.CountryId = applicationUser.SelectedCountryId;
+                    user.StateId = applicationUser.SelectedStateId;
+                    user.DistrictId = applicationUser.SelectedDistrictId;
+                    user.PinCodeId = applicationUser.SelectedPincodeId;
+
                     user.Updated = DateTime.Now;
                     user.Comments = applicationUser.Comments;
                     user.PhoneNumber = applicationUser.PhoneNumber;

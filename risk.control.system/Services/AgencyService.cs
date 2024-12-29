@@ -52,6 +52,11 @@ namespace risk.control.system.Services
                     vendor.DocumentUrl = existingVendor.DocumentUrl;
                 }
             }
+            vendor.PinCodeId = vendor.SelectedPincodeId;
+            vendor.DistrictId = vendor.SelectedDistrictId;
+            vendor.StateId = vendor.SelectedStateId;
+            vendor.CountryId = vendor.SelectedCountryId;
+
             vendor.Updated = DateTime.Now;
             vendor.UpdatedBy = currentUserEmail;
             context.Vendor.Update(vendor);

@@ -6,11 +6,11 @@
         },
         columnDefs: [
             {
-                className: 'max-width-column-email', // Apply the CSS class,
+                className: 'max-width-column', // Apply the CSS class,
                 targets: 2                      // Index of the column to style
             },
         {
-            className: 'max-width-column', // Apply the CSS class,
+            className: 'max-width-column-pincodes', // Apply the CSS class,
             targets: 4                      // Index of the column to style
             },
             {
@@ -133,7 +133,13 @@ function getdetails(id) {
     setTimeout(function () {
         $(".submit-progress").removeClass("hidden");
     }, 1);
-    $('a.btn *').attr('disabled', 'disabled');
+    // Disable all buttons, submit inputs, and anchors
+    $('button, input[type="submit"], a').prop('disabled', true);
+
+    // Add a class to visually indicate disabled state for anchors
+    $('a').addClass('disabled-anchor').on('click', function (e) {
+        e.preventDefault(); // Prevent default action for anchor clicks
+    });
     $('a#details' + id + '.btn.btn-xs.btn-danger').html("<i class='fas fa-sync fa-spin'></i> Delete");
 
     var article = document.getElementById("article");
@@ -151,7 +157,13 @@ function showedit(id) {
     setTimeout(function () {
         $(".submit-progress").removeClass("hidden");
     }, 1);
-    $('a.btn').attr('disabled', 'disabled');
+    // Disable all buttons, submit inputs, and anchors
+    $('button, input[type="submit"], a').prop('disabled', true);
+
+    // Add a class to visually indicate disabled state for anchors
+    $('a').addClass('disabled-anchor').on('click', function (e) {
+        e.preventDefault(); // Prevent default action for anchor clicks
+    });
     $('a#edit' + id + '.btn.btn-xs.btn-warning').html("<i class='fas fa-sync fa-spin'></i> Edit");
 
     var article = document.getElementById("article");

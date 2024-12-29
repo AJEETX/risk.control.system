@@ -51,6 +51,14 @@ namespace risk.control.system.Models
 
         [Display(Name = "District")]
         public District? District { get; set; } = default!;
+        [NotMapped]
+        public long SelectedPincodeId { get; set; }
+        [NotMapped]
+        public long SelectedDistrictId { get; set; }
+        [NotMapped]
+        public long SelectedStateId { get; set; }
+        [NotMapped]
+        public long SelectedCountryId { get; set; }
 
         [Display(Name = "Bank Name")]
         public string BankName { get; set; } = default!;

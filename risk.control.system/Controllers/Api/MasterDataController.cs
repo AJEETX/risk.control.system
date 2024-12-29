@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
+using Microsoft.AspNetCore.Authorization; // Required for AllowAnonymous
 using risk.control.system.Data;
 using risk.control.system.Models;
 
@@ -153,6 +153,7 @@ namespace risk.control.system.Controllers.Api
         }
 
         [HttpGet("GetUserBySearch")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetUserBySearch(string search)
         {
             var applicationUsers = new List<ApplicationUser>();

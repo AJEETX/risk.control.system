@@ -1,15 +1,15 @@
 ﻿$.validator.setDefaults({
     submitHandler: function (form) {
         $.confirm({
-            title: "Confirm Edit User",
+            title: "Confirm Edit",
             content: "Are you sure to edit?",
-
             icon: 'fas fa-user-plus',
+
             type: 'orange',
             closeIcon: true,
             buttons: {
                 confirm: {
-                    text: "Edit User",
+                    text: "Edit",
                     btnClass: 'btn-warning',
                     action: function () {
                         $("body").addClass("submit-progress-bg");
@@ -18,13 +18,16 @@
                         setTimeout(function () {
                             $(".submit-progress").removeClass("hidden");
                         }, 1);
-                        $('#create-user').attr('disabled', 'disabled');
-                        $('#create-user').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Edit User");
+                        // Disable all buttons, submit inputs, and anchors
+                        $('button, input[type="submit"], a').prop('disabled', true);
 
+                        // Add a class to visually indicate disabled state for anchors
+                        $('a').addClass('disabled-anchor').on('click', function (e) {
+                            e.preventDefault(); // Prevent default action for anchor clicks
+                        });
                         form.submit();
-                        var createForm = document.getElementById("create-form");
+                        var createForm = document.getElementById("form");
                         if (createForm) {
-
                             var nodes = createForm.getElementsByTagName('*');
                             for (var i = 0; i < nodes.length; i++) {
                                 nodes[i].disabled = true;
@@ -47,7 +50,7 @@ $(document).ready(function () {
     if (currentImageElement) {
         currentImage = currentImageElement.src;
     }
-
+    $("#documentImageInput").on('change', function () {
     $("#documentImageInput").on('change', function () {
         var MaxSizeInBytes = 2097152;
         //Get count of selected files

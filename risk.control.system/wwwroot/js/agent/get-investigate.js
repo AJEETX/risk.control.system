@@ -135,17 +135,11 @@
                             setTimeout(function () {
                                 $(".submit-progress").removeClass("hidden");
                             }, 1);
-                            $('#UploadFaceImageButton').attr('disabled', 'disabled');
+
                             $('#UploadFaceImageButton').html("<i class='fas fa-sync fa-spin'></i> Uploading");
+                            disableAllInteractiveElements();
 
                             $('#upload-face').submit();
-                            $('html *').css('cursor', 'not-allowed');
-                            $('html a').css('pointer-events', 'none');
-                            $('html a').css('cursor', 'none');
-                            $('html button').attr('disabled', true);
-                            $('#back').attr('disabled', true);
-
-                            $('html a *, html button *').css('pointer-events', 'none');
 
                             var article = document.getElementById("article");
                             if (article) {
@@ -279,15 +273,12 @@
                             setTimeout(function () {
                                 $(".submit-progress").removeClass("hidden");
                             }, 1);
-                            $('#UploadPanImageButton').attr('disabled', 'disabled');
+
                             $('#UploadPanImageButton').html("<i class='fas fa-sync fa-spin'></i> Uploading");
+                            disableAllInteractiveElements();
 
                             $('#upload-pan').submit();
-                            $('#back').attr('disabled', 'disabled');
-
-                            $('html *').css('cursor', 'not-allowed');
-                            $('html a *, html button *').css('pointer-events', 'none')
-
+                            
                             var article = document.getElementById("article");
                             if (article) {
                                 var nodes = article.getElementsByTagName('*');
@@ -421,15 +412,12 @@
                             setTimeout(function () {
                                 $(".submit-progress").removeClass("hidden");
                             }, 1);
-                            $('#UploadPassportImageButton').attr('disabled', 'disabled');
+
                             $('#UploadPassportImageButton').html("<i class='fas fa-sync fa-spin'></i> Uploading");
+                            disableAllInteractiveElements();
 
                             $('#upload-passport').submit();
-                            $('#back').attr('disabled', 'disabled');
-
-                            $('html *').css('cursor', 'not-allowed');
-                            $('html a *, html button *').css('pointer-events', 'none')
-
+                            
                             var article = document.getElementById("article");
                             if (article) {
                                 var nodes = article.getElementsByTagName('*');
@@ -554,15 +542,12 @@
                             setTimeout(function () {
                                 $(".submit-progress").removeClass("hidden");
                             }, 1);
-                            $('#UploadAudioButton').attr('disabled', 'disabled');
+
                             $('#UploadAudioButton').html("<i class='fas fa-sync fa-spin'></i> Uploading");
+                            disableAllInteractiveElements();
 
                             $('#upload-audio').submit();
-                            $('#back').attr('disabled', 'disabled');
-
-                            $('html *').css('cursor', 'not-allowed');
-                            $('html a *, html button *').css('pointer-events', 'none')
-
+                           
                             var article = document.getElementById("article");
                             if (article) {
                                 var nodes = article.getElementsByTagName('*');
@@ -687,15 +672,12 @@
                             setTimeout(function () {
                                 $(".submit-progress").removeClass("hidden");
                             }, 1);
-                            $('#UploadVideoButton').attr('disabled', 'disabled');
+
                             $('#UploadVideoButton').html("<i class='fas fa-sync fa-spin'></i> Uploading");
+                            disableAllInteractiveElements();
 
                             $('#upload-video').submit();
-                            $('#back').attr('disabled', 'disabled');
-
-                            $('html *').css('cursor', 'not-allowed');
-                            $('html a *, html button *').css('pointer-events', 'none')
-
+                           
                             var article = document.getElementById("article");
                             if (article) {
                                 var nodes = article.getElementsByTagName('*');
@@ -808,13 +790,10 @@
                             setTimeout(function () {
                                 $(".submit-progress").removeClass("hidden");
                             }, 1);
-                            $('body').attr('disabled', 'disabled');
-                            $('html *').css('cursor', 'not-allowed');
-                            $('button').prop('disabled', true);
-                            $('a.btn *').removeAttr('href');
-                            $('html a *, html button *').css('pointer-events', 'none');
-                            $('#submit-case').attr('disabled', 'disabled');
+
                             $('#submit-case').html("<i class='fas fa-sync fa-spin'></i> SUBMIT");
+                            disableAllInteractiveElements();
+
                             $('#create-form').submit();
 
                             var article = document.getElementById("article");

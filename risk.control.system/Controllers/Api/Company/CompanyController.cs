@@ -16,7 +16,7 @@ namespace risk.control.system.Controllers.Api.Company
 {
     [ApiExplorerSettings(IgnoreApi = true)]
     [Route("api/[controller]")]
-    [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME}, {CREATOR.DISPLAY_NAME}")]
+    [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME},{AGENCY_ADMIN.DISPLAY_NAME}, {CREATOR.DISPLAY_NAME}")]
     [ApiController]
     public class CompanyController : ControllerBase
     {

@@ -5,13 +5,9 @@
         setTimeout(function () {
             $(".submit-progress").removeClass("hidden");
         }, 1);
-        $('#allocatedcase').attr('disabled', 'disabled');
-        $('body').attr('disabled', 'disabled');
-        $('html *').css('cursor', 'not-allowed');
-        $('button').prop('disabled', true);
-        $('a.btn *').removeAttr('href');
-        $('html a *, html button *').css('pointer-events', 'none');
+        
         $('#allocatedcase').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Allocate <sub>new</sub>");
+        disableAllInteractiveElements();
 
         $('#radioButtons').submit();
         var article = document.getElementById("article");
@@ -29,13 +25,10 @@
         setTimeout(function () {
             $(".submit-progress").removeClass("hidden");
         }, 1);
-        $('#investigatecase').attr('disabled', 'disabled');
-        $('body').attr('disabled', 'disabled');
-        $('html *').css('cursor', 'not-allowed');
-        $('button').prop('disabled', true);
-        $('a.btn *').removeAttr('href');
-        $('html a *, html button *').css('pointer-events', 'none');
+        // Disable all buttons, submit inputs, and anchors
+        
         $('#investigatecase').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Investigate");
+        disableAllInteractiveElements();
 
         $('#radioButtons').submit();
         var article = document.getElementById("article");
@@ -323,12 +316,9 @@ function showdetails(id) {
     setTimeout(function () {
         $(".submit-progress").removeClass("hidden");
     }, 1);
-    $('body').attr('disabled', 'disabled');
-    $('html *').css('cursor', 'not-allowed');
-    $('button').prop('disabled', true);
-    $('a.btn *').removeAttr('href');
-    $('html a *, html button *').css('pointer-events', 'none');
+    
     $('a#details' + id + '.btn.btn-xs.btn-danger').html("<i class='fas fa-sync fa-spin'></i> Decline");
+    disableAllInteractiveElements();
 
     var article = document.getElementById("article");
     if (article) {
@@ -347,8 +337,9 @@ function showenquiry(id) {
     setTimeout(function () {
         $(".submit-progress").removeClass("hidden");
     }, 1);
-    $('a.btn *').attr('disabled', 'disabled');
+    
     $('a#details' + id + '.btn.btn-xs.btn-warning').html("<i class='fas fa-sync fa-spin'></i> ENQUIRY");
+    disableAllInteractiveElements();
 
     var article = document.getElementById("article");
     if (article) {

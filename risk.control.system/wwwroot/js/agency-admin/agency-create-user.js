@@ -17,12 +17,15 @@
                         setTimeout(function () {
                             $(".submit-progress").removeClass("hidden");
                         }, 1);
-                        $('#create-user').attr('disabled', 'disabled');
-                        $('#create-user').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Add User");
-                        $('button#create-agency').attr('disabled', 'disabled');
-                        $('button#create-agency').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Add User");
-                        $('html a *, html button *').css('pointer-events', 'none');
+                        // Disable all buttons, submit inputs, and anchors
+                        $('button, input[type="submit"], a').prop('disabled', true);
 
+                        // Add a class to visually indicate disabled state for anchors
+                        $('a').addClass('disabled-anchor').on('click', function (e) {
+                            e.preventDefault(); // Prevent default action for anchor clicks
+                        });
+                        $('button#create-agency').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Add User");
+                        
                         form.submit();
                         var createForm = document.getElementById("create-form");
                         if (createForm) {

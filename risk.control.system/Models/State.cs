@@ -22,6 +22,9 @@ namespace risk.control.system.Models
 
         [Display(Name = "Country name")]
         public Country Country { get; set; } = default!;
+
+        [NotMapped]
+        public long SelectedCountryId { get; set; }
         public override string ToString()
         {
             return $"State Information:\n" +

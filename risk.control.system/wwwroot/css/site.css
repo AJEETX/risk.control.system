@@ -1634,10 +1634,15 @@ ul#messagesList {
     }
 
     /* Optional hover and focus styles */
-    .remarks.auto-dropdown:hover,
+    .remarks.auto-dropdown:hover{
+        border-color: #007bff; /* Highlighted border color */
+        outline: none; /* Removes focus outline */
+    }
+    .remarks.auto-dropdown:active,
     .remarks.auto-dropdown:focus {
         border-color: #007bff; /* Highlighted border color */
         outline: none; /* Removes focus outline */
+        background: white url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="gray"><path d="M7 10l5 5 5-5z"/></svg>') no-repeat right 5px center;
     }
 
 .autocomplete-wrapper {
@@ -1666,7 +1671,6 @@ ul#messagesList {
     font-family: Arial, sans-serif; /* Font styling */
     font-size: 1em; /* Font size */
     padding: 5px 0; /* Spacing */
-    background: #fff url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="gray"><path d="M7 10l5 5 5-5z"/></svg>') no-repeat right 10px center;
     background-size: 16px 16px;
     cursor: pointer;
 }
@@ -1684,4 +1688,10 @@ ul#messagesList {
             color: #15B01B; /* Text color */
         }
 
-
+.input-invalid {
+    border: 1px solid red;
+}
+.disabled-anchor {
+    pointer-events: none;
+    cursor: none;
+}

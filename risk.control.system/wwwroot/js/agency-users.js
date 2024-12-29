@@ -6,7 +6,14 @@
         setTimeout(function () {
             $(".submit-progress").removeClass("hidden");
         }, 1);
-        $('a.create-agency-user').attr('disabled', 'disabled');
+        // Disable all buttons, submit inputs, and anchors
+        $('button, input[type="submit"], a').prop('disabled', true);
+
+        // Add a class to visually indicate disabled state for anchors
+        $('a').addClass('disabled-anchor').on('click', function (e) {
+            e.preventDefault(); // Prevent default action for anchor clicks
+        });
+
         $('a.create-agency-user').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Add User");
 
         var article = document.getElementById("article");
@@ -93,7 +100,11 @@ function showedit(id) {
     setTimeout(function () {
         $(".submit-progress").removeClass("hidden");
     }, 1);
-    $('a.btn').attr('disabled', 'disabled');
+    // Disable all buttons, submit inputs, and anchors
+    $('button, input[type="submit"], a').prop('disabled', true);
+
+    // Add a class to visually indicate disabled state for anchors
+    $('a').addClass('disabled-anchor');
     $('a#edit' + id +'.btn.btn-xs.btn-warning').html("<i class='fas fa-sync fa-spin'></i> Edit");
 
     var article = document.getElementById("article");
@@ -112,7 +123,12 @@ function showroles(id) {
     setTimeout(function () {
         $(".submit-progress").removeClass("hidden");
     }, 1);
-    $('a.btn').attr('disabled', 'disabled');
+    // Disable all buttons, submit inputs, and anchors
+    $('button, input[type="submit"], a').prop('disabled', true);
+
+    // Add a class to visually indicate disabled state for anchors
+    $('a').addClass('disabled-anchor');
+
     $('a#role' + id +'.btn.btn-info').html("<i class='fas fa-sync fa-spin'></i> Role");
 
     var article = document.getElementById("article");

@@ -28,6 +28,13 @@ namespace risk.control.system.Models
 
         [Display(Name = "Country name")]
         public Country Country { get; set; } = default!;
+
+        [NotMapped]
+        public long SelectedDistrictId { get; set; }
+        [NotMapped]
+        public long SelectedStateId { get; set; }
+        [NotMapped]
+        public long SelectedCountryId { get; set; }
         public override string ToString()
         {
             return $"City Information:\n" +

@@ -2,7 +2,7 @@
     submitHandler: function (form) {
         $.confirm({
             title: "Confirm Edit User",
-            content: "Are you sure to edit ?",
+            content: "Are you sure to edit?",
 
             icon: 'fas fa-user-plus',
             type: 'orange',
@@ -18,13 +18,19 @@
                         setTimeout(function () {
                             $(".submit-progress").removeClass("hidden");
                         }, 1);
-                        $('.btn').attr('disabled', 'disabled');
-                        $('button#edituser.btn.btn-warning').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Edit User");
-                        $('html a *, html button *').css('pointer-events', 'none');
+                        // Disable all buttons, submit inputs, and anchors
+                        $('button, input[type="submit"], a').prop('disabled', true);
+
+                        // Add a class to visually indicate disabled state for anchors
+                        $('a').addClass('disabled-anchor').on('click', function (e) {
+                            e.preventDefault(); // Prevent default action for anchor clicks
+                        });
+                        $('#create-user').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Edit User");
 
                         form.submit();
                         var createForm = document.getElementById("create-form");
                         if (createForm) {
+
                             var nodes = createForm.getElementsByTagName('*');
                             for (var i = 0; i < nodes.length; i++) {
                                 nodes[i].disabled = true;
@@ -83,7 +89,6 @@ $(document).ready(function () {
                             }
                         );
                     }
-
                     else {
                         document.getElementById('profileImage').src = window.URL.createObjectURL($(this)[0].files[i]);
                     }

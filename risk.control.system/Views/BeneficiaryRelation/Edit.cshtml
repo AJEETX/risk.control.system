@@ -12,7 +12,7 @@
             <div class="submit-progress hidden">
                 <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
             </div>
-            <form id="create-form" asp-action="Edit">
+            <form id="edit-form" asp-action="Edit">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <input type="hidden" asp-for="BeneficiaryRelationId" />
                 <div class="form-group">
@@ -49,7 +49,6 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-    <script src="~/js/beneficiary-edit.js">
-
+    <script src="~/js/company-admin/beneficiary.js">
     </script>
 }

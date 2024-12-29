@@ -1,28 +1,7 @@
-﻿$(document).ready(function () {
-
-    $('.btn.btn-success').on('click', function () {
-        $("body").addClass("submit-progress-bg");
-        // Wrap in setTimeout so the UI
-        // can update the spinners
-        setTimeout(function () {
-            $(".submit-progress").removeClass("hidden");
-        }, 1);
-        $('.btn.btn-success').attr('disabled', 'disabled');
-        $('.btn.btn-success').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Add User");
-
-        var article = document.getElementById("article");
-        if (article) {
-            var nodes = article.getElementsByTagName('*');
-            for (var i = 0; i < nodes.length; i++) {
-                nodes[i].disabled = true;
-            }
-        }
-    });
-
-    var id = $('#companyId').val();
+$(document).ready(function () {
     $("#customerTable").DataTable({
         ajax: {
-            url: '/api/Company/CompanyUsers?id=' + id,
+            url: '/api/User/AllUsers',
             dataSrc: ''
         },
         fixedHeader: true,
@@ -49,7 +28,10 @@
             { "data": "email" },
             { "data": "name" },
             { "data": "phone" },
-            { "data": "addressline", bSortable:false },
+            { "data": "addressline", bSortable : false },
+            { "data": "district" },
+            { "data": "state" },
+            { "data": "country" },
             { "data": "pincode" },
             {
                 "sDefaultContent": "",
@@ -67,15 +49,13 @@
                 }
             },
             { "data": "roles" },
-            { "data": "updated" },
-            { "data": "updateBy" },
             {
                 "sDefaultContent": "",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += '<a id=edit' + row.id + ' onclick="showedit(' + row.id + ')"  href="/CompanyUser/Edit?userId=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-pen"></i> Edit</a>&nbsp;'
-                    //buttons += '<a href="/CompanyUserRoles/Index?userId=' + row.id + '"  class="btn btn-xs btn-info"><i class="fas fa-pen"></i> Roles</a>'
+                    buttons += '<a id=edit' + row.id + ' onclick="showedit(' + row.id + ')"  href="/User/Edit?userId=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-user-minus"></i> Edit</a>&nbsp;'
+                    //buttons += '<a onclick="showroles()" href="/UserRoles/Index?userId=' + row.id + '"  class="btn btn-xs btn-info"><i class="fas fa-user-plus"></i> Roles</a>'
                     return buttons;
                 }
             }
@@ -91,6 +71,31 @@
     });
 });
 
+function showroles() {
+    $("body").addClass("submit-progress-bg");
+    // Wrap in setTimeout so the UI
+    // can update the spinners
+    setTimeout(function () {
+        $(".submit-progress").removeClass("hidden");
+    }, 1);
+    // Disable all buttons, submit inputs, and anchors
+    $('button, input[type="submit"], a').prop('disabled', true);
+
+    // Add a class to visually indicate disabled state for anchors
+    $('a').addClass('disabled-anchor').on('click', function (e) {
+        e.preventDefault(); // Prevent default action for anchor clicks
+    });
+
+    $('a.btn.btn-info').html("<i class='fas fa-sync fa-spin'></i> Roles");
+
+    var article = document.getElementById("article");
+    if (article) {
+        var nodes = article.getElementsByTagName('*');
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].disabled = true;
+        }
+    }
+}
 function showedit(id) {
     $("body").addClass("submit-progress-bg");
     // Wrap in setTimeout so the UI
@@ -99,7 +104,13 @@ function showedit(id) {
         $(".submit-progress").removeClass("hidden");
     }, 1);
     var editbtn = $('a#edit' + id + '.btn.btn-xs.btn-warning')
-    $('.btn.btn-xs.btn-warning').attr('disabled', 'disabled');
+    // Disable all buttons, submit inputs, and anchors
+    $('button, input[type="submit"], a').prop('disabled', true);
+
+    // Add a class to visually indicate disabled state for anchors
+    $('a').addClass('disabled-anchor').on('click', function (e) {
+        e.preventDefault(); // Prevent default action for anchor clicks
+    });
     editbtn.html("<i class='fas fa-sync fa-spin'></i> Edit");
 
     var article = document.getElementById("article");

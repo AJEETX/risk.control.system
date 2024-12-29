@@ -197,12 +197,9 @@ function showdetails(id) {
     setTimeout(function () {
         $(".submit-progress").removeClass("hidden");
     }, 1);
-    $('body').attr('disabled', 'disabled');
-    $('html *').css('cursor', 'not-allowed');
-    $('button').prop('disabled', true);
-    $('a.btn *').removeAttr('href');
-    $('html a *, html button *').css('pointer-events', 'none');
+    
     $('a#details' + id + '.btn.btn-xs.btn-info').html("<i class='fas fa-sync fa-spin'></i> Detail");
+    disableAllInteractiveElements();
 
     var nodes = document.getElementById("article").getElementsByTagName('*');
     for (var i = 0; i < nodes.length; i++) {

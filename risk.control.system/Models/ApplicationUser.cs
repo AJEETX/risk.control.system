@@ -80,7 +80,14 @@ namespace risk.control.system.Models
         public string? AddressLatitude { get; set; }
         public string? AddressLongitude { get; set; }
         public string? AddressMapLocation { get; set; }
-
+        [NotMapped]
+        public long SelectedPincodeId { get; set; }
+        [NotMapped]
+        public long SelectedDistrictId { get; set; }
+        [NotMapped]
+        public long SelectedStateId { get; set; }
+        [NotMapped]
+        public long SelectedCountryId { get; set; }
         public override string ToString()
         {
             return $"User Information:\n" +

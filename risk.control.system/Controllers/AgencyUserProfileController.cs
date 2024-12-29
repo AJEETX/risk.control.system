@@ -31,7 +31,6 @@ namespace risk.control.system.Controllers
         private readonly INotyfService notifyService;
         private readonly RoleManager<ApplicationRole> roleManager;
         private readonly ISmsService smsService;
-        private readonly IToastNotification toastNotification;
         private readonly IWebHostEnvironment webHostEnvironment;
 
         public AgencyUserProfileController(ApplicationDbContext context,
@@ -42,7 +41,7 @@ namespace risk.control.system.Controllers
             SignInManager<ApplicationUser> signInManager,
             RoleManager<ApplicationRole> roleManager,
             ISmsService SmsService,
-            IToastNotification toastNotification, IWebHostEnvironment webHostEnvironment)
+            IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
             this.signInManager = signInManager;
@@ -52,7 +51,6 @@ namespace risk.control.system.Controllers
             this.notifyService = notifyService;
             this.roleManager = roleManager;
             smsService = SmsService;
-            this.toastNotification = toastNotification;
             this.webHostEnvironment = webHostEnvironment;
             UserList = new List<UsersViewModel>();
         }
@@ -87,7 +85,6 @@ namespace risk.control.system.Controllers
                 if (userId == null || _context.VendorApplicationUser == null)
                 {
                     notifyService.Custom($"No user not found.", 3, "red", "fas fa-user");
-                    toastNotification.AddErrorToastMessage("agency not found");
                     return NotFound();
                 }
 
@@ -162,6 +159,11 @@ namespace risk.control.system.Controllers
 
                 if (user != null)
                 {
+                    user.Addressline = applicationUser?.Addressline ?? user.Addressline;
+                    user.PinCodeId = applicationUser?.SelectedPincodeId ?? user.PinCodeId;
+                    user.StateId = applicationUser?.SelectedStateId ?? user.StateId;
+                    user.DistrictId = applicationUser?.SelectedDistrictId ?? user.DistrictId;
+                    user.CountryId = applicationUser?.SelectedCountryId ?? user.CountryId;
                     user.ProfileImage = applicationUser?.ProfileImage ?? user.ProfileImage;
                     user.ProfilePictureUrl = applicationUser?.ProfilePictureUrl ?? user.ProfilePictureUrl;
                     user.PhoneNumber = applicationUser?.PhoneNumber ?? user.PhoneNumber;
@@ -335,7 +337,7 @@ namespace risk.control.system.Controllers
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
-            toastNotification.AddErrorToastMessage("Error to create Agency user!");
+            notifyService.Error("Error to create Agency user!");
             return RedirectToAction(nameof(Index), "Dashboard");
         }
 

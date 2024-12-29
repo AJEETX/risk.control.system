@@ -6,9 +6,9 @@
         setTimeout(function () {
             $(".submit-progress").removeClass("hidden");
         }, 1);
-        $('a.create-policy').attr('disabled', 'disabled');
+       
         $('a.create-policy').html("<i class='fas fa-sync fa-spin'></i> Add New");
-
+        disableAllInteractiveElements();
         var article = document.getElementById("article");
         if (article) {
             var nodes = article.getElementsByTagName('*');
@@ -353,13 +353,10 @@
                             setTimeout(function () {
                                 $(".submit-progress").removeClass("hidden");
                             }, 1);
-                            $('#allocatedcase').attr('disabled', 'disabled');
-                            $('body').attr('disabled', 'disabled');
-                            $('html *').css('cursor', 'not-allowed');
-                            $('button').prop('disabled', true);
-                            $('a.btn *').removeAttr('href');
-                            $('html a *, html button *').css('pointer-events', 'none');
+                           
                             $('#allocatedcase').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Assign<span class='badge badge-warning'>(auto)</span>");
+
+                            disableAllInteractiveElements();
 
                             $('#checkboxes').submit();
                             var article = document.getElementById("article");
@@ -474,15 +471,12 @@
                             setTimeout(function () {
                                 $(".submit-progress").removeClass("hidden");
                             }, 1);
-                            $('#UploadFileButton').attr('disabled', 'disabled');
-                            $('#UploadFileButton').html("<i class='fas fa-sync fa-spin'></i> Uploading");
+                            
 
+                            $('#UploadFileButton').html("<i class='fas fa-sync fa-spin'></i> Uploading");
+                            disableAllInteractiveElements();
                             $('#upload-claims').submit();
-                            $('body').attr('disabled', 'disabled');
-                            $('html *').css('cursor', 'not-allowed');
-                            $('button').prop('disabled', true);
-                            $('a.btn *').removeAttr('href');
-                            $('html a *, html button *').css('pointer-events', 'none');
+                            
                             var article = document.getElementById("article");
                             if (article) {
                                 var nodes = article.getElementsByTagName('*');
@@ -513,12 +507,10 @@ function showedit(id) {
     setTimeout(function () {
         $(".submit-progress").removeClass("hidden");
     }, 1);
-    $('body').attr('disabled', 'disabled');
-    $('html *').css('cursor', 'not-allowed');
-    $('button').prop('disabled', true);
-    $('a.btn *').removeAttr('href');
-    $('html a *, html button *').css('pointer-events', 'none');
+    
     $('a#edit' + id + '.btn.btn-xs.btn-warning').html("<i class='fas fa-sync fa-spin'></i> EDIT");
+
+    disableAllInteractiveElements();
 
     var article = document.getElementById("article");
     if (article) {
@@ -535,13 +527,10 @@ function getdetails(id) {
     setTimeout(function () {
         $(".submit-progress").removeClass("hidden");
     }, 1);
-    $('body').attr('disabled', 'disabled');
-    $('html *').css('cursor', 'not-allowed');
-    $('button').prop('disabled', true);
-    $('a.btn *').removeAttr('href');
-    $('html a *, html button *').css('pointer-events', 'none');
-    $('a#details' + id + '.btn.btn-xs.btn-danger').html("<i class='fas fa-sync fa-spin'></i> Delete");
+   
 
+    $('a#details' + id + '.btn.btn-xs.btn-danger').html("<i class='fas fa-sync fa-spin'></i> Delete");
+    disableAllInteractiveElements();
     var article = document.getElementById("article");
     if (article) {
         var nodes = article.getElementsByTagName('*');
@@ -549,42 +538,4 @@ function getdetails(id) {
             nodes[i].disabled = true;
         }
     }
-}
-
-
-function Delete(userId, status) {
-    $.confirm({
-        title: 'Change Status!',
-        content: 'Do you want to Change Status!',
-        buttons: {
-            confirm: function () {
-                $.ajax({
-                    url: "/Administration/User/ChangeUserStatus",
-                    type: "POST",
-                    data: { UserId: userId, Status: status },
-                    success: function (data, textStatus, xhr) {
-                        if (data.Result == "success") {
-                            location.reload();
-                        }
-                        if (data.Result == "failed") {
-                            $.alert('Something Went Wrong');
-                        }
-                    },
-                    error: function (xhr, status, err) {
-                        if (xhr.status == 401) {
-                            alert('Error');
-                            window.location.href = "/Portal/Logout";
-                        }
-                        if (xhr.status == 500) {
-                            alert('Error');
-                            window.location.href = "/Portal/Logout";
-                        }
-                    }
-                });
-            },
-            cancel: function () {
-                $.alert('Canceled!');
-            }
-        }
-    });
 }

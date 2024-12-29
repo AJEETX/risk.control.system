@@ -185,8 +185,13 @@ function resetField(fieldSelector, hiddenFieldSelector = null) {
 function updatePlaceholdersBasedOnState() {
     $(".form-control.auto-dropdown").each(function () {
         const $field = $(this);
-        const placeholder = $field.data("placeholder") || "info";
-        $field.attr("placeholder", `Type ${placeholder}`);
+        const placeholder = $field.data("placeholder"); // Get the placeholder value
+        if (placeholder) {
+            $field.attr("placeholder", `Type ${placeholder}`);
+            console.log(`Updated placeholder for #${$field.attr("id")} to "Type ${placeholder}"`);
+        } else {
+            console.warn(`No placeholder found for #${$field.attr("id")}`);
+        }
     });
 }
 
@@ -203,15 +208,27 @@ function initializeFieldValidations() {
  * Validates a parent field and toggles its dependent fields based on validity.
  */
 function handleFieldValidation(parentFieldId, dependentFieldIds) {
-    $(parentFieldId).on("blur", function () {
-        const isValid = validateAutocompleteValue(parentFieldId);
-        if (parentFieldId === "#StateId" && isValid) {
-            // If State is valid, do not reset dependent fields (District and Pincode)
-            return;
-        }
-        toggleDependentFields(dependentFieldIds, isValid);
-    });
+    let initialValue = ""; // Store the initial value of the field on focus
+
+    $(parentFieldId)
+        .on("focus", function () {
+            initialValue = $(this).val().trim(); // Store the value when the field gains focus
+        })
+        .on("blur", function () {
+            const currentValue = $(this).val().trim();
+
+            // If the value hasn't changed, skip resetting dependent fields
+            if (currentValue === initialValue) {
+                console.log(`No change detected in ${parentFieldId}`);
+                return;
+            }
+
+            // Update dependent fields only if the value changes
+            const isValid = validateAutocompleteValue(parentFieldId);
+            toggleDependentFields(dependentFieldIds, isValid);
+        });
 }
+
 function validateAutocompleteValue(fieldSelector) {
     const $field = $(fieldSelector);
     const value = $field.val().trim();

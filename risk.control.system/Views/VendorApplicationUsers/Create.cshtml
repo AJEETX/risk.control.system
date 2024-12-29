@@ -128,62 +128,60 @@
                         </div>
                     </div>
                     <div class="col-md-6">
-
-                        <div class="form-group">
-                            <span class="input-group-label"> Country:</span>
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text" for="CountryId"><i class="fas fa-map-marked-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                </div>    <select asp-for="CountryId" class="form-control remarks" id="CountryId" asp-items="ViewBag.CountryId" onchange="loadState(this)" required>
-                                    <option value="">--- SELECT ---</option>
-                                </select>
-                                <span asp-validation-for="CountryId" class="text-danger"></span>
-
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <span class="input-group-label"> State:</span>
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text" for="StateId"><i class="fas fa-map-marker-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <span class="input-group-label" for="CountryId"> Country:</span>
+                                <div class="input-group mb-3 autocomplete-wrapper">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" for="CountryId"><i class="fas fa-map-marked-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                    </div>
+                                    <input type="text" id="CountryId" class="form-control remarks auto-dropdown" data-placeholder="country" placeholder="Type country..." asp-for="CountryId" required value="" />
+                                    <span asp-validation-for="CountryId" class="text-danger"></span>
+                                    <input asp-for="SelectedCountryId" type="hidden" id="SelectedCountryId" name="SelectedCountryId" value="@Model?.CountryId" />
                                 </div>
-                                <select id="StateId" asp-for="StateId" class="form-control remarks" asp-items="ViewBag.StateId" onchange="loadDistrict(this)" required>
-                                    <option value="">--- SELECT ---</option>
-                                </select>
-
-                                <span asp-validation-for="StateId" class="text-danger"></span>
                             </div>
-                        </div>
-
-                        <div class="form-group">
-                            <span class="input-group-label"> District:</span>
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text" for="DistrictId"><i class="fas fa-city"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                            <div class="form-group">
+                                <span class="input-group-label" for="StateId"> State:</span>
+                                <div class="input-group mb-3 autocomplete-wrapper">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" for="StateId"><i class="fas fa-map-marker-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                    </div>
+                                    <input type="text" id="StateId" class="form-control remarks auto-dropdown" data-placeholder="state" placeholder="Type state..." asp-for="StateId" required value="" />
+                                    <span asp-validation-for="StateId" class="text-danger"></span>
+                                    <input asp-for="SelectedStateId" type="hidden" id="SelectedStateId" name="SelectedStateId" value="@Model?.StateId" />
                                 </div>
-
-                                <select id="DistrictId" asp-for="DistrictId" class="form-control remarks" asp-items="ViewBag.DistrictId" onchange="loadPinCode(this)" required>
-                                    <option value="">--- SELECT ---</option>
-                                </select>
-
-                                <span asp-validation-for="DistrictId" class="text-danger"></span>
                             </div>
-                        </div>
-
-                        <div class="form-group">
-                            <span class="input-group-label"> Pincode:</span>
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text" for="PinCodeId"><i class="fas fa-map-pin"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                            <div class="form-group">
+                                <span class="input-group-label" for="DistrictId">District:</span>
+                                <div class="input-group mb-3 autocomplete-wrapper">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" for="DistrictId">
+                                            <i class="fas fa-city"></i>
+                                            <i class="fa fa-asterisk asterik-style"></i>
+                                        </span>
+                                    </div>
+                                    <input type="text" id="DistrictId" class="form-control remarks auto-dropdown" data-placeholder="district" placeholder="Type district..." asp-for="DistrictId" required value="" />
+                                    <span asp-validation-for="DistrictId" class="text-danger"></span>
+                                    <input asp-for="SelectedDistrictId" type="hidden" id="SelectedDistrictId" name="SelectedDistrictId" value="@Model?.DistrictId" />
                                 </div>
-                                <select id="PinCodeId" asp-for="PinCodeId" class="form-control remarks" asp-items="ViewBag.PinCodeId" required>
-                                    <option value="">--- SELECT ---</option>
-                                </select>
-                                <span asp-validation-for="PinCodeId" class="text-danger"></span>
-
                             </div>
-                        </div>
+                            <div class="form-group">
+                                <span class="input-group-label" for="PinCodeId">Pincode:</span>
+                                <div class="input-group mb-3 autocomplete-wrapper">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" for="PinCodeId">
+                                            <i class="fas fa-map-pin"></i>
+                                            <i class="fa fa-asterisk asterik-style"></i>
+                                        </span>
+                                    </div>
+                                    <input type="text" id="PinCodeId" class="form-control remarks auto-dropdown" data-placeholder="pincode" placeholder="Type pincode..." asp-for="PinCodeId" required value="" />
+                                    <span asp-validation-for="PinCodeId" class="text-danger"></span>
+                                    <input asp-for="SelectedPincodeId" type="hidden" id="SelectedPincodeId" name="SelectedPincodeId" value="@Model?.PinCodeId" />
+                                    <div id="pincode-loading" style="display: none;">
+                                        <i class="fas fa-spinner fa-spin"></i> Loading...
+                                    </div>
+                                </div>
+                            </div>
                         <div class="form-group">
                             <span class="input-group-label"> Address:</span>
                             <div class="input-group mb-3">
@@ -232,7 +230,6 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-    <script src="~/js/create-vendor.js">
-
-    </script>
+    <script src="~/js/create-vendor.js"></script>
+    <script src="~/js/company-admin/pincode.js"></script>
 }

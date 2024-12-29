@@ -18,7 +18,7 @@
     <link rel="stylesheet" href="~/css/login.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Security-Policy" content="default-src 'none';connect-src 'self' wss:; script-src 'self';  style-src 'self' https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://fonts.googleapis.com; img-src 'self' https://hostedscan.com; frame-src 'self';form-action 'self';upgrade-insecure-requests;" />
-    
+
 </head>
 <body>
     <div class="submit-progress hidden">
@@ -30,14 +30,14 @@
             <div class="front">
                 <img src="~/images/icheckify-cover.gif" alt="icheckify">
                 @* <div class="text">
-                    <span class="text-2">Simple verification process</span>
+                <span class="text-2">Simple verification process</span>
                 </div> *@
             </div>
             <div class="back">
                 <img class="backImg" src="~/images/front-image.gif" alt="verify">
                 @* <div class="text">
-                    <span class="text-1">Complete miles of journey <br> with one step</span>
-                    <span class="text-2">Let's get started</span>
+                <span class="text-1">Complete miles of journey <br> with one step</span>
+                <span class="text-2">Let's get started</span>
                 </div> *@
             </div>
         </div>
@@ -47,12 +47,12 @@
             <div class="form-content">
                 <div class="login-form">
                     <img class="login-logo" src="/img/iCheckifyLogo.png" />™️
-                    
+
                     <div id="title" class="title">Login</div>
                     @Html.AntiForgeryToken()
-                    <form id="login-form" asp-controller="Account"  method="post">
+                    <form id="login-form" asp-controller="Account" method="post">
                         <input type="hidden" id="latlong" name="latlong" value="-37.1234,1401234" />
-                        @if(Model.ShowUserOnLogin)
+                        @if (Model.ShowUserOnLogin)
                         {
                             <input type="hidden" id="show-users" name="show-users" value="true" />
                         }
@@ -62,26 +62,35 @@
                             <input type="hidden" id="show-users" name="show-users" value="false" />
                         }
                         <div class="input-boxes">
-                            <div class="input-box">
-                                <i class="fas fa-envelope left-padd"></i>
-                                @if(Model.ShowUserOnLogin)
-                                {
+
+
+                            @if (Model.ShowUserOnLogin)
+                            {
+                                <div class="input-box">
+                                    <i class="fas fa-envelope left-padd"></i>
                                     <select required id="email" asp-for="Email" title="Email" class="form-control remarks" asp-items="ViewBag.Users">
                                         <option value=""> --- select user email --- </option>
                                     </select>
                                     <span asp-validation-for="Email" class="text-danger"></span>
-                                }
-                                else
-                                {
-                                    <input asp-for=Email id="email" type="email" title="Email" class="form-control remarks" placeholder="Enter your email" title="Enter your email" value="@Applicationsettings.INSURER_CREATOR" autocomplete="off" required />
+                                </div>
+                                <div class="input-box">
+                                    <i class="fas fa-lock left-padd"></i>
+                                    <input asp-for=Password id="password" type="password" title="password" class="form-control remarks" placeholder="Enter your password" title="Enter your password" value="@Applicationsettings.TestPassword" autocomplete="off" required />
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="input-box autocomplete-wrapper">
+                                    <i class="fas fa-envelope left-padd"></i>
+                                    <input asp-for=Email id="email" type="email" title="Email" class="form-control remarks" placeholder="Enter your email" title="Enter your email" autocomplete="off" required />
                                     <span asp-validation-for="Email" class="text-danger"></span>
-                                }
-                            </div>
-                            <div class="input-box">
-                                <i class="fas fa-lock left-padd"></i>
-                                <input asp-for=Password id="password" type="password" title="password" class="form-control remarks" placeholder="Enter your password" title="Enter your password" value="@Applicationsettings.TestPassword" autocomplete="off" required />
-                            </div>
-                            
+                                </div>
+                                <div class="input-box">
+                                    <i class="fas fa-lock left-padd"></i>
+                                    <input asp-for=Password id="password" type="password" title="password" class="form-control remarks" placeholder="Enter your password" title="Enter your password" autocomplete="off" required />
+                                </div>
+                            }
+
                             <p class="account">By clicking login, you agree to our <a href="#">Terms & Conditions!</a></p>
                             <div class="button input-box">
                                 <button data-testid="logintest" id="login" type="submit" value="Login" class="btn btn-secondary btn-block"><span class="fa fa-key" aria-hidden="true"></span> Login</button>
@@ -94,7 +103,7 @@
                         @if (Model?.Error != null)
                         {
                             <p class="account">
-                                <a  class="error"> @Model?.Error</a>
+                                <a class="error"> @Model?.Error</a>
                             </p>
                         }
                     </div>
@@ -124,7 +133,7 @@
                             <div class="input-box">
                                 <i class="fa fa-mobile left-padd" aria-hidden="true"></i>
                                 <input asp-for="Mobile" id="mobile" name="mobile" class="form-control remarks" maxlength="14" type="text" placeholder="Phone (61432854196)" autocomplete="number"
-                                        required>
+                                       required>
                                 <span asp-validation-for="Mobile" class="text-danger"></span>
                             </div>
                             <p class="account">By clicking Reset, you agree to our <a href="#">Terms & Conditions!</a></p>
@@ -140,7 +149,7 @@
                         @if (Model?.Error != null)
                         {
                             <p class="account">
-                                <a  class="error"> @Model?.Error</a>
+                                <a class="error"> @Model?.Error</a>
                             </p>
                         }
                     </div>

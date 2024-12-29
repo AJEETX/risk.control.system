@@ -23,8 +23,9 @@ $(document).ready(function () {
                             setTimeout(function () {
                                 $(".submit-progress").removeClass("hidden");
                             }, 1);
-                            $('#assign-list').attr('disabled', 'disabled');
+                            
                             $('#assign-list').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Assign<span class='badge badge-light'>(auto)</span>");
+                            disableAllInteractiveElements();
 
                             $('#create-form').submit();
                             var article = document.getElementById("article");
@@ -52,8 +53,9 @@ $(document).ready(function () {
         setTimeout(function () {
             $(".submit-progress").removeClass("hidden");
         }, 1);
-        $('#edit-policy').attr('disabled', 'disabled');
+        
         $('#edit-policy').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Edit  Policy");
+        disableAllInteractiveElements();
 
         var article = document.getElementById("article");
         if (article) {
@@ -71,8 +73,9 @@ $(document).ready(function () {
         setTimeout(function () {
             $(".submit-progress").removeClass("hidden");
         }, 1);
-        $('#add-customer').attr('disabled', 'disabled');
+        
         $('#add-customer').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Add Customer");
+        disableAllInteractiveElements();
 
         var article = document.getElementById("article");
         if (article) {
@@ -90,8 +93,9 @@ $(document).ready(function () {
         setTimeout(function () {
             $(".submit-progress").removeClass("hidden");
         }, 1);
-        $('#edit-customer').attr('disabled', 'disabled');
+        
         $('#edit-customer').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Edit Customer");
+        disableAllInteractiveElements();
 
         var article = document.getElementById("article");
         if (article) {
@@ -109,8 +113,9 @@ $(document).ready(function () {
         setTimeout(function () {
             $(".submit-progress").removeClass("hidden");
         }, 1);
-        $('#add-beneficiary').attr('disabled', 'disabled');
+        
         $('#add-beneficiary').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Add Beneficiary");
+        disableAllInteractiveElements();
 
         var article = document.getElementById("article");
         if (article) {
@@ -128,8 +133,9 @@ $(document).ready(function () {
         setTimeout(function () {
             $(".submit-progress").removeClass("hidden");
         }, 1);
-        $('#edit-beneficiary').attr('disabled', 'disabled');
+        
         $('#edit-beneficiary').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Edit Beneficiary");
+        disableAllInteractiveElements();
 
         var article = document.getElementById("article");
         if (article) {
@@ -147,8 +153,9 @@ $(document).ready(function () {
         setTimeout(function () {
             $(".submit-progress").removeClass("hidden");
         }, 1);
-        $('#assign-manual-list').attr('disabled', 'disabled');
+        
         $('#assign-manual-list').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Assign<b> <sub>manual</sub></b>");
+        disableAllInteractiveElements();
 
         var article = document.getElementById("article");
         if (article) {
@@ -223,8 +230,9 @@ $(document).ready(function () {
                             setTimeout(function () {
                                 $(".submit-progress").removeClass("hidden");
                             }, 1);
-                            $('#submit-case').attr('disabled', 'disabled');
+                            
                             $('#submit-case').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Withdraw");
+                            disableAllInteractiveElements();
 
                             $('#withdraw-form').submit();
                             var article = document.getElementById("article");

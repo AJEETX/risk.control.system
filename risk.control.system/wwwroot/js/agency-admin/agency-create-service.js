@@ -19,8 +19,12 @@ $.validator.setDefaults({
                         setTimeout(function () {
                             $(".submit-progress").removeClass("hidden");
                         }, 1);
-                        $('html a *, html button *').css('pointer-events', 'none');
-                        $('#create-pincode').attr('disabled', 'disabled');
+                        // Disable all buttons, submit inputs, and anchors
+                        $('button, input[type="submit"], a').prop('disabled', true);
+
+                        // Add a class to visually indicate disabled state for anchors
+                        $('a').addClass('disabled-anchor');
+
                         $('#create-pincode').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Add Service");
 
                         form.submit();

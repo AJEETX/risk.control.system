@@ -6,8 +6,21 @@
         setTimeout(function () {
             $(".submit-progress").removeClass("hidden");
         }, 1);
-        $('a.create-policy').attr('disabled', 'disabled');
+
         $('a.create-policy').html("<i class='fas fa-sync fa-spin'></i> Add New");
+
+        // Disable all buttons, submit inputs, and anchors
+        $('button, input[type="submit"], a').prop('disabled', true);
+
+        // Add a class to visually indicate disabled state for anchors
+        $('a').addClass('disabled-anchor').on('click', function (e) {
+            e.preventDefault(); // Prevent default action for anchor clicks
+        });
+        $('a').attr('disabled', 'disabled');
+        $('button').attr('disabled', 'disabled');
+        $('html button').css('pointer-events', 'none');
+        $('html a').css({ 'pointer-events': 'none' }, { 'cursor': 'none' });
+        $('.text').css({ 'pointer-events': 'none' }, { 'cursor': 'none' });
 
         var article = document.getElementById("article");
         if (article) {
@@ -296,13 +309,9 @@
         setTimeout(function () {
             $(".submit-progress").removeClass("hidden");
         }, 1);
-        $('#allocatedcase').attr('disabled', 'disabled');
-        $('body').attr('disabled', 'disabled');
-        $('html *').css('cursor', 'not-allowed');
-        $('button').prop('disabled', true);
-        $('a.btn *').removeAttr('href');
-        $('html a *, html button *').css('pointer-events', 'none');
+        
         $('#allocatedcase').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Assign <b> <sub>manual</sub></b>");
+        disableAllInteractiveElements();
 
         $('#radioButtons').submit();
         var article = document.getElementById("article");
@@ -408,14 +417,12 @@
                             setTimeout(function () {
                                 $(".submit-progress").removeClass("hidden");
                             }, 1);
-                            $('#UploadFileButton').attr('disabled', 'disabled');
+                            
                             $('#UploadFileButton').html("<i class='fas fa-sync fa-spin'></i> Uploading");
+                            disableAllInteractiveElements();
 
                             $('#upload-claims').submit();
-                            $('#back').attr('disabled', 'disabled');
-
-                            $('html *').css('cursor', 'not-allowed');
-                            $('html a *, html button *').css('pointer-events', 'none')
+                            
 
                             var article = document.getElementById("article");
                             if (article) {
@@ -446,12 +453,9 @@ function showedit(id) {
     setTimeout(function () {
         $(".submit-progress").removeClass("hidden");
     }, 1);
-    $('body').attr('disabled', 'disabled');
-    $('html *').css('cursor', 'not-allowed');
-    $('button').prop('disabled', true);
-    $('a.btn *').removeAttr('href');
-    $('html a *, html button *').css('pointer-events', 'none');
+    
     $('a#edit' + id + '.btn.btn-xs.btn-warning').html("<i class='fas fa-sync fa-spin'></i> Edit");
+    disableAllInteractiveElements();
 
     var article = document.getElementById("article");
     if (article) {
@@ -468,12 +472,9 @@ function getdetails(id) {
     setTimeout(function () {
         $(".submit-progress").removeClass("hidden");
     }, 1);
-    $('body').attr('disabled', 'disabled');
-    $('html *').css('cursor', 'not-allowed');
-    $('button').prop('disabled', true);
-    $('a.btn *').removeAttr('href');
-    $('html a *, html button *').css('pointer-events', 'none');
+    
     $('a#details' + id + '.btn.btn-xs.btn-danger').html("<i class='fas fa-sync fa-spin'></i> Delete");
+    disableAllInteractiveElements();
 
     var article = document.getElementById("article");
     if (article) {

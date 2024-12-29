@@ -302,14 +302,12 @@
                             setTimeout(function () {
                                 $(".submit-progress").removeClass("hidden");
                             }, 1);
-                            $('body').attr('disabled', 'disabled');
-                            $('html *').css('cursor', 'not-allowed');
-                            $('button').prop('disabled', true);
-                            $('a.btn *').removeAttr('href');
-                            $('html a *, html button *').css('pointer-events', 'none');
-                            $('#allocatedcase').attr('disabled', 'disabled');
+                            
                             $('#allocatedcase').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Assign <sub>manual</sub>");
-                            $('#radioButtons').submit(); var article = document.getElementById("article");
+                            disableAllInteractiveElements();
+
+                            $('#radioButtons').submit();
+                            var article = document.getElementById("article");
                             if (article) {
                                 var nodes = article.getElementsByTagName('*');
                                 for (var i = 0; i < nodes.length; i++) {
@@ -338,8 +336,10 @@ function showVendor(id) {
         $(".submit-progress").removeClass("hidden");
     }, 1);
     var editbtn = $('a#' + id + '.btn.btn-xs.btn-info')
-    $('.btn.btn-xs.btn-info').attr('disabled', 'disabled');
+    
     editbtn.html("<i class='fas fa-sync fa-spin'></i> Details");
+    disableAllInteractiveElements();
+
     var article = document.getElementById("article");
     if (article) {
         var nodes = article.getElementsByTagName('*');

@@ -148,7 +148,7 @@ namespace risk.control.system.Controllers
         [Breadcrumb("Add New", FromAction = "Profile")]
         public IActionResult Create()
         {
-            ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
+            //ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
             return View();
         }
 
@@ -163,6 +163,8 @@ namespace risk.control.system.Controllers
             {
                 district.Updated = DateTime.Now;
                 district.UpdatedBy = HttpContext.User?.Identity?.Name;
+                district.CountryId = district.SelectedCountryId;
+                district.StateId = district.SelectedStateId;
                 _context.Add(district);
                 await _context.SaveChangesAsync();
                 toastNotification.AddSuccessToastMessage("district created successfully!");
@@ -212,6 +214,8 @@ namespace risk.control.system.Controllers
                 {
                     district.Updated = DateTime.Now;
                     district.UpdatedBy = HttpContext.User?.Identity?.Name;
+                    district.CountryId = district.SelectedCountryId;
+                    district.StateId = district.SelectedStateId;
                     _context.Update(district);
                     await _context.SaveChangesAsync();
                 }
@@ -237,7 +241,7 @@ namespace risk.control.system.Controllers
         [Breadcrumb("Delete", FromAction = "Profile")]
         public async Task<IActionResult> Delete(long id)
         {
-            if (id == null || _context.District == null)
+            if (id < 1)
             {
                 toastNotification.AddErrorToastMessage("district not found!");
                 return NotFound();

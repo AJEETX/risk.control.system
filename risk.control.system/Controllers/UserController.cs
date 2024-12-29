@@ -88,6 +88,12 @@ namespace risk.control.system.Controllers
             user.Mailbox = new Mailbox { Name = user.Email };
             user.Updated = DateTime.Now;
             user.UpdatedBy = HttpContext.User?.Identity?.Name;
+
+            user.PinCodeId = user.SelectedPincodeId;
+            user.StateId = user.SelectedStateId;
+            user.DistrictId = user.SelectedDistrictId;
+            user.CountryId = user.SelectedCountryId;
+
             IdentityResult result = await userManager.CreateAsync(user, user.Password);
 
             if (result.Succeeded)
@@ -103,21 +109,8 @@ namespace risk.control.system.Controllers
                 foreach (IdentityError error in result.Errors)
                     ModelState.AddModelError("", error.Description);
             }
-            GetCountryStateEdit(user);
+            //GetCountryStateEdit(user);
             return View(user);
-        }
-
-        private void GetCountryStateEdit(ApplicationUser? applicationUser)
-        {
-            var country = context.Country.OrderBy(o => o.Name);
-            var relatedStates = context.State.Include(s => s.Country).Where(s => s.Country.CountryId == applicationUser.CountryId).OrderBy(d => d.Name);
-            var districts = context.District.Include(d => d.State).Where(d => d.State.StateId == applicationUser.StateId).OrderBy(d => d.Name);
-            var pincodes = context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == applicationUser.DistrictId).OrderBy(d => d.Name);
-
-            ViewData["CountryId"] = new SelectList(country, "CountryId", "Name", applicationUser.CountryId);
-            ViewData["StateId"] = new SelectList(relatedStates, "StateId", "Name", applicationUser.StateId);
-            ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", applicationUser.DistrictId);
-            ViewData["PinCodeId"] = new SelectList(pincodes, "PinCodeId", "Code", applicationUser.PinCodeId);
         }
 
         [Breadcrumb(" Edit")]
@@ -130,7 +123,7 @@ namespace risk.control.system.Controllers
 
             var applicationUser = await userManager.FindByIdAsync(userId);
 
-            GetCountryStateEdit(applicationUser);
+            //GetCountryStateEdit(applicationUser);
 
             if (applicationUser != null)
                 return View(applicationUser);
@@ -204,11 +197,12 @@ namespace risk.control.system.Controllers
                         user.Country = applicationUser.Country;
                         user.Active = applicationUser.Active;
                         user.Addressline = applicationUser.Addressline;
-                        user.CountryId = applicationUser.CountryId;
-                        user.State = applicationUser.State;
-                        user.StateId = applicationUser.StateId;
-                        user.PinCode = applicationUser.PinCode;
-                        user.PinCodeId = applicationUser.PinCodeId;
+                        
+                        user.CountryId = applicationUser.SelectedCountryId;
+                        user.StateId = applicationUser.SelectedStateId;
+                        user.DistrictId = applicationUser.SelectedDistrictId;
+                        user.PinCodeId = applicationUser.SelectedPincodeId;
+                        
                         user.Updated = DateTime.Now;
                         user.PhoneNumber = applicationUser.PhoneNumber;
                         user.UpdatedBy = HttpContext.User?.Identity?.Name;
