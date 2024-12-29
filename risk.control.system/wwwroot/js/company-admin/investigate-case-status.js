@@ -6,7 +6,7 @@ $(document).ready(function () {
             $.confirm({
                 title: "Confirm  Add New",
                 icon: 'fas fa-tools',
-    
+
                 content: "Are you sure to add?",
                 type: 'green',
                 closeIcon: true,
@@ -17,6 +17,35 @@ $(document).ready(function () {
                         action: function () {
                             askConfirmation = false;
                             $('#create-form').submit();
+                        }
+                    },
+                    cancel: {
+                        text: "Cancel",
+                        btnClass: 'btn-default'
+                    }
+                }
+            });
+        }
+    });
+
+    var askEditConfirmation = true;
+    $('#edit-form').submit(function (e) {
+        if (askEditConfirmation) {
+            e.preventDefault();
+            $.confirm({
+                title: "Confirm Edit",
+                content: "Are you sure to edit?",
+                icon: 'fas fa-tools',
+
+                type: 'orange',
+                closeIcon: true,
+                buttons: {
+                    confirm: {
+                        text: "Edit ",
+                        btnClass: 'btn-warning',
+                        action: function () {
+                            askEditConfirmation = false;
+                            $('#edit-form').submit();
                         }
                     },
                     cancel: {

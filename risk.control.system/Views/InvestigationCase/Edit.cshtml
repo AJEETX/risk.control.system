@@ -6,7 +6,7 @@
 }
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Edit" asp-antiforgery="true" enctype="multipart/form-data">
+        <form id="edit-form" asp-action="Edit" asp-antiforgery="true" enctype="multipart/form-data">
             <div class="card-body">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <input type="hidden" asp-for="InvestigationId" />
@@ -53,7 +53,7 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-    <script src="~/js/investigate-case-edit.js">
+    <script src="~/js/company-admin/investigate-case.js">
       
     </script>
 }

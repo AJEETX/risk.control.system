@@ -10,7 +10,7 @@
             <h3 class="card-title"><i class="fas fa-business-time"></i> Edit </h3>
         </div>
         <div class="card-body">
-            <form id="create-form" asp-action="Create">
+            <form id="edit-form" asp-action="Create">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <input type="hidden" asp-for="LineOfBusinessId" />
                 <div class="form-group">
@@ -54,7 +54,7 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-    <script src="~/js/lob-edit.js">
+    <script src="~/js/company-admin/lob.js">
         
     </script>
 }

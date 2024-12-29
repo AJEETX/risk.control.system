@@ -45,15 +45,21 @@ $.validator.setDefaults({
 });
 
 function focusLogin() {
-    const showUsers = document.getElementById("show-users").value;
-    if (showUsers == 'true') {
-        const login = document.getElementById("email");
+
+    const login = document.getElementById("email");
+    if (login) {
         login.focus();
     }
-    else {
-        const pwd = document.getElementById("password");
-        pwd.select();
-    }
+
+    //const showUsers = document.getElementById("show-users").value;
+    //if (showUsers == 'false') {
+    //    const login = document.getElementById("email");
+    //    login.focus();
+    //}
+    //else {
+    //    const pwd = document.getElementById("password");
+    //    pwd.select();
+    //}
 
 }
 
@@ -132,7 +138,7 @@ $(document).ready(function () {
                 }
             });
         },
-        minLength: 1, // Start showing suggestions after 1 character
+        minLength: 0, // Start showing suggestions after 1 character
         select: function (event, ui) {
             // Set the selected value to the input field
             $("#email").val(ui.item.value);
@@ -143,6 +149,17 @@ $(document).ready(function () {
                 return `${amount} result${amount > 1 ? "s" : ""} found`;
             }
         }
+    });
+    $("#email").on("focus", function () {
+        console.log("Focus triggered");
+        const emailValue = $(this).val();
+        if (!emailValue && emailValue.trim()) {
+            $(this).autocomplete("search", ""); // Trigger autocomplete with an empty search term
+        }
+    });
+
+    $('input').on('focus', function () {
+        $(this).select();
     });
 });
 

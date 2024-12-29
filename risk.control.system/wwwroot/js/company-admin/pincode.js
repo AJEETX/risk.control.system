@@ -75,6 +75,7 @@ function loadPincodeData(countryId, stateId, districtId) {
 function fetchAndSetFieldValue(url, data, inputSelector, responseKey, callback) {
     const $inputWrapper = $(inputSelector).closest('.input-group');  // Get the input container
     const $spinner = $inputWrapper.find('.loading-spinner');         // Find the spinner inside the input container
+    const $inputField = $(inputSelector); // Target the input field itself
 
     if ($spinner.length) {
         $spinner.addClass('active'); // Show spinner
@@ -86,7 +87,9 @@ function fetchAndSetFieldValue(url, data, inputSelector, responseKey, callback) 
         data,
         success: function (response) {
             if (response && response[responseKey]) {
-                $(inputSelector).val(response[responseKey]);
+                $inputField.val(response[responseKey]);
+                // Fade in the input field
+                $inputField.hide().fadeIn(1000); // Adjust duration as needed
                 if (callback) callback();
             }
         },
@@ -191,6 +194,13 @@ function setAutocomplete(fieldSelector, url, extraDataCallback, onSelectCallback
                 onSelectCallback(ui);
             }
             return false;
+        }
+    });
+    // Trigger autocomplete on focus if the input field is empty
+    $(fieldSelector).on("focus", function () {
+        const value = $(this).val().trim();
+        if (!value) {
+            $(this).autocomplete("search", ""); // Trigger autocomplete with an empty search term
         }
     });
 }

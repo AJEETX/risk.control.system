@@ -154,16 +154,20 @@ namespace risk.control.system.Controllers.Api
 
         [HttpGet("GetUserBySearch")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetUserBySearch(string search)
+        public async Task<IActionResult> GetUserBySearch(string search ="")
         {
             var applicationUsers = new List<ApplicationUser>();
+            if(string.IsNullOrWhiteSpace(search))
+            {
+                return Ok(context.ApplicationUser?.OrderBy(o=>o.Email).Take(10).Select(a => a.Email).OrderBy(s => s).ToList());
+            }
             if (!string.IsNullOrEmpty(search))
             {
                 applicationUsers = await context.ApplicationUser.Where(s =>
                    (!string.IsNullOrEmpty(search) && s.Email.ToLower().StartsWith(search.Trim().ToLower()))
                 ).ToListAsync();
             }
-            return Ok(applicationUsers?.Select(a => a.Email).OrderBy(s => s).ToList());
+            return Ok(applicationUsers?.OrderBy(o => o.Email).Take(10).Select(a => a.Email).OrderBy(s => s).ToList());
         }
         [HttpGet("GetIpAddress")]
         public async Task<IActionResult> GetIpAddress()
