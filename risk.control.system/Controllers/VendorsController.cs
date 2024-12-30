@@ -27,6 +27,7 @@ namespace risk.control.system.Controllers
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME},{CREATOR.DISPLAY_NAME}")]
     public class VendorsController : Controller
     {
+        private const string vendorMapSize = "800x800";
         private readonly ApplicationDbContext _context;
         private readonly UserManager<VendorApplicationUser> userManager;
         private readonly RoleManager<ApplicationRole> roleManager;
@@ -200,6 +201,11 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateUser(VendorApplicationUser user, string emailSuffix)
         {
+            if (user is null || user.SelectedCountryId < 1 || user.SelectedStateId < 1 || user.SelectedDistrictId < 1 || user.SelectedPincodeId < 1)
+            {
+                notifyService.Custom($"OOPs !!!..Invalid Data.", 3, "red", "fas fa-building");
+                return RedirectToAction(nameof(CreateUser), "Vendors", new { userid = user.Id });
+            }
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
@@ -394,6 +400,11 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditUser(string id, VendorApplicationUser applicationUser)
         {
+            if (applicationUser is null || applicationUser.SelectedCountryId < 1 || applicationUser.SelectedStateId < 1 || applicationUser.SelectedDistrictId < 1 || applicationUser.SelectedPincodeId < 1)
+            {
+                notifyService.Custom($"OOPs !!!..Invalid Data.", 3, "red", "fas fa-building");
+                return RedirectToAction(nameof(EditUser), "Vendors", new { userid = id });
+            }
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
@@ -761,6 +772,11 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Vendor vendor, string domainAddress, string mailAddress)
         {
+            if(vendor is null || vendor.SelectedCountryId < 1 || vendor.SelectedStateId < 1 || vendor.SelectedDistrictId < 1 || vendor.SelectedPincodeId < 1)
+            {
+                notifyService.Custom($"OOPs !!!..Invalid Data.", 3, "red", "fas fa-building");
+                return RedirectToAction(nameof(Create), "Vendors");
+            }
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
@@ -807,6 +823,16 @@ namespace risk.control.system.Controllers
                 vendor.DistrictId = vendor.SelectedDistrictId;
                 vendor.StateId = vendor.SelectedStateId;
                 vendor.CountryId = vendor.SelectedCountryId;
+
+                var pinCode = _context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).FirstOrDefault(s => s.PinCodeId == vendor.SelectedPincodeId);
+
+                var companyAddress = vendor.Addressline + ", " + pinCode.District.Name + ", " + pinCode.State.Name + ", " + pinCode.Country.Code;
+                var companyCoordinates = await customApiCLient.GetCoordinatesFromAddressAsync(companyAddress);
+                var companyLatLong = companyCoordinates.Latitude + "," + companyCoordinates.Longitude;
+                var url = $"https://maps.googleapis.com/maps/api/staticmap?center={companyLatLong}&zoom=14&size={vendorMapSize}&maptype=roadmap&markers=color:red%7Clabel:S%7C{companyLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+                vendor.AddressLatitude = companyCoordinates.Latitude;
+                vendor.AddressLongitude = companyCoordinates.Longitude;
+                vendor.AddressMapLocation = url;
 
                 _context.Add(vendor);
                 await _context.SaveChangesAsync();
@@ -881,10 +907,10 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(long vendorId, Vendor vendor)
         {
-            if (vendorId != vendor.VendorId || vendor is null)
+            if (vendor is null || vendorId != vendor.VendorId || vendor.SelectedCountryId < 1 || vendor.SelectedStateId < 1 || vendor.SelectedDistrictId < 1 || vendor.SelectedPincodeId < 1)
             {
-                notifyService.Error("OOPS !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                notifyService.Custom($"OOPs !!!..Invalid Data.", 3, "red", "fas fa-building");
+                return RedirectToAction(nameof(Edit), "Vendors", new { id = vendorId});
             }
 
             try
@@ -930,6 +956,15 @@ namespace risk.control.system.Controllers
                 vendor.DistrictId = vendor.SelectedDistrictId;
                 vendor.StateId = vendor.SelectedStateId;
                 vendor.CountryId = vendor.SelectedCountryId;
+                var pinCode = _context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).FirstOrDefault(s => s.PinCodeId == vendor.SelectedPincodeId);
+
+                var companyAddress = vendor.Addressline + ", " + pinCode.District.Name + ", " + pinCode.State.Name + ", " + pinCode.Country.Code;
+                var companyCoordinates = await customApiCLient.GetCoordinatesFromAddressAsync(companyAddress);
+                var companyLatLong = companyCoordinates.Latitude + "," + companyCoordinates.Longitude;
+                var url = $"https://maps.googleapis.com/maps/api/staticmap?center={companyLatLong}&zoom=14&size={vendorMapSize}&maptype=roadmap&markers=color:red%7Clabel:S%7C{companyLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+                vendor.AddressLatitude = companyCoordinates.Latitude;
+                vendor.AddressLongitude = companyCoordinates.Longitude;
+                vendor.AddressMapLocation = url;
 
                 _context.Vendor.Update(vendor);
 

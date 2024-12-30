@@ -191,7 +191,22 @@ function setAutocomplete(fieldSelector, url, extraDataCallback, onSelectCallback
         minLength: 0,
         select: function (event, ui) {
             if (ui.item.value) {
-                onSelectCallback(ui);
+                // Update the input field with the selected label
+                $(fieldSelector).val(ui.item.label);
+
+                // Store the selected ID in a hidden input field or data attribute
+                const hiddenFieldSelector = $(fieldSelector).data('hiddenField');
+                if (hiddenFieldSelector) {
+                    $(hiddenFieldSelector).val(ui.item.id);
+                }
+
+                // Call the provided callback function
+                if (onSelectCallback) {
+                    onSelectCallback(ui);
+                }
+
+                // Remove the error class in case the field was previously marked invalid
+                $(fieldSelector).removeClass('is-invalid');
             }
             return false;
         }

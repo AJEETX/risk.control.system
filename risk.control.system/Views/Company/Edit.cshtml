@@ -17,6 +17,9 @@
                     <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
                 </div>
                 <input type="hidden" asp-for="ClientCompanyId" />
+                <input type="hidden" asp-for="AddressMapLocation" value="@Model.AddressMapLocation" />
+                <input type="hidden" asp-for="AddressLatitude" value="@Model.AddressLatitude" />
+                <input type="hidden" asp-for="AddressLongitude" value="@Model.AddressLongitude" />
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <div class="row">
                     <div class="col-sm-6">

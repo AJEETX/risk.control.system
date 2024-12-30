@@ -178,6 +178,7 @@ namespace risk.control.system.Seeds
             return pincodes
                 .Where(p => p.StateCode == "VIC"
                 || p.StateCode == "NSW"
+                //|| p.StateCode == "QLD"
                 )?.ToList();
         }
 

@@ -1,5 +1,7 @@
 ﻿using AspNetCoreHero.ToastNotification.Abstractions;
 
+using Google.Api;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -26,10 +28,12 @@ namespace risk.control.system.Controllers
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME}")]
     public class ClientCompanyController : Controller
     {
+        private const string vendorMapSize = "800x800";
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly INotyfService notifyService;
         private readonly RoleManager<ApplicationRole> roleManager;
+        private readonly ICustomApiCLient customApiCLient;
         private readonly ISmsService smsService;
         private readonly UserManager<ClientCompanyApplicationUser> userManager;
 
@@ -38,6 +42,7 @@ namespace risk.control.system.Controllers
             IWebHostEnvironment webHostEnvironment,
             INotyfService notifyService,
             RoleManager<ApplicationRole> roleManager,
+            ICustomApiCLient customApiCLient,
             ISmsService SmsService,
             UserManager<ClientCompanyApplicationUser> userManager)
         {
@@ -45,6 +50,7 @@ namespace risk.control.system.Controllers
             this.webHostEnvironment = webHostEnvironment;
             this.notifyService = notifyService;
             this.roleManager = roleManager;
+            this.customApiCLient = customApiCLient;
             smsService = SmsService;
             this.userManager = userManager;
         }
@@ -65,47 +71,57 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ClientCompany clientCompany, string domainAddress, string mailAddress)
         {
-            if (clientCompany is not null)
+            if(clientCompany is null || clientCompany.SelectedCountryId < 1 || clientCompany.SelectedStateId < 1 || clientCompany.SelectedDistrictId < 1 || clientCompany.SelectedPincodeId < 1)
             {
-                Domain domainData = (Domain)Enum.Parse(typeof(Domain), domainAddress, true);
-
-                clientCompany.Email = mailAddress.ToLower() + domainData.GetEnumDisplayName();
-                IFormFile? companyDocument = Request.Form?.Files?.FirstOrDefault();
-                if (companyDocument is not null)
-                {
-                    string newFileName = clientCompany.Email;
-                    string fileExtension = Path.GetExtension(Path.GetFileName( companyDocument.FileName));
-                    newFileName += fileExtension;
-                    string path = Path.Combine(webHostEnvironment.WebRootPath, "company");
-                    if (!Directory.Exists(path))
-                    {
-                        Directory.CreateDirectory(path);
-                    }
-                    var upload = Path.Combine(webHostEnvironment.WebRootPath, "company", newFileName);
-                    companyDocument.CopyTo(new FileStream(upload, FileMode.Create));
-                    clientCompany.DocumentUrl = "/company/" + newFileName;
-
-                    using var dataStream = new MemoryStream();
-                    companyDocument.CopyTo(dataStream);
-                    clientCompany.DocumentImage = dataStream.ToArray();
-                }
-
-                await smsService.DoSendSmsAsync(clientCompany.PhoneNumber, "Company account created. Domain : " + clientCompany.Email);
-
-                clientCompany.PinCodeId = clientCompany.SelectedPincodeId;
-                clientCompany.DistrictId = clientCompany.SelectedDistrictId;
-                clientCompany.StateId = clientCompany.SelectedStateId;
-                clientCompany.CountryId = clientCompany.SelectedCountryId;
-
-                clientCompany.Updated = DateTime.Now;
-                clientCompany.UpdatedBy = HttpContext.User?.Identity?.Name;
-                var addedCompany = _context.Add(clientCompany);
-                await _context.SaveChangesAsync();
-                notifyService.Custom($"Company created successfully.", 3, "green", "fas fa-building");
-                return RedirectToAction(nameof(Companies));
+                notifyService.Custom($"Please check input fields.", 3, "red", "fas fa-building");
+                return RedirectToAction(nameof(Create));
             }
-            notifyService.Custom($"Company not found.", 3, "red", "fas fa-building");
-            return RedirectToAction(nameof(Index));
+            Domain domainData = (Domain)Enum.Parse(typeof(Domain), domainAddress, true);
+
+            clientCompany.Email = mailAddress.ToLower() + domainData.GetEnumDisplayName();
+            IFormFile? companyDocument = Request.Form?.Files?.FirstOrDefault();
+            if (companyDocument is not null)
+            {
+                string newFileName = clientCompany.Email;
+                string fileExtension = Path.GetExtension(Path.GetFileName(companyDocument.FileName));
+                newFileName += fileExtension;
+                string path = Path.Combine(webHostEnvironment.WebRootPath, "company");
+                if (!Directory.Exists(path))
+                {
+                    Directory.CreateDirectory(path);
+                }
+                var upload = Path.Combine(webHostEnvironment.WebRootPath, "company", newFileName);
+                companyDocument.CopyTo(new FileStream(upload, FileMode.Create));
+                clientCompany.DocumentUrl = "/company/" + newFileName;
+
+                using var dataStream = new MemoryStream();
+                companyDocument.CopyTo(dataStream);
+                clientCompany.DocumentImage = dataStream.ToArray();
+            }
+
+            var pinCode = _context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).FirstOrDefault(s => s.PinCodeId == clientCompany.SelectedPincodeId);
+
+            var companyAddress = clientCompany.Addressline + ", " + pinCode.District.Name + ", " + pinCode.State.Name + ", " + pinCode.Country.Code;
+            var companyCoordinates = await customApiCLient.GetCoordinatesFromAddressAsync(companyAddress);
+            var companyLatLong = companyCoordinates.Latitude + "," + companyCoordinates.Longitude;
+            var url = $"https://maps.googleapis.com/maps/api/staticmap?center={companyLatLong}&zoom=14&size={vendorMapSize}&maptype=roadmap&markers=color:red%7Clabel:S%7C{companyLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+            clientCompany.AddressLatitude = companyCoordinates.Latitude;
+            clientCompany.AddressLongitude = companyCoordinates.Longitude;
+            clientCompany.AddressMapLocation = url;
+
+            await smsService.DoSendSmsAsync(clientCompany.PhoneNumber, "Company account created. Domain : " + clientCompany.Email);
+
+            clientCompany.PinCodeId = clientCompany.SelectedPincodeId;
+            clientCompany.DistrictId = clientCompany.SelectedDistrictId;
+            clientCompany.StateId = clientCompany.SelectedStateId;
+            clientCompany.CountryId = clientCompany.SelectedCountryId;
+
+            clientCompany.Updated = DateTime.Now;
+            clientCompany.UpdatedBy = HttpContext.User?.Identity?.Name;
+            var addedCompany = _context.Add(clientCompany);
+            await _context.SaveChangesAsync();
+            notifyService.Custom($"Company created successfully.", 3, "green", "fas fa-building");
+            return RedirectToAction(nameof(Companies));
         }
 
         // GET: ClientCompanies/Delete/5
@@ -241,26 +257,13 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(ClientCompany clientCompany)
         {
+            if (clientCompany is null || clientCompany.SelectedCountryId < 1 || clientCompany.SelectedStateId < 1 || clientCompany.SelectedDistrictId < 1 || clientCompany.SelectedPincodeId < 1)
+            {
+                notifyService.Custom($"Please check input fields.", 3, "red", "fas fa-building");
+                return RedirectToAction(nameof(Edit), "ClientCompany", new {id = clientCompany.ClientCompanyId });
+            }
             try
             {
-                if (clientCompany.ClientCompanyId < 1)
-                {
-                    notifyService.Error("OOPs !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-                var userEmail = HttpContext.User?.Identity?.Name;
-                if (userEmail is null)
-                {
-                    notifyService.Error("OOPs !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-
-                var companyUser = _context.ApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-                if (companyUser is null)
-                {
-                    notifyService.Error("OOPs !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
                 IFormFile? companyDocument = Request.Form?.Files?.FirstOrDefault();
                 if (companyDocument is not null)
                 {
@@ -289,6 +292,15 @@ namespace risk.control.system.Controllers
                         clientCompany.DocumentUrl = existingClientCompany.DocumentUrl;
                     }
                 }
+                var pinCode = _context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).FirstOrDefault(s => s.PinCodeId == clientCompany.SelectedPincodeId);
+
+                var companyAddress = clientCompany.Addressline + ", " + pinCode.District.Name + ", " + pinCode.State.Name + ", " + pinCode.Country.Code;
+                var companyCoordinates = await customApiCLient.GetCoordinatesFromAddressAsync(companyAddress);
+                var companyLatLong = companyCoordinates.Latitude + "," + companyCoordinates.Longitude;
+                var url = $"https://maps.googleapis.com/maps/api/staticmap?center={companyLatLong}&zoom=14&size={vendorMapSize}&maptype=roadmap&markers=color:red%7Clabel:S%7C{companyLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+                clientCompany.AddressLatitude = companyCoordinates.Latitude;
+                clientCompany.AddressLongitude = companyCoordinates.Longitude;
+                clientCompany.AddressMapLocation = url;
 
                 clientCompany.PinCodeId = clientCompany.SelectedPincodeId;
                 clientCompany.DistrictId = clientCompany.SelectedDistrictId;
@@ -301,13 +313,16 @@ namespace risk.control.system.Controllers
                 await _context.SaveChangesAsync();
 
                 await smsService.DoSendSmsAsync(clientCompany.PhoneNumber, "Company account edited. Domain : " + clientCompany.Email);
+                notifyService.Custom($"Company edited successfully.", 3, "orange", "fas fa-building");
+                return RedirectToAction(nameof(ClientCompanyController.Details), "ClientCompany", new { id = clientCompany.ClientCompanyId });
             }
-            catch
+            catch(Exception ex)
             {
-                
+                Console.WriteLine(ex.ToString());
+                notifyService.Custom($"Error editing company.", 3, "red", "fas fa-building");
+                return RedirectToAction(nameof(Edit), "ClientCompany", new { id = clientCompany.ClientCompanyId });
             }
-            notifyService.Custom($"Company edited successfully.", 3, "orange", "fas fa-building");
-            return RedirectToAction(nameof(ClientCompanyController.Details), "ClientCompany", new { id = clientCompany.ClientCompanyId });
+            
         }
 
         // GET: ClientCompanies

@@ -488,6 +488,25 @@
 
                                         </div>
                                         <div class="card-body">
+                                            <div class="card collapsed-card">
+                                                <div class="card-header">
+                                                    <i class="fas fa-film"></i><h3 class="card-title">Map<span class="badge badge-light">Expected and visited</span></h3>
+
+                                                    <div class="card-tools">
+                                                        <span data-toggle="tooltip" title="Map Location: Expected and visited" class="badge badge-light"> <i class='far fa-hand-point-right'></i></span>
+                                                        <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                                            <i class="fas fa-plus"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <div class="card-body">
+                                                    <div id="face-map">
+                                                        <img id="face-map-url" />
+                                                        <div id="face-msg">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                             <div class="row">
                                                 <div class="col-6">
                                                     <p class="text-muted text-sm">
@@ -504,19 +523,15 @@
                                                             }
                                                         }
                                                     </p>
+                                                    
+                                                </div>
+                                                <div class="col-6">
                                                     <p class="text-muted text-sm">
 
                                                         <span class="badge badge-light"><i class="fas fa-info"></i> Location Info</span>
                                                         <br />
                                                         <label class="ocr-data img-fluid"> @Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImageData</label>
 
-                                                    </p>
-                                                </div>
-                                                <div class="col-6">
-                                                    <p class="text-muted text-sm">
-                                                        <span class="badge badge-light"><i class="fas fa-map-pin"></i> Location visited</span>
-                                                        <br />
-                                                        <img class="img-fluid locationImage" src="@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImageLocationUrl" />
                                                     </p>
                                                     <p class="text-muted text-sm">
 
@@ -526,26 +541,20 @@
                                                     </p>
                                                 </div>
                                             </div>
+                                            <p class="text-center">
+                                                <span class="badge badge-light"> Match :  </span>
+                                                @if (@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.Similarity < 70 && Model.ClaimsInvestigation.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime != null)
+                                                {
+                                                    <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i>
+                                                }
+                                                else
+                                                {
+                                                    <i style='color:green;' class='fas fa-check-circle'></i>
+                                                }
+                                            </p>
                                         </div>
                                     </div>
-                                    <div class="card direct-chat direct-chat-warning collapsed-card">
-                                        <div class="card-header">
-                                            <i class="fas fa-film"></i><h3 class="card-title">Map<span class="badge badge-light">Expected and visited</span></h3>
-
-                                            <div class="card-tools">
-                                                <span data-toggle="tooltip" title="Map Location" class="badge badge-light"> <i class='far fa-hand-point-right'></i></span>
-                                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                                    <i class="fas fa-plus"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <div class="card-body">
-                                            <div id="face-map">
-                                            </div>
-                                            <div id="face-msg">
-                                            </div>
-                                        </div>
-                                    </div>
+                                    
                                 </div>
                             }
                             if (@Model.ClaimsInvestigation.AgencyReport?.PanIdReport?.DocumentIdImageData != null && @Model.ClaimsInvestigation.AgencyReport?.PanIdReport?.DocumentIdImageLongLatTime != null)
@@ -623,19 +632,14 @@
                                                             }
                                                         }
                                                     </p>
+                                                    
+                                                </div>
+                                                <div class="col-6">
                                                     <p class="text-muted text-sm">
 
                                                         <span class="badge badge-light"><i class="fas fa-info"></i> Image Scan Info</span>
                                                         <br />
                                                         <label class="img-fluid ocr-data"> @Model.ClaimsInvestigation.AgencyReport?.PanIdReport?.DocumentIdImageData</label>
-                                                    </p>
-                                                </div>
-                                                <div class="col-6">
-
-                                                    <p class="text-muted text-sm">
-                                                        <span class="badge badge-light"><i class="fas fa-map-pin"></i> Location visited</span>
-                                                        <br />
-                                                        <img class="img-fluid olocationImage" src="@Model.ClaimsInvestigation.AgencyReport?.PanIdReport?.DocumentIdImageLocationUrl" />
                                                     </p>
                                                     <p class="text-muted text-sm">
 
@@ -648,24 +652,7 @@
                                         </div>
 
                                     </div>
-                                    <div class="card direct-chat direct-chat-warning collapsed-card">
-                                        <div class="card-header">
-                                            <i class="fas fa-film"></i> <h3 class="card-title">Map<span class="badge badge-light">Expected and visited</span></h3>
-
-                                            <div class="card-tools">
-                                                <span data-toggle="tooltip" title="Map Location" class="badge badge-light"> <i class='far fa-hand-point-right'></i></span>
-                                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                                    <i class="fas fa-plus"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <div class="card-body">
-                                            <div id="ocr-map">
-                                            </div>
-                                            <div id="ocr-msg">
-                                            </div>
-                                        </div>
-                                    </div>
+                                    
                                 </div>
                             }
                         }

@@ -30,9 +30,6 @@ namespace risk.control.system.Seeds
             //CREATE VENDOR COMPANY
 
             var checkerPinCode = context.PinCode.Include(p => p.District).FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE2);
-            var checkerDistrict = context.District.Include(d => d.State).FirstOrDefault(s => s.DistrictId == checkerPinCode.District.DistrictId);
-            var checkerState = context.State.Include(s => s.Country).FirstOrDefault(s => s.StateId == checkerDistrict.State.StateId);
-            var checkerCountry = context.Country.FirstOrDefault(s => s.CountryId == checkerState.Country.CountryId) ?? default!;
             string checkerImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(Applicationsettings.AGENCY1PHOTO));
             var checkerImage = File.ReadAllBytes(checkerImagePath);
 
@@ -40,7 +37,6 @@ namespace risk.control.system.Seeds
             {
                 checkerImage = File.ReadAllBytes(noCompanyImagePath);
             }
-
 
             var checker = new Vendor
             {
@@ -53,10 +49,10 @@ namespace risk.control.system.Seeds
                 BankName = "WESTPAC",
                 BankAccountNumber = "1234567",
                 IFSCCode = "IFSC100",
-                Country = checkerCountry,
-                District = checkerDistrict,
-                State = checkerState,
-                PinCode = checkerPinCode,
+                CountryId = checkerPinCode.CountryId,
+                DistrictId = checkerPinCode.DistrictId,
+                StateId = checkerPinCode.StateId,
+                PinCodeId = checkerPinCode.PinCodeId,
                 Description = "HEAD OFFICE ",
                 Email = Applicationsettings.AGENCY1DOMAIN,
                 PhoneNumber = "8888004739",

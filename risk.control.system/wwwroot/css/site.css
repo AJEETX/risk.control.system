@@ -1709,3 +1709,13 @@ input.auto-dropdown {
     transition: opacity 0.5s ease; /* Smooth opacity change */
     opacity: 1;
 }
+
+.is-invalid {
+    border-color: red !important;
+}
+
+.text-danger {
+    display: none;
+    color: red;
+    font-size: 0.875rem;
+}

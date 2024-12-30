@@ -1,155 +1,160 @@
-var askConfirmation = true;
+var askConfirmation = true; // Flag to prevent duplicate confirmation dialogs
 var logoutPath = "/Account/Logout";
 var defaultTimeoutSeconds = parseInt(document.getElementById('timeout')?.value || "900", 10); // Default 15 minutes
 var sessionTimer = localStorage.getItem("sessionTimer")
     ? parseInt(localStorage.getItem("sessionTimer"), 10)
     : defaultTimeoutSeconds;
 
+// Function to start the timer
 function startTimer(timeout, display) {
-    var timer = timeout;
-    var countdown;
+    let timer = timeout;
 
+    // Function to update the display
     function updateDisplay() {
-        var minutes = parseInt(timer / 60, 10);
-        var seconds = parseInt(timer % 60, 10);
-
-        minutes = minutes < 10 ? "0" + minutes : minutes;
-        seconds = seconds < 10 ? "0" + seconds : seconds;
-
+        const minutes = String(Math.floor(timer / 60)).padStart(2, "0");
+        const seconds = String(timer % 60).padStart(2, "0");
         if (display) {
-            display.textContent = minutes + ":" + seconds;
+            display.textContent = `${minutes}:${seconds}`;
         }
     }
 
-    function stopCountdown() {
-        clearInterval(countdown);
-    }
+    // Update the display initially
+    updateDisplay();
 
-    countdown = setInterval(function () {
-        // Fetch the latest timer value from localStorage
+    // Main countdown logic
+    const countdown = setInterval(function () {
+        // Update the timer from localStorage
         timer = parseInt(localStorage.getItem("sessionTimer"), 10) || timer;
 
         // Update the display
         updateDisplay();
 
-        if (timer <= 0) {
-            stopCountdown();
-            localStorage.removeItem("sessionTimer");
-            window.location.href = logoutPath; // Redirect to logout
-        } else if (timer <= 15 && askConfirmation) {
+        // Show confirmation popup when 15 seconds are left
+        if (timer <= 15 && askConfirmation) {
             askConfirmation = false; // Prevent duplicate confirmation dialogs
-            stopCountdown(); // Pause the timer
-
-            // Show confirmation popup
+            const clockDisplay = document.getElementById("time");
+            if (clockDisplay) {
+                timer
+                clockDisplay.style.visibility = "hidden"; // Hide clock when popup shows
+            }
+            // Display confirmation popup
             $.confirm({
                 title: "Session Expiring!",
-                content: `Your session is about to expire!<br />Click <b>CONTINUE</b> to stay logged in.`,
-                icon: 'fas fa-hourglass-end fa-spin',
-                type: 'orange',
+                content: `Your session is about to expire!<br>Click <b>CONTINUE</b> to stay logged in.`,
+                icon: "fas fa-hourglass-end fa-spin",
+                type: "orange",
                 closeIcon: true,
-                autoClose: `cancel|${timer * 1000}`,
+                autoClose: `cancel|${timer * 1000}`, // Auto-close after the timer expires
                 buttons: {
                     confirm: {
                         text: "CONTINUE",
-                        btnClass: 'btn-warning',
+                        btnClass: "btn-warning",
                         action: function () {
-                            localStorage.removeItem("sessionTimer"); // Reset session timer
-                            window.location.href = window.location.href; // Refresh the page
-                        }
+                            // Reset session timer and continue
+                            timer = defaultTimeoutSeconds;
+                            localStorage.setItem("sessionTimer", timer);
+                            askConfirmation = true; // Allow future popups if needed
+                            // Show the clock again
+                            if (clockDisplay) {
+                                clockDisplay.style.visibility = "visible"; // Show clock again
+                            }
+                            updateDisplay();
+                        },
                     },
                     cancel: {
                         text: "LOGOUT",
-                        btnClass: 'btn-default',
+                        btnClass: "btn-default",
                         action: function () {
                             localStorage.removeItem("sessionTimer");
                             window.location.href = logoutPath; // Logout
-                        }
-                    }
-                }
+                        },
+                    },
+                },
             });
         }
 
-        // Decrement the timer and store the updated value
-        timer--;
-        localStorage.setItem("sessionTimer", timer);
+        // Handle session expiration
+        if (timer <= 0) {
+            clearInterval(countdown); // Stop the countdown
+            localStorage.removeItem("sessionTimer");
+            window.location.href = logoutPath; // Redirect to logout
+        } else {
+            timer--;
+            localStorage.setItem("sessionTimer", timer);
+        }
     }, 1000);
 }
 
-// Show current time in 12-hour format
-function showTime() {
-    let time = new Date();
-    let hour = time.getHours();
-    let min = time.getMinutes();
-    let sec = time.getSeconds();
-    let am_pm = "AM";
-
-    if (hour >= 12) {
-        if (hour > 12) hour -= 12;
-        am_pm = "PM";
-    } else if (hour == 0) {
-        hour = 12;
-        am_pm = "AM";
-    }
-
-    hour = hour < 10 ? "0" + hour : hour;
-    min = min < 10 ? "0" + min : min;
-    sec = sec < 10 ? "0" + sec : sec;
-
-    let currentTime = hour + ":" + min + ":" + sec + " " + am_pm;
-
-    var clockTime = document.getElementById("clock");
-    if (clockTime) {
-        clockTime.innerHTML = currentTime; // Display current time in clock element
-    }
-}
-
-// Detect when the tab becomes visible or hidden
+// Handle tab visibility changes
 document.addEventListener("visibilitychange", function () {
-    if (document.visibilityState === 'visible') {
-        var lastTime = localStorage.getItem("lastTime");
-        if (lastTime) {
-            var elapsed = Math.floor((new Date().getTime() - lastTime) / 1000);
-
-            sessionTimer = parseInt(localStorage.getItem("sessionTimer"), 10) || sessionTimer;
-            sessionTimer -= elapsed;
+    if (document.visibilityState === "visible") {
+        // Tab becomes active
+        const lastInactiveTime = parseInt(localStorage.getItem("lastInactiveTime"), 10);
+        if (lastInactiveTime) {
+            const elapsed = Math.floor((Date.now() - lastInactiveTime) / 1000);
+            sessionTimer = Math.max(0, sessionTimer - elapsed); // Decrease timer by elapsed time
 
             if (sessionTimer <= 0) {
-                sessionTimer = 0;
-                localStorage.setItem("sessionTimer", sessionTimer);
-                window.location.href = logoutPath; // Logout if session expired
+                // Log out immediately if session expired during inactivity
+                localStorage.setItem("sessionTimer", 0);
+                window.location.href = logoutPath;
                 return;
             }
 
+            // Save the updated session timer
             localStorage.setItem("sessionTimer", sessionTimer);
         }
+
+        // Immediately update the display with the current timer value
+        const display = document.querySelector("#time");
+        if (display) {
+            const minutes = String(Math.floor(sessionTimer / 60)).padStart(2, "0");
+            const seconds = String(sessionTimer % 60).padStart(2, "0");
+            display.textContent = `${minutes}:${seconds}`;
+        }
     } else {
-        localStorage.setItem("lastTime", new Date().getTime());
+        // Tab becomes inactive
+        localStorage.setItem("lastInactiveTime", Date.now());
     }
 });
-window.onload = function () {
-    var display = document.querySelector('#time');
-    var timeoutElement = document.getElementById('timeout');
 
-    // Initialize sessionTimer from the 'timeout' element value if available
-    if (timeoutElement != null) {
+// Display the current time in 12-hour format
+function showTime() {
+    const now = new Date();
+    let hour = now.getHours();
+    const minute = String(now.getMinutes()).padStart(2, "0");
+    const second = String(now.getSeconds()).padStart(2, "0");
+    const am_pm = hour >= 12 ? "PM" : "AM";
+
+    hour = hour % 12 || 12; // Convert to 12-hour format
+    const timeString = `${String(hour).padStart(2, "0")}:${minute}:${second} ${am_pm}`;
+    const clockDisplay = document.getElementById("clock");
+
+    if (clockDisplay) {
+        clockDisplay.innerHTML = timeString;
+    }
+}
+
+// Initialize on page load
+window.onload = function () {
+    const display = document.querySelector("#time");
+    const timeoutElement = document.getElementById("timeout");
+
+    // Set the session timer based on the timeout element if present
+    if (timeoutElement) {
         sessionTimer = parseInt(timeoutElement.value, 10);
         localStorage.setItem("sessionTimer", sessionTimer);
     }
 
-    // Load saved session time from localStorage if available
-    var savedTimeout = localStorage.getItem("sessionTimer");
-    if (savedTimeout) {
-        sessionTimer = parseInt(savedTimeout, 10);
+    // Use the saved session timer from localStorage
+    const savedTimer = localStorage.getItem("sessionTimer");
+    if (savedTimer) {
+        sessionTimer = parseInt(savedTimer, 10);
     }
 
-    // Ensure sessionTimer is valid and not less than zero
-    if (sessionTimer <= 0) {
-        sessionTimer = parseInt(timeoutElement ? timeoutElement.value : "900", 10); // Default to 15 minutes
-    }
-
-    // Start the session timer
+    // Start the timer
     startTimer(sessionTimer, display);
 
-    // Show current time
-    showTime();
+    // Show the current time
+    setInterval(showTime, 1000); // Ensure the clock updates every second
 };

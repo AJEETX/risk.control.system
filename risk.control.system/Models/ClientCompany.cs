@@ -75,7 +75,9 @@ namespace risk.control.system.Models
 
         [Display(Name = "Document url")]
         public byte[]? DocumentImage { get; set; } = default!;
-
+        public string? AddressMapLocation { get; set; }
+        public string? AddressLatitude { get; set; }
+        public string? AddressLongitude { get; set; }
         public List<ClientCompanyApplicationUser>? CompanyApplicationUser { get; set; }
 
         public List<Vendor>? EmpanelledVendors { get; set; } = new();

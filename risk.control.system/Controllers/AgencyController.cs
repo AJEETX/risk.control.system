@@ -177,8 +177,18 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(Vendor vendor)
         {
+            if(vendor is null || vendor.SelectedCountryId < 1 || vendor.SelectedStateId < 1 || vendor.SelectedDistrictId < 1 || vendor.SelectedPincodeId < 1)
+            {
+                notifyService.Custom($"OOPs !!!..Invalid Data.", 3, "red", "fas fa-building");
+                return RedirectToAction(nameof(Edit), "Agency");
+            }
             try
             {
+                if (vendor is null || vendor.SelectedCountryId < 1 || vendor.SelectedStateId < 1 || vendor.SelectedDistrictId < 1 || vendor.SelectedPincodeId < 1)
+                {
+                    notifyService.Custom($"OOPs !!!..Invalid Data.", 3, "red", "fas fa-building");
+                    return RedirectToAction(nameof(Edit), "Agency");
+                }
                 if (vendor == null || vendor.VendorId == 0)
                 {
                     notifyService.Custom($"No agency not found.", 3, "red", "fas fa-building");
@@ -208,7 +218,6 @@ namespace risk.control.system.Controllers
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
-
         }
 
         [Breadcrumb("Manage Users ")]
@@ -274,6 +283,12 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateUser(VendorApplicationUser user, string emailSuffix, string vendorId, string txn = "agency")
         {
+            if(user is null || user.SelectedCountryId < 1 || user.SelectedStateId < 1 || user.SelectedDistrictId < 1 || user.SelectedPincodeId < 1)
+            {
+                notifyService.Custom($"OOPs !!!..Invalid Data.", 3, "red", "fas fa-building");
+                return RedirectToAction(nameof(CreateUser), "Agency");
+            }
+
             try
             {
                 if(user == null || string.IsNullOrWhiteSpace(emailSuffix) || string.IsNullOrWhiteSpace(vendorId))
@@ -485,6 +500,13 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditUser(string id, VendorApplicationUser applicationUser)
         {
+
+            if (applicationUser is null || applicationUser.SelectedCountryId < 1 || applicationUser.SelectedStateId < 1 || applicationUser.SelectedDistrictId < 1 || applicationUser.SelectedPincodeId < 1)
+            {
+                notifyService.Custom($"OOPs !!!..Invalid Data.", 3, "red", "fas fa-building");
+                return RedirectToAction(nameof(CreateUser), "Agency");
+            }
+
             try
             {
                 if (id != applicationUser.Id.ToString() || applicationUser == null)
@@ -838,6 +860,11 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateService(VendorInvestigationServiceType vendorInvestigationServiceType)
         {
+            if (vendorInvestigationServiceType is null || vendorInvestigationServiceType.SelectedCountryId < 1 || vendorInvestigationServiceType.SelectedStateId < 1 || vendorInvestigationServiceType.SelectedDistrictId < 1)
+            {
+                notifyService.Custom($"OOPs !!!..Invalid Data.", 3, "red", "fas fa-building");
+                return RedirectToAction(nameof(CreateService), "Agency");
+            }
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
@@ -948,17 +975,16 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditService(long vendorInvestigationServiceTypeId, VendorInvestigationServiceType vendorInvestigationServiceType)
         {
+            if (vendorInvestigationServiceType is null || vendorInvestigationServiceType.SelectedCountryId < 1 || vendorInvestigationServiceType.SelectedStateId < 1 || vendorInvestigationServiceType.SelectedDistrictId < 1)
+            {
+                    notifyService.Custom($"Error to edit service.", 3, "red", "fas fa-truck");
+                    return RedirectToAction(nameof(EditService), "Agency",new {id = vendorInvestigationServiceTypeId });
+            }
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (currentUserEmail == null)
-                {
-                    notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
                 if (vendorInvestigationServiceTypeId != vendorInvestigationServiceType.VendorInvestigationServiceTypeId)
                 {
-                    notifyService.Custom($"Error to edit service.", 3, "red", "fas fa-truck");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 

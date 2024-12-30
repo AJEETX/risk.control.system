@@ -14,6 +14,9 @@
             <div class="card-body">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <input type="hidden" name="vendorId" asp-for="VendorId" />
+                <input type="hidden" asp-for="AddressLatitude" />
+                <input type="hidden" asp-for="AddressLongitude" />
+                <input type="hidden" asp-for="AddressMapLocation" />
                 <div class="submit-progress hidden">
                     <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
                 </div>
@@ -290,9 +293,9 @@
                             </div>
                         </div>
                         <div class="form-group text-right">
-                            <button id="reset" type="submit" onclick="clearAllInputs()" class="btn btn-outline-secondary">
+                            @* <button id="reset" type="submit" onclick="clearAllInputs()" class="btn btn-outline-secondary">
                                 <i class="fas fa-undo"></i> Reset
-                            </button>
+                            </button> *@
                             <a id="back" asp-action="Details" asp-route-id="@Model.VendorId" class="btn btn-secondary">
                                 <i class="fa fa-window-close"></i>
                                 @Applicationsettings.CANCEL

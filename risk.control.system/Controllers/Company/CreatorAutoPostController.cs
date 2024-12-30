@@ -281,6 +281,12 @@ namespace risk.control.system.Controllers.Company
         {
             try
             {
+                if(customerDetail == null || customerDetail.SelectedCountryId < 1 || customerDetail.SelectedStateId < 1 || customerDetail.SelectedDistrictId < 1 || customerDetail.SelectedPincodeId < 1)
+                {
+                    notifyService.Error("OOPs !!!..Error creating customer");
+                    return RedirectToAction(nameof(CreatorAutoController.Details), "CreatorAuto", new { id = customerDetail.ClaimsInvestigationId });
+                }
+
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 IFormFile profileFile = null;
                 var files = Request.Form?.Files;
@@ -318,6 +324,11 @@ namespace risk.control.system.Controllers.Company
         {
             try
             {
+                if (customerDetail == null || customerDetail.SelectedCountryId < 1 || customerDetail.SelectedStateId < 1 || customerDetail.SelectedDistrictId < 1 || customerDetail.SelectedPincodeId < 1)
+                {
+                    notifyService.Error("OOPs !!!..Error creating customer");
+                    return RedirectToAction(nameof(CreatorAutoController.Details), "CreatorAuto", new { id = customerDetail.ClaimsInvestigationId });
+                }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 IFormFile profileFile = null;
                 var files = Request.Form?.Files;
@@ -365,6 +376,11 @@ namespace risk.control.system.Controllers.Company
         {
             try
             {
+                if (beneficiary == null || beneficiary.SelectedCountryId < 1 || beneficiary.SelectedStateId < 1 || beneficiary.SelectedDistrictId < 1 || beneficiary.SelectedPincodeId < 1)
+                {
+                    notifyService.Error("OOPs !!!..Error creating customer");
+                    return RedirectToAction(nameof(CreatorAutoController.Details), "CreatorAuto", new { id = beneficiary.ClaimsInvestigationId });
+                }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
@@ -413,6 +429,11 @@ namespace risk.control.system.Controllers.Company
         {
             try
             {
+                if (beneficiary == null || beneficiary.SelectedCountryId < 1 || beneficiary.SelectedStateId < 1 || beneficiary.SelectedDistrictId < 1 || beneficiary.SelectedPincodeId < 1)
+                {
+                    notifyService.Error("OOPs !!!..Error creating customer");
+                    return RedirectToAction(nameof(CreatorAutoController.Details), "CreatorAuto", new { id = beneficiary.ClaimsInvestigationId });
+                }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
                 IFormFile profileFile = null;

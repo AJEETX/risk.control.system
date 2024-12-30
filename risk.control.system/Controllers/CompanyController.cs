@@ -1,4 +1,6 @@
-﻿using AspNetCoreHero.ToastNotification.Abstractions;
+﻿using Amazon.Rekognition.Model;
+
+using AspNetCoreHero.ToastNotification.Abstractions;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -159,6 +161,12 @@ namespace risk.control.system.Controllers
         {
             try
             {
+                if(clientCompany is null || clientCompany.SelectedCountryId < 1 || clientCompany.SelectedStateId < 1 || clientCompany.SelectedDistrictId < 1 || clientCompany.SelectedPincodeId < 1)
+                {
+                    notifyService.Custom($"OOPs !!!..Invalid Data.", 3, "red", "fas fa-building");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 if (currentUserEmail == null)
                 {
@@ -197,6 +205,7 @@ namespace risk.control.system.Controllers
                     companyDocument.CopyTo(dataStream);
                     existCompany.DocumentImage = dataStream.ToArray();
                 }
+
                 existCompany.CountryId = clientCompany.CountryId;
                 existCompany.StateId = clientCompany.StateId;
                 existCompany.DistrictId = clientCompany.DistrictId;
@@ -286,6 +295,11 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateUser(ClientCompanyApplicationUser user, string emailSuffix)
         {
+            if(user is null || user.SelectedCountryId < 1 || user.SelectedStateId < 1 || user.SelectedDistrictId < 1 || user.SelectedPincodeId < 1)
+            {
+                notifyService.Custom($"OOPs !!!..Invalid Data.", 3, "red", "fas fa-building");
+                return RedirectToAction(nameof(CreateUser), "Company");
+            }
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
@@ -436,6 +450,11 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditUser(string id, ClientCompanyApplicationUser applicationUser)
         {
+            if (applicationUser is null || applicationUser.SelectedCountryId < 1 || applicationUser.SelectedStateId < 1 || applicationUser.SelectedDistrictId < 1 || applicationUser.SelectedPincodeId < 1)
+            {
+                notifyService.Custom($"OOPs !!!..Invalid Data.", 3, "red", "fas fa-building");
+                return RedirectToAction(nameof(EditUser), "Company",new {userid = id });
+            }
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;

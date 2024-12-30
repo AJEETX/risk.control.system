@@ -12,13 +12,16 @@ namespace risk.control.system.Services
     }
     public class AgencyService : IAgencyService
     {
+        private const string vendorMapSize = "800x800";
         private readonly IWebHostEnvironment webHostEnvironment;
+        private readonly ICustomApiCLient customApiCLient;
         private readonly ApplicationDbContext context;
         private readonly ISmsService smsService;
 
-        public AgencyService(IWebHostEnvironment webHostEnvironment, ApplicationDbContext context, ISmsService SmsService)
+        public AgencyService(IWebHostEnvironment webHostEnvironment, ICustomApiCLient customApiCLient, ApplicationDbContext context, ISmsService SmsService)
         {
             this.webHostEnvironment = webHostEnvironment;
+            this.customApiCLient = customApiCLient;
             this.context = context;
             smsService = SmsService;
         }
@@ -56,6 +59,16 @@ namespace risk.control.system.Services
             vendor.DistrictId = vendor.SelectedDistrictId;
             vendor.StateId = vendor.SelectedStateId;
             vendor.CountryId = vendor.SelectedCountryId;
+
+            var pinCode = context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).FirstOrDefault(s => s.PinCodeId == vendor.SelectedPincodeId);
+
+            var companyAddress = vendor.Addressline + ", " + pinCode.District.Name + ", " + pinCode.State.Name + ", " + pinCode.Country.Code;
+            var companyCoordinates = await customApiCLient.GetCoordinatesFromAddressAsync(companyAddress);
+            var companyLatLong = companyCoordinates.Latitude + "," + companyCoordinates.Longitude;
+            var url = $"https://maps.googleapis.com/maps/api/staticmap?center={companyLatLong}&zoom=14&size={vendorMapSize}&maptype=roadmap&markers=color:red%7Clabel:S%7C{companyLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+            vendor.AddressLatitude = companyCoordinates.Latitude;
+            vendor.AddressLongitude = companyCoordinates.Longitude;
+            vendor.AddressMapLocation = url;
 
             vendor.Updated = DateTime.Now;
             vendor.UpdatedBy = currentUserEmail;

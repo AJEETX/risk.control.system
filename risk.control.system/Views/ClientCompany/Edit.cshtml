@@ -30,6 +30,9 @@
                         </div>
                         <div class="card-body pb-0">
                             <input type="hidden" asp-for="ClientCompanyId" id="ClientCompanyId" />
+                            <input type="hidden" asp-for="AddressLatitude" />
+                            <input type="hidden" asp-for="AddressLongitude" />
+                            <input type="hidden" asp-for="AddressMapLocation" />
                             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                             <div class="row">
                                 <div class="col-sm-6">

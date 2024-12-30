@@ -94,8 +94,6 @@ namespace risk.control.system.Controllers
         {
             try
             {
-
-
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
@@ -128,8 +126,13 @@ namespace risk.control.system.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(VendorInvestigationServiceType vendorInvestigationServiceType)
+        public async Task<IActionResult> Create(VendorInvestigationServiceType vendorInvestigationServiceType, long VendorId)
         {
+            if (vendorInvestigationServiceType is null || vendorInvestigationServiceType.SelectedCountryId < 1 || vendorInvestigationServiceType.SelectedStateId < 1 || vendorInvestigationServiceType.SelectedDistrictId < 1 )
+            {
+                notifyService.Custom($"Error to edit service.", 3, "red", "fas fa-truck");
+                return RedirectToAction(nameof(Create), "Agency", new { id = VendorId });
+            }
             try
             {
                 var pincodesServiced = await _context.PinCode.Where(p => vendorInvestigationServiceType.SelectedMultiPincodeId.Contains(p.PinCodeId)).ToListAsync();
@@ -239,6 +242,11 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(long VendorInvestigationServiceTypeId, VendorInvestigationServiceType vendorInvestigationServiceType)
         {
+            if(vendorInvestigationServiceType is null || vendorInvestigationServiceType.SelectedCountryId < 1 || vendorInvestigationServiceType.SelectedStateId < 1 || vendorInvestigationServiceType.SelectedDistrictId < 1)
+            {
+                notifyService.Custom($"Error to edit service.", 3, "red", "fas fa-truck");
+                return RedirectToAction(nameof(Edit), "VendorService", new { id = VendorInvestigationServiceTypeId });
+            }
             try
             {
                 var existingServicedPincodes = _context.ServicedPinCode.Where(s => s.VendorInvestigationServiceTypeId == vendorInvestigationServiceType.VendorInvestigationServiceTypeId);
