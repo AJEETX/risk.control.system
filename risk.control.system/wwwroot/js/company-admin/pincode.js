@@ -1,4 +1,20 @@
 ﻿$(document).ready(function () {
+    $(document).ready(function () {
+    const fields = ['#CountryId', '#StateId', '#DistrictId', '#PinCodeId'];
+
+    fields.forEach(function (field) {
+        $(field).on('input', function () {
+            const isValid = /^[a-zA-Z0-9]*$/.test(this.value); // Check if input is valid
+            if (!isValid) {
+                $(this).val('');
+                $(this).addClass('is-invalid'); // Add error class
+            } else {
+                $(this).removeClass('is-invalid'); // Remove error class
+            }
+        });
+    });
+});
+
     // Initialize placeholders and field validations
     updatePlaceholdersBasedOnState();
     initializeFieldValidations();
@@ -172,13 +188,20 @@ function setAutocomplete(fieldSelector, url, extraDataCallback, onSelectCallback
                 url,
                 data: { term: request.term, ...extraDataCallback() },
                 success: function (data) {
-                    response(data.map(item => ({
-                        label: item.name || item.stateName || item.districtName || item.pincodeName,
-                        value: item.name || item.stateName || item.districtName || item.pincodeName,
-                        id: item.id || item.stateId || item.districtId || item.pincodeId
-                    })));
+                    if (!data || data.length === 0) {
+                        console.warn("No results found for term:", request.term);
+                        response([{ label: "No results found", value: "" }]);
+                    } else {
+                        response(data.map(item => ({
+                            label: item.name || item.stateName || item.districtName || item.pincodeName,
+                            value: item.name || item.stateName || item.districtName || item.pincodeName,
+                            id: item.id || item.stateId || item.districtId || item.pincodeId
+                        })));
+                    }
                 },
-                error: function () {
+                error: function (xhr) {
+                    console.error("Error fetching autocomplete data:", error);
+                    console.log("Response Text:", xhr.responseText); // Log the server error
                     response([{ label: "Error fetching data", value: "" }]);
                 },
                 complete: function () {
@@ -206,7 +229,7 @@ function setAutocomplete(fieldSelector, url, extraDataCallback, onSelectCallback
                 }
 
                 // Remove the error class in case the field was previously marked invalid
-                $(fieldSelector).removeClass('is-invalid');
+                //$(fieldSelector).removeClass('is-invalid');
             }
             return false;
         }
@@ -218,6 +241,70 @@ function setAutocomplete(fieldSelector, url, extraDataCallback, onSelectCallback
             const value = rawValue.trim();
             if (!value) {
                 $(this).autocomplete("search", ""); // Trigger autocomplete with an empty search term
+            }
+        }
+    });
+
+    // Validate the field value on blur
+    $(fieldSelector).on("blur", function () {
+        const $field = $(this);
+        const enteredValue = $field.val().trim();
+        const autocomplete = $field.data('ui-autocomplete');
+
+        if (!enteredValue || !autocomplete) {
+            //$field.addClass('is-invalid'); // Add invalid class if no value
+            return;
+        }
+
+        // Validate if the entered value matches any autocomplete option
+        const options = autocomplete.options.source;
+
+        if (typeof options === 'function') {
+            // Handle async source function
+            options({ term: enteredValue }, function (data) {
+                console.log("Entered Value:", enteredValue);
+                console.log("Autocomplete Data:", data);
+
+                const validOptions = data.filter(option =>
+                    option.value !== "" &&
+                    option.label !== "No results found" &&
+                    option.label !== undefined
+                );
+
+                const isValid = validOptions.some(option =>
+                    (option.label || "").trim().toLowerCase() === enteredValue.trim().toLowerCase()
+                );
+
+                console.log("Filtered Data:", validOptions);
+                console.log("Is Valid:", isValid);
+
+                if (!isValid) {
+                    $field.val(''); // Clear invalid input
+                    //$field.addClass('is-invalid'); // Add invalid class
+                } else {
+                    //$field.removeClass('is-invalid'); // Remove invalid class if valid
+                }
+            });
+        } else if (Array.isArray(options)) {
+            // Handle static options
+            const validOptions = options.filter(option =>
+                option.value !== "" &&
+                option.label !== "No results found" &&
+                option.label !== undefined
+            );
+
+            const isValid = validOptions.some(option =>
+                (option.label || "").trim().toLowerCase() === enteredValue.trim().toLowerCase()
+            );
+
+            console.log("Static Options Filtered Data:", validOptions);
+            console.log("Is Valid:", isValid);
+
+            if (!isValid) {
+                $field.val(''); // Clear invalid input
+                //$field.addClass('is-invalid'); // Add invalid class
+            } else {
+                //$field.removeClass('is-invalid'); // Remove invalid class if valid
             }
         }
     });
@@ -262,23 +349,23 @@ function initializeFieldValidations() {
 function handleFieldValidation(parentFieldId, dependentFieldIds) {
     let initialValue = ""; // Store the initial value of the field on focus
 
-    $(parentFieldId)
-        .on("focus", function () {
-            initialValue = $(this).val().trim(); // Store the value when the field gains focus
-        })
-        .on("blur", function () {
-            const currentValue = $(this).val().trim();
+    //$(parentFieldId)
+    //    .on("focus", function () {
+    //        initialValue = $(this).val().trim(); // Store the value when the field gains focus
+    //    })
+    //    .on("blur", function () {
+    //        const currentValue = $(this).val().trim();
 
-            // If the value hasn't changed, skip resetting dependent fields
-            if (currentValue === initialValue) {
-                console.log(`No change detected in ${parentFieldId}`);
-                return;
-            }
+    //        // If the value hasn't changed, skip resetting dependent fields
+    //        if (currentValue === initialValue) {
+    //            console.log(`No change detected in ${parentFieldId}`);
+    //            return;
+    //        }
 
-            // Update dependent fields only if the value changes
+    //        // Update dependent fields only if the value changes
             const isValid = validateAutocompleteValue(parentFieldId);
             toggleDependentFields(dependentFieldIds, isValid);
-        });
+    //    });
 }
 
 function validateAutocompleteValue(fieldSelector) {

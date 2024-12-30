@@ -113,8 +113,8 @@ function success(position) {
     var latlong = lat + "," + long; // Store lat and long in the latlong variable
     fetchIpInfo(latlong);
 }
-function error() {
-    console.error('Geolocation request failed or was denied.');
+function error(err) {
+    console.error('Geolocation request failed or was denied.' + err);
 }
 $(document).ready(function () {
     $('[data-toggle="tooltip"]').tooltip({

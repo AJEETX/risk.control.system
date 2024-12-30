@@ -359,25 +359,59 @@ namespace risk.control.system.Controllers.Api.Company
         [HttpGet("SearchPincode")]
         public IActionResult SearchPincode(long districtId, long stateId, long countryId, string term = "")
         {
+            // Check if the term is empty or null
             if (string.IsNullOrEmpty(term?.Trim()))
             {
-                var allpincodes = _context.PinCode.Where(x => x.DistrictId == districtId && x.StateId == stateId && x.CountryId == countryId) // Filter based on user input
-                .OrderBy(x => x.Name)
-                .Take(10) // Limit the number of results
-                .Select(x => new { PincodeId = x.PinCodeId, PincodeName = $"{x.Name} - {x.Code}" })?.ToList();
+                // If no search term, return all pincodes for the given district, state, and country
+                var allpincodes = _context.PinCode
+                    .Where(x => x.DistrictId == districtId && x.StateId == stateId && x.CountryId == countryId)
+                    .OrderBy(x => x.Name)
+                    .Take(10)
+                    .Select(x => new { PincodeId = x.PinCodeId, PincodeName = $"{x.Name} - {x.Code}" })
+                    .ToList();
                 return Ok(allpincodes);
             }
 
-            var pincodes = _context.PinCode.Where(x => x.DistrictId == districtId && x.StateId == stateId && x.CountryId == countryId).ToList();
-            var filteredPincodes = pincodes.Where(x => x.Name.ToLower().Contains(term.ToLower()) || 
-                x.Code.ToLower().Contains(term.ToLower())) // Filter based on user input
-                .OrderBy(x => x.Name)
-                .Take(10) // Limit the number of results
-                .Select(x => new { PincodeId = x.PinCodeId, PincodeName = $"{x.Name} - {x.Code}" })?.ToList();
+            // Sanitize the term by trimming spaces
+            var sanitizedTerm = term.Trim();
 
+            // Split the term by hyphen, handle both parts (name and pincode)
+            var termParts = sanitizedTerm.Split('-').Select(part => part.Trim()).ToArray();
+
+            // Name filter: The part before the hyphen (if exists)
+            var nameFilter = termParts.Length > 0 ? termParts[0] : string.Empty;
+
+            // Pincode filter: The part after the hyphen (if exists)
+            var pincodeFilter = termParts.Length > 1 ? termParts[1] : string.Empty;
+
+            // Search pincodes that match either name or pincode
+            var pincodesQuery = _context.PinCode
+                .Where(x => x.DistrictId == districtId && x.StateId == stateId && x.CountryId == countryId);
+
+            // Apply name filter (case-insensitive)
+            if (!string.IsNullOrEmpty(nameFilter))
+            {
+                pincodesQuery = pincodesQuery.Where(x => x.Name.ToLower().Contains(nameFilter.ToLower()));
+            }
+
+            // Apply pincode filter (case-insensitive)
+            if (!string.IsNullOrEmpty(pincodeFilter))
+            {
+                pincodesQuery = pincodesQuery.Where(x => x.Code.ToLower().Contains(pincodeFilter.ToLower()));
+            }
+
+            // Get the filtered and sorted results
+            var filteredPincodes = pincodesQuery
+                .OrderBy(x => x.Name)
+                .Take(10)
+                .Select(x => new { PincodeId = x.PinCodeId, PincodeName = $"{x.Name} - {x.Code}" })
+                .ToList();
+
+            // Return the filtered pincodes
             return Ok(filteredPincodes);
         }
-       
+
+
         [HttpGet("GetCountryName")]
         public IActionResult GetCountryName(long id)
         {
