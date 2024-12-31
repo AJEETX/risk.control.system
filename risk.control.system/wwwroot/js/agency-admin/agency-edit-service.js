@@ -28,7 +28,7 @@
                         $('button#editservice.btn.btn-warning').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Edit Service");
                         
                         form.submit();
-                        var createForm = document.getElementById("create-form");
+                        var createForm = document.getElementById("edit-form");
                         if (createForm) {
                             var nodes = createForm.getElementsByTagName('*');
                             for (var i = 0; i < nodes.length; i++) {
@@ -46,7 +46,22 @@
     }
 });
 $(document).ready(function () {
-    $("#create-form").validate();
+    $("#edit-form").validate();
+
+    // Highlight selected options in the multi-select dropdown
+    $('#PinCodeId').on('change', function () {
+        // Apply styles to selected options
+        $('#PinCodeId option:selected').each(function () {
+            $(this).css('background-color', '#007bff'); // Blue background for selected options
+            $(this).css('color', 'white'); // White text color
+        });
+
+        // Remove styles from unselected options
+        $('#PinCodeId option').not(':selected').each(function () {
+            $(this).css('background-color', ''); // Reset background color
+            $(this).css('color', ''); // Reset text color
+        });
+    });
 
     $('.selectPincode').attr('data-live-search', true);
 

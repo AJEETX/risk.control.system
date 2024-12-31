@@ -66,7 +66,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text" for="CountryId"><i class="fas fa-map-marked-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <input type="text" id="CountryId" class="form-control remarks auto-dropdown" data-placeholder="country" placeholder="Type country..." asp-for="CountryId" required value="" />
+                                <input type="text" id="CountryId" class="form-control remarks auto-dropdown" data-placeholder="country" placeholder="Type country..." asp-for="CountryId" required onblur="clearPinCodeField()" value="" />
                                 <span asp-validation-for="CountryId" class="text-danger"></span>
                                 <input asp-for="SelectedCountryId" type="hidden" id="SelectedCountryId" name="SelectedCountryId" value="@Model?.CountryId" />
                                 <div id="country-loading" class="loading-spinner">
@@ -80,7 +80,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text" for="StateId"><i class="fas fa-map-marker-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <input type="text" id="StateId" class="form-control remarks auto-dropdown" data-placeholder="state" placeholder="Type state..." asp-for="StateId" required value="" />
+                                <input type="text" id="StateId" class="form-control remarks auto-dropdown" data-placeholder="state" placeholder="Type state..." asp-for="StateId" required value="" onblur="clearPinCodeField()" />
                                 <span asp-validation-for="StateId" class="text-danger"></span>
                                 <input asp-for="SelectedStateId" type="hidden" id="SelectedStateId" name="SelectedStateId" value="@Model?.StateId" />
                                 <div id="state-loading" class="loading-spinner">
@@ -97,8 +97,8 @@
                                         <i class="fa fa-asterisk asterik-style"></i>
                                     </span>
                                 </div>
-                                <input type="text" id="DistrictId" class="form-control remarks auto-dropdown" data-placeholder="district" placeholder="Type district..." asp-for="DistrictId" required 
-                                onblur="GetRemainingServicePinCode(false,'@Model.Vendor.VendorId', '@Model.LineOfBusinessId')" onchange="GetRemainingServicePinCode(false,'@Model.Vendor.VendorId', '@Model.LineOfBusinessId')">
+                                <input type="text" id="DistrictId" class="form-control remarks auto-dropdown" data-placeholder="district" placeholder="Type district..." asp-for="DistrictId" required
+                                       onblur="GetRemainingServicePinCode(false,'@Model.Vendor.VendorId', '@Model.LineOfBusinessId')" onchange="GetRemainingServicePinCode(false,'@Model.Vendor.VendorId', '@Model.LineOfBusinessId')" />
                                 <span asp-validation-for="DistrictId" class="text-danger"></span>
                                 <input asp-for="SelectedDistrictId" type="hidden" id="SelectedDistrictId" name="SelectedDistrictId" value="@Model?.DistrictId" />
                                 <div id="district-loading" class="loading-spinner">
@@ -114,7 +114,7 @@
                         <div class="form-group">
                             <div class="form-group">
                                 <label asp-for="SelectedMultiPincodeId" class="control-label"></label>
-                                <select id="PinCodeId" asp-for="SelectedMultiPincodeId" class="form-control remarks" asp-items="ViewBag.PinCodeId" multiple required>
+                                <select id="PinCodeId" asp-for="SelectedMultiPincodeId" class="form-control remarks selectPincode" asp-items="ViewBag.PinCodeId" multiple required>
                                 </select>
                                 <span asp-validation-for="SelectedMultiPincodeId" class="text-danger"></span>
                             </div>
@@ -140,7 +140,6 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-    <script src="~/js/company-admin/pincode.js"></script>
     <script src="~/js/common/agency-service.js"></script>
     <script src="~/js/agency-admin/agency-create-service.js"></script>
 }

@@ -37,17 +37,16 @@
                         <div class="form-group">
                             <span class="input-group-label"> Photo:</span>
                             <div class="input-group mb-3">
-
                                 @if (Model?.ProfilePictureUrl is not null)
                                 {
-                                    <img id="profileImage" class="form-Image" src="@Model?.ProfilePictureUrl">
+                                    <img id="editProfileImage" class="form-Image" src="@Model?.ProfilePictureUrl" alt="Profile Image" />
                                 }
                                 else
                                 {
-                                    <img id="profileImage" class="form-Image" src="@Applicationsettings.NO_USER">
+                                    <img id="editProfileImage" class="form-Image" src="@Applicationsettings.NO_USER" alt="Profile Image" />
                                 }
                                 <i class="fa fa-asterisk asterik-style"></i>
-                                <input asp-for="ProfileImage" type="file" class="form-control remarks" id="documentImageInput" />
+                                <input asp-for="ProfileImage" class="form-control remarks  document-image-input" type="file" id="editImageInput" data-preview-id="editProfileImage" />
                             </div>
                         </div>
 
@@ -221,4 +220,6 @@
     }
     <script src="~/js/company-admin/edit-user.js"></script>
     <script src="~/js/company-admin/pincode.js"></script>
+    <script src="~/js/common/profile-image-upload.js"></script>
+
 }

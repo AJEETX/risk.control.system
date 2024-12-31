@@ -6,7 +6,7 @@
     
 }
 <section class="content">
-    <form id="create-form" asp-action="EditUser" enctype="multipart/form-data">
+    <form id="edit-form" asp-action="EditUser" enctype="multipart/form-data">
         <div class="card bg-light card-secondary">
             <div class="card-header">
                 <h3 class="card-title"><i class="fas fa-user-plus"></i> @Applicationsettings.EDIT   User </h3>
@@ -33,14 +33,14 @@
                             <div class="input-group mb-3">
                                 @if (Model?.ProfilePictureUrl is not null)
                                 {
-                                    <img id="profileImage" class="form-Image" src="@Model?.ProfilePictureUrl">
+                                    <img id="editProfileImage" class="form-Image" src="@Model?.ProfilePictureUrl" alt="Profile Image" />
                                 }
                                 else
                                 {
-                                    <img id="profileImage" class="form-Image" src="@Applicationsettings.NO_USER">
+                                    <img id="editProfileImage" class="form-Image" src="@Applicationsettings.NO_USER" alt="Profile Image" />
                                 }
                                 <i class="fa fa-asterisk asterik-style"></i>
-                                <input asp-for="ProfileImage" class="form-control remarks" type="file" id="documentImageInput" />
+                                <input asp-for="ProfileImage" class="form-control remarks  document-image-input" type="file" id="editImageInput" data-preview-id="editProfileImage" />
                             </div>
                         </div>
                         <div class="form-group">
@@ -240,4 +240,5 @@
     }
     <script src="~/js/agency-admin/agency-edit-user.js"></script>
     <script src="~/js/company-admin/pincode.js"></script>
+    <script src="~/js/common/profile-image-upload.js"></script>
 }

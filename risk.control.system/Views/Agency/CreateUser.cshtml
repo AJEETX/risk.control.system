@@ -59,16 +59,14 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group hide-id">
-                            <label asp-for="VendorId" class="control-label"></label>
                             <input asp-for="VendorId" class="form-control remarks" value="@Model.Vendor.VendorId" />
-                            <span asp-validation-for="VendorId" class="text-danger"></span>
                         </div>
                         <div class="form-group">
                             <span class="input-group-label"> Photo:</span>
                             <div class="input-group mb-3">
-                                <img id="profileImage" class="form-Image" src="@Applicationsettings.NO_USER">
+                                <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="@Applicationsettings.NO_USER" />
                                 <i class="fa fa-asterisk asterik-style"></i>
-                                <input asp-for="ProfileImage" class="form-control remarks" type="file" id="documentImageInput" onchange="document.getElementById('profileImage').src = window.URL.createObjectURL(this.files[0])" required/>
+                                <input asp-for="ProfileImage" class="form-control remarks document-image-input" type="file" id="createImageInput" data-preview-id="createProfileImage" required />
                             </div>
                         </div>
                         <div class="form-group">
@@ -266,4 +264,5 @@
     <script src="~/js/agency-admin/agency-create-user.js">
     </script>
     <script src="~/js/company-admin/pincode.js"></script>
+    <script src="~/js/common/profile-image-upload.js"></script>
 }

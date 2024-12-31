@@ -1719,3 +1719,11 @@ input.auto-dropdown {
     color: red;
     font-size: 0.875rem;
 }
+
+#PinCodeId option:checked {
+    background-color: #007bff; /* Blue background */
+    color: white; /* White text */
+}
+select#PinCodeId{
+    height:350px;
+}

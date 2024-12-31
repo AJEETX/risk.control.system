@@ -2,11 +2,10 @@
 
 @{
     ViewData["Title"] = @Applicationsettings.EDIT;
-    
 }
 
 <section class="content">
-    <form id="create-form" asp-action="Edit" enctype="multipart/form-data">
+    <form id="edit-form" asp-action="Edit" enctype="multipart/form-data">
         <div class="card bg-light card-secondary">
             <div class="card-header">
                 <h3 class="card-title"><i class="fas fa-truck"></i> Edit @Applicationsettings.SERVICE</h3>
@@ -69,7 +68,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text" for="CountryId"><i class="fas fa-map-marked-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <input type="text" id="CountryId" class="form-control remarks auto-dropdown" data-placeholder="country" placeholder="Type country..." asp-for="CountryId" required value="" />
+                                <input type="text" id="CountryId" class="form-control remarks auto-dropdown" data-placeholder="country" placeholder="Type country..." asp-for="CountryId" required value="" onblur="clearPinCodeField()" />
                                 <span asp-validation-for="CountryId" class="text-danger"></span>
                                 <input asp-for="SelectedCountryId" type="hidden" id="SelectedCountryId" name="SelectedCountryId" value="@Model?.CountryId" />
                                 <div id="country-loading" class="loading-spinner">
@@ -83,7 +82,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text" for="StateId"><i class="fas fa-map-marker-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <input type="text" id="StateId" class="form-control remarks auto-dropdown" data-placeholder="state" placeholder="Type state..." asp-for="StateId" required value="" />
+                                <input type="text" id="StateId" class="form-control remarks auto-dropdown" data-placeholder="state" placeholder="Type state..." asp-for="StateId" required value="" onblur="clearPinCodeField()" />
                                 <span asp-validation-for="StateId" class="text-danger"></span>
                                 <input asp-for="SelectedStateId" type="hidden" id="SelectedStateId" name="SelectedStateId" value="@Model?.StateId" />
                                 <div id="state-loading" class="loading-spinner">
@@ -163,8 +162,7 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-    <script src="~/js/company-admin/pincode.js"></script>
-    <script src="~/js/common/agency-service.js"></script>
-    <script src="~/js/company-admin/company-agency-edit.js">
+        <script src="~/js/common/agency-service.js"></script>
+    <script src="~/js/agency-admin/agency-edit-service.js">
     </script>
 }
