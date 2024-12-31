@@ -1,8 +1,19 @@
 ﻿$(document).ready(function () {
-
-    const noPolicyUrl = '/img/no-policy.jpg';
-    const noUserUrl = '/img/no-user.png';
+    const noPolicyUrl = '/img/no-policy.jpg'; // Default policy image URL
+    const noUserUrl = '/img/no-user.png'; // Default user image URL
     const MaxSizeInBytes = 2097152; // 2 MB
+    let originalImageUrl = ''; // To store the original image URL
+    let previousFileValue = ''; // Store previous file value to reset input if needed
+
+    // Store the original image URL when the page is loaded
+    function initializeOriginalImage() {
+        const previewElement = $('#createProfileImage'); // Select the preview image element
+        originalImageUrl = previewElement.attr('src'); // Store the original image URL
+    }
+
+    // Call initializeOriginalImage() to store the original image when the page is loaded
+    initializeOriginalImage();
+
     function showAlert(title, content, type) {
         $.alert({
             title: title,
@@ -18,10 +29,12 @@
             }
         });
     }
+
     function resetImageInput(inputElement, previewElement, defaultImageUrl) {
+        // Reset the file input to empty and keep the image preview intact
         inputElement.val(''); // Clear the input value
         if (previewElement) {
-            previewElement.attr('src', defaultImageUrl || noUserUrl); // Reset to default image
+            previewElement.attr('src', defaultImageUrl || originalImageUrl); // Revert to the original image
         }
     }
 
@@ -39,6 +52,10 @@
         const fileName = file.name.toLowerCase();
         const fileExtension = fileName.substring(fileName.lastIndexOf('.') + 1);
 
+        // Store the current file input value and preview image before making changes
+        previousFileValue = inputElement.val();
+        const currentPreviewUrl = previewElement.attr('src');
+
         // Validate file type
         if (!["gif", "png", "jpg", "jpeg"].includes(fileExtension)) {
             showAlert(
@@ -46,7 +63,7 @@
                 "Please select only image files with extensions: jpg, png, gif, jpeg!",
                 'red'
             );
-            resetImageInput(inputElement, previewElement, defaultImageUrl);
+            resetImageInput(inputElement, previewElement, originalImageUrl);
             return;
         }
 
@@ -57,7 +74,7 @@
                 "<i class='fa fa-upload'></i> Upload Image size limit exceeded. <br />Max file size is 2 MB!",
                 'red'
             );
-            resetImageInput(inputElement, previewElement, defaultImageUrl);
+            resetImageInput(inputElement, previewElement, originalImageUrl);
             return;
         }
 
@@ -77,13 +94,14 @@
                 "This browser does not support FileReader. Please use a modern browser!",
                 'red'
             );
-            resetImageInput(inputElement, previewElement, defaultImageUrl);
+            resetImageInput(inputElement, previewElement, originalImageUrl);
         }
 
-        if (defaultImageUrl == noPolicyUrl || defaultImageUrl == noUserUrl) {
+        // Check if the file selected is the same as the default image (noPolicyUrl or noUserUrl)
+        if (fileName.includes(noPolicyUrl) || fileName.includes(noUserUrl)) {
             $.alert({
                 title: "NO FILE SELECTED",
-                content: "NO FILE SELECTED",
+                content: "No file selected, please choose an image.",
                 icon: 'fas fa-exclamation-triangle',
                 type: "red",
                 closeIcon: true,
@@ -94,6 +112,21 @@
                     }
                 }
             });
+            resetImageInput(inputElement, previewElement, originalImageUrl);
         }
+    });
+
+    // To keep the previously selected image when reverting to previous value
+    function revertToOriginalImage(inputElement, previewElement) {
+        // Revert the file input value to empty (if needed) and set the preview to the original image
+        inputElement.val(''); // Clear the input value
+        previewElement.attr('src', originalImageUrl); // Set the preview image to the original image
+    }
+
+    // Example usage to revert the image if the user cancels or selects an invalid image
+    $(".cancel-button").on('click', function () {
+        const inputElement = $(".document-image-input");
+        const previewElement = $(`#${inputElement.data('preview-id')}`);
+        revertToOriginalImage(inputElement, previewElement);
     });
 });

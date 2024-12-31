@@ -248,7 +248,7 @@ function setAutocomplete(fieldSelector, url, extraDataCallback, onSelectCallback
     // Validate the field value on blur
     $(fieldSelector).on("blur", function () {
         const $field = $(this);
-        const enteredValue = $field.val().trim();
+        const enteredValue = $field ? $field.val().trim() : '';
         const autocomplete = $field.data('ui-autocomplete');
 
         if (!enteredValue || !autocomplete) {
@@ -370,7 +370,7 @@ function handleFieldValidation(parentFieldId, dependentFieldIds) {
 
 function validateAutocompleteValue(fieldSelector) {
     const $field = $(fieldSelector);
-    const value = $field.val().trim();
+    const value = $field ? $field.val().trim() : '';
     const autocomplete = $field.data("ui-autocomplete");
     if (!autocomplete) return false;
 

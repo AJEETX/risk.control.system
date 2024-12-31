@@ -5,8 +5,8 @@
 }
 
 <section class="content">
-    <form id="create-form" asp-controller="CreatorManualPost" asp-action="EditBeneficiary" enctype="multipart/form-data">
-                <partial name="Creator/_EditBeneficiary" model="Model" />
+    <form id="edit-form" asp-controller="CreatorManualPost" asp-action="EditBeneficiary" enctype="multipart/form-data">
+        <partial name="Creator/_EditBeneficiary" model="Model" />
     </form>
 </section>
 
@@ -14,8 +14,7 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-    <script src="~/js/creator/edit-beneficiary.js">
-
+    <script src="~/js/creator/beneficiary.js">
     </script>
     <script src="~/js/company-admin/pincode.js"></script>
     <script src="~/js/common/profile-image-upload.js"></script>

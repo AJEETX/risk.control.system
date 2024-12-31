@@ -4,7 +4,7 @@
     ViewData["Title"] = @Applicationsettings.EDIT;
 }
 <section class="content">
-    <form id="create-form" asp-controller="CreatorAutoPost" asp-action="EditCustomer" method="post" enctype="multipart/form-data">
+    <form id="edit-form" asp-controller="CreatorAutoPost" asp-action="EditCustomer" method="post" enctype="multipart/form-data">
             <input type="hidden" id="claimtype" name="claimtype" value="auto" />
         <partial name="Creator/_EditCustomer" model="Model" />
     </form>
@@ -15,7 +15,7 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-    <script src="~/js/creator/edit-customer.js"></script>
+    <script src="~/js/creator/customer.js"></script>
     <script src="~/js/company-admin/pincode.js"></script>
     <script src="~/js/common/profile-image-upload.js"></script>
 

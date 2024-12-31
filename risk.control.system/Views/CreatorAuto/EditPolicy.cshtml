@@ -6,7 +6,7 @@
     var hasClientCompany = @Model.HasClientCompany ? "none" : "";
 }
 <section class="content">
-    <form id="create-form" method="post" asp-controller="CreatorAutoPost" asp-action="EditPolicy" enctype="multipart/form-data">
+    <form id="edit-form" method="post" asp-controller="CreatorAutoPost" asp-action="EditPolicy" enctype="multipart/form-data">
         <input type="hidden" id="claimtype" name="claimtype" value="auto" />
         <partial name="Creator/_EditPolicy" model="Model" />
         
@@ -16,6 +16,6 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-    <script src="~/js/creator/edit-policy.js"></script>
+    <script src="~/js/creator/policy.js"></script>
     <script src="~/js/common/profile-image-upload.js"></script>
 }

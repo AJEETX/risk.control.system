@@ -8,33 +8,31 @@ $(document).ready(function () {
             e.preventDefault(); // Prevent form submission
 
             $.confirm({
-                title: "Confirm Add Policy",
-                content: "Are you sure to add?",
-                icon: 'far fa-file-powerpoint',
+                title: "Confirm  Add Customer",
+                content: "Are you sure to add ?",
+                icon: 'fas fa-user-plus',
+
                 type: 'green',
                 closeIcon: true,
                 buttons: {
                     confirm: {
-                        text: "Add Policy",
+                        text: "Add Customer",
                         btnClass: 'btn-success',
                         action: function () {
                             askConfirmation = false;
-                            // Add a loading animation
                             $("body").addClass("submit-progress-bg");
+                            // Wrap in setTimeout so the UI
+                            // can update the spinners
                             setTimeout(function () {
                                 $(".submit-progress").removeClass("hidden");
                             }, 1);
 
-                            // Change button text to show submission in progress
-                            $('#create').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Add Policy");
+                            $('#create-cust').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Add Customer");
                             disableAllInteractiveElements();
-
-                            // Submit the form after confirmation
-                            $('#create-form').submit(); // Directly submit the form
-
-                            // Disable all form elements to prevent further interaction
+                            $("#create-form").submit();
                             var createForm = document.getElementById("create-form");
                             if (createForm) {
+
                                 var nodes = createForm.getElementsByTagName('*');
                                 for (var i = 0; i < nodes.length; i++) {
                                     nodes[i].disabled = true;
@@ -78,15 +76,15 @@ $(document).ready(function () {
             e.preventDefault(); // Prevent form submission
 
             $.confirm({
-                title: "Confirm Edit Policy",
+                title: "Confirm Edit Customer",
                 content: "Are you sure to edit?",
-
-                icon: 'far fa-file-powerpoint',
+                icon: 'fas fa-user-plus',
                 type: 'orange',
+
                 closeIcon: true,
                 buttons: {
                     confirm: {
-                        text: "Edit Policy",
+                        text: "Edit Customer",
                         btnClass: 'btn-warning',
                         action: function () {
                             askEditConfirmation = false;
@@ -97,14 +95,14 @@ $(document).ready(function () {
                                 $(".submit-progress").removeClass("hidden");
                             }, 1);
 
-                            $('#create').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Edit Policy");
+                            $('#create-cust').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Edit Customer");
                             disableAllInteractiveElements();
 
                             $('#edit-form').submit();
-                            var editForm = document.getElementById("edit-form");
-                            if (editForm) {
+                            var createForm = document.getElementById("edit-form");
+                            if (createForm) {
 
-                                var nodes = editForm.getElementsByTagName('*');
+                                var nodes = createForm.getElementsByTagName('*');
                                 for (var i = 0; i < nodes.length; i++) {
                                     nodes[i].disabled = true;
                                 }
@@ -138,40 +136,8 @@ $(document).ready(function () {
 
     $("#edit-form").validate();
 
-    $("#ContractNumber").focus();
-
-    $('#create-policy').on('click', function () {
-        $("body").addClass("submit-progress-bg");
-        // Wrap in setTimeout so the UI
-        // can update the spinners
-        setTimeout(function () {
-            $(".submit-progress").removeClass("hidden");
-        }, 1);
-
-
-        $('#create-policy').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Add Policy");
-        disableAllInteractiveElements();
-
-        var article = document.getElementById("article");
-        if (article) {
-            var nodes = article.getElementsByTagName('*');
-            for (var i = 0; i < nodes.length; i++) {
-                nodes[i].disabled = true;
-            }
-        }
-    });
-
 });
 
-var dateContractId = document.getElementById("dateContractId");
-if (dateContractId) {
-    dateContractId.max = new Date().toISOString().split("T")[0];
-}
+$("#customer-name").focus();
 
-var dateIncidentId = document.getElementById("dateIncidentId");
-if (dateIncidentId) {
-    dateIncidentId.max = new Date().toISOString().split("T")[0];
-}
-
-//dateContractId.max = new Date().toISOString().split("T")[0];
-//dateIncidentId.max = new Date().toISOString().split("T")[0];
+dateCustomerId.max = new Date().toISOString().split("T")[0];
