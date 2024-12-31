@@ -2,51 +2,23 @@
 
 @{
     ViewData["Title"] = "Details";
-    bool policyExist = true;
-    bool customerExist = Model.ClaimsInvestigation.CustomerDetail != null;
-    bool beneficiaryExist = Model.Location != null;
-    string customerProgressbarMessage = "add customer";
-    string beneficiaryProgressbarMessage = "beneficiary";
-    
-    if (Model.ClaimsInvestigation.CustomerDetail != null)
-    {
-        customerExist = true;
-        customerProgressbarMessage = "customer";
-    }
-    if (Model.Location?.BeneficiaryDetailId > 0)
-    {
-        beneficiaryExist = true;
-        beneficiaryProgressbarMessage = "edit beneficiary";
-    }
-    string customerProgressColor = "steps2";
-    string customerLineColor = "line";
-    if (Model.ClaimsInvestigation.PolicyDetail != null)
-    {
-        customerLineColor = "line0";
-    }
-    if (@customerExist)
-    {
-        customerProgressColor = "steps";
-        customerLineColor = "line1";
-    }
-    string benficiaryProgressColor = "steps3";
-    string beneficiaryLineColor = "line";
 
-    if (@customerExist)
-    {
-        benficiaryProgressColor = "steps2";
-        beneficiaryLineColor = "line0";
-    }
-    if (@customerExist && @beneficiaryExist)
-    {
-        benficiaryProgressColor = "steps";
-        beneficiaryLineColor = "line1";
-    }
+    // Initialize variables
+    bool customerExist = Model.ClaimsInvestigation.CustomerDetail != null;
+    bool beneficiaryExist = Model.Location?.BeneficiaryDetailId > 0;
+
+    string customerProgressbarMessage = customerExist ? "customer" : "add customer";
+    string beneficiaryProgressbarMessage = beneficiaryExist ? "edit beneficiary" : "beneficiary";
+
+    string customerProgressColor = customerExist ? "steps" : "steps2";
+    string customerLineColor = Model.ClaimsInvestigation.PolicyDetail != null ? "line0" : customerExist ? "line1" : "line";
+
+    string beneficiaryProgressColor = customerExist && beneficiaryExist ? "steps" : customerExist ? "steps2" : "steps3";
+    string beneficiaryLineColor = customerExist && beneficiaryExist ? "line1" : customerExist ? "line0" : "line";
 }
 
 <section class="content">
     <div id="article" class="card card-secondary">
-
         <div class="card-header">
             <h3 class="card-title">
                 <i class="fas fa-newspaper"></i> Details
@@ -121,93 +93,86 @@
 
             </h3>
         </div>
+        <div class="container d-flex justify-content-center align-items-center">
+            <div class="progresses">
+                <div class="steps">
+                    <span> <i class="far fa-file-powerpoint"></i></span>
+                </div>
+                <span class="@customerLineColor"></span>
+                <div class="@customerProgressColor">
+                    <span class="font-weight-bold"><i class="fa fa-user-plus"></i></span>
+                </div>
+                <span class="@beneficiaryLineColor"></span>
+                <div class="@beneficiaryProgressColor">
+                    <span class="font-weight-bold"><i class="fas fa-user-tie"></i></span>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="submit-progress hidden">
+                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+            </div>
+            <div class="row">
 
+                <partial name="Creator/_FilledPolicy" model="@Model" />
+                <partial name="Creator/_CustomerBeneficiary" model="@Model" />
+            </div>
+
+        </div>
+        <form id="create-form" method="post" asp-controller="ClaimsInvestigationPost" asp-action="Assign">
             <input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail?.CustomerDetailId" />
             <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
+            <input type="hidden" id="claims" name="claims" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
             <input type="hidden" id="beneficiaryId" value="@Model.Location?.BeneficiaryDetailId" />
+            <div class="card-footer d-flex  justify-content-center align-items-center">
 
-            <div class="container d-flex justify-content-center align-items-center">
-                <div class="progresses">
-                    <div class="steps">
-                        <span> <i class="far fa-file-powerpoint"></i></span>
-                    </div>
-                    <span class="@customerLineColor"></span>
-                    <div class="@customerProgressColor">
-                        <span class="font-weight-bold"><i class="fa fa-user-plus"></i></span>
-                    </div>
-                    <span class="@beneficiaryLineColor"></span>
-                    <div class="@benficiaryProgressColor">
-                        <span class="font-weight-bold"><i class="fas fa-user-tie"></i></span>
-                    </div>
-                </div>
-            </div>
-            <div class="card-body">
-                <div class="submit-progress hidden">
-                    <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
-                </div>
                 <div class="row">
 
+                    <div class="col-md-12">
 
-                <partial name="_Policy" model="@Model" />
-                <partial name="_CustomerBeneficiaryAuto" model="@Model" />
+                        @if (!customerExist || !beneficiaryExist)
+                        {
+                            <div class="d-flex justify-content-center align-items-center">
+                                <span class="detail-wizard"> <i class="far fa-hand-point-up"></i>  Complete  details to <b> Assign </b> <i class="far fa-hand-point-down"></i></span>
+                            </div>
+                            <div>
 
-                </div>
+                                <a id="back" asp-action="New" class="btn btn-outline-secondary"><span class="badge badge-light"> <i class="fas fa-arrow-left"></i> </span> Back </a>
+                                <button disabled class="btn btn-warning disabled">
+                                    <span class="badge badge-warning"> <i class="fas fa-random"></i></span><b> Assign </b> <i class="small-suffix"> auto</i>
+                                </button>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="d-flex justify-content-center align-items-center">
+                                <span class="detail-wizard-complete"> <i class="far fa-thumbs-up"></i> Detail completed. <b> Assign </b> <i class="far fa-hand-point-down"></i></span>
+                            </div>
 
-            </div>
-            <form id="create-form" method="post" asp-controller="ClaimsInvestigationPost" asp-action="Assign">
-                <input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail?.CustomerDetailId" />
-                <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
-                <input type="hidden" id="claims" name="claims" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
-                <input type="hidden" id="beneficiaryId" value="@Model.Location?.BeneficiaryDetailId" />
-                <div class="card-footer d-flex  justify-content-center align-items-center">
+                            <div>
 
-                    <div class="row">
+                                <a id="back" asp-action="New" class="btn btn-outline-secondary"><span class="badge badge-light"> <i class="fas fa-arrow-left"></i> </span> Back </a>
 
-                        <div class="col-md-12">
+                                @if (customerExist && beneficiaryExist)
+                                {
 
-                            @if (!customerExist || !beneficiaryExist)
-                            {
-                                <div class="d-flex justify-content-center align-items-center">
-                                    <span class="detail-wizard"> <i class="far fa-hand-point-up"></i>  Complete  details to <b> Assign </b> <i class="far fa-hand-point-down"></i></span>
-                                </div>
-                                <div>
-
-                                    <a id="back" asp-action="New" class="btn btn-outline-secondary"><span class="badge badge-light"> <i class="fas fa-arrow-left"></i> </span> Back </a>
+                                    <button type="submit" id="assign-list" class="btn btn-warning">
+                                        <span class="badge badge-warning"> <i class="fas fa-random"></i></span><b> Assign </b><span class="badge badge-warning">auto</span>
+                                    </button>
+                                }
+                                else
+                                {
                                     <button disabled class="btn btn-warning disabled">
                                         <span class="badge badge-warning"> <i class="fas fa-random"></i></span><b> Assign </b> <i class="small-suffix"> auto</i>
                                     </button>
-                                </div>
-                            }
-                            else
-                            {
-                                <div class="d-flex justify-content-center align-items-center">
-                                    <span class="detail-wizard-complete"> <i class="far fa-thumbs-up"></i> Detail completed. <b> Assign </b> <i class="far fa-hand-point-down"></i></span>
-                                </div>
+                                }
+                            </div>
+                        }
 
-                                <div>
-
-                                    <a id="back" asp-action="New" class="btn btn-outline-secondary"><span class="badge badge-light"> <i class="fas fa-arrow-left"></i> </span> Back </a>
-
-                                    @if (customerExist && beneficiaryExist)
-                                    {
-
-                                        <button type="submit" id="assign-list" class="btn btn-warning">
-                                            <span class="badge badge-warning"> <i class="fas fa-random"></i></span><b> Assign </b><span class="badge badge-warning">auto</span>
-                                        </button>
-                                    }
-                                    else
-                                    {
-                                        <button disabled class="btn btn-warning disabled">
-                                            <span class="badge badge-warning"> <i class="fas fa-random"></i></span><b> Assign </b> <i class="small-suffix"> auto</i>
-                                        </button>
-                                    }
-                                </div>
-                            }
-
-                        </div>
                     </div>
                 </div>
-            </form>
+            </div>
+        </form>
 
     </div>
 </section>

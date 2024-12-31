@@ -34,12 +34,12 @@ function PopulatePinCode(dropDownId, list, option, showDefaultOption) {
     if (list && list.length > 0) {
         $.each(list, function (index, row) {
             $(dropDownId).append("<option value='" + row.pinCodeId + "'>" + row.name + " -- " + row.code + "</option>");
-            $('#create-pincode').prop('disabled', false);
+            $('#create').prop('disabled', false);
         });
     }
     else {
         $(dropDownId).append("<option value='-1'>NO - PINCODE - AVAILABLE</option>")
-        $('#create-pincode').prop('disabled', true);
+        $('#create').prop('disabled', true);
     }
 }
 function PopulateInvestigationServices(dropDownId, list, option) {
@@ -50,22 +50,19 @@ function PopulateInvestigationServices(dropDownId, list, option) {
     });
 }
 $(document).ready(function () {
-    $(document).ready(function () {
-        const fields = ['#CountryId', '#StateId', '#DistrictId'];
+    const fields = ['#CountryId', '#StateId', '#DistrictId'];
 
-        fields.forEach(function (field) {
-            $(field).on('input', function () {
-                const isValid = /^[a-zA-Z0-9]*$/.test(this.value); // Check if input is valid
-                if (!isValid) {
-                    $(this).val('');
-                    $(this).addClass('is-invalid'); // Add error class
-                } else {
-                    $(this).removeClass('is-invalid'); // Remove error class
-                }
-            });
+    fields.forEach(function (field) {
+        $(field).on('input', function () {
+            const isValid = /^[a-zA-Z]*$/.test(this.value); // Check if input is valid
+            if (!isValid) {
+                $(this).val('');
+                $(this).addClass('is-invalid'); // Add error class
+            } else {
+                $(this).removeClass('is-invalid'); // Remove error class
+            }
         });
     });
-
     // Initialize placeholders and field validations
     updatePlaceholdersBasedOnState();
     initializeFieldValidations();

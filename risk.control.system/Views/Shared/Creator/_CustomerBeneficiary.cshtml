@@ -15,20 +15,20 @@
 
     if (@customerExist)
     {
-        <partial name="_CustomerExist" model="@Model" />
+        <partial name="Creator/_FilledCustomer" model="@Model" />
     }
     else
     {
-        <partial name="_CustomerNotExist" model="@Model" />
+        <partial name="Creator/_BlankCustomer" model="@Model" />
 
     }
 
     if (@beneficiaryExist)
     {
-        <partial name="_CustomerBeneficiaryExist" model="@Model" />
+        <partial name="Creator/_FilledBeneficiary" model="@Model" />
     }
     else
     {
-        <partial name="_CustomerBeneficiaryNotExist" model="@Model" />
+        <partial name="Creator/_BlankBeneficiary" model="@Model" />
     }
 }

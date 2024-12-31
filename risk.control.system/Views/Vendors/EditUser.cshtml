@@ -6,194 +6,19 @@
     
 }
 <section class="content">
-    <form id="create-form" asp-action="EditUser" enctype="multipart/form-data">
-        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <form id="edit-form" asp-action="EditUser" enctype="multipart/form-data">
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="VendorId" value="@Model.Vendor.VendorId" />
         <div class="card bg-light card-secondary">
             <div class="card-header">
-                <h3 class="card-title"><i class="fas fa-user-plus"></i>  Edit User</h3>
+                <h3 class="card-title"><i class="fas fa-user-plus"></i> @Applicationsettings.EDIT   User </h3>
             </div>
             <div class="card-body">
                 <div class="submit-progress hidden">
                     <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
                 </div>
-                <div class="row">
-                    <input type="hidden" asp-for="Id" />
-                    <div class="col-md-6">
-                        <div class="form-group hide-id">
-                            <label asp-for="VendorId" class="control-label"></label>
-                            <input asp-for="VendorId" class="form-control remarks" value="@Model.Vendor.VendorId" />
-                            <span asp-validation-for="VendorId" class="text-danger"></span>
-                        </div>
-                        <div class="form-group">
-                            <span class="input-group-label"> Email Address:</span>
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text" id="email"><i class="fas fa-at"></i> <i class="fa fa-asterisk asterik-style-none"></i></span>
-                                </div>
-                                <input readonly asp-for="Email" class="form-control readonly-input" />
-                            </div>
-                        </div>
+                <partial name="Vendor/_EditUser" model="Model" />
 
-                        <div class="form-group">
-                            <span class="input-group-label"> Photo:</span>
-                            <div class="input-group mb-3">
-                                @if (Model?.ProfilePictureUrl is not null)
-                                {
-                                    <img id="editProfileImage" class="form-Image" src="@Model?.ProfilePictureUrl" alt="Profile Image" />
-                                }
-                                else
-                                {
-                                    <img id="editProfileImage" class="form-Image" src="@Applicationsettings.NO_USER" alt="Profile Image" />
-                                }
-                                <i class="fa fa-asterisk asterik-style"></i>
-                                <input asp-for="ProfileImage" class="form-control remarks  document-image-input" type="file" id="editImageInput" data-preview-id="editProfileImage" />
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <span class="input-group-label"> First Name:</span>
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text" id="FirstName"><i class="fa fa-user"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                </div>
-                                <input type="text" asp-for="FirstName" class="form-control remarks" required placeholder="First Name" maxlength="20">
-                                <span asp-validation-for="FirstName" class="text-danger"></span>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <span class="input-group-label"> Last Name:</span>
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text" id="LastName"> <i class="fa fa-user"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                </div>
-                                <input type="text" asp-for="LastName" class="form-control remarks" required placeholder="Last Name" maxlength="20">
-                                <span asp-validation-for="LastName" class="text-danger"></span>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <span class="input-group-label"> Phone #:</span>
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text" id="PhoneNumber"><i class="fas fa-phone"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                </div>
-                                <input type="text" asp-for="PhoneNumber" class="form-control remarks" required maxlength="14" placeholder="Phone # with country code"
-                                       oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" />
-                                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <span class="input-group-label"> Role:</span>
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text" asp-for="ClaimType"><i class="nav-icon fas fa-file-invoice"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                </div>
-                                <select required asp-for="@Model.UserRole" class="form-control remarks" asp-items="Html.GetEnumSelectList<AgencyRole>()">
-                                    <option value="">--- SELECT ---</option>
-                                </select>
-                                <span asp-validation-for="@Model.UserRole" class="text-danger"></span>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <span class="input-group-label"> Note:</span>
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text" id="Comments"><i class="fas fa-comment"></i> <i class="fa fa-asterisk asterik-style-none"></i></span>
-                                </div>
-                                <input type="text" asp-for="Comments" class="form-control remarks" placeholder="Note (optional)" maxlength="50" />
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <span class="input-group-label" for="CountryId"> Country:</span>
-                            <div class="input-group mb-3 autocomplete-wrapper">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text" for="CountryId"><i class="fas fa-map-marked-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                </div>
-                                <input type="text" id="CountryId" class="form-control remarks auto-dropdown" data-placeholder="country" placeholder="Type country..." asp-for="CountryId" required value="" />
-                                <span asp-validation-for="CountryId" class="text-danger"></span>
-                                <input asp-for="SelectedCountryId" type="hidden" id="SelectedCountryId" name="SelectedCountryId" value="@Model?.CountryId" />
-                                <div id="country-loading" class="loading-spinner">
-                                    <i class="fas fa-spinner fa-spin"></i>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <span class="input-group-label" for="StateId"> State:</span>
-                            <div class="input-group mb-3 autocomplete-wrapper">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text" for="StateId"><i class="fas fa-map-marker-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                </div>
-                                <input type="text" id="StateId" class="form-control remarks auto-dropdown" data-placeholder="state" placeholder="Type state..." asp-for="StateId" required value="" />
-                                <span asp-validation-for="StateId" class="text-danger"></span>
-                                <input asp-for="SelectedStateId" type="hidden" id="SelectedStateId" name="SelectedStateId" value="@Model?.StateId" />
-                                <div id="state-loading" class="loading-spinner">
-                                    <i class="fas fa-spinner fa-spin"></i>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <span class="input-group-label" for="DistrictId">District:</span>
-                            <div class="input-group mb-3 autocomplete-wrapper">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text" for="DistrictId">
-                                        <i class="fas fa-city"></i>
-                                        <i class="fa fa-asterisk asterik-style"></i>
-                                    </span>
-                                </div>
-                                <input type="text" id="DistrictId" class="form-control remarks auto-dropdown" data-placeholder="district" placeholder="Type district..." asp-for="DistrictId" required value="" />
-                                <span asp-validation-for="DistrictId" class="text-danger"></span>
-                                <input asp-for="SelectedDistrictId" type="hidden" id="SelectedDistrictId" name="SelectedDistrictId" value="@Model?.DistrictId" />
-                                <div id="district-loading" class="loading-spinner">
-                                    <i class="fas fa-spinner fa-spin"></i>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <span class="input-group-label" for="PinCodeId">Pincode:</span>
-                            <div class="input-group mb-3 autocomplete-wrapper">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text" for="PinCodeId">
-                                        <i class="fas fa-map-pin"></i>
-                                        <i class="fa fa-asterisk asterik-style"></i>
-                                    </span>
-                                </div>
-                                <input type="text" id="PinCodeId" class="form-control remarks auto-dropdown" data-placeholder="pincode" placeholder="Type pincode..." asp-for="PinCodeId" required value="" />
-                                <span asp-validation-for="PinCodeId" class="text-danger"></span>
-                                <input asp-for="SelectedPincodeId" type="hidden" id="SelectedPincodeId" name="SelectedPincodeId" value="@Model?.PinCodeId" />
-                                <div id="pincode-loading" class="loading-spinner">
-                                    <i class="fas fa-spinner fa-spin"></i>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <span class="input-group-label"> Address:</span>
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text" id="Addressline"><i class="fa fa-home"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                </div>
-                                <input type="text" asp-for="Addressline" class="form-control remarks" placeholder="Enter Address line" maxlength="50" required />
-                                <span asp-validation-for="Addressline" class="text-danger"></span>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <span class="input-group-label"> Status:</span>
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text" id="Addressline"><i class="fa fa-key"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                </div>
-                                <div class="input-group-prepend">
-                                </div>
-                                <span class="checkbox">
-                                    <input asp-for="Active" type="checkbox" data-toggle="toggle" data-on="<i class='fa fa-toggle-on'></i> Active " data-off="<i class='fa fa-toggle-off'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
-                                </span>
-                            </div>
-                        </div>
-
-
-                    </div>
-                </div>
                 <div class="row">
                     <div class="col-md-12">
                         <div class="form-group text-right">
@@ -204,8 +29,8 @@
                                 <i class="fa fa-window-close"></i>
                                 @Applicationsettings.CANCEL
                             </a>
-                            <button id="btnSubmit" type="submit" class="btn btn-warning">
-                                <i class="fas fa-user-plus"></i> Edit User
+                            <button id="edit-user" type="submit" class="btn btn-warning">
+                                <i class="fas fa-user-plus"></i> @Applicationsettings.EDIT  User
                             </button>
                         </div>
                     </div>
@@ -218,7 +43,7 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-    <script src="~/js/company-admin/edit-user.js"></script>
+    <script src="~/js/common/manage-user.js"></script>
     <script src="~/js/company-admin/pincode.js"></script>
     <script src="~/js/common/profile-image-upload.js"></script>
 

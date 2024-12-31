@@ -1,124 +1,61 @@
 $(document).ready(function () {
-
     var askConfirmation = true;
-
-    $('#create-form').submit(function (e) {
-        // Validate the form before showing the confirmation prompt
-        if ($("#create-form").valid() && askConfirmation) {
-            e.preventDefault(); // Prevent form submission
-
-            $.confirm({
-                title: "Confirm Add Policy",
-                content: "Are you sure to add?",
-                icon: 'far fa-file-powerpoint',
-                type: 'green',
-                closeIcon: true,
-                buttons: {
-                    confirm: {
-                        text: "Add Policy",
-                        btnClass: 'btn-success',
-                        action: function () {
-                            askConfirmation = false;
-                            // Add a loading animation
-                            $("body").addClass("submit-progress-bg");
-                            setTimeout(function () {
-                                $(".submit-progress").removeClass("hidden");
-                            }, 1);
-
-                            // Change button text to show submission in progress
-                            $('#create').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Add Policy");
-                            disableAllInteractiveElements();
-
-                            // Submit the form after confirmation
-                            $('#create-form').submit(); // Directly submit the form
-
-                            // Disable all form elements to prevent further interaction
-                            var createForm = document.getElementById("create-form");
-                            if (createForm) {
-                                var nodes = createForm.getElementsByTagName('*');
-                                for (var i = 0; i < nodes.length; i++) {
-                                    nodes[i].disabled = true;
-                                }
-                            }
-                        }
-                    },
-                    cancel: {
-                        text: "Cancel",
-                        btnClass: 'btn-default'
-                    }
-                }
-            });
-        } else if(askConfirmation) {
-            // If the form is not valid, prevent form submission and show a validation error
-            e.preventDefault();
-            $.alert({
-                title: "Form Validation Error",
-                content: "Please fill in all required fields correctly.",
-                icon: 'fas fa-exclamation-triangle',
-                type: 'red',
-                closeIcon: true,
-                buttons: {
-                    ok: {
-                        text: "OK",
-                        btnClass: 'btn-danger'
-                    }
-                }
-            });
-        }
-    });
-
-    // Initialize the form validation
-    $("#create-form").validate();
-
     var askEditConfirmation = true;
 
-    $('#edit-form').submit(function (e) {
-        // Validate the form before showing the confirmation prompt
-        if ($("#edit-form").valid() && askEditConfirmation) {
-            e.preventDefault(); // Prevent form submission
-
-            $.confirm({
-                title: "Confirm Edit Policy",
-                content: "Are you sure to edit?",
-
-                icon: 'far fa-file-powerpoint',
-                type: 'orange',
-                closeIcon: true,
-                buttons: {
-                    confirm: {
-                        text: "Edit Policy",
-                        btnClass: 'btn-warning',
-                        action: function () {
-                            askEditConfirmation = false;
-                            $("body").addClass("submit-progress-bg");
-                            // Wrap in setTimeout so the UI
-                            // can update the spinners
-                            setTimeout(function () {
-                                $(".submit-progress").removeClass("hidden");
-                            }, 1);
-
-                            $('#create').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Edit Policy");
-                            disableAllInteractiveElements();
-
-                            $('#edit-form').submit();
-                            var editForm = document.getElementById("edit-form");
-                            if (editForm) {
-
-                                var nodes = editForm.getElementsByTagName('*');
-                                for (var i = 0; i < nodes.length; i++) {
-                                    nodes[i].disabled = true;
-                                }
-                            }
-                        }
-                    },
-                    cancel: {
-                        text: "Cancel",
-                        btnClass: 'btn-default'
-                    }
+    // Common functions
+    function showConfirmation(formId, title, content, type, buttonText, buttonClass, successCallback) {
+        $.confirm({
+            title: title,
+            content: content,
+            icon: 'far fa-file-powerpoint',
+            type: type,
+            closeIcon: true,
+            buttons: {
+                confirm: {
+                    text: buttonText,
+                    btnClass: buttonClass,
+                    action: successCallback
+                },
+                cancel: {
+                    text: "Cancel",
+                    btnClass: 'btn-default'
                 }
-            });
-        } else if (askEditConfirmation){
-            // If the form is not valid, prevent form submission and show a validation error
+            }
+        });
+    }
+
+    function handleFormSubmit(e, formId, confirmationFlag, confirmationDetails) {
+        if ($(`#${formId}`).valid() && confirmationFlag) {
+            e.preventDefault();
+            showConfirmation(
+                formId,
+                confirmationDetails.title,
+                confirmationDetails.content,
+                confirmationDetails.type,
+                confirmationDetails.buttonText,
+                confirmationDetails.buttonClass,
+                function () {
+                    // Disable confirmation to prevent duplicate prompts
+                    if (formId === "create-form") askConfirmation = false;
+                    if (formId === "edit-form") askEditConfirmation = false;
+
+                    // Add a loading animation
+                    $("body").addClass("submit-progress-bg");
+                    setTimeout(function () {
+                        $(".submit-progress").removeClass("hidden");
+                    }, 1);
+
+                    // Update button text
+                    $(`#${formId} button[type=submit]`).html(
+                        `<i class='fas fa-sync fa-spin' aria-hidden='true'></i> ${confirmationDetails.buttonText}`
+                    );
+                    disableAllInteractiveElements();
+
+                    // Submit the form
+                    $(`#${formId}`)[0].submit();
+                }
+            );
+        } else if (confirmationFlag) {
             e.preventDefault();
             $.alert({
                 title: "Form Validation Error",
@@ -134,20 +71,42 @@ $(document).ready(function () {
                 }
             });
         }
+    }
+
+    // Handle form submissions
+    $('#create-form').submit(function (e) {
+        handleFormSubmit(e, "create-form", askConfirmation, {
+            title: "Confirm Add Policy",
+            content: "Are you sure to add?",
+            type: "green",
+            buttonText: "Add Policy",
+            buttonClass: "btn-success"
+        });
     });
 
+    $('#edit-form').submit(function (e) {
+        handleFormSubmit(e, "edit-form", askEditConfirmation, {
+            title: "Confirm Edit Policy",
+            content: "Are you sure to edit?",
+            type: "orange",
+            buttonText: "Edit Policy",
+            buttonClass: "btn-warning"
+        });
+    });
+
+    // Initialize form validations
+    $("#create-form").validate();
     $("#edit-form").validate();
 
+    // Automatically set focus
     $("#ContractNumber").focus();
 
+    // Handle add policy click
     $('#create-policy').on('click', function () {
         $("body").addClass("submit-progress-bg");
-        // Wrap in setTimeout so the UI
-        // can update the spinners
         setTimeout(function () {
             $(".submit-progress").removeClass("hidden");
         }, 1);
-
 
         $('#create-policy').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Add Policy");
         disableAllInteractiveElements();
@@ -161,17 +120,7 @@ $(document).ready(function () {
         }
     });
 
+    // Set max dates for contract and incident dates
+    var maxDate = new Date().toISOString().split("T")[0];
+    $("#dateContractId, #dateIncidentId").attr("max", maxDate);
 });
-
-var dateContractId = document.getElementById("dateContractId");
-if (dateContractId) {
-    dateContractId.max = new Date().toISOString().split("T")[0];
-}
-
-var dateIncidentId = document.getElementById("dateIncidentId");
-if (dateIncidentId) {
-    dateIncidentId.max = new Date().toISOString().split("T")[0];
-}
-
-//dateContractId.max = new Date().toISOString().split("T")[0];
-//dateIncidentId.max = new Date().toISOString().split("T")[0];

@@ -1,0 +1,197 @@
+﻿@model risk.control.system.Models.VendorApplicationUser
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <span class="input-group-label"> Email:</span>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="email"><i class="fas fa-at"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                </div>
+                <input readonly asp-for="Email" class="form-control readonly-input" />
+            </div>
+        </div>
+        <div class="form-group">
+            <span class="input-group-label"> Profile Photo:</span>
+            <div class="input-group mb-3">
+                @if (Model?.ProfilePictureUrl is not null)
+                {
+                    <img id="editProfileImage" class="form-Image" src="@Model?.ProfilePictureUrl" alt="Profile Image" />
+                }
+                else
+                {
+                    <img id="editProfileImage" class="form-Image" src="@Applicationsettings.NO_USER" alt="Profile Image" />
+                }
+                <i class="fa fa-asterisk asterik-style"></i>
+                <input asp-for="ProfileImage" class="form-control remarks  document-image-input" type="file" id="editImageInput" data-preview-id="editProfileImage" />
+            </div>
+        </div>
+        <div class="form-group">
+            <span class="input-group-label"> First Name:</span>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="FirstName"><i class="fa fa-user"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                </div>
+                <input type="text" asp-for="FirstName" class="form-control remarks title-name" required placeholder="First Name" maxlength="20">
+                <span asp-validation-for="FirstName" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <span class="input-group-label"> Last Name:</span>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="LastName"> <i class="fa fa-user"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                </div>
+                <input type="text" asp-for="LastName" class="form-control remarks title-name" required placeholder="Last Name" maxlength="20">
+                <span asp-validation-for="LastName" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <span class="input-group-label"> Phone #:</span>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="PhoneNumber"><i class="fas fa-phone"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                </div>
+                <input type="text" asp-for="PhoneNumber" class="form-control remarks" required maxlength="14" placeholder="Phone # with country code"
+                       oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" />
+                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <span class="input-group-label"> Role:</span>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" asp-for="ClaimType"><i class="nav-icon fas fa-file-invoice"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                </div>
+                @{
+                    // Get the enum values except the one you want to exclude
+                    var roles = Enum.GetValues(typeof(AgencyRole))
+                    .Cast<AgencyRole>()
+                    .Where(role => role != AgencyRole.AGENCY_ADMIN) // Replace RoleToExclude with the actual enum value
+                    .Select(role => new SelectListItem
+            {
+                Value = role.ToString(),
+                Text = role.ToString()
+            });
+                }
+                @if (Model.UserRole == AgencyRole.AGENCY_ADMIN)
+                {
+                    <select readonly asp-for="@Model.UserRole" class="form-control remarks">
+                        <option value="@AgencyRole.AGENCY_ADMIN">@AgencyRole.AGENCY_ADMIN</option>
+                    </select>
+                }
+                else
+                {
+                    <select required asp-for="@Model.UserRole" class="form-control remarks" asp-items="@roles">
+                        <option value="">--- SELECT ---</option>
+                    </select>
+                    <span asp-validation-for="@Model.UserRole" class="text-danger"></span>
+                }
+            </div>
+        </div>
+        <div class="form-group">
+            <span class="input-group-label"> Note:</span>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="Comments"><i class="fas fa-comment"></i> <i class="fa fa-asterisk asterik-style" style="color:#e9ecef;"></i></span>
+                </div>
+                <input type="text" asp-for="Comments" class="form-control remarks" placeholder="Note (optional)" maxlength="50" />
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <span class="input-group-label" for="CountryId"> Country:</span>
+            <div class="input-group mb-3 autocomplete-wrapper">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" for="CountryId"><i class="fas fa-map-marked-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                </div>
+                <input type="text" id="CountryId" class="form-control remarks auto-dropdown" data-placeholder="country" placeholder="Type country..." asp-for="CountryId" required value="" />
+                <span asp-validation-for="CountryId" class="text-danger"></span>
+                <input asp-for="SelectedCountryId" type="hidden" id="SelectedCountryId" name="SelectedCountryId" value="@Model?.CountryId" />
+                <div id="country-loading" class="loading-spinner">
+                    <i class="fas fa-spinner fa-spin"></i>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <span class="input-group-label" for="StateId"> State:</span>
+            <div class="input-group mb-3 autocomplete-wrapper">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" for="StateId"><i class="fas fa-map-marker-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                </div>
+                <input type="text" id="StateId" class="form-control remarks auto-dropdown" data-placeholder="state" placeholder="Type state..." asp-for="StateId" required value="" />
+                <span asp-validation-for="StateId" class="text-danger"></span>
+                <input asp-for="SelectedStateId" type="hidden" id="SelectedStateId" name="SelectedStateId" value="@Model?.StateId" />
+                <div id="state-loading" class="loading-spinner">
+                    <i class="fas fa-spinner fa-spin"></i>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <span class="input-group-label" for="DistrictId">District:</span>
+            <div class="input-group mb-3 autocomplete-wrapper">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" for="DistrictId">
+                        <i class="fas fa-city"></i>
+                        <i class="fa fa-asterisk asterik-style"></i>
+                    </span>
+                </div>
+                <input type="text" id="DistrictId" class="form-control remarks auto-dropdown" data-placeholder="district" placeholder="Type district..." asp-for="DistrictId" required value="" />
+                <span asp-validation-for="DistrictId" class="text-danger"></span>
+                <input asp-for="SelectedDistrictId" type="hidden" id="SelectedDistrictId" name="SelectedDistrictId" value="@Model?.DistrictId" />
+                <div id="district-loading" class="loading-spinner">
+                    <i class="fas fa-spinner fa-spin"></i>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <span class="input-group-label" for="PinCodeId">Pincode:</span>
+            <div class="input-group mb-3 autocomplete-wrapper">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" for="PinCodeId">
+                        <i class="fas fa-map-pin"></i>
+                        <i class="fa fa-asterisk asterik-style"></i>
+                    </span>
+                </div>
+                <input type="text" id="PinCodeId" class="form-control remarks auto-dropdown" data-placeholder="pincode" placeholder="Type pincode..." asp-for="PinCodeId" required value="" />
+                <span asp-validation-for="PinCodeId" class="text-danger"></span>
+                <input asp-for="SelectedPincodeId" type="hidden" id="SelectedPincodeId" name="SelectedPincodeId" value="@Model?.PinCodeId" />
+                <div id="pincode-loading" class="loading-spinner">
+                    <i class="fas fa-spinner fa-spin"></i>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <span class="input-group-label"> Address:</span>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="Addressline"><i class="fa fa-home"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
+                </div>
+                <input type="text" asp-for="Addressline" class="form-control remarks" placeholder="Address" required maxlength="50" />
+                <span asp-validation-for="Addressline" class="text-danger"></span>
+            </div>
+        </div>
+        @if (Model.UserRole == AgencyRole.AGENCY_ADMIN)
+        {
+            <input asp-for="Active" type="hidden" value="true">
+        }
+        else
+        {
+            <div class="form-group">
+                <span class="input-group-label"> Status:</span>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fa fa-toggle-on"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                    </div>
+                    <div class="input-group-prepend">
+                    </div>
+
+                    <span class="checkbox">
+                        <input asp-for="Active" type="checkbox" data-toggle="toggle" data-on="<i class='fa fa-toggle-on'></i> Active " data-off="<i class='fa fa-toggle-off'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
+                    </span>
+                </div>
+            </div>
+        }
+    </div>
+</div>

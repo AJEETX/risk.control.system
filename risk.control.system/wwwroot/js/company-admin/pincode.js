@@ -370,7 +370,7 @@ function handleFieldValidation(parentFieldId, dependentFieldIds) {
 
 function validateAutocompleteValue(fieldSelector) {
     const $field = $(fieldSelector);
-    const value = $field ? $field.val().trim() : '';
+    const value = $field && $field.val() ? $field.val().trim() : '';
     const autocomplete = $field.data("ui-autocomplete");
     if (!autocomplete) return false;
 

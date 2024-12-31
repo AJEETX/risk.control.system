@@ -61,14 +61,15 @@
                                 <span asp-validation-for="Name" class="text-danger"></span>
                             </div>
                         </div>
+
                         <div class="form-group">
                             <span class="input-group-label"> Document:</span>
                             <div class="input-group mb-3">
-
-                                <img id="companyImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
+                                <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="@Applicationsettings.NO_POLICY_IMAGE" data-toggle="tooltip" title="No Document" />
                                 <i class="fa fa-asterisk asterik-style"></i>
-                                <input asp-for="DocumentImage" class="form-control remarks" type="file" id="documentImageInput" required/>
-
+                                <input accept=".jpg,.jpeg,.png" asp-for="DocumentImage" type="file"
+                                       class="form-control remarks document-image-input" id="createImageInput" data-preview-id="createProfileImage" required data-toggle="tooltip" title="Upload Document"
+                                       data-default-image="@Applicationsettings.NO_POLICY_IMAGE" />
                             </div>
                         </div>
                         <div class="form-group">
@@ -301,4 +302,5 @@
     }
     <script src="~/js/company-admin/create-agency.js"></script>
     <script src="~/js/company-admin/pincode.js"></script>
+    <script src="~/js/common/profile-image-upload.js"></script>
 }

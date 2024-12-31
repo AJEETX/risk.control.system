@@ -1,23 +1,18 @@
-﻿
-$(document).ready(function () {
+﻿$(document).ready(function () {
 
     var askConfirmation = true;
-
     $('#create-form').submit(function (e) {
-        // Validate the form before showing the confirmation prompt
-        if ($("#create-form").valid() && askConfirmation) {
-            e.preventDefault(); // Prevent form submission
-
+        if (askConfirmation) {
+            e.preventDefault();
             $.confirm({
-                title: "Confirm Add Agency",
+                title: "Confirm Add User",
                 content: "Are you sure to add?",
-
-                icon: 'fas fa-building',
+                icon: 'fas fa-user-plus',
                 type: 'green',
                 closeIcon: true,
                 buttons: {
                     confirm: {
-                        text: "Add Agency",
+                        text: "Add User",
                         btnClass: 'btn-success',
                         action: function () {
                             askConfirmation = false;
@@ -27,14 +22,8 @@ $(document).ready(function () {
                             setTimeout(function () {
                                 $(".submit-progress").removeClass("hidden");
                             }, 1);
-                            // Disable all buttons, submit inputs, and anchors
-                            $('button, input[type="submit"], a').prop('disabled', true);
-
-                            // Add a class to visually indicate disabled state for anchors
-                            $('a').addClass('disabled-anchor').on('click', function (e) {
-                                e.preventDefault(); // Prevent default action for anchor clicks
-                            });
-                            $('#create-agency').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Add Agency");
+                            $('#create-user').attr('disabled', 'disabled');
+                            $('#create-user').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i>  Add User");
 
                             $('#create-form').submit();
                             var createForm = document.getElementById("create-form");
@@ -53,19 +42,49 @@ $(document).ready(function () {
                     }
                 }
             });
-        } else if (askConfirmation) {
-            // If the form is not valid, prevent form submission and show a validation error
+        }
+    });
+
+    var askEditConfirmation = true;
+    $('#edit-form').submit(function (e) {
+        if (askEditConfirmation) {
             e.preventDefault();
-            $.alert({
-                title: "Form Validation Error",
-                content: "Please fill in all required fields correctly.",
-                icon: 'fas fa-exclamation-triangle',
-                type: 'red',
+            $.confirm({
+                title: "Confirm Edit User",
+                content: "Are you sure to edit?",
+
+                icon: 'fas fa-user-plus',
+                type: 'orange',
                 closeIcon: true,
                 buttons: {
-                    ok: {
-                        text: "OK",
-                        btnClass: 'btn-danger'
+                    confirm: {
+                        text: "Edit User",
+                        btnClass: 'btn-warning',
+                        action: function () {
+                            askEditConfirmation = false;
+                            $("body").addClass("submit-progress-bg");
+                            // Wrap in setTimeout so the UI
+                            // can update the spinners
+                            setTimeout(function () {
+                                $(".submit-progress").removeClass("hidden");
+                            }, 1);
+                            $('#edit-user').attr('disabled', 'disabled');
+                            $('#edit-user').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Edit User");
+
+                            $('#edit-form').submit();
+                            var createForm = document.getElementById("edit-form");
+                            if (createForm) {
+
+                                var nodes = createForm.getElementsByTagName('*');
+                                for (var i = 0; i < nodes.length; i++) {
+                                    nodes[i].disabled = true;
+                                }
+                            }
+                        }
+                    },
+                    cancel: {
+                        text: "Cancel",
+                        btnClass: 'btn-default'
                     }
                 }
             });
@@ -73,6 +92,7 @@ $(document).ready(function () {
     });
 
     $("#create-form").validate();
+    $("#edit-form").validate();
 
     $('input#emailAddress').on('input change', function () {
         if ($(this).val() != '' && $(this).val().length > 4) {
@@ -81,7 +101,6 @@ $(document).ready(function () {
             $("#check-email").css('background-color', '#004788');
             $("#check-email").css('cursor', 'default');
         } else {
-            $('#create-agency').prop('disabled', 'true !important');
             $('#check-email').prop('disabled', true);
             $("#check-email").css('color', '#ccc');
             $("#check-email").css('background-color', 'grey');
@@ -103,52 +122,45 @@ $(document).ready(function () {
             $("#check-email").css('cursor', 'not-allowed');
         }
     });
+
+    $("input#emailAddress").on({
+        keydown: function (e) {
+            if (e.which === 32)
+                return false;
+        },
+        change: function () {
+            this.value = this.value.replace(/\s/g, "");
+        }
+    });
 });
+
 function alphaOnly(event) {
     var key = event.keyCode;
     return ((key >= 65 && key <= 90) || key == 8);
 };
-AgreementDate.max = new Date().toISOString().split("T")[0];
-$("input#emailAddress").on({
-    keydown: function (e) {
-        if (e.which === 32)
-            return false;
-    },
-    change: function () {
-        this.value = this.value.replace(/\s/g, "");
-    }
-});
 
-function checkDomain() {
-    var url = "/Account/CheckAgencyName";
+function checkUserEmail() {
+    var url = "/Account/CheckUserEmail";
     var name = $('#emailAddress').val().toLowerCase();
-    var domain = $('#domain').val().toLowerCase();
+    var emailSuffix = $('#emailSuffix').val().toLowerCase();
     if (name) {
-        $('#result').fadeOut(1000); // 1.5 seconds
-        $('#result').fadeOut('slow'); // 1.5 seconds
-        $.get(url, { input: name, domain: domain }, function (data) {
+        $.get(url, { input: name + '@' + emailSuffix }, function (data) {
             if (data == 0) { //available
                 $('#mailAddress').val($('#emailAddress').val());
-                $('#domainName').val($('#domain').val());
-                var mailDomain = $('#domain').val();
-                $("#domainAddress").val(mailDomain);
-                $("#result").html("<span style='color:green;padding-top:.5rem;'> <i class='fas fa-check' style='color:#298807'></i> </span>");
+                $("#result").html("<span style='color:green;padding-top:.5rem;' title=' Available' data-toggle='tooltip'> <i class='fas fa-check' style='color:#298807'></i></span>");
                 $('#result').css('padding', '.5rem')
+                //$('#result').fadeOut(10000); // 1.5 seconds
+                //$('#result').fadeOut('slow'); // 1.5 seconds
                 $("#emailAddress").css('background-color', '');
                 $("#emailAddress").css('border-color', '#ccc');
-                $('#create-agency').prop('disabled', false);
-                $('#result').fadeIn(1000); // 1.5 seconds
-                $('#result').fadeIn('slow'); // 1.5 seconds
-                $("#Name").focus();
+                $('#create-user').prop('disabled', false);
             }
             else if (data == 1) {//domain exists
-                $("#result").html("<span style='color:red;padding-top:.5rem;display:inline !important'><i class='fa fa-times-circle' style='color:red;'></i>  </span>");
+                $("#result").html("<span style='color:red;padding-top:.5rem;display:inline !important' title=' Email exists' data-toggle='tooltip'><i class='fa fa-times-circle' style='color:red;'></i> </span>");
                 $('#result').css('padding', '.5rem')
                 $('#result').css('display', 'inline')
                 $("#emailAddress").css('border-color', '#e97878');
-                $('#create-agency').prop('disabled', 'true !important');
-                $('#result').fadeIn(1000); // 1.5 seconds
-                $('#result').fadeIn('slow'); // 1.5 seconds
+                $('#create-user').prop('disabled', 'true !important');
             }
             else if (data = null || data == undefined) {
             }
@@ -157,9 +169,7 @@ function checkDomain() {
 }
 
 function CheckIfEmailValid() {
-    $('#result').fadeOut(1000); // 1.5 seconds
-    $('#result').fadeOut('slow'); // 1.5 seconds
-    var name = $('#emailAddress').val();
+    var name = $('#email').val();
     if (name && name.length > 4) {
         $('#check-email').prop('disabled', false);
         $("#check-email").css('color', 'white');
@@ -172,7 +182,6 @@ function CheckIfEmailValid() {
         $("#check-email").css('background-color', 'grey');
         $("#check-email").css('cursor', 'not-allowed');
     }
-    $('#result').fadeIn(1000); // 1.5 seconds
-    $('#result').fadeIn('slow'); // 1.5 seconds
 }
+
 $('#emailAddress').focus();

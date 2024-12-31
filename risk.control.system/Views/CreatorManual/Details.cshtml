@@ -2,194 +2,155 @@
 
 @{
     ViewData["Title"] = "Details";
-}
-@{
-    string address = string.Empty;
-    string baddress = string.Empty;
-    int currentAgeinYrs = 0;
-    int currentBAgeinYrs = 0;
-    bool policyExist = true;
+
+    // Initialize variables
     bool customerExist = Model.ClaimsInvestigation.CustomerDetail != null;
-    bool beneficiaryExist = Model.Location != null;
-    string customerProgressbarMessage = "add customer";
-    string beneficiaryProgressbarMessage = "beneficiary";
+    bool beneficiaryExist = Model.Location?.BeneficiaryDetailId > 0;
 
-    if (Model.ClaimsInvestigation.CustomerDetail != null)
-    {
-        customerExist = true;
-        customerProgressbarMessage = "customer";
-    }
-    if (Model.Location?.BeneficiaryDetailId > 0)
-    {
-        beneficiaryExist = true;
-        beneficiaryProgressbarMessage = "edit beneficiary";
-    }
-    string customerProgressColor = "steps2";
-    string customerLineColor = "line";
-    if (Model.ClaimsInvestigation.PolicyDetail != null)
-    {
-        customerLineColor = "line0";
-    }
-    if (@customerExist)
-    {
-        customerProgressColor = "steps";
-        customerLineColor = "line1";
-    }
-    string benficiaryProgressColor = "steps3";
-    string beneficiaryLineColor = "line";
+    string customerProgressbarMessage = customerExist ? "customer" : "add customer";
+    string beneficiaryProgressbarMessage = beneficiaryExist ? "edit beneficiary" : "beneficiary";
 
-    if (@customerExist)
-    {
-        benficiaryProgressColor = "steps2";
-        beneficiaryLineColor = "line0";
-    }
-    if (@customerExist && @beneficiaryExist)
-    {
-        benficiaryProgressColor = "steps";
-        beneficiaryLineColor = "line1";
-    }
+    string customerProgressColor = customerExist ? "steps" : "steps2";
+    string customerLineColor = Model.ClaimsInvestigation.PolicyDetail != null ? "line0" : customerExist ? "line1" : "line";
+
+    string beneficiaryProgressColor = customerExist && beneficiaryExist ? "steps" : customerExist ? "steps2" : "steps3";
+    string beneficiaryLineColor = customerExist && beneficiaryExist ? "line1" : customerExist ? "line0" : "line";
 }
 
 <section class="content">
     <div id="article" class="card card-secondary">
-
         <div class="card-header">
             <h3 class="card-title">
                 <i class="fas fa-newspaper"></i> Details
                 <span class="hover-text">
                     <i class="fas fa-info-circle"></i>
                     <span class="tooltip-text" id="information">
-
                         <li>
                             <i class='far fa-hand-point-right'></i>
-                            <button class="btn btn-warning btn-xs"><i class="far fa-file-powerpoint"></i>  Edit Policy</button>
-
+                            <button class="btn btn-warning btn-xs">
+                                <i class="far fa-file-powerpoint"></i> Edit Policy
+                            </button>
                         </li>
-                        @if (customerExist)
-                        {
-                            <li>
-                                <i class='far fa-hand-point-right'></i>
-                                <button class="btn btn-warning btn-xs"><i class="fa fa-user-plus"></i>  Edit Customer</button>
-                            </li>
-                        }
-                        else
-                        {
-                            <li>
-                                <i class='far fa-hand-point-right'></i>
-                                <a class="btn btn-success btn-xs"><i class="fa fa-user-plus"></i> Add Customer</a>
-
-                            </li>
-                        }
-
-                        @if (!customerExist && !beneficiaryExist)
-                        {
-                            <li>
-                                <i class='far fa-hand-point-right'></i>
-                                <a style="pointer-events:none;color:grey;" class="btn btn-outline-secondary btn-xs"><i class="fas fa-user-tie"></i> Beneficiary</a>
-                            </li>
-                        }
-                        else if (customerExist && !beneficiaryExist)
-                        {
-                            <li>
-                                <i class='far fa-hand-point-right'></i>
-                                <a class="btn btn-success btn-xs"><i class="fas fa-user-tie"></i> Add Beneficiary</a>
-                            </li>
-                        }
-                        else if (customerExist && beneficiaryExist)
-                        {
-                            <li>
-                                <i class='far fa-hand-point-right'></i>
-                                <button class="btn btn-warning btn-xs"><i class="fas fa-user-tie"></i> Edit Beneficiary</button>
-                            </li>
-                        }
-
-                        @if (!customerExist || !beneficiaryExist)
-                        {
-                            <li>
-                                <i class='far fa-thumbs-up'></i>
-
-                                <button class="btn btn-danger  btn-xs disabled">
-                                    <span class="badge badge-danger"> <i class="fas fa-external-link-alt"></i></span><b> Assign </b><sub>manual</sub>
+                        <li>
+                            <i class='far fa-hand-point-right'></i>
+                            @if (customerExist)
+                            {
+                                <button class="btn btn-warning btn-xs">
+                                    <i class="fa fa-user-plus"></i> Edit Customer
                                 </button>
-                            </li>
-                        }
-                        else
-                        {
-                            <li>
-                                <i class='far fa-thumbs-up'></i>
-
-                                <button class="btn btn-danger  btn-xs">
-                                    <span class="badge badge-danger"> <i class="fas fa-external-link-alt"></i></span><b> Assign </b><sub>manual</sub>
+                            }
+                            else
+                            {
+                                <a class="btn btn-success btn-xs">
+                                    <i class="fa fa-user-plus"></i> Add Customer
+                                </a>
+                            }
+                        </li>
+                        <li>
+                            <i class='far fa-hand-point-right'></i>
+                            @if (customerExist && beneficiaryExist)
+                            {
+                                <button class="btn btn-warning btn-xs">
+                                    <i class="fas fa-user-tie"></i> Edit Beneficiary
                                 </button>
-                            </li>
-                        }
+                            }
+                            else if (customerExist)
+                            {
+                                <a class="btn btn-success btn-xs">
+                                    <i class="fas fa-user-tie"></i> Add Beneficiary
+                                </a>
+                            }
+                            else
+                            {
+                                <a style="pointer-events:none;color:grey;" class="btn btn-outline-secondary btn-xs">
+                                    <i class="fas fa-user-tie"></i> Beneficiary
+                                </a>
+                            }
+                        </li>
+                        <li>
+                            <i class='far fa-thumbs-up'></i>
+                            <button class="btn btn-danger btn-xs @(!customerExist || !beneficiaryExist ? "disabled" : "")">
+                                <span class="badge badge-danger">
+                                    <i class="fas fa-external-link-alt"></i>
+                                </span>
+                                <b>Assign</b><sub>manual</sub>
+                            </button>
+                        </li>
                     </span>
                 </span>
             </h3>
         </div>
-
-        <input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail?.CustomerDetailId" />
-        <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
-        <input type="hidden" id="beneficiaryId" value="@Model.Location?.BeneficiaryDetailId" />
-
+        <!-- Progress Bar -->
         <div class="container d-flex justify-content-center align-items-center">
             <div class="progresses">
                 <div class="steps">
-                    <span> <i class="far fa-file-powerpoint"></i></span>
+                    <span><i class="far fa-file-powerpoint"></i></span>
                 </div>
                 <span class="@customerLineColor"></span>
                 <div class="@customerProgressColor">
                     <span class="font-weight-bold"><i class="fa fa-user-plus"></i></span>
                 </div>
                 <span class="@beneficiaryLineColor"></span>
-                <div class="@benficiaryProgressColor">
+                <div class="@beneficiaryProgressColor">
                     <span class="font-weight-bold"><i class="fas fa-user-tie"></i></span>
                 </div>
             </div>
         </div>
+
+        <!-- Card Body -->
         <div class="card-body">
             <div class="submit-progress hidden">
                 <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
             </div>
-
             <div class="row">
-                <partial name="_Policy" model="@Model" />
-
-
-                <partial name="_CustomerBeneficiary" model="@Model" />
-
+                <partial name="Creator/_FilledPolicy" model="@Model" />
+                <partial name="Creator/_CustomerBeneficiary" model="@Model" />
             </div>
-
         </div>
+
+        <!-- Footer -->
         <form id="create-form" method="post" asp-controller="ClaimsInvestigationPost" asp-action="Assign">
             <input type="hidden" name="claims" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
-            <div class="card-footer  d-flex  justify-content-center align-items-center">
+            <div class="card-footer d-flex justify-content-center align-items-center">
                 <div class="row">
-                    <div class="col-md-12 ">
+                    <div class="col-md-12">
+
                         @if (!customerExist || !beneficiaryExist)
                         {
                             <div class="d-flex justify-content-center align-items-center">
                                 <span class="detail-wizard"> <i class="far fa-hand-point-up"></i>  Complete  details to <b> Assign </b> <i class="far fa-hand-point-down"></i></span>
                             </div>
-                            <div>
-                                <a id="back" asp-action="New" class="btn btn-outline-secondary"><span class="badge badge-light"> <i class="fas fa-arrow-left"></i> </span> Back </a>
-
+                            <div class="text-center">
+                                
+                                <a id="back" asp-action="New" class="btn btn-outline-secondary">
+                                    <span class="badge badge-light">
+                                        <i class="fas fa-arrow-left"></i>
+                                    </span> Back
+                                </a>
                                 <button disabled id="assign-list" class="btn btn-danger disabled">
-                                    <span class="badge badge-danger"> <i class="fas fa-external-link-alt"></i></span><b> Assign </b><sub>manual</sub>
+                                    <span class="badge badge-danger">
+                                        <i class="fas fa-external-link-alt"></i>
+                                    </span><b> Assign </b><sub>manual</sub>
                                 </button>
                             </div>
                         }
                         else
                         {
-                            <div class="d-flex justify-content-center align-items-center">
-                                <span class="detail-wizard-complete"> <i class="far fa-thumbs-up"></i> Detail  completed. <b> Assign </b> <i class="far fa-hand-point-down"></i> </span>
-                            </div>
-
-                            <div>
-                                <a id="back" asp-action="New" class="btn btn-outline-secondary"><span class="badge badge-light"> <i class="fas fa-arrow-left"></i> </span> Back </a>
-
+                            <div class="text-center">
+                                <span class="detail-wizard-complete">
+                                    <i class="far fa-thumbs-up"></i> Details completed. <b>Assign</b>
+                                    <i class="far fa-hand-point-down"></i>
+                                </span>
+                                <br />
+                                <a id="back" asp-action="New" class="btn btn-outline-secondary">
+                                    <span class="badge badge-light">
+                                        <i class="fas fa-arrow-left"></i>
+                                    </span> Back
+                                </a>
                                 <a id="assign-manual-list" asp-action="EmpanelledVendors" asp-route-selectedcase="@Model.ClaimsInvestigation.ClaimsInvestigationId" class="btn btn-danger">
-                                    <span class="badge badge-danger"> <i class="fas fa-external-link-alt"></i></span><b> Assign </b><sub>manual</sub>
+                                    <span class="badge badge-danger">
+                                        <i class="fas fa-external-link-alt"></i>
+                                    </span><b> Assign </b><sub>manual</sub>
                                 </a>
                             </div>
                         }
@@ -200,12 +161,10 @@
     </div>
 </section>
 
-
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
     <script src="~/js/company/policy-detail.js"></script>
     <script src="~/js/common/claim-details.js"></script>
-
 }

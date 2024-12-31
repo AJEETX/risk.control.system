@@ -18,8 +18,8 @@
                         setTimeout(function () {
                             $(".submit-progress").removeClass("hidden");
                         }, 1);
-                        $('#create-agency').attr('disabled', 'disabled');
-                        $('#create-agency').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Add User");
+                        $('#create-user').attr('disabled', 'disabled');
+                        $('#create-user').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Add User");
 
                         form.submit();
                         var createForm = document.getElementById("create-form");
@@ -42,79 +42,9 @@
 });
 
 $(document).ready(function () {
+
     $("#create-form").validate();
-    $("#documentImageInput").on('change', function () {
-        var MaxSizeInBytes = 2097152;
-        //Get count of selected files
-        var countFiles = $(this)[0].files.length;
 
-        var imgPath = $(this)[0].value;
-        var extn = imgPath.substring(imgPath.lastIndexOf('.') + 1).toLowerCase();
-
-        if (extn == "gif" || extn == "png" || extn == "jpg" || extn == "jpeg") {
-            if (typeof (FileReader) != "undefined") {
-
-                //loop for each file selected for uploaded.
-                for (var i = 0; i < countFiles; i++) {
-                    var fileSize = $(this)[0].files[i].size;
-                    if (fileSize > MaxSizeInBytes) {
-                        document.getElementById('profileImage').src = '/img/no-user.png';
-                        document.getElementById('documentImageInput').value = '';
-                        $.alert(
-                            {
-                                title: " Image UPLOAD issue !",
-                                content: " <i class='fa fa-upload'></i> Upload Image size limit exceeded. <br />Max file size is 2 MB!",
-                                icon: 'fas fa-exclamation-triangle',
-                                type: 'red',
-                                closeIcon: true,
-                                buttons: {
-                                    cancel: {
-                                        text: "CLOSE",
-                                        btnClass: 'btn-danger'
-                                    }
-                                }
-                            }
-                        );
-                    }
-                }
-
-            } else {
-                $.alert(
-                    {
-                        title: "Outdated Browser !",
-                        content: "This browser does not support FileReader. Try on modern browser!",
-                        icon: 'fas fa-exclamation-triangle',
-            
-                        type: 'red',
-                        closeIcon: true,
-                        buttons: {
-                            cancel: {
-                                text: "CLOSE",
-                                btnClass: 'btn-danger'
-                            }
-                        }
-                    }
-                );
-            }
-        } else {
-            $.alert(
-                {
-                    title: "FILE UPLOAD TYPE !!",
-                    content: "Pls select only image with extension jpg, png,gif ! ",
-                    icon: 'fas fa-exclamation-triangle',
-        
-                    type: 'red',
-                    closeIcon: true,
-                    buttons: {
-                        cancel: {
-                            text: "CLOSE",
-                            btnClass: 'btn-danger'
-                        }
-                    }
-                }
-            );
-        }
-    });
     $('input#emailAddress').on('input change', function () {
         if ($(this).val() != '' && $(this).val().length > 4) {
             $('#check-email').prop('disabled', false);
@@ -176,7 +106,7 @@ function checkUserEmail() {
 
                 $("#emailAddress").css('background-color', '');
                 $("#emailAddress").css('border-color', '#ccc');
-                $('#create-agency').prop('disabled', false);
+                $('#create-user').prop('disabled', false);
                 $('#result').fadeIn(1000); // 1.5 seconds
                 $('#result').fadeIn('slow'); // 1.5 seconds
             }
@@ -185,7 +115,7 @@ function checkUserEmail() {
                 $('#result').css('padding', '.5rem')
                 $('#result').css('display', 'inline')
                 $("#emailAddress").css('border-color', '#e97878');
-                $('#create-agency').prop('disabled', 'true !important');
+                $('#create-user').prop('disabled', 'true !important');
                 $('#result').fadeIn(1000); // 1.5 seconds
                 $('#result').fadeIn('slow'); // 1.5 seconds
             }
@@ -214,4 +144,5 @@ function CheckIfEmailValid() {
     $('#result').fadeIn(1000); // 1.5 seconds
     $('#result').fadeIn('slow'); // 1.5 seconds
 }
+    
 $('#emailAddress').focus();
