@@ -69,10 +69,24 @@ namespace risk.control.system.Controllers
         }
 
         [Authorize]
-        public JsonResult KeepSessionAlive()
+        public IActionResult KeepSessionAlive()
         {
+            if (User.Identity.IsAuthenticated)
+            {
+                // Example user details to return
+                var userDetails = new
+                {
+                    UserId = User.FindFirst("sub")?.Value, // Assuming "sub" is the user ID claim
+                    UserName = User.Identity.Name,
+                    Roles = User.Claims.Where(c => c.Type == ClaimTypes.Role).Select(c => c.Value)
+                };
+
+                return Ok(userDetails);
+            }
+
+            return Unauthorized();
             // Return success to indicate the session is alive
-            return Json(new { success = true });
+            //return Json(new { success = true });
         }
 
         [HttpGet]

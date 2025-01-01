@@ -63,7 +63,7 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text" asp-for="SumAssuredValue"><i class="fas fa-rupee-sign"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
                         </div>
-                        <input required asp-for="PolicyDetail.SumAssuredValue" class="form-control remarks" type="text" placeholder="Sum Assured" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" min="100" maxlength="10" />
+                        <input id="SumAssuredValue" required asp-for="PolicyDetail.SumAssuredValue" class="form-control remarks" type="text" placeholder="Sum Assured" min="1000" maxlength="10" />
                         <span asp-validation-for="PolicyDetail.SumAssuredValue" class="text-danger"></span>
                     </div>
                 </div>
@@ -74,7 +74,7 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text" asp-for="PolicyDetail.ContractIssueDate"><i class="far fa-calendar-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                         </div>
-                        <input required asp-for="PolicyDetail.ContractIssueDate" id="dateContractId" class="form-control remarks" type="date" />
+                        <input required asp-for="PolicyDetail.ContractIssueDate" id="ContractIssueDate" class="form-control remarks" type="date" />
                         <span asp-validation-for="PolicyDetail.ContractIssueDate" class="text-danger"></span>
                     </div>
                 </div>
@@ -110,9 +110,9 @@
                     <span class="input-group-label"> Incident Date:</span>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
-                            <span class="input-group-text" asp-for="PolicyDetail.DateOfIncident"><i class="far fa-calendar-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                            <span class="input-group-text" asp-for="DateOfIncident"><i class="far fa-calendar-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                         </div>
-                        <input required asp-for="PolicyDetail.DateOfIncident" id="dateIncidentId" class="form-control remarks" type="date" />
+                        <input required asp-for="PolicyDetail.DateOfIncident" id="DateOfIncident" class="form-control remarks" type="date" />
                         <span asp-validation-for="PolicyDetail.DateOfIncident" class="text-danger"></span>
                     </div>
                 </div>

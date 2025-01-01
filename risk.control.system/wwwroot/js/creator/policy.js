@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    $('#contractnum, #PolicyDetail_CauseOfLoss').on('input', function () {
+    $('#ContractNumber').on('input', function () {
         const regex = /^[a-zA-Z0-9]*$/; // Allow alphabets and spaces
         const value = $(this).val();
         if (!regex.test(value)) {
@@ -15,6 +15,15 @@ $(document).ready(function () {
             $(this).val(value.replace(/[^a-zA-Z0-9 ]/g, '')); // Remove invalid characters
         }
     });
+
+
+    $('#SumAssuredValue').on('input', function () {
+        // Replace invalid characters and limit to one dot
+        this.value = this.value
+            .replace(/[^0-9.]/g, '')  // Allow only numbers and a single dot
+            .replace(/(\..*)\./g, '$1'); // Prevent multiple dots
+    });
+
 
     var askConfirmation = true;
     var askEditConfirmation = true;
@@ -144,5 +153,5 @@ $(document).ready(function () {
 
     // Set max dates for contract and incident dates
     var maxDate = new Date().toISOString().split("T")[0];
-    $("#dateContractId, #dateIncidentId").attr("max", maxDate);
+    $("#ContractIssueDate, #DateOfIncident").attr("max", maxDate);
 });

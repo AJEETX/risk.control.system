@@ -1,11 +1,24 @@
 $(document).ready(function () {
 
-    $('#BeneficiaryName, #CountryId, #StateId, #DistrictId, #Addressline').on('input', function () {
+    $('#BeneficiaryName, #CountryId, #StateId, #DistrictId').on('input', function () {
         const regex = /^[a-zA-Z ]*$/; // Allow alphabets and spaces
         const value = $(this).val();
         if (!regex.test(value)) {
             $(this).val(value.replace(/[^a-zA-Z ]/g, '')); // Remove invalid characters
         } 
+    });
+    
+    $('#ContactNumber').on('input', function () {
+        this.value = this.value
+            .replace(/[^0-9.]/g, '')  // Allow only numbers and a single dot
+            .replace(/(\..*)\./g, '$1'); // Prevent multiple dots
+    });
+    $('#Description, #Addressline').on('input', function () {
+        const regex = /^[a-zA-Z0-9 ]*$/; // Allow alphabets and spaces
+        const value = $(this).val();
+        if (!regex.test(value)) {
+            $(this).val(value.replace(/[^a-zA-Z0-9 ]/g, '')); // Remove invalid characters
+        }
     });
 
     let askCreateConfirmation = true;
@@ -108,6 +121,9 @@ $(document).ready(function () {
     $("#create-form").validate();
     $("#edit-form").validate();
 
+    // Set max dates for contract and incident dates
+    var maxDate = new Date().toISOString().split("T")[0];
+    $("#DateOfBirth").attr("max", maxDate);
     // Automatically set focus to the Beneficiary Name input field
     $("#BeneficiaryName").focus();
 });

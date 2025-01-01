@@ -263,6 +263,9 @@ div .error-message {
         background: grey;
     }
 
+    #email{
+        cursor:pointer;
+    }
 #email:focus {
     border: 1px solid #333;
     background-color:whitesmoke;
@@ -424,4 +427,52 @@ img.logo {
 
 .remarks {
     background-color: lightgoldenrodyellow;
+}
+
+.input-group .input-group-text {
+    background-color: #fff; /* Match input background */
+    border-left: 0; /* Remove border overlap with input */
+    cursor: pointer;
+}
+
+.input-group input {
+    border-right: 0; /* Remove border overlap with dropdown */
+}
+
+.input-group .input-group-append:hover {
+    background-color: #f0f0f0; /* Highlight on hover */
+}
+.input-group-append-caret{
+    position:relative;
+    left:-30px;
+    top:-10px;
+}
+
+/* Styling for the dropdown list that appears below the input */
+.ui-autocomplete {
+    border: 1px solid #ccc;
+    max-height: 200px; /* Limit the height of the dropdown */
+    overflow-y: auto; /* Enable scrolling if dropdown is long */
+    background-color: #fff;
+    border-radius: 4px;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.15);
+    z-index: 9999; /* Ensure the dropdown is on top */
+}
+
+/* Hover effect for dropdown items */
+.ui-menu .ui-menu-item:hover {
+    background-color: #007bff;
+    color: darkblue;
+}
+
+/* Selected item style */
+.ui-state-active {
+    background-color: #007bff !important;
+    color: white !important;
+}
+
+/* Adjust the font of the dropdown items */
+.ui-menu .ui-menu-item {
+    padding: 8px 12px;
+    cursor: pointer;
 }

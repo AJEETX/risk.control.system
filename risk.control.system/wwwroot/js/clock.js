@@ -18,15 +18,16 @@ function refreshSession() {
             credentials: "include", // Include cookies in the request
         },
     })
-        .then((response) => {
-            if (response.ok) {
-                console.log("Session refreshed successfully.");
-            } else {
-                console.warn("Failed to refresh session.");
+        .then(async (response) => {
+            if (!response.ok) {
+                console.error("Failed to fetch user identity details.");
+                return;
             }
+            const userDetails = await response.json(); // Assuming the API returns user details in JSON format
+            console.log("User Identity Details:", userDetails);
         })
         .catch((error) => {
-            console.error("Error refreshing session:", error);
+            console.error("Error during fetch:", error);
         });
 }
 

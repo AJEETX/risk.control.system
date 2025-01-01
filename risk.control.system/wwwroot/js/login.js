@@ -50,71 +50,64 @@ function focusLogin() {
     if (login) {
         login.focus();
     }
-
-    //const showUsers = document.getElementById("show-users").value;
-    //if (showUsers == 'false') {
-    //    const login = document.getElementById("email");
-    //    login.focus();
-    //}
-    //else {
-    //    const pwd = document.getElementById("password");
-    //    pwd.select();
-    //}
-
 }
 
-// Success function to handle geolocation success
-function success(position) {
-    var lat = position.coords.latitude;
-    var long = position.coords.longitude;
-    var latlong = lat + "," + long; // Store lat and long in the latlong variable
-
-    // Call fetchIpInfo only after we have the geolocation
-    fetchIpInfo(latlong);
+// Function to handle successful geolocation retrieval
+function handleGeolocationSuccess(position) {
+    const latlong = `${position.coords.latitude},${position.coords.longitude}`;
+    fetchIpInfo(latlong); // Call fetchIpInfo with geolocation data
 }
 
-// Error function to handle geolocation failure
-function error(err) {
-    console.error('Geolocation request failed or was denied.' + err);
-    // You may want to handle a default location or notify the user here
-    fetchIpInfo(); // Optionally, still send the request even without location data
+// Function to handle geolocation errors
+function handleGeolocationError(err) {
+    console.error('Geolocation request failed or was denied:', err.message);
+    fetchIpInfo(); // Optionally fetch IP info without geolocation
 }
-async function fetchIpInfo(latlong) {
+
+// Function to fetch IP info and update the UI
+async function fetchIpInfo(latlong = '') {
     try {
-        if (latlong) {
-            // Prepare the URL with the latlong parameter if available
-            const url = "/api/Notification/GetClientIp?url=" + encodeURIComponent(window.location.pathname) + "&latlong=" + encodeURIComponent(latlong);
+        // Construct the URL with or without latlong
+        const url = `/api/Notification/GetClientIp?url=${encodeURIComponent(window.location.pathname)}${latlong ? `&latlong=${encodeURIComponent(latlong)}` : ''}`;
 
-            // Make the fetch call
-            const response = await fetch(url);
+        // Make the fetch request
+        const response = await fetch(url);
 
-            // Handle if the response is not OK
-            if (!response.ok) {
-                console.error('There has been a problem with your ip fetch operation');
-                document.querySelector('#ipAddress .info-data').textContent = data.ipAddress || 'Not available';
-                document.querySelector('#ipAddress1 .info-data').textContent = data.ipAddress || 'Not available';
-            }
-
-            else {
-                // Parse the response data as JSON
-                const data = await response.json();
-
-                // Update the page with the received data
-                document.querySelector('#ipAddress .info-data').textContent = data.ipAddress || 'Not available';
-                document.querySelector('#ipAddress1 .info-data').textContent = data.ipAddress || 'Not available';
-            }
+        // Handle non-OK responses
+        if (!response.ok) {
+            console.error(`IP fetch failed with status: ${response.status}`);
+            updateInfoDisplay('---', '---');
+            return;
         }
+
+        // Parse and process the JSON response
+        const data = await response.json();
+        const district = data.district || 'Not available';
+        updateInfoDisplay(district, district);
     } catch (error) {
-        console.error('There has been a problem with your fetch operation:', error);
+        console.error('Error during IP info fetch operation:', error.message);
+        updateInfoDisplay('Not available', 'Not available');
     }
 }
 
-if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(success, error);
-} else {
-    console.error('Geolocation is not supported by this browser.');
-    fetchIpInfo(); // Optionally call fetchIpInfo even if geolocation is not available
+// Function to update the UI with the fetched data
+function updateInfoDisplay(ipAddress, ipAddress1) {
+    document.querySelector('#ipAddress .info-data').textContent = ipAddress;
+    document.querySelector('#ipAddress1 .info-data').textContent = ipAddress1;
 }
+
+// Initialize geolocation handling
+function initGeolocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(handleGeolocationSuccess, handleGeolocationError);
+    } else {
+        console.error('Geolocation is not supported by this browser.');
+        fetchIpInfo(); // Optionally fetch IP info without geolocation
+    }
+}
+
+// Call the initialization function
+
 $(document).ready(function () {
     $("#login-form").validate();
     $("#reset-form").validate();
@@ -153,7 +146,7 @@ $(document).ready(function () {
     $("#email").on("focus", function () {
         console.log("Focus triggered");
         const emailValue = $(this).val();
-        if (!emailValue && emailValue.trim()) {
+        if (!emailValue && emailValue.trim() ==="") {
             $(this).autocomplete("search", ""); // Trigger autocomplete with an empty search term
         }
     });
@@ -167,5 +160,7 @@ function onlyDigits(el) {
     el.value = el.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');
 }
 window.onload = function () {
+    initGeolocation();
+
     focusLogin();
 }

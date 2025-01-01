@@ -35,6 +35,78 @@ function clearAllInputs(event) {
         profileImage.src = '/img/no-user.png';
     }
 }
+function success(position) {
+    const { latitude, longitude } = position.coords;
+    const latlong = `${latitude},${longitude}`; // Store lat and long in the latlong variable
+    fetchIpInfo(latlong);
+}
+
+function error(err) {
+    console.error('Geolocation request failed or was denied:', err.message);
+    displayUnavailableInfo();
+}
+
+async function fetchIpInfo(latlong) {
+    try {
+        if (!latlong) throw new Error("Latitude and longitude are not available");
+
+        const url = `/api/Notification/GetClientIp?url=${encodeURIComponent(window.location.pathname)}&latlong=${encodeURIComponent(latlong)}`;
+        const parser = new UAParser();
+        const browserInfo = parser.getResult();
+
+        const response = await fetch(url);
+        if (!response.ok) {
+            console.error(`IP fetch failed with status: ${response.status}`);
+            displayUnavailableInfo();
+            return;
+        }
+
+        const data = await response.json();
+        updateInfoDisplay({
+            ipAddress: data.ipAddress || 'Not available',
+            city: data.district || 'Not available',
+            browser: `${browserInfo.browser.name?.toLowerCase()} ${browserInfo.browser.major}` || 'Not available',
+            device: getDeviceType() || 'Not available',
+            os: `${browserInfo.os.name?.toLowerCase()} ${browserInfo.os.version}` || 'Not available',
+        });
+    } catch (err) {
+        console.error('Error during IP info fetch operation:', err.message);
+        displayUnavailableInfo();
+
+        if (navigator.geolocation) {
+            console.log('Retrying geolocation...');
+            navigator.geolocation.getCurrentPosition(success, error);
+        } else {
+            console.error('Geolocation is not supported by this browser.');
+        }
+    }
+}
+
+function updateInfoDisplay(info) {
+    const fields = {
+        ipAddress: '#ipAddress .info-data',
+        city: '#city .info-data',
+        browser: '#browser .info-data',
+        device: '#device .info-data',
+        os: '#os .info-data',
+    };
+
+    for (const [key, selector] of Object.entries(fields)) {
+        const element = document.querySelector(selector);
+        if (element) element.textContent = info[key];
+    }
+}
+
+function displayUnavailableInfo() {
+    updateInfoDisplay({
+        ipAddress: 'Not available',
+        city: 'Not available',
+        browser: 'Not available',
+        device: 'Not available',
+        os: 'Not available',
+    });
+}
+
 function getDeviceType() {
     const ua = navigator.userAgent;
     if (/(tablet|ipad|playbook|silk)|(android(?!.*mobi))/i.test(ua)) {
@@ -61,47 +133,7 @@ function getMobileType() {
     }
 }
 
-async function fetchIpInfo(latlong) {
-    try {
-        if (latlong) {
-            const url = "/api/Notification/GetClientIp?url=" + encodeURIComponent(window.location.pathname) + "&latlong=" + encodeURIComponent(latlong);
-            var parser = new UAParser();
-            var result = parser.getResult();
-            const response = await fetch(url);
-            if (!response.ok) {
-                const data = {};
-                console.error('There has been a problem with your ip fetch operation');
-                document.querySelector('#ipAddress .info-data').textContent = 'Not available';
-                document.querySelector('#city .info-data').textContent = 'Not available';
-            }
-            else {
-                const data = await response.json();
-                document.querySelector('#ipAddress .info-data').textContent = data.ipAddress || 'Not available';
-                document.querySelector('#city .info-data').textContent = data.district || 'Not available';
-            }
-            document.querySelector('#browser .info-data').textContent = result.browser.name.toLowerCase() + '' + result.browser.major || 'Not available';
-            document.querySelector('#device .info-data').textContent = getDeviceType() || 'Not available';
-            document.querySelector('#os .info-data').textContent = result.os.name.toLowerCase() + '' + result.os.version || 'Not available';
-        }
 
-    } catch (error) {
-        console.error('There has been a problem with your fetch operation:', error);
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(success, error);
-        } else {
-            console.error('Geolocation is not supported by this browser.');
-        }
-    }
-}
-function success(position) {
-    var lat = position.coords.latitude;
-    var long = position.coords.longitude;
-    var latlong = lat + "," + long; // Store lat and long in the latlong variable
-    fetchIpInfo(latlong);
-}
-function error(err) {
-    console.error('Geolocation request failed or was denied.' + err);
-}
 $(document).ready(function () {
     $('[data-toggle="tooltip"]').tooltip({
         animated: 'fade',

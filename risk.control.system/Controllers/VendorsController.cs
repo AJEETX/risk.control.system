@@ -527,12 +527,12 @@ namespace risk.control.system.Controllers
                                 message += "                                                                                ";
                                 message += $"https://icheckify.co.in";
                                 await smsService.DoSendSmsAsync(user.PhoneNumber, message, true);
-                                notifyService.Custom($"Agent onboarding initiated.", 3, "green", "fas fa-user-check");
+                                notifyService.Custom($"Agent onboarding initiated.", 3, "orange", "fas fa-user-check");
                             }
                             else
                             {
                                 await smsService.DoSendSmsAsync(user.PhoneNumber, "Agency user edited and unlocked. Email : " + user.Email);
-                                notifyService.Custom($"User edited.", 3, "green", "fas fa-user-check");
+                                notifyService.Custom($"User edited.", 3, "orange", "fas fa-user-check");
                             }
                         }
                     }

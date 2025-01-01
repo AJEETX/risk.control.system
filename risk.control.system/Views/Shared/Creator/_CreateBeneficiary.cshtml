@@ -67,7 +67,7 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text" asp-for="DateOfBirth"><i class="far fa-calendar-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                         </div>
-                        <input required asp-for="DateOfBirth" id="BeneficiaryDateOfBirthId" class="form-control remarks" type="date" />
+                        <input required asp-for="DateOfBirth" id="DateOfBirth" class="form-control remarks" type="date" />
                         <span asp-validation-for="DateOfBirth" class="text-danger"></span>
                     </div>
                 </div>
@@ -76,7 +76,7 @@
                     <span class="input-group-label"> Relation:</span>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
-                            <span class="input-group-text" asp-for="BeneficiaryName"><i class="fas fa-user-tie"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                            <span class="input-group-text" asp-for="BeneficiaryRelationId"><i class="fas fa-user-tie"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                         </div>
                         <select required asp-for="BeneficiaryRelationId" class="form-control remarks" asp-items="ViewBag.BeneficiaryRelationId">
                             <option value="">--- SELECT ---</option>
@@ -89,10 +89,9 @@
                     <span class="input-group-label"> Phone #:</span>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
-                            <span class="input-group-text" id="PhoneNumber"><i class="fas fa-phone"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                            <span class="input-group-text" asp-for="ContactNumber"><i class="fas fa-phone"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                         </div>
-                        <input type="text" asp-for="ContactNumber" class="form-control remarks" required maxlength="14"
-                               placeholder="Phone # with country code" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" />
+                        <input type="text" asp-for="ContactNumber" id="ContactNumber" class="form-control remarks" required maxlength="14" placeholder="Phone # with country code" />
                         <span asp-validation-for="ContactNumber" class="text-danger"></span>
                     </div>
                 </div>
@@ -102,7 +101,7 @@
                     <span class="input-group-label"> Income:</span>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
-                            <span class="input-group-text" asp-for="BeneficiaryIncome"><i class="far fa-money-bill-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                            <span class="input-group-text" asp-for="Income"><i class="far fa-money-bill-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                         </div>
                         <select required asp-for="Income" class="form-control remarks" asp-items="Html.GetEnumSelectList<Income>()">
                             <option value="">--- SELECT---</option>
@@ -188,9 +187,9 @@
                     <span class="input-group-label"> Address:</span>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
-                            <span class="input-group-text" id="Addressline"><i class="fa fa-home"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                            <span class="input-group-text"><i class="fa fa-home"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                         </div>
-                        <input type="text" asp-for="Addressline" class="form-control remarks" placeholder="Address" required maxlength="50" />
+                        <input type="text" id="Addressline" asp-for="Addressline" class="form-control remarks" placeholder="Street Address" required maxlength="50" />
                         <span asp-validation-for="Addressline" class="text-danger"></span>
                     </div>
                 </div>

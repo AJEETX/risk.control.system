@@ -1,9 +1,22 @@
 $(document).ready(function () {
-    $('#customer-name, #Description, #CountryId, #StateId, #DistrictId, #Addressline, #Description').on('input', function () {
+    $('#CustomerName, #CountryId, #StateId, #DistrictId').on('input', function () {
         const regex = /^[a-zA-Z ]*$/; // Allow alphabets and spaces
         const value = $(this).val();
         if (!regex.test(value)) {
             $(this).val(value.replace(/[^a-zA-Z ]/g, '')); // Remove invalid characters
+        }
+    });
+    $('#ContactNumber').on('input', function () {
+        this.value = this.value
+            .replace(/[^0-9.]/g, '')  // Allow only numbers and a single dot
+            .replace(/(\..*)\./g, '$1'); // Prevent multiple dots
+    });
+
+    $('#Description, #Addressline').on('input', function () {
+        const regex = /^[a-zA-Z0-9 ]*$/; // Allow alphabets and spaces
+        const value = $(this).val();
+        if (!regex.test(value)) {
+            $(this).val(value.replace(/[^a-zA-Z0-9 ]/g, '')); // Remove invalid characters
         }
     });
 
@@ -113,5 +126,5 @@ $(document).ready(function () {
 
     // Set the max date for customer date input
     const maxDate = new Date().toISOString().split("T")[0];
-    $("#dateCustomerId").attr("max", maxDate);
+    $("#DateOfBirth").attr("max", maxDate);
 });
