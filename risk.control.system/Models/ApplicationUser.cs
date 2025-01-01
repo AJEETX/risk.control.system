@@ -80,6 +80,8 @@ namespace risk.control.system.Models
         public string? AddressLatitude { get; set; }
         public string? AddressLongitude { get; set; }
         public string? AddressMapLocation { get; set; }
+        public bool IsUpdated { get; set; } = true;
+
         [NotMapped]
         public long SelectedPincodeId { get; set; }
         [NotMapped]
@@ -88,6 +90,8 @@ namespace risk.control.system.Models
         public long SelectedStateId { get; set; }
         [NotMapped]
         public long SelectedCountryId { get; set; }
+        [NotMapped]
+        public IList<AgencyRole> AgencyRole { get; set; }
         public override string ToString()
         {
             return $"User Information:\n" +

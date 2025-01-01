@@ -53,6 +53,11 @@ $(document).ready(function () {
 
                     // Submit the form
                     $(`#${formId}`)[0].submit();
+                    // Disable all elements in the form
+                    const formElements = document.getElementById(formId).getElementsByTagName("*");
+                    for (const element of formElements) {
+                        element.disabled = true;
+                    }
                 }
             );
         } else if (confirmationFlag) {

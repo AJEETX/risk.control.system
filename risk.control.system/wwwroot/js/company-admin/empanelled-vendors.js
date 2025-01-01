@@ -29,7 +29,7 @@
                 className: 'max-width-column-name', // Apply the CSS class,
                 targets: 11                      // Index of the column to style
             }],
-        order: [[1, 'asc']],
+        order: [[13, 'desc'], [14, 'desc']], // Sort by `isUpdated` and `lastModified`,
         fixedHeader: true,
         processing: true,
         paging: true,
@@ -92,6 +92,14 @@
                 "mRender": function (data, type, row) {
                     return '<span title="' + row.updateBy + '" data-toggle="tooltip">' + data + '</span>'
                 }
+            },
+            {
+                "data": "isUpdated",
+                "bVisible": false
+            },
+            {
+                "data": "lastModified",
+                bVisible: false
             }
         ],
         "drawCallback": function (settings, start, end, max, total, pre) {
@@ -103,20 +111,35 @@
         error: function (xhr, status, error) { alert('err ' + error) }
     });
 
-    $('#customerTable').on('draw.dt', function () {
+    table.on('draw', function () {
+        table.rows().every(function () {
+            var data = this.data(); // Get row data
+            console.log(data); // Debug row data
+
+            if (data.isUpdated) { // Check if the row should be highlighted
+                var rowNode = this.node();
+
+                // Highlight the row
+                $(rowNode).addClass('highlight-new-user');
+
+                // Scroll the row into view
+                rowNode.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                // Optionally, remove the highlight after a delay
+                setTimeout(function () {
+                    $(rowNode).removeClass('highlight-new-user');
+                }, 3000);
+            }
+        });
+    });
+    table.on('draw.dt', function () {
         $('[data-toggle="tooltip"]').tooltip({
             animated: 'fade',
             placement: 'top',
             html: true
         });
     });
-    //$('#customerTable input[type="checkbox"].vendors').on('click', function () {
-    //    var checkboxes = $("input[type='checkbox'].vendors");
-    //    var anyChecked = checkIfAnyChecked(checkboxes);
-    //    var allChecked = checkIfAllChecked(checkboxes);
-    //    $('#checkall').prop('checked', allChecked);
-    //    $('#empanel-vendors').prop('disabled', !anyChecked)
-    //});
+    
     // Handle click on "Select all" control
     $('#checkall').on('click', function () {
         // Get all rows with search applied

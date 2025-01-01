@@ -70,6 +70,7 @@ namespace risk.control.system.Services
             vendor.AddressLongitude = companyCoordinates.Longitude;
             vendor.AddressMapLocation = url;
 
+            vendor.IsUpdated = true;
             vendor.Updated = DateTime.Now;
             vendor.UpdatedBy = currentUserEmail;
             context.Vendor.Update(vendor);

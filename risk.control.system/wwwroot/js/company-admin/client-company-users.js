@@ -26,7 +26,7 @@
     });
 
     var id = $('#companyId').val();
-    $("#customerTable").DataTable({
+    var table = $("#customerTable").DataTable({
         ajax: {
             url: '/api/Company/CompanyUsers?id=' + id,
             dataSrc: ''

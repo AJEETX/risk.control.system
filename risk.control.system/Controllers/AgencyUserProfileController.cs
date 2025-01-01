@@ -182,6 +182,7 @@ namespace risk.control.system.Controllers
                     user.StateId = applicationUser.StateId;
                     user.PinCode = applicationUser.PinCode;
                     user.PinCodeId = applicationUser.PinCodeId;
+                    user.IsUpdated = true;
                     user.Updated = DateTime.Now;
                     user.Comments = applicationUser.Comments;
                     user.PhoneNumber = applicationUser.PhoneNumber;

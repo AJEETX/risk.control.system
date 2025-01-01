@@ -1,9 +1,10 @@
 ﻿$(document).ready(function () {
-    $("#customerTable").DataTable({
+    var table = $("#customerTable").DataTable({
         ajax: {
             url: '/api/Agency/GetUsers',
             dataSrc: ''
         },
+        order: [[10, 'desc'], [11, 'desc']], // Sort by `isUpdated` and `lastModified`,
         columnDefs: [
             {
                 className: 'max-width-column', // Apply the CSS class,
@@ -103,6 +104,14 @@
                     }
                     return buttons;
                 }
+            },
+            {
+                "data": "isUpdated",
+                bVisible: false
+            },
+            {
+                "data": "lastModified",
+                bVisible: false
             }
         ],
         "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
@@ -118,6 +127,27 @@
         error: function (xhr, status, error) { alert('err ' + error) }
     });
 
+    table.on('draw', function () {
+        table.rows().every(function () {
+            var data = this.data(); // Get row data
+            console.log(data); // Debug row data
+
+            if (data.isUpdated) { // Check if the row should be highlighted
+                var rowNode = this.node();
+
+                // Highlight the row
+                $(rowNode).addClass('highlight-new-user');
+
+                // Scroll the row into view
+                rowNode.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                // Optionally, remove the highlight after a delay
+                setTimeout(function () {
+                    $(rowNode).removeClass('highlight-new-user');
+                }, 3000);
+            }
+        });
+    });
     $('#customerTable').on('draw.dt', function () {
         $('[data-toggle="tooltip"]').tooltip({
             animated: 'fade',

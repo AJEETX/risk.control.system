@@ -30,7 +30,7 @@ namespace risk.control.system.Controllers.Api.Company
         }
 
         [HttpGet("AllCompanies")]
-        public IActionResult AllCompanies()
+        public async Task< IActionResult> AllCompanies()
         {
             var companies = _context.ClientCompany.
                 Where(v =>!v.Deleted)
@@ -38,6 +38,7 @@ namespace risk.control.system.Controllers.Api.Company
                 .Include(v => v.PinCode)
                 .Include(v => v.District)
                 .Include(v => v.State).OrderBy(o => o.Name);
+
             var result =
                 companies.Select(u =>
                 new
@@ -54,10 +55,13 @@ namespace risk.control.system.Controllers.Api.Company
                     Country = u.Country.Name,
                     Updated = u.Updated.HasValue ?  u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy"),
                     Active = u.Status.GetEnumDisplayName(),
-                    UpdatedBy = u.UpdatedBy
-                });
-
-            return Ok(result?.ToArray());
+                    UpdatedBy = u.UpdatedBy,
+                    IsUpdated = u.IsUpdated,
+                    LastModified = u.Updated
+                })?.ToArray();
+            companies.ToList().ForEach(u => u.IsUpdated = false);
+            await _context.SaveChangesAsync();
+            return Ok(result);
         }
 
         [HttpGet("CompanyUsers")]
@@ -96,8 +100,13 @@ namespace risk.control.system.Controllers.Api.Company
                     Roles = u.UserRole != null ? $"<span class=\"badge badge-light\">{u.UserRole.GetEnumDisplayName()}</span>" : "<span class=\"badge badge-light\">...</span>",
                     Pincode = u.PinCode.Code,
                     Updated = u.Updated.HasValue ?  u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy"),
-                    UpdateBy = u.UpdatedBy
+                    UpdateBy = u.UpdatedBy,
+                    IsUpdated = u.IsUpdated,
+                    LastModified = u.Updated
                 })?.ToArray();
+
+            users?.ToList().ForEach(u => u.IsUpdated = false);
+            await _context.SaveChangesAsync();
             return Ok(result);
         }
 
@@ -140,8 +149,13 @@ namespace risk.control.system.Controllers.Api.Company
                     UpdateBy = u.UpdatedBy,
                     Role = u.UserRole.GetEnumDisplayName(),
                     RawEmail = u.Email,
-                    RawAddress = u.Addressline + ", " + u.District.Name + ", " + u.State.Name + ", " + u.Country.Code
+                    RawAddress = u.Addressline + ", " + u.District.Name + ", " + u.State.Name + ", " + u.Country.Code,
+                    IsUpdated = u.IsUpdated,
+                    LastModified = u.Updated
                 })?.ToArray();
+
+            users?.ToList().ForEach(u => u.IsUpdated = false);
+            await _context.SaveChangesAsync();
             return Ok(result);
         }
 
@@ -184,9 +198,13 @@ namespace risk.control.system.Controllers.Api.Company
                     CaseCount = claimsCases.Count(c => c.VendorId == u.VendorId), 
                     RateCount = u.RateCount, 
                     RateTotal = u.RateTotal ,
-                    RawAddress = u.Addressline + ","+ u.District.Name +", " + u.State.Code + ", "+u.Country.Code
-                });
-            return Ok(result?.ToArray());
+                    RawAddress = u.Addressline + ","+ u.District.Name +", " + u.State.Code + ", "+u.Country.Code,
+                    IsUpdated = u.IsUpdated,
+                    LastModified = u.Updated
+                })?.ToArray();
+            company.EmpanelledVendors?.ToList().ForEach(u => u.IsUpdated = false);
+            await _context.SaveChangesAsync();
+            return Ok(result);
         }
 
         [HttpGet("GetAvailableVendors")]
@@ -234,9 +252,13 @@ namespace risk.control.system.Controllers.Api.Company
                     Updated = u.Updated.HasValue ? u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy"),
                     UpdateBy = u.UpdatedBy,
                     CanOnboard = u.Status == VendorStatus.ACTIVE && u.VendorInvestigationServiceTypes != null && u.VendorInvestigationServiceTypes.Count > 0,
-                    VendorName = u.Email
-                });
-            return Ok(result?.ToArray());
+                    VendorName = u.Email,
+                    IsUpdated = u.IsUpdated,
+                    LastModified = u.Updated
+                })?.ToArray();
+            availableVendors?.ToList().ForEach(u => u.IsUpdated = false);
+            await _context.SaveChangesAsync();
+            return Ok(result);
 
         }
 
@@ -280,11 +302,14 @@ namespace risk.control.system.Controllers.Api.Company
                      RawPincodes = string.Join(", ", s.PincodeServices.Select(c =>  c.Pincode)),
                     Rate = s.Price,
                     UpdatedBy = s.UpdatedBy,
-                    Updated = s.Updated.HasValue ? s.Updated.Value.ToString("dd-MM-yyyy") : s.Created.ToString("dd-MM-yyyy")
+                    Updated = s.Updated.HasValue ? s.Updated.Value.ToString("dd-MM-yyyy") : s.Created.ToString("dd-MM-yyyy"),
+                    IsUpdated = s.IsUpdated,
+                    LastModified = s.Updated
+                })?.ToArray();
 
-                });
-
-            return Ok(result?.ToArray());
+            vendor.VendorInvestigationServiceTypes?.ToList().ForEach(u => u.IsUpdated = false);
+            await _context.SaveChangesAsync();
+            return Ok(result);
         }
 
         [HttpGet("SearchCountry")]
@@ -410,7 +435,6 @@ namespace risk.control.system.Controllers.Api.Company
             // Return the filtered pincodes
             return Ok(filteredPincodes);
         }
-
 
         [HttpGet("GetCountryName")]
         public IActionResult GetCountryName(long id)

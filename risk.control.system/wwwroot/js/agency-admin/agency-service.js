@@ -18,11 +18,12 @@
         }
     });
 
-    $("#customerTable").DataTable({
+    var table = $("#customerTable").DataTable({
         ajax: {
             url: '/api/Agency/AllServices',
             dataSrc: ''
         },
+        order: [[11, 'desc'], [12, 'desc']], // Sort by `isUpdated` and `lastModified`,
         columnDefs: [
             {
                 className: 'max-width-column', // Apply the CSS class,
@@ -43,7 +44,8 @@
             /* Name of the keys from
             data file source */
             {
-                "data": "id", "name": "Id", "bVisible": false
+                "data": "id", "name": "Id",
+                "bVisible": false
             },
             {
                 "data": "caseType",
@@ -99,6 +101,7 @@
                     return '<span title="' + row.updated + '" data-toggle="tooltip">' + data + '</span>';
                 }
             },
+            
             {
                 "sDefaultContent": "",
                 "bSortable": false,
@@ -109,9 +112,39 @@
                     buttons += '<a id=delete' + row.id + ' onclick="getdetails(' + row.id + ')" href="/Agency/DeleteService?id=' + row.id + '"  class="btn btn-xs btn-danger"><i class="fas fa-trash"></i> Delete</a>'
                     return buttons;
                 }
+            },
+            {
+                "data": "isUpdated",
+                "bVisible": false
+            },
+            {
+                "data": "lastModified",
+                bVisible: false
             }
         ],
         error: function (xhr, status, error) { alert('err ' + error) }
+    });
+
+    table.on('draw', function () {
+        table.rows().every(function () {
+            var data = this.data(); // Get row data
+            console.log(data); // Debug row data
+
+            if (data.isUpdated) { // Check if the row should be highlighted
+                var rowNode = this.node();
+
+                // Highlight the row
+                $(rowNode).addClass('highlight-new-user');
+
+                // Scroll the row into view
+                rowNode.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                // Optionally, remove the highlight after a delay
+                setTimeout(function () {
+                    $(rowNode).removeClass('highlight-new-user');
+                }, 3000);
+            }
+        });
     });
     $('#customerTable').on('draw.dt', function () {
         $('[data-toggle="tooltip"]').tooltip({

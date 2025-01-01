@@ -148,17 +148,6 @@ namespace risk.control.system.Controllers
                     notifyService.Custom($"Agency Not found.", 3, "red", "fas fa-building");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-
-                var country = _context.Country.OrderBy(c => c.Name);
-                var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == vendor.CountryId).OrderBy(d => d.Name);
-                var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == vendor.StateId).OrderBy(d => d.Name);
-                var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == vendor.DistrictId).OrderBy(d => d.Name);
-
-                ViewData["CountryId"] = new SelectList(country, "CountryId", "Name", vendor.CountryId);
-                ViewData["StateId"] = new SelectList(relatedStates, "StateId", "Name", vendor.StateId);
-                ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", vendor.DistrictId);
-                ViewData["PinCodeId"] = new SelectList(pincodes, "PinCodeId", "Code", vendor.PinCodeId);
-
                 return View(vendor);
             }
             catch (Exception ex)
@@ -265,8 +254,9 @@ namespace risk.control.system.Controllers
                     notifyService.Custom($"No agency not found.", 3, "red", "fas fa-building");
                     return RedirectToAction(nameof(AgencyController.Profile), "Agency");
                 }
-                var model = new VendorApplicationUser { Vendor = vendor };
-                ViewData["CountryId"] = new SelectList(_context.Country.OrderBy(c => c.Name), "CountryId", "Name");
+                var roles = Enum.GetValues(typeof(AgencyRole)).Cast<AgencyRole>().Where(role => role != AgencyRole.AGENCY_ADMIN)?.ToList();
+
+                var model = new VendorApplicationUser { Vendor = vendor, AgencyRole = roles };
                 return View(model);
             }
             catch (Exception ex)
@@ -357,8 +347,8 @@ namespace risk.control.system.Controllers
 
                         if (lockUser.Succeeded && lockDate.Succeeded)
                         {
-                            notifyService.Custom($"User {user.Email} created and locked.", 3, "green", "fas fa-user-lock");
-                            await smsService.DoSendSmsAsync(user.PhoneNumber, "Agency user created and locked. Email : " + user.Email);
+                            notifyService.Custom($"User {user.Email} created.", 3, "green", "fas fa-user-lock");
+                            await smsService.DoSendSmsAsync(user.PhoneNumber, "Agency user created. Email : " + user.Email);
                             if(txn =="agency")
                             {
                                 return RedirectToAction(nameof(AgencyController.Users), "Agency");
@@ -443,18 +433,14 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(AgencyController.User), "Agency");
                 }
 
-                var vendorApplicationUser = await _context.VendorApplicationUser.FindAsync(userId);
-                if (vendorApplicationUser == null)
+                var user = await _context.VendorApplicationUser.FindAsync(userId);
+                if (user == null)
                 {
                     notifyService.Error("User not found!!!..Contact Admin");
                     return RedirectToAction(nameof(AgencyController.User), "Agency");
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (string.IsNullOrWhiteSpace(currentUserEmail))
-                {
-                    notifyService.Error("User Not found!!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
+                
                 var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == currentUserEmail);
                 if (vendorUser == null)
                 {
@@ -468,21 +454,8 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(AgencyController.Profile), "Agency");
                 }
 
-                ViewBag.Show = vendorApplicationUser.Email == vendorUser.Email ? false : true;
-
-                vendorApplicationUser.Vendor = vendor;
-
-                var country = _context.Country.OrderBy(o => o.Name);
-                var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == vendorApplicationUser.CountryId).OrderBy(d => d.Name);
-                var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == vendorApplicationUser.StateId).OrderBy(d => d.Name);
-                var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == vendorApplicationUser.DistrictId).OrderBy(d => d.Name);
-
-                ViewData["CountryId"] = new SelectList(country, "CountryId", "Name", vendorApplicationUser.CountryId);
-                ViewData["StateId"] = new SelectList(relatedStates, "StateId", "Name", vendorApplicationUser.StateId);
-                ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", vendorApplicationUser.DistrictId);
-                ViewData["PinCodeId"] = new SelectList(pincodes, "PinCodeId", "Code", vendorApplicationUser.PinCodeId);
-
-                return View(vendorApplicationUser);
+                user.Vendor = vendor;
+                return View(user);
             }
             catch (Exception ex)
             {
@@ -551,6 +524,7 @@ namespace risk.control.system.Controllers
 
                     user.Addressline = applicationUser.Addressline;
                     user.Active = applicationUser.Active;
+                    user.IsUpdated = true;
                     user.Updated = DateTime.Now;
                     user.Comments = applicationUser.Comments;
                     user.PhoneNumber = applicationUser.PhoneNumber;
@@ -583,8 +557,8 @@ namespace risk.control.system.Controllers
 
                             if (lockUser.Succeeded && lockDate.Succeeded)
                             {
-                                await smsService.DoSendSmsAsync(user.PhoneNumber, "User edited and locked. Email : " + user.Email);
-                                notifyService.Custom($"User {user.Email} edited and locked.", 3, "orange", "fas fa-user-lock");
+                                await smsService.DoSendSmsAsync(user.PhoneNumber, "User edited. Email : " + user.Email);
+                                notifyService.Custom($"User {user.Email} edited.", 3, "orange", "fas fa-user-lock");
                             }
                         }
                         else
@@ -843,7 +817,6 @@ namespace risk.control.system.Controllers
                 var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == vendorUser.VendorId);
 
                 ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name");
-                //ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
                 var model = new VendorInvestigationServiceType { SelectedMultiPincodeId = new List<long>(), Vendor = vendor, PincodeServices = new List<ServicedPinCode>() };
                 return View(model);
             }
@@ -879,14 +852,15 @@ namespace risk.control.system.Controllers
                     VendorInvestigationServiceType = vendorInvestigationServiceType,
                 }).ToList();
                 vendorInvestigationServiceType.PincodeServices = servicePinCodes;
-                vendorInvestigationServiceType.Updated = DateTime.Now;
-                vendorInvestigationServiceType.UpdatedBy = HttpContext.User?.Identity?.Name;
-                vendorInvestigationServiceType.Created = DateTime.Now;
+                
                 vendorInvestigationServiceType.VendorId = vendorUser.VendorId.GetValueOrDefault();
                 vendorInvestigationServiceType.CountryId = vendorInvestigationServiceType.SelectedCountryId;
                 vendorInvestigationServiceType.StateId = vendorInvestigationServiceType.SelectedStateId;
                 vendorInvestigationServiceType.DistrictId = vendorInvestigationServiceType.SelectedDistrictId;
 
+                vendorInvestigationServiceType.Updated = DateTime.Now;
+                vendorInvestigationServiceType.UpdatedBy = HttpContext.User?.Identity?.Name;
+                vendorInvestigationServiceType.Created = DateTime.Now;
                 _context.Add(vendorInvestigationServiceType);
                 await _context.SaveChangesAsync();
                 notifyService.Custom($"Service created successfully.", 3, "green", "fas fa-truck");
@@ -936,15 +910,6 @@ namespace risk.control.system.Controllers
                     .Include(i => i.LineOfBusiness)
                     .Where(i => i.LineOfBusiness.LineOfBusinessId == vendorInvestigationServiceType.LineOfBusinessId),
                     "InvestigationServiceTypeId", "Name", vendorInvestigationServiceType.InvestigationServiceTypeId);
-
-                //var country = _context.Country.OrderBy(o => o.Name);
-                //var states = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == vendorInvestigationServiceType.CountryId).OrderBy(d => d.Name);
-                //var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == vendorInvestigationServiceType.StateId).OrderBy(d => d.Name);
-
-                //ViewData["CountryId"] = new SelectList(country, "CountryId", "Name", vendorInvestigationServiceType.CountryId);
-                //ViewData["StateId"] = new SelectList(states, "StateId", "Name", vendorInvestigationServiceType.StateId);
-                //ViewData["VendorId"] = new SelectList(_context.Vendor, "VendorId", "Name", vendorInvestigationServiceType.VendorId);
-                //ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", vendorInvestigationServiceType.DistrictId);
 
                 ViewBag.PinCodeId = _context.PinCode.Where(p => p.District.DistrictId == vendorInvestigationServiceType.DistrictId)
                     .Select(x => new SelectListItem
@@ -1004,13 +969,15 @@ namespace risk.control.system.Controllers
                     _context.ServicedPinCode.AddRange(pinCodesWithId);
 
                     vendorInvestigationServiceType.PincodeServices = pinCodesWithId;
-                    vendorInvestigationServiceType.Updated = DateTime.Now;
-                    vendorInvestigationServiceType.UpdatedBy = currentUserEmail;
+                    
                     vendorInvestigationServiceType.CountryId = vendorInvestigationServiceType.SelectedCountryId;
                     vendorInvestigationServiceType.StateId = vendorInvestigationServiceType.SelectedStateId;
                     vendorInvestigationServiceType.DistrictId = vendorInvestigationServiceType.SelectedDistrictId;
 
 
+                    vendorInvestigationServiceType.Updated = DateTime.Now;
+                    vendorInvestigationServiceType.UpdatedBy = currentUserEmail;
+                    vendorInvestigationServiceType.IsUpdated = true; 
                     _context.Update(vendorInvestigationServiceType);
                     await _context.SaveChangesAsync();
                     notifyService.Custom($"Service updated successfully.", 3, "orange", "fas fa-truck");
@@ -1018,9 +985,6 @@ namespace risk.control.system.Controllers
                 }
                 ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType, "InvestigationServiceTypeId", "Name", vendorInvestigationServiceType.InvestigationServiceTypeId);
                 ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", vendorInvestigationServiceType.LineOfBusinessId);
-                //ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name", vendorInvestigationServiceType.StateId);
-                //ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name", vendorInvestigationServiceType.DistrictId);
-                //ViewData["VendorId"] = new SelectList(_context.Vendor, "VendorId", "Name", vendorInvestigationServiceType.VendorId);
                 return View(vendorInvestigationServiceType);
             }
             catch (Exception ex)

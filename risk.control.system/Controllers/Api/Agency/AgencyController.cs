@@ -54,7 +54,7 @@ namespace risk.control.system.Controllers.Api.Agency
         }
 
         [HttpGet("AllUsers")]
-        public IActionResult AllUsers()
+        public async Task<IActionResult> AllUsers()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
@@ -71,8 +71,7 @@ namespace risk.control.system.Controllers.Api.Agency
                 .ThenBy(u => u.LastName)
                 .AsQueryable();
 
-            var result =
-                users?.Select(u =>
+            var result = users?.Select(u =>
                 new
                 {
                     Id = u.Id,
@@ -85,14 +84,18 @@ namespace risk.control.system.Controllers.Api.Agency
                     Pincode = u.PinCode.Code,
                     Roles = u.UserRole != null ? $"<span class=\"badge badge-light\">{u.UserRole.GetEnumDisplayName()}</span>" : "<span class=\"badge badge-light\">...</span>",
                     Updated = u.Updated.HasValue ? u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy"),
-                    UpdateBy = u.UpdatedBy
-                });
+                    UpdateBy = u.UpdatedBy,
+                    IsUpdated = u.IsUpdated,
+                    LastModified = u.Updated
+                })?.ToArray();
 
-            return Ok(result?.ToArray());
+            users?.ToList().ForEach(u => u.IsUpdated = false);
+            await _context.SaveChangesAsync();
+            return Ok(result);
         }
 
         [HttpGet("AllAgencies")]
-        public IActionResult AllAgencies()
+        public async Task<IActionResult> AllAgencies()
         {
             var agencies = _context.Vendor
                 .Include(v => v.Country)
@@ -101,9 +104,7 @@ namespace risk.control.system.Controllers.Api.Agency
                 .Include(v => v.State)
                 .Include(v => v.VendorInvestigationServiceTypes)
                 .Where(v => !v.Deleted);
-            var result =
-                agencies
-                ?.Select(u =>
+            var result =agencies?.Select(u =>
                 new
                 {
                     Id = u.VendorId,
@@ -118,14 +119,18 @@ namespace risk.control.system.Controllers.Api.Agency
                     Updated = u.Updated.HasValue ? u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy"),
                     Update = u.UpdatedBy,
                     VendorName = u.Email,
-                    RawStatus = u.Status.GetEnumDisplayName()
-                })
-                ?.OrderBy(a => a.Name);
+                    RawStatus = u.Status.GetEnumDisplayName(),
+                    IsUpdated = u.IsUpdated,
+                    LastModified = u.Updated
+                })?.ToArray();
 
-            return Ok(result?.ToArray());
+            agencies?.ToList().ForEach(u => u.IsUpdated = false);
+            await _context.SaveChangesAsync();
+
+            return Ok(result);
         }
         [HttpGet("GetEmpannelled")]
-        public IActionResult GetEmpannelled()
+        public async Task<IActionResult> GetEmpannelled()
         {
             var agencies = _context.Vendor
                 .Include(v => v.Country)
@@ -133,9 +138,7 @@ namespace risk.control.system.Controllers.Api.Agency
                 .Include(v => v.District)
                 .Include(v => v.State)
                 .Where(v => !v.Deleted);
-            var result =
-                agencies
-                ?.Select(u =>
+            var result =agencies?.Select(u =>
                 new
                 {
                     Id = u.VendorId,
@@ -149,15 +152,18 @@ namespace risk.control.system.Controllers.Api.Agency
                     State = u.State.Name,
                     Country = u.Country.Name,
                     Updated = u.Updated.HasValue ? u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy"),
-                    UpdateBy = u.UpdatedBy
-                })
-                ?.OrderBy(a => a.Name);
+                    UpdateBy = u.UpdatedBy,
+                    IsUpdated = u.IsUpdated,
+                    LastModified = u.Updated
+                })?.ToArray();
 
-            return Ok(result?.ToArray());
+            agencies?.ToList().ForEach(u => u.IsUpdated = false);
+            await _context.SaveChangesAsync();
+            return Ok(result);
         }
 
         [HttpGet("AllServices")]
-        public IActionResult AllServices()
+        public async Task<IActionResult> AllServices()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
@@ -197,10 +203,12 @@ namespace risk.control.system.Controllers.Api.Agency
                     Rate = s.Price,
                     UpdatedBy = s.UpdatedBy,
                     Updated = s.Updated.HasValue ? s.Updated.Value.ToString("dd-MM-yyyy") :  s.Created.ToString("dd-MM-yyyy"),
-                    UpdateBy = s.UpdatedBy
-                });
-
-            return Ok(result?.ToArray());
+                    IsUpdated = s.IsUpdated,
+                    LastModified = s.Updated
+                })?.ToArray();
+            vendor.VendorInvestigationServiceTypes?.ToList().ForEach(i => i.IsUpdated = false);
+            await _context.SaveChangesAsync();
+            return Ok(result);
         }
 
         [HttpGet("GetCompanyAgencyUser")]
@@ -246,7 +254,7 @@ namespace risk.control.system.Controllers.Api.Agency
         }
 
         [HttpGet("GetUsers")]
-        public IActionResult GetUsers()
+        public async Task<IActionResult> GetUsers()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
@@ -260,8 +268,8 @@ namespace risk.control.system.Controllers.Api.Agency
                 .Where(c => c.VendorId == vendorUser.VendorId && !c.Deleted);
 
             var users = vendorUsers?
-                .OrderBy(u => u.FirstName)
-                .ThenBy(u => u.LastName)
+                .OrderBy(u => u.IsUpdated)
+                .ThenBy(u => u.Updated)
                 .AsQueryable();
             var result = dashboardService.CalculateAgentCaseStatus(userEmail);
 
@@ -304,9 +312,13 @@ namespace risk.control.system.Controllers.Api.Agency
                     UpdateBy = u.AgencyUser.UpdatedBy,
                     Role = u.AgencyUser.UserRole.GetEnumDisplayName(),
                     AgentOnboarded =(u.AgencyUser.UserRole == AgencyRole.AGENT && !string.IsNullOrWhiteSpace(u.AgencyUser.MobileUId) || u.AgencyUser.UserRole != AgencyRole.AGENT),
-                    RawEmail = u.AgencyUser.Email
-                });
-            return Ok(agentWithLoad?.ToArray());
+                    RawEmail = u.AgencyUser.Email,
+                    isUpdated = u.AgencyUser.IsUpdated,
+                    LastModified = u.AgencyUser.Updated
+                })?.ToArray();
+            users?.ToList().ForEach(user => user.IsUpdated = false);
+            await _context.SaveChangesAsync();
+            return Ok(agentWithLoad);
         }
 
         [HttpGet("GetAgentLoad")]

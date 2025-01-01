@@ -1,10 +1,12 @@
 ﻿$(document).ready(function () {
 
-    $("#customerTable").DataTable({
+    var table = $("#customerTable").DataTable({
         ajax: {
             url: '/api/Company/AllUsers',
             dataSrc: ''
-        }, columnDefs: [{
+        },
+        order: [[11, 'desc'], [12, 'desc']], // Sort by `isUpdated` and `lastModified`,
+        columnDefs: [{
             'targets': 0,
             'searchable': false,
             'orderable': false,
@@ -103,6 +105,14 @@
                     }
                     return buttons;
                 }
+            },
+            {
+                "data": "isUpdated",
+                "bVisible": false
+            },
+            {
+                "data": "lastModified",
+                bVisible: false
             }
         ],
         "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
@@ -113,7 +123,29 @@
         },
         error: function (xhr, status, error) { alert('err ' + error) }
     });
-    $('#customerTable').on('draw.dt', function () {
+
+    table.on('draw', function () {
+        table.rows().every(function () {
+            var data = this.data(); // Get row data
+            console.log(data); // Debug row data
+
+            if (data.isUpdated) { // Check if the row should be highlighted
+                var rowNode = this.node();
+
+                // Highlight the row
+                $(rowNode).addClass('highlight-new-user');
+
+                // Scroll the row into view
+                rowNode.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                // Optionally, remove the highlight after a delay
+                setTimeout(function () {
+                    $(rowNode).removeClass('highlight-new-user');
+                }, 3000);
+            }
+        });
+    });
+    table.on('draw.dt', function () {
         $('[data-toggle="tooltip"]').tooltip({
             animated: 'fade',
             placement: 'top',

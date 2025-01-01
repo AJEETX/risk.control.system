@@ -224,7 +224,6 @@ namespace risk.control.system.Controllers
                     foreach (IdentityError error in result.Errors)
                         ModelState.AddModelError("", error.Description);
                 }
-                GetCountryStateEdit(user);
                 notifyService.Custom($"User created successfully.", 3, "green", "fas fa-user-plus");
                 return View(user);
             }
@@ -234,14 +233,6 @@ namespace risk.control.system.Controllers
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
-        }
-
-        private void GetCountryStateEdit(VendorApplicationUser? user)
-        {
-            ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", user?.CountryId);
-            ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name", user?.DistrictId);
-            ViewData["StateId"] = new SelectList(_context.State.Where(s => s.CountryId == user.CountryId), "StateId", "Name", user?.StateId);
-            ViewData["PinCodeId"] = new SelectList(_context.PinCode.Where(s => s.StateId == user.StateId), "PinCodeId", "Name", user?.PinCodeId);
         }
 
         // GET: VendorApplicationUsers/Edit/5
@@ -361,6 +352,7 @@ namespace risk.control.system.Controllers
                     user.PinCode = applicationUser.PinCode;
                     user.PinCodeId = applicationUser.PinCodeId;
                     user.Updated = DateTime.Now;
+                    user.IsUpdated = true;
                     user.Comments = applicationUser.Comments;
                     user.PhoneNumber = applicationUser.PhoneNumber;
                     user.UpdatedBy = HttpContext.User?.Identity?.Name;

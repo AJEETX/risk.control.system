@@ -1727,3 +1727,8 @@ input.auto-dropdown {
 select#PinCodeId{
     height:300px;
 }
+.highlight-new-user {
+    background-color: #d4edda; /* Light green background */
+    color: #155724; /* Dark green text */
+    animation: highlight 3s ease-in-out;
+}

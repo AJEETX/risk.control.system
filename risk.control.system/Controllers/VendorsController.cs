@@ -179,8 +179,24 @@ namespace risk.control.system.Controllers
                 notifyService.Error("OOPS !!!..Error creating user");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
+            var allRoles = Enum.GetValues(typeof(AgencyRole)).Cast<AgencyRole>()?.ToList(); 
+
             var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == id);
-            var model = new VendorApplicationUser { Vendor = vendor };
+            if(vendor == null)
+            {
+                notifyService.Error("OOPS !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+            var currentVendorUserCount = _context.VendorApplicationUser.Count(v => v.VendorId == id);
+            if (currentVendorUserCount == 0)
+            {
+                allRoles = allRoles.Where(r => r == AgencyRole.AGENCY_ADMIN).ToList();
+            }
+            else
+            {
+                allRoles = allRoles.Where(r => r != AgencyRole.AGENCY_ADMIN).ToList();
+            }
+            var model = new VendorApplicationUser { Vendor = vendor, AgencyRole = allRoles };
             //ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
 
             var agencysPage = new MvcBreadcrumbNode("AvailableVendors", "Company", "Manager Agency(s)");
@@ -363,19 +379,8 @@ namespace risk.control.system.Controllers
                     notifyService.Error("OOPS !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
+
                 vendorApplicationUser.Vendor = vendor;
-
-                //var country = _context.Country.OrderBy(o => o.Name);
-                //var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == vendorApplicationUser.CountryId).OrderBy(d => d.Name);
-                //var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == vendorApplicationUser.StateId).OrderBy(d => d.Name);
-                //var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == vendorApplicationUser.DistrictId).OrderBy(d => d.Name);
-
-                //ViewData["CountryId"] = new SelectList(country.OrderBy(c => c.Name), "CountryId", "Name", vendorApplicationUser.CountryId);
-                //ViewData["StateId"] = new SelectList(relatedStates, "StateId", "Name", vendorApplicationUser.StateId);
-                //ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", vendorApplicationUser.DistrictId);
-                //ViewData["PinCodeId"] = new SelectList(pincodes, "PinCodeId", "Code", vendorApplicationUser.PinCodeId);
-
-
 
                 var agencysPage = new MvcBreadcrumbNode("AvailableVendors", "Company", "Manager Agency(s)");
                 var agency2Page = new MvcBreadcrumbNode("AvailableVendors", "Company", "Available Agencies") { Parent = agencysPage, };
@@ -459,6 +464,7 @@ namespace risk.control.system.Controllers
                 user.StateId = applicationUser.SelectedStateId;
                 user.CountryId = applicationUser.SelectedCountryId;
 
+                user.IsUpdated = true;
                 user.Updated = DateTime.Now;
                 user.Comments = applicationUser.Comments;
                 user.PhoneNumber = applicationUser.PhoneNumber;
@@ -949,6 +955,7 @@ namespace risk.control.system.Controllers
                         vendor.DocumentUrl = existingVendor.DocumentUrl;
                     }
                 }
+                vendor.IsUpdated = true;
                 vendor.Updated = DateTime.Now;
                 vendor.UpdatedBy = HttpContext.User?.Identity?.Name;
 

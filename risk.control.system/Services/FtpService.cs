@@ -264,6 +264,8 @@ namespace risk.control.system.Services
                                 dt.Rows[dt.Rows.Count - 1][i] = cell?.Trim() ?? NO_DATA;
                                 i++;
                             }
+
+                            //CREATE CLAIM
                             var subStatus = companyUser.ClientCompany.AutoAllocation && createdAsMethod == CREATEDBY.AUTO ? createdStatus : assignedStatus;
                             var claim = new ClaimsInvestigation
                             {
@@ -289,8 +291,8 @@ namespace risk.control.system.Services
                                 CreatorSla = companyUser.ClientCompany.CreatorSla
                             };
 
+                            //CREATE POLICY
                             var servicetype = _context.InvestigationServiceType.FirstOrDefault(s => s.Code.ToLower() == (rowData[4].Trim().ToLower()));
-
                             var policyImage = archive.Entries.FirstOrDefault(p => p.FullName.ToLower().EndsWith(rowData[0]?.Trim().ToLower() + "/policy.jpg"));
                             byte[] savedNewImage = null;
                             using (var pImage = policyImage.Open())
@@ -316,6 +318,7 @@ namespace risk.control.system.Services
                                 DocumentImage = savedNewImage,
                             };
 
+                            //CREATE CUSTOMER
                             var pinCode = _context.PinCode
                                 .Include(p => p.District)
                                 .Include(p => p.State)
@@ -357,7 +360,6 @@ namespace risk.control.system.Services
                                 ProfilePicture = customerNewImage,
                             };
 
-
                             var address = claim.CustomerDetail.Addressline + ", " +
                                 pinCode.District.Name + ", " +
                                 pinCode.State.Name + ", " +
@@ -371,6 +373,7 @@ namespace risk.control.system.Services
                             var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:A%7C{customerLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
                             claim.CustomerDetail.CustomerLocationMap = url;
 
+                            //CREATE BENEFICIARY
                             var benePinCode = _context.PinCode
                                 .Include(p => p.District)
                                 .Include(p => p.State)

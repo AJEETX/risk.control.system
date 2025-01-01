@@ -199,15 +199,7 @@ namespace risk.control.system.Controllers
                     .Include(i => i.LineOfBusiness)
                     .Where(i => i.LineOfBusiness.LineOfBusinessId == vendorInvestigationServiceType.LineOfBusinessId),
                     "InvestigationServiceTypeId", "Name", vendorInvestigationServiceType.InvestigationServiceTypeId);
-
-                //var country = _context.Country.OrderBy(c => c.Name);
-                //var states = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == vendorInvestigationServiceType.CountryId).OrderBy(d => d.Name);
-                //var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == vendorInvestigationServiceType.StateId).OrderBy(d => d.Name);
-
-                //ViewData["CountryId"] = new SelectList(country, "CountryId", "Name", vendorInvestigationServiceType.CountryId);
-                //ViewData["StateId"] = new SelectList(states, "StateId", "Name", vendorInvestigationServiceType.StateId);
-                //ViewData["VendorId"] = new SelectList(_context.Vendor, "VendorId", "Name", vendorInvestigationServiceType.VendorId);
-                //ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", vendorInvestigationServiceType.DistrictId);
+                
                 ViewBag.PinCodeId = _context.PinCode.Include(p => p.District).Where(p => p.District.DistrictId == vendorInvestigationServiceType.DistrictId)
                     .Select(x => new SelectListItem
                     {
@@ -265,7 +257,7 @@ namespace risk.control.system.Controllers
                 vendorInvestigationServiceType.PincodeServices = pinCodesWithId;
                 vendorInvestigationServiceType.Updated = DateTime.Now;
                 vendorInvestigationServiceType.UpdatedBy = HttpContext.User?.Identity?.Name;
-
+                vendorInvestigationServiceType.IsUpdated = true;
                 vendorInvestigationServiceType.CountryId = vendorInvestigationServiceType.SelectedCountryId;
                 vendorInvestigationServiceType.StateId = vendorInvestigationServiceType.SelectedStateId;
                 vendorInvestigationServiceType.DistrictId = vendorInvestigationServiceType.SelectedDistrictId;

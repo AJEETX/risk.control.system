@@ -505,6 +505,7 @@ namespace risk.control.system.Controllers
                     user.DistrictId = applicationUser.SelectedDistrictId;
                     user.PinCodeId = applicationUser.SelectedPincodeId;
 
+                    user.IsUpdated = true;
                     user.Updated = DateTime.Now;
                     user.Comments = applicationUser.Comments;
                     user.PhoneNumber = applicationUser.PhoneNumber;

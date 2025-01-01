@@ -14,6 +14,8 @@ namespace risk.control.system.Models
         [Display(Name = "Beneficiary relation code")]
         [Required]
         public string Code { get; set; } = default!;
+        public bool IsUpdated { get; set; } = true;
+
         public override string ToString()
         {
             return $"Beneficiary relation Information:\n" +
