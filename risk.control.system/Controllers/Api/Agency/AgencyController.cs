@@ -236,7 +236,7 @@ namespace risk.control.system.Controllers.Api.Agency
                     "<a href=/Vendors/EditUser?userId=" + u.Id + ">" + u.Email + "</a>" :
                     "<a href=/Vendors/EditUser?userId=" + u.Id + ">" + u.Email + "</a><span title=\"Onboarding incomplete !!!\" data-toggle=\"tooltip\"><i class='fa fa-asterisk asterik-style'></i></span>",
                     Phone = u.PhoneNumber,
-                    Photo = string.IsNullOrWhiteSpace(u.ProfilePictureUrl) ? noUserImagefilePath : u.ProfilePictureUrl,
+                    Photo = u.ProfilePicture == null ? noUserImagefilePath : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(u.ProfilePicture)) ,
                     Addressline = u.Addressline + ", " + u.District.Name + ", " + u.State.Name + ", " + u.Country.Code,
                     Pincode = u.PinCode.Code,
                     Active = u.Active,
@@ -304,7 +304,7 @@ namespace risk.control.system.Controllers.Api.Agency
                 .Select(u => new
                 {
                     Id = u.AgencyUser.Id,
-                    Photo = string.IsNullOrWhiteSpace(u.AgencyUser.ProfilePictureUrl) ? noUserImagefilePath : u.AgencyUser.ProfilePictureUrl,
+                    Photo = u.AgencyUser.ProfilePicture == null ? noUserImagefilePath : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(u.AgencyUser.ProfilePicture)) ,
                     Email = (u.AgencyUser.UserRole == AgencyRole.AGENT && !string.IsNullOrWhiteSpace(u.AgencyUser.MobileUId) || u.AgencyUser.UserRole != AgencyRole.AGENT) ?
                     "<a href=/Agency/EditUser?userId=" +u.AgencyUser.Id +">" + u.AgencyUser.Email + "</a>":
                     "<a href=/Agency/EditUser?userId=" + u.AgencyUser.Id + ">" + u.AgencyUser.Email + "</a><span title=\"Onboarding incomplete !!!\" data-toggle=\"tooltip\"><i class='fa fa-asterisk asterik-style'></i></span>",

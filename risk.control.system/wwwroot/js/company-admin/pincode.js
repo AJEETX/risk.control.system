@@ -1,10 +1,10 @@
 ﻿$(document).ready(function () {
-    $(document).ready(function () {
+
     const fields = ['#CountryId', '#StateId', '#DistrictId', '#PinCodeId'];
 
     fields.forEach(function (field) {
         $(field).on('input', function () {
-            const isValid = /^[a-zA-Z0-9]*$/.test(this.value); // Check if input is valid
+            const isValid = /^[a-zA-Z0-9 ]*$/.test(this.value); // Check if input is valid
             if (!isValid) {
                 $(this).val('');
                 $(this).addClass('is-invalid'); // Add error class
@@ -13,7 +13,6 @@
             }
         });
     });
-});
 
     // Initialize placeholders and field validations
     updatePlaceholdersBasedOnState();

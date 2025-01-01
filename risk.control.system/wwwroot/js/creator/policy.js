@@ -1,4 +1,21 @@
 $(document).ready(function () {
+    $('#contractnum, #PolicyDetail_CauseOfLoss').on('input', function () {
+        const regex = /^[a-zA-Z0-9]*$/; // Allow alphabets and spaces
+        const value = $(this).val();
+        if (!regex.test(value)) {
+            $(this).val(value.replace(/[^a-zA-Z0-9]/g, '')); // Remove invalid characters
+        }
+    });
+
+
+    $('#PolicyDetail_CauseOfLoss').on('input', function () {
+        const regex = /^[a-zA-Z0-9 ]*$/; // Allow alphabets and spaces
+        const value = $(this).val();
+        if (!regex.test(value)) {
+            $(this).val(value.replace(/[^a-zA-Z0-9 ]/g, '')); // Remove invalid characters
+        }
+    });
+
     var askConfirmation = true;
     var askEditConfirmation = true;
 

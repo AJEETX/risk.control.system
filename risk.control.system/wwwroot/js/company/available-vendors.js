@@ -29,7 +29,7 @@
                 className: 'max-width-column-name', // Apply the CSS class,
                 targets: 12                      // Index of the column to style
             }],
-        order: [[1, 'asc']],
+        order: [[14, 'desc'], [15, 'desc']], // Sort by `isUpdated` and `lastModified`,
         fixedHeader: true,
         processing: true,
         paging: true,
@@ -102,6 +102,14 @@
                     buttons += '<a id=delete' + row.id + ' onclick="getdetails(' + row.id + ')" href="/Vendors/Delete?Id=' + row.id + '"  class="btn btn-xs btn-danger"><i class="fas fa-trash"></i></i> Delete</a>'
                     return buttons;
                 }
+            },
+            {
+                "data": "isUpdated",
+                bVisible: false
+            },
+            {
+                "data": "lastModified",
+                bVisible: false
             }
         ],
         "drawCallback": function (settings, start, end, max, total, pre) {
@@ -121,6 +129,27 @@
         });
     });
 
+    table.on('draw', function () {
+        table.rows().every(function () {
+            var data = this.data(); // Get row data
+            console.log(data); // Debug row data
+
+            if (data.isUpdated) { // Check if the row should be highlighted
+                var rowNode = this.node();
+
+                // Highlight the row
+                $(rowNode).addClass('highlight-new-user');
+
+                // Scroll the row into view
+                rowNode.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                // Optionally, remove the highlight after a delay
+                setTimeout(function () {
+                    $(rowNode).removeClass('highlight-new-user');
+                }, 3000);
+            }
+        });
+    });
     // Handle click on "Select all" control
     $('#checkall').on('click', function () {
         // Get all rows with search applied

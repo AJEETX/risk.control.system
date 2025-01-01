@@ -24,7 +24,7 @@ using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers
 {
-    [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME},{CREATOR.DISPLAY_NAME}")]
+    [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME},{CREATOR.DISPLAY_NAME},{AGENCY_ADMIN.DISPLAY_NAME}")]
     public class VendorsController : Controller
     {
         private const string vendorMapSize = "800x800";
@@ -403,7 +403,7 @@ namespace risk.control.system.Controllers
         [HttpPost]
         [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditUser(string id, VendorApplicationUser applicationUser)
+        public async Task<IActionResult> EditUser(string id, VendorApplicationUser applicationUser, string editby)
         {
             if (applicationUser is null || applicationUser.SelectedCountryId < 1 || applicationUser.SelectedStateId < 1 || applicationUser.SelectedDistrictId < 1 || applicationUser.SelectedPincodeId < 1)
             {
@@ -447,7 +447,6 @@ namespace risk.control.system.Controllers
                     applicationUser.ProfilePicture = dataStream.ToArray();
                 }
                 user.ProfilePicture = applicationUser?.ProfilePicture ?? user.ProfilePicture;
-                user.ProfileImage = applicationUser?.ProfileImage ?? user.ProfileImage;
                 user.ProfilePictureUrl = applicationUser?.ProfilePictureUrl ?? user.ProfilePictureUrl;
                 user.PhoneNumber = applicationUser?.PhoneNumber ?? user.PhoneNumber;
                 user.FirstName = applicationUser?.FirstName;
@@ -537,7 +536,15 @@ namespace risk.control.system.Controllers
                             }
                         }
                     }
-                    return RedirectToAction(nameof(Users), "Vendors", new { id = applicationUser.VendorId });
+
+                    if(editby == "company")
+                    {
+                        return RedirectToAction(nameof(Users), "Vendors", new { id = applicationUser.VendorId });
+                    }
+                    else
+                    {
+                        return RedirectToAction(nameof(AgencyController.Users), "Agency");
+                    }
                 }
             }
             catch (Exception ex)

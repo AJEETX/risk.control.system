@@ -1,4 +1,13 @@
 $(document).ready(function () {
+
+    $('#BeneficiaryName, #CountryId, #StateId, #DistrictId, #Addressline').on('input', function () {
+        const regex = /^[a-zA-Z ]*$/; // Allow alphabets and spaces
+        const value = $(this).val();
+        if (!regex.test(value)) {
+            $(this).val(value.replace(/[^a-zA-Z ]/g, '')); // Remove invalid characters
+        } 
+    });
+
     let askCreateConfirmation = true;
     let askEditConfirmation = true;
 

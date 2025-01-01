@@ -286,6 +286,17 @@ namespace risk.control.system.Controllers
                     notifyService.Custom($"Error to create user.", 3, "red", "fas fa-user-plus");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
+                IFormFile profileFile = null;
+                var files = Request.Form?.Files;
+
+                if (files != null && files.Count > 0)
+                {
+                    var file = files.FirstOrDefault(f => f.FileName == user?.ProfileImage?.FileName && f.Name == user?.ProfileImage?.Name);
+                    if (file != null)
+                    {
+                        profileFile = file;
+                    }
+                }
 
                 if (user.ProfileImage != null && user.ProfileImage.Length > 0 && !string .IsNullOrWhiteSpace(Path.GetFileName(user.ProfileImage.FileName)))
                 {
@@ -488,10 +499,26 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(AgencyController.Users), "Agency");
                 }
                 var user = await userManager.FindByIdAsync(id);
-                if (applicationUser?.ProfileImage != null && applicationUser.ProfileImage.Length > 0)
+                if(user is null)
+                {
+                    notifyService.Custom($"OOPs !!!..Invalid Data.", 3, "red", "fas fa-building");
+                    return RedirectToAction(nameof(AgencyController.Users), "Agency");
+                }
+                IFormFile profileFile = null;
+                var files = Request.Form?.Files;
+                if (files != null && files.Count > 0)
+                {
+                    var file = files.FirstOrDefault(f => f.FileName == applicationUser?.ProfileImage?.FileName && f.Name == applicationUser?.ProfileImage?.Name);
+                    if (file != null)
+                    {
+                        profileFile = file;
+                    }
+                }
+
+                if (profileFile != null && profileFile.Length > 0)
                 {
                     string newFileName = Guid.NewGuid().ToString();
-                    string fileExtension = Path.GetExtension(Path.GetFileName(applicationUser.ProfileImage.FileName));
+                    string fileExtension = Path.GetExtension(Path.GetFileName(profileFile.FileName));
                     newFileName += fileExtension;
                     string path = Path.Combine(webHostEnvironment.WebRootPath, "agency");
                     if (!Directory.Exists(path))
@@ -499,107 +526,103 @@ namespace risk.control.system.Controllers
                         Directory.CreateDirectory(path);
                     }
                     var upload = Path.Combine(webHostEnvironment.WebRootPath, "agency", newFileName);
-                    applicationUser.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
+                    profileFile.CopyTo(new FileStream(upload, FileMode.Create));
                     using var dataStream = new MemoryStream();
-                    applicationUser.ProfileImage.CopyTo(dataStream);
                     applicationUser.ProfilePicture = dataStream.ToArray();
                     applicationUser.ProfilePictureUrl = "/agency/" + newFileName;
                 }
 
-                if (user != null)
+                user.ProfilePictureUrl = applicationUser?.ProfilePictureUrl ?? user.ProfilePictureUrl;
+                user.ProfilePicture = applicationUser?.ProfilePicture ?? user.ProfilePicture;
+                user.PhoneNumber = applicationUser?.PhoneNumber ?? user.PhoneNumber;
+                user.FirstName = applicationUser?.FirstName;
+                user.LastName = applicationUser?.LastName;
+                if (!string.IsNullOrWhiteSpace(applicationUser?.Password))
                 {
-                    user.ProfilePictureUrl = applicationUser?.ProfilePictureUrl ?? user.ProfilePictureUrl;
-                    user.ProfilePicture = applicationUser?.ProfilePicture ?? user.ProfilePicture;
-                    user.PhoneNumber = applicationUser?.PhoneNumber ?? user.PhoneNumber;
-                    user.FirstName = applicationUser?.FirstName;
-                    user.LastName = applicationUser?.LastName;
-                    if (!string.IsNullOrWhiteSpace(applicationUser?.Password))
-                    {
-                        user.Password = applicationUser.Password;
-                    }
-                    user.PinCodeId = applicationUser.SelectedPincodeId;
-                    user.DistrictId = applicationUser.SelectedDistrictId;
-                    user.StateId = applicationUser.SelectedStateId;
-                    user.CountryId = applicationUser.SelectedCountryId;
+                    user.Password = applicationUser.Password;
+                }
+                user.PinCodeId = applicationUser.SelectedPincodeId;
+                user.DistrictId = applicationUser.SelectedDistrictId;
+                user.StateId = applicationUser.SelectedStateId;
+                user.CountryId = applicationUser.SelectedCountryId;
 
-                    user.Addressline = applicationUser.Addressline;
-                    user.Active = applicationUser.Active;
-                    user.IsUpdated = true;
-                    user.Updated = DateTime.Now;
-                    user.Comments = applicationUser.Comments;
-                    user.PhoneNumber = applicationUser.PhoneNumber;
-                    user.UpdatedBy = HttpContext.User?.Identity?.Name;
-                    user.SecurityStamp = DateTime.Now.ToString();
-                    user.UserRole = applicationUser.UserRole;
-                    user.Role = applicationUser.Role != null ? applicationUser.Role : (AppRoles)Enum.Parse(typeof(AppRoles), user.UserRole.ToString());
-                    user.IsVendorAdmin = user.UserRole == AgencyRole.AGENCY_ADMIN;
-                    if (user.Role == AppRoles.AGENT)
+                user.Addressline = applicationUser.Addressline;
+                user.Active = applicationUser.Active;
+                user.IsUpdated = true;
+                user.Updated = DateTime.Now;
+                user.Comments = applicationUser.Comments;
+                user.PhoneNumber = applicationUser.PhoneNumber;
+                user.UpdatedBy = HttpContext.User?.Identity?.Name;
+                user.SecurityStamp = DateTime.Now.ToString();
+                user.UserRole = applicationUser.UserRole;
+                user.Role = applicationUser.Role != null ? applicationUser.Role : (AppRoles)Enum.Parse(typeof(AppRoles), user.UserRole.ToString());
+                user.IsVendorAdmin = user.UserRole == AgencyRole.AGENCY_ADMIN;
+                if (user.Role == AppRoles.AGENT)
+                {
+                    var pincode = _context.PinCode.Include(p => p.District).Include(p => p.State).Include(p => p.Country).FirstOrDefault(c => c.PinCodeId == user.PinCodeId);
+                    var userAddress = $"{user.Addressline}, {pincode.Name}, {pincode.District.Name}, {pincode.State.Name}, {pincode.Country.Name}";
+                    var coordinates = await customApiCLient.GetCoordinatesFromAddressAsync(userAddress);
+                    var customerLatLong = coordinates.Latitude + "," + coordinates.Longitude;
+                    user.AddressLatitude = coordinates.Latitude;
+                    user.AddressLongitude = coordinates.Longitude;
+                    user.AddressMapLocation = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+                }
+                var result = await userManager.UpdateAsync(user);
+                if (result.Succeeded)
+                {
+                    var roles = await userManager.GetRolesAsync(user);
+                    var roleResult = await userManager.RemoveFromRolesAsync(user, roles);
+                    await userManager.AddToRoleAsync(user, user.UserRole.ToString());
+                    if (!user.Active)
                     {
-                        var pincode = _context.PinCode.Include(p => p.District).Include(p => p.State).Include(p => p.Country).FirstOrDefault(c => c.PinCodeId == user.PinCodeId);
-                        var userAddress = $"{user.Addressline}, {pincode.Name}, {pincode.District.Name}, {pincode.State.Name}, {pincode.Country.Name}";
-                        var coordinates = await customApiCLient.GetCoordinatesFromAddressAsync(userAddress);
-                        var customerLatLong = coordinates.Latitude + "," + coordinates.Longitude;
-                        user.AddressLatitude = coordinates.Latitude;
-                        user.AddressLongitude = coordinates.Longitude;
-                        user.AddressMapLocation = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
-                    }
-                    var result = await userManager.UpdateAsync(user);
-                    if (result.Succeeded)
-                    {
-                        var roles = await userManager.GetRolesAsync(user);
-                        var roleResult = await userManager.RemoveFromRolesAsync(user, roles);
-                        await userManager.AddToRoleAsync(user, user.UserRole.ToString());
-                        if (!user.Active)
+                        var createdUser = await userManager.FindByEmailAsync(user.Email);
+                        var lockUser = await userManager.SetLockoutEnabledAsync(createdUser, true);
+                        var lockDate = await userManager.SetLockoutEndDateAsync(createdUser, DateTime.MaxValue);
+
+                        if (lockUser.Succeeded && lockDate.Succeeded)
                         {
-                            var createdUser = await userManager.FindByEmailAsync(user.Email);
-                            var lockUser = await userManager.SetLockoutEnabledAsync(createdUser, true);
-                            var lockDate = await userManager.SetLockoutEndDateAsync(createdUser, DateTime.MaxValue);
+                            await smsService.DoSendSmsAsync(user.PhoneNumber, "User edited. Email : " + user.Email);
+                            notifyService.Custom($"User {user.Email} edited.", 3, "orange", "fas fa-user-lock");
+                        }
+                    }
+                    else
+                    {
+                        var createdUser = await userManager.FindByEmailAsync(user.Email);
+                        var lockUser = await userManager.SetLockoutEnabledAsync(createdUser, true);
+                        var lockDate = await userManager.SetLockoutEndDateAsync(createdUser, DateTime.Now);
+                        var onboardAgent = roles.Any(r => AppConstant.AppRoles.AGENT.ToString().Contains(r)) && string.IsNullOrWhiteSpace(user.MobileUId);
+                        if (lockUser.Succeeded && lockDate.Succeeded)
+                        {
 
-                            if (lockUser.Succeeded && lockDate.Succeeded)
+
+                            if (onboardAgent)
                             {
-                                await smsService.DoSendSmsAsync(user.PhoneNumber, "User edited. Email : " + user.Email);
-                                notifyService.Custom($"User {user.Email} edited.", 3, "orange", "fas fa-user-lock");
+                                var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == user.VendorId);
+
+                                System.Uri address = new System.Uri("http://tinyurl.com/api-create.php?url=" + vendor.MobileAppUrl);
+                                System.Net.WebClient client = new System.Net.WebClient();
+                                string tinyUrl = client.DownloadString(address);
+
+                                var message = $"Dear {user.FirstName}";
+                                message += "                                                                                ";
+                                message += $"Click on link below to install the mobile app";
+                                message += "                                                                                ";
+                                message += $"{tinyUrl}";
+                                message += "                                                                                ";
+                                message += $"Thanks";
+                                message += "                                                                                ";
+                                message += $"https://icheckify.co.in";
+                                await smsService.DoSendSmsAsync(user.PhoneNumber, message, true);
+                                notifyService.Custom($"Agent onboarding initiated.", 3, "green", "fas fa-user-check");
+                            }
+                            else
+                            {
+                                await smsService.DoSendSmsAsync(user.PhoneNumber, "User edited and unlocked. Email : " + user.Email);
+                                notifyService.Custom($"User {user.Email} edited.", 3, "orange", "fas fa-user-check");
                             }
                         }
-                        else
-                        {
-                            var createdUser = await userManager.FindByEmailAsync(user.Email);
-                            var lockUser = await userManager.SetLockoutEnabledAsync(createdUser, true);
-                            var lockDate = await userManager.SetLockoutEndDateAsync(createdUser, DateTime.Now);
-                            var onboardAgent = roles.Any(r => AppConstant.AppRoles.AGENT.ToString().Contains(r)) && string.IsNullOrWhiteSpace(user.MobileUId);
-                            if (lockUser.Succeeded && lockDate.Succeeded)
-                            {
-                                
-
-                                if (onboardAgent)
-                                {
-                                    var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == user.VendorId);
-
-                                    System.Uri address = new System.Uri("http://tinyurl.com/api-create.php?url=" + vendor.MobileAppUrl);
-                                    System.Net.WebClient client = new System.Net.WebClient();
-                                    string tinyUrl = client.DownloadString(address);
-
-                                    var message = $"Dear {user.FirstName}";
-                                    message += "                                                                                ";
-                                    message += $"Click on link below to install the mobile app";
-                                    message += "                                                                                ";
-                                    message += $"{tinyUrl}";
-                                    message += "                                                                                ";
-                                    message += $"Thanks";
-                                    message += "                                                                                ";
-                                    message += $"https://icheckify.co.in";
-                                    await smsService.DoSendSmsAsync(user.PhoneNumber, message, true);
-                                    notifyService.Custom($"Agent onboarding initiated.", 3, "green", "fas fa-user-check");
-                                }
-                                else
-                                {
-                                    await smsService.DoSendSmsAsync(user.PhoneNumber, "User edited and unlocked. Email : " + user.Email);
-                                    notifyService.Custom($"User {user.Email} edited.", 3, "orange", "fas fa-user-check");
-                                }
-                            }
-                        }
-                        return RedirectToAction(nameof(AgencyController.Users), "Agency");
                     }
+                    return RedirectToAction(nameof(AgencyController.Users), "Agency");
                 }
             }
             catch (Exception ex)

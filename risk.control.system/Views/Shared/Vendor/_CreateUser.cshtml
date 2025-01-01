@@ -6,9 +6,9 @@
         <div class="form-group">
             <span class="input-group-label"> Photo:</span>
             <div class="input-group mb-3">
-                <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="@Applicationsettings.NO_USER" />
+                <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="@Applicationsettings.NO_USER" data-toggle="tooltip" title="Upload Photo" />
                 <i class="fa fa-asterisk asterik-style"></i>
-                <input asp-for="ProfileImage" class="form-control remarks document-image-input" type="file" id="createImageInput" data-preview-id="createProfileImage" required />
+                <input accept=".jpg,.jpeg,.png" asp-for="ProfileImage" class="form-control remarks document-image-input" type="file" id="createImageInput" data-preview-id="createProfileImage" required data-toggle="tooltip" title="Upload Photo" />
             </div>
         </div>
         <div class="form-group">
