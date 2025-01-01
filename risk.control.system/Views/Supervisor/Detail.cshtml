@@ -26,30 +26,7 @@
                         <li>
                             <i class='fas fa-user-tie'></i> Beneficiary details
                         </li>
-                        @if (!Model.ClaimsInvestigation.NotDeclinable)
-                        {
-                            <li>
-                                <i class='far fa-thumbs-up'></i>
-                                <button class='btn btn-danger btn-xs'>
-                                    <span class='badge badge-danger btn-xs'>
-                                        <i class='fas fa-undo'></i>
-                                    </span> Decline
-                                </button>
-
-                            </li>
-                        }
-                        else
-                        {
-                            <li>
-                                <i class='far fa-thumbs-up'></i>
-                                <div class="btn btn-outline-danger btn-xs">
-                                    <span class="badge badge-light"> <i class="fas fa-undo"></i> </span> Decline <span class="badge badge-danger">
-                                        <i class="fas fa-info"></i>
-                                    </span>
-                                </div>
-
-                            </li>
-                        }
+                        
                     </span>
                 </span>
             </h3>
@@ -67,27 +44,13 @@
 
             <div class="card-footer">
                 <form id="withdraw-form">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                This CLAIM can not be declined as per the status.
-                            </div>
-                        </div>
-                    </div>
+                    
                     <div class="row">
                         <div class="col-md-12">
                             <a id="back" asp-action="Open" class="btn btn-outline-secondary">
                                 <i class="fas fa-arrow-left"></i>
                                 <span class="badge badge-light"> <i class="fa fa-toggle-on"></i> </span> Back
                             </a>
-
-                            <span id="decline-information-popup" class="badge badge-light">
-                                <div class="btn btn-outline-danger">
-                                    <span class="badge badge-light"> <i class="fas fa-undo"></i> </span> Decline <span class="badge badge-danger">
-                                        <i class="fas fa-info"></i>
-                                    </span>
-                                </div>
-                            </span>
 
                         </div>
                     </div>

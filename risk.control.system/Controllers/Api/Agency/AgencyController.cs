@@ -212,7 +212,7 @@ namespace risk.control.system.Controllers.Api.Agency
         }
 
         [HttpGet("GetCompanyAgencyUser")]
-        public IActionResult GetCompanyAgencyUser(long id)
+        public async Task<IActionResult> GetCompanyAgencyUser(long id)
         {
             var vendorUsers = _context.VendorApplicationUser
                   .Include(u => u.Country)
@@ -222,13 +222,11 @@ namespace risk.control.system.Controllers.Api.Agency
                   .Where(c => c.VendorId == id && !c.Deleted);
 
             var users = vendorUsers?
-                .OrderBy(u => u.FirstName)
-                .ThenBy(u => u.LastName)
+                .OrderBy(u => u.IsUpdated)
+                .ThenBy(u => u.Updated)
                 .AsQueryable();
 
-            var result =
-                users?.Select(u =>
-                new
+            var result =users?.Select(u => new
                 {
                     Id = u.Id,
                     Name = u.FirstName + " " + u.LastName,
@@ -247,10 +245,15 @@ namespace risk.control.system.Controllers.Api.Agency
                     Role = u.UserRole.GetEnumDisplayName(),
                     AgentOnboarded = (u.Role == AppRoles.AGENT && !string.IsNullOrWhiteSpace(u.MobileUId) || u.Role != AppRoles.AGENT),
                     Agent = u.Role == AppRoles.AGENT,
-                    RawEmail = u.Email
-                });
+                    RawEmail = u.Email,
+                    isUpdated = u.IsUpdated,
+                    LastModified = u.Updated
+                })?.ToArray();
 
-            return Ok(result?.ToArray());
+            users?.ToList().ForEach(u => u.IsUpdated = false);
+            await _context.SaveChangesAsync();
+
+            return Ok(result);
         }
 
         [HttpGet("GetUsers")]
