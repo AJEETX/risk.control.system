@@ -68,9 +68,12 @@ namespace risk.control.system.Controllers
             smsService = SmsService;
         }
 
-        [TempData]
-        public string ErrorMessage { get; set; } = string.Empty;
-
+        [Authorize]
+        public JsonResult KeepSessionAlive()
+        {
+            // Return success to indicate the session is alive
+            return Json(new { success = true });
+        }
 
         [HttpGet]
         [AllowAnonymous]

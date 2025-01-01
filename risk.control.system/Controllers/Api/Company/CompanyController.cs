@@ -128,7 +128,7 @@ namespace risk.control.system.Controllers.Api.Company
                 .FirstOrDefaultAsync(c => c.ClientCompanyId == companyUser.ClientCompanyId);
 
             var users = company.CompanyApplicationUser
-                .Where(u => !u.Deleted)
+                .Where(u => !u.Deleted && u.Email != userEmail)
                 .OrderBy(u => u.FirstName)
                 .ThenBy(u => u.LastName)
                 .AsQueryable();

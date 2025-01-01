@@ -10,20 +10,6 @@ var showOcrMap = false;
 const image =
     "/images/beachflag.png";
 
-
-//document.addEventListener("DOMContentLoaded", function () {
-//    var ws = new WebSocket('wss://' + window.location.host + '/ws');
-//    ws.onopen = function () {
-//        ws.send("Hello, server!");
-//    };
-//    ws.onmessage = function (event) {
-//        console.log("Received message: " + event.data);
-//    };
-//    ws.onerror = function (error) {
-//        console.error("WebSocket error: " + error);
-//    };
-//});
-
 function openForm() {
     document.getElementById("myForm").style.display = "block";
 }

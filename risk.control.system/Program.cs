@@ -82,10 +82,10 @@ builder.Services.Configure<FormOptions>(x =>
 builder.Services.AddRateLimiter(_ => _
     .AddFixedWindowLimiter(policyName: "fixed", options =>
     {
-        options.PermitLimit = 10;
-        options.Window = TimeSpan.FromSeconds(12);
+        options.PermitLimit = 100;
+        options.Window = TimeSpan.FromSeconds(1);
         options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
-        options.QueueLimit = 2;
+        options.QueueLimit = 10;
     }));
 // forward headers configuration for reverse proxy
 builder.Services.Configure<ForwardedHeadersOptions>(options => {

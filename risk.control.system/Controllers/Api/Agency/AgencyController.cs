@@ -67,6 +67,7 @@ namespace risk.control.system.Controllers.Api.Agency
                  .Where(c => c.VendorId == vendorUser.VendorId && !c.Deleted);
 
             var users = vendorUsers?
+                .Where(u => !u.Deleted && u.Email != userEmail)
                 .OrderBy(u => u.FirstName)
                 .ThenBy(u => u.LastName)
                 .AsQueryable();
@@ -268,7 +269,8 @@ namespace risk.control.system.Controllers.Api.Agency
                 .Include(u=>u.State)
                 .Include(u=>u.District)
                 .Include(u=>u.PinCode)
-                .Where(c => c.VendorId == vendorUser.VendorId && !c.Deleted);
+                .Where(c => c.VendorId == vendorUser.VendorId 
+                && !c.Deleted && c.Email != userEmail);
 
             var users = vendorUsers?
                 .OrderBy(u => u.IsUpdated)
