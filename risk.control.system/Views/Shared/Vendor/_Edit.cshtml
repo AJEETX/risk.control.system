@@ -213,30 +213,55 @@
             </div>
             <span asp-validation-for="Description" class="text-danger"></span>
         </div>
-
-        <div class="form-group">
-            <span class="input-group-label"> Mobile App Url:</span>
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <span class="input-group-text" id="MobileApiBaseUrl"><i class="fas fa-code-branch"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+        @if(Model.SelectedByCompany)
+        {
+            <div class="form-group">
+                <span class="input-group-label"> Mobile App Url:</span>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="MobileApiBaseUrl"><i class="fas fa-code-branch"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                    </div>
+                    <input  readonly type="text" asp-for="MobileAppUrl" class="form-control remarks" placeholder="mobile app url" maxlength="100" />
+                    <span asp-validation-for="MobileAppUrl" class="text-danger"></span>
                 </div>
-                <input type="text" asp-for="MobileAppUrl" class="form-control remarks" placeholder="mobile app url" maxlength="100" />
-                <span asp-validation-for="MobileAppUrl" class="text-danger"></span>
             </div>
-        </div>
-        <div class="form-group">
-            <span class="input-group-label"> Status:</span>
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <span class="input-group-text" for="Status"><i class="fa fa-toggle-on"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+            <div class="form-group">
+                <span class="input-group-label"> Status:</span>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" for="Status"><i class="fa fa-toggle-on"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                    </div>
+                    <select disabled id="Status" asp-for="Status" class="form-control remarks" asp-items="Html.GetEnumSelectList<VendorStatus>()">
+                    </select>
                 </div>
-                <select required id="Status" asp-for="Status" class="form-control remarks" asp-items="Html.GetEnumSelectList<VendorStatus>()">
-                    <option value="">--- SELECT ---</option>
-                </select>
-                <span asp-validation-for="Status" class="text-danger"></span>
-
             </div>
-        </div>
+        }
+        else
+        {
+            <div class="form-group">
+                <span class="input-group-label"> Mobile App Url:</span>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="MobileApiBaseUrl"><i class="fas fa-code-branch"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                    </div>
+                    <input type="text" asp-for="MobileAppUrl" class="form-control remarks" placeholder="mobile app url" maxlength="100" />
+                    <span asp-validation-for="MobileAppUrl" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-group">
+                <span class="input-group-label"> Status:</span>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" for="Status"><i class="fa fa-toggle-on"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                    </div>
+                    <select required id="Status" asp-for="Status" class="form-control remarks" asp-items="Html.GetEnumSelectList<VendorStatus>()">
+                        <option value="">--- SELECT ---</option>
+                    </select>
+                    <span asp-validation-for="Status" class="text-danger"></span>
+
+                </div>
+            </div>
+        }
 
     </div>
 </div>

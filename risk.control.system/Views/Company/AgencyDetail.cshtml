@@ -1,13 +1,11 @@
 ﻿@model risk.control.system.Models.Vendor
 
 @{
-    ViewData["Title"] = @Applicationsettings.DELETE;
-
+    ViewData["Title"] = @Applicationsettings.DETAILS;
 }
+
 <section class="content">
-    <form id="create-form" asp-action="Delete" method="post">
-        <input type="hidden" asp-for="VendorId" name="VendorId" id="@Model.VendorId" />
-        <input type="hidden" id="Latitude" asp-for="@Model.PinCode.Latitude" />
+    <input type="hidden" id="Latitude" asp-for="@Model.PinCode.Latitude" />
     <input type="hidden" id="Longitude" asp-for="@Model.PinCode.Longitude" />
     <div class="card card-secondary">
         <div class="card-header">
@@ -18,7 +16,7 @@
                 <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
             </div>
             <div class="row">
-                <div class="col-12 d-flex align-items-stretch flex-column">
+                <div class="col-12 col-sm-7 d-flex align-items-stretch flex-column">
                     <div class="card bg-light d-flex flex-fill">
                         <div class="card-footer">
                             <i class="fas fa-building"></i> Details View
@@ -108,7 +106,18 @@
                                             </span>
                                             Mobile App Url : <i class="fas fa-code"></i> <a href="#">  @Model.MobileAppUrl</a>
                                         </li>
-
+                                        <li class="small">
+                                            <span class="fa-li">
+                                                <i class="fas fa-key"></i>
+                                            </span>
+                                            Edit Profile <b>@Html.DisplayFor(model => model.CanChangePassword) </b>
+                                        </li>
+                                        <li class="small">
+                                            <span class="fa-li">
+                                                <i class="far fa-comment-alt"></i>
+                                            </span>
+                                            Enable mailbox <b>@Html.DisplayFor(model => model.EnableMailbox) </b>
+                                        </li>
                                     </ul>
                                 </div>
                                 <div class="col-5 text-center">
@@ -152,7 +161,26 @@
                                                      class="img-fluid form-Image" src="@Applicationsettings.NO_IMAGE">
                                             }
                                         </li>
+
                                     </ul>
+
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-sm-5 d-flex align-items-stretch flex-column">
+                    <div class="card bg-light d-flex flex-fill">
+                        <div class="card-footer text-muted border-bottom-0">
+                            <i class="fas fa-map-marked-alt"></i> Map View
+                        </div>
+                        
+                        <div class="card-body">
+                            <div class="row">
+                                <div id="company-map">
+                                    <img id="company-map-url" src="@Model.AddressMapLocation" />
                                 </div>
                             </div>
                         </div>
@@ -160,40 +188,20 @@
                 </div>
             </div>
         </div>
-
+       
         <div class="card-footer">
-            <div class="row">
+            <div class="row float-right">
                 <div class="col-md-12">
                     <div class="form-group">
-                            @if (Model.SelectedByCompany)
-                            {
-                                <a id="back" asp-controller="Vendors" asp-action="Agencies" class="btn btn-secondary"><i class="fa fa-window-close"></i>  @Applicationsettings.CANCEL </a>
-                            }
-                            else
-                            {
-                                <a id="back" asp-controller="Company" asp-action="EmpanelledVendors" class="btn btn-secondary"><i class="fa fa-window-close"></i>  @Applicationsettings.CANCEL </a>
-                            }
-                            &nbsp;
-                        @if(Model.HasClaims)
-                        {
-                                <span id="withdraw-information-popup" class="badge badge-light">
-                                    <div class="btn btn-outline-danger">
-                                        <i class="fa fa-trash"></i>  @Applicationsettings.DELETE <span class="badge badge-danger">
-                                            <i class="fas fa-info"></i>
-                                        </span>
-                                    </div>
-                                </span>
-                        }
-                        else
-                        {
-                                <input type="submit" value="Delete" class="btn btn-danger" />
-                        }
+                        <a id="back" asp-controller="Company" asp-action="EmpanelledVendors" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
+                        <a id="edit-profile" asp-controller="Company" asp-action="EditAgency" asp-route-id="@Model.VendorId" class="btn btn-warning"><i class='fas fa-building'></i> @Applicationsettings.PROFILE</a>
+                        <a asp-controller="Company" asp-action="AgencyUsers" asp-route-id="@Model.VendorId" class="btn btn-success"><i class="fas fa-user-friends"></i>  @Applicationsettings.USER</a>
+                        <a asp-controller="Company" asp-action="Service" asp-route-id="@Model.VendorId" class="btn btn-danger"><i class="fas fa-truck"></i>  @Applicationsettings.SERVICE</a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    </form>
 </section>
 
 
@@ -201,7 +209,5 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-
-        <script src="~/js/common/delete-user.js">
-    </script>
+    <script src="~/js/common/companies.js"></script>
 }

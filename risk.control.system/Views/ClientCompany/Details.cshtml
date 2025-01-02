@@ -96,6 +96,39 @@
                                                 </li>
                                             }
                                         }
+                                        <li class="small">
+                                            <span class="fa-li">
+                                                <i class="fas fa-sitemap"></i>
+                                            </span>
+                                            Whitelist Ip Addresses : <b>  @Model.WhitelistIpAddress</b>
+                                        </li>
+                                        <li class="small">
+                                            <span class="fa-li">
+                                                <i class="fas fa-project-diagram"></i>
+                                            </span>
+                                            Creator Sla (day(s):  <a href="#">  @Model.CreatorSla</a>
+                                        </li>
+
+                                        <li class="small">
+                                            <span class="fa-li">
+                                                <i class="fas fa-project-diagram"></i>
+                                            </span>
+                                            Assessor Sla(day(s):  <a href="#">  @Model.AssessorSla</a>
+                                        </li>
+
+                                        <li class="small">
+                                            <span class="fa-li">
+                                                <i class="fas fa-project-diagram"></i>
+                                            </span>
+                                            Supervisor Sla(day(s):  <a href="#">  @Model.SupervisorSla</a>
+                                        </li>
+
+                                        <li class="small">
+                                            <span class="fa-li">
+                                                <i class="fas fa-project-diagram"></i>
+                                            </span>
+                                            Agent Sla(day(s):  <a href="#">  @Model.AgentSla</a>
+                                        </li>
                                     </ul>
                                 </div>
                                 <div class="col-5 text-center">
@@ -162,12 +195,7 @@
                                             </span>
                                             Mobile App Url : <a href="#">  @Model.MobileAppUrl</a>
                                         </li>
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fas fa-sitemap"></i>
-                                            </span>
-                                            Whitelist Ip Addresses : <b>  @Model.WhitelistIpAddress</b>
-                                        </li>
+                                        
                                         <li class="small">
                                             <span class="fa-li">
                                                 <i class="fas fa-project-diagram"></i>
@@ -186,6 +214,17 @@
                                             </span>
                                             Passport Api Host:  <b>  @Model.PassportApiHost</b>
                                         </li>
+                                        
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-6">
+                                    <p class="text-muted text-sm">
+                                        <i class="fas fa-tools"></i> <b> Settings : </b>
+                                    </p>
+                                    <ul class="ml-4 mb-0 fa-ul text-muted">
+                                        
                                         <li class="small">
                                             <span class="fa-li">
                                                 <i class="far fa-paper-plane"></i>
@@ -229,6 +268,12 @@
                                             Bulk Upload: <b>@Html.DisplayFor(model => model.BulkUpload)</b>
                                         </li>
 
+                                    </ul>
+                                </div>
+                                <div class="col-6">
+                                    ---
+                                    <ul class="ml-4 mb-0 fa-ul text-muted">
+
                                         <li class="small">
                                             <span class="fa-li">
                                                 <i class="fa fa-upload"></i>
@@ -247,44 +292,18 @@
                                             </span>
                                             Enable mailbox <b>@Html.DisplayFor(model => model.EnableMailbox) </b>
                                         </li>
+                                        
                                         <li class="small">
                                             <span class="fa-li">
-                                                <i class="fas fa-project-diagram"></i>
+                                                <i class="fas fa-comments"></i>
                                             </span>
-                                            Creator Sla (day(s):  <a href="#">  @Model.CreatorSla</a>
-                                        </li>
-
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fas fa-project-diagram"></i>
-                                            </span>
-                                            Assessor Sla(day(s):  <a href="#">  @Model.AssessorSla</a>
-                                        </li>
-
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fas fa-project-diagram"></i>
-                                            </span>
-                                            Supervisor Sla(day(s):  <a href="#">  @Model.SupervisorSla</a>
-                                        </li>
-
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fas fa-project-diagram"></i>
-                                            </span>
-                                            Agent Sla(day(s):  <a href="#">  @Model.AgentSla</a>
+                                            Edit Report(Supervisor): <b>@Html.DisplayFor(model => model.UpdateAgentReport)</b>
                                         </li>
                                         <li class="small">
                                             <span class="fa-li">
                                                 <i class="fas fa-comments"></i>
                                             </span>
-                                            Enable Report update(Supervisor): <b>@Html.DisplayFor(model => model.UpdateAgentReport)</b>
-                                        </li>
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fas fa-comments"></i>
-                                            </span>
-                                            Enable Agent Answer update(Supervisor): <b>@Html.DisplayFor(model => model.UpdateAgentAnswer)</b>
+                                            Edit Answer(Supervisor): <b>@Html.DisplayFor(model => model.UpdateAgentAnswer)</b>
                                         </li>
                                         <li class="small">
                                             <span class="fa-li">

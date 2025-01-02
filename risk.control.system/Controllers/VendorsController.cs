@@ -215,7 +215,7 @@ namespace risk.control.system.Controllers
         [HttpPost]
         [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateUser(VendorApplicationUser user, string emailSuffix)
+        public async Task<IActionResult> CreateUser(VendorApplicationUser user, string emailSuffix, string createdBy="")
         {
             if (user is null || user.SelectedCountryId < 1 || user.SelectedStateId < 1 || user.SelectedDistrictId < 1 || user.SelectedPincodeId < 1)
             {
@@ -540,6 +540,10 @@ namespace risk.control.system.Controllers
                     if(editby == "company")
                     {
                         return RedirectToAction(nameof(Users), "Vendors", new { id = applicationUser.VendorId });
+                    }
+                    else if (editby == "empanelled")
+                    {
+                        return RedirectToAction(nameof(CompanyController.AgencyUsers), "Company", new { id = applicationUser.VendorId });
                     }
                     else
                     {

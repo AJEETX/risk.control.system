@@ -185,7 +185,7 @@ namespace risk.control.system.Controllers.Api.Company
                 { 
                     Id = u.VendorId, 
                     Document = string.IsNullOrWhiteSpace(u.DocumentUrl) ? Applicationsettings.NO_IMAGE : u.DocumentUrl, 
-                    Domain = companyUser.Role == AppRoles.COMPANY_ADMIN ? "<a href=/Vendors/Details?id=" + u.VendorId + ">" + u.Email + "</a>" : u.Email, 
+                    Domain = companyUser.Role == AppRoles.COMPANY_ADMIN ? "<a href=/Company/AgencyDetail?id=" + u.VendorId + ">" + u.Email + "</a>" : u.Email, 
                     Name = u.Name, 
                     Code = u.Code, 
                     Phone = u.PhoneNumber, 

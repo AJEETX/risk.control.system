@@ -1,0 +1,53 @@
+﻿@{
+    ViewData["Title"] = @Applicationsettings.USER;
+}
+
+<section class="content">
+    <div id="article" class="card card-secondary d-flex flex-fill">
+
+        <div class="card-header">
+            <h3 class="card-title"><i class="fas fa-user-friends"></i>  Manage Users</h3>
+        </div>
+        <div class="card-body">
+            <div class="submit-progress hidden">
+                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+            </div>
+            <input type="hidden" id="vendorId" value="@ViewData["vendorId"]" />
+            <table id="customerTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Photo</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Address</th>
+                        <th>Pincode</th>
+                        <th>Active</th>
+                        <th>Role</th>
+                        <th>UpdatedBy</th>
+                        <th>Actions</th>
+
+                    </tr>
+                </thead>
+
+            </table>
+
+        </div>
+        <div class="card-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <a id="back" asp-controller="Company" asp-action="AgencyDetail" asp-route-id="@ViewData["vendorId"]" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
+
+                        <a class="create-agency-user btn btn-success" asp-controller="Company" asp-action="CreateAgencyUser" asp-route-id="@ViewData["vendorId"]"><i class="fas fa-user-plus"></i> @Applicationsettings.CREATE User</a>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+@section Scripts    
+{
+    <script src="~/js/common/agency-users.js"></script>
+}

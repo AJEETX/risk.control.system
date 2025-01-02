@@ -148,6 +148,10 @@ namespace risk.control.system.Controllers
                     notifyService.Custom($"Agency Not found.", 3, "red", "fas fa-building");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
+                if(vendorUser.IsVendorAdmin)
+                {
+                    vendor.SelectedByCompany = true;
+                }
                 return View(vendor);
             }
             catch (Exception ex)
@@ -410,6 +414,10 @@ namespace risk.control.system.Controllers
                         if (txn == "agency")
                         {
                             return RedirectToAction(nameof(AgencyController.Users), "Agency");
+                        }
+                        else if(txn == "company")
+                        {
+                            return RedirectToAction(nameof(CompanyController.AgencyUsers), "Company", new { id = vendorId });
                         }
                         else
                         {
