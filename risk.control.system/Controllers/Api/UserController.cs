@@ -29,7 +29,7 @@ namespace risk.control.system.Controllers.Api
         }
 
         [HttpGet("AllUsers")]
-        public IActionResult AllUsers()
+        public async Task<IActionResult> AllUsers()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             var companyUser = _context.ApplicationUser.FirstOrDefault(c => c.Email == userEmail);
@@ -45,8 +45,7 @@ namespace risk.control.system.Controllers.Api
                         .OrderBy(u => u.FirstName)
                 .ThenBy(u => u.LastName)
                                 .ToList();
-                var result =
-                    users.Select(u =>
+                var result = users?.Select(u =>
                     new
                     {
                         Id = u.Id,
@@ -61,8 +60,12 @@ namespace risk.control.system.Controllers.Api
                         Country = u.Country.Name,
                         Roles = string.Join(",", GetUserRoles(u).Result),
                         Pincode = u.PinCode.Code,
+                        IsUpdated = u.IsUpdated,
+                        LastModified = u.Updated
                     })?.ToList();
 
+                users?.ToList().ForEach(u => u.IsUpdated = false);
+                await _context.SaveChangesAsync();
                 return Ok(result);
             }
             return BadRequest();

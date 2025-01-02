@@ -181,7 +181,7 @@ namespace risk.control.system.Helpers
 
             else if (enquiry)
             {
-                timeToCompare = a.EnquiredByAssessorTime.Value;
+                timeToCompare = a.EnquiryReplyByAssessorTime.Value;
                 if (DateTime.Now.Subtract(timeToCompare).Days >= a.SupervisorSla)
                     return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Days} day</span>");
 

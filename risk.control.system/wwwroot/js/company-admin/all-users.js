@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    $("#customerTable").DataTable({
+    var table = $("#customerTable").DataTable({
         ajax: {
             url: '/api/User/AllUsers',
             dataSrc: ''
@@ -11,6 +11,7 @@ $(document).ready(function () {
             loadingRecords: '&nbsp;',
             processing: '<i class="fas fa-sync fa-spin fa-4x fa-fw"></i><span class="sr-only">Loading...</span>'
         },
+        order: [[13, 'desc'], [14, 'desc']], // Sort by `isUpdated` and `lastModified`,
         columns: [
             /* Name of the keys from
             data file source */
@@ -58,10 +59,40 @@ $(document).ready(function () {
                     //buttons += '<a onclick="showroles()" href="/UserRoles/Index?userId=' + row.id + '"  class="btn btn-xs btn-info"><i class="fas fa-user-plus"></i> Roles</a>'
                     return buttons;
                 }
+            },
+            {
+                "data": "isUpdated",
+                "bVisible": false
+            },
+            {
+                "data": "lastModified",
+                bVisible: false
             }
         ],
         error: function (xhr, status, error) { alert('err ' + error) }
     });
+    table.on('draw', function () {
+        table.rows().every(function () {
+            var data = this.data(); // Get row data
+            console.log(data); // Debug row data
+
+            if (data.isUpdated) { // Check if the row should be highlighted
+                var rowNode = this.node();
+
+                // Highlight the row
+                $(rowNode).addClass('highlight-new-user');
+
+                // Scroll the row into view
+                rowNode.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                // Optionally, remove the highlight after a delay
+                setTimeout(function () {
+                    $(rowNode).removeClass('highlight-new-user');
+                }, 3000);
+            }
+        });
+    });
+
     $('#customerTable').on('draw.dt', function () {
         $('[data-toggle="tooltip"]').tooltip({
             animated: 'fade',

@@ -14,7 +14,7 @@ else @if (!string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.AgencyReport.Agen
 {
 
     <div class="col-12 col-sm-4 d-flex align-items-stretch flex-column">
-        <div class="card bg-light d-flex flex-fill border-success">
+        <div class="card bg-light d-flex flex-fill border-success collapsed-card">
             <div class="card-header text-muted border-bottom-0">
                 <h3 class="card-title">
                     <i class="far fa-comment"></i> Questionnaire
@@ -30,6 +30,9 @@ else @if (!string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.AgencyReport.Agen
                 </h3>
                 <div class="card-tools">
                     <span data-toggle="tooltip" title="Claim #" class="badge badge-light"> <i class="nav-icon fas fa-clock"></i> @questionTime </span>
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                        <i class="fas fa-plus"></i>
+                    </button>
                 </div>
             </div>
             <div class="card-footer text-muted border-bottom-0">
@@ -132,6 +135,8 @@ else @if (!string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.AgencyReport.Agen
                 </div>
             </div>
         </div>
-
+        <div class="card-footer border-success secondary btn-outline-secondary">
+            
+        </div>
     </div>
 }

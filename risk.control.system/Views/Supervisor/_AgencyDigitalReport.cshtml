@@ -22,7 +22,7 @@
     if (@Model.AgencyReport?.DigitalIdReport?.DigitalIdImageData != null && @Model.AgencyReport?.DigitalIdReport?.DigitalIdImageLongLatTime != null)
     {
         <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
-            <div class="card bg-light d-flex flex-fill @borderColor">
+            <div class="card bg-light d-flex flex-fill @borderColor collapsed-card">
                 <div class="card-header text-muted border-bottom-0">
 
                     <h3 class="card-title">
@@ -59,7 +59,9 @@
                             <i class="nav-icon fas fa-clock"></i>
                             @Model.AgencyReport?.DigitalIdReport?.DigitalIdImageLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt")
                         </span>
-
+                        <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                            <i class="fas fa-plus"></i>
+                        </button>
                     </div>
 
 
@@ -172,8 +174,9 @@
                 }
 
             </div>
-
-            
+            <div class="card-footer @borderColor">
+                
+            </div>
         </div>
     }
 

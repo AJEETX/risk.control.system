@@ -1470,6 +1470,11 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AvailableVendors(List<string> vendors)
         {
+            if (vendors is null || vendors.Count == 0)
+            {
+                notifyService.Error("No agency selected !!!");
+                return RedirectToAction(nameof(AvailableVendors), "Company");
+            }
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
@@ -1478,11 +1483,7 @@ namespace risk.control.system.Controllers
                     notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                if (vendors is null || vendors.Count == 0)
-                {
-                    notifyService.Error("OOPs !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
+                
                 
                 var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == currentUserEmail);
                 if (companyUser == null)

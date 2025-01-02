@@ -202,7 +202,8 @@ namespace risk.control.system.Controllers
                         user.StateId = applicationUser.SelectedStateId;
                         user.DistrictId = applicationUser.SelectedDistrictId;
                         user.PinCodeId = applicationUser.SelectedPincodeId;
-                        
+
+                        user.IsUpdated = true;
                         user.Updated = DateTime.Now;
                         user.PhoneNumber = applicationUser.PhoneNumber;
                         user.UpdatedBy = HttpContext.User?.Identity?.Name;
