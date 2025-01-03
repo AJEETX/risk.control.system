@@ -34,12 +34,12 @@ function PopulatePinCode(dropDownId, list, option, showDefaultOption) {
     if (list && list.length > 0) {
         $.each(list, function (index, row) {
             $(dropDownId).append("<option value='" + row.pinCodeId + "'>" + row.name + " -- " + row.code + "</option>");
-            $('#create').prop('disabled', false);
+            //$('#create').prop('disabled', false);
         });
     }
     else {
         $(dropDownId).append("<option value='-1'>NO - PINCODE - AVAILABLE</option>")
-        $('#create').prop('disabled', true);
+        //$('#create').prop('disabled', true);
     }
 }
 function PopulateInvestigationServices(dropDownId, list, option) {
@@ -49,6 +49,27 @@ function PopulateInvestigationServices(dropDownId, list, option) {
         $(dropDownId).append("<option value='" + row.investigationServiceTypeId + "'>" + row.name + "</option>")
     });
 }
+
+function checkFormCompletion(formSelector) {
+    let isFormComplete = true;
+
+    // Check all required fields (select, input fields)
+    $(formSelector).find('select[required], input[required]').each(function () {
+        if (!$(this).val()) {
+            isFormComplete = false;
+            return false;  // Exit loop early if a required field is empty
+        }
+    });
+
+    // Additional check for PinCodeId field
+    if ($('#PinCodeId').length > 0 && ($('#PinCodeId').val() || []).length === 0) {
+        isFormComplete = false;
+    }
+
+    // Enable or disable the submit button
+    $(formSelector).find('button[type="submit"]').prop('disabled', !isFormComplete);
+}
+
 $(document).ready(function () {
     const fields = ['#CountryId', '#StateId', '#DistrictId'];
 
@@ -57,12 +78,25 @@ $(document).ready(function () {
             const isValid = /^[a-zA-Z]*$/.test(this.value); // Check if input is valid
             if (!isValid) {
                 $(this).val('');
-                $(this).addClass('is-invalid'); // Add error class
+                //$(this).addClass('is-invalid'); // Add error class
             } else {
-                $(this).removeClass('is-invalid'); // Remove error class
+                //$(this).removeClass('is-invalid'); // Remove error class
             }
         });
     });
+    $('select[required], input[required], #PinCodeId').on('change input', function () {
+        checkFormCompletion('#create-form');
+        checkFormCompletion('#edit-form');
+    });
+    $('select[required], input[required], #PinCodeId').on('blur', function () {
+        checkFormCompletion('#create-form');
+        checkFormCompletion('#edit-form');
+    });
+
+    // Initially check the form when the page loads
+    checkFormCompletion('#create-form');
+    checkFormCompletion('#edit-form');
+
     // Initialize placeholders and field validations
     updatePlaceholdersBasedOnState();
     initializeFieldValidations();
@@ -161,17 +195,22 @@ function fetchAndSetFieldValue(url, data, inputSelector, responseKey, callback) 
  * Initializes autocomplete for all relevant fields.
  */
 function initializeAutocomplete() {
+    const countryDependentFields = ["#StateId", "#DistrictId", "#PinCodeId"];
+    const stateDependentFields = ["#DistrictId", "#PinCodeId"];
+    const districtDependentFields = ["#PinCodeId"];
     const autocompleteConfig = [
         {
             field: "#CountryId",
             url: "/api/Company/SearchCountry",
-            onSelect: (ui) => handleAutocompleteSelect(ui, "#CountryId", "#SelectedCountryId", ["#StateId", "#DistrictId", "#PinCodeId"])
+            onSelect: (ui) => handleAutocompleteSelect(ui, "#CountryId", "#SelectedCountryId", countryDependentFields),
+            dependentFields: countryDependentFields
         },
         {
             field: "#StateId",
             url: "/api/Company/SearchState",
             extraData: () => ({ countryId: $("#SelectedCountryId").val() }),
-            onSelect: (ui) => handleAutocompleteSelect(ui, "#StateId", "#SelectedStateId", ["#DistrictId", "#PinCodeId"])
+            onSelect: (ui) => handleAutocompleteSelect(ui, "#StateId", "#SelectedStateId", stateDependentFields),
+            dependentFields: stateDependentFields
         },
         {
             field: "#DistrictId",
@@ -180,7 +219,8 @@ function initializeAutocomplete() {
                 countryId: $("#SelectedCountryId").val(),
                 stateId: $("#SelectedStateId").val()
             }),
-            onSelect: (ui) => handleAutocompleteSelect(ui, "#DistrictId", "#SelectedDistrictId", ["#PinCodeId"])
+            onSelect: (ui) => handleAutocompleteSelect(ui, "#DistrictId", "#SelectedDistrictId", districtDependentFields),
+            dependentFields: districtDependentFields
         },
         //{
         //    field: "#PinCodeId",
@@ -195,7 +235,7 @@ function initializeAutocomplete() {
     ];
 
     autocompleteConfig.forEach(config => {
-        setAutocomplete(config.field, config.url, config.extraData || (() => ({})), config.onSelect);
+        setAutocomplete(config.field, config.url, config.extraData || (() => ({})), config.onSelect, config.dependentFields);
     });
 }
 
@@ -211,7 +251,7 @@ function handleAutocompleteSelect(ui, inputSelector, hiddenSelector, dependentFi
 /**
  * Sets up an autocomplete field with dynamic data fetching.
  */
-function setAutocomplete(fieldSelector, url, extraDataCallback, onSelectCallback) {
+function setAutocomplete(fieldSelector, url, extraDataCallback, onSelectCallback, dependentFields) {
     const $wrapper = $(fieldSelector).closest('.autocomplete-wrapper');
     const $spinner = $wrapper.find('.loading-spinner');
 
@@ -230,9 +270,9 @@ function setAutocomplete(fieldSelector, url, extraDataCallback, onSelectCallback
                         response([{ label: "No results found", value: "" }]);
                     } else {
                         response(data.map(item => ({
-                            label: item.name || item.stateName || item.districtName ,
-                            value: item.name || item.stateName || item.districtName,
-                            id: item.id || item.stateId || item.districtId
+                            label: item.name || item.stateName || item.districtName || item.pincodeName,
+                            value: item.name || item.stateName || item.districtName || item.pincodeName,
+                            id: item.id || item.stateId || item.districtId || item.pincodeId
                         })));
                     }
                 },
@@ -288,8 +328,31 @@ function setAutocomplete(fieldSelector, url, extraDataCallback, onSelectCallback
         const enteredValue = $field && $field.val() !== null ? $field.val().trim() : '';
         const autocomplete = $field.data('ui-autocomplete');
 
-        if (!enteredValue || !autocomplete) {
+        if (!enteredValue) {
+            // If the current value is empty, clear all dependent fields
+            if (Array.isArray(dependentFields) && dependentFields.length > 0) {
+                dependentFields.forEach(selector => {
+                    const $dependentField = $(selector);
+                    if ($dependentField.length) {
+                        $dependentField.val(''); // Clear the value of each dependent field
+
+                        // Temporarily clear autocomplete source
+                        if ($dependentField.data('ui-autocomplete')) {
+                            $dependentField.autocomplete("option", "source", function (request, response) {
+                                response([]); // Return an empty result
+                            });
+                        }
+                    } else {
+                        console.warn(`Dependent field selector "${selector}" did not match any elements.`);
+                    }
+                });
+            }
+
             //$field.addClass('is-invalid'); // Add invalid class if no value
+            return;
+        }
+
+        if (!autocomplete) {
             return;
         }
 
@@ -299,9 +362,6 @@ function setAutocomplete(fieldSelector, url, extraDataCallback, onSelectCallback
         if (typeof options === 'function') {
             // Handle async source function
             options({ term: enteredValue }, function (data) {
-                console.log("Entered Value:", enteredValue);
-                console.log("Autocomplete Data:", data);
-
                 const validOptions = data.filter(option =>
                     option.value !== "" &&
                     option.label !== "No results found" &&
@@ -311,9 +371,6 @@ function setAutocomplete(fieldSelector, url, extraDataCallback, onSelectCallback
                 const isValid = validOptions.some(option =>
                     (option.label || "").trim().toLowerCase() === enteredValue.trim().toLowerCase()
                 );
-
-                console.log("Filtered Data:", validOptions);
-                console.log("Is Valid:", isValid);
 
                 if (!isValid) {
                     $field.val(''); // Clear invalid input
@@ -334,15 +391,23 @@ function setAutocomplete(fieldSelector, url, extraDataCallback, onSelectCallback
                 (option.label || "").trim().toLowerCase() === enteredValue.trim().toLowerCase()
             );
 
-            console.log("Static Options Filtered Data:", validOptions);
-            console.log("Is Valid:", isValid);
-
             if (!isValid) {
                 $field.val(''); // Clear invalid input
                 //$field.addClass('is-invalid'); // Add invalid class
             } else {
                 //$field.removeClass('is-invalid'); // Remove invalid class if valid
             }
+        }
+    });
+
+    // Reinitialize dependent fields' autocomplete on focus
+    $(dependentFields.join(',')).on("focus", function () {
+        const $field = $(this);
+
+        // Restore autocomplete source dynamically
+        const originalSource = $field.data('originalSource'); // Store the original source during initialization
+        if (originalSource) {
+            $field.autocomplete("option", "source", originalSource);
         }
     });
 }

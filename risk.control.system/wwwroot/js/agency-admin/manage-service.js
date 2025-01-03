@@ -1,109 +1,119 @@
-﻿$("#LineOfBusinessId").focus();
+﻿$(document).ready(function () {
+    $("#LineOfBusinessId").focus();
 
-$(document).ready(function () {
-    var askConfirmation = true;
-    $('#create-form').submit(function (e) {
-        if (askConfirmation) {
-            e.preventDefault();
-            $.confirm({
-                title: "Confirm Add Service",
-                content: "Are you sure to add?",
-                icon: 'fas fa-truck fa-sync',
-                type: 'green',
-                closeIcon: true,
-                buttons: {
-                    confirm: {
-                        text: "Add Service",
-                        btnClass: 'btn-success',
-                        action: function () {
-                            askConfirmation = false;
-                            $("body").addClass("submit-progress-bg");
-                            // Wrap in setTimeout so the UI
-                            // can update the spinners
-                            setTimeout(function () {
-                                $(".submit-progress").removeClass("hidden");
-                            }, 1);
-                            // Disable all buttons, submit inputs, and anchors
-                            $('button, input[type="submit"], a').prop('disabled', true);
+    // Common form submission handler to avoid duplication
+    function handleFormSubmission(formId, buttonId, confirmationText, confirmCallback) {
+        let askConfirmation = true;
 
-                            // Add a class to visually indicate disabled state for anchors
-                            $('a').addClass('disabled-anchor');
+        $(formId).submit(function (e) {
+            if ($(formId).valid() && askConfirmation) {
+                e.preventDefault();
+                $.confirm({
+                    title: confirmationText.title,
+                    content: confirmationText.content,
+                    icon: confirmationText.icon,
+                    type: confirmationText.type,
+                    closeIcon: true,
+                    buttons: {
+                        confirm: {
+                            text: confirmationText.confirmButtonText,
+                            btnClass: 'btn-success',
+                            action: function () {
+                                askConfirmation = false;
+                                $("body").addClass("submit-progress-bg");
 
-                            $('#create').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Add Service");
+                                // Update UI with a short delay to show spinner
+                                setTimeout(function () {
+                                    $(".submit-progress").removeClass("hidden");
+                                }, 1);
 
-                            $('#create-form').submit();
-                            var createForm = document.getElementById("create-form");
-                            if (createForm) {
-                                var nodes = createForm.getElementsByTagName('*');
-                                for (var i = 0; i < nodes.length; i++) {
-                                    nodes[i].disabled = true;
-                                }
+                                // Disable all buttons, submit inputs, and anchors
+                                $('button, input[type="submit"], a').prop('disabled', true);
+                                $('a').addClass('disabled-anchor');
+
+                                // Change button to show loading spinner
+                                $(buttonId).html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> " + confirmationText.buttonText);
+
+                                // Disable form inputs
+                                disableFormElements(formId);
+
+                                // Submit the form
+                                $(formId).submit();
                             }
+                        },
+                        cancel: {
+                            text: "Cancel",
+                            btnClass: 'btn-default'
                         }
-                    },
-                    cancel: {
-                        text: "Cancel",
-                        btnClass: 'btn-default'
                     }
-                }
-            });
-        }
-    });
-
-    var askEditConfirmation = true;
-    $('#edit-form').submit(function (e) {
-        if (askEditConfirmation) {
-            e.preventDefault();
-            $.confirm({
-                title: "Confirm Add Service",
-                content: "Are you sure to add?",
-                icon: 'fas fa-truck fa-sync',
-                type: 'green',
-                closeIcon: true,
-                buttons: {
-                    confirm: {
-                        text: "Add Service",
-                        btnClass: 'btn-success',
-                        action: function () {
-                            askEditConfirmation = false;
-                            $("body").addClass("submit-progress-bg");
-                            // Wrap in setTimeout so the UI
-                            // can update the spinners
-                            setTimeout(function () {
-                                $(".submit-progress").removeClass("hidden");
-                            }, 1);
-                            // Disable all buttons, submit inputs, and anchors
-                            $('button, input[type="submit"], a').prop('disabled', true);
-
-                            // Add a class to visually indicate disabled state for anchors
-                            $('a').addClass('disabled-anchor');
-
-                            $('#edit').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Add Service");
-
-                            $('#edit-form').submit();
-                            var createForm = document.getElementById("edit-form");
-                            if (createForm) {
-                                var nodes = createForm.getElementsByTagName('*');
-                                for (var i = 0; i < nodes.length; i++) {
-                                    nodes[i].disabled = true;
-                                }
-                            }
+                });
+            } else if (askConfirmation) {
+                // Show validation error alert if form is invalid
+                e.preventDefault();
+                $.alert({
+                    title: "Form Validation Error",
+                    content: "Please fill in all required fields correctly.",
+                    icon: 'fas fa-exclamation-triangle',
+                    type: 'red',
+                    closeIcon: true,
+                    buttons: {
+                        ok: {
+                            text: "OK",
+                            btnClass: 'btn-danger'
                         }
-                    },
-                    cancel: {
-                        text: "Cancel",
-                        btnClass: 'btn-default'
                     }
-                }
-            });
+                });
+            }
+        });
+    }
+
+    // Function to disable all form elements
+    function disableFormElements(formId) {
+        const form = document.getElementById(formId);
+        if (form) {
+            const nodes = form.getElementsByTagName('*');
+            for (let i = 0; i < nodes.length; i++) {
+                nodes[i].disabled = true;
+            }
         }
-    });
+    }
+
+    // Apply the handler for the create form
+    handleFormSubmission(
+        '#create-form',
+        '#create',
+        {
+            title: "Confirm Add Service",
+            content: "Are you sure to add?",
+            icon: 'fas fa-truck fa-sync',
+            type: 'green',
+            confirmButtonText: "Add Service",
+            buttonText: "Add Service"
+        }
+    );
+
+    // Apply the handler for the edit form
+    handleFormSubmission(
+        '#edit-form',
+        '#edit',
+        {
+            title: "Confirm Edit Service",
+            content: "Are you sure to edit?",
+            icon: 'fas fa-truck fa-sync',
+            type: 'orange',
+            confirmButtonText: "Edit Service",
+            buttonText: "Edit Service"
+        }
+    );
+
+    // Initialize validation
     $("#create-form").validate();
     $("#edit-form").validate();
 
-    $('#PinCodeId').attr('data-live-search', true);
-
-    //// Enable multiple select.
-    $('#PinCodeId').attr('multiple', true);
-    $('#PinCodeId').attr('data-selected-text-format', 'count');
+    // Set attributes for PinCodeId select element
+    $('#PinCodeId').attr({
+        'data-live-search': true,
+        'multiple': true,
+        'data-selected-text-format': 'count'
+    });
 });

@@ -115,6 +115,8 @@ $(document).ready(function () {
         }
     });
 
+    let availableSuggestions = []; // Store available suggestions
+
     $("#receipient-email").autocomplete({
         source: function (request, response) {
             $("#loader").show(); // Show loader
@@ -123,13 +125,15 @@ $(document).ready(function () {
                 type: "GET",
                 data: { search: request.term },
                 success: function (data) {
-                    // Ensure data is in the format [{ label: "email", value: "email" }]
-                    response($.map(data, function (item) {
-                        return { label: item, value: item };
-                    }));
+                    availableSuggestions = data.map(item => ({
+                        label: item,
+                        value: item
+                    })); // Update the available suggestions
+                    response(availableSuggestions);
                     $("#loader").hide(); // Hide loader
                 },
                 error: function () {
+                    availableSuggestions = []; // Clear suggestions on error
                     response([]);
                     $("#loader").hide(); // Hide loader
                 }
@@ -150,18 +154,18 @@ $(document).ready(function () {
 
     $("#receipient-email").on("blur", function () {
         const inputValue = $(this).val().trim();
-        let isValid = false;
 
-        // Check if the current input matches any autocomplete suggestions
-        $(this).autocomplete("option", "source")({ term: inputValue }, function (data) {
-            isValid = data.some(item => item.label === inputValue);
-        });
+        // Check if the input value matches any available suggestion
+        const isValid = availableSuggestions.some(item =>
+            item.label === inputValue);
 
         // Reset the input field if invalid
         if (!isValid) {
             $(this).val("").addClass("input-invalid");
+            $(this).focus();
         } else {
             $(this).removeClass("input-invalid");
         }
     });
+
 });

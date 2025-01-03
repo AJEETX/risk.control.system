@@ -7,9 +7,9 @@
             const isValid = /^[a-zA-Z0-9 ]*$/.test(this.value); // Check if input is valid
             if (!isValid) {
                 $(this).val('');
-                $(this).addClass('is-invalid'); // Add error class
+                //$(this).addClass('is-invalid'); // Add error class
             } else {
-                $(this).removeClass('is-invalid'); // Remove error class
+                //$(this).removeClass('is-invalid'); // Remove error class
             }
         });
     });
@@ -123,17 +123,22 @@ function fetchAndSetFieldValue(url, data, inputSelector, responseKey, callback) 
  * Initializes autocomplete for all relevant fields.
  */
 function initializeAutocomplete() {
+    const countryDependentFields = ["#StateId", "#DistrictId", "#PinCodeId"];
+    const stateDependentFields = ["#DistrictId", "#PinCodeId"];
+    const districtDependentFields = ["#PinCodeId"];
     const autocompleteConfig = [
         {
             field: "#CountryId",
             url: "/api/Company/SearchCountry",
-            onSelect: (ui) => handleAutocompleteSelect(ui, "#CountryId", "#SelectedCountryId", ["#StateId", "#DistrictId", "#PinCodeId"])
+            onSelect: (ui) => handleAutocompleteSelect(ui, "#CountryId", "#SelectedCountryId", countryDependentFields),
+            dependentFields: countryDependentFields
         },
         {
             field: "#StateId",
             url: "/api/Company/SearchState",
             extraData: () => ({ countryId: $("#SelectedCountryId").val() }),
-            onSelect: (ui) => handleAutocompleteSelect(ui, "#StateId", "#SelectedStateId", ["#DistrictId", "#PinCodeId"])
+            onSelect: (ui) => handleAutocompleteSelect(ui, "#StateId", "#SelectedStateId", stateDependentFields),
+            dependentFields: stateDependentFields
         },
         {
             field: "#DistrictId",
@@ -142,7 +147,8 @@ function initializeAutocomplete() {
                 countryId: $("#SelectedCountryId").val(),
                 stateId: $("#SelectedStateId").val()
             }),
-            onSelect: (ui) => handleAutocompleteSelect(ui, "#DistrictId", "#SelectedDistrictId", ["#PinCodeId"])
+            onSelect: (ui) => handleAutocompleteSelect(ui, "#DistrictId", "#SelectedDistrictId", districtDependentFields),
+            dependentFields: districtDependentFields
         },
         {
             field: "#PinCodeId",
@@ -152,12 +158,13 @@ function initializeAutocomplete() {
                 stateId: $("#SelectedStateId").val(),
                 districtId: $("#SelectedDistrictId").val()
             }),
-            onSelect: (ui) => handleAutocompleteSelect(ui, "#PinCodeId", "#SelectedPincodeId")
+            onSelect: (ui) => handleAutocompleteSelect(ui, "#PinCodeId", "#SelectedPincodeId"),
+            dependentFields: []
         }
     ];
 
     autocompleteConfig.forEach(config => {
-        setAutocomplete(config.field, config.url, config.extraData || (() => ({})), config.onSelect);
+        setAutocomplete(config.field, config.url, config.extraData || (() => ({})), config.onSelect, config.dependentFields);
     });
 }
 
@@ -173,7 +180,7 @@ function handleAutocompleteSelect(ui, inputSelector, hiddenSelector, dependentFi
 /**
  * Sets up an autocomplete field with dynamic data fetching.
  */
-function setAutocomplete(fieldSelector, url, extraDataCallback, onSelectCallback) {
+function setAutocomplete(fieldSelector, url, extraDataCallback, onSelectCallback, dependentFields) {
     const $wrapper = $(fieldSelector).closest('.autocomplete-wrapper');
     const $spinner = $wrapper.find('.loading-spinner');
 
@@ -247,11 +254,34 @@ function setAutocomplete(fieldSelector, url, extraDataCallback, onSelectCallback
     // Validate the field value on blur
     $(fieldSelector).on("blur", function () {
         const $field = $(this);
-        const enteredValue = $field ? $field.val().trim() : '';
+        const enteredValue = $field && $field.val() !== null ? $field.val().trim() : '';
         const autocomplete = $field.data('ui-autocomplete');
 
-        if (!enteredValue || !autocomplete) {
+        if (!enteredValue) {
+            // If the current value is empty, clear all dependent fields
+            if (Array.isArray(dependentFields) && dependentFields.length > 0) {
+                dependentFields.forEach(selector => {
+                    const $dependentField = $(selector);
+                    if ($dependentField.length) {
+                        $dependentField.val(''); // Clear the value of each dependent field
+
+                        // Temporarily clear autocomplete source
+                        if ($dependentField.data('ui-autocomplete')) {
+                            $dependentField.autocomplete("option", "source", function (request, response) {
+                                response([]); // Return an empty result
+                            });
+                        }
+                    } else {
+                        console.warn(`Dependent field selector "${selector}" did not match any elements.`);
+                    }
+                });
+            }
+
             //$field.addClass('is-invalid'); // Add invalid class if no value
+            return;
+        }
+
+        if (!autocomplete) {
             return;
         }
 
@@ -261,9 +291,6 @@ function setAutocomplete(fieldSelector, url, extraDataCallback, onSelectCallback
         if (typeof options === 'function') {
             // Handle async source function
             options({ term: enteredValue }, function (data) {
-                console.log("Entered Value:", enteredValue);
-                console.log("Autocomplete Data:", data);
-
                 const validOptions = data.filter(option =>
                     option.value !== "" &&
                     option.label !== "No results found" &&
@@ -273,9 +300,6 @@ function setAutocomplete(fieldSelector, url, extraDataCallback, onSelectCallback
                 const isValid = validOptions.some(option =>
                     (option.label || "").trim().toLowerCase() === enteredValue.trim().toLowerCase()
                 );
-
-                console.log("Filtered Data:", validOptions);
-                console.log("Is Valid:", isValid);
 
                 if (!isValid) {
                     $field.val(''); // Clear invalid input
@@ -296,15 +320,23 @@ function setAutocomplete(fieldSelector, url, extraDataCallback, onSelectCallback
                 (option.label || "").trim().toLowerCase() === enteredValue.trim().toLowerCase()
             );
 
-            console.log("Static Options Filtered Data:", validOptions);
-            console.log("Is Valid:", isValid);
-
             if (!isValid) {
                 $field.val(''); // Clear invalid input
                 //$field.addClass('is-invalid'); // Add invalid class
             } else {
                 //$field.removeClass('is-invalid'); // Remove invalid class if valid
             }
+        }
+    });
+
+    // Reinitialize dependent fields' autocomplete on focus
+    $(dependentFields.join(',')).on("focus", function () {
+        const $field = $(this);
+
+        // Restore autocomplete source dynamically
+        const originalSource = $field.data('originalSource'); // Store the original source during initialization
+        if (originalSource) {
+            $field.autocomplete("option", "source", originalSource);
         }
     });
 }
