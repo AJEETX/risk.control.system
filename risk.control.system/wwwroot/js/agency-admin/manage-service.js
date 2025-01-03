@@ -17,7 +17,7 @@
                     buttons: {
                         confirm: {
                             text: confirmationText.confirmButtonText,
-                            btnClass: 'btn-success',
+                            btnClass: confirmationText.buttonClass,
                             action: function () {
                                 askConfirmation = false;
                                 $("body").addClass("submit-progress-bg");
@@ -88,7 +88,8 @@
             icon: 'fas fa-truck fa-sync',
             type: 'green',
             confirmButtonText: "Add Service",
-            buttonText: "Add Service"
+            buttonText: "Add Service",
+            buttonClass: "btn-success"
         }
     );
 
@@ -102,7 +103,8 @@
             icon: 'fas fa-truck fa-sync',
             type: 'orange',
             confirmButtonText: "Edit Service",
-            buttonText: "Edit Service"
+            buttonText: "Edit Service",
+            buttonClass: "btn-warning"
         }
     );
 

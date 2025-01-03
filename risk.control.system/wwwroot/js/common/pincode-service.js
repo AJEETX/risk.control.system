@@ -50,26 +50,6 @@ function PopulateInvestigationServices(dropDownId, list, option) {
     });
 }
 
-function checkFormCompletion(formSelector) {
-    let isFormComplete = true;
-
-    // Check all required fields (select, input fields)
-    $(formSelector).find('select[required], input[required]').each(function () {
-        if (!$(this).val()) {
-            isFormComplete = false;
-            return false;  // Exit loop early if a required field is empty
-        }
-    });
-
-    // Additional check for PinCodeId field
-    if ($('#PinCodeId').length > 0 && ($('#PinCodeId').val() || []).length === 0) {
-        isFormComplete = false;
-    }
-
-    // Enable or disable the submit button
-    $(formSelector).find('button[type="submit"]').prop('disabled', !isFormComplete);
-}
-
 $(document).ready(function () {
     const fields = ['#CountryId', '#StateId', '#DistrictId'];
 
@@ -84,18 +64,6 @@ $(document).ready(function () {
             }
         });
     });
-    $('select[required], input[required], #PinCodeId').on('change input', function () {
-        checkFormCompletion('#create-form');
-        checkFormCompletion('#edit-form');
-    });
-    $('select[required], input[required], #PinCodeId').on('blur', function () {
-        checkFormCompletion('#create-form');
-        checkFormCompletion('#edit-form');
-    });
-
-    // Initially check the form when the page loads
-    checkFormCompletion('#create-form');
-    checkFormCompletion('#edit-form');
 
     // Initialize placeholders and field validations
     updatePlaceholdersBasedOnState();

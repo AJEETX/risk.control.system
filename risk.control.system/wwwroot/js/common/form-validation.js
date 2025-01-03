@@ -15,17 +15,18 @@ $(document).ready(function () {
     // Example usage: Validate file input for allowed types (.jpg, .png, .pdf)
     validateFileInput('#createImageInput', ['jpg', 'png', 'jpeg']); // Adjust the selector and extensions as per your needs
 
-    $('select[required], input[required], input[type="file"], #PinCodeId').on('change input', function () {
-        checkFormCompletion('#create-form');
-        checkFormCompletion('#edit-form');
-    });
-    $('select[required], input[required], input[type="file"], #PinCodeId').on('blur', function () {
-        checkFormCompletion('#create-form');
+    // Common selector for required fields and specific inputs
+    const requiredFieldsSelector = 'select[required], input[required], input[type="file"], #PinCodeId';
+
+    // Add event handlers for 'change' and 'blur' events
+    $(requiredFieldsSelector).on('input change blur', function () {
+        // Check form completion for the specified forms
+        checkFormCompletion('#create-form', true);
         checkFormCompletion('#edit-form');
     });
 
     // Initially check the form when the page loads
-    checkFormCompletion('#create-form');
+    checkFormCompletion('#create-form', true);
     checkFormCompletion('#edit-form');
 
 });

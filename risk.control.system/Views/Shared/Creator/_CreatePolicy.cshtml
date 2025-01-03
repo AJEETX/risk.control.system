@@ -1,5 +1,5 @@
 ﻿@model risk.control.system.Models.ClaimsInvestigation
-
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
 <div id="article" class="card bg-light card-secondary">
     <input type="hidden" asp-for="PolicyDetail.LineOfBusinessId" value="@ViewBag.LineOfBusinessId" />
     <div class="card-header">

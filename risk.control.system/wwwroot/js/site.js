@@ -9,24 +9,34 @@ var showLocationMap = false;
 var showOcrMap = false;
 const image =
     "/images/beachflag.png";
-function checkFormCompletion(formSelector) {
+function checkFormCompletion(formSelector, create = false) {
     let isFormComplete = true;
 
-    // Check all required fields (select, input fields)
+    // Check all required fields (select, input fields, and file inputs)
     $(formSelector).find('select[required], input[required], input[type="file"]').each(function () {
+        const fieldType = $(this).attr('type');
+
+        // Skip file input validation in edit mode
+        if (fieldType === 'file' && !create) {
+            return; // Skip to the next field
+        }
+
+        // Check if the field has a value
         if (!$(this).val()) {
             isFormComplete = false;
-            return false;  // Exit loop early if a required field is empty
+            return false; // Exit loop early if a required field is empty
+        }
+
+        // Validate file input type in create mode
+        if (fieldType === 'file' && create) {
+            const allowedExtensions = ['jpg', 'png', 'jpeg']; // Define your allowed extensions here
+            if (!validateFileInput(this, allowedExtensions)) {
+                isFormComplete = false;
+                return false; // Exit loop if the file type is invalid
+            }
         }
     });
-    // For file inputs, validate file type
-    if ($(this).attr('type') === 'file') {
-        const allowedExtensions = ['jpg', 'png', 'pdf']; // Add your allowed extensions here
-        if (!validateFileType(this, allowedExtensions)) {
-            isFormComplete = false;
-            return false; // Exit loop if the file type is invalid
-        }
-    }
+
     // Additional check for PinCodeId field
     if ($('#PinCodeId').length > 0 && ($('#PinCodeId').val() || []).length === 0) {
         isFormComplete = false;
@@ -35,19 +45,25 @@ function checkFormCompletion(formSelector) {
     // Enable or disable the submit button
     $(formSelector).find('button[type="submit"]').prop('disabled', !isFormComplete);
 }
+
 // Function to validate file input types
-function validateFileInput(selector, allowedExtensions) {
-    $(selector).on('change', function () {
-        const file = this.files[0];
-        if (file) {
-            const fileExtension = file.name.split('.').pop().toLowerCase();
-            if (allowedExtensions.indexOf(fileExtension) === -1) {
-                alert('Invalid file type! Please upload a file with one of the following extensions: ' + allowedExtensions.join(', '));
-                $(this).val(''); // Clear the input
-            }
-        }
-    });
+function validateFileInput(inputElement, allowedExtensions) {
+    if (!inputElement.files || !inputElement.files[0]) {
+        return false; // Exit early if no files are selected
+    }
+
+    const file = inputElement.files[0];
+    const fileExtension = file.name.split('.').pop().toLowerCase();
+
+    if (!allowedExtensions.includes(fileExtension)) {
+        alert(`Invalid file type! Please upload a file with one of the following extensions: ${allowedExtensions.join(', ')}`);
+        inputElement.value = ''; // Clear the input
+        return false;
+    }
+
+    return true;
 }
+
 
 // Generic input validation function
 function validateInput(selector, regex) {

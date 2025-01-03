@@ -1,66 +1,129 @@
 ﻿$(document).ready(function () {
-    // Function to handle form submission with confirmation
-    function handleFormSubmit(formSelector, formType) {
-        var askConfirmation = true;
-        $(formSelector).submit(function (e) {
-            if (askConfirmation) {
-                e.preventDefault();
 
-                // Define the confirmation message based on form type
-                var confirmationTitle = formType === 'create' ? "Confirm Add User" : "Confirm Edit User";
-                var confirmationContent = formType === 'create' ? "Are you sure to add?" : "Are you sure to edit?";
-                var buttonText = formType === 'create' ? "Add User" : "Edit User";
-                var buttonClass = formType === 'create' ? 'btn-success' : 'btn-warning';
-                var buttonIcon = formType === 'create' ? 'fas fa-user-plus' : 'fas fa-user-edit';
+    var askConfirmation = true;
+    $('#create-form').submit(function (e) {
+        if ($('#create-form').valid() &&  askConfirmation) {
+            e.preventDefault();
+            $.confirm({
+                title: "Confirm Add User",
+                content: "Are you sure to add?",
+                icon: 'fas fa-user-plus',
+                type: 'green',
+                closeIcon: true,
+                buttons: {
+                    confirm: {
+                        text: "Add User",
+                        btnClass: 'btn-success',
+                        action: function () {
+                            askConfirmation = false;
+                            $("body").addClass("submit-progress-bg");
+                            // Wrap in setTimeout so the UI
+                            // can update the spinners
+                            setTimeout(function () {
+                                $(".submit-progress").removeClass("hidden");
+                            }, 1);
+                            $('#create').attr('disabled', 'disabled');
+                            $('#create').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i>  Add User");
 
-                $.confirm({
-                    title: confirmationTitle,
-                    content: confirmationContent,
-                    icon: buttonIcon,
-                    type: formType === 'create' ? 'green' : 'orange',
-                    closeIcon: true,
-                    buttons: {
-                        confirm: {
-                            text: buttonText,
-                            btnClass: buttonClass,
-                            action: function () {
-                                askConfirmation = false;
-                                $("body").addClass("submit-progress-bg");
+                            $('#create-form').submit();
+                            var createForm = document.getElementById("create-form");
+                            if (createForm) {
 
-                                // Display loading spinner
-                                setTimeout(function () {
-                                    $(".submit-progress").removeClass("hidden");
-                                }, 1);
-
-                                // Disable the submit button and change text to show progress
-                                var submitButton = $(formSelector).find('button[type="submit"]');
-                                submitButton.attr('disabled', 'disabled');
-                                submitButton.html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> " + buttonText);
-
-                                // Disable all form inputs to prevent further edits
-                                $(formSelector).find("input, select, button").prop("disabled", true);
-
-                                // Submit the form after disabling inputs
-                                $(formSelector).submit();
+                                var nodes = createForm.getElementsByTagName('*');
+                                for (var i = 0; i < nodes.length; i++) {
+                                    nodes[i].disabled = true;
+                                }
                             }
-                        },
-                        cancel: {
-                            text: "Cancel",
-                            btnClass: 'btn-default'
                         }
+                    },
+                    cancel: {
+                        text: "Cancel",
+                        btnClass: 'btn-default'
                     }
-                });
-            }
-        });
-    }
+                }
+            });
+        } else if (askConfirmation) {
+            e.preventDefault();
+            $.alert({
+                title: "Form Validation Error",
+                content: "Please fill in all required fields correctly.",
+                icon: 'fas fa-exclamation-triangle',
+                type: 'red',
+                closeIcon: true,
+                buttons: {
+                    ok: {
+                        text: "OK",
+                        btnClass: 'btn-danger'
+                    }
+                }
+            });
+        }
+    });
 
-    // Initialize both create and edit form submissions
-    handleFormSubmit('#create-form', 'create');
-    handleFormSubmit('#edit-form', 'edit');
+    var askEditConfirmation = true;
+    $('#edit-form').submit(function (e) {
+        if ($('#edit-form').valid() && askEditConfirmation) {
+            e.preventDefault();
+            $.confirm({
+                title: "Confirm Edit User",
+                content: "Are you sure to edit?",
 
-    // Initialize form validation for both forms
+                icon: 'fas fa-user-plus',
+                type: 'orange',
+                closeIcon: true,
+                buttons: {
+                    confirm: {
+                        text: "Edit User",
+                        btnClass: 'btn-warning',
+                        action: function () {
+                            askEditConfirmation = false;
+                            $("body").addClass("submit-progress-bg");
+                            // Wrap in setTimeout so the UI
+                            // can update the spinners
+                            setTimeout(function () {
+                                $(".submit-progress").removeClass("hidden");
+                            }, 1);
+                            $('#edit').attr('disabled', 'disabled');
+                            $('#edit').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Edit User");
+
+                            $('#edit-form').submit();
+                            var createForm = document.getElementById("edit-form");
+                            if (createForm) {
+
+                                var nodes = createForm.getElementsByTagName('*');
+                                for (var i = 0; i < nodes.length; i++) {
+                                    nodes[i].disabled = true;
+                                }
+                            }
+                        }
+                    },
+                    cancel: {
+                        text: "Cancel",
+                        btnClass: 'btn-default'
+                    }
+                }
+            });
+        } else if (askEditConfirmation) {
+            e.preventDefault();
+            $.alert({
+                title: "Form Validation Error",
+                content: "Please fill in all required fields correctly.",
+                icon: 'fas fa-exclamation-triangle',
+                type: 'red',
+                closeIcon: true,
+                buttons: {
+                    ok: {
+                        text: "OK",
+                        btnClass: 'btn-danger'
+                    }
+                }
+            });
+        }
+    });
+
     $("#create-form").validate();
     $("#edit-form").validate();
+
     $('input#emailAddress').on('input change', function () {
         if ($(this).val() != '' && $(this).val().length > 4) {
             $('#check-email').prop('disabled', false);
@@ -120,14 +183,14 @@ function checkUserEmail() {
                 //$('#result').fadeOut('slow'); // 1.5 seconds
                 $("#emailAddress").css('background-color', '');
                 $("#emailAddress").css('border-color', '#ccc');
-                $('#create').prop('disabled', false);
+                //$('#create').prop('disabled', false);
             }
             else if (data == 1) {//domain exists
                 $("#result").html("<span style='color:red;padding-top:.5rem;display:inline !important' title=' Email exists' data-toggle='tooltip'><i class='fa fa-times-circle' style='color:red;'></i> </span>");
                 $('#result').css('padding', '.5rem')
                 $('#result').css('display', 'inline')
                 $("#emailAddress").css('border-color', '#e97878');
-                $('#create').prop('disabled', 'true !important');
+                //$('#create').prop('disabled', 'true !important');
             }
             else if (data = null || data == undefined) {
             }
