@@ -125,7 +125,7 @@ namespace risk.control.system.Services
             return true;
         }
 
-        public async Task<bool> UploadFile(string userEmail, IFormFile postedFile, string uploadingway)
+        public async Task<bool> UploadFile(string userEmail, IFormFile postedFile, string autoManual)
         {
             string path = Path.Combine(webHostEnvironment.WebRootPath, "upload-file");
             if (!Directory.Exists(path))
@@ -151,7 +151,7 @@ namespace risk.control.system.Services
                     {
                         return false;
                     }
-                    var processed = await ProcessFile(userEmail, archive, uploadingway, ORIGIN.FILE);
+                    var processed = await ProcessFile(userEmail, archive, autoManual, ORIGIN.FILE);
                     if (!processed)
                     {
                         return false;
@@ -183,10 +183,10 @@ namespace risk.control.system.Services
             await _context.SaveChangesAsync();
         }
 
-        private async Task<bool> ProcessFile(string userEmail, ZipArchive archive, string createdAs, ORIGIN uploadingway)
+        private async Task<bool> ProcessFile(string userEmail, ZipArchive archive, string autoManual, ORIGIN fileOrFtp)
         {
 
-            var createdAsMethod = (CREATEDBY)Enum.Parse(typeof(CREATEDBY), createdAs, true);
+            var createdAsMethod = (CREATEDBY)Enum.Parse(typeof(CREATEDBY), autoManual, true);
             var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(c => c.Email == userEmail);
             bool userCanCreate = true;
             var totalClaimsCreated = await _context.ClaimsInvestigation.CountAsync(c => !c.Deleted && c.ClientCompanyId == companyUser.ClientCompanyId);
@@ -224,14 +224,14 @@ namespace risk.control.system.Services
             if (userCanCreate && userCanUpload)
             {
 
-                return await DoUpload(companyUser, dataRows, createdAs, archive, uploadingway);
+                return await DoUpload(companyUser, dataRows, autoManual, archive, fileOrFtp);
             }
             return false;
 
         }
-        private async Task<bool> DoUpload(ClientCompanyApplicationUser companyUser, string[] dataRows, string createdAs, ZipArchive archive, ORIGIN uploadingway)
+        private async Task<bool> DoUpload(ClientCompanyApplicationUser companyUser, string[] dataRows, string autoManual, ZipArchive archive, ORIGIN fileOrFtp)
         {
-            var createdAsMethod = (CREATEDBY)Enum.Parse(typeof(CREATEDBY), createdAs, true);
+            var createdAsMethod = (CREATEDBY)Enum.Parse(typeof(CREATEDBY), autoManual, true);
             var status = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.INITIATED));
             var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
             var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
@@ -285,7 +285,7 @@ namespace risk.control.system.Services
                                 UserEmailActioned = companyUser.Email,
                                 UserEmailActionedTo = companyUser.Email,
                                 CREATEDBY = createdAsMethod,
-                                ORIGIN = uploadingway,
+                                ORIGIN = fileOrFtp,
                                 ClientCompanyId = companyUser.ClientCompanyId,
                                 UserRoleActionedTo = $"{companyUser.ClientCompany.Email}",
                                 CreatorSla = companyUser.ClientCompany.CreatorSla

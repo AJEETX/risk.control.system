@@ -36,12 +36,9 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb("Country")]
-        public async Task<IActionResult> Profile()
+        public IActionResult Profile()
         {
-            var applicationDbContext = _context.Country.AsQueryable();
-
-            var applicationDbContextResult = await applicationDbContext.ToListAsync();
-            return View(applicationDbContextResult);
+            return View();
         }
 
 
@@ -91,7 +88,9 @@ namespace risk.control.system.Controllers
                 {
                     s.CountryId,
                     s.Name,
-                    s.Code
+                    s.Code,
+                    IsUpdated = s.IsUpdated,
+                    lastModified = s.Updated
                 })
                 .ToListAsync();
 
@@ -138,6 +137,7 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Country country)
         {
+            country.IsUpdated = true;
             country.Updated = DateTime.Now;
             country.UpdatedBy = HttpContext.User?.Identity?.Name;
             _context.Add(country);
@@ -183,6 +183,7 @@ namespace risk.control.system.Controllers
                 try
                 {
                     country.Updated = DateTime.Now;
+                    country.IsUpdated = true;
                     country.UpdatedBy = HttpContext.User?.Identity?.Name;
                     _context.Update(country);
                     await _context.SaveChangesAsync();

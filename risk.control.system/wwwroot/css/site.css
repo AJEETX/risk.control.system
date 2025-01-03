@@ -1732,3 +1732,7 @@ select#PinCodeId{
     color: #155724; /* Dark green text */
     animation: highlight 3s ease-in-out;
 }
+.highlighted-row {
+    background-color: #fffbcc; /* Light yellow background */
+    font-weight: bold;
+}

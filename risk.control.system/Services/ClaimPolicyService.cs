@@ -51,9 +51,6 @@ namespace risk.control.system.Services
                 UserEmailActioned = userEmail,
                 UserEmailActionedTo = userEmail,
             };
-
-            var clientCompanyUser = _context.ClientCompanyApplicationUser.Include(u=>u.ClientCompany).FirstOrDefault(c => c.Email == userEmail);
-
             return model;
         }
 

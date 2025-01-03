@@ -135,24 +135,13 @@ namespace risk.control.system.Controllers.Company
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (string.IsNullOrWhiteSpace(currentUserEmail))
-                {
-                    notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
+                
                 if (claimsInvestigation == null)
                 {
                     notifyService.Error("OOPs !!!..Claim Not Found");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-
-                var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == currentUserEmail);
-                if (companyUser == null)
-                {
-                    notifyService.Error("OOPs !!!..User Not Found");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-                claimsInvestigation.ClientCompanyId = companyUser?.ClientCompanyId;
+                
                 claimsInvestigation.CREATEDBY = CREATEDBY.AUTO;
                 claimsInvestigation.ORIGIN = ORIGIN.USER;
 

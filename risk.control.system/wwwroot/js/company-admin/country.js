@@ -1,5 +1,5 @@
 ﻿$(document).ready(function () {
-    $('#customerTable').DataTable({
+    var table = $('#customerTable').DataTable({
         processing: true,
         serverSide: true,
         ajax: {
@@ -12,7 +12,7 @@
                 d.orderDirection = d.order[0]?.dir; // Pass the sorting directio
             }
         },
-        order: [[0, 'asc']],
+        order: [[4, 'desc'], [2, 'desc']],
         fixedHeader: true,
         processing: true,
         paging: true,
@@ -24,6 +24,17 @@
         columns: [
             { data: 'code', orderable: true }, // Make sortable
             { data: 'name', orderable: true }, // Make sortable
+            {
+                data: 'lastModified',
+                orderable: true, // Enable sorting for this column
+                render: function (data, type, row) {
+                    if (data) {
+                        const date = new Date(data);
+                        return date.toLocaleDateString('en-AU');
+                    }
+                    return 'N/A';
+                }
+            },
             {
                 data: 'countryId',
                 orderable: false, // Disable sorting for actions column
@@ -37,8 +48,51 @@
                                     <i class="fas fa-trash"></i> Delete
                                 </a>`;
                 }
+            },
+            {
+                "data": "isUpdated",
+                bVisible: false
             }
-        ]
+        ],
+        rowCallback: function (row, data, index) {
+            // Highlight rows updated in the last 24 hours
+            if (data.lastModified) {
+                const lastModified = new Date(data.lastModified);
+                const now = new Date();
+                const timeDifference = now - lastModified;
+
+                // Check if the difference is less than 24 hours
+                if (timeDifference < 24 * 60 * 60 * 1000) {
+                    //$(row).addClass('highlighted-row'); // Apply a custom CSS class
+                }
+            }
+        }
+    });
+
+    table.on('draw', function () {
+        table.rows().every(function () {
+            var data = this.data(); // Get row data
+            console.log(data); // Debug row data
+
+            if (data.lastModified) { // Check if the row should be highlighted
+                var rowNode = this.node();
+                const lastModified = new Date(data.lastModified);
+                const now = new Date();
+                const timeDifference = now - lastModified;
+                if (timeDifference < 24 * 60 * 60 * 1000) {
+                    // Highlight the row
+                    $(rowNode).addClass('highlight-new-user');
+
+                    // Scroll the row into view
+                    rowNode.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                    // Optionally, remove the highlight after a delay
+                    setTimeout(function () {
+                        $(rowNode).removeClass('highlight-new-user');
+                    }, 3000);
+                }
+            }
+        });
     });
 
     var askConfirmation = true;

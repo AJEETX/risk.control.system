@@ -149,19 +149,17 @@ namespace risk.control.system.Controllers.Company
                 ViewData["CaseEnablerId"] = new SelectList(_context.CaseEnabler.OrderBy(s => s.Code), "CaseEnablerId", "Name");
                 ViewData["CostCentreId"] = new SelectList(_context.CostCentre.OrderBy(s => s.Code), "CostCentreId", "Name");
 
+                ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType.Where(i =>
+                i.LineOfBusinessId == lineOfBusinessId).OrderBy(s => s.Code), "InvestigationServiceTypeId", "Name");
                 var currentUser = await _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
                 if (currentUser.ClientCompany.HasSampleData)
                 {
                     var model = claimPolicyService.AddClaimPolicy(currentUserEmail, lineOfBusinessId);
                     model.ClientCompanyId = currentUser.ClientCompanyId;
-
-                    ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType.Where(i =>
-                    i.LineOfBusinessId == model.PolicyDetail.LineOfBusinessId).OrderBy(s => s.Code), "InvestigationServiceTypeId", "Name");
                     return View(model);
                 }
                 else
                 {
-                    ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType.Where(i => i.LineOfBusinessId == lineOfBusinessId).OrderBy(s => s.Code), "InvestigationServiceTypeId", "Name");
                     return View();
                 }
             }
