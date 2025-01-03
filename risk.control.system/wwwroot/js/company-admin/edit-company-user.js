@@ -18,11 +18,11 @@
                         setTimeout(function () {
                             $(".submit-progress").removeClass("hidden");
                         }, 1);
-                        $('#create-user').attr('disabled', 'disabled');
-                        $('#create-user').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Edit User");
+                        $('#edit').attr('disabled', 'disabled');
+                        $('#edit').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Edit User");
 
                         form.submit();
-                        var createForm = document.getElementById("create-form");
+                        var createForm = document.getElementById("edit-form");
                         if (createForm) {
 
                             var nodes = createForm.getElementsByTagName('*');
@@ -41,5 +41,5 @@
     }
 });
 $(document).ready(function () {
-    $("#create-form").validate();
+    $("#edit-form").validate();
 });
