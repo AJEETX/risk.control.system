@@ -24,6 +24,7 @@ using NuGet.Packaging.Signing;
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
+using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
 
@@ -35,6 +36,7 @@ namespace risk.control.system.Controllers
     {
         private readonly UserManager<Models.ApplicationUser> _userManager;
         private readonly SignInManager<Models.ApplicationUser> _signInManager;
+        private readonly IConfiguration config;
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly INotificationService service;
         private readonly IAccountService accountService;
@@ -47,6 +49,7 @@ namespace risk.control.system.Controllers
         public AccountController(
             UserManager<Models.ApplicationUser> userManager,
             SignInManager<Models.ApplicationUser> signInManager,
+            IConfiguration config,
              IHttpContextAccessor httpContextAccessor,
             INotificationService service,
             IAccountService accountService,
@@ -58,6 +61,7 @@ namespace risk.control.system.Controllers
         {
             _userManager = userManager ?? throw new ArgumentNullException();
             _signInManager = signInManager ?? throw new ArgumentNullException();
+            this.config = config;
             this.httpContextAccessor = httpContextAccessor;
             this.service = service;
             this.accountService = accountService;
@@ -69,42 +73,47 @@ namespace risk.control.system.Controllers
         }
 
         [Authorize]
-        public async Task<IActionResult> KeepSessionAlive()
+        [IgnoreAntiforgeryToken]
+        public async Task<IActionResult> KeepSessionAlive([FromBody] KeepSessionRequest request)
         {
-            if (User.Identity.IsAuthenticated)
+            try
             {
-                var user = await _signInManager.UserManager.GetUserAsync(User);
-
-                if (user != null)
+                if (User.Identity.IsAuthenticated)
                 {
-                    // Refresh the sign-in, resetting the cookie
-                    await _signInManager.RefreshSignInAsync(user);
-                    return Ok();
+                    var user = await _signInManager.UserManager.GetUserAsync(User);
+
+                    if (user != null)
+                    {
+                        await _signInManager.RefreshSignInAsync(user);
+                        var userDetails = new 
+                        { 
+                            name = user.UserName, 
+                            role = user.Role.GetEnumDisplayName(), 
+                            cookieExpiry = user.LastActivityDate ?? user.Updated ,
+                            currentPage = request.CurrentPage
+                        };
+
+                        var userSessionAlive = new UserSessionAlive
+                        {
+                            Updated = DateTime.Now,
+                            ActiveUser = user,
+                            CurrentPage = request.CurrentPage,
+                        };
+                        _context.UserSessionAlive.Add(userSessionAlive);
+                        await _context.SaveChangesAsync();
+                        return Ok(userDetails);
+                    }
                 }
+                await _signInManager.SignOutAsync();
+                return Unauthorized(new { message = "User is logged out due to inactivity or authentication failure." });
             }
-
-            return Unauthorized();
-            // Return success to indicate the session is alive
-            //return Json(new { success = true });
-        }
-
-        [HttpGet]
-        [AllowAnonymous]
-        public async Task<IActionResult> icheckify()
-        {
-            var timer = DateTime.Now;
-            // Clear the existing external cookie to ensure a clean login process
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            await _signInManager.SignOutAsync();
-            var showLoginUsers = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
-            var users = _context.Users.OrderBy(o => o.Email);
-            if (showLoginUsers)
+            catch (Exception ex)
             {
-                    ViewData["Users"] = new SelectList(users, "Email", "Email");
+                _logger.LogError(ex, "Error in KeepSessionAlive");
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred." });
             }
-            //ViewBag.SlimLogin = "Login";
-            return View(new LoginViewModel { ShowUserOnLogin = showLoginUsers , Users = users.Select(u=>u.Email)?.ToList() });
         }
+
         [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> Login()
@@ -117,10 +126,10 @@ namespace risk.control.system.Controllers
             if (showLoginUsers)
             {
                 var showgtrialUsers = await featureManager.IsEnabledAsync(FeatureFlags.TrialVersion);
-                if(showgtrialUsers)
+                if (showgtrialUsers)
                 {
                     var xx = _context.Users.ToList();
-                    ViewData["Users"] = new SelectList(_context.Users.Where(u=>!u.Deleted && !u.Email.StartsWith("admin")).OrderBy(o => o.Email), "Email", "Email");
+                    ViewData["Users"] = new SelectList(_context.Users.Where(u => !u.Deleted && !u.Email.StartsWith("admin")).OrderBy(o => o.Email), "Email", "Email");
                 }
                 else
                 {
@@ -140,30 +149,6 @@ namespace risk.control.system.Controllers
             return View(new LoginViewModel { ShowUserOnLogin = showLoginUsers });
         }
 
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //[AllowAnonymous]
-        //public async Task<IActionResult> Login(LoginViewModel model)
-        //{
-        //    if (ModelState.IsValid || !model.Email.ValidateEmail())
-        //    {
-        //        var result = await _signInManager.PasswordSignInAsync(HttpUtility.HtmlEncode(model.Email), HttpUtility.HtmlEncode(model.Password), model.RememberMe, lockoutOnFailure: false);
-        //        if (result.Succeeded)
-        //        {
-        //            var claims = new List<Claim> { new Claim(ClaimTypes.NameIdentifier, model.Email) , new Claim(ClaimTypes.Name, model.Email) };
-        //            var userIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-        //            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(userIdentity), new AuthenticationProperties{});
-
-        //            notifyService.Success("Login successful");
-        //            return RedirectToAction("Index", "Dashboard");
-        //        }
-        //    }
-        //    ModelState.AddModelError(string.Empty, "Bad Request.");
-        //    model.Error = "Bad Request.";
-        //    model.ShowUserOnLogin = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
-        //    ViewData["Users"] = new SelectList(_context.Users.OrderBy(o => o.Email), "Email", "Email");
-        //    return View(model);
-        //}
         [HttpPost]
         [ValidateAntiForgeryToken]
         [AllowAnonymous]
@@ -202,13 +187,13 @@ namespace risk.control.system.Controllers
                             if (await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED) && vendorIsActive)
                             {
                                 var userIsAgent = vendorUser.Role == AppRoles.AGENT;
-                                if(userIsAgent)
+                                if (userIsAgent)
                                 {
                                     vendorIsActive = !string.IsNullOrWhiteSpace(user.MobileUId);
                                 }
                             }
                         }
-                        if (companyIsActive && user.Active || vendorIsActive && user.Active || companyUser == null && vendorUser == null )
+                        if (companyIsActive && user.Active || vendorIsActive && user.Active || companyUser == null && vendorUser == null)
                         {
                             var claims = new List<Claim> {
                             new Claim(ClaimTypes.NameIdentifier, model.Email) ,
@@ -216,12 +201,14 @@ namespace risk.control.system.Controllers
                             };
                             var userIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                             ClaimsPrincipal principal = new ClaimsPrincipal(userIdentity);
+                            var timeout = config["SESSION_TIMEOUT_SEC"];
+                            var properties = new AuthenticationProperties
+                            {
+                                ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(double.Parse(timeout)), // Reset expiry time
+                                IsPersistent = true,
+                            };
+                            await _signInManager.SignInAsync(user, properties);
 
-                            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal,
-                                new AuthenticationProperties
-                                {
-
-                                });
                             var isAuthenticated = HttpContext.User.Identity.IsAuthenticated;
 
                             if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN) && user?.Email != null && !user.Email.StartsWith("admin"))
@@ -342,14 +329,14 @@ namespace risk.control.system.Controllers
                         model.Error = "Invalid login attempt.";
                         model.ShowUserOnLogin = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
                         ViewData["Users"] = new SelectList(_context.Users.OrderBy(o => o.Email), "Email", "Email");
-                            return View(model);
+                        return View(model);
                     }
                 }
             }
             ModelState.AddModelError(string.Empty, "Bad Request.");
             model.Error = "Bad Request.";
             model.ShowUserOnLogin = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
-            ViewData["Users"] = new SelectList(_context.Users.Where(u =>!u.Deleted).OrderBy(o => o.Email), "Email", "Email");
+            ViewData["Users"] = new SelectList(_context.Users.Where(u => !u.Deleted).OrderBy(o => o.Email), "Email", "Email");
             return View(model);
         }
 
@@ -359,7 +346,7 @@ namespace risk.control.system.Controllers
         public async Task<IActionResult> Forgot(LoginViewModel input)
         {
             string message = string.Empty;
-            var smsSent = await accountService.ForgotPassword(input.Email,long.Parse(input.Mobile));
+            var smsSent = await accountService.ForgotPassword(input.Email, long.Parse(input.Mobile));
             if (smsSent)
             {
                 message = "Password sent to mobile: " + input.Mobile;
@@ -395,7 +382,7 @@ namespace risk.control.system.Controllers
 
             var newDomain = input.Trim().ToLower() + domainData.GetEnumDisplayName();
 
-            var userCount =  await  _userManager.Users.CountAsync(u => u.Email.Trim().ToLower().Substring(u.Email.IndexOf("@") + 1) == newDomain);
+            var userCount = await _userManager.Users.CountAsync(u => u.Email.Trim().ToLower().Substring(u.Email.IndexOf("@") + 1) == newDomain);
 
             return userCount == 0 ? 0 : 1;
 
@@ -412,10 +399,10 @@ namespace risk.control.system.Controllers
 
             var newDomain = input.Trim().ToLower() + domainData.GetEnumDisplayName();
 
-            var agenccompanyCount = await _context.ClientCompany.CountAsync(u =>u.Email.Trim().ToLower() == newDomain );
-            var agencyCount = await _context.Vendor.CountAsync(u =>u.Email.Trim().ToLower() == newDomain );
+            var agenccompanyCount = await _context.ClientCompany.CountAsync(u => u.Email.Trim().ToLower() == newDomain);
+            var agencyCount = await _context.Vendor.CountAsync(u => u.Email.Trim().ToLower() == newDomain);
 
-            return agencyCount == 0  && agenccompanyCount == 0 ? 0 : 1;
+            return agencyCount == 0 && agenccompanyCount == 0 ? 0 : 1;
         }
 
         [HttpGet]
@@ -431,5 +418,9 @@ namespace risk.control.system.Controllers
             return userCount == 0 ? 0 : 1;
         }
 
+    }
+    public class KeepSessionRequest
+    {
+        public string CurrentPage { get; set; }
     }
 }

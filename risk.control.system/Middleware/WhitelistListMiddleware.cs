@@ -93,6 +93,7 @@ namespace risk.control.system.Middleware
             }
             var timeout = double.Parse(config["SESSION_TIMEOUT_SEC"]);
             context.Items.Add("timeout", timeout);
+            Console.WriteLine("timeout: " + timeout);
             try
             {
                 await _next(context).ConfigureAwait(false);

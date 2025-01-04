@@ -1,35 +1,57 @@
 var askConfirmation = true; // Prevent duplicate confirmation dialogs
 var logoutPath = "/Account/Logout";
-var refreshSessionPath = "/Account/KeepSessionAlive"; // Path to refresh session
 var defaultTimeoutSeconds = parseInt(document.getElementById('timeout')?.value || "900", 10); // Default 15 minutes
 var sessionTimer = localStorage.getItem("sessionTimer")
     ? parseInt(localStorage.getItem("sessionTimer"), 10)
     : defaultTimeoutSeconds;
+var refreshSessionPath = "/Account/KeepSessionAlive"; // Path to refresh session
 
-// Function to refresh session by contacting the server
 function refreshSession() {
-    console.log("Refreshing session..."); // Debug log
-
-    // Send an AJAX request to the server
+    const currentPageUrl = window.location.href;
+    console.log("Refreshing session on "+ currentPageUrl);
     fetch(refreshSessionPath, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
-            credentials: "include", // Include cookies in the request
         },
+        credentials: "include", // Include cookies in the request
+        body: JSON.stringify({ currentPage: currentPageUrl }), // Send the current page URL in the request body
     })
         .then(async (response) => {
-            if (!response.ok) {
-                console.error("Failed to fetch user identity details.");
+            if (response.status === 401) {
+                // Handle unauthorized response (e.g., session expired)
+                console.warn("Session expired or user is unauthorized. Redirecting to login page...");
+                window.location.href = "/Account/Login"; // Redirect to the login page
                 return;
             }
-            const userDetails = await response.json(); // Assuming the API returns user details in JSON format
-            console.log("User Identity Details:", userDetails);
+
+            if (!response.ok) {
+                const errorText = await response.text(); // Read error response as text
+                console.error("Failed to fetch user identity details. Server response:", errorText);
+                return;
+            }
+
+            try {
+                const userDetails = await response.json(); // Parse JSON response
+                console.log("User Identity Details:", userDetails);
+                updateUserUI(userDetails);
+            } catch (error) {
+                console.error("Error parsing JSON:", error);
+            }
         })
         .catch((error) => {
             console.error("Error during fetch:", error);
         });
 }
+
+// Example function to update the UI based on user details
+function updateUserUI(userDetails) {
+    if (userDetails) {
+        console.log(userDetails.name);
+        console.log(userDetails.role);
+    }
+}
+
 
 // Function to start the timer
 function startTimer(timeout, display) {
