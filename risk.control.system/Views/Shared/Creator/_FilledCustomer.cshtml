@@ -20,13 +20,13 @@
 
         if (customerDetail.DateOfBirth != null)
         {
-            currentAgeInYrs = (int)(DateTime.Now.Subtract(customerDetail.DateOfBirth).TotalDays / 365);
+            currentAgeInYrs = (int)(DateTime.Now.Subtract(customerDetail.DateOfBirth.GetValueOrDefault()).TotalDays / 365);
         }
     }
 
     if (location?.DateOfBirth != null)
     {
-        currentBAgeInYrs = (int)(DateTime.Now.Subtract(location.DateOfBirth).TotalDays / 365);
+        currentBAgeInYrs = (int)(DateTime.Now.Subtract(location.DateOfBirth.GetValueOrDefault()).TotalDays / 365);
     }
 
     // Progress bar and message setup

@@ -635,7 +635,7 @@ namespace risk.control.system.Controllers.Api
                             Relation = claimCase.BeneficiaryRelation.Name,
                             Income = claimCase.Income.GetEnumDisplayName(),
                             Phone = claimCase.ContactNumber,
-                            DateOfBirth = claimCase.DateOfBirth.ToString("dd-MMM-yyyy"),
+                            DateOfBirth = claimCase.DateOfBirth.GetValueOrDefault().ToString("dd-MMM-yyyy"),
                             Address = claimCase.Addressline + " " + claimCase.District.Name + " " + claimCase.State.Name + " " + claimCase.Country.Name + " " + claimCase.PinCode.Code
                         },
                         Customer = new
@@ -647,7 +647,7 @@ namespace risk.control.system.Controllers.Api
                             string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noCustomerimage)),
                             Income = claim.CustomerDetail.Income.GetEnumDisplayName(),
                             Phone = claim.CustomerDetail.ContactNumber,
-                            DateOfBirth = claim.CustomerDetail.DateOfBirth.ToString("dd-MMM-yyyy"),
+                            DateOfBirth = claim.CustomerDetail.DateOfBirth.GetValueOrDefault().ToString("dd-MMM-yyyy"),
                             Address = claim.CustomerDetail.Addressline + " " + claim.CustomerDetail.District.Name + " " + claim.CustomerDetail.State.Name + " " + claim.CustomerDetail.Country.Name + " " + claim.CustomerDetail.PinCode.Code
                         },
                         InvestigationData = new

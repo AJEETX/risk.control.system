@@ -748,7 +748,7 @@ namespace risk.control.system.Services
                         a.UserEmailActionedTo == companyUser.Email &&
                         a.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId)
                         ||
-                        (!companyUser.ClientCompany.AutoAllocation && a.UserEmailActioned == companyUser.Email &&
+                        (a.CREATEDBY == CREATEDBY.MANUAL && a.UserEmailActioned == companyUser.Email &&
                          a.UserEmailActionedTo == companyUser.Email &&
                          a.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId) ||
                 (a.IsReviewCase && a.InvestigationCaseSubStatusId == reAssignedStatus.InvestigationCaseSubStatusId &&
@@ -821,7 +821,7 @@ namespace risk.control.system.Services
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
             var count = applicationDbContext.Count(a => a.ClientCompanyId == companyUser.ClientCompanyId &&
                 (
-                    (a.UserEmailActioned == companyUser.Email &&
+                    (a.UserEmailActioned == companyUser.Email && a.CREATEDBY == CREATEDBY.AUTO &&
                         a.UserEmailActionedTo == companyUser.Email &&
                         a.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId)
                 ));

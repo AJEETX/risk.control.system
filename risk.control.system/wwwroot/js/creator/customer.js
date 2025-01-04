@@ -100,7 +100,7 @@ $(document).ready(function () {
     $("#edit-form").validate();
 
     // Automatically set focus to the customer name input
-    $("#customer-name").focus();
+    $("#CustomerName").focus();
 
     // Set the max date for customer date input
     const maxDate = new Date().toISOString().split("T")[0];

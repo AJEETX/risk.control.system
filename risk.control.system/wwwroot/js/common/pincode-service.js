@@ -1,4 +1,5 @@
-﻿function loadInvestigationServices(obj) {
+﻿$("#CountryId").val('');
+function loadInvestigationServices(obj) {
     var value = obj.value;
     if (value == '') {
         $('#InvestigationServiceTypeId').empty();
@@ -51,6 +52,15 @@ function PopulateInvestigationServices(dropDownId, list, option) {
 }
 
 $(document).ready(function () {
+    const inputSelector = "#SelectedCountryId";
+    const preloadedCountryId = $("#SelectedCountryId").val();
+    const $inputWrapper = $(inputSelector).closest('.input-group');  // Get the input container
+    const $spinner = $inputWrapper.find('.loading-spinner');
+    if ($spinner.length) {
+        $spinner.addClass('active'); // Show spinner
+    }
+
+
     const fields = ['#CountryId', '#StateId', '#DistrictId'];
 
     fields.forEach(function (field) {

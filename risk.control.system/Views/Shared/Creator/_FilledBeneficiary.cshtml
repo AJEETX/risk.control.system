@@ -35,7 +35,7 @@
 
         if (Model.Location.DateOfBirth != null)
         {
-            beneficiaryAgeInYears = (int)(DateTime.Now.Subtract(Model.Location.DateOfBirth).TotalDays / 365);
+            beneficiaryAgeInYears = (int)(DateTime.Now.Subtract(Model.Location.DateOfBirth.GetValueOrDefault()).TotalDays / 365);
         }
     }
 }

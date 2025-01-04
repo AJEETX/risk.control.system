@@ -113,7 +113,7 @@ namespace risk.control.system.Controllers.Api.Claims
                     Occupation = customer.Occupation.GetEnumDisplayName(),
                     Income = customer.Income.GetEnumDisplayName(),
                     Education = customer.Education.GetEnumDisplayName(),
-                    DateOfBirth = customer.DateOfBirth.ToString("dd-MM-yyyy"),
+                    DateOfBirth = customer.DateOfBirth.GetValueOrDefault().ToString("dd-MM-yyyy"),
                 }
                 );
         }
@@ -143,7 +143,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 Beneficiary = beneficiary?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(beneficiary.ProfilePicture)) :
                     string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noDataimage)),
                 BeneficiaryName = beneficiary.Name,
-                Dob = (int)beneficiary.DateOfBirth.Subtract(DateTime.Now).TotalDays / 365,
+                Dob = (int)beneficiary.DateOfBirth.GetValueOrDefault().Subtract(DateTime.Now).TotalDays / 365,
                 Income = beneficiary.Income.GetEnumDisplayName(),
                 BeneficiaryRelation = beneficiary.BeneficiaryRelation.Name,
                 Address = beneficiary.Addressline + "  " + beneficiary.District.Name + "  " + beneficiary.State.Name + "  " + beneficiary.Country.Name + "  " + beneficiary.PinCode.Code,

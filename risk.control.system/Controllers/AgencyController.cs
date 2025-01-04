@@ -260,7 +260,7 @@ namespace risk.control.system.Controllers
                 }
                 var roles = Enum.GetValues(typeof(AgencyRole)).Cast<AgencyRole>().Where(role => role != AgencyRole.AGENCY_ADMIN)?.ToList();
 
-                var model = new VendorApplicationUser { Vendor = vendor, AgencyRole = roles };
+                var model = new VendorApplicationUser { CountryId = vendor.CountryId, Vendor = vendor, AgencyRole = roles };
                 return View(model);
             }
             catch (Exception ex)
@@ -848,7 +848,7 @@ namespace risk.control.system.Controllers
                 var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == vendorUser.VendorId);
 
                 ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name");
-                var model = new VendorInvestigationServiceType { SelectedMultiPincodeId = new List<long>(), Vendor = vendor, PincodeServices = new List<ServicedPinCode>() };
+                var model = new VendorInvestigationServiceType {  CountryId = vendor.CountryId, SelectedMultiPincodeId = new List<long>(), Vendor = vendor, PincodeServices = new List<ServicedPinCode>() };
                 return View(model);
             }
             catch (Exception ex)

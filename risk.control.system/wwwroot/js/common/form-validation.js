@@ -3,7 +3,7 @@ $(document).ready(function () {
     // Call validateInput with selectors and patterns
     validateInput('#ContractNumber', /[^a-zA-Z0-9]/g); // Allow only alphanumeric characters (no spaces)
     validateInput('#PolicyDetail_CauseOfLoss, #Description, #Addressline, #Comments', /[^a-zA-Z0-9 ]/g); // Allow alphanumeric and spaces
-    validateInput('#CustomerName, #BeneficiaryName, #CountryId, #StateId, #DistrictId, #FirstName, #LastName', /[^a-zA-Z ]/g); // Allow alphabets and spaces
+    validateInput('#CustomerName, #BeneficiaryName, #StateId, #DistrictId, #FirstName, #LastName', /[^a-zA-Z ]/g); // Allow alphabets and spaces
 
     // Allow only numbers and a single dot
     // Allow only numbers and a single dot for SumAssuredValue and ContactNumber

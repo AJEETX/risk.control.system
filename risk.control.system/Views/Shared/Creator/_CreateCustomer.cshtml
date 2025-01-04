@@ -1,7 +1,7 @@
 ﻿@model risk.control.system.Models.CustomerDetail
 
 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-<input type="hidden" asp-for="ClaimsInvestigationId" value="@ViewBag.ClaimId" />
+<input type="hidden" asp-for="ClaimsInvestigationId" value="@Model.ClaimsInvestigationId" />
 <div id="article" class="card  bg-light card-secondary">
     <div class="card-header">
         <h3 class="card-title">
@@ -61,6 +61,7 @@
                         <span asp-validation-for="Name" class="text-danger"></span>
                     </div>
                 </div>
+
                 <div class="form-group">
                     <span class="input-group-label"> Date Of Birth:</span>
                     <div class="input-group mb-3">
@@ -71,6 +72,7 @@
                         <span asp-validation-for="DateOfBirth" class="text-danger"></span>
                     </div>
                 </div>
+
                 <div class="form-group">
                     <span class="input-group-label"> Gender:</span>
                     <div class="input-group mb-3">
@@ -151,68 +153,8 @@
 
             </div>
             <div class="col-sm-6">
-                <div class="form-group">
-                    <span class="input-group-label" for="CountryId"> Country:</span>
-                    <div class="input-group mb-3 autocomplete-wrapper">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text" for="CountryId"><i class="fas fa-map-marked-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                        </div>
-                        <input type="text" id="CountryId" class="form-control remarks auto-dropdown" data-placeholder="country" placeholder="Type country..." asp-for="CountryId" required value="" />
-                        <span asp-validation-for="CountryId" class="text-danger"></span>
-                        <input asp-for="SelectedCountryId" type="hidden" id="SelectedCountryId" name="SelectedCountryId" value="@Model?.CountryId" />
-                        <div id="country-loading" class="loading-spinner">
-                            <i class="fas fa-spinner fa-spin"></i>
-                        </div>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <span class="input-group-label" for="StateId"> State:</span>
-                    <div class="input-group mb-3 autocomplete-wrapper">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text" for="StateId"><i class="fas fa-map-marker-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                        </div>
-                        <input type="text" id="StateId" class="form-control remarks auto-dropdown" data-placeholder="state" placeholder="Type state..." asp-for="StateId" required value="" />
-                        <span asp-validation-for="StateId" class="text-danger"></span>
-                        <input asp-for="SelectedStateId" type="hidden" id="SelectedStateId" name="SelectedStateId" value="@Model?.StateId" />
-                        <div id="state-loading" class="loading-spinner">
-                            <i class="fas fa-spinner fa-spin"></i>
-                        </div>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <span class="input-group-label" for="DistrictId">District:</span>
-                    <div class="input-group mb-3 autocomplete-wrapper">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text" for="DistrictId">
-                                <i class="fas fa-city"></i>
-                                <i class="fa fa-asterisk asterik-style"></i>
-                            </span>
-                        </div>
-                        <input type="text" id="DistrictId" class="form-control remarks auto-dropdown" data-placeholder="district" placeholder="Type district..." asp-for="DistrictId" required value="" />
-                        <span asp-validation-for="DistrictId" class="text-danger"></span>
-                        <input asp-for="SelectedDistrictId" type="hidden" id="SelectedDistrictId" name="SelectedDistrictId" value="@Model?.DistrictId" />
-                        <div id="district-loading" class="loading-spinner">
-                            <i class="fas fa-spinner fa-spin"></i>
-                        </div>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <span class="input-group-label" for="PinCodeId">Pincode:</span>
-                    <div class="input-group mb-3 autocomplete-wrapper">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text" for="PinCodeId">
-                                <i class="fas fa-map-pin"></i>
-                                <i class="fa fa-asterisk asterik-style"></i>
-                            </span>
-                        </div>
-                        <input type="text" id="PinCodeId" class="form-control remarks auto-dropdown" data-placeholder="pincode" placeholder="Type pincode..." asp-for="PinCodeId" required value="" />
-                        <span asp-validation-for="PinCodeId" class="text-danger"></span>
-                        <input asp-for="SelectedPincodeId" type="hidden" id="SelectedPincodeId" name="SelectedPincodeId" value="@Model?.PinCodeId" />
-                        <div id="pincode-loading" class="loading-spinner">
-                            <i class="fas fa-spinner fa-spin"></i>
-                        </div>
-                    </div>
-                </div>
+                <partial name="_CustomerAddress" model="@Model" />
+
                 <div class="form-group">
                     <span class="input-group-label"> Address:</span>
                     <div class="input-group mb-3">
@@ -252,7 +194,7 @@
             @* <button type="submit" onclick="clearAllInputs()" class="btn btn-outline-secondary">
             <i class="fas fa-undo"></i> Reset
             </button> *@
-            <a id="back" asp-action="Details" asp-route-id="@ViewBag.ClaimId" class="btn btn-secondary">
+            <a id="back" asp-action="Details" asp-route-id="@Model.ClaimsInvestigationId" class="btn btn-secondary">
                 <i class="fa fa-window-close"></i>
                 @Applicationsettings.CANCEL
             </a>

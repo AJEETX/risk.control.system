@@ -285,8 +285,7 @@ namespace risk.control.system.Controllers
                     notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var model = new ClientCompanyApplicationUser { ClientCompany = company };
-                //ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
+                var model = new ClientCompanyApplicationUser { ClientCompany = company, CountryId = company.CountryId };
                 return View(model);
             }
             catch (Exception ex)

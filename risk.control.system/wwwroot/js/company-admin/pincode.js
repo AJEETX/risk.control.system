@@ -1,4 +1,5 @@
-﻿$(document).ready(function () {
+﻿$("#CountryId").val('');
+$(document).ready(function () {
 
     const fields = ['#CountryId', '#StateId', '#DistrictId', '#PinCodeId'];
 
@@ -104,7 +105,7 @@ function fetchAndSetFieldValue(url, data, inputSelector, responseKey, callback) 
             if (response && response[responseKey]) {
                 $inputField.val(response[responseKey]);
                 // Fade in the input field
-                $inputField.hide().fadeIn(1000); // Adjust duration as needed
+                //$inputField.hide().fadeIn(1000); // Adjust duration as needed
                 if (callback) callback();
             }
         },

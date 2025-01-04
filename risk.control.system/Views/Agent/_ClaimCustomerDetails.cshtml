@@ -2,56 +2,18 @@
 
 @{
     string address = string.Empty;
-    string baddress = string.Empty;
     int currentAgeinYrs = 0;
-    int currentBAgeinYrs = 0;
-    bool customerExist = false;
-    bool beneficiaryExist = false;
     if (Model.ClaimsInvestigation != null && Model.ClaimsInvestigation.CustomerDetail != null)
     {
         address = @Model.ClaimsInvestigation?.CustomerDetail.Addressline + " " + @Model.ClaimsInvestigation?.CustomerDetail.District.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.State.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.Country.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.PinCode.Code;
-        baddress = @Model.Location != null ? @Model.Location?.Addressline + " " +
-        @Model.Location?.District?.Name + " " + @Model.Location?.State?.Name + " " +
-        @Model.Location?.Country?.Name + " " + @Model.Location?.PinCode?.Code : string.Empty;
+      
         if (Model.ClaimsInvestigation?.CustomerDetail.DateOfBirth != null)
         {
-            var age = DateTime.Now.Subtract(Model.ClaimsInvestigation.CustomerDetail.DateOfBirth).TotalDays;
+            var age = DateTime.Now.Subtract(Model.ClaimsInvestigation.CustomerDetail.DateOfBirth.GetValueOrDefault()).TotalDays;
             currentAgeinYrs = (int)age / 365;
         }
-
-        if (Model.Location?.DateOfBirth != null)
-        {
-            var age = DateTime.Now.Subtract(Model.Location.DateOfBirth).TotalDays;
-            currentBAgeinYrs = (int)age / 365;
-        }
-
     }
-    if (!string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.PolicyDetail?.ContractNumber))
-    {
-        customerExist = true;
-    }
-    if (Model.Location?.BeneficiaryDetailId > 0)
-    {
-        beneficiaryExist = true;
-    }
-    string customerProgressColor = "grey";
-    if (@customerExist)
-    {
-        customerProgressColor = "green";
-    }
-    string benficiaryProgressColor = "lightgrey";
-    if (@customerExist && @beneficiaryExist)
-    {
-        benficiaryProgressColor = "green";
-    }
-    if (@customerExist && !@beneficiaryExist)
-    {
-        benficiaryProgressColor = "grey";
-    }
-    if (!@customerExist && !@beneficiaryExist)
-    {
-        benficiaryProgressColor = "lightgrey";
-    }
+    
     <div class="col-12 col-sm-6 d-flex align-items-stretch flex-column">
         <div class="card bg-light d-flex flex-fill">
             <div class="card-header text-muted border-bottom-0">

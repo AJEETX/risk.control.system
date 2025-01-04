@@ -2,7 +2,7 @@
 
 @{
     ViewData["Title"] = @Applicationsettings.EDIT;
-    
+
 }
 
 <section class="content">
@@ -24,10 +24,10 @@
                         <input type="hidden" asp-for="ClientCompanyId" value="@Model.ClientCompany.ClientCompanyId" />
                         <div class="form-group">
                             <span asp-for="ProfileImage" class="control-label">Profile Photo</span>
-                            
-                            @if (Model?.ProfilePictureUrl is not null)
+
+                            @if (Model?.ProfilePicture is not null)
                             {
-                                <img id="editProfileImage" class="form-Image" src="@Model?.ProfilePictureUrl" alt="Profile Image" />
+                                <img id="editProfileImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.ProfilePicture))" alt="Profile Image" />
                             }
                             else
                             {
@@ -95,86 +95,34 @@
                         </div>
 
                         <div class="col-md-6">
+                            <partial name="_Address" model="@Model" />
+
                             <div class="form-group">
-                                <span class="input-group-label" for="CountryId"> Country:</span>
-                                <div class="input-group mb-3 autocomplete-wrapper">
+                                <span class="input-group-label"> Address:</span>
+                                <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text" for="CountryId"><i class="fas fa-map-marked-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                        <span class="input-group-text" id="Addressline"><i class="fa fa-home"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                     </div>
-                                    <input type="text" id="CountryId" class="form-control remarks auto-dropdown" data-placeholder="country" placeholder="Type country..." asp-for="CountryId" required value="" />
-                                    <span asp-validation-for="CountryId" class="text-danger"></span>
-                                    <input asp-for="SelectedCountryId" type="hidden" id="SelectedCountryId" name="SelectedCountryId" value="@Model?.CountryId" />
-                                    <div id="country-loading" class="loading-spinner">
-                                        <i class="fas fa-spinner fa-spin"></i>
-                                    </div>
+                                    <input type="text" asp-for="Addressline" class="form-control remarks" placeholder="Address line" maxlength="50" />
                                 </div>
                             </div>
                             <div class="form-group">
-                                <span class="input-group-label" for="StateId"> State:</span>
-                                <div class="input-group mb-3 autocomplete-wrapper">
+                                <span class="input-group-label"> Note:</span>
+                                <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text" for="StateId"><i class="fas fa-map-marker-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                        <span class="input-group-text" id="Comments"><i class="fa fa-comment"></i> <i class="fa fa-asterisk asterik-style-none"></i></span>
                                     </div>
-                                    <input type="text" id="StateId" class="form-control remarks auto-dropdown" data-placeholder="state" placeholder="Type state..." asp-for="StateId" required value="" />
-                                    <span asp-validation-for="StateId" class="text-danger"></span>
-                                    <input asp-for="SelectedStateId" type="hidden" id="SelectedStateId" name="SelectedStateId" value="@Model?.StateId" />
-                                    <div id="state-loading" class="loading-spinner">
-                                        <i class="fas fa-spinner fa-spin"></i>
-                                    </div>
+                                    <input type="text" asp-for="Comments" class="form-control remarks" placeholder="Note" maxlength="50" />
                                 </div>
                             </div>
-                            <div class="form-group">
-                                <span class="input-group-label" for="DistrictId">District:</span>
-                                <div class="input-group mb-3 autocomplete-wrapper">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text" for="DistrictId">
-                                            <i class="fas fa-city"></i>
-                                            <i class="fa fa-asterisk asterik-style"></i>
-                                        </span>
-                                    </div>
-                                    <input type="text" id="DistrictId" class="form-control remarks auto-dropdown" data-placeholder="district" placeholder="Type district..." asp-for="DistrictId" required value="" />
-                                    <span asp-validation-for="DistrictId" class="text-danger"></span>
-                                    <input asp-for="SelectedDistrictId" type="hidden" id="SelectedDistrictId" name="SelectedDistrictId" value="@Model?.DistrictId" />
-                                    <div id="district-loading" class="loading-spinner">
-                                        <i class="fas fa-spinner fa-spin"></i>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <span class="input-group-label" for="PinCodeId">Pincode:</span>
-                                <div class="input-group mb-3 autocomplete-wrapper">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text" for="PinCodeId">
-                                            <i class="fas fa-map-pin"></i>
-                                            <i class="fa fa-asterisk asterik-style"></i>
-                                        </span>
-                                    </div>
-                                    <input type="text" id="PinCodeId" class="form-control remarks auto-dropdown" data-placeholder="pincode" placeholder="Type pincode..." asp-for="PinCodeId" required value="" />
-                                    <span asp-validation-for="PinCodeId" class="text-danger"></span>
-                                    <input asp-for="SelectedPincodeId" type="hidden" id="SelectedPincodeId" name="SelectedPincodeId" value="@Model?.PinCodeId" />
-                                    <div id="pincode-loading" class="loading-spinner">
-                                        <i class="fas fa-spinner fa-spin"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        <div class="form-group">
-                            <span class="input-group-label"> Address:</span>
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text" id="Addressline"><i class="fa fa-home"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                </div>
-                                <input type="text" asp-for="Addressline" class="form-control remarks" placeholder="Address line" maxlength="50" />
-                            </div>
+
                         </div>
-                        <div class="form-group">
-                            <span class="input-group-label"> Note:</span>
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text" id="Comments"><i class="fa fa-comment"></i> <i class="fa fa-asterisk asterik-style-none"></i></span>
-                                </div>
-                                <input type="text" asp-for="Comments" class="form-control remarks" placeholder="Note" maxlength="50" />
-                            </div>
-                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="row">
+                    <div class="col-md-12">
                         <div class="form-group text-right">
                             <a id="back" asp-controller="Dashboard" asp-action="Index" class="btn btn-secondary">
                                 <i class="fa fa-window-close"></i>

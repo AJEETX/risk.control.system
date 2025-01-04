@@ -174,7 +174,6 @@ namespace risk.control.system.Controllers.Company
                 if (currentUser.ClientCompany.HasSampleData)
                 {
                     var model = claimPolicyService.AddClaimPolicy(currentUserEmail, lineOfBusinessId);
-                    model.ClientCompanyId = currentUser.ClientCompanyId;
                     return View(model);
                 }
                 else
@@ -196,11 +195,7 @@ namespace risk.control.system.Controllers.Company
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (string.IsNullOrWhiteSpace(currentUserEmail))
-                {
-                    notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
+                
                 if (id == null || string.IsNullOrWhiteSpace(id))
                 {
                     notifyService.Error("OOPS!!!.Claim Not Found.Try Again");
@@ -267,7 +262,6 @@ namespace risk.control.system.Controllers.Company
                 var details1Page = new MvcBreadcrumbNode("Details", "CreatorManual", $"Details") { Parent = detailsPage, RouteValues = new { id = id } };
                 var editPage = new MvcBreadcrumbNode("CreateCustomer", "CreatorManual", $"Create Customer") { Parent = details1Page, RouteValues = new { id = id } };
                 ViewData["BreadcrumbNode"] = editPage;
-                ViewBag.ClaimId = id;
 
                 var currentUser = await _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
 
@@ -299,8 +293,9 @@ namespace risk.control.system.Controllers.Company
                     };
                     return View(customerDetail);
                 }
-                
-                return View();
+
+                var blankCustomerDetail = new CustomerDetail { CountryId = currentUser.ClientCompany.CountryId, ClaimsInvestigationId = id };
+                return View(blankCustomerDetail);
             }
             catch (Exception ex)
             {
@@ -401,7 +396,8 @@ namespace risk.control.system.Controllers.Company
                 }
                 else
                 {
-                    return View();
+                    var model = new BeneficiaryDetail { ClaimsInvestigationId = id, CountryId = currentUser.ClientCompany.CountryId };
+                    return View(model);
                 }
             }
             catch (Exception ex)

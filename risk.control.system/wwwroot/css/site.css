@@ -723,6 +723,11 @@ dl.row {
     color: red;
 }
 
+.asterik-style-info {
+    font-size: .5rem !important;
+    color: #2A78C6;
+    padding-bottom: 1rem;
+}
 .asterik-style-none {
     font-size: .4rem !important;
     color: #e9ecef;

@@ -37,6 +37,8 @@ namespace risk.control.system.Services
             try
             {
                 var currentUser = context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
+                claimsInvestigation.ClientCompanyId = currentUser.ClientCompanyId;
+
                 if (claimDocument is not null)
                 {
                     using var dataStream = new MemoryStream();

@@ -54,6 +54,7 @@ namespace risk.control.system.Controllers.Api.Company
 
             applicationDbContext = applicationDbContext.Where(a =>
                 a.ClientCompanyId == companyUser.ClientCompanyId &&
+                     a.CREATEDBY == CREATEDBY.AUTO &&
                      a.UserEmailActioned == companyUser.Email &&
                          a.UserEmailActionedTo == companyUser.Email &&
                          a.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId
@@ -157,7 +158,7 @@ namespace risk.control.system.Controllers.Api.Company
                         a.UserEmailActionedTo == companyUser.Email &&
                         a.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId)
                         ||
-                        (!companyUser.ClientCompany.AutoAllocation && a.UserEmailActioned == companyUser.Email &&
+                        (a.CREATEDBY == CREATEDBY.MANUAL && a.UserEmailActioned == companyUser.Email &&
                          a.UserEmailActionedTo == companyUser.Email &&
                          a.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId) ||
                 (a.IsReviewCase && a.InvestigationCaseSubStatusId == reAssignedStatus.InvestigationCaseSubStatusId &&

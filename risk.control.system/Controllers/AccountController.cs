@@ -69,19 +69,18 @@ namespace risk.control.system.Controllers
         }
 
         [Authorize]
-        public IActionResult KeepSessionAlive()
+        public async Task<IActionResult> KeepSessionAlive()
         {
             if (User.Identity.IsAuthenticated)
             {
-                // Example user details to return
-                var userDetails = new
-                {
-                    UserId = User.FindFirst("sub")?.Value, // Assuming "sub" is the user ID claim
-                    UserName = User.Identity.Name,
-                    Roles = User.Claims.Where(c => c.Type == ClaimTypes.Role).Select(c => c.Value)
-                };
+                var user = await _signInManager.UserManager.GetUserAsync(User);
 
-                return Ok(userDetails);
+                if (user != null)
+                {
+                    // Refresh the sign-in, resetting the cookie
+                    await _signInManager.RefreshSignInAsync(user);
+                    return Ok();
+                }
             }
 
             return Unauthorized();
