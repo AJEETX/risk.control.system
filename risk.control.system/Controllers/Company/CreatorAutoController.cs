@@ -127,7 +127,6 @@ namespace risk.control.system.Controllers.Company
                         notifyService.Information($"Limit available = <b>{model.AvailableCount}</b>");
                     }
                 }
-
                 return View(model);
             }
             catch (Exception ex)
@@ -429,11 +428,7 @@ namespace risk.control.system.Controllers.Company
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (string.IsNullOrWhiteSpace(currentUserEmail))
-                {
-                    notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
+                
                 if (id == null || string.IsNullOrWhiteSpace(id))
                 {
                     notifyService.Error("OOPS!!!.Claim Not Found.Try Again");

@@ -5,7 +5,8 @@
 }
 
 <section class="content">
-    <form id="create-form" asp-controller="CreatorAutoPost" asp-action="CreatePolicy" method="post" enctype="multipart/form-data">
+    <form id="create-form" asp-controller="CreatorPost" asp-action="CreatePolicy" method="post" enctype="multipart/form-data">
+        <input type="hidden" asp-for="CREATEDBY" value="@CREATEDBY.AUTO" />
         <partial name="Creator/_CreatePolicy" model="Model" />
     </form>
 </section>

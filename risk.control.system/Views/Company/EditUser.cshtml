@@ -3,7 +3,7 @@
 @{
     ViewData["Title"] = @Applicationsettings.EDIT;
     var email = Model.ClientCompany.Email;
-    
+
 }
 <section class="content">
     <form id="edit-form" asp-action="EditUser" enctype="multipart/form-data">
@@ -80,7 +80,7 @@
                                 <span asp-validation-for="PhoneNumber" class="text-danger"></span>
                             </div>
                         </div>
-                        
+
                         <div class="form-group">
                             <span class="input-group-label"> Note:</span>
                             <div class="input-group mb-3">
@@ -102,14 +102,14 @@
                                     .Cast<CompanyRole>()
                                     .Where(role => role != CompanyRole.COMPANY_ADMIN) // Replace RoleToExclude with the actual enum value
                                     .Select(role => new SelectListItem
-                                    {
-                                        Value = role.ToString(),
-                                        Text = role.ToString()
-                                    });
+            {
+                Value = role.ToString(),
+                Text = role.ToString()
+            });
                                 }
-                                @if(Model.UserRole == CompanyRole.COMPANY_ADMIN)
+                                @if (Model.UserRole == CompanyRole.COMPANY_ADMIN)
                                 {
-                                    <select readonly asp-for="@Model.UserRole" class="form-control remarks" >
+                                    <select readonly asp-for="@Model.UserRole" class="form-control remarks">
                                         <option value="@CompanyRole.COMPANY_ADMIN">@CompanyRole.COMPANY_ADMIN</option>
                                     </select>
                                 }
@@ -119,7 +119,7 @@
                                         <option value="">--- SELECT ---</option>
                                     </select>
                                 }
-                                
+
                                 <span asp-validation-for="@Model.UserRole" class="text-danger"></span>
                             </div>
                         </div>
@@ -196,7 +196,7 @@
                                 <input type="text" asp-for="Addressline" class="form-control remarks" required placeholder="Enter Address line" maxlength="50" />
                             </div>
                         </div>
-                        @if(Model.UserRole == CompanyRole.COMPANY_ADMIN)
+                        @if (Model.UserRole == CompanyRole.COMPANY_ADMIN)
                         {
                             <input asp-for="Active" type="hidden" value="true">
                         }
@@ -218,11 +218,14 @@
                         }
                     </div>
                 </div>
+
+            </div>
+            <div class="card-footer">
                 <div class="row">
                     <div class="col-md-12">
                         <div class="form-group text-right">
                             @* <button id="reset" type="submit" onclick="clearAllInputs()" class="btn btn-outline-secondary">
-                                <i class="fas fa-undo"></i> Reset
+                            <i class="fas fa-undo"></i> Reset
                             </button> *@
                             <a id="back" asp-controller="Company" asp-action="Users" class="btn btn-secondary">
                                 <i class="fa fa-window-close"></i>

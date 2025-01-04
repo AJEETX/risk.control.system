@@ -4,8 +4,8 @@
     ViewData["Title"] = @Applicationsettings.CREATE;
 }
 <section class="content">
-    <form id="create-form" asp-controller="CreatorAutoPost" asp-action="CreateCustomer" method="post" enctype="multipart/form-data">
-        <input type="hidden" id="claimtype" name="claimtype" value="auto" />
+    <form id="create-form" asp-controller="CreatorPost" asp-action="CreateCustomer" method="post" enctype="multipart/form-data">
+        <input type="hidden" asp-for="CREATEDBY" value="@CREATEDBY.AUTO" />
         <partial name="Creator/_CreateCustomer" model="Model" />
     </form>
 </section>

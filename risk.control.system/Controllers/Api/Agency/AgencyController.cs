@@ -81,7 +81,7 @@ namespace risk.control.system.Controllers.Api.Agency
                     Phone = u.PhoneNumber,
                     Photo = string.IsNullOrWhiteSpace(u.ProfilePictureUrl) ? noUserImagefilePath : u.ProfilePictureUrl,
                     Active = u.Active,
-                    Addressline = "<span class='badge badge-light'>" + u.Addressline + ", " + u.District.Name + ", " + u.State.Name + ", " + u.Country.Code + "</span>",
+                    Addressline = u.Addressline + ", " + u.District.Name + ", " + u.State.Name + ", " + u.Country.Code,
                     Pincode = u.PinCode.Code,
                     Roles = u.UserRole != null ? $"<span class=\"badge badge-light\">{u.UserRole.GetEnumDisplayName()}</span>" : "<span class=\"badge badge-light\">...</span>",
                     Updated = u.Updated.HasValue ? u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy"),

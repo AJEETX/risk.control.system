@@ -6,8 +6,8 @@
     var hasClientCompany = @Model.HasClientCompany ? "none" : "";
 }
 <section class="content">
-    <form id="edit-form" method="post" asp-controller="CreatorManualPost" asp-action="EditPolicy" enctype="multipart/form-data">
-        <input type="hidden" id="claimtype" name="claimtype" value="manual" />
+    <form id="edit-form" method="post" asp-controller="CreatorPost" asp-action="EditPolicy" enctype="multipart/form-data">
+        <input type="hidden" asp-for="CREATEDBY" value="@CREATEDBY.MANUAL" />
         <partial name="Creator/_EditPolicy" model="Model" />
         
     </form>

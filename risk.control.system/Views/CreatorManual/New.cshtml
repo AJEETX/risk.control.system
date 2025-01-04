@@ -122,8 +122,8 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        <form id="upload-claims" asp-controller="CreatorManualPost" asp-action="New" method="post" enctype="multipart/form-data">
-                            <input type="hidden" id="uploadingway" name="uploadingway" value="manual" />
+                        <form id="upload-claims" asp-controller="CreatorPost" asp-action="New" method="post" enctype="multipart/form-data">
+                            <input type="hidden" asp-for="CREATEDBY" value="@CREATEDBY.MANUAL" />
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
@@ -134,7 +134,7 @@
                                             </div>
                                             @if (Model.BulkUpload)
                                             {
-                                                <select data-toggle="tooltip" title="Select upload type" name="uploadtype" id="uploadtype" required class="form-control remarks" asp-items="Html.GetEnumSelectList<UploadType>()">
+                                                <select asp-for="Uploadtype" data-toggle="tooltip" title="Select upload type" name="uploadtype" id="uploadtype" required class="form-control remarks" asp-items="Html.GetEnumSelectList<UploadType>()">
                                                     <option value="">--- SELECT---</option>
                                                 </select>
                                             }

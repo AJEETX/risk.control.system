@@ -18,9 +18,9 @@ namespace risk.control.system.Services
 {
     public interface IFtpService
     {
-        Task<bool> UploadFile(string userEmail, IFormFile postedFile, string uploadingway);
+        Task<bool> UploadFile(string userEmail, IFormFile postedFile, CREATEDBY autoOrManual);
 
-        Task<bool> UploadFtpFile(string userEmail, IFormFile postedFile, string uploadingway);
+        Task<bool> UploadFtpFile(string userEmail, IFormFile postedFile, CREATEDBY autoOrManual);
     }
 
     public class FtpService : IFtpService
@@ -41,7 +41,7 @@ namespace risk.control.system.Services
             this.customApiCLient = customApiCLient;
         }
 
-        public async Task<bool> UploadFtpFile(string userEmail, IFormFile postedFile, string uploadingway)
+        public async Task<bool> UploadFtpFile(string userEmail, IFormFile postedFile, CREATEDBY autoOrManual)
         {
             try
             {
@@ -64,7 +64,7 @@ namespace risk.control.system.Services
 
                 Console.WriteLine("ZIP file uploaded successfully.");
 
-                var processed = await DownloadFtp(userEmail, uploadingway);
+                var processed = await DownloadFtp(userEmail, autoOrManual);
                 if (!processed)
                 {
                     return false;
@@ -80,7 +80,7 @@ namespace risk.control.system.Services
             }
         }
 
-        private async Task<bool> DownloadFtp(string userEmail, string uploadingway)
+        private async Task<bool> DownloadFtp(string userEmail, CREATEDBY autoOrManual)
         {
             string path = Path.Combine(webHostEnvironment.WebRootPath, "download-ftp");
             if (!Directory.Exists(path))
@@ -104,7 +104,7 @@ namespace risk.control.system.Services
                     {
                         return false;
                     }
-                    var processed = await ProcessFile(userEmail, archive, uploadingway, ORIGIN.FTP);
+                    var processed = await ProcessFile(userEmail, archive, autoOrManual, ORIGIN.FTP);
                     if (!processed)
                     {
                         return false;
@@ -125,7 +125,7 @@ namespace risk.control.system.Services
             return true;
         }
 
-        public async Task<bool> UploadFile(string userEmail, IFormFile postedFile, string autoManual)
+        public async Task<bool> UploadFile(string userEmail, IFormFile postedFile, CREATEDBY autoOrManual)
         {
             string path = Path.Combine(webHostEnvironment.WebRootPath, "upload-file");
             if (!Directory.Exists(path))
@@ -151,7 +151,7 @@ namespace risk.control.system.Services
                     {
                         return false;
                     }
-                    var processed = await ProcessFile(userEmail, archive, autoManual, ORIGIN.FILE);
+                    var processed = await ProcessFile(userEmail, archive, autoOrManual, ORIGIN.FILE);
                     if (!processed)
                     {
                         return false;
@@ -183,10 +183,9 @@ namespace risk.control.system.Services
             await _context.SaveChangesAsync();
         }
 
-        private async Task<bool> ProcessFile(string userEmail, ZipArchive archive, string autoManual, ORIGIN fileOrFtp)
+        private async Task<bool> ProcessFile(string userEmail, ZipArchive archive, CREATEDBY autoOrManual, ORIGIN fileOrFtp)
         {
 
-            var createdAsMethod = (CREATEDBY)Enum.Parse(typeof(CREATEDBY), autoManual, true);
             var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(c => c.Email == userEmail);
             bool userCanCreate = true;
             var totalClaimsCreated = await _context.ClaimsInvestigation.CountAsync(c => !c.Deleted && c.ClientCompanyId == companyUser.ClientCompanyId);
@@ -224,14 +223,13 @@ namespace risk.control.system.Services
             if (userCanCreate && userCanUpload)
             {
 
-                return await DoUpload(companyUser, dataRows, autoManual, archive, fileOrFtp);
+                return await DoUpload(companyUser, dataRows, autoOrManual, archive, fileOrFtp);
             }
             return false;
 
         }
-        private async Task<bool> DoUpload(ClientCompanyApplicationUser companyUser, string[] dataRows, string autoManual, ZipArchive archive, ORIGIN fileOrFtp)
+        private async Task<bool> DoUpload(ClientCompanyApplicationUser companyUser, string[] dataRows, CREATEDBY autoOrManual, ZipArchive archive, ORIGIN fileOrFtp)
         {
-            var createdAsMethod = (CREATEDBY)Enum.Parse(typeof(CREATEDBY), autoManual, true);
             var status = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.INITIATED));
             var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
             var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
@@ -266,7 +264,7 @@ namespace risk.control.system.Services
                             }
 
                             //CREATE CLAIM
-                            var subStatus = companyUser.ClientCompany.AutoAllocation && createdAsMethod == CREATEDBY.AUTO ? createdStatus : assignedStatus;
+                            var subStatus = companyUser.ClientCompany.AutoAllocation && autoOrManual == CREATEDBY.AUTO ? createdStatus : assignedStatus;
                             var claim = new ClaimsInvestigation
                             {
                                 InvestigationCaseStatusId = status.InvestigationCaseStatusId,
@@ -284,7 +282,7 @@ namespace risk.control.system.Services
                                 IsReviewCase = false,
                                 UserEmailActioned = companyUser.Email,
                                 UserEmailActionedTo = companyUser.Email,
-                                CREATEDBY = createdAsMethod,
+                                CREATEDBY = autoOrManual,
                                 ORIGIN = fileOrFtp,
                                 ClientCompanyId = companyUser.ClientCompanyId,
                                 UserRoleActionedTo = $"{companyUser.ClientCompany.Email}",

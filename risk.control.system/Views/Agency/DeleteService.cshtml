@@ -87,18 +87,21 @@
                     </dl>
                 </div>
             </div>
-            <div class="row">
-                <div class="col-md-12 text-right">
-                    <form id="create-form" asp-action="Delete" method="post">
-                        <input type="hidden" asp-for="VendorInvestigationServiceTypeId" name="id" />
-                        <a id="back" asp-controller="Agency" asp-action="Service" class="btn btn-secondary">
-                            <i class="fa fa-window-close"></i>
-                            @Applicationsettings.CANCEL
-                        </a> &nbsp;
-                        <input type="submit" value="Delete" class="btn btn-danger" />
-                    </form>
-                </div>
+            
+        </div>
+        <div class="card-footer">
+        <div class="row">
+            <div class="col-md-12 text-right">
+                <form id="create-form" asp-action="Delete" method="post">
+                    <input type="hidden" asp-for="VendorInvestigationServiceTypeId" name="id" />
+                    <a id="back" asp-controller="Agency" asp-action="Service" class="btn btn-secondary">
+                        <i class="fa fa-window-close"></i>
+                        @Applicationsettings.CANCEL
+                    </a> &nbsp;
+                    <input type="submit" value="Delete" class="btn btn-danger" />
+                </form>
             </div>
+        </div>
         </div>
     </div>
 

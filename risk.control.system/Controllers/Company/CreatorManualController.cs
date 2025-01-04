@@ -134,11 +134,6 @@ namespace risk.control.system.Controllers.Company
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (string.IsNullOrWhiteSpace(currentUserEmail))
-                {
-                    notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
                 var model = creatorService.Create(currentUserEmail);
 
                 if (model.Trial)
@@ -152,7 +147,6 @@ namespace risk.control.system.Controllers.Company
                         notifyService.Information($"Limit available = <b>{model.AvailableCount}</b>");
                     }
                 }
-
                 return View(model);
             }
             catch (Exception ex)
@@ -161,7 +155,6 @@ namespace risk.control.system.Controllers.Company
                 notifyService.Error("OOPS!!!..Try Again");
                 return RedirectToAction(nameof(Create));
             }
-
         }
 
         [Breadcrumb(title: " Add Policy", FromAction = "Create")]
@@ -170,30 +163,22 @@ namespace risk.control.system.Controllers.Company
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (string.IsNullOrWhiteSpace(currentUserEmail))
-                {
-                    notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
                 var lineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == CLAIMS).LineOfBusinessId;
 
                 ViewData["lineOfBusinessId"] = lineOfBusinessId;
                 ViewData["CaseEnablerId"] = new SelectList(_context.CaseEnabler.OrderBy(s => s.Code), "CaseEnablerId", "Name");
                 ViewData["CostCentreId"] = new SelectList(_context.CostCentre.OrderBy(s => s.Code), "CostCentreId", "Name");
+                ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType.Where(i => i.LineOfBusinessId == lineOfBusinessId).OrderBy(s => s.Code), "InvestigationServiceTypeId", "Name");
 
                 var currentUser = await _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
                 if (currentUser.ClientCompany.HasSampleData)
                 {
                     var model = claimPolicyService.AddClaimPolicy(currentUserEmail, lineOfBusinessId);
                     model.ClientCompanyId = currentUser.ClientCompanyId;
-
-                    ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType.Where(i =>
-                    i.LineOfBusinessId == model.PolicyDetail.LineOfBusinessId).OrderBy(s => s.Code), "InvestigationServiceTypeId", "Name");
                     return View(model);
                 }
                 else
                 {
-                    ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType.Where(i => i.LineOfBusinessId == lineOfBusinessId).OrderBy(s => s.Code), "InvestigationServiceTypeId", "Name");
                     return View();
                 }
             }
@@ -260,11 +245,7 @@ namespace risk.control.system.Controllers.Company
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (string.IsNullOrWhiteSpace(currentUserEmail))
-                {
-                    notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
+                
                 if (id == null || string.IsNullOrWhiteSpace(id))
                 {
                     notifyService.Error("OOPS!!!.Claim Not Found.Try Again");
@@ -317,15 +298,6 @@ namespace risk.control.system.Controllers.Company
                         Gender = Gender.MALE,
                     };
                     return View(customerDetail);
-
-                    //var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == country.CountryId).OrderBy(d => d.Name);
-                    //var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == state.StateId).OrderBy(d => d.Name);
-                    ////var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == district.DistrictId).OrderBy(d => d.Name);
-
-                    //ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", claimsInvestigation.CustomerDetail.Country.CountryId);
-                    //ViewData["StateId"] = new SelectList(relatedStates.OrderBy(s => s.Code), "StateId", "Name", claimsInvestigation.CustomerDetail.State.StateId);
-                    //ViewData["DistrictId"] = new SelectList(districts.OrderBy(d => d.Code), "DistrictId", "Name", claimsInvestigation.CustomerDetail.District.DistrictId);
-                    //ViewData["PinCodeId"] = new SelectList(pincodes.Select(p => new { PinCodeId = p.PinCodeId, DisplayText = $"{p.Name} - {p.Code}" }), "PinCodeId", "DisplayText", claimsInvestigation.CustomerDetail.PinCode.PinCodeId);
                 }
                 
                 return View();
@@ -344,11 +316,7 @@ namespace risk.control.system.Controllers.Company
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (string.IsNullOrWhiteSpace(currentUserEmail))
-                {
-                    notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
+                
                 if (id == null || string.IsNullOrWhiteSpace(id))
                 {
                     notifyService.Error("OOPS!!!.Claim Not Found.Try Again");
@@ -367,15 +335,6 @@ namespace risk.control.system.Controllers.Company
                     notifyService.Error("OOPS!!!.Claim Not Found.Try Again");
                     return RedirectToAction(nameof(CreatePolicy));
                 }
-                //var country = _context.Country.OrderBy(o => o.Name);
-                //var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == claimsInvestigation.CustomerDetail.CountryId).OrderBy(d => d.Name);
-                //var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == claimsInvestigation.CustomerDetail.StateId).OrderBy(d => d.Name);
-                //var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == claimsInvestigation.CustomerDetail.DistrictId).OrderBy(d => d.Name);
-
-                //ViewData["CountryId"] = new SelectList(country, "CountryId", "Name", claimsInvestigation.CustomerDetail.CountryId);
-                //ViewData["StateId"] = new SelectList(relatedStates, "StateId", "Name", claimsInvestigation.CustomerDetail.StateId);
-                //ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", claimsInvestigation.CustomerDetail.DistrictId);
-                //ViewData["PinCodeId"] = new SelectList(pincodes.Select(p => new { PinCodeId = p.PinCodeId, DisplayText = $"{p.Name} - {p.Code}" }), "PinCodeId", "DisplayText", claimsInvestigation.CustomerDetail.PinCode.PinCodeId);
 
                 var claimsPage = new MvcBreadcrumbNode("New", "CreatorManual", "Claims");
                 var agencyPage = new MvcBreadcrumbNode("New", "CreatorManual", "Assign(manual)") { Parent = claimsPage, };
@@ -400,11 +359,6 @@ namespace risk.control.system.Controllers.Company
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (string.IsNullOrWhiteSpace(currentUserEmail))
-                {
-                    notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
                 
                 ViewData["BeneficiaryRelationId"] = new SelectList(_context.BeneficiaryRelation, "BeneficiaryRelationId", "Name");
 
@@ -443,19 +397,10 @@ namespace risk.control.system.Controllers.Company
                         ContactNumber = "61432854196",
                     };
 
-                    //var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == country.CountryId).OrderBy(d => d.Name);
-                    //var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == state.StateId).OrderBy(d => d.Name);
-                    //var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == district.DistrictId).OrderBy(d => d.Name);
-
-                    //ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", model.CountryId);
-                    //ViewData["DistrictId"] = new SelectList(districts.OrderBy(s => s.Code), "DistrictId", "Name", model.DistrictId);
-                    //ViewData["StateId"] = new SelectList(relatedStates.OrderBy(s => s.Code), "StateId", "Name", model.StateId);
-                    //ViewData["PinCodeId"] = new SelectList(pincodes.Select(p => new { PinCodeId = p.PinCodeId, DisplayText = $"{p.Name} - {p.Code}" }), "PinCodeId", "DisplayText", model.PinCodeId);
                     return View(model);
                 }
                 else
                 {
-                    //ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
                     return View();
                 }
             }
@@ -474,11 +419,6 @@ namespace risk.control.system.Controllers.Company
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (string.IsNullOrWhiteSpace(currentUserEmail))
-                {
-                    notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
                 if (id == null)
                 {
                     notifyService.Error("OOPS!!!.Claim Not Found.Try Again");
@@ -490,16 +430,6 @@ namespace risk.control.system.Controllers.Company
                     .ThenInclude(c => c.PolicyDetail)
                     .Include(v => v.District)
                     .First(v => v.BeneficiaryDetailId == id);
-
-                //var country = _context.Country.OrderBy(o => o.Name);
-                //var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == beneficiary.CountryId).OrderBy(d => d.Name);
-                //var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == beneficiary.StateId).OrderBy(d => d.Name);
-                //var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == beneficiary.DistrictId).OrderBy(d => d.Name);
-
-                //ViewData["CountryId"] = new SelectList(country, "CountryId", "Name", beneficiary.CountryId);
-                //ViewData["StateId"] = new SelectList(relatedStates, "StateId", "Name", beneficiary.StateId);
-                //ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", beneficiary.DistrictId);
-                //ViewData["PinCodeId"] = new SelectList(pincodes.Select(p => new { PinCodeId = p.PinCodeId, DisplayText = $"{p.Name} - {p.Code}" }), "PinCodeId", "DisplayText", beneficiary.PinCodeId);
 
                 ViewData["BeneficiaryRelationId"] = new SelectList(_context.BeneficiaryRelation.OrderBy(s => s.Code), "BeneficiaryRelationId", "Name", beneficiary.BeneficiaryRelationId);
 
@@ -527,11 +457,7 @@ namespace risk.control.system.Controllers.Company
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (string.IsNullOrWhiteSpace(currentUserEmail))
-                {
-                    notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
+                
                 if (id == null || string.IsNullOrWhiteSpace(id))
                 {
                     notifyService.Error("OOPS!!!.Claim Not Found.Try Again");
@@ -565,11 +491,6 @@ namespace risk.control.system.Controllers.Company
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
-                if (string.IsNullOrWhiteSpace(currentUserEmail))
-                {
-                    notifyService.Error("OOPs !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
                 if (string.IsNullOrWhiteSpace(selectedcase))
                 {
                     notifyService.Error("No case selected!!!. Please select case to be allocate.");
@@ -594,11 +515,7 @@ namespace risk.control.system.Controllers.Company
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (string.IsNullOrWhiteSpace(currentUserEmail))
-                {
-                    notifyService.Error("OOPs !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
+               
                 if (id == 0 || selectedcase is null)
                 {
                     notifyService.Error("OOPs !!!..Contact Admin");
@@ -651,11 +568,7 @@ namespace risk.control.system.Controllers.Company
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (string.IsNullOrWhiteSpace(currentUserEmail))
-                {
-                    notifyService.Error("OOPs !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
+                
                 if (id == null)
                 {
                     notifyService.Error("NOT FOUND !!!..");

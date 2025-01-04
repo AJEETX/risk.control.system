@@ -5,7 +5,8 @@
 }
 
 <section class="content">
-    <form id="create-form" asp-controller="CreatorManualPost" asp-action="CreateBeneficiary" enctype="multipart/form-data">
+    <form id="create-form" asp-controller="CreatorPost" asp-action="CreateBeneficiary" enctype="multipart/form-data">
+        <input type="hidden" asp-for="CREATEDBY" value="@CREATEDBY.MANUAL" />
         <partial name="Creator/_CreateBeneficiary" model="Model" />
     </form>
 </section>

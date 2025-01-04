@@ -1,7 +1,7 @@
 ﻿@model ApplicationUser
 @{
     ViewData["Title"] = @Applicationsettings.CREATE;
-    
+
 }
 <section class="content">
     <form id="create-form" asp-action="Create" enctype="multipart/form-data">
@@ -48,7 +48,7 @@
                         <div class="form-group">
                             <label asp-for="ProfileImage" class="control-label"></label>
                             <img id="ProfileImage" class="form-Image">
-                            <input asp-for="ProfileImage" class="form-control remarks" type="file" onchange="document.getElementById('ProfileImage').src = window.URL.createObjectURL(this.files[0])" required/>
+                            <input asp-for="ProfileImage" class="form-control remarks" type="file" onchange="document.getElementById('ProfileImage').src = window.URL.createObjectURL(this.files[0])" required />
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -115,6 +115,13 @@
                             </div>
                         </div>
 
+
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="row">
+                    <div class="col-md-12">
                         <div class="form-group text-right">
                             <a id="back" asp-controller="User" asp-action="Index" class="btn btn-secondary">
                                 <i class="fa fa-window-close"></i>

@@ -10,12 +10,14 @@
         <div class="card-footer">
             <div class="row">
                 <div class="col-md-12">
-
-                    <form id="create-form" asp-controller="CreatorManualPost" asp-action="Delete">
+                    <div class="form-group">
+                    <form id="create-form" asp-controller="CreatorPost" asp-action="Delete">
+                        <input type="hidden" asp-for="ClaimsInvestigation.CREATEDBY" value="@CREATEDBY.MANUAL" />
                         <a id="back" asp-action="New" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
                         <input type="hidden" asp-for="ClaimsInvestigation.ClaimsInvestigationId" />
                         <input type="submit" value="Delete" class="btn btn-danger" />
                     </form>
+                    </div>
                 </div>
             </div>
         </div>

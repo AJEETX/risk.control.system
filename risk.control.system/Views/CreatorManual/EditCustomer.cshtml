@@ -4,8 +4,8 @@
     ViewData["Title"] = @Applicationsettings.EDIT;
 }
 <section class="content">
-    <form id="edit-form" asp-controller="CreatorManualPost" asp-action="EditCustomer" method="post" enctype="multipart/form-data">
-        <input type="hidden" id="claimtype" name="claimtype" value="manual" />
+    <form id="edit-form" asp-controller="CreatorPost" asp-action="EditCustomer" method="post" enctype="multipart/form-data">
+        <input type="hidden" asp-for="CREATEDBY" value="@CREATEDBY.MANUAL" />
         <partial name="Creator/_EditCustomer" model="Model" />
     </form>
 </section>
@@ -17,5 +17,6 @@
     }
     <script src="~/js/creator/customer.js"></script>
     <script src="~/js/company-admin/pincode.js"></script>
+    <script src="~/js/common/profile-image-upload.js"></script>
     <script src="~/js/common/form-validation.js"></script>
 }

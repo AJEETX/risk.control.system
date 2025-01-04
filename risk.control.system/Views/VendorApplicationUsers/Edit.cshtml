@@ -3,7 +3,7 @@
 @{
     ViewData["Title"] = @Applicationsettings.EDIT;
     var email = Model.Vendor.Email;
-    
+
 }
 <section class="content">
     <form id="edit-form" asp-action="Edit" enctype="multipart/form-data">
@@ -34,16 +34,17 @@
                         <div class="form-group">
                             <span class="input-group-label"> Photo:</span>
                             <div class="input-group mb-3">
-
-                                @if (Model?.ProfilePictureUrl is not null)
+                                @if (Model?.ProfilePicture is not null)
                                 {
-                                    <img id="ProfileImage" class="form-Image" src="@Model?.ProfilePictureUrl">
+                                    <img id="createProfileImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.ProfilePicture))" alt="Profile Image" />
                                 }
                                 else
                                 {
-                                    <img id="ProfileImage" class="form-Image" src="@Applicationsettings.NO_USER">
+                                    <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="@Applicationsettings.NO_USER" data-toggle="tooltip" title="Customer Photo" />
                                 }
-                                <input asp-for="ProfileImage" type="file" class="form-control remarks" onchange="document.getElementById('ProfileImage').src = window.URL.createObjectURL(this.files[0])" required/>
+                                <i class="fa fa-asterisk asterik-style"></i>
+                                <input accept=".jpg,.jpeg,.png" asp-for="ProfileImage" class="form-control remarks document-image-input" type="file" id="createImageInput" data-preview-id="createProfileImage" data-toggle="tooltip" title="Customer Photo" />
+                                <span asp-validation-for="ProfilePicture" class="text-danger"></span>
                             </div>
                         </div>
 
@@ -174,9 +175,11 @@
                                 </span>
                             </div>
                         </div>
-
-
                     </div>
+
+                </div>
+            </div>
+            <div class="card-footer">
                 <div class="row">
                     <div class="col-md-12">
                         <div class="form-group text-right">
@@ -184,7 +187,7 @@
                                 <i class="fa fa-window-close"></i>
                                 @Applicationsettings.CANCEL
                             </a>
-                            <button id="edit-user" type="submit" class="btn btn-warning">
+                            <button id="edit" type="submit" class="btn btn-warning">
                                 <i class="fas fa-user-plus"></i> Edit User
                             </button>
                         </div>
@@ -192,12 +195,12 @@
                 </div>
             </div>
         </div>
-        </div>
     </form>
 </section>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
     <script src="~/js/common/manage-user.js"></script>
     <script src="~/js/company-admin/pincode.js"></script>

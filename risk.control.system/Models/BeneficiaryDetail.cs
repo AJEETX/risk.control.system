@@ -74,7 +74,8 @@ namespace risk.control.system.Models
         [NotMapped]
         public long SelectedCountryId { get; set; }
 
-
+        [NotMapped]
+        public CREATEDBY CREATEDBY { get; set; } = CREATEDBY.MANUAL;
         public string? BeneficiaryLocationMap { get; set; }
         public string? Latitude { get; set; }
         public string? Longitude { get; set; }

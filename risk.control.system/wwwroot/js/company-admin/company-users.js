@@ -153,7 +153,7 @@
         });
     });
 
-    $('a.create-user').on('click', function () {
+    $('a.create').on('click', function () {
         $("body").addClass("submit-progress-bg");
         // Wrap in setTimeout so the UI
         // can update the spinners

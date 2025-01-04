@@ -70,16 +70,17 @@
                     .Cast<AgencyRole>()
                     .Where(role => role != AgencyRole.AGENCY_ADMIN) // Replace RoleToExclude with the actual enum value
                     .Select(role => new SelectListItem
-            {
-                Value = role.ToString(),
-                Text = role.ToString()
-            });
+                    {
+                        Value = role.ToString(),
+                        Text = role.ToString()
+                    });
                 }
                 @if (Model.UserRole == AgencyRole.AGENCY_ADMIN)
                 {
-                    <select readonly asp-for="@Model.UserRole" class="form-control remarks">
-                        <option value="@AgencyRole.AGENCY_ADMIN">@AgencyRole.AGENCY_ADMIN</option>
+                    <select class="form-control remarks" disabled>
+                        <option value="@AgencyRole.AGENCY_ADMIN" selected>@AgencyRole.AGENCY_ADMIN</option>
                     </select>
+                    <input type="hidden" name="UserRole" value="@AgencyRole.AGENCY_ADMIN" />
                 }
                 else
                 {

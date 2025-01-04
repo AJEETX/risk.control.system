@@ -470,7 +470,7 @@ namespace risk.control.system.Controllers
                 user.UpdatedBy = HttpContext.User?.Identity?.Name;
                 user.SecurityStamp = DateTime.Now.ToString();
                 user.UserRole = applicationUser.UserRole;
-                user.IsVendorAdmin = user.UserRole == AgencyRole.AGENCY_ADMIN;
+                user.IsVendorAdmin = user.UserRole == null;
                 user.Role = applicationUser.Role != null ? applicationUser.Role : (AppRoles)Enum.Parse(typeof(AppRoles), user.UserRole.ToString());
 
                 if (user.Role == AppRoles.AGENT)

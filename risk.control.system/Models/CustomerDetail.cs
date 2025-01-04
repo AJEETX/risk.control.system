@@ -66,6 +66,8 @@ namespace risk.control.system.Models
         [NotMapped]
         public long SelectedCountryId { get; set; }
 
+        [NotMapped]
+        public CREATEDBY CREATEDBY { get; set; } = CREATEDBY.MANUAL;
 
         [Required]
         [Display(Name = "Customer type")]

@@ -19,18 +19,21 @@
                 </div>
                 <partial name="Vendor/_EditService" model="Model" />
 
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="form-group text-right">
-                            <a id="back" asp-controller="Vendors" asp-action="Service" asp-route-id="@Model.Vendor.VendorId" class="btn btn-secondary">
-                                <i class="fa fa-window-close"></i>
-                                @Applicationsettings.CANCEL
-                            </a>
-                            <button id="edit" type="submit" class="btn btn-warning">
-                                <i class="fas fa-truck"></i> @Applicationsettings.EDIT Service
-                            </button>
-                        </div>
+               
+            </div>
+            <div class="card-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group text-right">
+                        <a id="back" asp-controller="Vendors" asp-action="Service" asp-route-id="@Model.Vendor.VendorId" class="btn btn-secondary">
+                            <i class="fa fa-window-close"></i>
+                            @Applicationsettings.CANCEL
+                        </a>
+                        <button id="edit" type="submit" class="btn btn-warning">
+                            <i class="fas fa-truck"></i> @Applicationsettings.EDIT Service
+                        </button>
                     </div>
+                </div>
                 </div>
             </div>
         </div>

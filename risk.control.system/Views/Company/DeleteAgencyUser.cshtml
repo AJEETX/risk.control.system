@@ -107,22 +107,24 @@
             <div class="card-footer">
                 <div class="row">
                     <div class="col-md-12">
-                        <a id="back" asp-controller="Company" asp-action="AgencyUsers" asp-route-id="@Model.VendorId" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
-                        <input type="hidden" asp-for="Email" name="email" />
-                        @if (Model.HasClaims)
-                        {
-                            <span id="withdraw-information-popup" class="badge badge-light">
-                                <div class="btn btn-outline-danger">
-                                    <i class="fa fa-trash"></i>  @Applicationsettings.DELETE <span class="badge badge-danger">
-                                        <i class="fas fa-info"></i>
-                                    </span>
-                                </div>
-                            </span>
-                        }
-                        else
-                        {
-                            <input type="submit" value="Delete" class="btn btn-danger" />
-                        }
+                        <div class="form-group text-right">
+                            <a id="back" asp-controller="Company" asp-action="AgencyUsers" asp-route-id="@Model.VendorId" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
+                            <input type="hidden" asp-for="Email" name="email" />
+                            @if (Model.HasClaims)
+                            {
+                                <span id="withdraw-information-popup" class="badge badge-light">
+                                    <div class="btn btn-outline-danger">
+                                        <i class="fa fa-trash"></i>  @Applicationsettings.DELETE <span class="badge badge-danger">
+                                            <i class="fas fa-info"></i>
+                                        </span>
+                                    </div>
+                                </span>
+                            }
+                            else
+                            {
+                                <input type="submit" value="Delete" class="btn btn-danger" />
+                            }
+                        </div>
                     </div>
                 </div>
             </div>
@@ -133,7 +135,7 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-        <script src="~/js/common/delete-user.js">
+    <script src="~/js/common/delete-user.js">
 
     </script>
 }

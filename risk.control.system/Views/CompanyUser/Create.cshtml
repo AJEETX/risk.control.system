@@ -2,8 +2,6 @@
 
 @{
     ViewData["Title"] = Applicationsettings.CREATE;
-    
-
     var email = Model.ClientCompany.Email;
     var emailAtIndex = email.IndexOf("@");
     if (emailAtIndex > 0)
@@ -65,7 +63,7 @@
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-6">
-                                   
+
                                     <div class="form-group hide-id">
                                         <label asp-for="ClientCompanyId" class="control-label"></label>
                                         <input asp-for="ClientCompanyId" class="form-control remarks" value="@Model.ClientCompany.ClientCompanyId" />
@@ -74,11 +72,9 @@
                                     <div class="form-group">
                                         <span class="input-group-label"> Photo:</span>
                                         <div class="input-group mb-3">
-
-                                            <img id="ProfileImage" class="form-Image" src="@Applicationsettings.NO_USER">
-
-                                            <input asp-for="ProfileImage" class="form-control remarks" type="file" onchange="document.getElementById('ProfileImage').src = window.URL.createObjectURL(this.files[0])" />
-
+                                            <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="@Applicationsettings.NO_USER" data-toggle="tooltip" title="Upload Photo" />
+                                            <i class="fa fa-asterisk asterik-style"></i>
+                                            <input accept=".jpg,.jpeg,.png" asp-for="ProfileImage" class="form-control remarks document-image-input" type="file" id="createImageInput" data-preview-id="createProfileImage" required data-toggle="tooltip" title="Upload Photo" />
                                         </div>
                                     </div>
                                     <div class="form-group">
@@ -104,14 +100,14 @@
                                     </div>
 
                                     @*<div class="form-group">
-                                        <span class="input-group-label"> Password:</span>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text" id="Password"> <i class="fa fa-key"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                            </div>
-                                            <input type="password" asp-for="Password" class="form-control remarks" value="" required placeholder="Password" maxlength="20" autocomplete="off">
-                                            <span asp-validation-for="Password" class="text-danger"></span>
-                                        </div>
+                                    <span class="input-group-label"> Password:</span>
+                                    <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                    <span class="input-group-text" id="Password"> <i class="fa fa-key"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                    </div>
+                                    <input type="password" asp-for="Password" class="form-control remarks" value="" required placeholder="Password" maxlength="20" autocomplete="off">
+                                    <span asp-validation-for="Password" class="text-danger"></span>
+                                    </div>
                                     </div>*@
 
                                     <div class="form-group">
@@ -150,68 +146,8 @@
                                     </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <div class="form-group">
-                                        <span class="input-group-label" for="CountryId"> Country:</span>
-                                        <div class="input-group mb-3 autocomplete-wrapper">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text" for="CountryId"><i class="fas fa-map-marked-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                            </div>
-                                            <input type="text" id="CountryId" class="form-control remarks auto-dropdown" data-placeholder="country" placeholder="Type country..." asp-for="CountryId" required value="" />
-                                            <span asp-validation-for="CountryId" class="text-danger"></span>
-                                            <input asp-for="SelectedCountryId" type="hidden" id="SelectedCountryId" name="SelectedCountryId" value="@Model?.CountryId" />
-                                            <div id="country-loading" class="loading-spinner">
-                                                <i class="fas fa-spinner fa-spin"></i>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <span class="input-group-label" for="StateId"> State:</span>
-                                        <div class="input-group mb-3 autocomplete-wrapper">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text" for="StateId"><i class="fas fa-map-marker-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                            </div>
-                                            <input type="text" id="StateId" class="form-control remarks auto-dropdown" data-placeholder="state" placeholder="Type state..." asp-for="StateId" required value="" />
-                                            <span asp-validation-for="StateId" class="text-danger"></span>
-                                            <input asp-for="SelectedStateId" type="hidden" id="SelectedStateId" name="SelectedStateId" value="@Model?.StateId" />
-                                            <div id="state-loading" class="loading-spinner">
-                                                <i class="fas fa-spinner fa-spin"></i>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <span class="input-group-label" for="DistrictId">District:</span>
-                                        <div class="input-group mb-3 autocomplete-wrapper">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text" for="DistrictId">
-                                                    <i class="fas fa-city"></i>
-                                                    <i class="fa fa-asterisk asterik-style"></i>
-                                                </span>
-                                            </div>
-                                            <input type="text" id="DistrictId" class="form-control remarks auto-dropdown" data-placeholder="district" placeholder="Type district..." asp-for="DistrictId" required value="" />
-                                            <span asp-validation-for="DistrictId" class="text-danger"></span>
-                                            <input asp-for="SelectedDistrictId" type="hidden" id="SelectedDistrictId" name="SelectedDistrictId" value="@Model?.DistrictId" />
-                                            <div id="district-loading" class="loading-spinner">
-                                                <i class="fas fa-spinner fa-spin"></i>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <span class="input-group-label" for="PinCodeId">Pincode:</span>
-                                        <div class="input-group mb-3 autocomplete-wrapper">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text" for="PinCodeId">
-                                                    <i class="fas fa-map-pin"></i>
-                                                    <i class="fa fa-asterisk asterik-style"></i>
-                                                </span>
-                                            </div>
-                                            <input type="text" id="PinCodeId" class="form-control remarks auto-dropdown" data-placeholder="pincode" placeholder="Type pincode..." asp-for="PinCodeId" required value="" />
-                                            <span asp-validation-for="PinCodeId" class="text-danger"></span>
-                                            <input asp-for="SelectedPincodeId" type="hidden" id="SelectedPincodeId" name="SelectedPincodeId" value="@Model?.PinCodeId" />
-                                            <div id="pincode-loading" class="loading-spinner">
-                                                <i class="fas fa-spinner fa-spin"></i>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <partial name="_Address" model="@Model" />
+
                                     <div class="form-group">
                                         <span class="input-group-label"> Address:</span>
                                         <div class="input-group mb-3">
@@ -236,11 +172,15 @@
                                         </div>
                                     </div>
                                 </div>
+
+                            </div>
+                        </div>
+                        <div class="card-footer">
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="form-group text-right">
                                         <a id="back" asp-controller="CompanyUser" asp-action="Index" asp-route-id="@Model.ClientCompany.ClientCompanyId" class="btn btn-secondary"><i class="fa fa-window-close"></i> Cancel</a>
-                                        <button disabled id="create-agency" type="submit" class="btn btn-success">
+                                        <button disabled id="create" type="submit" class="btn btn-success">
                                             <i class="fas fa-user-plus"></i> Add New
                                         </button>
                                     </div>
@@ -248,8 +188,6 @@
                             </div>
                         </div>
                     </form>
-
-
                 </div>
             </div>
         </div>
@@ -264,5 +202,6 @@
 
     </script>
     <script src="~/js/company-admin/pincode.js"></script>
+    <script src="~/js/common/form-validation.js"></script>
 
 }

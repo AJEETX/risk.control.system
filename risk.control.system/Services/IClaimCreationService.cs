@@ -12,7 +12,7 @@ namespace risk.control.system.Services
 {
     public interface IClaimCreationService
     {
-        Task<ClaimsInvestigation> CreatePolicy(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? claimDocument, IFormFile? customerDocument, bool create = true);
+        Task<ClaimsInvestigation> CreatePolicy(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? claimDocument);
 
         Task<ClaimsInvestigation> EdiPolicy(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? claimDocument);
 
@@ -32,7 +32,7 @@ namespace risk.control.system.Services
             this.context = context;
             this.customApiCLient = customApiCLient;
         }
-        public async Task<ClaimsInvestigation> CreatePolicy(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? claimDocument, IFormFile? customerDocument, bool create = true)
+        public async Task<ClaimsInvestigation> CreatePolicy(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? claimDocument)
         {
             try
             {
@@ -43,13 +43,10 @@ namespace risk.control.system.Services
                     claimDocument.CopyTo(dataStream);
                     claimsInvestigation.PolicyDetail.DocumentImage = dataStream.ToArray();
                 }
-                var initiatedStatus = context.InvestigationCaseStatus.FirstOrDefault(i =>
-                i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INITIATED);
-                var createdStatus = context.InvestigationCaseSubStatus.FirstOrDefault(i =>
-                i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
-
-                var assigned2AssignerStatus = context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
+                var initiatedStatusId = context.InvestigationCaseStatus.FirstOrDefault(i =>
+                i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INITIATED).InvestigationCaseStatusId;
+                var createdSubStatusId = context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR).InvestigationCaseSubStatusId;
 
                 claimsInvestigation.Updated = DateTime.Now;
                 claimsInvestigation.UserEmailActioned = userEmail;
@@ -58,8 +55,8 @@ namespace risk.control.system.Services
                 claimsInvestigation.UpdatedBy = userEmail;
                 claimsInvestigation.CurrentUserEmail = userEmail;
                 claimsInvestigation.CurrentClaimOwner = currentUser.Email;
-                claimsInvestigation.InvestigationCaseStatusId = initiatedStatus.InvestigationCaseStatusId;
-                claimsInvestigation.InvestigationCaseSubStatusId = create ? createdStatus.InvestigationCaseSubStatusId : assigned2AssignerStatus.InvestigationCaseSubStatusId;
+                claimsInvestigation.InvestigationCaseStatusId = initiatedStatusId;
+                claimsInvestigation.InvestigationCaseSubStatusId = createdSubStatusId;
                 claimsInvestigation.CreatorSla = currentUser.ClientCompany.CreatorSla;
                 var aaddedClaimId = context.ClaimsInvestigation.Add(claimsInvestigation);
                 var log = new InvestigationTransaction
@@ -71,20 +68,19 @@ namespace risk.control.system.Services
                     CurrentClaimOwner = currentUser.Email,
                     HopCount = 0,
                     Time2Update = 0,
-                    InvestigationCaseStatusId = initiatedStatus.InvestigationCaseStatusId,
-                    InvestigationCaseSubStatusId = create ? createdStatus.InvestigationCaseSubStatusId : assigned2AssignerStatus.InvestigationCaseSubStatusId,
+                    InvestigationCaseStatusId = initiatedStatusId,
+                    InvestigationCaseSubStatusId = createdSubStatusId,
                     UpdatedBy = userEmail,
                 };
                 context.InvestigationTransaction.Add(log);
 
-                await context.SaveChangesAsync();
+                return await context.SaveChangesAsync() > 0 ? claimsInvestigation : null!;
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.StackTrace);
-                throw;
+                return null!;
             }
-            return claimsInvestigation;
         }
 
         public async Task<ClaimsInvestigation> EdiPolicy(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? claimDocument)
@@ -117,13 +113,13 @@ namespace risk.control.system.Services
 
                 context.ClaimsInvestigation.Update(existingPolicy);
 
-                await context.SaveChangesAsync();
+                return await context.SaveChangesAsync() > 0 ? existingPolicy:null! ;
 
-                return existingPolicy;
             }
             catch (Exception ex)
             {
-                throw;
+                Console.WriteLine(ex.StackTrace);
+                return null!;
             }
         }
 
@@ -144,13 +140,6 @@ namespace risk.control.system.Services
                     var existingCustomer = await context.CustomerDetail
                         .AsNoTracking()
                         .FirstOrDefaultAsync(c => c.ClaimsInvestigationId == customerDetail.ClaimsInvestigationId);
-
-                    if (existingCustomer == null)
-                    {
-                        Console.WriteLine("Customer not found");
-                        return false;
-                    }
-
                     customerDetail.ProfilePicture ??= existingCustomer.ProfilePicture;
                 }
 
@@ -159,6 +148,7 @@ namespace risk.control.system.Services
                 customerDetail.StateId = customerDetail.SelectedStateId;
                 customerDetail.DistrictId = customerDetail.SelectedDistrictId;
                 customerDetail.PinCodeId = customerDetail.SelectedPincodeId;
+
                 var pincode = context.PinCode
                         .Include(p => p.District)
                         .Include(p => p.State)

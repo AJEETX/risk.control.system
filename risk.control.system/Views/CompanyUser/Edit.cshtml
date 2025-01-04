@@ -13,7 +13,7 @@
 
 <section class="content">
     <div class="container-fluid">
-        <form id="create-form" asp-action="Edit" enctype="multipart/form-data">
+        <form id="edit-form" asp-action="Edit" enctype="multipart/form-data">
             <div class="row">
                 <div class="col-md-12">
                     <div class="card bg-light card-secondary">
@@ -196,19 +196,22 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col-md-12">
+                            
+                        </div>
+                        <div class="card-footer">
+                        <div class="row">
+                            <div class="col-md-12">
                                 <div class="form-group text-right">
-                                        <a id="back" asp-controller="CompanyUser" asp-action="Index" asp-route-id="@Model.ClientCompanyId" class="btn btn-secondary">
+                                    <a id="back" asp-controller="CompanyUser" asp-action="Index" asp-route-id="@Model.ClientCompanyId" class="btn btn-secondary">
                                         <i class="fa fa-window-close"></i>
                                         @Applicationsettings.CANCEL
                                     </a>
-                                    <button id="create-user" type="submit" class="btn btn-success">
+                                    <button id="edit" type="submit" class="btn btn-success">
                                         <i class="fas fa-user-plus"></i> @Applicationsettings.EDIT User
                                     </button>
                                 </div>
-                                </div>
                             </div>
+                        </div>
                         </div>
                     </div>
                 </div>
@@ -225,5 +228,6 @@
  
     </script>
     <script src="~/js/company-admin/pincode.js"></script>
+    <script src="~/js/common/form-validation.js"></script>
 
 }
