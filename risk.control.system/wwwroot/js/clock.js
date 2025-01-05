@@ -4,51 +4,44 @@ var defaultTimeoutSeconds = parseInt(document.getElementById('timeout')?.value |
 var sessionTimer = localStorage.getItem("sessionTimer")
     ? parseInt(localStorage.getItem("sessionTimer"), 10)
     : defaultTimeoutSeconds;
-var refreshSessionPath = "/Account/KeepSessionAlive"; // Path to refresh session
+const refreshSessionPath = "/Account/KeepSessionAlive"; // Path to refresh session
 
-function refreshSession() {
+async function refreshSession() {
     const currentPageUrl = window.location.href;
-    console.log("Refreshing session on "+ currentPageUrl);
-    fetch(refreshSessionPath, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        credentials: "include", // Include cookies in the request
-        body: JSON.stringify({ currentPage: currentPageUrl }), // Send the current page URL in the request body
-    })
-        .then(async (response) => {
-            if (response.status === 401) {
-                // Handle unauthorized response (e.g., session expired)
-                console.warn("Session expired or user is unauthorized. Redirecting to login page...");
-                window.location.href = "/Account/Login"; // Redirect to the login page
-                return;
-            }
+    console.log(`Refreshing session on ${currentPageUrl}`);
 
-            if (!response.ok) {
-                const errorText = await response.text(); // Read error response as text
-                console.error("Failed to fetch user identity details. Server response:", errorText);
-                return;
-            }
-
-            try {
-                const userDetails = await response.json(); // Parse JSON response
-                console.log("User Identity Details:", userDetails);
-                updateUserUI(userDetails);
-            } catch (error) {
-                console.error("Error parsing JSON:", error);
-            }
-        })
-        .catch((error) => {
-            console.error("Error during fetch:", error);
+    try {
+        // Send a POST request to keep the session alive
+        const response = await fetch(refreshSessionPath, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            credentials: "include", // Include cookies in the request
+            body: JSON.stringify({ currentPage: currentPageUrl }), // Include the current page URL
         });
-}
 
-// Example function to update the UI based on user details
-function updateUserUI(userDetails) {
-    if (userDetails) {
-        console.log(userDetails.name);
-        console.log(userDetails.role);
+        if (response.status === 401) {
+            console.warn("Session expired or user is unauthorized. Redirecting to login page...");
+            window.location.href = "/Account/Login"; // Redirect to the login page
+            return;
+        }
+
+        if (!response.ok) {
+            const errorText = await response.text(); // Extract error message from response
+            console.error(`Failed to refresh session. Status: ${response.status}, Response: ${errorText}`);
+            return;
+        }
+
+        // Parse and log the user identity details if available
+        try {
+            const userDetails = await response.json();
+            console.log("User Identity Details:", userDetails);
+        } catch (error) {
+            console.error("Failed to parse user identity details as JSON:", error);
+        }
+    } catch (error) {
+        console.error("Error during session refresh request:", error);
     }
 }
 

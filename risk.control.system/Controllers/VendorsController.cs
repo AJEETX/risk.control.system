@@ -196,7 +196,7 @@ namespace risk.control.system.Controllers
             {
                 allRoles = allRoles.Where(r => r != AgencyRole.AGENCY_ADMIN).ToList();
             }
-            var model = new VendorApplicationUser { Vendor = vendor, AgencyRole = allRoles };
+            var model = new VendorApplicationUser { CountryId = vendor.CountryId, Vendor = vendor, AgencyRole = allRoles };
             //ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
 
             var agencysPage = new MvcBreadcrumbNode("AvailableVendors", "Company", "Manager Agency(s)");
@@ -780,7 +780,7 @@ namespace risk.control.system.Controllers
                 notifyService.Error("OOPs !!!..Unauthenticated Access");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
-            ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
+
             return View();
         }
 
@@ -850,7 +850,6 @@ namespace risk.control.system.Controllers
                 vendor.AddressLatitude = companyCoordinates.Latitude;
                 vendor.AddressLongitude = companyCoordinates.Longitude;
                 vendor.AddressMapLocation = url;
-
                 _context.Add(vendor);
                 await _context.SaveChangesAsync();
 

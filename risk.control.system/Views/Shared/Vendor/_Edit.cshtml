@@ -1,13 +1,10 @@
-﻿@model risk.control.system.Models.Vendor
+﻿    @model risk.control.system.Models.Vendor
 
 <div class="row">
     <div class="col-sm-6">
-
-
         <div class="form-group">
             <span class="input-group-label"> Document:</span>
             <div class="input-group mb-3">
-
                 @if (Model?.DocumentUrl is not null)
                 {
                     <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="@Model?.DocumentUrl" data-toggle="tooltip" title="Document" />
@@ -21,6 +18,7 @@
                     <i class="fa fa-asterisk asterik-style"></i>
                     <input accept=".jpg,.jpeg,.png" asp-for="Document" type="file"
                            class="form-control remarks document-image-input" id="createImageInput" data-preview-id="createProfileImage" required data-toggle="tooltip" title="Upload Document" data-default-image="@Applicationsettings.NO_IMAGE" />
+                    <span asp-validation-for="Document" class="text-danger"></span>
                 }
             </div>
         </div>
@@ -28,9 +26,9 @@
             <span class="input-group-label"> Agency Name: </span>
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
-                    <span class="input-group-text" id="Name"><i class="fas fa-building"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                    <span class="input-group-text" ><i class="fas fa-building"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                 </div>
-                <input type="text" asp-for="Name" class="form-control remarks title-name" required placeholder="Enter Agency Name" maxlength="30">
+                <input type="text" id="Name" asp-for="Name" class="form-control remarks title-name" required placeholder="Enter Agency Name" maxlength="30">
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
         </div>
@@ -38,9 +36,9 @@
             <span class="input-group-label"> Agency Code:</span>
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
-                    <span class="input-group-text" id="Code"><i class="fas fa-code"></i><i class="fa fa-asterisk asterik-style"></i></span>
+                    <span class="input-group-text"><i class="fas fa-code"></i><i class="fa fa-asterisk asterik-style"></i></span>
                 </div>
-                <input type="text" asp-for="Code" class="form-control remarks asterikx" required placeholder="Enter Agency Code" maxlength="5">
+                <input type="text" id="Code" asp-for="Code" class="form-control remarks asterikx" required placeholder="Enter Agency Code" maxlength="5">
                 <span asp-validation-for="Code" class="text-danger"></span>
             </div>
         </div>
@@ -49,10 +47,9 @@
             <span class="input-group-label"> Phone #: </span>
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
-                    <span class="input-group-text" id="PhoneNumber"><i class="fas fa-phone"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                    <span class="input-group-text" ><i class="fas fa-phone"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                 </div>
-                <input type="text" asp-for="PhoneNumber" class="form-control remarks" required maxlength="14" placeholder="Phone # with country code"
-                       oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" />
+                <input type="text" id="PhoneNumber" asp-for="PhoneNumber" class="form-control remarks" required maxlength="14" placeholder="Phone # with country code"/>
                 <span asp-validation-for="PhoneNumber" class="text-danger"></span>
             </div>
         </div>
@@ -62,9 +59,9 @@
             <span class="input-group-label"> Branch Name: </span>
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
-                    <span class="input-group-text" id="Branch"><i class="far fa-building"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                    <span class="input-group-text"><i class="far fa-building"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                 </div>
-                <input type="text" asp-for="Branch" class="form-control remarks title-name" required placeholder="Enter Branch Name" maxlength="30">
+                <input type="text" id="Branch" asp-for="Branch" class="form-control remarks title-name" required placeholder="Enter Branch Name" maxlength="30">
                 <span asp-validation-for="Branch" class="text-danger"></span>
             </div>
         </div>
@@ -73,9 +70,9 @@
             <span class="input-group-label"> Bank Name: </span>
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
-                    <span class="input-group-text" id="BankName"> <i class="fas fa-landmark"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                    <span class="input-group-text"> <i class="fas fa-landmark"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                 </div>
-                <input type="text" asp-for="BankName" class="form-control remarks title-name" required placeholder="Enter Bank Name" maxlength="30">
+                <input type="text" id="BankName" asp-for="BankName" class="form-control remarks title-name" required placeholder="Enter Bank Name" maxlength="30">
                 <span asp-validation-for="BankName" class="text-danger"></span>
             </div>
         </div>
@@ -84,9 +81,9 @@
             <span class="input-group-label"> Bank Account #: </span>
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
-                    <span class="input-group-text" id="BankAccountNumber"><i class="fab fa-btc"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                    <span class="input-group-text"><i class="fab fa-btc"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                 </div>
-                <input type="text" asp-for="BankAccountNumber" class="form-control remarks" required placeholder="Bank Account #" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" maxlength="20">
+                <input type="text" id="BankAccountNumber" asp-for="BankAccountNumber" class="form-control remarks" required placeholder="Bank Account #" maxlength="20">
                 <span asp-validation-for="BankAccountNumber" class="text-danger"></span>
             </div>
         </div>
@@ -95,9 +92,9 @@
             <span class="input-group-label"> IFSC Code: </span>
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
-                    <span class="input-group-text" id="IFSCCode"><i class="fas fa-rupee-sign"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                    <span class="input-group-text"><i class="fas fa-rupee-sign"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                 </div>
-                <input type="text" asp-for="IFSCCode" class="form-control remarks asterikx" required placeholder="Bank IFSC Code" maxlength="10">
+                <input type="text" id="IFSCCode" asp-for="IFSCCode" class="form-control remarks asterikx" required placeholder="Bank IFSC Code" maxlength="10">
                 <span asp-validation-for="IFSCCode" class="text-danger"></span>
             </div>
         </div>
@@ -105,11 +102,11 @@
             <span class="input-group-label"> Profile edit:</span>
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
-                    <span class="input-group-text" id="CanChangePassword"><i class="fas fa-portrait"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                    <span class="input-group-text"><i class="fas fa-portrait"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                 </div>
 
                 <span class="checkbox">
-                    <input asp-for="CanChangePassword" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
+                    <input asp-for="CanChangePassword" id="CanChangePassword" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
 
                 </span>
             </div>
@@ -118,11 +115,11 @@
             <span class="input-group-label"> Enable Mailbox:</span>
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
-                    <span class="input-group-text" id="EnableMailbox"><i class="far fa-comment-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                    <span class="input-group-text" ><i class="far fa-comment-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                 </div>
 
                 <span class="checkbox">
-                    <input asp-for="EnableMailbox" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
+                    <input asp-for="EnableMailbox" id="EnableMailbox" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
 
                 </span>
             </div>
@@ -195,9 +192,9 @@
             <span class="input-group-label"> Address:</span>
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
-                    <span class="input-group-text" id="Addressline"><i class="fa fa-home"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                    <span class="input-group-text"><i class="fa fa-home"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                 </div>
-                <input type="text" asp-for="Addressline" class="form-control remarks" type="text" placeholder="Enter Address line" required maxlength="50" />
+                <input type="text" id="Addressline" asp-for="Addressline" class="form-control remarks" type="text" placeholder="Enter Address line" required maxlength="50" />
                 <span asp-validation-for="Addressline" class="text-danger"></span>
             </div>
         </div>
@@ -207,9 +204,9 @@
             <span class="input-group-label"> Note:</span>
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
-                    <span class="input-group-text" id="Comments"><i class="fas fa-pencil-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                    <span class="input-group-text" ><i class="fas fa-pencil-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                 </div>
-                <input type="text" asp-for="Description" class="form-control remarks" placeholder="Enter Remarks" required maxlength="50" />
+                <input type="text" id="Description" asp-for="Description" class="form-control remarks" placeholder="Enter Remarks" required maxlength="50" />
             </div>
             <span asp-validation-for="Description" class="text-danger"></span>
         </div>
@@ -219,9 +216,9 @@
                 <span class="input-group-label"> Mobile App Url:</span>
                 <div class="input-group mb-3">
                     <div class="input-group-prepend">
-                        <span class="input-group-text" id="MobileApiBaseUrl"><i class="fas fa-code-branch"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                        <span class="input-group-text" ><i class="fas fa-code-branch"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                     </div>
-                    <input  readonly type="text" asp-for="MobileAppUrl" class="form-control remarks" placeholder="mobile app url" maxlength="100" />
+                    <input readonly type="text" id="MobileApiBaseUrl" asp-for="MobileAppUrl" class="form-control remarks" placeholder="mobile app url" maxlength="100" />
                     <span asp-validation-for="MobileAppUrl" class="text-danger"></span>
                 </div>
             </div>
@@ -242,9 +239,9 @@
                 <span class="input-group-label"> Mobile App Url:</span>
                 <div class="input-group mb-3">
                     <div class="input-group-prepend">
-                        <span class="input-group-text" id="MobileApiBaseUrl"><i class="fas fa-code-branch"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                        <span class="input-group-text" ><i class="fas fa-code-branch"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                     </div>
-                    <input type="text" asp-for="MobileAppUrl" class="form-control remarks" placeholder="mobile app url" maxlength="100" />
+                    <input type="text" id="MobileApiBaseUrl" asp-for="MobileAppUrl" class="form-control remarks" placeholder="mobile app url" maxlength="100" />
                     <span asp-validation-for="MobileAppUrl" class="text-danger"></span>
                 </div>
             </div>

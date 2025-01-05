@@ -1,0 +1,233 @@
+﻿@model risk.control.system.Models.Vendor
+
+<div class="card-body">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="row">
+        <div class="col-sm-6">
+
+            <div class="form-group">
+                <span class="input-group-label"> Agency Name: </span>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" asp-for="Name"><i class="fas fa-building"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                    </div>
+                    <input type="text" id="Name" asp-for="Name" class="form-control remarks title-name" required placeholder="Agency Name" maxlength="30" value="Proper">
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <span class="input-group-label"> Document:</span>
+                <div class="input-group mb-3">
+                    <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="@Applicationsettings.NO_POLICY_IMAGE" data-toggle="tooltip" title="No Document" />
+                    <i class="fa fa-asterisk asterik-style"></i>
+                    <input accept=".jpg,.jpeg,.png" asp-for="DocumentImage" type="file"
+                           class="form-control remarks document-image-input" id="createImageInput" data-preview-id="createProfileImage" required data-toggle="tooltip" title="Upload Document"
+                           data-default-image="@Applicationsettings.NO_POLICY_IMAGE" />
+                    <span asp-validation-for="DocumentImage" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-group">
+                <span class="input-group-label"> Agency Code:</span>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fas fa-code"></i><i class="fa fa-asterisk asterik-style"></i></span>
+                    </div>
+                    <input type="text" id="Code" asp-for="Code" class="form-control remarks asterikx" required placeholder="Agency Code" maxlength="5" value="pro">
+                    <span asp-validation-for="Code" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <span class="input-group-label"> Phone #: </span>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fas fa-phone"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                    </div>
+                    <input type="text" id="PhoneNumber" asp-for="PhoneNumber" class="form-control remarks" required maxlength="14" value="61432854196" placeholder="61432854196"
+                           />
+                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                </div>
+            </div>
+
+
+            <div class="form-group">
+                <span class="input-group-label"> Branch Name: </span>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" ><i class="far fa-building"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                    </div>
+                    <input type="text" id="Branch" asp-for="Branch" class="form-control remarks title-name" required placeholder="Branch Name" value="PROPER101" maxlength="20">
+                    <span asp-validation-for="Branch" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <span class="input-group-label"> Bank Name: </span>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"> <i class="fas fa-landmark"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                    </div>
+                    <input type="text" id="BankName" asp-for="BankName" class="form-control remarks title-name" required placeholder="Bank Name" value="Commonwealth" maxlength="30">
+                    <span asp-validation-for="BankName" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <span class="input-group-label"> Bank Account #: </span>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fab fa-btc"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                    </div>
+                    <input type="text" id="BankAccountNumber" asp-for="BankAccountNumber" class="form-control remarks" required placeholder="Bank Account #" value="123456789"
+                     maxlength="20">
+                    <span asp-validation-for="BankAccountNumber" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <span class="input-group-label"> IFSC Code: </span>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" ><i class="fas fa-rupee-sign"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                    </div>
+                    <input type="text" id="IFSCCode" asp-for="IFSCCode" class="form-control remarks asterikx" required placeholder="Bank IFSC Code" value="IFSC1234" maxlength="10">
+                    <span asp-validation-for="IFSCCode" class="text-danger"></span>
+                </div>
+            </div>
+
+        </div>
+        <div class="col-sm-6">
+
+
+            <div class="form-group">
+                <span class="input-group-label"> Agreement Date: </span>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="far fa-calendar-check"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                    </div>
+                    <input type="date" id="AgreementDate" asp-for="AgreementDate" id="AgreementDate" class="form-control remarks" required placeholder="Agreement Date" value="@DateTime.Now">
+                    <span asp-validation-for="AgreementDate" class="text-danger"></span>
+                </div>
+            </div>
+
+            @*<div class="form-group">
+            <label asp-for="ActivatedDate" class="control-label"></label>
+            <input asp-for="ActivatedDate" class="form-control remarks" />
+            <span asp-validation-for="ActivatedDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+            <label asp-for="DeListedDate" class="control-label"></label>
+            <input asp-for="DeListedDate" class="form-control remarks" />
+            <span asp-validation-for="DeListedDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+            <label asp-for="Status" class="control-label"></label>
+            <select asp-for="Status" class="form-control remarks" asp-items="Html.GetEnumSelectList<VendorStatus>()">
+            <option>--- SELECT STATUS ---</option>
+            </select>
+            <span asp-validation-for="Status" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+            <label asp-for="DelistReason" class="control-label"></label>
+            <textarea asp-for="DelistReason" class="form-control remarks"></textarea>
+            <span asp-validation-for="DelistReason" class="text-danger"></span>
+            </div>*@
+            <div class="form-group">
+                <span class="input-group-label" for="CountryId"> Country:</span>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" for="CountryId"><i class="fas fa-map-marked-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                    </div>
+                    <input type="text" id="CountryId" class="form-control" data-placeholder="country" asp-for="CountryId" value="" placeholder="Type country" />
+                    <span asp-validation-for="CountryId" class="text-danger"></span>
+                    <input asp-for="SelectedCountryId" type="hidden" id="SelectedCountryId" name="SelectedCountryId" value="@Model?.CountryId" />
+                    <div id="country-loading" class="loading-spinner">
+                        <i class="fas fa-spinner fa-spin"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <span class="input-group-label" for="StateId"> State:</span>
+                <div class="input-group mb-3 autocomplete-wrapper">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" for="StateId"><i class="fas fa-map-marker-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                    </div>
+                    <input type="text" id="StateId" class="form-control remarks auto-dropdown" data-placeholder="state" placeholder="Type state..." asp-for="StateId" required value="" />
+                    <span asp-validation-for="StateId" class="text-danger"></span>
+                    <input asp-for="SelectedStateId" type="hidden" id="SelectedStateId" name="SelectedStateId" value="@Model?.StateId" />
+                    <div id="state-loading" class="loading-spinner">
+                        <i class="fas fa-spinner fa-spin"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <span class="input-group-label" for="DistrictId">District:</span>
+                <div class="input-group mb-3 autocomplete-wrapper">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" for="DistrictId">
+                            <i class="fas fa-city"></i>
+                            <i class="fa fa-asterisk asterik-style"></i>
+                        </span>
+                    </div>
+                    <input type="text" id="DistrictId" class="form-control remarks auto-dropdown" data-placeholder="district" placeholder="Type district..." asp-for="DistrictId" required value="" />
+                    <span asp-validation-for="DistrictId" class="text-danger"></span>
+                    <input asp-for="SelectedDistrictId" type="hidden" id="SelectedDistrictId" name="SelectedDistrictId" value="@Model?.DistrictId" />
+                    <div id="district-loading" class="loading-spinner">
+                        <i class="fas fa-spinner fa-spin"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <span class="input-group-label" for="PinCodeId">Pincode:</span>
+                <div class="input-group mb-3 autocomplete-wrapper">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" for="PinCodeId">
+                            <i class="fas fa-map-pin"></i>
+                            <i class="fa fa-asterisk asterik-style"></i>
+                        </span>
+                    </div>
+                    <input type="text" id="PinCodeId" class="form-control remarks auto-dropdown" data-placeholder="pincode" placeholder="Type pincode..." asp-for="PinCodeId" required value="" />
+                    <span asp-validation-for="PinCodeId" class="text-danger"></span>
+                    <input asp-for="SelectedPincodeId" type="hidden" id="SelectedPincodeId" name="SelectedPincodeId" value="@Model?.PinCodeId" />
+                    <div id="pincode-loading" class="loading-spinner">
+                        <i class="fas fa-spinner fa-spin"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <span class="input-group-label"> Address: </span>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fas fa-home"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                    </div>
+                    <input type="text" id="Addressline" asp-for="Addressline" class="form-control remarks" placeholder="Address line" required maxlength="50" value="99 Great Avenue" />
+                    <span asp-validation-for="Addressline" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-group">
+                <span class="input-group-label"> Remarks:</span>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" ><i class="fas fa-pencil-alt"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
+                    </div>
+                    <input type="text" id="Description" asp-for="Description" class="form-control remarks" value="Add new Agency" placeholder="Remarks" required maxlength="50" />
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-group">
+                <span class="input-group-label"> Status:</span>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" for="Status"><i class="fa fa-toggle-on"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                    </div>
+                    <select required id="Status" asp-for="Status" class="form-control remarks" asp-items="Html.GetEnumSelectList<VendorStatus>()">
+                        <option value="">--- SELECT ---</option>
+                    </select>
+                    <span asp-validation-for="Status" class="text-danger"></span>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

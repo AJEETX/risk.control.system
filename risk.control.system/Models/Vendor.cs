@@ -123,7 +123,7 @@ namespace risk.control.system.Models
         }
 
         public virtual ICollection<AgencyRating>? ratings { get; set; }
-        public string? MobileAppUrl { get; set; }
+        public string? MobileAppUrl { get; set; } = Applicationsettings.APP_URL;
         public bool CanChangePassword { get; set; } = false;
         public bool HasClaims { get; set; } = false;
         public bool EnableMailbox { get; set; } = true;

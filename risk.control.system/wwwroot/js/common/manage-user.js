@@ -162,6 +162,9 @@
             this.value = this.value.replace(/\s/g, "");
         }
     });
+    $('#check-email').on('click', function () {
+        checkUserEmail();
+    });
 });
 
 function alphaOnly(event) {
