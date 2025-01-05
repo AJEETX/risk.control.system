@@ -537,5 +537,95 @@ namespace risk.control.system.Controllers.Api.Company
 
             return Ok(pincode);
         }
+
+        [HttpGet("GetStateAndDistrictByPincode")]
+        public IActionResult GetStateAndDistrictByPincode(long pincodeId, long countryId)
+        {
+            var pincode = _context.PinCode
+                .Include(p => p.District)
+                .Include(p => p.State)
+                .Include(p => p.Country)
+                .FirstOrDefault(x => x.PinCodeId == pincodeId && x.CountryId == countryId); // Format for jQuery UI Autocomplete
+
+            var response = new
+            {
+                DistrictId = pincode.DistrictId,
+                DistrictName = pincode.District.Name,
+                StateId = pincode.StateId,
+                StateName = pincode.State.Name
+            };
+            return Ok(response);
+        }
+
+        [HttpGet("GetPincode")]
+        public IActionResult GetPincode(long id, long countryId)
+        {
+            var pincode = _context.PinCode.FirstOrDefault(x => x.PinCodeId == id && x.CountryId == countryId); // Format for jQuery UI Autocomplete
+
+            var response = new
+            {
+                DistrictId = pincode.DistrictId,
+                StateId = pincode.StateId,
+                PincodeName = $"{pincode.Name} - {pincode.Code}",
+                PincodeId = pincode.PinCodeId
+            };
+            return Ok(response);
+        }
+        [HttpGet("GetPincodeSuggestions")]
+        public IActionResult GetPincodeSuggestions(long countryId, string term="")
+        {
+            // Check if the term is empty or null
+            if (string.IsNullOrEmpty(term?.Trim()))
+            {
+                // If no search term, return all pincodes for the given district, state, and country
+                var allpincodes = _context.PinCode
+                    .Include(x => x.State)
+                    .Include(x => x.District)
+                    .Where(x => x.CountryId == countryId)
+                    .OrderBy(x => x.Name)
+                    .Select(x => new { 
+                        PincodeI = x.PinCodeId, 
+                        Pincode = x.Code, 
+                        Name = x.Name, 
+                        StateId = x.StateId, 
+                        StateName = x.State.Name, 
+                        DistricId = x.DistrictId, 
+                        DistrictName = x.District.Name
+                    })?
+                    .ToList();
+                return Ok(allpincodes);
+            }
+
+            // Sanitize the term by trimming spaces
+            var sanitizedTerm = term.Trim();
+
+            // Search pincodes that match either name or pincode
+            var pincodesQuery = _context.PinCode
+                .Where(x =>  x.CountryId == countryId && 
+                (x.Name.ToLower().Contains(sanitizedTerm.ToLower()) ||
+                x.Code.ToLower().Contains(sanitizedTerm.ToLower()))
+                );
+
+
+            // Get the filtered and sorted results
+            var filteredPincodes = pincodesQuery
+                .Include(x => x.State)
+                .Include(x => x.District)
+                .OrderBy(x => x.Name)
+                    .Select(x => new 
+                    { 
+                        PincodeId = x.PinCodeId, 
+                        Pincode = x.Code, 
+                        Name = x.Name, 
+                        StateId = x.StateId, 
+                        StateName = x.State.Name, 
+                        DistrictId = x.DistrictId, 
+                        DistrictName = x.District.Name
+                    })?
+                .ToList();
+
+            // Return the filtered pincodes
+            return Ok(filteredPincodes);
+        }
     }
 }

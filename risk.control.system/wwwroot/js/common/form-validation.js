@@ -43,9 +43,8 @@ $(document).ready(function () {
     // Handle blur event
     $emailInput.on("blur", function () {
 
-        var email = $(this).val();
-        if (email != undefined) {
-            CheckIfEmailValid(email);
+        if ($(this).val()) {
+            CheckIfEmailValid($(this).val());
         }
     });
 

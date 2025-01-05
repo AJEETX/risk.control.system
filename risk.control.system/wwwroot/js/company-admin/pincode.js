@@ -1,6 +1,4 @@
-﻿$("#CountryId").val('');
-$(document).ready(function () {
-
+﻿$(document).ready(function () {
     const fields = ['#CountryId', '#StateId', '#DistrictId', '#PinCodeId'];
 
     fields.forEach(function (field) {
@@ -8,425 +6,152 @@ $(document).ready(function () {
             const isValid = /^[a-zA-Z0-9 ]*$/.test(this.value); // Check if input is valid
             if (!isValid) {
                 $(this).val('');
-                //$(this).addClass('is-invalid'); // Add error class
-            } else {
-                //$(this).removeClass('is-invalid'); // Remove error class
             }
         });
     });
 
-    // Initialize placeholders and field validations
-    updatePlaceholdersBasedOnState();
-    initializeFieldValidations();
-
-    // Preload data if available
-    preloadFieldData();
-
-    // Initialize autocomplete for fields
-    initializeAutocomplete();
-
-    // Event listener for input focus to select text
     $('input.auto-dropdown').on('focus', function () {
         $(this).select();
     });
+
+    const preloadedCountryId = $("#SelectedCountryId").val();
+    const preloadedPincodeId = $("#SelectedPincodeId").val();
+
+    if (preloadedCountryId) {
+        // Preload country name
+        fetchAndSetFieldValue("/api/Company/GetCountryName", { id: preloadedCountryId }, "#CountryId", "name");
+
+        // Preload details if Pincode is provided
+        if (preloadedPincodeId) {
+            preloadPincodeDetails(preloadedCountryId, preloadedPincodeId);
+        }
+    }
+
+    // Initialize autocomplete for Pincode
+    pincodeAutocomplete();
+
+    // Dynamically fetch State and District on Pincode change
+    $("#PinCodeId").on("change", function () {
+        pincodeAutocomplete();
+    });
 });
 
-/**
- * Preloads field data from hidden fields (e.g., SelectedCountryId).
- */
-function preloadFieldData() {
-    const preloadedCountryId = $("#SelectedCountryId").val();
-    if (preloadedCountryId) {
-        console.log("Preloaded Country ID: ", preloadedCountryId);
-        // Fetch and set the Country field value
-        fetchAndSetFieldValue("/api/Company/GetCountryName", { id: preloadedCountryId }, "#CountryId", "name", () => {
-            // After Country is loaded, load State, District, and Pincode based on preloaded values
-            loadStateData(preloadedCountryId);
-        });
-    }
-}
-
-/**
- * Loads state data based on the preloaded Country ID.
- */
-function loadStateData(countryId) {
-    const preloadedStateId = $("#SelectedStateId").val();
-    if (preloadedStateId) {
-        console.log("Preloaded State ID: ", preloadedStateId);
-        fetchAndSetFieldValue("/api/Company/GetStateName", { id: preloadedStateId, countryId: countryId }, "#StateId", "stateName", () => {
-            // After State is loaded, load District and Pincode based on preloaded values
-            loadDistrictData(countryId, preloadedStateId);
-        });
-    }
-}
-
-/**
- * Loads district data based on the preloaded Country and State IDs.
- */
-function loadDistrictData(countryId, stateId) {
-    const preloadedDistrictId = $("#SelectedDistrictId").val();
-    if (preloadedDistrictId) {
-        console.log("Preloaded District ID: ", preloadedDistrictId);
-        fetchAndSetFieldValue("/api/Company/GetDistrictName", { id: preloadedDistrictId, stateId: stateId, countryId: countryId }, "#DistrictId", "districtName", () => {
-            // After District is loaded, load Pincode based on preloaded values
-            loadPincodeData(countryId, stateId, preloadedDistrictId);
-        });
-    }
-}
-
-/**
- * Loads pincode data based on the preloaded Country, State, and District IDs.
- */
-function loadPincodeData(countryId, stateId, districtId) {
-    const preloadedPinCodeId = $("#SelectedPincodeId").val();
-    if (preloadedPinCodeId) {
-        console.log("Preloaded PinCode ID: ", preloadedPinCodeId);
-        fetchAndSetFieldValue("/api/Company/GetPincodeName", { id: preloadedPinCodeId, districtId: districtId, stateId: stateId, countryId: countryId }, "#PinCodeId", "pincodeName");
-    }
-}
-
-/**
- * Fetches a value from the server and sets it to the specified input field.
- */
-function fetchAndSetFieldValue(url, data, inputSelector, responseKey, callback) {
-    const $inputWrapper = $(inputSelector).closest('.input-group');  // Get the input container
-    const $spinner = $inputWrapper.find('.loading-spinner');         // Find the spinner inside the input container
-    const $inputField = $(inputSelector); // Target the input field itself
-
-    if ($spinner.length) {
-        $spinner.addClass('active'); // Show spinner
-    }
+function preloadPincodeDetails(preloadedCountryId, preloadedPincodeId) {
+    showLoader("#pincode-loading");
 
     $.ajax({
-        url,
+        url: "/api/Company/GetPincode",
         type: "GET",
-        data,
+        data: { id: preloadedPincodeId, countryId: preloadedCountryId },
         success: function (response) {
-            if (response && response[responseKey]) {
-                $inputField.val(response[responseKey]);
-                // Fade in the input field
-                //$inputField.hide().fadeIn(1000); // Adjust duration as needed
-                if (callback) callback();
+            hideLoader("#pincode-loading");
+
+            if (response) {
+                // Preload Pincode
+                $("#PinCodeId").val(response.pincodeName);
+                $("#SelectedPincodeId").val(response.pincodeId);
+
+                // Preload State
+                if (response.stateId) {
+                    fetchAndSetFieldValue(
+                        "/api/Company/GetStateName",
+                        { id: response.stateId, CountryId: preloadedCountryId },
+                        "#StateId",
+                        "stateName"
+                    );
+                }
+
+                // Preload District
+                if (response.districtId) {
+                    fetchAndSetFieldValue(
+                        "/api/Company/GetDistrictName",
+                        { id: response.districtId, stateId: response.stateId, CountryId: preloadedCountryId },
+                        "#DistrictId",
+                        "districtName"
+                    );
+                }
+            } else {
+                resetField("#PinCodeId");
+                resetField("#StateId");
+                resetField("#DistrictId");
             }
         },
         error: function () {
-            console.error(`Failed to fetch value for ${inputSelector}`);
-        },
-        complete: function () {
-            if ($spinner.length) {
-                $spinner.removeClass('active'); // Hide spinner after the request is complete
-            }
+            hideLoader("#pincode-loading");
+            alert("Error fetching Pincode details.");
         }
     });
 }
 
-/**
- * Initializes autocomplete for all relevant fields.
- */
-function initializeAutocomplete() {
-    const countryDependentFields = ["#StateId", "#DistrictId", "#PinCodeId"];
-    const stateDependentFields = ["#DistrictId", "#PinCodeId"];
-    const districtDependentFields = ["#PinCodeId"];
-    const autocompleteConfig = [
-        {
-            field: "#CountryId",
-            url: "/api/Company/SearchCountry",
-            onSelect: (ui) => handleAutocompleteSelect(ui, "#CountryId", "#SelectedCountryId", countryDependentFields),
-            dependentFields: countryDependentFields
-        },
-        {
-            field: "#StateId",
-            url: "/api/Company/SearchState",
-            extraData: () => ({ countryId: $("#SelectedCountryId").val() }),
-            onSelect: (ui) => handleAutocompleteSelect(ui, "#StateId", "#SelectedStateId", stateDependentFields),
-            dependentFields: stateDependentFields
-        },
-        {
-            field: "#DistrictId",
-            url: "/api/Company/SearchDistrict",
-            extraData: () => ({
-                countryId: $("#SelectedCountryId").val(),
-                stateId: $("#SelectedStateId").val()
-            }),
-            onSelect: (ui) => handleAutocompleteSelect(ui, "#DistrictId", "#SelectedDistrictId", districtDependentFields),
-            dependentFields: districtDependentFields
-        },
-        {
-            field: "#PinCodeId",
-            url: "/api/Company/SearchPincode",
-            extraData: () => ({
-                countryId: $("#SelectedCountryId").val(),
-                stateId: $("#SelectedStateId").val(),
-                districtId: $("#SelectedDistrictId").val()
-            }),
-            onSelect: (ui) => handleAutocompleteSelect(ui, "#PinCodeId", "#SelectedPincodeId"),
-            dependentFields: []
-        }
-    ];
 
-    autocompleteConfig.forEach(config => {
-        setAutocomplete(config.field, config.url, config.extraData || (() => ({})), config.onSelect, config.dependentFields);
-    });
-}
-
-/**
- * Handles selection in autocomplete and updates dependent fields.
- */
-function handleAutocompleteSelect(ui, inputSelector, hiddenSelector, dependentFields = []) {
-    $(inputSelector).val(ui.item.label);
-    $(hiddenSelector).val(ui.item.id);
-    dependentFields.forEach(field => resetField(field));
-}
-
-/**
- * Sets up an autocomplete field with dynamic data fetching.
- */
-function setAutocomplete(fieldSelector, url, extraDataCallback, onSelectCallback, dependentFields) {
-    const $wrapper = $(fieldSelector).closest('.autocomplete-wrapper');
-    const $spinner = $wrapper.find('.loading-spinner');
-
-    $(fieldSelector).autocomplete({
+function pincodeAutocomplete() {
+    $("#PinCodeId").autocomplete({
         source: function (request, response) {
-            if ($spinner.length) {
-                $spinner.show(); // Show spinner while fetching data
-            }
-
             $.ajax({
-                url,
-                data: { term: request.term, ...extraDataCallback() },
+                url: "/api/Company/GetPincodeSuggestions",
+                type: "GET",
+                data: { term: request.term, countryId: $("#SelectedCountryId").val() },
                 success: function (data) {
-                    if (!data || data.length === 0) {
-                        console.warn("No results found for term:", request.term);
-                        response([{ label: "No results found", value: "" }]);
-                    } else {
-                        response(data.map(item => ({
-                            label: item.name || item.stateName || item.districtName || item.pincodeName,
-                            value: item.name || item.stateName || item.districtName || item.pincodeName,
-                            id: item.id || item.stateId || item.districtId || item.pincodeId
-                        })));
-                    }
+                    response(data.map(function (item) {
+                        return {
+                            label: `${item.pincode} - ${item.name}`,
+                            value: item.pincodeId,
+                            stateId: item.stateId,
+                            stateName: item.stateName,
+                            districtId: item.districtId,
+                            districtName: item.districtName
+                        };
+                    }));
                 },
-                error: function (xhr) {
-                    console.error("Error fetching autocomplete data:", error);
-                    console.log("Response Text:", xhr.responseText); // Log the server error
-                    response([{ label: "Error fetching data", value: "" }]);
-                },
-                complete: function () {
-                    if ($spinner.length) {
-                        $spinner.hide(); // Hide spinner after fetching
-                    }
+                error: function () {
+                    alert("Error fetching Pincode suggestions.");
                 }
             });
         },
-        minLength: 0,
         select: function (event, ui) {
-            if (ui.item.value) {
-                // Update the input field with the selected label
-                $(fieldSelector).val(ui.item.label);
+            $("#PinCodeId").val(ui.item.label);
+            $("#SelectedPincodeId").val(ui.item.value);
+            $("#StateId").val(ui.item.stateName);
+            $("#SelectedStateId").val(ui.item.stateId);
+            $("#DistrictId").val(ui.item.districtName);
+            $("#SelectedDistrictId").val(ui.item.districtId);
 
-                // Store the selected ID in a hidden input field or data attribute
-                const hiddenFieldSelector = $(fieldSelector).data('hiddenField');
-                if (hiddenFieldSelector) {
-                    $(hiddenFieldSelector).val(ui.item.id);
-                }
-
-                // Call the provided callback function
-                if (onSelectCallback) {
-                    onSelectCallback(ui);
-                }
-
-                // Remove the error class in case the field was previously marked invalid
-                //$(fieldSelector).removeClass('is-invalid');
-            }
             return false;
-        }
+        },
+        minLength: 2
     });
-    // Trigger autocomplete on focus if the input field is empty
-    $(fieldSelector).on("focus", function () {
-        const rawValue = $(this).val();
-        if (rawValue == '') {
-            const value = rawValue.trim();
-            if (!value) {
-                $(this).autocomplete("search", ""); // Trigger autocomplete with an empty search term
+}
+
+// Utility functions
+function fetchAndSetFieldValue(url, data, fieldSelector, fieldName, callback = null) {
+    showLoader(`${fieldSelector}-loading`);
+
+    $.ajax({
+        url: url,
+        type: "GET",
+        data: data,
+        success: function (response) {
+            hideLoader(`${fieldSelector}-loading`);
+            if (response && response[fieldName]) {
+                $(fieldSelector).val(response[fieldName]);
             }
-        }
-    });
-
-    // Validate the field value on blur
-    $(fieldSelector).on("blur", function () {
-        const $field = $(this);
-        const enteredValue = $field && $field.val() !== null ? $field.val().trim() : '';
-        const autocomplete = $field.data('ui-autocomplete');
-
-        if (!enteredValue) {
-            // If the current value is empty, clear all dependent fields
-            if (Array.isArray(dependentFields) && dependentFields.length > 0) {
-                dependentFields.forEach(selector => {
-                    const $dependentField = $(selector);
-                    if ($dependentField.length) {
-                        $dependentField.val(''); // Clear the value of each dependent field
-
-                        // Temporarily clear autocomplete source
-                        if ($dependentField.data('ui-autocomplete')) {
-                            $dependentField.autocomplete("option", "source", function (request, response) {
-                                response([]); // Return an empty result
-                            });
-                        }
-                    } else {
-                        console.warn(`Dependent field selector "${selector}" did not match any elements.`);
-                    }
-                });
-            }
-
-            //$field.addClass('is-invalid'); // Add invalid class if no value
-            return;
-        }
-
-        if (!autocomplete) {
-            return;
-        }
-
-        // Validate if the entered value matches any autocomplete option
-        const options = autocomplete.options.source;
-
-        if (typeof options === 'function') {
-            // Handle async source function
-            options({ term: enteredValue }, function (data) {
-                const validOptions = data.filter(option =>
-                    option.value !== "" &&
-                    option.label !== "No results found" &&
-                    option.label !== undefined
-                );
-
-                const isValid = validOptions.some(option =>
-                    (option.label || "").trim().toLowerCase() === enteredValue.trim().toLowerCase()
-                );
-
-                if (!isValid) {
-                    $field.val(''); // Clear invalid input
-                    //$field.addClass('is-invalid'); // Add invalid class
-                } else {
-                    //$field.removeClass('is-invalid'); // Remove invalid class if valid
-                }
-            });
-        } else if (Array.isArray(options)) {
-            // Handle static options
-            const validOptions = options.filter(option =>
-                option.value !== "" &&
-                option.label !== "No results found" &&
-                option.label !== undefined
-            );
-
-            const isValid = validOptions.some(option =>
-                (option.label || "").trim().toLowerCase() === enteredValue.trim().toLowerCase()
-            );
-
-            if (!isValid) {
-                $field.val(''); // Clear invalid input
-                //$field.addClass('is-invalid'); // Add invalid class
-            } else {
-                //$field.removeClass('is-invalid'); // Remove invalid class if valid
-            }
-        }
-    });
-
-    // Reinitialize dependent fields' autocomplete on focus
-    $(dependentFields.join(',')).on("focus", function () {
-        const $field = $(this);
-
-        // Restore autocomplete source dynamically
-        const originalSource = $field.data('originalSource'); // Store the original source during initialization
-        if (originalSource) {
-            $field.autocomplete("option", "source", originalSource);
+            if (callback) callback(response);
+        },
+        error: function () {
+            hideLoader(`${fieldSelector}-loading`);
+            alert("Error loading data.");
         }
     });
 }
 
-/**
- * Resets a field's value and clears its hidden field if applicable.
- */
-function resetField(fieldSelector, hiddenFieldSelector = null) {
-    $(fieldSelector).val('');
-    if (hiddenFieldSelector) $(hiddenFieldSelector).val('');
+function resetField(fieldSelector) {
+    $(fieldSelector).val("");
 }
 
-/**
- * Updates placeholders dynamically based on field state.
- */
-function updatePlaceholdersBasedOnState() {
-    $(".form-control.auto-dropdown").each(function () {
-        const $field = $(this);
-        const placeholder = $field.data("placeholder"); // Get the placeholder value
-        if (placeholder) {
-            $field.attr("placeholder", `Type ${placeholder}`);
-            console.log(`Updated placeholder for #${$field.attr("id")} to "Type ${placeholder}"`);
-        } else {
-            console.warn(`No placeholder found for #${$field.attr("id")}`);
-        }
-    });
+function showLoader(selector) {
+    $(selector).show();
 }
 
-/**
- * Initializes field validation and toggling for dependencies.
- */
-function initializeFieldValidations() {
-    handleFieldValidation("#CountryId", ["#StateId", "#DistrictId", "#PinCodeId"]);
-    handleFieldValidation("#StateId", ["#DistrictId", "#PinCodeId"]);
-    handleFieldValidation("#DistrictId", ["#PinCodeId"]);
-}
-
-/**
- * Validates a parent field and toggles its dependent fields based on validity.
- */
-function handleFieldValidation(parentFieldId, dependentFieldIds) {
-    let initialValue = ""; // Store the initial value of the field on focus
-
-    //$(parentFieldId)
-    //    .on("focus", function () {
-    //        initialValue = $(this).val().trim(); // Store the value when the field gains focus
-    //    })
-    //    .on("blur", function () {
-    //        const currentValue = $(this).val().trim();
-
-    //        // If the value hasn't changed, skip resetting dependent fields
-    //        if (currentValue === initialValue) {
-    //            console.log(`No change detected in ${parentFieldId}`);
-    //            return;
-    //        }
-
-    //        // Update dependent fields only if the value changes
-            const isValid = validateAutocompleteValue(parentFieldId);
-            toggleDependentFields(dependentFieldIds, isValid);
-    //    });
-}
-
-function validateAutocompleteValue(fieldSelector) {
-    const $field = $(fieldSelector);
-    const value = $field && $field.val() ? $field.val().trim() : '';
-    const autocomplete = $field.data("ui-autocomplete");
-    if (!autocomplete) return false;
-
-    const options = autocomplete.options.source;
-    if (typeof options === "function") {
-        let isValid = false;
-        options({ term: value }, function (data) {
-            isValid = data.some(option => option.label === value);
-        });
-        return isValid;
-    } else if (Array.isArray(options)) {
-        return options.some(option => option.label === value);
-    }
-    return false;
-}
-
-
-/**
- * Toggles dependent fields based on parent field validity.
- */
-function toggleDependentFields(dependentFieldIds, isValid) {
-    dependentFieldIds.forEach(fieldId => {
-        if (!isValid) {
-            $(fieldId).val('');
-        }
-    });
+function hideLoader(selector) {
+    $(selector).hide();
 }

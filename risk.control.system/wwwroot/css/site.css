@@ -565,14 +565,14 @@ textarea {
     background-color: whitesmoke;
     font-weight: bold;
 }
-#CountryId.form-control[readonly] {
+#CountryId.form-control[readonly], #StateId.form-control[readonly], #DistrictId.form-control[readonly] {
     cursor: not-allowed; /* Pointer cursor for better UX */
+    background: none;
     background-color: whitesmoke;
     border: 1px solid #D0D9E1;
     border-radius: 1px;
-    color:blue;
+    color: #989BA0;
 }
-
 .input-group-prepend {
     display: block;
     width: 5rem;
@@ -1625,7 +1625,7 @@ ul#messagesList {
     z-index: 999;
 }
 
-#CountryId {
+#CountryId, #StateId, #DistrictId {
     cursor: pointer; /* Pointer cursor for better UX */
     width: 100%; /* Full width of the container */
     position: relative;
