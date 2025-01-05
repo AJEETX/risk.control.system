@@ -759,7 +759,7 @@ function DisableBackButton() {
 DisableBackButton();
 window.onload = DisableBackButton;
 window.onpageshow = function (evt) { if (evt.persisted) DisableBackButton() }
-window.onunload = function () { void (0) }
+//window.onunload = function () { void (0) }
 if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(success, error);
 } else {

@@ -566,11 +566,11 @@ textarea {
     font-weight: bold;
 }
 #CountryId.form-control[readonly] {
-    cursor: pointer; /* Pointer cursor for better UX */
+    cursor: not-allowed; /* Pointer cursor for better UX */
     background-color: whitesmoke;
-    font-weight: normal;
     border: 1px solid #D0D9E1;
     border-radius: 1px;
+    color:blue;
 }
 
 .input-group-prepend {

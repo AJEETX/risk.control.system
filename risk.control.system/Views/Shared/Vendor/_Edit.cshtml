@@ -127,12 +127,12 @@
     </div>
     <div class="col-sm-6">
         <div class="form-group">
-            <span class="input-group-label" for="CountryId"> Country:</span>
-            <div class="input-group mb-3 autocomplete-wrapper">
+            <span class="input-group-label" for="CountryId" data-toggle="tooltip" title="Registered Country"> Country:</span>
+            <div class="input-group mb-3">
                 <div class="input-group-prepend">
-                    <span class="input-group-text" for="CountryId"><i class="fas fa-map-marked-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                    <span class="input-group-text" for="CountryId" data-toggle="tooltip" title="Registered Country"><i class="fas fa-map-marked-alt"></i> <i class="fa fa-asterisk asterik-style-info"></i></span>
                 </div>
-                <input type="text" id="CountryId" class="form-control remarks auto-dropdown" data-placeholder="country" placeholder="Type country..." asp-for="CountryId" required value="" />
+                <input readonly type="text" id="CountryId" class="form-control" data-placeholder="country" asp-for="CountryId" data-toggle="tooltip" title="Registered Country" value="" tabindex="-1" />
                 <span asp-validation-for="CountryId" class="text-danger"></span>
                 <input asp-for="SelectedCountryId" type="hidden" id="SelectedCountryId" name="SelectedCountryId" value="@Model?.CountryId" />
                 <div id="country-loading" class="loading-spinner">
