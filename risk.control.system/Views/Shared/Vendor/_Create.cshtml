@@ -133,72 +133,73 @@
             <textarea asp-for="DelistReason" class="form-control remarks"></textarea>
             <span asp-validation-for="DelistReason" class="text-danger"></span>
             </div>*@
+
             <div class="form-group">
-    <span class="input-group-label" for="PinCodeId">Pincode:</span>
-    <div class="input-group mb-3 autocomplete-wrapper">
-        <div class="input-group-prepend">
-            <span class="input-group-text" for="PinCodeId">
-                <i class="fas fa-map-pin"></i>
-                <i class="fa fa-asterisk asterik-style"></i>
-            </span>
-        </div>
-        <input type="text" id="PinCodeId" class="form-control remarks auto-dropdown"
-               data-placeholder="pincode" placeholder="Type pincode..." asp-for="PinCodeId"
-               required value="" autocomplete="off" />
-        <span asp-validation-for="PinCodeId" class="text-danger"></span>
-        <input asp-for="SelectedPincodeId" type="hidden" id="SelectedPincodeId" name="SelectedPincodeId" value="@Model?.PinCodeId" />
-        <div id="pincode-loading" class="loading-spinner">
-            <i class="fas fa-spinner fa-spin"></i>
-        </div>
-    </div>
-</div>
+                <span class="input-group-label" for="CountryId" data-toggle="tooltip" title="Registered Country"> Country:</span>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" for="CountryId" data-toggle="tooltip" title="Registered Country"><i class="fas fa-map-marked-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                    </div>
+                    <input type="text" id="CountryId" class="form-control" data-placeholder="country" asp-for="CountryId" data-toggle="tooltip" value="" placeholder="Type country..." />
+                    <span asp-validation-for="CountryId" class="text-danger"></span>
+                    <input asp-for="SelectedCountryId" type="hidden" id="SelectedCountryId" name="SelectedCountryId" value="@Model?.CountryId" />
+                    <div id="country-loading" class="loading-spinner">
+                        <i class="fas fa-spinner fa-spin"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <span class="input-group-label" for="PinCodeId">Pincode:</span>
+                <div class="input-group mb-3 autocomplete-wrapper">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" for="PinCodeId">
+                            <i class="fas fa-map-pin"></i>
+                            <i class="fa fa-asterisk asterik-style"></i>
+                        </span>
+                    </div>
+                    <input disabled type="text" id="PinCodeId" class="form-control remarks auto-dropdown"
+                           data-placeholder="pincode" asp-for="PinCodeId"
+                           required value="" autocomplete="off" />
+                    <span asp-validation-for="PinCodeId" class="text-danger"></span>
+                    <input asp-for="SelectedPincodeId" type="hidden" id="SelectedPincodeId" name="SelectedPincodeId" value="@Model?.PinCodeId" />
+                    <div id="pincode-loading" class="loading-spinner">
+                        <i class="fas fa-spinner fa-spin"></i>
+                    </div>
+                </div>
+            </div>
 
-<div class="form-group">
-    <span class="input-group-label" for="DistrictId">District:</span>
-    <div class="input-group mb-3 autocomplete-wrapper">
-        <div class="input-group-prepend">
-            <span class="input-group-text" for="DistrictId">
-                <i class="fas fa-city"></i>
-                <i class="fa fa-asterisk asterik-style"></i>
-            </span>
-        </div>
-        <input readonly type="text" id="DistrictId" class="form-control remarks" data-placeholder="district" placeholder="..." asp-for="DistrictId" required value="" tabindex="-1" />
-        <span asp-validation-for="DistrictId" class="text-danger"></span>
-        <input asp-for="SelectedDistrictId" type="hidden" id="SelectedDistrictId" name="SelectedDistrictId" value="@Model?.DistrictId" />
-        <div id="district-loading" class="loading-spinner">
-            <i class="fas fa-spinner fa-spin"></i>
-        </div>
-    </div>
-</div>
-<div class="form-group">
-    <span class="input-group-label" for="StateId"> State:</span>
-    <div class="input-group mb-3 autocomplete-wrapper">
-        <div class="input-group-prepend">
-            <span class="input-group-text" for="StateId"><i class="fas fa-map-marker-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-        </div>
-        <input readonly type="text" id="StateId" class="form-control remarks" data-placeholder="state" placeholder="..." asp-for="StateId" required value="" tabindex="-1" />
-        <span asp-validation-for="StateId" class="text-danger"></span>
-        <input asp-for="SelectedStateId" type="hidden" id="SelectedStateId" name="SelectedStateId" value="@Model?.StateId" />
-        <div id="state-loading" class="loading-spinner">
-            <i class="fas fa-spinner fa-spin"></i>
-        </div>
-    </div>
-</div>
-<div class="form-group">
-    <span class="input-group-label" for="CountryId" data-toggle="tooltip" title="Registered Country"> Country:</span>
-    <div class="input-group mb-3">
-        <div class="input-group-prepend">
-            <span class="input-group-text" for="CountryId" data-toggle="tooltip" title="Registered Country"><i class="fas fa-map-marked-alt"></i> <i class="fa fa-asterisk asterik-style-info"></i></span>
-        </div>
-        <input readonly type="text" id="CountryId" class="form-control" data-placeholder="country" asp-for="CountryId" data-toggle="tooltip" title="Registered Country" value="" tabindex="-1" />
-        <span asp-validation-for="CountryId" class="text-danger"></span>
-        <input asp-for="SelectedCountryId" type="hidden" id="SelectedCountryId" name="SelectedCountryId" value="@Model?.CountryId" />
-        <div id="country-loading" class="loading-spinner">
-            <i class="fas fa-spinner fa-spin"></i>
-        </div>
-    </div>
-</div>
-
+            <div class="form-group">
+                <span class="input-group-label" for="DistrictId">District:</span>
+                <div class="input-group mb-3 autocomplete-wrapper">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" for="DistrictId">
+                            <i class="fas fa-city"></i>
+                            <i class="fa fa-asterisk asterik-style-disabled"></i>
+                        </span>
+                    </div>
+                    <input readonly type="text" id="DistrictId" class="form-control remarks" data-placeholder="district" placeholder="..." asp-for="DistrictId" required value="" tabindex="-1" />
+                    <span asp-validation-for="DistrictId" class="text-danger"></span>
+                    <input asp-for="SelectedDistrictId" type="hidden" id="SelectedDistrictId" name="SelectedDistrictId" value="@Model?.DistrictId" />
+                    <div id="district-loading" class="loading-spinner">
+                        <i class="fas fa-spinner fa-spin"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <span class="input-group-label" for="StateId"> State:</span>
+                <div class="input-group mb-3 autocomplete-wrapper">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" for="StateId"><i class="fas fa-map-marker-alt"></i> <i class="fa fa-asterisk asterik-style-disabled"></i></span>
+                    </div>
+                    <input readonly type="text" id="StateId" class="form-control remarks" data-placeholder="state" placeholder="..." asp-for="StateId" required value="" tabindex="-1" />
+                    <span asp-validation-for="StateId" class="text-danger"></span>
+                    <input asp-for="SelectedStateId" type="hidden" id="SelectedStateId" name="SelectedStateId" value="@Model?.StateId" />
+                    <div id="state-loading" class="loading-spinner">
+                        <i class="fas fa-spinner fa-spin"></i>
+                    </div>
+                </div>
+            </div>
+            
             <div class="form-group">
                 <span class="input-group-label"> Address: </span>
                 <div class="input-group mb-3">

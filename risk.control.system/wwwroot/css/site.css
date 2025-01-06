@@ -735,8 +735,13 @@ dl.row {
     color: #2A78C6;
     padding-bottom: 1rem;
 }
+.asterik-style-disabled {
+    font-size: .5rem !important;
+    color: dimgrey;
+    padding-bottom: 1rem;
+}
 .asterik-style-none {
-    font-size: .4rem !important;
+    font-size: .5rem !important;
     color: #e9ecef;
     padding-bottom: 1rem;
 }

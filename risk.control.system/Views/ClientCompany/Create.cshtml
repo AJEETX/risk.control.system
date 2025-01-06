@@ -211,7 +211,7 @@
                                         <i class="fa fa-asterisk asterik-style"></i>
                                     </span>
                                 </div>
-                                <input type="text" id="PinCodeId" class="form-control remarks auto-dropdown" data-placeholder="pincode" placeholder="Type pincode..." asp-for="PinCodeId" required value="" />
+                                <input type="text" id="PinCodeId" class="form-control remarks auto-dropdown" data-placeholder="pincode" placeholder="Type pincode or name" asp-for="PinCodeId" required value="" />
                                 <span asp-validation-for="PinCodeId" class="text-danger"></span>
                                 <input asp-for="SelectedPincodeId" type="hidden" id="SelectedPincodeId" name="SelectedPincodeId" value="@Model?.PinCodeId" />
                                 <div id="pincode-loading" class="loading-spinner">

@@ -583,6 +583,7 @@ namespace risk.control.system.Controllers.Api.Company
                     .Include(x => x.District)
                     .Where(x => x.CountryId == countryId)
                     .OrderBy(x => x.Name)
+                 .Take(10)
                     .Select(x => new { 
                         PincodeI = x.PinCodeId, 
                         Pincode = x.Code, 
@@ -611,6 +612,7 @@ namespace risk.control.system.Controllers.Api.Company
             var filteredPincodes = pincodesQuery
                 .Include(x => x.State)
                 .Include(x => x.District)
+                 .Take(10)
                 .OrderBy(x => x.Name)
                     .Select(x => new 
                     { 
@@ -626,6 +628,37 @@ namespace risk.control.system.Controllers.Api.Company
 
             // Return the filtered pincodes
             return Ok(filteredPincodes);
+        }
+
+        [HttpGet("GetCountrySuggestions")]
+        public IActionResult GetCountrySuggestions(string term = "")
+        {
+            var allCountries = _context.Country.ToList();
+
+            if (string.IsNullOrEmpty(term))
+                return Ok(allCountries
+                    .OrderBy(x => x.Name)
+                 .Take(10)
+                 .Select(c => new
+                 {
+                     Id = c.CountryId,
+                     Name = c.Name,
+                     Label = c.Name
+                 })?
+                    .ToList());
+
+            var countries = allCountries
+                    .Where(c => c.Name.Contains(term, StringComparison.OrdinalIgnoreCase))
+                    .OrderBy(x => x.Name)
+                 .Take(10)
+                    .Select(c => new
+                    {
+                        Id = c.CountryId,
+                        Name = c.Name,
+                        Label = c.Name
+                    })?
+                    .ToList();
+            return Ok(countries);
         }
     }
 }

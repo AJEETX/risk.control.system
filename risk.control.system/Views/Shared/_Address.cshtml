@@ -9,7 +9,7 @@
             </span>
         </div>
         <input type="text" id="PinCodeId" class="form-control remarks auto-dropdown"
-               data-placeholder="pincode" placeholder="Type pincode..." asp-for="PinCodeId"
+               data-placeholder="pincode" placeholder="Type pincode or name" asp-for="PinCodeId"
                required value="" autocomplete="off" />
         <span asp-validation-for="PinCodeId" class="text-danger"></span>
         <input asp-for="SelectedPincodeId" type="hidden" id="SelectedPincodeId" name="SelectedPincodeId" value="@Model?.PinCodeId" />
@@ -25,7 +25,7 @@
         <div class="input-group-prepend">
             <span class="input-group-text" for="DistrictId">
                 <i class="fas fa-city"></i>
-                <i class="fa fa-asterisk asterik-style"></i>
+                <i class="fa fa-asterisk asterik-style-disabled"></i>
             </span>
         </div>
         <input readonly type="text" id="DistrictId" class="form-control remarks" data-placeholder="district" placeholder="..." asp-for="DistrictId" required value="" tabindex="-1" />
@@ -40,7 +40,7 @@
     <span class="input-group-label" for="StateId"> State:</span>
     <div class="input-group mb-3 autocomplete-wrapper">
         <div class="input-group-prepend">
-            <span class="input-group-text" for="StateId"><i class="fas fa-map-marker-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+            <span class="input-group-text" for="StateId"><i class="fas fa-map-marker-alt"></i> <i class="fa fa-asterisk asterik-style-disabled"></i></span>
         </div>
         <input readonly type="text" id="StateId" class="form-control remarks" data-placeholder="state" placeholder="..." asp-for="StateId" required value="" tabindex="-1" />
         <span asp-validation-for="StateId" class="text-danger"></span>
