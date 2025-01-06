@@ -45,7 +45,7 @@
 
     var askConfirmation = true;
     $('#create-form').submit(function (e) {
-        if (askConfirmation) {
+        if ($('#create-form').valid() && askConfirmation) { // Ensure `valid` is called as a method
             e.preventDefault();
             $.confirm({
                 title: "Confirm  Add New",
@@ -74,7 +74,7 @@
 
     var askEditConfirmation = true;
     $('#edit-form').submit(function (e) {
-        if (askEditConfirmation) {
+        if ($('#edit-form').valid() && askEditConfirmation) {
             e.preventDefault();
             $.confirm({
                 title: "Confirm Edit",
@@ -100,4 +100,7 @@
             });
         }
     })
+
+    
+
 });

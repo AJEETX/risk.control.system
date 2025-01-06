@@ -49,7 +49,13 @@ namespace risk.control.system.Controllers
                 .Include(p => p.District)
                 .Include(p => p.State)
                 .AsQueryable();
+            var userEmail = HttpContext.User.Identity.Name;
 
+            var user = _context.ApplicationUser.FirstOrDefault(u => u.Email == userEmail);
+            if (!user.IsSuperAdmin)
+            {
+                query = query.Where(s => s.CountryId == user.CountryId);
+            }
             // Filter based on the search input (if provided)
             if (!string.IsNullOrEmpty(search) && Regex.IsMatch(search, @"^[a-zA-Z0-9\s]*$"))
             {
@@ -156,8 +162,16 @@ namespace risk.control.system.Controllers
         [Breadcrumb("Add New", FromAction = "Profile")]
         public IActionResult Create()
         {
-            //ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
-            return View();
+            var userEmail = HttpContext.User.Identity.Name;
+
+            var user = _context.ApplicationUser.Include(a => a.Country).FirstOrDefault(u => u.Email == userEmail);
+
+            if (user.IsSuperAdmin)
+            {
+                return View();
+            }
+            var district = new PinCode { Country = user.Country, CountryId = user.CountryId.GetValueOrDefault(), SelectedCountryId = user.CountryId.GetValueOrDefault() };
+            return View(district);
         }
 
         // POST: PinCodes/Create

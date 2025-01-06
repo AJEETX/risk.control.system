@@ -219,8 +219,8 @@
                             setTimeout(function () {
                                 $(".submit-progress").removeClass("hidden");
                             }, 1);
-                            $('#allocate-case').attr('disabled', 'disabled');
-                            $('#allocate-case').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Allocate <sub>agent</sub>");
+                            $('#allocatedcase').attr('disabled', 'disabled');
+                            $('#allocatedcase').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Allocate <sub>agent</sub>");
 
                             $('#radioButtons').submit();
                             var article = document.getElementById("article");

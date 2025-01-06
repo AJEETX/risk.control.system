@@ -1744,7 +1744,8 @@ input.auto-dropdown {
 }
 
 .is-invalid {
-    border-color: red !important;
+    border: 1px solid red;
+    background-color: #ffe6e6; /* Light red background */
 }
 
 .text-danger {
@@ -1768,4 +1769,8 @@ select#PinCodeId{
 .highlighted-row {
     background-color: #fffbcc; /* Light yellow background */
     font-weight: bold;
+}
+.invalid {
+    border: 1px solid red;
+    background-color: #ffe6e6; /* Light red background */
 }

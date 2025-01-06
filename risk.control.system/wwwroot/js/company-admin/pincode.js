@@ -1,7 +1,8 @@
 ﻿$(document).ready(function () {
     const fields = ['#CountryId', '#StateId', '#DistrictId', '#PinCodeId'];
     // Disable PinCodeId by default
-    $("#PinCodeId").prop("disabled", true).attr("placeholder", "");
+    $("#StateId").prop("disabled", true).val("");
+    $("#PinCodeId").prop("disabled", true);
     fields.forEach(function (field) {
         $(field).on('input', function () {
             const isValid = /^[a-zA-Z0-9 ]*$/.test(this.value); // Check if input is valid
@@ -23,7 +24,8 @@
         fetchAndSetFieldValue("/api/Company/GetCountryName", { id: preloadedCountryId }, "#CountryId", "name");
 
         // Enable PinCodeId since a country is preloaded
-            $("#PinCodeId").prop("disabled", false).attr("placeholder", "Type Pincode or name");
+        $("#StateId").prop("disabled", false);
+            $("#PinCodeId").prop("disabled", false);
 
         // Preload details if Pincode is provided
         if (preloadedPincodeId) {
@@ -37,22 +39,27 @@
 
         if (!countryIdValue) {
             // Disable PinCodeId and clear its value
-            $("#PinCodeId").prop("disabled", true).val("").attr("placeholder", "");
+            $("#StateId").prop("disabled", true);
+            $("#PinCodeId").prop("disabled", true);
             resetField("#PinCodeId");
             resetField("#StateId");
-            resetField("#DistrictId");
         }
     });
+
     // Watch for changes in CountryId
     $("#CountryId").on("input change", function () {
         const selectedCountryId = $("#SelectedCountryId").val();
 
         if (selectedCountryId) {
             // Enable PinCodeId if a valid country is selected
-            $("#PinCodeId").prop("disabled", false).attr("placeholder", "Type Pincode or name");
+            stateAutocomplete();
+            $("#StateId").prop("disabled", false);
+            $("#DistrictId").prop("disabled", false);
+            $("#PinCodeId").prop("disabled", false);
         } else {
             // Disable PinCodeId if no country is selected
-            $("#PinCodeId").prop("disabled", true).val("").attr("placeholder", "");
+            $("#StateId").prop("disabled", true);
+            $("#PinCodeId").prop("disabled", true);
 
             // Reset dependent fields
             resetField("#PinCodeId");
@@ -61,13 +68,57 @@
         }
     });
 
+    $("#StateId").on("blur", function () {
+        const stateIdValue = $(this).val().trim();
+
+        if (!stateIdValue) {
+            // Disable PinCodeId and clear its value
+            $("#PinCodeId").prop("disabled", true);
+            resetField("#DistrictId");
+            resetField("#PinCodeId");
+        }
+        else {
+            districtAutocomplete();
+            $("#StateId").prop("disabled", false);
+            $("#DistrictId").prop("disabled", false);
+            $("#PinCodeId").prop("disabled", false);
+        }
+    });
+
+    // Watch for changes in CountryId
+    $("#StateId").on("input change", function () {
+        const selectedStateId = $("#SelectedStateId").val();
+
+        if (selectedStateId) {
+            $("#DistrictId").prop("disabled", false);
+            $("#PinCodeId").prop("disabled", false);
+            // Enable PinCodeId if a valid country is selected
+            districtAutocomplete();
+            
+        } else {
+            // Disable PinCodeId if no country is selected
+            $("#PinCodeId").prop("disabled", true);
+
+            // Reset dependent fields
+            resetField("#PinCodeId");
+            resetField("#DistrictId");
+        }
+    });
+
     // Initialize country autocomplete
     countryAutocomplete();
+
+    //Initialize state autocomplete
+    stateAutocomplete();
+
+    //Initialize district autocomplete
+    districtAutocomplete();
+
     // Initialize autocomplete for Pincode
     pincodeAutocomplete();
 
     // Dynamically fetch State and District on Pincode change
-    $("#PinCodeId").on("input, change", function () {
+    $("#PinCodeId").on("blur input, change", function () {
         pincodeAutocomplete();
     });
 });
@@ -155,21 +206,120 @@ function countryAutocomplete() {
 }
 
 function pincodeAutocomplete() {
-    $("#PinCodeId").autocomplete({
+    const pinCodeField = "#PinCodeId";
+    const selectedPinCodeField = "#SelectedPincodeId";
+    const selectedCountryField = "#SelectedCountryId";
+
+    // Initialize autocomplete
+    $(pinCodeField).autocomplete({
+        source: function (request, response) {
+            fetchPincodeSuggestions(request.term, $(selectedCountryField).val(), response);
+        },
+        select: function (event, ui) {
+            populatePincodeDetails(ui.item);
+            $(pinCodeField).removeClass("invalid");
+            return false;
+        },
+        minLength: 2
+    });
+
+    // Validate on blur to ensure a valid option is selected
+    $(pinCodeField).on("blur", function () {
+        validatePincodeSelection($(this).val(), $(selectedCountryField).val());
+    });
+}
+
+// Fetch Pincode suggestions from the server
+function fetchPincodeSuggestions(term, countryId, responseCallback) {
+    $.ajax({
+        url: "/api/Company/GetPincodeSuggestions",
+        type: "GET",
+        data: { term: term, countryId: countryId },
+        success: function (data) {
+            const suggestions = data.map(item => ({
+                label: `${item.name} - ${item.pincode}`,
+                value: item.pincodeId,
+                stateId: item.stateId,
+                stateName: item.stateName,
+                districtId: item.districtId,
+                districtName: item.districtName
+            }));
+            responseCallback(suggestions);
+        },
+        error: function () {
+            alert("Error fetching Pincode suggestions.");
+        }
+    });
+}
+
+// Populate fields based on the selected Pincode
+function populatePincodeDetails(selectedItem) {
+    $("#PinCodeId").val(selectedItem.label);
+    $("#SelectedPincodeId").val(selectedItem.value);
+    $("#StateId").val(selectedItem.stateName);
+    $("#SelectedStateId").val(selectedItem.stateId);
+    $("#DistrictId").val(selectedItem.districtName);
+    $("#SelectedDistrictId").val(selectedItem.districtId);
+    $("#PinCodeId").removeClass("invalid");
+}
+
+// Validate if the input matches any valid Pincode suggestion
+function validatePincodeSelection(inputValue, countryId) {
+    if (!inputValue) {
+        clearPincodeFields();
+        return;
+    }
+
+    $.ajax({
+        url: "/api/Company/GetPincodeSuggestions",
+        type: "GET",
+        data: { term: inputValue, countryId: countryId },
+        success: function (data) {
+            const isValid = data.some(item =>
+                `${item.name} - ${item.pincode}` === inputValue);
+
+            if (!isValid) {
+                markInvalidField("#PinCodeId");
+                clearPincodeFields();
+                //alert("Please select a valid Pincode from the dropdown.");
+            } else {
+                $("#PinCodeId").removeClass("invalid"); // Remove invalid class if valid
+            }
+        },
+        error: function () {
+            alert("Error validating Pincode.");
+        }
+    });
+}
+// Mark a field as invalid
+function markInvalidField(fieldSelector) {
+    $(fieldSelector).addClass("invalid");
+}
+
+// Clear Pincode and dependent fields
+function clearPincodeFields() {
+    $("#PinCodeId").val("");
+    $("#SelectedPincodeId").val("");
+    $("#StateId").val("");
+    $("#SelectedStateId").val("");
+    $("#DistrictId").val("");
+    $("#SelectedDistrictId").val("");
+}
+
+
+function stateAutocomplete() {
+    $("#StateId").autocomplete({
         source: function (request, response) {
             $.ajax({
-                url: "/api/Company/GetPincodeSuggestions",
+                url: "/api/Company/SearchState",
                 type: "GET",
                 data: { term: request.term, countryId: $("#SelectedCountryId").val() },
                 success: function (data) {
                     response(data.map(function (item) {
                         return {
-                            label: `${item.name} - ${item.pincode}`,
-                            value: item.pincodeId,
-                            stateId: item.stateId,
+                            label: `${item.stateName}`,
+                            value: item.stateId,
                             stateName: item.stateName,
-                            districtId: item.districtId,
-                            districtName: item.districtName
                         };
                     }));
                 },
@@ -179,12 +329,39 @@ function pincodeAutocomplete() {
             });
         },
         select: function (event, ui) {
-            $("#PinCodeId").val(ui.item.label);
-            $("#SelectedPincodeId").val(ui.item.value);
-            $("#StateId").val(ui.item.stateName);
-            $("#SelectedStateId").val(ui.item.stateId);
-            $("#DistrictId").val(ui.item.districtName);
-            $("#SelectedDistrictId").val(ui.item.districtId);
+            $("#StateId").val(ui.item.label);
+            $("#SelectedStateId").val(ui.item.value);
+
+            return false;
+        },
+        minLength: 2
+    });
+}
+
+function districtAutocomplete() {
+    $("#DistrictId").autocomplete({
+        source: function (request, response) {
+            $.ajax({
+                url: "/api/Company/SearchDistrict",
+                type: "GET",
+                data: { term: request.term, stateId: $("#SelectedStateId").val() ,countryId: $("#SelectedCountryId").val() },
+                success: function (data) {
+                    response(data.map(function (item) {
+                        return {
+                            label: `${item.districtName}`,
+                            value: item.districtId,
+                            districtName: item.districtName,
+                        };
+                    }));
+                },
+                error: function () {
+                    alert("Error fetching Pincode suggestions.");
+                }
+            });
+        },
+        select: function (event, ui) {
+            $("#DistrictId").val(ui.item.label);
+            $("#SelectedDistrictId").val(ui.item.value);
 
             return false;
         },

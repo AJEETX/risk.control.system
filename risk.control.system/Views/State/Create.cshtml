@@ -21,7 +21,14 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" for="CountryId"><i class="fas fa-map-marked-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                     </div>
-                                    <input type="text" id="CountryId" class="form-control remarks auto-dropdown" data-placeholder="country" placeholder="Type country..." asp-for="CountryId" required value="" />
+                                    @if (Model != null && Model.CountryId > 0)
+                                    {
+                                        <input readonly type="text" id="CountryId" class="form-control remarks" data-placeholder="country" asp-for="CountryId" />
+                                    }
+                                    else
+                                    {
+                                        <input type="text" id="CountryId" class="form-control remarks auto-dropdown" data-placeholder="country" placeholder="Type country..." asp-for="CountryId" required value="" />
+                                    }
                                     <span asp-validation-for="CountryId" class="text-danger"></span>
                                     <input asp-for="SelectedCountryId" type="hidden" id="SelectedCountryId" name="SelectedCountryId" value="@Model?.CountryId" />
                                     <div id="country-loading" class="loading-spinner">
@@ -73,4 +80,5 @@
     }
     <script src="~/js/company-admin/state.js"></script>
     <script src="~/js/company-admin/pincode.js"></script>
+    <script src="~/js/common/form-validation.js"></script>
 }

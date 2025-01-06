@@ -21,13 +21,27 @@
                                 <i class="fa fa-asterisk asterik-style"></i>
                             </span>
                         </div>
-                        <input type="text"
-                               id="CountryId"
-                               class="form-control remarks auto-dropdown"
-                               data-placeholder="country"
-                               asp-for="CountryId"
-                               required
-                               value="" />
+                        @if (Model != null && Model.CountryId > 0)
+                        {
+
+                            <input readonly type="text"
+                                   id="CountryId"
+                                   class="form-control remarks"
+                                   data-placeholder="country"
+                                   asp-for="CountryId"
+                                   />
+                        }
+                        else
+                        {
+
+                            <input type="text"
+                                   id="CountryId"
+                                   class="form-control remarks auto-dropdown"
+                                   data-placeholder="country" placeholder="Type country"
+                                   asp-for="CountryId"
+                                   required
+                                   value="" />
+                        }
                         <span asp-validation-for="CountryId" class="text-danger"></span>
                         <input asp-for="SelectedCountryId" type="hidden" id="SelectedCountryId" name="SelectedCountryId" value="@Model?.CountryId" />
                     </div>
@@ -39,7 +53,7 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text" for="StateId"><i class="fas fa-map-marker-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                         </div>
-                        <input type="text" id="StateId" class="form-control remarks auto-dropdown" data-placeholder="state" placeholder="Type state..." asp-for="StateId" required value="" />
+                        <input type="text" id="StateId" class="form-control remarks auto-dropdown" data-placeholder="state" placeholder="Type state" asp-for="StateId" required value="" />
                         <span asp-validation-for="StateId" class="text-danger"></span>
                         <input asp-for="SelectedStateId" type="hidden" id="SelectedStateId" name="SelectedStateId" value="@Model?.StateId" />
                     </div>
@@ -87,5 +101,6 @@
        
     </script>
     <script src="~/js/company-admin/pincode.js"></script>
+    <script src="~/js/common/form-validation.js"></script>
 
 }

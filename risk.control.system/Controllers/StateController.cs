@@ -38,7 +38,7 @@ namespace risk.control.system.Controllers
         [Breadcrumb("State")]
         public IActionResult Profile()
         {
-            return View();
+                return View();
         }
         [HttpGet]
         public async Task<IActionResult> GetStates(int draw, int start, int length, string search, int? orderColumn, string orderDirection)
@@ -57,7 +57,13 @@ namespace risk.control.system.Controllers
             var query = _context.State
                 .Include(s => s.Country)
                 .AsQueryable();
+            var userEmail = HttpContext.User.Identity.Name;
 
+            var user = _context.ApplicationUser.FirstOrDefault(u => u.Email == userEmail);
+            if (!user.IsSuperAdmin)
+            {
+                query = query.Where(s => s.CountryId == user.CountryId);
+            }
             // Apply search filter
             if (!string.IsNullOrEmpty(search) && Regex.IsMatch(search, @"^[a-zA-Z0-9\s]*$"))
             {
@@ -153,8 +159,16 @@ namespace risk.control.system.Controllers
         [Breadcrumb("Add New", FromAction ="Profile")]
         public IActionResult Create()
         {
-            //ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
-            return View();
+            var userEmail = HttpContext.User.Identity.Name;
+
+            var user = _context.ApplicationUser.FirstOrDefault(u => u.Email == userEmail);
+
+            if (user.IsSuperAdmin)
+            {
+                return View();
+            }
+            var state = new State { CountryId = user.CountryId.GetValueOrDefault(), SelectedCountryId = user.CountryId.GetValueOrDefault() };
+            return View(state);
         }
 
         [HttpPost]

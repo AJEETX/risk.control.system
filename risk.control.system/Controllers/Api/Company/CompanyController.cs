@@ -598,14 +598,37 @@ namespace risk.control.system.Controllers.Api.Company
             }
 
             // Sanitize the term by trimming spaces
+            // Sanitize the term by trimming spaces
             var sanitizedTerm = term.Trim();
 
-            // Search pincodes that match either name or pincode
-            var pincodesQuery = _context.PinCode
-                .Where(x =>  x.CountryId == countryId && 
-                (x.Name.ToLower().Contains(sanitizedTerm.ToLower()) ||
-                x.Code.ToLower().Contains(sanitizedTerm.ToLower()))
-                );
+            // Split the term by hyphen, handle both parts (name and pincode)
+            var termParts = sanitizedTerm.Split('-').Select(part => part.Trim()).ToArray();
+
+            // Name filter: The part before the hyphen (if exists)
+            var nameFilter = termParts.Length > 0 ? termParts[0] : string.Empty;
+
+            // Pincode filter: The part after the hyphen (if exists)
+            var pincodeFilter = termParts.Length > 1 ? termParts[1] : string.Empty;
+
+            var pincodesQuery = _context.PinCode.Where(x => x.CountryId == countryId);
+
+            if (!string.IsNullOrWhiteSpace(nameFilter))
+            {
+                // Search pincodes that match either name or pincode
+                pincodesQuery = _context.PinCode
+                    .Where(x => x.CountryId == countryId &&
+                    (x.Name.ToLower().Contains(nameFilter.ToLower()) ||
+                    x.Code.ToLower().Contains(nameFilter.ToLower()))
+                    );
+            }
+            else
+            {
+                // Search pincodes that match either name or pincode
+                pincodesQuery = _context.PinCode
+                    .Where(x => x.CountryId == countryId &&
+                    x.Code.ToLower().Contains(pincodeFilter.ToLower())
+                    );
+            }
 
 
             // Get the filtered and sorted results

@@ -1,4 +1,22 @@
 ﻿$(document).ready(function () {
+
+    if ($(".selected-case:checked").length) {
+        $("#allocate-case").prop('disabled', false);
+    }
+    else {
+        $("#allocate-case").prop('disabled', true);
+    }
+
+    // When user checks a radio button, Enable submit button
+    $(".selected-case").change(function (e) {
+        if ($(this).is(":checked")) {
+            $("#allocate-case").prop('disabled', false);
+        }
+        else {
+            $("#allocate-case").prop('disabled', true);
+        }
+    });
+
     $('#reselect-case').click(function (e) {
         $("body").addClass("submit-progress-bg");
         // Wrap in setTimeout so the UI
