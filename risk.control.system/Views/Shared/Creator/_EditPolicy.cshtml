@@ -130,7 +130,7 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text" asp-for="CauseOfLoss"><i class="nav-icon far fa-flag"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                         </div>
-                        <input required asp-for="PolicyDetail.CauseOfLoss" class="form-control remarks" type="text" placeholder="Cause Of Incident" maxlength="70" />
+                        <input required id="CauseOfLoss" asp-for="PolicyDetail.CauseOfLoss" class="form-control remarks" type="text" placeholder="Cause Of Incident" maxlength="70" />
                         <span asp-validation-for="PolicyDetail.CauseOfLoss" class="text-danger"></span>
                     </div>
                 </div>

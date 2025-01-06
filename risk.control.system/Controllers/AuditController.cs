@@ -5,10 +5,13 @@ using Microsoft.EntityFrameworkCore;
 using risk.control.system.Data;
 using risk.control.system.Models;
 
+using SmartBreadcrumbs.Attributes;
+
 using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers
 {
+    [Breadcrumb("Company Settings ")]
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME}")]
     public class AuditController : Controller
     {
@@ -60,6 +63,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: Audit/Details/5
+        [Breadcrumb("Details ")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null || _context.AuditLogs == null)

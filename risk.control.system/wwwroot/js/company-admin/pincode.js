@@ -17,7 +17,7 @@
     });
 
     const preloadedCountryId = $("#SelectedCountryId").val();
-    const preloadedPincodeId = $("#SelectedPincodeId").val();
+    const preloadedPincodeId = $("#PincodeId").val();
 
     if (preloadedCountryId) {
         // Preload country name
@@ -121,6 +121,14 @@
     $("#PinCodeId").on("blur input, change", function () {
         pincodeAutocomplete();
     });
+
+    $("#PinCodeId").on("autocompletechange", function (event, ui) {
+        if (!ui.item) {
+            // If no valid item is selected, clear the input
+            $(this).val("");
+            $("#SelectedPincodeId").val("");
+        }
+    });
 });
 
 function preloadPincodeDetails(preloadedCountryId, preloadedPincodeId) {
@@ -215,10 +223,25 @@ function pincodeAutocomplete() {
         source: function (request, response) {
             fetchPincodeSuggestions(request.term, $(selectedCountryField).val(), response);
         },
+        focus: function (event, ui) {
+            // Prevent the input field from being filled with the value during navigation
+            event.preventDefault();
+            $(pinCodeField).val(ui.item.label); // Temporarily display the label
+        },
         select: function (event, ui) {
+            // Populate the display with the label and store the pincodeId as the value
+            $(pinCodeField).val(ui.item.label); // Display label in the field
+            $(selectedPinCodeField).val(ui.item.value); // Store pincodeId in the hidden field
+
             populatePincodeDetails(ui.item);
             $(pinCodeField).removeClass("invalid");
             return false;
+        },
+        change: function (event, ui) {
+            if (!ui.item) {
+                $(pinCodeField).val("");
+                $(selectedPinCodeField).val("");
+            }
         },
         minLength: 2
     });

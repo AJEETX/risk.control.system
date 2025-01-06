@@ -88,7 +88,7 @@ namespace risk.control.system.Services
                         if ((isAuthenticated && !string.IsNullOrWhiteSpace(userEmail) && userEmail != Applicationsettings.PORTAL_ADMIN.EMAIL) || !isAuthenticated)
                         {
                             context.IpApiResponse.Add(response);
-                            await context.SaveChangesAsync();
+                            await context.SaveChangesAsync(false);
                         }
                         return response;
                     }

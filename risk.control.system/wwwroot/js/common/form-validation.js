@@ -7,9 +7,9 @@ $(document).ready(function () {
 
     // Call validateInput with selectors and patterns
     validateInput('#emailAddress', /[^a-z]/g); // Allow only alphanumeric characters (no spaces)
-    validateInput('#ContractNumber, #IFSCCode', /[^a-zA-Z0-9]/g); // Allow only alphanumeric characters (no spaces)
+    validateInput('#ContractNumber, #IFSCCode, #Code', /[^a-zA-Z0-9]/g); // Allow only alphanumeric characters (no spaces)
     validateInput('#Code', /[^a-zA-Z]/g); // Allow only alphabets characters (no spaces)
-    validateInput('#PolicyDetail_CauseOfLoss, #Description, #Addressline, #Comments', /[^a-zA-Z0-9 ]/g); // Allow alphanumeric and spaces
+    validateInput('#CauseOfLoss, #Description, #Addressline, #Comments', /[^a-zA-Z0-9 ]/g); // Allow alphanumeric and spaces
     validateInput('#CustomerName, #BeneficiaryName, #StateId, #DistrictId, #FirstName, #LastName, #Name, #Branch, #BankName', /[^a-zA-Z ]/g); // Allow alphabets and spaces
     validateInput('#ContactNumber, #PhoneNumber, #BankAccountNumber', /[^0-9]/g); // Allow numeric only no spaces
 
@@ -24,7 +24,7 @@ $(document).ready(function () {
     validateFileInput('#createImageInput', ['jpg', 'png', 'jpeg']); // Adjust the selector and extensions as per your needs
 
     // Common selector for required fields and specific inputs
-    const requiredFieldsSelector = 'select[required], input[required], input[type="file"], #PinCodeId';
+    const requiredFieldsSelector = 'select[required], input[required], input[type="file"], #Comments, #PinCodeId';
 
     // Add event handlers for 'change' and 'blur' events
     $(requiredFieldsSelector).on('input change blur', function () {

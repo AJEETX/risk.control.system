@@ -72,10 +72,14 @@
                                 @Html.DisplayFor(modelItem => item.DateTime)
                             </td>
                             <td>
-                                @Html.DisplayFor(modelItem => item.OldValues)
+                                <div class="scrollable-column">
+                                    @Html.DisplayFor(modelItem => item.OldValues)
+                                </div>
                             </td>
                             <td>
-                                @Html.DisplayFor(modelItem => item.NewValues)
+                                <div class="scrollable-column">
+                                    @Html.DisplayFor(modelItem => item.NewValues)
+                                </div>
                             </td>
                             <td>
                                 <a class="btn btn-xs btn-info" asp-action="Details" asp-route-id="@item.Id"><i class="fa fa-search"></i> @Applicationsettings.DETAILS</a>

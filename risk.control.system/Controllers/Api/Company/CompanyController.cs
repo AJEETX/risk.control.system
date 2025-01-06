@@ -20,6 +20,7 @@ namespace risk.control.system.Controllers.Api.Company
     [ApiController]
     public class CompanyController : ControllerBase
     {
+        private readonly string noUserImagefilePath = string.Empty;
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ClientCompanyApplicationUser> userManager;
 
@@ -27,6 +28,7 @@ namespace risk.control.system.Controllers.Api.Company
         {
             this.userManager = userManager;
             _context = context;
+            noUserImagefilePath = "/img/no-user.png";
         }
 
         [HttpGet("AllCompanies")]
@@ -94,7 +96,7 @@ namespace risk.control.system.Controllers.Api.Company
                     Name = u.FirstName + " " + u.LastName,
                     Email = "<a href=''>" + u.Email + "</a>",
                     Phone = u.PhoneNumber,
-                    Photo = string.IsNullOrWhiteSpace(u.ProfilePictureUrl) ? Applicationsettings.NO_USER : u.ProfilePictureUrl,
+                    Photo = u.ProfilePicture == null ? noUserImagefilePath : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(u.ProfilePicture)) ,
                     Active = u.Active,
                     Addressline = u.Addressline + ", " + u.District.Name + ", " + u.State.Name + ", " + u.Country.Code,
                     Roles = u.UserRole != null ? $"<span class=\"badge badge-light\">{u.UserRole.GetEnumDisplayName()}</span>" : "<span class=\"badge badge-light\">...</span>",
@@ -140,7 +142,7 @@ namespace risk.control.system.Controllers.Api.Company
                     Name = u.FirstName + " " + u.LastName,
                     Email = "<a href=/Company/EditUser?userId=" + u.Id + ">" + u.Email + "</a>",
                     Phone = u.PhoneNumber,
-                    Photo = string.IsNullOrWhiteSpace(u.ProfilePictureUrl) ? Applicationsettings.NO_USER : u.ProfilePictureUrl,
+                    Photo = u.ProfilePicture == null ? noUserImagefilePath : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(u.ProfilePicture)) ,
                     Active = u.Active,
                     Addressline =  u.Addressline + ", " + u.District.Name + ", " + u.State.Name + ", " + u.Country.Code,
                     Roles = u.UserRole != null ? $"<span class=\"badge badge-light\">{u.UserRole.GetEnumDisplayName()}</span>" : "<span class=\"badge badge-light\">...</span>",

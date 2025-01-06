@@ -1774,3 +1774,26 @@ select#PinCodeId{
     border: 1px solid red;
     background-color: #ffe6e6; /* Light red background */
 }
+/* Ensure the column content does not expand the table */
+.scrollable-column {
+    max-width: 200px; /* Adjust as needed */
+    overflow-x: auto;
+    white-space: nowrap; /* Prevent text wrapping */
+    text-overflow: ellipsis;
+    border: 1px solid #ddd; /* Optional: Add a border for clarity */
+    padding: 5px; /* Optional: Add some padding */
+}
+
+/* Style the scrollbar for better UX */
+.scrollable-column::-webkit-scrollbar {
+    height: 8px; /* Horizontal scrollbar height */
+}
+
+.scrollable-column::-webkit-scrollbar-thumb {
+    background-color: #888; /* Scrollbar color */
+    border-radius: 4px; /* Rounded scrollbar */
+}
+
+.scrollable-column::-webkit-scrollbar-thumb:hover {
+    background-color: #555; /* Hover effect */
+}
