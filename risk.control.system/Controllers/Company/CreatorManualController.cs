@@ -337,6 +337,12 @@ namespace risk.control.system.Controllers.Company
                 var details1Page = new MvcBreadcrumbNode("Details", "CreatorManual", $"Details") { Parent = detailsPage, RouteValues = new { id = id } };
                 var editPage = new MvcBreadcrumbNode("EditCustomer", "CreatorManual", $"Edit Customer") { Parent = details1Page, RouteValues = new { id = id } };
                 ViewData["BreadcrumbNode"] = editPage;
+
+                customer.SelectedCountryId = customer.CountryId.GetValueOrDefault();
+                customer.SelectedStateId = customer.StateId.GetValueOrDefault();
+                customer.SelectedDistrictId = customer.DistrictId.GetValueOrDefault();
+                customer.SelectedPincodeId = customer.PinCodeId.GetValueOrDefault();
+
                 return View(customer);
             }
             catch (Exception ex)

@@ -17,7 +17,7 @@
     });
 
     const preloadedCountryId = $("#SelectedCountryId").val();
-    const preloadedPincodeId = $("#PincodeId").val();
+    const preloadedPincodeId = $("#SelectedPincodeId").val() ?? $("#PinCodeId").val();
 
     if (preloadedCountryId) {
         // Preload country name
@@ -25,7 +25,7 @@
 
         // Enable PinCodeId since a country is preloaded
         $("#StateId").prop("disabled", false);
-            $("#PinCodeId").prop("disabled", false);
+        $("#PinCodeId").prop("disabled", false);
 
         // Preload details if Pincode is provided
         if (preloadedPincodeId) {
@@ -94,7 +94,7 @@
             $("#PinCodeId").prop("disabled", false);
             // Enable PinCodeId if a valid country is selected
             districtAutocomplete();
-            
+
         } else {
             // Disable PinCodeId if no country is selected
             $("#PinCodeId").prop("disabled", true);
@@ -223,25 +223,10 @@ function pincodeAutocomplete() {
         source: function (request, response) {
             fetchPincodeSuggestions(request.term, $(selectedCountryField).val(), response);
         },
-        focus: function (event, ui) {
-            // Prevent the input field from being filled with the value during navigation
-            event.preventDefault();
-            $(pinCodeField).val(ui.item.label); // Temporarily display the label
-        },
         select: function (event, ui) {
-            // Populate the display with the label and store the pincodeId as the value
-            $(pinCodeField).val(ui.item.label); // Display label in the field
-            $(selectedPinCodeField).val(ui.item.value); // Store pincodeId in the hidden field
-
             populatePincodeDetails(ui.item);
             $(pinCodeField).removeClass("invalid");
             return false;
-        },
-        change: function (event, ui) {
-            if (!ui.item) {
-                $(pinCodeField).val("");
-                $(selectedPinCodeField).val("");
-            }
         },
         minLength: 2
     });
