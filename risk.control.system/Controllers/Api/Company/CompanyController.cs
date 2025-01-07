@@ -587,7 +587,7 @@ namespace risk.control.system.Controllers.Api.Company
                     .OrderBy(x => x.Name)
                  .Take(10)
                     .Select(x => new { 
-                        PincodeI = x.PinCodeId, 
+                        PincodeId = x.PinCodeId, 
                         Pincode = x.Code, 
                         Name = x.Name, 
                         StateId = x.StateId, 

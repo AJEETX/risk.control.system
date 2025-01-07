@@ -1772,7 +1772,6 @@ select#PinCodeId{
 }
 .invalid {
     border: 1px solid red;
-    background-color: #ffe6e6; /* Light red background */
 }
 /* Ensure the column content does not expand the table */
 .scrollable-column {

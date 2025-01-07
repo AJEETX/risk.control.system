@@ -17,7 +17,7 @@
     });
 
     const preloadedCountryId = $("#SelectedCountryId").val();
-    const preloadedPincodeId = $("#SelectedPincodeId").val() ?? $("#PinCodeId").val();
+    const preloadedPincodeId = $("#SelectedPincodeId").val();// $("#PinCodeId").val();
 
     if (preloadedCountryId) {
         // Preload country name
@@ -119,6 +119,7 @@
 
     // Dynamically fetch State and District on Pincode change
     $("#PinCodeId").on("blur input, change", function () {
+        const selectedpinCodeId = $("#SelectedStateId").val();
         pincodeAutocomplete();
     });
 
@@ -223,6 +224,11 @@ function pincodeAutocomplete() {
         source: function (request, response) {
             fetchPincodeSuggestions(request.term, $(selectedCountryField).val(), response);
         },
+        focus: function (event, ui) {
+            // Set the input field to the "label" value when navigating with arrow keys
+            $(pinCodeField).val(ui.item.label);
+            return false; // Prevent default behavior of updating the field with "value"
+        },
         select: function (event, ui) {
             populatePincodeDetails(ui.item);
             $(pinCodeField).removeClass("invalid");
@@ -275,6 +281,7 @@ function populatePincodeDetails(selectedItem) {
 function validatePincodeSelection(inputValue, countryId) {
     if (!inputValue) {
         clearPincodeFields();
+                markInvalidField("#PinCodeId");
         return;
     }
 
