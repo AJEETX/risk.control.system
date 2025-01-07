@@ -102,16 +102,21 @@ namespace risk.control.system.Controllers.Api
         }
 
         [HttpGet("GetPincodesByDistrictIdWithoutPreviousSelectedService")]
-        public async Task<IActionResult> GetPincodesByDistrictIdWithoutPreviousSelectedService(long districtId, long vendorId, long lobId, long serviceId)
+        public async Task<IActionResult> GetPincodesByDistrictIdWithoutPreviousSelectedService(long districtId,string district,long stateId, long vendorId, long lobId, long serviceId)
         {
             long sId;
             var pincodes = new List<PinCode>();
             var remaingPincodes = new List<PinCode>();
 
-            if (districtId > 0)
+            if (districtId > 0 && !string.IsNullOrWhiteSpace(district))
             {
                 sId = districtId;
-                pincodes = await context.PinCode.Where(s => s.District.DistrictId.Equals(sId)).ToListAsync();
+                var validDistrict = context.PinCode.Include(p=>p.District).Any(s =>s.StateId == stateId && s.District.Name.ToLower().Contains(district.ToLower()));
+                if(!validDistrict)
+                {
+                    return Ok();
+                }
+                pincodes = await context.PinCode.Include(p=>p.District).Where(s => s.District.DistrictId.Equals(sId) && s.District.Name.ToLower().Contains(district.ToLower())).ToListAsync();
 
                 var vendor = context.Vendor
                     .Include(c => c.VendorInvestigationServiceTypes)

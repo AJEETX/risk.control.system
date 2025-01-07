@@ -103,7 +103,7 @@ namespace risk.control.system.Controllers
                 var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == id);
                 ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name");
                 //ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
-                var model = new VendorInvestigationServiceType { SelectedMultiPincodeId = new List<long>(), Vendor = vendor, PincodeServices = new List<ServicedPinCode>() };
+                var model = new VendorInvestigationServiceType { SelectedMultiPincodeId = new List<long>(), CountryId = vendor.CountryId, Vendor = vendor, PincodeServices = new List<ServicedPinCode>() };
 
                 var agencysPage = new MvcBreadcrumbNode("Agencies", "Vendors", "Manage Agency(s)");
                 var agencyPage = new MvcBreadcrumbNode("Agencies", "Vendors", "Agencies") { Parent = agencysPage };

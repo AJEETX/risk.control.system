@@ -103,7 +103,7 @@ namespace risk.control.system.Controllers
         public IActionResult Create(long id)
         {
             var company = _context.ClientCompany.FirstOrDefault(v => v.ClientCompanyId == id);
-            var model = new ClientCompanyApplicationUser { ClientCompany = company };
+            var model = new ClientCompanyApplicationUser { CountryId = company.CountryId, ClientCompany = company };
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
 
             var agencysPage = new MvcBreadcrumbNode("Companies", "ClientCompany", "Admin Settings");

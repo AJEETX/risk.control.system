@@ -23,15 +23,17 @@ function GetRemainingServicePinCode(showDefaultOption = true, vendorId, lineId) 
     var district = document.getElementById('DistrictId').value;
     var districtId = document.getElementById('SelectedDistrictId').value;
 
-    if (state == '' || stateId == '') {
-        PopulatePinCode("#PinCodeId", nodata, "<option>--SELECT PINCODE--</option>", showDefaultOption);
+    if (state == '' || stateId == '' || district == '' || districtId == '') {
+        //PopulatePinCode("#PinCodeId", nodata, "<option>--SELECT PINCODE--</option>", showDefaultOption);
+        $('#PinCodeId').empty();
+        $('#PinCodeId').val('');
     }
     else {
         var lobId = localStorage.getItem('lobId');
 
         var serviceId = localStorage.getItem('serviceId');
 
-        $.get("/api/MasterData/GetPincodesByDistrictIdWithoutPreviousSelectedService", { districtId: districtId, vendorId: vendorId, lobId: lobId, serviceId: serviceId }, function (data) {
+        $.get("/api/MasterData/GetPincodesByDistrictIdWithoutPreviousSelectedService", { districtId: districtId, stateId: stateId, district: district, vendorId: vendorId, lobId: lobId, serviceId: serviceId }, function (data) {
             PopulatePinCode("#PinCodeId", data, "<option>--SELECT PINCODE--</option>", showDefaultOption);
         });
     }
@@ -48,9 +50,13 @@ function PopulatePinCode(dropDownId, list, option, showDefaultOption) {
             //$('#create').prop('disabled', false);
         });
     }
-    else {
+    else if (list && list.length == 0) {
         $(dropDownId).append("<option value='-1'>NO - PINCODE - AVAILABLE</option>")
         //$('#create').prop('disabled', true);
+    }
+    else {
+        $(dropDownId).empty();
+        $(dropDownId).val('');
     }
 }
 function PopulateInvestigationServices(dropDownId, list, option) {
