@@ -259,9 +259,9 @@ namespace risk.control.system.Controllers
                         }
                     }
 
-                    var ipApiFailedResponse = await service.GetClientIp(ipAddressWithoutPort, ct, "login-failed", model.Email, false, latlong);
                     if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN) && !user.Email.StartsWith("admin"))
                     {
+                    var ipApiFailedResponse = await service.GetClientIp(ipAddressWithoutPort, ct, "login-failed", model.Email, false, latlong);
                         var adminForFailed = _context.ApplicationUser.FirstOrDefault(u => u.IsSuperAdmin);
                         string failedMessage = $"Dear {adminForFailed.Email}";
                         failedMessage += $"                         ";
@@ -282,9 +282,9 @@ namespace risk.control.system.Controllers
                 else if (result.IsLockedOut)
                 {
                     var isAuthenticated = HttpContext.User.Identity.IsAuthenticated;
-                    var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct, "login-locked", model.Email, isAuthenticated, latlong);
                     if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
                     {
+                        var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct, "login-locked", model.Email, isAuthenticated, latlong);
                         var admin = _context.ApplicationUser.FirstOrDefault(u => u.IsSuperAdmin);
                         string message = $"Dear {admin.Email}";
                         message += $"                           ";
@@ -309,9 +309,9 @@ namespace risk.control.system.Controllers
                 {
                     var isAuthenticated = HttpContext.User.Identity.IsAuthenticated;
 
-                    var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct, "login-failed", model.Email, isAuthenticated, latlong);
                     if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
                     {
+                    var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct, "login-failed", model.Email, isAuthenticated, latlong);
                         var admin = _context.ApplicationUser.FirstOrDefault(u => u.IsSuperAdmin);
                         string message = $"Dear {admin.Email}";
                         message += $"                          ";

@@ -1771,7 +1771,7 @@ select#PinCodeId{
     font-weight: bold;
 }
 .invalid {
-    border: 1px solid red;
+    border: 1px solid red !important;
 }
 /* Ensure the column content does not expand the table */
 .scrollable-column {

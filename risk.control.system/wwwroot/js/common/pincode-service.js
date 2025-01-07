@@ -16,15 +16,25 @@ function setInvestigationServices(obj) {
     localStorage.setItem('serviceId', obj.value);
 }
 function GetRemainingServicePinCode(showDefaultOption = true, vendorId, lineId) {
+    const nodata = [];
+    var state = document.getElementById('StateId').value;
+    var stateId = document.getElementById('SelectedStateId').value;
+
+    var district = document.getElementById('DistrictId').value;
     var districtId = document.getElementById('SelectedDistrictId').value;
 
-    var lobId = localStorage.getItem('lobId');
+    if (state == '' || stateId == '') {
+        PopulatePinCode("#PinCodeId", nodata, "<option>--SELECT PINCODE--</option>", showDefaultOption);
+    }
+    else {
+        var lobId = localStorage.getItem('lobId');
 
-    var serviceId = localStorage.getItem('serviceId');
+        var serviceId = localStorage.getItem('serviceId');
 
-    $.get("/api/MasterData/GetPincodesByDistrictIdWithoutPreviousSelectedService", { districtId: districtId, vendorId: vendorId, lobId: lobId, serviceId: serviceId }, function (data) {
-        PopulatePinCode("#PinCodeId", data, "<option>--SELECT PINCODE--</option>", showDefaultOption);
-    });
+        $.get("/api/MasterData/GetPincodesByDistrictIdWithoutPreviousSelectedService", { districtId: districtId, vendorId: vendorId, lobId: lobId, serviceId: serviceId }, function (data) {
+            PopulatePinCode("#PinCodeId", data, "<option>--SELECT PINCODE--</option>", showDefaultOption);
+        });
+    }
 }
 
 function PopulatePinCode(dropDownId, list, option, showDefaultOption) {
@@ -65,12 +75,12 @@ $(document).ready(function () {
 
     fields.forEach(function (field) {
         $(field).on('input', function () {
-            const isValid = /^[a-zA-Z]*$/.test(this.value); // Check if input is valid
+            const isValid = /^[a-zA-Z0-9 ]*$/.test(this.value); // Check if input is valid
             if (!isValid) {
                 $(this).val('');
-                //$(this).addClass('is-invalid'); // Add error class
+                //$(this).addClass('invalid'); // Add error class
             } else {
-                //$(this).removeClass('is-invalid'); // Remove error class
+                //$(this).removeClass('invalid'); // Remove error class
             }
         });
     });
@@ -153,12 +163,14 @@ function fetchAndSetFieldValue(url, data, inputSelector, responseKey, callback) 
         success: function (response) {
             if (response && response[responseKey]) {
                 $inputField.val(response[responseKey]);
+                $inputField.removeClass('invalid');
                 // Fade in the input field
-                $inputField.hide().fadeIn(1000); // Adjust duration as needed
+                //$inputField.hide().fadeIn(1000); // Adjust duration as needed
                 if (callback) callback();
             }
         },
         error: function () {
+            $inputField.addClass('invalid');
             console.error(`Failed to fetch value for ${inputSelector}`);
         },
         complete: function () {
@@ -257,6 +269,11 @@ function setAutocomplete(fieldSelector, url, extraDataCallback, onSelectCallback
                 error: function (xhr) {
                     console.error("Error fetching autocomplete data:", error);
                     console.log("Response Text:", xhr.responseText); // Log the server error
+                    $(fieldSelector).addClass('invalid');
+                    const hiddenFieldSelector = $(fieldSelector).data('hiddenField');
+                    if (hiddenFieldSelector) {
+                        $(hiddenFieldSelector).val('');
+                    }
                     response([{ label: "Error fetching data", value: "" }]);
                 },
                 complete: function () {
@@ -267,24 +284,53 @@ function setAutocomplete(fieldSelector, url, extraDataCallback, onSelectCallback
             });
         },
         minLength: 0,
-        select: function (event, ui) {
-            if (ui.item.value) {
-                // Update the input field with the selected label
+        focus: function (event, ui) {
+            if (ui.item.label == 'Error fetching data' || ui.item.label == "No results found") {
+                $(fieldSelector).val('');
+                $(fieldSelector).addClass('invalid');
+                const hiddenFieldSelector = $(fieldSelector).data('hiddenField');
+                if (hiddenFieldSelector) {
+                    $(hiddenFieldSelector).val('');
+                }
+            }
+            else {
+                // Set the input field to the "label" value when navigating with arrow keys
                 $(fieldSelector).val(ui.item.label);
-
-                // Store the selected ID in a hidden input field or data attribute
+                $(fieldSelector).removeClass('invalid');
                 const hiddenFieldSelector = $(fieldSelector).data('hiddenField');
                 if (hiddenFieldSelector) {
                     $(hiddenFieldSelector).val(ui.item.id);
                 }
-
-                // Call the provided callback function
-                if (onSelectCallback) {
-                    onSelectCallback(ui);
+            }
+            return false; // Prevent default behavior of updating the field with "value"
+        },
+        select: function (event, ui) {
+            if (ui.item.value == 'Error fetching data' || ui.item.label == "No results found") {
+                $(fieldSelector).val('');
+                $(fieldSelector).addClass('invalid');
+                const hiddenFieldSelector = $(fieldSelector).data('hiddenField');
+                if (hiddenFieldSelector) {
+                    $(hiddenFieldSelector).val('');
                 }
+            } else {
+                if (ui.item.value) {
+                    // Update the input field with the selected label
+                    $(fieldSelector).val(ui.item.label);
 
-                // Remove the error class in case the field was previously marked invalid
-                //$(fieldSelector).removeClass('is-invalid');
+                    // Store the selected ID in a hidden input field or data attribute
+                    const hiddenFieldSelector = $(fieldSelector).data('hiddenField');
+                    if (hiddenFieldSelector) {
+                        $(hiddenFieldSelector).val(ui.item.id);
+                    }
+
+                    // Call the provided callback function
+                    if (onSelectCallback) {
+                        onSelectCallback(ui);
+                    }
+
+                    // Remove the error class in case the field was previously marked invalid
+                    $(fieldSelector).removeClass('invalid');
+                }
             }
             return false;
         }
@@ -326,7 +372,7 @@ function setAutocomplete(fieldSelector, url, extraDataCallback, onSelectCallback
                 });
             }
 
-            //$field.addClass('is-invalid'); // Add invalid class if no value
+            $field.addClass('invalid'); // Add invalid class if no value
             return;
         }
 
@@ -352,10 +398,12 @@ function setAutocomplete(fieldSelector, url, extraDataCallback, onSelectCallback
 
                 if (!isValid) {
                     $field.val(''); // Clear invalid input
-                    //$field.addClass('is-invalid'); // Add invalid class
+                    $field.addClass('invalid'); // Add invalid class
                 } else {
-                    //$field.removeClass('is-invalid'); // Remove invalid class if valid
+                    $field.removeClass('invalid'); // Remove invalid class if valid
                 }
+                toggleDependentFields(dependentFields, isValid);
+
             });
         } else if (Array.isArray(options)) {
             // Handle static options
@@ -371,10 +419,12 @@ function setAutocomplete(fieldSelector, url, extraDataCallback, onSelectCallback
 
             if (!isValid) {
                 $field.val(''); // Clear invalid input
-                //$field.addClass('is-invalid'); // Add invalid class
+                $field.addClass('invalid'); // Add invalid class
+
             } else {
-                //$field.removeClass('is-invalid'); // Remove invalid class if valid
+                $field.removeClass('invalid'); // Remove invalid class if valid
             }
+            toggleDependentFields(dependentFields, isValid);
         }
     });
 
@@ -476,10 +526,34 @@ function toggleDependentFields(dependentFieldIds, isValid) {
         dependentFieldIds.forEach(fieldId => {
             if (!isValid) {
                 $(fieldId).val('');
+                //$(fieldId).addClass('invalid');
+            }
+            else {
+                $(fieldId).removeClass('invalid');
             }
         });
     }
-    
+    //if (!isValid) {
+
+    //    // If the current value is empty, clear all dependent fields
+    //    if (Array.isArray(dependentFieldIds) && dependentFieldIds.length > 0) {
+    //        dependentFieldIds.forEach(selector => {
+    //            const $dependentField = $(selector);
+    //            if ($dependentField.length) {
+    //                $dependentField.val(''); // Clear the value of each dependent field
+
+    //                // Temporarily clear autocomplete source
+    //                if ($dependentField.data('ui-autocomplete')) {
+    //                    $dependentField.autocomplete("option", "source", function (request, response) {
+    //                        response([]); // Return an empty result
+    //                    });
+    //                }
+    //            } else {
+    //                console.warn(`Dependent field selector "${selector}" did not match any elements.`);
+    //            }
+    //        });
+    //    }
+    //}
 }
 
 function clearPinCodeField() {

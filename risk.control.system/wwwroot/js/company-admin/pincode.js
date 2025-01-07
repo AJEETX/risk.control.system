@@ -105,6 +105,20 @@
         }
     });
 
+    $("#StateId").on("blur", function () {
+        const stateValue = $(this).val().trim();
+        const countryId = $("#SelectedCountryId").val();
+        validateStateSelection(stateValue, countryId);
+    });
+
+    $("#DistrictId").on("blur", function () {
+        const districtValue = $(this).val().trim();
+        const stateId = $("#SelectedStateId").val();
+        const countryId = $("#SelectedCountryId").val();
+        validateDistrictSelection(districtValue, stateId, countryId);
+    });
+
+
     // Initialize country autocomplete
     countryAutocomplete();
 
@@ -167,6 +181,7 @@ function preloadPincodeDetails(preloadedCountryId, preloadedPincodeId) {
                     );
                 }
             } else {
+                $("#PinCodeId").addClass("invalid")
                 resetField("#PinCodeId");
                 resetField("#StateId");
                 resetField("#DistrictId");
@@ -174,7 +189,7 @@ function preloadPincodeDetails(preloadedCountryId, preloadedPincodeId) {
         },
         error: function () {
             hideLoader("#pincode-loading");
-            alert("Error fetching Pincode details.");
+            $("#PinCodeId").addClass("invalid")
         }
     });
 }
@@ -189,12 +204,16 @@ function countryAutocomplete() {
                 success: function (data) {
                     response(data); // Pass the list of suggestions to the autocomplete
                 },
-                error: function () {
-                    alert("Error fetching country suggestions.");
+                error: function (err) {
+                    console.log("Error fetching country suggestions." + err);
+                    $("#CountryId").addClass("invalid")
+
                 }
             });
         },
         select: function (event, ui) {
+
+            $("#CountryId").removeClass("invalid");
             // On selecting a country, populate the field with its name and set its ID
             $("#CountryId").val(ui.item.label); // Set country name
             $("#SelectedCountryId").val(ui.item.id); // Set hidden field for CountryId
@@ -261,7 +280,7 @@ function fetchPincodeSuggestions(term, countryId, responseCallback) {
             responseCallback(suggestions);
         },
         error: function () {
-            alert("Error fetching Pincode suggestions.");
+            console.log("Error fetching Pincode suggestions.");
         }
     });
 }
@@ -270,8 +289,10 @@ function fetchPincodeSuggestions(term, countryId, responseCallback) {
 function populatePincodeDetails(selectedItem) {
     $("#PinCodeId").val(selectedItem.label);
     $("#SelectedPincodeId").val(selectedItem.value);
+    $("#StateId").removeClass("invalid");
     $("#StateId").val(selectedItem.stateName);
     $("#SelectedStateId").val(selectedItem.stateId);
+    $("#DistrictId").removeClass("invalid");
     $("#DistrictId").val(selectedItem.districtName);
     $("#SelectedDistrictId").val(selectedItem.districtId);
     $("#PinCodeId").removeClass("invalid");
@@ -302,10 +323,85 @@ function validatePincodeSelection(inputValue, countryId) {
             }
         },
         error: function () {
-            alert("Error validating Pincode.");
+            console.log("Error validating Pincode.");
+                markInvalidField("#PinCodeId");
+                clearPincodeFields();
         }
     });
 }
+
+function validateStateSelection(inputValue, countryId) {
+    if (!inputValue) {
+        clearStateFields();
+        markInvalidField("#StateId");
+        return;
+    }
+
+    $.ajax({
+        url: "/api/Company/SearchState",
+        type: "GET",
+        data: { term: inputValue, countryId: countryId },
+        success: function (data) {
+            const isValid = data.some(item => item.stateName === inputValue);
+
+            if (!isValid) {
+                markInvalidField("#StateId");
+                clearStateFields();
+            } else {
+                $("#StateId").removeClass("invalid");
+            }
+        },
+        error: function () {
+            markInvalidField("#StateId");
+            clearStateFields();
+        }
+    });
+}
+
+function clearStateFields() {
+    $("#StateId").val("");
+    $("#SelectedStateId").val("");
+    $("#DistrictId").val("");
+    $("#SelectedDistrictId").val("");
+    $("#PinCodeId").val("");
+    $("#SelectedPincodeId").val("");
+}
+
+function validateDistrictSelection(inputValue, stateId, countryId) {
+    if (!inputValue) {
+        clearDistrictFields();
+        markInvalidField("#DistrictId");
+        return;
+    }
+
+    $.ajax({
+        url: "/api/Company/SearchDistrict",
+        type: "GET",
+        data: { term: inputValue, stateId: stateId, countryId: countryId },
+        success: function (data) {
+            const isValid = data.some(item => item.districtName === inputValue);
+
+            if (!isValid) {
+                markInvalidField("#DistrictId");
+                clearDistrictFields();
+            } else {
+                $("#DistrictId").removeClass("invalid");
+            }
+        },
+        error: function () {
+            markInvalidField("#DistrictId");
+            clearDistrictFields();
+        }
+    });
+}
+
+function clearDistrictFields() {
+    $("#DistrictId").val("");
+    $("#SelectedDistrictId").val("");
+    $("#PinCodeId").val("");
+    $("#SelectedPincodeId").val("");
+}
+
 // Mark a field as invalid
 function markInvalidField(fieldSelector) {
     $(fieldSelector).addClass("invalid");
@@ -339,9 +435,15 @@ function stateAutocomplete() {
                     }));
                 },
                 error: function () {
-                    alert("Error fetching Pincode suggestions.");
+                    console.log("Error fetching Pincode suggestions.");
                 }
             });
+        },
+        focus: function (event, ui) {
+            // Set the input field to the "label" value when navigating with arrow keys
+            $("#StateId").val(ui.item.label);
+            $("#SelectedStateId").val(ui.item.value);
+            return false; // Prevent default behavior of updating the field with "value"
         },
         select: function (event, ui) {
             $("#StateId").val(ui.item.label);
@@ -370,9 +472,15 @@ function districtAutocomplete() {
                     }));
                 },
                 error: function () {
-                    alert("Error fetching Pincode suggestions.");
+                    console.log("Error fetching district suggestions.");
                 }
             });
+        },
+        focus: function (event, ui) {
+            $("#DistrictId").val(ui.item.label);
+            $("#SelectedDistrictId").val(ui.item.value);
+
+            return false;
         },
         select: function (event, ui) {
             $("#DistrictId").val(ui.item.label);
@@ -401,7 +509,6 @@ function fetchAndSetFieldValue(url, data, fieldSelector, fieldName, callback = n
         },
         error: function () {
             hideLoader(`${fieldSelector}-loading`);
-            alert("Error loading data.");
         }
     });
 }
@@ -416,4 +523,18 @@ function showLoader(selector) {
 
 function hideLoader(selector) {
     $(selector).hide();
+}
+
+function markInvalidField(fieldSelector) {
+    $(fieldSelector).addClass("invalid");
+}
+
+function clearPinCodeField() {
+    var pincodeDropdown = document.getElementById("PinCodeId");
+    if (pincodeDropdown) {
+        // Clear all selected options
+        pincodeDropdown.value = '';
+        // Optionally, you can clear the options as well
+        pincodeDropdown.innerHTML = '';
+    }
 }
