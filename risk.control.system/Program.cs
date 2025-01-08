@@ -99,6 +99,7 @@ builder.Services.Configure<ForwardedHeadersOptions>(options => {
 });
 
 builder.Services.AddFeatureManagement().AddFeatureFilter<TimeWindowFilter>();
+builder.Services.AddScoped<IUserService,UserService>();
 builder.Services.AddScoped<IClaimCreationService,ClaimCreationService>();
 builder.Services.AddScoped<IGoogleService, GoogleService>();
 builder.Services.AddScoped<ICustomApiCLient, CustomApiClient>();

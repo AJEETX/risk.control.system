@@ -11,12 +11,21 @@ $(document).ready(function () {
             loadingRecords: '&nbsp;',
             processing: '<i class="fas fa-sync fa-spin fa-4x fa-fw"></i><span class="sr-only">Loading...</span>'
         },
-        order: [[13, 'desc'], [14, 'desc']], // Sort by `isUpdated` and `lastModified`,
+        order: [[14, 'desc'], [14, 'desc']], // Sort by `isUpdated` and `lastModified`,
         columns: [
             /* Name of the keys from
             data file source */
             {
                 "data": "id", "name": "Id", "bVisible": false
+            },
+            {
+                "data": "onlineStatus",
+                "sDefaultContent": '<i class="fas fa-circle" style="color: green;"></i> ',
+                "bSortable": false,
+                "mRender": function (data, type, row) {
+                    var img = '<i class="' + row.onlineStatusIcon + '" style="color:' + data + ';" title="' + row.onlineStatusName + '" data-toggle="tooltip"></i> ';
+                    return img;
+                }
             },
             {
                 "sDefaultContent": "",

@@ -5,7 +5,7 @@
             url: '/api/Company/AllUsers',
             dataSrc: ''
         },
-        order: [[11, 'desc'], [12, 'desc']], // Sort by `isUpdated` and `lastModified`,
+        order: [[12, 'desc'], [13, 'desc']], // Sort by `isUpdated` and `lastModified`,
         columnDefs: [{
             'targets': 0,
             'searchable': false,
@@ -41,6 +41,15 @@
                 "data": "id", "name": "Id", "bVisible": false
             },
             {
+                "data": "onlineStatus",
+                "sDefaultContent": '<i class="fas fa-circle" style="color: green;"></i> ',
+                "bSortable": false,
+                "mRender": function (data, type, row) {
+                    var img = '<i class="' + row.onlineStatusIcon + '" style="color:' + data + ';" title="' + row.onlineStatusName + '" data-toggle="tooltip"></i> ';
+                    return img;
+                }
+            },
+            {
                 "sDefaultContent": '<i class="fa fa-toggle-on"></i>',
                 "bSortable": false,
                 "mRender": function (data, type, row) {
@@ -65,7 +74,7 @@
                 "data": "addressline",
                 bSortable: false,
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.rawAddress + '" data-toggle="tooltip">' + data + '</span>'
+                    return '<span title="' + row.addressline + '" data-toggle="tooltip">' + data + '</span>'
                 }
             },
             { "data": "pincode" },
@@ -87,9 +96,9 @@
             { "data": "roles" },
             { "data": "updated" },
             {
-                "data": "updateBy",
+                "data": "updatedBy",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.updateBy + '" data-toggle="tooltip">' + data + '</span>'
+                    return '<span title="' + row.updatedBy + '" data-toggle="tooltip">' + data + '</span>'
                 }
             },
             {

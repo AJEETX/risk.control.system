@@ -9,6 +9,7 @@ using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
+using risk.control.system.Services;
 
 using static risk.control.system.AppConstant.Applicationsettings;
 
@@ -22,12 +23,14 @@ namespace risk.control.system.Controllers.Api.Company
     {
         private readonly string noUserImagefilePath = string.Empty;
         private readonly ApplicationDbContext _context;
+        private readonly IUserService userService;
         private readonly UserManager<ClientCompanyApplicationUser> userManager;
 
-        public CompanyController(ApplicationDbContext context, UserManager<ClientCompanyApplicationUser> userManager)
+        public CompanyController(ApplicationDbContext context, IUserService userService, UserManager<ClientCompanyApplicationUser> userManager)
         {
             this.userManager = userManager;
             _context = context;
+            this.userService = userService;
             noUserImagefilePath = "/img/no-user.png";
         }
 
@@ -116,48 +119,8 @@ namespace risk.control.system.Controllers.Api.Company
         public async Task<IActionResult> AllUsers()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
-            var companyUser =await _context.ClientCompanyApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
+            var result = await userService.GetCompanyUsers(userEmail);
 
-            var company = await _context.ClientCompany
-                .Include(c => c.CompanyApplicationUser)
-                .ThenInclude(u => u.PinCode)
-                .Include(c => c.CompanyApplicationUser)
-                .ThenInclude(u => u.Country)
-                .Include(c => c.CompanyApplicationUser)
-                .ThenInclude(u => u.District)
-                .Include(c => c.CompanyApplicationUser)
-                .ThenInclude(u => u.State)
-                .FirstOrDefaultAsync(c => c.ClientCompanyId == companyUser.ClientCompanyId);
-
-            var users = company.CompanyApplicationUser
-                .Where(u => !u.Deleted && u.Email != userEmail)
-                .OrderBy(u => u.FirstName)
-                .ThenBy(u => u.LastName)
-                .AsQueryable();
-            var result =
-                users?.Select(u =>
-                new
-                {
-                    Id = u.Id,
-                    Name = u.FirstName + " " + u.LastName,
-                    Email = "<a href=/Company/EditUser?userId=" + u.Id + ">" + u.Email + "</a>",
-                    Phone = u.PhoneNumber,
-                    Photo = u.ProfilePicture == null ? noUserImagefilePath : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(u.ProfilePicture)) ,
-                    Active = u.Active,
-                    Addressline =  u.Addressline + ", " + u.District.Name + ", " + u.State.Name + ", " + u.Country.Code,
-                    Roles = u.UserRole != null ? $"<span class=\"badge badge-light\">{u.UserRole.GetEnumDisplayName()}</span>" : "<span class=\"badge badge-light\">...</span>",
-                    Pincode = u.PinCode.Code,
-                    Updated = u.Updated.HasValue ?  u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy"),
-                    UpdateBy = u.UpdatedBy,
-                    Role = u.UserRole.GetEnumDisplayName(),
-                    RawEmail = u.Email,
-                    RawAddress = u.Addressline + ", " + u.District.Name + ", " + u.State.Name + ", " + u.Country.Code,
-                    IsUpdated = u.IsUpdated,
-                    LastModified = u.Updated
-                })?.ToArray();
-
-            users?.ToList().ForEach(u => u.IsUpdated = false);
-            await _context.SaveChangesAsync();
             return Ok(result);
         }
 

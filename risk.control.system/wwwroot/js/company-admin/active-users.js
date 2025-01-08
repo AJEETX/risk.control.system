@@ -16,7 +16,13 @@ $(document).ready(function () {
             /* Name of the keys from
             data file source */
             {
-                "data": "id", "name": "Id", "bVisible": false
+                "data": "onlineStatus",
+                "sDefaultContent": '<i class="fas fa-circle" style="color: green;"></i> ',
+                "bSortable": false,
+                "mRender": function (data, type, row) {
+                    var img = '<i class="' + row.onlineStatusIcon +'" style="color:' + data + ';" title="' + row.onlineStatusName +'" data-toggle="tooltip"></i> ';
+                    return img;
+                }
             },
             {
                 "sDefaultContent": "",

@@ -7,6 +7,8 @@ using Microsoft.EntityFrameworkCore;
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
+using risk.control.system.Models.ViewModel;
+using risk.control.system.Services;
 
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 using static risk.control.system.AppConstant.Applicationsettings;
@@ -21,52 +23,30 @@ namespace risk.control.system.Controllers.Api
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> userManager;
+        private readonly IUserService userService;
+        private readonly IConfiguration config;
 
-        public UserController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
+        public UserController(ApplicationDbContext context, UserManager<ApplicationUser> userManager,IUserService userService, IConfiguration config)
         {
             this._context = context;
             this.userManager = userManager;
+            this.userService = userService;
+            this.config = config;
         }
 
         [HttpGet("AllUsers")]
         public async Task<IActionResult> AllUsers()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
-            var companyUser = _context.ApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-
-            if (companyUser != null && companyUser.IsSuperAdmin)
+            try
             {
-                var users = _context.ApplicationUser
-                    .Include(a => a.District)
-                    .Include(a => a.State)
-                    .Include(a => a.Country)
-                    .Include(a => a.PinCode)
-                        .Where(u => !u.Deleted)?
-                        .OrderBy(u => u.FirstName)
-                .ThenBy(u => u.LastName)
-                                .ToList();
-                var result = users?.Select(u =>
-                    new
-                    {
-                        Id = u.Id,
-                        Name = u.FirstName + " " + u.LastName,
-                        Email = "<a href=/User/Edit?userId=" + u.Id + ">" + u.Email + "</a>",
-                        Phone = u.PhoneNumber,
-                    Photo = u.ProfilePicture == null ? Applicationsettings.NO_USER : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(u.ProfilePicture)) ,
-                        Active = u.Active,
-                        Addressline = u.Addressline,
-                        District = u.District.Name,
-                        State = u.State.Name,
-                        Country = u.Country.Name,
-                        Roles = string.Join(",", GetUserRoles(u).Result),
-                        Pincode = u.PinCode.Code,
-                        IsUpdated = u.IsUpdated,
-                        LastModified = u.Updated
-                    })?.ToList();
+                var activeUsersDetails = await userService.GetUsers(userEmail);
 
-                users?.ToList().ForEach(u => u.IsUpdated = false);
-                await _context.SaveChangesAsync();
-                return Ok(result);
+                return Ok(activeUsersDetails);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
             }
             return BadRequest();
         }
@@ -82,7 +62,7 @@ namespace risk.control.system.Controllers.Api
                 try
                 {
                     // Calculate the cutoff time for 15 minutes ago
-                    var cutoffTime = DateTime.Now.AddMinutes(-15);
+                    var cutoffTime = DateTime.Now.AddMinutes(double.Parse(config["LOGIN_SESSION_TIMEOUT_MIN"]));
 
                     // Fetch user session data from the database
                     var userSessions = await _context.UserSessionAlive
@@ -102,36 +82,61 @@ namespace risk.control.system.Controllers.Api
                         return Ok(new { data = new List<object>() });
                     }
                     // Query users from the database
-                    var users =await _context.ApplicationUser
+                    var users = await _context.ApplicationUser
                     .Include(a => a.District)
                     .Include(a => a.State)
                     .Include(a => a.Country)
                     .Include(a => a.PinCode)
-                    .Where(a => !a.Deleted && activeUsers.Contains(a.Email)) // Use Contains for SQL IN
+                    .Where(a => !a.Deleted && activeUsers.Contains(a.Email) && a.Email != userEmail) // Use Contains for SQL IN
                     .OrderBy(a => a.FirstName)
                     .ThenBy(a => a.LastName)
                     ?.ToListAsync();
-
-                var result = users?.Select(u =>
-                    new
+                    var activeUsersDetails = new List<UserDetailResponse>();
+                    foreach (var user in users)
                     {
-                        Id = u.Id,
-                        Name = u.FirstName + " " + u.LastName,
-                        Email = "<a href=/User/Edit?userId=" + u.Id + ">" + u.Email + "</a>",
-                        Phone = u.PhoneNumber,
-                        Photo = u.ProfilePicture == null ? Applicationsettings.NO_USER : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(u.ProfilePicture)) ,
-                        Active = u.Active,
-                        Addressline = u.Addressline,
-                        District = u.District.Name,
-                        State = u.State.Name,
-                        Country = u.Country.Name,
-                        Roles = string.Join(",", GetUserRoles(u).Result),
-                        Pincode = u.PinCode.Code,
-                        IsUpdated = u.IsUpdated,
-                        LastModified = u.Updated
-                    })?.ToList();
+                        var currentOnlineTime = _context.UserSessionAlive.Where(a => a.ActiveUser.Email == user.Email).Max(d => d.Created);
+                        string status = "green";
+                        string statusIcon = "fas fa-circle";
+                        string statusName = "Online now";
+                        if (DateTime.Now.Subtract(currentOnlineTime).Minutes > 5)
+                        {
+                            status = "#C3B3B3";
+                            statusName = $"Away for {DateTime.Now.Subtract(currentOnlineTime).Minutes} minutes";
+                            statusIcon = "far fa-clock";
+                        }
+                        else if (DateTime.Now.Subtract(currentOnlineTime).Minutes >= 1)
+                        {
+                            status = "orange";
+                            statusName = $"Inactive for {DateTime.Now.Subtract(currentOnlineTime).Minutes} minutes";
+                            statusIcon = "fas fa-clock";
+                        }
 
-                return Ok(result);
+                        var activeUser = new UserDetailResponse
+                        {
+                            Id = user.Id,
+                            Name = user.FirstName + " " + user.LastName,
+                            Email = "<a href=/User/Edit?userId=" + user.Id + ">" + user.Email + "</a>",
+                            Phone = user.PhoneNumber,
+                            Photo = user.ProfilePicture == null ? Applicationsettings.NO_USER : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(user.ProfilePicture)),
+                            Active = user.Active,
+                            Addressline = user.Addressline,
+                            District = user.District.Name,
+                            State = user.State.Name,
+                            Country = user.Country.Name,
+                            Roles = string.Join(",", GetUserRoles(user).Result),
+                            Pincode = user.PinCode.Code,
+                            OnlineStatus = status,
+                            OnlineStatusName = statusName,
+                            OnlineStatusIcon = statusIcon,
+                            IsUpdated = user.IsUpdated,
+                            LastModified = user.Updated.GetValueOrDefault()
+                        };
+                        activeUsersDetails.Add(activeUser);
+                    }
+
+                    activeUsersDetails?.ToList().ForEach(u => u.IsUpdated = false);
+                    await _context.SaveChangesAsync();
+                    return Ok(activeUsersDetails);
                 }
                 catch (Exception ex)
                 {
