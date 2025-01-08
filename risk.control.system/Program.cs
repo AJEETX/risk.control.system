@@ -241,7 +241,7 @@ builder.Services.ConfigureApplicationCookie(options =>
             ValidIssuer = builder.Configuration["Jwt:Issuer"],
             ValidAudience = builder.Configuration["Jwt:Audience"],
             IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(builder.Configuration[Applicationsettings.HEXdATA])
+                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])
             ),
             ClockSkew = TimeSpan.Zero // Reduce delay tolerance for token expiration.
         };
