@@ -52,7 +52,7 @@ namespace risk.control.system.Controllers.Api
                         Name = u.FirstName + " " + u.LastName,
                         Email = "<a href=/User/Edit?userId=" + u.Id + ">" + u.Email + "</a>",
                         Phone = u.PhoneNumber,
-                        Photo = string.IsNullOrWhiteSpace(u.ProfilePictureUrl) ? Applicationsettings.NO_USER : u.ProfilePictureUrl,
+                    Photo = u.ProfilePicture == null ? Applicationsettings.NO_USER : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(u.ProfilePicture)) ,
                         Active = u.Active,
                         Addressline = u.Addressline,
                         District = u.District.Name,
@@ -71,6 +71,76 @@ namespace risk.control.system.Controllers.Api
             return BadRequest();
         }
 
+        [HttpGet("ActiveUsers")]
+        public async Task<IActionResult> ActiveUsers()
+        {
+            var userEmail = HttpContext.User?.Identity?.Name;
+            var companyUser = _context.ApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+
+            if (companyUser != null && companyUser.IsSuperAdmin)
+            {
+                try
+                {
+                    // Calculate the cutoff time for 15 minutes ago
+                    var cutoffTime = DateTime.Now.AddMinutes(-15);
+
+                    // Fetch user session data from the database
+                    var userSessions = await _context.UserSessionAlive
+                        .Where(u => u.Updated >= cutoffTime) // Filter sessions within the last 15 minutes
+                        .Include(u => u.ActiveUser)? // Include ActiveUser to access email
+                        .ToListAsync(); // Materialize data into memory
+
+                    var activeUsers = userSessions
+                            .GroupBy(u => u.ActiveUser.Email)? // Group by email
+                            .Select(g => g.OrderByDescending(u => u.Updated).FirstOrDefault())? // Get the latest session
+                            .Where(u => u != null && !u.LoggedOut)?
+                             .Select(u => u.ActiveUser.Email)? // Select the user email
+                             .ToList(); // Exclude users who have logged out
+
+                    if (activeUsers == null || !activeUsers.Any())
+                    {
+                        return Ok(new { data = new List<object>() });
+                    }
+                    // Query users from the database
+                    var users =await _context.ApplicationUser
+                    .Include(a => a.District)
+                    .Include(a => a.State)
+                    .Include(a => a.Country)
+                    .Include(a => a.PinCode)
+                    .Where(a => !a.Deleted && activeUsers.Contains(a.Email)) // Use Contains for SQL IN
+                    .OrderBy(a => a.FirstName)
+                    .ThenBy(a => a.LastName)
+                    ?.ToListAsync();
+
+                var result = users?.Select(u =>
+                    new
+                    {
+                        Id = u.Id,
+                        Name = u.FirstName + " " + u.LastName,
+                        Email = "<a href=/User/Edit?userId=" + u.Id + ">" + u.Email + "</a>",
+                        Phone = u.PhoneNumber,
+                        Photo = u.ProfilePicture == null ? Applicationsettings.NO_USER : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(u.ProfilePicture)) ,
+                        Active = u.Active,
+                        Addressline = u.Addressline,
+                        District = u.District.Name,
+                        State = u.State.Name,
+                        Country = u.Country.Name,
+                        Roles = string.Join(",", GetUserRoles(u).Result),
+                        Pincode = u.PinCode.Code,
+                        IsUpdated = u.IsUpdated,
+                        LastModified = u.Updated
+                    })?.ToList();
+
+                return Ok(result);
+                }
+                catch (Exception ex)
+                {
+
+                    throw;
+                }
+            }
+            return BadRequest();
+        }
         private async Task<List<string>> GetUserRoles(ApplicationUser user)
         {
             var roles = await userManager.GetRolesAsync(user);

@@ -1,5 +1,8 @@
 ﻿using System.Net;
 
+using Amazon.Rekognition.Model;
+using Google.Api;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
 
@@ -87,6 +90,15 @@ namespace risk.control.system.Services
                             response.isAuthenticated = isAuthenticated;
                         if ((isAuthenticated && !string.IsNullOrWhiteSpace(userEmail) && userEmail != Applicationsettings.PORTAL_ADMIN.EMAIL) || !isAuthenticated)
                         {
+                            var user = context.ApplicationUser.FirstOrDefault(a => a.Email == userEmail);
+                            var userSessionAlive = new UserSessionAlive
+                            {
+                                Updated = DateTime.Now,
+                                ActiveUser = user,
+                                CurrentPage = page
+                            };
+                            context.UserSessionAlive.Add(userSessionAlive);
+
                             context.IpApiResponse.Add(response);
                             await context.SaveChangesAsync(false);
                         }

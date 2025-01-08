@@ -198,7 +198,8 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a asp-controller="User" asp-action="Index" is-active-page class="navlink-border nav-link @Url.MakeActiveClass("User","") @Url.MakeActiveClass("Roles","")">
+                    <a asp-controller="User" asp-action="Index" is-active-page class="navlink-border nav-link @Url.MakeActiveClass("User","")
+                            @Url.MakeActiveClass("ActiveUser","") @Url.MakeActiveClass("Roles","")">
                         <i class="nav-icon fas fa-user-cog"></i>
                         <p class="sidebar-menu-header-label">
                             @Applicationsettings.USER_ROLES
@@ -219,6 +220,15 @@
                         <i class="fas fa-user-lock nav-icon"></i>
                         <p>
                             @Applicationsettings.ROLE
+
+                        </p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a is-active-page asp-controller="ActiveUser" asp-action="Active" class="actual-link nav-link @Url.MakeActiveClass("ActiveUser","")">
+                        <i class="fas fa-users nav-icon"></i>
+                        <p>
+                            Active users
 
                         </p>
                     </a>

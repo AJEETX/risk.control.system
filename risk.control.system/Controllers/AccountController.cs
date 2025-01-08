@@ -366,6 +366,16 @@ namespace risk.control.system.Controllers
         [HttpGet]
         public async Task<IActionResult> Logout()
         {
+            var user = await _signInManager.UserManager.GetUserAsync(User);
+            var userSessionAlive = new UserSessionAlive
+            {
+                Updated = DateTime.Now,
+                ActiveUser = user,
+                CurrentPage = "Logging-Out",
+                LoggedOut = true
+            };
+            _context.UserSessionAlive.Add(userSessionAlive);
+            await _context.SaveChangesAsync();
             await _signInManager.SignOutAsync();
             _logger.LogInformation("User logged out.");
             return RedirectToAction(nameof(AccountController.Login), "Account");

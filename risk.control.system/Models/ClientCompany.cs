@@ -98,7 +98,7 @@ namespace risk.control.system.Models
         public bool CanChangePassword { get; set; } = false;
         public string? MobileAppUrl { get; set; } = Applicationsettings.APP_URL;
         public bool BulkUpload { get; set; } = false;
-        public string WhitelistIpAddress { get; set; } = "::1;202.7.251.15";
+        public string WhitelistIpAddress { get; set; } = "::1;202.7.251.53";
         public string? WhitelistIpAddressRange { get; set; } = default!;
         public LicenseType LicenseType { get; set; } = LicenseType.Trial;
         public string LicenseId { get; set; } = Guid.NewGuid().ToString();

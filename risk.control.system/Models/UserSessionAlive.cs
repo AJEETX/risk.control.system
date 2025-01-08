@@ -10,5 +10,6 @@ namespace risk.control.system.Models
         public long UserSessionAliveId { get; set; }
         public ApplicationUser ActiveUser { get; set; }
         public string CurrentPage { get; set; }
+        public bool LoggedOut { get; set; }
     }
 }
