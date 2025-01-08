@@ -33,6 +33,7 @@ namespace risk.control.system.Controllers.Api.Agency
         private readonly IDashboardService dashboardService;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly IFeatureManager featureManager;
+        private readonly IUserService userService;
         private readonly ICustomApiCLient customApiCLient;
         private static HttpClient httpClient = new();
 
@@ -40,6 +41,7 @@ namespace risk.control.system.Controllers.Api.Agency
             UserManager<VendorApplicationUser> userManager, 
             IWebHostEnvironment webHostEnvironment,
             IFeatureManager featureManager,
+            IUserService userService,
             ICustomApiCLient customApiCLient,
             IDashboardService dashboardService)
         {
@@ -47,6 +49,7 @@ namespace risk.control.system.Controllers.Api.Agency
             this.dashboardService = dashboardService;
             this.webHostEnvironment = webHostEnvironment;
             this.featureManager = featureManager;
+            this.userService = userService;
             this.customApiCLient = customApiCLient;
             _context = context;
             noUserImagefilePath = "/img/no-user.png";
@@ -215,44 +218,8 @@ namespace risk.control.system.Controllers.Api.Agency
         [HttpGet("GetCompanyAgencyUser")]
         public async Task<IActionResult> GetCompanyAgencyUser(long id)
         {
-            var vendorUsers = _context.VendorApplicationUser
-                  .Include(u => u.Country)
-                  .Include(u => u.State)
-                  .Include(u => u.District)
-                  .Include(u => u.PinCode)
-                  .Where(c => c.VendorId == id && !c.Deleted);
-
-            var users = vendorUsers?
-                .OrderBy(u => u.IsUpdated)
-                .ThenBy(u => u.Updated)
-                .AsQueryable();
-
-            var result =users?.Select(u => new
-                {
-                    Id = u.Id,
-                    Name = u.FirstName + " " + u.LastName,
-                    //Email = "<a href=/Vendors/EditUser?userId=" + u.Id +">" + u.Email + "</a>",
-                    Email = (u.UserRole == AgencyRole.AGENT && !string.IsNullOrWhiteSpace(u.MobileUId) || u.UserRole != AgencyRole.AGENT) ?
-                    "<a href=/Vendors/EditUser?userId=" + u.Id + ">" + u.Email + "</a>" :
-                    "<a href=/Vendors/EditUser?userId=" + u.Id + ">" + u.Email + "</a><span title=\"Onboarding incomplete !!!\" data-toggle=\"tooltip\"><i class='fa fa-asterisk asterik-style'></i></span>",
-                    Phone = u.PhoneNumber,
-                    Photo = u.ProfilePicture == null ? noUserImagefilePath : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(u.ProfilePicture)) ,
-                    Addressline = u.Addressline + ", " + u.District.Name + ", " + u.State.Name + ", " + u.Country.Code,
-                    Pincode = u.PinCode.Code,
-                    Active = u.Active,
-                    Roles = u.UserRole != null ? $"<span class=\"badge badge-light\">{u.UserRole.GetEnumDisplayName()}</span>" : "<span class=\"badge badge-light\">...</span>",
-                    Updated = u.Updated.HasValue ? u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy"),
-                    UpdateBy = u.UpdatedBy,
-                    Role = u.UserRole.GetEnumDisplayName(),
-                    AgentOnboarded = (u.Role == AppRoles.AGENT && !string.IsNullOrWhiteSpace(u.MobileUId) || u.Role != AppRoles.AGENT),
-                    Agent = u.Role == AppRoles.AGENT,
-                    RawEmail = u.Email,
-                    isUpdated = u.IsUpdated,
-                    LastModified = u.Updated
-                })?.ToArray();
-
-            users?.ToList().ForEach(u => u.IsUpdated = false);
-            await _context.SaveChangesAsync();
+            var userEmail = HttpContext.User?.Identity?.Name;
+            var result = await userService.GetCompanyAgencyUsers(userEmail, id);
 
             return Ok(result);
         }
@@ -261,68 +228,7 @@ namespace risk.control.system.Controllers.Api.Agency
         public async Task<IActionResult> GetUsers()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
-            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-            List<VendorUserClaim> agents = new List<VendorUserClaim>();
-
-            var vendorUsers = _context.VendorApplicationUser
-                .Include(u=>u.Country)
-                .Include(u=>u.State)
-                .Include(u=>u.District)
-                .Include(u=>u.PinCode)
-                .Where(c => c.VendorId == vendorUser.VendorId 
-                && !c.Deleted && c.Email != userEmail);
-
-            var users = vendorUsers?
-                .OrderBy(u => u.IsUpdated)
-                .ThenBy(u => u.Updated)
-                .AsQueryable();
-            var result = dashboardService.CalculateAgentCaseStatus(userEmail);
-
-            foreach (var user in users)
-            {
-                int claimCount = 0;
-                if (result.TryGetValue(user.Email, out claimCount))
-                {
-                    var agentData = new VendorUserClaim
-                    {
-                        AgencyUser = user,
-                        CurrentCaseCount = claimCount,
-                    };
-                    agents.Add(agentData);
-                }
-                else
-                {
-                    var agentData = new VendorUserClaim
-                    {
-                        AgencyUser = user,
-                        CurrentCaseCount = 0,
-                    };
-                    agents.Add(agentData);
-                }
-            }
-            var agentWithLoad = agents?
-                .Select(u => new
-                {
-                    Id = u.AgencyUser.Id,
-                    Photo = u.AgencyUser.ProfilePicture == null ? noUserImagefilePath : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(u.AgencyUser.ProfilePicture)) ,
-                    Email = (u.AgencyUser.UserRole == AgencyRole.AGENT && !string.IsNullOrWhiteSpace(u.AgencyUser.MobileUId) || u.AgencyUser.UserRole != AgencyRole.AGENT) ?
-                    "<a href=/Agency/EditUser?userId=" +u.AgencyUser.Id +">" + u.AgencyUser.Email + "</a>":
-                    "<a href=/Agency/EditUser?userId=" + u.AgencyUser.Id + ">" + u.AgencyUser.Email + "</a><span title=\"Onboarding incomplete !!!\" data-toggle=\"tooltip\"><i class='fa fa-asterisk asterik-style'></i></span>",
-                    Name = u.AgencyUser.FirstName + " " + u.AgencyUser.LastName,
-                    Phone = u.AgencyUser.PhoneNumber,
-                    Addressline = u.AgencyUser.Addressline + ", " + u.AgencyUser.District.Name + ", " + u.AgencyUser.State.Name + ", " + u.AgencyUser.Country.Code + ", " + u.AgencyUser.PinCode.Code,
-                    Active = u.AgencyUser.Active,
-                    Roles = u.AgencyUser.UserRole != null ? $"<span class=\"badge badge-light\">{u.AgencyUser.UserRole.GetEnumDisplayName()}</span>" : "<span class=\"badge badge-light\">...</span>",
-                    Count = u.CurrentCaseCount,
-                    UpdateBy = u.AgencyUser.UpdatedBy,
-                    Role = u.AgencyUser.UserRole.GetEnumDisplayName(),
-                    AgentOnboarded =(u.AgencyUser.UserRole == AgencyRole.AGENT && !string.IsNullOrWhiteSpace(u.AgencyUser.MobileUId) || u.AgencyUser.UserRole != AgencyRole.AGENT),
-                    RawEmail = u.AgencyUser.Email,
-                    isUpdated = u.AgencyUser.IsUpdated,
-                    LastModified = u.AgencyUser.Updated
-                })?.ToArray();
-            users?.ToList().ForEach(user => user.IsUpdated = false);
-            await _context.SaveChangesAsync();
+            var agentWithLoad = await userService.GetAgencyUsers(userEmail);
             return Ok(agentWithLoad);
         }
 

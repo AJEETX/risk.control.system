@@ -31,19 +31,19 @@
             url: '/api/Agency/GetCompanyAgencyUser?id=' + $('#vendorId').val(),
             dataSrc: ''
         },
-        order: [[10, 'desc'], [11, 'desc']], // Sort by `isUpdated` and `lastModified`,
+        order: [[11, 'desc'], [12, 'desc']], // Sort by `isUpdated` and `lastModified`,
         columnDefs: [
             {
                 className: 'max-width-column', // Apply the CSS class,
-                targets: 2                      // Index of the column to style
+                targets: 3                      // Index of the column to style
             },
             {
                 className: 'max-width-column-pincodes', // Apply the CSS class,
-                targets: 4                      // Index of the column to style
+                targets: 5                      // Index of the column to style
             },
             {
                 className: 'max-width-column-name', // Apply the CSS class,
-                targets: 7                      // Index of the column to style
+                targets: 8                      // Index of the column to style
             }],
         fixedHeader: true,
         processing: true,
@@ -57,6 +57,15 @@
             data file source */
             {
                 "data": "id", "name": "Id", "bVisible": false
+            },
+            {
+                "data": "onlineStatus",
+                "sDefaultContent": '<i class="fas fa-circle" style="color: green;"></i> ',
+                "bSortable": false,
+                "mRender": function (data, type, row) {
+                    var img = '<i class="' + row.onlineStatusIcon + '" style="color:' + data + ';" title="' + row.onlineStatusName + '" data-toggle="tooltip"></i> ';
+                    return img;
+                }
             },
             {
                 "sDefaultContent": '<i class="fa fa-toggle-on"></i>',
@@ -104,9 +113,9 @@
             },
             { "data": "roles" },
             {
-                "data": "updateBy",
+                "data": "updatedBy",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.updateBy + '" data-toggle="tooltip">' + data + '</span>'
+                    return '<span title="' + row.updatedBy + '" data-toggle="tooltip">' + data + '</span>'
                 }
             },
             {

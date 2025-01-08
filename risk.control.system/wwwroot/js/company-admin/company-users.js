@@ -17,15 +17,15 @@
         },
         {
             className: 'max-width-column', // Apply the CSS class,
-            targets: 2                      // Index of the column to style
+            targets: 3                      // Index of the column to style
         },
         {
             className: 'max-width-column-pincodes', // Apply the CSS class,
-            targets: 4                      // Index of the column to style
+            targets: 5                      // Index of the column to style
         },
         {
             className: 'max-width-column-name', // Apply the CSS class,
-            targets: 9                      // Index of the column to style
+            targets: 10                      // Index of the column to style
         }],
         fixedHeader: true,
         processing: true,
