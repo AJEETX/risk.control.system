@@ -156,86 +156,68 @@ namespace risk.control.system.Controllers
         {
             var ipAddress = HttpContext.GetServerVariable("HTTP_X_FORWARDED_FOR") ?? HttpContext.Connection.RemoteIpAddress?.ToString();
             var ipAddressWithoutPort = ipAddress?.Split(':')[0];
-
-            if (ModelState.IsValid || !model.Email.ValidateEmail())
+            if (!ModelState.IsValid || !model.Email.ValidateEmail())
             {
-                var email = HttpUtility.HtmlEncode(model.Email);
-                var pwd = HttpUtility.HtmlEncode(model.Password);
-                var result = await _signInManager.PasswordSignInAsync(email, pwd, model.RememberMe, lockoutOnFailure: false);
-                var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
-                var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
-                var BaseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
-                if (result.Succeeded)
+                ModelState.AddModelError(string.Empty, "Bad Request.");
+                model.Error = "Bad Request.";
+                model.ShowUserOnLogin = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
+                ViewData["Users"] = new SelectList(_context.Users.Where(u => !u.Deleted).OrderBy(o => o.Email), "Email", "Email");
+                return View(model);
+            }
+            var email = HttpUtility.HtmlEncode(model.Email);
+            var pwd = HttpUtility.HtmlEncode(model.Password);
+            var result = await _signInManager.PasswordSignInAsync(email, pwd, model.RememberMe, lockoutOnFailure: false);
+            var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
+            var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
+            var BaseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
+            if (result.Succeeded)
+            {
+                var user = await _userManager.FindByEmailAsync(email);
+                var roles = await _userManager.GetRolesAsync(user);
+                if (roles != null && roles.Count > 0)
                 {
-                    var user = await _userManager.FindByEmailAsync(email);
-                    var roles = await _userManager.GetRolesAsync(user);
-                    if (roles != null && roles.Count > 0)
+                    var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == email && !u.Deleted);
+                    var vendorUser = _context.VendorApplicationUser.FirstOrDefault(u => u.Email == email && !u.Deleted);
+                    bool vendorIsActive = false;
+                    bool companyIsActive = false;
+
+                    if (companyUser != null)
                     {
-                        var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == email && !u.Deleted);
-                        var vendorUser = _context.VendorApplicationUser.FirstOrDefault(u => u.Email == email && !u.Deleted);
-                        bool vendorIsActive = false;
-                        bool companyIsActive = false;
+                        companyIsActive = _context.ClientCompany.Any(c => c.ClientCompanyId == companyUser.ClientCompanyId && c.Status == Models.CompanyStatus.ACTIVE);
 
-                        if (companyUser != null)
+                    }
+                    else if (vendorUser != null)
+                    {
+                        vendorIsActive = _context.Vendor.Any(c => c.VendorId == vendorUser.VendorId && c.Status == Models.VendorStatus.ACTIVE);
+                        if (await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED) && vendorIsActive)
                         {
-                            companyIsActive = _context.ClientCompany.Any(c => c.ClientCompanyId == companyUser.ClientCompanyId && c.Status == Models.CompanyStatus.ACTIVE);
-
-                        }
-                        else if (vendorUser != null)
-                        {
-                            vendorIsActive = _context.Vendor.Any(c => c.VendorId == vendorUser.VendorId && c.Status == Models.VendorStatus.ACTIVE);
-                            if (await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED) && vendorIsActive)
+                            var userIsAgent = vendorUser.Role == AppRoles.AGENT;
+                            if (userIsAgent)
                             {
-                                var userIsAgent = vendorUser.Role == AppRoles.AGENT;
-                                if (userIsAgent)
-                                {
-                                    vendorIsActive = !string.IsNullOrWhiteSpace(user.MobileUId);
-                                }
+                                vendorIsActive = !string.IsNullOrWhiteSpace(user.MobileUId);
                             }
                         }
-                        if (companyIsActive && user.Active || vendorIsActive && user.Active || companyUser == null && vendorUser == null)
+                    }
+                    if (companyIsActive && user.Active || vendorIsActive && user.Active || companyUser == null && vendorUser == null)
+                    {
+                        var timeout = config["SESSION_TIMEOUT_SEC"];
+                        var properties = new AuthenticationProperties
                         {
-                            var claims = new List<Claim> {
-                            new Claim(ClaimTypes.NameIdentifier, model.Email) ,
-                            new Claim(ClaimTypes.Name, model.Email)
-                            };
-                            var userIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                            ClaimsPrincipal principal = new ClaimsPrincipal(userIdentity);
-                            var timeout = config["SESSION_TIMEOUT_SEC"];
-                            var properties = new AuthenticationProperties
-                            {
-                                ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(double.Parse(timeout)), // Reset expiry time
-                                IsPersistent = true,
-                            };
-                            await _signInManager.SignInAsync(user, properties);
+                            ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(double.Parse(timeout)), // Reset expiry time
+                            IsPersistent = true,
+                        };
+                        await _signInManager.SignInAsync(user, properties);
 
-                            var isAuthenticated = HttpContext.User.Identity.IsAuthenticated;
+                        var isAuthenticated = HttpContext.User.Identity.IsAuthenticated;
 
-                            if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN) && user?.Email != null && !user.Email.StartsWith("admin"))
+                        if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN) && user?.Email != null && !user.Email.StartsWith("admin"))
+                        {
+                            var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct, "login-success", model.Email, isAuthenticated, latlong);
+                            var admin = _context.ApplicationUser.FirstOrDefault(u => u.IsSuperAdmin);
+                            string message = string.Empty;
+                            if (admin != null)
                             {
-                                var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct, "login-success", model.Email, isAuthenticated, latlong);
-                                var admin = _context.ApplicationUser.FirstOrDefault(u => u.IsSuperAdmin);
-                                string message = string.Empty;
-                                if (admin != null)
-                                {
-                                    message = $"Dear {admin.Email}";
-                                    message += $"                                       ";
-                                    message += $"                       ";
-                                    message += $"User {user.Email} logged in from IP address {ipApiResponse.query}";
-                                    message += $"                                       ";
-                                    message += $"Thanks                                         ";
-                                    message += $"                                       ";
-                                    message += $"                                       ";
-                                    message += $"{BaseUrl}";
-                                    try
-                                    {
-                                        await smsService.DoSendSmsAsync("+" + admin.PhoneNumber, message);
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        Console.WriteLine(ex.ToString());
-                                    }
-                                }
+                                message = $"Dear {admin.Email}";
                                 message += $"                                       ";
                                 message += $"                       ";
                                 message += $"User {user.Email} logged in from IP address {ipApiResponse.query}";
@@ -253,84 +235,100 @@ namespace risk.control.system.Controllers
                                     Console.WriteLine(ex.ToString());
                                 }
                             }
-
-                            notifyService.Success("Login successful");
-                            return RedirectToAction("Index", "Dashboard");
+                            message += $"                                       ";
+                            message += $"                       ";
+                            message += $"User {user.Email} logged in from IP address {ipApiResponse.query}";
+                            message += $"                                       ";
+                            message += $"Thanks                                         ";
+                            message += $"                                       ";
+                            message += $"                                       ";
+                            message += $"{BaseUrl}";
+                            try
+                            {
+                                await smsService.DoSendSmsAsync("+" + admin.PhoneNumber, message);
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine(ex.ToString());
+                            }
                         }
-                    }
 
-                    if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN) && !user.Email.StartsWith("admin"))
-                    {
-                    var ipApiFailedResponse = await service.GetClientIp(ipAddressWithoutPort, ct, "login-failed", model.Email, false, latlong);
-                        var adminForFailed = _context.ApplicationUser.FirstOrDefault(u => u.IsSuperAdmin);
-                        string failedMessage = $"Dear {adminForFailed.Email}";
-                        failedMessage += $"                         ";
-                        failedMessage += $"Locked user {user.Email} logged in from IP address {ipApiFailedResponse.query}";
-                        failedMessage += $"                                       ";
-                        failedMessage += $"Thanks                                       ";
-                        failedMessage += $"                                       ";
-                        failedMessage += $"                                       ";
-                        failedMessage += $"{BaseUrl}";
-                        await smsService.DoSendSmsAsync("+" + adminForFailed.PhoneNumber, failedMessage);
+                        notifyService.Success("Login successful");
+                        return RedirectToAction("Index", "Dashboard");
                     }
+                }
+
+                if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN) && !user.Email.StartsWith("admin"))
+                {
+                    var ipApiFailedResponse = await service.GetClientIp(ipAddressWithoutPort, ct, "login-failed", model.Email, false, latlong);
+                    var adminForFailed = _context.ApplicationUser.FirstOrDefault(u => u.IsSuperAdmin);
+                    string failedMessage = $"Dear {adminForFailed.Email}";
+                    failedMessage += $"                         ";
+                    failedMessage += $"Locked user {user.Email} logged in from IP address {ipApiFailedResponse.query}";
+                    failedMessage += $"                                       ";
+                    failedMessage += $"Thanks                                       ";
+                    failedMessage += $"                                       ";
+                    failedMessage += $"                                       ";
+                    failedMessage += $"{BaseUrl}";
+                    await smsService.DoSendSmsAsync("+" + adminForFailed.PhoneNumber, failedMessage);
+                }
+                model.ShowUserOnLogin = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
+                ViewData["Users"] = new SelectList(_context.Users.OrderBy(o => o.Email), "Email", "Email");
+                _logger.LogWarning("User account locked out.");
+                model.Error = "User account locked out.";
+                return View(model);
+            }
+            else if (result.IsLockedOut)
+            {
+                var isAuthenticated = HttpContext.User.Identity.IsAuthenticated;
+                if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
+                {
+                    var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct, "login-locked", model.Email, isAuthenticated, latlong);
+                    var admin = _context.ApplicationUser.FirstOrDefault(u => u.IsSuperAdmin);
+                    string message = $"Dear {admin.Email}";
+                    message += $"                           ";
+                    message += $"{model.Email} failed login attempt from IP address {ipApiResponse.query}";
+                    message += $"                                       ";
+                    message += $"Thanks                                         ";
+                    message += $"                                       ";
+                    message += $"                                       ";
+                    message += $"{BaseUrl}";
+                    await smsService.DoSendSmsAsync("+" + admin.PhoneNumber, message);
+                }
+                else
+                {
                     model.ShowUserOnLogin = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
                     ViewData["Users"] = new SelectList(_context.Users.OrderBy(o => o.Email), "Email", "Email");
                     _logger.LogWarning("User account locked out.");
                     model.Error = "User account locked out.";
                     return View(model);
                 }
-                else if (result.IsLockedOut)
+            }
+            else
+            {
+                var isAuthenticated = HttpContext.User.Identity.IsAuthenticated;
+
+                if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
                 {
-                    var isAuthenticated = HttpContext.User.Identity.IsAuthenticated;
-                    if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
-                    {
-                        var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct, "login-locked", model.Email, isAuthenticated, latlong);
-                        var admin = _context.ApplicationUser.FirstOrDefault(u => u.IsSuperAdmin);
-                        string message = $"Dear {admin.Email}";
-                        message += $"                           ";
-                        message += $"{model.Email} failed login attempt from IP address {ipApiResponse.query}";
-                        message += $"                                       ";
-                        message += $"Thanks                                         ";
-                        message += $"                                       ";
-                        message += $"                                       ";
-                        message += $"{BaseUrl}";
-                        await smsService.DoSendSmsAsync("+" + admin.PhoneNumber, message);
-                    }
-                    else
-                    {
-                        model.ShowUserOnLogin = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
-                        ViewData["Users"] = new SelectList(_context.Users.OrderBy(o => o.Email), "Email", "Email");
-                        _logger.LogWarning("User account locked out.");
-                        model.Error = "User account locked out.";
-                        return View(model);
-                    }
+                    var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct, "login-failed", model.Email, isAuthenticated, latlong);
+                    var admin = _context.ApplicationUser.FirstOrDefault(u => u.IsSuperAdmin);
+                    string message = $"Dear {admin.Email}";
+                    message += $"                          ";
+                    message += $"{model.Email} failed login attempt from IP address {ipApiResponse.query}";
+                    message += $"                                       ";
+                    message += $"Thanks                                         ";
+                    message += $"                                       ";
+                    message += $"                                       ";
+                    message += $"{BaseUrl}";
+                    await smsService.DoSendSmsAsync("+" + admin.PhoneNumber, message);
                 }
                 else
                 {
-                    var isAuthenticated = HttpContext.User.Identity.IsAuthenticated;
-
-                    if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
-                    {
-                    var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct, "login-failed", model.Email, isAuthenticated, latlong);
-                        var admin = _context.ApplicationUser.FirstOrDefault(u => u.IsSuperAdmin);
-                        string message = $"Dear {admin.Email}";
-                        message += $"                          ";
-                        message += $"{model.Email} failed login attempt from IP address {ipApiResponse.query}";
-                        message += $"                                       ";
-                        message += $"Thanks                                         ";
-                        message += $"                                       ";
-                        message += $"                                       ";
-                        message += $"{BaseUrl}";
-                        await smsService.DoSendSmsAsync("+" + admin.PhoneNumber, message);
-                    }
-                    else
-                    {
-                        ModelState.AddModelError(string.Empty, "Invalid login attempt.");
-                        model.Error = "Invalid login attempt.";
-                        model.ShowUserOnLogin = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
-                        ViewData["Users"] = new SelectList(_context.Users.OrderBy(o => o.Email), "Email", "Email");
-                        return View(model);
-                    }
+                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                    model.Error = "Invalid login attempt.";
+                    model.ShowUserOnLogin = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
+                    ViewData["Users"] = new SelectList(_context.Users.OrderBy(o => o.Email), "Email", "Email");
+                    return View(model);
                 }
             }
             ModelState.AddModelError(string.Empty, "Bad Request.");

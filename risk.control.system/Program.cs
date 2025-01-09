@@ -99,6 +99,8 @@ builder.Services.Configure<ForwardedHeadersOptions>(options => {
 });
 
 builder.Services.AddFeatureManagement().AddFeatureFilter<TimeWindowFilter>();
+builder.Services.AddSingleton<IValidationService,ValidationService>();
+builder.Services.AddScoped<ITokenService,TokenService>();
 builder.Services.AddScoped<IUserService,UserService>();
 builder.Services.AddScoped<IClaimCreationService,ClaimCreationService>();
 builder.Services.AddScoped<IGoogleService, GoogleService>();
@@ -240,8 +242,7 @@ builder.Services.ConfigureApplicationCookie(options =>
             ValidateIssuerSigningKey = true,
             ValidIssuer = builder.Configuration["Jwt:Issuer"],
             ValidAudience = builder.Configuration["Jwt:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])
             ),
             ClockSkew = TimeSpan.Zero // Reduce delay tolerance for token expiration.
         };

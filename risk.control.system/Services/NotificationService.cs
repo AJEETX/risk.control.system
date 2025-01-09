@@ -22,6 +22,7 @@ namespace risk.control.system.Services
         Task<ClaimsInvestigation> ReplyVerifySchedule(string id, string confirm = "N");
 
         Task<IpApiResponse?> GetClientIp(string? ipAddress, CancellationToken ct, string page, string userEmail = "", bool isAuthenticated = false, string latlong = "");
+        Task<IpApiResponse?> GetAgentIp(string? ipAddress, CancellationToken ct, string page, string userEmail = "", bool isAuthenticated = false, string latlong = "");
 
         Task<(ClaimMessage message, string yes, string no)> GetClaim(string baseUrl, string id);
 
@@ -73,7 +74,7 @@ namespace risk.control.system.Services
                     var lng = latlong.Substring(latlong.IndexOf(",") + 1);
                     //var newAddress = await customerApiclient.GetAddressFromLatLong(double.Parse(lat), double.Parse(lng));
                     var address = await httpClientService.GetAddress(lat, lng);
-                    var mapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={latlong}&zoom=14&size=560x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{latlong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+                    var mapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={latlong}&zoom=18&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latlong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
 
                     if (response != null && (await featureManager.IsEnabledAsync(FeatureFlags.IPTracking)))
                     {
@@ -88,6 +89,70 @@ namespace risk.control.system.Services
                             response.MapUrl = mapUrl;
                             response.page = page;
                             response.isAuthenticated = isAuthenticated;
+                        if ((isAuthenticated && !string.IsNullOrWhiteSpace(userEmail) && userEmail != Applicationsettings.PORTAL_ADMIN.EMAIL) || !isAuthenticated)
+                        {
+                            var user = context.ApplicationUser.FirstOrDefault(a => a.Email == userEmail);
+                            var userSessionAlive = new UserSessionAlive
+                            {
+                                Updated = DateTime.Now,
+                                ActiveUser = user,
+                                CurrentPage = page
+                            };
+                            context.UserSessionAlive.Add(userSessionAlive);
+
+                            context.IpApiResponse.Add(response);
+                            await context.SaveChangesAsync(false);
+                        }
+                        return response;
+                    }
+                }
+                //else
+                //{
+                //    var longLatString = response?.lat.GetValueOrDefault().ToString() + "," + response?.lon.GetValueOrDefault().ToString();
+                //    var mapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={longLatString}&zoom=6&size=560x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{longLatString}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+                //    response.page = page;
+                //    response.user = userEmail;
+                //    response.isAuthenticated = isAuthenticated;
+                //    response.MapUrl = mapUrl;
+                //    context.IpApiResponse.Add(response);
+                //    await context.SaveChangesAsync();
+                //}
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+            }
+            return null!;
+        }
+        public async Task<IpApiResponse?> GetAgentIp(string? ipAddress, CancellationToken ct, string page, string userEmail = "", bool isAuthenticated = false, string latlong = "")
+        {
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(latlong))
+                {
+                    var route = $"{IP_BASE_URL}/json/{ipAddress}";
+                    page = page == "/" ? "dashboard" : page;
+                    var response = await _httpClient.GetFromJsonAsync<IpApiResponse>(route, ct);
+                    var lat = latlong.Substring(0, latlong.IndexOf(","));
+                    var lng = latlong.Substring(latlong.IndexOf(",") + 1);
+                    //var newAddress = await customerApiclient.GetAddressFromLatLong(double.Parse(lat), double.Parse(lng));
+                    var address = await httpClientService.GetAddress(lat, lng);
+                    var mapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={latlong}&zoom=18&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latlong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+
+                    if (response != null && (await featureManager.IsEnabledAsync(FeatureFlags.IPTracking)))
+                    {
+                        response.country = address?.features[0].properties.country;
+                        response.regionName = address?.features[0].properties?.state;
+                        response.city = address?.features[0].properties?.county ?? response.city;
+                        response.district = address?.features[0].properties?.city;
+                        response.zip = address?.features[0].properties?.postcode;
+                        response.lat = address?.features[0].properties.lat;
+                        response.lon = address?.features[0].properties.lon;
+                        response.user = !string.IsNullOrWhiteSpace(userEmail) ? userEmail : "Guest";
+                        response.MapUrl = mapUrl;
+                        response.page = page;
+                        response.isAuthenticated = isAuthenticated;
                         if ((isAuthenticated && !string.IsNullOrWhiteSpace(userEmail) && userEmail != Applicationsettings.PORTAL_ADMIN.EMAIL) || !isAuthenticated)
                         {
                             var user = context.ApplicationUser.FirstOrDefault(a => a.Email == userEmail);
