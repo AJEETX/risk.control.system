@@ -384,7 +384,7 @@ namespace risk.control.system.Controllers.Company
                         ClaimsInvestigationId = id,
                         Addressline = random.Next(100, 999) + " GREAT ROAD",
                         DateOfBirth = DateTime.Now.AddYears(-random.Next(25, 77)).AddMonths(3),
-                        Income = Income.MEDIUUM_INCOME,
+                        Income = Income.MEDIUM_INCOME,
                         Name = NameGenerator.GenerateName(),
                         BeneficiaryRelationId = beneRelationId,
                         CountryId = pinCode.CountryId,

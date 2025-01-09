@@ -72,11 +72,7 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (currentUserEmail == null)
-                {
-                    notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
+                
                 var vendorApplicationUser = await _context.VendorApplicationUser
                     .Include(v => v.Country)
                     .Include(v => v.District)
@@ -116,12 +112,7 @@ namespace risk.control.system.Controllers
                     notifyService.Error("OOPs !!!..Id Not Found");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (currentUserEmail == null)
-                {
-                    notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
+                
                 var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == id);
                 var model = new VendorApplicationUser { Vendor = vendor };
                 ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
@@ -153,11 +144,7 @@ namespace risk.control.system.Controllers
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (currentUserEmail == null)
-                {
-                    notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
+                
                 if (user == null)
                 {
                     notifyService.Error("OOPs !!!..User not found");
@@ -194,7 +181,7 @@ namespace risk.control.system.Controllers
                 user.UserName = userFullEmail;
                 user.Mailbox = new Mailbox { Name = userFullEmail };
                 user.Updated = DateTime.Now;
-                user.UpdatedBy = HttpContext.User?.Identity?.Name;
+                user.UpdatedBy = currentUserEmail;
                 IdentityResult result = await userManager.CreateAsync(user, user.Password);
 
                 if (result.Succeeded)
@@ -242,12 +229,7 @@ namespace risk.control.system.Controllers
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (currentUserEmail == null)
-                {
-                    notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-
+                
                 if (userId == null || _context.VendorApplicationUser == null)
                 {
                     notifyService.Error("OOPs !!!..Id Not found");
@@ -308,11 +290,7 @@ namespace risk.control.system.Controllers
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (currentUserEmail == null)
-                {
-                    notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
+                
                 var user = await userManager.FindByIdAsync(id);
                 if (applicationUser?.ProfileImage != null && applicationUser.ProfileImage.Length > 0)
                 {
@@ -355,7 +333,7 @@ namespace risk.control.system.Controllers
                     user.IsUpdated = true;
                     user.Comments = applicationUser.Comments;
                     user.PhoneNumber = applicationUser.PhoneNumber;
-                    user.UpdatedBy = HttpContext.User?.Identity?.Name;
+                    user.UpdatedBy = currentUserEmail;
                     user.SecurityStamp = DateTime.Now.ToString();
                     var result = await userManager.UpdateAsync(user);
                     if (result.Succeeded)
@@ -530,11 +508,7 @@ namespace risk.control.system.Controllers
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (currentUserEmail == null)
-                {
-                    notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
+                
                 var vendorApplicationUser = await _context.VendorApplicationUser.FindAsync(id);
                 if (vendorApplicationUser == null)
                 {
@@ -542,7 +516,7 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(Index));
                 }
                 vendorApplicationUser.Updated = DateTime.Now;
-                vendorApplicationUser.UpdatedBy = HttpContext.User?.Identity?.Name;
+                vendorApplicationUser.UpdatedBy = currentUserEmail;
                 _context.VendorApplicationUser.Remove(vendorApplicationUser);
                 notifyService.Error($"User deleted successfully.", 3);
                 await _context.SaveChangesAsync();

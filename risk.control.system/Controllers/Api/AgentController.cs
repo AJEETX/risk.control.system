@@ -21,6 +21,8 @@ using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
 
+using static risk.control.system.AppConstant.Applicationsettings;
+
 namespace risk.control.system.Controllers.Api
 {
     [Route("api/[controller]")]
@@ -73,47 +75,6 @@ namespace risk.control.system.Controllers.Api
             portal_base_url = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
         }
 
-        [AllowAnonymous]
-        [HttpPost("Login")]
-        public IActionResult Login([FromBody] LoginModel model)
-        {
-            // Validate user credentials (e.g., via a database)
-            if (model.Username == "mobileUser" && model.Password == "password") // Replace with actual validation
-            {
-                var token = GenerateJwtToken(model.Username);
-                return Ok(new { Token = token });
-            }
-
-            return Unauthorized();
-        }
-
-        private string GenerateJwtToken(string userId)
-        {
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_KEY")));
-            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-
-            var claims = new[]
-            {
-                new Claim(JwtRegisteredClaimNames.Sub, userId),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-            };
-
-            var token = new JwtSecurityToken(
-                issuer: configuration["Jwt:Issuer"],
-                audience: configuration["Jwt:Audience"],
-                claims: claims,
-                expires: DateTime.UtcNow.AddHours(1),
-                signingCredentials: credentials
-            );
-
-            return new JwtSecurityTokenHandler().WriteToken(token);
-        }
-
-        public class LoginModel
-        {
-            public string Username { get; set; }
-            public string Password { get; set; }
-        }
         [AllowAnonymous]
         [HttpPost("ResetUid")]
         public async Task<IActionResult> ResetUid([Required] string mobile, bool sendSMS = false)
@@ -361,8 +322,9 @@ namespace risk.control.system.Controllers.Api
         }
 
         [AllowAnonymous]
+        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
         [HttpGet("agent")]
-        public async Task<IActionResult> GetAll(string email = "agent@verify.com")
+        public async Task<IActionResult> GetAll(string email = "agentx@verify.com")
         {
             try
             {
@@ -402,64 +364,64 @@ namespace risk.control.system.Controllers.Api
                             i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
 
                 var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == email && c.Role == AppRoles.AGENT);
-
-                if (vendorUser != null)
+                if (vendorUser == null)
                 {
-                    applicationDbContext = applicationDbContext.Where(i => i.VendorId == vendorUser.VendorId);
-                    var claimsAssigned = new List<ClaimsInvestigation>();
-
-                    foreach (var item in applicationDbContext)
-                    {
-                        if (item.VendorId == vendorUser.VendorId
-                            && item.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId)
-                        {
-                            claimsAssigned.Add(item);
-                        }
-                    }
-                    var filePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-policy.jpg");
-
-                    var noDocumentimage = await System.IO.File.ReadAllBytesAsync(filePath);
-
-                    filePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "user.png");
-
-                    var noCustomerimage = await System.IO.File.ReadAllBytesAsync(filePath);
-
-                    var claim2Agent = claimsAssigned
-                        .Select(c =>
-                    new
-                    {
-                        claimId = c.ClaimsInvestigationId,
-                        Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId),
-                        claimType = c.PolicyDetail.ClaimType.GetEnumDisplayName(),
-                        DocumentPhoto = c.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(c.PolicyDetail.DocumentImage)) :
-                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noDocumentimage)),
-                        CustomerName = c.CustomerDetail.Name,
-                        CustomerEmail = email,
-                        PolicyNumber = c.PolicyDetail.ContractNumber,
-                        Gender = c.CustomerDetail.Gender.GetEnumDisplayName(),
-                        c.CustomerDetail.Addressline,
-                        c.CustomerDetail.PinCode.Code,
-                        CustomerPhoto = c?.CustomerDetail.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(c?.CustomerDetail.ProfilePicture)) :
-                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noCustomerimage)),
-                        Country = c.CustomerDetail.Country.Name,
-                        State = c.CustomerDetail.State.Name,
-                        District = c.CustomerDetail.District.Name,
-                        c.CustomerDetail.Description,
-                        Locations = new
-                        {
-                            c.BeneficiaryDetail.BeneficiaryDetailId,
-                            Photo = c.BeneficiaryDetail?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(c.BeneficiaryDetail.ProfilePicture)) :
-                            string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noCustomerimage)),
-                            c.BeneficiaryDetail.Country.Name,
-                            BeneficiaryName = c.BeneficiaryDetail.Name,
-                            c.BeneficiaryDetail.Addressline,
-                            c.BeneficiaryDetail.PinCode.Code,
-                            District = c.BeneficiaryDetail.District.Name,
-                            State = c.BeneficiaryDetail.State.Name
-                        }
-                    });
-                    return Ok(claim2Agent);
+                    return Unauthorized("Invalid User !!!");
                 }
+                applicationDbContext = applicationDbContext.Where(i => i.VendorId == vendorUser.VendorId);
+                var claimsAssigned = new List<ClaimsInvestigation>();
+
+                foreach (var item in applicationDbContext)
+                {
+                    if (item.VendorId == vendorUser.VendorId
+                        && item.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId)
+                    {
+                        claimsAssigned.Add(item);
+                    }
+                }
+                var filePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-policy.jpg");
+
+                var noDocumentimage = await System.IO.File.ReadAllBytesAsync(filePath);
+
+                filePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "user.png");
+
+                var noCustomerimage = await System.IO.File.ReadAllBytesAsync(filePath);
+
+                var claim2Agent = claimsAssigned
+                    .Select(c =>
+                new
+                {
+                    claimId = c.ClaimsInvestigationId,
+                    Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId),
+                    claimType = c.PolicyDetail.ClaimType.GetEnumDisplayName(),
+                    DocumentPhoto = c.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(c.PolicyDetail.DocumentImage)) :
+                    string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noDocumentimage)),
+                    CustomerName = c.CustomerDetail.Name,
+                    CustomerEmail = email,
+                    PolicyNumber = c.PolicyDetail.ContractNumber,
+                    Gender = c.CustomerDetail.Gender.GetEnumDisplayName(),
+                    c.CustomerDetail.Addressline,
+                    c.CustomerDetail.PinCode.Code,
+                    CustomerPhoto = c?.CustomerDetail.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(c?.CustomerDetail.ProfilePicture)) :
+                    string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noCustomerimage)),
+                    Country = c.CustomerDetail.Country.Name,
+                    State = c.CustomerDetail.State.Name,
+                    District = c.CustomerDetail.District.Name,
+                    c.CustomerDetail.Description,
+                    Locations = new
+                    {
+                        c.BeneficiaryDetail.BeneficiaryDetailId,
+                        Photo = c.BeneficiaryDetail?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(c.BeneficiaryDetail.ProfilePicture)) :
+                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noCustomerimage)),
+                        c.BeneficiaryDetail.Country.Name,
+                        BeneficiaryName = c.BeneficiaryDetail.Name,
+                        c.BeneficiaryDetail.Addressline,
+                        c.BeneficiaryDetail.PinCode.Code,
+                        District = c.BeneficiaryDetail.District.Name,
+                        State = c.BeneficiaryDetail.State.Name
+                    }
+                });
+                return Ok(claim2Agent);
 
                 return Unauthorized("UnAuthenticated User !!!");
             }
@@ -472,7 +434,7 @@ namespace risk.control.system.Controllers.Api
 
         [AllowAnonymous]
         [HttpGet("agent-map")]
-        public async Task<IActionResult> IndexMap(string email = "agent@verify.com")
+        public async Task<IActionResult> IndexMap(string email = "agentx@verify.com")
         {
             try
             {
@@ -514,46 +476,46 @@ namespace risk.control.system.Controllers.Api
                             i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
 
                 var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == email && c.Role == AppRoles.AGENT);
-
-                if (vendorUser != null)
+                if (vendorUser == null)
                 {
-                    applicationDbContext = applicationDbContext.Where(i => i.VendorId == vendorUser.VendorId);
-                    var claimsAssigned = new List<ClaimsInvestigation>();
-
-                    foreach (var item in applicationDbContext)
-                    {
-                        if (item.VendorId == vendorUser.VendorId
-                            && item.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId)
-                        {
-                            claimsAssigned.Add(item);
-                        }
-                    }
-                    var filePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-policy.jpg");
-
-                    var noDocumentimage = await System.IO.File.ReadAllBytesAsync(filePath);
-
-                    filePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "user.png");
-
-                    var noCustomerimage = await System.IO.File.ReadAllBytesAsync(filePath);
-
-                    var claim2Agent = claimsAssigned
-                        .Select(c =>
-                    new
-                    {
-                        ClaimId = c.ClaimsInvestigationId,
-                        Registered= vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId), 
-                        Coordinate = new
-                        {
-                            Lat = c.PolicyDetail.ClaimType == ClaimType.HEALTH ?
-                                decimal.Parse(c.CustomerDetail.Latitude) : decimal.Parse(c.BeneficiaryDetail.Latitude),
-                            Lng = c.PolicyDetail.ClaimType == ClaimType.HEALTH ?
-                                 decimal.Parse(c.CustomerDetail.Longitude) : decimal.Parse(c.BeneficiaryDetail.Longitude)
-                        },
-                        Address = LocationDetail.GetAddress(c.PolicyDetail.ClaimType, c.CustomerDetail, c.BeneficiaryDetail),
-                        PolicyNumber = c.PolicyDetail.ContractNumber,
-                    });
-                    return Ok(claim2Agent);
+                    return Unauthorized("Invalid User !!!");
                 }
+                applicationDbContext = applicationDbContext.Where(i => i.VendorId == vendorUser.VendorId);
+                var claimsAssigned = new List<ClaimsInvestigation>();
+
+                foreach (var item in applicationDbContext)
+                {
+                    if (item.VendorId == vendorUser.VendorId
+                        && item.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId)
+                    {
+                        claimsAssigned.Add(item);
+                    }
+                }
+                var filePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-policy.jpg");
+
+                var noDocumentimage = await System.IO.File.ReadAllBytesAsync(filePath);
+
+                filePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "user.png");
+
+                var noCustomerimage = await System.IO.File.ReadAllBytesAsync(filePath);
+
+                var claim2Agent = claimsAssigned
+                    .Select(c =>
+                new
+                {
+                    ClaimId = c.ClaimsInvestigationId,
+                    Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId),
+                    Coordinate = new
+                    {
+                        Lat = c.PolicyDetail.ClaimType == ClaimType.HEALTH ?
+                            decimal.Parse(c.CustomerDetail.Latitude) : decimal.Parse(c.BeneficiaryDetail.Latitude),
+                        Lng = c.PolicyDetail.ClaimType == ClaimType.HEALTH ?
+                             decimal.Parse(c.CustomerDetail.Longitude) : decimal.Parse(c.BeneficiaryDetail.Longitude)
+                    },
+                    Address = LocationDetail.GetAddress(c.PolicyDetail.ClaimType, c.CustomerDetail, c.BeneficiaryDetail),
+                    PolicyNumber = c.PolicyDetail.ContractNumber,
+                });
+                return Ok(claim2Agent);
                 return Unauthorized();
             }
             catch (Exception ex)
@@ -565,7 +527,7 @@ namespace risk.control.system.Controllers.Api
 
         [AllowAnonymous]
         [HttpGet("get")]
-        public async Task<IActionResult> Get(string claimId, string email = "agent@verify.com")
+        public async Task<IActionResult> Get(string claimId, string email = "agentx@verify.com")
         {
             try
             {
@@ -587,7 +549,7 @@ namespace risk.control.system.Controllers.Api
                     .ThenInclude(c => c.PinCode)
                     .FirstOrDefault(c => c.ClaimsInvestigationId == claimId
                     );
-                var claimCase = _context.BeneficiaryDetail
+                var beneficiary = _context.BeneficiaryDetail
                     .Include(c => c.BeneficiaryRelation)
                     .Include(c => c.PinCode)
                     .Include(c => c.District)
@@ -627,16 +589,16 @@ namespace risk.control.system.Controllers.Api
                         },
                         beneficiary = new
                         {
-                            BeneficiaryId = claimCase.BeneficiaryDetailId,
-                            Name = claimCase.Name,
-                            Photo = claimCase.ProfilePicture != null ?
-                            string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claimCase.ProfilePicture)) :
+                            BeneficiaryId = beneficiary.BeneficiaryDetailId,
+                            Name = beneficiary.Name,
+                            Photo = beneficiary.ProfilePicture != null ?
+                            string.Format("data:image/*;base64,{0}", Convert.ToBase64String(beneficiary.ProfilePicture)) :
                             string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noCustomerimage)),
-                            Relation = claimCase.BeneficiaryRelation.Name,
-                            Income = claimCase.Income.GetEnumDisplayName(),
-                            Phone = claimCase.ContactNumber,
-                            DateOfBirth = claimCase.DateOfBirth.GetValueOrDefault().ToString("dd-MMM-yyyy"),
-                            Address = claimCase.Addressline + " " + claimCase.District.Name + " " + claimCase.State.Name + " " + claimCase.Country.Name + " " + claimCase.PinCode.Code
+                            Relation = beneficiary.BeneficiaryRelation.Name,
+                            Income = beneficiary.Income.GetEnumDisplayName(),
+                            Phone = beneficiary.ContactNumber,
+                            DateOfBirth = beneficiary.DateOfBirth.GetValueOrDefault().ToString("dd-MMM-yyyy"),
+                            Address = beneficiary.Addressline + " " + beneficiary.District.Name + " " + beneficiary.State.Name + " " + beneficiary.Country.Name + " " + beneficiary.PinCode.Code
                         },
                         Customer = new
                         {

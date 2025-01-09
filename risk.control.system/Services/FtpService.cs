@@ -76,7 +76,7 @@ namespace risk.control.system.Services
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
-                throw ex;
+                return false;
             }
         }
 

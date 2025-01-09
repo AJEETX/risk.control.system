@@ -57,32 +57,7 @@ namespace risk.control.system.Middleware
                         var ips = safelist.Split(';');
 
                         badIp = !IsIpAllowed(remoteIp, ips?.ToList());
-                        //_safelist = new byte[ips.Length][];
-                        //for (var i = 0; i < ips.Length; i++)
-                        //{
-                        //    _safelist[i] = IPAddress.Parse(ips[i]).GetAddressBytes();
-                        //}
-                        //foreach (var address in _safelist)
-                        //{
-                        //    if (address.SequenceEqual(bytes))
-                        //    {
-                        //        badIp = false;
-                        //        break;
-                        //    }
-                        //}
-                        //if(badIp)
-                        //{
-                        //    foreach (var ip in ips)
-                        //    {
-                        //        var ipRange = IPAddressRange.Parse($"{ip}/255.255.255.0");
-                        //        var isInRange = ipRange.Contains(remoteIp); // is True.
-                        //        if (isInRange)
-                        //        {
-                        //            badIp = false;
-                        //            break;
-                        //        }
-                        //    }
-                        //}
+                        
                         if (badIp)
                         {
                             context.Response.Redirect("/page/oops.html");

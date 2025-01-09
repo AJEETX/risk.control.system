@@ -1759,7 +1759,8 @@ input.auto-dropdown {
     color: white; /* White text */
 }
 select#PinCodeId{
-    height:300px;
+    min-height:430px;
+    height:100%;
 }
 .highlight-new-user {
     background-color: #d4edda; /* Light green background */

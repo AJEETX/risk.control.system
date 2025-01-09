@@ -17,7 +17,6 @@
             </div>
         </div>
 
-
         <div class="form-group">
             <span class="input-group-label"> Type of Service:</span>
             <div class="input-group mb-3">
@@ -41,8 +40,6 @@
                 <span asp-validation-for="Price" class="text-danger"></span>
             </div>
         </div>
-    </div>
-    <div class="col-md-6">
         <div class="form-group">
             <span class="input-group-label" for="CountryId" data-toggle="tooltip" title="Registered Country"> Country:</span>
             <div class="input-group mb-3">
@@ -90,15 +87,18 @@
             </div>
         </div>
     </div>
-    <div class="col-md-12">
-
+    <div class="col-md-6">
         <div class="form-group">
-            @Html.LabelFor(model => model.SelectedMultiPincodeId, new { @class = "col-sm-2 col-form-label" })
+            <span class="input-group-label" for="SelectedMultiPincodeId"> <i class="fas fa-map-pin"></i> Pincodes: <i class='far fa-hand-point-down'></i> </span>
+
             @{
                 var pincodes = ViewBag.PinCodeId as List<SelectListItem>;
             }
-            @Html.ListBoxFor(model => model.SelectedMultiPincodeId, new MultiSelectList(pincodes, "Value", "Text"), new { @class = "form-control remarks", multiple = "multiple", id = "PinCodeId" })
-        </div>
+            <div class="input-group">
 
+                @Html.ListBoxFor(model => model.SelectedMultiPincodeId, new MultiSelectList(pincodes, "Value", "Text"), new { @class = "form-control remarks", multiple = "multiple", id = "PinCodeId" })
+
+            </div>
+        </div>
     </div>
 </div>

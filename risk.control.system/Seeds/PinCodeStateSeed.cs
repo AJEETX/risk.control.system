@@ -106,7 +106,7 @@ namespace risk.control.system.Seeds
             }
             catch (Exception ex)
             {
-                throw ex;
+                Console.WriteLine(ex.Message);
             }
         }
         

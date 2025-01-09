@@ -24,7 +24,7 @@ namespace risk.control.system.Models
 
         [Display(Name = "5 - 8 Lac")]
         [Description("Medium income level")]
-        MEDIUUM_INCOME,
+        MEDIUM_INCOME,
 
         [Display(Name = "8 - 15 Lac")]
         [Description("Upper-middle income level")]

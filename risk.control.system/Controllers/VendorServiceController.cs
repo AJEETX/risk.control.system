@@ -52,8 +52,7 @@ namespace risk.control.system.Controllers
         {
             try
             {
-
-                if (id < 1 || _context.VendorInvestigationServiceType == null)
+                if (id < 1)
                 {
                     return NotFound();
                 }
@@ -72,11 +71,6 @@ namespace risk.control.system.Controllers
                     return NotFound();
                 }
 
-                //var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "Manage Agency(s)");
-                //var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Manage Agency") { Parent = agencysPage, RouteValues = new { id = vendorInvestigationServiceType.VendorId } };
-                //var editPage = new MvcBreadcrumbNode("Service", "Vendors", $"Manage Services") { Parent = agencyPage, RouteValues = new { id = vendorInvestigationServiceType.VendorId } };
-                //ViewData["BreadcrumbNode"] = editPage;
-
                 return View(vendorInvestigationServiceType);
 
             }
@@ -94,12 +88,6 @@ namespace risk.control.system.Controllers
         {
             try
             {
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (string.IsNullOrWhiteSpace(currentUserEmail))
-                {
-                    notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
                 var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == id);
                 ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name");
                 //ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
@@ -172,13 +160,7 @@ namespace risk.control.system.Controllers
         {
             try
             {
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (string.IsNullOrWhiteSpace(currentUserEmail))
-                {
-                    notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-                if (id == 0 || _context.VendorInvestigationServiceType == null)
+                if (id <= 0)
                 {
                     notifyService.Error("OOPs !!!..Agency Id Not Found");
                     return RedirectToAction(nameof(Index), "Dashboard");
@@ -207,8 +189,16 @@ namespace risk.control.system.Controllers
                         Value = x.PinCodeId.ToString()
                     }).ToList();
 
-                var selected = services.PincodeServices.Select(s => s.Pincode).ToList();
-                services.SelectedMultiPincodeId = _context.PinCode.Where(p => selected.Contains(p.Code)).Select(p => p.PinCodeId).ToList();
+                var selectedPincodeWithArea = services.PincodeServices;
+                var vendorServiceTypes = new List<long>();
+
+                foreach (var service in selectedPincodeWithArea)
+                {
+                    var pincodeServices = _context.PinCode.Where(p => p.Code == service.Pincode && p.Name == service.Name).Select(p => p.PinCodeId)?.ToList();
+                    vendorServiceTypes.AddRange(pincodeServices);
+                }
+
+                services.SelectedMultiPincodeId = vendorServiceTypes;
 
                 var agencysPage = new MvcBreadcrumbNode("Agencies", "Vendors", "Manage Agency(s)");
                 var agencyPage = new MvcBreadcrumbNode("Agencies", "Vendors", "Agencies") { Parent = agencysPage };
@@ -281,17 +271,12 @@ namespace risk.control.system.Controllers
         {
             try
             {
-                if (id == 0 || _context.VendorInvestigationServiceType == null)
+                if (id < 1)
                 {
                     notifyService.Error("OOPs !!!..Id Not Found");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (string.IsNullOrWhiteSpace(currentUserEmail))
-                {
-                    notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
+                
                 var vendorInvestigationServiceType = await _context.VendorInvestigationServiceType
                     .Include(v => v.InvestigationServiceType)
                     .Include(v => v.LineOfBusiness)
@@ -335,16 +320,12 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (string.IsNullOrWhiteSpace(currentUserEmail))
-                {
-                    notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
+                
                 var vendorInvestigationServiceType = await _context.VendorInvestigationServiceType.FindAsync(id);
                 if (vendorInvestigationServiceType != null)
                 {
                     vendorInvestigationServiceType.Updated = DateTime.Now;
-                    vendorInvestigationServiceType.UpdatedBy = HttpContext.User?.Identity?.Name;
+                    vendorInvestigationServiceType.UpdatedBy = currentUserEmail;
                     _context.VendorInvestigationServiceType.Remove(vendorInvestigationServiceType);
                     await _context.SaveChangesAsync();
                     notifyService.Custom($"Service deleted successfully.", 3, "red", "fas fa-truck");

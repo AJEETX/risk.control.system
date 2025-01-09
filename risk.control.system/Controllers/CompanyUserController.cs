@@ -78,7 +78,7 @@ namespace risk.control.system.Controllers
         [Breadcrumb("Details")]
         public async Task<IActionResult> Details(long? id)
         {
-            if (id == null || _context.ClientCompanyApplicationUser == null)
+            if (id == null || id <= 0)
             {
                 return NotFound();
             }
@@ -193,7 +193,7 @@ namespace risk.control.system.Controllers
         [Breadcrumb("Edit ")]
         public async Task<IActionResult> Edit(long? userId)
         {
-            if (userId == null || _context.ClientCompanyApplicationUser == null)
+            if (userId == null || userId <= 0)
             {
                 notifyService.Error("company not found");
                 return NotFound();
@@ -213,16 +213,6 @@ namespace risk.control.system.Controllers
                 return NotFound();
             }
             clientCompanyApplicationUser.ClientCompany = clientCompany;
-            //var country = _context.Country.OrderBy(o => o.Name);
-            //var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == clientCompanyApplicationUser.CountryId).OrderBy(d => d.Name);
-            //var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == clientCompanyApplicationUser.StateId).OrderBy(d => d.Name);
-            //var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == clientCompanyApplicationUser.DistrictId).OrderBy(d => d.Name);
-
-            //ViewData["CountryId"] = new SelectList(country.OrderBy(c => c.Name), "CountryId", "Name", clientCompanyApplicationUser.CountryId);
-            //ViewData["StateId"] = new SelectList(relatedStates, "StateId", "Name", clientCompanyApplicationUser.StateId);
-            //ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", clientCompanyApplicationUser.DistrictId);
-            //ViewData["PinCodeId"] = new SelectList(pincodes, "PinCodeId", "Code", clientCompanyApplicationUser.PinCodeId);
-
 
             var agencysPage = new MvcBreadcrumbNode("Companies", "ClientCompany", "Admin Settings");
             var agency2Page = new MvcBreadcrumbNode("Companies", "ClientCompany", "Companies") { Parent = agencysPage, };
@@ -315,7 +305,7 @@ namespace risk.control.system.Controllers
         [Breadcrumb("Delete")]
         public async Task<IActionResult> Delete(long? id)
         {
-            if (id == null || _context.VendorApplicationUser == null)
+            if (id == null || id <= 0)
             {
                 return NotFound();
             }
@@ -340,7 +330,7 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(long id)
         {
-            if (_context.ClientCompanyApplicationUser == null)
+            if (id  <= 0)
             {
                 return Problem("Entity set 'ApplicationDbContext.VendorApplicationUser'  is null.");
             }

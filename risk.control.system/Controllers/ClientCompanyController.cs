@@ -155,7 +155,7 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(long ClientCompanyId)
         {
-            if (_context.ClientCompany == null)
+            if (ClientCompanyId <= 0)
             {
                 notifyService.Error("Company not found!");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -217,7 +217,7 @@ namespace risk.control.system.Controllers
         [Breadcrumb(title: "Edit Company", FromAction = "Details")]
         public async Task<IActionResult> Edit(long id)
         {
-            if (id == 0 || _context.ClientCompany == null)
+            if (id <= 0 )
             {
                 notifyService.Error("Company not found!");
                 return RedirectToAction(nameof(Index), "Dashboard");
@@ -229,16 +229,6 @@ namespace risk.control.system.Controllers
                 notifyService.Error("Company not found!");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
-
-            //var country = _context.Country;
-            //var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == clientCompany.CountryId).OrderBy(d => d.Name);
-            //var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == clientCompany.StateId).OrderBy(d => d.Name);
-            //var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == clientCompany.DistrictId).OrderBy(d => d.Name);
-
-            //ViewData["CountryId"] = new SelectList(country.OrderBy(c => c.Name), "CountryId", "Name", clientCompany.CountryId);
-            //ViewData["StateId"] = new SelectList(relatedStates, "StateId", "Name", clientCompany.StateId);
-            //ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", clientCompany.DistrictId);
-            //ViewData["PinCodeId"] = new SelectList(pincodes, "PinCodeId", "Code", clientCompany.PinCodeId);
 
             var agencysPage = new MvcBreadcrumbNode("Companies", "ClientCompany", "Admin Settings");
             var agency2Page = new MvcBreadcrumbNode("Companies", "ClientCompany", "Companies") { Parent = agencysPage, };

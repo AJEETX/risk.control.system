@@ -36,21 +36,6 @@ namespace risk.control.system.Controllers
             return View();
         }
 
-        // POST: IpAddressController/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IpAddress address)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
         // GET: IpAddressController/Edit/5
         public ActionResult Edit(int id)
         {
