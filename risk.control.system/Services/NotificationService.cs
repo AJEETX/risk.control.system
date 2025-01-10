@@ -1,6 +1,7 @@
 ﻿using System.Net;
 
 using Amazon.Rekognition.Model;
+
 using Google.Api;
 
 using Microsoft.EntityFrameworkCore;
@@ -78,28 +79,33 @@ namespace risk.control.system.Services
 
                     if (response != null && (await featureManager.IsEnabledAsync(FeatureFlags.IPTracking)))
                     {
-                            response.country = address?.features[0].properties.country;
-                            response.regionName = address?.features[0].properties?.state;
-                            response.city = address?.features[0].properties?.county ?? response.city;
-                            response.district = address?.features[0].properties?.city;
-                            response.zip = address?.features[0].properties?.postcode;
-                            response.lat = address?.features[0].properties.lat;
-                            response.lon = address?.features[0].properties.lon;
-                            response.user = !string.IsNullOrWhiteSpace(userEmail) ? userEmail : "Guest";
-                            response.MapUrl = mapUrl;
-                            response.page = page;
-                            response.isAuthenticated = isAuthenticated;
+                        response.country = address?.features[0].properties.country;
+                        response.regionName = address?.features[0].properties?.state;
+                        response.city = address?.features[0].properties?.county ?? response.city;
+                        response.district = address?.features[0].properties?.city;
+                        response.zip = address?.features[0].properties?.postcode;
+                        response.lat = address?.features[0].properties.lat;
+                        response.lon = address?.features[0].properties.lon;
+                        response.user = !string.IsNullOrWhiteSpace(userEmail) ? userEmail : "Guest";
+                        response.MapUrl = mapUrl;
+                        response.page = page;
+                        response.isAuthenticated = isAuthenticated;
                         if ((isAuthenticated && !string.IsNullOrWhiteSpace(userEmail) && userEmail != Applicationsettings.PORTAL_ADMIN.EMAIL) || !isAuthenticated)
                         {
                             var user = context.ApplicationUser.FirstOrDefault(a => a.Email == userEmail);
-                            var userSessionAlive = new UserSessionAlive
+                            if (user != null)
                             {
-                                Updated = DateTime.Now,
-                                ActiveUser = user,
-                                CurrentPage = page
-                            };
-                            context.UserSessionAlive.Add(userSessionAlive);
-
+                                var userSessionAlive = new UserSessionAlive
+                                {
+                                    Updated = DateTime.Now,
+                                    ActiveUser = user,
+                                    CurrentPage = page,
+                                    Created = DateTime.Now,
+                                    IsUpdated = false,
+                                    UpdatedBy = user.Email
+                                };
+                                context.UserSessionAlive.Add(userSessionAlive);
+                            }
                             context.IpApiResponse.Add(response);
                             await context.SaveChangesAsync(false);
                         }

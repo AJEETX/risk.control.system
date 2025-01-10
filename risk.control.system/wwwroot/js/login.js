@@ -180,7 +180,7 @@ $(document).ready(function () {
                 }
             });
         },
-        minLength: 1, // Start showing suggestions after 1 character
+        minLength: 0, // Start showing suggestions after 1 character
         select: function (event, ui) {
             // Set the selected value to the input field
             $("#email").val(ui.item.value);

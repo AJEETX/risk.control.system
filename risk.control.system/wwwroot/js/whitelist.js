@@ -7,9 +7,30 @@
             dataSrc: ''
         },
         columnDefs: [
+            
+            {
+                className: 'max-width-column-claim', // Apply the CSS class,
+                targets: 1                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-claim', // Apply the CSS class,
+                targets: 2                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-claim', // Apply the CSS class,
+                targets: 3                     // Index of the column to style
+            },
+            {
+                className: 'max-width-column-claim', // Apply the CSS class,
+                targets: 4                     // Index of the column to style
+            },
             {
                 className: 'max-width-column-name', // Apply the CSS class,
                 targets: 5                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-claim', // Apply the CSS class,
+                targets: 6                      // Index of the column to style
             },
             {
                 className: 'max-width-column-name', // Apply the CSS class,
@@ -59,9 +80,9 @@
                 }
             },
             {
-                "data": "city",
+                "data": "district",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.city + '" data-toggle="tooltip">' + data + '</span>'
+                    return '<span title="' + row.district + '" data-toggle="tooltip">' + data + '</span>'
                 }
             },
             {

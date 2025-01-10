@@ -123,7 +123,7 @@ namespace risk.control.system.Controllers.Api
 
                 var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.AGENT.ToString()));
                 var user2Onboards = _context.VendorApplicationUser.Where(
-                    u => u.PhoneNumber.TrimStart('+') == request.Mobile.TrimStart('+'));
+                    u => u.Country.ISDCode + u.PhoneNumber == request.Mobile.TrimStart('+'));
                 foreach (var user2Onboard in user2Onboards)
                 {
                     var isAgent = await userVendorManager.IsInRoleAsync(user2Onboard, agentRole?.Name);
@@ -133,7 +133,7 @@ namespace risk.control.system.Controllers.Api
                         user2Onboard.MobileUId = request.Uid;
                         user2Onboard.SecretPin = randomNumber.Next(1000, 9999).ToString();
                         _context.VendorApplicationUser.Update(user2Onboard);
-                        _context.SaveChanges();
+                        await _context.SaveChangesAsync();
                         if (request.SendSMS)
                         {
                             //SEND SMS

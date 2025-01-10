@@ -63,9 +63,10 @@ namespace risk.control.system.Middleware
                     !context.Request.Query.Any(q => q.Value.Contains("js"))
                     )
                 {
-                    var ipAddress = context.GetServerVariable("HTTP_X_FORWARDED_FOR") ?? context.Connection.RemoteIpAddress?.ToString();
-                    var ipAddressWithoutPort = ipAddress?.Split(':')[0];
-                    var remoteIp = IPAddress.Parse(ipAddressWithoutPort);
+                    //var ipAddress = context.GetServerVariable("HTTP_X_FORWARDED_FOR") ?? context.Connection.RemoteIpAddress?.ToString();
+                    //var ipAddressWithoutPort = ipAddress?.Split(':')[0];
+                    //var remoteIp = IPAddress.Parse(ipAddressWithoutPort);
+                    var remoteIp = context.Connection.RemoteIpAddress;
 
                     _logger.LogDebug("Request from Remote IP address: {RemoteIp}", remoteIp);
 
