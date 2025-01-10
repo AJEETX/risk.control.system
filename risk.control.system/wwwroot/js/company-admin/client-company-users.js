@@ -54,7 +54,12 @@
             },
             { "data": "email" },
             { "data": "name" },
-            { "data": "phone" },
+            {
+                "data": "phone",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + data + '" data-toggle="tooltip"> <img alt="' + data + '" title="' + data + '" src="' + row.flag + '" class="flag-icon" data-toggle="tooltip"/>' + data + '</span>'
+                }
+            },
             { "data": "addressline", bSortable:false },
             { "data": "pincode" },
             {

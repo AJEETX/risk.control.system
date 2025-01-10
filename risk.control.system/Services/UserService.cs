@@ -24,10 +24,12 @@ namespace risk.control.system.Services
         private readonly ApplicationDbContext context;
         private readonly UserManager<ApplicationUser> userManager;
         private readonly IDashboardService dashboardService;
+        private readonly DateTime cutoffTime;
 
         public UserService(IConfiguration config, ApplicationDbContext context, UserManager<ApplicationUser> userManager, IDashboardService dashboardService)
         {
             this.config = config;
+            cutoffTime = DateTime.Now.AddMinutes(double.Parse(config["LOGIN_SESSION_TIMEOUT_MIN"]));
             this.context = context;
             this.userManager = userManager;
             this.dashboardService = dashboardService;
@@ -35,7 +37,6 @@ namespace risk.control.system.Services
 
         public async Task<List<UserDetailResponse>> GetAgencyUsers(string userEmail)
         {
-            var cutoffTime = DateTime.Now.AddMinutes(double.Parse(config["LOGIN_SESSION_TIMEOUT_MIN"]));
 
             // Fetch user session data from the database
             var userSessions = await context.UserSessionAlive
@@ -135,7 +136,9 @@ namespace risk.control.system.Services
                     "<a href=/Agency/EditUser?userId=" + u.AgencyUser.Id + ">" + u.AgencyUser.Email + "</a><span title=\"Onboarding incomplete !!!\" data-toggle=\"tooltip\"><i class='fa fa-asterisk asterik-style'></i></span>",
                     Name = u.AgencyUser.FirstName + " " + u.AgencyUser.LastName,
                     Phone = "(+"+ u.AgencyUser.Country.ISDCode+") " + u.AgencyUser.PhoneNumber,
-                    Addressline = u.AgencyUser.Addressline + ", " + u.AgencyUser.District.Name + ", " + u.AgencyUser.State.Name + ", " + u.AgencyUser.Country.Code + ", " + u.AgencyUser.PinCode.Code,
+                    Addressline = u.AgencyUser.Addressline + ", " + u.AgencyUser.District.Name + ", " + u.AgencyUser.State.Code + ", " + u.AgencyUser.Country.Code + ", " + u.AgencyUser.PinCode.Code,
+                    Country = u.AgencyUser.Country.Code,
+                    Flag = "/flags/" + u.AgencyUser.Country.Code.ToLower() + ".png",
                     Active = u.AgencyUser.Active,
                     Roles = u.AgencyUser.UserRole != null ? $"<span class=\"badge badge-light\">{u.AgencyUser.UserRole.GetEnumDisplayName()}</span>" : "<span class=\"badge badge-light\">...</span>",
                     Count = u.CurrentCaseCount,
@@ -160,8 +163,6 @@ namespace risk.control.system.Services
 
         public async Task<List<UserDetailResponse>> GetCompanyAgencyUsers(string userEmail, long id)
         {
-            var cutoffTime = DateTime.Now.AddMinutes(double.Parse(config["LOGIN_SESSION_TIMEOUT_MIN"]));
-
             // Fetch user session data from the database
             var userSessions = await context.UserSessionAlive
                 .Where(u => u.Updated >= cutoffTime) // Filter sessions within the last 15 minutes
@@ -236,7 +237,9 @@ namespace risk.control.system.Services
                     Phone = "(+"+ user.Country.ISDCode+") " + user.PhoneNumber,
                     Photo = user.ProfilePicture == null ? Applicationsettings.NO_USER : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(user.ProfilePicture)),
                     Active = user.Active,
-                    Addressline = user.Addressline + ", " + user.District.Name + ", " + user.State.Name + ", " + user.Country.Code,
+                    Addressline = user.Addressline + ", " + user.District.Name + ", " + user.State.Code + ", " + user.Country.Code,
+                    Country = user.Country.Code,
+                    Flag = "/flags/" + user.Country.Code.ToLower() + ".png",
                     Pincode = user.PinCode.Code,
                     Roles = string.Join(",", GetUserRoles(user).Result),
                     Updated = user.Updated.HasValue ? user.Updated.Value.ToString("dd-MM-yyyy") : user.Created.ToString("dd-MM-yyyy"),
@@ -259,8 +262,6 @@ namespace risk.control.system.Services
 
         public async Task<List<UserDetailResponse>> GetCompanyUsers(string userEmail)
         {
-            var cutoffTime = DateTime.Now.AddMinutes(double.Parse(config["LOGIN_SESSION_TIMEOUT_MIN"]));
-
             // Fetch user session data from the database
             var userSessions = await context.UserSessionAlive
                 .Where(u => u.Updated >= cutoffTime) // Filter sessions within the last 15 minutes
@@ -339,10 +340,11 @@ namespace risk.control.system.Services
                     Phone = "(+"+ user.Country.ISDCode+") " + user.PhoneNumber,
                     Photo = user.ProfilePicture == null ? Applicationsettings.NO_USER : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(user.ProfilePicture)),
                     Active = user.Active,
-                    Addressline = user.Addressline,
+                    Addressline = user.Addressline + ", " + user.District.Name + ", " + user.State.Code + ", " + user.Country.Code,
                     District = user.District.Name,
-                    State = user.State.Name,
-                    Country = user.Country.Name,
+                    State = user.State.Code,
+                    Country = user.Country.Code,
+                    Flag = "/flags/" + user.Country.Code.ToLower() + ".png",
                     Roles = string.Join(",", GetUserRoles(user).Result),
                     Pincode = user.PinCode.Code,
                     OnlineStatus = status,
@@ -431,10 +433,11 @@ namespace risk.control.system.Services
                     Phone = user.PhoneNumber,
                     Photo = user.ProfilePicture == null ? Applicationsettings.NO_USER : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(user.ProfilePicture)),
                     Active = user.Active,
-                    Addressline = user.Addressline,
+                    Addressline = user.Addressline + ", " + user.District.Name + ", " + user.State.Code + ", " + user.Country.Code,
                     District = user.District.Name,
-                    State = user.State.Name,
-                    Country = user.Country.Name,
+                    State = user.State.Code,
+                    Country = user.Country.Code,
+                    Flag = "/flags/" + user.Country.Code.ToLower() + ".png",
                     Roles = string.Join(",", GetUserRoles(user).Result),
                     Pincode = user.PinCode.Code,
                     OnlineStatus = status,

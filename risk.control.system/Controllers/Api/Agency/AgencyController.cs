@@ -84,7 +84,9 @@ namespace risk.control.system.Controllers.Api.Agency
                     Phone = "(+"+ u.Country.ISDCode+") " + u.PhoneNumber,
                     Photo = u.ProfilePicture == null ? noUserImagefilePath : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(u.ProfilePicture)) ,
                     Active = u.Active,
-                    Addressline = u.Addressline + ", " + u.District.Name + ", " + u.State.Name + ", " + u.Country.Code,
+                    Addressline = u.Addressline + ", " + u.District.Name + ", " + u.State.Code + ", " + u.Country.Code,
+                    Country = u.Country.Code,
+                    Flag = "/flags/" + u.Country.Code.ToLower() + ".png",
                     Pincode = u.PinCode.Code,
                     Roles = u.UserRole != null ? $"<span class=\"badge badge-light\">{u.UserRole.GetEnumDisplayName()}</span>" : "<span class=\"badge badge-light\">...</span>",
                     Updated = u.Updated.HasValue ? u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy"),
@@ -117,7 +119,9 @@ namespace risk.control.system.Controllers.Api.Agency
                     Name = u.Name,
                     Code = u.Code,
                     Phone = "(+"+ u.Country.ISDCode+") " + u.PhoneNumber,
-                    Address = u.Addressline + ", " + u.District.Name + ", " + u.State.Name + ", " + u.Country.Code,
+                    Address = u.Addressline + ", " + u.District.Name + ", " + u.State.Code + ", " + u.Country.Code,
+                    Country = u.Country.Code,
+                    Flag = "/flags/" + u.Country.Code.ToLower() + ".png",
                     Pincode =  u.PinCode.Code,
                     Status = "<span class='badge badge-light'>"+ u.Status.GetEnumDisplayName() + "</span>",
                     Updated = u.Updated.HasValue ? u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy"),
@@ -153,8 +157,9 @@ namespace risk.control.system.Controllers.Api.Agency
                     Phone = "(+"+ u.Country.ISDCode+") " + u.PhoneNumber,
                     Address = u.Addressline,
                     District = u.District.Name,
-                    State = u.State.Name,
-                    Country = u.Country.Name,
+                    State = u.State.Code,
+                    Country = u.Country.Code,
+                    Flag = "/flags/" + u.Country.Code.ToLower() + ".png",
                     Updated = u.Updated.HasValue ? u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy"),
                     UpdateBy = u.UpdatedBy,
                     IsUpdated = u.IsUpdated,
@@ -198,8 +203,9 @@ namespace risk.control.system.Controllers.Api.Agency
                     CaseType = s.LineOfBusiness.Name,
                     ServiceType = s.InvestigationServiceType.Name,
                     District = s.District.Name,
-                    State = s.State.Name,
-                    Country = s.Country.Name,
+                    State = s.State.Code,
+                    Country = s.Country.Code,
+                    Flag = "/flags/" + s.Country.Code.ToLower() + ".png",
                     Pincodes = s.PincodeServices.Count == 0 ?
                     "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>" :
                      string.Join("", s.PincodeServices.Select(c => "<span class='badge badge-light'>" + c.Pincode + "</span> ")),
@@ -359,6 +365,8 @@ namespace risk.control.system.Controllers.Api.Agency
                     Name = u.AgencyUser.FirstName + " " + u.AgencyUser.LastName,
                     Phone = "(+"+ u.AgencyUser.Country.ISDCode+") " + u.AgencyUser.PhoneNumber,
                     Addressline = u.AgencyUser.Addressline + ", " + u.AgencyUser.District.Name + ", " + u.AgencyUser.State.Code + ", " + u.AgencyUser.Country.Code,
+                    Country = u.AgencyUser.Country.Code,
+                    Flag = "/flags/" + u.AgencyUser.Country.Code.ToLower() + ".png",
                     Active = u.AgencyUser.Active,
                     Roles = u.AgencyUser.UserRole != null ? $"<span class=\"badge badge-light\">{u.AgencyUser.UserRole.GetEnumDisplayName()}</span>" : "<span class=\"badge badge-light\">...</span>",
                     Count = u.CurrentCaseCount,
@@ -393,6 +401,8 @@ namespace risk.control.system.Controllers.Api.Agency
         public string Addressline { get; set; }
         public bool Active { get; set; }
         public string Roles { get; set; }
+        public string Country { get; set; }
+        public string? Flag{ get; set; }
         public int Count { get; set; }
         public string UpdateBy { get; set; }
         public string Role { get; set; }

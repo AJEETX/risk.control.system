@@ -235,7 +235,7 @@ namespace risk.control.system.Controllers.Company
                 var currentUser = await _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c=>c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
                 if (currentUser.ClientCompany.HasSampleData)
                 {
-                    var pinCode = _context.PinCode.Include(s => s.Country).FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE2);
+                    var pinCode = _context.PinCode.Include(s => s.Country).OrderBy(s=>s.Name).FirstOrDefault(s => s.Country.CountryId == currentUser.ClientCompany.CountryId);
                     var random = new Random();
                     var customerDetail = new CustomerDetail
                     {
@@ -341,7 +341,7 @@ namespace risk.control.system.Controllers.Company
                 if (currentUser.ClientCompany.HasSampleData)
                 {
                     var beneRelationId = _context.BeneficiaryRelation.FirstOrDefault().BeneficiaryRelationId;
-                    var pinCode = _context.PinCode.Include(p=>p.Country).FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE2);
+                    var pinCode = _context.PinCode.Include(s => s.Country).LastOrDefault(s => s.Country.CountryId == currentUser.ClientCompany.CountryId);
                     var random = new Random();
 
                     var model = new BeneficiaryDetail

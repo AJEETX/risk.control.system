@@ -53,6 +53,8 @@ namespace risk.control.system.Seeds
                 Addressline = "987 Canterbury Road",
                 PhoneNumber = Applicationsettings.PORTAL_ADMIN_MOBILE,
                 IsVendorAdmin = false,
+                PinCode = pinCode,
+                Country = pinCode.Country,
                 CountryId = pinCode.CountryId,
                 DistrictId = pinCode?.DistrictId ?? default!,
                 StateId = pinCode?.StateId ?? default!,

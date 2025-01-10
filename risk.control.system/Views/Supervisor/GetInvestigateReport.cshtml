@@ -42,14 +42,13 @@
         <partial name="_PolicyDetails" model="@Model" />
 
         <form id="supervisor-form" method="post" asp-action="ProcessReport" asp-controller="ClaimsVendorPost" enctype="multipart/form-data">
-            <partial name="_AgentReport" model="@Model" />
             <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
             <input type="hidden" id="CaseLocationId" name="CaseLocationId" value="@Model.Location.BeneficiaryDetailId" />
             <input type="hidden" id="policyDetailId" value="@Model.ClaimsInvestigation?.PolicyDetail.PolicyDetailId" />
             <input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail.CustomerDetailId" />
             <input type="hidden" id="beneficiaryId" value="@Model.Location?.BeneficiaryDetailId" />
-
-            <partial name="_SupervisorRemarks" model="@Model" />
+            <partial name="_AgentReport" model="@Model" />
+            <partial name="_Submit" model="@Model" />
         </form>
     </div>
 </section>

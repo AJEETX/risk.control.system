@@ -21,7 +21,7 @@ namespace risk.control.system.Seeds
         {
             var company = context.ClientCompany.FirstOrDefault(c => c.Email == clientCompany.Email);
             string noUserImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", @Applicationsettings.NO_USER);
-            var pinCode = context.PinCode.Include(p => p.District).Include(p => p.State).Include(p => p.Country).FirstOrDefault(p => p.Code == CURRENT_PINCODE);
+            var pinCode = context.PinCode.Include(p => p.District).Include(p => p.State).Include(p => p.Country).FirstOrDefault(p => p.PinCodeId == clientCompany.PinCodeId);
 
             //Seed client admin
             await CompanyAdminSeed.Seed(context, webHostEnvironment, userManager, clientCompany, httpAccessor, company.Email, pinCode);

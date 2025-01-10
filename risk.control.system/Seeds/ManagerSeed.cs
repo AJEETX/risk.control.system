@@ -51,6 +51,7 @@ namespace risk.control.system.Seeds
                 Addressline = "22 Golden Road",
                 IsVendorAdmin = false,
                 ClientCompany = clientCompany,
+                Country = pinCode.Country,
                 CountryId = pinCode.CountryId,
                 DistrictId = pinCode?.DistrictId ?? default!,
                 StateId = pinCode?.StateId ?? default!,

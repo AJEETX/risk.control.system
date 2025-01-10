@@ -29,7 +29,7 @@ namespace risk.control.system.Seeds
                 Name = adminEmailwithSuffix
             };
 
-            var pinCode = context.PinCode.Include(p => p.District).Include(p => p.State).FirstOrDefault(p => p.Code == CURRENT_PINCODE);
+            var pinCode = context.PinCode.Include(p => p.District).Include(p => p.State).FirstOrDefault(p => p.PinCodeId == vendor.PinCodeId);
             var district = context.District.FirstOrDefault(c => c.DistrictId == pinCode.District.DistrictId);
             var state = context.State.Include(s => s.Country).FirstOrDefault(s => s.StateId == pinCode.State.StateId);
             var countryId = context.Country.FirstOrDefault(s => s.CountryId == state.Country.CountryId)?.CountryId ?? default!;
@@ -100,8 +100,7 @@ namespace risk.control.system.Seeds
             //     Applicationsettings.AGENT.FIRST_NAME, Applicationsettings.AGENT.LAST_NAME,"Holland Road");
 
             string agent2EmailwithSuffix = AGENTX.CODE + "@" + vendor.Email;
-            var pinCode2 = CURRENT_PINCODE4;
-            await AgentSeed.Seed(context, agent2EmailwithSuffix, webHostEnvironment, customApiCLient, userManager, vendor, pinCode2, Applicationsettings.AGENTX.PROFILE_IMAGE,
+            await AgentSeed.Seed(context, agent2EmailwithSuffix, webHostEnvironment, customApiCLient, userManager, vendor, vendor.PinCode.Code, Applicationsettings.AGENTX.PROFILE_IMAGE,
                                  Applicationsettings.AGENTX.FIRST_NAME, Applicationsettings.AGENTX.LAST_NAME,"44 Waverley Road");
 
             //string agent3EmailwithSuffix = AGENTY.CODE + "@" + vendor.Email;

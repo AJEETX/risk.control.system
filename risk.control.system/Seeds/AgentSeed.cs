@@ -52,6 +52,8 @@ namespace risk.control.system.Seeds
                 IsClientAdmin = false,
                 IsVendorAdmin = false,
                 Addressline = "23 Vincent Avenue",
+                Country = pincode?.Country,
+                PinCode = pincode,
                 CountryId = pincode?.CountryId,
                 DistrictId = pincode?.DistrictId ?? default!,
                 StateId = pincode?.StateId ?? default!,

@@ -21,9 +21,7 @@ namespace risk.control.system.Seeds
             {
                 Name = PORTAL_ADMIN.EMAIL
             };
-            var pinCode = context.PinCode.Include(p => p.District).Include(p => p.State).FirstOrDefault(p => p.Code == CURRENT_PINCODE);
-            var district = context.District.FirstOrDefault(c => c.DistrictId == pinCode.District.DistrictId);
-            var state = context.State.Include(s=>s.Country).FirstOrDefault(s => s.StateId == pinCode.State.StateId);
+            var pinCode = context.PinCode.Include(p => p.District).Include(p => p.State).Include(p => p.Country).FirstOrDefault(p => p.Code == CURRENT_PINCODE);
 
             string adminImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(PORTAL_ADMIN.PROFILE_IMAGE));
             var adminImage = File.ReadAllBytes(adminImagePath);
@@ -50,9 +48,11 @@ namespace risk.control.system.Seeds
                 IsVendorAdmin = true,
                 PhoneNumberConfirmed = true,
                 PhoneNumber = Applicationsettings.PORTAL_ADMIN_MOBILE,
-                CountryId = state.Country.CountryId,
-                DistrictId = district?.DistrictId ?? default!,
-                StateId = state?.StateId ?? default!,
+                PinCode = pinCode,
+                Country = pinCode.Country,
+                CountryId = pinCode.Country.CountryId,
+                DistrictId = pinCode?.DistrictId ?? default!,
+                StateId = pinCode?.StateId ?? default!,
                 PinCodeId = pinCode?.PinCodeId ?? default!,
                 ProfilePictureUrl = PORTAL_ADMIN.PROFILE_IMAGE,
                 ProfilePicture = adminImage,

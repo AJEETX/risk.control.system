@@ -14,6 +14,7 @@
         public string? District { get; set; }
         public string? State { get; set; }
         public string? Country { get; set; }
+        public string? Flag { get; set; }
         public string Roles { get; set; }
         public string? Role { get; set; }
         public string? Pincode { get; set; }

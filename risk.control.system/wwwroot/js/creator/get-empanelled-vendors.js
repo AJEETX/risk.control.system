@@ -110,7 +110,7 @@
             {
                 "data": "phone",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.phone + '" data-toggle="tooltip">' + data + '</span>';
+                    return '<span title="' + data + '" data-toggle="tooltip"> <img alt="' + data + '" title="' + data + '" src="' + row.flag + '" class="flag-icon" data-toggle="tooltip"/>' + data + '</span>'
                 }
             },
             {
@@ -134,7 +134,7 @@
             {
                 "data": "country",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.country + '" data-toggle="tooltip">' + data + '</span>';
+                    return '<span title="' + row.country + '" data-toggle="tooltip"> <img alt="' + data + '" title="' + data + '" src="' + row.flag + '" class="flag-icon" data-toggle="tooltip"/>' + data + '</span>';
                 }
             },
             {

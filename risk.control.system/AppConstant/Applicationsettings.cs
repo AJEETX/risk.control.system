@@ -227,6 +227,16 @@
         public const string AGENCY3DOMAIN = "investigate.com";
         public const string AGENCY3PHOTO = "/img/investigate.png";
 
+        public const string AGENCY4NAME = "Proper";
+        public const string AGENCY4CODE = "PPR";
+        public const string AGENCY4DOMAIN = "proper.com";
+        public const string AGENCY4PHOTO = "/img/proper.png";
+
+        public const string AGENCY5NAME = "Honest";
+        public const string AGENCY5CODE = "HNT";
+        public const string AGENCY5DOMAIN = "honest.com";
+        public const string AGENCY5PHOTO = "/img/honest.png";
+
         public const string NO_IMAGE = "/img/no-image.png";
         public const string AUDIO_UPLOAD_IMAGE = "/img/upload-audio.png";
         public const string VIDEO_UPLOAD_IMAGE = "/img/upload-video.png";

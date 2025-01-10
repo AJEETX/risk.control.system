@@ -302,7 +302,8 @@ builder.Services.AddMvcCore(config =>
 builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
-//app.UseMiddleware<UpdateUserLastActivityMiddleware>();
+app.UseMiddleware<UpdateUserLastActivityMiddleware>();
+app.UseMiddleware<CookieConsentMiddleware>();
 //app.UseWebSockets();
 app.UseSwagger();
 

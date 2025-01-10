@@ -53,6 +53,7 @@ namespace risk.control.system.Seeds
                 Addressline = "453 Main Road",
                 PhoneNumber = Applicationsettings.PORTAL_ADMIN_MOBILE,
                 IsVendorAdmin = false,
+                Country = pinCode.Country,
                 CountryId = pinCode.CountryId,
                 DistrictId = pinCode?.DistrictId ?? default!,
                 StateId = pinCode?.StateId ?? default!,

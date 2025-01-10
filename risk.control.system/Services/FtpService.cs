@@ -263,6 +263,15 @@ namespace risk.control.system.Services
                                 i++;
                             }
 
+                            var pinCode = _context.PinCode
+                                .Include(p => p.District)
+                                .Include(p => p.State)
+                                .Include(p => p.Country)
+                                .FirstOrDefault(p => p.Code == rowData[19].Trim());
+                            if(pinCode.CountryId != companyUser.ClientCompany.CountryId)
+                            {
+                                continue;
+                            }
                             //CREATE CLAIM
                             var subStatus = companyUser.ClientCompany.AutoAllocation && autoOrManual == CREATEDBY.AUTO ? createdStatus : assignedStatus;
                             var claim = new ClaimsInvestigation
@@ -317,12 +326,7 @@ namespace risk.control.system.Services
                             };
 
                             //CREATE CUSTOMER
-                            var pinCode = _context.PinCode
-                                .Include(p => p.District)
-                                .Include(p => p.State)
-                                .Include(p => p.Country)
-                                .FirstOrDefault(p => p.Code == rowData[19].Trim());
-
+                            
                             var district = _context.District.FirstOrDefault(c => c.DistrictId == pinCode.District.DistrictId);
 
                             var state = _context.State.FirstOrDefault(s => s.StateId == pinCode.State.StateId);

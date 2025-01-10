@@ -6,7 +6,8 @@
                 <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
             </div>
             <div class="card-header">
-                <h3 class="card-title"><i class="fas fa-user-shield"></i> Report: <span class="badge badge-light"> @Model.AgencyReport.AgentEmail </span>
+                <h3 class="card-title">
+                    <i class="fas fa-user-shield"></i> Report: <span class="badge badge-light"> @Model.AgencyReport.AgentEmail </span>
                     <span class="hover-text">
                         <i class="fas fa-info-circle"></i>
                         <span class="tooltip-text" id="information">
@@ -32,18 +33,34 @@
             <div class="card-body pb-0">
 
                 <div class="row">
-                    <partial name="_AgencyDigitalReport" model="@Model" />
-                    <partial name="_AgencyDocumentReport" model="@Model" />
-                    @if(Model.ClaimsInvestigation.EnablePassport)
-                    {
-                        <partial name="_AgencyPassportIdReport" model="@Model" />
-                    }
-                    @if(Model.ClaimsInvestigation.EnableMedia)
-                    {
-                        <partial name="_AgencyAudioReport" model="@Model" />
-                        <partial name="_AgencyVideoReport" model="@Model" />
-                    }
-                    <partial name="_AgencyAgentAnswer" model="@Model" />
+                    <div class="col-md-4">
+                        <partial name="_AgencyDigitalReport" model="@Model" />
+
+                        <partial name="_AgencyDocumentReport" model="@Model" />
+
+                        @if (Model.ClaimsInvestigation.EnablePassport)
+                        {
+                            <div class="row">
+                                <partial name="_AgencyPassportIdReport" model="@Model" />
+                            </div>
+                        }
+                        @if (Model.ClaimsInvestigation.EnableMedia)
+                        {
+                            <div class="row">
+                                <partial name="_AgencyAudioReport" model="@Model" />
+                            </div>
+                            <div class="row">
+                                <partial name="_AgencyVideoReport" model="@Model" />
+                            </div>
+                        }
+                    </div>
+                    <div class="col-md-4">
+                        <partial name="_AgencyAgentAnswer" model="@Model" />
+
+                    </div>
+                    <div class="col-md-4">
+                        <partial name="_SupervisorRemarks" model="@Model" />
+                    </div>
                 </div>
             </div>
         </div>

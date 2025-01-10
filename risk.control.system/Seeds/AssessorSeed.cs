@@ -54,6 +54,8 @@ namespace risk.control.system.Seeds
                 IsClientManager = true,
                 Addressline = "11 Nurlendi Street",
                 PhoneNumber = Applicationsettings.PORTAL_ADMIN_MOBILE,
+                PinCode = pinCode,
+                Country = pinCode.Country,
                 CountryId = pinCode.CountryId,
                 DistrictId = pinCode?.DistrictId ?? default!,
                 StateId = pinCode?.StateId ?? default!,

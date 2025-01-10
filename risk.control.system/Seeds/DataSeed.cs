@@ -308,7 +308,8 @@ namespace risk.control.system.Seeds
             #region CLIENT/ VENDOR COMPANY
 
             var (vendors, companyIds) = await ClientVendorSeed.Seed(context, webHostEnvironment, claimComprehensiveService.Entity,
-                claimDiscreetService.Entity, claimDocumentCollectionService.Entity, claimCaseType.Entity,httpAccessor,customApiCLient);
+                claimDiscreetService.Entity, claimDocumentCollectionService.Entity, claimCaseType.Entity,
+                httpAccessor,customApiCLient, clientUserManager, vendorUserManager);
 
             #endregion CLIENT/ VENDOR COMPANY
 
@@ -323,18 +324,18 @@ namespace risk.control.system.Seeds
             #region APPLICATION USERS ROLES
 
 
-            foreach (var companyId in companyIds)
-            {
-                await ClientApplicationUserSeed.Seed(context, webHostEnvironment, clientUserManager, companyId, httpAccessor);
-            }
-            await context.SaveChangesAsync(null, false);
+            //foreach (var companyId in companyIds)
+            //{
+            //    await ClientApplicationUserSeed.Seed(context, webHostEnvironment, clientUserManager, companyId, httpAccessor);
+            //}
+            //await context.SaveChangesAsync(null, false);
 
-            foreach (var vendor in vendors)
-            {
-                await VendorApplicationUserSeed.Seed(context, webHostEnvironment, vendorUserManager, vendor, customApiCLient, httpAccessor);
-            }
+            //foreach (var vendor in vendors)
+            //{
+            //    await VendorApplicationUserSeed.Seed(context, webHostEnvironment, vendorUserManager, vendor, customApiCLient, httpAccessor);
+            //}
 
-            await context.SaveChangesAsync(null, false);
+            //await context.SaveChangesAsync(null, false);
 
             #endregion APPLICATION USERS ROLES
         }

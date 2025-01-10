@@ -240,6 +240,34 @@ namespace risk.control.system.Controllers.Mobile
             return Ok(new { message });
         }
 
+        [AllowAnonymous]
+        [HttpPost]
+        [Route("AcceptCookies")]
+        public IActionResult AcceptCookies()
+        {
+            Response.Cookies.Append("CookieConsent", "Accepted", new CookieOptions
+            {
+                Expires = DateTimeOffset.UtcNow.AddDays(1),
+                HttpOnly = true
+            });
+
+            return Ok(new { success = true, message = "Cookie consent saved successfully!" });
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
+        [Route("RevokeCookies")]
+        public IActionResult RevokeCookies()
+        {
+            // Remove the CookieConsent cookie
+            Response.Cookies.Delete("CookieConsent");
+
+            // Optionally, perform additional server-side cleanup (e.g., clear sessions)
+
+            // Return a success message
+            return Ok(new { success = true, message = "Cookie consent has been revoked." });
+        }
+
 
         //[Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
         //[HttpGet("cookie-api")]

@@ -9,6 +9,8 @@ var showLocationMap = false;
 var showOcrMap = false;
 const image =
     "/images/beachflag.png";
+
+
 function checkFormCompletion(formSelector, create = false) {
     let isFormComplete = true;
 

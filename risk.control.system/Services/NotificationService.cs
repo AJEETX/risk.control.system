@@ -74,7 +74,7 @@ namespace risk.control.system.Services
                     var lng = latlong.Substring(latlong.IndexOf(",") + 1);
                     //var newAddress = await customerApiclient.GetAddressFromLatLong(double.Parse(lat), double.Parse(lng));
                     var address = await httpClientService.GetAddress(lat, lng);
-                    var mapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={latlong}&zoom=18&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latlong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+                    var mapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={latlong}&zoom=15&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latlong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
 
                     if (response != null && (await featureManager.IsEnabledAsync(FeatureFlags.IPTracking)))
                     {

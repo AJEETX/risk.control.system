@@ -52,6 +52,55 @@ function focusLogin() {
     }
 }
 
+async function acceptCookies() {
+    try {
+        const response = await fetch('/api/secure/AcceptCookies', { method: 'POST' });
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const data = await response.json(); // Assuming the server returns JSON
+        console.log('Response data:', data);
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
+//document.addEventListener("DOMContentLoaded", function () {
+//    if (!localStorage.getItem("cookieConsentAccepted")) {
+//        document.getElementById("cookieConsent").style.display = "block";
+//    }
+
+//    document.getElementById("acceptCookies").addEventListener("click", function () {
+//        // Save consent in localStorage
+//        localStorage.setItem("cookieConsentAccepted", "true");
+
+//        // Hide the cookie consent popup
+//        document.getElementById("cookieConsent").style.display = "none";
+
+//        // Optionally, inform the server about consent
+//        acceptCookies();
+//    });
+//});
+
+//document.getElementById("revokeConsent").addEventListener("click", async function () {
+//    try {
+//        // Send a POST request to the server to revoke consent
+//        const response = await fetch('/api/secure/RevokeCookies', { method: 'POST' });
+
+//        if (!response.ok) {
+//            throw new Error(`HTTP error! Status: ${response.status}`);
+//        }
+
+//        const result = await response.json(); // Assuming server sends a JSON response
+//        alert(result.message || "Cookie consent revoked.");
+
+//        // Optionally reload the page
+//        location.reload();
+//    } catch (error) {
+//        console.error("Error revoking consent:", error);
+//        alert("Failed to revoke cookie consent.");
+//    }
+//});
+
 // Function to handle successful geolocation retrieval
 //function handleGeolocationSuccess(position) {
 //    const latlong = `${position.coords.latitude},${position.coords.longitude}`;

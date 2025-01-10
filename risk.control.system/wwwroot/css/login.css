@@ -476,3 +476,17 @@ img.logo {
     padding: 8px 12px;
     cursor: pointer;
 }
+#cookieConsent {
+    font-size: .7em;
+    display: none;
+    position: fixed;
+    bottom: 0;
+    width: 90%;
+    background-color: #F7ECEC;
+    color: white;
+    padding: 2px;
+    text-align: center;
+    z-index: 1000;
+    color:black;
+    border:1px solid #ddd;
+}
