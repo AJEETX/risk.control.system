@@ -102,8 +102,8 @@ namespace risk.control.system.Controllers
         [Breadcrumb("Add New", FromAction = "Index")]
         public IActionResult Create(long id)
         {
-            var company = _context.ClientCompany.FirstOrDefault(v => v.ClientCompanyId == id);
-            var model = new ClientCompanyApplicationUser { CountryId = company.CountryId, ClientCompany = company };
+            var company = _context.ClientCompany.Include(c=>c.Country).FirstOrDefault(v => v.ClientCompanyId == id);
+            var model = new ClientCompanyApplicationUser { Country = company.Country, CountryId = company.CountryId, ClientCompany = company };
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
 
             var agencysPage = new MvcBreadcrumbNode("Companies", "ClientCompany", "Admin Settings");
@@ -199,29 +199,21 @@ namespace risk.control.system.Controllers
                 return NotFound();
             }
 
-            var clientCompanyApplicationUser = await _context.ClientCompanyApplicationUser.FindAsync(userId);
-            if (clientCompanyApplicationUser == null)
+            var user = await _context.ClientCompanyApplicationUser.Include(u=>u.ClientCompany).Include(c=>c.Country).FirstOrDefaultAsync(v=>v.Id == userId);
+            if (user == null)
             {
                 notifyService.Error("company not found");
                 return NotFound();
             }
-            var clientCompany = _context.ClientCompany.FirstOrDefault(v => v.ClientCompanyId == clientCompanyApplicationUser.ClientCompanyId);
-
-            if (clientCompany == null)
-            {
-                notifyService.Error("company not found");
-                return NotFound();
-            }
-            clientCompanyApplicationUser.ClientCompany = clientCompany;
 
             var agencysPage = new MvcBreadcrumbNode("Companies", "ClientCompany", "Admin Settings");
             var agency2Page = new MvcBreadcrumbNode("Companies", "ClientCompany", "Companies") { Parent = agencysPage, };
-            var agencyPage = new MvcBreadcrumbNode("Details", "ClientCompany", "Company Profile") { Parent = agency2Page, RouteValues = new { id = clientCompany.ClientCompanyId } };
-            var createPage = new MvcBreadcrumbNode("Index", "CompanyUser", $"Users") { Parent = agencyPage, RouteValues = new { id = clientCompany.ClientCompanyId } };
+            var agencyPage = new MvcBreadcrumbNode("Details", "ClientCompany", "Company Profile") { Parent = agency2Page, RouteValues = new { id = user.ClientCompany.ClientCompanyId } };
+            var createPage = new MvcBreadcrumbNode("Index", "CompanyUser", $"Users") { Parent = agencyPage, RouteValues = new { id = user.ClientCompany.ClientCompanyId } };
             var editPage = new MvcBreadcrumbNode("Edit", "CompanyUser", $"Edit User") { Parent = createPage };
             ViewData["BreadcrumbNode"] = editPage;
 
-            return View(clientCompanyApplicationUser);
+            return View(user);
         }
 
         // POST: ClientCompanyApplicationUser/Edit/5

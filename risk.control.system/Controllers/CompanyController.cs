@@ -253,13 +253,13 @@ namespace risk.control.system.Controllers
                     notifyService.Error("OOPs !!!..User Not Found");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var company = _context.ClientCompany.FirstOrDefault(v => v.ClientCompanyId == companyUser.ClientCompanyId);
+                var company = _context.ClientCompany.Include(c=>c.Country).FirstOrDefault(v => v.ClientCompanyId == companyUser.ClientCompanyId);
                 if (company == null)
                 {
                     notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var model = new ClientCompanyApplicationUser { ClientCompany = company, CountryId = company.CountryId };
+                var model = new ClientCompanyApplicationUser { Country = company.Country, ClientCompany = company, CountryId = company.CountryId };
                 return View(model);
             }
             catch (Exception ex)
@@ -374,25 +374,17 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                var clientCompanyApplicationUser = await _context.ClientCompanyApplicationUser.FindAsync(userId);
+                var clientCompanyApplicationUser = await _context.ClientCompanyApplicationUser
+                    .Include(u => u.Country).
+                    Include(u => u.ClientCompany)
+                    .FirstOrDefaultAsync(c => c.Id== userId);
+
                 if (clientCompanyApplicationUser == null)
                 {
                     notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 
-                var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == currentUserEmail);
-
-                ViewBag.Show = clientCompanyApplicationUser.Email == companyUser.Email ? false : true;
-                var clientCompany = _context.ClientCompany.FirstOrDefault(v => v.ClientCompanyId == clientCompanyApplicationUser.ClientCompanyId);
-
-                if (clientCompany == null)
-                {
-                    notifyService.Error("OOPs !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-                clientCompanyApplicationUser.ClientCompany = clientCompany;
-
                 return View(clientCompanyApplicationUser);
             }
             catch (Exception ex)
@@ -665,7 +657,7 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                var vendor = await _context.Vendor.FindAsync(id);
+                var vendor = await _context.Vendor.Include(v=>v.Country).FirstOrDefaultAsync(v=>v.VendorId == id);
                 if (vendor == null)
                 {
                     notifyService.Error("OOPS !!!..Contact Admin");
@@ -778,7 +770,7 @@ namespace risk.control.system.Controllers
             }
             var allRoles = Enum.GetValues(typeof(AgencyRole)).Cast<AgencyRole>()?.ToList();
 
-            var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == id);
+            var vendor = _context.Vendor.Include(v=>v.Country).FirstOrDefault(v => v.VendorId == id);
             if (vendor == null)
             {
                 notifyService.Error("OOPS !!!..Contact Admin");
@@ -793,7 +785,7 @@ namespace risk.control.system.Controllers
             {
                 allRoles = allRoles.Where(r => r != AgencyRole.AGENCY_ADMIN).ToList();
             }
-            var model = new VendorApplicationUser { Vendor = vendor, AgencyRole = allRoles };
+            var model = new VendorApplicationUser {Country = vendor.Country, CountryId = vendor.CountryId, Vendor = vendor, AgencyRole = allRoles };
 
             return View(model);
         }
@@ -940,23 +932,16 @@ namespace risk.control.system.Controllers
                 }
 
                 var vendorApplicationUser = _context.VendorApplicationUser
-                    .Include(v => v.Mailbox).Where(v => v.Id == userId)
+                    .Include(u=>u.Vendor)
+                    .Include(v => v.Country).Where(v => v.Id == userId)
                     ?.FirstOrDefault();
+
                 if (vendorApplicationUser == null)
                 {
                     notifyService.Error("OOPS !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == vendorApplicationUser.VendorId);
-
-                if (vendor == null)
-                {
-                    notifyService.Error("OOPS !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-
-                vendorApplicationUser.Vendor = vendor;
-
+                
                 return View(vendorApplicationUser);
             }
             catch (Exception ex)
@@ -1060,9 +1045,9 @@ namespace risk.control.system.Controllers
         {
             try
             {
-                var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == id);
+                var vendor = _context.Vendor.Include(v=>v.Country).FirstOrDefault(v => v.VendorId == id);
                 ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name");
-                var model = new VendorInvestigationServiceType { SelectedMultiPincodeId = new List<long>(), Vendor = vendor, PincodeServices = new List<ServicedPinCode>() };
+                var model = new VendorInvestigationServiceType { Country = vendor.Country, SelectedMultiPincodeId = new List<long>(), Vendor = vendor, PincodeServices = new List<ServicedPinCode>() };
 
                 return View(model);
             }
@@ -1137,6 +1122,7 @@ namespace risk.control.system.Controllers
                     return NotFound();
                 }
                 var services = _context.VendorInvestigationServiceType
+                    .Include(v => v.Country)
                     .Include(v => v.Vendor)
                     .Include(v => v.PincodeServices)
                     .First(v => v.VendorInvestigationServiceTypeId == id);

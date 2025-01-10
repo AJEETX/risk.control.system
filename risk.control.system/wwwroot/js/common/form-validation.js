@@ -11,7 +11,7 @@ $(document).ready(function () {
     validateInput('#Code', /[^a-zA-Z]/g); // Allow only alphabets characters (no spaces)
     validateInput('#CauseOfLoss, #Description, #Addressline, #Comments', /[^a-zA-Z0-9 ]/g); // Allow alphanumeric and spaces
     validateInput('#CustomerName, #BeneficiaryName, #StateId, #DistrictId, #FirstName, #LastName, #Name, #Branch, #BankName', /[^a-zA-Z ]/g); // Allow alphabets and spaces
-    validateInput('#ContactNumber, #PhoneNumber, #BankAccountNumber', /[^0-9]/g); // Allow numeric only no spaces
+    validateInput('#ContactNumber, #PhoneNumber, #BankAccountNumber, #ISDCode', /[^0-9]/g); // Allow numeric only no spaces
 
     // Allow only numbers and a single dot
     // Allow only numbers and a single dot for SumAssuredValue and ContactNumber

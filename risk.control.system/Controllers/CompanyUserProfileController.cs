@@ -94,20 +94,13 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                var clientCompanyApplicationUser = await _context.ClientCompanyApplicationUser.FindAsync(userId);
+                var clientCompanyApplicationUser = await _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).Include(c => c.Country).FirstOrDefaultAsync(u=>u.Id == userId);
                 if (clientCompanyApplicationUser == null)
                 {
                     notifyService.Error("USER NOT FOUND");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var clientCompany = _context.ClientCompany.FirstOrDefault(v => v.ClientCompanyId == clientCompanyApplicationUser.ClientCompanyId);
-
-                if (clientCompany == null)
-                {
-                    notifyService.Error("COMPANY NOT FOUND");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-                clientCompanyApplicationUser.ClientCompany = clientCompany;
+               
                 return View(clientCompanyApplicationUser);
             }
             catch (Exception ex)

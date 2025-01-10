@@ -115,7 +115,8 @@ namespace risk.control.system.Seeds
             var country = new Country
             {
                 Name = "INDIA",
-                Code = "IND",
+                Code = "IN",
+                ISDCode = 91,
                 Updated = DateTime.Now,
             };
 
@@ -131,6 +132,7 @@ namespace risk.control.system.Seeds
             {
                 Name = "AUSTRALIA",
                 Code = "AU",
+                ISDCode = 61,
                 Updated = DateTime.Now,
             };
             var australiaCountry = await context.Country.AddAsync(country);

@@ -1797,3 +1797,9 @@ select#PinCodeId{
 .scrollable-column::-webkit-scrollbar-thumb:hover {
     background-color: #555; /* Hover effect */
 }
+#country-code-display{
+    font-size:small;
+}
+.flag-icon{
+    margin-right:4px;
+}

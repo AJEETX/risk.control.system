@@ -134,7 +134,7 @@ namespace risk.control.system.Controllers
                     notifyService.Error("User Not found !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var vendor = await _context.Vendor.FindAsync(vendorUser.VendorId);
+                var vendor = await _context.Vendor.Include(v=>v.Country).FirstOrDefaultAsync(v=>v.VendorId == vendorUser.VendorId);
                 if (vendor == null)
                 {
                     notifyService.Custom($"Agency Not found.", 3, "red", "fas fa-building");
@@ -219,7 +219,7 @@ namespace risk.control.system.Controllers
                     notifyService.Error("User Not found !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == vendorUser.VendorId);
+                var vendor = _context.Vendor.Include(v=>v.Country).FirstOrDefault(v => v.VendorId == vendorUser.VendorId);
                 if (vendor == null)
                 {
                     notifyService.Custom($"No agency not found.", 3, "red", "fas fa-building");
@@ -227,7 +227,7 @@ namespace risk.control.system.Controllers
                 }
                 var roles = Enum.GetValues(typeof(AgencyRole)).Cast<AgencyRole>().Where(role => role != AgencyRole.AGENCY_ADMIN)?.ToList();
 
-                var model = new VendorApplicationUser { CountryId = vendor.CountryId, Vendor = vendor, AgencyRole = roles };
+                var model = new VendorApplicationUser { Country = vendor.Country, CountryId = vendor.CountryId, Vendor = vendor, AgencyRole = roles };
                 return View(model);
             }
             catch (Exception ex)
@@ -419,28 +419,12 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(AgencyController.User), "Agency");
                 }
 
-                var user = await _context.VendorApplicationUser.FindAsync(userId);
+                var user = await _context.VendorApplicationUser.Include(u => u.Country).Include(u => u.Vendor).FirstOrDefaultAsync(c => c.Id== userId);
                 if (user == null)
                 {
                     notifyService.Error("User not found!!!..Contact Admin");
                     return RedirectToAction(nameof(AgencyController.User), "Agency");
                 }
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-                
-                var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == currentUserEmail);
-                if (vendorUser == null)
-                {
-                    notifyService.Error("User Not found !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-                var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == vendorUser.VendorId);
-                if (vendor == null)
-                {
-                    notifyService.Custom($"No agency not found.", 3, "red", "fas fa-building");
-                    return RedirectToAction(nameof(AgencyController.Profile), "Agency");
-                }
-
-                user.Vendor = vendor;
                 return View(user);
             }
             catch (Exception ex)
@@ -509,7 +493,6 @@ namespace risk.control.system.Controllers
 
                 user.ProfilePictureUrl = applicationUser?.ProfilePictureUrl ?? user.ProfilePictureUrl;
                 user.ProfilePicture = applicationUser?.ProfilePicture ?? user.ProfilePicture;
-                user.PhoneNumber = applicationUser?.PhoneNumber ?? user.PhoneNumber;
                 user.FirstName = applicationUser?.FirstName;
                 user.LastName = applicationUser?.LastName;
                 if (!string.IsNullOrWhiteSpace(applicationUser?.Password))
@@ -798,10 +781,10 @@ namespace risk.control.system.Controllers
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 
                 var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == currentUserEmail);
-                var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == vendorUser.VendorId);
+                var vendor = _context.Vendor.Include(v=>v.Country).FirstOrDefault(v => v.VendorId == vendorUser.VendorId);
 
                 ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name");
-                var model = new VendorInvestigationServiceType {  CountryId = vendor.CountryId, SelectedMultiPincodeId = new List<long>(), Vendor = vendor, PincodeServices = new List<ServicedPinCode>() };
+                var model = new VendorInvestigationServiceType { Country =  vendor.Country, CountryId = vendor.CountryId, SelectedMultiPincodeId = new List<long>(), Vendor = vendor, PincodeServices = new List<ServicedPinCode>() };
                 return View(model);
             }
             catch (Exception ex)
@@ -879,6 +862,7 @@ namespace risk.control.system.Controllers
                 }
 
                 var services = _context.VendorInvestigationServiceType
+                    .Include(v => v.Country)
                     .Include(v => v.Vendor)
                     .Include(v => v.PincodeServices)
                     .First(v => v.VendorInvestigationServiceTypeId == id);

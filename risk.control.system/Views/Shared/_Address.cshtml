@@ -51,10 +51,18 @@
     </div>
 </div>
 <div class="form-group">
-    <span class="input-group-label" for="CountryId" data-toggle="tooltip" title="Registered Country"> Country:</span>
+    <span class="input-group-label" for="CountryId"> Country:</span>
     <div class="input-group mb-3">
         <div class="input-group-prepend">
             <span class="input-group-text" for="CountryId" data-toggle="tooltip" title="Registered Country"><i class="fas fa-map-marked-alt"></i> <i class="fa fa-asterisk asterik-style-info"></i></span>
+        </div>
+        <div class="input-group-prepend">
+            @{
+                var img = "/flags/" + @Model.Country.Code.ToLower() + ".png";
+            }
+            <span class="input-group-text" data-toggle="tooltip" title="Registered Country :@Model?.Country.Name">
+                <img src="@img" class="flag-icon" data-toggle="tooltip" title="@Model.Country.Name" /> @Model?.Country.Code
+            </span>
         </div>
         <input readonly type="text" id="CountryId" class="form-control" data-placeholder="country" asp-for="CountryId" data-toggle="tooltip" title="Registered Country" value="" tabindex="-1" />
         <span asp-validation-for="CountryId" class="text-danger"></span>

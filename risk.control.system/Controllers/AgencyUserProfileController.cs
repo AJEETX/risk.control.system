@@ -88,20 +88,12 @@ namespace risk.control.system.Controllers
                     return NotFound();
                 }
 
-                var vendorApplicationUser = await _context.VendorApplicationUser.FindAsync(userId);
+                var vendorApplicationUser = await _context.VendorApplicationUser.Include(v => v.Vendor).Include(c => c.Country).FirstOrDefaultAsync(u=>u.Id == userId);
                 if (vendorApplicationUser == null)
                 {
                     notifyService.Custom($"No user not found.", 3, "red", "fas fa-user");
                     return NotFound();
                 }
-                var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == vendorApplicationUser.VendorId);
-
-                if (vendor == null)
-                {
-                    notifyService.Custom($"No user not found.", 3, "red", "fas fa-user");
-                    return NotFound();
-                }
-                vendorApplicationUser.Vendor = vendor;
 
                 var country = _context.Country.OrderBy(o => o.Name);
                 var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == vendorApplicationUser.CountryId).OrderBy(d => d.Name);

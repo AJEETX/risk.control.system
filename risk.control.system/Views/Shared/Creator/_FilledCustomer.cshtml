@@ -68,7 +68,7 @@
                         <li class="small"><span class="fa-li"><i class="fas fa-graduation-cap"></i></span>Education: @customerDetail?.Education</li>
                         <li class="small"><span class="fa-li"><i class="fas fa-user-alt"></i></span>Age: @currentAgeInYrs</li>
                         <li class="small"><span class="fa-li"><i class="fas fa-lg fa-building"></i></span>Address: @address</li>
-                        <li class="small"><span class="fa-li"><i class="fas fa-lg fa-phone"></i></span>Phone #: +@customerDetail?.ContactNumber</li>
+                        <li class="small"><span class="fa-li"><i class="fas fa-lg fa-phone"></i></span>Phone #: (+@customerDetail?.Country.ISDCode) @customerDetail?.ContactNumber</li>
                     </ul>
                 </div>
 

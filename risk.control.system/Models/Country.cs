@@ -15,6 +15,10 @@ public class Country : BaseEntity
     [Display(Name = "Country code")]
     [Required]
     public string Code { get; set; } = default!;
+
+    [Display(Name = "ISD Code")]
+    [Required]
+    public int ISDCode { get; set; } = default!;
     public override string ToString()
     {
         return $"Country Information:\n" +

@@ -223,7 +223,7 @@ namespace risk.control.system.Controllers
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
 
-            var clientCompany = await _context.ClientCompany.FindAsync(id);
+            var clientCompany = await _context.ClientCompany.Include(c=>c.Country).FirstOrDefaultAsync(c=>c.ClientCompanyId == id);
             if (clientCompany == null)
             {
                 notifyService.Error("Company not found!");

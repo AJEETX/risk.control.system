@@ -113,8 +113,8 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 
-                var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == id);
-                var model = new VendorApplicationUser { Vendor = vendor };
+                var vendor = _context.Vendor.Include(v=>v.Country).FirstOrDefault(v => v.VendorId == id);
+                var model = new VendorApplicationUser {Country = vendor.Country, Vendor = vendor };
                 ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
 
                 var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "Agencies");
@@ -236,36 +236,17 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                var vendorApplicationUser = _context.VendorApplicationUser
-                    .Include(v => v.Mailbox).Where(v => v.Id == userId)
-                    ?.FirstOrDefault();
+                var vendorApplicationUser =await _context.VendorApplicationUser
+                    .Include(v => v.Vendor).Include(v => v.Country)?.FirstOrDefaultAsync(v => v.Id == userId);
                 if (vendorApplicationUser == null)
                 {
                     notifyService.Error("OOPs !!!..User Not found");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var vendor = await _context.Vendor.FirstOrDefaultAsync(v => v.VendorId == vendorApplicationUser.VendorId);
-
-                if (vendor == null)
-                {
-                    notifyService.Error("OOPs !!!..Agency Not found");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-                vendorApplicationUser.Vendor = vendor;
-
-                var country = _context.Country.OrderBy(o => o.Name);
-                var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == vendorApplicationUser.CountryId).OrderBy(d => d.Name);
-                var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == vendorApplicationUser.StateId).OrderBy(d => d.Name);
-                var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == vendorApplicationUser.DistrictId).OrderBy(d => d.Name);
-
-                ViewData["CountryId"] = new SelectList(country.OrderBy(c => c.Name), "CountryId", "Name", vendorApplicationUser.CountryId);
-                ViewData["StateId"] = new SelectList(relatedStates, "StateId", "Name", vendorApplicationUser.StateId);
-                ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", vendorApplicationUser.DistrictId);
-                ViewData["PinCodeId"] = new SelectList(pincodes, "PinCodeId", "Code", vendorApplicationUser.PinCodeId);
 
                 var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "Agencies");
-                var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Manage Agency") { Parent = agencysPage, RouteValues = new { id = vendor.VendorId } };
-                var usersPage = new MvcBreadcrumbNode("Index", "VendorUser", $"Manage Users") { Parent = agencyPage, RouteValues = new { id = vendor.VendorId } };
+                var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Manage Agency") { Parent = agencysPage, RouteValues = new { id = vendorApplicationUser.Vendor.VendorId } };
+                var usersPage = new MvcBreadcrumbNode("Index", "VendorUser", $"Manage Users") { Parent = agencyPage, RouteValues = new { id = vendorApplicationUser.Vendor.VendorId } };
                 var editPage = new MvcBreadcrumbNode("Edit", "VendorApplicationUsers", $"Edit User") { Parent = usersPage, RouteValues = new { id = userId } };
                 ViewData["BreadcrumbNode"] = editPage;
 

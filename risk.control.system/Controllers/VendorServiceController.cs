@@ -88,10 +88,10 @@ namespace risk.control.system.Controllers
         {
             try
             {
-                var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == id);
+                var vendor = _context.Vendor.Include(v=>v.Country).FirstOrDefault(v => v.VendorId == id);
                 ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name");
                 //ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
-                var model = new VendorInvestigationServiceType { SelectedMultiPincodeId = new List<long>(), CountryId = vendor.CountryId, Vendor = vendor, PincodeServices = new List<ServicedPinCode>() };
+                var model = new VendorInvestigationServiceType { Country = vendor.Country, SelectedMultiPincodeId = new List<long>(), CountryId = vendor.CountryId, Vendor = vendor, PincodeServices = new List<ServicedPinCode>() };
 
                 var agencysPage = new MvcBreadcrumbNode("Agencies", "Vendors", "Manage Agency(s)");
                 var agencyPage = new MvcBreadcrumbNode("Agencies", "Vendors", "Agencies") { Parent = agencysPage };
@@ -172,6 +172,7 @@ namespace risk.control.system.Controllers
                     return NotFound();
                 }
                 var services = _context.VendorInvestigationServiceType
+                    .Include(v => v.Country)
                     .Include(v => v.Vendor)
                     .Include(v => v.PincodeServices)
                     .First(v => v.VendorInvestigationServiceTypeId == id);

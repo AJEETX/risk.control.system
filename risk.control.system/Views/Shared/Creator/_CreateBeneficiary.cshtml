@@ -84,18 +84,7 @@
                         <span asp-validation-for="BeneficiaryRelationId" class="text-danger"></span>
                     </div>
                 </div>
-
-                <div class="form-group">
-                    <span class="input-group-label"> Phone #:</span>
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text" asp-for="ContactNumber"><i class="fas fa-phone"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                        </div>
-                        <input type="text" asp-for="ContactNumber" id="ContactNumber" class="form-control remarks" required maxlength="14" placeholder="Phone # with country code" />
-                        <span asp-validation-for="ContactNumber" class="text-danger"></span>
-                    </div>
-                </div>
-
+                <partial name="Creator/_BeneficiaryPhoneNumber" model="@Model" />
 
                 <div class="form-group">
                     <span class="input-group-label"> Income:</span>
@@ -121,7 +110,7 @@
 
             </div>
             <div class="col-md-6">
-                <partial name="_BeneficiaryAddress" model="@Model" />
+                <partial name="Creator/_BeneficiaryAddress" model="@Model" />
 
                 <div class="form-group">
                     <span class="input-group-label"> Address:</span>

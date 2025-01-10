@@ -347,7 +347,7 @@
                                                             <span class="fa-li">
                                                                 <i class="fas fa-lg fa-phone"></i>
                                                             </span>
-                                                            Phone #: + @Model.ClaimsInvestigation?.CustomerDetail?.ContactNumber
+                                                            Phone #: (+@Model.ClaimsInvestigation?.CustomerDetail?.Country.ISDCode) @Model.ClaimsInvestigation?.CustomerDetail?.ContactNumber
                                                         </li>
                                                     </ul>
                                                 </div>
@@ -447,7 +447,7 @@
                                                             <span class="fa-li">
                                                                 <i class="fas fa-lg fa-phone"></i>
                                                             </span>
-                                                            Phone #: + @Model.Location?.ContactNumber
+                                                            Phone #: (+@Model.Location?.Country.ISDCode) @Model.Location?.ContactNumber
                                                         </li>
                                                     </ul>
                                                 </div>

@@ -159,7 +159,7 @@ namespace risk.control.system.Controllers
             }
             var allRoles = Enum.GetValues(typeof(AgencyRole)).Cast<AgencyRole>()?.ToList(); 
 
-            var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == id);
+            var vendor = _context.Vendor.Include(v=>v.Country).FirstOrDefault(v => v.VendorId == id);
             if(vendor == null)
             {
                 notifyService.Error("OOPS !!!..Contact Admin");
@@ -174,8 +174,7 @@ namespace risk.control.system.Controllers
             {
                 allRoles = allRoles.Where(r => r != AgencyRole.AGENCY_ADMIN).ToList();
             }
-            var model = new VendorApplicationUser { CountryId = vendor.CountryId, Vendor = vendor, AgencyRole = allRoles };
-            //ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
+            var model = new VendorApplicationUser { Country= vendor.Country, CountryId = vendor.CountryId, Vendor = vendor, AgencyRole = allRoles };
 
             var agencysPage = new MvcBreadcrumbNode("AvailableVendors", "Company", "Manager Agency(s)");
             var agency2Page = new MvcBreadcrumbNode("AvailableVendors", "Company", "Available Agencies") { Parent = agencysPage, };
@@ -328,27 +327,19 @@ namespace risk.control.system.Controllers
                 }
 
                 var vendorApplicationUser = _context.VendorApplicationUser
-                    .Include(v => v.Mailbox).Where(v => v.Id == userId)
-                    ?.FirstOrDefault();
+                    .Include(v => v.Country)?
+                    .Include(v => v.Vendor)?
+                    .FirstOrDefault(v => v.Id == userId);
                 if (vendorApplicationUser == null)
                 {
                     notifyService.Error("OOPS !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == vendorApplicationUser.VendorId);
-
-                if (vendor == null)
-                {
-                    notifyService.Error("OOPS !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-
-                vendorApplicationUser.Vendor = vendor;
 
                 var agencysPage = new MvcBreadcrumbNode("AvailableVendors", "Company", "Manager Agency(s)");
                 var agency2Page = new MvcBreadcrumbNode("AvailableVendors", "Company", "Available Agencies") { Parent = agencysPage, };
-                var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Manage Agency") { Parent = agency2Page, RouteValues = new { id = vendor.VendorId } };
-                var usersPage = new MvcBreadcrumbNode("Users", "Vendors", $"Manager Users") { Parent = agencyPage, RouteValues = new { id = vendor.VendorId } };
+                var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Manage Agency") { Parent = agency2Page, RouteValues = new { id = vendorApplicationUser.Vendor.VendorId } };
+                var usersPage = new MvcBreadcrumbNode("Users", "Vendors", $"Manager Users") { Parent = agencyPage, RouteValues = new { id = vendorApplicationUser.Vendor.VendorId } };
                 var editPage = new MvcBreadcrumbNode("EditUser", "Vendors", $"Edit User") { Parent = usersPage, RouteValues = new { id = userId } };
                 ViewData["BreadcrumbNode"] = editPage;
 
@@ -800,7 +791,7 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                var vendor = await _context.Vendor.FindAsync(id);
+                var vendor = await _context.Vendor.Include(v=>v.Country).FirstOrDefaultAsync(v=>v.VendorId == id);
                 if (vendor == null)
                 {
                     notifyService.Error("OOPS !!!..Contact Admin");

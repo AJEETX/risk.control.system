@@ -134,7 +134,7 @@ namespace risk.control.system.Services
                     "<a href=/Agency/EditUser?userId=" + u.AgencyUser.Id + ">" + u.AgencyUser.Email + "</a>" :
                     "<a href=/Agency/EditUser?userId=" + u.AgencyUser.Id + ">" + u.AgencyUser.Email + "</a><span title=\"Onboarding incomplete !!!\" data-toggle=\"tooltip\"><i class='fa fa-asterisk asterik-style'></i></span>",
                     Name = u.AgencyUser.FirstName + " " + u.AgencyUser.LastName,
-                    Phone = u.AgencyUser.PhoneNumber,
+                    Phone = "(+"+ u.AgencyUser.Country.ISDCode+") " + u.AgencyUser.PhoneNumber,
                     Addressline = u.AgencyUser.Addressline + ", " + u.AgencyUser.District.Name + ", " + u.AgencyUser.State.Name + ", " + u.AgencyUser.Country.Code + ", " + u.AgencyUser.PinCode.Code,
                     Active = u.AgencyUser.Active,
                     Roles = u.AgencyUser.UserRole != null ? $"<span class=\"badge badge-light\">{u.AgencyUser.UserRole.GetEnumDisplayName()}</span>" : "<span class=\"badge badge-light\">...</span>",
@@ -233,7 +233,7 @@ namespace risk.control.system.Services
                     "<a href=/Vendors/EditUser?userId=" + user.Id + ">" + user.Email + "</a>" :
                     "<a href=/Vendors/EditUser?userId=" + user.Id + ">" + user.Email + "</a><span title=\"Onboarding incomplete !!!\" data-toggle=\"tooltip\"><i class='fa fa-asterisk asterik-style'></i></span>",
                     RawEmail = user.Email,
-                    Phone = user.PhoneNumber,
+                    Phone = "(+"+ user.Country.ISDCode+") " + user.PhoneNumber,
                     Photo = user.ProfilePicture == null ? Applicationsettings.NO_USER : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(user.ProfilePicture)),
                     Active = user.Active,
                     Addressline = user.Addressline + ", " + user.District.Name + ", " + user.State.Name + ", " + user.Country.Code,
@@ -336,7 +336,7 @@ namespace risk.control.system.Services
                     Name = user.FirstName + " " + user.LastName,
                     Email = "<a href=/Company/EditUser?userId=" + user.Id + ">" + user.Email + "</a>",
                     RawEmail = user.Email,
-                    Phone = user.PhoneNumber,
+                    Phone = "(+"+ user.Country.ISDCode+") " + user.PhoneNumber,
                     Photo = user.ProfilePicture == null ? Applicationsettings.NO_USER : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(user.ProfilePicture)),
                     Active = user.Active,
                     Addressline = user.Addressline,

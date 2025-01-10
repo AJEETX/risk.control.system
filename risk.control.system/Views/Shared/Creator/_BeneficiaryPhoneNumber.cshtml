@@ -1,0 +1,23 @@
+﻿@model risk.control.system.Models.BeneficiaryDetail
+<div class="form-group">
+    <span class="input-group-label"> Phone #:</span>
+    <div class="input-group">
+        <!-- Display Country Code -->
+        <div class="input-group-prepend">
+            <span class="input-group-text" data-toggle="tooltip" title="Country Code :+@Model?.Country.ISDCode">
+                <i class="fas fa-phone"></i><i class="fa fa-asterisk asterik-style"> </i>
+            </span>
+        </div>
+        <div class="input-group-prepend">
+            @{
+                var imgPath = "/flags/" + @Model.Country.Code.ToLower() + ".png";
+            }
+            <span class="input-group-text" data-toggle="tooltip" title="Country Code :+@Model?.Country.ISDCode">
+                <img src="@imgPath" class="flag-icon" data-toggle="tooltip" title="@Model.Country.Name" />  +@Model?.Country.ISDCode
+            </span>
+        </div>
+        <input id="ContactNumber" type="text" asp-for="ContactNumber" class="form-control remarks" required maxlength="10"
+               placeholder="Phone number only (e.g., 1234567890)" />
+        <span asp-validation-for="ContactNumber" class="text-danger"></span>
+    </div>
+</div>

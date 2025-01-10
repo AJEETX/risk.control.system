@@ -232,16 +232,16 @@ namespace risk.control.system.Controllers.Company
                 var editPage = new MvcBreadcrumbNode("CreateCustomer", "CreatorAuto", $"Create Customer") { Parent = details1Page, RouteValues = new { id = id } };
                 ViewData["BreadcrumbNode"] = editPage;
 
-                var currentUser = await _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
+                var currentUser = await _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c=>c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
                 if (currentUser.ClientCompany.HasSampleData)
                 {
-                    var pinCode = _context.PinCode.Include(p => p.District).Include(d => d.State).Include(s => s.Country).FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE2);
+                    var pinCode = _context.PinCode.Include(s => s.Country).FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE2);
                     var random = new Random();
                     var customerDetail = new CustomerDetail
                     {
                         ClaimsInvestigationId = id,
                         Addressline = random.Next(100, 999) + " GOOD STREET",
-                        ContactNumber = "61432854196",
+                        ContactNumber = Applicationsettings.PORTAL_ADMIN_MOBILE,
                         DateOfBirth = DateTime.Now.AddYears(-random.Next(25, 77)).AddDays(20),
                         Education = Education.PROFESSIONAL,
                         Income = Income.UPPER_INCOME,
@@ -249,6 +249,7 @@ namespace risk.control.system.Controllers.Company
                         Occupation = Occupation.SELF_EMPLOYED,
                         CustomerType = CustomerType.HNI,
                         Description = "DODGY PERSON",
+                        Country= pinCode.Country,
                         CountryId = pinCode.CountryId,
                         SelectedCountryId = pinCode.CountryId,
                         StateId = pinCode.StateId,
@@ -261,7 +262,7 @@ namespace risk.control.system.Controllers.Company
                     };
                     return View(customerDetail);
                 }
-                    var blankCustomerDetail = new CustomerDetail { CountryId = currentUser.ClientCompany.CountryId, ClaimsInvestigationId = id };
+                    var blankCustomerDetail = new CustomerDetail { Country = currentUser.ClientCompany.Country, CountryId = currentUser.ClientCompany.CountryId, ClaimsInvestigationId = id };
                     return View(blankCustomerDetail);
             }
             catch (Exception ex)
@@ -335,12 +336,12 @@ namespace risk.control.system.Controllers.Company
                 var editPage = new MvcBreadcrumbNode("CreateBeneficiary", "CreatorAuto", $"Add beneficiary") { Parent = details1Page, RouteValues = new { id = id } };
                 ViewData["BreadcrumbNode"] = editPage;
                 ViewBag.ClaimId = id;
-                var currentUser = await _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
+                var currentUser = await _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c=>c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
 
                 if (currentUser.ClientCompany.HasSampleData)
                 {
                     var beneRelationId = _context.BeneficiaryRelation.FirstOrDefault().BeneficiaryRelationId;
-                    var pinCode = _context.PinCode.FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE2);
+                    var pinCode = _context.PinCode.Include(p=>p.Country).FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE2);
                     var random = new Random();
 
                     var model = new BeneficiaryDetail
@@ -351,6 +352,7 @@ namespace risk.control.system.Controllers.Company
                         Income = Income.MEDIUM_INCOME,
                         Name = NameGenerator.GenerateName(),
                         BeneficiaryRelationId = beneRelationId,
+                        Country = pinCode.Country,
                         CountryId = pinCode.CountryId,
                         SelectedCountryId = pinCode.CountryId,
                         StateId = pinCode.StateId,
@@ -359,13 +361,13 @@ namespace risk.control.system.Controllers.Company
                         SelectedDistrictId = pinCode.DistrictId.GetValueOrDefault(),
                         PinCodeId = pinCode.PinCodeId,
                         SelectedPincodeId = pinCode.PinCodeId,
-                        ContactNumber = "61432854196",
+                        ContactNumber = Applicationsettings.PORTAL_ADMIN_MOBILE,
                     };
                     return View(model);
                 }
                 else
                 {
-                    var model = new BeneficiaryDetail { ClaimsInvestigationId = id, CountryId = currentUser.ClientCompany.CountryId };
+                    var model = new BeneficiaryDetail { ClaimsInvestigationId = id, Country = currentUser.ClientCompany.Country, CountryId = currentUser.ClientCompany.CountryId };
                     return View(model);
                 }
             }
