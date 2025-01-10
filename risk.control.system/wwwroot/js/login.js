@@ -102,58 +102,58 @@ async function acceptCookies() {
 //});
 
 // Function to handle successful geolocation retrieval
-//function handleGeolocationSuccess(position) {
-//    const latlong = `${position.coords.latitude},${position.coords.longitude}`;
-//    fetchIpInfo(latlong); // Call fetchIpInfo with geolocation data
-//}
+function handleGeolocationSuccess(position) {
+    const latlong = `${position.coords.latitude},${position.coords.longitude}`;
+    fetchIpInfo(latlong); // Call fetchIpInfo with geolocation data
+}
 
-//// Function to handle geolocation errors
-//function handleGeolocationError(err) {
-//    console.error('Geolocation request failed or was denied:', err.message);
-//    fetchIpInfo(); // Optionally fetch IP info without geolocation
-//}
+// Function to handle geolocation errors
+function handleGeolocationError(err) {
+    console.error('Geolocation request failed or was denied:', err.message);
+    fetchIpInfo(); // Optionally fetch IP info without geolocation
+}
 
-//// Function to fetch IP info and update the UI
-//async function fetchIpInfo(latlong = '') {
-//    try {
-//        // Construct the URL with or without latlong
-//        const url = `/api/Notification/GetClientIp?url=${encodeURIComponent(window.location.pathname)}${latlong ? `&latlong=${encodeURIComponent(latlong)}` : ''}`;
+// Function to fetch IP info and update the UI
+async function fetchIpInfo(latlong = '') {
+    try {
+        // Construct the URL with or without latlong
+        const url = `/api/Notification/GetClientIp?url=${encodeURIComponent(window.location.pathname)}${latlong ? `&latlong=${encodeURIComponent(latlong)}` : ''}`;
 
-//        // Make the fetch request
-//        const response = await fetch(url);
+        // Make the fetch request
+        const response = await fetch(url);
 
-//        // Handle non-OK responses
-//        if (!response.ok) {
-//            console.error(`IP fetch failed with status: ${response.status}`);
-//            updateInfoDisplay('---', '---');
-//            return;
-//        }
+        // Handle non-OK responses
+        if (!response.ok) {
+            console.error(`IP fetch failed with status: ${response.status}`);
+            updateInfoDisplay('---', '---');
+            return;
+        }
 
-//        // Parse and process the JSON response
-//        const data = await response.json();
-//        const district = data.district || 'Not available';
-//        updateInfoDisplay(district, district);
-//    } catch (error) {
-//        console.error('Error during IP info fetch operation:', error.message);
-//        updateInfoDisplay('Not available', 'Not available');
-//    }
-//}
+        // Parse and process the JSON response
+        const data = await response.json();
+        const district = data.district || 'Not available';
+        updateInfoDisplay(district, district);
+    } catch (error) {
+        console.error('Error during IP info fetch operation:', error.message);
+        updateInfoDisplay('Not available', 'Not available');
+    }
+}
 
-//// Function to update the UI with the fetched data
-//function updateInfoDisplay(ipAddress, ipAddress1) {
-//    document.querySelector('#ipAddress .info-data').textContent = ipAddress;
-//    document.querySelector('#ipAddress1 .info-data').textContent = ipAddress1;
-//}
+// Function to update the UI with the fetched data
+function updateInfoDisplay(ipAddress, ipAddress1) {
+    document.querySelector('#ipAddress .info-data').textContent = ipAddress;
+    document.querySelector('#ipAddress1 .info-data').textContent = ipAddress1;
+}
 
-//// Initialize geolocation handling
-//function initGeolocation() {
-//    if (navigator.geolocation) {
-//        navigator.geolocation.getCurrentPosition(handleGeolocationSuccess, handleGeolocationError);
-//    } else {
-//        console.error('Geolocation is not supported by this browser.');
-//        fetchIpInfo(); // Optionally fetch IP info without geolocation
-//    }
-//}
+// Initialize geolocation handling
+function initGeolocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(handleGeolocationSuccess, handleGeolocationError);
+    } else {
+        console.error('Geolocation is not supported by this browser.');
+        fetchIpInfo(); // Optionally fetch IP info without geolocation
+    }
+}
 
 // Call the initialization function
 
@@ -180,7 +180,7 @@ $(document).ready(function () {
                 }
             });
         },
-        minLength: 0, // Start showing suggestions after 1 character
+        minLength: 1, // Start showing suggestions after 1 character
         select: function (event, ui) {
             // Set the selected value to the input field
             $("#email").val(ui.item.value);
@@ -209,7 +209,7 @@ function onlyDigits(el) {
     el.value = el.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');
 }
 window.onload = function () {
-    //initGeolocation();
+    initGeolocation();
 
     focusLogin();
 }

@@ -1,4 +1,6 @@
-﻿using System.Web;
+﻿using System.Net.Sockets;
+using System.Net;
+using System.Web;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Extensions;
@@ -37,6 +39,17 @@ namespace risk.control.system.Controllers.Api
                 var ipAddress = HttpContext.GetServerVariable("HTTP_X_FORWARDED_FOR") ?? HttpContext.Connection.RemoteIpAddress?.ToString();
                 var ipAddressWithoutPort = ipAddress?.Split(':')[0];
                 var isWhiteListed = service.IsWhiteListIpAddress(HttpContext.Connection.RemoteIpAddress);
+
+                string publicIp = "Unable to fetch IP";
+                using (var client = new UdpClient())
+                {
+                    // Connect to an external endpoint
+                    client.Connect("8.8.8.8", 12345); // Google's DNS
+                    var endpoint = client.Client.LocalEndPoint as IPEndPoint;
+                    publicIp = endpoint?.Address.ToString() ?? "Unknown IP";
+                }
+
+
                 var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct, decodedUrl,user, isAuthenticated, latlong);
                 if(ipApiResponse == null)
                 {

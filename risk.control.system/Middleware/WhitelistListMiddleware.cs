@@ -13,6 +13,28 @@ namespace risk.control.system.Middleware
 {
     public class WhitelistListMiddleware
     {
+        private readonly string classAIpStartAddress = "1.0.0.0";    // Subnet mask for the network
+        private readonly string classAIpEndAddress = "127.255.255.255";    // Subnet mask for the network
+        private readonly string classAsubnetMask = "255.0.0.0";    // Subnet mask for the network
+
+        private readonly string classBIpStartAddress = "128.0.0.0";    // Subnet mask for the network
+        private readonly string classBIpEndAddress = "191.255.255.255";    // Subnet mask for the network
+        private readonly string classBsubnetMask = "255.255.0.0";    // Subnet mask for the network
+
+        private readonly string classCIpStartAddress = "192.0.0.0";    // Subnet mask for the network
+        private readonly string classCIpEndAddress = "223.255.255.255";    // Subnet mask for the network
+        private readonly string classCsubnetMask = "255.255.255.0";    // Subnet mask for the network
+
+        private readonly string privateIp1StartAddress = "10.0.0.0";
+        private readonly string privateIp1EndAddress = "10.255.255.255";
+
+        private readonly string privateIp2StartAddress = "172.16.0.0";
+        private readonly string privateIp2EndAddress = "10.255.255.255";
+
+        private readonly string privateIp3StartAddress = "192.168.0.0";
+        private readonly string privateIp3EndAddress = "192.168.255.255";
+
+
         private readonly RequestDelegate _next;
         private readonly ILogger<WhitelistListMiddleware> _logger;
         private readonly IFeatureManager featureManager;
@@ -41,7 +63,10 @@ namespace risk.control.system.Middleware
                     !context.Request.Query.Any(q => q.Value.Contains("js"))
                     )
                 {
-                    var remoteIp = context.Connection.RemoteIpAddress;
+                    var ipAddress = context.GetServerVariable("HTTP_X_FORWARDED_FOR") ?? context.Connection.RemoteIpAddress?.ToString();
+                    var ipAddressWithoutPort = ipAddress?.Split(':')[0];
+                    var remoteIp = IPAddress.Parse(ipAddressWithoutPort);
+
                     _logger.LogDebug("Request from Remote IP address: {RemoteIp}", remoteIp);
 
                     var bytes = remoteIp.GetAddressBytes();
@@ -79,6 +104,71 @@ namespace risk.control.system.Middleware
                 return;
             }
         }
+        private bool IsPrivateIp(IPAddress ip)
+        {
+            byte[] bytes = ip.GetAddressBytes();
+            // Check for private IP ranges
+            return
+                (bytes[0] == 10) ||
+                (bytes[0] == 172 && bytes[1] >= 16 && bytes[1] <= 31) ||
+                (bytes[0] == 192 && bytes[1] == 168);
+        }
+        private bool IsInNetwork(string ipAddress, string networkAddress, string subnetMask)
+        {
+            var ip = IPAddress.Parse(ipAddress);
+            var network = IPAddress.Parse(networkAddress);
+            var mask = IPAddress.Parse(subnetMask);
+
+            byte[] ipBytes = ip.GetAddressBytes();
+            byte[] networkBytes = network.GetAddressBytes();
+            byte[] maskBytes = mask.GetAddressBytes();
+
+            // Ensure that both the IP address and network address are in the same address family (IPv4)
+            if (ip.AddressFamily != network.AddressFamily)
+            {
+                return false;
+            }
+
+            // Compare the network part of the IP address using the subnet mask
+            for (int i = 0; i < ipBytes.Length; i++)
+            {
+                // Apply the subnet mask (AND operation)
+                if ((ipBytes[i] & maskBytes[i]) != (networkBytes[i] & maskBytes[i]))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private string GetSubnetMask(IPAddress ip)
+        {
+            // Check if the IP is private and assign the appropriate subnet mask
+            byte[] bytes = ip.GetAddressBytes();
+
+            // Subnet mask for Class A (10.x.x.x)
+            if (bytes[0] == 10)
+            {
+                return "255.0.0.0";
+            }
+
+            // Subnet mask for Class B (172.x.x.x) - consider 172.16.0.0 to 172.31.255.255 as private
+            if (bytes[0] == 172 && bytes[1] >= 16 && bytes[1] <= 31)
+            {
+                return "255.240.0.0";
+            }
+
+            // Subnet mask for Class C (192.168.x.x)
+            if (bytes[0] == 192 && bytes[1] == 168)
+            {
+                return "255.255.0.0";
+            }
+
+            // If the IP is public (or any other IP that doesn't match the private ranges), assume /24 subnet mask
+            return "255.255.255.0";
+        }
+
         private bool IsIpAllowed(IPAddress remoteIp, List<string> allowedIpRanges)
         {
             foreach (var range in allowedIpRanges)
