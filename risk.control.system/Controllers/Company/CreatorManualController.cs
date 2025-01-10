@@ -377,7 +377,7 @@ namespace risk.control.system.Controllers.Company
                 if (currentUser.ClientCompany.HasSampleData)
                 {
                     var beneRelationId = _context.BeneficiaryRelation.FirstOrDefault().BeneficiaryRelationId;
-                    var pinCode = _context.PinCode.Include(s => s.Country).LastOrDefault(s => s.Country.CountryId == currentUser.ClientCompany.CountryId);
+                    var pinCode = _context.PinCode.Include(s => s.Country).OrderBy(p=>p.StateId).LastOrDefault(s => s.Country.CountryId == currentUser.ClientCompany.CountryId);
                     var random = new Random();
 
                     var model = new BeneficiaryDetail
