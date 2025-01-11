@@ -83,7 +83,7 @@ namespace risk.control.system.Controllers
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                
+
                 var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == currentUserEmail);
 
                 var vendor = await _context.Vendor
@@ -127,20 +127,20 @@ namespace risk.control.system.Controllers
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                
+
                 var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == currentUserEmail);
                 if (vendorUser == null)
                 {
                     notifyService.Error("User Not found !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var vendor = await _context.Vendor.Include(v=>v.Country).FirstOrDefaultAsync(v=>v.VendorId == vendorUser.VendorId);
+                var vendor = await _context.Vendor.Include(v => v.Country).FirstOrDefaultAsync(v => v.VendorId == vendorUser.VendorId);
                 if (vendor == null)
                 {
                     notifyService.Custom($"Agency Not found.", 3, "red", "fas fa-building");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                if(vendorUser.IsVendorAdmin)
+                if (vendorUser.IsVendorAdmin)
                 {
                     vendor.SelectedByCompany = true;
                 }
@@ -162,7 +162,7 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(Vendor vendor)
         {
-            if(vendor is null || vendor.SelectedCountryId < 1 || vendor.SelectedStateId < 1 || vendor.SelectedDistrictId < 1 || vendor.SelectedPincodeId < 1)
+            if (vendor is null || vendor.SelectedCountryId < 1 || vendor.SelectedStateId < 1 || vendor.SelectedDistrictId < 1 || vendor.SelectedPincodeId < 1)
             {
                 notifyService.Custom($"OOPs !!!..Invalid Data.", 3, "red", "fas fa-building");
                 return RedirectToAction(nameof(Edit), "Agency");
@@ -180,7 +180,7 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(AgencyController.Profile), "Agency");
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                
+
                 IFormFile? vendorDocument = Request.Form?.Files?.FirstOrDefault();
 
                 var edited = await agencyService.EditAgency(vendor, vendorDocument, currentUserEmail);
@@ -212,14 +212,14 @@ namespace risk.control.system.Controllers
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                
+
                 var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == currentUserEmail);
                 if (vendorUser == null)
                 {
                     notifyService.Error("User Not found !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var vendor = _context.Vendor.Include(v=>v.Country).FirstOrDefault(v => v.VendorId == vendorUser.VendorId);
+                var vendor = _context.Vendor.Include(v => v.Country).FirstOrDefault(v => v.VendorId == vendorUser.VendorId);
                 if (vendor == null)
                 {
                     notifyService.Custom($"No agency not found.", 3, "red", "fas fa-building");
@@ -244,7 +244,7 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateUser(VendorApplicationUser user, string emailSuffix, string vendorId, string txn = "agency")
         {
-            if(user is null || user.SelectedCountryId < 1 || user.SelectedStateId < 1 || user.SelectedDistrictId < 1 || user.SelectedPincodeId < 1)
+            if (user is null || user.SelectedCountryId < 1 || user.SelectedStateId < 1 || user.SelectedDistrictId < 1 || user.SelectedPincodeId < 1)
             {
                 notifyService.Custom($"OOPs !!!..Invalid Data.", 3, "red", "fas fa-building");
                 return RedirectToAction(nameof(CreateUser), "Agency");
@@ -252,7 +252,7 @@ namespace risk.control.system.Controllers
 
             try
             {
-                if(user == null || string.IsNullOrWhiteSpace(emailSuffix) || string.IsNullOrWhiteSpace(vendorId))
+                if (user == null || string.IsNullOrWhiteSpace(emailSuffix) || string.IsNullOrWhiteSpace(vendorId))
                 {
                     notifyService.Custom($"Error to create user.", 3, "red", "fas fa-user-plus");
                     return RedirectToAction(nameof(Index), "Dashboard");
@@ -269,7 +269,7 @@ namespace risk.control.system.Controllers
                     }
                 }
 
-                if (user.ProfileImage != null && user.ProfileImage.Length > 0 && !string .IsNullOrWhiteSpace(Path.GetFileName(user.ProfileImage.FileName)))
+                if (user.ProfileImage != null && user.ProfileImage.Length > 0 && !string.IsNullOrWhiteSpace(Path.GetFileName(user.ProfileImage.FileName)))
                 {
                     string newFileName = Guid.NewGuid().ToString();
                     string fileExtension = Path.GetExtension(Path.GetFileName(user.ProfileImage.FileName));
@@ -304,9 +304,9 @@ namespace risk.control.system.Controllers
                 user.UpdatedBy = HttpContext.User?.Identity?.Name;
                 user.Role = user.Role != null ? user.Role : (AppRoles)Enum.Parse(typeof(AppRoles), user.UserRole.ToString());
                 user.IsVendorAdmin = user.UserRole == AgencyRole.AGENCY_ADMIN;
-                if(user.Role == AppRoles.AGENT)
+                var pincode = _context.PinCode.Include(p => p.District).Include(p => p.State).Include(p => p.Country).FirstOrDefault(c => c.PinCodeId == user.PinCodeId);
+                if (user.Role == AppRoles.AGENT)
                 {
-                    var pincode = _context.PinCode.Include(p => p.District).Include(p => p.State).Include(p => p.Country).FirstOrDefault(c => c.PinCodeId == user.PinCodeId);
                     var userAddress = $"{user.Addressline}, {pincode.Name}, {pincode.District.Name}, {pincode.State.Name}, {pincode.Country.Name}";
                     var coordinates = await customApiCLient.GetCoordinatesFromAddressAsync(userAddress);
                     var customerLatLong = coordinates.Latitude + "," + coordinates.Longitude;
@@ -330,8 +330,8 @@ namespace risk.control.system.Controllers
                         if (lockUser.Succeeded && lockDate.Succeeded)
                         {
                             notifyService.Custom($"User {user.Email} created.", 3, "green", "fas fa-user-lock");
-                            await smsService.DoSendSmsAsync(user.PhoneNumber, "Agency user created. Email : " + user.Email);
-                            if(txn =="agency")
+                            await smsService.DoSendSmsAsync(pincode.Country.ISDCode + user.PhoneNumber, "Agency user created. Email : " + user.Email);
+                            if (txn == "agency")
                             {
                                 return RedirectToAction(nameof(AgencyController.Users), "Agency");
                             }
@@ -349,7 +349,7 @@ namespace risk.control.system.Controllers
                         var onboardAgent = roles.Any(r => AppConstant.AppRoles.AGENT.ToString().Contains(r)) && string.IsNullOrWhiteSpace(user.MobileUId);
                         if (lockUser.Succeeded && lockDate.Succeeded)
                         {
-                            
+
 
                             if (onboardAgent)
                             {
@@ -368,12 +368,12 @@ namespace risk.control.system.Controllers
                                 message += $"Thanks";
                                 message += "                                                                                ";
                                 message += $"https://icheckify.co.in";
-                                await smsService.DoSendSmsAsync(user.PhoneNumber, message, true);
+                                await smsService.DoSendSmsAsync(pincode.Country.ISDCode + user.PhoneNumber, message, true);
                                 notifyService.Custom($"Agent {user.Email} onboarding initiated.", 3, "green", "fas fa-user-check");
                             }
                             else
                             {
-                                await smsService.DoSendSmsAsync(user.PhoneNumber, "User created. Email : " + user.Email);
+                                await smsService.DoSendSmsAsync(pincode.Country.ISDCode + user.PhoneNumber, "User created. Email : " + user.Email);
                                 notifyService.Custom($"User {user.Email} created.", 3, "green", "fas fa-user-check");
                             }
                         }
@@ -382,7 +382,7 @@ namespace risk.control.system.Controllers
                         {
                             return RedirectToAction(nameof(AgencyController.Users), "Agency");
                         }
-                        else if(txn == "company")
+                        else if (txn == "company")
                         {
                             return RedirectToAction(nameof(CompanyController.AgencyUsers), "Company", new { id = vendorId });
                         }
@@ -419,7 +419,7 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(AgencyController.User), "Agency");
                 }
 
-                var user = await _context.VendorApplicationUser.Include(u => u.Country).Include(u => u.Vendor).FirstOrDefaultAsync(c => c.Id== userId);
+                var user = await _context.VendorApplicationUser.Include(u => u.Country).Include(u => u.Vendor).FirstOrDefaultAsync(c => c.Id == userId);
                 if (user == null)
                 {
                     notifyService.Error("User not found!!!..Contact Admin");
@@ -458,7 +458,7 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(AgencyController.Users), "Agency");
                 }
                 var user = await userManager.FindByIdAsync(id);
-                if(user is null)
+                if (user is null)
                 {
                     notifyService.Custom($"OOPs !!!..Invalid Data.", 3, "red", "fas fa-building");
                     return RedirectToAction(nameof(AgencyController.Users), "Agency");
@@ -515,9 +515,9 @@ namespace risk.control.system.Controllers
                 user.UserRole = applicationUser.UserRole;
                 user.Role = applicationUser.Role != null ? applicationUser.Role : (AppRoles)Enum.Parse(typeof(AppRoles), user.UserRole.ToString());
                 user.IsVendorAdmin = user.UserRole == AgencyRole.AGENCY_ADMIN;
+                var pincode = _context.PinCode.Include(p => p.District).Include(p => p.State).Include(p => p.Country).FirstOrDefault(c => c.PinCodeId == user.PinCodeId);
                 if (user.Role == AppRoles.AGENT)
                 {
-                    var pincode = _context.PinCode.Include(p => p.District).Include(p => p.State).Include(p => p.Country).FirstOrDefault(c => c.PinCodeId == user.PinCodeId);
                     var userAddress = $"{user.Addressline}, {pincode.Name}, {pincode.District.Name}, {pincode.State.Name}, {pincode.Country.Name}";
                     var coordinates = await customApiCLient.GetCoordinatesFromAddressAsync(userAddress);
                     var customerLatLong = coordinates.Latitude + "," + coordinates.Longitude;
@@ -539,7 +539,7 @@ namespace risk.control.system.Controllers
 
                         if (lockUser.Succeeded && lockDate.Succeeded)
                         {
-                            await smsService.DoSendSmsAsync(user.PhoneNumber, "User edited. Email : " + user.Email);
+                            await smsService.DoSendSmsAsync(pincode.Country.ISDCode+ user.PhoneNumber, "User edited. Email : " + user.Email);
                             notifyService.Custom($"User {user.Email} edited.", 3, "orange", "fas fa-user-lock");
                         }
                     }
@@ -570,12 +570,12 @@ namespace risk.control.system.Controllers
                                 message += $"Thanks";
                                 message += "                                                                                ";
                                 message += $"https://icheckify.co.in";
-                                await smsService.DoSendSmsAsync(user.PhoneNumber, message, true);
+                                await smsService.DoSendSmsAsync(pincode.Country.ISDCode + user.PhoneNumber, message, true);
                                 notifyService.Custom($"Agent onboarding initiated.", 3, "green", "fas fa-user-check");
                             }
                             else
                             {
-                                await smsService.DoSendSmsAsync(user.PhoneNumber, "User edited and unlocked. Email : " + user.Email);
+                                await smsService.DoSendSmsAsync(pincode.Country.ISDCode + user.PhoneNumber, "User edited and unlocked. Email : " + user.Email);
                                 notifyService.Custom($"User {user.Email} edited.", 3, "orange", "fas fa-user-check");
                             }
                         }
@@ -603,7 +603,7 @@ namespace risk.control.system.Controllers
                     notifyService.Error("OOPS!!!.Id Not Found.Try Again");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var model = await _context.VendorApplicationUser.Include(v=>v.Country).Include(v => v.State).Include(v => v.District).Include(v => v.PinCode).FirstOrDefaultAsync(c => c.Id == userId);
+                var model = await _context.VendorApplicationUser.Include(v => v.Country).Include(v => v.State).Include(v => v.District).Include(v => v.PinCode).FirstOrDefaultAsync(c => c.Id == userId);
                 if (model == null)
                 {
                     notifyService.Error("OOPS!!!.Claim Not Found.Try Again");
@@ -637,13 +637,13 @@ namespace risk.control.system.Controllers
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                
+
                 if (string.IsNullOrWhiteSpace(email))
                 {
                     notifyService.Error("Not Found!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var model = _context.VendorApplicationUser.Include(v=>v.Country).Include(v => v.State).Include(v => v.District).Include(v => v.PinCode).FirstOrDefault(c => c.Email == email);
+                var model = _context.VendorApplicationUser.Include(v => v.Country).Include(v => v.State).Include(v => v.District).Include(v => v.PinCode).FirstOrDefault(c => c.Email == email);
                 if (model == null)
                 {
                     notifyService.Error("Not Found!!!..Contact Admin");
@@ -757,7 +757,8 @@ namespace risk.control.system.Controllers
             message += $"https://icheckify.co.in";
             if (onboardAgent)
             {
-                await smsService.DoSendSmsAsync(user.PhoneNumber, message);
+                var isdCode = _context.Country.FirstOrDefault(c => c.CountryId == user.CountryId).ISDCode;
+                await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, message);
                 notifyService.Custom($"Agent onboarding initiated.", 3, "green", "fas fa-user-check");
             }
             else
@@ -779,12 +780,12 @@ namespace risk.control.system.Controllers
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                
+
                 var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == currentUserEmail);
-                var vendor = _context.Vendor.Include(v=>v.Country).FirstOrDefault(v => v.VendorId == vendorUser.VendorId);
+                var vendor = _context.Vendor.Include(v => v.Country).FirstOrDefault(v => v.VendorId == vendorUser.VendorId);
 
                 ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name");
-                var model = new VendorInvestigationServiceType { Country =  vendor.Country, CountryId = vendor.CountryId, SelectedMultiPincodeId = new List<long>(), Vendor = vendor, PincodeServices = new List<ServicedPinCode>() };
+                var model = new VendorInvestigationServiceType { Country = vendor.Country, CountryId = vendor.CountryId, SelectedMultiPincodeId = new List<long>(), Vendor = vendor, PincodeServices = new List<ServicedPinCode>() };
                 return View(model);
             }
             catch (Exception ex)
@@ -819,7 +820,7 @@ namespace risk.control.system.Controllers
                     VendorInvestigationServiceType = vendorInvestigationServiceType,
                 }).ToList();
                 vendorInvestigationServiceType.PincodeServices = servicePinCodes;
-                
+
                 vendorInvestigationServiceType.VendorId = vendorUser.VendorId.GetValueOrDefault();
                 vendorInvestigationServiceType.CountryId = vendorInvestigationServiceType.SelectedCountryId;
                 vendorInvestigationServiceType.StateId = vendorInvestigationServiceType.SelectedStateId;
@@ -883,7 +884,7 @@ namespace risk.control.system.Controllers
                 var selectedPincodeWithArea = services.PincodeServices;
                 var vendorServiceTypes = new List<long>();
 
-                foreach(var service in selectedPincodeWithArea)
+                foreach (var service in selectedPincodeWithArea)
                 {
                     var pincodeServices = _context.PinCode.Where(p => p.Code == service.Pincode && p.Name == service.Name).Select(p => p.PinCodeId)?.ToList();
                     vendorServiceTypes.AddRange(pincodeServices);
@@ -912,8 +913,8 @@ namespace risk.control.system.Controllers
         {
             if (vendorInvestigationServiceType is null || vendorInvestigationServiceType.SelectedCountryId < 1 || vendorInvestigationServiceType.SelectedStateId < 1 || vendorInvestigationServiceType.SelectedDistrictId < 1)
             {
-                    notifyService.Custom($"Error to edit service.", 3, "red", "fas fa-truck");
-                    return RedirectToAction(nameof(EditService), "Agency",new {id = vendorInvestigationServiceTypeId });
+                notifyService.Custom($"Error to edit service.", 3, "red", "fas fa-truck");
+                return RedirectToAction(nameof(EditService), "Agency", new { id = vendorInvestigationServiceTypeId });
             }
             try
             {
@@ -939,7 +940,7 @@ namespace risk.control.system.Controllers
                     _context.ServicedPinCode.AddRange(pinCodesWithId);
 
                     vendorInvestigationServiceType.PincodeServices = pinCodesWithId;
-                    
+
                     vendorInvestigationServiceType.CountryId = vendorInvestigationServiceType.SelectedCountryId;
                     vendorInvestigationServiceType.StateId = vendorInvestigationServiceType.SelectedStateId;
                     vendorInvestigationServiceType.DistrictId = vendorInvestigationServiceType.SelectedDistrictId;
@@ -947,7 +948,7 @@ namespace risk.control.system.Controllers
 
                     vendorInvestigationServiceType.Updated = DateTime.Now;
                     vendorInvestigationServiceType.UpdatedBy = currentUserEmail;
-                    vendorInvestigationServiceType.IsUpdated = true; 
+                    vendorInvestigationServiceType.IsUpdated = true;
                     _context.Update(vendorInvestigationServiceType);
                     await _context.SaveChangesAsync();
                     notifyService.Custom($"Service updated successfully.", 3, "orange", "fas fa-truck");
@@ -973,7 +974,7 @@ namespace risk.control.system.Controllers
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                
+
                 if (id <= 0)
                 {
                     notifyService.Custom($"NOT FOUND.", 3, "red", "fas fa-truck");
@@ -1013,7 +1014,7 @@ namespace risk.control.system.Controllers
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                
+
                 if (id <= 0)
                 {
                     return Problem("Entity set 'ApplicationDbContext.VendorInvestigationServiceType'  is null.");

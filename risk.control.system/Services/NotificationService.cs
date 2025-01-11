@@ -226,15 +226,17 @@ namespace risk.control.system.Services
                 .Include(c => c.ClaimMessages)
                 .Include(c => c.PolicyDetail)
                 .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.Country)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == message.ClaimId);
             var assignedToAgentStatus = context.InvestigationCaseSubStatus.FirstOrDefault(
                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
-            var beneficiary = context.BeneficiaryDetail
+            var beneficiary = context.BeneficiaryDetail.Include(c=>c.Country)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == message.ClaimId);
 
             string mobile = string.Empty;
             string recepientName = string.Empty;
             string recepientPhone = string.Empty;
+            int isdCode = claim.CustomerDetail.PinCode.Country.ISDCode;
             if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
             {
                 mobile = claim.CustomerDetail.ContactNumber.ToString();
@@ -246,6 +248,7 @@ namespace risk.control.system.Services
                 mobile = beneficiary.ContactNumber.ToString();
                 recepientName = beneficiary.Name;
                 recepientPhone = beneficiary.ContactNumber.ToString();
+                isdCode = beneficiary.Country.ISDCode;
             }
 
             string device = "0";
@@ -307,7 +310,7 @@ namespace risk.control.system.Services
             //    noTinyUrl
             //    );
 
-            await smsService.DoSendSmsAsync("+" + mobile, finalMessage);
+            await smsService.DoSendSmsAsync("+" +isdCode + mobile, finalMessage);
             var meetingTime = DateTime.Now.AddDays(1);
             if (DateTime.TryParse(message.Time, out DateTime date))
             {
@@ -339,14 +342,16 @@ namespace risk.control.system.Services
             var claim = context.ClaimsInvestigation
                 .Include(c => c.PolicyDetail)
                 .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.Country)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == id);
             var assignedToAgentStatus = context.InvestigationCaseSubStatus.FirstOrDefault(
                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
-            var beneficiary = context.BeneficiaryDetail
+            var beneficiary = context.BeneficiaryDetail.Include(b=>b.Country)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == id);
 
             string recepientName = string.Empty;
             string recepientPhone = string.Empty;
+            int isdCode = claim.CustomerDetail.Country.ISDCode;
             if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
             {
                 recepientName = claim.CustomerDetail.Name;
@@ -356,6 +361,7 @@ namespace risk.control.system.Services
             {
                 recepientName = beneficiary.Name;
                 recepientPhone = beneficiary.ContactNumber.ToString();
+                isdCode = beneficiary.Country.ISDCode;
             }
 
             if (confirm.ToUpper() == "Y")
@@ -481,11 +487,13 @@ namespace risk.control.system.Services
             .Include(c => c.PolicyDetail)
             .Include(c => c.CustomerDetail)
                .ThenInclude(c => c.PinCode)
+                .Include(c => c.CustomerDetail)
+               .ThenInclude(c => c.Country)
             .FirstOrDefaultAsync(c => c.ClaimsInvestigationId == claimId);
 
             var mobile = claim.CustomerDetail.ContactNumber.ToString();
             var user = context.ApplicationUser.FirstOrDefault(u => u.Email == currentUser);
-
+            var isdCode = claim.CustomerDetail.Country.ISDCode;
             var isInsurerUser = user is ClientCompanyApplicationUser;
             var isVendorUser = user is VendorApplicationUser;
 
@@ -531,17 +539,21 @@ namespace risk.control.system.Services
             };
             claim.ClaimMessages.Add(scheduleMessage);
             context.SaveChanges();
-            await smsService.DoSendSmsAsync("+" + mobile, message);
+            await smsService.DoSendSmsAsync("+"+isdCode + mobile, message);
             return claim.CustomerDetail.Name;
         }
 
         public async Task<string> SendSms2Beneficiary(string currentUser, string claimId, string sms)
         {
-            var beneficiary = await context.BeneficiaryDetail.Include(b => b.ClaimsInvestigation).ThenInclude(c => c.PolicyDetail)
+            var beneficiary = await context.BeneficiaryDetail
+                .Include(b => b.Country)
+                .Include(b => b.ClaimsInvestigation)
+                .ThenInclude(c => c.PolicyDetail)
                .FirstOrDefaultAsync(c => c.ClaimsInvestigationId == claimId);
 
             var mobile = beneficiary.ContactNumber.ToString();
             var user = context.ApplicationUser.FirstOrDefault(u => u.Email == currentUser);
+            var isdCode = beneficiary.Country.ISDCode;
 
             var isInsurerUser = user is ClientCompanyApplicationUser;
             var isVendorUser = user is VendorApplicationUser;
@@ -594,7 +606,7 @@ namespace risk.control.system.Services
             .FirstOrDefault(c => c.ClaimsInvestigationId == claimId);
             claim.ClaimMessages.Add(scheduleMessage);
             context.SaveChanges();
-            await smsService.DoSendSmsAsync("+" + mobile, message);
+            await smsService.DoSendSmsAsync("+"+isdCode + mobile, message);
             return beneficiary.Name;
         }
     }

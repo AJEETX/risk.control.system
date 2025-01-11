@@ -106,7 +106,6 @@ namespace risk.control.system.Controllers
             var currentUser = await userManager.GetUserAsync(User);
             await signInManager.RefreshSignInAsync(currentUser);
 
-            await smsService.DoSendSmsAsync(user.PhoneNumber, "User role edited. Email : " + user.Email);
             notifyService.Custom($"User role(s) updated successfully.", 3, "orange", "fas fa-user-cog");
             return RedirectToAction(nameof(VendorUserController.Index), "VendorUser", new { Id = model.VendorId });
         }

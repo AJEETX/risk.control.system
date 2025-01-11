@@ -35,14 +35,14 @@ namespace risk.control.system.Middleware
         {
             if (await featureManager.IsEnabledAsync(FeatureFlags.SECURITY))
             {
-                context.Response.Headers.Add("X-Frame-Options", "DENY");
-                context.Response.Headers.Add("X-Permitted-Cross-Domain-Policies", "none");
-                context.Response.Headers.Add("X-Xss-Protection", "1; mode=block");
-                context.Response.Headers.Add("X-Content-Type-Options", "nosniff");
-                context.Response.Headers.Add("Referrer-Policy", "no-referrer");
-                context.Response.Headers.Add("Permissions-Policy", "geolocation=(self)");
+                context.Response.Headers.Append("X-Frame-Options", "DENY");
+                context.Response.Headers.Append("X-Permitted-Cross-Domain-Policies", "none");
+                context.Response.Headers.Append("X-Xss-Protection", "1; mode=block");
+                context.Response.Headers.Append("X-Content-Type-Options", "nosniff");
+                context.Response.Headers.Append("Referrer-Policy", "no-referrer");
+                context.Response.Headers.Append("Permissions-Policy", "geolocation=(self)");
 
-                context.Response.Headers.Add("Content-Security-Policy",
+                context.Response.Headers.Append("Content-Security-Policy",
                     "default-src 'self';" +
                     "connect-src 'self' wss: https://maps.googleapis.com; " +
                     "script-src 'unsafe-inline' 'self' https://maps.googleapis.com https://highcharts.com https://export.highcharts.com https://cdnjs.cloudflare.com;" +

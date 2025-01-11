@@ -33,7 +33,6 @@ namespace risk.control.system.Controllers.Api
         private static string PanIdfyUrl = "https://pan-card-verification-at-lowest-price.p.rapidapi.com/verification/marketing/pan";
         private static string RapidAPIKey = "df0893831fmsh54225589d7b9ad1p15ac51jsnb4f768feed6f";
         private static string PanTask_id = "pan-card-verification-at-lowest-price.p.rapidapi.com";
-        private static string PanGroup_id = "8e16424a-58fc-4ba4-ab20-5bc8e7c3c41e";
         private readonly ApplicationDbContext _context;
         private readonly IHttpClientService httpClientService;
         private readonly IConfiguration configuration;
@@ -48,6 +47,7 @@ namespace risk.control.system.Controllers.Api
         private static string FaceMatchBaseUrl = "https://2j2sgigd3l.execute-api.ap-southeast-2.amazonaws.com/Development/icheckify";
         private static Random randomNumber = new Random();
         private string portal_base_url = string.Empty;
+
         //test PAN FNLPM8635N
         public AgentController(ApplicationDbContext context, IHttpClientService httpClientService,
             IConfiguration configuration,
@@ -122,7 +122,7 @@ namespace risk.control.system.Controllers.Api
                 }
 
                 var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.AGENT.ToString()));
-                var user2Onboards = _context.VendorApplicationUser.Where(
+                var user2Onboards = _context.VendorApplicationUser.Include(u => u.Country).Where(
                     u => u.Country.ISDCode + u.PhoneNumber == request.Mobile.TrimStart('+'));
                 foreach (var user2Onboard in user2Onboards)
                 {
@@ -144,7 +144,7 @@ namespace risk.control.system.Controllers.Api
                             message += $"Thanks                           ";
                             message += $"                                ";
                             message += $"https://icheckify.co.in";
-                            await smsService.DoSendSmsAsync(request.Mobile, message);
+                            await smsService.DoSendSmsAsync(user2Onboard.Country.ISDCode + request.Mobile, message);
                         }
 
                         return Ok(new { Email = user2Onboard.Email, Pin = user2Onboard.SecretPin });
@@ -158,6 +158,7 @@ namespace risk.control.system.Controllers.Api
                 return BadRequest($"mobile number and/or Agent does not exist");
             }
         }
+
         [AllowAnonymous]
         [HttpPost("VerifyId")]
         public async Task<IActionResult> VerifyId(VerifyIdRequest request)
@@ -269,13 +270,12 @@ namespace risk.control.system.Controllers.Api
                 return BadRequest("document verify issue");
             }
         }
-        [ApiExplorerSettings(IgnoreApi = true)]
 
+        [ApiExplorerSettings(IgnoreApi = true)]
         [AllowAnonymous]
         [HttpGet("GetImage")]
         public IActionResult GetImage(string claimId, string type)
         {
-
             try
             {
                 var claim = _context.ClaimsInvestigation
@@ -422,8 +422,6 @@ namespace risk.control.system.Controllers.Api
                     }
                 });
                 return Ok(claim2Agent);
-
-                return Unauthorized("UnAuthenticated User !!!");
             }
             catch (Exception ex)
             {
@@ -680,9 +678,9 @@ namespace risk.control.system.Controllers.Api
             {
                 return BadRequest();
             }
-            if(!string.IsNullOrWhiteSpace(Path.GetFileName(data.MediaFile.Name)))
+            if (!string.IsNullOrWhiteSpace(Path.GetFileName(data.MediaFile.Name)))
             {
-                data.Name =Path.GetFileName(data.MediaFile.Name);
+                data.Name = Path.GetFileName(data.MediaFile.Name);
                 using (var ds = new MemoryStream())
                 {
                     data.MediaFile.CopyTo(ds);
@@ -724,10 +722,10 @@ namespace risk.control.system.Controllers.Api
                 }
 
                 var (vendor, contract) = await claimsInvestigationService.SubmitToVendorSupervisor(
-                    data.Email, 
+                    data.Email,
                     data.ClaimId,
                     data.Remarks, data.Question1, data.Question2, data.Question3, data.Question4);
-                if(vendor.EnableMailbox)
+                if (vendor.EnableMailbox)
                 {
                     await mailboxService.NotifyClaimReportSubmitToVendorSupervisor(data.Email, data.ClaimId);
                 }
@@ -740,7 +738,6 @@ namespace risk.control.system.Controllers.Api
                 Console.WriteLine(ex.StackTrace);
                 return StatusCode(500, ex.StackTrace);
             }
-
         }
 
         [AllowAnonymous]
@@ -752,7 +749,6 @@ namespace risk.control.system.Controllers.Api
                 if (string.IsNullOrWhiteSpace(domain) || string.IsNullOrWhiteSpace(ipaddress) || string.IsNullOrWhiteSpace(url))
                 {
                     return BadRequest($"EMPTY INPUT(s)");
-
                 }
                 var ipSet = await httpClientService.WhitelistIP(url, domain, ipaddress);
 
@@ -772,7 +768,6 @@ namespace risk.control.system.Controllers.Api
         {
             try
             {
-
                 var ipSet = await iCheckifyService.WhitelistIP(request);
 
                 return Ok(ipSet);

@@ -30,7 +30,7 @@ namespace risk.control.system.Controllers
         // GET: DocumentIdReports/Details/5
         public async Task<IActionResult> Details(long id)
         {
-            if (id == null || _context.PanIdReport == null)
+            if (id <= 0)
             {
                 return NotFound();
             }
@@ -132,7 +132,7 @@ namespace risk.control.system.Controllers
         // GET: DocumentIdReports/Delete/5
         public async Task<IActionResult> Delete(long id)
         {
-            if (id == null || _context.PanIdReport == null)
+            if (id <= 0)
             {
                 return NotFound();
             }

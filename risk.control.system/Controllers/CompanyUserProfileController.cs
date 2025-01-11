@@ -174,7 +174,8 @@ namespace risk.control.system.Controllers
                     if (result.Succeeded)
                     {
                         notifyService.Custom($"User profile edited successfully.", 3, "green", "fas fa-user");
-                        await smsService.DoSendSmsAsync(user.PhoneNumber, "User edited . Email : " + user.Email);
+                        var isdCode = _context.Country.FirstOrDefault(c => c.CountryId == user.CountryId)?.ISDCode;
+                        await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "User edited . Email : " + user.Email);
                         return RedirectToAction(nameof(Index), "Dashboard");
                     }
                 }
@@ -232,7 +233,7 @@ namespace risk.control.system.Controllers
                     var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
                     var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
                     var BaseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
-                    var admin = _context.ApplicationUser.FirstOrDefault(u => u.IsSuperAdmin);
+                    var admin = _context.ApplicationUser.Include(c=>c.Country).FirstOrDefault(u => u.IsSuperAdmin);
                     var isAuthenticated = HttpContext.User.Identity.IsAuthenticated;
                     var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct, "login-success", user.Email, isAuthenticated);
 
@@ -256,7 +257,7 @@ namespace risk.control.system.Controllers
                         failedMessage += $"                                       ";
                         failedMessage += $"                                       ";
                         failedMessage += $"{BaseUrl}";
-                        await smsService.DoSendSmsAsync("+" + admin.PhoneNumber, failedMessage);
+                        await smsService.DoSendSmsAsync("+" + admin.Country.ISDCode+ admin.PhoneNumber, failedMessage);
                         notifyService.Error("OOPS !!!..Contact Admin");
                         return RedirectToAction("/Account/Login");
                     }
@@ -272,7 +273,7 @@ namespace risk.control.system.Controllers
                     message += $"                                       ";
                     message += $"                                       ";
                     message += $"{BaseUrl}";
-                    await smsService.DoSendSmsAsync("+" + admin.PhoneNumber, message);
+                    await smsService.DoSendSmsAsync("+" + admin.Country.ISDCode + admin.PhoneNumber, message);
 
 
                     message = string.Empty;
@@ -285,7 +286,7 @@ namespace risk.control.system.Controllers
                     message += $"                                       ";
                     message += $"                                       ";
                     message += $"{BaseUrl}";
-                    await smsService.DoSendSmsAsync("+" + user.PhoneNumber, message);
+                    await smsService.DoSendSmsAsync("+" + admin.Country.ISDCode + user.PhoneNumber, message);
 
                     return View("ChangePasswordConfirmation");
                 }

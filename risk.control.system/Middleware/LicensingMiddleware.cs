@@ -18,7 +18,6 @@ namespace risk.control.system.Middleware
         private readonly RequestDelegate _next;
         private readonly ILogger<WhitelistListMiddleware> _logger;
         private readonly IFeatureManager featureManager;
-        private byte[][] _safelist;
         public LicensingMiddleware(RequestDelegate next, ILogger<WhitelistListMiddleware> logger, IFeatureManager featureManager)
         {
             _next = next;

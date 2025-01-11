@@ -4,8 +4,6 @@
     string baddress = string.Empty;
     int currentAgeinYrs = 0;
     int currentBAgeinYrs = 0;
-    bool customerExist = false;
-    bool beneficiaryExist = false;
     if (Model.ClaimsInvestigation != null && Model.ClaimsInvestigation.CustomerDetail != null)
     {
         address = @Model.ClaimsInvestigation?.CustomerDetail.Addressline + " " + @Model.ClaimsInvestigation?.CustomerDetail.District.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.State.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.Country.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.PinCode.Code;
@@ -23,33 +21,6 @@
             var age = DateTime.Now.Subtract(Model.Location.DateOfBirth.GetValueOrDefault()).TotalDays;
             currentBAgeinYrs = (int)age / 365;
         }
-
-    }
-    if (!string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.PolicyDetail?.ContractNumber))
-    {
-        customerExist = true;
-    }
-    if (Model.Location?.BeneficiaryDetailId > 0)
-    {
-        beneficiaryExist = true;
-    }
-    string customerProgressColor = "grey";
-    if (@customerExist)
-    {
-        customerProgressColor = "green";
-    }
-    string benficiaryProgressColor = "lightgrey";
-    if (@customerExist && @beneficiaryExist)
-    {
-        benficiaryProgressColor = "green";
-    }
-    if (@customerExist && !@beneficiaryExist)
-    {
-        benficiaryProgressColor = "grey";
-    }
-    if (!@customerExist && !@beneficiaryExist)
-    {
-        benficiaryProgressColor = "lightgrey";
     }
 }
 <article>

@@ -39,7 +39,6 @@ namespace risk.control.system.Middleware
         private readonly ILogger<WhitelistListMiddleware> _logger;
         private readonly IFeatureManager featureManager;
         private readonly IConfiguration config;
-        private byte[][] _safelist;
         public WhitelistListMiddleware(RequestDelegate next, ILogger<WhitelistListMiddleware> logger, IFeatureManager featureManager, IConfiguration config)
         {
             _next = next;

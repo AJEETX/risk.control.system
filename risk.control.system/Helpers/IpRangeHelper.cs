@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
+
 namespace risk.control.system.Helpers
 {
     public class IpRangeHelper
@@ -44,7 +45,7 @@ namespace risk.control.system.Helpers
         }
 
         // Get the local IP address
-        private static IPAddress GetLocalIpAddress()
+        public static IPAddress GetLocalIpAddress()
         {
             var host = Dns.GetHostEntry(Dns.GetHostName());
             return host.AddressList.FirstOrDefault(ip => ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork);

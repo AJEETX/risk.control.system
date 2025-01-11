@@ -23,7 +23,6 @@ namespace risk.control.system.Controllers
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME},{AGENCY_ADMIN.DISPLAY_NAME},{CREATOR.DISPLAY_NAME},{ASSESSOR.DISPLAY_NAME},{MANAGER.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME},{AGENT.DISPLAY_NAME}")]
     public class UploadsController : Controller
     {
-        private static string NO_DATA = " NO - DATA ";
         private readonly ApplicationDbContext _context;
         private readonly INotyfService notifyService;
         private readonly IClaimsAgentService agentService;

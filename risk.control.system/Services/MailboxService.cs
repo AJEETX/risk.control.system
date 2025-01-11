@@ -75,7 +75,7 @@ namespace risk.control.system.Services
             var supervisorRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.SUPERVISOR.ToString()));
             var agencyAdminRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.AGENCY_ADMIN.ToString()));
 
-            var vendorUsers = _context.VendorApplicationUser.Where(u => u.VendorId == vendorId);
+            var vendorUsers = _context.VendorApplicationUser.Include(c=>c.Country).Where(u => u.VendorId == vendorId);
 
             List<VendorApplicationUser> userEmailsToSend = new();
 
@@ -149,7 +149,7 @@ namespace risk.control.system.Services
                     message += $"                                          ";
                     message += $"{clientCompanyUser.Email}";
                     message += $"                                          ";
-                    await smsService.DoSendSmsAsync(userEmailToSend.PhoneNumber, message);
+                    await smsService.DoSendSmsAsync(userEmailToSend.Country.ISDCode+ userEmailToSend.PhoneNumber, message);
                 }
                 //SMS ::END
             }
@@ -160,6 +160,7 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
+                Console.WriteLine(ex.Message);
                 throw;
             }
         }
@@ -175,7 +176,7 @@ namespace risk.control.system.Services
 
             //var assignerRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Assigner.ToString()));
 
-            var companyUsers = _context.ClientCompanyApplicationUser.Where(u => u.ClientCompanyId == clientCompanyUser.ClientCompanyId);
+            var companyUsers = _context.ClientCompanyApplicationUser.Include(c=>c.Country).Where(u => u.ClientCompanyId == clientCompanyUser.ClientCompanyId);
 
             foreach (var companyUser in companyUsers)
             {
@@ -245,7 +246,7 @@ namespace risk.control.system.Services
                     message += $"                                          ";
                     message += $"{applicationUser.Email}";
                     message += $"                                          ";
-                    await smsService.DoSendSmsAsync(userEmailToSend.PhoneNumber, message);
+                    await smsService.DoSendSmsAsync(userEmailToSend.Country.ISDCode+ userEmailToSend.PhoneNumber, message);
                 }
                 //SMS ::END
             }
@@ -255,6 +256,7 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
+                Console.WriteLine(ex.Message);
                 throw;
             }
         }
@@ -266,7 +268,7 @@ namespace risk.control.system.Services
             {
                 var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claim.ClientCompanyId);
 
-                var companyUsers = _context.ClientCompanyApplicationUser.Where(u => u.ClientCompanyId == claim.ClientCompanyId);
+                var companyUsers = _context.ClientCompanyApplicationUser.Include(c => c.Country).Where(u => u.ClientCompanyId == claim.ClientCompanyId);
 
                 var assessorRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.ASSESSOR.ToString()));
 
@@ -336,7 +338,7 @@ namespace risk.control.system.Services
                         message += $"                                          ";
                         message += $"{senderUserEmail})";
                         message += $"                                           ";
-                        await smsService.DoSendSmsAsync(user.PhoneNumber, message);
+                        await smsService.DoSendSmsAsync(user.Country.ISDCode+ user.PhoneNumber, message);
                     }
                 }
                 try
@@ -345,6 +347,7 @@ namespace risk.control.system.Services
                 }
                 catch (Exception ex)
                 {
+                Console.WriteLine(ex.Message);
                     throw;
                 }
             }
@@ -355,7 +358,7 @@ namespace risk.control.system.Services
             var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.AGENT.ToString()));
 
             var recepientMailbox = _context.Mailbox.Include(m => m.Inbox).FirstOrDefault(c => c.Name == agentEmail);
-            var recepientUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == agentEmail);
+            var recepientUser = _context.VendorApplicationUser.Include(c=>c.Country).FirstOrDefault(c => c.Email == agentEmail);
 
             string claimsUrl = $"{AgencyBaseUrl + claimId}";
 
@@ -409,11 +412,12 @@ namespace risk.control.system.Services
                     message += $"                                          ";
                     message += $"{userEmail}";
                     message += $"                                          ";
-                    await smsService.DoSendSmsAsync(recepientUser.PhoneNumber, message);
+                    await smsService.DoSendSmsAsync(recepientUser.Country.ISDCode+recepientUser.PhoneNumber, message);
                 }
             }
             catch (Exception ex)
             {
+                Console.WriteLine(ex.Message);
                 throw;
             }
         }
@@ -498,6 +502,7 @@ namespace risk.control.system.Services
             {
                 var companyUsers = _context.ClientCompanyApplicationUser
                     .Include(u => u.ClientCompany)
+                    .Include(u => u.Country)
                     .Where(u => u.ClientCompanyId == claim.ClientCompanyId);
 
                 var claimsInvestigation = _context.ClaimsInvestigation
@@ -574,7 +579,7 @@ namespace risk.control.system.Services
                         message += $"                                          ";
                         message += $"{senderUserEmail}";
                         message += $"                                          ";
-                        await smsService.DoSendSmsAsync(user.PhoneNumber, message);
+                        await smsService.DoSendSmsAsync(user.Country.ISDCode+ user.PhoneNumber, message);
                     }
                 }
                 try
@@ -593,7 +598,7 @@ namespace risk.control.system.Services
             var claim = _context.ClaimsInvestigation.Include(i => i.PolicyDetail).Where(c => c.ClaimsInvestigationId == claimId).FirstOrDefault();
             if (claim != null)
             {
-                var companyUsers = _context.ClientCompanyApplicationUser.Where(u => u.ClientCompanyId == claim.ClientCompanyId);
+                var companyUsers = _context.ClientCompanyApplicationUser.Include(c => c.Country).Where(u => u.ClientCompanyId == claim.ClientCompanyId);
 
                 var assessorRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.ASSESSOR.ToString()));
 
@@ -660,7 +665,7 @@ namespace risk.control.system.Services
                         message += $"                                          ";
                         message += $"{senderUserEmail}";
                         message += $"                                          ";
-                        await smsService.DoSendSmsAsync(user.PhoneNumber, message);
+                        await smsService.DoSendSmsAsync(user.Country.ISDCode+ user.PhoneNumber, message);
                     }
                 }
                 try
@@ -669,6 +674,7 @@ namespace risk.control.system.Services
                 }
                 catch (Exception ex)
                 {
+                    Console.WriteLine(ex.Message);
                     throw;
                 }
             }
@@ -681,7 +687,7 @@ namespace risk.control.system.Services
 
             var vendorUser = _context.VendorApplicationUser.FirstOrDefault(u => u.Email == senderUserEmail);
 
-            var vendorUsers = _context.VendorApplicationUser.Where(u => u.VendorId == vendorUser.VendorId);
+            var vendorUsers = _context.VendorApplicationUser.Include(c => c.Country).Where(u => u.VendorId == vendorUser.VendorId);
 
             List<VendorApplicationUser> users = new List<VendorApplicationUser>();
 
@@ -750,7 +756,7 @@ namespace risk.control.system.Services
                     message += $"                                          ";
                     message += $"{senderUserEmail}";
                     message += $"                                          ";
-                    await smsService.DoSendSmsAsync(user.PhoneNumber, message);
+                    await smsService.DoSendSmsAsync(user.Country.ISDCode+ user.PhoneNumber, message);
                 }
             }
             try
@@ -777,7 +783,7 @@ namespace risk.control.system.Services
             var supervisorRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.SUPERVISOR.ToString()));
             var agencyAdminRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.AGENCY_ADMIN.ToString()));
 
-            var vendorUsers = _context.VendorApplicationUser.Where(u => u.VendorId == claimsInvestigation.Vendor.VendorId);
+            var vendorUsers = _context.VendorApplicationUser.Include(c => c.Country).Where(u => u.VendorId == claimsInvestigation.Vendor.VendorId);
 
             List<VendorApplicationUser> userEmailsToSend = new();
 
@@ -846,7 +852,7 @@ namespace risk.control.system.Services
                     message += $"                                          ";
                     message += $"{clientCompanyUser.Email}";
                     message += $"                                          ";
-                    await smsService.DoSendSmsAsync(userEmailToSend.PhoneNumber, message);
+                    await smsService.DoSendSmsAsync(userEmailToSend.Country.ISDCode+ userEmailToSend.PhoneNumber, message);
                 }
                 //SMS ::END
             }
@@ -857,6 +863,7 @@ namespace risk.control.system.Services
             }
             catch (Exception ex)
             {
+                Console.WriteLine(ex.Message);
                 throw;
             }
         }
@@ -866,7 +873,7 @@ namespace risk.control.system.Services
             var claim = _context.ClaimsInvestigation.Include(i => i.PolicyDetail).Where(c => c.ClaimsInvestigationId == claimId).FirstOrDefault();
             if (claim != null)
             {
-                var companyUsers = _context.ClientCompanyApplicationUser.Where(u => u.ClientCompanyId == claim.ClientCompanyId);
+                var companyUsers = _context.ClientCompanyApplicationUser.Include(c=>c.Country).Where(u => u.ClientCompanyId == claim.ClientCompanyId);
 
                 var assessorRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.ASSESSOR.ToString()));
 
@@ -933,7 +940,7 @@ namespace risk.control.system.Services
                         message += $"                                          ";
                         message += $"{senderUserEmail}";
                         message += $"                                          ";
-                        await smsService.DoSendSmsAsync(user.PhoneNumber, message);
+                        await smsService.DoSendSmsAsync(user.Country.ISDCode+ user.PhoneNumber, message);
                     }
                 }
                 try

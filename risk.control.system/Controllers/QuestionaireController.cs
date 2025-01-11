@@ -131,7 +131,7 @@ namespace risk.control.system.Controllers
         // GET: Questionaire/Delete/5
         public async Task<IActionResult> Delete(long id)
         {
-            if (id == null || _context.ReportQuestionaire == null)
+            if (id <= 0)
             {
                 return NotFound();
             }

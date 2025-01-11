@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
@@ -48,7 +49,7 @@ namespace risk.control.system.Services
         {
             var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.AGENT.ToString()));
 
-            var user2Onboard = _context.VendorApplicationUser.FirstOrDefault(
+            var user2Onboard = _context.VendorApplicationUser.Include(c=>c.Country).FirstOrDefault(
                 u => u.PhoneNumber.TrimStart('+') == mobile.TrimStart('+') && !string.IsNullOrWhiteSpace(u.MobileUId));
 
             if (user2Onboard == null)
@@ -75,7 +76,7 @@ namespace risk.control.system.Services
                 message += $"Thanks";
                 message += $"                                          ";
                 message += $"{BaseUrl}";
-                await smsService.DoSendSmsAsync(mobile, message);
+                await smsService.DoSendSmsAsync(user2Onboard.Country.ISDCode+ mobile, message);
             }
             return user2Onboard;
         }

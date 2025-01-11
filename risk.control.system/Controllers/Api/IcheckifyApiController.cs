@@ -17,7 +17,6 @@ namespace risk.control.system.Controllers.Api
         private static string PanIdfyUrl = "https://pan-card-verification-at-lowest-price.p.rapidapi.com/verification/marketing/pan";
         private static string RapidAPIKey = "df0893831fmsh54225589d7b9ad1p15ac51jsnb4f768feed6f";
         private static string PanTask_id = "pan-card-verification-at-lowest-price.p.rapidapi.com";
-        private static string PanGroup_id = "8e16424a-58fc-4ba4-ab20-5bc8e7c3c41e";
 
         public IcheckifyApiController(IHttpClientService httpClientService)
         {

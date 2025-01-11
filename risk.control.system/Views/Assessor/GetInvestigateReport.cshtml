@@ -4,25 +4,7 @@
     ViewData["Title"] = "Report ";
 
 }
-@{
-    string digitalIdColor = "grey";
-    var borderColor = "";
-    if (Model.ClaimsInvestigation.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime == null)
-    {
-        digitalIdColor = "grey";
-        borderColor = "";
-    }
-    else if (Model.ClaimsInvestigation.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime != null && string.IsNullOrWhiteSpace(@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImageMatchConfidence))
-    {
-        digitalIdColor = "#dc3545!important";
-        borderColor = "border-danger";
-    }
-    else if (Model.ClaimsInvestigation.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime != null && !string.IsNullOrWhiteSpace(@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImageMatchConfidence))
-    {
-        borderColor = "border-success";
-        digitalIdColor = "green";
-    }
-}
+
 <section class="content">
     <form id="create-form" method="post" asp-controller="ClaimsInvestigationPost" asp-action="ProcessCaseReport">
         <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />

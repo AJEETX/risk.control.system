@@ -30,7 +30,7 @@ namespace risk.control.system.Controllers
         // GET: DigitalIdReports/Details/5
         public async Task<IActionResult> Details(long id)
         {
-            if (id == null || _context.DigitalIdReport == null)
+            if (id <= 0)
             {
                 return NotFound();
             }

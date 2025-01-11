@@ -44,7 +44,7 @@ namespace risk.control.system.Services
             var filePath = Path.Combine(webHostEnvironment.WebRootPath, Path.GetFileNameWithoutExtension(file), file);
 
             ReportRunner.Run(webHostEnvironment.WebRootPath).Build(filePath); ;
-            if (file == null) return null;
+            if (file == null) return null!;
             var memory = new MemoryStream();
             using (var stream = new FileStream(filePath, FileMode.Open))
             {

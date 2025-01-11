@@ -59,7 +59,7 @@ namespace risk.control.system.Controllers.Mobile
             smsService = SmsService;
             this.tokenService = tokenService;
         }
-       
+
         [AllowAnonymous]
         [HttpPost("agent-login")]
         public async Task<IActionResult> Login(CancellationToken ct, AgentLoginModel model)
@@ -84,8 +84,8 @@ namespace risk.control.system.Controllers.Mobile
                 if (roles != null && roles.Count > 0)
                 {
                     var vendorUser = _context.VendorApplicationUser.FirstOrDefault(u => u.Email == email && !u.Deleted && u.Role == AppRoles.AGENT);
-                    
-                    bool vendorIsActive = false; 
+
+                    bool vendorIsActive = false;
                     vendorIsActive = _context.Vendor.Any(c => c.VendorId == vendorUser.VendorId && c.Status == Models.VendorStatus.ACTIVE);
                     if (await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED) && vendorIsActive)
                     {
@@ -99,7 +99,7 @@ namespace risk.control.system.Controllers.Mobile
 
                         if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN) && user?.Email != null)
                         {
-                            var admin = _context.ApplicationUser.FirstOrDefault(u => u.IsSuperAdmin);
+                            var admin = _context.ApplicationUser.Include(c => c.Country).FirstOrDefault(u => u.IsSuperAdmin);
                             if (admin != null)
                             {
                                 message = $"Dear {admin.Email}";
@@ -113,7 +113,7 @@ namespace risk.control.system.Controllers.Mobile
                                 message += $"{BaseUrl}";
                                 try
                                 {
-                                    await smsService.DoSendSmsAsync("+" + admin.PhoneNumber, message);
+                                    await smsService.DoSendSmsAsync("+" + admin.Country.ISDCode + admin.PhoneNumber, message);
                                 }
                                 catch (Exception ex)
                                 {
@@ -130,7 +130,7 @@ namespace risk.control.system.Controllers.Mobile
                             message += $"{BaseUrl}";
                             try
                             {
-                                await smsService.DoSendSmsAsync("+" + admin.PhoneNumber, message);
+                                await smsService.DoSendSmsAsync("+" + admin.Country.ISDCode + admin.PhoneNumber, message);
                             }
                             catch (Exception ex)
                             {
@@ -161,6 +161,7 @@ namespace risk.control.system.Controllers.Mobile
                 return BadRequest("Invalid login attempt.");
             }
         }
+
         [AllowAnonymous]
         [HttpPost("refresh-token")]
         public async Task<IActionResult> RefreshToken([FromBody] string refreshToken)
@@ -198,6 +199,7 @@ namespace risk.control.system.Controllers.Mobile
                 ExpiresAt = DateTime.UtcNow.AddMinutes(15) // Matches access token lifetime
             });
         }
+
         [Authorize]
         [HttpPost("logout")]
         public async Task<IActionResult> RevokeToken([FromBody] string refreshToken)
@@ -225,9 +227,10 @@ namespace risk.control.system.Controllers.Mobile
                 Role = $"{AGENT.DISPLAY_NAME}"
             };
             var message = tokenService.GenerateJwtToken(model);
-
+            await Task.Delay(10);
             return Ok(new { message });
         }
+
         // This endpoint requires JWT authentication.
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{AGENT.DISPLAY_NAME}")]
         [HttpGet("test-2-access-secure-api")]
@@ -268,6 +271,13 @@ namespace risk.control.system.Controllers.Mobile
             return Ok(new { success = true, message = "Cookie consent has been revoked." });
         }
 
+        [AllowAnonymous]
+        [HttpGet("test-sms")]
+        public async Task<IActionResult> Sms(string mobile = "61432854196")
+        {
+            await SmsService.SendSmsAsync(mobile);
+            return Ok(new { message = "Sms sent!!" });
+        }
 
         //[Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
         //[HttpGet("cookie-api")]

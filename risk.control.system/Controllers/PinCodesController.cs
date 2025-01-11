@@ -196,7 +196,7 @@ namespace risk.control.system.Controllers
         [Breadcrumb("Edit ", FromAction = "Profile")]
         public async Task<IActionResult> Edit(long id)
         {
-            if (id == null || _context.PinCode == null)
+            if (id <= 0)
             {
                 toastNotification.AddErrorToastMessage("pincode not found!");
                 return NotFound();
@@ -253,7 +253,7 @@ namespace risk.control.system.Controllers
         [Breadcrumb("Delete ", FromAction = "Profile")]
         public async Task<IActionResult> Delete(long id)
         {
-            if (id == null || _context.PinCode == null)
+            if (id <= 0)
             {
                 toastNotification.AddErrorToastMessage("pincode not found!");
                 return NotFound();

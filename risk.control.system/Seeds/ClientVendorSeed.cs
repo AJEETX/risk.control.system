@@ -22,13 +22,6 @@ namespace risk.control.system.Seeds
         {
             string noCompanyImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", @Applicationsettings.NO_IMAGE);
 
-            var request = httpAccessor.HttpContext?.Request;
-            string host = request?.Host.Value;
-            var mobileAppUrl = Applicationsettings.APP_DEMO_URL;
-            if(host != null && host.Contains(Applicationsettings.AZURE_APP_URL))
-            {
-                mobileAppUrl = Applicationsettings.APP_URL;
-            }
             var globalSetting = new GlobalSettings
             {
                 EnableMailbox = true
@@ -36,7 +29,6 @@ namespace risk.control.system.Seeds
             var newGlobalSetting = await context.GlobalSettings.AddAsync(globalSetting);
             await context.SaveChangesAsync(null, false);
             var globalSettings = context.GlobalSettings.FirstOrDefault();
-
             var enableMailbox = globalSettings?.EnableMailbox ?? false;
 
             var vendors = await VendorSeed.Seed(context,webHostEnvironment,investigationServiceType,discreetServiceType,docServiceType,lineOfBusiness,httpAccessor,customApiCLient, vendorUserManager);

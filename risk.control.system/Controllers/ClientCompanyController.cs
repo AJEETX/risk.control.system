@@ -108,8 +108,8 @@ namespace risk.control.system.Controllers
             clientCompany.AddressLatitude = companyCoordinates.Latitude;
             clientCompany.AddressLongitude = companyCoordinates.Longitude;
             clientCompany.AddressMapLocation = url;
-
-            await smsService.DoSendSmsAsync(clientCompany.PhoneNumber, "Company account created. Domain : " + clientCompany.Email);
+            var isdCode = _context.Country.FirstOrDefault(c => c.CountryId == clientCompany.SelectedCountryId)?.ISDCode;
+            await smsService.DoSendSmsAsync(isdCode+clientCompany.PhoneNumber, "Company account created. Domain : " + clientCompany.Email);
 
             clientCompany.PinCodeId = clientCompany.SelectedPincodeId;
             clientCompany.DistrictId = clientCompany.SelectedDistrictId;
@@ -160,7 +160,7 @@ namespace risk.control.system.Controllers
                 notifyService.Error("Company not found!");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
-            var clientCompany = await _context.ClientCompany.FindAsync(ClientCompanyId);
+            var clientCompany = await _context.ClientCompany.Include(c=>c.Country).FirstOrDefaultAsync(c=>c.ClientCompanyId == ClientCompanyId);
             if (clientCompany != null)
             {
                 clientCompany.Updated = DateTime.Now;
@@ -178,7 +178,7 @@ namespace risk.control.system.Controllers
                 }
                 await _context.SaveChangesAsync();
 
-                await smsService.DoSendSmsAsync(clientCompany.PhoneNumber, "Company account deleted. Domain : " + clientCompany.Email);
+                await smsService.DoSendSmsAsync(clientCompany.Country.ISDCode+ clientCompany.PhoneNumber, "Company account deleted. Domain : " + clientCompany.Email);
 
                 notifyService.Custom($"Company {clientCompany.Email} deleted successfully.", 3, "red", "fas fa-building");
                 return RedirectToAction(nameof(Index));
@@ -302,7 +302,7 @@ namespace risk.control.system.Controllers
                 _context.ClientCompany.Update(clientCompany);
                 await _context.SaveChangesAsync();
 
-                await smsService.DoSendSmsAsync(clientCompany.PhoneNumber, "Company account edited. Domain : " + clientCompany.Email);
+                await smsService.DoSendSmsAsync(pinCode.Country.ISDCode+ clientCompany.PhoneNumber, "Company account edited. Domain : " + clientCompany.Email);
                 notifyService.Custom($"Company edited successfully.", 3, "orange", "fas fa-building");
                 return RedirectToAction(nameof(ClientCompanyController.Details), "ClientCompany", new { id = clientCompany.ClientCompanyId });
             }

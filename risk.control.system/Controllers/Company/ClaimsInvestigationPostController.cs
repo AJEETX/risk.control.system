@@ -33,7 +33,6 @@ namespace risk.control.system.Controllers.Company
             WriteIndented = true
         };
 
-        private static string NO_DATA = " NO - DATA ";
         private static Regex regex = new Regex("\\\"(.*?)\\\"");
         private readonly ApplicationDbContext _context;
         private readonly IClaimsInvestigationService claimsInvestigationService;

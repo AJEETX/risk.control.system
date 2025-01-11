@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
@@ -30,7 +31,7 @@ namespace risk.control.system.Services
         public async Task<bool> ForgotPassword(string useremail, long mobile)
         {
             //CHECK AND VALIDATE EMAIL PASSWORD
-            var user = context.ApplicationUser.FirstOrDefault(u => !u.Deleted && u.Email == useremail && u.PhoneNumber == mobile.ToString());
+            var user = context.ApplicationUser.Include(a=>a.Country).FirstOrDefault(u => !u.Deleted && u.Email == useremail && u.PhoneNumber == mobile.ToString());
             if (user != null)
             {
 
@@ -49,7 +50,7 @@ namespace risk.control.system.Services
                 message += $"{BaseUrl}";
                 if(user != null)
                 {
-                    await smsService.DoSendSmsAsync(user.PhoneNumber, message);
+                    await smsService.DoSendSmsAsync(user.Country.ISDCode+ user.PhoneNumber, message);
                 }
             }
             //SEND SMS

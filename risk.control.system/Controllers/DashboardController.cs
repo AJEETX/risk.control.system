@@ -98,6 +98,7 @@ namespace risk.control.system.Controllers
             }
             catch (Exception ex)
             {
+                Console.WriteLine(ex.Message);
                 notifyService.Error("OOPs !!!...Contact Admin");
                 await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
                 await signInManager.SignOutAsync();

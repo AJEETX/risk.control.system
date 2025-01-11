@@ -213,7 +213,7 @@ namespace risk.control.system.Controllers
                         if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN) && user?.Email != null && !user.Email.StartsWith("admin"))
                         {
                             var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct, "login-success", model.Email, isAuthenticated, latlong);
-                            var admin = _context.ApplicationUser.FirstOrDefault(u => u.IsSuperAdmin);
+                            var admin = _context.ApplicationUser.Include(a=>a.Country).FirstOrDefault(u => u.IsSuperAdmin);
                             string message = string.Empty;
                             if (admin != null)
                             {
@@ -228,7 +228,7 @@ namespace risk.control.system.Controllers
                                 message += $"{BaseUrl}";
                                 try
                                 {
-                                    await smsService.DoSendSmsAsync("+" + admin.PhoneNumber, message);
+                                    await smsService.DoSendSmsAsync("+" + admin.Country.ISDCode + admin.PhoneNumber, message);
                                 }
                                 catch (Exception ex)
                                 {
@@ -245,7 +245,7 @@ namespace risk.control.system.Controllers
                             message += $"{BaseUrl}";
                             try
                             {
-                                await smsService.DoSendSmsAsync("+" + admin.PhoneNumber, message);
+                                    await smsService.DoSendSmsAsync("+" + admin.Country.ISDCode + admin.PhoneNumber, message);
                             }
                             catch (Exception ex)
                             {
@@ -261,7 +261,7 @@ namespace risk.control.system.Controllers
                 if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN) && !user.Email.StartsWith("admin"))
                 {
                     var ipApiFailedResponse = await service.GetClientIp(ipAddressWithoutPort, ct, "login-failed", model.Email, false, latlong);
-                    var adminForFailed = _context.ApplicationUser.FirstOrDefault(u => u.IsSuperAdmin);
+                    var adminForFailed = _context.ApplicationUser.Include(a=>a.Country).FirstOrDefault(u => u.IsSuperAdmin);
                     string failedMessage = $"Dear {adminForFailed.Email}";
                     failedMessage += $"                         ";
                     failedMessage += $"Locked user {user.Email} logged in from IP address {ipApiFailedResponse.query}";
@@ -270,7 +270,7 @@ namespace risk.control.system.Controllers
                     failedMessage += $"                                       ";
                     failedMessage += $"                                       ";
                     failedMessage += $"{BaseUrl}";
-                    await smsService.DoSendSmsAsync("+" + adminForFailed.PhoneNumber, failedMessage);
+                    await smsService.DoSendSmsAsync("+" + adminForFailed.Country.ISDCode +  adminForFailed.PhoneNumber, failedMessage);
                 }
                 model.ShowUserOnLogin = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
                 ViewData["Users"] = new SelectList(_context.Users.OrderBy(o => o.Email), "Email", "Email");
@@ -284,7 +284,7 @@ namespace risk.control.system.Controllers
                 if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
                 {
                     var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct, "login-locked", model.Email, isAuthenticated, latlong);
-                    var admin = _context.ApplicationUser.FirstOrDefault(u => u.IsSuperAdmin);
+                    var admin = _context.ApplicationUser.Include(a => a.Country).FirstOrDefault(u => u.IsSuperAdmin);
                     string message = $"Dear {admin.Email}";
                     message += $"                           ";
                     message += $"{model.Email} failed login attempt from IP address {ipApiResponse.query}";
@@ -293,7 +293,7 @@ namespace risk.control.system.Controllers
                     message += $"                                       ";
                     message += $"                                       ";
                     message += $"{BaseUrl}";
-                    await smsService.DoSendSmsAsync("+" + admin.PhoneNumber, message);
+                    await smsService.DoSendSmsAsync("+" + admin.Country.ISDCode+ admin.PhoneNumber, message);
                 }
                 else
                 {
@@ -311,7 +311,7 @@ namespace risk.control.system.Controllers
                 if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
                 {
                     var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct, "login-failed", model.Email, isAuthenticated, latlong);
-                    var admin = _context.ApplicationUser.FirstOrDefault(u => u.IsSuperAdmin);
+                    var admin = _context.ApplicationUser.Include(a => a.Country).FirstOrDefault(u => u.IsSuperAdmin);
                     string message = $"Dear {admin.Email}";
                     message += $"                          ";
                     message += $"{model.Email} failed login attempt from IP address {ipApiResponse.query}";
@@ -320,7 +320,7 @@ namespace risk.control.system.Controllers
                     message += $"                                       ";
                     message += $"                                       ";
                     message += $"{BaseUrl}";
-                    await smsService.DoSendSmsAsync("+" + admin.PhoneNumber, message);
+                    await smsService.DoSendSmsAsync("+" + admin.Country.ISDCode+ admin.PhoneNumber, message);
                 }
                 else
                 {

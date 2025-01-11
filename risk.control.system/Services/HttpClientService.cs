@@ -46,7 +46,6 @@ namespace risk.control.system.Services
     public class HttpClientService : IHttpClientService
     {
         private HttpClient httpClient = new HttpClient();
-        private static string RapidAPIHost = "idfy-verification-suite.p.rapidapi.com";
         private static string PinCodeBaseUrl = "https://india-pincode-with-latitude-and-longitude.p.rapidapi.com/api/v1/pincode";
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly IAmazonTranscribeService _amazonTranscribeService;

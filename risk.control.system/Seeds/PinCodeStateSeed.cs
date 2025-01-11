@@ -13,10 +13,7 @@ namespace risk.control.system.Seeds
     public static class PinCodeStateSeed
     {
         private static string au_stateWisePincodeFilePath = @"au_postcodes.csv";
-        private static string in_stateWisePincodeFilePath = @"india_pincodes.csv";
         private static string all_india_pincodes = @"india_pincode.csv";
-
-        //private static string stateWisePincodeFilePath = @"pincode.csv";
         private static string NO_DATA = " NO - DATA ";
 
         private static Regex regex = new Regex("\\\"(.*?)\\\"");
