@@ -57,9 +57,8 @@ h1 {
     text-decoration:none;
 }
 #maps{
-    max-width:560px;
-    overflow-x:auto;
-    min-height:300px;
+    min-height:250px;
+    border:2px solid #ddd;
 }
 
 .error-template {

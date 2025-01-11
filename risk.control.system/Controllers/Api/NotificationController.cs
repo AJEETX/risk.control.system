@@ -40,21 +40,13 @@ namespace risk.control.system.Controllers.Api
                 var ipAddressWithoutPort = ipAddress?.Split(':')[0];
                 var isWhiteListed = service.IsWhiteListIpAddress(HttpContext.Connection.RemoteIpAddress);
 
-                string publicIp = "Unable to fetch IP";
-                using (var client = new UdpClient())
-                {
-                    // Connect to an external endpoint
-                    client.Connect("8.8.8.8", 12345); // Google's DNS
-                    var endpoint = client.Client.LocalEndPoint as IPEndPoint;
-                    publicIp = endpoint?.Address.ToString() ?? "Unknown IP";
-                }
-
-
-                var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct, decodedUrl,user, isAuthenticated, latlong);
-                if(ipApiResponse == null)
+                var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct, decodedUrl, user, isAuthenticated, latlong);
+                if (ipApiResponse == null)
                 {
                     return StatusCode(StatusCodes.Status500InternalServerError, "Error getting IP address");
                 }
+                var mapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={latlong}&zoom=15&size=600x250&maptype=roadmap&markers=color:red%7Clabel:S%7C{latlong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+                ipApiResponse.MapUrl = mapUrl;
                 var response = new
                 {
                     IpAddress = string.IsNullOrWhiteSpace(ipAddressWithoutPort) ? ipApiResponse?.query : ipAddressWithoutPort,
@@ -69,7 +61,6 @@ namespace risk.control.system.Controllers.Api
                     mapUrl = ipApiResponse.MapUrl,
                     whiteListed = false,
                 };
-
                 return Ok(response);
             }
             catch (Exception ex)

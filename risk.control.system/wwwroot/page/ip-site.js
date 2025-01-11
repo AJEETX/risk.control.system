@@ -45,7 +45,7 @@ async function fetchIpInfo(latlong) {
                 document.querySelector('#postCode .info-data').textContent = data.postCode || 'Not available';
                 document.querySelector('#isp .info-data').textContent = data.isp || 'Not available';
                 document.querySelector('#latLong .info-data').textContent = data.longitude ? data.latitude + "/" + data.longitude : 'Not available';
-                document.querySelector('#maps .info-data #location-map').src = data.mapUrl || '/img/no-map.jpeg';
+                document.querySelector('#location-map').src = data.mapUrl || '/img/no-map.jpeg';
             }
         }
 

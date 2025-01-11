@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization; // Required for AllowAnonymous
 using risk.control.system.Data;
 using risk.control.system.Models;
+using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers.Api
 {
@@ -39,7 +40,7 @@ namespace risk.control.system.Controllers.Api
         {
             long lId;
             var services = new List<InvestigationServiceType>();
-            if (LineOfBusinessId >0)
+            if (LineOfBusinessId > 0)
             {
                 lId = LineOfBusinessId;
                 services = await context.InvestigationServiceType.Where(s => s.LineOfBusiness.LineOfBusinessId.Equals(lId)).ToListAsync();
@@ -102,7 +103,7 @@ namespace risk.control.system.Controllers.Api
         }
 
         [HttpGet("GetPincodesByDistrictIdWithoutPreviousSelectedService")]
-        public async Task<IActionResult> GetPincodesByDistrictIdWithoutPreviousSelectedService(long districtId,string district,long stateId, long vendorId, long lobId, long serviceId)
+        public async Task<IActionResult> GetPincodesByDistrictIdWithoutPreviousSelectedService(long districtId, string district, long stateId, long vendorId, long lobId, long serviceId)
         {
             long sId;
             var pincodes = new List<PinCode>();
@@ -111,12 +112,12 @@ namespace risk.control.system.Controllers.Api
             if (districtId > 0 && !string.IsNullOrWhiteSpace(district))
             {
                 sId = districtId;
-                var validDistrict = context.PinCode.Include(p=>p.District).Any(s =>s.StateId == stateId && s.District.Name.ToLower().Contains(district.ToLower()));
-                if(!validDistrict)
+                var validDistrict = context.PinCode.Include(p => p.District).Any(s => s.StateId == stateId && s.District.Name.ToLower().Contains(district.ToLower()));
+                if (!validDistrict)
                 {
                     return Ok();
                 }
-                pincodes = await context.PinCode.Include(p=>p.District).Where(s => s.District.DistrictId.Equals(sId) && s.District.Name.ToLower().Contains(district.ToLower())).ToListAsync();
+                pincodes = await context.PinCode.Include(p => p.District).Where(s => s.District.DistrictId.Equals(sId) && s.District.Name.ToLower().Contains(district.ToLower())).ToListAsync();
 
                 var vendor = context.Vendor
                     .Include(c => c.VendorInvestigationServiceTypes)
@@ -159,12 +160,12 @@ namespace risk.control.system.Controllers.Api
 
         [HttpGet("GetUserBySearch")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetUserBySearch(string search ="")
+        public async Task<IActionResult> GetUserBySearch(string search = "")
         {
             var applicationUsers = new List<ApplicationUser>();
-            if(string.IsNullOrWhiteSpace(search))
+            if (string.IsNullOrWhiteSpace(search))
             {
-                return Ok(context.ApplicationUser?.OrderBy(o=>o.Email).Take(10).Select(a => a.Email).OrderBy(s => s).ToList());
+                return Ok(context.ApplicationUser?.Where(a => a.Email.ToLower() != PORTAL_ADMIN.EMAIL.ToLower()).OrderBy(o => o.Email).Take(10).Select(a => a.Email).OrderBy(s => s).ToList());
             }
             if (!string.IsNullOrEmpty(search))
             {
@@ -174,6 +175,7 @@ namespace risk.control.system.Controllers.Api
             }
             return Ok(applicationUsers?.OrderBy(o => o.Email).Take(10).Select(a => a.Email).OrderBy(s => s).ToList());
         }
+
         [HttpGet("GetIpAddress")]
         public async Task<IActionResult> GetIpAddress()
         {
