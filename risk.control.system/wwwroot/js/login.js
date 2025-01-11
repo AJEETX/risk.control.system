@@ -7,17 +7,16 @@ $.validator.setDefaults({
             $(".submit-progress").removeClass("hidden");
         }, 1);
 
-        $('#login').css('color', 'lightgrey');
-        $('#reset-pwd').css('color', 'lightgrey');
+        $('#reset-pwd').addClass('login-disabled');
 
         $('#login').html('<span class="fas fa-sync fa-spin" aria-hidden="true"></span> Login');
         $('#reset-pwd').html('<span class="fas fa-sync fa-spin" aria-hidden="true"></span> Reset Password');
 
         $('a').attr('disabled', 'disabled');
-        $('button').attr('disabled', 'disabled');
-        $('html button').css('pointer-events', 'none')
-        $('html a').css({ 'pointer-events': 'none' }, { 'cursor': 'none' })
-        $('.text').css({ 'pointer-events': 'none' }, { 'cursor': 'none' })
+        $('#login').attr('disabled', 'disabled');
+        $('#login').addClass('login-disabled');
+        $('html a').addClass('anchor-disabled');
+        $('.text').addClass('anchor-disabled');
 
         form.submit();
 
@@ -128,8 +127,8 @@ $(document).ready(function () {
         },
         messages: {
             noResults: "No results found",
-            results: function (amount) {
-                return `${amount} result${amount > 1 ? "s" : ""} found`;
+            results: function (data) {
+                return `${data} result${data > 1 ? "s" : ""} found`;
             }
         }
     });

@@ -18,7 +18,7 @@
     <link rel="stylesheet" href="~/css/login.css">
     <link rel="stylesheet" href="~/css/cookie.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'none';connect-src 'self' wss:; script-src 'self';  style-src 'self' https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://fonts.googleapis.com; img-src 'self' https://hostedscan.com; frame-src 'self';form-action 'self';upgrade-insecure-requests;" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none';connect-src 'self' ; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' https://hostedscan.com; frame-src 'self';form-action 'self';upgrade-insecure-requests;" />
 
 </head>
 <body>
@@ -76,7 +76,7 @@
                                 </div>
                                 <div class="input-box">
                                     <i class="fas fa-lock left-padd"></i>
-                                    <input asp-for=Password id="password" type="password" title="password" class="form-control remarks" placeholder="Enter your password" title="Enter your password" value="@Applicationsettings.TestPassword" autocomplete="off" required />
+                                    <input asp-for=Password id="password" type="password" title="password" class="form-control remarks" placeholder="Enter your password" value="@Applicationsettings.TestPassword" autocomplete="off" required />
                                 </div>
                             }
                             else
@@ -84,7 +84,7 @@
                                 <div class="input-box autocomplete-wrapper">
                                     <i class="fas fa-envelope left-padd"></i>
                                     <input asp-for=Email id="email" type="email" title="Email" class="form-control remarks auto-dropdown" 
-                                    placeholder="Enter your email" title="Enter your email" autocomplete="off" required />
+                                    placeholder="Enter your email" autocomplete="off" required />
                                     <div class="input-group-append-caret">
                                         <span class="input-group-text"><i class="fas fa-caret-down"></i></span>
                                     </div>
@@ -92,7 +92,7 @@
                                 </div>
                                 <div class="input-box">
                                     <i class="fas fa-lock left-padd"></i>
-                                    <input asp-for=Password id="password" type="password" title="password" class="form-control remarks" placeholder="Enter your password" title="Enter your password" value="@Applicationsettings.Password" autocomplete="off" required />
+                                    <input asp-for=Password id="password" type="password" title="password" class="form-control remarks" placeholder="Enter your password" value="@Applicationsettings.Password" autocomplete="off" required />
                                 </div>
                             }
 
@@ -170,7 +170,6 @@
     <script src="~/js/jquery-ui.js"></script>
     <script src="~/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/bootstrap-select.min.js"></script>
-    <script src="~/js/jqueryconfirm/js/custom.jqueryconfirm.js"></script>
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }

@@ -31,13 +31,13 @@
     text-align: center;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     font-family: Verdana;
-    font-size: small;
+    font-size: .8em;
     color: gray;
 }
 
     /* Text Inside Popup */
     .popup-content span {
-        font-size: 10px;
+        font-size: .8em;
         color: #333;
         display: block;
         margin-bottom: 20px;
@@ -46,7 +46,7 @@
 /* Buttons */
 .popup-buttons {
     display: flex;
-    justify-content: center;
+    justify-content: right;
     gap: 15px;
 }
 
@@ -55,7 +55,7 @@
     border: none;
     cursor: pointer;
     border-radius: 2px;
-    font-size: 12px;
+    font-size: 1em;
     transition: background-color 0.3s ease;
 }
 
@@ -69,12 +69,12 @@
     }
 
 .btn-revoke {
-    background-color: #f44336;
+    background-color: grey;
     color: white;
 }
 
     .btn-revoke:hover {
-        background-color: #d32f2f;
+        background-color: darkgrey;
     }
 
 /* Responsive Design */
@@ -85,12 +85,12 @@
     }
 
         .popup-content span {
-            font-size: 10px;
+            font-size: .8em;
         }
 
     .btn-accept, .btn-revoke {
         padding: 4px 8px;
-        font-size: 10px;
+        font-size: 1em;
     }
 }
 
@@ -127,7 +127,7 @@
 
     /* Alert Message Text */
     .alert-content span {
-        font-size: 12px;
+        font-size:.8em;
         color: #333;
         display: block;
         margin-bottom: 10px;
@@ -139,7 +139,7 @@
     border: none;
     cursor: pointer;
     border-radius: 2px;
-    font-size: 12px;
+    font-size: 1em;
     transition: background-color 0.3s ease;
 }
 
@@ -170,7 +170,9 @@
     z-index: 1000;
     font-family: Verdana;
     display: none; /* Initially hidden */
-    color: black;
+    color: grey;
+    background:transparent;
+    font-size:.8em;
 }
 
     /* Specific Style for the Accept and Revoke Buttons */
@@ -181,7 +183,7 @@
         border: none;
         cursor: pointer;
         border-radius: 2px;
-        font-size: 10px;
+        font-size: 1em;
         transition: background-color 0.3s ease;
     }
 
@@ -191,16 +193,28 @@
         }
 
     #cookieRevoke button {
-        background-color: #f44336; /* Red for Revoke Button */
+        background-color: grey; /* Red for Revoke Button */
     }
 
         #cookieRevoke button:hover {
-            background-color: #d32f2f; /* Slightly darker red */
+            background-color: darkgrey; /* Slightly darker red */
         }
 
     /* Style for Text Inside Divs */
     #cookieConsent span, #cookieRevoke span {
-        font-size: 10px;
-        margin-right: 10px;
+        font-size: .8em;
+        margin-right: 1em;
         display: inline-block;
     }
+#privacy {
+    color: #4CAF50;
+    text-decoration: underline;
+}
+#cookie-content{
+    margin-bottom:8px;
+}
+#cookieRevokeSpan{
+    background:white;
+    border:1px solid #ddd;
+    padding:2px 5px;
+}

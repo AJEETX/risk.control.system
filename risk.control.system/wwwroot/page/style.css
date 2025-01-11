@@ -56,11 +56,18 @@ h1 {
     border-radius:.5rem;
     text-decoration:none;
 }
-#maps{
-    min-height:250px;
-    border:2px solid #ddd;
+#maps {
+    width: 100%; /* The container's width */
+    height: 300px; /* Set a fixed height or a relative height (e.g., vh or %) */
+    position: relative; /* Ensures the image respects the container size */
+    overflow: hidden; /* Ensures the image doesn't overflow the container */
 }
 
+#location-map {
+    width: 100%; /* Make the image take up the full width of the container */
+    height: 100%; /* Make the image take up the full height of the container */
+    object-fit: cover; /* Ensures the image scales without distortion */
+}
 .error-template {
     padding: 40px 15px;
     text-align: center;

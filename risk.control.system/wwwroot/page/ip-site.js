@@ -31,7 +31,6 @@ async function fetchIpInfo(latlong) {
                 document.querySelector('#city .info-data').textContent = data.city || 'Not available';
                 document.querySelector('#postCode .info-data').textContent = 'Not available';
                 document.querySelector('#isp .info-data').textContent = 'Not available';
-                document.querySelector('#latLong .info-data').textContent = 'Not available';
                 document.querySelector('#maps .info-data #location-map').src ='/img/no-map.jpeg';
             }
             else {
@@ -44,7 +43,6 @@ async function fetchIpInfo(latlong) {
                 document.querySelector('#city .info-data').textContent = data.district || data.city || 'Not available';
                 document.querySelector('#postCode .info-data').textContent = data.postCode || 'Not available';
                 document.querySelector('#isp .info-data').textContent = data.isp || 'Not available';
-                document.querySelector('#latLong .info-data').textContent = data.longitude ? data.latitude + "/" + data.longitude : 'Not available';
                 document.querySelector('#location-map').src = data.mapUrl || '/img/no-map.jpeg';
             }
         }

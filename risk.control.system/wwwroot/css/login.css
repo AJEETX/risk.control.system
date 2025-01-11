@@ -485,3 +485,11 @@ img.logo {
     padding: 8px 12px;
     cursor: pointer;
 }
+.login-disabled {
+    pointer-events: none;
+    color:lightgrey;
+}
+.anchor-disabled {
+    pointer-events: none;
+    cursor:none;
+}

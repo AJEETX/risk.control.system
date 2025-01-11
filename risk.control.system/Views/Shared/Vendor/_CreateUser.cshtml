@@ -47,12 +47,6 @@
         <div class="form-group">
             <span class="input-group-label"> Phone #:</span>
             <div class="input-group">
-                <!-- Display Country Code -->
-                <div class="input-group-prepend">
-                    <span class="input-group-text" data-toggle="tooltip" title="Country Code :+@Model?.Country.ISDCode">
-                        <i class="fas fa-phone"></i><i class="fa fa-asterisk asterik-style"> </i>
-                    </span>
-                </div>
                 <div class="input-group-prepend">
                     @{
                         var imgPath = "/flags/" + @Model.Country.Code.ToLower() + ".png";
