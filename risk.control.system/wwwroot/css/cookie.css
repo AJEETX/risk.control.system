@@ -1,0 +1,206 @@
+﻿.hostedscan {
+    height :30px;
+    width:auto
+}
+/* Popup Container */
+.popup {
+    display: none; /* Initially hidden */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+    backdrop-filter: blur(8px); /* Add blur effect */
+    z-index: 9999;
+}
+
+/* Popup Content Box */
+.popup-content {
+    z-index: 9999;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 400px;
+    max-width: 90%;
+    background-color: #fff;
+    border: 2px solid #fff;
+    border-radius: 5px;
+    padding: 10px;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    font-family: Verdana;
+    font-size: small;
+    color: gray;
+}
+
+    /* Text Inside Popup */
+    .popup-content span {
+        font-size: 10px;
+        color: #333;
+        display: block;
+        margin-bottom: 20px;
+    }
+
+/* Buttons */
+.popup-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.btn-accept, .btn-revoke {
+    padding: 5px 10px;
+    border: none;
+    cursor: pointer;
+    border-radius: 2px;
+    font-size: 12px;
+    transition: background-color 0.3s ease;
+}
+
+.btn-accept {
+    background-color: #4CAF50;
+    color: white;
+}
+
+    .btn-accept:hover {
+        background-color: #45a049;
+    }
+
+.btn-revoke {
+    background-color: #f44336;
+    color: white;
+}
+
+    .btn-revoke:hover {
+        background-color: #d32f2f;
+    }
+
+/* Responsive Design */
+@media (max-width: 600px) {
+    .popup-content {
+        width: 90%;
+        padding: 10px;
+    }
+
+        .popup-content span {
+            font-size: 10px;
+        }
+
+    .btn-accept, .btn-revoke {
+        padding: 4px 8px;
+        font-size: 10px;
+    }
+}
+
+/* Alert Overlay with Blur Effect */
+.alert-popup {
+    display: none; /* Initially hidden */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+    z-index: 2000;
+    backdrop-filter: blur(8px); /* Add blur effect */
+}
+
+/* Alert Content Box */
+.alert-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 300px;
+    max-width: 90%;
+    background-color: #fff;
+    border: 2px solid #fff;
+    border-radius: 5px;
+    padding: 10px;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    font-family: Verdana;
+    color: gray;
+}
+
+    /* Alert Message Text */
+    .alert-content span {
+        font-size: 12px;
+        color: #333;
+        display: block;
+        margin-bottom: 10px;
+    }
+
+/* Close Button */
+.btn-close {
+    padding: 5px 10px;
+    border: none;
+    cursor: pointer;
+    border-radius: 2px;
+    font-size: 12px;
+    transition: background-color 0.3s ease;
+}
+
+    .btn-close:hover {
+        background-color: #45a049;
+    }
+
+/
+/* General Style for Both Divs */
+#cookieConsent {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #FCFAFA;
+    text-align: center;
+    z-index: 1000;
+    font-family: Verdana;
+    display: none; /* Initially hidden */
+    color: black;
+}
+#cookieRevoke {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    text-align: right;
+    z-index: 1000;
+    font-family: Verdana;
+    display: none; /* Initially hidden */
+    color: black;
+}
+
+    /* Specific Style for the Accept and Revoke Buttons */
+    #cookieConsent button, #cookieRevoke button {
+        background-color: #4CAF50; /* Green for Accept Button */
+        color: white;
+        padding: 2px 5px;
+        border: none;
+        cursor: pointer;
+        border-radius: 2px;
+        font-size: 10px;
+        transition: background-color 0.3s ease;
+    }
+
+        /* Hover Effect for Buttons */
+        #cookieConsent button:hover {
+            background-color: #45a049; /* Slightly darker green */
+        }
+
+    #cookieRevoke button {
+        background-color: #f44336; /* Red for Revoke Button */
+    }
+
+        #cookieRevoke button:hover {
+            background-color: #d32f2f; /* Slightly darker red */
+        }
+
+    /* Style for Text Inside Divs */
+    #cookieConsent span, #cookieRevoke span {
+        font-size: 10px;
+        margin-right: 10px;
+        display: inline-block;
+    }

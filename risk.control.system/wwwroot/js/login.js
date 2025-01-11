@@ -31,8 +31,6 @@ $.validator.setDefaults({
 
         $('#password').attr('disabled', 'disabled');
 
-        
-
         var nodes = document.getElementById("login-form").getElementsByTagName('*');
         for (var i = 0; i < nodes.length; i++) {
             nodes[i].disabled = true;
@@ -43,63 +41,6 @@ $.validator.setDefaults({
         }
     }
 });
-
-function focusLogin() {
-
-    const login = document.getElementById("email");
-    if (login) {
-        login.focus();
-    }
-}
-
-async function acceptCookies() {
-    try {
-        const response = await fetch('/api/secure/AcceptCookies', { method: 'POST' });
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        const data = await response.json(); // Assuming the server returns JSON
-        console.log('Response data:', data);
-    } catch (error) {
-        console.error('Error:', error);
-    }
-}
-//document.addEventListener("DOMContentLoaded", function () {
-//    if (!localStorage.getItem("cookieConsentAccepted")) {
-//        document.getElementById("cookieConsent").style.display = "block";
-//    }
-
-//    document.getElementById("acceptCookies").addEventListener("click", function () {
-//        // Save consent in localStorage
-//        localStorage.setItem("cookieConsentAccepted", "true");
-
-//        // Hide the cookie consent popup
-//        document.getElementById("cookieConsent").style.display = "none";
-
-//        // Optionally, inform the server about consent
-//        acceptCookies();
-//    });
-//});
-
-//document.getElementById("revokeConsent").addEventListener("click", async function () {
-//    try {
-//        // Send a POST request to the server to revoke consent
-//        const response = await fetch('/api/secure/RevokeCookies', { method: 'POST' });
-
-//        if (!response.ok) {
-//            throw new Error(`HTTP error! Status: ${response.status}`);
-//        }
-
-//        const result = await response.json(); // Assuming server sends a JSON response
-//        alert(result.message || "Cookie consent revoked.");
-
-//        // Optionally reload the page
-//        location.reload();
-//    } catch (error) {
-//        console.error("Error revoking consent:", error);
-//        alert("Failed to revoke cookie consent.");
-//    }
-//});
 
 // Function to handle successful geolocation retrieval
 function handleGeolocationSuccess(position) {
@@ -180,7 +121,7 @@ $(document).ready(function () {
                 }
             });
         },
-        minLength: 0, // Start showing suggestions after 1 character
+        minLength: 1, // Start showing suggestions after 1 character
         select: function (event, ui) {
             // Set the selected value to the input field
             $("#email").val(ui.item.value);
@@ -195,7 +136,7 @@ $(document).ready(function () {
     $("#email").on("focus", function () {
         console.log("Focus triggered");
         const emailValue = $(this).val();
-        if (!emailValue && emailValue.trim() ==="") {
+        if (!emailValue && emailValue.trim() === "") {
             $(this).autocomplete("search", ""); // Trigger autocomplete with an empty search term
         }
     });
@@ -204,6 +145,13 @@ $(document).ready(function () {
         $(this).select();
     });
 });
+
+function focusLogin() {
+    const login = document.getElementById("email");
+    if (login) {
+        login.focus();
+    }
+}
 
 function onlyDigits(el) {
     el.value = el.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');

@@ -16,6 +16,7 @@
     <link rel="stylesheet" href="~/plugins/fontawesome-free/css/all.min.css">
     <link rel="stylesheet" href="~/css/jquery-ui.css">
     <link rel="stylesheet" href="~/css/login.css">
+    <link rel="stylesheet" href="~/css/cookie.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Security-Policy" content="default-src 'none';connect-src 'self' wss:; script-src 'self';  style-src 'self' https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://fonts.googleapis.com; img-src 'self' https://hostedscan.com; frame-src 'self';form-action 'self';upgrade-insecure-requests;" />
 
@@ -162,15 +163,18 @@
             </div>
         </div>
         
+        <partial name="_CookieConsentPartial" />
+        
     </div>
     <script src="~/js/jquery-1.10.2.js"></script>
     <script src="~/js/jquery-ui.js"></script>
     <script src="~/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/bootstrap-select.min.js"></script>
-
+    <script src="~/js/jqueryconfirm/js/custom.jqueryconfirm.js"></script>
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
     <script src="~/js/login.js"></script>
+    <script src="~/js/common/cookie.js"></script>
 </body>
 </html>

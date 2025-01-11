@@ -35,12 +35,14 @@ div .error-message {
 }
 
 .signup-form form {
-    padding-top:1rem;
+    padding-top: 1rem;
 }
+
 #ipAddress, #ipAddress1 {
     padding: 2rem 5rem;
     font-size: .6rem;
 }
+
 .container .cover {
     position: absolute;
     top: 0;
@@ -56,18 +58,21 @@ div .error-message {
 .container #flip:checked ~ .cover {
     transform: rotateY(-180deg);
 }
+
     .container #flip:checked ~ .cover .front {
         transition: all 0.3s ease;
         visibility: hidden;
     }
+
     .container #flip:checked ~ .cover .back {
         transition: all 0.3s ease;
         visibility: visible;
     }
-    .container #flip~ .cover .front {
-        transition: all 0.3s ease;
-        visibility: visible;
-    }
+
+.container #flip ~ .cover .front {
+    transition: all 0.3s ease;
+    visibility: visible;
+}
 
 .container #flip ~ .cover .back {
     transition: all 0.3s ease;
@@ -202,6 +207,7 @@ div .error-message {
     border-radius: 2px;
     transition: all 0.3s ease;
 }
+
 .form-content .input-box select {
     height: 100%;
     width: 100%;
@@ -263,13 +269,15 @@ div .error-message {
         background: grey;
     }
 
-    #email{
-        cursor:pointer;
-    }
-#email:focus {
-    border: 1px solid #333;
-    background-color:whitesmoke;
+#email {
+    cursor: pointer;
 }
+
+    #email:focus {
+        border: 1px solid #333;
+        background-color: whitesmoke;
+    }
+
 .input-validation-error {
     border-color: red !important;
 }
@@ -442,10 +450,11 @@ img.logo {
 .input-group .input-group-append:hover {
     background-color: #f0f0f0; /* Highlight on hover */
 }
-.input-group-append-caret{
-    position:relative;
-    left:-30px;
-    top:-10px;
+
+.input-group-append-caret {
+    position: relative;
+    left: -30px;
+    top: -10px;
 }
 
 /* Styling for the dropdown list that appears below the input */
@@ -475,18 +484,4 @@ img.logo {
 .ui-menu .ui-menu-item {
     padding: 8px 12px;
     cursor: pointer;
-}
-#cookieConsent {
-    font-size: .7em;
-    display: none;
-    position: fixed;
-    bottom: 0;
-    width: 90%;
-    background-color: #F7ECEC;
-    color: white;
-    padding: 2px;
-    text-align: center;
-    z-index: 1000;
-    color:black;
-    border:1px solid #ddd;
 }

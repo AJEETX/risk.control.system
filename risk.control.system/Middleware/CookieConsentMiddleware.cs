@@ -11,11 +11,10 @@
 
         public async Task InvokeAsync(HttpContext context)
         {
-            // Check if the user has given cookie consent
+            // Check if the "CookieConsent" cookie exists
             var cookieConsent = context.Request.Cookies["CookieConsent"];
-            context.Items["HasConsent"] = cookieConsent == "Accepted";
+            context.Items["HasCookieConsent"] = cookieConsent == "Accepted";
 
-            // Call the next middleware in the pipeline
             await _next(context);
 
             //// Inject analytics scripts after the response is generated
@@ -41,5 +40,4 @@
             //}
         }
     }
-
 }

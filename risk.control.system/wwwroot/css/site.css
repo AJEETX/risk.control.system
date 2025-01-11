@@ -1,10 +1,8 @@
-﻿
-* {
+﻿* {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
     font-family: Tahoma;
-    
 }
 
 a.navbar-brand {
@@ -17,9 +15,10 @@ a.navbar-brand {
 a {
     color: #0366d6;
 }
-.upload{
 
+.upload {
 }
+
 .btn-primary {
     color: #fff;
     background-color: #1b6ec2;
@@ -105,7 +104,6 @@ button.accept-policy {
     width: 34%;
     background-color: darkgray;
 }
-
 
 .footer {
     position: absolute;
@@ -225,6 +223,7 @@ a.table-link {
 #agentOcrPicture {
     cursor: pointer;
 }
+
 #agentPassportPicture {
     cursor: pointer;
 }
@@ -236,6 +235,7 @@ a.table-link {
 #videoPlayer {
     cursor: pointer;
 }
+
 .ocr-Image {
     height: 250px;
     width: 200px;
@@ -250,19 +250,20 @@ a.table-link {
     border-radius: 5px;
 }
 
-
 .video-Image {
     height: 200px;
     width: 200px;
     border: 1px solid #ccc;
     border-radius: 5px;
 }
+
 .passport-Image {
     height: 200px;
     width: 200px;
     border: 1px solid #ccc;
     border-radius: 5px;
 }
+
 #documentImage {
     width: 350px;
     height: 150px;
@@ -291,6 +292,7 @@ a.table-link {
     border-radius: 5px;
     cursor: pointer;
 }
+
 .passportlocationImage {
     height: 200px;
     width: 200px;
@@ -298,7 +300,6 @@ a.table-link {
     border-radius: 5px;
     cursor: pointer;
 }
-
 
 .audiolocationImage {
     height: 200px;
@@ -315,13 +316,15 @@ a.table-link {
     border-radius: 5px;
     cursor: pointer;
 }
+
 #face-map {
     height: 300px;
     width: auto;
 }
-#face-map-url{
-    height:100%;
-    width:100%;
+
+#face-map-url {
+    height: 100%;
+    width: 100%;
 }
 
 #audio-map {
@@ -329,18 +332,20 @@ a.table-link {
     width: auto;
 }
 
-
 #video-map {
     height: 300px;
     width: auto;
 }
+
 #notesDetail {
     cursor: pointer;
 }
+
 #ocr-map {
     height: 300px;
     width: auto;
 }
+
 #ocr-map-url {
     height: 100%;
     width: 100%;
@@ -392,7 +397,6 @@ a.table-link {
     height: 110px;
     border: .1px ridge #ccc;
 }
-
 
 .report-image {
     width: 16rem;
@@ -471,32 +475,35 @@ a.table-link {
     font-size: 1rem;
 }
 
-.sidebar-light-primary .nav-sidebar > .nav-item > .actual-link.nav-link.active {
-    background-color: #ccc !important;
-    font-size: 1rem;
-    font-weight: bold;
-}
-
-    .sidebar-light-primary .nav-sidebar > .nav-item > .actual-link.nav-link.active > p {
-        color: black;
+    .sidebar-light-primary .nav-sidebar > .nav-item > .actual-link.nav-link.active {
+        background-color: #ccc !important;
         font-size: 1rem;
         font-weight: bold;
     }
+
+        .sidebar-light-primary .nav-sidebar > .nav-item > .actual-link.nav-link.active > p {
+            color: black;
+            font-size: 1rem;
+            font-weight: bold;
+        }
+
     .sidebar-light-primary .nav-sidebar > .nav-item > .actual-link.nav-link > p > span {
         font-size: .8rem;
     }
-        .sidebar-light-primary .nav-sidebar > .nav-item > .actual-link.nav-link.active > p > span {
-            font-size: 1rem !important;
-            font-weight: bold !important;
-        }
 
+    .sidebar-light-primary .nav-sidebar > .nav-item > .actual-link.nav-link.active > p > span {
+        font-size: 1rem !important;
+        font-weight: bold !important;
+    }
 
 .content {
     font-size: 1rem;
 }
+
 .content-wrapper > .content {
     padding: 0 .2rem !important;
 }
+
 .d-block {
     margin-top: .5em;
     margin-left: 1em;
@@ -565,6 +572,7 @@ textarea {
     background-color: whitesmoke;
     font-weight: bold;
 }
+
 #CountryId.form-control[readonly], #StateId.form-control[readonly], #DistrictId.form-control[readonly] {
     cursor: not-allowed; /* Pointer cursor for better UX */
     background: none;
@@ -573,6 +581,7 @@ textarea {
     border-radius: 1px;
     color: #989BA0;
 }
+
 .input-group-prepend {
     display: block;
     width: 5rem;
@@ -735,11 +744,13 @@ dl.row {
     color: #2A78C6;
     padding-bottom: 1rem;
 }
+
 .asterik-style-disabled {
     font-size: .5rem !important;
     color: dimgrey;
     padding-bottom: 1rem;
 }
+
 .asterik-style-none {
     font-size: .5rem !important;
     color: #e9ecef;
@@ -1171,6 +1182,7 @@ img.table-agency-image {
     width: 2.5rem;
     border: 2px solid green;
 }
+
 img.table-profile-image {
     border-radius: 10%;
     height: 2.5rem;
@@ -1191,6 +1203,7 @@ img.table-profile-image-user-inactive {
     width: 2.5rem;
     border: 2px solid orange;
 }
+
 img.table-profile-image-no-user {
     border-radius: 10%;
     height: 2.5rem;
@@ -1225,7 +1238,6 @@ img.doc-profile-image {
     -moz-box-shadow: 0.4em 0.4em rgba(0,0,0,0.6);
     z-index: 999;
 }
-
 
     .submit-progress.hidden {
         display: none;
@@ -1278,6 +1290,7 @@ a.btn.btn-sm {
 button.btn.btn-info.upload {
     margin-top: 0;
 }
+
 button.btn.btn-tool {
     min-width: 1rem;
 }
@@ -1308,7 +1321,7 @@ a#back-button {
 
 #time {
     font-size: .8rem;
-    font-family:Tahoma;
+    font-family: Tahoma;
     width: 4rem;
     text-align: center;
     border: 2px solid #ccc;
@@ -1353,17 +1366,20 @@ a#back-button {
     padding: 1rem;
     text-shadow: 4px 4px white;
 }
+
 .review-case {
     color: orange;
     margin: 1rem;
     padding: 1rem;
     text-shadow: 4px 4px white;
 }
+
 .approve-case {
     color: green;
     padding: 1rem;
     margin: 1rem;
 }
+
 .trial-case {
     color: darkgoldenrod;
     margin: 1rem;
@@ -1376,10 +1392,12 @@ a#back-button {
     cursor: none;
     text-decoration: none;
 }
+
 #dashboard.navlink-border.nav-link {
-    pointer-events:auto;
-    cursor:pointer;
+    pointer-events: auto;
+    cursor: pointer;
 }
+
 .fas.fa-info-circle:hover, .fas.fa-info:hover {
     cursor: pointer;
 }
@@ -1389,7 +1407,7 @@ a#back-button {
     position: absolute;
     z-index: 200;
     top: 2rem;
-    left:-6rem;
+    left: -6rem;
     width: 15rem;
     color: black;
     font-family: Verdana;
@@ -1407,6 +1425,7 @@ a#back-button {
     position: relative;
     text-align: left;
 }
+
 @media (max-width: 768px) {
     .tooltip-text {
         min-width: 10rem;
@@ -1416,27 +1435,32 @@ a#back-button {
         padding: 5px;
     }
 
-    .tooltip-text li {
-        margin: 5px 0px;
-        list-style-type: none;
-    }
+        .tooltip-text li {
+            margin: 5px 0px;
+            list-style-type: none;
+        }
 }
+
 .tooltip-text li {
     margin: 5px 0px;
 }
+
 .far.fa-hand-point-right, .far.fa-thumbs-up, .far.fa-thumbs-down, .fa.fa-hand-peace-o {
     font-size: 1.1rem;
 }
+
 .breadcrumb-item + .breadcrumb-item::before {
     font-family: "Font Awesome 5 Free";
     content: "\f105";
     font-weight: 900;
 }
+
 ul#messagesList {
     list-style-type: none;
-    max-height:300px;
-    overflow-y:auto;
+    max-height: 300px;
+    overflow-y: auto;
 }
+
 .open-button {
     background-color: #555;
     color: white;
@@ -1444,7 +1468,7 @@ ul#messagesList {
     cursor: pointer;
     opacity: 0.8;
     position: fixed;
-    bottom:50px;
+    bottom: 50px;
     right: 20px;
     width: 80px;
 }
@@ -1472,7 +1496,7 @@ ul#messagesList {
         background: #f1f1f1;
         resize: none;
         min-height: 200px;
-        padding:5px;
+        padding: 5px;
     }
 
         /* When the textarea gets focus, do something */
@@ -1503,34 +1527,40 @@ ul#messagesList {
     .form-container .btn:hover, .open-button:hover {
         opacity: 1;
     }
+
 .notyf__toast {
     max-width: 500px !important; /* Set your desired width */
     max-height: 500px !important; /* Set your desired width */
 }
+
 .max-width-column {
     max-width: 200px;
     white-space: nowrap; /* Prevents text wrapping */
     overflow: hidden; /* Ensures overflow is hidden */
     text-overflow: ellipsis; /* Adds ellipsis if text overflows */
 }
+
 .max-width-column-email {
     max-width: 150px;
     white-space: nowrap; /* Prevents text wrapping */
     overflow: hidden; /* Ensures overflow is hidden */
     text-overflow: ellipsis; /* Adds ellipsis if text overflows */
 }
+
 .max-width-column-name {
     max-width: 100px;
     white-space: nowrap; /* Prevents text wrapping */
     overflow: hidden; /* Ensures overflow is hidden */
     text-overflow: ellipsis; /* Adds ellipsis if text overflows */
 }
+
 .max-width-column-number {
     max-width: 100px;
     white-space: nowrap; /* Prevents text wrapping */
     overflow: hidden; /* Ensures overflow is hidden */
     text-overflow: ellipsis; /* Adds ellipsis if text overflows */
 }
+
 .max-width-column-claim {
     max-width: 60px;
     white-space: nowrap; /* Prevents text wrapping */
@@ -1550,16 +1580,17 @@ ul#messagesList {
     padding-left: 2rem; /* Adjust spacing for the icon */
 }
 
-.trash-icon::before {
-    content: "\f1f8"; /* Font Awesome trash icon unicode */
-    font-family: "Font Awesome 5 Free"; /* Use Font Awesome font */
-    font-weight: 900; /* Adjust for solid icon */
-    position: absolute;
-    left: 0.5rem; /* Adjust icon position */
-    top: 50%;
-    transform: translateY(-50%);
-    color: white; /* Icon color */
-}
+    .trash-icon::before {
+        content: "\f1f8"; /* Font Awesome trash icon unicode */
+        font-family: "Font Awesome 5 Free"; /* Use Font Awesome font */
+        font-weight: 900; /* Adjust for solid icon */
+        position: absolute;
+        left: 0.5rem; /* Adjust icon position */
+        top: 50%;
+        transform: translateY(-50%);
+        color: white; /* Icon color */
+    }
+
 .map-thumbnail {
     position: relative;
     display: inline-block;
@@ -1574,12 +1605,12 @@ ul#messagesList {
     border-radius: 50%;
 }
 
-    /* CSS class for the thumbnail image size */
-    .map-thumbnail img.thumbnail {
-        cursor: pointer;
-        width: 2.5rem;
-        height: 2.5rem;
-    }
+/* CSS class for the thumbnail image size */
+.map-thumbnail img.thumbnail {
+    cursor: pointer;
+    width: 2.5rem;
+    height: 2.5rem;
+}
 /* CSS class for the thumbnail image size */
 .map-thumbnail-customer img.thumbnail {
     cursor: pointer;
@@ -1595,8 +1626,8 @@ ul#messagesList {
     width: 250px;
     height: 250px;
     display: none; /* Initially hidden */
-    border:1px solid #C38787;
-    z-index:999;
+    border: 1px solid #C38787;
+    z-index: 999;
 }
 
 .full-map-customer {
@@ -1615,7 +1646,7 @@ ul#messagesList {
     top: 0;
     position: absolute;
     display: none; /* Initially hidden */
-    background:none;
+    background: none;
     z-index: 999;
 }
 
@@ -1713,14 +1744,15 @@ ul#messagesList {
     cursor: pointer;
 }
 
-
 .input-invalid {
     border: 1px solid red;
 }
+
 .disabled-anchor {
     pointer-events: none;
     cursor: none;
 }
+
 .input-group {
     position: relative;
 }
@@ -1738,6 +1770,7 @@ ul#messagesList {
     .loading-spinner.active {
         display: inline-block; /* Show spinner when active */
     }
+
 input.auto-dropdown {
     transition: opacity 0.5s ease; /* Smooth opacity change */
     opacity: 1;
@@ -1758,19 +1791,23 @@ input.auto-dropdown {
     background-color: #007bff; /* Blue background */
     color: white; /* White text */
 }
-select#PinCodeId{
-    min-height:430px;
-    height:100%;
+
+select#PinCodeId {
+    min-height: 430px;
+    height: 100%;
 }
+
 .highlight-new-user {
     background-color: #d4edda; /* Light green background */
     color: #155724; /* Dark green text */
     animation: highlight 3s ease-in-out;
 }
+
 .highlighted-row {
     background-color: #fffbcc; /* Light yellow background */
     font-weight: bold;
 }
+
 .invalid {
     border: 1px solid red !important;
 }
@@ -1784,22 +1821,24 @@ select#PinCodeId{
     padding: 5px; /* Optional: Add some padding */
 }
 
-/* Style the scrollbar for better UX */
-.scrollable-column::-webkit-scrollbar {
-    height: 8px; /* Horizontal scrollbar height */
+    /* Style the scrollbar for better UX */
+    .scrollable-column::-webkit-scrollbar {
+        height: 8px; /* Horizontal scrollbar height */
+    }
+
+    .scrollable-column::-webkit-scrollbar-thumb {
+        background-color: #888; /* Scrollbar color */
+        border-radius: 4px; /* Rounded scrollbar */
+    }
+
+        .scrollable-column::-webkit-scrollbar-thumb:hover {
+            background-color: #555; /* Hover effect */
+        }
+
+#country-code-display {
+    font-size: small;
 }
 
-.scrollable-column::-webkit-scrollbar-thumb {
-    background-color: #888; /* Scrollbar color */
-    border-radius: 4px; /* Rounded scrollbar */
-}
-
-.scrollable-column::-webkit-scrollbar-thumb:hover {
-    background-color: #555; /* Hover effect */
-}
-#country-code-display{
-    font-size:small;
-}
-.flag-icon{
-    margin-right:4px;
+.flag-icon {
+    margin-right: 4px;
 }
