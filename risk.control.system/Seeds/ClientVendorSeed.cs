@@ -13,11 +13,9 @@ namespace risk.control.system.Seeds
 {
     public class ClientVendorSeed
     {
-        private const string vendorMapSize = "800x800";
-        private const string companyMapSize = "800x800";
         public static async Task<(List<Vendor> vendors, List<ClientCompany> companyIds)> Seed(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment,
-                    InvestigationServiceType investigationServiceType, InvestigationServiceType discreetServiceType, 
-                    InvestigationServiceType docServiceType, LineOfBusiness lineOfBusiness, IHttpContextAccessor httpAccessor, 
+                    InvestigationServiceType investigationServiceType, InvestigationServiceType discreetServiceType,
+                    InvestigationServiceType docServiceType, LineOfBusiness lineOfBusiness, IHttpContextAccessor httpAccessor,
                     ICustomApiCLient customApiCLient, UserManager<ClientCompanyApplicationUser> clientUserManager, UserManager<VendorApplicationUser> vendorUserManager)
         {
             string noCompanyImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", @Applicationsettings.NO_IMAGE);
@@ -31,7 +29,7 @@ namespace risk.control.system.Seeds
             var globalSettings = context.GlobalSettings.FirstOrDefault();
             var enableMailbox = globalSettings?.EnableMailbox ?? false;
 
-            var vendors = await VendorSeed.Seed(context,webHostEnvironment,investigationServiceType,discreetServiceType,docServiceType,lineOfBusiness,httpAccessor,customApiCLient, vendorUserManager);
+            var vendors = await VendorSeed.Seed(context, webHostEnvironment, investigationServiceType, discreetServiceType, docServiceType, lineOfBusiness, httpAccessor, customApiCLient, vendorUserManager);
 
             var companies = await CompanyInsurer.Seed(context, vendors, webHostEnvironment, investigationServiceType, discreetServiceType, docServiceType, lineOfBusiness, httpAccessor, customApiCLient, clientUserManager);
 
@@ -41,7 +39,7 @@ namespace risk.control.system.Seeds
             {
                 foreach (var insurerCompany in companies)
                 {
-                    if(vendor.CountryId == insurerCompany.CountryId)
+                    if (vendor.CountryId == insurerCompany.CountryId)
                     {
                         vendor.Clients.Add(insurerCompany);
                     }

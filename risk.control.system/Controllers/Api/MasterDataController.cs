@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization; // Required for AllowAnonymous
 using risk.control.system.Data;
 using risk.control.system.Models;
 using static risk.control.system.AppConstant.Applicationsettings;
+using risk.control.system.AppConstant;
 
 namespace risk.control.system.Controllers.Api
 {
@@ -108,11 +109,29 @@ namespace risk.control.system.Controllers.Api
             long sId;
             var pincodes = new List<PinCode>();
             var remaingPincodes = new List<PinCode>();
-
+            if (districtId == -1)
+            {
+                var stateWideService = await context.VendorInvestigationServiceType.AsNoTracking().
+                        AnyAsync(v =>
+                            v.VendorId == vendorId &&
+                            v.LineOfBusinessId == lobId &&
+                            v.InvestigationServiceTypeId == serviceId &&
+                            v.StateId == stateId &&
+                            v.DistrictId == null);
+                if (stateWideService)
+                {
+                    return Ok();
+                }
+                var pincode = new PinCode { Code = "State Wide", PinCodeId = -1 };
+                pincodes.Add(pincode);
+                return Ok(pincodes);
+            }
             if (districtId > 0 && !string.IsNullOrWhiteSpace(district))
             {
                 sId = districtId;
-                var validDistrict = context.PinCode.Include(p => p.District).Any(s => s.StateId == stateId && s.District.Name.ToLower().Contains(district.ToLower()));
+                var validDistrict = context.PinCode.Include(p => p.District).Any(s => s.StateId == stateId &&
+                    (s.District.Name.ToLower().Contains(district.ToLower()) || 
+                    (s.DistrictId == null && districtId ==-1)));
                 if (!validDistrict)
                 {
                     return Ok();
@@ -130,7 +149,7 @@ namespace risk.control.system.Controllers.Api
                     .ThenInclude(v => v.PincodeServices)
                     .FirstOrDefault(c => c.VendorId == vendorId);
 
-                var existingVendorServices = vendor.VendorInvestigationServiceTypes;
+                var existingVendorServices = vendor.VendorInvestigationServiceTypes.Where(i=>i.StateId == stateId);
 
                 var existingServicedPincodes = new List<ServicedPinCode>();
 
@@ -140,7 +159,14 @@ namespace risk.control.system.Controllers.Api
 
                     foreach (var existingVendorService in existingVendorServices)
                     {
-                        if (existingVendorService.LineOfBusinessId == lobId && existingVendorService.InvestigationServiceTypeId == serviceId)
+                        if(existingVendorService.DistrictId == null)
+                        {
+                            var pinCodesForStateWide = await context.ServicedPinCode.Where(p => p.VendorInvestigationServiceTypeId == existingVendorService.VendorInvestigationServiceTypeId)?.ToListAsync();
+
+                            existingServicedPincodes.AddRange(pinCodesForStateWide);
+                        }
+                        else if (existingVendorService.LineOfBusinessId == lobId && existingVendorService.InvestigationServiceTypeId == serviceId && 
+                            existingVendorService.StateId == stateId && existingVendorService.DistrictId == districtId)
                         {
                             foreach (var pincodeService in existingVendorService.PincodeServices)
                             {

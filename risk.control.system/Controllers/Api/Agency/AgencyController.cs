@@ -38,7 +38,7 @@ namespace risk.control.system.Controllers.Api.Agency
         private static HttpClient httpClient = new();
 
         public AgencyController(ApplicationDbContext context,
-            UserManager<VendorApplicationUser> userManager, 
+            UserManager<VendorApplicationUser> userManager,
             IWebHostEnvironment webHostEnvironment,
             IFeatureManager featureManager,
             IUserService userService,
@@ -81,8 +81,8 @@ namespace risk.control.system.Controllers.Api.Agency
                     Id = u.Id,
                     Name = u.FirstName + " " + u.LastName,
                     Email = "<a href=''>" + u.Email + "</a>",
-                    Phone = "(+"+ u.Country.ISDCode+") " + u.PhoneNumber,
-                    Photo = u.ProfilePicture == null ? noUserImagefilePath : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(u.ProfilePicture)) ,
+                    Phone = "(+" + u.Country.ISDCode + ") " + u.PhoneNumber,
+                    Photo = u.ProfilePicture == null ? noUserImagefilePath : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(u.ProfilePicture)),
                     Active = u.Active,
                     Addressline = u.Addressline + ", " + u.District.Name + ", " + u.State.Code + ", " + u.Country.Code,
                     Country = u.Country.Code,
@@ -110,20 +110,20 @@ namespace risk.control.system.Controllers.Api.Agency
                 .Include(v => v.State)
                 .Include(v => v.VendorInvestigationServiceTypes)
                 .Where(v => !v.Deleted);
-            var result =agencies?.Select(u =>
+            var result = agencies?.Select(u =>
                 new
                 {
                     Id = u.VendorId,
                     Document = string.IsNullOrEmpty(u.DocumentUrl) ? noDataImagefilePath : u.DocumentUrl,
-                    Domain = "<a href=/Vendors/Details?id=" + u.VendorId+">" + u.Email + "</a>",
+                    Domain = "<a href=/Vendors/Details?id=" + u.VendorId + ">" + u.Email + "</a>",
                     Name = u.Name,
                     Code = u.Code,
-                    Phone = "(+"+ u.Country.ISDCode+") " + u.PhoneNumber,
+                    Phone = "(+" + u.Country.ISDCode + ") " + u.PhoneNumber,
                     Address = u.Addressline + ", " + u.District.Name + ", " + u.State.Code + ", " + u.Country.Code,
                     Country = u.Country.Code,
                     Flag = "/flags/" + u.Country.Code.ToLower() + ".png",
-                    Pincode =  u.PinCode.Code,
-                    Status = "<span class='badge badge-light'>"+ u.Status.GetEnumDisplayName() + "</span>",
+                    Pincode = u.PinCode.Code,
+                    Status = "<span class='badge badge-light'>" + u.Status.GetEnumDisplayName() + "</span>",
                     Updated = u.Updated.HasValue ? u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy"),
                     Update = u.UpdatedBy,
                     VendorName = u.Email,
@@ -137,6 +137,7 @@ namespace risk.control.system.Controllers.Api.Agency
 
             return Ok(result);
         }
+
         [HttpGet("GetEmpannelled")]
         public async Task<IActionResult> GetEmpannelled()
         {
@@ -146,7 +147,7 @@ namespace risk.control.system.Controllers.Api.Agency
                 .Include(v => v.District)
                 .Include(v => v.State)
                 .Where(v => !v.Deleted);
-            var result =agencies?.Select(u =>
+            var result = agencies?.Select(u =>
                 new
                 {
                     Id = u.VendorId,
@@ -154,7 +155,7 @@ namespace risk.control.system.Controllers.Api.Agency
                     Domain = "<a href=''>" + u.Email + "</a>",
                     Name = u.Name,
                     Code = u.Code,
-                    Phone = "(+"+ u.Country.ISDCode+") " + u.PhoneNumber,
+                    Phone = "(+" + u.Country.ISDCode + ") " + u.PhoneNumber,
                     Address = u.Addressline,
                     District = u.District.Name,
                     State = u.State.Code,
@@ -194,31 +195,52 @@ namespace risk.control.system.Controllers.Api.Agency
                 .ThenInclude(i => i.PincodeServices)
                 .FirstOrDefault(a => a.VendorId == vendorUser.VendorId && !a.Deleted);
 
-            var result = vendor.VendorInvestigationServiceTypes?
-                .OrderBy(s => s.InvestigationServiceType.Name)?
-                .Select(s => new
+            var services = vendor.VendorInvestigationServiceTypes?
+                .OrderBy(s => s.InvestigationServiceType.Name);
+            var serviceResponse = new List<AgencyServiceResponse>();
+            foreach (var service in services)
+            {
+                var IsAllDistrict = (service.DistrictId == null);
+                string pincodes = $"{ALL_PINCODE}";
+                string rawPincodes = $"{ALL_PINCODE}";
+                if (!IsAllDistrict)
                 {
-                    VendorId = s.VendorId,
-                    Id = s.VendorInvestigationServiceTypeId,
-                    CaseType = s.LineOfBusiness.Name,
-                    ServiceType = s.InvestigationServiceType.Name,
-                    District = s.District.Name,
-                    State = s.State.Code,
-                    Country = s.Country.Code,
-                    Flag = "/flags/" + s.Country.Code.ToLower() + ".png",
-                    Pincodes = s.PincodeServices.Count == 0 ?
-                    "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>" :
-                     string.Join("", s.PincodeServices.Select(c => "<span class='badge badge-light'>" + c.Pincode + "</span> ")),
-                     RawPincodes = string.Join(", ", s.PincodeServices.Select(c =>  c.Pincode)),
-                    Rate = s.Price,
-                    UpdatedBy = s.UpdatedBy,
-                    Updated = s.Updated.HasValue ? s.Updated.Value.ToString("dd-MM-yyyy") :  s.Created.ToString("dd-MM-yyyy"),
-                    IsUpdated = s.IsUpdated,
-                    LastModified = s.Updated
-                })?.ToArray();
+                    var allPinCodesForDistrict = await _context.PinCode.CountAsync(p => p.DistrictId == service.DistrictId);
+                    if(allPinCodesForDistrict == service.PincodeServices.Count)
+                    {
+                        pincodes = ALL_PINCODE;
+                        rawPincodes = ALL_PINCODE;
+                    }
+                    else
+                    {
+                        pincodes = string.Join(", ", service.PincodeServices.Select(c => c.Pincode).Distinct());
+                        rawPincodes = string.Join(", ", service.PincodeServices.Select(c => c.Name).Distinct());
+                    }
+                }   
+
+                serviceResponse.Add(new AgencyServiceResponse
+                {
+                    VendorId = service.VendorId,
+                    Id = service.VendorInvestigationServiceTypeId,
+                    CaseType = service.LineOfBusiness.Name,
+                    ServiceType = service.InvestigationServiceType.Name,
+                    District = IsAllDistrict ? ALL_DISTRICT : service.District.Name,
+                    State = service.State.Code,
+                    Country = service.Country.Code,
+                    Flag = "/flags/" + service.Country.Code.ToLower() + ".png",
+                    Pincodes = pincodes,
+                    RawPincodes = rawPincodes,
+                    Rate = service.Price,
+                    UpdatedBy = service.UpdatedBy,
+                    Updated = service.Updated.HasValue ? service.Updated.Value.ToString("dd-MM-yyyy") : service.Created.ToString("dd-MM-yyyy"),
+                    IsUpdated = service.IsUpdated,
+                    LastModified = service.Updated
+                });
+            }
+
             vendor.VendorInvestigationServiceTypes?.ToList().ForEach(i => i.IsUpdated = false);
             await _context.SaveChangesAsync();
-            return Ok(result);
+            return Ok(serviceResponse);
         }
 
         [HttpGet("GetCompanyAgencyUser")]
@@ -252,7 +274,7 @@ namespace risk.control.system.Controllers.Api.Agency
                 .Include(u => u.District)
                 .Include(u => u.PinCode)
                 .Where(c => c.VendorId == vendorUser.VendorId && !c.Deleted && c.Active && c.Role == AppRoles.AGENT);
-            if(onboardingEnabled)
+            if (onboardingEnabled)
             {
                 vendorUsers = vendorUsers.Where(c => !string.IsNullOrWhiteSpace(c.MobileUId));
             }
@@ -300,12 +322,12 @@ namespace risk.control.system.Controllers.Api.Agency
             }
 
             var agentList = new List<AgentData>();
-            foreach(var u in agents)
-            { 
+            foreach (var u in agents)
+            {
                 string distance, duration, map;
                 float distanceInMetre;
                 int durationInSec;
-                var agentExistingDrivingMap = _context.AgentDrivingMap.FirstOrDefault(a=>a.AgentId == u.AgencyUser.Id && a.ClaimsInvestigationId == id);
+                var agentExistingDrivingMap = _context.AgentDrivingMap.FirstOrDefault(a => a.AgentId == u.AgencyUser.Id && a.ClaimsInvestigationId == id);
 
                 if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH && claim.CustomerDetail != null)
                 {
@@ -358,12 +380,12 @@ namespace risk.control.system.Controllers.Api.Agency
                 var agentData = new AgentData
                 {
                     Id = u.AgencyUser.Id,
-                    Photo = u.AgencyUser.ProfilePicture == null ? noUserImagefilePath : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(u.AgencyUser.ProfilePicture)) ,
+                    Photo = u.AgencyUser.ProfilePicture == null ? noUserImagefilePath : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(u.AgencyUser.ProfilePicture)),
                     Email = (u.AgencyUser.UserRole == AgencyRole.AGENT && !string.IsNullOrWhiteSpace(u.AgencyUser.MobileUId) || u.AgencyUser.UserRole != AgencyRole.AGENT) ?
                     "<a href=/Agency/EditUser?userId=" + u.AgencyUser.Id + ">" + u.AgencyUser.Email + "</a>" :
                     "<a href=/Agency/EditUser?userId=" + u.AgencyUser.Id + ">" + u.AgencyUser.Email + "</a><span title=\"Onboarding incomplete !!!\" data-toggle=\"tooltip\"><i class='fa fa-asterisk asterik-style'></i></span>",
                     Name = u.AgencyUser.FirstName + " " + u.AgencyUser.LastName,
-                    Phone = "(+"+ u.AgencyUser.Country.ISDCode+") " + u.AgencyUser.PhoneNumber,
+                    Phone = "(+" + u.AgencyUser.Country.ISDCode + ") " + u.AgencyUser.PhoneNumber,
                     Addressline = u.AgencyUser.Addressline + ", " + u.AgencyUser.District.Name + ", " + u.AgencyUser.State.Code + ", " + u.AgencyUser.Country.Code,
                     Country = u.AgencyUser.Country.Code,
                     Flag = "/flags/" + u.AgencyUser.Country.Code.ToLower() + ".png",
@@ -389,8 +411,8 @@ namespace risk.control.system.Controllers.Api.Agency
             await _context.SaveChangesAsync();
             return Ok(agentList);
         }
-
     }
+
     public class AgentData
     {
         public long Id { get; set; }
@@ -402,7 +424,7 @@ namespace risk.control.system.Controllers.Api.Agency
         public bool Active { get; set; }
         public string Roles { get; set; }
         public string Country { get; set; }
-        public string? Flag{ get; set; }
+        public string? Flag { get; set; }
         public int Count { get; set; }
         public string UpdateBy { get; set; }
         public string Role { get; set; }

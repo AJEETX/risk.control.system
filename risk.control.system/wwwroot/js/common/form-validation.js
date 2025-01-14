@@ -15,7 +15,7 @@ $(document).ready(function () {
 
     // Allow only numbers and a single dot
     // Allow only numbers and a single dot for SumAssuredValue and ContactNumber
-    validateInput('#SumAssuredValue', /[^0-9.]/g, function(value) {
+    validateInput('#SumAssuredValue, #Price', /[^0-9.]/g, function(value) {
         return value.replace(/(\..*)\./g, '$1'); // Prevent multiple dots
     });
 
@@ -62,7 +62,7 @@ $(document).ready(function () {
 });
 // Example function: Check if email is valid
 function CheckIfEmailValid(email) {
-    if (!email.includes("@")) {
+    if (email && !email.includes("@")) {
         console.warn("Invalid email address.");
         // Add your logic to handle invalid emails (e.g., display error message)
     }

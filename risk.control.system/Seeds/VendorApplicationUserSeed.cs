@@ -14,10 +14,11 @@ namespace risk.control.system.Seeds
 {
     public static class VendorApplicationUserSeed
     {
-         private static string noUserImagePath = string.Empty;
-        public static async Task Seed(ApplicationDbContext context, 
-            IWebHostEnvironment webHostEnvironment, 
-            UserManager<VendorApplicationUser> userManager, 
+        private static string noUserImagePath = string.Empty;
+
+        public static async Task Seed(ApplicationDbContext context,
+            IWebHostEnvironment webHostEnvironment,
+            UserManager<VendorApplicationUser> userManager,
             Vendor vendor, ICustomApiCLient customApiCLient,
             IHttpContextAccessor httpAccessor)
         {
@@ -92,7 +93,6 @@ namespace risk.control.system.Seeds
             await SupervisorSeed.Seed(context, SUPERVISOR.CODE, webHostEnvironment, userManager, vendor, pinCode, Applicationsettings.SUPERVISOR.PROFILE_IMAGE,
                 Applicationsettings.SUPERVISOR.FIRST_NAME, Applicationsettings.SUPERVISOR.LAST_NAME);
 
-
             //Seed Vendor Agent
             //string agentEmailwithSuffix = AGENT.CODE + "@" + vendor.Email;
             //var pinCode1 = CURRENT_PINCODE2;
@@ -101,7 +101,7 @@ namespace risk.control.system.Seeds
 
             string agent2EmailwithSuffix = AGENTX.CODE + "@" + vendor.Email;
             await AgentSeed.Seed(context, agent2EmailwithSuffix, webHostEnvironment, customApiCLient, userManager, vendor, vendor.PinCode.Code, Applicationsettings.AGENTX.PROFILE_IMAGE,
-                                 Applicationsettings.AGENTX.FIRST_NAME, Applicationsettings.AGENTX.LAST_NAME,"44 Waverley Road");
+                                 Applicationsettings.AGENTX.FIRST_NAME, Applicationsettings.AGENTX.LAST_NAME, "44 Waverley Road");
 
             //string agent3EmailwithSuffix = AGENTY.CODE + "@" + vendor.Email;
             //var pinCode3 = CURRENT_PINCODE5;
@@ -112,7 +112,6 @@ namespace risk.control.system.Seeds
             //var pinCode4 = CURRENT_PINCODE3;
             //await SeedAgent.Seed(context, agent4EmailwithSuffix, webHostEnvironment, customApiCLient, userManager, vendor, pinCode4, Applicationsettings.AGENTZ.PROFILE_IMAGE,
             //Applicationsettings.AGENTZ.FIRST_NAME, Applicationsettings.AGENTZ.LAST_NAME);
-
         }
     }
 }

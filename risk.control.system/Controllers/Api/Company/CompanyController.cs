@@ -9,6 +9,7 @@ using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
+using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
 
 using static risk.control.system.AppConstant.Applicationsettings;
@@ -35,10 +36,10 @@ namespace risk.control.system.Controllers.Api.Company
         }
 
         [HttpGet("AllCompanies")]
-        public async Task< IActionResult> AllCompanies()
+        public async Task<IActionResult> AllCompanies()
         {
             var companies = _context.ClientCompany.
-                Where(v =>!v.Deleted)
+                Where(v => !v.Deleted)
                 .Include(v => v.Country)
                 .Include(v => v.PinCode)
                 .Include(v => v.District)
@@ -53,13 +54,13 @@ namespace risk.control.system.Controllers.Api.Company
                     Domain = $"<a href='/ClientCompany/Details?Id={u.ClientCompanyId}'>" + u.Email + "</a>",
                     Name = u.Name,
                     Code = u.Code,
-                    Phone = "(+"+ u.Country.ISDCode+") " + u.PhoneNumber,
+                    Phone = "(+" + u.Country.ISDCode + ") " + u.PhoneNumber,
                     Address = u.Addressline,
                     District = u.District.Name,
                     State = u.State.Code,
                     Country = u.Country.Code,
                     Flag = "/flags/" + u.Country.Code.ToLower() + ".png",
-                    Updated = u.Updated.HasValue ?  u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy"),
+                    Updated = u.Updated.HasValue ? u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy"),
                     Active = u.Status.GetEnumDisplayName(),
                     UpdatedBy = u.UpdatedBy,
                     IsUpdated = u.IsUpdated,
@@ -99,15 +100,15 @@ namespace risk.control.system.Controllers.Api.Company
                     Id = u.Id,
                     Name = u.FirstName + " " + u.LastName,
                     Email = "<a href=''>" + u.Email + "</a>",
-                    Phone = "(+"+ u.Country.ISDCode+") " + u.PhoneNumber,
-                    Photo = u.ProfilePicture == null ? noUserImagefilePath : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(u.ProfilePicture)) ,
+                    Phone = "(+" + u.Country.ISDCode + ") " + u.PhoneNumber,
+                    Photo = u.ProfilePicture == null ? noUserImagefilePath : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(u.ProfilePicture)),
                     Active = u.Active,
                     Addressline = u.Addressline + ", " + u.District.Name + ", " + u.State.Name + ", " + u.Country.Code,
                     Country = u.Country.Code,
                     Flag = "/flags/" + u.Country.Code.ToLower() + ".png",
                     Roles = u.UserRole != null ? $"<span class=\"badge badge-light\">{u.UserRole.GetEnumDisplayName()}</span>" : "<span class=\"badge badge-light\">...</span>",
                     Pincode = u.PinCode.Code,
-                    Updated = u.Updated.HasValue ?  u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy"),
+                    Updated = u.Updated.HasValue ? u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy"),
                     UpdateBy = u.UpdatedBy,
                     IsUpdated = u.IsUpdated,
                     LastModified = u.Updated
@@ -131,13 +132,13 @@ namespace risk.control.system.Controllers.Api.Company
         public async Task<IActionResult> GetEmpanelledVendors()
         {
             var userEmail = HttpContext.User?.Identity?.Name; var companyUser = await _context.ClientCompanyApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
-            var allocatedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR); 
-            var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT); 
+            var allocatedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
+            var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
             var submitted2SuperStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR);
             var claimsCases = _context.ClaimsInvestigation
-                .Where(c => c.ClientCompanyId == companyUser.ClientCompanyId && 
-                (c.InvestigationCaseSubStatusId == allocatedStatus.InvestigationCaseSubStatusId || 
-                c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId || 
+                .Where(c => c.ClientCompanyId == companyUser.ClientCompanyId &&
+                (c.InvestigationCaseSubStatusId == allocatedStatus.InvestigationCaseSubStatusId ||
+                c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId ||
                 c.InvestigationCaseSubStatusId == submitted2SuperStatus.InvestigationCaseSubStatusId))
                 ?.ToList();
             var company = _context.ClientCompany
@@ -149,25 +150,25 @@ namespace risk.control.system.Controllers.Api.Company
                 .Include(c => c.EmpanelledVendors).ThenInclude(c => c.ratings)
                 .FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
             var result = company.EmpanelledVendors?.Where(v => !v.Deleted && v.Status == VendorStatus.ACTIVE)
-                .OrderBy(u => u.Name).Select(u => new 
-                { 
-                    Id = u.VendorId, 
-                    Document = string.IsNullOrWhiteSpace(u.DocumentUrl) ? Applicationsettings.NO_IMAGE : u.DocumentUrl, 
-                    Domain = companyUser.Role == AppRoles.COMPANY_ADMIN ? "<a href=/Company/AgencyDetail?id=" + u.VendorId + ">" + u.Email + "</a>" : u.Email, 
-                    Name = u.Name, 
-                    Code = u.Code, 
-                    Phone = "(+"+ u.Country.ISDCode+") " + u.PhoneNumber,
-                    Address = u.Addressline, 
-                    District = u.District.Name, 
-                    State = u.State.Name, 
-                    Country = u.Country.Code, 
+                .OrderBy(u => u.Name).Select(u => new
+                {
+                    Id = u.VendorId,
+                    Document = string.IsNullOrWhiteSpace(u.DocumentUrl) ? Applicationsettings.NO_IMAGE : u.DocumentUrl,
+                    Domain = companyUser.Role == AppRoles.COMPANY_ADMIN ? "<a href=/Company/AgencyDetail?id=" + u.VendorId + ">" + u.Email + "</a>" : u.Email,
+                    Name = u.Name,
+                    Code = u.Code,
+                    Phone = "(+" + u.Country.ISDCode + ") " + u.PhoneNumber,
+                    Address = u.Addressline,
+                    District = u.District.Name,
+                    State = u.State.Name,
+                    Country = u.Country.Code,
                     Flag = "/flags/" + u.Country.Code.ToLower() + ".png",
-                    Updated = u.Updated.HasValue ? u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy"), 
-                    UpdateBy = u.UpdatedBy, 
-                    CaseCount = claimsCases.Count(c => c.VendorId == u.VendorId), 
-                    RateCount = u.RateCount, 
-                    RateTotal = u.RateTotal ,
-                    RawAddress = u.Addressline + ","+ u.District.Name +", " + u.State.Code + ", "+u.Country.Code,
+                    Updated = u.Updated.HasValue ? u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy"),
+                    UpdateBy = u.UpdatedBy,
+                    CaseCount = claimsCases.Count(c => c.VendorId == u.VendorId),
+                    RateCount = u.RateCount,
+                    RateTotal = u.RateTotal,
+                    RawAddress = u.Addressline + "," + u.District.Name + ", " + u.State.Code + ", " + u.Country.Code,
                     IsUpdated = u.IsUpdated,
                     LastModified = u.Updated
                 })?.ToArray();
@@ -213,7 +214,7 @@ namespace risk.control.system.Controllers.Api.Company
                     Domain = "<a href=/Vendors/Details?id=" + u.VendorId + ">" + u.Email + "</a>",
                     Name = u.Name,
                     Code = u.Code,
-                    Phone = "(+"+ u.Country.ISDCode+") " + u.PhoneNumber,
+                    Phone = "(+" + u.Country.ISDCode + ") " + u.PhoneNumber,
                     Address = u.Addressline,
                     District = u.District.Name,
                     State = u.State.Name,
@@ -229,7 +230,6 @@ namespace risk.control.system.Controllers.Api.Company
             availableVendors?.ToList().ForEach(u => u.IsUpdated = false);
             await _context.SaveChangesAsync();
             return Ok(result);
-
         }
 
         [HttpGet("AllServices")]
@@ -255,32 +255,52 @@ namespace risk.control.system.Controllers.Api.Company
                 .ThenInclude(i => i.PincodeServices)
                 .FirstOrDefault(a => a.VendorId == id);
 
-            var result = vendor.VendorInvestigationServiceTypes?
-                .OrderBy(s => s.InvestigationServiceType.Name)?
-                .Select(s => new
+            var services = vendor.VendorInvestigationServiceTypes?
+               .OrderBy(s => s.InvestigationServiceType.Name);
+            var serviceResponse = new List<AgencyServiceResponse>();
+            foreach (var service in services)
+            {
+                var IsAllDistrict = (service.DistrictId == null);
+                string pincodes = $"{ALL_PINCODE}";
+                string rawPincodes = $"{ALL_PINCODE}";
+                if (!IsAllDistrict)
                 {
-                    VendorId = s.VendorId,
-                    Id = s.VendorInvestigationServiceTypeId,
-                    CaseType = s.LineOfBusiness.Name,
-                    ServiceType = s.InvestigationServiceType.Name,
-                    District = s.District.Name,
-                    State = s.State.Name,
-                    Country = s.Country.Code,
-                    Flag = "/flags/" + s.Country.Code.ToLower() + ".png",
-                    Pincodes = s.PincodeServices.Count == 0 ?
-                    "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>" :
-                     string.Join("", s.PincodeServices.Select(c => "<span class='badge badge-light'>" + c.Pincode + "</span> ")),
-                     RawPincodes = string.Join(", ", s.PincodeServices.Select(c =>  c.Pincode)),
-                    Rate = s.Price,
-                    UpdatedBy = s.UpdatedBy,
-                    Updated = s.Updated.HasValue ? s.Updated.Value.ToString("dd-MM-yyyy") : s.Created.ToString("dd-MM-yyyy"),
-                    IsUpdated = s.IsUpdated,
-                    LastModified = s.Updated
-                })?.ToArray();
+                    var allPinCodesForDistrict = await _context.PinCode.CountAsync(p => p.DistrictId == service.DistrictId);
+                    if (allPinCodesForDistrict == service.PincodeServices.Count)
+                    {
+                        pincodes = ALL_PINCODE;
+                        rawPincodes = ALL_PINCODE;
+                    }
+                    else
+                    {
+                        pincodes = string.Join(", ", service.PincodeServices.Select(c => c.Pincode).Distinct());
+                        rawPincodes = string.Join(", ", service.PincodeServices.Select(c => c.Name).Distinct());
+                    }
+                }
 
-            vendor.VendorInvestigationServiceTypes?.ToList().ForEach(u => u.IsUpdated = false);
+                serviceResponse.Add(new AgencyServiceResponse
+                {
+                    VendorId = service.VendorId,
+                    Id = service.VendorInvestigationServiceTypeId,
+                    CaseType = service.LineOfBusiness.Name,
+                    ServiceType = service.InvestigationServiceType.Name,
+                    District = IsAllDistrict ? ALL_DISTRICT : service.District.Name,
+                    State = service.State.Code,
+                    Country = service.Country.Code,
+                    Flag = "/flags/" + service.Country.Code.ToLower() + ".png",
+                    Pincodes = pincodes,
+                    RawPincodes = rawPincodes,
+                    Rate = service.Price,
+                    UpdatedBy = service.UpdatedBy,
+                    Updated = service.Updated.HasValue ? service.Updated.Value.ToString("dd-MM-yyyy") : service.Created.ToString("dd-MM-yyyy"),
+                    IsUpdated = service.IsUpdated,
+                    LastModified = service.Updated
+                });
+            }
+
+            vendor.VendorInvestigationServiceTypes?.ToList().ForEach(i => i.IsUpdated = false);
             await _context.SaveChangesAsync();
-            return Ok(result);
+            return Ok(serviceResponse);
         }
 
         [HttpGet("SearchCountry")]
@@ -293,11 +313,11 @@ namespace risk.control.system.Controllers.Api.Company
                     .OrderBy(x => x.Name)
                  .Take(10)
                  .Select(c => new
-                {
-                    Id = c.CountryId,
-                    Name = c.Name,
-                    Label = c.Name
-                })?
+                 {
+                     Id = c.CountryId,
+                     Name = c.Name,
+                     Label = c.Name
+                 })?
                     .ToList());
 
             var countries = allCountries
@@ -315,7 +335,7 @@ namespace risk.control.system.Controllers.Api.Company
         }
 
         [HttpGet("SearchState")]
-        public IActionResult SearchState(long countryId, string term="")
+        public IActionResult SearchState(long countryId, string term = "")
         {
             if (string.IsNullOrEmpty(term?.Trim()))
                 return Ok(_context.State.Where(x => x.CountryId == countryId)?
@@ -338,18 +358,44 @@ namespace risk.control.system.Controllers.Api.Company
         [HttpGet("SearchDistrict")]
         public IActionResult SearchDistrict(long stateId, long countryId, string term = "")
         {
-            if (string.IsNullOrEmpty(term?.Trim()))
-            {
-                _context.District.OrderBy(x => x.Name).Take(10)
-                .Select(x => new { DistrictId = x.DistrictId, DistrictName = $"{x.Name}" })?.ToList(); // Format for jQuery UI Autocomplete
-            }
+            // If the search term is empty or null, fetch the first 10 districts
+            var districts = string.IsNullOrEmpty(term?.Trim())
+                ? _context.District
+                    .Where(x => x.CountryId == countryId && x.StateId == stateId)
+                    .OrderBy(x => x.Name)
+                    .Take(10)
+                    .Select(x => new
+                    {
+                        DistrictId = x.DistrictId,
+                        DistrictName = $"{x.Name}"
+                    })
+                    .ToList()
+                : _context.District
+                    .Where(x => x.CountryId == countryId && x.StateId == stateId && x.Name.ToLower().Contains(term.ToLower()))
+                    .OrderBy(x => x.Name)
+                    .Take(10)
+                    .Select(x => new
+                    {
+                        DistrictId = x.DistrictId,
+                        DistrictName = $"{x.Name}"
+                    })
+                    .ToList();
 
-            var districts = _context.District
-                 .Where(x => x.CountryId == countryId && x.StateId == stateId && x.Name.ToLower().Contains(term.ToLower()))
-                 .OrderBy(x=>x.Name)
-                 .Take(10)
-                 .Select(x => new { DistrictId = x.DistrictId, DistrictName = $"{x.Name}" })?.ToList(); // Format for jQuery UI Autocomplete
-            return Ok(districts);
+            // Add the "ALL DISTRICTS" option to the response
+            var result = new List<object>
+            {
+                new
+                {
+                    DistrictId = -1, // Special value for "ALL DISTRICTS"
+                    DistrictName = Applicationsettings.ALL_DISTRICT
+                }
+            };
+
+            // Append the queried districts to the result
+            result.AddRange(districts);
+
+            // Return the final response
+            return Ok(result);
         }
 
         [HttpGet("SearchPincode")]
@@ -479,9 +525,38 @@ namespace risk.control.system.Controllers.Api.Company
 
             return Ok(state);
         }
+
         [HttpGet("GetDistrictName")]
         public IActionResult GetDistrictName(long id, long stateId, long countryId)
         {
+            if(id ==-1)
+            {
+                var result = new 
+                {
+                    DistrictId = -1, // Special value for "ALL DISTRICTS"
+                    DistrictName = Applicationsettings.ALL_DISTRICT
+                };
+                return Ok(result);
+
+            }
+            var pincode = _context.District.Where(x => x.DistrictId == id && x.StateId == stateId && x.CountryId == countryId).OrderBy(x => x.Name).Take(10) // Filter based on user input
+                .Select(x => new { DistrictId = x.DistrictId, DistrictName = $"{x.Name}" }).FirstOrDefault(); // Format for jQuery UI Autocomplete
+
+            return Ok(pincode);
+        }
+
+        [HttpGet("GetDistrictNameForAgency")]
+        public IActionResult GetDistrictName(long id, long stateId, long countryId, long lob, long serviceId, long vendorId)
+        {
+            if (id == -1)
+            {
+                var result = new
+                {
+                    DistrictId = -1, // Special value for "ALL DISTRICTS"
+                    DistrictName = Applicationsettings.ALL_DISTRICT
+                };
+                return Ok(result);
+            }
             var pincode = _context.District.Where(x => x.DistrictId == id && x.StateId == stateId && x.CountryId == countryId).OrderBy(x => x.Name).Take(10) // Filter based on user input
                 .Select(x => new { DistrictId = x.DistrictId, DistrictName = $"{x.Name}" }).FirstOrDefault(); // Format for jQuery UI Autocomplete
 
@@ -496,11 +571,12 @@ namespace risk.control.system.Controllers.Api.Company
 
             return Ok(pincode);
         }
+
         [HttpGet("GetPincodeNamez")]
         public IActionResult GetPincodeNamez(long id, long countryId)
         {
             var pincode = _context.PinCode
-                .Include(p=>p.District)
+                .Include(p => p.District)
                 .Include(p => p.State)
                 .Include(p => p.Country)
                 .Where(x => x.PinCodeId == id && x.CountryId == countryId).OrderBy(x => x.Name).Take(10) // Filter based on user input
@@ -542,8 +618,9 @@ namespace risk.control.system.Controllers.Api.Company
             };
             return Ok(response);
         }
+
         [HttpGet("GetPincodeSuggestions")]
-        public IActionResult GetPincodeSuggestions(long countryId, string term="")
+        public IActionResult GetPincodeSuggestions(long countryId, string term = "")
         {
             // Check if the term is empty or null
             if (string.IsNullOrEmpty(term?.Trim()))
@@ -555,13 +632,14 @@ namespace risk.control.system.Controllers.Api.Company
                     .Where(x => x.CountryId == countryId)
                     .OrderBy(x => x.Name)
                  .Take(10)
-                    .Select(x => new { 
-                        PincodeId = x.PinCodeId, 
-                        Pincode = x.Code, 
-                        Name = x.Name, 
-                        StateId = x.StateId, 
-                        StateName = x.State.Name, 
-                        DistricId = x.DistrictId, 
+                    .Select(x => new
+                    {
+                        PincodeId = x.PinCodeId,
+                        Pincode = x.Code,
+                        Name = x.Name,
+                        StateId = x.StateId,
+                        StateName = x.State.Name,
+                        DistricId = x.DistrictId,
                         DistrictName = x.District.Name
                     })?
                     .ToList();
@@ -601,21 +679,20 @@ namespace risk.control.system.Controllers.Api.Company
                     );
             }
 
-
             // Get the filtered and sorted results
             var filteredPincodes = pincodesQuery
                 .Include(x => x.State)
                 .Include(x => x.District)
                  .Take(10)
                 .OrderBy(x => x.Name)
-                    .Select(x => new 
-                    { 
-                        PincodeId = x.PinCodeId, 
-                        Pincode = x.Code, 
-                        Name = x.Name, 
-                        StateId = x.StateId, 
-                        StateName = x.State.Name, 
-                        DistrictId = x.DistrictId, 
+                    .Select(x => new
+                    {
+                        PincodeId = x.PinCodeId,
+                        Pincode = x.Code,
+                        Name = x.Name,
+                        StateId = x.StateId,
+                        StateName = x.State.Name,
+                        DistrictId = x.DistrictId,
                         DistrictName = x.District.Name
                     })?
                 .ToList();

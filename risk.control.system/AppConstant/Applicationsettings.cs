@@ -18,7 +18,6 @@
         public const string AZURE_APP_DEMO_URL = "icheckify-demo.azurewebsites.net";
         public const string AZURE_APP_URL = "icheckify.azurewebsites.net";
 
-        
         //WEBSITE SETTINGS
 
         public const string WEBSITE_SITE_MENU_BRAND = "aby";
@@ -39,6 +38,12 @@
         public static readonly string NO_AUDIO = "/img/no-audio.png";
         public static readonly string NO_VIDEO = "/img/no-video.png";
         public static readonly string MARKER_FLAG = "/images/beachflag.png";
+
+        public const string ALL_DISTRICT = "All Districts";
+        public const string ALL_DISTRICT_CODE = "-1";
+
+        public const string ALL_PINCODE = "All PinCodes";
+        public const string ALL_PINCODE_CODE = "-1";
 
         //LOGIN
         public const string WEBSITE_LOGIN = "Log in: iCheckify";
@@ -297,6 +302,7 @@
             public const string LAST_NAME = "Patrick";
             public const string PROFILE_IMAGE = "/img/assessor.jpeg";
         }
+
         public static class MANAGER
         {
             public const string DISPLAY_NAME = "MANAGER";
@@ -337,6 +343,7 @@
             public const string LAST_NAME = "Travolta";
             public const string PROFILE_IMAGE = "/img/agent.jpeg";
         }
+
         public static class AGENTZ
         {
             public const string DISPLAY_NAME = "AGENT";
@@ -346,6 +353,7 @@
             public const string LAST_NAME = "Tobbs";
             public const string PROFILE_IMAGE = "/img/assigner.jpeg";
         }
+
         public static class AGENTX
         {
             public const string DISPLAY_NAME = "AGENT";
@@ -355,6 +363,7 @@
             public const string LAST_NAME = "Piccasso";
             public const string PROFILE_IMAGE = "/img/creator.jpeg";
         }
+
         public static class AGENTY
         {
             public const string DISPLAY_NAME = "AGENT";

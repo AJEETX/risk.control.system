@@ -514,7 +514,6 @@ namespace risk.control.system.Controllers.Api
                     PolicyNumber = c.PolicyDetail.ContractNumber,
                 });
                 return Ok(claim2Agent);
-                return Unauthorized();
             }
             catch (Exception ex)
             {

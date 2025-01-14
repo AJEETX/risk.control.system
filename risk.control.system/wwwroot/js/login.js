@@ -18,6 +18,8 @@ $.validator.setDefaults({
         $('html a').addClass('anchor-disabled');
         $('.text').addClass('anchor-disabled');
 
+        $('#cancelConsent').attr('disabled', 'disabled');
+        $('#cancelConsent').addClass('login-disabled');
         form.submit();
 
         $('#login-form').attr('disabled', 'disabled');

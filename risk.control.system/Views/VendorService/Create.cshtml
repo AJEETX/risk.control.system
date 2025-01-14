@@ -7,7 +7,7 @@
 
 <section class="content">
     <form id="create-form" asp-action="Create" enctype="multipart/form-data">
-        <input type="hidden" asp-for="VendorId" value="@Model.Vendor.VendorId" />
+        <input id="VendorId" type="hidden" asp-for="VendorId" value="@Model.Vendor.VendorId" />
         <div class="card bg-light card-secondary">
             <div class="card-header">
                 <h3 class="card-title"><i class="fas fa-truck"></i> Add @Applicationsettings.SERVICE</h3>

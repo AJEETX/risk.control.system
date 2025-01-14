@@ -1,22 +1,8 @@
 ﻿$("#CountryId").val('');
-function loadInvestigationServices(obj) {
-    var value = obj.value;
-    if (value == '') {
-        $('#InvestigationServiceTypeId').empty();
-        $('#InvestigationServiceTypeId').append("<option value=''>--- SELECT ---</option>");
-    }
-    else {
-        localStorage.setItem('lobId', value);
-        $.get("/api/MasterData/GetInvestigationServicesByLineOfBusinessId", { LineOfBusinessId: value }, function (data) {
-            PopulateInvestigationServices("#InvestigationServiceTypeId", data, "<option>--- SELECT ---</option>");
-        });
-    }
-}
-function setInvestigationServices(obj) {
-    localStorage.setItem('serviceId', obj.value);
-}
-function GetRemainingServicePinCode(showDefaultOption = true, vendorId, lineId) {
-    const nodata = [];
+function GetRemainingServicePinCode(showDefaultOption = true) {
+    var pinCode = $('#PinCodeId');
+    var pinCodeId = $('#SelectedMultiPincodeId');
+
     var state = document.getElementById('StateId').value;
     var stateId = document.getElementById('SelectedStateId').value;
 
@@ -24,16 +10,28 @@ function GetRemainingServicePinCode(showDefaultOption = true, vendorId, lineId) 
     var districtId = document.getElementById('SelectedDistrictId').value;
 
     if (state == '' || stateId == '' || district == '' || districtId == '') {
-        //PopulatePinCode("#PinCodeId", nodata, "<option>--SELECT PINCODE--</option>", showDefaultOption);
-        $('#PinCodeId').empty();
-        $('#PinCodeId').val('');
+        $(pinCode).empty();
+        $(pinCode).val('');
     }
+    //else if (districtId == -1) {
+    //    $(pinCode).empty();
+    //    $(pinCode).append("<option value='-1'>All Districts</option>")
+    //}
     else {
-        var lobId = localStorage.getItem('lobId');
+        var lobId = document.getElementById('LineOfBusinessId').value;
+        var serviceId = document.getElementById('InvestigationServiceTypeId').value;
+        var vendorId = document.getElementById('vendorId').value;
 
-        var serviceId = localStorage.getItem('serviceId');
-
-        $.get("/api/MasterData/GetPincodesByDistrictIdWithoutPreviousSelectedService", { districtId: districtId, stateId: stateId, district: district, vendorId: vendorId, lobId: lobId, serviceId: serviceId }, function (data) {
+        $.get("/api/MasterData/GetPincodesByDistrictIdWithoutPreviousSelectedService",
+            {
+                stateId: stateId,
+                districtId: districtId,
+                district: district,
+                vendorId: vendorId,
+                lobId: lobId,
+                serviceId: serviceId
+            },
+            function (data) {
             PopulatePinCode("#PinCodeId", data, "<option>--SELECT PINCODE--</option>", showDefaultOption);
         });
     }
@@ -44,20 +42,25 @@ function PopulatePinCode(dropDownId, list, option, showDefaultOption) {
     $(dropDownId).val('');
     if (showDefaultOption)
         $(dropDownId).append(option)
-    if (list && list.length > 0) {
+    if (list == '' || list && list.length == 0) {
+        $(dropDownId).append("<option disabled class='service-exists' value='-1'> -- SERIVCE EXISTS -- </option>");
+        $('#DistrictId').empty();
+        $('#DistrictId').val('');
+        $('#DistrictId').focus();
+
+    }
+    else if (list && list.length == 1 && list[0].pinCodeId ==-1) {
+        $(dropDownId).empty();
+        $(dropDownId).append("<option class='all-pincodes' value='-1'> --ALL PIN CODES -- </option>");
+        $(dropDownId).val('');
+    }
+    else if (list && list.length > 0) {
         $.each(list, function (index, row) {
             $(dropDownId).append("<option value='" + row.pinCodeId + "'>" + row.name + " -- " + row.code + "</option>");
             //$('#create').prop('disabled', false);
         });
     }
-    else if (list && list.length == 0) {
-        $(dropDownId).append("<option value='-1'>NO - PINCODE - AVAILABLE</option>")
-        //$('#create').prop('disabled', true);
-    }
-    else {
-        $(dropDownId).empty();
-        $(dropDownId).val('');
-    }
+     
 }
 function PopulateInvestigationServices(dropDownId, list, option) {
     $(dropDownId).empty();
@@ -68,6 +71,39 @@ function PopulateInvestigationServices(dropDownId, list, option) {
 }
 
 $(document).ready(function () {
+
+    $("#DistrictId").on("blur change", function () {
+        // Call the GetRemainingServicePinCode function with the necessary parameters
+        GetRemainingServicePinCode(false);
+    });
+
+    // Bind the change event to the InvestigationServiceTypeId dropdown
+    $("#InvestigationServiceTypeId").on("change", function () {
+        // Store the selected service ID in sessionStorage
+        sessionStorage.setItem('serviceId', $(this).val());
+    });
+
+    // Bind the change event to the dropdown
+    $("#LineOfBusinessId").on("change", function () {
+        var value = $(this).val();
+
+        if (value === '') {
+            // Clear and reset InvestigationServiceTypeId dropdown
+            $('#InvestigationServiceTypeId').empty();
+            $('#InvestigationServiceTypeId').append("<option value=''>--- SELECT ---</option>");
+        } else {
+            // Store the selected Line of Business ID in sessionStorage
+            sessionStorage.setItem('lobId', value);
+
+            // Fetch investigation services via AJAX and populate the dropdown
+            $.get("/api/MasterData/GetInvestigationServicesByLineOfBusinessId", { LineOfBusinessId: value }, function (data) {
+                PopulateInvestigationServices("#InvestigationServiceTypeId", data, "<option>--- SELECT ---</option>");
+            });
+        }
+    });
+
+
+
     const inputSelector = "#SelectedCountryId";
     const preloadedCountryId = $("#SelectedCountryId").val();
     const $inputWrapper = $(inputSelector).closest('.input-group');  // Get the input container
@@ -75,7 +111,6 @@ $(document).ready(function () {
     if ($spinner.length) {
         $spinner.addClass('active'); // Show spinner
     }
-
 
     const fields = ['#CountryId', '#StateId', '#DistrictId'];
 
@@ -140,10 +175,22 @@ function loadStateData(countryId) {
  * Loads district data based on the preloaded Country and State IDs.
  */
 function loadDistrictData(countryId, stateId) {
-    const preloadedDistrictId = $("#SelectedDistrictId").val();
-    if (preloadedDistrictId) {
+    var preloadedDistrictId = $("#SelectedDistrictId").val();
+    const districtId = $("#DistrictId").val();
+    if (preloadedDistrictId || !districtId) {
+        if (!preloadedDistrictId && !districtId) {
+            preloadedDistrictId = -1;
+        }
         console.log("Preloaded District ID: ", preloadedDistrictId);
-        fetchAndSetFieldValue("/api/Company/GetDistrictName", { id: preloadedDistrictId, stateId: stateId, countryId: countryId }, "#DistrictId", "districtName", () => {
+        fetchAndSetFieldValue("/api/Company/GetDistrictNameForAgency",
+            {
+                id: preloadedDistrictId,
+                stateId: stateId,
+                countryId: countryId,
+                lob: $("#LineOfBusinessId").val(),
+                serviceId: $("#InvestigationServiceTypeId").val(),
+                vendorId: $("#vendorId").val()
+            }, "#DistrictId", "districtName", () => {
             // After District is loaded, load Pincode based on preloaded values
             //loadPincodeData(countryId, stateId, preloadedDistrictId);
         });
@@ -409,7 +456,6 @@ function setAutocomplete(fieldSelector, url, extraDataCallback, onSelectCallback
                     $field.removeClass('invalid'); // Remove invalid class if valid
                 }
                 toggleDependentFields(dependentFields, isValid);
-
             });
         } else if (Array.isArray(options)) {
             // Handle static options
@@ -426,7 +472,6 @@ function setAutocomplete(fieldSelector, url, extraDataCallback, onSelectCallback
             if (!isValid) {
                 $field.val(''); // Clear invalid input
                 $field.addClass('invalid'); // Add invalid class
-
             } else {
                 $field.removeClass('invalid'); // Remove invalid class if valid
             }
@@ -523,7 +568,6 @@ function validateAutocompleteValue(fieldSelector) {
     return false;
 }
 
-
 /**
  * Toggles dependent fields based on parent field validity.
  */
@@ -540,7 +584,6 @@ function toggleDependentFields(dependentFieldIds, isValid) {
         });
     }
     //if (!isValid) {
-
     //    // If the current value is empty, clear all dependent fields
     //    if (Array.isArray(dependentFieldIds) && dependentFieldIds.length > 0) {
     //        dependentFieldIds.forEach(selector => {

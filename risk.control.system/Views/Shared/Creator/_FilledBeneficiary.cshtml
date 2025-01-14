@@ -10,7 +10,6 @@
     bool beneficiaryExists = Model.Location?.BeneficiaryDetailId > 0;
 
     // Default progress bar colors
-    string customerProgressColor = "steps2";
     string customerLineColor = Model.ClaimsInvestigation?.PolicyDetail != null ? "line0" : "line";
     string beneficiaryProgressColor = "steps3";
     string beneficiaryLineColor = "line";
@@ -18,7 +17,6 @@
     // Update progress bar colors based on conditions
     if (customerExists)
     {
-        customerProgressColor = "steps";
         customerLineColor = "line1";
         beneficiaryProgressColor = beneficiaryExists ? "green" : "grey";
         beneficiaryLineColor = beneficiaryExists ? "line1" : "line0";

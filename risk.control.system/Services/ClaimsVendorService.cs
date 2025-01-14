@@ -66,14 +66,14 @@ namespace risk.control.system.Services
         {
             var claimsAllocate2Agent = claimsService.GetClaims().FirstOrDefault(v => v.ClaimsInvestigationId == selectedcase);
 
-            var beneficiaryDetail = _context.BeneficiaryDetail
+            var beneficiaryDetail = await _context.BeneficiaryDetail
                 .Include(c => c.ClaimsInvestigation)
                 .Include(c => c.PinCode)
                 .Include(c => c.BeneficiaryRelation)
                 .Include(c => c.District)
                 .Include(c => c.State)
                 .Include(c => c.Country)
-                .FirstOrDefault(c => c.BeneficiaryDetailId == claimsAllocate2Agent.BeneficiaryDetail.BeneficiaryDetailId);
+                .FirstOrDefaultAsync(c => c.BeneficiaryDetailId == claimsAllocate2Agent.BeneficiaryDetail.BeneficiaryDetailId);
 
             var maskedCustomerContact = new string('*', claimsAllocate2Agent.CustomerDetail.ContactNumber.ToString().Length - 4) + claimsAllocate2Agent.CustomerDetail.ContactNumber.ToString().Substring(claimsAllocate2Agent.CustomerDetail.ContactNumber.ToString().Length - 4);
             claimsAllocate2Agent.CustomerDetail.ContactNumber = maskedCustomerContact;

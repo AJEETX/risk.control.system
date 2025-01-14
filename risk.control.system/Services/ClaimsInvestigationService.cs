@@ -149,7 +149,8 @@ namespace risk.control.system.Services
                                     serviceType.LineOfBusinessId == claimsInvestigation.PolicyDetail.LineOfBusinessId)
                             {
                                 var pincode = _context.PinCode.Include(p => p.District).FirstOrDefault(p => p.Code == pinCode2Verify);
-                                if (serviceType.District.DistrictId == pincode.District.DistrictId)
+
+                                if (serviceType.District?.DistrictId == pincode.District.DistrictId)
                                 {
                                     vendorsInPincode.Add(empanelledVendor);
                                     continue;

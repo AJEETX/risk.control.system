@@ -1842,3 +1842,9 @@ select#PinCodeId {
 .flag-icon {
     margin-right: 4px;
 }
+#all-pincodes{
+    font-weight:bold;
+}
+#service-exists{
+    color:darkred;
+}

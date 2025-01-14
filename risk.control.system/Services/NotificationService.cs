@@ -251,8 +251,6 @@ namespace risk.control.system.Services
                 isdCode = beneficiary.Country.ISDCode;
             }
 
-            string device = "0";
-
             string? attachments = $"<a href='{logo}'>team</a>";
 
             string baseUrl = $"{message.BaseUrl}/api/notification/ConfirmSchedule?id={message.ClaimId}&confirm=";

@@ -10,7 +10,7 @@
                 <div class="input-group-prepend">
                     <span class="input-group-text" for="LineOfBusinessId"><i class="fas fa-business-time"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                 </div>
-                <select id="LineOfBusinessId" asp-for="LineOfBusinessId" class="form-control remarks" asp-items="ViewBag.LineOfBusinessId" onchange="loadInvestigationServices(this)" required>
+                <select id="LineOfBusinessId" asp-for="LineOfBusinessId" class="form-control remarks" asp-items="ViewBag.LineOfBusinessId" required>
                     <option value="">--- SELECT ---</option>
                 </select>
                 <span asp-validation-for="LineOfBusinessId" class="text-danger"></span>
@@ -23,7 +23,7 @@
                 <div class="input-group-prepend">
                     <span class="input-group-text" for="InvestigationServiceTypeId"><i class="fas fa-tools"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                 </div>
-                <select id="InvestigationServiceTypeId" name="InvestigationServiceTypeId" asp-for="InvestigationServiceTypeId" onchange="setInvestigationServices(this)" class="form-control remarks" asp-items="ViewBag.InvestigationServiceTypeId" required>
+                <select id="InvestigationServiceTypeId" name="InvestigationServiceTypeId" asp-for="InvestigationServiceTypeId" class="form-control remarks" asp-items="ViewBag.InvestigationServiceTypeId" required>
                     <option value="">--- SELECT ---</option>
                 </select>
                 <span asp-validation-for="InvestigationServiceTypeId" class="text-danger"></span>
@@ -36,7 +36,7 @@
                 <div class="input-group-prepend">
                     <span class="input-group-text" for="Price"> <i class="fas fa-rupee-sign"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                 </div>
-                <input asp-for="Price" class="form-control remarks" type="text" placeholder="Service Price (Rs.)" required oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" maxlength="10" />
+                <input asp-for="Price" class="form-control remarks" type="text" placeholder="Service Price (Rs.)" required maxlength="10" />
                 <span asp-validation-for="Price" class="text-danger"></span>
             </div>
         </div>
@@ -65,7 +65,7 @@
                 <div class="input-group-prepend">
                     <span class="input-group-text" for="StateId"><i class="fas fa-map-marker-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                 </div>
-                <input type="text" id="StateId" class="form-control remarks auto-dropdown" data-placeholder="state" placeholder="Type state..." asp-for="StateId" required value="" onblur="clearPinCodeField()" />
+                <input type="text" id="StateId" class="form-control remarks auto-dropdown" data-placeholder="state" placeholder="Type state..." asp-for="StateId" required />
                 <span asp-validation-for="StateId" class="text-danger"></span>
                 <input asp-for="SelectedStateId" type="hidden" id="SelectedStateId" name="SelectedStateId" value="@Model?.StateId" />
                 <div id="state-loading" class="loading-spinner">
@@ -82,8 +82,7 @@
                         <i class="fa fa-asterisk asterik-style"></i>
                     </span>
                 </div>
-                <input type="text" id="DistrictId" class="form-control remarks auto-dropdown" data-placeholder="district" placeholder="Type district..." asp-for="DistrictId" required
-                       onblur="GetRemainingServicePinCode(false,'@Model.Vendor.VendorId', '@Model.LineOfBusinessId')" onchange="GetRemainingServicePinCode(false,'@Model.Vendor.VendorId', '@Model.LineOfBusinessId')">
+                <input type="text" id="DistrictId" class="form-control remarks auto-dropdown" data-placeholder="district" placeholder="Type district..." asp-for="DistrictId" required />
                 <span asp-validation-for="DistrictId" class="text-danger"></span>
                 <input asp-for="SelectedDistrictId" type="hidden" id="SelectedDistrictId" name="SelectedDistrictId" value="@Model?.DistrictId" />
                 <div id="district-loading" class="loading-spinner">
