@@ -70,12 +70,12 @@ namespace risk.control.system.Controllers.Api.Agency
                  .Where(c => c.VendorId == vendorUser.VendorId && !c.Deleted);
 
             var users = vendorUsers?
-                .Where(u => !u.Deleted && u.Email != userEmail)
-                .OrderBy(u => u.FirstName)
-                .ThenBy(u => u.LastName)
-                .AsQueryable();
+                .Where(u => !u.Deleted && u.Email != userEmail);
 
-            var result = users?.Select(u =>
+            var allUsers = users?
+                .OrderBy(u => u.FirstName)
+                .ThenBy(u => u.LastName);
+            var result = allUsers?.Select(u =>
                 new
                 {
                     Id = u.Id,
@@ -84,7 +84,9 @@ namespace risk.control.system.Controllers.Api.Agency
                     Phone = "(+" + u.Country.ISDCode + ") " + u.PhoneNumber,
                     Photo = u.ProfilePicture == null ? noUserImagefilePath : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(u.ProfilePicture)),
                     Active = u.Active,
-                    Addressline = u.Addressline + ", " + u.District.Name + ", " + u.State.Code + ", " + u.Country.Code,
+                    Addressline = u.Addressline + ", " + u.District.Name,
+                    District = u.District.Name,
+                    State = u.State.Code,
                     Country = u.Country.Code,
                     Flag = "/flags/" + u.Country.Code.ToLower() + ".png",
                     Pincode = u.PinCode.Code,

@@ -43,15 +43,45 @@ function PopulatePinCode(dropDownId, list, option, showDefaultOption) {
     if (showDefaultOption)
         $(dropDownId).append(option)
     if (list == '' || list && list.length == 0) {
-        $(dropDownId).append("<option disabled class='service-exists' value='-1'> -- SERIVCE EXISTS -- </option>");
         $('#DistrictId').empty();
         $('#DistrictId').val('');
         $('#DistrictId').focus();
-
+        $.alert({
+            title: "SERVICE EXISTS",
+            content: "Please select other district.",
+            icon: 'fas fa-exclamation-triangle',
+            type: 'red',
+            closeIcon: true,
+            buttons: {
+                ok: {
+                    text: "OK",
+                    btnClass: 'btn-danger',
+                    action: function () {
+                        $('#DistrictId').focus(); // Focus on the input element after clicking OK
+                    }
+                }
+            }
+        });
     }
     else if (list && list.length == 1 && list[0].pinCodeId ==-1) {
+        $.alert({
+            title: "ALL PIN CODES",
+            content: "District ALL PIN CODES selected.",
+            icon: 'fa fa-info',
+            type: 'info',
+            closeIcon: true,
+            buttons: {
+                ok: {
+                    text: "OK",
+                    btnClass: 'btn-info',
+                    action: function () {
+                        $(dropDownId).focus(); // Focus on the input element after clicking OK
+                    }
+                }
+            }
+        });
         $(dropDownId).empty();
-        $(dropDownId).append("<option class='all-pincodes' value='-1'> --ALL PIN CODES -- </option>");
+        $(dropDownId).append("<option class='all-pincodes' value='-1'> -- ALL PIN CODES -- </option>");
         $(dropDownId).val('');
     }
     else if (list && list.length > 0) {

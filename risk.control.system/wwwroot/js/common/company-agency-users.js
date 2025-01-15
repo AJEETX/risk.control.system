@@ -31,7 +31,7 @@
             url: '/api/Agency/GetCompanyAgencyUser?id=' + $('#vendorId').val(),
             dataSrc: ''
         },
-        order: [[11, 'desc'], [12, 'desc']], // Sort by `isUpdated` and `lastModified`,
+        order: [[12, 'desc'], [13, 'desc']], // Sort by `isUpdated` and `lastModified`,
         columnDefs: [
             {
                 className: 'max-width-column', // Apply the CSS class,
@@ -43,7 +43,7 @@
             },
             {
                 className: 'max-width-column-name', // Apply the CSS class,
-                targets: 8                      // Index of the column to style
+                targets: 9                      // Index of the column to style
             }],
         fixedHeader: true,
         processing: true,
@@ -100,6 +100,7 @@
                     return '<span title="' + row.addressline + '" data-toggle="tooltip">' + data + '</span>'
                 }
             },
+            { "data": "state" },
             { "data": "pincode" },
             {
                 "sDefaultContent": "",

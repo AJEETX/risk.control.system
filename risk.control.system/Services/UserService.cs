@@ -136,7 +136,9 @@ namespace risk.control.system.Services
                     "<a href=/Agency/EditUser?userId=" + u.AgencyUser.Id + ">" + u.AgencyUser.Email + "</a><span title=\"Onboarding incomplete !!!\" data-toggle=\"tooltip\"><i class='fa fa-asterisk asterik-style'></i></span>",
                     Name = u.AgencyUser.FirstName + " " + u.AgencyUser.LastName,
                     Phone = "(+"+ u.AgencyUser.Country.ISDCode+") " + u.AgencyUser.PhoneNumber,
-                    Addressline = u.AgencyUser.Addressline + ", " + u.AgencyUser.District.Name + ", " + u.AgencyUser.State.Code + ", " + u.AgencyUser.Country.Code + ", " + u.AgencyUser.PinCode.Code,
+                    Addressline = u.AgencyUser.Addressline + ", " + u.AgencyUser.District.Name,
+                    State = u.AgencyUser.State.Code,
+                    Pincode =  u.AgencyUser.PinCode.Code,
                     Country = u.AgencyUser.Country.Code,
                     Flag = "/flags/" + u.AgencyUser.Country.Code.ToLower() + ".png",
                     Active = u.AgencyUser.Active,
@@ -155,7 +157,7 @@ namespace risk.control.system.Services
                 };
                 activeUsersDetails.Add(activeUser);
             }
-            users?.ToList().ForEach(user => user.IsUpdated = false);
+            vendorUsers?.ToList().ForEach(user => user.IsUpdated = false);
 
             await context.SaveChangesAsync();
             return activeUsersDetails;
@@ -185,8 +187,7 @@ namespace risk.control.system.Services
 
             var users = vendorUsers?
                 .OrderBy(u => u.IsUpdated)
-                .ThenBy(u => u.Updated)
-                .AsQueryable();
+                .ThenBy(u => u.Updated);
 
 
             var activeUsersDetails = new List<UserDetailResponse>();
@@ -237,10 +238,11 @@ namespace risk.control.system.Services
                     Phone = "(+"+ user.Country.ISDCode+") " + user.PhoneNumber,
                     Photo = user.ProfilePicture == null ? Applicationsettings.NO_USER : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(user.ProfilePicture)),
                     Active = user.Active,
-                    Addressline = user.Addressline + ", " + user.District.Name + ", " + user.State.Code + ", " + user.Country.Code,
+                    Addressline = user.Addressline + ", " + user.District.Name,
+                    State = user.State.Code,
+                    Pincode = user.PinCode.Code,
                     Country = user.Country.Code,
                     Flag = "/flags/" + user.Country.Code.ToLower() + ".png",
-                    Pincode = user.PinCode.Code,
                     Roles = string.Join(",", GetUserRoles(user).Result),
                     Updated = user.Updated.HasValue ? user.Updated.Value.ToString("dd-MM-yyyy") : user.Created.ToString("dd-MM-yyyy"),
                     UpdatedBy = user.UpdatedBy,
@@ -255,7 +257,7 @@ namespace risk.control.system.Services
                 activeUsersDetails.Add(activeUser);
             }
 
-            users?.ToList().ForEach(u => u.IsUpdated = false);
+            vendorUsers?.ToList().ForEach(u => u.IsUpdated = false);
             await context.SaveChangesAsync();
             return activeUsersDetails;
         }
@@ -289,14 +291,14 @@ namespace risk.control.system.Services
                 .FirstOrDefaultAsync(c => c.ClientCompanyId == companyUser.ClientCompanyId);
 
             var users = company.CompanyApplicationUser
-                .Where(u => !u.Deleted && u.Email != userEmail)
-                .OrderBy(u => u.FirstName)
-                .ThenBy(u => u.LastName)?
-                .ToList();
+                .Where(u => !u.Deleted && u.Email != userEmail);
 
+            var allUsers = users?
+                .OrderBy(u => u.FirstName)
+                .ThenBy(u => u.LastName);
             var activeUsersDetails = new List<UserDetailResponse>();
 
-            foreach(var user in users)
+            foreach(var user in allUsers)
             {
                 var currentOnlineTime = context.UserSessionAlive
                     .Where(a => a.ActiveUser.Email == user.Email && activeUsers.Contains(a.ActiveUser.Email))?
@@ -340,7 +342,7 @@ namespace risk.control.system.Services
                     Phone = "(+"+ user.Country.ISDCode+") " + user.PhoneNumber,
                     Photo = user.ProfilePicture == null ? Applicationsettings.NO_USER : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(user.ProfilePicture)),
                     Active = user.Active,
-                    Addressline = user.Addressline + ", " + user.District.Name + ", " + user.State.Code + ", " + user.Country.Code,
+                    Addressline = user.Addressline + ", " + user.District.Name,
                     District = user.District.Name,
                     State = user.State.Code,
                     Country = user.Country.Code,
@@ -358,6 +360,8 @@ namespace risk.control.system.Services
                 activeUsersDetails.Add(activeUser);
             }
 
+            users?.ToList().ForEach(u => u.IsUpdated = false);
+            await context.SaveChangesAsync();
             return activeUsersDetails;
         }
 
@@ -383,13 +387,13 @@ namespace risk.control.system.Services
                 .Include(a => a.State)
                 .Include(a => a.Country)
                 .Include(a => a.PinCode)
-                    .Where(u => !u.Deleted && u.Email != userEmail)?
-                    .OrderBy(u => u.FirstName)
-            .ThenBy(u => u.LastName)
-                            .ToList();
+                    .Where(u => !u.Deleted && u.Email != userEmail);
+
+            var allUsers = users?.OrderBy(u => u.FirstName)
+            .ThenBy(u => u.LastName);
 
             var activeUsersDetails = new List<UserDetailResponse>();
-            foreach (var user in users)
+            foreach (var user in allUsers)
             {
                 var currentOnlineTime = context.UserSessionAlive
                     .Where(a => a.ActiveUser.Email == user.Email && activeUsers.Contains(a.ActiveUser.Email))?
@@ -450,7 +454,7 @@ namespace risk.control.system.Services
                 };
                 activeUsersDetails.Add(activeUser);
             }
-            activeUsersDetails?.ToList().ForEach(u => u.IsUpdated = false);
+            users?.ToList().ForEach(u => u.IsUpdated = false);
             await context.SaveChangesAsync();
             return activeUsersDetails;
         }

@@ -4,7 +4,7 @@
             url: '/api/Agency/GetUsers',
             dataSrc: ''
         },
-        order: [[11, 'desc'], [12, 'desc']], // Sort by `isUpdated` and `lastModified`,
+        order: [[12, 'desc'], [13, 'desc']], // Sort by `isUpdated` and `lastModified`,
         columnDefs: [
             {
                 className: 'max-width-column', // Apply the CSS class,
@@ -16,11 +16,11 @@
             },
             {
                 className: 'max-width-column-claim', // Apply the CSS class,
-                targets: 8                      // Index of the column to style
+                targets: 9                      // Index of the column to style
             },
             {
                 className: 'max-width-column-name', // Apply the CSS class,
-                targets: 9                      // Index of the column to style
+                targets: 10                      // Index of the column to style
             }],
         fixedHeader: true,
         processing: true,
@@ -80,6 +80,8 @@
                     return '<span title="' + row.addressline + '" data-toggle="tooltip">' + row.addressline + '</span>'
                 }
             },
+            { "data": "state" },
+            { "data": "pincode" },
             {
                 "data": "active",
                 "sDefaultContent": "",
@@ -98,12 +100,6 @@
             },
             { "data": "roles" },
             { "data": "count" },
-            {
-                "data": "updatedBy",
-                "mRender": function (data, type, row) {
-                    return '<span title="' + row.updatedBy + '" data-toggle="tooltip">' + data + '</span>'
-                }
-            },
             {
                 "sDefaultContent": "",
                 "bSortable": false,
