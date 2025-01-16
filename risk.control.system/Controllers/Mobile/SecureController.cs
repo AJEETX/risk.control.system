@@ -248,13 +248,29 @@ namespace risk.control.system.Controllers.Mobile
         [Route("AcceptCookies")]
         public IActionResult AcceptCookies()
         {
-            Response.Cookies.Append("CookieConsent", "Accepted", new CookieOptions
+            Response.Cookies.Append("cookieConsent", "Accepted", new CookieOptions
             {
-                Expires = DateTimeOffset.UtcNow.AddDays(1),
-                HttpOnly = true
+                Expires = DateTimeOffset.UtcNow.AddDays(265),
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict
+            });
+            Response.Cookies.Append("analyticsCookies", false.ToString(), new CookieOptions
+            {
+                Expires = DateTimeOffset.UtcNow.AddDays(365),
+                HttpOnly = false,
+                Secure = true,
+                SameSite = SameSiteMode.Strict
             });
 
-            return Ok(new { success = true, message = "Cookie consent saved successfully!" });
+            Response.Cookies.Append("marketingCookies", false.ToString(), new CookieOptions
+            {
+                Expires = DateTimeOffset.UtcNow.AddDays(365),
+                HttpOnly = false,
+                Secure = true,
+                SameSite = SameSiteMode.Strict
+            });
+            return Ok(new { success = true, message = "Cookie accepted consent saved successfully!" });
         }
 
         [AllowAnonymous]
@@ -262,39 +278,70 @@ namespace risk.control.system.Controllers.Mobile
         [Route("RevokeCookies")]
         public IActionResult RevokeCookies()
         {
-            Response.Cookies.Append("CookieConsent", "Accepted", new CookieOptions
+            Response.Cookies.Append("cookieConsent", "Accepted", new CookieOptions
             {
-                Expires = DateTimeOffset.UtcNow.AddDays(1),
-                HttpOnly = true
+                Expires = DateTimeOffset.UtcNow.AddDays(365), // Persistent for 1 year
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict
             });
 
-            return Ok(new { success = true, message = "Cookie consent saved successfully!" });
+            Response.Cookies.Append("analyticsCookies", "false", new CookieOptions
+            {
+                Expires = DateTimeOffset.UtcNow.AddDays(365),
+                HttpOnly = false,
+                Secure = true,
+                SameSite = SameSiteMode.Strict
+            });
+
+            Response.Cookies.Append("marketingCookies", false.ToString(), new CookieOptions
+            {
+                Expires = DateTimeOffset.UtcNow.AddDays(365),
+                HttpOnly = false,
+                Secure = true,
+                SameSite = SameSiteMode.Strict
+            });
+            return Ok(new { success = true, message = "Cookie consent saved on close successfully!" });
         }
 
         [AllowAnonymous]
         [HttpPost]
         [Route("SavePreferences")]
-        public IActionResult SavePreferences(bool analyticsCookies, bool marketingCookies)
+        public IActionResult SavePreferences([FromBody] CookiePreferences preferences)
         {
-            Response.Cookies.Append("CookieConsent", "Accepted", new CookieOptions
+            if (preferences == null)
             {
-                Expires = DateTimeOffset.UtcNow.AddDays(1),
-                HttpOnly = true
-            });
-            Response.Cookies.Append("AnalyticsCookies", analyticsCookies.ToString(), new CookieOptions
+                return BadRequest(new { success = false, message = "Invalid data received." });
+            }
+
+            Response.Cookies.Append("cookieConsent", "Accepted", new CookieOptions
             {
                 Expires = DateTimeOffset.UtcNow.AddDays(365),
-                HttpOnly = true
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict
             });
 
-            Response.Cookies.Append("MarketingCookies", marketingCookies.ToString(), new CookieOptions
+            Response.Cookies.Append("analyticsCookies", preferences.AnalyticsCookies.ToString(), new CookieOptions
             {
                 Expires = DateTimeOffset.UtcNow.AddDays(365),
-                HttpOnly = true
+                HttpOnly = false,
+                Secure = true,
+                SameSite = SameSiteMode.Strict
+            });
+
+            Response.Cookies.Append("marketingCookies", preferences.MarketingCookies.ToString(), new CookieOptions
+            {
+                Expires = DateTimeOffset.UtcNow.AddDays(365),
+                HttpOnly = false,
+                Secure = true,
+                SameSite = SameSiteMode.Strict
             });
 
             return Ok(new { success = true, message = "Cookie preferences saved successfully!" });
         }
+
+
         [AllowAnonymous]
         [HttpGet("test-sms")]
         public async Task<IActionResult> Sms(string mobile = "61432854196")
@@ -309,5 +356,10 @@ namespace risk.control.system.Controllers.Mobile
         //{
         //    return Ok(new { message = "This endpoint is secured with Cookie" });
         //}
+    }
+    public class CookiePreferences
+    {
+        public bool AnalyticsCookies { get; set; }
+        public bool MarketingCookies { get; set; }
     }
 }
