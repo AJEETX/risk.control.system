@@ -262,15 +262,39 @@ namespace risk.control.system.Controllers.Mobile
         [Route("RevokeCookies")]
         public IActionResult RevokeCookies()
         {
-            // Remove the CookieConsent cookie
-            Response.Cookies.Delete("CookieConsent");
+            Response.Cookies.Append("CookieConsent", "Accepted", new CookieOptions
+            {
+                Expires = DateTimeOffset.UtcNow.AddDays(1),
+                HttpOnly = true
+            });
 
-            // Optionally, perform additional server-side cleanup (e.g., clear sessions)
-
-            // Return a success message
-            return Ok(new { success = true, message = "Cookie consent has been revoked." });
+            return Ok(new { success = true, message = "Cookie consent saved successfully!" });
         }
 
+        [AllowAnonymous]
+        [HttpPost]
+        [Route("SavePreferences")]
+        public IActionResult SavePreferences(bool analyticsCookies, bool marketingCookies)
+        {
+            Response.Cookies.Append("CookieConsent", "Accepted", new CookieOptions
+            {
+                Expires = DateTimeOffset.UtcNow.AddDays(1),
+                HttpOnly = true
+            });
+            Response.Cookies.Append("AnalyticsCookies", analyticsCookies.ToString(), new CookieOptions
+            {
+                Expires = DateTimeOffset.UtcNow.AddDays(365),
+                HttpOnly = true
+            });
+
+            Response.Cookies.Append("MarketingCookies", marketingCookies.ToString(), new CookieOptions
+            {
+                Expires = DateTimeOffset.UtcNow.AddDays(365),
+                HttpOnly = true
+            });
+
+            return Ok(new { success = true, message = "Cookie preferences saved successfully!" });
+        }
         [AllowAnonymous]
         [HttpGet("test-sms")]
         public async Task<IActionResult> Sms(string mobile = "61432854196")

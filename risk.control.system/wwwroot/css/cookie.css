@@ -50,7 +50,7 @@
     gap: 15px;
 }
 
-.btn-accept, .btn-revoke {
+.btn-accept, .btn-manage, .btn-revoke {
     padding: 5px 10px;
     border: none;
     cursor: pointer;
@@ -68,6 +68,13 @@
         background-color: #45a049;
     }
 
+.btn-manage{
+    background-color:cornflowerblue;
+    color:white;
+}
+.btn-manage:hover{
+    background-color:blue;
+}
 .btn-revoke {
     background-color: grey;
     color: white;
@@ -207,7 +214,6 @@
         display: inline-block;
     }
 #privacy {
-    color: #4CAF50;
     text-decoration: underline;
 }
 #cookie-content{
@@ -223,4 +229,35 @@
     color: green;
     display: block;
     margin: 10px 0px;
+}
+#cookieManagePopup{
+    display:none;
+}
+/* Form styling */
+#manageCookieForm {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+    #manageCookieForm div {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    #manageCookieForm label {
+        color: #555555;
+    }
+
+    #manageCookieForm input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+    }
+
+/* Disabled checkbox styling */
+#essentialCookies:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
 }
