@@ -92,7 +92,7 @@ function startTimer(timeout, display) {
             // Confirmation dialog
             $.confirm({
                 title: "Session Expiring!",
-                content: `Your session is about to expire!<br>Click <b>CONTINUE</b> to stay logged in.`,
+                content: `Your session expiring!<br>Click <b>CONTINUE</b>.`,
                 icon: "fas fa-hourglass-end fa-spin",
                 type: "orange",
                 closeIcon: true,

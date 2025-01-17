@@ -96,7 +96,6 @@
                         <span asp-validation-for="CustomerType" class="text-danger"></span>
                     </div>
                 </div>
-                <partial name="Creator/_CustomerPhoneNumber" model="@Model" />
 
                 <div class="form-group">
                     <span class="input-group-label"> Income:</span>
@@ -141,6 +140,7 @@
 
             </div>
             <div class="col-sm-6">
+                <partial name="Creator/_CustomerPhoneNumber" model="@Model" />
                 <partial name="Creator/_CustomerAddress" model="@Model" />
 
                 <div class="form-group">

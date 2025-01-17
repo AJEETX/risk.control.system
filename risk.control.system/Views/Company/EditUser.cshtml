@@ -70,23 +70,7 @@
                                 <span asp-validation-for="LastName" class="text-danger"></span>
                             </div>
                         </div>
-                        <div class="form-group">
-                            <span class="input-group-label"> Phone #:</span>
-                            <div class="input-group">
-                                
-                                <div class="input-group-prepend">
-                                    @{
-                                        var imgPath = "/flags/" + @Model.Country.Code.ToLower() + ".png";
-                                    }
-                                    <span class="input-group-text" data-toggle="tooltip" title="Country Code :+@Model?.Country.ISDCode">
-                                        <img src="@imgPath" class="flag-icon" data-toggle="tooltip" title="@Model.Country.Name" />  +@Model?.Country.ISDCode
-                                    </span>
-                                </div>
-                                <input id="PhoneNumber" type="text" asp-for="PhoneNumber" class="form-control remarks" required maxlength="10"
-                                       placeholder="Phone number only (e.g., 1234567890)" />
-                                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
-                            </div>
-                        </div>
+                        
 
                         <div class="form-group">
                             <span class="input-group-label"> Note:</span>
@@ -132,6 +116,23 @@
                         </div>
                     </div>
                     <div class="col-md-6">
+                        <div class="form-group">
+                            <span class="input-group-label"> Phone #:</span>
+                            <div class="input-group">
+
+                                <div class="input-group-prepend">
+                                    @{
+                                        var imgPath = "/flags/" + @Model.Country.Code.ToLower() + ".png";
+                                    }
+                                    <span class="input-group-text" data-toggle="tooltip" title="Country Code :+@Model?.Country.ISDCode">
+                                        <img src="@imgPath" class="flag-icon" data-toggle="tooltip" />  +@Model?.Country.ISDCode
+                                    </span>
+                                </div>
+                                <input id="PhoneNumber" type="text" asp-for="PhoneNumber" class="form-control remarks" required maxlength="10"
+                                       placeholder="Phone number only (e.g., 1234567890)" />
+                                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                            </div>
+                        </div>
                         <partial name="_Address" model="@Model" />
 
                         <div class="form-group">

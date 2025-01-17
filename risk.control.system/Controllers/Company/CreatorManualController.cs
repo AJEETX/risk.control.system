@@ -420,19 +420,23 @@ namespace risk.control.system.Controllers.Company
         [Breadcrumb("Edit Beneficiary", FromAction = "Details")]
         public IActionResult EditBeneficiary(long? id)
         {
+            if (id == null || id < 1)
+            {
+                notifyService.Error("OOPS!!!.Claim Not Found.Try Again");
+                return RedirectToAction(nameof(CreatePolicy));
+            }
+
             try
             {
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (id == null)
-                {
-                    notifyService.Error("OOPS!!!.Claim Not Found.Try Again");
-                    return RedirectToAction(nameof(CreatePolicy));
-                }
-
+               
                 var beneficiary = _context.BeneficiaryDetail
                     .Include(v => v.ClaimsInvestigation)
                     .ThenInclude(c => c.PolicyDetail)
                     .Include(v => v.District)
+                    .Include(v => v.State)
+                    .Include(v => v.District)
+                    .Include(v => v.Country)
+                    .Include(v => v.BeneficiaryRelation)
                     .First(v => v.BeneficiaryDetailId == id);
 
                 ViewData["BeneficiaryRelationId"] = new SelectList(_context.BeneficiaryRelation.OrderBy(s => s.Code), "BeneficiaryRelationId", "Name", beneficiary.BeneficiaryRelationId);

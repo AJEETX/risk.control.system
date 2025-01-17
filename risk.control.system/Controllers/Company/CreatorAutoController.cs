@@ -383,20 +383,13 @@ namespace risk.control.system.Controllers.Company
         [Breadcrumb("Edit Beneficiary", FromAction = "Details")]
         public IActionResult EditBeneficiary(long? id)
         {
-            if (id < 1)
+            if (id == null || id < 1)
             {
                 notifyService.Error("OOPS!!!.Policy Not Found.Try Again");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                    return RedirectToAction(nameof(CreatePolicy));
             }
             try
             {
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (id == null)
-                {
-                    notifyService.Error("OOPS!!!.Claim Not Found.Try Again");
-                    return RedirectToAction(nameof(CreatePolicy));
-                }
-
                 var beneficiary = _context.BeneficiaryDetail
                     .Include(v => v.PinCode)
                     .Include(v => v.District)

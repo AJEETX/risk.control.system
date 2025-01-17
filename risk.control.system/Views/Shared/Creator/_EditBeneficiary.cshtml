@@ -77,7 +77,6 @@
                         <span asp-validation-for="BeneficiaryRelationId" class="text-danger"></span>
                     </div>
                 </div>
-                <partial name="Creator/_BeneficiaryPhoneNumber" model="@Model" />
 
                 <div class="form-group">
                     <span class="input-group-label"> Income:</span>
@@ -111,6 +110,7 @@
                 </div>
             </div>
             <div class="col-md-6">
+                <partial name="Creator/_BeneficiaryPhoneNumber" model="@Model" />
                 <partial name="Creator/_BeneficiaryAddress" model="@Model" />
 
                 <div class="form-group">

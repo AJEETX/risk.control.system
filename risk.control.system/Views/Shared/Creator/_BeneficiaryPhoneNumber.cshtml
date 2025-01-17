@@ -7,7 +7,7 @@
                 var imgPath = "/flags/" + @Model.Country.Code.ToLower() + ".png";
             }
             <span class="input-group-text" data-toggle="tooltip" title="Country Code :+@Model?.Country.ISDCode">
-                <img src="@imgPath" class="flag-icon" data-toggle="tooltip" title="@Model.Country.Name" />  +@Model?.Country.ISDCode
+                <img src="@imgPath" class="flag-icon" data-toggle="tooltip"  />  +@Model?.Country.ISDCode
             </span>
         </div>
         <input id="ContactNumber" type="text" asp-for="ContactNumber" class="form-control remarks" required maxlength="10"

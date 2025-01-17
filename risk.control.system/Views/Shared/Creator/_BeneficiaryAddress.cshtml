@@ -1,4 +1,8 @@
 ﻿@model risk.control.system.Models.BeneficiaryDetail
+
+<input asp-for="SelectedCountryId" type="hidden" id="SelectedCountryId" name="SelectedCountryId" value="@Model?.CountryId" />
+<input type="hidden" id="CountryId" asp-for="CountryId" />
+
 <div class="form-group">
     <span class="input-group-label" for="PinCodeId">Pincode:</span>
     <div class="input-group mb-3 autocomplete-wrapper">
@@ -40,31 +44,17 @@
     <span class="input-group-label" for="StateId"> State:</span>
     <div class="input-group mb-3 autocomplete-wrapper">
         <div class="input-group-prepend">
-            <span class="input-group-text" for="StateId"><i class="fas fa-map-marker-alt"></i> <i class="fa fa-asterisk asterik-style-disabled"></i></span>
+            @{
+                var imgPath = "/flags/" + @Model.Country.Code.ToLower() + ".png";
+            }
+            <span class="input-group-text" data-toggle="tooltip" title="Registered Country :@Model?.Country.Name">
+                <img src="@imgPath" class="flag-icon" data-toggle="tooltip" /><span> @Model?.Country.Code</span>
+            </span>
         </div>
         <input readonly type="text" id="StateId" class="form-control remarks" data-placeholder="state" placeholder="..." asp-for="StateId" required value="" tabindex="-1" />
         <span asp-validation-for="StateId" class="text-danger"></span>
         <input asp-for="SelectedStateId" type="hidden" id="SelectedStateId" name="SelectedStateId" value="@Model?.StateId" />
         <div id="state-loading" class="loading-spinner">
-            <i class="fas fa-spinner fa-spin"></i>
-        </div>
-    </div>
-</div>
-<div class="form-group">
-    <span class="input-group-label" for="CountryId"> Country:</span>
-    <div class="input-group mb-3">
-        <div class="input-group-prepend">
-            @{
-                var imgPath = "/flags/" + @Model.Country.Code.ToLower() + ".png";
-            }
-            <span class="input-group-text" data-toggle="tooltip" title="Registered Country :@Model?.Country.Name">
-                <img src="@imgPath" class="flag-icon" data-toggle="tooltip" title="@Model.Country.Name" /><span> @Model?.Country.Code</span>
-            </span>
-        </div>
-        <input readonly type="text" id="CountryId" class="form-control" data-placeholder="country" asp-for="CountryId" data-toggle="tooltip" title="Registered Country" value="" tabindex="-1" />
-        <span asp-validation-for="CountryId" class="text-danger"></span>
-        <input asp-for="SelectedCountryId" type="hidden" id="SelectedCountryId" name="SelectedCountryId" value="@Model?.CountryId" />
-        <div id="country-loading" class="loading-spinner">
             <i class="fas fa-spinner fa-spin"></i>
         </div>
     </div>
