@@ -13,11 +13,13 @@
         public string Addressline { get; set; }
         public string? District { get; set; }
         public string? State { get; set; }
+        public string? StateName { get; set; }
         public string? Country { get; set; }
         public string? Flag { get; set; }
         public string Roles { get; set; }
         public string? Role { get; set; }
         public string? Pincode { get; set; }
+        public string? PincodeName { get; set; }
         public string? Updated { get; set; }
         public string? UpdatedBy { get; set; }
         public string OnlineStatus { get; set; }

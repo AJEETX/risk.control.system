@@ -208,7 +208,7 @@ namespace risk.control.system.Controllers.Api.Agency
                 if (!IsAllDistrict)
                 {
                     var allPinCodesForDistrict = await _context.PinCode.CountAsync(p => p.DistrictId == service.DistrictId);
-                    if(allPinCodesForDistrict == service.PincodeServices.Count)
+                    if(allPinCodesForDistrict == service.PincodeServices.Count && allPinCodesForDistrict > 1)
                     {
                         pincodes = ALL_PINCODE;
                         rawPincodes = ALL_PINCODE;

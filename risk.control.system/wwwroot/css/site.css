@@ -1848,3 +1848,14 @@ select#PinCodeId {
 #service-exists{
     color:darkred;
 }
+/* Text color for 'All Districts' */
+.text-light-green {
+    color: green !important;
+    font-weight: bold;
+}
+
+/* Text color for 'All Pincodes' */
+.text-light-blue {
+    color: blue !important;
+    font-weight: bold;
+}

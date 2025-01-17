@@ -111,8 +111,39 @@
     table.on('draw', function () {
         table.rows().every(function () {
             const data = this.data();
+            const rowNode = this.node();
+
+            // Convert to lowercase for case-insensitive comparison
+            const district = data.district ? data.district.toLowerCase() : '';
+            const pincodes = data.pincodes ? data.pincodes.toLowerCase() : '';
+
+            if (district === 'all districts' && pincodes === 'all pincodes') {
+                $(rowNode).find('td:nth-child(4)').addClass('text-light-green'); // Column index starts from 1
+                $(rowNode).find('td:nth-child(5)').addClass('text-light-green'); // Column index starts from 1
+                $(rowNode).find('td:nth-child(6)').addClass('text-light-green'); // Column index starts from 1
+                $(rowNode).find('td:nth-child(7)').addClass('text-light-green'); // Column index starts from 1
+            } else {
+                $(rowNode).find('td:nth-child(4)').removeClass('text-light-green');
+                $(rowNode).find('td:nth-child(5)').removeClass('text-light-green');
+                $(rowNode).find('td:nth-child(6)').removeClass('text-light-green');
+                $(rowNode).find('td:nth-child(7)').removeClass('text-light-green');
+            }
+
+            // Apply text color for `pincodes` column
+            if (district != 'all districts' && pincodes === 'all pincodes') {
+                $(rowNode).find('td:nth-child(4)').addClass('text-light-blue');
+                $(rowNode).find('td:nth-child(5)').addClass('text-light-blue');
+                $(rowNode).find('td:nth-child(6)').addClass('text-light-blue');
+                $(rowNode).find('td:nth-child(7)').addClass('text-light-blue');
+            } else {
+                $(rowNode).find('td:nth-child(4)').removeClass('text-light-blue');
+                $(rowNode).find('td:nth-child(5)').removeClass('text-light-blue');
+                $(rowNode).find('td:nth-child(6)').removeClass('text-light-blue');
+                $(rowNode).find('td:nth-child(7)').removeClass('text-light-blue');
+            }
+
             if (data.isUpdated) {
-                const rowNode = this.node();
+
                 $(rowNode).addClass('highlight-new-user');
                 rowNode.scrollIntoView({ behavior: 'smooth', block: 'center' });
 

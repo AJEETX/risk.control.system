@@ -1,4 +1,18 @@
 ﻿$(document).ready(function () {
+
+    function disableAllElements() {
+        $('button, input[type="submit"], a').prop('disabled', true);
+        $('a').addClass('disabled-anchor').on('click', function (e) {
+            e.preventDefault(); // Prevent default action for anchor clicks
+        });
+    }
+    $('body').on('click', 'a.create-agency-service', function () {
+        $("body").addClass("submit-progress-bg");
+        setTimeout(() => $(".submit-progress").removeClass("hidden"), 1);
+
+        $(this).attr('disabled', true).html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Add Service");
+        disableAllElements();
+    });
     // Utility function to show loading progress
     function showLoadingState(element, message, spinnerClass = 'fas fa-sync fa-spin') {
         $("body").addClass("submit-progress-bg");

@@ -18,21 +18,10 @@
     $("#acceptCookies").on("click", function () {
         cookiePopup.fadeOut(); // Hide the popup
         acceptCookies(cookieCancel);
-        if (!getCookie("cookieConsent")) {
-            //setCookie("cookieConsentAccepted", "true", 365); // Set consent for 1 year
-            //setCookie("analyticsCookies", "true", 365); // Default to enabling analytics cookies
-            //setCookie("marketingCookies", "true", 365); // Default to enabling marketing cookies
-        }
-
     });
 
     // Handle revoke consent button click
     $("#revokeConsent").on("click", function () {
-        if (!getCookie("cookieConsent")) {
-            //setCookie("cookieConsentAccepted", "true", 365); // Set consent for 1 year
-            //setCookie("analyticsCookies", "false", 365); // Default to enabling analytics cookies
-            //setCookie("marketingCookies", "false", 365); // Default to enabling marketing cookies
-        }
         cookiePopup.fadeOut(); // Hide the popup
         acceptCookies(cookieCancel);
     });
@@ -41,11 +30,6 @@
     $("#manageCookies").on("click", function () {
         cookiePopup.fadeOut(); // Hide main popup
         cookieManagePopup.fadeIn(); // Show manage popup
-        // Pre-check preferences based on existing cookies
-        setCookie("cookieConsent", "Accepted", 365); // Set consent for 1 year
-
-        //$("#analyticsCookies").prop("checked", getCookie("analyticsCookies") === "true");
-        //$("#marketingCookies").prop("checked", getCookie("marketingCookies") === "true");
     });
 
     $("#savePreferences").on("click", function () {
@@ -84,7 +68,7 @@
                 }
 
                 cookieManagePopup.fadeOut(); // Hide manage popup
-                showAlertWithAutoClose("Preferences saved successfully.", 2000);
+                showAlertWithAutoClose("Preferences saved successfully.", 1000);
                 const login = document.getElementById("email");
                 if (login) {
                     login.focus();
@@ -92,7 +76,7 @@
             })
             .catch((error) => {
                 console.error('Error:', error);
-                showAlertWithAutoClose("An error occurred while saving cookie preferences. Please try again.", 4000);
+                showAlertWithAutoClose("An error occurred while saving cookie preferences. Please try again.", 3000);
             });
     });
 
@@ -122,11 +106,8 @@ function acceptCookies(cookieCancel) {
             const message = data.message || "Cookies have been successfully accepted.";
             if (!getCookie("cookieConsent")) {
                 setCookie("cookieConsent", "Accepted", 365); // Set consent for 1 year
-                //setCookie("analyticsCookies", "false", 365); // Default to enabling analytics cookies
-                //setCookie("marketingCookies", "false", 365); // Default to enabling marketing cookies
             }
-            showAlertWithAutoClose(`<i class="fas fa-check"></i> ${message}`, 2000);
-            //cookieCancel.fadeIn();
+            showAlertWithAutoClose(`<i class="fas fa-check"></i> ${message}`, 1000);
             const login = document.getElementById("email");
             if (login) {
                 login.focus();
@@ -134,7 +115,7 @@ function acceptCookies(cookieCancel) {
         })
         .catch((error) => {
             console.error('Error:', error);
-            showAlertWithAutoClose("An error occurred while accepting cookies consent. Please try again.", 4000);
+            showAlertWithAutoClose("An error occurred while accepting cookies consent. Please try again.", 3000);
         });
 }
 
@@ -155,18 +136,14 @@ async function revokeCookies(cookiePopup) {
         const message = data.message || "Cookies have been successfully accepted.";
         if (!getCookie("cookieConsent")) {
             setCookie("cookieConsent", "Accepted", 365); // Set consent for 1 year
-            //setCookie("analyticsCookies", "false", 365); // Default to enabling analytics cookies
-            //setCookie("marketingCookies", "false", 365); // Default to enabling marketing cookies
         }
-        //showAlertWithAutoClose(`<i class="fas fa-times" class="danger"></i> ${message}`, 2000);
-        //cookiePopup.fadeIn(); // Show the main cookie popup again
         const login = document.getElementById("email");
         if (login) {
             login.focus();
         }
     } catch (error) {
         console.error('Error:', error);
-        showAlertWithAutoClose("An error occurred while revoking cookies. Please try again.", 4000);
+        showAlertWithAutoClose("An error occurred while revoking cookies. Please try again.", 3000);
     }
 }
 
@@ -200,7 +177,7 @@ function showAlertWithAutoClose(message, delay) {
     showAlert(message);
     setTimeout(function () {
         $("#customAlert").fadeOut();
-    }, delay || 3000); // Default delay is 3 seconds
+    }, delay || 1000); // Default delay is 3 seconds
 }
 
 function showAlert(message) {

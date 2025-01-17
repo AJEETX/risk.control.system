@@ -1,4 +1,10 @@
 ﻿$(document).ready(function () {
+
+    $('[data-toggle="tooltip"]').tooltip({
+        animated: 'fade',
+        placement: 'bottom',
+        html: true // Enables HTML content in the tooltip
+    });
     var table = $("#customerTable").DataTable({
         ajax: {
             url: '/api/Agency/GetUsers',
@@ -80,8 +86,18 @@
                     return '<span title="' + row.addressline + '" data-toggle="tooltip">' + row.addressline + '</span>'
                 }
             },
-            { "data": "state" },
-            { "data": "pincode" },
+            {
+                "data": "state",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.stateName + '" data-toggle="tooltip">' + data + '</span>'
+                } },
+            {
+                "data": "pincode",
+                bSortable: false,
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.pincodeName + '" data-toggle="tooltip">' + data + '</span>'
+                }
+            },
             {
                 "data": "active",
                 "sDefaultContent": "",
@@ -98,7 +114,12 @@
                     return buttons;
                 }
             },
-            { "data": "roles" },
+            {
+                "data": "roles",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + data + '" data-toggle="tooltip">' + data + '</span>'
+                }
+            },
             { "data": "count" },
             {
                 "sDefaultContent": "",

@@ -1,148 +1,191 @@
 ﻿.hostedscan {
-    height :30px;
-    width:auto
+height :30px;
+width:auto
 }
 /* Popup Container */
 .popup {
-    display: none; /* Initially hidden */
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
-    backdrop-filter: blur(2px); /* Add blur effect */
-    z-index: 9999;
+display: none; /* Initially hidden */
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+backdrop-filter: blur(2px); /* Add blur effect */
+z-index: 9999;
 }
 
 /* Popup Content Box */
 .popup-content {
-    z-index: 9999;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 400px;
-    max-width: 90%;
-    background-color: #fff;
-    border: 2px solid #fff;
-    border-radius: 5px;
-    padding: 10px;
-    text-align: center;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    font-family: Verdana;
-    font-size: .8em;
-    color: gray;
+z-index: 9999;
+position: absolute;
+top: 50%;
+left: 50%;
+transform: translate(-50%, -50%);
+width: 400px;
+max-width: 90%;
+background-color: #fff;
+border: 2px solid #fff;
+border-radius: 5px;
+padding: 10px;
+box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+font-family: Verdana;
+font-size: .8em;
+color: gray;
 }
 
-    /* Text Inside Popup */
-    .popup-content span {
-        font-size: .8em;
-        color: #333;
-        display: block;
-        margin-bottom: 20px;
-    }
+/* Text Inside Popup */
+.popup-content span {
+    font-size: .8em;
+    color: #333;
+    display: block;
+    margin-bottom: 20px;
+}
 
 /* Buttons */
 .popup-buttons {
-    display: flex;
-    justify-content: right;
-    gap: 15px;
+display: flex;
+justify-content: right;
+gap: 15px;
 }
 
 .btn-accept, .btn-manage, .btn-revoke {
-    padding: 5px 10px;
-    border: none;
-    cursor: pointer;
-    border-radius: 2px;
-    font-size: 1em;
-    transition: background-color 0.3s ease;
+padding: 5px 10px;
+border: none;
+cursor: pointer;
+border-radius: 2px;
+font-size: 1em;
+transition: background-color 0.3s ease;
 }
 
 .btn-accept {
-    background-color: #4CAF50;
-    color: white;
+background-color: #4CAF50;
+color: white;
 }
 
-    .btn-accept:hover {
-        background-color: #45a049;
-    }
+.btn-accept:hover {
+    background-color: #45a049;
+}
 
 .btn-manage{
-    background-color:cornflowerblue;
-    color:white;
+background-color:cornflowerblue;
+color:white;
 }
 .btn-manage:hover{
-    background-color:blue;
+background-color:blue;
 }
 .btn-revoke {
-    background-color: grey;
-    color: white;
+background-color: grey;
+color: white;
 }
 
-    .btn-revoke:hover {
-        background-color: darkgrey;
-    }
+.btn-revoke:hover {
+    background-color: darkgrey;
+}
 
 /* Responsive Design */
 @media (max-width: 600px) {
-    .popup-content {
-        width: 90%;
-        padding: 10px;
+.popup-content {
+    width: 90%;
+    padding: 10px;
+}
+
+    .popup-content span {
+        font-size: .8em;
     }
 
-        .popup-content span {
-            font-size: .8em;
-        }
-
-    .btn-accept, .btn-revoke {
-        padding: 4px 8px;
-        font-size: 1em;
-    }
+.btn-accept, .btn-revoke {
+    padding: 4px 8px;
+    font-size: 1em;
+}
 }
 
 /* Alert Overlay with Blur Effect */
 .alert-popup {
-    display: none; /* Initially hidden */
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
-    z-index: 2000;
-    backdrop-filter: blur(2px); /* Add blur effect */
+display: none; /* Initially hidden */
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+z-index: 2000;
+backdrop-filter: blur(2px); /* Add blur effect */
 }
 
 /* Alert Content Box */
 .alert-content {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 300px;
-    max-width: 90%;
-    background-color: #fff;
-    border: 2px solid #fff;
-    border-radius: 4px;
-    padding: 20px 10px;
-    text-align: center;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    font-family: Verdana;
-    color: gray;
+position: absolute;
+top: 50%;
+left: 50%;
+transform: translate(-50%, -50%);
+width: 300px;
+max-width: 90%;
+background-color: #fff;
+border: 2px solid #fff;
+border-radius: 4px;
+padding: 20px 10px;
+text-align: center;
+box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+font-family: Verdana;
+color: gray;
 }
 
-    /* Alert Message Text */
-    .alert-content span {
-        font-size:.8em;
-        color:green;
-        display: block;
-        margin: 10px 0px;
-    }
+/* Alert Message Text */
+.alert-content span {
+    font-size:.8em;
+    color:green;
+    display: block;
+    margin: 10px 0px;
+}
 
 /* Close Button */
 .btn-close {
-    padding: 5px 10px;
+padding: 5px 10px;
+border: none;
+cursor: pointer;
+border-radius: 2px;
+font-size: 1em;
+transition: background-color 0.3s ease;
+}
+
+.btn-close:hover {
+    background-color: #45a049;
+}
+
+/
+/* General Style for Both Divs */
+#cookieConsent {
+position: fixed;
+bottom: 0;
+left: 0;
+width: 100%;
+background-color: #FCFAFA;
+text-align: center;
+z-index: 1000;
+font-family: Verdana;
+display: none; /* Initially hidden */
+color: black;
+}
+#cookieRevoke {
+position: fixed;
+bottom: 0;
+left: 0;
+width: 100%;
+text-align: right;
+z-index: 1000;
+font-family: Verdana;
+display: none; /* Initially hidden */
+color: grey;
+background:transparent;
+font-size:.8em;
+}
+
+/* Specific Style for the Accept and Revoke Buttons */
+#cookieConsent button, #cookieRevoke button {
+    background-color: #4CAF50; /* Green for Accept Button */
+    color: white;
+    padding: 2px 5px;
     border: none;
     cursor: pointer;
     border-radius: 2px;
@@ -150,114 +193,75 @@
     transition: background-color 0.3s ease;
 }
 
-    .btn-close:hover {
-        background-color: #45a049;
+    /* Hover Effect for Buttons */
+    #cookieConsent button:hover {
+        background-color: #45a049; /* Slightly darker green */
     }
 
-/
-/* General Style for Both Divs */
-#cookieConsent {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    background-color: #FCFAFA;
-    text-align: center;
-    z-index: 1000;
-    font-family: Verdana;
-    display: none; /* Initially hidden */
-    color: black;
-}
-#cookieRevoke {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    text-align: right;
-    z-index: 1000;
-    font-family: Verdana;
-    display: none; /* Initially hidden */
-    color: grey;
-    background:transparent;
-    font-size:.8em;
+#cookieRevoke button {
+    background-color: grey; /* Red for Revoke Button */
 }
 
-    /* Specific Style for the Accept and Revoke Buttons */
-    #cookieConsent button, #cookieRevoke button {
-        background-color: #4CAF50; /* Green for Accept Button */
-        color: white;
-        padding: 2px 5px;
-        border: none;
-        cursor: pointer;
-        border-radius: 2px;
-        font-size: 1em;
-        transition: background-color 0.3s ease;
+    #cookieRevoke button:hover {
+        background-color: darkgrey; /* Slightly darker red */
     }
 
-        /* Hover Effect for Buttons */
-        #cookieConsent button:hover {
-            background-color: #45a049; /* Slightly darker green */
-        }
-
-    #cookieRevoke button {
-        background-color: grey; /* Red for Revoke Button */
-    }
-
-        #cookieRevoke button:hover {
-            background-color: darkgrey; /* Slightly darker red */
-        }
-
-    /* Style for Text Inside Divs */
-    #cookieConsent span, #cookieRevoke span {
-        font-size: .8em;
-        margin-right: 1em;
-        display: inline-block;
-    }
+/* Style for Text Inside Divs */
+#cookieConsent span, #cookieRevoke span {
+    font-size: .8em;
+    margin-right: 1em;
+    display: inline-block;
+}
 #privacy {
-    text-decoration: underline;
+text-decoration: underline;
 }
 #cookie-content{
-    margin-bottom:8px;
+    margin:8px;
+    padding:10px;
 }
 #cookieRevokeSpan{
-    background:white;
-    border:1px solid #ddd;
-    padding:2px 5px;
+background:white;
+border:1px solid #ddd;
+padding:2px 5px;
 }
 #errorMessage {
-    font-size: .8em;
-    color: green;
-    display: block;
-    margin: 10px 0px;
+font-size: .8em;
+color: green;
+display: block;
+margin: 10px 0px;
 }
 #cookieManagePopup{
-    display:none;
+display:none;
 }
 /* Form styling */
 #manageCookieForm {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
+display: flex;
+flex-direction: column;
+gap: 15px;
+padding:10px;
 }
 
-    #manageCookieForm div {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
+#manageCookieForm div {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
 
-    #manageCookieForm label {
-        color: #555555;
-    }
+#manageCookieForm label {
+    color: #555555;
+}
 
-    #manageCookieForm input[type="checkbox"] {
-        width: 20px;
-        height: 20px;
-        cursor: pointer;
-    }
+#manageCookieForm input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
 
+#cookieManagePopup:focus {
+    outline: 2px solid #4caf50;
+}
 /* Disabled checkbox styling */
 #essentialCookies:disabled {
-    cursor: not-allowed;
-    opacity: 0.6;
+cursor: not-allowed;
+opacity: 0.6;
 }

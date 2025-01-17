@@ -5,7 +5,7 @@
             url: '/api/Company/AllUsers',
             dataSrc: ''
         },
-        order: [[1, 'desc'],[12, 'desc'], [13, 'desc']], // Sort by `isUpdated` and `lastModified`,
+        order: [[1, 'desc'],[13, 'desc'], [14, 'desc']], // Sort by `isUpdated` and `lastModified`,
         columnDefs: [{
             'targets': 0,
             'searchable': false,
@@ -25,7 +25,7 @@
         },
         {
             className: 'max-width-column-name', // Apply the CSS class,
-            targets: 10                      // Index of the column to style
+            targets: 11                      // Index of the column to style
         }],
         fixedHeader: true,
         processing: true,
@@ -82,7 +82,19 @@
                     return '<span title="' + row.addressline + '" data-toggle="tooltip">' + data + '</span>'
                 }
             },
-            { "data": "pincode" },
+            {
+                "data": "state",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.stateName + '" data-toggle="tooltip">' + data + '</span>'
+                }
+            },
+            {
+                "data": "pincode",
+                bSortable: false,
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.pincodeName + '" data-toggle="tooltip">' + data + '</span>'
+                }
+            },
             {
                 "sDefaultContent": "",
                 "bSortable": false,
