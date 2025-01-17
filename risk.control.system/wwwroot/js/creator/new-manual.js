@@ -217,13 +217,28 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += '<a id="edit' + row.id + '" onclick="showedit(`' + row.id + '`)" href="Details?Id=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-pencil-alt"></i> Edit</a>&nbsp;'
-                    buttons += '<a id="details' + row.id + '" onclick="getdetails(`' + row.id + '`)" href="Delete?Id=' + row.id + '" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i> Delete </a>'
+                    buttons += '<a id="edit' + row.id + '" href="Details?Id=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-pencil-alt"></i> Edit</a>&nbsp;'
+                    buttons += '<a id="details' + row.id + '" href="Delete?Id=' + row.id + '" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i> Delete </a>'
                     return buttons;
                 }
             },
             { "data": "timeElapsed", bVisible: false }
         ],
+        "drawCallback": function (settings, start, end, max, total, pre) {
+            
+            $('#customerTable tbody').on('click', '.btn-danger', function (e) {
+                e.preventDefault(); // Prevent the default anchor behavior
+                var id = $(this).attr('id').replace('details', ''); // Extract the ID from the button's ID attribute
+                getdetails(id); // Call the getdetails function with the ID
+                window.location.href = $(this).attr('href'); // Navigate to the delete page
+            });
+            $('#customerTable tbody').on('click', '.btn-warning', function (e) {
+                e.preventDefault(); // Prevent the default anchor behavior
+                var id = $(this).attr('id').replace('edit', ''); // Extract the ID from the button's ID attribute
+                showedit(id); // Call the getdetails function with the ID
+                window.location.href = $(this).attr('href'); // Navigate to the edit page
+            });
+        },
         "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
             if (aData.isNewAssigned) {
                 $('td', nRow).css('background-color', '#ffa');

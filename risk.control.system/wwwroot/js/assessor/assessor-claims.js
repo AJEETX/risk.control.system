@@ -1,20 +1,5 @@
 $(document).ready(function () {
-    $('#view-type a').on('click', function () {
-        var id = this.id;
-        if (this.id == 'map-type') {
-            $('#checkboxes').css('display', 'none');
-            $('#maps').css('display', 'block');
-            $('#map-type').css('display', 'none');
-            $('#list-type').css('display', 'block');
-        }
-        else {
-            $('#checkboxes').css('display', 'block');
-            $('#maps').css('display', 'none');
-            $('#map-type').css('display', 'block');
-            $('#list-type').css('display', 'none');
-        }
-    });
-
+    
     var table = $("#customerTable").DataTable({
         ajax: {
             url: '/api/Assessor/Get',

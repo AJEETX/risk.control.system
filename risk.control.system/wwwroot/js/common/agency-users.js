@@ -140,10 +140,10 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += '<a id=edit' + row.id + ' onclick="showedit(' + row.id + ')" href="/Company/EditAgencyUser?userId=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-pen"></i> Edit</a>&nbsp;'
+                    buttons += '<a id=edit' + row.id + 'href="/Company/EditAgencyUser?userId=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-pen"></i> Edit</a>&nbsp;'
                     //buttons += '<a id=role' + row.id + ' onclick="showroles(' + row.id + ')" href="/Vendors/UserRoles?userId=' + row.id + '"  class="btn btn-xs btn-info"><i class="fas fa-pen"></i> Role</a>'
                     if (row.role != "AGENCY_ADMIN") {
-                        buttons += '<a id="details' + row.id + '" onclick="getdetails(`' + row.id + '`)" href="/Company/DeleteAgencyUser?userId=' + row.id + '" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i> Delete </a>'
+                        buttons += '<a id="details' + row.id + '" href="/Company/DeleteAgencyUser?userId=' + row.id + '" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i> Delete </a>'
                     } else {
                         buttons += '<button disabled class="btn btn-xs btn-danger"><i class="fa fa-trash"></i> Delete </a>'
                     }
@@ -160,6 +160,21 @@
                 bVisible: false
             }
         ],
+        "drawCallback": function (settings, start, end, max, total, pre) {
+            
+            $('#customerTable tbody').on('click', '.btn-danger', function (e) {
+                e.preventDefault(); // Prevent the default anchor behavior
+                var id = $(this).attr('id').replace('details', ''); // Extract the ID from the button's ID attribute
+                getdetails(id); // Call the getdetails function with the ID
+                window.location.href = $(this).attr('href'); // Navigate to the delete page
+            });
+            $('#customerTable tbody').on('click', '.btn-warning', function (e) {
+                e.preventDefault(); // Prevent the default anchor behavior
+                var id = $(this).attr('id').replace('edit', ''); // Extract the ID from the button's ID attribute
+                showedit(id); // Call the getdetails function with the ID
+                window.location.href = $(this).attr('href'); // Navigate to the edit page
+            });
+        },
         "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
             if (!aData.agentOnboarded) {
                 $('td', nRow).css('background-color', '#FCFCEF');

@@ -100,21 +100,24 @@ namespace risk.control.system.Controllers.Api.Company
                     Id = u.Id,
                     Name = u.FirstName + " " + u.LastName,
                     Email = "<a href=''>" + u.Email + "</a>",
+                    RawEmail = u.Email,
                     Phone = "(+" + u.Country.ISDCode + ") " + u.PhoneNumber,
                     Photo = u.ProfilePicture == null ? noUserImagefilePath : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(u.ProfilePicture)),
                     Active = u.Active,
-                    Addressline = u.Addressline + ", " + u.District.Name + ", " + u.State.Name + ", " + u.Country.Code,
+                    Addressline = u.Addressline + ", " + u.District.Name,
+                    State = u.State.Code,
                     Country = u.Country.Code,
                     Flag = "/flags/" + u.Country.Code.ToLower() + ".png",
                     Roles = u.UserRole != null ? $"<span class=\"badge badge-light\">{u.UserRole.GetEnumDisplayName()}</span>" : "<span class=\"badge badge-light\">...</span>",
                     Pincode = u.PinCode.Code,
+                    PincodeLabel = u.PinCode.Name + " - " +u.PinCode.Code,
                     Updated = u.Updated.HasValue ? u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy"),
                     UpdateBy = u.UpdatedBy,
                     IsUpdated = u.IsUpdated,
                     LastModified = u.Updated
                 })?.ToArray();
 
-            users?.ToList().ForEach(u => u.IsUpdated = false);
+            companyUsers?.ToList().ForEach(u => u.IsUpdated = false);
             await _context.SaveChangesAsync();
             return Ok(result);
         }

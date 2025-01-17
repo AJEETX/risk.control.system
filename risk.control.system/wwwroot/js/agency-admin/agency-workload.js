@@ -125,18 +125,16 @@
                 "sDefaultContent": "",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    var buttons = "";
-                    buttons += '<a id=edit' + row.id + ' onclick="showedit(' + row.id + ')"  href="/Agency/EditUser?userId=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-pen"></i> Edit</a>&nbsp;';
-                    //buttons += '<a href="/Agency/UserRoles?userId=' + row.id + '"  class="btn btn-xs btn-info"><i class="fas fa-pen"></i> Roles</a>'
-
-                    if (row.role != "AGENCY_ADMIN") {
-                        buttons += '<a id="details' + row.id + '" onclick="getdetails(`' + row.id + '`)" href="/Agency/DeleteUser?userId=' + row.id + '" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i> Delete </a>'
+                    var buttons = '';
+                    buttons += '<a id="edit' + row.id + '" href="/Agency/EditUser?userId=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-pen"></i> Edit</a>&nbsp;';
+                    if (row.role !== "AGENCY_ADMIN") {
+                        buttons += '<a id="details' + row.id + '" href="/Agency/DeleteUser?userId=' + row.id + '" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i> Delete</a>';
                     } else {
-                        buttons += '<button disabled class="btn btn-xs btn-danger"><i class="fa fa-trash"></i> Delete </a>'
+                        buttons += '<button disabled class="btn btn-xs btn-danger"><i class="fa fa-trash"></i> Delete</button>';
                     }
                     return buttons;
                 }
-            },
+            }, 
             {
                 "data": "isUpdated",
                 bVisible: false
@@ -181,6 +179,17 @@
         });
     });
     $('#customerTable').on('draw.dt', function () {
+        $('#customerTable .btn-warning').on('click', function (e) {
+            var id = $(this).attr('id').replace('edit', '');
+            showedit(id);  // Call showedit function with the ID
+        });
+
+        // Bind the "Delete" button click event
+        $('#customerTable .btn-danger').on('click', function (e) {
+            var id = $(this).attr('id').replace('details', '');
+            getdetails(id);  // Call getdetails function with the ID
+        });
+
         $('[data-toggle="tooltip"]').tooltip({
             animated: 'fade',
             placement: 'top',
@@ -189,18 +198,15 @@
     });
 });
 function getdetails(id) {
+    // Same logic for getdetails
     $("body").addClass("submit-progress-bg");
-    // Wrap in setTimeout so the UI
-    // can update the spinners
     setTimeout(function () {
         $(".submit-progress").removeClass("hidden");
     }, 1);
-    // Disable all buttons, submit inputs, and anchors
-    $('button, input[type="submit"], a').prop('disabled', true);
 
-    // Add a class to visually indicate disabled state for anchors
+    $('button, input[type="submit"], a').prop('disabled', true);
     $('a').addClass('disabled-anchor').on('click', function (e) {
-        e.preventDefault(); // Prevent default action for anchor clicks
+        e.preventDefault();
     });
     $('a#details' + id + '.btn.btn-xs.btn-danger').html("<i class='fas fa-sync fa-spin'></i> Delete");
 
@@ -212,19 +218,17 @@ function getdetails(id) {
         }
     }
 }
+
 function showedit(id) {
+    // Same logic for showedit
     $("body").addClass("submit-progress-bg");
-    // Wrap in setTimeout so the UI
-    // can update the spinners
     setTimeout(function () {
         $(".submit-progress").removeClass("hidden");
     }, 1);
-    // Disable all buttons, submit inputs, and anchors
-    $('button, input[type="submit"], a').prop('disabled', true);
 
-    // Add a class to visually indicate disabled state for anchors
+    $('button, input[type="submit"], a').prop('disabled', true);
     $('a').addClass('disabled-anchor').on('click', function (e) {
-        e.preventDefault(); // Prevent default action for anchor clicks
+        e.preventDefault();
     });
     $('a#edit' + id + '.btn.btn-xs.btn-warning').html("<i class='fas fa-sync fa-spin'></i> Edit");
 

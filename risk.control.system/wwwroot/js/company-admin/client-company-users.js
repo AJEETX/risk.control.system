@@ -34,6 +34,19 @@
         fixedHeader: true,
         processing: true,
         paging: true,
+        columnDefs: [
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 3                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 3                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 10                      // Index of the column to style
+            }],
         language: {
             loadingRecords: '&nbsp;',
             processing: '<i class="fas fa-sync fa-spin fa-4x fa-fw"></i><span class="sr-only">Loading...</span>'
@@ -52,16 +65,42 @@
                     return img;
                 }
             },
-            { "data": "email" },
-            { "data": "name" },
+            {
+                "data": "email",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.rawEmail + '" data-toggle="tooltip">' + data + '</span>'
+                }
+            },
+            {
+                "data": "name",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.name + '" data-toggle="tooltip">' + data + '</span>'
+                }
+            },
             {
                 "data": "phone",
                 "mRender": function (data, type, row) {
                     return '<span title="' + data + '" data-toggle="tooltip"> <img alt="' + data + '" title="' + data + '" src="' + row.flag + '" class="flag-icon" data-toggle="tooltip"/>' + data + '</span>'
                 }
             },
-            { "data": "addressline", bSortable:false },
-            { "data": "pincode" },
+            {
+                "data": "addressline", bSortable: false,
+                "mRender": function (data, type, row) {
+                    return '<span title="' + data + '" data-toggle="tooltip">' + data + '</span>'
+                }
+            },
+            {
+                "data": "state",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + data + '" data-toggle="tooltip">' + data + '</span>'
+                }
+            },
+            {
+                "data": "pincode",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.pincodeLabel + '" data-toggle="tooltip">' + data + '</span>'
+                }
+            },
             {
                 "sDefaultContent": "",
                 "bSortable": false,
@@ -77,7 +116,9 @@
                     return buttons;
                 }
             },
-            { "data": "roles" },
+            {
+                "data": "roles",
+            },
             { "data": "updated" },
             { "data": "updateBy" },
             {
@@ -85,12 +126,21 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += '<a id=edit' + row.id + ' onclick="showedit(' + row.id + ')"  href="/CompanyUser/Edit?userId=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-pen"></i> Edit</a>&nbsp;'
+                    buttons += '<a id=edit' + row.id + ' href="/CompanyUser/Edit?userId=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-pen"></i> Edit</a>&nbsp;'
                     //buttons += '<a href="/CompanyUserRoles/Index?userId=' + row.id + '"  class="btn btn-xs btn-info"><i class="fas fa-pen"></i> Roles</a>'
                     return buttons;
                 }
             }
         ],
+        "drawCallback": function (settings, start, end, max, total, pre) {
+
+            $('#customerTable tbody').on('click', '.btn-warning', function (e) {
+                e.preventDefault(); // Prevent the default anchor behavior
+                var id = $(this).attr('id').replace('edit', ''); // Extract the ID from the button's ID attribute
+                showedit(id); // Call the getdetails function with the ID
+                window.location.href = $(this).attr('href'); // Navigate to the edit page
+            });
+        },
         error: function (xhr, status, error) { alert('err ' + error) }
     });
     $('#customerTable').on('draw.dt', function () {

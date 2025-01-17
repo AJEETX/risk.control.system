@@ -73,7 +73,12 @@
                     return '<span title="' + row.name + '" data-toggle="tooltip">' + data + '</span>'
                 }
             },
-            { "data": "code" },
+            {
+                "data": "code",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + data + '" data-toggle="tooltip">' + data + '</span>'
+                }
+            },
             {
                 "data": "phone",
                 "mRender": function (data, type, row) {
@@ -87,10 +92,30 @@
                     return '<span title="' + row.address + '" data-toggle="tooltip">' + data + '</span>'
                 }
             },
-            { "data": "district" },
-            { "data": "state" },
-            { "data": "country" },
-            { "data": "updated" },
+            {
+                "data": "district",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + data + '" data-toggle="tooltip">' + data + '</span>'
+                }
+            },
+            {
+                "data": "state",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + data + '" data-toggle="tooltip">' + data + '</span>'
+                }
+            },
+            {
+                "data": "country",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.country + '" data-toggle="tooltip"> <img alt="' + data + '" title="' + data + '" src="' + row.flag + '" class="flag-icon" data-toggle="tooltip"/>' + data + '</span>';
+                }
+            },
+            {
+                "data": "updated",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + data + '" data-toggle="tooltip">' + data + '</span>'
+                }
+            },
             {
                 "data": "updateBy",
                 "mRender": function (data, type, row) {
@@ -117,6 +142,16 @@
                 bVisible: false
             }
         ],
+        "drawCallback": function (settings, start, end, max, total, pre) {
+
+            $('#customerTable tbody').on('click', '.btn-danger', function (e) {
+                e.preventDefault(); // Prevent the default anchor behavior
+                var id = $(this).attr('id').replace('delete', ''); // Extract the ID from the button's ID attribute
+                getdetails(id); // Call the getdetails function with the ID
+                window.location.href = $(this).attr('href'); // Navigate to the delete page
+            });
+
+        },
         "drawCallback": function (settings, start, end, max, total, pre) {
             var rowCount = (this.fnSettings().fnRecordsTotal()); // total number of rows
             if (rowCount > 0) {

@@ -105,13 +105,17 @@ namespace risk.control.system.Controllers.Api.Agency
         [HttpGet("AllAgencies")]
         public async Task<IActionResult> AllAgencies()
         {
-            var agencies = _context.Vendor
+            var allAgencies = _context.Vendor
                 .Include(v => v.Country)
                 .Include(v => v.PinCode)
                 .Include(v => v.District)
                 .Include(v => v.State)
                 .Include(v => v.VendorInvestigationServiceTypes)
                 .Where(v => !v.Deleted);
+
+            var agencies = allAgencies.
+                OrderBy(a=>a.Name);
+
             var result = agencies?.Select(u =>
                 new
                 {
@@ -121,20 +125,20 @@ namespace risk.control.system.Controllers.Api.Agency
                     Name = u.Name,
                     Code = u.Code,
                     Phone = "(+" + u.Country.ISDCode + ") " + u.PhoneNumber,
-                    Address = u.Addressline + ", " + u.District.Name + ", " + u.State.Code + ", " + u.Country.Code,
+                    Address = u.Addressline + ", " + u.District.Name + ", " + u.State.Code,
                     Country = u.Country.Code,
                     Flag = "/flags/" + u.Country.Code.ToLower() + ".png",
                     Pincode = u.PinCode.Code,
                     Status = "<span class='badge badge-light'>" + u.Status.GetEnumDisplayName() + "</span>",
                     Updated = u.Updated.HasValue ? u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy"),
-                    Update = u.UpdatedBy,
+                    UpdatedBy = u.UpdatedBy,
                     VendorName = u.Email,
                     RawStatus = u.Status.GetEnumDisplayName(),
                     IsUpdated = u.IsUpdated,
                     LastModified = u.Updated
                 })?.ToArray();
 
-            agencies?.ToList().ForEach(u => u.IsUpdated = false);
+            allAgencies?.ToList().ForEach(u => u.IsUpdated = false);
             await _context.SaveChangesAsync();
 
             return Ok(result);

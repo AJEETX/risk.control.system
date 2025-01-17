@@ -1,19 +1,4 @@
 $(document).ready(function () {
-    $('#view-type a').on('click', function () {
-        var id = this.id;
-        if (this.id == 'map-type') {
-            $('#checkboxes').css('display', 'none');
-            $('#maps').css('display', 'block');
-            $('#map-type').css('display', 'none');
-            $('#list-type').css('display', 'block');
-        }
-        else {
-            $('#checkboxes').css('display', 'block');
-            $('#maps').css('display', 'none');
-            $('#map-type').css('display', 'block');
-            $('#list-type').css('display', 'none');
-        }
-    });
 
     var table = $("#customerTable").DataTable({
         ajax: {
@@ -190,7 +175,7 @@ $(document).ready(function () {
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += '<a id="details' + row.id + '" onclick="getdetails(`' + row.id + '`)"  href="AssessorDetail?Id=' + row.id + '" class="active-claims btn btn-xs btn-info"><i class="fa fa-search"></i> Detail</a>';
+                    buttons += '<a id="details' + row.id + '" href="AssessorDetail?Id=' + row.id + '" class="active-claims btn btn-xs btn-info"><i class="fa fa-search"></i> Detail</a>';
 
                     if (row.autoAllocated) {
 
@@ -202,6 +187,16 @@ $(document).ready(function () {
                 }
             }
         ],
+        "drawCallback": function (settings, start, end, max, total, pre) {
+
+            $('#customerTable tbody').on('click', '.btn-info', function (e) {
+                e.preventDefault(); // Prevent the default anchor behavior
+                var id = $(this).attr('id').replace('details', ''); // Extract the ID from the button's ID attribute
+                getdetails(id); // Call the getdetails function with the ID
+                window.location.href = $(this).attr('href'); // Navigate to the delete page
+            });
+
+        },
         "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
             if (aData.isNewAssigned) {
                 $('td', nRow).css('background-color', '#ffa');

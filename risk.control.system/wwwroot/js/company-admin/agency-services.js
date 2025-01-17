@@ -109,8 +109,8 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += '<a id=edit' + row.id + ' onclick="showedit(' + row.id + ')" href="/Company/EditService?id=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-pen"></i> Edit</a>&nbsp;'
-                    buttons += '<a id=delete' + row.id + ' onclick="getdetails(' + row.id + ')" href="/Company/DeleteService?id=' + row.id + '"  class="btn btn-xs btn-danger"><i class="fas fa-trash"></i> Delete</a>'
+                    buttons += '<a id=edit' + row.id + ' href="/Company/EditService?id=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-pen"></i> Edit</a>&nbsp;'
+                    buttons += '<a id=delete' + row.id + ' href="/Company/DeleteService?id=' + row.id + '"  class="btn btn-xs btn-danger"><i class="fas fa-trash"></i> Delete</a>'
                     return buttons;
                 }
             },
@@ -123,6 +123,21 @@
                 bVisible: false
             }
         ],
+        drawCallback: function () {
+            // Event delegation for .btn-danger elements
+            $('#customerTable tbody').on('click', '.btn-danger', function (e) {
+                e.preventDefault(); // Prevent the default anchor behavior
+                var id = $(this).attr('id').replace('details', ''); // Extract the ID from the button's ID attribute
+                getdetails(id); // Call the getdetails function with the ID
+                window.location.href = $(this).attr('href'); // Navigate to the delete page
+            });
+            $('#customerTable tbody').on('click', '.btn-warning', function (e) {
+                e.preventDefault(); // Prevent the default anchor behavior
+                var id = $(this).attr('id').replace('edit', ''); // Extract the ID from the button's ID attribute
+                showedit(id); // Call the getdetails function with the ID
+                window.location.href = $(this).attr('href'); // Navigate to the edit page
+            });
+        },
         error: function (xhr, status, error) { alert('err ' + error) }
     });
 

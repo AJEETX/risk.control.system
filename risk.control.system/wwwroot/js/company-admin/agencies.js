@@ -98,6 +98,16 @@
                 bVisible: false
             }
         ],
+        "drawCallback": function (settings, start, end, max, total, pre) {
+
+            $('#customerTable tbody').on('click', '.btn-info', function (e) {
+                e.preventDefault(); // Prevent the default anchor behavior
+                var id = $(this).attr('id').replace('details', ''); // Extract the ID from the button's ID attribute
+                showdetails(id); // Call the getdetails function with the ID
+                window.location.href = $(this).attr('href'); // Navigate to the delete page
+            });
+
+        },
         error: function (xhr, status, error) { alert('err ' + error) }
     });
 

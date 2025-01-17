@@ -6,6 +6,7 @@
             e.preventDefault(); // Prevent default action for anchor clicks
         });
     }
+
     $('body').on('click', 'a.create-agency-service', function () {
         $("body").addClass("submit-progress-bg");
         setTimeout(() => $(".submit-progress").removeClass("hidden"), 1);
@@ -13,6 +14,7 @@
         $(this).attr('disabled', true).html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Add Service");
         disableAllElements();
     });
+
     // Utility function to show loading progress
     function showLoadingState(element, message, spinnerClass = 'fas fa-sync fa-spin') {
         $("body").addClass("submit-progress-bg");
@@ -43,25 +45,32 @@
         e.preventDefault();
         const actionType = $(this).data('action');
         const id = $(this).data('id');
+        let targetUrl = '';
 
         switch (actionType) {
             case 'details':
                 showLoadingState(this, 'Detail');
-                // Perform your logic for showing details here
+                targetUrl = `/VendorService/Details?id=${id}`; // Redirect to details page
                 break;
 
             case 'edit':
                 showLoadingState(this, 'Edit');
-                // Perform your logic for editing here
+                targetUrl = `/VendorService/Edit?id=${id}`; // Redirect to edit page
                 break;
 
             case 'delete':
                 showLoadingState(this, 'Delete');
-                // Perform your logic for deleting here
+                // Perform your delete logic here, then redirect if necessary
+                targetUrl = `/VendorService/Delete?id=${id}`; // For deleting, you may want to confirm before navigating
                 break;
 
             default:
                 console.warn(`Unknown action: ${actionType}`);
+        }
+
+        // Navigate to the respective URL (edit or detail page)
+        if (targetUrl) {
+            window.location.href = targetUrl; // Navigate to the page
         }
     });
 
@@ -130,10 +139,10 @@
                 defaultContent: '',
                 orderable: false,
                 render: (data, type, row) => `
-                    <a href="/VendorService/Edit?id=${row.id}" data-id="${row.id}" data-action="edit" class="action-btn btn btn-xs btn-warning">
+                    <a href="#" data-id="${row.id}" data-action="edit" class="action-btn btn btn-xs btn-warning">
                         <i class="fas fa-pen"></i> Edit
                     </a>&nbsp;
-                    <a href="/VendorService/Delete?id=${row.id}" data-id="${row.id}" data-action="delete" class="action-btn btn btn-xs btn-danger">
+                    <a href="#" data-id="${row.id}" data-action="delete" class="action-btn btn btn-xs btn-danger">
                         <i class="fas fa-trash"></i> Delete
                     </a>`
             },

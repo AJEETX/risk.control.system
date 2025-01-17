@@ -6,16 +6,12 @@
         },
         columnDefs: [
             {
-                className: 'max-width-column-name', // Apply the CSS class,
-                targets: 2                      // Index of the column to style
-            },
-            {
                 className: 'max-width-column', // Apply the CSS class,
                 targets: 5                      // Index of the column to style
             },
             {
                 className: 'max-width-column-name', // Apply the CSS class,
-                targets: 10                      // Index of the column to style
+                targets: 11                      // Index of the column to style
             }],
         order: [[13, 'desc'], [14, 'desc']], // Sort by `isUpdated` and `lastModified`,
         fixedHeader: true,
@@ -60,8 +56,18 @@
                     return '<span title="' + row.address + '" data-toggle="tooltip">' + data + '</span>'
                 }
             },
-            { "data": "district" },
-            { "data": "state" },
+            {
+                "data": "district",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + data + '" data-toggle="tooltip">' + data + '</span>'
+                }
+            },
+            {
+                "data": "state",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + data + '" data-toggle="tooltip">' + data + '</span>'
+                }
+            },
             {
                 "data": "country",
                 "mRender": function (data, type, row) {
@@ -83,7 +89,12 @@
                     return buttons;
                 }
             },
-            { "data": "updated" },
+            {
+                "data": "updated",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + data + '" data-toggle="tooltip">' + data + '</span>'
+                }
+            },
             {
                 "data": "updatedBy",
                 bSortable: false,
@@ -96,9 +107,9 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += '<a id=detail' + row.id + ' onclick="showdetails(' + row.id + ')" href="/ClientCompany/Details?Id=' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Detail</a>&nbsp;'
+                    buttons += '<a id=detail' + row.id + ' href="/ClientCompany/Details?Id=' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Detail</a>&nbsp;'
                     //buttons += '<a id=edit' + row.id + ' onclick="showedit(' + row.id + ')"  href="/ClientCompany/Edit?Id=' + row.id + '"  class="btn btn-xs btn-warning"><i class="fas fa-pen"></i> Edit</a>&nbsp;'
-                    buttons += '<a id=delete' + row.id + ' onclick="getdetails(' + row.id + ')" href="/ClientCompany/Delete?Id=' + row.id + '"  class="btn btn-xs btn-danger"><i class="fas fa-trash"></i></i> Delete</a>'
+                    buttons += '<a id=delete' + row.id + ' href="/ClientCompany/Delete?Id=' + row.id + '" class="btn btn-xs btn-danger"><i class="fas fa-trash"></i></i> Delete</a>'
                     return buttons;
                 }
             },
@@ -111,6 +122,21 @@
                 bVisible: false
             }
         ],
+        drawCallback: function () {
+            // Event delegation for .btn-danger elements
+            $('#customerTable tbody').on('click', '.btn-danger', function (e) {
+                e.preventDefault(); // Prevent the default anchor behavior
+                var id = $(this).attr('id').replace('delete', ''); // Extract the ID from the button's ID attribute
+                getdetails(id); // Call the getdetails function with the ID
+                window.location.href = $(this).attr('href'); // Navigate to the delete page
+            });
+            $('#customerTable tbody').on('click', '.btn-info', function (e) {
+                e.preventDefault(); // Prevent the default anchor behavior
+                var id = $(this).attr('id').replace('detail', ''); // Extract the ID from the button's ID attribute
+                showdetails(id); // Call the getdetails function with the ID
+                window.location.href = $(this).attr('href'); // Navigate to the edit page
+            });
+        },
         error: function (xhr, status, error) { alert('err ' + error) }
     });
     table.on('draw', function () {

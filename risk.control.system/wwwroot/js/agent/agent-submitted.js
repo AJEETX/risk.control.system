@@ -1,20 +1,5 @@
 ﻿$(document).ready(function () {
-    $('#view-type a').on('click', function () {
-        var id = this.id;
-        if (this.id == 'map-type') {
-            $('#checkboxes').css('display', 'none');
-            $('#maps').css('display', 'block');
-            $('#map-type').css('display', 'none');
-            $('#list-type').css('display', 'block');
-        }
-        else {
-            $('#checkboxes').css('display', 'block');
-            $('#maps').css('display', 'none');
-            $('#map-type').css('display', 'block');
-            $('#list-type').css('display', 'none');
-        }
-    });
-
+   
     $("#customerTable").DataTable({
         ajax: {
             url: '/api/agency/agent/GetSubmitted',
@@ -133,7 +118,7 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += '<a id="details' + row.id + '" onclick="getdetails(`' + row.id + '`)" href="/Agent/SubmittedDetail?Id=' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Detail</a>&nbsp;'
+                    buttons += '<a id="details' + row.id + '" href="/Agent/SubmittedDetail?Id=' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Detail</a>&nbsp;';
                     return buttons;
                 }
             },
@@ -141,6 +126,18 @@
         ],
         error: function (xhr, status, error) { alert('err ' + error) }
     });
+
+    // Event delegation for 'Detail' button click
+    $(document).on('click', 'a[id^="details"]', function (e) {
+        e.preventDefault(); // Prevent default link behavior
+
+        var id = $(this).attr('id').replace('details', ''); // Get the ID from the button's ID
+        getdetails(id); // Call the function with the ID
+        window.location.href = $(this).attr('href'); // Navigate to the detail page
+    });
+
+    // Function to show loading state
+    
 
     $('#customerTable')
         .on('mouseenter', '.map-thumbnail', function () {
@@ -169,12 +166,9 @@
     });
     //initMap("/api/ClaimsVendor/GetReportMap");
 });
-
-
 function getdetails(id) {
     $("body").addClass("submit-progress-bg");
-    // Wrap in setTimeout so the UI
-    // can update the spinners
+    // Wrap in setTimeout so the UI can update the spinners
     setTimeout(function () {
         $(".submit-progress").removeClass("hidden");
     }, 1);
@@ -189,4 +183,12 @@ function getdetails(id) {
             nodes[i].disabled = true;
         }
     }
+}
+
+// Function to disable all interactive elements (buttons, inputs, etc.)
+function disableAllInteractiveElements() {
+    $('button, input[type="submit"], a').prop('disabled', true);
+    $('a').addClass('disabled-anchor').on('click', function (e) {
+        e.preventDefault(); // Prevent default action for anchor clicks
+    });
 }

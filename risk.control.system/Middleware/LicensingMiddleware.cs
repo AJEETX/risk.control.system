@@ -10,6 +10,7 @@ using risk.control.system.Services;
 using System.Collections.Generic;
 using System.Net;
 using System.Security.Claims;
+using System.Threading;
 
 namespace risk.control.system.Middleware
 {
@@ -32,6 +33,24 @@ namespace risk.control.system.Middleware
 
                 if (context.User.Identity.IsAuthenticated)
                 {
+                    var authTime = context.User.Claims.FirstOrDefault(c => c.Type == "auth_time")?.Value;
+                    if (authTime != null && DateTimeOffset.TryParse(authTime, out var authDateTime))
+                    {
+                        var now = DateTimeOffset.UtcNow;
+
+                        // Example: Timeout after 30 minutes of inactivity
+                        var timeoutDuration = TimeSpan.FromMinutes(double.Parse(context.Items["timeout"].ToString()));
+
+                        if (now - authDateTime > timeoutDuration)
+                        {
+                            // Logout the user if timeout exceeded
+                            await context.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+                            // Redirect to login page
+                            context.Response.Redirect("/Account/Login"); // Replace with your logout or login page
+                            return;
+                        }
+                    }
                     var user = context.User.Identity.Name;
                     var dbContext = context.RequestServices.GetRequiredService<ApplicationDbContext>();
                     var appUser = dbContext.ApplicationUser.FirstOrDefault(u => u.Email == user);

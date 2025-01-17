@@ -204,16 +204,31 @@
                 "mRender": function (data, type, row) {
                     var buttons = "";
                     if (row.isQueryCase) {
-                        buttons += '<a id="details' + row.id + '" onclick="showenquiry(`' + row.id + '`)" href="/SuperVisor/ReplyEnquiry?Id=' + row.id + '"  class="btn btn-xs btn-warning"><i class="fas fa-question" aria-hidden="true"></i> ENQUIRY </a>'
+                        buttons += '<a id="details' + row.id + '" href="/SuperVisor/ReplyEnquiry?Id=' + row.id + '"  class="btn btn-xs btn-warning"><i class="fas fa-question" aria-hidden="true"></i> ENQUIRY </a>'
                     }
                     else {
-                        buttons += '<a id="details' + row.id + '" onclick="showdetails(`' + row.id + '`)" href="/SuperVisor/CaseDetail?Id=' + row.id + '"  class="btn btn-xs btn-danger"><i class="fas fa-undo"></i> Decline</a>'
+                        buttons += '<a id="details' + row.id + '" href="/SuperVisor/CaseDetail?Id=' + row.id + '"  class="btn btn-xs btn-danger"><i class="fas fa-undo"></i> Decline</a>'
                     }
                     return buttons;
                 }
             },
             { "data":"timeElapsed","bVisible":false}
         ],
+        "drawCallback": function (settings, start, end, max, total, pre) {
+
+            $('#customerTable tbody').on('click', '.btn-danger', function (e) {
+                e.preventDefault(); // Prevent the default anchor behavior
+                var id = $(this).attr('id').replace('details', ''); // Extract the ID from the button's ID attribute
+                showdetails(id); // Call the getdetails function with the ID
+                window.location.href = $(this).attr('href'); // Navigate to the delete page
+            });
+            $('#customerTable tbody').on('click', '.btn-warning', function (e) {
+                e.preventDefault(); // Prevent the default anchor behavior
+                var id = $(this).attr('id').replace('details', ''); // Extract the ID from the button's ID attribute
+                showenquiry(id); // Call the getdetails function with the ID
+                window.location.href = $(this).attr('href'); // Navigate to the edit page
+            });
+        },
         "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
             if (aData.isNewAssigned) {
                 $('td', nRow).css('background-color', '#ffa');

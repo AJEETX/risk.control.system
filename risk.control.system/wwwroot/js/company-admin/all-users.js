@@ -74,7 +74,7 @@ $(document).ready(function () {
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += '<a id=edit' + row.id + ' onclick="showedit(' + row.id + ')"  href="/User/Edit?userId=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-user-minus"></i> Edit</a>&nbsp;'
+                    buttons += '<a id=edit' + row.id + ' href="/User/Edit?userId=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-user-minus"></i> Edit</a>&nbsp;'
                     //buttons += '<a onclick="showroles()" href="/UserRoles/Index?userId=' + row.id + '"  class="btn btn-xs btn-info"><i class="fas fa-user-plus"></i> Roles</a>'
                     return buttons;
                 }
@@ -88,6 +88,16 @@ $(document).ready(function () {
                 bVisible: false
             }
         ],
+        drawCallback: function () {
+            // Event delegation for .btn-danger elements
+            
+            $('#customerTable tbody').on('click', '.btn-warning', function (e) {
+                e.preventDefault(); // Prevent the default anchor behavior
+                var id = $(this).attr('id').replace('edit', ''); // Extract the ID from the button's ID attribute
+                showedit(id); // Call the getdetails function with the ID
+                window.location.href = $(this).attr('href'); // Navigate to the edit page
+            });
+        },
         error: function (xhr, status, error) { alert('err ' + error) }
     });
     table.on('draw', function () {
