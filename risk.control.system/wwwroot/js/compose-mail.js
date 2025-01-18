@@ -87,7 +87,7 @@ $(document).ready(function () {
     });
 
     var askConfirmation = true;
-    $('#send-email').submit(function (e) {
+    $('#email-form').submit(function (e) {
         if (askConfirmation) {
             e.preventDefault();
             $.confirm({

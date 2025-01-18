@@ -1913,3 +1913,6 @@ select#PinCodeId {
 .last-update-term {
     color: #8351f9;
 }
+.loader{
+    display:none;
+}
