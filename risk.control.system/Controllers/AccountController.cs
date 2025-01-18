@@ -17,8 +17,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.FeatureManagement;
 using Microsoft.FeatureManagement.Mvc;
 
-using NToastNotify;
-
 using NuGet.Packaging.Signing;
 
 using risk.control.system.AppConstant;

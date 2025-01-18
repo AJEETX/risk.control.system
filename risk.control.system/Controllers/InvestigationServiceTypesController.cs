@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
+
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
-using NToastNotify;
+
 
 using risk.control.system.Data;
 using risk.control.system.Models;
@@ -19,12 +21,12 @@ namespace risk.control.system.Controllers
     public class InvestigationServiceTypesController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private readonly IToastNotification toastNotification;
+        private readonly INotyfService notifyService;
 
-        public InvestigationServiceTypesController(ApplicationDbContext context, IToastNotification toastNotification)
+        public InvestigationServiceTypesController(ApplicationDbContext context, INotyfService notifyService)
         {
             _context = context;
-            this.toastNotification = toastNotification;
+            this.notifyService = notifyService;
         }
 
         // GET: InvestigationServiceTypes
@@ -46,7 +48,7 @@ namespace risk.control.system.Controllers
         {
             if (id < 1 || _context.InvestigationServiceType == null)
             {
-                toastNotification.AddErrorToastMessage("service type not found!");
+                notifyService.Error("service type not found!");
                 return NotFound();
             }
 
@@ -82,11 +84,11 @@ namespace risk.control.system.Controllers
                 investigationServiceType.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Add(investigationServiceType);
                 await _context.SaveChangesAsync();
-                toastNotification.AddSuccessToastMessage("service type created successfully!");
+                notifyService.Success("service type created successfully!");
                 return RedirectToAction(nameof(Index));
             }
             ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", investigationServiceType.LineOfBusinessId);
-            toastNotification.AddErrorToastMessage("Error to create service type!");
+            notifyService.Error("Error to create service type!");
             return View(investigationServiceType);
         }
 
@@ -96,14 +98,14 @@ namespace risk.control.system.Controllers
         {
             if (id < 1 || _context.InvestigationServiceType == null)
             {
-                toastNotification.AddErrorToastMessage("service type not found!");
+                notifyService.Error("service type not found!");
                 return NotFound();
             }
 
             var investigationServiceType = await _context.InvestigationServiceType.FindAsync(id);
             if (investigationServiceType == null)
             {
-                toastNotification.AddErrorToastMessage("service type not found!");
+                notifyService.Error("service type not found!");
                 return NotFound();
             }
             ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", investigationServiceType.LineOfBusinessId);
@@ -119,7 +121,7 @@ namespace risk.control.system.Controllers
         {
             if (id != investigationServiceType.InvestigationServiceTypeId)
             {
-                toastNotification.AddErrorToastMessage("service type not found!");
+                notifyService.Error("service type not found!");
                 return NotFound();
             }
 
@@ -144,11 +146,11 @@ namespace risk.control.system.Controllers
                         throw;
                     }
                 }
-                toastNotification.AddSuccessToastMessage("service type edited successfully!");
+                notifyService.Success("service type edited successfully!");
                 return RedirectToAction(nameof(Index));
             }
             ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", investigationServiceType.LineOfBusinessId);
-            toastNotification.AddErrorToastMessage("Error to edit service type!");
+            notifyService.Error("Error to edit service type!");
             return View(investigationServiceType);
         }
 
@@ -158,7 +160,7 @@ namespace risk.control.system.Controllers
         {
             if (id <= 0)
             {
-                toastNotification.AddErrorToastMessage("service type not found!");
+                notifyService.Error("service type not found!");
                 return NotFound();
             }
 
@@ -167,7 +169,7 @@ namespace risk.control.system.Controllers
                 .FirstOrDefaultAsync(m => m.InvestigationServiceTypeId == id);
             if (investigationServiceType == null)
             {
-                toastNotification.AddErrorToastMessage("service type not found!");
+                notifyService.Error("service type not found!");
                 return NotFound();
             }
 
@@ -181,7 +183,7 @@ namespace risk.control.system.Controllers
         {
             if (_context.InvestigationServiceType == null)
             {
-                toastNotification.AddErrorToastMessage("service type not found!");
+                notifyService.Error("service type not found!");
                 return Problem("Entity set 'ApplicationDbContext.InvestigationServiceType'  is null.");
             }
             var investigationServiceType = await _context.InvestigationServiceType.FindAsync(id);
@@ -194,7 +196,7 @@ namespace risk.control.system.Controllers
             }
 
             await _context.SaveChangesAsync();
-            toastNotification.AddSuccessToastMessage("service type deleted successfully!");
+            notifyService.Success("service type deleted successfully!");
             return RedirectToAction(nameof(Index));
         }
 

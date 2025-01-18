@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
-using NToastNotify;
+
 
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
@@ -31,8 +31,8 @@ namespace risk.control.system.Controllers
         private readonly IPasswordHasher<ClientCompanyApplicationUser> passwordHasher;
         private readonly INotyfService notifyService;
         private readonly RoleManager<ApplicationRole> roleManager;
+        private readonly INotyfService notyfService;
         private readonly IWebHostEnvironment webHostEnvironment;
-        private readonly IToastNotification toastNotification;
         private readonly ISmsService smsService;
         private readonly ApplicationDbContext _context;
 
@@ -40,8 +40,8 @@ namespace risk.control.system.Controllers
             IPasswordHasher<ClientCompanyApplicationUser> passwordHasher,
             INotyfService notifyService,
             RoleManager<ApplicationRole> roleManager,
+            INotyfService notyfService,
             IWebHostEnvironment webHostEnvironment,
-            IToastNotification toastNotification,
             ISmsService SmsService,
             ApplicationDbContext context)
         {
@@ -49,8 +49,8 @@ namespace risk.control.system.Controllers
             this.passwordHasher = passwordHasher;
             this.notifyService = notifyService;
             this.roleManager = roleManager;
+            this.notyfService = notyfService;
             this.webHostEnvironment = webHostEnvironment;
-            this.toastNotification = toastNotification;
             smsService = SmsService;
             this._context = context;
             UserList = new List<UsersViewModel>();

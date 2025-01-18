@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
-using NToastNotify;
+
 
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
@@ -32,7 +32,6 @@ namespace risk.control.system.Controllers
         private readonly UserManager<VendorApplicationUser> userManager;
         private readonly RoleManager<ApplicationRole> roleManager;
         private readonly INotyfService notifyService;
-        private readonly IToastNotification toastNotification;
         private readonly ICustomApiCLient customApiCLient;
         private readonly ISmsService smsService;
         private readonly IWebHostEnvironment webHostEnvironment;
@@ -42,7 +41,6 @@ namespace risk.control.system.Controllers
             UserManager<VendorApplicationUser> userManager,
             RoleManager<ApplicationRole> roleManager,
             INotyfService notifyService,
-            IToastNotification toastNotification,
             ICustomApiCLient customApiCLient,
             ISmsService SmsService,
             IWebHostEnvironment webHostEnvironment)
@@ -51,7 +49,6 @@ namespace risk.control.system.Controllers
             this.userManager = userManager;
             this.roleManager = roleManager;
             this.notifyService = notifyService;
-            this.toastNotification = toastNotification;
             this.customApiCLient = customApiCLient;
             smsService = SmsService;
             this.webHostEnvironment = webHostEnvironment;

@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
-using NToastNotify;
+
 
 using risk.control.system.Data;
 using risk.control.system.Models;
@@ -31,7 +31,6 @@ namespace risk.control.system.Controllers
         private readonly ISentMailService sentMailService;
         private readonly IInboxMailService inboxMailService;
         private readonly ITrashMailService trashMailService;
-        private readonly IToastNotification toastNotification;
 
         private readonly JsonSerializerOptions options = new()
         {
@@ -43,15 +42,13 @@ namespace risk.control.system.Controllers
             INotyfService notifyService,
             ISentMailService sentMailService,
             IInboxMailService inboxMailService,
-            ITrashMailService trashMailService,
-            IToastNotification toastNotification)
+            ITrashMailService trashMailService)
         {
             _context = context;
             this.notifyService = notifyService;
             this.sentMailService = sentMailService;
             this.inboxMailService = inboxMailService;
             this.trashMailService = trashMailService;
-            this.toastNotification = toastNotification;
         }
 
         public IActionResult Chat()
@@ -595,7 +592,7 @@ namespace risk.control.system.Controllers
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
-                    toastNotification.AddErrorToastMessage("OOPs !!!..Contact Admin");
+                    notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 contactMessage.Message = HttpUtility.HtmlEncode(contactMessage.RawMessage);
@@ -606,19 +603,19 @@ namespace risk.control.system.Controllers
 
                 if (mailSent)
                 {
-                    toastNotification.AddSuccessToastMessage("mail sent successfully!");
+                    notifyService.Success("mail sent successfully!");
                     return RedirectToAction(nameof(Inbox));
                 }
                 else
                 {
-                    toastNotification.AddErrorToastMessage("Error: recepient email incorrect!");
+                    notifyService.Error("Error: recepient email incorrect!");
                     return RedirectToAction(nameof(Create));
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.StackTrace);
-                toastNotification.AddErrorToastMessage("OOPs !!!..Contact Admin");
+                notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
 

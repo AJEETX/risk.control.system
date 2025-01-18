@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
+
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using NToastNotify;
+
 using risk.control.system.Data;
 using risk.control.system.Models;
 
@@ -16,12 +18,12 @@ namespace risk.control.system.Controllers
     public class InvestigationCaseStatusController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private readonly IToastNotification toastNotification;
+        private readonly INotyfService notifyService;
 
-        public InvestigationCaseStatusController(ApplicationDbContext context, IToastNotification toastNotification)
+        public InvestigationCaseStatusController(ApplicationDbContext context, INotyfService notifyService)
         {
             _context = context;
-            this.toastNotification = toastNotification;
+            this.notifyService = notifyService;
         }
 
         // GET: RiskCaseStatus
@@ -42,7 +44,7 @@ namespace risk.control.system.Controllers
         {
             if (id == null || _context.InvestigationCaseStatus == null)
             {
-                toastNotification.AddErrorToastMessage("status not found!");
+                notifyService.Error("status not found!");
                 return NotFound();
             }
 
@@ -50,7 +52,7 @@ namespace risk.control.system.Controllers
                 .FirstOrDefaultAsync(m => m.InvestigationCaseStatusId == id);
             if (investigationCaseStatus == null)
             {
-                toastNotification.AddErrorToastMessage("status not found!");
+                notifyService.Error("status not found!");
                 return NotFound();
             }
 
@@ -75,7 +77,7 @@ namespace risk.control.system.Controllers
             investigationCaseStatus.UpdatedBy = HttpContext.User?.Identity?.Name;
             _context.Add(investigationCaseStatus);
             await _context.SaveChangesAsync();
-            toastNotification.AddSuccessToastMessage("case status created successfully!");
+            notifyService.Success("case status created successfully!");
             return RedirectToAction(nameof(Index));
         }
 
@@ -85,14 +87,14 @@ namespace risk.control.system.Controllers
         {
             if (id == null || _context.InvestigationCaseStatus == null)
             {
-                toastNotification.AddErrorToastMessage("status not found!");
+                notifyService.Error("status not found!");
                 return NotFound();
             }
 
             var investigationCaseStatus = await _context.InvestigationCaseStatus.FindAsync(id);
             if (investigationCaseStatus == null)
             {
-                toastNotification.AddErrorToastMessage("status not found!");
+                notifyService.Error("status not found!");
                 return NotFound();
             }
             return View(investigationCaseStatus);
@@ -107,7 +109,7 @@ namespace risk.control.system.Controllers
         {
             if (id != investigationCaseStatus.InvestigationCaseStatusId)
             {
-                toastNotification.AddErrorToastMessage("status not found!");
+                notifyService.Error("status not found!");
                 return NotFound();
             }
 
@@ -131,10 +133,10 @@ namespace risk.control.system.Controllers
                         throw;
                     }
                 }
-                toastNotification.AddSuccessToastMessage("case status edited successfully!");
+                notifyService.Success("case status edited successfully!");
                 return RedirectToAction(nameof(Index));
             }
-            toastNotification.AddErrorToastMessage("Error to edit status!");
+            notifyService.Error("Error to edit status!");
             return View(investigationCaseStatus);
         }
 
@@ -144,7 +146,7 @@ namespace risk.control.system.Controllers
         {
             if (id == null || _context.InvestigationCaseStatus == null)
             {
-                toastNotification.AddErrorToastMessage("status not found!");
+                notifyService.Error("status not found!");
                 return NotFound();
             }
 
@@ -152,7 +154,7 @@ namespace risk.control.system.Controllers
                 .FirstOrDefaultAsync(m => m.InvestigationCaseStatusId == id);
             if (investigationCaseStatus == null)
             {
-                toastNotification.AddErrorToastMessage("status not found!");
+                notifyService.Error("status not found!");
                 return NotFound();
             }
 
@@ -166,7 +168,7 @@ namespace risk.control.system.Controllers
         {
             if (_context.InvestigationCaseStatus == null)
             {
-                toastNotification.AddErrorToastMessage("status not found!");
+                notifyService.Error("status not found!");
                 return Problem("Entity set 'ApplicationDbContext.RiskCaseStatus'  is null.");
             }
             var investigationCaseStatus = await _context.InvestigationCaseStatus.FindAsync(id);
@@ -178,7 +180,7 @@ namespace risk.control.system.Controllers
             }
 
             await _context.SaveChangesAsync();
-            toastNotification.AddSuccessToastMessage("case status deleted successfully!");
+            notifyService.Success("case status deleted successfully!");
             return RedirectToAction(nameof(Index));
         }
 

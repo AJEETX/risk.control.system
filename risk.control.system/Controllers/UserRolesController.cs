@@ -3,7 +3,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
-using NToastNotify;
+
 
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
@@ -21,20 +21,17 @@ namespace risk.control.system.Controllers
         private readonly INotyfService notifyService;
         private readonly RoleManager<ApplicationRole> roleManager;
         private readonly ISmsService smsService;
-        private readonly IToastNotification toastNotification;
 
         public UserRolesController(UserManager<ApplicationUser> userManager,
             INotyfService notifyService,
             RoleManager<ApplicationRole> roleManager,
             ISmsService smsService,
-            IToastNotification toastNotification,
             SignInManager<ApplicationUser> signInManager)
         {
             this.userManager = userManager;
             this.notifyService = notifyService;
             this.roleManager = roleManager;
             this.smsService = smsService;
-            this.toastNotification = toastNotification;
             this.signInManager = signInManager;
         }
 
@@ -45,7 +42,7 @@ namespace risk.control.system.Controllers
             var user = await userManager.FindByIdAsync(userId);
             if (user == null)
             {
-                toastNotification.AddErrorToastMessage("user not found!");
+                notifyService.Error("user not found!");
                 return NotFound();
             }
             //ViewBag.UserName = user.UserName;
@@ -94,7 +91,6 @@ namespace risk.control.system.Controllers
             await signInManager.RefreshSignInAsync(currentUser);
 
             notifyService.Custom($"User role(s) updated successfully.", 3, "orange", "fas fa-user-cog");
-            toastNotification.AddSuccessToastMessage("roles updated successfully!");
             return RedirectToAction(nameof(UserController.Index), "User");
         }
     }

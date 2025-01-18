@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
+
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-using NToastNotify;
+
 
 using risk.control.system.Data;
 using risk.control.system.Models;
@@ -18,12 +20,12 @@ namespace risk.control.system.Controllers
     public class CaseEnablerController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private readonly IToastNotification toastNotification;
+        private readonly INotyfService notifyService;
 
-        public CaseEnablerController(ApplicationDbContext context, IToastNotification toastNotification)
+        public CaseEnablerController(ApplicationDbContext context, INotyfService notifyService)
         {
             _context = context;
-            this.toastNotification = toastNotification;
+            this.notifyService = notifyService;
         }
 
         public IActionResult Index()
@@ -78,7 +80,7 @@ namespace risk.control.system.Controllers
                 caseEnabler.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Add(caseEnabler);
                 await _context.SaveChangesAsync();
-                toastNotification.AddSuccessToastMessage("case enabler created successfully!");
+                notifyService.Custom($"Case enabler created successfully!", 3, "green", "fas fa-puzzle-piece");
                 return RedirectToAction(nameof(Index));
             }
             return View(caseEnabler);
@@ -88,7 +90,7 @@ namespace risk.control.system.Controllers
         [Breadcrumb("Edit ", FromAction = "Profile")]
         public async Task<IActionResult> Edit(long id)
         {
-            if (id < 1  || _context.CaseEnabler == null)
+            if (id < 1 || _context.CaseEnabler == null)
             {
                 return NotFound();
             }
@@ -133,7 +135,7 @@ namespace risk.control.system.Controllers
                         throw;
                     }
                 }
-                toastNotification.AddSuccessToastMessage("case enabler edited successfully!");
+                notifyService.Custom($"Case enabler edited successfully!", 3, "orange", "fas fa-puzzle-piece");
                 return RedirectToAction(nameof(Index));
             }
             return View(caseEnabler);
@@ -176,7 +178,7 @@ namespace risk.control.system.Controllers
             }
 
             await _context.SaveChangesAsync();
-            toastNotification.AddSuccessToastMessage("case enabler deleted successfully!");
+            notifyService.Custom($"Case enabler deleted successfully!", 3, "orange", "fas fa-puzzle-piece");
             return RedirectToAction(nameof(Index));
         }
 

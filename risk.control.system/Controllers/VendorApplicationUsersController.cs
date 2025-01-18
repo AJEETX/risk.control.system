@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
-using NToastNotify;
+
 
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
@@ -32,7 +32,6 @@ namespace risk.control.system.Controllers
         private readonly INotyfService notifyService;
         private readonly ISmsService smsService;
         private readonly IWebHostEnvironment webHostEnvironment;
-        private readonly IToastNotification toastNotification;
 
         public VendorApplicationUsersController(ApplicationDbContext context,
             UserManager<VendorApplicationUser> userManager,
@@ -40,8 +39,7 @@ namespace risk.control.system.Controllers
             RoleManager<ApplicationRole> roleManager,
             INotyfService notifyService,
             ISmsService SmsService,
-            IWebHostEnvironment webHostEnvironment,
-            IToastNotification toastNotification)
+            IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
             this.userManager = userManager;
@@ -50,7 +48,6 @@ namespace risk.control.system.Controllers
             this.notifyService = notifyService;
             smsService = SmsService;
             this.webHostEnvironment = webHostEnvironment;
-            this.toastNotification = toastNotification;
         }
 
         // GET: VendorApplicationUsers
@@ -208,7 +205,7 @@ namespace risk.control.system.Controllers
                 }
                 else
                 {
-                    toastNotification.AddErrorToastMessage("Error to create user!");
+                    notifyService.Error("Error to create user!");
                     foreach (IdentityError error in result.Errors)
                         ModelState.AddModelError("", error.Description);
                 }
@@ -368,7 +365,7 @@ namespace risk.control.system.Controllers
             VendorApplicationUser user = await userManager.FindByIdAsync(userId);
             if (user == null)
             {
-                toastNotification.AddErrorToastMessage("user not found!");
+                notifyService.Error("user not found!");
                 return NotFound();
             }
             //ViewBag.UserName = user.UserName;
@@ -414,11 +411,7 @@ namespace risk.control.system.Controllers
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (currentUserEmail == null)
-                {
-                    notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
+                
                 if (string.IsNullOrWhiteSpace(userId))
                 {
                     notifyService.Error("OOPs !!!..User not found");

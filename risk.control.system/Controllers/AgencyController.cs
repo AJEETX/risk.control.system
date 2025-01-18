@@ -10,8 +10,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
-using NToastNotify;
-
 using Org.BouncyCastle.Utilities.Net;
 
 using risk.control.system.AppConstant;

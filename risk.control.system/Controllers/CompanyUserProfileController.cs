@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using NToastNotify;
+
 
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
@@ -34,7 +34,6 @@ namespace risk.control.system.Controllers
         private readonly RoleManager<ApplicationRole> roleManager;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly ISmsService smsService;
-        private readonly IToastNotification toastNotification;
 
         public CompanyUserProfileController(ApplicationDbContext context,
             UserManager<ClientCompanyApplicationUser> userManager,
@@ -44,8 +43,7 @@ namespace risk.control.system.Controllers
              IHttpContextAccessor httpContextAccessor,
             RoleManager<ApplicationRole> roleManager,
             IWebHostEnvironment webHostEnvironment,
-            ISmsService SmsService,
-            IToastNotification toastNotification)
+            ISmsService SmsService)
         {
             this._context = context;
             this.signInManager = signInManager;
@@ -56,7 +54,6 @@ namespace risk.control.system.Controllers
             this.roleManager = roleManager;
             this.webHostEnvironment = webHostEnvironment;
             smsService = SmsService;
-            this.toastNotification = toastNotification;
             UserList = new List<UsersViewModel>();
         }
 

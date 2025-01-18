@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using NToastNotify;
+
 using risk.control.system.Data;
 using risk.control.system.Models.ViewModel;
 

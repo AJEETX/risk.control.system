@@ -1,8 +1,11 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
+
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-using NToastNotify;
+
 
 using risk.control.system.Data;
 using risk.control.system.Models;
@@ -18,12 +21,12 @@ namespace risk.control.system.Controllers
     public class BeneficiaryRelationController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private readonly IToastNotification toastNotification;
+        private readonly INotyfService notifyService;
 
-        public BeneficiaryRelationController(ApplicationDbContext context, IToastNotification toastNotification)
+        public BeneficiaryRelationController(ApplicationDbContext context, INotyfService notifyService)
         {
             _context = context;
-            this.toastNotification = toastNotification;
+            this.notifyService = notifyService;
         }
 
         // GET: BeneficiaryRelation
@@ -79,7 +82,7 @@ namespace risk.control.system.Controllers
                 beneficiaryRelation.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Add(beneficiaryRelation);
                 await _context.SaveChangesAsync();
-                toastNotification.AddSuccessToastMessage("beneficiary relation created successfully!");
+                notifyService.Custom($"beneficiary relation created successfully!!", 3, "green", "fas fa-user-tie");
                 return RedirectToAction(nameof(Index));
             }
             return View(beneficiaryRelation);
@@ -134,7 +137,7 @@ namespace risk.control.system.Controllers
                         throw;
                     }
                 }
-                toastNotification.AddSuccessToastMessage("beneficiary relation edited successfully!");
+                notifyService.Custom($"beneficiary relation edited successfully!!", 3, "orange", "fas fa-user-tie");
                 return RedirectToAction(nameof(Index));
             }
             return View(beneficiaryRelation);
@@ -177,7 +180,7 @@ namespace risk.control.system.Controllers
             }
 
             await _context.SaveChangesAsync();
-            toastNotification.AddSuccessToastMessage("beneficiary relation deleted successfully!");
+                notifyService.Custom($"beneficiary relation deleted successfully!!", 3, "orange", "fas fa-user-tie");
             return RedirectToAction(nameof(Index));
         }
 

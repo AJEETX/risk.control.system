@@ -8,7 +8,7 @@ using risk.control.system.Models;
 using System.Text.RegularExpressions;
 using risk.control.system.Helpers;
 using risk.control.system.Services;
-using NToastNotify;
+
 using AspNetCoreHero.ToastNotification.Notyf;
 using AspNetCoreHero.ToastNotification.Abstractions;
 using Microsoft.AspNetCore.Authorization;
@@ -24,7 +24,6 @@ namespace risk.control.system.Controllers
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly INotyfService notifyService;
-        private readonly IToastNotification toastNotification;
         private readonly IClaimsService claimsService;
         private static HttpClient _httpClient = new();
         private Regex longLatRegex = new Regex("(?<lat>[-|+| ]\\d+.\\d+)\\s* \\/\\s*(?<lon>\\d+.\\d+)");
@@ -32,13 +31,11 @@ namespace risk.control.system.Controllers
         public ReportController(ApplicationDbContext context, 
             IWebHostEnvironment webHostEnvironment,
             INotyfService notifyService,
-            IToastNotification toastNotification,
             IClaimsService claimsService)
         {
             this._context = context;
             this.webHostEnvironment = webHostEnvironment;
             this.notifyService = notifyService;
-            this.toastNotification = toastNotification;
             this.claimsService = claimsService;
         }
 

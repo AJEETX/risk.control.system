@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
+
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
-using NToastNotify;
+
 
 using risk.control.system.Data;
 using risk.control.system.Models;
@@ -19,12 +21,12 @@ namespace risk.control.system.Controllers
     public class InvestigationCaseSubStatusController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private readonly IToastNotification toastNotification;
+        private readonly INotyfService notifyService;
 
-        public InvestigationCaseSubStatusController(ApplicationDbContext context, IToastNotification toastNotification)
+        public InvestigationCaseSubStatusController(ApplicationDbContext context, INotyfService notifyService)
         {
             _context = context;
-            this.toastNotification = toastNotification;
+            this.notifyService = notifyService;
         }
 
         // GET: InvestigationCaseSubStatus
@@ -76,10 +78,10 @@ namespace risk.control.system.Controllers
                 investigationCaseSubStatus.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Add(investigationCaseSubStatus);
                 await _context.SaveChangesAsync();
-                toastNotification.AddSuccessToastMessage("case sub-status created successfully!");
+                notifyService.Success("case sub-status created successfully!");
                 return RedirectToAction(nameof(Index));
             }
-            toastNotification.AddErrorToastMessage("case sub-status create failed!!");
+            notifyService.Error("case sub-status create failed!!");
             ViewData["InvestigationCaseStatusId"] = new SelectList(_context.InvestigationCaseStatus, "InvestigationCaseStatusId", "Name", investigationCaseSubStatus.InvestigationCaseStatusId);
             return View(investigationCaseSubStatus);
         }
@@ -134,7 +136,7 @@ namespace risk.control.system.Controllers
                         throw;
                     }
                 }
-                toastNotification.AddSuccessToastMessage("case sub-status edited successfully!");
+                notifyService.Success("case sub-status edited successfully!");
                 return RedirectToAction(nameof(Index));
             }
             ViewData["InvestigationCaseStatusId"] = new SelectList(_context.InvestigationCaseStatus, "InvestigationCaseStatusId", "Name", investigationCaseSubStatus.InvestigationCaseStatusId);
@@ -179,7 +181,7 @@ namespace risk.control.system.Controllers
             }
 
             await _context.SaveChangesAsync();
-            toastNotification.AddSuccessToastMessage("case sub-status deleted successfully!");
+            notifyService.Success("case sub-status deleted successfully!");
             return RedirectToAction(nameof(Index));
         }
 

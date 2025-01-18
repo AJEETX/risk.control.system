@@ -38,7 +38,7 @@ using Microsoft.FeatureManagement.FeatureFilters;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
-using NToastNotify;
+
 
 using risk.control.system.AppConstant;
 using risk.control.system.Controllers.Api.Claims;
@@ -164,13 +164,6 @@ AWSConfigs.LoggingConfig.LogResponses = ResponseLoggingOption.Always;
 // Add services to the container.
 builder.Services.AddControllersWithViews()
     .AddRazorRuntimeCompilation()
-    .AddNToastNotifyNoty(new NotyOptions
-    {
-        ProgressBar = true,
-        Timeout = 1000,
-        Modal = true,
-        Type = Enums.NotificationTypesNoty.Info
-    })
     .AddNewtonsoftJson(options =>
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
 );
@@ -338,7 +331,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.UseMiddleware<LicensingMiddleware>();
 
-app.UseNToastNotify();
 app.UseNotyf();
 app.UseFileServer();
 

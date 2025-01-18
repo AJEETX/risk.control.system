@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
+
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-using NToastNotify;
+
 
 using risk.control.system.Data;
 using risk.control.system.Models;
@@ -18,12 +20,12 @@ namespace risk.control.system.Controllers
     public class InvestigationCaseOutcomeController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private readonly IToastNotification toastNotification;
+        private readonly INotyfService notifyService;
 
-        public InvestigationCaseOutcomeController(ApplicationDbContext context, IToastNotification toastNotification)
+        public InvestigationCaseOutcomeController(ApplicationDbContext context, INotyfService notifyService)
         {
             _context = context;
-            this.toastNotification = toastNotification;
+            this.notifyService = notifyService;
         }
 
         // GET: InvestigationCaseOutcome
@@ -73,7 +75,7 @@ namespace risk.control.system.Controllers
                 investigationCaseOutcome.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Add(investigationCaseOutcome);
                 await _context.SaveChangesAsync();
-                toastNotification.AddSuccessToastMessage("case outcome created successfully!");
+                notifyService.Success("case outcome created successfully!");
                 return RedirectToAction(nameof(Index));
             }
             return View(investigationCaseOutcome);
@@ -128,7 +130,7 @@ namespace risk.control.system.Controllers
                         throw;
                     }
                 }
-                toastNotification.AddSuccessToastMessage("case outcome edited successfully!");
+                notifyService.Success("case outcome edited successfully!");
                 return RedirectToAction(nameof(Index));
             }
             return View(investigationCaseOutcome);
@@ -170,7 +172,7 @@ namespace risk.control.system.Controllers
                 _context.InvestigationCaseOutcome.Remove(investigationCaseOutcome);
             }
 
-            toastNotification.AddSuccessToastMessage("case outcome deleted successfully!");
+            notifyService.Success("case outcome deleted successfully!");
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }

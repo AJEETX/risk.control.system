@@ -3,7 +3,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
-using NToastNotify;
+
 
 using risk.control.system.AppConstant;
 using risk.control.system.Models;
@@ -22,20 +22,17 @@ namespace risk.control.system.Controllers
         private readonly INotyfService notifyService;
         private readonly RoleManager<ApplicationRole> roleManager;
         private readonly ISmsService smsService;
-        private readonly IToastNotification toastNotification;
 
         public CompanyUserRolesController(UserManager<ApplicationUser> userManager,
             INotyfService notifyService,
             RoleManager<ApplicationRole> roleManager,
             ISmsService SmsService,
-            IToastNotification toastNotification,
             SignInManager<ApplicationUser> signInManager)
         {
             this.userManager = userManager;
             this.notifyService = notifyService;
             this.roleManager = roleManager;
             smsService = SmsService;
-            this.toastNotification = toastNotification;
             this.signInManager = signInManager;
         }
 
@@ -46,7 +43,7 @@ namespace risk.control.system.Controllers
             ClientCompanyApplicationUser user = (ClientCompanyApplicationUser)await userManager.FindByIdAsync(userId);
             if (user == null)
             {
-                toastNotification.AddErrorToastMessage("user not found!");
+                notifyService.Error("user not found!");
                 return NotFound();
             }
             //ViewBag.UserName = user.UserName;

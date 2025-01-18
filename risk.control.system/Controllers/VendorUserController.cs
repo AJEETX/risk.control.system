@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
-using NToastNotify;
+
 
 using risk.control.system.Data;
 using risk.control.system.Models;
@@ -24,21 +24,18 @@ namespace risk.control.system.Controllers
         private readonly IPasswordHasher<VendorApplicationUser> passwordHasher;
         private readonly RoleManager<ApplicationRole> roleManager;
         private readonly IWebHostEnvironment webHostEnvironment;
-        private readonly IToastNotification toastNotification;
         private readonly ApplicationDbContext context;
 
         public VendorUserController(UserManager<VendorApplicationUser> userManager,
             IPasswordHasher<VendorApplicationUser> passwordHasher,
             RoleManager<ApplicationRole> roleManager,
             IWebHostEnvironment webHostEnvironment,
-            IToastNotification toastNotification,
             ApplicationDbContext context)
         {
             this.userManager = userManager;
             this.passwordHasher = passwordHasher;
             this.roleManager = roleManager;
             this.webHostEnvironment = webHostEnvironment;
-            this.toastNotification = toastNotification;
             this.context = context;
             UserList = new List<UsersViewModel>();
         }

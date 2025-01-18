@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
+
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-using NToastNotify;
+
 
 using risk.control.system.Data;
 using risk.control.system.Models;
@@ -18,12 +20,12 @@ namespace risk.control.system.Controllers
     public class LineOfBusinessController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private readonly IToastNotification toastNotification;
+        private readonly INotyfService notifyService;
 
-        public LineOfBusinessController(ApplicationDbContext context, IToastNotification toastNotification)
+        public LineOfBusinessController(ApplicationDbContext context, INotyfService notifyService)
         {
             _context = context;
-            this.toastNotification = toastNotification;
+            this.notifyService = notifyService;
         }
 
         // GET: RiskCaseTypes
@@ -46,7 +48,7 @@ namespace risk.control.system.Controllers
         {
             if (id < 1 || _context.LineOfBusiness == null)
             {
-                toastNotification.AddErrorToastMessage("line of business not found!");
+                notifyService.Error("line of business not found!");
                 return NotFound();
             }
 
@@ -54,7 +56,7 @@ namespace risk.control.system.Controllers
                 .FirstOrDefaultAsync(m => m.LineOfBusinessId == id);
             if (lineOfBusiness == null)
             {
-                toastNotification.AddErrorToastMessage("line of business not found!");
+                notifyService.Error("line of business not found!");
                 return NotFound();
             }
 
@@ -80,7 +82,7 @@ namespace risk.control.system.Controllers
 
             _context.Add(lineOfBusiness);
             await _context.SaveChangesAsync();
-            toastNotification.AddSuccessToastMessage("line of business created successfully!");
+            notifyService.Success("line of business created successfully!");
             return RedirectToAction(nameof(Index));
         }
 
@@ -90,14 +92,14 @@ namespace risk.control.system.Controllers
         {
             if (id == null || _context.LineOfBusiness == null)
             {
-                toastNotification.AddErrorToastMessage("line of business not found!");
+                notifyService.Error("line of business not found!");
                 return NotFound();
             }
 
             var lineOfBusiness = await _context.LineOfBusiness.FindAsync(id);
             if (lineOfBusiness == null)
             {
-                toastNotification.AddErrorToastMessage("line of business not found!");
+                notifyService.Error("line of business not found!");
                 return NotFound();
             }
             return View(lineOfBusiness);
@@ -112,7 +114,7 @@ namespace risk.control.system.Controllers
         {
             if (id != lineOfBusiness.LineOfBusinessId)
             {
-                toastNotification.AddErrorToastMessage("line of business not found!");
+                notifyService.Error("line of business not found!");
                 return NotFound();
             }
 
@@ -137,10 +139,10 @@ namespace risk.control.system.Controllers
                         throw;
                     }
                 }
-                toastNotification.AddSuccessToastMessage("line of business edited successfully!");
+                notifyService.Success("line of business edited successfully!");
                 return RedirectToAction(nameof(Index));
             }
-            toastNotification.AddErrorToastMessage("Error to edit line of business!");
+            notifyService.Error("Error to edit line of business!");
             return View(lineOfBusiness);
         }
 
@@ -150,7 +152,7 @@ namespace risk.control.system.Controllers
         {
             if (id == null || _context.LineOfBusiness == null)
             {
-                toastNotification.AddErrorToastMessage("line of business not found!");
+                notifyService.Error("line of business not found!");
                 return NotFound();
             }
 
@@ -158,7 +160,7 @@ namespace risk.control.system.Controllers
                 .FirstOrDefaultAsync(m => m.LineOfBusinessId == id);
             if (lineOfBusiness == null)
             {
-                toastNotification.AddErrorToastMessage("line of business not found!");
+                notifyService.Error("line of business not found!");
                 return NotFound();
             }
 
@@ -172,7 +174,7 @@ namespace risk.control.system.Controllers
         {
             if (_context.LineOfBusiness == null)
             {
-                toastNotification.AddErrorToastMessage("line of business not found!");
+                notifyService.Error("line of business not found!");
                 return Problem("Entity set 'ApplicationDbContext.RiskCaseType'  is null.");
             }
             var lineOfBusiness = await _context.LineOfBusiness.FindAsync(id);
@@ -185,7 +187,7 @@ namespace risk.control.system.Controllers
             }
 
             await _context.SaveChangesAsync();
-            toastNotification.AddSuccessToastMessage("line of business deleted successfully!");
+            notifyService.Success("line of business deleted successfully!");
             return RedirectToAction(nameof(Index));
         }
 
