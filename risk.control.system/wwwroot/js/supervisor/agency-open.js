@@ -18,7 +18,7 @@
                 className: 'max-width-column-name', // Apply the CSS class,
                 targets: 8                      // Index of the column to style
             }],
-        order: [[14, 'asc']],
+        order: [[14, 'desc']],
         fixedHeader: true,
         processing: true,
         paging: true,
@@ -143,7 +143,10 @@
                     return buttons;
                 }
             },
-            { "data": "timeElapsed", "bVisible": false }
+            {
+                "data": "timeElapsed",
+                "bVisible": false
+            }
         ],
         "drawCallback": function (settings, start, end, max, total, pre) {
 

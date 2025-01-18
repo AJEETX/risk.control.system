@@ -1,55 +1,4 @@
 ﻿@model ClaimTransactionModel
-@{
-    string address = string.Empty;
-    string baddress = string.Empty;
-    int currentAgeinYrs = 0;
-    int currentBAgeinYrs = 0;
-    bool customerExist = false;
-    bool beneficiaryExist = false;
-    if (Model.ClaimsInvestigation != null && Model.ClaimsInvestigation.CustomerDetail != null)
-    {
-        address = @Model.ClaimsInvestigation?.CustomerDetail.Addressline + " " + @Model.ClaimsInvestigation?.CustomerDetail.District.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.State.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.Country.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.PinCode.Code;
-        baddress = @Model.Location != null ? @Model.Location?.Addressline + " " +
-        @Model.Location?.District?.Name + " " + @Model.Location?.State?.Name + " " +
-        @Model.Location?.Country?.Name + " " + @Model.Location?.PinCode?.Code : string.Empty;
-        if (Model.ClaimsInvestigation?.CustomerDetail.DateOfBirth != null)
-        {
-            var age = DateTime.Now.Subtract(Model.ClaimsInvestigation.CustomerDetail.DateOfBirth.GetValueOrDefault()).TotalDays;
-            currentAgeinYrs = (int)age / 365;
-        }
-
-        if (Model.Location?.DateOfBirth != null)
-        {
-            var age = DateTime.Now.Subtract(Model.Location.DateOfBirth.GetValueOrDefault()).TotalDays;
-            currentBAgeinYrs = (int)age / 365;
-        }
-
-    }
-    if (!string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.PolicyDetail?.ContractNumber))
-    {
-        customerExist = true;
-    }
-    if (Model.Location?.BeneficiaryDetailId > 0)
-    {
-        beneficiaryExist = true;
-    }
-    if (@customerExist)
-    {
-    }
-    string benficiaryProgressColor = "lightgrey";
-    if (@customerExist && @beneficiaryExist)
-    {
-        benficiaryProgressColor = "green";
-    }
-    if (@customerExist && !@beneficiaryExist)
-    {
-        benficiaryProgressColor = "grey";
-    }
-    if (!@customerExist && !@beneficiaryExist)
-    {
-        benficiaryProgressColor = "lightgrey";
-    }
-}
 <article>
     <div class="bb-blog-inner">
         <div class="card card-light expanding-card">
@@ -102,10 +51,10 @@
                 <div class="row">
                     @{
                         var data = new ClaimsInvestigationVendorsModel
-                        {
-                         ClaimsInvestigation = Model.ClaimsInvestigation,
-                         Location = Model.Location
-                        };
+            {
+                ClaimsInvestigation = Model.ClaimsInvestigation,
+                Location = Model.Location
+            };
                     }
                     <partial name="_ClaimPolicyDetails" model="@data" />
                     @if (Model.ClaimsInvestigation.PolicyDetail.ClaimType == ClaimType.HEALTH)
@@ -149,7 +98,7 @@
                                 @{
                                     <partial name="_AgentSubmittedDigitalIdReport" model="@Model" />
                                     <partial name="_AgentSubmittedDocumentIdReport" model="@Model" />
-                                    if(Model.ClaimsInvestigation.EnablePassport)
+                                    if (Model.ClaimsInvestigation.EnablePassport)
                                     {
                                         <partial name="_AgentSubmittedPassportIdReport" model="@Model" />
                                     }
@@ -192,7 +141,7 @@
                                             </div>
                                             <div class="progress">
                                                 <i class="far fa-bookmark bookmark-green"></i>
-                                                <div class="progress-bar" role="progressbar" style="width:100%;background-color:green;">
+                                                <div class="progress-bar progress-bar-green" role="progressbar">
                                                     questionaaire
                                                 </div>
                                             </div>

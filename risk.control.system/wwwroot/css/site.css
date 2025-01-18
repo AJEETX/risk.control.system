@@ -410,6 +410,8 @@ a.table-link {
     height: 10rem;
     border: .1rem inset #ddd;
     background-color: whitesmoke;
+    font-size:.8em;
+    font-weight:lighter;
 }
 
 .disclaimer-body {
@@ -1858,4 +1860,56 @@ select#PinCodeId {
 .text-light-blue {
     color: blue !important;
     font-weight: bold;
+}
+
+/* Default styling for progress-bar */
+.progress-bar {
+    width: 100%; /* Keep the width here since it's not dynamic */
+    text-align: center;
+}
+
+.progress-bar-green {
+    background-color: green;
+    color: white;
+}
+
+.progress-bar-grey {
+    background-color: grey;
+}
+.progress-bar-red {
+    background-color: #dc3545 !important;
+}
+
+.progress-bar-lightgrey {
+    background-color: lightgrey;
+}
+
+
+
+.text-black {
+    color: black;
+}
+
+.text-lightgray {
+    color: lightgray;
+}
+
+.btn-btn-grey {
+    pointer-events: none;
+    color: grey;
+}
+.i-grey {
+    color: grey;
+}
+.i-orangered {
+    color: orangered;
+}
+.i-green {
+    color: green;
+}
+.terms-condition {
+    margin-top: 0.2em !important;
+}
+.last-update-term {
+    color: #8351f9;
 }

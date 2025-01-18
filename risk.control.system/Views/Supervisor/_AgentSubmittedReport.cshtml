@@ -1,28 +1,4 @@
 ﻿@model ClaimTransactionModel
-@{
-    string address = string.Empty;
-    string baddress = string.Empty;
-    int currentAgeinYrs = 0;
-    int currentBAgeinYrs = 0;
-    if (Model.ClaimsInvestigation != null && Model.ClaimsInvestigation.CustomerDetail != null)
-    {
-        address = @Model.ClaimsInvestigation?.CustomerDetail.Addressline + " " + @Model.ClaimsInvestigation?.CustomerDetail.District.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.State.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.Country.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.PinCode.Code;
-        baddress = @Model.Location != null ? @Model.Location?.Addressline + " " +
-        @Model.Location?.District?.Name + " " + @Model.Location?.State?.Name + " " +
-        @Model.Location?.Country?.Name + " " + @Model.Location?.PinCode?.Code : string.Empty;
-        if (Model.ClaimsInvestigation?.CustomerDetail.DateOfBirth != null)
-        {
-            var age = DateTime.Now.Subtract(Model.ClaimsInvestigation.CustomerDetail.DateOfBirth.GetValueOrDefault()).TotalDays;
-            currentAgeinYrs = (int)age / 365;
-        }
-
-        if (Model.Location?.DateOfBirth != null)
-        {
-            var age = DateTime.Now.Subtract(Model.Location.DateOfBirth.GetValueOrDefault()).TotalDays;
-            currentBAgeinYrs = (int)age / 365;
-        }
-    }
-}
 <article>
     <div class="bb-blog-inner">
         <div class="card card-light expanding-card">
@@ -167,7 +143,7 @@
                                             </div>
                                             <div class="progress">
                                                 <i class="far fa-bookmark bookmark-green"></i>
-                                                <div class="progress-bar" role="progressbar" style="width:100%;background-color:green;">
+                                                <div class="progress-bar progress-bar-green" role="progressbar">
                                                     questionaaire
                                                 </div>
                                             </div>

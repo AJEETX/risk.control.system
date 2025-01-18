@@ -33,23 +33,23 @@
     {
         beneficiaryExist = true;
     }
-    string customerProgressColor = "grey";
+    string customerProgressColor = "progress-bar-grey";
     if (@customerExist)
     {
-        customerProgressColor = "green";
+        customerProgressColor = "progress-bar-green";
     }
-    string benficiaryProgressColor = "lightgrey";
+    string benficiaryProgressColor = "progress-bar-lightgrey";
     if (@customerExist && @beneficiaryExist)
     {
-        benficiaryProgressColor = "green";
+        benficiaryProgressColor = "progress-bar-green";
     }
     if (@customerExist && !@beneficiaryExist)
     {
-        benficiaryProgressColor = "grey";
+        benficiaryProgressColor = "progress-bar-grey";
     }
     if (!@customerExist && !@beneficiaryExist)
     {
-        benficiaryProgressColor = "lightgrey";
+        benficiaryProgressColor = "progress-bar-lightgrey";
     }
 
     <article>
@@ -116,7 +116,7 @@
                                 </div>
                                 <div class="progress">
                                     <i class="far fa-bookmark bookmark-green"></i>
-                                    <div class="progress-bar" role="progressbar" style="width:100%;background-color:green;">
+                                    <div class="progress-bar progress-bar-green" role="progressbar">
                                         <i class="far fa-file-powerpoint"></i>
                                     </div>
                                 </div>
@@ -246,7 +246,7 @@
                                 </div>
                                 <div class="progress">
                                     <i class="far fa-bookmark bookmark-green"></i>
-                                    <div class="progress-bar" role="progressbar" style="width:100%;background-color:@customerProgressColor;">
+                                    <div class="progress-bar @customerProgressColor" role="progressbar">
                                         <i class="fa fa-user-plus"></i>
                                     </div>
                                 </div>
@@ -364,7 +364,7 @@
                                 </div>
                                 <div class="progress">
                                     <i class="far fa-bookmark bookmark-green"></i>
-                                    <div class="progress-bar" role="progressbar" style="width:100%;background-color:@benficiaryProgressColor;">
+                                    <div class="progress-bar @benficiaryProgressColor" role="progressbar">
                                         <i class="fas fa-user-tie"></i>
                                     </div>
                                 </div>

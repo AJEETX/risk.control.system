@@ -119,11 +119,11 @@
                                                 <label class="form-check-label" for="flexRadioDefault2">
                                                     @if (@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.Similarity <= 70)
                                                     {
-                                                        <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i>
+                                                        <i class='fa fa-times i-orangered' aria-hidden='true'></i>
                                                     }
                                                     else
                                                     {
-                                                        <i style='color:green;' class='fas fa-check-circle'></i>
+                                                        <i class='fas fa-check-circle i-green'></i>
                                                     }<span class="process-case"> </span>
                                                     <i class="fas fa-portrait"></i> <b> Photo Match </b>
                                                 </label>
@@ -136,11 +136,11 @@
                                                 <label class="form-check-label" for="flexRadioDefault1">
                                                     @if (@Model.ClaimsInvestigation.AgencyReport.PanIdReport?.DocumentIdImageValid != null && @Model.ClaimsInvestigation.AgencyReport.PanIdReport.DocumentIdImageValid.Value)
                                                     {
-                                                        <i style='color:green;' class='fas fa-check-circle'></i>
+                                                        <i class='fas fa-check-circle  i-green'></i>
                                                     }
                                                     else
                                                     {
-                                                        <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i>
+                                                        <i class='fa fa-times i-orangered' aria-hidden='true'></i>
                                                     } <span class="process-case"></span>
                                                     <i class="far fa-image"></i>  <b>  PAN Card Valid </b>
                                                 </label>
@@ -154,11 +154,11 @@
                                                     <label class="form-check-label" for="flexRadioDefault1">
                                                         @if (@Model.ClaimsInvestigation.AgencyReport.PassportIdReport?.DocumentIdImageValid != null && @Model.ClaimsInvestigation.AgencyReport.PassportIdReport.DocumentIdImageValid.Value)
                                                         {
-                                                            <i style='color:green;' class='fas fa-check-circle'></i>
+                                                            <i class='fas fa-check-circle  i-green'></i>
                                                         }
                                                         else
                                                         {
-                                                            <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i>
+                                                            <i class='fa fa-times i-orangered' aria-hidden='true'></i>
                                                         } <span class="process-case"></span>
                                                         <i class="far fa-image"></i>  <b>  Passport Valid </b>
                                                     </label>
@@ -174,11 +174,11 @@
                                                     <label class="form-check-label" for="flexRadioDefault1">
                                                         @if (@Model.ClaimsInvestigation.AgencyReport.AudioReport?.DocumentIdImageValid != null && @Model.ClaimsInvestigation.AgencyReport.AudioReport.DocumentIdImageValid.Value)
                                                         {
-                                                            <i style='color:green;' class='fas fa-check-circle'></i>
+                                                            <i class='fas fa-check-circle  i-green'></i>
                                                         }
                                                         else
                                                         {
-                                                            <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i>
+                                                            <i class='fa fa-times i-orangered' aria-hidden='true'></i>
                                                         } <span class="process-case"></span>
                                                         <i class="far fa-image"></i>  <b>  Audio Valid </b>
                                                     </label>
@@ -190,11 +190,11 @@
                                                     <label class="form-check-label" for="flexRadioDefault1">
                                                         @if (@Model.ClaimsInvestigation.AgencyReport.VideoReport?.DocumentIdImageValid != null && @Model.ClaimsInvestigation.AgencyReport.VideoReport.DocumentIdImageValid.Value)
                                                         {
-                                                            <i style='color:green;' class='fas fa-check-circle'></i>
+                                                            <i class='fas fa-check-circle  i-green'></i>
                                                         }
                                                         else
                                                         {
-                                                            <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i>
+                                                            <i class='fa fa-times i-orangered' aria-hidden='true'></i>
                                                         } <span class="process-case"></span>
                                                         <i class="far fa-image"></i>  <b>  Video Valid </b>
                                                     </label>
@@ -205,7 +205,7 @@
                                             <div class="form-check form-switch">
 
                                                 <label class="form-check-label" for="flexRadioDefault3">
-                                                    <i style='color:green;' class='fas fa-check-circle'></i> <span class="process-case"> </span>
+                                                    <i class='fas fa-check-circle  i-green'></i> <span class="process-case"> </span>
                                                     <i class="far fa-comment"></i>  <b> Questionaire info </b>
                                                 </label>
 
@@ -214,7 +214,7 @@
                                         <div class="form-group">
                                             <div class="form-check form-switch">
                                                 <label class="form-check-label" for="flexRadioDefault3">
-                                                    <i style='color:green;' class='fas fa-check-circle'></i> <span class="process-case"></span>
+                                                    <i class='fas fa-check-circle  i-green'></i> <span class="process-case"></span>
                                                     <i class="fas fa-comment"></i>  <b> Supervisor remarks </b>
                                                 </label>
                                             </div>
@@ -252,7 +252,7 @@
                                                     <div class="form-check form-switch">
                                                         <input class="form-check-input selected-case" type="radio" name="flexRadioDefault" id="flexRadioDefault1" checked>
                                                         <label class="form-check-label" for="flexRadioDefault1">
-                                                            <b>  REJECT </b> <span class="process-case"> System recommendation : <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i> </span>
+                                                            <b>  REJECT </b> <span class="process-case"> System recommendation : <i class='fa fa-times i-orangered' aria-hidden='true'></i> </span>
                                                         </label>
                                                     </div>
                                                 </div>
@@ -279,7 +279,7 @@
                                                     <div class="form-check form-switch">
                                                         <input class="form-check-input selected-case" type="radio" name="flexRadioDefault" id="flexRadioDefault3" checked>
                                                         <label class="form-check-label" for="flexRadioDefault3">
-                                                            <b> APPROVE </b> <span class="approve-case"> System recommendation : <i style='color:green;' class='fas fa-check-circle'></i> </span>
+                                                            <b> APPROVE </b> <span class="approve-case"> System recommendation : <i class='fas fa-check-circle i-green'></i> </span>
                                                         </label>
                                                     </div>
                                                 </div>
@@ -318,7 +318,7 @@
                                                     <div class="form-check form-switch">
                                                         <input class="form-check-input selected-case" type="radio" name="flexRadioDefault" id="flexRadioDefault1" checked>
                                                         <label class="form-check-label" for="flexRadioDefault1">
-                                                            <b>  REJECT </b> <span class="process-case"> System recommendation : <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i> </span>
+                                                            <b>  REJECT </b> <span class="process-case"> System recommendation : <i class='fa fa-times i-orangered' aria-hidden='true'></i> </span>
                                                         </label>
                                                     </div>
                                                 </div>
@@ -349,7 +349,7 @@
                                                     <div class="form-check form-switch">
                                                         <input class="form-check-input selected-case" type="radio" name="flexRadioDefault" id="flexRadioDefault3" checked>
                                                         <label class="form-check-label" for="flexRadioDefault3">
-                                                            <b> APPROVE </b> <span class="approve-case"> System recommendation : <i style='color:green;' class='fas fa-check-circle'></i> </span>
+                                                            <b> APPROVE </b> <span class="approve-case"> System recommendation : <i class='fas fa-check-circle i-green'></i> </span>
                                                         </label>
                                                     </div>
                                                 </div>

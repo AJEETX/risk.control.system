@@ -3,24 +3,6 @@
 @{
     ViewData["Title"] = "Details";
 
-    // Address variables
-    string address = string.Empty;
-    string baddress = string.Empty;
-
-    // Age variables
-    // Flags for existence checks
-    bool customerExist = Model.ClaimsInvestigation?.CustomerDetail != null;
-    bool beneficiaryExist = Model.Location?.BeneficiaryDetailId > 0;
-
-    // Progress bar messages and colors
-    string customerProgressbarMessage = customerExist ? "customer" : "add customer";
-    string beneficiaryProgressbarMessage = beneficiaryExist ? "edit beneficiary" : "beneficiary";
-
-    string customerProgressColor = customerExist ? "steps" : "steps2";
-    string customerLineColor = customerExist ? "line1" : (Model.ClaimsInvestigation?.PolicyDetail != null ? "line0" : "line");
-
-    string beneficiaryProgressColor = (customerExist && beneficiaryExist) ? "steps" : (customerExist ? "steps2" : "steps3");
-    string beneficiaryLineColor = (customerExist && beneficiaryExist) ? "line1" : (customerExist ? "line0" : "line");
 }
 
 <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
@@ -39,7 +21,7 @@
         <!-- Progress Bar -->
         <div class="progress">
             <i class="far fa-bookmark bookmark-green"></i>
-            <div class="progress-bar" role="progressbar" style="width:100%;background-color:green;">
+            <div class="progress-bar progress-bar-green" role="progressbar">
                 <i class="far fa-file-powerpoint"></i>
             </div>
         </div>

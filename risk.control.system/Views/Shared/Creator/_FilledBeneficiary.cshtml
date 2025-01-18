@@ -1,41 +1,22 @@
 ﻿@model ClaimTransactionModel
 
 @{
-    // Initialize variables
-    string beneficiaryAddress = string.Empty;
-    int beneficiaryAgeInYears = 0;
-
     // Progress and existence flags
     bool customerExists = Model.ClaimsInvestigation?.CustomerDetail != null;
     bool beneficiaryExists = Model.Location?.BeneficiaryDetailId > 0;
 
     // Default progress bar colors
-    string customerLineColor = Model.ClaimsInvestigation?.PolicyDetail != null ? "line0" : "line";
-    string beneficiaryProgressColor = "steps3";
-    string beneficiaryLineColor = "line";
+    string beneficiaryProgressColor = "progress-bar-lightgrey";
 
     // Update progress bar colors based on conditions
     if (customerExists)
     {
-        customerLineColor = "line1";
-        beneficiaryProgressColor = beneficiaryExists ? "green" : "grey";
-        beneficiaryLineColor = beneficiaryExists ? "line1" : "line0";
+        beneficiaryProgressColor = beneficiaryExists ? "progress-bar-green" : "progress-bar-grey";
     }
-    else
-    {
-        beneficiaryProgressColor = "lightgrey";
-    }
+    
+    var beneficiaryAddress = $"{Model.Location.Addressline} {Model.Location.District?.Name} {Model.Location.State?.Name} {Model.Location.Country?.Name} {Model.Location.PinCode?.Code}";
+    var beneficiaryAgeInYears = (int)(DateTime.Now.Subtract(Model.Location.DateOfBirth.GetValueOrDefault()).TotalDays / 365);
 
-    // Calculate beneficiary address and age
-    if (Model.Location != null)
-    {
-        beneficiaryAddress = $"{Model.Location.Addressline} {Model.Location.District?.Name} {Model.Location.State?.Name} {Model.Location.Country?.Name} {Model.Location.PinCode?.Code}";
-
-        if (Model.Location.DateOfBirth != null)
-        {
-            beneficiaryAgeInYears = (int)(DateTime.Now.Subtract(Model.Location.DateOfBirth.GetValueOrDefault()).TotalDays / 365);
-        }
-    }
 }
 
 <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
@@ -54,7 +35,7 @@
         <!-- Progress Bar -->
         <div class="progress">
             <i class="far fa-bookmark bookmark-green"></i>
-            <div class="progress-bar" role="progressbar" style="width:100%;background-color:@beneficiaryProgressColor">
+            <div class="progress-bar @beneficiaryProgressColor" role="progressbar">
                 <i class="fas fa-user-tie"></i>
             </div>
         </div>

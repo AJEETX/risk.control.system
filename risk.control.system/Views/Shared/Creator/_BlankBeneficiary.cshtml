@@ -1,23 +1,14 @@
 ﻿@model ClaimTransactionModel
 
 @{
-    bool policyExist = Model.ClaimsInvestigation?.PolicyDetail != null;
+    string beneficiaryProgressClass = "progress-bar-lightgrey"; // Default class
+
     bool customerExist = Model.ClaimsInvestigation?.CustomerDetail != null;
     bool beneficiaryExist = Model.Location?.BeneficiaryDetailId > 0;
 
-    string customerProgressbarMessage = customerExist ? "customer" : "add customer";
-    string beneficiaryProgressbarMessage = beneficiaryExist ? "edit beneficiary" : "beneficiary";
-
-    string customerProgressColor = customerExist ? "green" : "steps2";
-    string customerLineColor = policyExist ? "line0" : "line";
-    customerLineColor = customerExist ? "line1" : customerLineColor;
-
-    string beneficiaryProgressColor = "lightgrey";
-    string beneficiaryLineColor = "line";
     if (customerExist)
     {
-        beneficiaryProgressColor = beneficiaryExist ? "green" : "grey";
-        beneficiaryLineColor = beneficiaryExist ? "line1" : "line0";
+        beneficiaryProgressClass = beneficiaryExist ? "progress-bar-green" : "progress-bar-grey";
     }
 }
 
@@ -32,16 +23,17 @@
                 </span>
             </span>
         </div>
+
         <div class="progress">
             <i class="far fa-bookmark bookmark-green"></i>
-            <div class="progress-bar" role="progressbar" style="width:100%;background-color:@beneficiaryProgressColor">
+            <div class="progress-bar @beneficiaryProgressClass" role="progressbar">
                 <i class="fas fa-user-tie"></i>
             </div>
         </div>
         <div class="card-body">
             <div class="row">
                 <div class="col-7">
-                    <h2 class="lead" style="color:@(beneficiaryExist ? "black" : "lightgray")">
+                    <h2 class="lead @(customerExist ? "text-black" : "text-lightgray")">
                         <b>@(Model.Location?.Name ?? "Beneficiary Name")</b>
                     </h2>
                     <p class="text-muted text-sm">
@@ -86,7 +78,7 @@
                 }
                 else
                 {
-                    <a class="btn btn-outline-secondary" style="pointer-events:none; color:grey;">
+                    <a class="btn btn-outline-secondary btn-btn-grey">
                         <i class="fas fa-user-tie"></i> Beneficiary
                     </a>
                 }

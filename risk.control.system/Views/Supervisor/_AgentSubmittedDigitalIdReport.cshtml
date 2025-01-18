@@ -4,24 +4,24 @@
     if (@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImageData != null && @Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.DigitalIdImageLongLatTime != null)
     {
 
-        string digitalIdColor = "grey";
+        string digitalIdColor = "progress-bar-grey";
         var borderColor = "";
         if (Model.ClaimsInvestigation.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime == null)
         {
-            digitalIdColor = "grey";
+            digitalIdColor = "progress-bar-grey";
             borderColor = "";
         }
         else if (Model.ClaimsInvestigation.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime != null &&
-@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.Similarity < 70)
+        @Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.Similarity < 70)
         {
-            digitalIdColor = "#dc3545!important";
+            digitalIdColor = "progress-bar-red";
             borderColor = "border-danger";
         }
         else if (Model.ClaimsInvestigation.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime != null &&
-@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.Similarity >= 70)
+        @Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.Similarity >= 70)
         {
             borderColor = "border-success";
-            digitalIdColor = "green";
+            digitalIdColor = "progress-bar-green";
         }
 
         <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
@@ -39,20 +39,20 @@
                                     <button class='badge badge-info btn-xs'>
                                         <span class='badge badge-info btn-xs'>
                                             <i class='fa fa-upload'></i>
-                                        </span> Upload <i style='color:grey;' class='fa fa-times' aria-hidden='true'></i>
+                                        </span> Upload <i class='fa fa-times i-grey' aria-hidden='true'></i>
                                     </button> Photo ID
                                 </span>
                             }
                             else if (borderColor == "border-danger")
                             {
                                 <span class="tooltip-text" id="beneficiary-information">
-                                    <i class='far fa-thumbs-down'></i> Verify <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i> UnMatched Photo ID
+                                    <i class='far fa-thumbs-down'></i> Verify <i class='fa fa-times i-orangered' aria-hidden='true'></i> UnMatched Photo ID
                                 </span>
                             }
                             else if (borderColor == "border-success")
                             {
                                 <span class="tooltip-text" id="beneficiary-information">
-                                    <i class='far fa-thumbs-up'></i> Verify  <i style='color:green;' class='fas fa-check-circle'></i> Matched Photo ID
+                                    <i class='far fa-thumbs-up'></i> Verify  <i class='fas fa-check-circle i-green'></i> Matched Photo ID
                                 </span>
                             }
                         </span>
@@ -71,16 +71,16 @@
                     <span class="badge badge-light"><i class="fas fa-portrait"></i> Match :  </span>
                     @if (@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.Similarity < 70 && Model.ClaimsInvestigation.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime != null)
                     {
-                        <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i>
+                        <i class='fa fa-times i-orangered' aria-hidden='true'></i>
                     }
                     else
                     {
-                        <i style='color:green;' class='fas fa-check-circle'></i>
+                        <i class='fas fa-check-circle i-green'></i>
                     }
                 </div>
                 <div class="progress">
                     <i class="far fa-bookmark bookmark-green"></i>
-                    <div class="progress-bar" role="progressbar" style="width:100%;background-color:@digitalIdColor;">
+                    <div class="progress-bar @digitalIdColor" role="progressbar">
                         photo-id
                     </div>
                 </div>
@@ -144,11 +144,11 @@
                         <span class="badge badge-light"> Match :  </span>
                         @if (@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.Similarity < 70 && Model.ClaimsInvestigation.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime != null)
                         {
-                            <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i>
+                            <i class='fa fa-times i-orangered' aria-hidden='true'></i>
                         }
                         else
                         {
-                            <i style='color:green;' class='fas fa-check-circle'></i>
+                            <i class='fas fa-check-circle i-green'></i>
                         }
                     </p>
                 </div>

@@ -3,10 +3,10 @@
 @{
     var questionTime = @Model.AgencyReport.AgentRemarksUpdated != null ? @Model.AgencyReport.AgentRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt") : null;
 
-    string questionaire = "grey";
+    string questionaire = "progress-bar-grey";
     if (Model.AgencyReport.AgentRemarks != null)
     {
-        questionaire = "green";
+        questionaire = "progress-bar-green";
     }
     <div class="col-12 col-sm-4 d-flex align-items-stretch flex-column">
         <div id="questionaire-border" class="card bg-light d-flex flex-fill">
@@ -35,7 +35,7 @@
             </div>
             <div class="progress">
                 <i class="far fa-bookmark bookmark-green"></i>
-                <div id="questionaire" class="progress-bar" role="progressbar" style="width:100%;background-color:@questionaire;">
+                <div id="questionaire" class="progress-bar @questionaire" role="progressbar">
                     questionaire
                 </div>
             </div>

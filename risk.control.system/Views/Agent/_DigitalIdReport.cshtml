@@ -2,22 +2,22 @@
 
 @{
     var imageCapturedTime = @Model.AgencyReport?.DigitalIdReport?.DigitalIdImageLongLatTime != null ? @Model.AgencyReport?.DigitalIdReport?.DigitalIdImageLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt") : null;
-    string digitalIdColor = "grey";
+    string digitalIdColor = "progress-bar-grey";
     var borderColor = "";
     if (Model.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime == null)
     {
-        digitalIdColor = "grey";
+        digitalIdColor = "progress-bar-grey";
         borderColor = "";
     }
     else if (Model.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime != null && @Model.AgencyReport?.DigitalIdReport?.Similarity < 70 )
     {
-        digitalIdColor = "#dc3545!important";
+        digitalIdColor = "progress-bar-red";
         borderColor = "border-danger";
     }
     else if (Model.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime != null && @Model.AgencyReport?.DigitalIdReport?.Similarity >= 70)
     {
         borderColor = "border-success";
-        digitalIdColor = "green";
+        digitalIdColor = "progress-bar-green";
     }
 
 
@@ -56,7 +56,7 @@
                                     <b> Upload</b> Max image size 2 MB
                                 </div>
                                 <div>
-                                    <i class='far fa-thumbs-down'></i> <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i> UnMatched Photo ID
+                                    <i class='far fa-thumbs-down'></i> <i class='fa fa-times i-orangered' aria-hidden='true'></i> UnMatched Photo ID
                                 </div>
                             </div>
                         }
@@ -68,7 +68,7 @@
                                     <b> Upload</b> Max image size 2 MB
                                 </div>
                                 <div>
-                                <i class='far fa-thumbs-up'></i> <i style='color:green;' class='fas fa-check-circle'></i> Matched Photo ID
+                                    <i class='far fa-thumbs-up'></i> <i class='fas fa-check-circlei-green'></i> Matched Photo ID
                             </div>
                             </div>
                         }
@@ -88,21 +88,21 @@
                 <span class="badge badge-light"><i class="fas fa-portrait"></i> Match :  </span>
                 @if (@Model.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime == null)
                 {
-                    <i style='color:grey;' class='fa fa-times' aria-hidden='true'></i>
+                    <i class='fa fa-times i-grey' aria-hidden='true'></i>
                 }
                 else if (@Model.AgencyReport?.DigitalIdReport?.Similarity < 70 && @Model.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime != null)
                 {
-                    <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i>
+                    <i class='fa fa-times i-orangered' aria-hidden='true'></i>
                 }
 
                 else
                 {
-                    <i style='color:green;' class='fas fa-check-circle'></i>
+                    <i class='fas fa-check-circle i-green'></i>
                 }
             </div>
             <div class="progress">
                 <i class="far fa-bookmark bookmark-green"></i>
-                <div class="progress-bar" role="progressbar" style="width:100%;background-color:@digitalIdColor;">
+                <div class="progress-bar @digitalIdColor" role="progressbar">
                     photo-id
                 </div>
             </div>
@@ -167,16 +167,16 @@
                     <span class="badge badge-light"><i class="fas fa-portrait"></i> Match :  </span>
                     @if (@Model.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime == null)
                     {
-                        <i style='color:grey;' class='fa fa-times' aria-hidden='true'></i>
+                        <i class='fa fa-times i-grey' aria-hidden='true'></i>
                     }
                     else if (@Model.AgencyReport?.DigitalIdReport?.Similarity < 70 && @Model.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime != null)
                     {
-                        <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i>
+                        <i class='fa fa-times i-orangered' aria-hidden='true'></i>
                     }
 
                     else
                     {
-                        <i style='color:green;' class='fas fa-check-circle'></i>
+                        <i class='fas fa-check-circle i-green'></i>
                     }
                 </p>
             </div>

@@ -139,12 +139,6 @@
                 }
             },
             {
-                "data": "location",
-                "mRender": function (data, type, row) {
-                    return '<span title="' + row.status + '" data-toggle="tooltip">' + data + '</span>'
-                }
-            },
-            {
                 "data": "created",
                 "mRender": function (data, type, row) {
                     return '<span title="' + row.created + '" data-toggle="tooltip">' + data + '</span>'
