@@ -1183,7 +1183,8 @@ namespace risk.control.system.Controllers
                 var vendorInvestigationServiceType = await _context.VendorInvestigationServiceType.FindAsync(id);
                 if (vendorInvestigationServiceType == null)
                 {
-                    return NotFound();
+                    notifyService.Custom($"Error to edit service.", 3, "red", "fas fa-truck");
+                    return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var services = _context.VendorInvestigationServiceType
                     .Include(v => v.Country)
@@ -1196,17 +1197,48 @@ namespace risk.control.system.Controllers
                     .Include(i => i.LineOfBusiness)
                     .Where(i => i.LineOfBusiness.LineOfBusinessId == vendorInvestigationServiceType.LineOfBusinessId),
                     "InvestigationServiceTypeId", "Name", vendorInvestigationServiceType.InvestigationServiceTypeId);
-
-                ViewBag.PinCodeId = _context.PinCode.Include(p => p.District).Where(p => p.District.DistrictId == vendorInvestigationServiceType.DistrictId)
+                if (vendorInvestigationServiceType.DistrictId == null)
+                {
+                    var pinCodes = new List<PinCode> { new PinCode { Name = ALL_PINCODE, Code = ALL_PINCODE_CODE } };
+                    services.PincodeServices = pinCodes.Select(p =>
+                        new ServicedPinCode
+                        {
+                            Name = p.Name,
+                            Pincode = p.Code,
+                            VendorInvestigationServiceTypeId = vendorInvestigationServiceType.VendorInvestigationServiceTypeId
+                        }).ToList();
+                    ViewBag.PinCodeId = pinCodes
+                    .Select(x => new SelectListItem
+                    {
+                        Text = x.Name,
+                        Value = x.Code
+                    }).ToList();
+                }
+                else
+                {
+                    ViewBag.PinCodeId = _context.PinCode.Where(p => p.District.DistrictId == vendorInvestigationServiceType.DistrictId)
                     .Select(x => new SelectListItem
                     {
                         Text = x.Name + " - " + x.Code,
                         Value = x.PinCodeId.ToString()
                     }).ToList();
+                }
 
-                var selected = services.PincodeServices.Select(s => s.Pincode).ToList();
-                services.SelectedMultiPincodeId = _context.PinCode.Where(p => selected.Contains(p.Code)).Select(p => p.PinCodeId).ToList();
 
+                var selectedPincodeWithArea = services.PincodeServices;
+                var vendorServiceTypes = new List<long>();
+
+                foreach (var service in selectedPincodeWithArea)
+                {
+                    var pincodeServices = _context.PinCode.Where(p => p.Code == service.Pincode && p.Name == service.Name).Select(p => p.PinCodeId)?.ToList();
+                    vendorServiceTypes.AddRange(pincodeServices);
+                }
+
+                services.SelectedMultiPincodeId = vendorServiceTypes;
+                if (services.DistrictId == null)
+                {
+                    services.SelectedDistrictId = -1;
+                }
                 return View(services);
             }
             catch (Exception ex)

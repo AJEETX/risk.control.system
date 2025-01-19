@@ -1,5 +1,6 @@
 ﻿@model risk.control.system.Models.VendorInvestigationServiceType
-
+<input type="hidden" id="CountryId" asp-for="CountryId" />
+<input asp-for="SelectedCountryId" type="hidden" id="SelectedCountryId" name="SelectedCountryId" value="@Model?.CountryId" />
 <div class="row">
     <div class="col-md-6">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -41,29 +42,15 @@
             </div>
         </div>
         <div class="form-group">
-            <span class="input-group-label" for="CountryId"> Country:</span>
-            <div class="input-group mb-3">
+            <span class="input-group-label" for="StateId"> State:</span>
+            <div class="input-group mb-3 autocomplete-wrapper">
                 <div class="input-group-prepend">
                     @{
                         var imgPath = "/flags/" + @Model.Country.Code.ToLower() + ".png";
                     }
-                    <span class="input-group-text" data-toggle="tooltip" title="Registered Country :+@Model?.Country.Name">
-                        <img src="@imgPath" class="flag-icon" data-toggle="tooltip" title="@Model.Country.Name" />  @Model?.Country.Code
+                    <span class="input-group-text" data-toggle="tooltip" title="Registered Country : @Model?.Country.Name">
+                        <img src="@imgPath" class="flag-icon" data-toggle="tooltip" />  @Model?.Country.Code
                     </span>
-                </div>
-                <input readonly type="text" id="CountryId" class="form-control" data-placeholder="country" asp-for="CountryId" data-toggle="tooltip" title="Registered Country" value="" tabindex="-1" />
-                <span asp-validation-for="CountryId" class="text-danger"></span>
-                <input asp-for="SelectedCountryId" type="hidden" id="SelectedCountryId" name="SelectedCountryId" value="@Model?.CountryId" />
-                <div id="country-loading" class="loading-spinner">
-                    <i class="fas fa-spinner fa-spin"></i>
-                </div>
-            </div>
-        </div>
-        <div class="form-group">
-            <span class="input-group-label" for="StateId"> State:</span>
-            <div class="input-group mb-3 autocomplete-wrapper">
-                <div class="input-group-prepend">
-                    <span class="input-group-text" for="StateId"><i class="fas fa-map-marker-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                 </div>
                 <input type="text" id="StateId" class="form-control remarks auto-dropdown" data-placeholder="state" placeholder="Type state..." asp-for="StateId" required />
                 <span asp-validation-for="StateId" class="text-danger"></span>

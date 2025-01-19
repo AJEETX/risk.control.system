@@ -3,11 +3,10 @@
 @{
     ViewData["Title"] = @Applicationsettings.EDIT;
 }
-
 <section class="content">
     <form id="edit-form" asp-action="EditService" enctype="multipart/form-data">
         <input type="hidden" asp-for="VendorInvestigationServiceTypeId" />
-        <input id="VendorId" type="hidden" asp-for="VendorId" value="@Model.Vendor.VendorId" />
+        <input id="vendorId" type="hidden" asp-for="VendorId" value="@Model.Vendor.VendorId" />
 
         <div class="card bg-light card-secondary">
             <div class="card-header">
