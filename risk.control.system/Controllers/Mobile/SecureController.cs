@@ -226,9 +226,9 @@ namespace risk.control.system.Controllers.Mobile
                 Email = username,
                 Role = $"{AGENT.DISPLAY_NAME}"
             };
-            var message = tokenService.GenerateJwtToken(model);
+            var token = tokenService.GenerateJwtToken(model);
             await Task.Delay(10);
-            return Ok(new { message });
+            return Ok(new { token });
         }
 
         // This endpoint requires JWT authentication.

@@ -199,7 +199,7 @@ builder.Services.Configure<CookiePolicyOptions>(options =>
 {
     // This lambda determines whether user consent for non-essential cookies is needed for a given request.
     options.CheckConsentNeeded = context => false;
-    options.MinimumSameSitePolicy = SameSiteMode.None;
+    options.MinimumSameSitePolicy = SameSiteMode.Strict;
 });
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
 {
@@ -226,11 +226,22 @@ builder.Services.Configure<IdentityOptions>(options =>
 builder.Services.ConfigureApplicationCookie(options =>
 {
     //options.EventsType = typeof(CustomCookieAuthenticationEvents);
-    options.LoginPath = "/Account/Login";
-    options.LogoutPath = "/Account/Logout";
-    options.AccessDeniedPath = "/Account/Logout";
-    options.SlidingExpiration = true;
-    options.ExpireTimeSpan = TimeSpan.FromSeconds(double.Parse(builder.Configuration["SESSION_TIMEOUT_SEC"]));
+    // General cookie settings
+    options.Cookie.HttpOnly = true; // Ensures the cookie cannot be accessed via JavaScript (enhances security).
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Ensures the cookie is sent only over HTTPS.
+    options.Cookie.SameSite = SameSiteMode.Strict; // Prevents the cookie from being sent in cross-site requests (CSRF protection).
+    options.Cookie.Name = "iCheckify"; // Custom name for the authentication cookie.
+    options.Cookie.Path = "/"; // Specifies the cookie path.
+    options.Cookie.IsEssential = true; // Ensures the cookie is marked as essential, bypassing consent if required.
+
+    // Authentication-specific settings
+    options.LoginPath = "/Account/Login"; // Redirect to this path if the user is not authenticated.
+    options.LogoutPath = "/Account/Logout"; // Redirect to this path after logout.
+    options.AccessDeniedPath = "/Account/Logout"; // Redirect here if the user lacks the required permissions.
+
+    // Expiration settings
+    options.SlidingExpiration = true; // Renews the cookie expiration time on every valid request.
+    options.ExpireTimeSpan = TimeSpan.FromSeconds(double.Parse(builder.Configuration["SESSION_TIMEOUT_SEC"])); // Sets the lifetime of the cookie.
 }).AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie()
     .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>

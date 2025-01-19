@@ -1795,7 +1795,7 @@ input.auto-dropdown {
 }
 
 select#PinCodeId {
-    min-height: 430px;
+    min-height: 350px;
     height: 100%;
 }
 
@@ -1915,4 +1915,15 @@ select#PinCodeId {
 }
 .loader{
     display:none;
+}
+.online-icon-default {
+    color: #DED5D5; /* Default color for the icon */
+}
+
+.online-status-green {
+    color: green;
+}
+
+.online-status-orange {
+    color: orange;
 }

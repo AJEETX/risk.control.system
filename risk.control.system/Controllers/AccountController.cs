@@ -204,7 +204,6 @@ namespace risk.control.system.Controllers
                         var properties = new AuthenticationProperties
                         {
                             ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(double.Parse(timeout)), // Reset expiry time
-                            IsPersistent = true,
                         };
                         await _signInManager.SignInAsync(user, properties);
 

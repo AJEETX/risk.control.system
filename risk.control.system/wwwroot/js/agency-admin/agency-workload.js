@@ -46,7 +46,10 @@
                 "sDefaultContent": '<i class="fas fa-circle" style="color: green;"></i> ',
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    var img = '<i class="' + row.onlineStatusIcon + '" style="color:' + data + ';" title="' + row.onlineStatusName + '" data-toggle="tooltip"></i> ';
+                    var iconClass = row.onlineStatusIcon; // Class for the icon
+                    var colorClass = getColorClass(data); // Class for the color
+                    var tooltip = row.onlineStatusName; // Tooltip text
+                    var img = `<i class="${iconClass} ${colorClass}" title="${tooltip}" data-toggle="tooltip"></i>`;
                     return img;
                 }
             },
@@ -197,6 +200,18 @@
         });
     });
 });
+
+function getColorClass(color) {
+    switch (color.toLowerCase()) {
+        case "green":
+            return "online-status-green";
+
+        case "orange":
+            return "online-status-orange";
+        default:
+            return "online-icon-default"; // Fallback class
+    }
+}
 function getdetails(id) {
     // Same logic for getdetails
     $("body").addClass("submit-progress-bg");

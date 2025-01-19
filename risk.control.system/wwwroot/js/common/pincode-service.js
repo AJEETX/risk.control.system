@@ -13,10 +13,6 @@ function GetRemainingServicePinCode(showDefaultOption = true) {
         $(pinCode).empty();
         $(pinCode).val('');
     }
-    //else if (districtId == -1) {
-    //    $(pinCode).empty();
-    //    $(pinCode).append("<option value='-1'>All Districts</option>")
-    //}
     else {
         var lobId = document.getElementById('LineOfBusinessId').value;
         var serviceId = document.getElementById('InvestigationServiceTypeId').value;
@@ -63,26 +59,42 @@ function PopulatePinCode(dropDownId, list, option, showDefaultOption) {
             }
         });
     }
-    else if (list && list.length == 1 && list[0].pinCodeId ==-1) {
+    else if (list && list.length == 1 && list[0].pinCodeId == -1) {
+        $(dropDownId).empty(); // Clear existing options
+        $(dropDownId).append("<option class='all-pincodes' value='-1'> -- ALL PIN CODES -- </option>"); // Add "ALL PIN CODES" option
+
+        // Setting the value to '-1' to select the "ALL PIN CODES" option
+        $(dropDownId).val('-1'); // This will set the "ALL PIN CODES" option as selected
+        $(dropDownId).trigger('change'); // Trigger change event if you want to do any additional processing after selection
+
+
         $.alert({
             title: "ALL PIN CODES",
             content: "District ALL PIN CODES selected.",
-            icon: 'fa fa-info',
-            type: 'info',
-            closeIcon: true,
+            icon: 'fa fa-info-circle', // Using a more specific icon
+            type: 'info', // Info type alert
+            closeIcon: true, // Show close icon
             buttons: {
                 ok: {
                     text: "OK",
-                    btnClass: 'btn-info',
+                    btnClass: 'btn-info', // Large button style
                     action: function () {
-                        $(dropDownId).focus(); // Focus on the input element after clicking OK
+                        $(dropDownId).focus();
                     }
                 }
+            },
+            backgroundDismiss: true, // Allow dismiss by clicking outside the box
+            contentTextAlign: 'center', // Center the text content
+            autoClose: '3000', // Automatically close after 3 seconds
+            onOpen: function () {
+                // Optional: Add custom animations or additional functionality when the alert opens
+                $(this).addClass('animated fadeIn'); // Adding a fade-in animation
+            },
+            onClose: function () {
+                // Optional: Add custom functionality when the alert closes
+                $(this).removeClass('animated fadeIn'); // Remove fade-in animation when closed
             }
         });
-        $(dropDownId).empty();
-        $(dropDownId).append("<option class='all-pincodes' value='-1'> -- ALL PIN CODES -- </option>");
-        $(dropDownId).val('');
     }
     else if (list && list.length > 0) {
         $.each(list, function (index, row) {
@@ -107,12 +119,6 @@ $(document).ready(function () {
         GetRemainingServicePinCode(false);
     });
 
-    // Bind the change event to the InvestigationServiceTypeId dropdown
-    $("#InvestigationServiceTypeId").on("change", function () {
-        // Store the selected service ID in sessionStorage
-        sessionStorage.setItem('serviceId', $(this).val());
-    });
-
     // Bind the change event to the dropdown
     $("#LineOfBusinessId").on("change", function () {
         var value = $(this).val();
@@ -122,17 +128,12 @@ $(document).ready(function () {
             $('#InvestigationServiceTypeId').empty();
             $('#InvestigationServiceTypeId').append("<option value=''>--- SELECT ---</option>");
         } else {
-            // Store the selected Line of Business ID in sessionStorage
-            sessionStorage.setItem('lobId', value);
-
             // Fetch investigation services via AJAX and populate the dropdown
             $.get("/api/MasterData/GetInvestigationServicesByLineOfBusinessId", { LineOfBusinessId: value }, function (data) {
                 PopulateInvestigationServices("#InvestigationServiceTypeId", data, "<option>--- SELECT ---</option>");
             });
         }
     });
-
-
 
     const inputSelector = "#SelectedCountryId";
     const preloadedCountryId = $("#SelectedCountryId").val();
@@ -559,21 +560,6 @@ function initializeFieldValidations() {
  */
 function handleFieldValidation(parentFieldId, dependentFieldIds) {
     let initialValue = ""; // Store the initial value of the field on focus
-
-    //$(parentFieldId)
-    //    .on("focus", function () {
-    //        initialValue = $(this).val().trim(); // Store the value when the field gains focus
-    //    })
-    //    .on("blur", function () {
-    //        const currentValue = $(this).val().trim();
-
-    //        // If the value hasn't changed, skip resetting dependent fields
-    //        if (currentValue === initialValue) {
-    //            console.log(`No change detected in ${parentFieldId}`);
-    //            return;
-    //        }
-
-    //        // Update dependent fields only if the value changes
     const isValid = validateAutocompleteValue(parentFieldId);
     toggleDependentFields(dependentFieldIds, isValid);
     //    });
@@ -612,35 +598,5 @@ function toggleDependentFields(dependentFieldIds, isValid) {
                 $(fieldId).removeClass('invalid');
             }
         });
-    }
-    //if (!isValid) {
-    //    // If the current value is empty, clear all dependent fields
-    //    if (Array.isArray(dependentFieldIds) && dependentFieldIds.length > 0) {
-    //        dependentFieldIds.forEach(selector => {
-    //            const $dependentField = $(selector);
-    //            if ($dependentField.length) {
-    //                $dependentField.val(''); // Clear the value of each dependent field
-
-    //                // Temporarily clear autocomplete source
-    //                if ($dependentField.data('ui-autocomplete')) {
-    //                    $dependentField.autocomplete("option", "source", function (request, response) {
-    //                        response([]); // Return an empty result
-    //                    });
-    //                }
-    //            } else {
-    //                console.warn(`Dependent field selector "${selector}" did not match any elements.`);
-    //            }
-    //        });
-    //    }
-    //}
-}
-
-function clearPinCodeField() {
-    var pincodeDropdown = document.getElementById("PinCodeId");
-    if (pincodeDropdown) {
-        // Clear all selected options
-        pincodeDropdown.value = '';
-        // Optionally, you can clear the options as well
-        pincodeDropdown.innerHTML = '';
     }
 }

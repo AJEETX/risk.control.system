@@ -241,14 +241,27 @@ function pincodeAutocomplete() {
     // Initialize autocomplete
     $(pinCodeField).autocomplete({
         source: function (request, response) {
-            fetchPincodeSuggestions(request.term, $(selectedCountryField).val(), response);
+            fetchPincodeSuggestions(request.term, $(selectedCountryField).val(), function (suggestions) {
+                // Filter out non-selectable items
+                response(suggestions);
+            });
         },
         focus: function (event, ui) {
+            if (ui.item.isSelectable === false) {
+                $(pinCodeField).val('');
+                $(pinCodeField).addClass("invalid");
+                return false;
+            }
             // Set the input field to the "label" value when navigating with arrow keys
             $(pinCodeField).val(ui.item.label);
             return false; // Prevent default behavior of updating the field with "value"
         },
         select: function (event, ui) {
+            if (ui.item.isSelectable === false) {
+                // Prevent selection if it's the "No result found"
+                $(pinCodeField).addClass("invalid");
+                return false;
+            }
             populatePincodeDetails(ui.item);
             $(pinCodeField).removeClass("invalid");
             return false;
@@ -277,6 +290,18 @@ function fetchPincodeSuggestions(term, countryId, responseCallback) {
                 districtId: item.districtId,
                 districtName: item.districtName
             }));
+            // If no suggestions found, add the "No result found" option
+            if (suggestions.length === 0) {
+                suggestions.push({
+                    label: "No result found",
+                    value: "",
+                    stateId: null,
+                    stateName: null,
+                    districtId: null,
+                    districtName: null,
+                    isSelectable: false // Mark it as non-selectable
+                });
+            }
             responseCallback(suggestions);
         },
         error: function () {
