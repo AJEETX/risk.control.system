@@ -21,10 +21,10 @@
     }
     <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
         <div class="card bg-light d-flex flex-fill @borderColor">
-            <div class="card-header text-muted border-bottom-0">
+            <div class="card-header text-muted border-bottom-0 float-right">
 
                 <i class="fas fa-mobile-alt"></i> Document <span class="badge badge-light">checkify </span>
-                <span class="badge badge-light" style="float:right;">
+                <span class="badge badge-light">
                     <i class="nav-icon fas fa-clock"></i>
                     @Model.ClaimsInvestigation.AgencyReport?.PanIdReport.DocumentIdImageLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt")
                 </span>
@@ -33,11 +33,11 @@
                 <span class="badge badge-light"><i class="far fa-image"></i> Valid : </span>
                 @if (@Model.ClaimsInvestigation.AgencyReport?.PanIdReport?.DocumentIdImageValid.Value ?? false)
                 {
-                    <i style='color:green;' class='fas fa-check-circle'></i>
+                        <i class='fas fa-check-circle i-green'></i>
                 }
                 else
                 {
-                    <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i>
+                        <i class='fa fa-times i-orangered' aria-hidden='true'></i>
                 }
             </div>
             <div class="progress">
@@ -103,11 +103,11 @@
                     <span class="badge badge-light">Valid : </span>
                     @if (@Model.ClaimsInvestigation.AgencyReport?.PanIdReport?.DocumentIdImageValid.Value ?? false)
                     {
-                        <i style='color:green;' class='fas fa-check-circle'></i>
+                        <i class='fas fa-check-circle i-green'></i>
                     }
                     else
                     {
-                        <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i>
+                        <i class='fa fa-times i-orangered' aria-hidden='true'></i>
                     }
                 </p>
             </div>

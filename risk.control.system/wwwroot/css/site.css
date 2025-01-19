@@ -1842,10 +1842,13 @@ select#PinCodeId {
 }
 
 .flag-icon {
-    margin-right: 4px;
+    margin-right: 5px;
 }
-#all-pincodes{
-    font-weight:bold;
+.country-code-text{
+    font-family:fantasy;
+}
+#all-pincodes {
+    font-weight: bold;
 }
 #service-exists{
     color:darkred;
@@ -1905,7 +1908,7 @@ select#PinCodeId {
     color: orangered;
 }
 .i-green {
-    color: green;
+    color: green;;
 }
 .terms-condition {
     margin-top: 0.2em !important;
@@ -1926,4 +1929,10 @@ select#PinCodeId {
 
 .online-status-orange {
     color: orange;
+}
+.subtotal {
+    width: 50%
+}
+.callout-info {
+    margin-bottom: 0 !important;
 }

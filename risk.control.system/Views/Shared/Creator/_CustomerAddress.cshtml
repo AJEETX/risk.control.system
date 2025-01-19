@@ -31,7 +31,7 @@
                 <i class="fa fa-asterisk asterik-style-disabled"></i>
             </span>
         </div>
-        <input readonly type="text" id="DistrictId" class="form-control remarks" data-placeholder="district" placeholder="..." asp-for="DistrictId" required value="" tabindex="-1" />
+        <input readonly type="text" id="DistrictId" class="form-control remarks" data-placeholder="district" data-toggle="tooltip" title="Auto-selected based on Pincode" placeholder="..." asp-for="DistrictId" required value="" tabindex="-1" />
         <span asp-validation-for="DistrictId" class="text-danger"></span>
         <input asp-for="SelectedDistrictId" type="hidden" id="SelectedDistrictId" name="SelectedDistrictId" value="@Model?.DistrictId" />
         <div id="district-loading" class="loading-spinner">
@@ -47,11 +47,11 @@
         }
         <div class="input-group-prepend">
 
-            <span class="input-group-text" data-toggle="tooltip" title="Registered Country :@Model?.Country.Name">
-                <img src="@img" class="flag-icon" data-toggle="tooltip" /> @Model?.Country.Code
+            <span class="input-group-text country-code-text" data-toggle="tooltip" title="Registered Country: @Model?.Country.Name">
+                <img src="@img" class="flag-icon" data-toggle="tooltip" /> @Model?.Country.Code<i class="fa fa-asterisk asterik-style-info"></i>
             </span>
         </div>
-        <input readonly type="text" id="StateId" class="form-control remarks" data-placeholder="state" placeholder="..." asp-for="StateId" required value="" tabindex="-1" />
+        <input readonly type="text" id="StateId" class="form-control remarks" data-placeholder="state" data-toggle="tooltip" title="Auto-selected based on Pincode"  placeholder="..." asp-for="StateId" required value="" tabindex="-1" />
         <span asp-validation-for="StateId" class="text-danger"></span>
         <input asp-for="SelectedStateId" type="hidden" id="SelectedStateId" name="SelectedStateId" value="@Model?.StateId" />
         <div id="state-loading" class="loading-spinner">
