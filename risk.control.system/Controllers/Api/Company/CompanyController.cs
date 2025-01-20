@@ -152,6 +152,7 @@ namespace risk.control.system.Controllers.Api.Company
                 .Include(c => c.EmpanelledVendors).ThenInclude(c => c.PinCode)
                 .Include(c => c.EmpanelledVendors).ThenInclude(c => c.ratings)
                 .FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
+
             var result = company.EmpanelledVendors?.Where(v => !v.Deleted && v.Status == VendorStatus.ACTIVE)
                 .OrderBy(u => u.Name).Select(u => new
                 {
@@ -175,6 +176,7 @@ namespace risk.control.system.Controllers.Api.Company
                     IsUpdated = u.IsUpdated,
                     LastModified = u.Updated
                 })?.ToArray();
+
             company.EmpanelledVendors?.ToList().ForEach(u => u.IsUpdated = false);
             await _context.SaveChangesAsync();
             return Ok(result);
@@ -186,12 +188,12 @@ namespace risk.control.system.Controllers.Api.Company
             var userEmail = HttpContext.User?.Identity?.Name;
             var companyUser = await _context.ClientCompanyApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
             var company = _context.ClientCompany
-                .Include(c => c.CompanyApplicationUser)
+                .Include(c => c.EmpanelledVendors)
                 .FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
 
             var availableVendors = _context.Vendor
-                .Where(v =>
-                !v.Clients.Any(c => c.ClientCompanyId == companyUser.ClientCompanyId))
+                .Where(v => !company.EmpanelledVendors.Contains(v))
+                .Include(v => v.VendorApplicationUser)
                 .Include(v => v.Country)
                 .Include(v => v.PinCode)
                 .Include(v => v.District)
@@ -225,7 +227,11 @@ namespace risk.control.system.Controllers.Api.Company
                     Flag = "/flags/" + u.Country.Code.ToLower() + ".png",
                     Updated = u.Updated.HasValue ? u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy"),
                     UpdateBy = u.UpdatedBy,
-                    CanOnboard = u.Status == VendorStatus.ACTIVE && u.VendorInvestigationServiceTypes != null && u.VendorInvestigationServiceTypes.Count > 0,
+                    CanOnboard = u.Status == VendorStatus.ACTIVE &&
+                        u.VendorInvestigationServiceTypes != null && 
+                        u.VendorApplicationUser != null && 
+                        u.VendorApplicationUser.Count > 0 && 
+                        u.VendorInvestigationServiceTypes.Count > 0,
                     VendorName = u.Email,
                     IsUpdated = u.IsUpdated,
                     LastModified = u.Updated

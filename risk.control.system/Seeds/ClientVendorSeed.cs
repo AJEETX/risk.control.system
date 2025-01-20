@@ -35,16 +35,16 @@ namespace risk.control.system.Seeds
 
             await context.SaveChangesAsync(null, false);
 
-            foreach (var vendor in vendors)
-            {
-                foreach (var insurerCompany in companies)
-                {
-                    if (vendor.CountryId == insurerCompany.CountryId)
-                    {
-                        vendor.Clients.Add(insurerCompany);
-                    }
-                }
-            }
+            //foreach (var vendor in vendors)
+            //{
+            //    foreach (var insurerCompany in companies)
+            //    {
+            //        if (vendor.CountryId == insurerCompany.CountryId)
+            //        {
+            //            vendor.Clients.Add(insurerCompany);
+            //        }
+            //    }
+            //}
 
             await context.SaveChangesAsync(null, false);
             return (vendors, companies);

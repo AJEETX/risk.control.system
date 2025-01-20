@@ -171,7 +171,7 @@ namespace risk.control.system.Controllers
                 IFormFile? companyDocument = Request.Form?.Files?.FirstOrDefault();
                 if (companyDocument is not null)
                 {
-                    string newFileName = clientCompany.Email + Guid.NewGuid().ToString();
+                    string newFileName = Guid.NewGuid().ToString();
                     string fileExtension = Path.GetExtension(Path.GetFileName(companyDocument.FileName));
                     newFileName += fileExtension;
                     string path = Path.Combine(webHostEnvironment.WebRootPath, "company");
@@ -283,7 +283,7 @@ namespace risk.control.system.Controllers
                 var userFullEmail = user.Email.Trim().ToLower() + "@" + emailSuffix;
                 if (user.ProfileImage != null && user.ProfileImage.Length > 0)
                 {
-                    string newFileName = userFullEmail;
+                    string newFileName = Guid.NewGuid().ToString();
                     string fileExtension = Path.GetExtension(Path.GetFileName(user.ProfileImage.FileName));
                     newFileName += fileExtension;
                     string path = Path.Combine(webHostEnvironment.WebRootPath, "company");
@@ -417,7 +417,7 @@ namespace risk.control.system.Controllers
                 var user = await userManager.FindByIdAsync(id);
                 if (applicationUser?.ProfileImage != null && applicationUser.ProfileImage.Length > 0)
                 {
-                    string newFileName = applicationUser.Email + Guid.NewGuid().ToString();
+                    string newFileName = Guid.NewGuid().ToString();
                     string fileExtension = Path.GetExtension(Path.GetFileName(applicationUser.ProfileImage.FileName));
                     newFileName += fileExtension;
                     string path = Path.Combine(webHostEnvironment.WebRootPath, "company");
@@ -660,7 +660,7 @@ namespace risk.control.system.Controllers
                     notifyService.Error("OOPS !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-
+                vendor.SelectedByCompany = true;
                 return View(vendor);
             }
             catch (Exception ex)
@@ -1422,7 +1422,7 @@ namespace risk.control.system.Controllers
                     notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var company = _context.ClientCompany.Include(c => c.CompanyApplicationUser).Include(c => c.EmpanelledVendors)
+                var company = _context.ClientCompany.Include(c => c.EmpanelledVendors)
                     .FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
 
                 if (company == null)
@@ -1437,11 +1437,6 @@ namespace risk.control.system.Controllers
                 company.UpdatedBy = currentUserEmail;
                 _context.ClientCompany.Update(company);
                 var savedRows = await _context.SaveChangesAsync();
-
-                foreach (var vendor2Empanel in vendors2Empanel)
-                {
-                    vendor2Empanel.Clients.Add(company);
-                }
 
                 notifyService.Custom($"Agency(s) empanelled.", 3, "green", "fas fa-thumbs-up");
                 return RedirectToAction("AvailableVendors");
@@ -1482,7 +1477,6 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var company = _context.ClientCompany
-                    .Include(c => c.CompanyApplicationUser)
                     .Include(c => c.EmpanelledVendors)
                     .FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
                 if (company == null)
@@ -1490,14 +1484,12 @@ namespace risk.control.system.Controllers
                     notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var empanelledVendors2Depanel = _context.Vendor.Include(v => v.Clients).AsNoTracking().Where(v => vendors.Contains(v.VendorId.ToString()));
+                var empanelledVendors2Depanel = _context.Vendor.AsNoTracking().Where(v => vendors.Contains(v.VendorId.ToString()));
+                
                 foreach (var empanelledVendor2Depanel in empanelledVendors2Depanel)
                 {
                     var empanelled = company.EmpanelledVendors.FirstOrDefault(v => v.VendorId == empanelledVendor2Depanel.VendorId);
                     company.EmpanelledVendors.Remove(empanelled);
-                    var clientCompany = empanelledVendor2Depanel.Clients.FirstOrDefault(c => c.ClientCompanyId == company.ClientCompanyId);
-
-                    empanelledVendor2Depanel.Clients.Remove(clientCompany);
                 }
                 company.Updated = DateTime.Now;
                 company.UpdatedBy = currentUserEmail;

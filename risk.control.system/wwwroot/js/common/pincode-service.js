@@ -72,7 +72,7 @@ function PopulatePinCode(dropDownId, list, option, showDefaultOption) {
             title: "ALL PIN CODES",
             content: "District ALL PIN CODES selected.",
             icon: 'fa fa-info-circle', // Using a more specific icon
-            type: 'info', // Info type alert
+            type: 'blue', // Info type alert
             closeIcon: true, // Show close icon
             buttons: {
                 ok: {
@@ -113,7 +113,30 @@ function PopulateInvestigationServices(dropDownId, list, option) {
 }
 
 $(document).ready(function () {
+    function toggleStateAndPinCodeFields() {
+        // Check if LineOfBusinessId, InvestigationServiceTypeId, and Price have values
+        if (
+            !$("#LineOfBusinessId").val() ||
+            !$("#InvestigationServiceTypeId").val() ||
+            !$("#Price").val()
+        ) {
+            // Disable StateId and PinCodeId if any of the fields are blank
+            $("#StateId").prop("disabled", true).val("").addClass('disabled');
+            $("#DistrictId").prop("disabled", true).val("");
+            $("#PinCodeId").prop("disabled", true).val("");
+        } else {
+            // Enable StateId and PinCodeId if all fields have values
+            $("#StateId").prop("disabled", false);
+            $("#PinCodeId").prop("disabled", false);
+            $("#DistrictId").prop("disabled", false);
+        }
+    }
 
+    // Run the function on page load
+    toggleStateAndPinCodeFields();
+
+    // Run the function whenever LineOfBusinessId, InvestigationServiceTypeId, or Price changes
+    $("#LineOfBusinessId, #InvestigationServiceTypeId, #Price").on("change keyup", toggleStateAndPinCodeFields);
     $("#DistrictId").on("blur change", function () {
         // Call the GetRemainingServicePinCode function with the necessary parameters
         GetRemainingServicePinCode(false);
@@ -538,8 +561,8 @@ function updatePlaceholdersBasedOnState() {
         const $field = $(this);
         const placeholder = $field.data("placeholder"); // Get the placeholder value
         if (placeholder) {
-            $field.attr("placeholder", `Type ${placeholder}`);
-            console.log(`Updated placeholder for #${$field.attr("id")} to "Type ${placeholder}"`);
+            $field.attr("placeholder", `Search ${placeholder} ...`);
+            console.log(`Updated placeholder for #${$field.attr("id")} to "Search ${placeholder} ..."`);
         } else {
             console.warn(`No placeholder found for #${$field.attr("id")}`);
         }

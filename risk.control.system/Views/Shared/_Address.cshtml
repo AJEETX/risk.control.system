@@ -12,7 +12,7 @@
             </span>
         </div>
         <input type="text" id="PinCodeId" class="form-control remarks auto-dropdown"
-               data-placeholder="pincode" placeholder="Type pincode or name" asp-for="PinCodeId"
+               data-placeholder="pincode" placeholder="Search pincode or name ..." asp-for="PinCodeId"
                required value="" autocomplete="off" />
         <span asp-validation-for="PinCodeId" class="text-danger"></span>
         <input asp-for="SelectedPincodeId" type="hidden" id="SelectedPincodeId" name="SelectedPincodeId" value="@Model?.PinCodeId" />

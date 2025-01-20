@@ -1668,7 +1668,7 @@ ul#messagesList {
     width: 100%; /* Full width of the container */
     position: relative;
     /*background: #fafad2 url("data:image/svg+xml;charset=UTF-8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><circle cx='11' cy='11' r='8'></circle><line x1='21' y1='21' x2='16.65' y2='16.65'></line></svg>") no-repeat right 10px center;*/
-    background: #fafad2 url("data:image/svg+xml;charset=UTF-8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='currentColor' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M4 6l4 4 4-4'></path></svg>") no-repeat right 10px center;
+    /*background: #fafad2 url("data:image/svg+xml;charset=UTF-8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='currentColor' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M4 6l4 4 4-4'></path></svg>") no-repeat right 10px center;*/
     border: 1px solid #ccc; /* Default border */
     padding: 8px 35px 8px 10px; /* Adjust padding for the dropdown arrow and text */
     border-radius: 4px; /* Rounded corners */
@@ -1683,8 +1683,8 @@ ul#messagesList {
     cursor: pointer; /* Pointer cursor for better UX */
     width: 100%; /* Full width of the container */
     position: relative;
-    /*background: #fafad2 url("data:image/svg+xml;charset=UTF-8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><circle cx='11' cy='11' r='8'></circle><line x1='21' y1='21' x2='16.65' y2='16.65'></line></svg>") no-repeat right 10px center;*/
-    background: #fafad2 url("data:image/svg+xml;charset=UTF-8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='currentColor' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M4 6l4 4 4-4'></path></svg>") no-repeat right 10px center;
+    background: #fafad2 url("data:image/svg+xml;charset=UTF-8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><circle cx='11' cy='11' r='8'></circle><line x1='21' y1='21' x2='16.65' y2='16.65'></line></svg>") no-repeat right 10px center;
+    /*background: #fafad2 url("data:image/svg+xml;charset=UTF-8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='currentColor' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M4 6l4 4 4-4'></path></svg>") no-repeat right 10px center;*/
     border: 1px solid #ccc; /* Default border */
     padding: 8px 35px 8px 10px; /* Adjust padding for the dropdown arrow and text */
     border-radius: 4px; /* Rounded corners */

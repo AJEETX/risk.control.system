@@ -116,19 +116,7 @@
                 </span>
             </div>
         </div>
-        <div class="form-group">
-            <span class="input-group-label"> Enable Mailbox:</span>
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <span class="input-group-text" ><i class="far fa-comment-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                </div>
-
-                <span class="checkbox">
-                    <input asp-for="EnableMailbox" id="EnableMailbox" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
-
-                </span>
-            </div>
-        </div>
+        
     </div>
     <div class="col-sm-6">
         <div class="form-group">
@@ -141,7 +129,7 @@
                     </span>
                 </div>
                 <input type="text" id="PinCodeId" class="form-control remarks auto-dropdown"
-                       data-placeholder="pincode" placeholder="Type pincode or name" asp-for="PinCodeId"
+                       data-placeholder="pincode" placeholder="Search pincode or name ..." asp-for="PinCodeId"
                        required value="" autocomplete="off" />
                 <span asp-validation-for="PinCodeId" class="text-danger"></span>
                 <input asp-for="SelectedPincodeId" type="hidden" id="SelectedPincodeId" name="SelectedPincodeId" value="@Model?.PinCodeId" />
@@ -245,6 +233,7 @@
                     </select>
                 </div>
             </div>
+
         }
         else
         {
@@ -272,6 +261,18 @@
                 </div>
             </div>
         }
+        <div class="form-group">
+            <span class="input-group-label"> Enable Mailbox:</span>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text"><i class="far fa-comment-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                </div>
 
+                <span class="checkbox">
+                    <input asp-for="EnableMailbox" id="EnableMailbox" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
+
+                </span>
+            </div>
+        </div>
     </div>
 </div>

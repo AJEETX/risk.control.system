@@ -29,7 +29,7 @@ namespace risk.control.system.Services
         {
             if (vendorDocument is not null)
             {
-                string newFileName = vendor.Email + Guid.NewGuid().ToString();
+                string newFileName = Guid.NewGuid().ToString();
                 string fileExtension = Path.GetExtension(Path.GetFileName(vendorDocument.FileName));
                 newFileName += fileExtension;
                 string path = Path.Combine(webHostEnvironment.WebRootPath, "agency");
