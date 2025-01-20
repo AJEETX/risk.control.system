@@ -32,21 +32,6 @@
             preloadPincodeDetails(preloadedCountryId, preloadedPincodeId);
         }
     }
-
-    //// On CountryId blur, check if it's cleared and disable PinCodeId
-    //$("#CountryId").on("blur", function () {
-    //    const countryIdValue = $(this).val().trim();
-
-    //    if (!countryIdValue) {
-    //        // Disable PinCodeId and clear its value
-    //        $("#StateId").prop("disabled", true);
-    //        $("#PinCodeId").prop("disabled", true);
-    //        resetField("#PinCodeId");
-    //        resetField("#StateId");
-    //    }
-    //});
-
-    // Watch for changes in CountryId
     $("#CountryId").on("input change", function () {
         const selectedCountryId = $("#SelectedCountryId").val();
 
@@ -131,19 +116,19 @@
     // Initialize autocomplete for Pincode
     pincodeAutocomplete();
 
-    // Dynamically fetch State and District on Pincode change
-    $("#PinCodeId").on("blur input, change", function () {
-        const selectedpinCodeId = $("#SelectedStateId").val();
-        pincodeAutocomplete();
-    });
+    //// Dynamically fetch State and District on Pincode change
+    //$("#PinCodeId").on("blur input, change", function () {
+    //    const selectedpinCodeId = $("#SelectedStateId").val();
+    //    pincodeAutocomplete();
+    //});
 
-    $("#PinCodeId").on("autocompletechange", function (event, ui) {
-        if (!ui.item) {
-            // If no valid item is selected, clear the input
-            $(this).val("");
-            $("#SelectedPincodeId").val("");
-        }
-    });
+    //$("#PinCodeId").on("autocompletechange", function (event, ui) {
+    //    if (!ui.item) {
+    //        // If no valid item is selected, clear the input
+    //        $(this).val("");
+    //        $("#SelectedPincodeId").val("");
+    //    }
+    //});
 });
 
 function preloadPincodeDetails(preloadedCountryId, preloadedPincodeId) {
@@ -421,7 +406,10 @@ function validatePincodeSelection(inputValue, countryId) {
                 clearPincodeFields();
                 //alert("Please select a valid Pincode from the dropdown.");
             } else {
-                $("#CountryId").removeClass("invalid"); // Remove invalid class if valid
+                var countryIdVisible = $("#CountryId");
+                if (countryIdVisible) {
+                    $("#CountryId").removeClass("invalid"); // Remove invalid class if valid
+                }
             }
         },
         error: function () {

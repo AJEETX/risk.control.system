@@ -283,9 +283,12 @@ namespace risk.control.system.Services
         private int GetAvailableAgencies(string userEmail)
         {
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == userEmail);
-            var availableVendors = _context.Vendor.Include(a=>a.VendorInvestigationServiceTypes)
-                           .Count(v =>
-                           !v.Clients.Any(c => c.ClientCompanyId == companyUser.ClientCompanyId) && !v.Deleted);
+            var company = _context.ClientCompany
+               .Include(c => c.EmpanelledVendors)
+               .FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
+
+            var availableVendors = _context.Vendor
+                .Count(v => !company.EmpanelledVendors.Contains(v) && v.CountryId == companyUser.CountryId && !v.Deleted);
             return availableVendors;
         }
         private int GetEmpanelledAgencies(string userEmail)

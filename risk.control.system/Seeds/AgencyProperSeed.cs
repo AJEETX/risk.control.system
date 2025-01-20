@@ -35,7 +35,7 @@ namespace risk.control.system.Seeds
             var enableMailbox = globalSettings?.EnableMailbox ?? false;
             //CREATE VENDOR COMPANY
 
-            var properPinCode = context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).FirstOrDefault(s => s.District.Name.ToLower().Contains("har"));
+            var properPinCode = context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).FirstOrDefault(s => s.Country.Code.ToLower() == "in");
             var properAddressline = "12, GT Road";
 
             var properAddress = properAddressline + ", " + properPinCode.District.Name + ", " + properPinCode.State.Name + ", " + properPinCode.Country.Code;

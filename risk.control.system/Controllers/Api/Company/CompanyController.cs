@@ -192,7 +192,7 @@ namespace risk.control.system.Controllers.Api.Company
                 .FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
 
             var availableVendors = _context.Vendor
-                .Where(v => !company.EmpanelledVendors.Contains(v))
+                .Where(v => !company.EmpanelledVendors.Contains(v) && !v.Deleted && v.CountryId == company.CountryId)
                 .Include(v => v.VendorApplicationUser)
                 .Include(v => v.Country)
                 .Include(v => v.PinCode)
@@ -206,7 +206,6 @@ namespace risk.control.system.Controllers.Api.Company
                 .ThenInclude(v => v.InvestigationServiceType)
                 .Include(v => v.VendorInvestigationServiceTypes)
                 .ThenInclude(v => v.PincodeServices)
-                .Where(v => !v.Deleted)
                 .OrderBy(u => u.Name)
                 .AsQueryable();
 

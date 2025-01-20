@@ -54,59 +54,6 @@ namespace risk.control.system.Seeds
             }
         }
 
-        public static async Task SeedPincode_India(ApplicationDbContext context)
-        {
-            var country = new Country
-            {
-                Name = "INDIA",
-                Code = "IND",
-                Updated = DateTime.Now,
-            };
-
-            var indiaCountry = await context.Country.AddAsync(country);
-            var pincodes = await CsvRead_India();
-
-            try
-            {
-                // add the states with pincodes
-                var states = pincodes.GroupBy(g => new { g.StateName, g.StateCode });
-                foreach (var state in states)
-                {
-                    var recordState = new State { Code = state.Key.StateCode, Name = state.Key.StateName, Country = country, Updated = DateTime.Now };
-                    var stateAdded = await context.State.AddAsync(recordState);
-
-                    var districts = state.GroupBy(g => g.District);
-
-                    var pinCodeList = new List<PinCode> { };
-                    foreach (var district in districts)
-                    {
-                        var districtDetail = new District { Code = district.Key, Name = district.Key, State = stateAdded.Entity, Country = country, Updated = DateTime.Now };
-                        var districtAdded = await context.District.AddAsync(districtDetail);
-                        foreach (var pinCode in district)
-                        {
-                            var pincodeState = new PinCode
-                            {
-                                Name = pinCode.Name,
-                                Code = pinCode.Code,
-                                Longitude = pinCode.Longitude,
-                                Latitude = pinCode.Latitude,
-                                District = districtAdded.Entity,
-                                State = stateAdded.Entity,
-                                Country = country,
-                                Updated = DateTime.Now
-                            };
-                            pinCodeList.Add(pincodeState);
-                        }
-                    }
-                    await context.PinCode.AddRangeAsync(pinCodeList);
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-        }
-        
         public static async Task<Country> India(ApplicationDbContext context)
         {
             var country = new Country

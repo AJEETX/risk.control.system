@@ -704,7 +704,10 @@ namespace risk.control.system.Controllers
         [Breadcrumb(" Add Agency")]
         public IActionResult Create()
         {
-            return View();
+            var currentUserEmail = HttpContext.User?.Identity?.Name;
+            var companyUser = _context.ClientCompanyApplicationUser.Include(c => c.Country).Include(c => c.ClientCompany).FirstOrDefault(c => c.Email == currentUserEmail);
+            var vendor = new Vendor { CountryId = companyUser.ClientCompany.CountryId, Country = companyUser.ClientCompany.Country, SelectedCountryId = companyUser.ClientCompany.CountryId.Value };
+            return View(vendor);
         }
 
         [HttpPost]

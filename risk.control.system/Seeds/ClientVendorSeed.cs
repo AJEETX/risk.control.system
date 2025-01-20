@@ -22,7 +22,7 @@ namespace risk.control.system.Seeds
 
             var globalSetting = new GlobalSettings
             {
-                EnableMailbox = true
+                EnableMailbox = false
             };
             var newGlobalSetting = await context.GlobalSettings.AddAsync(globalSetting);
             await context.SaveChangesAsync(null, false);
