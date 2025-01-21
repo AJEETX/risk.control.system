@@ -124,32 +124,11 @@
     $("#create-form").validate();
     $("#edit-form").validate();
 
-    $('input#emailAddress').on('input change', function () {
-        if ($(this).val() != '' && $(this).val().length > 4) {
-            $('#check-email').prop('disabled', false);
-            $("#check-email").css('color', 'white');
-            $("#check-email").css('background-color', '#004788');
-            $("#check-email").css('cursor', 'default');
+    $('input#emailAddress').on('input change focus', function () {
+        if ($(this).val() !== '' && $(this).val().length > 4) {
+            $('#check-email').prop('disabled', false).removeClass('disabled-btn').addClass('enabled-btn');
         } else {
-            $('#check-email').prop('disabled', true);
-            $("#check-email").css('color', '#ccc');
-            $("#check-email").css('background-color', 'grey');
-            $("#check-email").css('cursor', 'not-allowed');
-        }
-    });
-
-    $('input#emailAddress').on('input focus', function () {
-        if ($(this).val() != '' && $(this).val().length > 4) {
-            $('#check-email').prop('disabled', false);
-            $("#check-email").css('color', 'white');
-            $("#check-email").css('background-color', '#004788');
-            $("#check-email").css('cursor', 'default');
-        } else {
-            $('#create-agency').prop('disabled', 'true !important');
-            $('#check-email').prop('disabled', true);
-            $("#check-email").css('color', '#ccc');
-            $("#check-email").css('background-color', 'grey');
-            $("#check-email").css('cursor', 'not-allowed');
+            $('#check-email').prop('disabled', true).removeClass('enabled-btn').addClass('disabled-btn');
         }
     });
 
@@ -180,21 +159,16 @@ function checkUserEmail() {
         $.get(url, { input: name + '@' + emailSuffix }, function (data) {
             if (data == 0) { //available
                 $('#mailAddress').val($('#emailAddress').val());
-                $("#result").html("<span style='color:green;padding-top:.5rem;' title=' Available' data-toggle='tooltip'> <i class='fas fa-check' style='color:#298807'></i></span>");
-                $('#result').css('padding', '.5rem')
-                //$('#result').fadeOut(10000); // 1.5 seconds
-                //$('#result').fadeOut('slow'); // 1.5 seconds
-                $("#emailAddress").css('background-color', '');
-                $("#emailAddress").css('border-color', '#ccc');
-                //$('#create').prop('disabled', false);
+                $("#result").html("<span class='available' title='Available' data-toggle='tooltip'> <i class='fas fa-check'></i></span>");
+                $('#result').addClass('result-padding');
+                $("#emailAddress").removeClass('error-border');
             }
-            else if (data == 1) {//domain exists
-                $("#result").html("<span style='color:red;padding-top:.5rem;display:inline !important' title=' Email exists' data-toggle='tooltip'><i class='fa fa-times-circle' style='color:red;'></i> </span>");
-                $('#result').css('padding', '.5rem')
-                $('#result').css('display', 'inline')
-                $("#emailAddress").css('border-color', '#e97878');
-                //$('#create').prop('disabled', 'true !important');
+            else if (data == 1) { //domain exists
+                $("#result").html("<span class='unavailable' title='Email exists' data-toggle='tooltip'><i class='fa fa-times-circle'></i></span>");
+                $('#result').addClass('result-padding');
+                $("#emailAddress").addClass('error-border');
             }
+
             else if (data = null || data == undefined) {
             }
         });

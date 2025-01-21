@@ -17,18 +17,18 @@
                     <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
                 </div>
                 <div class="row">
-                    
+
                     <div class="col-md-6">
                         <div class="form-group">
-    <span class="input-group-label">Recepient Email:</span>
-    <div class="input-group mb-3">
-        <div class="input-group-prepend">
-            <span class="input-group-text"><i class="fas fa-at"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-        </div>
-        <input required id="receipient-email" name="ReceipientEmail" title="Email" class="form-control remarks" />
-        <span asp-validation-for="ReceipientEmail" class="text-danger"></span>
-    </div>
-</div>
+                            <span class="input-group-label">Recepient Email:</span>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-at"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                </div>
+                                <input required id="receipient-email" name="ReceipientEmail" title="Email" class="form-control remarks" />
+                                <span asp-validation-for="ReceipientEmail" class="text-danger"></span>
+                            </div>
+                        </div>
 
                     </div>
                     <div class="col-md-6">
@@ -50,7 +50,7 @@
                         @Html.TextAreaFor(model => model.RawMessage, new { @class = "form-control remarks message-content", @row = 3 })
                     </div>
                 </div>
-                
+
             </div>
 
             <div class="card-footer">
@@ -75,7 +75,7 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-    <script src="~/plugins/summernote/summernote.js"></script>
+    @* <script src="~/plugins/summernote/summernote.js"></script> *@
     <script src="~/js/compose-mail.js">
     </script>
 }

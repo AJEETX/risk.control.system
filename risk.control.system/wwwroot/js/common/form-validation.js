@@ -41,21 +41,26 @@ $(document).ready(function () {
     const $emailInput = $("#emailAddress");
 
     // Handle blur event
-    $emailInput.on("blur", function () {
+    if ($emailInput) {
+        $emailInput.on("blur", function () {
 
-        if ($(this).val()) {
-            CheckIfEmailValid($(this).val());
-        }
-    });
+            if ($(this).val()) {
+                CheckIfEmailValid($(this).val());
+            }
+        });
 
-    // Handle keydown event
-    $emailInput.on("keydown", function (event) {
-        return alphaOnly(event);
-    });
+        // Handle keydown event
+        $emailInput.on("keydown", function (event) {
+            return alphaOnly(event);
+        });
 
-    // Handle click event
-    $emailInput.on("click", function () {
-        $(this).select();
+        // Handle click event
+        $emailInput.on("click", function () {
+            $(this).select();
+        });
+    }
+    $('#check-domain').on('click', function () {
+        checkDomain();
     });
 
 
@@ -90,21 +95,17 @@ function checkDomain() {
                 $('#domainName').val($('#domain').val());
                 var mailDomain = $('#domain').val();
                 $("#domainAddress").val(mailDomain);
-                $("#result").html("<span style='color:green;padding-top:.5rem;'> <i class='fas fa-check' style='color:#298807'></i> </span>");
-                $('#result').css('padding', '.5rem')
-                $("#emailAddress").css('background-color', '');
-                $("#emailAddress").css('border-color', '#ccc');
-                //$('#create-agency').prop('disabled', false);
+                $("#result").html("<span class='available' title='Available' data-toggle='tooltip'> <i class='fas fa-check'></i></span>");
+                $('#result').addClass('result-padding');
+                $("#emailAddress").removeClass('error-border');
                 $('#result').fadeIn(1000); // 1.5 seconds
                 $('#result').fadeIn('slow'); // 1.5 seconds
                 $("#Name").focus();
             }
             else if (data == 1) {//domain exists
-                $("#result").html("<span style='color:red;padding-top:.5rem;display:inline !important'><i class='fa fa-times-circle' style='color:red;'></i>  </span>");
-                $('#result').css('padding', '.5rem')
-                $('#result').css('display', 'inline')
-                $("#emailAddress").css('border-color', '#e97878');
-                //$('#create-agency').prop('disabled', 'true !important');
+                $("#result").html("<span class='unavailable' title='Email exists' data-toggle='tooltip'><i class='fa fa-times-circle'></i></span>");
+                $('#result').addClass('result-padding');
+                $("#emailAddress").addClass('error-border');
                 $('#result').fadeIn(1000); // 1.5 seconds
                 $('#result').fadeIn('slow'); // 1.5 seconds
             }

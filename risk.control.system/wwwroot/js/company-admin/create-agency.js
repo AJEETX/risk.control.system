@@ -74,46 +74,16 @@ $(document).ready(function () {
 
     $("#create-form").validate();
 
-    $('input#emailAddress').on('input change', function () {
-        if ($(this).val() != '' && $(this).val().length > 4) {
-            $('#check-email').prop('disabled', false);
-            $("#check-email").css('color', 'white');
-            $("#check-email").css('background-color', '#004788');
-            $("#check-email").css('cursor', 'default');
+    $('input#emailAddress').on('input change focus', function () {
+        if ($(this).val() !== '' && $(this).val().length > 4) {
+            $('#check-domain').prop('disabled', false).removeClass('disabled-btn').addClass('enabled-btn');
         } else {
-            //$('#create-agency').prop('disabled', 'true !important');
-            $('#check-email').prop('disabled', true);
-            $("#check-email").css('color', '#ccc');
-            $("#check-email").css('background-color', 'grey');
-            $("#check-email").css('cursor', 'not-allowed');
+            $('#check-domain').prop('disabled', true).removeClass('enabled-btn').addClass('disabled-btn');
         }
     });
 
-    $('input#emailAddress').on('input focus', function () {
-        if ($(this).val() != '' && $(this).val().length > 4) {
-            $('#check-email').prop('disabled', false);
-            $("#check-email").css('color', 'white');
-            $("#check-email").css('background-color', '#004788');
-            $("#check-email").css('cursor', 'default');
-        } else {
-            //$('#create-agency').prop('disabled', 'true !important');
-            $('#check-email').prop('disabled', true);
-            $("#check-email").css('color', '#ccc');
-            $("#check-email").css('background-color', 'grey');
-            $("#check-email").css('cursor', 'not-allowed');
-        }
-    });
 });
 AgreementDate.max = new Date().toISOString().split("T")[0];
-$("input#emailAddress").on({
-    keydown: function (e) {
-        if (e.which === 32)
-            return false;
-    },
-    change: function () {
-        this.value = this.value.replace(/\s/g, "");
-    }
-});
 
 
 $('#emailAddress').focus();

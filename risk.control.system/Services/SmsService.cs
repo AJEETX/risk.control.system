@@ -39,13 +39,7 @@ namespace risk.control.system.Services
             try
             {
                 var url = "https://api.sms-gate.app/3rdparty/v1/message";
-#if DEBUG
 
-                //if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
-                //{
-                //    url = $"http://192.168.1.117:8080/message";
-                //}
-#endif
                 var username = Environment.GetEnvironmentVariable("SMS_User");
                 var password = Environment.GetEnvironmentVariable("SMS_Pwd");
                 var authToken = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{username}:{password}"));

@@ -678,12 +678,12 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     color: blue;
 }
 
-#check-email {
+/*#check-email {
     background-color: grey;
     border-radius: 5px;
     color: white;
     cursor: no-drop;
-}
+}*/
 
 input[type="checkbox"]:checked {
     accent-color: blue;
@@ -1935,4 +1935,52 @@ select#PinCodeId {
 }
 .callout-info {
     margin-bottom: 0 !important;
+}
+/* Padding and alignment for result */
+.result-padding {
+    padding: 0.5rem;
+}
+
+/* Styles for available email */
+.available {
+    color: green;
+    display: inline;
+}
+
+    .available i {
+        color: #298807;
+    }
+
+/* Styles for unavailable email */
+.unavailable {
+    color: red;
+    display: inline !important;
+}
+
+    .unavailable i {
+        color: red;
+    }
+
+/* Border for invalid email */
+.error-border {
+    border-color: #e97878;
+}
+
+/* Reset default border for valid email */
+#emailAddress {
+    border-color: #ccc;
+    background-color: transparent;
+}
+/* Styles for the enabled state of the button */
+.enabled-btn {
+    color: white;
+    background-color: #004788;
+    cursor: default;
+}
+
+/* Styles for the disabled state of the button */
+.disabled-btn {
+    color: #ccc;
+    background-color: grey;
+    cursor: not-allowed;
 }

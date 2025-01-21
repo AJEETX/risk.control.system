@@ -24,13 +24,13 @@
                             <div class="input-group-append">
                                 <span class="input-group-text" id="emailid"><i class="fa fa-globe"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                             </div>
-                            <input asp-for="Email" id="emailAddress" class="form-control email-address remarks" type="text" value="" onblur="CheckIfEmailValid();" required
-                                   placeholder="domain name" maxlength="15" onkeydown='return alphaOnly(event);' onClick="this.select();" autocomplete="off">
+                            <input asp-for="Email" id="emailAddress" class="form-control email-address remarks" type="text" value="" required
+                                   placeholder="domain name" maxlength="15" autocomplete="off">
                             <div class="input-group-append">
                                 <select id="domain" name="domain" asp-for="Email" required class="form-control remarks" asp-items="Html.GetEnumSelectList<Domain>()">
                                 </select>
                                 <div class="input-group-append">
-                                    <button disabled id="check-email" class="input-group-text" onclick="checkDomain();">
+                                    <button disabled id="check-domain" class="input-group-text">
                                         <i class="far fa-question-circle"></i>
                                     </button>
                                     <span id="result"></span>
@@ -96,8 +96,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text" id="PhoneNumber"><i class="fas fa-phone"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <input type="text" asp-for="PhoneNumber" class="form-control remarks" required maxlength="14" placeholder="61432854196" value="61432854196"
-                                       oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" />
+                                <input type="text" asp-for="PhoneNumber" class="form-control remarks" required maxlength="14" placeholder="Phone with ISD" value="61432854196" />
                                 <span asp-validation-for="PhoneNumber" class="text-danger"></span>
                             </div>
                         </div>
@@ -289,4 +288,5 @@
     }
     <script src="~/js/company-admin/create-company.js"></script>
     <script src="~/js/company-admin/pincode.js"></script>
+    <script src="~/js/common/form-validation.js"></script>
 }
