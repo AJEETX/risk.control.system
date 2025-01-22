@@ -122,33 +122,30 @@ namespace risk.control.system.Controllers.Api
                 }
 
                 var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.AGENT.ToString()));
-                var user2Onboards = _context.VendorApplicationUser.Include(u => u.Country).Where(
+                var user2Onboard = _context.VendorApplicationUser.Include(u => u.Country).FirstOrDefault(
                     u => u.Country.ISDCode + u.PhoneNumber == request.Mobile.TrimStart('+'));
-                foreach (var user2Onboard in user2Onboards)
+                var isAgent = await userVendorManager.IsInRoleAsync(user2Onboard, agentRole?.Name);
+
+                if (isAgent && string.IsNullOrWhiteSpace(user2Onboard.MobileUId) && user2Onboard.Active)
                 {
-                    var isAgent = await userVendorManager.IsInRoleAsync(user2Onboard, agentRole?.Name);
-
-                    if (isAgent && string.IsNullOrWhiteSpace(user2Onboard.MobileUId) && user2Onboard.Active)
+                    user2Onboard.MobileUId = request.Uid;
+                    user2Onboard.SecretPin = randomNumber.Next(1000, 9999).ToString();
+                    _context.VendorApplicationUser.Update(user2Onboard);
+                    await _context.SaveChangesAsync();
+                    if (request.SendSMS)
                     {
-                        user2Onboard.MobileUId = request.Uid;
-                        user2Onboard.SecretPin = randomNumber.Next(1000, 9999).ToString();
-                        _context.VendorApplicationUser.Update(user2Onboard);
-                        await _context.SaveChangesAsync();
-                        if (request.SendSMS)
-                        {
-                            //SEND SMS
-                            string message = $"Dear {user2Onboard.Email}";
-                            message += $"                                ";
-                            message += $"icheckifyApp Pin:{user2Onboard.SecretPin}";
-                            message += $"                                      ";
-                            message += $"Thanks                           ";
-                            message += $"                                ";
-                            message += $"https://icheckify.co.in";
-                            await smsService.DoSendSmsAsync(user2Onboard.Country.ISDCode + request.Mobile, message);
-                        }
-
-                        return Ok(new { Email = user2Onboard.Email, Pin = user2Onboard.SecretPin });
+                        //SEND SMS
+                        string message = $"Dear {user2Onboard.Email}";
+                        message += $"                                ";
+                        message += $"icheckifyApp Pin:{user2Onboard.SecretPin}";
+                        message += $"                                      ";
+                        message += $"Thanks                           ";
+                        message += $"                                ";
+                        message += $"https://icheckify.co.in";
+                        await smsService.DoSendSmsAsync(request.Mobile, message);
                     }
+
+                    return Ok(new { Email = user2Onboard.Email, Pin = user2Onboard.SecretPin });
                 }
                 return BadRequest($"Err");
             }
