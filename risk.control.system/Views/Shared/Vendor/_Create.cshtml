@@ -16,18 +16,7 @@
                 </div>
             </div>
 
-            <div class="form-group">
-                <span class="input-group-label"> Document:</span>
-                <div class="input-group mb-3">
-                    <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="@Applicationsettings.NO_POLICY_IMAGE" data-toggle="tooltip" title="No Document" />
-                    <i class="fa fa-asterisk asterik-style"></i>
-                    <input accept=".jpg,.jpeg,.png" asp-for="DocumentImage" type="file"
-                           class="form-control remarks document-image-input" id="createImageInput" data-preview-id="createProfileImage" required data-toggle="tooltip" title="Upload Document"
-                           data-default-image="@Applicationsettings.NO_POLICY_IMAGE" />
-                    <span asp-validation-for="DocumentImage" class="text-danger"></span>
-                </div>
-            </div>
-            <div class="form-group">
+            @* <div class="form-group">
                 <span class="input-group-label"> Agency Code:</span>
                 <div class="input-group mb-3">
                     <div class="input-group-prepend">
@@ -36,7 +25,7 @@
                     <input type="text" id="Code" asp-for="Code" class="form-control remarks asterikx" required placeholder="Agency Code" maxlength="5" value="pro">
                     <span asp-validation-for="Code" class="text-danger"></span>
                 </div>
-            </div>
+            </div> *@
 
             <div class="form-group">
                 <span class="input-group-label"> Phone #:</span>
@@ -55,7 +44,7 @@
                     <span asp-validation-for="PhoneNumber" class="text-danger"></span>
                 </div>
             </div>
-
+@* 
             <div class="form-group">
                 <span class="input-group-label"> Branch Name: </span>
                 <div class="input-group mb-3">
@@ -66,7 +55,7 @@
                     <span asp-validation-for="Branch" class="text-danger"></span>
                 </div>
             </div>
-
+ *@
             <div class="form-group">
                 <span class="input-group-label"> Bank Name: </span>
                 <div class="input-group mb-3">
@@ -105,17 +94,17 @@
         <div class="col-sm-6">
 
 
-            <div class="form-group">
-                <span class="input-group-label"> Agreement Date: </span>
+           @*  <div class="form-group">
+                <span class="input-group-label"> Active Date: </span>
                 <div class="input-group mb-3">
                     <div class="input-group-prepend">
                         <span class="input-group-text"><i class="far fa-calendar-check"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                     </div>
-                    <input type="date" id="AgreementDate" asp-for="AgreementDate" id="AgreementDate" class="form-control remarks" required placeholder="Agreement Date" value="@DateTime.Now">
-                    <span asp-validation-for="AgreementDate" class="text-danger"></span>
+                    <input type="date" id="ActivatedDate" asp-for="ActivatedDate" id="AgreementDate" class="form-control remarks" required placeholder="Agreement Date" value="@DateTime.Now">
+                    <span asp-validation-for="ActivatedDate" class="text-danger"></span>
                 </div>
             </div>
-
+ *@
             @*<div class="form-group">
             <label asp-for="ActivatedDate" class="control-label"></label>
             <input asp-for="ActivatedDate" class="form-control remarks" />
@@ -152,7 +141,7 @@
                     <span asp-validation-for="Addressline" class="text-danger"></span>
                 </div>
             </div>
-            <div class="form-group">
+            @* <div class="form-group">
                 <span class="input-group-label"> Remarks:</span>
                 <div class="input-group mb-3">
                     <div class="input-group-prepend">
@@ -161,7 +150,19 @@
                     <input type="text" id="Description" asp-for="Description" class="form-control remarks" value="Add new Agency" placeholder="Remarks" required maxlength="50" />
                     <span asp-validation-for="Description" class="text-danger"></span>
                 </div>
+            </div> *@
+            <div class="form-group">
+                <span class="input-group-label"> Document:</span>
+                <div class="input-group mb-3">
+                    <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="@Applicationsettings.NO_POLICY_IMAGE" data-toggle="tooltip" title="No Document" />
+                    <i class="fa fa-asterisk asterik-style"></i>
+                    <input accept=".jpg,.jpeg,.png" asp-for="DocumentImage" type="file"
+                           class="form-control remarks document-image-input" id="createImageInput" data-preview-id="createProfileImage" required data-toggle="tooltip" title="Upload Document"
+                           data-default-image="@Applicationsettings.NO_POLICY_IMAGE" />
+                    <span asp-validation-for="DocumentImage" class="text-danger"></span>
+                </div>
             </div>
+@* 
             <div class="form-group">
                 <span class="input-group-label"> Status:</span>
                 <div class="input-group mb-3">
@@ -174,7 +175,7 @@
                     <span asp-validation-for="Status" class="text-danger"></span>
 
                 </div>
-            </div>
+            </div> *@
         </div>
     </div>
 </div>

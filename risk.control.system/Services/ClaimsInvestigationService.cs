@@ -528,6 +528,7 @@ namespace risk.control.system.Services
             var assignedToAgent = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
             var claim = _context.ClaimsInvestigation
+                .Include(c=>c.PolicyDetail)
                 .Where(c => c.ClaimsInvestigationId == claimsInvestigationId).FirstOrDefault();
             if (claim != null)
             {
@@ -1064,6 +1065,7 @@ namespace risk.control.system.Services
         private async Task<ClaimsInvestigation> ApproveAgentReport(string userEmail, string claimsInvestigationId,  string supervisorRemarks, SupervisorRemarkType reportUpdateStatus, IFormFile? claimDocument = null, string editRemarks = "")
         {
             var claim = _context.ClaimsInvestigation
+                .Include(c => c.PolicyDetailId)
                 .Include(c => c.AgencyReport)
                 .Include(c => c.Vendor)
                 .Include(c => c.ClientCompany)

@@ -12,13 +12,13 @@
             },
             {
                 className: 'max-width-column-pincodes', // Apply the CSS class,
-                targets: 5                      // Index of the column to style
+                targets: 4                      // Index of the column to style
             },
             {
                 className: 'max-width-column-name', // Apply the CSS class,
-                targets: 9                      // Index of the column to style
+                targets: 8                      // Index of the column to style
             }],
-        order: [[11, 'desc'], [12, 'desc']], // Sort by `isUpdated` and `lastModified`,
+        order: [[10, 'desc'], [11, 'desc']], // Sort by `isUpdated` and `lastModified`,
         fixedHeader: true,
         processing: true,
         paging: true,
@@ -46,7 +46,6 @@
                     return '<span title="' + row.vendorName + '" data-toggle="tooltip">' + data + '</span>'
                 }
             },
-            { "data": "code" },
             {
                 "data": "phone",
                 "mRender": function (data, type, row) {

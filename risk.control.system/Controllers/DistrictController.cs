@@ -158,11 +158,7 @@ namespace risk.control.system.Controllers
 
             var user = _context.ApplicationUser.Include(a=>a.Country).FirstOrDefault(u => u.Email == userEmail);
 
-            if (user.IsSuperAdmin)
-            {
-                return View();
-            }
-            var district = new District { Country = user.Country, CountryId = user.CountryId.GetValueOrDefault(), SelectedCountryId = user.CountryId.GetValueOrDefault() };
+            var district = new District { IsUpdated = !user.IsSuperAdmin, Country = user.Country, CountryId = user.CountryId.GetValueOrDefault(), SelectedCountryId = user.CountryId.GetValueOrDefault() };
             return View(district);
         }
 

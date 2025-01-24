@@ -20,7 +20,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" for="CountryId"><i class="fas fa-map-marked-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                     </div>
-                                    @if (Model != null && Model.CountryId > 0)
+                                    @if (Model.IsUpdated)
                                     {
 
                                         <input readonly type="text"

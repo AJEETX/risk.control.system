@@ -18,18 +18,14 @@
             targets: 3                      // Index of the column to style
             },
             {
-                className: 'max-width-column-name', // Apply the CSS class,
-                targets: 4                      // Index of the column to style
-            },
-            {
                 className: 'max-width-column', // Apply the CSS class,
-                targets: 7                      // Index of the column to style
+                targets: 6                      // Index of the column to style
             },
             {
                 className: 'max-width-column-name', // Apply the CSS class,
-                targets: 12                      // Index of the column to style
+                targets: 11                      // Index of the column to style
             }],
-        order: [[14, 'desc'], [15, 'desc']], // Sort by `isUpdated` and `lastModified`,
+        order: [[13, 'desc'], [14, 'desc']], // Sort by `isUpdated` and `lastModified`,
         fixedHeader: true,
         processing: true,
         paging: true,
@@ -71,12 +67,6 @@
                 "data": "name",
                 "mRender": function (data, type, row) {
                     return '<span title="' + row.name + '" data-toggle="tooltip">' + data + '</span>'
-                }
-            },
-            {
-                "data": "code",
-                "mRender": function (data, type, row) {
-                    return '<span title="' + data + '" data-toggle="tooltip">' + data + '</span>'
                 }
             },
             {

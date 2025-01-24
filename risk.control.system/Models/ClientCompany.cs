@@ -17,15 +17,15 @@ namespace risk.control.system.Models
         public string Name { get; set; } = default!;
 
         [Display(Name = "Insurer code")]
-        public string Code { get; set; } = default!;
+        public string? Code { get; set; } = default!;
 
-        public string Description { get; set; } = default!;
+        public string? Description { get; set; } = default!;
 
         [Display(Name = "Phone number")]
         public string PhoneNumber { get; set; } = default!;
 
         public string Email { get; set; } = default!;
-        public string Branch { get; set; } = default!;
+        public string? Branch { get; set; } = default!;
         public string Addressline { get; set; } = default!;
 
         [Display(Name = "State name")]
@@ -56,12 +56,12 @@ namespace risk.control.system.Models
         public long SelectedStateId { get; set; }
         [NotMapped]
         public long SelectedCountryId { get; set; }
-        public string BankName { get; set; } = default!;
+        public string? BankName { get; set; } = default!;
 
         [Display(Name = "Bank Account Number")]
-        public string BankAccountNumber { get; set; } = default!;
+        public string? BankAccountNumber { get; set; } = default!;
 
-        public string IFSCCode { get; set; } = default!;
+        public string? IFSCCode { get; set; } = default!;
 
         [DataType(DataType.Date)]
         public DateTime? AgreementDate { get; set; } = DateTime.Now;
@@ -94,7 +94,7 @@ namespace risk.control.system.Models
         public string? PassportApiKey { get; set; } = "327fd8beb9msh8a441504790e80fp142ea8jsnf74b9208776a";
         public string? PassportApiHost { get; set; } = "document-ocr1.p.rapidapi.com";
         public bool SendSMS { get; set; } = true;
-        public bool EnableMailbox { get; set; } = true;
+        public bool EnableMailbox { get; set; } = false;
         public bool CanChangePassword { get; set; } = false;
         public string? MobileAppUrl { get; set; } = Applicationsettings.APP_URL;
         public bool BulkUpload { get; set; } = false;

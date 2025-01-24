@@ -83,7 +83,7 @@ $(document).ready(function () {
     });
 
 });
-AgreementDate.max = new Date().toISOString().split("T")[0];
+//ActivatedDate.max = new Date().toISOString().split("T")[0];
 
 
 $('#emailAddress').focus();

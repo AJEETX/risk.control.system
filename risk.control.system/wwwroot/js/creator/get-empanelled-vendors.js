@@ -13,40 +13,6 @@
                 'render': function (data, type, full, meta) {
                     return '<input type="checkbox" name="id[]" value="' + $('<div/>').text(data).html() + '">';
                 }
-            },
-            
-            {
-                className: 'max-width-column-number', // Apply the CSS class,
-                targets: 0                      // Index of the column to style
-            },
-            {
-                className: 'max-width-column-name', // Apply the CSS class,
-                targets: 1                      // Index of the column to style
-            },
-            {
-                className: 'max-width-column-number', // Apply the CSS class,
-                targets: 4                      // Index of the column to style
-            },
-            {
-                className: 'max-width-column-number', // Apply the CSS class,
-                targets: 5                      // Index of the column to style
-            },
-            {
-                className: 'max-width-column-name', // Apply the CSS class,
-                targets: 6                      // Index of the column to style
-            }
-            ,
-            {
-                className: 'max-width-column-number', // Apply the CSS class,
-                targets: 7                      // Index of the column to style
-            },
-            {
-                className: 'max-width-column-number', // Apply the CSS class,
-                targets: 8                      // Index of the column to style
-            },
-            {
-                className: 'max-width-column-number', // Apply the CSS class,
-                targets: 9                      // Index of the column to style
             }],
         order: [[1, 'asc']],
         fixedHeader: true,

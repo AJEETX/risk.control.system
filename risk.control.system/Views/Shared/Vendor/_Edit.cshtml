@@ -2,26 +2,7 @@
 
 <div class="row">
     <div class="col-sm-6">
-        <div class="form-group">
-            <span class="input-group-label"> Document:</span>
-            <div class="input-group mb-3">
-                @if (Model?.DocumentUrl is not null)
-                {
-                    <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="@Model?.DocumentUrl" data-toggle="tooltip" title="Document" />
-                    <i class="fa fa-asterisk asterik-style"></i>
-                    <input accept=".jpg,.jpeg,.png" asp-for="Document" type="file"
-                           class="form-control remarks document-image-input" id="createImageInput" data-preview-id="createProfileImage" data-toggle="tooltip" title="Upload Document" data-default-image="@Applicationsettings.NO_IMAGE" />
-                }
-                else
-                {
-                    <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src=@Applicationsettings.NO_IMAGE data-toggle="tooltip" title="No Document" />
-                    <i class="fa fa-asterisk asterik-style"></i>
-                    <input accept=".jpg,.jpeg,.png" asp-for="Document" type="file"
-                           class="form-control remarks document-image-input" id="createImageInput" data-preview-id="createProfileImage" required data-toggle="tooltip" title="Upload Document" data-default-image="@Applicationsettings.NO_IMAGE" />
-                    <span asp-validation-for="Document" class="text-danger"></span>
-                }
-            </div>
-        </div>
+        
         <div class="form-group">
             <span class="input-group-label"> Agency Name: </span>
             <div class="input-group mb-3">
@@ -30,16 +11,6 @@
                 </div>
                 <input type="text" id="Name" asp-for="Name" class="form-control remarks title-name" required placeholder="Enter Agency Name" maxlength="30">
                 <span asp-validation-for="Name" class="text-danger"></span>
-            </div>
-        </div>
-        <div class="form-group">
-            <span class="input-group-label"> Agency Code:</span>
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <span class="input-group-text"><i class="fas fa-code"></i><i class="fa fa-asterisk asterik-style"></i></span>
-                </div>
-                <input type="text" id="Code" asp-for="Code" class="form-control remarks asterikx" required placeholder="Enter Agency Code" maxlength="5">
-                <span asp-validation-for="Code" class="text-danger"></span>
             </div>
         </div>
 
@@ -60,7 +31,7 @@
                 <span asp-validation-for="PhoneNumber" class="text-danger"></span>
             </div>
         </div>
-        <div class="form-group">
+        @* <div class="form-group">
             <span class="input-group-label"> Branch Name: </span>
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
@@ -69,7 +40,7 @@
                 <input type="text" id="Branch" asp-for="Branch" class="form-control remarks title-name" required placeholder="Enter Branch Name" maxlength="30">
                 <span asp-validation-for="Branch" class="text-danger"></span>
             </div>
-        </div>
+        </div> *@
 
         <div class="form-group">
             <span class="input-group-label"> Bank Name: </span>
@@ -103,19 +74,59 @@
                 <span asp-validation-for="IFSCCode" class="text-danger"></span>
             </div>
         </div>
-        <div class="form-group">
-            <span class="input-group-label"> Profile edit:</span>
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <span class="input-group-text"><i class="fas fa-portrait"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+        @if (Model.SelectedByCompany)
+        {
+            <input asp-for="CanChangePassword" id="CanChangePassword" type="hidden" />
+            <input asp-for="EnableMailbox" id="EnableMailbox" type="hidden" />
+
+        }
+        else
+        {
+            
+            <div class="form-group d-flex justify-content-between align-items-center">
+                <!-- CanChangePassword -->
+                <div class="d-flex align-items-center">
+                    <span class="input-group-label mr-2">Profile edit:</span>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">
+                                <i class="fas fa-portrait"></i>
+                                <i class="fa fa-asterisk asterik-style"></i>
+                            </span>
+                        </div>
+                        <span class="checkbox ml-2">
+                            <input asp-for="CanChangePassword" id="CanChangePassword" type="checkbox" data-toggle="toggle"
+                                   data-on="<i class='fas fa-lock-open'></i> Active"
+                                   data-off="<i class='fas fa-lock'></i> Lock"
+                                   data-onstyle="success"
+                                   data-offstyle="danger"
+                                   data-width="120">
+                        </span>
+                    </div>
                 </div>
 
-                <span class="checkbox">
-                    <input asp-for="CanChangePassword" id="CanChangePassword" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
-
-                </span>
+                <!-- EnableMailbox -->
+                <div class="d-flex align-items-center">
+                    <span class="input-group-label mr-2">Enable Mailbox:</span>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">
+                                <i class="far fa-comment-alt"></i>
+                                <i class="fa fa-asterisk asterik-style"></i>
+                            </span>
+                        </div>
+                        <span class="checkbox ml-2">
+                            <input asp-for="EnableMailbox" id="EnableMailbox" type="checkbox" data-toggle="toggle"
+                                   data-on="<i class='fas fa-lock-open'></i> Active"
+                                   data-off="<i class='fas fa-lock'></i> Lock"
+                                   data-onstyle="success"
+                                   data-offstyle="danger"
+                                   data-width="120">
+                        </span>
+                    </div>
+                </div>
             </div>
-        </div>
+        }
         
     </div>
     <div class="col-sm-6">
@@ -132,7 +143,7 @@
             </div>
         </div>
 
-
+@* 
         <div class="form-group">
             <span class="input-group-label"> Note:</span>
             <div class="input-group mb-3">
@@ -142,43 +153,15 @@
                 <input type="text" id="Description" asp-for="Description" class="form-control remarks" placeholder="Enter Remarks" required maxlength="50" />
             </div>
             <span asp-validation-for="Description" class="text-danger"></span>
-        </div>
+        </div> *@
         @if(Model.SelectedByCompany)
         {
-            <div class="form-group">
-                <span class="input-group-label"> Mobile App Url:</span>
-                <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text" ><i class="fas fa-code-branch"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                    </div>
-                    <input readonly type="text" id="MobileApiBaseUrl" asp-for="MobileAppUrl" class="form-control remarks" placeholder="mobile app url" maxlength="100" />
-                    <span asp-validation-for="MobileAppUrl" class="text-danger"></span>
-                </div>
-            </div>
-            <div class="form-group">
-                <span class="input-group-label"> Status:</span>
-                <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text" for="Status"><i class="fa fa-toggle-on"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                    </div>
-                    <select disabled id="Status" asp-for="Status" class="form-control remarks" asp-items="Html.GetEnumSelectList<VendorStatus>()">
-                    </select>
-                </div>
-            </div>
+            <input type="hidden" id="Status" asp-for="Status" />
 
         }
         else
         {
-            <div class="form-group">
-                <span class="input-group-label"> Mobile App Url:</span>
-                <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text" ><i class="fas fa-code-branch"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                    </div>
-                    <input type="text" id="MobileApiBaseUrl" asp-for="MobileAppUrl" class="form-control remarks" placeholder="mobile app url" maxlength="100" />
-                    <span asp-validation-for="MobileAppUrl" class="text-danger"></span>
-                </div>
-            </div>
+            
             <div class="form-group">
                 <span class="input-group-label"> Status:</span>
                 <div class="input-group mb-3">
@@ -194,17 +177,25 @@
             </div>
         }
         <div class="form-group">
-            <span class="input-group-label"> Enable Mailbox:</span>
+            <span class="input-group-label"> Document:</span>
             <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <span class="input-group-text"><i class="far fa-comment-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                </div>
-
-                <span class="checkbox">
-                    <input asp-for="EnableMailbox" id="EnableMailbox" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
-
-                </span>
+                @if (Model?.DocumentUrl is not null)
+                {
+                    <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="@Model?.DocumentUrl" data-toggle="tooltip" title="Document" />
+                    <i class="fa fa-asterisk asterik-style"></i>
+                    <input accept=".jpg,.jpeg,.png" asp-for="Document" type="file"
+                           class="form-control remarks document-image-input" id="createImageInput" data-preview-id="createProfileImage" data-toggle="tooltip" title="Upload Document" data-default-image="@Applicationsettings.NO_IMAGE" />
+                }
+                else
+                {
+                    <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src=@Applicationsettings.NO_IMAGE data-toggle="tooltip" title="No Document" />
+                    <i class="fa fa-asterisk asterik-style"></i>
+                    <input accept=".jpg,.jpeg,.png" asp-for="Document" type="file"
+                           class="form-control remarks document-image-input" id="createImageInput" data-preview-id="createProfileImage" required data-toggle="tooltip" title="Upload Document" data-default-image="@Applicationsettings.NO_IMAGE" />
+                    <span asp-validation-for="Document" class="text-danger"></span>
+                }
             </div>
         </div>
+        
     </div>
 </div>

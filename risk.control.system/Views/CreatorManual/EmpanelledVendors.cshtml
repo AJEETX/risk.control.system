@@ -42,8 +42,6 @@
             string baddress = string.Empty;
             int currentAgeinYrs = 0;
             int currentBAgeinYrs = 0;
-            bool customerExist = false;
-            bool beneficiaryExist = false;
             if (Model.ClaimsInvestigation != null)
             {
                 address = @Model.ClaimsInvestigation?.CustomerDetail.Addressline + " " + @Model.ClaimsInvestigation?.CustomerDetail.District.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.State.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.Country.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.PinCode.Code;
@@ -61,33 +59,6 @@
                     currentBAgeinYrs = (int)age / 365;
                 }
             }
-            if (!string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.PolicyDetail.ContractNumber))
-            {
-                customerExist = true;
-            }
-            if (Model.Location?.BeneficiaryDetailId > 0)
-            {
-                beneficiaryExist = true;
-            }
-            string customerProgressColor = "grey";
-            if (@customerExist)
-            {
-                customerProgressColor = "green";
-            }
-            string benficiaryProgressColor = "lightgrey";
-            if (@customerExist && @beneficiaryExist)
-            {
-                benficiaryProgressColor = "green";
-            }
-            if (@customerExist && !@beneficiaryExist)
-            {
-                benficiaryProgressColor = "grey";
-            }
-            if (!@customerExist && !@beneficiaryExist)
-            {
-                benficiaryProgressColor = "lightgrey";
-            }
-
             <article>
                 <div class="bb-blog-inner">
                     <div class="card card-light collapsed-card">
@@ -150,7 +121,7 @@
                                         </div>
                                         <div class="progress">
                                             <i class="far fa-bookmark bookmark-green"></i>
-                                            <div class="progress-bar" role="progressbar" style="width:100%;background-color:green;">
+                                            <div class="progress-bar progress-bar-green" role="progressbar">
                                                 <i class="far fa-file-powerpoint"></i>
                                             </div>
                                         </div>
@@ -274,7 +245,7 @@
                                         </div>
                                         <div class="progress">
                                             <i class="far fa-bookmark bookmark-green"></i>
-                                            <div class="progress-bar" role="progressbar" style="width:100%;background-color:@customerProgressColor;">
+                                            <div class="progress-bar progress-bar-green" role="progressbar">
                                                 <i class="fa fa-user-plus"></i>
                                             </div>
                                         </div>
@@ -362,7 +333,6 @@
                                         </div>
                                     </div>
                                 </div>
-
                                 <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
                                     <div class="card bg-light d-flex flex-fill">
                                         <div class="card-header text-muted border-bottom-0">
@@ -392,7 +362,7 @@
                                         </div>
                                         <div class="progress">
                                             <i class="far fa-bookmark bookmark-green"></i>
-                                            <div class="progress-bar" role="progressbar" style="width:100%;background-color:@benficiaryProgressColor;">
+                                            <div class="progress-bar progress-bar-green" role="progressbar">
                                                 <i class="fas fa-user-tie"></i>
                                             </div>
                                         </div>
@@ -512,7 +482,6 @@
     </div>
 </section>
 @section Scripts {
-
-    <script type="text/javascript" src="~/js/creator/get-empanelled-vendors.js">
-    </script>
+    <script type="text/javascript" src="~/js/creator/get-empanelled-vendors.js"></script>
+    <script src="~/js/common/claim-details.js"></script>
 }

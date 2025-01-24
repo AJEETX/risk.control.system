@@ -26,25 +26,12 @@ namespace risk.control.system.Seeds
             };
             var newGlobalSetting = await context.GlobalSettings.AddAsync(globalSetting);
             await context.SaveChangesAsync(null, false);
-            var globalSettings = context.GlobalSettings.FirstOrDefault();
-            var enableMailbox = globalSettings?.EnableMailbox ?? false;
 
             var vendors = await VendorSeed.Seed(context, webHostEnvironment, investigationServiceType, discreetServiceType, docServiceType, lineOfBusiness, httpAccessor, customApiCLient, vendorUserManager);
 
             var companies = await CompanyInsurer.Seed(context, vendors, webHostEnvironment, investigationServiceType, discreetServiceType, docServiceType, lineOfBusiness, httpAccessor, customApiCLient, clientUserManager);
 
             await context.SaveChangesAsync(null, false);
-
-            //foreach (var vendor in vendors)
-            //{
-            //    foreach (var insurerCompany in companies)
-            //    {
-            //        if (vendor.CountryId == insurerCompany.CountryId)
-            //        {
-            //            vendor.Clients.Add(insurerCompany);
-            //        }
-            //    }
-            //}
 
             await context.SaveChangesAsync(null, false);
             return (vendors, companies);

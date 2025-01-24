@@ -23,13 +23,13 @@
             },
             {
                 className: 'max-width-column', // Apply the CSS class,
-                targets: 6                      // Index of the column to style
+                targets: 5                      // Index of the column to style
             },
             {
                 className: 'max-width-column-name', // Apply the CSS class,
-                targets: 11                      // Index of the column to style
+                targets: 10                      // Index of the column to style
             }],
-        order: [[13, 'desc'], [14, 'desc']], // Sort by `isUpdated` and `lastModified`,
+        order: [[12, 'desc'], [13, 'desc']], // Sort by `isUpdated` and `lastModified`,
         fixedHeader: true,
         processing: true,
         paging: true,
@@ -68,7 +68,6 @@
                     return '<span title="' + row.name + '" data-toggle="tooltip">' + data + '</span>'
                 }
             },
-            { "data": "code" },
             {
                 "data": "phone",
                 "mRender": function (data, type, row) {

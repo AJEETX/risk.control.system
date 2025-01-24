@@ -747,7 +747,8 @@ namespace risk.control.system.Controllers
                     vendorDocument.CopyTo(dataStream);
                     vendor.DocumentImage = dataStream.ToArray();
                 }
-                vendor.Status = vendor.Status;
+                vendor.Status = VendorStatus.ACTIVE;
+                vendor.AgreementDate = DateTime.Now;
                 vendor.ActivatedDate = DateTime.Now;
                 vendor.DomainName = domainData;
                 vendor.Updated = DateTime.Now;

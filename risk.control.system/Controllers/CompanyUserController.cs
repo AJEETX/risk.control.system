@@ -144,6 +144,7 @@ namespace risk.control.system.Controllers
                 user.ProfilePictureUrl = "/company/" + newFileName;
             }
             //DEMO
+            user.Active = true; 
             user.Password = Applicationsettings.Password;
             user.Email = userFullEmail;
             user.EmailConfirmed = true;
@@ -181,13 +182,6 @@ namespace risk.control.system.Controllers
             return View(user);
         }
 
-        //private void GetCountryStateEdit(ClientCompanyApplicationUser? user)
-        //{
-        //    ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", user?.CountryId);
-        //    ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name", user?.DistrictId);
-        //    ViewData["StateId"] = new SelectList(_context.State.Where(s => s.CountryId == user.CountryId), "StateId", "Name", user?.StateId);
-        //    ViewData["PinCodeId"] = new SelectList(_context.PinCode.Where(s => s.StateId == user.StateId), "PinCodeId", "Name", user?.PinCodeId);
-        //}
 
         // GET: ClientCompanyApplicationUser/Edit/5
         [Breadcrumb("Edit ")]

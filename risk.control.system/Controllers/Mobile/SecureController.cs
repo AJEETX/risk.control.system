@@ -255,7 +255,7 @@ namespace risk.control.system.Controllers.Mobile
                 Secure = true,
                 SameSite = SameSiteMode.Strict
             });
-            Response.Cookies.Append("analyticsCookies", false.ToString(), new CookieOptions
+            Response.Cookies.Append("analyticsCookies", true.ToString(), new CookieOptions
             {
                 Expires = DateTimeOffset.UtcNow.AddDays(365),
                 HttpOnly = false,
@@ -263,14 +263,14 @@ namespace risk.control.system.Controllers.Mobile
                 SameSite = SameSiteMode.Strict
             });
 
-            Response.Cookies.Append("marketingCookies", false.ToString(), new CookieOptions
+            Response.Cookies.Append("marketingCookies", true.ToString(), new CookieOptions
             {
                 Expires = DateTimeOffset.UtcNow.AddDays(365),
                 HttpOnly = false,
                 Secure = true,
                 SameSite = SameSiteMode.Strict
             });
-            return Ok(new { success = true, message = "Cookie accepted consent saved successfully!" });
+            return Ok(new { success = true, message = "Accept-All-Cookie consent saved successfully!" });
         }
 
         [AllowAnonymous]
@@ -286,7 +286,7 @@ namespace risk.control.system.Controllers.Mobile
                 SameSite = SameSiteMode.Strict
             });
 
-            Response.Cookies.Append("analyticsCookies", "false", new CookieOptions
+            Response.Cookies.Append("analyticsCookies", false.ToString(), new CookieOptions
             {
                 Expires = DateTimeOffset.UtcNow.AddDays(365),
                 HttpOnly = false,
@@ -301,7 +301,7 @@ namespace risk.control.system.Controllers.Mobile
                 Secure = true,
                 SameSite = SameSiteMode.Strict
             });
-            return Ok(new { success = true, message = "Cookie consent saved on close successfully!" });
+            return Ok(new { success = true, message = "Accept-only-required Cookie consent saved successfully!" });
         }
 
         [AllowAnonymous]
@@ -338,7 +338,7 @@ namespace risk.control.system.Controllers.Mobile
                 SameSite = SameSiteMode.Strict
             });
 
-            return Ok(new { success = true, message = "Cookie preferences saved successfully!" });
+            return Ok(new { success = true, message = "Cookie Preferences saved successfully!" });
         }
 
 

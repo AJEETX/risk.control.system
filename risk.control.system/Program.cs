@@ -275,6 +275,17 @@ builder.Services.ConfigureApplicationCookie(options =>
         };
     });
 
+builder.Services.AddAntiforgery(options =>
+{
+    options.Cookie.Name = "icheckifyToken"; // Set a custom cookie name
+    options.Cookie.HttpOnly = true; // Make the cookie HttpOnly
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Require secure cookies (only over HTTPS)
+    options.Cookie.SameSite = SameSiteMode.Strict; // Apply a strict SameSite policy
+    options.HeaderName = "X-CSRF-TOKEN"; // Set a custom header name
+    options.FormFieldName = "icheckifyAntiforgery"; // Set a custom form field name
+    options.SuppressXFrameOptionsHeader = false; // Enable the X-Frame-Options header
+});
+
 builder.Services.AddSwaggerGen(c =>
 {
     c.OperationFilter<AddRequiredHeaderParameter>();

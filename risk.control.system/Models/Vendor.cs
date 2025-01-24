@@ -18,16 +18,16 @@ namespace risk.control.system.Models
         public string Name { get; set; } = string.Empty;
 
         [Display(Name = "Agency code")]
-        public string Code { get; set; } = string.Empty;
+        public string? Code { get; set; } = string.Empty;
 
         [Display(Name = "Agency detail")]
-        public string Description { get; set; } = string.Empty;
+        public string? Description { get; set; } = string.Empty;
 
         [Display(Name = "Phone number")]
         public string PhoneNumber { get; set; } = string.Empty;
 
         public string Email { get; set; } = string.Empty;
-        public string Branch { get; set; } = string.Empty;
+        public string? Branch { get; set; } = string.Empty;
         public string Addressline { get; set; } = string.Empty;
         public List<VendorInvestigationServiceType>? VendorInvestigationServiceTypes { get; set; } = default!;
 
@@ -61,13 +61,13 @@ namespace risk.control.system.Models
         public long SelectedCountryId { get; set; }
 
         [Display(Name = "Bank Name")]
-        public string BankName { get; set; } = default!;
+        public string? BankName { get; set; } = default!;
 
         [Display(Name = "Bank Account Number")]
-        public string BankAccountNumber { get; set; } = default!;
+        public string? BankAccountNumber { get; set; } = default!;
 
         [Display(Name = "IFSC code")]
-        public string IFSCCode { get; set; } = default!;
+        public string? IFSCCode { get; set; } = default!;
 
         [Display(Name = "Agreement date")]
         [DataType(DataType.Date)]
@@ -126,7 +126,7 @@ namespace risk.control.system.Models
         public string? MobileAppUrl { get; set; } = Applicationsettings.APP_URL;
         public bool CanChangePassword { get; set; } = false;
         public bool HasClaims { get; set; } = false;
-        public bool EnableMailbox { get; set; } = true;
+        public bool EnableMailbox { get; set; } = false;
 
         public override string ToString()
         {
