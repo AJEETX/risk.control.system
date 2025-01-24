@@ -57,7 +57,7 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text" asp-for="CustomerName"><i class="fa fa-user-plus"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                         </div>
-                        <input id="CustomerName" required asp-for="Name" class="form-control remarks title-name" type="text" placeholder="Customer Name" maxlength="30" />
+                        <input id="CustomerName" required asp-for="Name" class="form-control remarks title-name" type="text" placeholder="Customer Name" maxlength="30" autocomplete="off" />
                         <span asp-validation-for="Name" class="text-danger"></span>
                     </div>
                 </div>
@@ -150,7 +150,7 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fa fa-home"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                         </div>
-                        <input type="text" asp-for="Addressline" id="Addressline" class="form-control remarks title-name" type="text" required placeholder="Address" maxlength="50" />
+                        <input type="text" asp-for="Addressline" id="Addressline" class="form-control remarks title-name" type="text" required placeholder="Address" maxlength="50" autocomplete="off" />
                         <span asp-validation-for="Addressline" class="text-danger"></span>
                     </div>
                 </div>
@@ -162,7 +162,7 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text" asp-for="Description"><i class="fas fa-pencil-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                         </div>
-                        <input required asp-for="Description" id="Description" class="form-control remarks" type="text" placeholder="Note" maxlength="50" />
+                        <input required asp-for="Description" id="Description" class="form-control remarks" type="text" placeholder="Note" maxlength="50" autocomplete="off" />
                         <span asp-validation-for="Description" class="text-danger"></span>
                     </div>
                 </div>
@@ -183,7 +183,7 @@
             @* <button type="submit" onclick="clearAllInputs()" class="btn btn-outline-secondary">
             <i class="fas fa-undo"></i> Reset
             </button> *@
-            <a id="back" asp-action="Details" asp-route-id="@Model.ClaimsInvestigationId" class="btn btn-secondary">
+            <a id="cancel" asp-action="Details" asp-route-id="@Model.ClaimsInvestigationId" class="btn btn-secondary">
                 <i class="fa fa-window-close"></i>
                 @Applicationsettings.CANCEL
             </a>

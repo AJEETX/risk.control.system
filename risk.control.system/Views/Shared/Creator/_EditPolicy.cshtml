@@ -59,7 +59,7 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text" asp-for="ContractNumber"><i class="far fa-file-powerpoint"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                         </div>
-                        <input id="ContractNumber" required asp-for="PolicyDetail.ContractNumber" class="form-control remarks" type="text" placeholder="Policy #" maxlength="20" />
+                        <input id="ContractNumber" required asp-for="PolicyDetail.ContractNumber" class="form-control remarks" type="text" placeholder="Policy #" maxlength="20" autocomplete="off" />
                         <span asp-validation-for="PolicyDetail.ContractNumber" class="text-danger"></span>
                     </div>
                 </div>
@@ -69,7 +69,7 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text" asp-for="SumAssuredValue"><i class="fas fa-rupee-sign"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
                         </div>
-                        <input id="SumAssuredValue" required asp-for="PolicyDetail.SumAssuredValue" class="form-control remarks" type="text" placeholder="Assured Amount" min="1000" maxlength="10" />
+                        <input id="SumAssuredValue" required asp-for="PolicyDetail.SumAssuredValue" class="form-control remarks" type="text" placeholder="Assured Amount" min="1000" maxlength="10" autocomplete="off" />
                         <span asp-validation-for="PolicyDetail.SumAssuredValue" class="text-danger"></span>
                     </div>
                 </div>
@@ -130,7 +130,7 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text" asp-for="CauseOfLoss"><i class="nav-icon far fa-flag"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                         </div>
-                        <input required id="CauseOfLoss" asp-for="PolicyDetail.CauseOfLoss" class="form-control remarks" type="text" placeholder="Cause Of Incident" maxlength="70" />
+                        <input required id="CauseOfLoss" asp-for="PolicyDetail.CauseOfLoss" class="form-control remarks" type="text" placeholder="Cause Of Incident" maxlength="70" autocomplete="off" />
                         <span asp-validation-for="PolicyDetail.CauseOfLoss" class="text-danger"></span>
                     </div>
                 </div>
@@ -191,7 +191,7 @@
             @* <button type="submit" onclick="clearAllInputs()" class="btn btn-outline-secondary">
             <i class="fas fa-undo"></i> Reset
             </button> *@
-            <a id="back" asp-action="Details" asp-route-id="@Model.ClaimsInvestigationId" class="btn btn-secondary">
+            <a id="cancel" asp-action="Details" asp-route-id="@Model.ClaimsInvestigationId" class="btn btn-secondary">
                 <i class="fa fa-window-close"></i>
                 @Applicationsettings.CANCEL
             </a>

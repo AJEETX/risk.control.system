@@ -226,45 +226,44 @@ $(document).ready(function () {
         }
     });
 
-    $('#back').on('click', function () {
-        $("body").addClass("submit-progress-bg");
-        // Wrap in setTimeout so the UI
-        // can update the spinners
-        setTimeout(function () {
-            $(".submit-progress").removeClass("hidden");
-        }, 1);
+    $('#cancel').on('click', function (e) {
+        //var controller = $(this).attr('asp-controller');
+        //if (!controller) {
+        //    controller = window.location.pathname.split('/')[1]; // Get the current controller from the URL
+        //}
+        //const action = $(this).attr('asp-action');
+        //const routeId = $(this).attr('asp-route-id');
 
-        $('#back').attr('disabled', 'disabled');
-        $('html').css('cursor', 'not-allowed');
-        $('a, button').css('cursor', 'not-allowed');
-        $('a, button').attr('disabled', 'disabled');
-        var section = document.getElementById("section");
-        if (section) {
-            var nodes = section.getElementsByTagName('*');
-            for (var i = 0; i < nodes.length; i++) {
-                nodes[i].disabled = true;
+        //// Construct the URL
+        //const baseUrl = `${window.location.origin}/${controller}/${action}`;
+        //const url = routeId ? `${baseUrl}/${routeId}` : baseUrl;
+        const url = $(this).attr('href');
+        e.preventDefault(); // Prevent the default navigation
+        $.confirm({
+            title: 'Confirm Cancellation',
+            content: 'Are you sure you want to cancel? Any unsaved changes will be lost.',
+            icon: 'fas fa-exclamation-triangle',
+            type: 'orange',
+            buttons: {
+                confirm: {
+                    text: 'Yes, Cancel',
+                    btnClass: 'btn-warning',
+                    action: function () {
+                        disableAllInteractiveElements();
+                        window.location.href = url;
+                    }
+                },
+                cancel: {
+                    text: 'No, Stay',
+                    btnClass: 'btn-secondary'
+                }
             }
-        }
+        });
     });
 
-    $('#back-button').on('click', function () {
-        $("body").addClass("submit-progress-bg");
-        // Wrap in setTimeout so the UI
-        // can update the spinners
-        setTimeout(function () {
-            $(".submit-progress").removeClass("hidden");
-        }, 1);
-        $('#back-button').attr('disabled', 'disabled');
-        $('html').css('cursor', 'not-allowed');
-        $('a, button').css('cursor', 'not-allowed');
-        $('a, button').attr('disabled', 'disabled');
-        var section = document.getElementById("section");
-        if (section) {
-            var nodes = section.getElementsByTagName('*');
-            for (var i = 0; i < nodes.length; i++) {
-                nodes[i].disabled = true;
-            }
-        }
+
+    $('#back').on('click', function () {
+        disableAllInteractiveElements();
     });
 
     $('.nav-item a.actual-link,.nav-item a.navlink-border').on('click', function (e) {

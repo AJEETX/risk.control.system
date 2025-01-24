@@ -56,7 +56,7 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text" asp-for="BeneficiaryName"><i class="fas fa-user-tie"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                         </div>
-                        <input id="BeneficiaryName" required asp-for="Name" class="form-control remarks title-name" type="text" placeholder="Beneficiary Name" maxlength="30" />
+                        <input id="BeneficiaryName" required asp-for="Name" class="form-control remarks title-name" type="text" placeholder="Beneficiary Name" maxlength="30" autocomplete="off" />
                         <span asp-validation-for="Name" class="text-danger"></span>
                     </div>
                 </div>
@@ -110,7 +110,7 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fa fa-home"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                         </div>
-                        <input type="text" id="Addressline" asp-for="Addressline" class="form-control remarks" placeholder="Street Address" required maxlength="50" />
+                        <input type="text" id="Addressline" asp-for="Addressline" class="form-control remarks" placeholder="Street Address" required maxlength="50" autocomplete="off" />
                         <span asp-validation-for="Addressline" class="text-danger"></span>
                     </div>
                 </div>
@@ -131,7 +131,7 @@
             @* <button type="submit" onclick="clearAllInputs()" class="btn btn-outline-secondary">
             <i class="fas fa-undo"></i> Reset
             </button> *@
-            <a id="back" asp-action="Details" asp-route-id="@ViewBag.ClaimId" class="btn btn-secondary">
+            <a id="cancel" asp-action="Details" asp-route-id="@ViewBag.ClaimId" class="btn btn-secondary">
                 <i class="fa fa-window-close"></i>
                 @Applicationsettings.CANCEL
             </a>

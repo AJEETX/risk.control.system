@@ -1065,7 +1065,7 @@ namespace risk.control.system.Services
         private async Task<ClaimsInvestigation> ApproveAgentReport(string userEmail, string claimsInvestigationId,  string supervisorRemarks, SupervisorRemarkType reportUpdateStatus, IFormFile? claimDocument = null, string editRemarks = "")
         {
             var claim = _context.ClaimsInvestigation
-                .Include(c => c.PolicyDetailId)
+                .Include(c => c.PolicyDetail)
                 .Include(c => c.AgencyReport)
                 .Include(c => c.Vendor)
                 .Include(c => c.ClientCompany)
