@@ -203,7 +203,8 @@ namespace risk.control.system.Controllers
                         var timeout = config["SESSION_TIMEOUT_SEC"];
                         var properties = new AuthenticationProperties
                         {
-                            ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(double.Parse(timeout)), // Reset expiry time
+                            IsPersistent = true, // Makes the cookie persistent
+                            ExpiresUtc = DateTimeOffset.UtcNow.AddSeconds(double.Parse(timeout)), // Reset expiry time
                         };
                         await _signInManager.SignInAsync(user, properties);
 

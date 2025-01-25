@@ -2,14 +2,14 @@
     submitHandler: function (form) {
         $.confirm({
             title: "Confirm  Edit Company",
-            content: "Are you sure to edit?",
+            content: "Are you sure to save?",
             icon: 'fas fa-building',
 
             type: 'orange',
             closeIcon: true,
             buttons: {
                 confirm: {
-                    text: "Edit Company",
+                    text: "Save Company",
                     btnClass: 'btn-warning',
                     action: function () {
 
@@ -20,7 +20,7 @@
                             $(".submit-progress").removeClass("hidden");
                         }, 1);
                         $('.btn.btn-warning').attr('disabled', 'disabled');
-                        $('#edit.btn.btn-warning').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Edit Company");
+                        $('#edit.btn.btn-warning').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Save Company");
 
                         form.submit();
                         var createForm = document.getElementById("create-form");

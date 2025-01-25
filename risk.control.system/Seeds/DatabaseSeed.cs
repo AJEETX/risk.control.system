@@ -41,11 +41,25 @@ namespace risk.control.system.Seeds
 
             var india = await PinCodeStateSeed.India(context);
             var indiaPincodes = await PinCodeStateSeed.CsvRead_India();
-            await PinCodeStateSeed.SeedPincode(context,indiaPincodes, india);
+            var indianStates = indiaPincodes.Where(s=>s.StateName.ToLower() == "haryana" ||
+            s.StateName.ToLower() == "delhi" ||
+            s.StateCode.ToLower() == "up" 
+            ).Select(g => g.StateCode).Distinct()?.ToList();
+
+            var filteredInPincodes = indiaPincodes.Where(g => indianStates.Contains(g.StateCode))?.ToList();
+
+            await PinCodeStateSeed.SeedPincode(context, filteredInPincodes, india);
 
             var au = await PinCodeStateSeed.Australia(context);
             var auPincodes = await PinCodeStateSeed.CsvRead_Au();
-            await PinCodeStateSeed.SeedPincode(context, auPincodes, au);
+            var auStates = auPincodes.Where(s => s.StateCode.ToLower() == "nsw" ||
+                s.StateCode.ToLower() == "qld" ||
+                s.StateCode.ToLower() == "vic"
+                ).Select(g => g.StateCode).Distinct()?.ToList();
+
+            var filteredAuPincodes = auPincodes.Where(g => auStates.Contains(g.StateCode))?.ToList();
+
+            await PinCodeStateSeed.SeedPincode(context, filteredAuPincodes, au);
 
             await context.SaveChangesAsync(null, false);
 

@@ -99,11 +99,11 @@
         '#edit',
         {
             title: "Confirm Edit Service",
-            content: "Are you sure to edit?",
+            content: "Are you sure to save?",
             icon: 'fas fa-truck fa-sync',
             type: 'orange',
-            confirmButtonText: "Edit Service",
-            buttonText: "Edit Service",
+            confirmButtonText: "Save Service",
+            buttonText: "Save Service",
             buttonClass: "btn-warning"
         }
     );

@@ -13,7 +13,11 @@
                 'render': function (data, type, full, meta) {
                     return '<input type="checkbox" name="id[]" value="' + $('<div/>').text(data).html() + '">';
                 }
-            }],
+            },
+            {
+                className: 'max-width-column', // Apply the CSS class,
+                targets: 5                      // Index of the column to style
+            },],
         order: [[1, 'asc']],
         fixedHeader: true,
         processing: true,

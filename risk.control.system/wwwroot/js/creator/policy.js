@@ -93,9 +93,9 @@ $(document).ready(function () {
     $('#edit-form').submit(function (e) {
         handleFormSubmit(e, "edit-form", askEditConfirmation, {
             title: "Confirm Edit Policy",
-            content: "Are you sure to edit?",
+            content: "Are you sure to save?",
             type: "orange",
-            buttonText: "Edit Policy",
+            buttonText: "Save Policy",
             buttonClass: "btn-warning"
         });
     });

@@ -1,4 +1,6 @@
-﻿namespace risk.control.system.Middleware
+﻿using System.Text;
+
+namespace risk.control.system.Middleware
 {
     public class CookieConsentMiddleware
     {
@@ -17,27 +19,31 @@
 
             await _next(context);
 
-            //// Inject analytics scripts after the response is generated
-            //if (cookieConsent == "Accepted" && context.Response.ContentType != null &&
-            //    context.Response.ContentType.Contains("text/html"))
-            //{
-            //    context.Response.Body.Seek(0, SeekOrigin.Begin);
-            //    var body = await new StreamReader(context.Response.Body).ReadToEndAsync();
-            //    context.Response.Body.Seek(0, SeekOrigin.Begin);
+            // Inject analytics scripts after the response is generated
+            if (cookieConsent != "Accepted" && context.Response.ContentType != null && context.Response.ContentType.Contains("text/html"))
+            {
+                // Inject a script that can trigger the popup on the client side
+                var script = @"
+                <script>
+                    window.onload = function() {
+                        if (!localStorage.getItem('cookieConsent')) {
+                            // Show your popup here
+                            alert('Please accept cookies to continue using this site.');
+                            // Store the consent in localStorage to avoid showing the popup again
+                            localStorage.setItem('cookieConsent', 'true');
+                            document.cookie = 'CookieConsent=Accepted; path=/; max-age=31536000'; // Set the cookie for 1 year
+                        }
+                    }
+                </script>";
 
-            //    // Inject analytics scripts at the end of the body
-            //    var script = @"
-            //    <script async src='https://www.googletagmanager.com/gtag/js?id=YOUR_ANALYTICS_ID'></script>
-            //    <script>
-            //        window.dataLayer = window.dataLayer || [];
-            //        function gtag() { dataLayer.push(arguments); }
-            //        gtag('js', new Date());
-            //        gtag('config', 'YOUR_ANALYTICS_ID');
-            //    </script>";
+                context.Response.Body.Seek(0, SeekOrigin.Begin); // Move to the beginning of the response
+                var responseBody = new StreamReader(context.Response.Body).ReadToEnd();
+                responseBody = responseBody.Replace("</body>", $"{script}</body>"); // Append the script just before closing </body>
 
-            //    body = body.Replace("</body>", $"{script}</body>");
-            //    await context.Response.WriteAsync(body);
-            //}
+                var modifiedBytes = Encoding.UTF8.GetBytes(responseBody);
+                context.Response.ContentLength = modifiedBytes.Length;
+                await context.Response.Body.WriteAsync(modifiedBytes, 0, modifiedBytes.Length);
+            }
         }
     }
 }

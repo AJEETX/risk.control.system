@@ -38,7 +38,7 @@
                 targets: 3                      // Index of the column to style
             },
             {
-                className: 'max-width-column-pincodes', // Apply the CSS class,
+                className: 'max-width-column', // Apply the CSS class,
                 targets: 5                      // Index of the column to style
             },
             {

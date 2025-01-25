@@ -489,7 +489,7 @@ namespace risk.control.system.Controllers
 
                             if (lockUser.Succeeded && lockDate.Succeeded)
                             {
-                                notifyService.Custom($"User {createdUser.Email} edited and unlocked.", 3, "orange", "fas fa-user-check");
+                                notifyService.Custom($"User {createdUser.Email} edited.", 3, "orange", "fas fa-user-check");
                                 await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "User created . Email : " + user.Email);
                                 return RedirectToAction(nameof(CompanyController.Users), "Company");
                             }

@@ -60,27 +60,44 @@
                 <span asp-validation-for="PhoneNumber" class="text-danger"></span>
             </div>
         </div>
-        <div class="form-group">
-            <span class="input-group-label"> Role:</span>
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <span class="input-group-text" asp-for="ClaimType"><i class="nav-icon fas fa-file-invoice"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+        @if(Model.UserRole == null)
+        {
+            <div class="form-group">
+                <span class="input-group-label"> Role:</span>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" asp-for="UserRole"><i class="nav-icon fas fa-file-invoice"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                    </div>
+                    @{
+                        // Get the enum values except the one you want to exclude
+                        var roles = Model.AgencyRole // Replace RoleToExclude with the actual enum value
+                        .Select(role => new SelectListItem
+                {
+                    Value = role.ToString(),
+                    Text = role.ToString()
+                });
+                    }
+                    <select required asp-for="@Model.UserRole" class="form-control remarks" asp-items="@roles">
+                        <option value="">--- SELECT ---</option>
+                    </select>
+                    <span asp-validation-for="@Model.UserRole" class="text-danger"></span>
                 </div>
-                @{
-                    // Get the enum values except the one you want to exclude
-                    var roles = Model.AgencyRole // Replace RoleToExclude with the actual enum value
-                    .Select(role => new SelectListItem
-            {
-                Value = role.ToString(),
-                Text = role.ToString()
-            });
-                }
-                <select required asp-for="@Model.UserRole" class="form-control remarks" asp-items="@roles">
-                    <option value="">--- SELECT ---</option>
-                </select>
-                <span asp-validation-for="@Model.UserRole" class="text-danger"></span>
             </div>
-        </div>
+        }
+        else
+        {
+            <div class="form-group">
+                <span class="input-group-label"> Role:</span>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" asp-for="UserRole"><i class="nav-icon fas fa-file-invoice"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                    </div>
+                    <select asp-for="@Model.UserRole" class="form-control remarks">
+                        <option value="@Model.UserRole">@Model.UserRole</option>
+                    </select>
+                </div>
+            </div>
+        }
         @* <div class="form-group">
             <span class="input-group-label"> Note:</span>
             <div class="input-group mb-3">
@@ -104,19 +121,38 @@
                 <span asp-validation-for="Addressline" class="text-danger"></span>
             </div>
         </div>
-        <div class="form-group">
-            <span class="input-group-label"> Status:</span>
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <span class="input-group-text" id="Addressline"><i class="fa fa-key"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+        @if(Model.Active)
+        {
+            <div class="form-group">
+                <span class="input-group-label"> Status:</span>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="Addressline"><i class="fa fa-key"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                    </div>
+                    <div class="input-group-prepend">
+                    </div>
+                    <span class="checkbox">
+                        <input readonly asp-for="Active" type="checkbox" data-toggle="toggle" data-on="<i class='fa fa-toggle-on'></i> Active " data-onstyle="secondary" data-width="120">
+                    </span>
                 </div>
-                <div class="input-group-prepend">
-                </div>
-                <span class="checkbox">
-                    <input asp-for="Active" type="checkbox" data-toggle="toggle" data-on="<i class='fa fa-toggle-on'></i> Active " data-off="<i class='fa fa-toggle-off'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
-                </span>
             </div>
-        </div>
-        
+        }
+        else
+        {
+            <div class="form-group">
+                <span class="input-group-label"> Status:</span>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="Addressline"><i class="fa fa-key"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                    </div>
+                    <div class="input-group-prepend">
+                    </div>
+                    <span class="checkbox">
+                        <input asp-for="Active" type="checkbox" data-toggle="toggle" data-on="<i class='fa fa-toggle-on'></i> Active " data-off="<i class='fa fa-toggle-off'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
+                    </span>
+                </div>
+            </div>
+        }
+
     </div>
 </div>

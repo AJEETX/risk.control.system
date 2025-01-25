@@ -2,14 +2,14 @@ $.validator.setDefaults({
     submitHandler: function (form) {
         $.confirm({
             title: "Confirm Edit",
-            content: "Are you sure to edit?",
+            content: "Are you sure to save?",
 
             icon: 'fas fa-building',
             type: 'orange',
             closeIcon: true,
             buttons: {
                 confirm: {
-                    text: "Edit",
+                    text: "Save",
                     btnClass: 'btn-warning',
                     action: function () {
                         askConfirmation = false;
@@ -20,7 +20,7 @@ $.validator.setDefaults({
                             $(".submit-progress").removeClass("hidden");
                         }, 1);
                         $('#edit').attr('disabled', 'disabled');
-                        $('#edit').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Edit Agency");
+                        $('#edit').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Save Agency");
 
                         form.submit();
                         var createForm = document.getElementById("edit-form");

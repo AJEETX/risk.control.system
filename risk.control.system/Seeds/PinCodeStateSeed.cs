@@ -24,8 +24,8 @@ namespace risk.control.system.Seeds
             var states = pincodes.GroupBy(g => new { g.StateName, g.StateCode });
             foreach (var state in states)
             {
-                var recordState = new State { Code = state.Key.StateCode, Name = state.Key.StateName, Country = country, Updated = DateTime.Now };
-                var stateAdded = await context.State.AddAsync(recordState);
+                var dbState = new State { Code = state.Key.StateCode, Name = state.Key.StateName, Country = country, Updated = DateTime.Now };
+                var stateAdded = await context.State.AddAsync(dbState);
 
                 var districts = state.GroupBy(g => g.District);
 
@@ -121,11 +121,7 @@ namespace risk.control.system.Seeds
                     }
                 }
             }
-            return pincodes
-                .Where(p => p.StateCode == "VIC"
-                || p.StateCode == "NSW"
-                //|| p.StateCode == "QLD"
-                )?.ToList();
+            return pincodes;
         }
 
         public static async Task<List<PinCodeState>> CsvRead_India()
@@ -163,11 +159,7 @@ namespace risk.control.system.Seeds
                     }
                 }
             }
-            return pincodes
-                .Where(p=>p.StateName.ToLower().StartsWith("haryana")
-                || p.StateName.ToLower().StartsWith("delhi")
-                //|| p.StateName.ToLower().StartsWith("uttar pradesh")
-                )?.ToList();
+            return pincodes;
         }
         static string GetInitials(string input)
         {

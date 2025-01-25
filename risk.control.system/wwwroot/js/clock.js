@@ -97,6 +97,10 @@ function startTimer(timeout, display) {
                 type: "orange",
                 closeIcon: true,
                 autoClose: `cancel|${timer * 1000}`, // Auto-close after the timer expires
+                onOpenBefore: function () {
+                    // Add blur effect to the background
+                    document.getElementById("main-container").classList.add("blur-background");
+                },
                 buttons: {
                     confirm: {
                         text: "CONTINUE",
@@ -106,7 +110,8 @@ function startTimer(timeout, display) {
                             localStorage.setItem("sessionTimer", timer);
                             refreshSession(); // Refresh session on confirmation
                             askConfirmation = true;
-
+                            // Remove blur effect from the background
+                            document.getElementById("main-container").classList.remove("blur-background");
                             // Show clock again
                             if (clockDisplay) {
                                 clockDisplay.style.visibility = "visible";
@@ -128,6 +133,10 @@ function startTimer(timeout, display) {
                             window.location.href = logoutPath; // Logout
                         },
                     },
+                },
+                onDestroy: function () {
+                    // Remove blur effect if dialog is closed
+                    document.getElementById("main-container").classList.remove("blur-background");
                 },
             });
         }

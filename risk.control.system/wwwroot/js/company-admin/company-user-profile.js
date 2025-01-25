@@ -2,14 +2,14 @@
     submitHandler: function (form) {
         $.confirm({
             title: "Confirm Edit",
-            content: "Are you sure to edit?",
+            content: "Are you sure to save?",
             icon: 'fas fa-user-plus',
 
             type: 'orange',
             closeIcon: true,
             buttons: {
                 confirm: {
-                    text: "Edit",
+                    text: "Save",
                     btnClass: 'btn-warning',
                     action: function () {
                         // Disable all buttons, submit inputs, and anchors
@@ -32,6 +32,6 @@
     }
 });
 $(document).ready(function () {
-    $("#create-form").validate();
+    $("#edit-form").validate();
    
 });

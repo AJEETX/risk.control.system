@@ -87,12 +87,12 @@ $(document).ready(function () {
     $('#edit-form').submit(function (e) {
         handleFormSubmit(e, "edit-form", askEditConfirmation, {
             title: "Confirm Edit Beneficiary",
-            content: "Are you sure to edit?",
+            content: "Are you sure to save?",
             icon: 'fas fa-user-tie',
             type: 'orange',
-            confirmText: "Edit Beneficiary",
+            confirmText: "Save Beneficiary",
             confirmClass: 'btn-warning',
-            actionText: "Edit Beneficiary"
+            actionText: "Save Beneficiary"
         });
     });
 

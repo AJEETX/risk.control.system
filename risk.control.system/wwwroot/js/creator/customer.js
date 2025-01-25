@@ -86,12 +86,12 @@ $(document).ready(function () {
     $('#edit-form').submit(function (e) {
         handleFormSubmit(e, "edit-form", askEditConfirmation, {
             title: "Confirm Edit Customer",
-            content: "Are you sure to edit?",
+            content: "Are you sure to save?",
             icon: 'fas fa-user-edit',
             type: 'orange',
-            confirmText: "Edit Customer",
+            confirmText: "Save Customer",
             confirmClass: 'btn-warning',
-            actionText: "Edit Customer"
+            actionText: "Save Customer"
         });
     });
 

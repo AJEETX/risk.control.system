@@ -21,43 +21,45 @@
         var nonce = Context.Items["CSPNonce"]?.ToString();
     }
     <div class="wrapper">
-        <input type="hidden" id="timeout" name="timeout" value="@timeout" />
-        @if (SignInManager.IsSignedIn(User))
-        {
-            var userEmail = User?.Identity?.Name;
-            var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
-            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-            ClientCompany company = null!;
-            if (companyUser is not null)
+        <div id="main-container">
+            <input type="hidden" id="timeout" name="timeout" value="@timeout" />
+            @if (SignInManager.IsSignedIn(User))
             {
-                company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
-                <partial name="AdminLTE/_CompanyTopNavigation" model="@company.CanChangePassword" />
+                var userEmail = User?.Identity?.Name;
+                var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
+                var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+                var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+                ClientCompany company = null!;
+                if (companyUser is not null)
+                {
+                    company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
+                    <partial name="AdminLTE/_CompanyTopNavigation" model="@company.CanChangePassword" />
 
-                <partial name="AdminLTE/_CompanySidebar" model="@company" />
-            }
-            else if (vendorUser is not null)
-            {
-                var vendor = _context.Vendor.FirstOrDefault(c => c.VendorId == vendorUser.VendorId);
-                <partial name="AdminLTE/_AgencyTopNavigation" model="@vendor.CanChangePassword" />
-                <partial name="AdminLTE/_VendorSidebar" model="@vendor" />
-            }
-            else
-            {
-                <partial name="AdminLTE/_TopNavigation" />
-                <partial name="AdminLTE/_Sidebar" />
-            }
-            <div class="content-wrapper content-wrapper-main">
-                <breadcrumb class="no-print"></breadcrumb>
-                <div id="main-content" class="content">
-                    <main>
-                        @RenderBody()
-                    </main>
+                    <partial name="AdminLTE/_CompanySidebar" model="@company" />
+                }
+                else if (vendorUser is not null)
+                {
+                    var vendor = _context.Vendor.FirstOrDefault(c => c.VendorId == vendorUser.VendorId);
+                    <partial name="AdminLTE/_AgencyTopNavigation" model="@vendor.CanChangePassword" />
+                    <partial name="AdminLTE/_VendorSidebar" model="@vendor" />
+                }
+                else
+                {
+                    <partial name="AdminLTE/_TopNavigation" />
+                    <partial name="AdminLTE/_Sidebar" />
+                }
+                <div class="content-wrapper content-wrapper-main">
+                    <breadcrumb class="no-print"></breadcrumb>
+                    <div id="main-content" class="content">
+                        <main>
+                            @RenderBody()
+                        </main>
+                    </div>
                 </div>
-            </div>
-            <partial name="AdminLTE/_Footer" />
-        }
-        
+                <partial name="AdminLTE/_Footer" />
+            }
+        </div>
+
         <!-- Logout Modal-->
         <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
              aria-hidden="true">

@@ -2,14 +2,14 @@
     submitHandler: function (form) {
         $.confirm({
             title: "Confirm Edit",
-            content: "Are you sure to edit?",
+            content: "Are you sure to save?",
             icon: 'fas fa-user-plus',
 
             type: 'orange',
             closeIcon: true,
             buttons: {
                 confirm: {
-                    text: "Edit",
+                    text: "Save",
                     btnClass: 'btn-warning',
                     action: function () {
                         $("body").addClass("submit-progress-bg");
@@ -26,7 +26,7 @@
                             e.preventDefault(); // Prevent default action for anchor clicks
                         });
                         form.submit();
-                        var createForm = document.getElementById("form");
+                        var createForm = document.getElementById("edit-form");
                         if (createForm) {
                             var nodes = createForm.getElementsByTagName('*');
                             for (var i = 0; i < nodes.length; i++) {
@@ -44,6 +44,6 @@
     }
 });
 $(document).ready(function () {
-    $("#create-form").validate();
+    $("#edit-form").validate();
     
 });

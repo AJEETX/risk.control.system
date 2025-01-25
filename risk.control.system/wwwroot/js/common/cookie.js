@@ -23,7 +23,7 @@
     // Handle revoke consent button click
     $("#revokeConsent").on("click", function () {
         cookiePopup.fadeOut(); // Hide the popup
-        acceptCookies(cookieCancel);
+        revokeCookies(cookieCancel);
     });
 
     // Handle manage cookies button click
@@ -36,7 +36,7 @@
         const analyticsCookies = $("#analyticsCookies").is(":checked");
         const marketingCookies = $("#marketingCookies").is(":checked");
 
-        fetch('/api/secure/SavePreferences', {
+        fetch('/api/auth/SavePreferences', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json', // Set content type to JSON
@@ -68,7 +68,7 @@
                 }
 
                 cookieManagePopup.fadeOut(); // Hide manage popup
-                showAlertWithAutoClose("Preferences saved successfully.", 1000);
+                showAlertWithAutoClose("Preferences saved successfully.", 10);
                 const login = document.getElementById("email");
                 if (login) {
                     login.focus();
@@ -88,7 +88,7 @@
 });
 
 function acceptCookies(cookieCancel) {
-    fetch('/api/secure/AcceptCookies', { method: 'POST' })
+    fetch('/api/auth/AcceptCookies', { method: 'POST' })
         .then((response) => {
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
@@ -107,7 +107,7 @@ function acceptCookies(cookieCancel) {
             if (!getCookie("cookieConsent")) {
                 setCookie("cookieConsent", "Accepted", 365); // Set consent for 1 year
             }
-            showAlertWithAutoClose(`<i class="fas fa-check"></i> ${message}`, 1000);
+            showAlertWithAutoClose(`<i class="fas fa-check"></i> ${message}`, 1);
             const login = document.getElementById("email");
             if (login) {
                 login.focus();
@@ -121,7 +121,7 @@ function acceptCookies(cookieCancel) {
 
 async function revokeCookies(cookiePopup) {
     try {
-        const response = await fetch('/api/secure/RevokeCookies', { method: 'POST' });
+        const response = await fetch('/api/auth/RevokeCookies', { method: 'POST' });
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }

@@ -30,7 +30,6 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.RateLimiting;
-//using Microsoft.AspNetCore.WebSockets;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.FeatureManagement;
@@ -140,7 +139,7 @@ builder.Services.AddScoped<ITrashMailService, TrashMailService>();
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
 builder.Services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
-builder.Services.AddTransient<CustomCookieAuthenticationEvents>();
+//builder.Services.AddTransient<CustomCookieAuthenticationEvents>();
 builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
 
 var awsOptions = new Amazon.Extensions.NETCore.Setup.AWSOptions
@@ -230,14 +229,13 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.Cookie.HttpOnly = true; // Ensures the cookie cannot be accessed via JavaScript (enhances security).
     options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Ensures the cookie is sent only over HTTPS.
     options.Cookie.SameSite = SameSiteMode.Strict; // Prevents the cookie from being sent in cross-site requests (CSRF protection).
-    options.Cookie.Name = "iCheckify"; // Custom name for the authentication cookie.
+    options.Cookie.Name = AppCookie.AUTH_COOKIE_NAME; // Custom name for the authentication cookie.
     options.Cookie.Path = "/"; // Specifies the cookie path.
     options.Cookie.IsEssential = true; // Ensures the cookie is marked as essential, bypassing consent if required.
-
     // Authentication-specific settings
-    options.LoginPath = "/Account/Login"; // Redirect to this path if the user is not authenticated.
-    options.LogoutPath = "/Account/Logout"; // Redirect to this path after logout.
-    options.AccessDeniedPath = "/Account/Logout"; // Redirect here if the user lacks the required permissions.
+    options.LoginPath = AppCookie.LOGIN_PATH; // Redirect to this path if the user is not authenticated.
+    options.LogoutPath = AppCookie.LOGOUT_PATH; // Redirect to this path after logout.
+    options.AccessDeniedPath = AppCookie.LOGOUT_PATH; // Redirect here if the user lacks the required permissions.
 
     // Expiration settings
     options.SlidingExpiration = true; // Renews the cookie expiration time on every valid request.
@@ -277,7 +275,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 
 builder.Services.AddAntiforgery(options =>
 {
-    options.Cookie.Name = "icheckifyToken"; // Set a custom cookie name
+    options.Cookie.Name = AppCookie.ANTI_FORGERY_COOKIE_NAME; // Set a custom cookie name
     options.Cookie.HttpOnly = true; // Make the cookie HttpOnly
     options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Require secure cookies (only over HTTPS)
     options.Cookie.SameSite = SameSiteMode.Strict; // Apply a strict SameSite policy
@@ -326,7 +324,6 @@ builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 app.UseMiddleware<UpdateUserLastActivityMiddleware>();
-app.UseMiddleware<CookieConsentMiddleware>();
 //app.UseWebSockets();
 app.UseSwagger();
 
@@ -351,6 +348,7 @@ app.UseSwaggerUI(options =>
     options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
 });
 
+app.UseMiddleware<CookieConsentMiddleware>();
 
 app.UseMiddleware<WhitelistListMiddleware>();
 
@@ -367,8 +365,6 @@ app.UseFileServer();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Dashboard}/{action=Index}/{id?}");
-
-//app.MapHub<ChatHub>("/chatHub");
 
 app.Run();
 

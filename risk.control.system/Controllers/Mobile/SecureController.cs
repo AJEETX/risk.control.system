@@ -244,105 +244,6 @@ namespace risk.control.system.Controllers.Mobile
         }
 
         [AllowAnonymous]
-        [HttpPost]
-        [Route("AcceptCookies")]
-        public IActionResult AcceptCookies()
-        {
-            Response.Cookies.Append("cookieConsent", "Accepted", new CookieOptions
-            {
-                Expires = DateTimeOffset.UtcNow.AddDays(265),
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.Strict
-            });
-            Response.Cookies.Append("analyticsCookies", true.ToString(), new CookieOptions
-            {
-                Expires = DateTimeOffset.UtcNow.AddDays(365),
-                HttpOnly = false,
-                Secure = true,
-                SameSite = SameSiteMode.Strict
-            });
-
-            Response.Cookies.Append("marketingCookies", true.ToString(), new CookieOptions
-            {
-                Expires = DateTimeOffset.UtcNow.AddDays(365),
-                HttpOnly = false,
-                Secure = true,
-                SameSite = SameSiteMode.Strict
-            });
-            return Ok(new { success = true, message = "Accept-All-Cookie consent saved" });
-        }
-
-        [AllowAnonymous]
-        [HttpPost]
-        [Route("RevokeCookies")]
-        public IActionResult RevokeCookies()
-        {
-            Response.Cookies.Append("cookieConsent", "Accepted", new CookieOptions
-            {
-                Expires = DateTimeOffset.UtcNow.AddDays(365), // Persistent for 1 year
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.Strict
-            });
-
-            Response.Cookies.Append("analyticsCookies", false.ToString(), new CookieOptions
-            {
-                Expires = DateTimeOffset.UtcNow.AddDays(365),
-                HttpOnly = false,
-                Secure = true,
-                SameSite = SameSiteMode.Strict
-            });
-
-            Response.Cookies.Append("marketingCookies", false.ToString(), new CookieOptions
-            {
-                Expires = DateTimeOffset.UtcNow.AddDays(365),
-                HttpOnly = false,
-                Secure = true,
-                SameSite = SameSiteMode.Strict
-            });
-            return Ok(new { success = true, message = "Accept-only-required Cookie consent saved" });
-        }
-
-        [AllowAnonymous]
-        [HttpPost]
-        [Route("SavePreferences")]
-        public IActionResult SavePreferences([FromBody] CookiePreferences preferences)
-        {
-            if (preferences == null)
-            {
-                return BadRequest(new { success = false, message = "Invalid data received." });
-            }
-
-            Response.Cookies.Append("cookieConsent", "Accepted", new CookieOptions
-            {
-                Expires = DateTimeOffset.UtcNow.AddDays(365),
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.Strict
-            });
-
-            Response.Cookies.Append("analyticsCookies", preferences.AnalyticsCookies.ToString(), new CookieOptions
-            {
-                Expires = DateTimeOffset.UtcNow.AddDays(365),
-                HttpOnly = false,
-                Secure = true,
-                SameSite = SameSiteMode.Strict
-            });
-
-            Response.Cookies.Append("marketingCookies", preferences.MarketingCookies.ToString(), new CookieOptions
-            {
-                Expires = DateTimeOffset.UtcNow.AddDays(365),
-                HttpOnly = false,
-                Secure = true,
-                SameSite = SameSiteMode.Strict
-            });
-
-            return Ok(new { success = true, message = "Cookie Preferences saved" });
-        }
-
-
-        [AllowAnonymous]
         [HttpGet("test-sms")]
         public async Task<IActionResult> Sms(string mobile = "61432854196")
         {
@@ -350,16 +251,5 @@ namespace risk.control.system.Controllers.Mobile
             return Ok(new { message = "Sms sent!!" });
         }
 
-        //[Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
-        //[HttpGet("cookie-api")]
-        //public IActionResult CookieApi()
-        //{
-        //    return Ok(new { message = "This endpoint is secured with Cookie" });
-        //}
-    }
-    public class CookiePreferences
-    {
-        public bool AnalyticsCookies { get; set; }
-        public bool MarketingCookies { get; set; }
     }
 }

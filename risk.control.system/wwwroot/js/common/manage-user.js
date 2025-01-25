@@ -66,14 +66,14 @@
             e.preventDefault();
             $.confirm({
                 title: "Confirm Edit User",
-                content: "Are you sure to edit?",
+                content: "Are you sure to save?",
 
                 icon: 'fas fa-user-plus',
                 type: 'orange',
                 closeIcon: true,
                 buttons: {
                     confirm: {
-                        text: "Edit User",
+                        text: "Save User",
                         btnClass: 'btn-warning',
                         action: function () {
                             askEditConfirmation = false;
@@ -84,7 +84,7 @@
                                 $(".submit-progress").removeClass("hidden");
                             }, 1);
                             $('#edit').attr('disabled', 'disabled');
-                            $('#edit').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Edit User");
+                            $('#edit').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Save User");
 
                             $('#edit-form').submit();
                             var createForm = document.getElementById("edit-form");
@@ -179,15 +179,15 @@ function CheckIfEmailValid() {
     var name = $('#email').val();
     if (name && name.length > 4) {
         $('#check-email').prop('disabled', false);
-        $("#check-email").css('color', 'white');
-        $("#check-email").css('background-color', '#004788');
-        $("#check-email").css('cursor', 'default');
+        //$("#check-email").css('color', 'white');
+        //$("#check-email").css('background-color', '#004788');
+        //$("#check-email").css('cursor', 'default');
     }
     else {
         $('#check-email').css('disabled', true);
-        $("#check-email").css('color', '#ccc');
-        $("#check-email").css('background-color', 'grey');
-        $("#check-email").css('cursor', 'not-allowed');
+        //$("#check-email").css('color', '#ccc');
+        //$("#check-email").css('background-color', 'grey');
+        //$("#check-email").css('cursor', 'not-allowed');
     }
 }
 

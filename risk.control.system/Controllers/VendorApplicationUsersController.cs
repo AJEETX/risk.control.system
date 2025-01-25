@@ -342,7 +342,7 @@ namespace risk.control.system.Controllers
                             if (lockUser.Succeeded && lockDate.Succeeded)
                             {
                                 await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "Agency user edited and unlocked. Email : " + user.Email);
-                                notifyService.Custom($"User edited and unlocked.", 3, "green", "fas fa-user-check");
+                                notifyService.Custom($"User edited.", 3, "green", "fas fa-user-check");
                             }
                         }
                         return RedirectToAction(nameof(VendorUserController.Index), "VendorUser", new { id = applicationUser.VendorId });

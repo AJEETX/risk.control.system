@@ -227,21 +227,12 @@ $(document).ready(function () {
     });
 
     $('#cancel').on('click', function (e) {
-        //var controller = $(this).attr('asp-controller');
-        //if (!controller) {
-        //    controller = window.location.pathname.split('/')[1]; // Get the current controller from the URL
-        //}
-        //const action = $(this).attr('asp-action');
-        //const routeId = $(this).attr('asp-route-id');
-
-        //// Construct the URL
-        //const baseUrl = `${window.location.origin}/${controller}/${action}`;
-        //const url = routeId ? `${baseUrl}/${routeId}` : baseUrl;
+        
         const url = $(this).attr('href');
         e.preventDefault(); // Prevent the default navigation
         $.confirm({
-            title: 'Confirm Cancellation',
-            content: 'Are you sure you want to cancel? Any unsaved changes will be lost.',
+            title: 'Confirm Cancel',
+            content: 'Any unsaved changes will be lost.',
             icon: 'fas fa-exclamation-triangle',
             type: 'orange',
             buttons: {
@@ -250,6 +241,7 @@ $(document).ready(function () {
                     btnClass: 'btn-warning',
                     action: function () {
                         disableAllInteractiveElements();
+
                         window.location.href = url;
                     }
                 },
