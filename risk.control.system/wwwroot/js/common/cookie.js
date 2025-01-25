@@ -4,9 +4,9 @@
     const cookieCancel = $("#cookieRevoke");
 
     // Step 1: Check if the pageLoaded cookie exists and clear cookies if not
-    if (!getCookie("pageLoaded")) {
+    if (!getCookie("icheckify.pageLoaded")) {
         clearAllCookies(); // Clear all cookies
-        setCookie("pageLoaded", "true", 365); // Mark that the page has been loaded for a year
+        setCookie("icheckify.pageLoaded", "true", 365); // Mark that the page has been loaded for a year
     }
 
     // Check if the user has accepted the cookie consent

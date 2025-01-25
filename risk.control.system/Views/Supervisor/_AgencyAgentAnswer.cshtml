@@ -13,7 +13,7 @@
 else @if (!string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.AgencyReport.AgentRemarks))
 {
 
-    <div class="d-flex align-items-stretch flex-column">
+    <div class="card bg-light d-flex flex-fill border-success">
         <div class="card bg-light d-flex flex-fill border-success collapsed-card">
             <div class="card-header text-muted border-bottom-0">
                 <h3 class="card-title">
@@ -135,10 +135,11 @@ else @if (!string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.AgencyReport.Agen
             </div>
         </div>
 
-        <div class="card-footer border-success secondary btn-outline-secondary">
-            
+        <div class="text-center">
+            <i class='fas fa-check-circle i-green'></i>
         </div>
-        <partial name="_Chat" model="@Model" />
 
     </div>
+    <partial name="_Chat" model="@Model" />
+
 }

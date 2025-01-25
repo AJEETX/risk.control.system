@@ -132,7 +132,8 @@
                     <div class="input-group-prepend">
                     </div>
                     <span class="checkbox">
-                        <input readonly asp-for="Active" type="checkbox" data-toggle="toggle" data-on="<i class='fa fa-toggle-on'></i> Active " data-onstyle="secondary" data-width="120">
+                        <input disabled asp-for="Active" type="checkbox" data-toggle="toggle" data-on="<i class='fa fa-check'></i> Active " data-onstyle="success" data-width="120">
+                        <input type="hidden" asp-for="Active">
                     </span>
                 </div>
             </div>

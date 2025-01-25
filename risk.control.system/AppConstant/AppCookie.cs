@@ -8,6 +8,13 @@
 
 
         public const string ANTI_FORGERY_COOKIE_NAME = "icheckify.Antiforgery.cookie";
+        
+        public const string CONSENT_COOKIE_NAME = "icheckify.Consent.cookie";
+        public const string COOKIE_PAGELOAD = "icheckify.Pageload.cookie";
+        public const string COOKIE_PAGELOAD_VALUE = "true";
+        public const string CONSENT_COOKIE_ACCEPTED = "Accepted";
+        public const string ANALYTICS_COOKIE_NAME = "icheckify.Analytics.cookie";
+        public const string PERFORMANCE_COOKIE_NAME = "icheckify.Performance.cookie";
 
     }
 }

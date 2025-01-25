@@ -224,6 +224,26 @@ builder.Services.Configure<IdentityOptions>(options =>
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
+    options.Events.OnValidatePrincipal = async context =>
+    {
+        var userPrincipal = context.Principal;
+
+        // Check if the cookie is close to expiring
+        var now = DateTimeOffset.UtcNow;
+        var issuedUtc = context.Properties.IssuedUtc;
+        var expiresUtc = context.Properties.ExpiresUtc;
+
+        var sessionTimeout = double.Parse(builder.Configuration["SESSION_TIMEOUT_SEC"]);
+        var renewalThreshold = sessionTimeout * 0.9; // Renew when 90% of the session timeout has passed.
+
+        if (expiresUtc.HasValue && now > expiresUtc.Value.AddSeconds(-renewalThreshold))
+        {
+            context.Properties.ExpiresUtc = now.AddSeconds(sessionTimeout);
+            context.ShouldRenew = true;
+        }
+
+        await Task.CompletedTask;
+    };
     //options.EventsType = typeof(CustomCookieAuthenticationEvents);
     // General cookie settings
     options.Cookie.HttpOnly = true; // Ensures the cookie cannot be accessed via JavaScript (enhances security).

@@ -21,8 +21,8 @@
 
     if (@Model.AgencyReport?.DigitalIdReport?.DigitalIdImageData != null && @Model.AgencyReport?.DigitalIdReport?.DigitalIdImageLongLatTime != null)
     {
-        <div class="d-flex align-items-stretch flex-column">
-            <div class="card bg-light d-flex flex-fill @borderColor collapsed-card">
+        <div class="card bg-light d-flex flex-fill @borderColor">
+            <div class="card bg-light d-flex flex-fill collapsed-card">
                 <div class="card-header text-muted border-bottom-0">
 
                     <h3 class="card-title">
@@ -66,17 +66,7 @@
 
 
                 </div>
-                <div class="card-footer text-center">
-                    <span class="badge badge-light"><i class="fas fa-portrait"></i> Match :  </span>
-                    @if (@Model.AgencyReport?.DigitalIdReport?.Similarity < 70 && Model.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime != null)
-                    {
-                        <i class='fa fa-times i-orangered' aria-hidden='true'></i>
-                    }
-                    else
-                    {
-                        <i class='fas fa-check-circle i-green'></i>
-                    }
-                </div>
+
                 <div class="progress">
                     <i class="far fa-bookmark bookmark-green"></i>
                     <div class="progress-bar @digitalIdColor" role="progressbar">
@@ -120,7 +110,7 @@
                                     }
                                 }
                             </p>
-                            
+
                         </div>
                         <div class="col-6">
                             <p class="text-muted text-sm">
@@ -139,19 +129,9 @@
                         </div>
 
                     </div>
-                    <p class="text-center">
-                        <span class="badge badge-light"> Match :  </span>
-                        @if (@Model.AgencyReport?.DigitalIdReport?.Similarity < 70 && Model.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime != null)
-                        {
-                            <i class='fa fa-times i-orangered' aria-hidden='true'></i>
-                        }
-                        else
-                        {
-                            <i class='fas fa-check-circle i-green'></i>
-                        }
-                    </p>
+
                 </div>
-                
+
                 @if (Model.ClaimsInvestigation.UpdateAgentReport)
                 {
                     <form id="upload-face" asp-controller="Uploads" asp-action="FaceUpload" method="post" enctype="multipart/form-data">
@@ -174,8 +154,16 @@
                 }
 
             </div>
-            <div class="card-footer @borderColor">
-                
+            <div class="text-muted text-center">
+                    <span class="badge badge-light"> Match :  </span>
+                    @if (@Model.AgencyReport?.DigitalIdReport?.Similarity < 70 && Model.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime != null)
+                    {
+                        <i class='fa fa-times i-orangered' aria-hidden='true'></i>
+                    }
+                    else
+                    {
+                        <i class='fas fa-check-circle i-green'></i>
+                    }
             </div>
         </div>
     }
