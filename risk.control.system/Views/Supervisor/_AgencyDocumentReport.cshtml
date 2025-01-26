@@ -22,8 +22,7 @@
             documentIdColor = "progress-bar-red";
             documentIdBorderColor = "border-danger";
         }
-        <div class="card bg-light d-flex flex-fill @documentIdColor">
-
+        <div class="card bg-light d-flex flex-fill @documentIdBorderColor">
             <div class="card bg-light d-flex flex-fill collapsed-card">
                 <div class="card-header text-muted border-bottom-0">
                     <h3 class="card-title">
@@ -66,7 +65,6 @@
                     </div>
 
                 </div>
-                
                 <div class="progress">
                     <i class="far fa-bookmark bookmark-green"></i>
                     <div class="progress-bar @documentIdColor" role="progressbar">
@@ -161,7 +159,7 @@
                     </form>
                 }
             </div>
-                <div class="text-center">
+            <div class="text-muted text-center">
                 <span class="badge badge-light"><i class="far fa-image"></i> Valid : </span>
                 @if (@Model.AgencyReport?.PanIdReport?.DocumentIdImageValid.Value ?? false)
                 {

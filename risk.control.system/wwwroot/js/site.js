@@ -50,21 +50,55 @@ function checkFormCompletion(formSelector, create = false) {
 
 // Function to validate file input types
 function validateFileInput(inputElement, allowedExtensions) {
+    var MaxSizeInBytes = 2097152;
     if (!inputElement.files || !inputElement.files[0]) {
         return false; // Exit early if no files are selected
     }
 
     const file = inputElement.files[0];
+    var fileSize = file.size;
+
     const fileExtension = file.name.split('.').pop().toLowerCase();
 
     if (!allowedExtensions.includes(fileExtension)) {
-        alert(`Invalid file type! Please upload a file with one of the following extensions: ${allowedExtensions.join(', ')}`);
         inputElement.value = ''; // Clear the input
-        return false;
-    }
 
+        $.alert({
+            title: "FILE UPLOAD TYPE !!",
+            content: `Pls select only image with extension ${allowedExtensions.join(', ')} ! `,
+            icon: 'fas fa-exclamation-triangle',
+            type: 'red',
+            closeIcon: true,
+            buttons: {
+                cancel: {
+                    text: "CLOSE",
+                    btnClass: 'btn-danger'
+                }
+            }
+        });
+    }
+    if (fileSize > MaxSizeInBytes) {
+        document.getElementById('createProfileImage').src = '/img/no-image.png';
+        document.getElementById('createImageInput').value = '';
+        $.alert({
+            title: "Image UPLOAD issue !",
+            content: " <i class='fa fa-upload'></i> Upload Image size limit exceeded. <br />Max file size is 2 MB!",
+            icon: 'fas fa-exclamation-triangle',
+            type: 'red',
+            closeIcon: true,
+            buttons: {
+                cancel: {
+                    text: "CLOSE",
+                    btnClass: 'btn-danger'
+                }
+            }
+        });
+    } else {
+        document.getElementById('createProfileImage').src = window.URL.createObjectURL(file);
+    }
     return true;
 }
+
 
 
 // Generic input validation function
@@ -85,7 +119,7 @@ function closeForm() {
 function clearAllInputs(event) {
     var allInputs = document.querySelectorAll('input');
 
-    allInputs.forEach(singleInput => singleInput.readOnly ? singleInput.value: singleInput.value = '');
+    allInputs.forEach(singleInput => singleInput.readOnly ? singleInput.value : singleInput.value = '');
     $("option:selected").prop("selected", false);
     var companyImage = document.getElementById('companyImage');
     if (companyImage) {
@@ -227,7 +261,7 @@ $(document).ready(function () {
     });
 
     $('#cancel').on('click', function (e) {
-        
+
         const url = $(this).attr('href');
         e.preventDefault(); // Prevent the default navigation
         $.confirm({
@@ -241,7 +275,7 @@ $(document).ready(function () {
                     btnClass: 'btn-warning',
                     action: function () {
                         disableAllInteractiveElements();
-
+                        refreshSession();
                         window.location.href = url;
                     }
                 },
@@ -255,6 +289,8 @@ $(document).ready(function () {
 
 
     $('#back').on('click', function () {
+        refreshSession();
+
         disableAllInteractiveElements();
     });
 
@@ -268,6 +304,7 @@ $(document).ready(function () {
             }, 1);
         }
 
+        refreshSession();
         $('a, button').css('cursor', 'not-allowed');
         $('a, button').attr('disabled', 'disabled');
 
@@ -368,7 +405,7 @@ $(document).ready(function () {
                 });
             },
             onContentReady: function () {
-                
+
             }
         })
     })

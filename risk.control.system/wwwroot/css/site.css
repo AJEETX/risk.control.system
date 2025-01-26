@@ -1985,7 +1985,7 @@ select#PinCodeId {
     cursor: not-allowed;
 }
 .blur-background {
-    filter: blur(5px);
+    filter: blur(2px);
     transition: filter 0.3s ease; /* Smooth transition */
     pointer-events: none; /* Prevent interactions with blurred elements */
 }

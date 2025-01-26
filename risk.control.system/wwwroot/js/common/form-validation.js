@@ -66,7 +66,7 @@ $(document).ready(function () {
 
 });
 function CheckIfEmailValid() {
-    var name = $('#email').val();
+    var name = $('#emailAddress').val();
     if (name && name.length > 4) {
         $('#check-email').prop('disabled', false);
         //$("#check-email").css('color', 'white');
