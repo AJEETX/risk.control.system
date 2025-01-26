@@ -93,12 +93,12 @@
                         <h3 class="card-title">
                             
                             <span class="download-file badge badge-light">
-                                <a class="ziplink" href="~/headers/single.zip">
+                                <a class="ziplink" href="@Url.Content($"~/headers/single-{Model.FileSampleIdentifier}.zip")">
                                     <i class="nav-icon fa fa-download"></i>  1 claim
                                 </a>
                             </span>
                             <span class="download-file badge badge-light">
-                                <a class="ziplink" href="~/headers/double.zip">
+                                <a class="ziplink" href="@Url.Content($"~/headers/double-{Model.FileSampleIdentifier}.zip")">
                                     <i class="nav-icon fa fa-download"></i> 2 claims
                                 </a>
                             </span>

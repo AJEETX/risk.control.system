@@ -59,8 +59,9 @@ namespace risk.control.system.Controllers
         [Breadcrumb("Add Company")]
         public IActionResult Create()
         {
-            ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
-            return View();
+            var country = _context.Country.FirstOrDefault();
+            var model = new ClientCompany { Country = country , SelectedCountryId = country.CountryId, CountryId= country.CountryId };
+            return View(model);
         }
 
         // POST: ClientCompanies/Create
@@ -111,6 +112,9 @@ namespace risk.control.system.Controllers
             var isdCode = _context.Country.FirstOrDefault(c => c.CountryId == clientCompany.SelectedCountryId)?.ISDCode;
             await smsService.DoSendSmsAsync(isdCode+clientCompany.PhoneNumber, "Company account created. Domain : " + clientCompany.Email);
 
+            //clientCompany.Description = "New company added.";
+            clientCompany.AgreementDate = DateTime.Now;
+            clientCompany.Status = CompanyStatus.ACTIVE;
             clientCompany.PinCodeId = clientCompany.SelectedPincodeId;
             clientCompany.DistrictId = clientCompany.SelectedDistrictId;
             clientCompany.StateId = clientCompany.SelectedStateId;

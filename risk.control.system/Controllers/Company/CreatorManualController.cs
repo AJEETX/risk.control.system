@@ -87,7 +87,7 @@ namespace risk.control.system.Controllers.Company
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == currentUserEmail);
+                var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).ThenInclude(c=>c.Country).FirstOrDefault(u => u.Email == currentUserEmail);
                 if (companyUser.ClientCompany.LicenseType == Standard.Licensing.LicenseType.Trial)
                 {
                     var totalClaimsCreated = _context.ClaimsInvestigation.Count(c => !c.Deleted && c.ClientCompanyId == companyUser.ClientCompanyId);
@@ -118,7 +118,8 @@ namespace risk.control.system.Controllers.Company
                  c.InvestigationCaseSubStatus == declinedClaimsStatus ||
                  c.InvestigationCaseSubStatus == reviewClaimsStatus
                  ));
-                return View(new CreateClaims { BulkUpload = companyUser.ClientCompany.BulkUpload, UserCanCreate = userCanCreate, HasClaims = hasClaim });
+                var fileIdentifier = $"{companyUser.ClientCompany.Country.Code.ToLower()}";
+                return View(new CreateClaims { BulkUpload = companyUser.ClientCompany.BulkUpload, UserCanCreate = userCanCreate, HasClaims = hasClaim, FileSampleIdentifier = fileIdentifier });
             }
             catch (Exception ex)
             {

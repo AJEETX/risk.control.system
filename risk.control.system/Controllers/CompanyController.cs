@@ -192,14 +192,14 @@ namespace risk.control.system.Controllers
                 existCompany.DistrictId = clientCompany.DistrictId;
                 existCompany.PinCodeId = clientCompany.PinCodeId;
                 existCompany.Name = clientCompany.Name;
-                existCompany.Code = clientCompany.Code;
+                //existCompany.Code = clientCompany.Code;
                 existCompany.PhoneNumber = clientCompany.PhoneNumber;
                 existCompany.Branch = clientCompany.Branch;
                 existCompany.BankName = clientCompany.BankName;
                 existCompany.BankAccountNumber = clientCompany.BankAccountNumber;
                 existCompany.IFSCCode = clientCompany.IFSCCode;
                 existCompany.Addressline = clientCompany.Addressline;
-                existCompany.Description = clientCompany.Description;
+                //existCompany.Description = clientCompany.Description;
 
                 existCompany.PinCodeId = clientCompany.SelectedPincodeId;
                 existCompany.DistrictId = clientCompany.SelectedDistrictId;
@@ -301,6 +301,7 @@ namespace risk.control.system.Controllers
                     user.ProfilePictureUrl = "/company/" + newFileName;
                 }
                 //DEMO
+                user.Active = true;
                 user.Password = Applicationsettings.Password;
                 user.Email = userFullEmail;
                 user.EmailConfirmed = true;
@@ -324,26 +325,8 @@ namespace risk.control.system.Controllers
                     var roleResult = await userManager.RemoveFromRolesAsync(user, roles);
                     roleResult = await userManager.AddToRolesAsync(user, new List<string> { user.UserRole.ToString() });
                     var isdCode = _context.Country.FirstOrDefault(c => c.CountryId == user.CountryId).ISDCode;
-                    if (!user.Active)
-                    {
-                        var createdUser = await userManager.FindByEmailAsync(user.Email);
-                        var lockUser = await userManager.SetLockoutEnabledAsync(createdUser, true);
-                        var lockDate = await userManager.SetLockoutEndDateAsync(createdUser, DateTime.MaxValue);
-
-                        if (lockUser.Succeeded && lockDate.Succeeded)
-                        {
-                            notifyService.Custom($"User {createdUser.Email} created and locked.", 3, "green", "fas fa-user-lock");
-                            await smsService.DoSendSmsAsync(isdCode +createdUser.PhoneNumber, "User created and locked. Email : " + createdUser.Email);
-                            return RedirectToAction(nameof(CompanyController.Users), "Company");
-                        }
-                    }
-                    else
-                    {
-                        notifyService.Custom($"User {user.Email} created successfully.", 3, "green", "fas fa-user-plus");
-                        await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "User created . Email : " + user.Email);
-                        return RedirectToAction(nameof(CompanyController.Users), "Company");
-                    }
                     notifyService.Custom($"User {user.Email} created successfully.", 3, "green", "fas fa-user-plus");
+                    await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "User created . Email : " + user.Email);
                     return RedirectToAction(nameof(CompanyController.Users), "Company");
                 }
                 notifyService.Error("OOPs !!!..Contact Admin");

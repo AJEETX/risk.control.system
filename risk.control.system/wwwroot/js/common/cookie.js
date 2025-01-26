@@ -34,7 +34,7 @@
 
     $("#savePreferences").on("click", function () {
         const analyticsCookies = $("#analyticsCookies").is(":checked");
-        const marketingCookies = $("#marketingCookies").is(":checked");
+        const perfomanceCookies = $("#perfomanceCookies").is(":checked");
 
         fetch('/api/auth/SavePreferences', {
             method: 'POST',
@@ -43,7 +43,7 @@
             },
             body: JSON.stringify({
                 analyticsCookies: analyticsCookies,
-                marketingCookies: marketingCookies
+                perfomanceCookies: perfomanceCookies
             })
         })
             .then((response) => {
@@ -56,8 +56,8 @@
                 if (data.analyticsCookies !== undefined) {
                     document.cookie = `analyticsCookies=${data.analyticsCookies}; path=/; max-age=${365 * 24 * 60 * 60}`;
                 }
-                if (data.marketingCookies !== undefined) {
-                    document.cookie = `marketingCookies=${data.marketingCookies}; path=/; max-age=${365 * 24 * 60 * 60}`;
+                if (data.perfomanceCookies !== undefined) {
+                    document.cookie = `perfomanceCookies=${data.perfomanceCookies}; path=/; max-age=${365 * 24 * 60 * 60}`;
                 }
 
                 console.log('Cookie accepted:', data.message);
@@ -99,8 +99,8 @@ function acceptCookies(cookieCancel) {
             if (data.analyticsCookies !== undefined) {
                 document.cookie = `analyticsCookies=${data.analyticsCookies}; path=/; max-age=${365 * 24 * 60 * 60}`;
             }
-            if (data.marketingCookies !== undefined) {
-                document.cookie = `marketingCookies=${data.marketingCookies}; path=/; max-age=${365 * 24 * 60 * 60}`;
+            if (data.perfomanceCookies !== undefined) {
+                document.cookie = `perfomanceCookies=${data.perfomanceCookies}; path=/; max-age=${365 * 24 * 60 * 60}`;
             }
             console.log('Cookie accepted:', data.message);
             const message = data.message || "Cookies have been successfully accepted.";
@@ -130,8 +130,8 @@ async function revokeCookies(cookiePopup) {
         if (data.analyticsCookies !== undefined) {
             document.cookie = `analyticsCookies=${data.analyticsCookies}; path=/; max-age=${365 * 24 * 60 * 60}`;
         }
-        if (data.marketingCookies !== undefined) {
-            document.cookie = `marketingCookies=${data.marketingCookies}; path=/; max-age=${365 * 24 * 60 * 60}`;
+        if (data.perfomanceCookies !== undefined) {
+            document.cookie = `perfomanceCookies=${data.perfomanceCookies}; path=/; max-age=${365 * 24 * 60 * 60}`;
         }
         const message = data.message || "Cookies have been successfully accepted.";
         if (!getCookie("cookieConsent")) {

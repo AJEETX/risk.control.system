@@ -80,7 +80,7 @@ namespace risk.control.system.Controllers.Mobile
                 SameSite = SameSiteMode.Strict
             });
 
-            Response.Cookies.Append("marketingCookies", true.ToString(), new CookieOptions
+            Response.Cookies.Append("perfomanceCookies", true.ToString(), new CookieOptions
             {
                 Expires = DateTimeOffset.UtcNow.AddDays(365),
                 HttpOnly = false,
@@ -111,7 +111,7 @@ namespace risk.control.system.Controllers.Mobile
                 SameSite = SameSiteMode.Strict
             });
 
-            Response.Cookies.Append("marketingCookies", false.ToString(), new CookieOptions
+            Response.Cookies.Append("perfomanceCookies", false.ToString(), new CookieOptions
             {
                 Expires = DateTimeOffset.UtcNow.AddDays(365),
                 HttpOnly = false,
@@ -147,7 +147,7 @@ namespace risk.control.system.Controllers.Mobile
                 SameSite = SameSiteMode.Strict
             });
 
-            Response.Cookies.Append("marketingCookies", preferences.MarketingCookies.ToString(), new CookieOptions
+            Response.Cookies.Append("perfomanceCookies", preferences.PerfomanceCookies.ToString(), new CookieOptions
             {
                 Expires = DateTimeOffset.UtcNow.AddDays(365),
                 HttpOnly = false,
@@ -162,6 +162,6 @@ namespace risk.control.system.Controllers.Mobile
     public class CookiePreferences
     {
         public bool AnalyticsCookies { get; set; }
-        public bool MarketingCookies { get; set; }
+        public bool PerfomanceCookies { get; set; }
     }
 }

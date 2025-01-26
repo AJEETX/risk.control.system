@@ -7,5 +7,6 @@
         public bool HasClaims { get; set; }
         public UploadType? Uploadtype { get; set; }
         public CREATEDBY CREATEDBY { get; set; }
+        public string? FileSampleIdentifier { get; set; }
     }
 }

@@ -1,5 +1,5 @@
 ﻿<!-- Cookie Consent Popup -->
-@if (Context.Request.Cookies["analyticsCookies"] == null && Context.Request.Cookies["marketingCookies"] == null)
+@if (Context.Request.Cookies["analyticsCookies"] == null && Context.Request.Cookies["perfomanceCookies"] == null)
 {
     <div id="cookiePopup" class="popup">
         <div class="popup-content">
@@ -31,8 +31,8 @@
                     <label for="analyticsCookies">Analytics Cookies</label>
                 </div>
                 <div>
-                    <input type="checkbox" id="marketingCookies" name="marketingCookies">
-                    <label for="marketingCookies">Performance Cookies</label>
+                    <input type="checkbox" id="perfomanceCookies" name="perfomanceCookies">
+                    <label for="perfomanceCookies">Performance Cookies</label>
                 </div>
                 <div class="popup-buttons">
                     <button type="button" id="savePreferences" class="btn-accept">Save Preferences</button>

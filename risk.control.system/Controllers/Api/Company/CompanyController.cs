@@ -53,7 +53,7 @@ namespace risk.control.system.Controllers.Api.Company
                     Document = string.IsNullOrWhiteSpace(u.DocumentUrl) ? Applicationsettings.NO_IMAGE : u.DocumentUrl,
                     Domain = $"<a href='/ClientCompany/Details?Id={u.ClientCompanyId}'>" + u.Email + "</a>",
                     Name = u.Name,
-                    Code = u.Code,
+                    //Code = u.Code,
                     Phone = "(+" + u.Country.ISDCode + ") " + u.PhoneNumber,
                     Address = u.Addressline,
                     District = u.District.Name,
@@ -99,7 +99,7 @@ namespace risk.control.system.Controllers.Api.Company
                 {
                     Id = u.Id,
                     Name = u.FirstName + " " + u.LastName,
-                    Email = "<a href=''>" + u.Email + "</a>",
+                    Email = $"<a href='/CompanyUser/Edit?userId={u.Id}'>{u.Email}</a>",
                     RawEmail = u.Email,
                     Phone = "(+" + u.Country.ISDCode + ") " + u.PhoneNumber,
                     Photo = u.ProfilePicture == null ? noUserImagefilePath : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(u.ProfilePicture)),
