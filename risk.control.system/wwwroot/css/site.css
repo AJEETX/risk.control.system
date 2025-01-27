@@ -423,6 +423,7 @@ a.table-link {
 }
     .disclaimer-body p{
         font-weight:lighter;
+        font-size:.8em;
         margin-bottom:0;
     }
     .attachment-list {
@@ -1991,4 +1992,9 @@ select#PinCodeId {
     filter: blur(2px);
     transition: filter 0.3s ease; /* Smooth transition */
     pointer-events: none; /* Prevent interactions with blurred elements */
+}
+
+.hostedscan {
+    height:30px;
+    width:auto
 }

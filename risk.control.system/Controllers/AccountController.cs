@@ -231,15 +231,15 @@ namespace risk.control.system.Controllers
                         
                         if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN) && user?.Email != null && !user.Email.StartsWith("admin"))
                         {
-                            var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct, "login-success", model.Email, isAuthenticated, latlong);
-                            if(ipApiResponse is null)
-                            {
-                                ModelState.AddModelError(string.Empty, "Bad Request.");
-                                model.Error = "Bad Request.";
-                                model.ShowUserOnLogin = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
-                                ViewData["Users"] = new SelectList(_context.Users.Where(u => !u.Deleted).OrderBy(o => o.Email), "Email", "Email");
-                                return View(model);
-                            }
+                            //var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct, "login-success", model.Email, isAuthenticated, latlong);
+                            //if(ipApiResponse is null)
+                            //{
+                            //    ModelState.AddModelError(string.Empty, "Bad Request.");
+                            //    model.Error = "Bad Request.";
+                            //    model.ShowUserOnLogin = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
+                            //    ViewData["Users"] = new SelectList(_context.Users.Where(u => !u.Deleted).OrderBy(o => o.Email), "Email", "Email");
+                            //    return View(model);
+                            //}
                             
                             string message = string.Empty;
                             if (admin != null)
@@ -247,7 +247,7 @@ namespace risk.control.system.Controllers
                                 message = $"Dear {admin.Email}";
                                 message += $"                                       ";
                                 message += $"                       ";
-                                message += $"User {user.Email} logged in from IP address {ipApiResponse.query}";
+                                message += $"User {user.Email} logged in";
                                 message += $"                                       ";
                                 message += $"Thanks                                         ";
                                 message += $"                                       ";

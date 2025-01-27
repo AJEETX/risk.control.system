@@ -235,7 +235,7 @@ namespace risk.control.system.Controllers
                     var BaseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
                     var admin = _context.ApplicationUser.Include(c=>c.Country).FirstOrDefault(u => u.IsSuperAdmin);
                     var isAuthenticated = HttpContext.User.Identity.IsAuthenticated;
-                    var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct, "login-success", user.Email, isAuthenticated);
+                    //var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct, "login-success", user.Email, isAuthenticated);
 
                     if (user == null)
                     {
@@ -251,7 +251,7 @@ namespace risk.control.system.Controllers
                         string failedMessage = $"Dear {admin.Email}";
                         failedMessage += $"                                       ";
                         failedMessage += $"                       ";
-                        failedMessage += $"User {user.Email} failed changed password from IP address {ipApiResponse.query}. New password: {model.NewPassword}";
+                        failedMessage += $"User {user.Email} failed changed password. New password: {model.NewPassword}";
                         failedMessage += $"                                       ";
                         failedMessage += $"Thanks                                         ";
                         failedMessage += $"                                       ";
@@ -267,7 +267,7 @@ namespace risk.control.system.Controllers
                     string message = $"Dear {admin.Email}";
                     message += $"                                       ";
                     message += $"                       ";
-                    message += $"User {user.Email} changed password from IP address {ipApiResponse.query}. New password: {model.NewPassword}";
+                    message += $"User {user.Email} changed password. New password: {model.NewPassword}";
                     message += $"                                       ";
                     message += $"Thanks                                         ";
                     message += $"                                       ";

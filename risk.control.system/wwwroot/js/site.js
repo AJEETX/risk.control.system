@@ -165,17 +165,17 @@ async function fetchIpInfo(latlong) {
         const parser = new UAParser();
         const browserInfo = parser.getResult();
 
-        const response = await fetch(url);
-        if (!response.ok) {
-            console.error(`IP fetch failed with status: ${response.status}`);
-            displayUnavailableInfo();
-            return;
-        }
+        //const response = await fetch(url);
+        //if (!response.ok) {
+        //    console.error(`IP fetch failed with status: ${response.status}`);
+        //    displayUnavailableInfo();
+        //    return;
+        //}
 
-        const data = await response.json();
+        //const data = await response.json();
         updateInfoDisplay({
-            ipAddress: data.ipAddress || 'Not available',
-            city: data.district || 'Not available',
+            //ipAddress: data.ipAddress || 'Not available',
+            //city: data.district || 'Not available',
             browser: `${browserInfo.browser.name?.toLowerCase()} ${browserInfo.browser.major}` || 'Not available',
             device: getDeviceType() || 'Not available',
             os: `${browserInfo.os.name?.toLowerCase()} ${browserInfo.os.version}` || 'Not available',
@@ -195,8 +195,8 @@ async function fetchIpInfo(latlong) {
 
 function updateInfoDisplay(info) {
     const fields = {
-        ipAddress: '#ipAddress .info-data',
-        city: '#city .info-data',
+        //ipAddress: '#ipAddress .info-data',
+        //city: '#city .info-data',
         browser: '#browser .info-data',
         device: '#device .info-data',
         os: '#os .info-data',
@@ -210,8 +210,8 @@ function updateInfoDisplay(info) {
 
 function displayUnavailableInfo() {
     updateInfoDisplay({
-        ipAddress: 'Not available',
-        city: 'Not available',
+        //ipAddress: 'Not available',
+        //city: 'Not available',
         browser: 'Not available',
         device: 'Not available',
         os: 'Not available',
