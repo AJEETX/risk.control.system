@@ -421,11 +421,14 @@ a.table-link {
     background: linear-gradient(45deg, #e3e3e3, transparent);
     border-radius: .3rem;
 }
-
-.attachment-list {
-    height: 50px;
-    object-fit: cover
-}
+    .disclaimer-body p{
+        font-weight:lighter;
+        margin-bottom:0;
+    }
+    .attachment-list {
+        height: 50px;
+        object-fit: cover
+    }
 
 .btn-right-bottom {
     right: -75rem;

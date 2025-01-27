@@ -78,6 +78,11 @@ namespace risk.control.system.Controllers
         {
             try
             {
+                if (User is null || User.Identity is null)
+                {
+                    return Unauthorized(new { message = "User is logged out due to inactivity or authentication failure." });
+                }
+
                 if (User.Identity.IsAuthenticated)
                 {
                     var user = await _signInManager.UserManager.GetUserAsync(User);
@@ -85,11 +90,11 @@ namespace risk.control.system.Controllers
                     if (user != null)
                     {
                         await _signInManager.RefreshSignInAsync(user);
-                        var userDetails = new 
-                        { 
-                            name = user.UserName, 
-                            role = user.Role.GetEnumDisplayName(), 
-                            cookieExpiry = user.LastActivityDate ?? user.Updated ,
+                        var userDetails = new
+                        {
+                            name = user.UserName,
+                            role = user.Role != null ? user.Role.GetEnumDisplayName(): null!,
+                            cookieExpiry = user.LastActivityDate ?? user.Updated,
                             currentPage = request.CurrentPage
                         };
 
@@ -136,16 +141,7 @@ namespace risk.control.system.Controllers
                     ViewData["Users"] = new SelectList(_context.Users.Where(u => !u.Deleted).OrderBy(o => o.Email), "Email", "Email");
                 }
             }
-            //ViewBag.SlimLogin = "Login";
-
-            //if (await featureManager.IsEnabledAsync(FeatureFlags.SLIM_LOGIN))
-            //{
-            //    ViewBag.SlimLogin = "Login";
-            //}
-            //else
-            //{
-            //    ViewBag.SlimLogin = "LoginPost";
-            //}
+            
             return View(new LoginViewModel { ShowUserOnLogin = showLoginUsers });
         }
 
@@ -170,9 +166,27 @@ namespace risk.control.system.Controllers
             var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
             var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
             var BaseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
+            var admin = _context.ApplicationUser.Include(a => a.Country).FirstOrDefault(u => u.IsSuperAdmin);
+            if (admin is null || admin.Country is null)
+            {
+                ModelState.AddModelError(string.Empty, "Bad Request.");
+                model.Error = "Bad Request.";
+                model.ShowUserOnLogin = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
+                ViewData["Users"] = new SelectList(_context.Users.Where(u => !u.Deleted).OrderBy(o => o.Email), "Email", "Email");
+                return View(model);
+            }
             if (result.Succeeded)
             {
                 var user = await _userManager.FindByEmailAsync(email);
+                if( user is null || user.Email is null || string.IsNullOrWhiteSpace(user.Email))
+                {
+                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                    model.Error = "Invalid login attempt.";
+                    model.ShowUserOnLogin = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
+                    ViewData["Users"] = new SelectList(_context.Users.Where(u => !u.Deleted).OrderBy(o => o.Email), "Email", "Email");
+                    return View(model);
+                }
+                
                 var roles = await _userManager.GetRolesAsync(user);
                 if (roles != null && roles.Count > 0)
                 {
@@ -204,16 +218,29 @@ namespace risk.control.system.Controllers
                         var properties = new AuthenticationProperties
                         {
                             IsPersistent = true, // Makes the cookie persistent
-                            ExpiresUtc = DateTimeOffset.UtcNow.AddSeconds(double.Parse(timeout)), // Reset expiry time
+                            ExpiresUtc = DateTimeOffset.UtcNow.AddSeconds(double.Parse(timeout ?? "900")), // Reset expiry time
                         };
                         await _signInManager.SignInAsync(user, properties);
 
-                        var isAuthenticated = HttpContext.User.Identity.IsAuthenticated;
+                        if(User is null || User.Identity is null)
+                        {
+                            return Unauthorized(new { message = "User is logged out due to inactivity or authentication failure." });
+                        }
 
+                        var isAuthenticated = User.Identity.IsAuthenticated;
+                        
                         if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN) && user?.Email != null && !user.Email.StartsWith("admin"))
                         {
                             var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct, "login-success", model.Email, isAuthenticated, latlong);
-                            var admin = _context.ApplicationUser.Include(a=>a.Country).FirstOrDefault(u => u.IsSuperAdmin);
+                            if(ipApiResponse is null)
+                            {
+                                ModelState.AddModelError(string.Empty, "Bad Request.");
+                                model.Error = "Bad Request.";
+                                model.ShowUserOnLogin = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
+                                ViewData["Users"] = new SelectList(_context.Users.Where(u => !u.Deleted).OrderBy(o => o.Email), "Email", "Email");
+                                return View(model);
+                            }
+                            
                             string message = string.Empty;
                             if (admin != null)
                             {
@@ -235,22 +262,6 @@ namespace risk.control.system.Controllers
                                     Console.WriteLine(ex.ToString());
                                 }
                             }
-                            message += $"                                       ";
-                            message += $"                       ";
-                            message += $"User {user.Email} logged in from IP address {ipApiResponse.query}";
-                            message += $"                                       ";
-                            message += $"Thanks                                         ";
-                            message += $"                                       ";
-                            message += $"                                       ";
-                            message += $"{BaseUrl}";
-                            try
-                            {
-                                    await smsService.DoSendSmsAsync("+" + admin.Country.ISDCode + admin.PhoneNumber, message);
-                            }
-                            catch (Exception ex)
-                            {
-                                Console.WriteLine(ex.ToString());
-                            }
                         }
 
                         notifyService.Success("Login successful");
@@ -261,8 +272,8 @@ namespace risk.control.system.Controllers
                 if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN) && !user.Email.StartsWith("admin"))
                 {
                     var ipApiFailedResponse = await service.GetClientIp(ipAddressWithoutPort, ct, "login-failed", model.Email, false, latlong);
-                    var adminForFailed = _context.ApplicationUser.Include(a=>a.Country).FirstOrDefault(u => u.IsSuperAdmin);
-                    string failedMessage = $"Dear {adminForFailed.Email}";
+                    var adminForFailed = _context.ApplicationUser.Include(a => a.Country).FirstOrDefault(u => u.IsSuperAdmin);
+                    string failedMessage = $"Dear {admin.Email}";
                     failedMessage += $"                         ";
                     failedMessage += $"Locked user {user.Email} logged in from IP address {ipApiFailedResponse.query}";
                     failedMessage += $"                                       ";
@@ -270,7 +281,7 @@ namespace risk.control.system.Controllers
                     failedMessage += $"                                       ";
                     failedMessage += $"                                       ";
                     failedMessage += $"{BaseUrl}";
-                    await smsService.DoSendSmsAsync("+" + adminForFailed.Country.ISDCode +  adminForFailed.PhoneNumber, failedMessage);
+                    await smsService.DoSendSmsAsync("+" + adminForFailed.Country.ISDCode + adminForFailed.PhoneNumber, failedMessage);
                 }
                 model.ShowUserOnLogin = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
                 ViewData["Users"] = new SelectList(_context.Users.OrderBy(o => o.Email), "Email", "Email");
@@ -280,11 +291,9 @@ namespace risk.control.system.Controllers
             }
             else if (result.IsLockedOut)
             {
-                var isAuthenticated = HttpContext.User.Identity.IsAuthenticated;
                 if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
                 {
-                    var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct, "login-locked", model.Email, isAuthenticated, latlong);
-                    var admin = _context.ApplicationUser.Include(a => a.Country).FirstOrDefault(u => u.IsSuperAdmin);
+                    var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct, "login-locked", model.Email, false, latlong);
                     string message = $"Dear {admin.Email}";
                     message += $"                           ";
                     message += $"{model.Email} failed login attempt from IP address {ipApiResponse.query}";
@@ -293,7 +302,7 @@ namespace risk.control.system.Controllers
                     message += $"                                       ";
                     message += $"                                       ";
                     message += $"{BaseUrl}";
-                    await smsService.DoSendSmsAsync("+" + admin.Country.ISDCode+ admin.PhoneNumber, message);
+                    await smsService.DoSendSmsAsync("+" + admin.Country.ISDCode + admin.PhoneNumber, message);
                 }
                 else
                 {
@@ -306,12 +315,9 @@ namespace risk.control.system.Controllers
             }
             else
             {
-                var isAuthenticated = HttpContext.User.Identity.IsAuthenticated;
-
                 if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
                 {
-                    var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct, "login-failed", model.Email, isAuthenticated, latlong);
-                    var admin = _context.ApplicationUser.Include(a => a.Country).FirstOrDefault(u => u.IsSuperAdmin);
+                    var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct, "login-failed", model.Email, false, latlong);
                     string message = $"Dear {admin.Email}";
                     message += $"                          ";
                     message += $"{model.Email} failed login attempt from IP address {ipApiResponse.query}";
@@ -320,7 +326,7 @@ namespace risk.control.system.Controllers
                     message += $"                                       ";
                     message += $"                                       ";
                     message += $"{BaseUrl}";
-                    await smsService.DoSendSmsAsync("+" + admin.Country.ISDCode+ admin.PhoneNumber, message);
+                    await smsService.DoSendSmsAsync("+" + admin.Country.ISDCode + admin.PhoneNumber, message);
                 }
                 else
                 {

@@ -234,10 +234,10 @@ namespace risk.control.system.Controllers.Company
 
                 var invoice = await invoiceService.GetInvoice(id);
 
-                var claimsPage = new MvcBreadcrumbNode("Assessor", "Assessor", "Claims");
-                var agencyPage = new MvcBreadcrumbNode("Approved", "Assessor", "Approved") { Parent = claimsPage, };
-                var detailsPage = new MvcBreadcrumbNode("ApprovedDetail", "Assessor", $"Details") { Parent = agencyPage, RouteValues = new { id = invoice.ClaimId } };
-                var editPage = new MvcBreadcrumbNode("ShowInvoice", "Assessor", $"Invoice") { Parent = detailsPage, RouteValues = new { id = id } };
+                var claimsPage = new MvcBreadcrumbNode("Assessor", "Manager", "Claims");
+                var agencyPage = new MvcBreadcrumbNode("Approved", "Manager", "Approved") { Parent = claimsPage, };
+                var detailsPage = new MvcBreadcrumbNode("ApprovedDetail", "Manager", $"Details") { Parent = agencyPage, RouteValues = new { id = invoice.ClaimId } };
+                var editPage = new MvcBreadcrumbNode("ShowInvoice", "Manager", $"Invoice") { Parent = detailsPage, RouteValues = new { id = id } };
                 ViewData["BreadcrumbNode"] = editPage;
 
                 return View(invoice);

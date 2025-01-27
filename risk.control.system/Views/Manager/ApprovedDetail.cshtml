@@ -2,7 +2,6 @@
 
 @{
     ViewData["Title"] = "Details";
-
 }
 
 <section class="content">
@@ -33,14 +32,14 @@
                 </span>
             </h3>
         </div>
-
-        <partial name="_ApprovedPolicyDetails" model="@Model" />
-
-        <partial name="_TimelineReport" model="@Model" />
-
-        <partial name="_InvoiceApproved" model="@Model" />
-
     </div>
+    <partial name="Company/_ApprovedPolicyDetails" model="@Model" />
+    <partial name="Company/_AgencySubmittedReport" model="@Model" />
+
+    <partial name="Company/_TimelineReport" model="@Model" />
+
+    <partial name="_Invoice" model="@Model" />
+
 </section>
 
 @section Scripts {

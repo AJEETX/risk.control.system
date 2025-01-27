@@ -10,6 +10,18 @@ var showOcrMap = false;
 const image =
     "/images/beachflag.png";
 
+// Function to trigger the print dialog
+function printInvoice() {
+    window.print();  // Opens the print dialog
+}
+
+// Add event listener to the print button once the DOM is fully loaded
+document.addEventListener("DOMContentLoaded", function () {
+    var printButton = document.getElementById("printInvoiceButton");
+    if (printButton) {
+        printButton.addEventListener("click", printInvoice);
+    }
+});
 
 function checkFormCompletion(formSelector, create = false) {
     let isFormComplete = true;
@@ -705,6 +717,12 @@ $(document).ready(function () {
 
 // Function to disable all interactive elements
 function disableAllInteractiveElements() {
+    $("body").addClass("submit-progress-bg");
+    // Wrap in setTimeout so the UI can update the spinners
+    setTimeout(function () {
+        $(".submit-progress").removeClass("hidden");
+    }, 1);
+
     // Disable buttons and inputs
     $('button, input[type="submit"]').prop('disabled', true);
 

@@ -233,7 +233,11 @@ namespace risk.control.system.Controllers.Company
                 }
 
                 var model = await investigationReportService.SubmittedDetail(id, currentUserEmail);
-
+                if (model != null && model.ClaimsInvestigation != null && model.ClaimsInvestigation.AiEnabled)
+                {
+                    var investigationSummary = await chatSummarizer.SummarizeDataAsync(model.ClaimsInvestigation);
+                    model.ReportAiSummary = investigationSummary;
+                }
                 return View(model);
             }
             catch (Exception ex)

@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width" />
     <title>Print Invoice</title>
 </head>
-<body onload="window.print();">
+<body>
     <div class="wrapper">
         <!-- Main content -->
         <section class="invoice">
@@ -123,7 +123,7 @@
             <!-- this row will not appear when printing -->
             <div class="row no-print">
                 <div class="col-xs-12">
-                    <a id="back" asp-action="Detail" asp-route-id="@Model.ClaimId" class="btn btn-default"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
+                    <a id="back" asp-action="ApprovedDetail" asp-route-id="@Model.ClaimId" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
 
                     <a href="@Url.Action("PrintInvoice", new { id = Model.VendorInvoiceId })" target="_blank" class="btn btn-primary"><i class="fa fa-print"></i> Print Invoice</a>
                 </div>

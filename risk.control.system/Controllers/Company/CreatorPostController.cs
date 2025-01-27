@@ -69,8 +69,19 @@ namespace risk.control.system.Controllers.Company
                 )
                 {
                     notifyService.Custom($"Upload Error. Contact Admin", 3, "red", "far fa-file-powerpoint");
+                    if (model == null)
+                    {
+                        return RedirectToAction(nameof(Index), "Dashboard");
+                    }
 
-                    return RedirectToAction("New", "CreatorAuto");
+                    if (model.CREATEDBY == CREATEDBY.AUTO)
+                    {
+                        return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
+                    }
+                    else
+                    {
+                        return RedirectToAction(nameof(CreatorManualController.New), "CreatorManual");
+                    }
                 }
 
                 bool processed = false;
@@ -87,11 +98,11 @@ namespace risk.control.system.Controllers.Company
 
                 if (processed)
                 {
-                    notifyService.Custom($"FTP download complete ", 3, "green", "fa fa-upload");
+                    notifyService.Custom($"{model.Uploadtype.GetEnumDisplayName()} complete ", 3, "green", "fa fa-upload");
                 }
                 else
                 {
-                    notifyService.Information($"FTP Upload Error. Check limit <i class='fa fa-upload' ></i>", 3);
+                    notifyService.Information($"{model.Uploadtype.GetEnumDisplayName()} Error. Check limit <i class='fa fa-upload' ></i>", 3);
                 }
                 if(model.CREATEDBY == CREATEDBY.AUTO)
                 {

@@ -53,35 +53,36 @@
                     </span>
                 </h3>
             </div>
-            <partial name="_PolicyDetails" model="@Model" />
+        </div>
+        <partial name="_PolicyDetails" model="@Model" />
 
-            <partial name="_AgencyReport" model="@Model" />
-            @if (@Model.ClaimsInvestigation.IsQueryCase && @Model.ClaimsInvestigation.AgencyReport.EnquiryRequest != null)
-            {
-                var data = new ClaimTransactionModel
+            
+        <partial name="_AgencyReport" model="@Model" />
+        @if (@Model.ClaimsInvestigation.IsQueryCase && @Model.ClaimsInvestigation.AgencyReport.EnquiryRequest != null)
+        {
+            var data = new ClaimTransactionModel
                 {
                     ClaimsInvestigation = Model.ClaimsInvestigation,
                 };
-                <partial name="_EnquiryReport" model="@data" />
+            <partial name="_EnquiryReport" model="@data" />
+        }
+
+        @{
+            var lastReport = Model.ClaimsInvestigation?.PreviousClaimReports.FirstOrDefault();
+            if (lastReport is not null)
+            {
+                <a class="btn btn-default btn-sm" href="@Url.Action("PreviousReports", new { id = lastReport.PreviousClaimReportId })"> <i class="fas fa-newspaper"></i> Previous Report</a>
             }
 
-            @{
-                var lastReport = Model.ClaimsInvestigation?.PreviousClaimReports.FirstOrDefault();
-                if (lastReport is not null)
-                {
-                    <a class="btn btn-default btn-sm" href="@Url.Action("PreviousReports", new { id = lastReport.PreviousClaimReportId })"> <i class="fas fa-newspaper"></i> Previous Report</a>
-                }
-
-            }
-            <div class="submit-progress hidden">
-                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
-            </div>
+        }
+        <div class="submit-progress hidden">
+            <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
         </div>
         @if (Model.ClaimsInvestigation.AiEnabled)
         {
             <partial name="_AgencyAiReport" model="@Model" />
         }
-        <div class="card card-secondary">
+        <div class="card card-light">
 
             <div class="card-header">
                 <h3 class="card-title">
