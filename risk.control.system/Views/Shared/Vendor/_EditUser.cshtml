@@ -2,7 +2,7 @@
 <div class="row">
     <div class="col-md-6">
         <div class="form-group">
-            <span class="input-group-label"> Email:</span>
+            <label class="input-group-label"> Email:</label>
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
                     <span class="input-group-text" id="email"><i class="fas fa-at"></i> <i class="fa fa-asterisk asterik-style"></i></span>
@@ -11,7 +11,7 @@
             </div>
         </div>
         <div class="form-group">
-            <span class="input-group-label"> Profile Photo:</span>
+            <label class="input-group-label"> Profile Photo:</label>
             <div class="input-group mb-3">
                 @if (Model?.ProfilePicture is not null)
                 {
@@ -27,7 +27,7 @@
             </div>
         </div>
         <div class="form-group">
-            <span class="input-group-label"> First Name:</span>
+            <label class="input-group-label"> First Name:</label>
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
                     <span class="input-group-text" id="FirstName"><i class="fa fa-user"></i> <i class="fa fa-asterisk asterik-style"></i></span>
@@ -38,7 +38,7 @@
         </div>
 
         <div class="form-group">
-            <span class="input-group-label"> Last Name:</span>
+            <label class="input-group-label"> Last Name:</label>
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
                     <span class="input-group-text" id="LastName"> <i class="fa fa-user"></i> <i class="fa fa-asterisk asterik-style"></i></span>
@@ -48,7 +48,7 @@
             </div>
         </div>
         <div class="form-group">
-            <span class="input-group-label"> Phone #:</span>
+            <label class="input-group-label"> Phone #:</label>
             <div class="input-group">
 
                 <div class="input-group-prepend">
@@ -65,7 +65,7 @@
             </div>
         </div>
         <div class="form-group">
-            <span class="input-group-label"> Role:</span>
+            <label class="input-group-label"> Role:</label>
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
                     <span class="input-group-text" asp-for="ClaimType"><i class="nav-icon fas fa-file-invoice"></i> <i class="fa fa-asterisk asterik-style"></i></span>
@@ -105,7 +105,7 @@
         <partial name="_Address" model="@Model" />
 
         <div class="form-group">
-            <span class="input-group-label"> Address:</span>
+            <label class="input-group-label"> Address:</label>
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
                     <span class="input-group-text" id="Addressline"><i class="fa fa-home"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
@@ -115,7 +115,7 @@
             </div>
         </div>
         <div class="form-group">
-            <span class="input-group-label"> Note:</span>
+            <label class="input-group-label"> Note:</label>
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
                     <span class="input-group-text" id="Comments"><i class="fas fa-comment"></i> <i class="fa fa-asterisk asterik-style-none"></i></span>
@@ -126,7 +126,7 @@
         @if (Model.UserRole == AgencyRole.AGENCY_ADMIN)
         {
             <div class="form-group">
-                <span class="input-group-label"> Status:</span>
+                <label class="input-group-label"> Status:</label>
                 <div class="input-group mb-3">
                     <div class="input-group-prepend">
                         <span class="input-group-text"><i class="fa fa-toggle-on"></i> <i class="fa fa-asterisk asterik-style"></i></span>
@@ -143,7 +143,7 @@
         else
         {
             <div class="form-group">
-                <span class="input-group-label"> Status:</span>
+                <label class="input-group-label"> Status:</label>
                 <div class="input-group mb-3">
                     <div class="input-group-prepend">
                         <span class="input-group-text"><i class="fa fa-toggle-on"></i> <i class="fa fa-asterisk asterik-style"></i></span>

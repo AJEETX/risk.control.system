@@ -24,18 +24,8 @@ namespace risk.control.system.Seeds
                     ICustomApiCLient customApiCLient, UserManager<ClientCompanyApplicationUser> clientUserManager)
         {
             string noCompanyImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", @Applicationsettings.NO_IMAGE);
-
-            var request = httpAccessor.HttpContext?.Request;
-            string host = request?.Host.Value;
-            var mobileAppUrl = Applicationsettings.APP_DEMO_URL;
-            if(host != null && host.Contains(Applicationsettings.AZURE_APP_URL))
-            {
-                mobileAppUrl = Applicationsettings.APP_URL;
-            }
-           
+                       
             var globalSettings = context.GlobalSettings.FirstOrDefault();
-
-            var enableMailbox = globalSettings?.EnableMailbox ?? false;
 
             var companyPinCode = context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE);
 
@@ -80,12 +70,24 @@ namespace risk.control.system.Seeds
                 ExpiryDate = DateTime.Now.AddDays(5),
                 EmpanelledVendors = vendors,
                 Status = CompanyStatus.ACTIVE,
-                 AutoAllocation = true,
-                 BulkUpload = true,
-                Updated = DateTime.Now,
-                Deleted = false,
-                EnableMailbox = enableMailbox,
-                MobileAppUrl = mobileAppUrl,
+                EnableMailbox = globalSettings.EnableMailbox,
+                MobileAppUrl = globalSettings.MobileAppUrl,
+                VerifyPan = globalSettings.VerifyPan,
+                VerifyPassport = globalSettings.VerifyPassport,
+                EnableMedia = globalSettings.EnableMedia,
+                PanIdfyUrl = globalSettings.PanIdfyUrl,
+                AiEnabled = globalSettings.AiEnabled,
+                CanChangePassword = globalSettings.CanChangePassword,
+                EnablePassport = globalSettings.EnablePassport,
+                HasSampleData = globalSettings.HasSampleData,
+                PassportApiHost = globalSettings.PassportApiHost,
+                PassportApiKey = globalSettings.PassportApiKey,
+                PassportApiUrl = globalSettings.PassportApiUrl,
+                PanAPIHost = globalSettings.PanAPIHost,
+                PanAPIKey = globalSettings.PanAPIKey,
+                SendSMS = globalSettings.SendSMS,
+                UpdateAgentAnswer = globalSettings.UpdateAgentAnswer,
+                UpdateAgentReport = globalSettings.UpdateAgentReport,
                 AddressMapLocation = companyAddressUrl,
                 AddressLatitude = companyAddressCoordinates.Latitude,
                 AddressLongitude = companyAddressCoordinates.Longitude

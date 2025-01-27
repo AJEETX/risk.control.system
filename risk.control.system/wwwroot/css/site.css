@@ -1799,7 +1799,7 @@ input.auto-dropdown {
 }
 
 select#PinCodeId {
-    min-height: 350px;
+    min-height: 380px;
     height: 100%;
 }
 
@@ -1997,4 +1997,25 @@ select#PinCodeId {
 .hostedscan {
     height:30px;
     width:auto
+}
+
+#editProfileImage {
+    width: 160px; /* Set the desired width */
+    height: 160px; /* Set the desired height */
+    border-radius: 50%; /* Makes the image circular */
+    border: 3px solid #ccc; /* Add a border around the image */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Adds a subtle shadow around the image */
+    object-fit: cover; /* Ensures the image maintains aspect ratio while filling the area */
+    transition: transform 0.3s ease; /* Smooth transition effect on hover */
+}
+
+    #editProfileImage:hover {
+        transform: scale(1.1); /* Slightly enlarges the image on hover */
+        border-color: #007bff; /* Changes border color on hover */
+    }
+
+/* Optional: You can add some styling to the file input for better appearance */
+.document-image-input {
+    background-color: #f8f9fa;
+    border-radius: 5px;
 }

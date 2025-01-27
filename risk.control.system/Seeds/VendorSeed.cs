@@ -21,9 +21,7 @@ namespace risk.control.system.Seeds
         {
             string noCompanyImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", @Applicationsettings.NO_IMAGE);
 
-            var globalSettings = context.GlobalSettings.FirstOrDefault();
-
-            var enableMailbox = globalSettings?.EnableMailbox ?? false;
+            
             //CREATE VENDOR COMPANY
 
             var checker = await AgencyCheckerSeed.Seed(context, webHostEnvironment, investigationServiceType, discreetServiceType, docServiceType, lineOfBusiness, httpAccessor, customApiCLient, vendorUserManager);

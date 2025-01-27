@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 using risk.control.system.AppConstant;
+using Standard.Licensing;
 
 namespace risk.control.system.Models
 {
@@ -10,18 +11,31 @@ namespace risk.control.system.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long GlobalSettingsId { get; set; }
 
+        // system wide settings
         public bool EnableMailbox { get; set; } = true;
+        public bool AutoAllocation { get; set; } = false;
 
         public bool SendSMS { get; set; } = false;
         public bool CanChangePassword { get; set; } = false;
+        public bool BulkUpload { get; set; } = false;
+        public bool VerifyPan { get; set; } = false;
+        public bool VerifyPassport { get; set; } = false;
+        public bool EnablePassport { get; set; } = false;
+        public bool EnableMedia { get; set; } = false;
+        public bool AiEnabled { get; set; } = false;
+
+        public bool UpdateAgentReport { get; set; } = false;
+        public bool UpdateAgentAnswer { get; set; } = false;
+
+        public bool HasSampleData { get; set; } = true;
         public bool ShowTimer { get; set; } = false;
         public bool ShowDetailFooter { get; set; } = false;
         public bool EnableClaim { get; set; } = false;
         public bool EnableUnderwriting { get; set; } = false;
 
         public string SmsUri { get; set; } = "https://api.sms-gate.app/3rdparty/v1/message";
-        public string SmsUser { get; set; } = "YXNGBE";
-        public string SmsData { get; set; } = "rfi-gbbukll7-6";
+        public string SmsUser { get; set; } = "EO66GF";
+        public string SmsData { get; set; } = "-lkoxvqoag8aep";
 
         public string FtpUri { get; set; } = "ftp://ftp.drivehq.com/holosync/";
         public string FtpUser { get; set; } = "its.aby@email.com";
@@ -33,8 +47,8 @@ namespace risk.control.system.Models
         public string WeatherUri { get; set; } = "https://api.open-meteo.com/v1/forecast";
 
         public string PanIdfyUrl { get; set; } = "https://pan-card-verification-at-lowest-price.p.rapidapi.com/verification/marketing/pan";
-        public string RapidAPIKey { get; set; } = "df0893831fmsh54225589d7b9ad1p15ac51jsnb4f768feed6f";
-        public string RapidAPIHost { get; set; } = "pan-card-verification-at-lowest-price.p.rapidapi.com";
+        public string PanAPIKey { get; set; } = "df0893831fmsh54225589d7b9ad1p15ac51jsnb4f768feed6f";
+        public string PanAPIHost { get; set; } = "pan-card-verification-at-lowest-price.p.rapidapi.com";
 
         public string? PassportApiUrl { get; set; } = "https://document-ocr1.p.rapidapi.com/idr";
         public string? PassportApiKey { get; set; } = "327fd8beb9msh8a441504790e80fp142ea8jsnf74b9208776a";

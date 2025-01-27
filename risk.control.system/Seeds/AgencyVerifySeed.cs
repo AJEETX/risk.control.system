@@ -22,17 +22,8 @@ namespace risk.control.system.Seeds
         {
             string noCompanyImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", @Applicationsettings.NO_IMAGE);
 
-            var request = httpAccessor.HttpContext?.Request;
-            string host = request?.Host.Value;
-            var mobileAppUrl = Applicationsettings.APP_DEMO_URL;
-            if (host != null && host.Contains(Applicationsettings.AZURE_APP_URL))
-            {
-                mobileAppUrl = Applicationsettings.APP_URL;
-            }
-           
             var globalSettings = context.GlobalSettings.FirstOrDefault();
 
-            var enableMailbox = globalSettings?.EnableMailbox ?? false;
             //CREATE VENDOR COMPANY
 
             var verifyPinCode = context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).FirstOrDefault(s => s.Country.Code.ToLower() =="au" );
@@ -76,8 +67,9 @@ namespace risk.control.system.Seeds
                 DocumentImage = verifyImage,
                 Status = VendorStatus.ACTIVE,
                 Updated = DateTime.Now,
-                EnableMailbox = enableMailbox,
-                MobileAppUrl = mobileAppUrl,
+                EnableMailbox = globalSettings.EnableMailbox,
+                MobileAppUrl = globalSettings.MobileAppUrl,
+                CanChangePassword = globalSettings.CanChangePassword,
                 AddressMapLocation = verifyUrl,
                 AddressLatitude = verifyCoordinates.Latitude,
                 AddressLongitude = verifyCoordinates.Longitude

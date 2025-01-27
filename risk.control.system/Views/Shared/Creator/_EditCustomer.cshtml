@@ -53,7 +53,7 @@
             <div class="col-sm-6">
 
                 <div class="form-group">
-                    <span class="input-group-label"> Customer Name:</span>
+                    <label class="input-group-label"> Customer Name:</label>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
                             <span class="input-group-text" asp-for="CustomerName"><i class="fa fa-user-plus"></i> <i class="fa fa-asterisk asterik-style"></i></span>
@@ -63,7 +63,7 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <span class="input-group-label"> Date Of Birth:</span>
+                    <label class="input-group-label"> Date Of Birth:</label>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
                             <span class="input-group-text" asp-for="DateOfBirth"><i class="far fa-calendar-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
@@ -73,7 +73,7 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <span class="input-group-label"> Gender:</span>
+                    <label class="input-group-label"> Gender:</label>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
                             <span class="input-group-text" asp-for="Gender"><i class="fa fa-user-plus"></i> <i class="fa fa-asterisk asterik-style"></i></span>
@@ -85,7 +85,7 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <span class="input-group-label"> Customer Type:</span>
+                    <label class="input-group-label"> Customer Type:</label>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
                             <span class="input-group-text" asp-for="CustomerType"><i class="fa fa-user-plus"></i> <i class="fa fa-asterisk asterik-style"></i></span>
@@ -98,7 +98,7 @@
                 </div>
 
                 <div class="form-group">
-                    <span class="input-group-label"> Income:</span>
+                    <label class="input-group-label"> Income:</label>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
                             <span class="input-group-text" asp-for="CustomerIncome"><i class="far fa-money-bill-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
@@ -112,7 +112,7 @@
                 </div>
 
                 <div class="form-group">
-                    <span class="input-group-label"> Occupation:</span>
+                    <label class="input-group-label"> Occupation:</label>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
                             <span class="input-group-text" asp-for="CustomerOccupation"><i class="fas fa-business-time"></i> <i class="fa fa-asterisk asterik-style"></i></span>
@@ -125,7 +125,7 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <span class="input-group-label"> Education:</span>
+                    <label class="input-group-label"> Education:</label>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
                             <span class="input-group-text" asp-for="CustomerEducation"><i class="fas fa-graduation-cap"></i> <i class="fa fa-asterisk asterik-style"></i></span>
@@ -144,7 +144,7 @@
                 <partial name="Creator/_CustomerAddress" model="@Model" />
 
                 <div class="form-group">
-                    <span class="input-group-label"> Address:</span>
+                    <label class="input-group-label"> Address:</label>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
                             <span class="input-group-text" ><i class="fa fa-home"></i> <i class="fa fa-asterisk asterik-style"></i></span>
@@ -156,7 +156,7 @@
 
 
                 <div class="form-group">
-                    <span class="input-group-label"> Note:</span>
+                    <label class="input-group-label"> Note:</label>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
                             <span class="input-group-text" asp-for="Description"><i class="fas fa-pencil-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
@@ -167,7 +167,7 @@
                 </div>
 
                 <div class="form-group">
-                    <span class="input-group-label"> Customer Photo:</span>
+                    <label class="input-group-label"> Customer Photo:</label>
                     <div class="input-group mb-3">
                         @if (Model?.ProfilePicture is not null)
                         {

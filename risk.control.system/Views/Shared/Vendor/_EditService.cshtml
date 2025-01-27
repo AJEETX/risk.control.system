@@ -6,7 +6,7 @@
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
         <div class="form-group">
-            <span class="input-group-label"> Line Of Business:</span>
+            <label class="input-group-label"> Line Of Business:</label>
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
                     <span class="input-group-text" for="LineOfBusinessId"><i class="fas fa-business-time"></i> <i class="fa fa-asterisk asterik-style"></i></span>
@@ -19,7 +19,7 @@
         </div>
 
         <div class="form-group">
-            <span class="input-group-label"> Type of Service:</span>
+            <label class="input-group-label"> Type of Service:</label>
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
                     <span class="input-group-text" for="InvestigationServiceTypeId"><i class="fas fa-tools"></i> <i class="fa fa-asterisk asterik-style"></i></span>
@@ -32,7 +32,7 @@
         </div>
 
         <div class="form-group">
-            <span class="input-group-label"> Service Price (Rs.):</span>
+            <label class="input-group-label"> Service Price (Rs.):</label>
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
                     <span class="input-group-text" for="Price"> <i class="fas fa-rupee-sign"></i> <i class="fa fa-asterisk asterik-style"></i></span>
@@ -42,7 +42,7 @@
             </div>
         </div>
         <div class="form-group">
-            <span class="input-group-label" for="StateId"> State:</span>
+            <label class="input-group-label" for="StateId"> State:</label>
             <div class="input-group mb-3 autocomplete-wrapper">
                 <div class="input-group-prepend">
                     @{
@@ -61,7 +61,7 @@
             </div>
         </div>
         <div class="form-group">
-            <span class="input-group-label" for="DistrictId">District:</span>
+            <label class="input-group-label" for="DistrictId">District:</label>
             <div class="input-group mb-3 autocomplete-wrapper">
                 <div class="input-group-prepend">
                     <span class="input-group-text" for="DistrictId">
@@ -80,7 +80,7 @@
     </div>
     <div class="col-md-6">
         <div class="form-group">
-            <span class="input-group-label" for="SelectedMultiPincodeId"> <i class="fas fa-map-pin"></i> Pincodes: <i class='far fa-hand-point-down'></i> </span>
+            <label class="input-group-label" for="SelectedMultiPincodeId"> <i class="fas fa-map-pin"></i> Pincodes: <i class='far fa-hand-point-down'></i> </label>
 
             @{
                 var pincodes = ViewBag.PinCodeId as List<SelectListItem>;

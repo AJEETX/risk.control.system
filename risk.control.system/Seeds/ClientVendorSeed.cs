@@ -22,7 +22,6 @@ namespace risk.control.system.Seeds
 
             var globalSetting = new GlobalSettings
             {
-                EnableMailbox = false
             };
             var newGlobalSetting = await context.GlobalSettings.AddAsync(globalSetting);
             await context.SaveChangesAsync(null, false);
@@ -30,8 +29,6 @@ namespace risk.control.system.Seeds
             var vendors = await VendorSeed.Seed(context, webHostEnvironment, investigationServiceType, discreetServiceType, docServiceType, lineOfBusiness, httpAccessor, customApiCLient, vendorUserManager);
 
             var companies = await CompanyInsurer.Seed(context, vendors, webHostEnvironment, investigationServiceType, discreetServiceType, docServiceType, lineOfBusiness, httpAccessor, customApiCLient, clientUserManager);
-
-            await context.SaveChangesAsync(null, false);
 
             await context.SaveChangesAsync(null, false);
             return (vendors, companies);

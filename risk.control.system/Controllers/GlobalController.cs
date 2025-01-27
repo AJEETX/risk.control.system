@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
+
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,12 +20,12 @@ namespace risk.control.system.Controllers
     public class GlobalController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private readonly IToastNotification toastNotification;
+        private readonly INotyfService notifyService;
 
-        public GlobalController(ApplicationDbContext context, IToastNotification toastNotification)
+        public GlobalController(ApplicationDbContext context, INotyfService notifyService)
         {
             _context = context;
-            this.toastNotification = toastNotification;
+            this.notifyService = notifyService;
         }
 
         // GET: RiskCaseStatus
@@ -47,7 +49,7 @@ namespace risk.control.system.Controllers
         {
             if (id < 1)
             {
-                toastNotification.AddErrorToastMessage("Global-settings not found!");
+                notifyService.Error("Global-settings not found!");
                 return NotFound();
             }
 
@@ -77,13 +79,13 @@ namespace risk.control.system.Controllers
                 catch (Exception ex)
                 {
                     Console.WriteLine(ex.Message);
-                    toastNotification.AddErrorToastMessage("Error to edit Global-settings!");
+                    notifyService.Error("Error to edit Global-settings!");
                     return View(settings);
                 }
-                toastNotification.AddSuccessToastMessage("Global-settings edited successfully!");
+                notifyService.Success("Global-settings edited successfully!");
                 return RedirectToAction(nameof(Index));
             }
-            toastNotification.AddErrorToastMessage("Error to edit Global-settings!");
+            notifyService.Error("Error to edit Global-settings!");
             return View(settings);
         }
     }

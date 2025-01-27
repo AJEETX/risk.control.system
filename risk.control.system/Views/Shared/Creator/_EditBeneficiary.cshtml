@@ -45,7 +45,7 @@
         <div class="row">
             <div class="col-md-6">
                 <div class="form-group">
-                    <span class="input-group-label"> Beneficiary Name:</span>
+                    <label class="input-group-label"> Beneficiary Name:</label>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
                             <span class="input-group-text" asp-for="BeneficiaryName"><i class="fas fa-user-tie"></i> <i class="fa fa-asterisk asterik-style"></i></span>
@@ -56,7 +56,7 @@
                 </div>
 
                 <div class="form-group">
-                    <span class="input-group-label"> Date Of Birth:</span>
+                    <label class="input-group-label"> Date Of Birth:</label>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
                             <span class="input-group-text" asp-for="DateOfBirth"><i class="far fa-calendar-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
@@ -66,7 +66,7 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <span class="input-group-label"> Relation:</span>
+                    <label class="input-group-label"> Relation:</label>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
                             <span class="input-group-text" asp-for="BeneficiaryRelationId"><i class="fas fa-user-tie"></i> <i class="fa fa-asterisk asterik-style"></i></span>
@@ -79,7 +79,7 @@
                 </div>
 
                 <div class="form-group">
-                    <span class="input-group-label"> Income:</span>
+                    <label class="input-group-label"> Income:</label>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
                             <span class="input-group-text" asp-for="Income"><i class="far fa-money-bill-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
@@ -98,7 +98,7 @@
                 <partial name="Creator/_BeneficiaryAddress" model="@Model" />
 
                 <div class="form-group">
-                    <span class="input-group-label"> Address:</span>
+                    <label class="input-group-label"> Address:</label>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fa fa-home"></i> <i class="fa fa-asterisk asterik-style"></i></span>
@@ -108,7 +108,7 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <span class="input-group-label"> Beneficiary Photo:</span>
+                    <label class="input-group-label"> Beneficiary Photo:</label>
                     <div class="input-group mb-3">
                         @if (Model?.ProfilePicture is not null)
                         {

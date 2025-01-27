@@ -282,7 +282,7 @@ public class ICheckifyService : IICheckifyService
                         //    body?.result != null &&
                         //    body.result?.source_output != null
                         //    && body.result?.source_output?.status == "id_found")
-                        var panResponse = await httpClientService.VerifyPanNew(maskedImage.DocumentId, company.PanIdfyUrl, company.RapidAPIKey, company.RapidAPIHost);
+                        var panResponse = await httpClientService.VerifyPanNew(maskedImage.DocumentId, company.PanIdfyUrl, company.PanAPIKey, company.PanAPIHost);
                         if (panResponse != null && panResponse.valid)
                         {
                             var panMatch = panRegex.Match(maskedImage.DocumentId);

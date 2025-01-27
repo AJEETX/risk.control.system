@@ -19,23 +19,13 @@ namespace risk.control.system.Seeds
         private const string vendorMapSize = "800x800";
         private const string companyMapSize = "800x800";
         public static async Task<ClientCompany> Seed(ApplicationDbContext context, List<Vendor> vendors, IWebHostEnvironment webHostEnvironment,
-                    InvestigationServiceType investigationServiceType, InvestigationServiceType discreetServiceType, 
+                    InvestigationServiceType investigationServiceType, InvestigationServiceType discreetServiceType,
                     InvestigationServiceType docServiceType, LineOfBusiness lineOfBusiness, IHttpContextAccessor httpAccessor,
                     ICustomApiCLient customApiCLient, UserManager<ClientCompanyApplicationUser> clientUserManager)
         {
             string noCompanyImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", @Applicationsettings.NO_IMAGE);
 
-            var request = httpAccessor.HttpContext?.Request;
-            string host = request?.Host.Value;
-            var mobileAppUrl = Applicationsettings.APP_DEMO_URL;
-            if(host != null && host.Contains(Applicationsettings.AZURE_APP_URL))
-            {
-                mobileAppUrl = Applicationsettings.APP_URL;
-            }
-            
             var globalSettings = context.GlobalSettings.FirstOrDefault();
-
-            var enableMailbox = globalSettings?.EnableMailbox ?? false;
 
             var companyPinCode = context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).FirstOrDefault(s => s.District.Name.ToLower().Contains("delhi"));
 
@@ -80,12 +70,29 @@ namespace risk.control.system.Seeds
                 ExpiryDate = DateTime.Now.AddDays(5),
                 EmpanelledVendors = vendors,
                 Status = CompanyStatus.ACTIVE,
-                 AutoAllocation = true,
-                 BulkUpload = true,
+                AutoAllocation = globalSettings.AutoAllocation,
+                BulkUpload = globalSettings.BulkUpload,
                 Updated = DateTime.Now,
                 Deleted = false,
-                EnableMailbox = enableMailbox,
-                MobileAppUrl = mobileAppUrl,
+                EnableMailbox = globalSettings.EnableMailbox,
+                MobileAppUrl = globalSettings.MobileAppUrl,
+                VerifyPan = globalSettings.VerifyPan,
+                VerifyPassport = globalSettings.VerifyPassport,
+                EnableMedia = globalSettings.EnableMedia,
+                PanIdfyUrl = globalSettings.PanIdfyUrl,
+                AiEnabled = globalSettings.AiEnabled,
+                CanChangePassword = globalSettings.CanChangePassword,
+                EnablePassport = globalSettings.EnablePassport,
+                HasSampleData = globalSettings.HasSampleData,
+                PassportApiHost = globalSettings.PassportApiHost,
+                PassportApiKey = globalSettings.PassportApiKey,
+                PassportApiUrl = globalSettings.PassportApiUrl,
+                PanAPIHost = globalSettings.PanAPIHost,
+                PanAPIKey = globalSettings.PanAPIKey,
+                SendSMS = globalSettings.SendSMS,
+                UpdateAgentAnswer = globalSettings.UpdateAgentAnswer,
+                UpdateAgentReport = globalSettings.UpdateAgentReport,
+
                 AddressMapLocation = companyAddressUrl,
                 AddressLatitude = companyAddressCoordinates.Latitude,
                 AddressLongitude = companyAddressCoordinates.Longitude
@@ -93,7 +100,7 @@ namespace risk.control.system.Seeds
 
             var insurerCompany = await context.ClientCompany.AddAsync(insurer);
             await context.SaveChangesAsync(null, false);
-            
+
             await ClientApplicationUserSeed.Seed(context, webHostEnvironment, clientUserManager, insurerCompany.Entity, httpAccessor);
 
             return insurerCompany.Entity;
