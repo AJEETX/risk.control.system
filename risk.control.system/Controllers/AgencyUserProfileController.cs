@@ -152,13 +152,8 @@ namespace risk.control.system.Controllers
                 if (user != null)
                 {
                     user.Addressline = applicationUser?.Addressline ?? user.Addressline;
-                    user.PinCodeId = applicationUser?.SelectedPincodeId ?? user.PinCodeId;
-                    user.StateId = applicationUser?.SelectedStateId ?? user.StateId;
-                    user.DistrictId = applicationUser?.SelectedDistrictId ?? user.DistrictId;
-                    user.CountryId = applicationUser?.SelectedCountryId ?? user.CountryId;
-                    user.ProfileImage = applicationUser?.ProfileImage ?? user.ProfileImage;
+                    user.ProfilePicture = applicationUser?.ProfilePicture ?? user.ProfilePicture;
                     user.ProfilePictureUrl = applicationUser?.ProfilePictureUrl ?? user.ProfilePictureUrl;
-                    user.PhoneNumber = applicationUser?.PhoneNumber ?? user.PhoneNumber;
                     user.FirstName = applicationUser?.FirstName;
                     user.LastName = applicationUser?.LastName;
                     if (!string.IsNullOrWhiteSpace(applicationUser?.Password))
@@ -168,12 +163,10 @@ namespace risk.control.system.Controllers
                     user.Email = applicationUser.Email;
                     user.UserName = applicationUser.Email;
                     user.EmailConfirmed = true;
-                    user.Country = applicationUser.Country;
-                    user.CountryId = applicationUser.CountryId;
-                    user.State = applicationUser.State;
-                    user.StateId = applicationUser.StateId;
-                    user.PinCode = applicationUser.PinCode;
-                    user.PinCodeId = applicationUser.PinCodeId;
+                    user.CountryId = applicationUser.SelectedCountryId;
+                    user.StateId = applicationUser.SelectedStateId;
+                    user.PinCodeId = applicationUser.SelectedPincodeId;
+                    user.DistrictId = applicationUser.SelectedDistrictId;
                     user.IsUpdated = true;
                     user.Updated = DateTime.Now;
                     user.Comments = applicationUser.Comments;

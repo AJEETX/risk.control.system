@@ -23,7 +23,7 @@
                         $('#edit.btn.btn-warning').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Save Company");
 
                         form.submit();
-                        var createForm = document.getElementById("create-form");
+                        var createForm = document.getElementById("edit-form");
                         if (createForm) {
 
                             var nodes = createForm.getElementsByTagName('*');

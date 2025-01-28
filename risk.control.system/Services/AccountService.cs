@@ -31,7 +31,7 @@ namespace risk.control.system.Services
         public async Task<bool> ForgotPassword(string useremail, long mobile)
         {
             //CHECK AND VALIDATE EMAIL PASSWORD
-            var user = context.ApplicationUser.Include(a=>a.Country).FirstOrDefault(u => !u.Deleted && u.Email == useremail && u.PhoneNumber == mobile.ToString());
+            var user = context.ApplicationUser.Include(a=>a.Country).FirstOrDefault(u => !u.Deleted && u.Email == useremail && u.Country.ISDCode + u.PhoneNumber == mobile.ToString());
             if (user != null)
             {
 
