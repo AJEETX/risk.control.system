@@ -141,8 +141,15 @@
                                 }
                                 else
                                 {
-                                    <input asp-for=Email id="resetemail" type="email" class="form-control remarks" placeholder="Enter your email" title="Enter your email" value="" autocomplete="off" required />
-                                    <span asp-validation-for="Email" class="text-danger"></span>
+                                    <div class="input-box autocomplete-wrapper">
+                                        <i class="fas fa-envelope left-padd"></i>
+                                        <input asp-for=Email id="resetemail" type="email" title="Email" class="form-control remarks auto-dropdown"
+                                               placeholder="Enter your email" autocomplete="off" required />
+                                        <div class="input-group-append-caret">
+                                            <span class="input-group-text"><i class="fas fa-caret-down"></i></span>
+                                        </div>
+                                        <span asp-validation-for="Email" class="text-danger"></span>
+                                    </div>
                                 }
                             </div>
                             <div class="input-box">

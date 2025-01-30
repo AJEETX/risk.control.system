@@ -13,5 +13,6 @@
         public const string SHOW_IMAGE_AS_HEADER = "SHOW_IMAGE_AS_HEADER";
         public const string SLIM_LOGIN = "SLIM_LOGIN";
         public const string ONBOARDING_ENABLED = "ONBOARDING_ENABLED";
+        public const string FIRST_LOGIN_CONFIRMATION = "FIRST_LOGIN_CONFIRMATION";
     }
 }

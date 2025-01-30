@@ -2,6 +2,7 @@
 using System.Net.Mail;
 using System.Reflection;
 using System.Security.Claims;
+using System.Text;
 using System.Web;
 
 using AspNetCoreHero.ToastNotification.Abstractions;
@@ -12,10 +13,12 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using Microsoft.FeatureManagement;
 using Microsoft.FeatureManagement.Mvc;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
 
 using NToastNotify;
 
@@ -93,7 +96,7 @@ namespace risk.control.system.Controllers
                         var userDetails = new
                         {
                             name = user.UserName,
-                            role = user.Role != null ? user.Role.GetEnumDisplayName(): null!,
+                            role = user.Role != null ? user.Role.GetEnumDisplayName() : null!,
                             cookieExpiry = user.LastActivityDate ?? user.Updated,
                             currentPage = request.CurrentPage
                         };
@@ -141,17 +144,17 @@ namespace risk.control.system.Controllers
                     ViewData["Users"] = new SelectList(_context.Users.Where(u => !u.Deleted).OrderBy(o => o.Email), "Email", "Email");
                 }
             }
-            
+
             return View(new LoginViewModel { ShowUserOnLogin = showLoginUsers });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         [AllowAnonymous]
-        public async Task<IActionResult> Login(CancellationToken ct, LoginViewModel model, string latlong = "")
+        public async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null)
         {
-            var ipAddress = HttpContext.GetServerVariable("HTTP_X_FORWARDED_FOR") ?? HttpContext.Connection.RemoteIpAddress?.ToString();
-            var ipAddressWithoutPort = ipAddress?.Split(':')[0];
+            //var ipAddress = HttpContext.GetServerVariable("HTTP_X_FORWARDED_FOR") ?? HttpContext.Connection.RemoteIpAddress?.ToString();
+            //var ipAddressWithoutPort = ipAddress?.Split(':')[0];
             if (!ModelState.IsValid || !model.Email.ValidateEmail())
             {
                 ModelState.AddModelError(string.Empty, "Bad Request.");
@@ -178,7 +181,7 @@ namespace risk.control.system.Controllers
             if (result.Succeeded)
             {
                 var user = await _userManager.FindByEmailAsync(email);
-                if( user is null || user.Email is null || string.IsNullOrWhiteSpace(user.Email))
+                if (user is null || user.Email is null || string.IsNullOrWhiteSpace(user.Email))
                 {
                     ModelState.AddModelError(string.Empty, "Invalid login attempt.");
                     model.Error = "Invalid login attempt.";
@@ -186,7 +189,14 @@ namespace risk.control.system.Controllers
                     ViewData["Users"] = new SelectList(_context.Users.Where(u => !u.Deleted).OrderBy(o => o.Email), "Email", "Email");
                     return View(model);
                 }
-                
+
+                if (await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION))
+                {
+                    if (user.IsPasswordChangeRequired)
+                    {
+                        return RedirectToAction("ChangePassword", "Account", new { email = user.Email });
+                    }
+                }
                 var roles = await _userManager.GetRolesAsync(user);
                 if (roles != null && roles.Count > 0)
                 {
@@ -222,25 +232,15 @@ namespace risk.control.system.Controllers
                         };
                         await _signInManager.SignInAsync(user, properties);
 
-                        if(User is null || User.Identity is null)
+                        if (User is null || User.Identity is null)
                         {
                             return Unauthorized(new { message = "User is logged out due to inactivity or authentication failure." });
                         }
 
                         var isAuthenticated = User.Identity.IsAuthenticated;
-                        
+
                         if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN) && user?.Email != null && !user.Email.StartsWith("admin"))
                         {
-                            //var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct, "login-success", model.Email, isAuthenticated, latlong);
-                            //if(ipApiResponse is null)
-                            //{
-                            //    ModelState.AddModelError(string.Empty, "Bad Request.");
-                            //    model.Error = "Bad Request.";
-                            //    model.ShowUserOnLogin = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
-                            //    ViewData["Users"] = new SelectList(_context.Users.Where(u => !u.Deleted).OrderBy(o => o.Email), "Email", "Email");
-                            //    return View(model);
-                            //}
-                            
                             string message = string.Empty;
                             if (admin != null)
                             {
@@ -271,11 +271,10 @@ namespace risk.control.system.Controllers
 
                 if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN) && !user.Email.StartsWith("admin"))
                 {
-                    var ipApiFailedResponse = await service.GetClientIp(ipAddressWithoutPort, ct, "login-failed", model.Email, false, latlong);
                     var adminForFailed = _context.ApplicationUser.Include(a => a.Country).FirstOrDefault(u => u.IsSuperAdmin);
                     string failedMessage = $"Dear {admin.Email}";
                     failedMessage += $"                         ";
-                    failedMessage += $"Locked user {user.Email} logged in from IP address {ipApiFailedResponse.query}";
+                    failedMessage += $"Locked user {user.Email} logged in";
                     failedMessage += $"                                       ";
                     failedMessage += $"Thanks                                       ";
                     failedMessage += $"                                       ";
@@ -293,10 +292,9 @@ namespace risk.control.system.Controllers
             {
                 if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
                 {
-                    var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct, "login-locked", model.Email, false, latlong);
                     string message = $"Dear {admin.Email}";
                     message += $"                           ";
-                    message += $"{model.Email} failed login attempt from IP address {ipApiResponse.query}";
+                    message += $"{model.Email} failed login attempt";
                     message += $"                                       ";
                     message += $"Thanks                                         ";
                     message += $"                                       ";
@@ -317,10 +315,9 @@ namespace risk.control.system.Controllers
             {
                 if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
                 {
-                    var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct, "login-failed", model.Email, false, latlong);
                     string message = $"Dear {admin.Email}";
                     message += $"                          ";
-                    message += $"{model.Email} failed login attempt from IP address {ipApiResponse.query}";
+                    message += $"{model.Email} failed login attempt";
                     message += $"                                       ";
                     message += $"Thanks                                         ";
                     message += $"                                       ";
@@ -344,12 +341,64 @@ namespace risk.control.system.Controllers
             return View(model);
         }
 
+        [HttpGet]
+        public IActionResult ChangePassword(string email)
+        {
+            var model = new ChangePasswordViewModel
+            {
+                Email = email
+            };
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.GetUserAsync(User);
+                if (user == null)
+                {
+                    return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+                }
+
+                var changePasswordResult = await _userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
+                if (!changePasswordResult.Succeeded)
+                {
+
+                    notifyService.Custom($"Password update Error", 3, "red", "fa fa-lock");
+
+                    return View(model);
+                }
+
+                // Mark that the user has changed their password
+                user.IsPasswordChangeRequired = false;
+                await _userManager.UpdateAsync(user);
+
+                await _signInManager.RefreshSignInAsync(user);
+
+                notifyService.Custom($"Password update successful", 3, "orange", "fa fa-unlock");
+                return RedirectToAction("Index", "Dashboard");
+            }
+
+            return View(model);
+        }
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Forgot(LoginViewModel input)
         {
             string message = string.Empty;
+            var user = await _userManager.FindByEmailAsync(input.Email);
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+            // Encode the token to make it URL-safe
+            var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
+
+            // Generate the reset link
+            var resetLink = Url.Action(nameof(ResetPassword), "Account", new { userId = user.Id, token = encodedToken }, Request.Scheme);
+
             var smsSent = await accountService.ForgotPassword(input.Email, long.Parse(input.Mobile));
             if (smsSent)
             {
@@ -359,11 +408,45 @@ namespace risk.control.system.Controllers
             {
                 message = "Incorrect details. Try Again";
             }
-            ForgotPassword model = new ForgotPassword
+            var model = new Models.ViewModel.ForgotPassword
             {
                 Message = message,
                 Reset = smsSent
             };
+            return View(model);
+        }
+        [HttpGet]
+        public IActionResult ResetPassword(string userId, string token)
+        {
+            if (userId == null || token == null)
+                return BadRequest("Invalid password reset token.");
+
+            var model = new ResetPasswordViewModel { UserId = userId, Token = token };
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var user = await _userManager.FindByIdAsync(model.UserId);
+            if (user == null)
+            {
+                return RedirectToAction(nameof(ResetPasswordConfirmation));
+            }
+            var decodedToken = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(model.Token));
+
+            var result = await _userManager.ResetPasswordAsync(user, decodedToken, model.Password);
+            if (result.Succeeded)
+                return RedirectToAction(nameof(ResetPasswordConfirmation));
+
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(string.Empty, error.Description);
+            }
+
             return View(model);
         }
 

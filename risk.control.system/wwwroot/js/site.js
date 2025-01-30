@@ -15,6 +15,10 @@ function printInvoice() {
     window.print();  // Opens the print dialog
 }
 
+//document.addEventListener("DOMContentLoaded", function () {
+//    // Apply blur effect dynamically
+//    document.getElementById("main-container").classList.add("blur-background");
+//});
 // Add event listener to the print button once the DOM is fully loaded
 document.addEventListener("DOMContentLoaded", function () {
     var printButton = document.getElementById("printInvoiceButton");

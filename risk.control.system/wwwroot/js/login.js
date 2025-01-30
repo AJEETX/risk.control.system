@@ -32,13 +32,20 @@ $.validator.setDefaults({
 
         $('#password').attr('disabled', 'disabled');
 
-        var nodes = document.getElementById("login-form").getElementsByTagName('*');
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].disabled = true;
+        var loginForm = document.getElementById("login-form");
+        if (loginForm) {
+            var nodes = loginForm.getElementsByTagName('*');
+            for (var i = 0; i < nodes.length; i++) {
+                nodes[i].disabled = true;
+            }
         }
-        var nodes = document.getElementById("reset-form").getElementsByTagName('*');
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].disabled = true;
+        
+        var resetForm = document.getElementById("reset-form");
+        if (resetForm) {
+            var nodes = resetForm.getElementsByTagName('*');
+            for (var i = 0; i < nodes.length; i++) {
+                nodes[i].disabled = true;
+            }
         }
     }
 });

@@ -343,6 +343,7 @@ builder.Services.AddMvcCore(config =>
 builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
+app.UseMiddleware<RequirePasswordChangeMiddleware>();
 app.UseMiddleware<UpdateUserLastActivityMiddleware>();
 //app.UseWebSockets();
 app.UseSwagger();

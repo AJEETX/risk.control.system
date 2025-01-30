@@ -9,6 +9,7 @@ namespace risk.control.system.Models
 {
     public partial class ApplicationUser : IdentityUser<long>
     {
+        public bool IsPasswordChangeRequired { get; set; } = true;
         [FileExtensions(Extensions = "jpg,jpeg,png")]
         public string? ProfilePictureUrl { get; set; }
 

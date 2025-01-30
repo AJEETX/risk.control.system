@@ -82,6 +82,77 @@
                 </div> <!-- End of Content Wrapper -->
             </div>
         </div>
+
+        @* <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <div class="card-header">
+                            <h3 class="card-title"> <i class="fas fa-pen"></i> Reset Password </h3>
+                        </div>
+                        
+                    </div>
+                    <div class="modal-footer">
+                        <form id="ChangePassword" asp-action="ChangePassword" method="post">
+                            <div class="card-body">
+                                <div class="submit-progress hidden">
+                                    <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="CurrentPassword">Current Password:</label>
+                                    <div class="input-group mb-3">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">
+                                                <i class="fa fa-key"></i>
+                                                <i class="fa fa-asterisk asterik-style"></i>
+                                            </span>
+                                        </div>
+                                        <input type="password" asp-for="CurrentPassword" class="form-control" required placeholder="Current Password" maxlength="20" />
+                                        <span asp-validation-for="CurrentPassword" class="text-danger"></span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="NewPassword">New Password:</label>
+                                    <div class="input-group mb-3">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">
+                                                <i class="fa fa-key"></i>
+                                                <i class="fa fa-asterisk asterik-style"></i>
+                                            </span>
+                                        </div>
+                                        <input type="password" asp-for="NewPassword" class="form-control" required placeholder="New Password" maxlength="20" />
+                                        <span asp-validation-for="NewPassword" class="text-danger"></span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="ConfirmPassword">Confirm Password:</label>
+                                    <div class="input-group mb-3">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">
+                                                <i class="fa fa-key"></i>
+                                                <i class="fa fa-asterisk asterik-style"></i>
+                                            </span>
+                                        </div>
+                                        <input type="password" asp-for="ConfirmPassword" class="form-control" required placeholder="Confirm Password" maxlength="20" />
+                                        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card-footer text-center">
+                                <button type="submit" class="btn btn-primary">Update Password</button>
+                            </div>
+                        </form>
+                    </div>
+                </div> <!-- End of Content Wrapper -->
+            </div>
+        </div> *@
+
+
     </div>
     <partial name="AdminLTE/_Scripts" />
     <partial name="AdminLTE/_DataTableScriptPartial" />
