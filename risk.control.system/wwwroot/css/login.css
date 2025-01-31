@@ -511,6 +511,36 @@ img.logo {
     z-index: 10000;
     opacity: 1; /* Fully visible */
 }
-#termsModal{
+/* Style the eye icon */
+#eyeIconCurrent {
+    font-size: 18px; /* Adjust the size */
+    color: #999; /* Color for normal state */
+    cursor: pointer; /* Pointer cursor to show it’s clickable */
+    transition: color 0.3s ease; /* Smooth transition effect */
+    padding: 0 10px; /* Add some space around the icon */
+}
 
+    /* Hover effect */
+    #eyeIconCurrent:hover {
+        color: #333; /* Darker color on hover */
+    }
+
+    /* Optionally, change color when password is visible */
+    #eyeIconCurrent.visible {
+        color: #999; /* Change color when password is visible */
+    }
+
+/* Align the icon with the input field */
+.password-toggle {
+    position: absolute;
+    right: 1em;
+    top: 30%;
+    transform: translateY(-50%);
+    padding:0px 1.8em;
+}
+
+/* Optional: Add focus or active styles */
+#eyeIconCurrent:focus {
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Add focus ring on icon */
 }

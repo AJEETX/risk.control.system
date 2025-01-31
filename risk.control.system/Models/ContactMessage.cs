@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Web.Mvc;
 
 namespace risk.control.system.Models
 {
@@ -12,7 +11,6 @@ namespace risk.control.system.Models
         public string SenderEmail { get; set; }
         public string ReceipientEmail { get; set; }
         public string Subject { get; set; }
-        [AllowHtml]
         public string? RawMessage { get; set; }
         public string Message { get; set; }
         public bool Read { get; set; } = false;
@@ -46,7 +44,6 @@ namespace risk.control.system.Models
         public string SenderEmail { get; set; }
         public string ReceipientEmail { get; set; }
         public string Subject { get; set; }
-        [AllowHtml]
         public string? RawMessage { get; set; }
         public string Message { get; set; }
         public bool Read { get; set; } = false;
@@ -80,7 +77,6 @@ namespace risk.control.system.Models
         public string SenderEmail { get; set; }
         public string ReceipientEmail { get; set; }
         public string Subject { get; set; }
-        [AllowHtml]
         public string? RawMessage { get; set; }
         public string Message { get; set; }
         public bool Read { get; set; } = false;
@@ -148,7 +144,6 @@ namespace risk.control.system.Models
         public string SenderEmail { get; set; }
         public string ReceipientEmail { get; set; }
         public string Subject { get; set; }
-        [AllowHtml]
         public string? RawMessage { get; set; }
         public string Message { get; set; }
         public bool Read { get; set; } = false;
@@ -183,7 +178,6 @@ namespace risk.control.system.Models
         public string SenderEmail { get; set; }
         public string ReceipientEmail { get; set; }
         public string Subject { get; set; }
-        [AllowHtml]
         public string? RawMessage { get; set; }
         public string Message { get; set; }
         public bool Read { get; set; } = false;

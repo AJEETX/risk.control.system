@@ -1,64 +1,71 @@
-﻿$(document).ready(function () {
+﻿$.validator.setDefaults({
+    submitHandler: function (form) {
+        $.confirm({
+            title: "Confirm Update Password",
+            content: "Remeber the new password.",
+            icon: 'fa fa-key',
+
+            type: 'orange',
+            closeIcon: true,
+            buttons: {
+                confirm: {
+                    text: "Update",
+                    btnClass: 'btn-warning',
+                    action: function () {
+                        askConfirmation = false;
+                        $("body").addClass("submit-progress-bg");
+
+                        // Update UI with a short delay to show spinner
+                        setTimeout(function () {
+                            $(".submit-progress").removeClass("hidden");
+                        }, 1);
+                        // Disable all buttons, submit inputs, and anchors
+                        $('button, input[type="submit"], a').prop('disabled', true);
+
+                        // Add a class to visually indicate disabled state for anchors
+                        $('a').addClass('disabled-anchor').on('click', function (e) {
+                            e.preventDefault(); // Prevent default action for anchor clicks
+                        });
+                        $('#updatebutton').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Update Password");
+                        form.submit();
+                        var createForm = document.getElementById("edit-form");
+                        if (createForm) {
+                            var nodes = createForm.getElementsByTagName('*');
+                            for (var i = 0; i < nodes.length; i++) {
+                                nodes[i].disabled = true;
+                            }
+                        }
+                    }
+                },
+                cancel: {
+                    text: "Cancel",
+                    btnClass: 'btn-default'
+                }
+            }
+        });
+    }
+});
+
+$(document).ready(function () {
 
     const currentpassword = $('#CurrentPassword');
     if (currentpassword) {
         currentpassword.focus()
     }
 
-    $('#editButton').on('click', function () {
+    $('#editButton').on('click', function (e) {
+        e.preventDefault();
         $("#edit-form").addClass("submit-progress-bg");
 
         // Update UI with a short delay to show spinner
         setTimeout(function () {
             $(".submit-progress").removeClass("hidden");
         }, 1);
-        
+
         $('#editButton').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> User Profile");
     });
-    var askConfirmation = true;
-    $('#edit-form').submit(function (e) {
-        if (askConfirmation) {
-            e.preventDefault();
-            $.confirm({
-                title: "Confirm Update Password",
-                content: "Remeber the new password.",
-                icon: 'fa fa-key',
+    $("#edit-form").validate();
 
-                type: 'orange',
-                closeIcon: true,
-                typeAnimated: true,
-                buttons: {
-                    confirm: {
-                        text: "Update",
-                        btnClass: 'btn-warning',
-                        action: function () {
-                            askConfirmation = false;
-                            $("body").addClass("submit-progress-bg");
-
-                            // Update UI with a short delay to show spinner
-                            setTimeout(function () {
-                                $(".submit-progress").removeClass("hidden");
-                            }, 1);
-                            // Disable all buttons, submit inputs, and anchors
-                            $('button, input[type="submit"], a').prop('disabled', true);
-
-                            // Add a class to visually indicate disabled state for anchors
-                            $('a').addClass('disabled-anchor').on('click', function (e) {
-                                e.preventDefault(); // Prevent default action for anchor clicks
-                            });
-                            $('#updatebutton').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Update Password");
-
-                            $('#edit-form').submit();
-                        }
-                    },
-                    cancel: {
-                        text: "Cancel",
-                        btnClass: 'btn-default'
-                    }
-                }
-            });
-        }
-    })
 });
 document.addEventListener('DOMContentLoaded', function () {
     // Add event listeners to all elements with class `toggle-password-visibility`

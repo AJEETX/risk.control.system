@@ -30,7 +30,7 @@ $.validator.setDefaults({
 
         $('#resetemail').attr('disabled', 'disabled');
 
-        $('#password').attr('disabled', 'disabled');
+        $('#Password').attr('disabled', 'disabled');
 
         var loginForm = document.getElementById("login-form");
         if (loginForm) {
@@ -83,29 +83,28 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    // Bind event to "Login with OTP" link
-    const otpLoginLink = document.getElementById('otp-login-link');
-    if (otpLoginLink) {
-        otpLoginLink.addEventListener('click', function () {
-            showOtpSection();
-        });
-    }
+    // Add event listeners to all elements with class `toggle-password-visibility`
+    const toggleButtons = document.querySelectorAll('.toggle-password-visibility');
 
-    // Bind event to "Send OTP" button
-    const sendOtpBtn = document.getElementById('send-otp-btn');
-    if (sendOtpBtn) {
-        sendOtpBtn.addEventListener('click', function () {
-            sendOtp();
-        });
-    }
+    toggleButtons.forEach(function (button) {
+        button.addEventListener('click', function () {
+            // Get the target input field ID from the `data-target` attribute
+            const passwordFieldId = button.getAttribute('data-target');
+            const passwordField = document.getElementById(passwordFieldId);
+            const eyeIcon = button.querySelector('i');
 
-    // Bind event to "Verify OTP" button
-    const verifyOtpBtn = document.getElementById('verify-otp-btn');
-    if (verifyOtpBtn) {
-        verifyOtpBtn.addEventListener('click', function () {
-            verifyOtp();
+            // Toggle password visibility
+            if (passwordField.type === "password") {
+                passwordField.type = "text";
+                eyeIcon.classList.remove("fa-eye-slash");
+                eyeIcon.classList.add("fa-eye");
+            } else {
+                passwordField.type = "password";
+                eyeIcon.classList.remove("fa-eye");
+                eyeIcon.classList.add("fa-eye-slash");
+            }
         });
-    }
+    });
 });
 
 $(document).ready(function () {

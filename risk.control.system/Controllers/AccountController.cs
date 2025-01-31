@@ -4,7 +4,6 @@ using System.Reflection;
 using System.Security.Claims;
 using System.Text;
 using System.Web;
-using System.Web.Helpers;
 
 using AspNetCoreHero.ToastNotification.Abstractions;
 
@@ -147,77 +146,6 @@ namespace risk.control.system.Controllers
             return View(new LoginViewModel { SetPassword = !dontSetPassword, OtpLogin = await featureManager.IsEnabledAsync(FeatureFlags.OTP_LOGIN) });
         }
 
-        [HttpGet]
-        [AllowAnonymous]
-        public async Task<IActionResult> AdminLogin()
-        {
-            var timer = DateTime.Now;
-            // Clear the existing external cookie to ensure a clean login process
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            await _signInManager.SignOutAsync();
-            var showLoginUsers = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
-            if (showLoginUsers)
-            {
-                var showgtrialUsers = await featureManager.IsEnabledAsync(FeatureFlags.TrialVersion);
-                if (showgtrialUsers)
-                {
-                    ViewData["Users"] = new SelectList(_context.Users.Where(u => !u.Deleted && !u.Email.StartsWith("admin")).OrderBy(o => o.Email), "Email", "Email");
-                }
-                else
-                {
-                    ViewData["Users"] = new SelectList(_context.Users.Where(u => !u.Deleted).OrderBy(o => o.Email), "Email", "Email");
-                }
-            }
-
-            return View(new LoginViewModel { SetPassword = showLoginUsers, OtpLogin = await featureManager.IsEnabledAsync(FeatureFlags.OTP_LOGIN) });
-        }
-        // API to send OTP to the user's email
-        [AllowAnonymous]
-        [HttpPost("api/Account/SendOtp")]
-        public async Task<IActionResult> SendOtp([FromBody] SendOtpRequest model)
-        {
-            if (string.IsNullOrEmpty(model.Email))
-            {
-                return BadRequest("Email is required.");
-            }
-
-            var user = await _userManager.FindByEmailAsync(model.Email);
-            if (user == null)
-            {
-                return BadRequest("No user found with this email.");
-            }
-
-            var otp = GenerateOtp();
-            // Save the OTP in the database or cache (use a cache like Redis or in-memory cache for real-time OTPs)
-            // For simplicity, we can store it in a session or local variable for now.
-
-            // Send the OTP to the user's email
-            await smsService.DoSendSmsAsync(user.PhoneNumber, $"Your OTP Code, Your OTP code is: {otp}");
-
-            // Return a success response
-            return Ok();
-        }
-
-        // API to verify OTP
-        [AllowAnonymous]
-        [HttpPost("api/Account/VerifyOtp")]
-        public IActionResult VerifyOtp([FromBody] VerifyOtpRequest model)
-        {
-            // Here, we assume you have a way to verify the OTP from the user
-            // For now, assume OTP is '123456' for testing.
-            if (model.Otp == "123456")
-            {
-                return Ok();
-            }
-
-            return BadRequest("Invalid OTP.");
-        }
-        // Helper to generate OTP (6 digits)
-        private string GenerateOtp()
-        {
-            Random random = new Random();
-            return random.Next(100000, 999999).ToString();
-        }
         [HttpPost]
         [ValidateAntiForgeryToken]
         [AllowAnonymous]
@@ -228,7 +156,7 @@ namespace risk.control.system.Controllers
             if (!ModelState.IsValid || !model.Email.ValidateEmail())
             {
                 ModelState.AddModelError(string.Empty, "Bad Request.");
-                model.Error = "Invalid credentials.";
+                model.LoginError = "Invalid credentials.";
                 model.SetPassword = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
                 ViewData["Users"] = new SelectList(_context.Users.Where(u => !u.Deleted).OrderBy(o => o.Email), "Email", "Email");
                 return View(model);
@@ -238,13 +166,13 @@ namespace risk.control.system.Controllers
             if (user is null || user.Email is null || string.IsNullOrWhiteSpace(user.Email))
             {
                 ModelState.AddModelError(string.Empty, "Invalid login attempt.");
-                model.Error = "Invalid credentials.";
+                model.LoginError = "Invalid credentials.";
                 model.SetPassword = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
                 ViewData["Users"] = new SelectList(_context.Users.Where(u => !u.Deleted).OrderBy(o => o.Email), "Email", "Email");
                 return View(model);
             }
 
-            
+
             var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
             var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
             var BaseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
@@ -252,7 +180,7 @@ namespace risk.control.system.Controllers
             if (admin is null || admin.Country is null)
             {
                 ModelState.AddModelError(string.Empty, "Bad Request.");
-                model.Error = "Server Error. Try again.";
+                model.LoginError = "Server Error. Try again.";
                 model.SetPassword = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
                 ViewData["Users"] = new SelectList(_context.Users.Where(u => !u.Deleted).OrderBy(o => o.Email), "Email", "Email");
                 return View(model);
@@ -356,7 +284,7 @@ namespace risk.control.system.Controllers
                 model.SetPassword = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
                 ViewData["Users"] = new SelectList(_context.Users.OrderBy(o => o.Email), "Email", "Email");
                 _logger.LogWarning("User account locked out.");
-                model.Error = "User account locked out.";
+                model.LoginError = "User account locked out.";
                 return View(model);
             }
             else if (result.IsLockedOut)
@@ -376,16 +304,16 @@ namespace risk.control.system.Controllers
                 model.SetPassword = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
                 ViewData["Users"] = new SelectList(_context.Users.OrderBy(o => o.Email), "Email", "Email");
                 _logger.LogWarning("User account locked out.");
-                model.Error = "User account locked out.";
+                model.LoginError = "User account locked out.";
                 return View(model);
             }
-            else
+            else if (result.IsNotAllowed)
             {
                 if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
                 {
                     string message = $"Dear {admin.Email}";
                     message += $"                          ";
-                    message += $"{model.Email} failed login attempt. Server Error. Try again.";
+                    message += $"{model.Email} failed login attempt. {nameof(result.IsNotAllowed)}. Contact admin.";
                     message += $"                                       ";
                     message += $"Thanks                                         ";
                     message += $"                                       ";
@@ -394,13 +322,13 @@ namespace risk.control.system.Controllers
                     await smsService.DoSendSmsAsync("+" + admin.Country.ISDCode + admin.PhoneNumber, message);
                 }
                 ModelState.AddModelError(string.Empty, "Invalid login attempt.");
-                model.Error = "Server Error. Try again.";
+                model.LoginError = $"{nameof(result.IsNotAllowed)}. Contact admin.";
                 model.SetPassword = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
                 ViewData["Users"] = new SelectList(_context.Users.OrderBy(o => o.Email), "Email", "Email");
                 return View(model);
             }
             ModelState.AddModelError(string.Empty, "Bad Request.");
-            model.Error = "Server Error. Try again.";
+            model.LoginError = "Invalid credentials. Try again";
             model.SetPassword = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
             ViewData["Users"] = new SelectList(_context.Users.Where(u => !u.Deleted).OrderBy(o => o.Email), "Email", "Email");
             return View(model);
@@ -560,7 +488,7 @@ namespace risk.control.system.Controllers
             //// Generate the reset link
             //var resetLink = Url.Action(nameof(ResetPassword), "Account", new { userId = user.Id, token = encodedToken }, Request.Scheme);
 
-            var smsSent = await accountService.ForgotPassword(input.Email,input.Mobile);
+            var smsSent = await accountService.ForgotPassword(input.Email, input.Mobile);
             if (smsSent)
             {
                 message = "Password sent to mobile: " + input.Mobile;

@@ -76,22 +76,25 @@
                                 </div>
                                 <span asp-validation-for="Email" class="text-danger"></span>
                             </div>
-                            @if (Model.SetPassword)
-                            {
-                                <div class="input-box">
-                                    <i class="fas fa-lock left-padd"></i>
-                                    <input asp-for=Password id="password" type="password" title="password" class="form-control remarks" placeholder="Enter your password" value="@Applicationsettings.Password" autocomplete="off" required />
-                                </div>
+                            <div class="input-box">
+                                <i class="fas fa-lock left-padd"></i>
+                                @if (Model.SetPassword)
+                                {
+                                    <input asp-for=Password id="Password" type="password" title="password" class="form-control remarks" placeholder="Enter your password" value="@Applicationsettings.Password" autocomplete="off" required />
+                                }
+                                else
+                                {
+                                    <input asp-for=Password id="Password" type="password" title="password" class="form-control remarks" placeholder="Enter your password" autocomplete="off" required />
 
-                            }
-                            else
-                            {
-                                <div class="input-box">
-                                    <i class="fas fa-lock left-padd"></i>
-                                    <input asp-for=Password id="password" type="password" title="password" class="form-control remarks" placeholder="Enter your password" autocomplete="off" required />
+                                }
+                                <!-- Eye Icon for Toggling Password Visibility -->
+                                <div class="password-toggle remarks">
+                                    <span class="input-group-text toggle-password-visibility" data-target="Password">
+                                        <i id="eyeIconCurrent" class="fa fa-eye-slash"></i>
+                                    </span>
                                 </div>
-
-                            }
+                            </div>
+                            
                             <p class="account">By clicking login, you agree to our <a class="termsLink" href="#">Terms & Conditions!</a></p>
                             <div class="button input-box">
                                 <button data-testid="logintest" id="login" type="submit" value="Login" class="btn btn-secondary btn-block"><span class="fa fa-key" aria-hidden="true"></span> Login</button>
@@ -101,10 +104,10 @@
                     </form>
                     <div class="error-message">
 
-                        @if (Model?.Error != null)
+                        @if (Model?.LoginError != null)
                         {
                             <p class="account">
-                                <a class="error"> @Model?.Error</a>
+                                <a class="error"> @Model?.LoginError</a>
                             </p>
                         }
                     </div>
@@ -154,10 +157,10 @@
                     </form>
                     <div class="error-message">
 
-                        @if (Model?.Error != null)
+                        @if (Model?.ResetError != null)
                         {
                             <p class="account">
-                                <a class="error"> @Model?.Error</a>
+                                <a class="error"> @Model?.ResetError</a>
                             </p>
                         }
                     </div>
