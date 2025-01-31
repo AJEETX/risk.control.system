@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Security.Claims;
 using System.Text;
 using System.Web;
+using System.Web.Helpers;
 
 using AspNetCoreHero.ToastNotification.Abstractions;
 
@@ -11,6 +12,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.WebUtilities;
@@ -19,6 +21,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.FeatureManagement;
 using Microsoft.FeatureManagement.Mvc;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 
 using NToastNotify;
 
@@ -136,7 +139,6 @@ namespace risk.control.system.Controllers
                 var showgtrialUsers = await featureManager.IsEnabledAsync(FeatureFlags.TrialVersion);
                 if (showgtrialUsers)
                 {
-                    var xx = _context.Users.ToList();
                     ViewData["Users"] = new SelectList(_context.Users.Where(u => !u.Deleted && !u.Email.StartsWith("admin")).OrderBy(o => o.Email), "Email", "Email");
                 }
                 else
@@ -145,9 +147,56 @@ namespace risk.control.system.Controllers
                 }
             }
 
-            return View(new LoginViewModel { ShowUserOnLogin = showLoginUsers });
+            return View(new LoginViewModel { ShowUserOnLogin = showLoginUsers, OtpLogin = await featureManager.IsEnabledAsync(FeatureFlags.OTP_LOGIN) });
         }
 
+        // API to send OTP to the user's email
+        [AllowAnonymous]
+        [HttpPost("api/Account/SendOtp")]
+        public async Task<IActionResult> SendOtp([FromBody] SendOtpRequest model)
+        {
+            if (string.IsNullOrEmpty(model.Email))
+            {
+                return BadRequest("Email is required.");
+            }
+
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null)
+            {
+                return BadRequest("No user found with this email.");
+            }
+
+            var otp = GenerateOtp();
+            // Save the OTP in the database or cache (use a cache like Redis or in-memory cache for real-time OTPs)
+            // For simplicity, we can store it in a session or local variable for now.
+
+            // Send the OTP to the user's email
+            await smsService.DoSendSmsAsync(user.PhoneNumber, $"Your OTP Code, Your OTP code is: {otp}");
+
+            // Return a success response
+            return Ok();
+        }
+
+        // API to verify OTP
+        [AllowAnonymous]
+        [HttpPost("api/Account/VerifyOtp")]
+        public IActionResult VerifyOtp([FromBody] VerifyOtpRequest model)
+        {
+            // Here, we assume you have a way to verify the OTP from the user
+            // For now, assume OTP is '123456' for testing.
+            if (model.Otp == "123456")
+            {
+                return Ok();
+            }
+
+            return BadRequest("Invalid OTP.");
+        }
+        // Helper to generate OTP (6 digits)
+        private string GenerateOtp()
+        {
+            Random random = new Random();
+            return random.Next(100000, 999999).ToString();
+        }
         [HttpPost]
         [ValidateAntiForgeryToken]
         [AllowAnonymous]
@@ -158,12 +207,29 @@ namespace risk.control.system.Controllers
             if (!ModelState.IsValid || !model.Email.ValidateEmail())
             {
                 ModelState.AddModelError(string.Empty, "Bad Request.");
-                model.Error = "Bad Request.";
+                model.Error = "Invalid credentials.";
                 model.ShowUserOnLogin = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
                 ViewData["Users"] = new SelectList(_context.Users.Where(u => !u.Deleted).OrderBy(o => o.Email), "Email", "Email");
                 return View(model);
             }
             var email = HttpUtility.HtmlEncode(model.Email);
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user is null || user.Email is null || string.IsNullOrWhiteSpace(user.Email))
+            {
+                ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                model.Error = "Invalid credentials.";
+                model.ShowUserOnLogin = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
+                ViewData["Users"] = new SelectList(_context.Users.Where(u => !u.Deleted).OrderBy(o => o.Email), "Email", "Email");
+                return View(model);
+            }
+
+            if (await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION))
+            {
+                if (user.IsPasswordChangeRequired)
+                {
+                    return RedirectToAction("ChangePassword", "Account", new { email = user.Email });
+                }
+            }
             var pwd = HttpUtility.HtmlEncode(model.Password);
             var result = await _signInManager.PasswordSignInAsync(email, pwd, model.RememberMe, lockoutOnFailure: false);
             var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
@@ -173,30 +239,14 @@ namespace risk.control.system.Controllers
             if (admin is null || admin.Country is null)
             {
                 ModelState.AddModelError(string.Empty, "Bad Request.");
-                model.Error = "Bad Request.";
+                model.Error = "Server Error. Try again.";
                 model.ShowUserOnLogin = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
                 ViewData["Users"] = new SelectList(_context.Users.Where(u => !u.Deleted).OrderBy(o => o.Email), "Email", "Email");
                 return View(model);
             }
+
             if (result.Succeeded)
             {
-                var user = await _userManager.FindByEmailAsync(email);
-                if (user is null || user.Email is null || string.IsNullOrWhiteSpace(user.Email))
-                {
-                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
-                    model.Error = "Invalid login attempt.";
-                    model.ShowUserOnLogin = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
-                    ViewData["Users"] = new SelectList(_context.Users.Where(u => !u.Deleted).OrderBy(o => o.Email), "Email", "Email");
-                    return View(model);
-                }
-
-                if (await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION))
-                {
-                    if (user.IsPasswordChangeRequired)
-                    {
-                        return RedirectToAction("ChangePassword", "Account", new { email = user.Email });
-                    }
-                }
                 var roles = await _userManager.GetRolesAsync(user);
                 if (roles != null && roles.Count > 0)
                 {
@@ -294,7 +344,7 @@ namespace risk.control.system.Controllers
                 {
                     string message = $"Dear {admin.Email}";
                     message += $"                           ";
-                    message += $"{model.Email} failed login attempt";
+                    message += $"{model.Email} locked out";
                     message += $"                                       ";
                     message += $"Thanks                                         ";
                     message += $"                                       ";
@@ -302,14 +352,11 @@ namespace risk.control.system.Controllers
                     message += $"{BaseUrl}";
                     await smsService.DoSendSmsAsync("+" + admin.Country.ISDCode + admin.PhoneNumber, message);
                 }
-                else
-                {
-                    model.ShowUserOnLogin = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
-                    ViewData["Users"] = new SelectList(_context.Users.OrderBy(o => o.Email), "Email", "Email");
-                    _logger.LogWarning("User account locked out.");
-                    model.Error = "User account locked out.";
-                    return View(model);
-                }
+                model.ShowUserOnLogin = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
+                ViewData["Users"] = new SelectList(_context.Users.OrderBy(o => o.Email), "Email", "Email");
+                _logger.LogWarning("User account locked out.");
+                model.Error = "User account locked out.";
+                return View(model);
             }
             else
             {
@@ -317,7 +364,7 @@ namespace risk.control.system.Controllers
                 {
                     string message = $"Dear {admin.Email}";
                     message += $"                          ";
-                    message += $"{model.Email} failed login attempt";
+                    message += $"{model.Email} failed login attempt. Server Error. Try again.";
                     message += $"                                       ";
                     message += $"Thanks                                         ";
                     message += $"                                       ";
@@ -325,22 +372,20 @@ namespace risk.control.system.Controllers
                     message += $"{BaseUrl}";
                     await smsService.DoSendSmsAsync("+" + admin.Country.ISDCode + admin.PhoneNumber, message);
                 }
-                else
-                {
-                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
-                    model.Error = "Invalid login attempt.";
-                    model.ShowUserOnLogin = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
-                    ViewData["Users"] = new SelectList(_context.Users.OrderBy(o => o.Email), "Email", "Email");
-                    return View(model);
-                }
+                ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                model.Error = "Server Error. Try again.";
+                model.ShowUserOnLogin = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
+                ViewData["Users"] = new SelectList(_context.Users.OrderBy(o => o.Email), "Email", "Email");
+                return View(model);
             }
             ModelState.AddModelError(string.Empty, "Bad Request.");
-            model.Error = "Bad Request.";
+            model.Error = "Server Error. Try again.";
             model.ShowUserOnLogin = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
             ViewData["Users"] = new SelectList(_context.Users.Where(u => !u.Deleted).OrderBy(o => o.Email), "Email", "Email");
             return View(model);
         }
 
+        [AllowAnonymous]
         [HttpGet]
         public IActionResult ChangePassword(string email)
         {
@@ -351,16 +396,20 @@ namespace risk.control.system.Controllers
             return View(model);
         }
 
+        [AllowAnonymous]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
         {
             if (ModelState.IsValid)
             {
-                var user = await _userManager.GetUserAsync(User);
+                var user = await _userManager.FindByEmailAsync(model.Email);
+
                 if (user == null)
                 {
-                    return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+                    notifyService.Custom($"Password update Error", 3, "red", "fa fa-lock");
+
+                    return RedirectToAction("Login");
                 }
 
                 var changePasswordResult = await _userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
@@ -369,7 +418,7 @@ namespace risk.control.system.Controllers
 
                     notifyService.Custom($"Password update Error", 3, "red", "fa fa-lock");
 
-                    return View(model);
+                    return RedirectToAction("Login");
                 }
 
                 // Mark that the user has changed their password
@@ -377,10 +426,99 @@ namespace risk.control.system.Controllers
                 await _userManager.UpdateAsync(user);
 
                 await _signInManager.RefreshSignInAsync(user);
+                var admin = _context.ApplicationUser.Include(a => a.Country).FirstOrDefault(u => u.IsSuperAdmin);
+                var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
+                var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
+                var BaseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
+                var roles = await _userManager.GetRolesAsync(user);
+                if (roles != null && roles.Count > 0)
+                {
+                    var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == user.Email && !u.Deleted);
+                    var vendorUser = _context.VendorApplicationUser.FirstOrDefault(u => u.Email == user.Email && !u.Deleted);
+                    bool vendorIsActive = false;
+                    bool companyIsActive = false;
 
+                    if (companyUser != null)
+                    {
+                        companyIsActive = _context.ClientCompany.Any(c => c.ClientCompanyId == companyUser.ClientCompanyId && c.Status == Models.CompanyStatus.ACTIVE);
+
+                    }
+                    else if (vendorUser != null)
+                    {
+                        vendorIsActive = _context.Vendor.Any(c => c.VendorId == vendorUser.VendorId && c.Status == Models.VendorStatus.ACTIVE);
+                        if (await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED) && vendorIsActive)
+                        {
+                            var userIsAgent = vendorUser.Role == AppRoles.AGENT;
+                            if (userIsAgent)
+                            {
+                                vendorIsActive = !string.IsNullOrWhiteSpace(user.MobileUId);
+                            }
+                        }
+                    }
+                    if (companyIsActive && user.Active || vendorIsActive && user.Active || companyUser == null && vendorUser == null)
+                    {
+                        var timeout = config["SESSION_TIMEOUT_SEC"];
+                        var properties = new AuthenticationProperties
+                        {
+                            IsPersistent = true, // Makes the cookie persistent
+                            ExpiresUtc = DateTimeOffset.UtcNow.AddSeconds(double.Parse(timeout ?? "900")), // Reset expiry time
+                        };
+                        await _signInManager.SignInAsync(user, properties);
+
+                        if (User is null || User.Identity is null)
+                        {
+                            return Unauthorized(new { message = "User is logged out due to inactivity or authentication failure." });
+                        }
+
+                        var isAuthenticated = User.Identity.IsAuthenticated;
+
+                        if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN) && user?.Email != null && !user.Email.StartsWith("admin"))
+                        {
+                            string message = string.Empty;
+                            if (admin != null)
+                            {
+                                message = $"Dear {admin.Email}";
+                                message += $"                                       ";
+                                message += $"                       ";
+                                message += $"User {user.Email} logged in";
+                                message += $"                                       ";
+                                message += $"Thanks                                         ";
+                                message += $"                                       ";
+                                message += $"                                       ";
+                                message += $"{BaseUrl}";
+                                try
+                                {
+                                    await smsService.DoSendSmsAsync("+" + admin.Country.ISDCode + admin.PhoneNumber, message);
+                                }
+                                catch (Exception ex)
+                                {
+                                    Console.WriteLine(ex.ToString());
+                                }
+                            }
+                        }
+
+                        notifyService.Custom($"Password update successful", 3, "orange", "fa fa-unlock");
+                        return RedirectToAction("Index", "Dashboard");
+                    }
+                }
+
+                if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN) && !user.Email.StartsWith("admin"))
+                {
+                    var adminForFailed = _context.ApplicationUser.Include(a => a.Country).FirstOrDefault(u => u.IsSuperAdmin);
+                    string failedMessage = $"Dear {admin.Email}";
+                    failedMessage += $"                         ";
+                    failedMessage += $"Locked user {user.Email} logged in";
+                    failedMessage += $"                                       ";
+                    failedMessage += $"Thanks                                       ";
+                    failedMessage += $"                                       ";
+                    failedMessage += $"                                       ";
+                    failedMessage += $"{BaseUrl}";
+                    await smsService.DoSendSmsAsync("+" + adminForFailed.Country.ISDCode + adminForFailed.PhoneNumber, failedMessage);
+                }
                 notifyService.Custom($"Password update successful", 3, "orange", "fa fa-unlock");
                 return RedirectToAction("Index", "Dashboard");
             }
+            notifyService.Custom($"Password update Error", 3, "red", "fa fa-lock");
 
             return View(model);
         }
@@ -519,5 +657,16 @@ namespace risk.control.system.Controllers
     public class KeepSessionRequest
     {
         public string CurrentPage { get; set; }
+    }
+    // DTOs
+    public class SendOtpRequest
+    {
+        public string Email { get; set; }
+    }
+
+    public class VerifyOtpRequest
+    {
+        public string Email { get; set; }
+        public string Otp { get; set; }
     }
 }

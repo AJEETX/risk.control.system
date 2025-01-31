@@ -56,6 +56,7 @@
             <a target="_blank" href="https://hostedscan.com"><img id="hostedscan" src="https://hostedscan.com/hostedscan-badge-light.svg" alt="HostedScan | An automated vulnerability scanner" /></a>
 
             <div class="form-content">
+
                 <div class="login-form">
                     <img class="login-logo" src="/img/iCheckifyLogo.png" />™️
 
@@ -63,54 +64,28 @@
                     @Html.AntiForgeryToken()
                     <form id="login-form" asp-controller="Account" method="post">
                         <input type="hidden" id="latlong" name="latlong" value="-37.1234,1401234" />
-                        @if (Model.ShowUserOnLogin)
-                        {
-                            <input type="hidden" id="show-users" name="show-users" value="true" />
-                        }
-                        else
-
-                        {
-                            <input type="hidden" id="show-users" name="show-users" value="false" />
-                        }
+                        <input type="hidden" id="show-users" name="show-users" value="true" />
                         <div class="input-boxes">
 
+                            <div class="input-box autocomplete-wrapper">
+                                <i class="fas fa-envelope left-padd"></i>
+                                <input asp-for=Email id="email" type="email" title="Email" class="form-control remarks auto-dropdown"
+                                       placeholder="Enter your email" autocomplete="off" required />
+                                <div class="input-group-append-caret">
+                                    <span class="input-group-text"><i class="fas fa-caret-down"></i></span>
+                                </div>
+                                <span asp-validation-for="Email" class="text-danger"></span>
+                            </div>
+                            <div class="input-box">
+                                <i class="fas fa-lock left-padd"></i>
+                                <input asp-for=Password id="password" type="password" title="password" class="form-control remarks" placeholder="Enter your password" value="@Applicationsettings.Password" autocomplete="off" required />
+                            </div>
 
-                            @if (Model.ShowUserOnLogin)
-                            {
-                                <div class="input-box">
-                                    <i class="fas fa-envelope left-padd"></i>
-                                    <select required id="email" asp-for="Email" title="Email" class="form-control remarks" asp-items="ViewBag.Users">
-                                        <option value=""> --- select user email --- </option>
-                                    </select>
-                                    <span asp-validation-for="Email" class="text-danger"></span>
-                                </div>
-                                <div class="input-box">
-                                    <i class="fas fa-lock left-padd"></i>
-                                    <input asp-for=Password id="password" type="password" title="password" class="form-control remarks" placeholder="Enter your password" value="@Applicationsettings.TestPassword" autocomplete="off" required />
-                                </div>
-                            }
-                            else
-                            {
-                                <div class="input-box autocomplete-wrapper">
-                                    <i class="fas fa-envelope left-padd"></i>
-                                    <input asp-for=Email id="email" type="email" title="Email" class="form-control remarks auto-dropdown" 
-                                    placeholder="Enter your email" autocomplete="off" required />
-                                    <div class="input-group-append-caret">
-                                        <span class="input-group-text"><i class="fas fa-caret-down"></i></span>
-                                    </div>
-                                    <span asp-validation-for="Email" class="text-danger"></span>
-                                </div>
-                                <div class="input-box">
-                                    <i class="fas fa-lock left-padd"></i>
-                                    <input asp-for=Password id="password" type="password" title="password" class="form-control remarks" placeholder="Enter your password" value="@Applicationsettings.Password" autocomplete="off" required />
-                                </div>
-                            }
-
-                            <p class="account">By clicking login, you agree to our <a href="#">Terms & Conditions!</a></p>
+                            <p class="account">By clicking login, you agree to our <a class="termsLink" href="#">Terms & Conditions!</a></p>
                             <div class="button input-box">
                                 <button data-testid="logintest" id="login" type="submit" value="Login" class="btn btn-secondary btn-block"><span class="fa fa-key" aria-hidden="true"></span> Login</button>
                             </div>
-                            <div class="text"><label for="flip" class="login-link">Forgot Password?</label></div>
+                            <div class="text">Forgot Password? <label for="flip" class="login-link">Click Here</label></div>
                         </div>
                     </form>
                     <div class="error-message">
@@ -158,7 +133,7 @@
                                        required>
                                 <span asp-validation-for="Mobile" class="text-danger"></span>
                             </div>
-                            <p class="account">By clicking Reset, you agree to our <a href="#">Terms & Conditions!</a></p>
+                            <p class="account">By clicking Reset, you agree to our <a class="termsLink" href="#">Terms & Conditions!</a></p>
 
                             <div class="button input-box">
                                 <button id="reset-pwd" type="submit" class="btn btn-secondary btn-block"> Reset Password</button>
@@ -181,6 +156,7 @@
         </div>
         
         <partial name="_CookieConsentPartial" />
+        <partial name="_TermsConditions" />
         
     </div>
     

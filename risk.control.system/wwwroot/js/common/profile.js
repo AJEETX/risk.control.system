@@ -7,7 +7,7 @@
             e.preventDefault();
             $.confirm({
                 title: "Confirm Update Password",
-                content: "Are you sure to edit ?",
+                content: "Remeber the new password.",
                 icon: 'fa fa-key',
 
                 type: 'orange',
@@ -32,7 +32,6 @@
                             $('a').addClass('disabled-anchor').on('click', function (e) {
                                 e.preventDefault(); // Prevent default action for anchor clicks
                             });
-                            disableAllInteractiveElements();
                             $('#updatebutton').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Update Password");
 
                             $('#edit-form').submit();

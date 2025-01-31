@@ -19,28 +19,38 @@
 
     <!-- Cookie Management Popup -->
     <div id="cookieManagePopup" class="popup">
-        <div class="popup-content">
-            <h3>Manage Cookie Preferences</h3>
-            <form id="manageCookieForm">
-                <div>
-                    <input type="checkbox" id="essentialCookies" disabled checked>
-                    <label for="essentialCookies">Essential Cookies (Required)</label>
-                </div>
-                <div>
-                    <input type="checkbox" id="analyticsCookies" name="analyticsCookies">
-                    <label for="analyticsCookies">Analytics Cookies</label>
-                </div>
-                <div>
-                    <input type="checkbox" id="perfomanceCookies" name="perfomanceCookies">
-                    <label for="perfomanceCookies">Performance Cookies</label>
-                </div>
-                <div class="popup-buttons">
-                    <button type="button" id="savePreferences" class="btn-accept">Save Preferences</button>
-                    <button type="button" id="cancelManage" class="btn-revoke">Cancel</button>
-                </div>
-            </form>
-        </div>
+    <div class="popup-content">
+        <h3>Manage Cookie Preferences</h3>
+        <form id="manageCookieForm text-sm">
+            <div class="cookie-info">
+                <input type="checkbox" id="essentialCookies" disabled checked>
+                <label for="essentialCookies">Essential Cookies (Required)</label>
+                <p class="cookie-description">
+                    These cookies are necessary for the website to function properly and cannot be disabled. They include things like authentication and security features, ensuring you can navigate the site securely.
+                </p>
+            </div>
+            <div class="cookie-info">
+                <input type="checkbox" id="analyticsCookies" name="analyticsCookies">
+                <label for="analyticsCookies">Analytics Cookies</label>
+                <p class="cookie-description">
+                    These cookies help us gather data on how users interact with the website. We use this information to improve the user experience and optimize the content and layout of the site. They help us understand what works and what doesn't.
+                </p>
+            </div>
+            <div class="cookie-info">
+                <input type="checkbox" id="perfomanceCookies" name="perfomanceCookies">
+                <label for="perfomanceCookies">Performance Cookies</label>
+                <p class="cookie-description">
+                    Performance cookies collect information about how users interact with the site, such as page loading times and the functionality of specific elements. This helps us improve overall site performance and efficiency.
+                </p>
+            </div>
+            <div class="popup-buttons">
+                <button type="button" id="savePreferences" class="btn-accept">Save Preferences</button>
+                <button type="button" id="cancelManage" class="btn-revoke">Cancel</button>
+            </div>
+        </form>
     </div>
+</div>
+
 
     <div id="customAlert" class="alert-popup">
         <div class="alert-content">

@@ -5,10 +5,39 @@
 <section class="content">
     <div class="container-fluid">
         <div class="row">
-            <div class="col-md-12">
+            <div class="col-md-6">
+                <div class="card card-light h-100">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-user"></i> Welcome, <span class="">@Model.Message</span>!
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <!-- Add Image Below the Welcome Message -->
+                        <div class="text-center">
+                            <img class="icheckify-logo" src="~/headers/information.gif" alt="Welcome Image" class="img-fluid" />
+                        </div>
+                        <!-- Basic Description -->
+                        <div class="welcome-message text-muted text-sm">
+                            @{
+                                var characters = "!@#$%^&*";
+                            }
+                            <div class="text-muted">We are glad you're here! Please reset your password to continue. This will help you secure your account and gain full access to all the features. Make sure your new password is strong and unique.</div>
+                            <ul class="mt-3">
+                                <li><span class="check-icon">✓</span> <strong>At least 8 characters long</strong> - Ensure your password is long enough to provide good security.</li>
+                                <li><span class="check-icon">✓</span> <strong>Includes a mix of letters and numbers</strong> - Combining characters from different categories makes it harder to guess.</li>
+                                <li><span class="check-icon">✓</span> <strong>Contains at least one special character</strong> - Including symbols like <label>@characters</label> adds an extra layer of security.</li>
+                                <li><span class="check-icon">✓</span> <strong>Avoids common words or easily guessable patterns</strong> - Do not use obvious choices like "password123" or your name.</li>
+                            </ul>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
                 <div class="card card-secondary">
                     <div class="card-header">
-                        <h3 class="card-title"><i class="fas fa-pen"></i>  Password processed</h3>
+                        <h3 class="card-title"><i class="fa fa-unlock"></i>  Password processed</h3>
                     </div>
                     <div class="card-body">
                         <div class="submit-progress hidden">
@@ -37,6 +66,7 @@
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
 </section>

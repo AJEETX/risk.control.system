@@ -276,3 +276,13 @@
     cursor: not-allowed;
     opacity: 0.6;
 }
+/* Example style for cookie descriptions */
+.cookie-description {
+    font-size: 12px;
+    color: #555;
+    margin-top: 5px;
+    line-height: 1.4;
+}
+.cookie-info{
+    padding:2px 0;
+}

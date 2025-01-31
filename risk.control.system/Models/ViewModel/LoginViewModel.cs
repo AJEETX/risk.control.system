@@ -22,6 +22,7 @@ namespace risk.control.system.Models.ViewModel
         public string? Error { get; set; }
         public string? Mobile { get; set; }
         public List<string>? Users { get; set; }
+        public bool OtpLogin { get; set; }
     }
 
     public class ResetPasswordViewModel

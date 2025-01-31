@@ -14,5 +14,6 @@
         public const string SLIM_LOGIN = "SLIM_LOGIN";
         public const string ONBOARDING_ENABLED = "ONBOARDING_ENABLED";
         public const string FIRST_LOGIN_CONFIRMATION = "FIRST_LOGIN_CONFIRMATION";
+        public const string OTP_LOGIN = "OTP_LOGIN";
     }
 }

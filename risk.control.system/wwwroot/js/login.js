@@ -49,67 +49,134 @@ $.validator.setDefaults({
         }
     }
 });
+document.addEventListener("DOMContentLoaded", function () {
 
-//// Function to handle successful geolocation retrieval
-//function handleGeolocationSuccess(position) {
-//    const latlong = `${position.coords.latitude},${position.coords.longitude}`;
-//    fetchIpInfo(latlong); // Call fetchIpInfo with geolocation data
-//}
+    // Reference to the modal and close button
+    var termsModal = document.getElementById('termsModal');
+    var closeTermsButton = document.getElementById('closeterms');
+    // Select all elements with the class 'termsLink'
+    var termsLinks = document.querySelectorAll('.termsLink');
 
-//// Function to handle geolocation errors
-//function handleGeolocationError(err) {
-//    console.error('Geolocation request failed or was denied:', err.message);
-//    fetchIpInfo(); // Optionally fetch IP info without geolocation
-//}
+    // Add a click event listener to each element
+    termsLinks.forEach(function (termsLink) {
+        termsLink.addEventListener('click', function (e) {
+            e.preventDefault(); // Prevent default link behavior (i.e., not navigating anywhere)
 
-//// Function to fetch IP info and update the UI
-//async function fetchIpInfo(latlong = '') {
-//    try {
-//        // Construct the URL with or without latlong
-//        const url = `/api/Notification/GetClientIp?url=${encodeURIComponent(window.location.pathname)}${latlong ? `&latlong=${encodeURIComponent(latlong)}` : ''}`;
+            // Show the terms modal
+            var termsModal = document.querySelector('#termsModal');
+            termsModal.classList.remove('hidden-section');
+            termsModal.classList.add('show');
+        });
+    });
 
-//        // Make the fetch request
-//        const response = await fetch(url);
+    // Close the modal when clicking the close button
+    closeTermsButton.addEventListener('click', function () {
+        termsModal.classList.add('hidden-section'); // Remove the 'show' class to hide the modal
+        termsModal.classList.remove('show'); // Remove the 'show' class to hide the modal
+    });
 
-//        // Handle non-OK responses
-//        if (!response.ok) {
-//            console.error(`IP fetch failed with status: ${response.status}`);
-//            updateInfoDisplay('---', '---');
-//            return;
-//        }
+    // Optionally, you can close the modal if clicked outside the modal content
+    window.addEventListener('click', function (e) {
+        if (e.target === termsModal) {
+            termsModal.classList.add('hidden-section'); // Remove the 'show' class to hide the modal
+            termsModal.classList.remove('show'); // Close the modal if clicked outside
+        }
+    });
 
-//        // Parse and process the JSON response
-//        const data = await response.json();
-//        const district = data.district || 'Not available';
-//        updateInfoDisplay(district, district);
-//    } catch (error) {
-//        console.error('Error during IP info fetch operation:', error.message);
-//        updateInfoDisplay('Not available', 'Not available');
-//    }
-//}
+    // Bind event to "Login with OTP" link
+    const otpLoginLink = document.getElementById('otp-login-link');
+    if (otpLoginLink) {
+        otpLoginLink.addEventListener('click', function () {
+            showOtpSection();
+        });
+    }
 
-//// Function to update the UI with the fetched data
-//function updateInfoDisplay(ipAddress, ipAddress1) {
-//    document.querySelector('#ipAddress .info-data').textContent = ipAddress;
-//    document.querySelector('#ipAddress1 .info-data').textContent = ipAddress1;
-//}
+    // Bind event to "Send OTP" button
+    const sendOtpBtn = document.getElementById('send-otp-btn');
+    if (sendOtpBtn) {
+        sendOtpBtn.addEventListener('click', function () {
+            sendOtp();
+        });
+    }
 
-//// Initialize geolocation handling
-//function initGeolocation() {
-//    if (navigator.geolocation) {
-//        navigator.geolocation.getCurrentPosition(handleGeolocationSuccess, handleGeolocationError);
-//    } else {
-//        console.error('Geolocation is not supported by this browser.');
-//        fetchIpInfo(); // Optionally fetch IP info without geolocation
-//    }
-//}
+    // Bind event to "Verify OTP" button
+    const verifyOtpBtn = document.getElementById('verify-otp-btn');
+    if (verifyOtpBtn) {
+        verifyOtpBtn.addEventListener('click', function () {
+            verifyOtp();
+        });
+    }
+});
 
-// Call the initialization function
+// Function to show OTP login section
+function showOtpSection() {
+    document.getElementById('otp-section').classList.remove('hidden-section');
+    document.getElementById('login-form').classList.add('hidden-section');
+}
+
+
+//document.addEventListener("DOMContentLoaded", function () {
+//    // Apply blur effect dynamically
+//    document.getElementById("main-container").classList.add("blur-background");
+//});
+
+// Function to send OTP
+function sendOtp() {
+    const email = document.getElementById('otp-email').value;
+
+    // Call the API to send OTP
+    fetch('/api/Account/SendOtp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email })
+    }).then(response => {
+        if (response.ok) {
+            alert('OTP sent successfully!');
+            document.getElementById('otp-input-box').classList.remove('hidden-section');
+            document.getElementById('otp-submit-btn').classList.remove('hidden-section');
+        } else {
+            alert('Failed to send OTP.');
+        }
+    });
+}
+
+// Function to verify OTP
+function verifyOtp() {
+    const email = document.getElementById('otp-email').value;
+    const otp = document.getElementById('otp').value;
+
+    // Call the API to verify OTP
+    fetch('/api/Account/VerifyOtp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email, otp: otp })
+    }).then(response => {
+        if (response.ok) {
+            alert('OTP verified! Logging in...');
+            // Redirect to dashboard or home page
+            window.location.href = '/home';
+        } else {
+            alert('Invalid OTP.');
+        }
+    });
+}
 
 $(document).ready(function () {
+
+    $("#flip").change(function () {
+        if ($(this).prop("checked")) {
+            // If checkbox is checked (Forgot Password form)
+            $("#resetemail").focus(); // Focus on resetemail input
+        } else {
+            // If checkbox is unchecked (Login form)
+            $("#email").focus(); // Focus on email input
+        }
+    });
+
+   
     $("#login-form").validate();
     $("#reset-form").validate();
-    $("#email").autocomplete({
+    $("#email, #resetemail").autocomplete({
         source: function (request, response) {
             $("#loader").show(); // Show loader
             $.ajax({
@@ -132,7 +199,7 @@ $(document).ready(function () {
         minLength: 1, // Start showing suggestions after 1 character
         select: function (event, ui) {
             // Set the selected value to the input field
-            $("#email").val(ui.item.value);
+            $(this).val(ui.item.value);
         },
         messages: {
             noResults: "No results found",
@@ -141,13 +208,18 @@ $(document).ready(function () {
             }
         }
     });
-    $("#email").on("focus", function () {
+
+    // Trigger autocomplete on focus for both fields
+    $("#email, #resetemail").on("focus", function () {
         console.log("Focus triggered");
         const emailValue = $(this).val();
-        if (!emailValue && emailValue.trim() === "") {
+
+        // If the field is empty, trigger autocomplete
+        if (!emailValue.trim()) {
             $(this).autocomplete("search", ""); // Trigger autocomplete with an empty search term
         }
     });
+
 
     $('input').on('focus', function () {
         $(this).select();
@@ -166,6 +238,5 @@ function onlyDigits(el) {
 }
 window.onload = function () {
     //initGeolocation();
-
     focusLogin();
 }
