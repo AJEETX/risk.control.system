@@ -1,9 +1,10 @@
 ﻿@model ClaimTransactionModel
 @{
     string baddress = string.Empty;
-    int currentBAgeinYrs = 0;
+    string currentBAgeinYrs = string.Empty;
     bool customerExist = false;
     bool beneficiaryExist = false;
+    var imgPath = "/flags/in.png";
     if (Model.ClaimsInvestigation.CustomerDetail != null)
     {
         customerExist = true;
@@ -11,9 +12,10 @@
     if (Model.Location?.BeneficiaryDetailId > 0)
     {
         beneficiaryExist = true;
-        baddress = @Model.Location?.Addressline + " " + @Model.Location?.District?.Name + " " + @Model.Location?.State?.Name + " " + @Model.Location?.Country?.Name + " " + @Model.Location?.PinCode?.Code;
+        baddress = @Model.Location?.Addressline + " " + @Model.Location?.District?.Name + " " + @Model.Location?.State?.Name + " " + @Model.Location?.PinCode?.Code;
         var age = DateTime.Now.Subtract(Model.Location.DateOfBirth.GetValueOrDefault()).TotalDays;
-        currentBAgeinYrs = (int)age / 365;
+        currentBAgeinYrs =$"{(int)(age/ 365 )} years";
+
     }
     string benficiaryProgressClass = "progress-bar-lightgrey"; // Default class
 
@@ -25,6 +27,8 @@
     {
         benficiaryProgressClass = "progress-bar-grey";
     }
+    imgPath = "/flags/" + @Model.Location.Country.Code.ToLower() + ".png";
+
 }
 <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
     <div class="card bg-light d-flex flex-fill">
@@ -66,9 +70,15 @@
                         </li>
                         <li class="small">
                             <span class="fa-li">
+                                <i class="fas fa-lg fa-globe"></i>
+                            </span>
+                            Country: <img src="@imgPath" class="flag-icon" data-toggle="tooltip" /> @Model.Location?.Country.Name
+                        </li>
+                        <li class="small">
+                            <span class="fa-li">
                                 <i class="fas fa-lg fa-phone"></i>
                             </span>
-                            Phone #: + @Model.Location?.ContactNumber
+                            Phone #: +@Model.Location?.Country.ISDCode (0) @Model.Location?.ContactNumber
                         </li>
                     </ul>
                 </div>

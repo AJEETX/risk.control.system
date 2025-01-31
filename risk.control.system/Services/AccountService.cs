@@ -9,7 +9,7 @@ namespace risk.control.system.Services
 {
     public interface IAccountService
     {
-        Task<bool> ForgotPassword(string useremail, long mobile);
+        Task<bool> ForgotPassword(string useremail, string mobile);
     }
 
     public class AccountService : IAccountService
@@ -28,14 +28,15 @@ namespace risk.control.system.Services
             this.httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<bool> ForgotPassword(string useremail, long mobile)
+        public async Task<bool> ForgotPassword(string useremail, string mobile)
         {
             //CHECK AND VALIDATE EMAIL PASSWORD
-            var user = context.ApplicationUser.Include(a=>a.Country).FirstOrDefault(u => !u.Deleted && u.Email == useremail && u.Country.ISDCode + u.PhoneNumber == mobile.ToString());
+            var userWithEmail = context.ApplicationUser.Include(a=>a.Country).FirstOrDefault(u => !u.Deleted && u.Email == useremail);
+            var userPhone = string.Concat(userWithEmail.Country.ISDCode.ToString(), userWithEmail.PhoneNumber);
+
+            var user = context.ApplicationUser.Include(a=>a.Country).FirstOrDefault(u => !u.Deleted && u.Email == useremail && string.Concat(u.Country.ISDCode.ToString(), u.PhoneNumber) == mobile.Trim().ToString());
             if (user != null)
             {
-
-
                 var passwordString = $"Your password is: {user.Password}";
                 var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
                 var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();

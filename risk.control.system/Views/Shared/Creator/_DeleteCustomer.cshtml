@@ -1,11 +1,12 @@
 ﻿@model ClaimTransactionModel
 @{
     string address = string.Empty;
+    var imgPath = "/flags/in.png";
     int currentAgeinYrs = 0;
     bool customerExist = false;
     if (Model.ClaimsInvestigation != null && Model.ClaimsInvestigation.CustomerDetail != null)
     {
-        address = @Model.ClaimsInvestigation?.CustomerDetail.Addressline + " " + @Model.ClaimsInvestigation?.CustomerDetail.District.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.State.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.Country.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.PinCode.Code;
+        address = @Model.ClaimsInvestigation?.CustomerDetail.Addressline + " " + @Model.ClaimsInvestigation?.CustomerDetail.District.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.State.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.PinCode.Code;
         
         if (Model.ClaimsInvestigation?.CustomerDetail.DateOfBirth != null)
         {
@@ -13,6 +14,7 @@
             currentAgeinYrs = (int)age / 365;
         }
         customerExist = true;
+        imgPath = "/flags/" + @Model.ClaimsInvestigation.CustomerDetail.Country.Code.ToLower() + ".png";
     }
 }
 <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
@@ -70,12 +72,17 @@
                             </span>
                             Address: @address
                         </li>
-
+                        <li class="small">
+                            <span class="fa-li">
+                                <i class="fas fa-lg fa-globe"></i>
+                            </span>
+                            Country: <img src="@imgPath" class="flag-icon" data-toggle="tooltip" /> @Model.ClaimsInvestigation?.CustomerDetail.Country.Name
+                        </li>
                         <li class="small">
                             <span class="fa-li">
                                 <i class="fas fa-lg fa-phone"></i>
                             </span>
-                            Phone #: + @Model.ClaimsInvestigation?.CustomerDetail?.ContactNumber
+                            Phone #: +@Model.ClaimsInvestigation?.CustomerDetail.Country.ISDCode (0) @Model.ClaimsInvestigation?.CustomerDetail?.ContactNumber
                         </li>
                     </ul>
                 </div>

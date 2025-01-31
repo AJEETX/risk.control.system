@@ -422,6 +422,8 @@ namespace risk.control.system.Controllers
                 }
 
                 // Mark that the user has changed their password
+                user.Password = model.NewPassword;
+                user.Updated = DateTime.Now;
                 user.IsPasswordChangeRequired = false;
                 await _userManager.UpdateAsync(user);
 
@@ -529,15 +531,15 @@ namespace risk.control.system.Controllers
         {
             string message = string.Empty;
             var user = await _userManager.FindByEmailAsync(input.Email);
-            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            //var token = await _userManager.GeneratePasswordResetTokenAsync(user);
 
-            // Encode the token to make it URL-safe
-            var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
+            //// Encode the token to make it URL-safe
+            //var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
 
-            // Generate the reset link
-            var resetLink = Url.Action(nameof(ResetPassword), "Account", new { userId = user.Id, token = encodedToken }, Request.Scheme);
+            //// Generate the reset link
+            //var resetLink = Url.Action(nameof(ResetPassword), "Account", new { userId = user.Id, token = encodedToken }, Request.Scheme);
 
-            var smsSent = await accountService.ForgotPassword(input.Email, long.Parse(input.Mobile));
+            var smsSent = await accountService.ForgotPassword(input.Email,input.Mobile);
             if (smsSent)
             {
                 message = "Password sent to mobile: " + input.Mobile;

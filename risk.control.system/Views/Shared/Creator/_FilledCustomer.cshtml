@@ -2,31 +2,19 @@
 
 @{
     var customerDetail = Model.ClaimsInvestigation?.CustomerDetail;
-    var location = Model.Location;
 
     // Customer and Beneficiary existence
     bool customerExist = customerDetail != null;
-    bool beneficiaryExist = location?.BeneficiaryDetailId > 0;
+    bool beneficiaryExist = Model.Location?.BeneficiaryDetailId > 0;
 
     // Address and age calculations
     string address = string.Empty;
-    string baddress = string.Empty;
-    int currentAgeInYrs = 0;
-    int currentBAgeInYrs = 0;
+    string currentAgeInYrs = string.Empty;
 
     if (customerExist)
     {
-        address = $"{customerDetail.Addressline} {customerDetail.District?.Name} {customerDetail.State?.Name} {customerDetail.Country?.Name} {customerDetail.PinCode?.Code}";
-
-        if (customerDetail.DateOfBirth != null)
-        {
-            currentAgeInYrs = (int)(DateTime.Now.Subtract(customerDetail.DateOfBirth.GetValueOrDefault()).TotalDays / 365);
-        }
-    }
-
-    if (location?.DateOfBirth != null)
-    {
-        currentBAgeInYrs = (int)(DateTime.Now.Subtract(location.DateOfBirth.GetValueOrDefault()).TotalDays / 365);
+        address = $"{customerDetail.Addressline} {customerDetail.District?.Name} {customerDetail.State?.Name} {customerDetail.PinCode?.Code}";
+        currentAgeInYrs = $"{(int)(DateTime.Now.Subtract(customerDetail.DateOfBirth.GetValueOrDefault()).TotalDays / 365)} years";
     }
 
     // Progress bar and message setup
@@ -35,6 +23,7 @@
     string customerProgressbarMessage = customerExist ? "customer" : "add customer";
 
     string beneficiaryProgressbarMessage = beneficiaryExist ? "edit beneficiary" : "beneficiary";
+    var imgPath = "/flags/" + @customerDetail.Country.Code.ToLower() + ".png";
 }
 
 <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
@@ -68,6 +57,7 @@
                         <li class="small"><span class="fa-li"><i class="fas fa-graduation-cap"></i></span>Education: @customerDetail?.Education</li>
                         <li class="small"><span class="fa-li"><i class="fas fa-user-alt"></i></span>Age: @currentAgeInYrs</li>
                         <li class="small"><span class="fa-li"><i class="fas fa-lg fa-building"></i></span>Address: @address</li>
+                        <li class="small"><span class="fa-li"><i class="fas fa-lg fa-globe"></i></span>Country:  <img src="@imgPath" class="flag-icon" data-toggle="tooltip" />@customerDetail.Country.Name</li>
                         <li class="small"><span class="fa-li"><i class="fas fa-lg fa-phone"></i></span>Phone #: (+@customerDetail?.Country.ISDCode) @customerDetail?.ContactNumber</li>
                     </ul>
                 </div>

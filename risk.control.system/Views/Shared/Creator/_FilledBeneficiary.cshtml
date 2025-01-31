@@ -15,7 +15,8 @@
     }
     
     var beneficiaryAddress = $"{Model.Location.Addressline} {Model.Location.District?.Name} {Model.Location.State?.Name} {Model.Location.Country?.Name} {Model.Location.PinCode?.Code}";
-    var beneficiaryAgeInYears = (int)(DateTime.Now.Subtract(Model.Location.DateOfBirth.GetValueOrDefault()).TotalDays / 365);
+    var beneficiaryAgeInYears =$"{(int)(DateTime.Now.Subtract(Model.Location.DateOfBirth.GetValueOrDefault()).TotalDays / 365)} years";
+    var imgPath = "/flags/" + @Model.Location.Country.Code.ToLower() + ".png";
 
 }
 
@@ -61,6 +62,10 @@
                         <li class="small">
                             <span class="fa-li"><i class="fas fa-lg fa-building"></i></span>
                             Address: @beneficiaryAddress
+                        </li>
+                        <li class="small">
+                            <span class="fa-li"><i class="fas fa-lg fa-globe"></i></span>
+                            Country:<img src="@imgPath" class="flag-icon" data-toggle="tooltip" /> @Model.Location?.Country.Name
                         </li>
                         <li class="small">
                             <span class="fa-li"><i class="fas fa-lg fa-phone"></i></span>

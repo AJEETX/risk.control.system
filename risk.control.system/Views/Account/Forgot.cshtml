@@ -8,7 +8,7 @@
             <div class="col-md-12">
                 <div class="card card-secondary">
                     <div class="card-header">
-                        <h3 class="card-title"><i class="fas fa-pen"></i>  Password processed</h3>
+                        <h3 class="card-title"><i class="fa fa-lock"></i>  Password processed</h3>
                     </div>
                     <div class="card-body">
                         <div class="submit-progress hidden">
@@ -18,17 +18,17 @@
                             @Model.Message
                         </h4>
                     </div>
-                    <div class="card-footer">
+                    <div class="card-footer text-center">
                         @if(Model.Reset)
                         {
-                            <a id="back" asp-controller="Account" asp-action="Login" class="btn btn-success">
+                            <a asp-controller="Account" asp-action="Login" class="btn btn-success">
                                 <i class="fa fa-key"></i>
                                 Login Now !
                             </a>
                         }
                         else
                         {
-                            <a id="back" asp-controller="Account" asp-action="Login" class="btn btn-danger">
+                            <a asp-controller="Account" asp-action="Login" class="btn btn-danger">
                                 <i class="fa fa-key"></i>
                                 Try Again
                             </a>
