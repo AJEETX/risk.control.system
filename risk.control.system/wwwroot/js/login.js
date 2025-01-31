@@ -108,59 +108,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 
-// Function to show OTP login section
-function showOtpSection() {
-    document.getElementById('otp-section').classList.remove('hidden-section');
-    document.getElementById('login-form').classList.add('hidden-section');
-}
-
-
-//document.addEventListener("DOMContentLoaded", function () {
-//    // Apply blur effect dynamically
-//    document.getElementById("main-container").classList.add("blur-background");
-//});
-
-// Function to send OTP
-function sendOtp() {
-    const email = document.getElementById('otp-email').value;
-
-    // Call the API to send OTP
-    fetch('/api/Account/SendOtp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email })
-    }).then(response => {
-        if (response.ok) {
-            alert('OTP sent successfully!');
-            document.getElementById('otp-input-box').classList.remove('hidden-section');
-            document.getElementById('otp-submit-btn').classList.remove('hidden-section');
-        } else {
-            alert('Failed to send OTP.');
-        }
-    });
-}
-
-// Function to verify OTP
-function verifyOtp() {
-    const email = document.getElementById('otp-email').value;
-    const otp = document.getElementById('otp').value;
-
-    // Call the API to verify OTP
-    fetch('/api/Account/VerifyOtp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email, otp: otp })
-    }).then(response => {
-        if (response.ok) {
-            alert('OTP verified! Logging in...');
-            // Redirect to dashboard or home page
-            window.location.href = '/home';
-        } else {
-            alert('Invalid OTP.');
-        }
-    });
-}
-
 $(document).ready(function () {
 
     $("#flip").change(function () {

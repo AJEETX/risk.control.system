@@ -1,6 +1,20 @@
 ﻿$(document).ready(function () {
 
-    $('#CurrentPassword').focus();
+    const currentpassword = $('#CurrentPassword');
+    if (currentpassword) {
+        currentpassword.focus()
+    }
+
+    $('#editButton').on('click', function () {
+        $("#edit-form").addClass("submit-progress-bg");
+
+        // Update UI with a short delay to show spinner
+        setTimeout(function () {
+            $(".submit-progress").removeClass("hidden");
+        }, 1);
+        
+        $('#editButton').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> User Profile");
+    });
     var askConfirmation = true;
     $('#edit-form').submit(function (e) {
         if (askConfirmation) {

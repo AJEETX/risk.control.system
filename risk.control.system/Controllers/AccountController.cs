@@ -133,6 +133,28 @@ namespace risk.control.system.Controllers
             // Clear the existing external cookie to ensure a clean login process
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             await _signInManager.SignOutAsync();
+            var dontSetPassword = await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION);
+            var showgtrialUsers = await featureManager.IsEnabledAsync(FeatureFlags.TrialVersion);
+            if (showgtrialUsers)
+            {
+                ViewData["Users"] = new SelectList(_context.Users.Where(u => !u.Deleted && !u.Email.StartsWith("admin")).OrderBy(o => o.Email), "Email", "Email");
+            }
+            else
+            {
+                ViewData["Users"] = new SelectList(_context.Users.Where(u => !u.Deleted).OrderBy(o => o.Email), "Email", "Email");
+            }
+
+            return View(new LoginViewModel { SetPassword = !dontSetPassword, OtpLogin = await featureManager.IsEnabledAsync(FeatureFlags.OTP_LOGIN) });
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> AdminLogin()
+        {
+            var timer = DateTime.Now;
+            // Clear the existing external cookie to ensure a clean login process
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            await _signInManager.SignOutAsync();
             var showLoginUsers = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
             if (showLoginUsers)
             {
@@ -147,9 +169,8 @@ namespace risk.control.system.Controllers
                 }
             }
 
-            return View(new LoginViewModel { ShowUserOnLogin = showLoginUsers, OtpLogin = await featureManager.IsEnabledAsync(FeatureFlags.OTP_LOGIN) });
+            return View(new LoginViewModel { SetPassword = showLoginUsers, OtpLogin = await featureManager.IsEnabledAsync(FeatureFlags.OTP_LOGIN) });
         }
-
         // API to send OTP to the user's email
         [AllowAnonymous]
         [HttpPost("api/Account/SendOtp")]
@@ -208,7 +229,7 @@ namespace risk.control.system.Controllers
             {
                 ModelState.AddModelError(string.Empty, "Bad Request.");
                 model.Error = "Invalid credentials.";
-                model.ShowUserOnLogin = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
+                model.SetPassword = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
                 ViewData["Users"] = new SelectList(_context.Users.Where(u => !u.Deleted).OrderBy(o => o.Email), "Email", "Email");
                 return View(model);
             }
@@ -218,20 +239,12 @@ namespace risk.control.system.Controllers
             {
                 ModelState.AddModelError(string.Empty, "Invalid login attempt.");
                 model.Error = "Invalid credentials.";
-                model.ShowUserOnLogin = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
+                model.SetPassword = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
                 ViewData["Users"] = new SelectList(_context.Users.Where(u => !u.Deleted).OrderBy(o => o.Email), "Email", "Email");
                 return View(model);
             }
 
-            if (await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION))
-            {
-                if (user.IsPasswordChangeRequired)
-                {
-                    return RedirectToAction("ChangePassword", "Account", new { email = user.Email });
-                }
-            }
-            var pwd = HttpUtility.HtmlEncode(model.Password);
-            var result = await _signInManager.PasswordSignInAsync(email, pwd, model.RememberMe, lockoutOnFailure: false);
+            
             var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
             var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
             var BaseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
@@ -240,13 +253,21 @@ namespace risk.control.system.Controllers
             {
                 ModelState.AddModelError(string.Empty, "Bad Request.");
                 model.Error = "Server Error. Try again.";
-                model.ShowUserOnLogin = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
+                model.SetPassword = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
                 ViewData["Users"] = new SelectList(_context.Users.Where(u => !u.Deleted).OrderBy(o => o.Email), "Email", "Email");
                 return View(model);
             }
-
+            var pwd = HttpUtility.HtmlEncode(model.Password);
+            var result = await _signInManager.PasswordSignInAsync(email, pwd, model.RememberMe, lockoutOnFailure: false);
             if (result.Succeeded)
             {
+                if (await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION))
+                {
+                    if (user.IsPasswordChangeRequired)
+                    {
+                        return RedirectToAction("ChangePassword", "Account", new { email = user.Email });
+                    }
+                }
                 var roles = await _userManager.GetRolesAsync(user);
                 if (roles != null && roles.Count > 0)
                 {
@@ -332,7 +353,7 @@ namespace risk.control.system.Controllers
                     failedMessage += $"{BaseUrl}";
                     await smsService.DoSendSmsAsync("+" + adminForFailed.Country.ISDCode + adminForFailed.PhoneNumber, failedMessage);
                 }
-                model.ShowUserOnLogin = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
+                model.SetPassword = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
                 ViewData["Users"] = new SelectList(_context.Users.OrderBy(o => o.Email), "Email", "Email");
                 _logger.LogWarning("User account locked out.");
                 model.Error = "User account locked out.";
@@ -352,7 +373,7 @@ namespace risk.control.system.Controllers
                     message += $"{BaseUrl}";
                     await smsService.DoSendSmsAsync("+" + admin.Country.ISDCode + admin.PhoneNumber, message);
                 }
-                model.ShowUserOnLogin = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
+                model.SetPassword = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
                 ViewData["Users"] = new SelectList(_context.Users.OrderBy(o => o.Email), "Email", "Email");
                 _logger.LogWarning("User account locked out.");
                 model.Error = "User account locked out.";
@@ -374,13 +395,13 @@ namespace risk.control.system.Controllers
                 }
                 ModelState.AddModelError(string.Empty, "Invalid login attempt.");
                 model.Error = "Server Error. Try again.";
-                model.ShowUserOnLogin = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
+                model.SetPassword = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
                 ViewData["Users"] = new SelectList(_context.Users.OrderBy(o => o.Email), "Email", "Email");
                 return View(model);
             }
             ModelState.AddModelError(string.Empty, "Bad Request.");
             model.Error = "Server Error. Try again.";
-            model.ShowUserOnLogin = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
+            model.SetPassword = await featureManager.IsEnabledAsync(FeatureFlags.SHOW_USERS_ON_LOGIN);
             ViewData["Users"] = new SelectList(_context.Users.Where(u => !u.Deleted).OrderBy(o => o.Email), "Email", "Email");
             return View(model);
         }

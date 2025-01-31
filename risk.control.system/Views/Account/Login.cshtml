@@ -76,11 +76,22 @@
                                 </div>
                                 <span asp-validation-for="Email" class="text-danger"></span>
                             </div>
-                            <div class="input-box">
-                                <i class="fas fa-lock left-padd"></i>
-                                <input asp-for=Password id="password" type="password" title="password" class="form-control remarks" placeholder="Enter your password" value="@Applicationsettings.Password" autocomplete="off" required />
-                            </div>
+                            @if (Model.SetPassword)
+                            {
+                                <div class="input-box">
+                                    <i class="fas fa-lock left-padd"></i>
+                                    <input asp-for=Password id="password" type="password" title="password" class="form-control remarks" placeholder="Enter your password" value="@Applicationsettings.Password" autocomplete="off" required />
+                                </div>
 
+                            }
+                            else
+                            {
+                                <div class="input-box">
+                                    <i class="fas fa-lock left-padd"></i>
+                                    <input asp-for=Password id="password" type="password" title="password" class="form-control remarks" placeholder="Enter your password" autocomplete="off" required />
+                                </div>
+
+                            }
                             <p class="account">By clicking login, you agree to our <a class="termsLink" href="#">Terms & Conditions!</a></p>
                             <div class="button input-box">
                                 <button data-testid="logintest" id="login" type="submit" value="Login" class="btn btn-secondary btn-block"><span class="fa fa-key" aria-hidden="true"></span> Login</button>
@@ -107,7 +118,7 @@
                         <div class="input-boxes">
                             <div class="input-box">
                                 <i class="fas fa-envelope left-padd"></i>
-                                @if (Model.ShowUserOnLogin)
+                                @if (Model.SetPassword)
                                 {
                                     <select required id="resetemail" asp-for="Email" class="form-control remarks" asp-items="ViewBag.Users">
                                         <option value=""> --- select user email --- </option>

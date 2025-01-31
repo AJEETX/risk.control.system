@@ -99,9 +99,16 @@
             </div>
             <div class="row">
                 <div class="col-md-12 text-right">
-                    <a asp-action="Edit" asp-route-userId="@Model.Id" class="btn btn-warning"><i class='far fa-user-circle'></i> User @Applicationsettings.PROFILE</a>
+                    <a id="editButton" asp-action="Edit" asp-route-userId="@Model.Id" class="btn btn-warning"><i class='far fa-user-circle'></i> User @Applicationsettings.PROFILE</a>
                 </div>
             </div>
         </div>
     </div>
 </section>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script src="~/js/common/profile.js"></script>
+    <script src="~/js/common/form-validation.js"></script>
+}

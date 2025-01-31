@@ -2045,17 +2045,22 @@ select#PinCodeId {
     cursor: pointer;
 }
 
+
 .welcome-message ul {
     list-style-type: none;
-    padding-left: 0;
+    padding-left: 1em;
 }
 
 .welcome-message li {
     margin-bottom: 10px;
-    font-size: 14px; /* Adjust text size */
+    font-size: .9em; /* Adjust text size */
+    color:black;
 }
-.check-icon {
-    color: green; /* Set the color of the checkmark */
-    font-weight: bold;
-    margin-right: 8px; /* Add spacing between the checkmark and text */
-}
+    .welcome-message li strong {
+        color: darkgreen;
+    }
+    .check-icon {
+        color: green; /* Set the color of the checkmark */
+        font-weight: bold;
+        margin-right: 8px; /* Add spacing between the checkmark and text */
+    }

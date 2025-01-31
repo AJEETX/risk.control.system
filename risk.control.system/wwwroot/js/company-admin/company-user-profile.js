@@ -12,6 +12,12 @@
                     text: "Save",
                     btnClass: 'btn-warning',
                     action: function () {
+                        $("#edit-form").addClass("submit-progress-bg");
+
+                        // Update UI with a short delay to show spinner
+                        setTimeout(function () {
+                            $(".submit-progress").removeClass("hidden");
+                        }, 1);
                         // Disable all buttons, submit inputs, and anchors
                         $('button, input[type="submit"], a').prop('disabled', true);
 
@@ -19,6 +25,7 @@
                         $('a').addClass('disabled-anchor').on('click', function (e) {
                             e.preventDefault(); // Prevent default action for anchor clicks
                         });
+                        $('#edit').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Save Profile");
 
                         form.submit();
                     }

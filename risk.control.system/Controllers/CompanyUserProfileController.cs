@@ -173,7 +173,7 @@ namespace risk.control.system.Controllers
                     var result = await userManager.UpdateAsync(user);
                     if (result.Succeeded)
                     {
-                        notifyService.Custom($"User profile edited successfully.", 3, "green", "fas fa-user");
+                        notifyService.Custom($"User profile edited successfully.", 3, "orange", "fas fa-user");
                         var isdCode = _context.Country.FirstOrDefault(c => c.CountryId == user.CountryId)?.ISDCode;
                         await smsService.DoSendSmsAsync(isdCode + user.PhoneNumber, "User edited . Email : " + user.Email);
                         return RedirectToAction(nameof(Index), "Dashboard");
