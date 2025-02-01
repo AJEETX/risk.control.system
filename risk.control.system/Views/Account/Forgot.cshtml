@@ -3,20 +3,24 @@
     Layout = "/Views/Shared/_Layout.cshtml";
 }
 <section class="content">
-    <div class="container-fluid">
         <div class="row">
-            <div class="col-md-12">
-                <div class="card card-secondary">
+            <div class="col-md-2">
+        </div>
+        <div class="col-md-8">
+            <div class="card card-light h-100">
+
                     <div class="card-header">
                         <h3 class="card-title"><i class="fa fa-lock"></i>  Password processed</h3>
                     </div>
-                    <div class="card-body">
+                <div class="card-body text-center">
                         <div class="submit-progress hidden">
                             <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
                         </div>
-                        <h4>
-                            @Model.Message
-                        </h4>
+                    <!-- Add Image Below the Welcome Message -->
+                    <div class="text-center">
+                        <img class="icheckify-logo" src="~/headers/information.gif" alt="Welcome Image" class="img-fluid" />
+                    </div>
+                    <div class="text-muted">@Model.Message.</div>
                     </div>
                     <div class="card-footer text-center">
                         @if(Model.Reset)
@@ -37,6 +41,7 @@
                     </div>
                 </div>
             </div>
+        <div class="col-md-2">
         </div>
     </div>
 </section>

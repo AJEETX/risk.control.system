@@ -2,12 +2,13 @@
 
 <div class="row">
     <div class="col-sm-6">
-        
+        <input type="hidden" id="MobileAppUrl" asp-for="MobileAppUrl" value="@Model.MobileAppUrl" />
+
         <div class="form-group">
             <label class="input-group-label"> Agency Name: </label>
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
-                    <span class="input-group-text" ><i class="fas fa-building"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                    <span class="input-group-text"><i class="fas fa-building"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                 </div>
                 <input type="text" id="Name" asp-for="Name" class="form-control remarks title-name" required placeholder="Enter Agency Name" maxlength="30">
                 <span asp-validation-for="Name" class="text-danger"></span>
@@ -32,14 +33,14 @@
             </div>
         </div>
         @* <div class="form-group">
-            <span class="input-group-label"> Branch Name: </span>
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <span class="input-group-text"><i class="far fa-building"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                </div>
-                <input type="text" id="Branch" asp-for="Branch" class="form-control remarks title-name" required placeholder="Enter Branch Name" maxlength="30">
-                <span asp-validation-for="Branch" class="text-danger"></span>
-            </div>
+        <span class="input-group-label"> Branch Name: </span>
+        <div class="input-group mb-3">
+        <div class="input-group-prepend">
+        <span class="input-group-text"><i class="far fa-building"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+        </div>
+        <input type="text" id="Branch" asp-for="Branch" class="form-control remarks title-name" required placeholder="Enter Branch Name" maxlength="30">
+        <span asp-validation-for="Branch" class="text-danger"></span>
+        </div>
         </div> *@
 
         <div class="form-group">
@@ -82,52 +83,32 @@
         }
         else
         {
-            
-            <div class="form-group d-flex justify-content-between align-items-center">
-                <!-- CanChangePassword -->
-                <div class="d-flex align-items-center">
-                    <span class="input-group-label mr-2">Profile edit:</span>
-                    <div class="input-group">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text">
-                                <i class="fas fa-portrait"></i>
-                                <i class="fa fa-asterisk asterik-style"></i>
-                            </span>
+            <div class="row">
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <span class="input-group-label"> Enable Mailbox:</span> <div class="checkbox-wrapper">
+                            <input asp-for="EnableMailbox" type="checkbox" id="EnableMailboxCheckbox" class="custom-checkbox">
+                            <label for="EnableMailboxCheckbox" class="custom-checkbox-label"></label>
                         </div>
-                        <span class="checkbox ml-2">
-                            <input asp-for="CanChangePassword" id="CanChangePassword" type="checkbox" data-toggle="toggle"
-                                   data-on="<i class='fas fa-lock-open'></i> Active"
-                                   data-off="<i class='fas fa-lock'></i> Lock"
-                                   data-onstyle="success"
-                                   data-offstyle="danger"
-                                   data-width="120">
-                        </span>
+                        
                     </div>
                 </div>
 
-                <!-- EnableMailbox -->
-                <div class="d-flex align-items-center">
-                    <span class="input-group-label mr-2">Enable Mailbox:</span>
-                    <div class="input-group">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text">
-                                <i class="far fa-comment-alt"></i>
-                                <i class="fa fa-asterisk asterik-style"></i>
-                            </span>
+                <div class="col-md-6">
+
+                    <div class="form-group">
+                        <span class="input-group-label"> Profile edit:</span>
+                        <div class="checkbox-wrapper">
+                            <input asp-for="CanChangePassword" type="checkbox" id="CanChangePasswordCheckbox" class="custom-checkbox">
+                            <label for="CanChangePasswordCheckbox" class="custom-checkbox-label"></label>
                         </div>
-                        <span class="checkbox ml-2">
-                            <input asp-for="EnableMailbox" id="EnableMailbox" type="checkbox" data-toggle="toggle"
-                                   data-on="<i class='fas fa-lock-open'></i> Active"
-                                   data-off="<i class='fas fa-lock'></i> Lock"
-                                   data-onstyle="success"
-                                   data-offstyle="danger"
-                                   data-width="120">
-                        </span>
+                        
                     </div>
                 </div>
             </div>
         }
-        
+
     </div>
     <div class="col-sm-6">
         <partial name="Vendor/_AgencyAddress" model="@Model" />
@@ -143,25 +124,23 @@
             </div>
         </div>
 
-@* 
+        @*
         <div class="form-group">
-            <span class="input-group-label"> Note:</span>
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <span class="input-group-text" ><i class="fas fa-pencil-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                </div>
-                <input type="text" id="Description" asp-for="Description" class="form-control remarks" placeholder="Enter Remarks" required maxlength="50" />
-            </div>
-            <span asp-validation-for="Description" class="text-danger"></span>
+        <span class="input-group-label"> Note:</span>
+        <div class="input-group mb-3">
+        <div class="input-group-prepend">
+        <span class="input-group-text" ><i class="fas fa-pencil-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+        </div>
+        <input type="text" id="Description" asp-for="Description" class="form-control remarks" placeholder="Enter Remarks" required maxlength="50" />
+        </div>
+        <span asp-validation-for="Description" class="text-danger"></span>
         </div> *@
-        @if(Model.SelectedByCompany)
+        @if (Model.SelectedByCompany)
         {
             <input type="hidden" id="Status" asp-for="Status" />
-
         }
         else
         {
-            
             <div class="form-group">
                 <label class="input-group-label"> Status:</label>
                 <div class="input-group mb-3">
@@ -196,6 +175,6 @@
                 }
             </div>
         </div>
-        
+
     </div>
 </div>

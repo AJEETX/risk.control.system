@@ -45,3 +45,17 @@
     margin-top: 40px;
     color: #777;
 }
+
+img.claims-logo {
+    outline: none;
+    text-decoration: none;
+    -ms-interpolation-mode: bicubic;
+    clear: both;
+    display: inline-block !important;
+    border: none;
+    height: auto;
+    float: none;
+    width: 35%;
+    max-width: 203px;
+    width: 200px;
+}
