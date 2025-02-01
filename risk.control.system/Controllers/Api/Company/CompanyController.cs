@@ -708,7 +708,6 @@ namespace risk.control.system.Controllers.Api.Company
             // Return the filtered pincodes
             return Ok(filteredPincodes);
         }
-
         [HttpGet("GetCountrySuggestions")]
         public IActionResult GetCountrySuggestions(string term = "")
         {
@@ -735,6 +734,39 @@ namespace risk.control.system.Controllers.Api.Company
                         Id = c.CountryId,
                         Name = c.Name,
                         Label = c.Name
+                    })?
+                    .ToList();
+            return Ok(countries);
+        }
+        [AllowAnonymous]
+        [HttpGet("GetCountryIsdCode")]
+        public IActionResult GetCountryIsdCode(string term = "")
+        {
+            var allCountries = _context.Country.ToList();
+
+            if (string.IsNullOrEmpty(term))
+                return Ok(allCountries
+                    .OrderBy(x => x.Name)
+                 .Take(10)
+                 .Select(c => new
+                 {
+                     IsdCode = $"+{c.ISDCode.ToString()}",
+                     Flag = "/flags/" + c.Code.ToLower() + ".png",
+                     Name = $"+{c.ISDCode.ToString()}",
+                     Label = $"+{c.ISDCode.ToString()}"
+                 })?
+                    .ToList());
+
+            var countries = allCountries
+                    .Where(c => c.Name.Contains(term, StringComparison.OrdinalIgnoreCase) || c.ISDCode.ToString().Contains(term, StringComparison.OrdinalIgnoreCase) || c.Code.Contains(term, StringComparison.OrdinalIgnoreCase))
+                    .OrderBy(x => x.Name)
+                 .Take(10)
+                    .Select(c => new
+                    {
+                        IsdCode = $"+{c.ISDCode.ToString()}",
+                        Flag = "/flags/" + c.Code.ToLower() + ".png",
+                        Name = $"+{c.ISDCode.ToString()}",
+                        Label = $"+{c.ISDCode.ToString()}"
                     })?
                     .ToList();
             return Ok(countries);

@@ -497,10 +497,10 @@ namespace risk.control.system.Controllers
             //// Generate the reset link
             //var resetLink = Url.Action(nameof(ResetPassword), "Account", new { userId = user.Id, token = encodedToken }, Request.Scheme);
 
-            var smsSent = await accountService.ForgotPassword(input.Email, input.Mobile);
+            var smsSent = await accountService.ForgotPassword(input.Email, input.Mobile, input.CountryId);
             if (smsSent)
             {
-                message = "Password sent to mobile: " + input.Mobile;
+                message = $"Password sent to mobile: {input.CountryId} (0) {input.Mobile}";
             }
             else
             {

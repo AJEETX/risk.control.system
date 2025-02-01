@@ -107,39 +107,10 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
-//const copyPasswordIcon = document.getElementById('copyPasswordIcon');
-//if (copyPasswordIcon) {
-//    copyPasswordIcon.addEventListener('click', function () {
-//        // Replace this with your actual password value or fetch dynamically if needed
-//        var password = document.getElementById('defaultpassword');
-
-//        // Create a temporary input element to hold the password text
-//        var tempInput = document.createElement('input');
-//        tempInput.value = password;
-//        document.body.appendChild(tempInput);
-
-//        // Select the text in the input
-//        tempInput.select();
-//        tempInput.setSelectionRange(0, 99999); // For mobile devices
-
-//        // Copy the text to the clipboard
-//        document.execCommand('copy');
-
-//        // Remove the temporary input element
-//        document.body.removeChild(tempInput);
-
-//        $('#copyPasswordIcon').attr('title', 'Password copied!');
-//        $('#copyPasswordIcon').tooltip('show');
-
-//        // Hide the tooltip after a short delay
-//        setTimeout(function () {
-//            $('#copyPasswordIcon').tooltip('hide');
-//        }, 2000); // Adjust the timeout for how long you want the tooltip to be visible
-//    });
-//}
-
 $(document).ready(function () {
 
+    validateMobile('#mobile', /[^0-9]/g); // Allow numeric only no spaces
+    $('#mobile')
     $("#flip").change(function () {
         if ($(this).prop("checked")) {
             // If checkbox is checked (Forgot Password form)
@@ -185,7 +156,6 @@ $(document).ready(function () {
             }
         }
     });
-
     // Trigger autocomplete on focus for both fields
     $("#email, #resetemail").on("focus", function () {
         console.log("Focus triggered");
@@ -197,12 +167,82 @@ $(document).ready(function () {
         }
     });
 
+    $("#CountryId").autocomplete({
+        source: function (request, response) {
+            $("#loader").show(); // Show loader
+            $.ajax({
+                url: "/api/Company/GetCountryIsdCode", // API endpoint for country suggestions
+                type: "GET",
+                data: { term: request.term }, // Use the term entered by the user
+                success: function (data) {
+                    // Ensure data is in the format [{ label: "CountryName", value: "CountryCode", countryId: "CountryId" }]
+                    response($.map(data, function (item) {
+                        return {
+                            label: item.isdCode,
+                            value: item.isdCode,
+                            flag: item.flag,
+                            countryId: item.isdCode  // Include the CountryId in the response
+                        };
+                    }));
+                    $("#loader").hide(); // Hide loader
+                },
+                error: function () {
+                    response([]);
+                    $("#loader").hide(); // Hide loader
+                }
+            });
+        },
+        minLength: 1, // Start showing suggestions after 1 character
+        select: function (event, ui) {
+            // Set the selected value to the input field
+            $(this).val('+' + ui.item.value);
+            // Optionally, set the CountryId in a hidden input or elsewhere if needed
+            $("#CountryId").val('+' +ui.item.countryId);
+        },
+        open: function () {
+            // Customize the dropdown menu to show flag next to the label
+            var autocompleteList = $(this).autocomplete("widget");
+            autocompleteList.find("li").each(function () {
+                var flagImg = $(this).data("flag");  // This line will be used for custom rendering
+
+                // Add the flag image before the text
+                $(this).find("a").prepend("<img src='" + flagImg + "' class='dropdown-flag' />");
+            });
+        },
+        focus: function (event, ui) {
+            // Prevent default focus behavior
+            return false;
+        },
+        messages: {
+            noResults: "No results found",
+            results: function (data) {
+                return `${data} result${data > 1 ? "s" : ""} found`;
+            }
+        }
+    });
+
+    // Trigger autocomplete on focus for country code field
+    $("#CountryId").on("focus", function () {
+        const countryCodeValue = $(this).val();
+        // If the field is empty, trigger autocomplete
+        if (!countryCodeValue.trim()) {
+            $(this).autocomplete("search", ""); // Trigger autocomplete with an empty search term
+        }
+    });
+
 
     $('input').on('focus', function () {
         $(this).select();
     });
 });
 
+function validateMobile(selector, regex) {
+    $(selector).on('input', function () {
+        const value = $(this).val();
+        // Remove invalid characters directly using the regex
+        $(this).val(value.replace(regex, ''));
+    });
+}
 function focusLogin() {
     const login = document.getElementById("email");
     if (login) {

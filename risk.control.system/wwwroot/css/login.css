@@ -11,16 +11,16 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 25px;
+    padding: 2px;
     border: 1px solid #ccc;
 }
 
 .container {
     position: relative;
-    max-width: 850px;
+    max-width: 900px;
     width: 100%;
     background: #fff;
-    padding: 40px 30px;
+    padding: 40px 20px;
     box-shadow: 0 5px 10px rgba(0,0,0,0.2);
     perspective: 2700px;
     border: 1px solid #ccc;
@@ -196,7 +196,10 @@ div .error-message {
 .left-padd {
     margin: 1rem;
 }
-
+.right-padd-mobile-icon{
+    margin:1em;
+    margin-left:8em;
+}
 .form-content .input-box input {
     height: 100%;
     width: 100%;
@@ -553,4 +556,15 @@ img.logo {
 .red-icon {
     color: darkblue;
     font-size:.7em;
+}
+.form-content .input-box input.country-code {
+    width: 45% !important;
+    padding: 1em;
+    padding-left:2em;
+}
+
+.ui-autocomplete .dropdown-flag {
+    width: 20px; /* Adjust flag size */
+    height: 12px;
+    margin-right: 8px; /* Space between the flag and the text */
 }

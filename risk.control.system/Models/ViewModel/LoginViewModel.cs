@@ -21,6 +21,7 @@ namespace risk.control.system.Models.ViewModel
 
         public string? LoginError { get; set; }
         public string? ResetError { get; set; }
+        public string? CountryId { get; set; }
         public string? Mobile { get; set; }
         public List<string>? Users { get; set; }
         public bool OtpLogin { get; set; }

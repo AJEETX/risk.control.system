@@ -122,29 +122,22 @@
                         <div class="input-boxes">
                             <div class="input-box">
                                 <i class="fas fa-envelope left-padd"></i>
-                                @if (Model.SetPassword)
-                                {
-                                    <select required id="resetemail" asp-for="Email" class="form-control remarks" asp-items="ViewBag.Users">
-                                        <option value=""> --- select user email --- </option>
-                                    </select>
-                                    <span asp-validation-for="Email" class="text-danger"></span>
-                                }
-                                else
-                                {
-                                    <div class="input-box autocomplete-wrapper">
-                                        <i class="fas fa-envelope left-padd"></i>
-                                        <input asp-for=Email id="resetemail" type="email" title="Email" class="form-control remarks auto-dropdown"
-                                               placeholder="Enter your email" autocomplete="off" required />
-                                        <div class="input-group-append-caret">
-                                            <span class="input-group-text"><i class="fas fa-caret-down"></i></span>
-                                        </div>
-                                        <span asp-validation-for="Email" class="text-danger"></span>
+                                <div class="input-box autocomplete-wrapper">
+                                    <i class="fas fa-envelope left-padd"></i>
+                                    <input asp-for=Email id="resetemail" type="email" title="Email" class="form-control remarks auto-dropdown"
+                                           placeholder="Enter your email" autocomplete="off" required />
+                                    <div class="input-group-append-caret">
+                                        <span class="input-group-text"><i class="fas fa-caret-down"></i></span>
                                     </div>
-                                }
+                                    <span asp-validation-for="Email" class="text-danger"></span>
+                                </div>
                             </div>
                             <div class="input-box">
-                                <i class="fa fa-mobile left-padd" aria-hidden="true"></i>
-                                <input asp-for="Mobile" id="mobile" name="mobile" class="form-control remarks" maxlength="14" type="text" placeholder="Phone (61432854196)" autocomplete="number"
+                                <i class="fa fa-globe left-padd" aria-hidden="true" title="Country code"></i>
+                                <input type="text" id="CountryId" name="CountryId" asp-asp-for="CountryId" class="form-control remarks country-code auto-dropdown" placeholder="Country" maxlength="3" autocomplete="off">
+
+                                <i class="fa fa-mobile right-padd-mobile-icon" aria-hidden="true"></i>
+                                <input asp-for="Mobile" id="mobile" name="mobile" class="form-control remarks" maxlength="10" type="text" placeholder="9432854196" autocomplete="number"
                                        required>
                                 <span asp-validation-for="Mobile" class="text-danger"></span>
                             </div>
