@@ -2,7 +2,6 @@
 
 @{
     ViewData["Title"] = "Login: icheckify";
-
     Layout = null;
 }
 <!DOCTYPE html>
@@ -58,13 +57,15 @@
             <div class="form-content">
 
                 <div class="login-form">
+                    <input type="hidden" id="defaultpassword" value="@Applicationsettings.Password" />
                     <img class="login-logo" src="/img/iCheckifyLogo.png" />™️
 
-                    <div id="title" class="title">Login</div>
+                    <div id="title" class="title" title="Default Password : @Applicationsettings.Password">
+                        Login
+                        <sup class="fa fa-info-circle red-icon" id="copyPasswordIcon"></sup>
+                    </div>
                     @Html.AntiForgeryToken()
                     <form id="login-form" asp-controller="Account" method="post">
-                        <input type="hidden" id="latlong" name="latlong" value="-37.1234,1401234" />
-                        <input type="hidden" id="show-users" name="show-users" value="true" />
                         <div class="input-boxes">
 
                             <div class="input-box autocomplete-wrapper">
@@ -95,11 +96,11 @@
                                 </div>
                             </div>
                             
-                            <p class="account">By clicking login, you agree to our <a class="termsLink" href="#">Terms & Conditions!</a></p>
+                            <p class="account">By clicking <strong><span class="fa fa-key" aria-hidden="true"></span> Login</strong>, you agree to <a class="termsLink" href="#">Terms & Conditions!</a></p>
                             <div class="button input-box">
                                 <button data-testid="logintest" id="login" type="submit" value="Login" class="btn btn-secondary btn-block"><span class="fa fa-key" aria-hidden="true"></span> Login</button>
                             </div>
-                            <div class="text">Forgot Password? <label for="flip" class="login-link">Click Here</label></div>
+                            <div class="text">Forgot Password? <span class="far fa-hand-point-right" aria-hidden="true"></span> <label for="flip" class="login-link"> Go Here</label></div>
                         </div>
                     </form>
                     <div class="error-message">
@@ -116,8 +117,8 @@
                 <div class="signup-form">
                     <img class="login-logo" src="/img/iCheckifyLogo.png" />™️
 
-                    <div class="title">Forgot Password</div>
-                    <form id="reset-form" asp-controller="Account" asp-action="Forgot" method="post">
+                    <div class="title">Get Password</div>
+                    <form id="reset-form" asp-controller="Account" asp-action="Forgot" method="post" autocomplete="off">
                         <div class="input-boxes">
                             <div class="input-box">
                                 <i class="fas fa-envelope left-padd"></i>
@@ -147,12 +148,12 @@
                                        required>
                                 <span asp-validation-for="Mobile" class="text-danger"></span>
                             </div>
-                            <p class="account">By clicking Reset, you agree to our <a class="termsLink" href="#">Terms & Conditions!</a></p>
+                            <p class="account">By clicking <strong> <span class="fa fa-unlock" aria-hidden="true"></span> Get</strong>, you agree to <a class="termsLink" href="#">Terms & Conditions!</a></p>
 
                             <div class="button input-box">
-                                <button id="reset-pwd" type="submit" class="btn btn-secondary btn-block"> Reset Password</button>
+                                <button id="reset-pwd" type="submit" class="btn btn-secondary btn-block"> <span class="fa fa-unlock" aria-hidden="true"></span> Get </button>
                             </div>
-                            <div class="text">Already member? <label for="flip" class="login-link">Login now</label></div>
+                            <div class="text">Already member? <span class="far fa-hand-point-right" aria-hidden="true"></span> <label for="flip" class="login-link"> Login</label></div>
                         </div>
                     </form>
                     <div class="error-message">

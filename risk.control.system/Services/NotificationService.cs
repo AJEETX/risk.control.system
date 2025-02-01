@@ -257,11 +257,11 @@ namespace risk.control.system.Services
             string yesUrl = $"{baseUrl}Y";
             string noUrl = $"{baseUrl}N";
 
-            //var address = new Uri("http://tinyurl.com/api-create.php?url=" + yesUrl);
-            //var yesTinyUrl = client.DownloadString(address);
+            var address = new Uri("http://tinyurl.com/api-create.php?url=" + yesUrl);
+            var yesTinyUrl = client.DownloadString(address);
 
-            //address = new Uri("http://tinyurl.com/api-create.php?url=" + noUrl);
-            //var noTinyUrl = client.DownloadString(address);
+            address = new Uri("http://tinyurl.com/api-create.php?url=" + noUrl);
+            var noTinyUrl = client.DownloadString(address);
             string agentMessage = $"Dear {recepientName}";
             agentMessage += "                       ";
             agentMessage += $"  {claim.CurrentClaimOwner} visit you on Date: {message.Time} for the claim policy {claim.PolicyDetail.ContractNumber}.            ";
@@ -275,17 +275,17 @@ namespace risk.control.system.Services
             //verifyMessage += "                                                       ";
             bool priority = true;
 
-            //var path = Path.Combine(webHostEnvironment.WebRootPath, "form", "ConfirmSchedule.html");
+            var path = Path.Combine(webHostEnvironment.WebRootPath, "form", "ConfirmSchedule.html");
 
-            //var subject = "Verify Your E-mail Address ";
-            //string HtmlBody = "";
-            //using (StreamReader stream = File.OpenText(path))
-            //{
-            //    HtmlBody = stream.ReadToEnd();
-            //}
+            var subject = "Verify Your E-mail Address ";
+            string HtmlBody = "";
+            using (StreamReader stream = File.OpenText(path))
+            {
+                HtmlBody = stream.ReadToEnd();
+            }
 
             var confirmPage = $"{message.BaseUrl + "/Confirm?id=" + message.ClaimId}";
-            var address = new Uri("http://tinyurl.com/api-create.php?url=" + confirmPage);
+            address = new Uri("http://tinyurl.com/api-create.php?url=" + confirmPage);
             var confirmTinyUrl = client.DownloadString(address);
 
             string? callbackUrl = message.BaseUrl + "";
@@ -298,15 +298,15 @@ namespace risk.control.system.Services
             finalMessage += "Thanks";
             finalMessage += "                                                                               ";
             finalMessage += logo;
-            //string messageBody = string.Format(HtmlBody,
-            //    subject,
-            //    string.Format("{0:dddd, d MMMM yyyy}", DateTime.Now),
-            //    recepientName,
-            //    recepientName,
-            //    confirmPageUrl,
-            //    yesTinyUrl,
-            //    noTinyUrl
-            //    );
+            string messageBody = string.Format(HtmlBody,
+                subject,
+                string.Format("{0:dddd, d MMMM yyyy}", DateTime.Now),
+                recepientName,
+                recepientName,
+                confirmPageUrl,
+                yesTinyUrl,
+                noTinyUrl
+                );
 
             await smsService.DoSendSmsAsync("+" +isdCode + mobile, finalMessage);
             var meetingTime = DateTime.Now.AddDays(1);

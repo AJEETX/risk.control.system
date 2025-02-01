@@ -107,6 +107,37 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
+//const copyPasswordIcon = document.getElementById('copyPasswordIcon');
+//if (copyPasswordIcon) {
+//    copyPasswordIcon.addEventListener('click', function () {
+//        // Replace this with your actual password value or fetch dynamically if needed
+//        var password = document.getElementById('defaultpassword');
+
+//        // Create a temporary input element to hold the password text
+//        var tempInput = document.createElement('input');
+//        tempInput.value = password;
+//        document.body.appendChild(tempInput);
+
+//        // Select the text in the input
+//        tempInput.select();
+//        tempInput.setSelectionRange(0, 99999); // For mobile devices
+
+//        // Copy the text to the clipboard
+//        document.execCommand('copy');
+
+//        // Remove the temporary input element
+//        document.body.removeChild(tempInput);
+
+//        $('#copyPasswordIcon').attr('title', 'Password copied!');
+//        $('#copyPasswordIcon').tooltip('show');
+
+//        // Hide the tooltip after a short delay
+//        setTimeout(function () {
+//            $('#copyPasswordIcon').tooltip('hide');
+//        }, 2000); // Adjust the timeout for how long you want the tooltip to be visible
+//    });
+//}
+
 $(document).ready(function () {
 
     $("#flip").change(function () {

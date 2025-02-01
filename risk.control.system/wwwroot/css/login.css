@@ -356,18 +356,24 @@ p.account, p.account1 {
             text-decoration: none;
         }
 
-#watermark {
-    position: fixed;
-    z-index: 10000;
-    bottom: 400px;
-    left: 150px;
-    font-size: 30px;
-    font-weight: bold;
-    font-style: italic;
-    color: red;
-    transform: rotate(-40deg);
-    opacity: 0.2;
-}
+    p.account strong span {
+        padding: 2px;
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 2px;
+    }
+    #watermark {
+        position: fixed;
+        z-index: 10000;
+        bottom: 400px;
+        left: 150px;
+        font-size: 30px;
+        font-weight: bold;
+        font-style: italic;
+        color: red;
+        transform: rotate(-40deg);
+        opacity: 0.2;
+    }
 
 img.logo {
     height: 40px !important;
@@ -543,4 +549,8 @@ img.logo {
 #eyeIconCurrent:focus {
     outline: none;
     box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Add focus ring on icon */
+}
+.red-icon {
+    color: darkblue;
+    font-size:.7em;
 }

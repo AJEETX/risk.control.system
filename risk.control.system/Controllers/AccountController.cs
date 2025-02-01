@@ -336,11 +336,20 @@ namespace risk.control.system.Controllers
 
         [AllowAnonymous]
         [HttpGet]
-        public IActionResult ChangePassword(string email)
+        public async Task<IActionResult> ChangePassword(string email)
         {
+            var user = await _userManager.FindByEmailAsync(email);
+
+            if (user == null)
+            {
+                notifyService.Custom($"Password update Error", 3, "red", "fa fa-lock");
+
+                return RedirectToAction("Login");
+            }
             var model = new ChangePasswordViewModel
             {
-                Email = email
+                Email = email,
+                CurrentPassword = user.Password
             };
             return View(model);
         }

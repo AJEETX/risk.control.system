@@ -48,13 +48,12 @@
 
 $(document).ready(function () {
 
-    const currentpassword = $('#CurrentPassword');
+    const currentpassword = $('#NewPassword');
     if (currentpassword) {
         currentpassword.focus()
     }
 
     $('#editButton').on('click', function (e) {
-        e.preventDefault();
         $("#edit-form").addClass("submit-progress-bg");
 
         // Update UI with a short delay to show spinner

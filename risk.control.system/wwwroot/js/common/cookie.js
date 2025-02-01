@@ -68,7 +68,7 @@
                 }
 
                 cookieManagePopup.fadeOut(); // Hide manage popup
-                showAlertWithAutoClose("Preferences saved successfully.", 10);
+                //showAlertWithAutoClose("Preferences saved successfully.", 10);
                 const login = document.getElementById("email");
                 if (login) {
                     login.focus();
@@ -107,7 +107,7 @@ function acceptCookies(cookieCancel) {
             if (!getCookie("cookieConsent")) {
                 setCookie("cookieConsent", "Accepted", 365); // Set consent for 1 year
             }
-            showAlertWithAutoClose(`<i class="fas fa-check"></i> ${message}`, 1);
+            //showAlertWithAutoClose(`<i class="fas fa-check"></i> ${message}`, 1);
             const login = document.getElementById("email");
             if (login) {
                 login.focus();
@@ -133,7 +133,7 @@ async function revokeCookies(cookiePopup) {
         if (data.perfomanceCookies !== undefined) {
             document.cookie = `perfomanceCookies=${data.perfomanceCookies}; path=/; max-age=${365 * 24 * 60 * 60}`;
         }
-        const message = data.message || "Cookies have been successfully accepted.";
+        //const message = data.message || "Cookies have been successfully accepted.";
         if (!getCookie("cookieConsent")) {
             setCookie("cookieConsent", "Accepted", 365); // Set consent for 1 year
         }

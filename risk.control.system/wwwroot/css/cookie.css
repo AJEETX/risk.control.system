@@ -278,7 +278,7 @@
 }
 /* Example style for cookie descriptions */
 .cookie-description {
-    font-size: 10px;
+    font-size: 1em;
     color: #555;
     margin-top: 5px;
     line-height: 1.4;
