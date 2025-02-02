@@ -166,7 +166,6 @@ $(document).ready(function () {
             $(this).autocomplete("search", ""); // Trigger autocomplete with an empty search term
         }
     });
-
     $("#CountryId").autocomplete({
         source: function (request, response) {
             $("#loader").show(); // Show loader
@@ -175,13 +174,14 @@ $(document).ready(function () {
                 type: "GET",
                 data: { term: request.term }, // Use the term entered by the user
                 success: function (data) {
-                    // Ensure data is in the format [{ label: "CountryName", value: "CountryCode", countryId: "CountryId" }]
+                    console.log(data); // Check what the server is sending
+                    // Ensure data is in the format [{ label: "CountryName", value: "CountryCode", countryId: "CountryId", flag: "FlagImage" }]
                     response($.map(data, function (item) {
                         return {
-                            label: item.isdCode,
-                            value: item.isdCode,
-                            flag: item.flag,
-                            countryId: item.isdCode  // Include the CountryId in the response
+                            label: item.label,  // This will be displayed as the text
+                            value: item.isdCode,  // This will be used for the input value
+                            flag: item.flag,   // Store the flag image URL
+                            countryId: item.countryId  // Store the country ID
                         };
                     }));
                     $("#loader").hide(); // Hide loader
@@ -193,25 +193,29 @@ $(document).ready(function () {
             });
         },
         minLength: 1, // Start showing suggestions after 1 character
+        autoFocus: true, // Automatically highlight the first item in the list
         select: function (event, ui) {
             // Set the selected value to the input field
             $(this).val('+' + ui.item.value);
             // Optionally, set the CountryId in a hidden input or elsewhere if needed
-            $("#CountryId").val('+' +ui.item.countryId);
-        },
-        open: function () {
-            // Customize the dropdown menu to show flag next to the label
-            var autocompleteList = $(this).autocomplete("widget");
-            autocompleteList.find("li").each(function () {
-                var flagImg = $(this).data("flag");  // This line will be used for custom rendering
+            $("#CountryId").val(ui.item.value);
 
-                // Add the flag image before the text
-                $(this).find("a").prepend("<img src='" + flagImg + "' class='dropdown-flag' />");
-            });
+            // Set the flag image based on the selected country
+            $("#country-flag").attr("src", ui.item.flag); // Update the flag image source
+
+            // Prevent the input field from allowing custom values
+            return false; // This stops the input from being updated by the user directly
         },
         focus: function (event, ui) {
-            // Prevent default focus behavior
-            return false;
+            // Prevent default focus behavior, to allow selecting only from the list
+            return false; // This prevents the input field from updating when an item is highlighted
+        },
+        change: function (event, ui) {
+            // If the value doesn't match any of the autocomplete suggestions, clear the input
+            if (!ui.item) {
+                $(this).val(''); // Optionally clear the input field
+                $("#country-flag").attr("src", "/img/no-map.jpeg"); // Reset flag image to default
+            }
         },
         messages: {
             noResults: "No results found",

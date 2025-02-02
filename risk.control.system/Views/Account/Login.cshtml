@@ -62,7 +62,7 @@
 
                     <div id="title" class="title" title="Default Password : @Applicationsettings.Password">
                         Login
-                        <sup class="fa fa-info-circle red-icon copyPasswordIcon"></sup>
+                        <sup class="fa fa-info-circle red-icon fa-spin"></sup>
                     </div>
                     @Html.AntiForgeryToken()
                     <form id="login-form" asp-controller="Account" method="post">
@@ -117,7 +117,7 @@
                 <div class="signup-form">
                     <img class="login-logo" src="/img/iCheckifyLogo.png" />™️
 
-                    <div class="title">Password
+                    <div class="title" title="Get Password !!!">Password
                         <sup class="fa fa-info-circle red-icon copyPasswordIcon"></sup>
 
                     </div>
@@ -134,9 +134,15 @@
                                     <span asp-validation-for="Email" class="text-danger"></span>
                                 </div>
                             </div>
+
                             <div class="input-box">
-                                <i class="fa fa-globe left-padd" aria-hidden="true" title="Country code"></i>
-                                <input type="text" id="CountryId" name="CountryId" asp-for="CountryId" title="ISD code" class="form-control remarks country-code auto-dropdown" required placeholder="ISD code" maxlength="3" autocomplete="off">
+                                <div class="input-group-prepend">
+                                    <span class="form-group input-group mb-3 input-group-text country-code-text" data-toggle="tooltip" title="Country Code">
+                                        <img id="country-flag" src="~/img/no-map.jpeg" class="flag-icon" data-toggle="tooltip" />
+                                    </span>
+                                </div>
+                                @* <i class="fa fa-globe left-padd" aria-hidden="true" title="Country code"></i> *@
+                                <input type="text" id="CountryId" name="CountryId" asp-for="CountryId" title="ISD code" class="form-control remarks country-code auto-dropdown" required placeholder="ISD code" maxlength="4" autocomplete="off">
                                 <div class="input-group-append-caret">
                                     <span class="input-group-text"><i class="fas fa-caret-down"></i></span>
                                 </div>

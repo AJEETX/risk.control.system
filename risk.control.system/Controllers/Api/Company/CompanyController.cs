@@ -110,7 +110,7 @@ namespace risk.control.system.Controllers.Api.Company
                     Flag = "/flags/" + u.Country.Code.ToLower() + ".png",
                     Roles = u.UserRole != null ? $"<span class=\"badge badge-light\">{u.UserRole.GetEnumDisplayName()}</span>" : "<span class=\"badge badge-light\">...</span>",
                     Pincode = u.PinCode.Code,
-                    PincodeLabel = u.PinCode.Name + " - " +u.PinCode.Code,
+                    PincodeLabel = u.PinCode.Name + " - " + u.PinCode.Code,
                     Updated = u.Updated.HasValue ? u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy"),
                     UpdateBy = u.UpdatedBy,
                     IsUpdated = u.IsUpdated,
@@ -227,9 +227,9 @@ namespace risk.control.system.Controllers.Api.Company
                     Updated = u.Updated.HasValue ? u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy"),
                     UpdateBy = u.UpdatedBy,
                     CanOnboard = u.Status == VendorStatus.ACTIVE &&
-                        u.VendorInvestigationServiceTypes != null && 
-                        u.VendorApplicationUser != null && 
-                        u.VendorApplicationUser.Count > 0 && 
+                        u.VendorInvestigationServiceTypes != null &&
+                        u.VendorApplicationUser != null &&
+                        u.VendorApplicationUser.Count > 0 &&
                         u.VendorInvestigationServiceTypes.Count > 0,
                     VendorName = u.Email,
                     IsUpdated = u.IsUpdated,
@@ -537,9 +537,9 @@ namespace risk.control.system.Controllers.Api.Company
         [HttpGet("GetDistrictName")]
         public IActionResult GetDistrictName(long id, long stateId, long countryId)
         {
-            if(id ==-1)
+            if (id == -1)
             {
-                var result = new 
+                var result = new
                 {
                     DistrictId = -1, // Special value for "ALL DISTRICTS"
                     DistrictName = Applicationsettings.ALL_DISTRICT
@@ -752,8 +752,8 @@ namespace risk.control.system.Controllers.Api.Company
                  {
                      IsdCode = $"+{c.ISDCode.ToString()}",
                      Flag = "/flags/" + c.Code.ToLower() + ".png",
-                     Name = $"+{c.ISDCode.ToString()}",
-                     Label = $"+{c.ISDCode.ToString()}"
+                     CountryId = $"{c.Code.ToString()}",
+                     Label = $"+{c.ISDCode.ToString()} {c.Code}"
                  })?
                     .ToList());
 
@@ -765,8 +765,8 @@ namespace risk.control.system.Controllers.Api.Company
                     {
                         IsdCode = $"+{c.ISDCode.ToString()}",
                         Flag = "/flags/" + c.Code.ToLower() + ".png",
-                        Name = $"+{c.ISDCode.ToString()}",
-                        Label = $"+{c.ISDCode.ToString()}"
+                        CountryId = $"{c.Code.ToString()}",
+                        Label = $"+{c.ISDCode.ToString()} {c.Code}"
                     })?
                     .ToList();
             return Ok(countries);

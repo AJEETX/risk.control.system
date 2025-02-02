@@ -7,6 +7,8 @@
 }
 
 body {
+    min-width:420px;
+    overflow-x:auto;
     min-height: 100vh;
     display: flex;
     align-items: center;
@@ -194,11 +196,12 @@ div .error-message {
 }
 
 .left-padd {
-    margin: 3%;
+    margin: 1em;
+    margin-left: 3%;
 }
 .right-padd-mobile-icon{
     margin:1em;
-    margin-left:35%;
+    margin-left:40%;
 }
 .form-content .input-box input {
     height: 100%;
@@ -276,13 +279,20 @@ div .error-message {
     cursor: pointer;
 }
 
-    input:focus {
-        border: 1px solid #333;
-        background-color: whitesmoke;
-    }
+input:focus {
+    border: 1px solid #333;
+    background-color: whitesmoke;
+}
+#CountryId {
+    font-size: 1em; /* Adjust the size as needed */
+    width:55%;
+    padding-left:3em;
+}
     #CountryId::placeholder {
-        font-size: 12px; /* Adjust the size as needed */
-        color: #999; /* Optional: You can also adjust the placeholder color */
+        font-size: .9em; /* Adjust the size as needed */
+        color: #827373; /* Optional: You can also adjust the placeholder color */
+        font-family: Arial, Helvetica, sans-serif;
+        padding-left: 2%;
     }
 .input-validation-error {
     border-color: red !important;
@@ -561,13 +571,35 @@ img.logo {
     font-size:.7em;
 }
 .form-content .input-box input.country-code {
-    width: 45% !important;
     padding: 1em;
-    padding-left:2em;
 }
 
-.ui-autocomplete .dropdown-flag {
-    width: 20px; /* Adjust flag size */
-    height: 12px;
-    margin-right: 8px; /* Space between the flag and the text */
+.dropdown-flag {
+    width: 20px;
+    height: 14px;
+    margin-right: 8px;
+    vertical-align: middle; /* Align flag vertically with text */
+}
+.flag-icon {
+    height: 100%;
+    width: 100%;
+    border: 1px solid #ddd;
+}
+.country-code-text {
+    position: absolute;
+    top: 50%;
+    left: 10px; /* Adjust this to your needs */
+    transform: translateY(-50%); /* Vertically center the flag */
+    pointer-events: none; /* Prevent flag from being clicked */
+}
+.input-group-prepend{
+    height:100%;
+}
+#country-flag {
+    width: 20px; /* Adjust the size of the flag */
+    height: 14px; /* Adjust the size of the flag */
+}
+.input-group-append-caret {
+    display: flex;
+    align-items: center;
 }

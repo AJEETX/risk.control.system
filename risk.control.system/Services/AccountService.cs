@@ -4,12 +4,13 @@ using Microsoft.EntityFrameworkCore;
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
+using risk.control.system.Models;
 
 namespace risk.control.system.Services
 {
     public interface IAccountService
     {
-        Task<bool> ForgotPassword(string useremail, string mobile, string countryCode);
+        Task<ApplicationUser> ForgotPassword(string useremail, string mobile, string countryCode);
     }
 
     public class AccountService : IAccountService
@@ -28,7 +29,7 @@ namespace risk.control.system.Services
             this.httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<bool> ForgotPassword(string useremail, string mobile, string countryCode)
+        public async Task<ApplicationUser> ForgotPassword(string useremail, string mobile, string countryCode)
         {
             //CHECK AND VALIDATE EMAIL PASSWORD
             var resetPhone = countryCode.TrimStart('+') + mobile.Trim().ToString();
@@ -54,7 +55,7 @@ namespace risk.control.system.Services
             }
             //SEND SMS
 
-            return user != null;
+            return user;
         }
     }
 }

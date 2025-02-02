@@ -18,9 +18,9 @@
                         </div>
                     <!-- Add Image Below the Welcome Message -->
                     <div class="text-center">
-                        <img class="icheckify-logo" src="~/headers/information.gif" alt="Welcome Image" class="img-fluid" />
+                        <img class="icheckify-logo img-fluid" src="~/headers/information.gif" alt="Password processed" />
                     </div>
-                    <div class="text-muted">@Model.Message.</div>
+                    <div class="text-muted"><span>Password sent to mobile: </span> <img class="flag-icon" src="@Model.Flag" alt="Country flag" />@Model.Message.</div>
                     </div>
                     <div class="card-footer text-center">
                         @if(Model.Reset)

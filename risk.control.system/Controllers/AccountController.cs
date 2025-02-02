@@ -497,10 +497,12 @@ namespace risk.control.system.Controllers
             //// Generate the reset link
             //var resetLink = Url.Action(nameof(ResetPassword), "Account", new { userId = user.Id, token = encodedToken }, Request.Scheme);
 
-            var smsSent = await accountService.ForgotPassword(input.Email, input.Mobile, input.CountryId);
-            if (smsSent)
+            var smsSent2User = await accountService.ForgotPassword(input.Email, input.Mobile, input.CountryId);
+            var flagPath = $"/img/no-map.jpeg";
+            if (smsSent2User != null)
             {
-                message = $"Password sent to mobile: {input.CountryId} (0) {input.Mobile}";
+                message = $"{input.CountryId} (0) {input.Mobile}";
+                flagPath = $"/flags/{smsSent2User.Country.Code}.png";
             }
             else
             {
@@ -509,7 +511,8 @@ namespace risk.control.system.Controllers
             var model = new Models.ViewModel.ForgotPassword
             {
                 Message = message,
-                Reset = smsSent
+                Reset = smsSent2User != null,
+                Flag = flagPath
             };
             return View(model);
         }
