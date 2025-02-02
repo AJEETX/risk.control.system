@@ -37,15 +37,11 @@
         columnDefs: [
             {
                 className: 'max-width-column-name', // Apply the CSS class,
-                targets: 3                      // Index of the column to style
+                targets: 4                      // Index of the column to style
             },
             {
                 className: 'max-width-column-name', // Apply the CSS class,
-                targets: 3                      // Index of the column to style
-            },
-            {
-                className: 'max-width-column-name', // Apply the CSS class,
-                targets: 10                      // Index of the column to style
+                targets: 11                      // Index of the column to style
             }],
         language: {
             loadingRecords: '&nbsp;',
@@ -58,10 +54,31 @@
                 "data": "id", "name": "Id", "bVisible": false
             },
             {
+                "data": "onlineStatus",
+                "sDefaultContent": '<i class="fas fa-circle" style="color: green;"></i> ',
+                "bSortable": false,
+                "mRender": function (data, type, row) {
+                    var iconClass = row.onlineStatusIcon; // Class for the icon
+                    var colorClass = getColorClass(data); // Class for the color
+                    var tooltip = row.onlineStatusName; // Tooltip text
+                    var img = `<i class="${iconClass} ${colorClass}" title="${tooltip}" data-toggle="tooltip"></i>`;
+                    return img;
+                }
+            },
+            {
                 "sDefaultContent": "",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var img = '<img alt="' + row.name + '" title="' + row.name + '" src="' + row.photo + '" class="table-profile-image" data-toggle="tooltip"/>';
+                    var buttons = "";
+                    buttons += '<span class="checkbox">';
+                    if (row.loginVerified) {
+                        buttons += '<i class="fa fa-check-circle text-light-green" title="User Login verified" data-toggle="tooltip"></i>';  // Green for checked
+                    } else {
+                        buttons += '<i class="fa fa-check text-lightgray" title="User Login not verified" data-toggle="tooltip"></i>';  // Grey for unchecked
+                    }
+                    buttons += '</span>';
+                    img += ' ' + buttons;
                     return img;
                 }
             },
@@ -151,7 +168,17 @@
         });
     });
 });
+function getColorClass(color) {
+    switch (color.toLowerCase()) {
+        case "green":
+            return "online-status-green";
 
+        case "orange":
+            return "online-status-orange";
+        default:
+            return "online-icon-default"; // Fallback class
+    }
+}
 function showedit(id) {
     $("body").addClass("submit-progress-bg");
     // Wrap in setTimeout so the UI

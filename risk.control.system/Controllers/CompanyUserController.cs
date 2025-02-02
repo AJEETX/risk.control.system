@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.FeatureManagement;
 
 using NToastNotify;
 
@@ -35,6 +36,7 @@ namespace risk.control.system.Controllers
         private readonly IToastNotification toastNotification;
         private readonly ISmsService smsService;
         private readonly ApplicationDbContext _context;
+        private readonly IFeatureManager featureManager;
 
         public CompanyUserController(UserManager<ClientCompanyApplicationUser> userManager,
             IPasswordHasher<ClientCompanyApplicationUser> passwordHasher,
@@ -43,6 +45,7 @@ namespace risk.control.system.Controllers
             IWebHostEnvironment webHostEnvironment,
             IToastNotification toastNotification,
             ISmsService SmsService,
+            IFeatureManager featureManager,
             ApplicationDbContext context)
         {
             this.userManager = userManager;
@@ -52,6 +55,7 @@ namespace risk.control.system.Controllers
             this.webHostEnvironment = webHostEnvironment;
             this.toastNotification = toastNotification;
             smsService = SmsService;
+            this.featureManager = featureManager;
             this._context = context;
             UserList = new List<UsersViewModel>();
         }
@@ -206,7 +210,7 @@ namespace risk.control.system.Controllers
             var createPage = new MvcBreadcrumbNode("Index", "CompanyUser", $"Users") { Parent = agencyPage, RouteValues = new { id = user.ClientCompany.ClientCompanyId } };
             var editPage = new MvcBreadcrumbNode("Edit", "CompanyUser", $"Edit User") { Parent = createPage };
             ViewData["BreadcrumbNode"] = editPage;
-
+            user.IsPasswordChangeRequired = await featureManager.IsEnabledAsync(nameof(FeatureFlags.FIRST_LOGIN_CONFIRMATION)) ? !user.IsPasswordChangeRequired : true;
             return View(user);
         }
 

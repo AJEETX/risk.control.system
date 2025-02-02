@@ -75,50 +75,8 @@ namespace risk.control.system.Controllers.Api.Company
         public async Task<IActionResult> CompanyUsers(long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
-            var adminUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
-            if (adminUser is null || !adminUser.IsSuperAdmin)
-            {
-                return BadRequest();
-            }
+            var result = await userService.GetCompanyUsers(userEmail, id);
 
-            var companyUsers = _context.ClientCompanyApplicationUser
-                .Include(u => u.PinCode)
-                .Include(u => u.Country)
-                .Include(u => u.District)
-                .Include(u => u.State)
-                .Where(c => c.ClientCompanyId == id);
-
-            var users = companyUsers
-                .Where(u => !u.Deleted)?
-                .OrderBy(u => u.FirstName)
-                .ThenBy(u => u.LastName)
-                .AsQueryable();
-            var result =
-                users?.Select(u =>
-                new
-                {
-                    Id = u.Id,
-                    Name = u.FirstName + " " + u.LastName,
-                    Email = $"<a href='/CompanyUser/Edit?userId={u.Id}'>{u.Email}</a>",
-                    RawEmail = u.Email,
-                    Phone = "(+" + u.Country.ISDCode + ") " + u.PhoneNumber,
-                    Photo = u.ProfilePicture == null ? noUserImagefilePath : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(u.ProfilePicture)),
-                    Active = u.Active,
-                    Addressline = u.Addressline + ", " + u.District.Name,
-                    State = u.State.Code,
-                    Country = u.Country.Code,
-                    Flag = "/flags/" + u.Country.Code.ToLower() + ".png",
-                    Roles = u.UserRole != null ? $"<span class=\"badge badge-light\">{u.UserRole.GetEnumDisplayName()}</span>" : "<span class=\"badge badge-light\">...</span>",
-                    Pincode = u.PinCode.Code,
-                    PincodeLabel = u.PinCode.Name + " - " + u.PinCode.Code,
-                    Updated = u.Updated.HasValue ? u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy"),
-                    UpdateBy = u.UpdatedBy,
-                    IsUpdated = u.IsUpdated,
-                    LastModified = u.Updated
-                })?.ToArray();
-
-            companyUsers?.ToList().ForEach(u => u.IsUpdated = false);
-            await _context.SaveChangesAsync();
             return Ok(result);
         }
 

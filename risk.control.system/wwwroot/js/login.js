@@ -12,7 +12,7 @@ $.validator.setDefaults({
         $('#login').html('<span class="fas fa-sync fa-spin" aria-hidden="true"></span> Login');
         $('#reset-pwd').html('<span class="fas fa-sync fa-spin" aria-hidden="true"></span> Get');
 
-        $('a').attr('disabled', 'disabled');
+        $('input').attr('disabled', 'disabled');
         $('#login').attr('disabled', 'disabled');
         $('#login').addClass('login-disabled');
         $('html a').addClass('anchor-disabled');
@@ -26,8 +26,7 @@ $.validator.setDefaults({
         $('#reset-form').attr('disabled', 'disabled');
 
         $('#email, .login-link').attr('disabled', 'disabled');
-        $('.login-link').attr('disabled', 'disabled');
-        $('#flip').attr('disabled', 'disabled');
+        $('.login-link').addClass('anchor-disabled');
 
         $('#resetemail').attr('disabled', 'disabled');
 
