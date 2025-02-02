@@ -81,6 +81,16 @@
                     else {
                         img = '<img alt="' + row.name + '" title="Onboarding incomplete !!! ' + row.name + '" src="' + row.photo + '" class="table-profile-image-agent-onboard" data-toggle="tooltip"/>';
                     }
+                    var buttons = "";
+                    buttons += '<span class="checkbox">';
+                    if (row.loginVerified) {
+                        buttons += '<i class="fa fa-check-circle text-light-green" title="User Login verified" data-toggle="tooltip"></i>';  // Green for checked
+
+                    } else {
+                        buttons += '<i class="fa fa-check text-lightgray" title="User Login not verified" data-toggle="tooltip"></i>';  // Grey for unchecked
+                    }
+                    buttons += '</span>';
+                    img += ' ' + buttons;
                     return img;
                 }
             },

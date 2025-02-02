@@ -1,10 +1,13 @@
-﻿using AspNetCoreHero.ToastNotification.Abstractions;
+﻿using Amazon.Rekognition.Model;
+
+using AspNetCoreHero.ToastNotification.Abstractions;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.FeatureManagement;
 
 using NToastNotify;
 
@@ -32,12 +35,14 @@ namespace risk.control.system.Controllers
         public List<UsersViewModel> UserList;
         private readonly ApplicationDbContext context;
         private IPasswordHasher<ApplicationUser> passwordHasher;
+        private readonly IFeatureManager featureManager;
 
         public UserController(UserManager<ApplicationUser> userManager,
             IPasswordHasher<ApplicationUser> passwordHasher,
             RoleManager<ApplicationRole> roleManager,
             IWebHostEnvironment webHostEnvironment,
             INotyfService notifyService,
+            IFeatureManager featureManager,
             IToastNotification toastNotification,
             ISmsService SmsService,
             ApplicationDbContext context)
@@ -49,6 +54,7 @@ namespace risk.control.system.Controllers
             this.notifyService = notifyService;
             this.toastNotification = toastNotification;
             smsService = SmsService;
+            this.featureManager = featureManager;
             this.context = context;
             UserList = new List<UsersViewModel>();
         }
@@ -121,18 +127,9 @@ namespace risk.control.system.Controllers
             {
                 return NotFound();
             }
-
             var applicationUser = await userManager.FindByIdAsync(userId);
-
-            //GetCountryStateEdit(applicationUser);
-
-            if (applicationUser != null)
-                return View(applicationUser);
-            else
-            {
-                toastNotification.AddErrorToastMessage("user not found!");
-                return RedirectToAction("Index");
-            }
+            applicationUser.IsPasswordChangeRequired = await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION) ? !applicationUser.IsPasswordChangeRequired : true;
+            return View(applicationUser);
         }
 
         [HttpPost]
@@ -224,8 +221,11 @@ namespace risk.control.system.Controllers
                         Errors(result);
                     }
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (Exception ex)
                 {
+                    Console.WriteLine(ex.StackTrace);
+                    toastNotification.AddErrorToastMessage("Error !!. The user con't be edited!");
+                    return RedirectToAction(nameof(Index), "Dashboard");
                 }
             }
 

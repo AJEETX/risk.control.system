@@ -1255,6 +1255,40 @@ img.doc-profile-image {
     cursor: none;
 }
 
+.submit-progress-password {
+    position: fixed;
+    left: 50%;
+    height: 10em;
+    margin-left:10%;
+    padding-top: 2.5em;
+    /* The following rules are the
+    ones most likely to change */
+    width: 15em;
+    /* Set 'margin-left' to a negative number
+    that is 1/2 of 'width' */
+    padding-left: 5em;
+    background-color: white;
+    color: black;
+    -webkit-border-radius: 0.4em;
+    -moz-border-radius: 0.4em;
+    border-radius: 0.4em;
+    border: 1px solid rgba(0,0,0,0.6);
+    box-shadow: 0.4em 0.4em rgba(0,0,0,0.6);
+    -webkit-box-shadow: 0.4em 0.4em rgba(0,0,0,0.6);
+    -moz-box-shadow: 0.4em 0.4em rgba(0,0,0,0.6);
+    z-index: 999;
+}
+
+.submit-progress-password.hidden {
+    display: none;
+}
+
+.submit-progress-password-bg {
+    background-color: lightgray;
+    opacity: .5;
+    cursor: none;
+}
+
 .col-5 {
     margin-top: .6rem;
 }

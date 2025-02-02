@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.FeatureManagement;
 
 using NToastNotify;
 
@@ -36,6 +37,7 @@ namespace risk.control.system.Controllers
         private readonly RoleManager<ApplicationRole> roleManager;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly ISmsService smsService;
+        private readonly IFeatureManager featureManager;
 
         public CompanyController(ApplicationDbContext context,
             UserManager<ClientCompanyApplicationUser> userManager,
@@ -45,6 +47,7 @@ namespace risk.control.system.Controllers
             ICustomApiCLient customApiCLient,
             RoleManager<ApplicationRole> roleManager,
             IWebHostEnvironment webHostEnvironment,
+            IFeatureManager featureManager,
             ISmsService SmsService)
         {
             this._context = context;
@@ -54,6 +57,7 @@ namespace risk.control.system.Controllers
             this.userManager = userManager;
             this.userAgencyManager = userAgencyManager;
             this.roleManager = roleManager;
+            this.featureManager = featureManager;
             this.webHostEnvironment = webHostEnvironment;
             smsService = SmsService;
         }
@@ -363,7 +367,7 @@ namespace risk.control.system.Controllers
                     notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                
+                clientCompanyApplicationUser.IsPasswordChangeRequired = await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION) ? !clientCompanyApplicationUser.IsPasswordChangeRequired : true;
                 return View(clientCompanyApplicationUser);
             }
             catch (Exception ex)
@@ -902,7 +906,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(" Edit User", FromAction = "AgencyUsers")]
-        public IActionResult EditAgencyUser(long? userId)
+        public async Task<IActionResult> EditAgencyUser(long? userId)
         {
             try
             {
@@ -922,7 +926,7 @@ namespace risk.control.system.Controllers
                     notifyService.Error("OOPS !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                
+                vendorApplicationUser.IsPasswordChangeRequired = await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION) ? !vendorApplicationUser.IsPasswordChangeRequired : true;
                 return View(vendorApplicationUser);
             }
             catch (Exception ex)

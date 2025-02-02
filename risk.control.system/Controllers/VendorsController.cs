@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.FeatureManagement;
 
 using NToastNotify;
 
@@ -32,28 +33,28 @@ namespace risk.control.system.Controllers
         private readonly UserManager<VendorApplicationUser> userManager;
         private readonly RoleManager<ApplicationRole> roleManager;
         private readonly INotyfService notifyService;
-        private readonly IToastNotification toastNotification;
         private readonly ICustomApiCLient customApiCLient;
         private readonly ISmsService smsService;
         private readonly IWebHostEnvironment webHostEnvironment;
+        private readonly IFeatureManager featureManager;
 
         public VendorsController(
             ApplicationDbContext context,
             UserManager<VendorApplicationUser> userManager,
             RoleManager<ApplicationRole> roleManager,
             INotyfService notifyService,
-            IToastNotification toastNotification,
             ICustomApiCLient customApiCLient,
             ISmsService SmsService,
+            IFeatureManager featureManager,
             IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
             this.userManager = userManager;
             this.roleManager = roleManager;
             this.notifyService = notifyService;
-            this.toastNotification = toastNotification;
             this.customApiCLient = customApiCLient;
             smsService = SmsService;
+            this.featureManager = featureManager;
             this.webHostEnvironment = webHostEnvironment;
         }
 
@@ -321,7 +322,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(" Edit User", FromAction = "Users")]
-        public IActionResult EditUser(long? userId)
+        public async Task<IActionResult> EditUser(long? userId)
         {
             try
             {
@@ -348,6 +349,7 @@ namespace risk.control.system.Controllers
                 var editPage = new MvcBreadcrumbNode("EditUser", "Vendors", $"Edit User") { Parent = usersPage, RouteValues = new { id = userId } };
                 ViewData["BreadcrumbNode"] = editPage;
 
+                vendorApplicationUser.IsPasswordChangeRequired = await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION) ? !vendorApplicationUser.IsPasswordChangeRequired : true;
 
                 return View(vendorApplicationUser);
             }

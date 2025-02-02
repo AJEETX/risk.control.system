@@ -13,11 +13,11 @@
                     btnClass: 'btn-warning',
                     action: function () {
                         askConfirmation = false;
-                        $("body").addClass("submit-progress-bg");
+                        $("body").addClass("submit-progress-password-bg");
 
                         // Update UI with a short delay to show spinner
                         setTimeout(function () {
-                            $(".submit-progress").removeClass("hidden");
+                            $(".submit-progress-password").removeClass("hidden");
                         }, 1);
                         // Disable all buttons, submit inputs, and anchors
                         $('button, input[type="submit"], a').prop('disabled', true);

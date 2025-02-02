@@ -75,12 +75,22 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var img;
-                    if (row.agentOnboarded) {
+                    if (row.active) {
                         img = '<img alt="' + row.name + '" title="' + row.name + '" src="' + row.photo + '" class="table-profile-image" data-toggle="tooltip"/>';
                     }
                     else {
-                        img = '<img alt="' + row.name + '" title="Onboarding incomplete !!! ' + row.name + '" src="' + row.photo + '" class="table-profile-image-agent-onboard" data-toggle="tooltip"/>';
+                        img = '<img alt="' + row.name + '" title="Inactive !!! ' + row.name + '" src="' + row.photo + '" class="table-profile-image-user-inactive" data-toggle="tooltip"/>';
                     }
+                    var buttons = "";
+                    buttons += '<span class="checkbox">';
+                    if (row.loginVerified) {
+                        buttons += '<i class="fa fa-check-circle text-light-green" title="User Login verified" data-toggle="tooltip"></i>';  // Green for checked
+
+                    } else {
+                        buttons += '<i class="fa fa-check text-lightgray" title="User Login not verified" data-toggle="tooltip"></i>';  // Grey for unchecked
+                    }
+                    buttons += '</span>';
+                    img += ' ' + buttons;
                     return img;
                 }
             },

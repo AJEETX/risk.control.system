@@ -29,5 +29,6 @@
         public bool? AgentOnboarded { get; set; }
         public bool? Agent { get; set; }
         public DateTime LastModified { get; set; }
+        public bool LoginVerified { get; set; } = false;
     }
 }

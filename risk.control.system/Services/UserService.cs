@@ -2,6 +2,7 @@
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.FeatureManagement;
 
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
@@ -25,14 +26,16 @@ namespace risk.control.system.Services
         private readonly UserManager<ApplicationUser> userManager;
         private readonly IDashboardService dashboardService;
         private readonly DateTime cutoffTime;
+        private readonly IFeatureManager featureManager;
 
-        public UserService(IConfiguration config, ApplicationDbContext context, UserManager<ApplicationUser> userManager, IDashboardService dashboardService)
+        public UserService(IConfiguration config, ApplicationDbContext context, UserManager<ApplicationUser> userManager, IDashboardService dashboardService, IFeatureManager featureManager)
         {
             this.config = config;
             cutoffTime = DateTime.Now.AddMinutes(double.Parse(config["LOGIN_SESSION_TIMEOUT_MIN"]));
             this.context = context;
             this.userManager = userManager;
             this.dashboardService = dashboardService;
+            this.featureManager = featureManager;
         }
 
         public async Task<List<UserDetailResponse>> GetAgencyUsers(string userEmail)
@@ -156,6 +159,7 @@ namespace risk.control.system.Services
                     OnlineStatusIcon = statusIcon,
                     Updated = u.AgencyUser.Updated.HasValue ? u.AgencyUser.Updated.Value.ToString("dd-MM-yyyy") : u.AgencyUser.Created.ToString("dd-MM-yyyy"),
                     UpdatedBy = u.AgencyUser.UpdatedBy,
+                    LoginVerified = await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION) ? !u.AgencyUser.IsPasswordChangeRequired : true
                 };
                 activeUsersDetails.Add(activeUser);
             }
@@ -256,7 +260,8 @@ namespace risk.control.system.Services
                     AgentOnboarded = (user.Role == AppRoles.AGENT && !string.IsNullOrWhiteSpace(user.MobileUId) || user.Role != AppRoles.AGENT),
                     Agent = user.Role == AppRoles.AGENT,
                     IsUpdated = user.IsUpdated,
-                    LastModified = user.Updated.GetValueOrDefault()
+                    LastModified = user.Updated.GetValueOrDefault(),
+                    LoginVerified = await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION) ? !user.IsPasswordChangeRequired : true
                 };
                 activeUsersDetails.Add(activeUser);
             }
@@ -361,7 +366,8 @@ namespace risk.control.system.Services
                     IsUpdated = user.IsUpdated,
                     LastModified = user.Updated.GetValueOrDefault(),
                     Updated = user.Updated.HasValue ? user.Updated.Value.ToString("dd-MM-yyyy") : user.Created.ToString("dd-MM-yyyy"),
-                    UpdatedBy = user.UpdatedBy
+                    UpdatedBy = user.UpdatedBy,
+                    LoginVerified = await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION) ? !user.IsPasswordChangeRequired : true
                 };
                 activeUsersDetails.Add(activeUser);
             }
@@ -456,7 +462,8 @@ namespace risk.control.system.Services
                     OnlineStatusName = statusName,
                     OnlineStatusIcon = statusIcon,
                     IsUpdated = user.IsUpdated,
-                    LastModified = user.Updated.GetValueOrDefault()
+                    LastModified = user.Updated.GetValueOrDefault(),
+                    LoginVerified = await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION) ? !user.IsPasswordChangeRequired : true
                 };
                 activeUsersDetails.Add(activeUser);
             }

@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.FeatureManagement;
 
 using NToastNotify;
 
@@ -42,6 +43,7 @@ namespace risk.control.system.Controllers
         private readonly ISmsService smsService;
         private readonly IAgencyService agencyService;
         private readonly IWebHostEnvironment webHostEnvironment;
+        private readonly IFeatureManager featureManager;
 
         public AgencyController(ApplicationDbContext context,
             UserManager<VendorApplicationUser> userManager,
@@ -51,6 +53,7 @@ namespace risk.control.system.Controllers
             ICustomApiCLient customApiCLient,
             ISmsService SmsService,
             IAgencyService agencyService,
+            IFeatureManager featureManager,
             IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
@@ -60,6 +63,7 @@ namespace risk.control.system.Controllers
             this.roleManager = roleManager;
             this.customApiCLient = customApiCLient;
             smsService = SmsService;
+            this.featureManager = featureManager;
             this.agencyService = agencyService;
             this.webHostEnvironment = webHostEnvironment;
         }
@@ -414,6 +418,8 @@ namespace risk.control.system.Controllers
                     notifyService.Error("User not found!!!..Contact Admin");
                     return RedirectToAction(nameof(AgencyController.User), "Agency");
                 }
+                user.IsPasswordChangeRequired = await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION) ? !user.IsPasswordChangeRequired : true;
+
                 return View(user);
             }
             catch (Exception ex)
