@@ -194,11 +194,11 @@ div .error-message {
 }
 
 .left-padd {
-    margin: 1rem;
+    margin: 3%;
 }
 .right-padd-mobile-icon{
     margin:1em;
-    margin-left:8em;
+    margin-left:35%;
 }
 .form-content .input-box input {
     height: 100%;
@@ -272,15 +272,18 @@ div .error-message {
         background: grey;
     }
 
-#email {
+#email, #CountryId, #resetemail {
     cursor: pointer;
 }
 
-    #email:focus {
+    input:focus {
         border: 1px solid #333;
         background-color: whitesmoke;
     }
-
+    #CountryId::placeholder {
+        font-size: 12px; /* Adjust the size as needed */
+        color: #999; /* Optional: You can also adjust the placeholder color */
+    }
 .input-validation-error {
     border-color: red !important;
 }
