@@ -30,13 +30,13 @@
     padding: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     font-family: Verdana;
-    font-size: .8em;
+    font-size:.8em;
     color: gray;
 }
 
     /* Text Inside Popup */
     .popup-content span {
-        font-size: .8em;
+        font-size: .9em;
         color: #333;
         display: block;
         margin-bottom: 20px;
@@ -278,7 +278,7 @@
 }
 /* Example style for cookie descriptions */
 .cookie-description {
-    font-size: .9em;
+    font-size:1em;
     color: #555;
     margin-top: 5px;
     line-height: 1.4;

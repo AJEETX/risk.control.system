@@ -1297,6 +1297,9 @@ img.doc-profile-image {
     .submit-progress {
         left: 25%;
     }
+    .submit-progress-password {
+        left: 10%;
+    }
 }
 
 .toggle.btn {
@@ -2178,4 +2181,30 @@ img.claims-logo {
     width: 35%;
     max-width: 203px;
     width: 80px;
+}
+.image-container {
+    position: relative;
+    display: inline-block;
+}
+
+.user-verified {
+    position: absolute;
+    top: -5px; /* Adjust this value to position the checkbox vertically (top) */
+    right: -10px; /* Adjust this value to position the checkbox horizontally (right) */
+    z-index: 10; /* Ensure the checkbox appears on top of the image */
+}
+
+.table-profile-image,
+.table-profile-image-user-inactive {
+    width: 50px; /* Adjust the size of the image */
+    height: 50px; /* Adjust the size of the image */
+    border-radius: 50%; /* Optional: to make the image circular */
+}
+
+.text-light-green {
+    color: lightgreen;
+}
+
+.text-lightgray {
+    color: lightgray;
 }

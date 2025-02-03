@@ -566,7 +566,7 @@ img.logo {
     outline: none;
     box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Add focus ring on icon */
 }
-.red-icon {
+.password-info-icon {
     color: darkblue;
     font-size:.7em;
 }

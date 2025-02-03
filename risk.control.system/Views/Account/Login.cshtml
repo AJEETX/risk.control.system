@@ -62,7 +62,7 @@
 
                     <div id="title" class="title" title="Default Password : @Applicationsettings.Password">
                         Login
-                        <sup class="fa fa-info-circle red-icon fa-spin"></sup>
+                        <sup class="fa fa-info-circle password-info-icon"></sup>
                     </div>
                     @Html.AntiForgeryToken()
                     <form id="login-form" asp-controller="Account" method="post">
@@ -118,7 +118,7 @@
                     <img class="login-logo" src="/img/iCheckifyLogo.png" />™️
 
                     <div class="title" title="Get Password !!!">Password
-                        <sup class="fa fa-info-circle red-icon copyPasswordIcon"></sup>
+                        <sup class="fa fa-info-circle password-info-icon"></sup>
 
                     </div>
                     <form id="reset-form" asp-controller="Account" asp-action="Forgot" method="post" autocomplete="off">
@@ -138,7 +138,7 @@
                             <div class="input-box">
                                 <div class="input-group-prepend">
                                     <span class="form-group input-group mb-3 input-group-text country-code-text" data-toggle="tooltip" title="Country Code">
-                                        <img id="country-flag" src="~/img/no-map.jpeg" class="flag-icon" data-toggle="tooltip" />
+                                        <img id="country-flag" src="~/flags/blank-flag.png" class="flag-icon" data-toggle="tooltip" />
                                     </span>
                                 </div>
                                 @* <i class="fa fa-globe left-padd" aria-hidden="true" title="Country code"></i> *@
