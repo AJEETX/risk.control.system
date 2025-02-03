@@ -42,7 +42,7 @@
             },
             {
                 "data": "onlineStatus",
-                "sDefaultContent": '<i class="fas fa-circle" style="color: green;"></i> ',
+                "sDefaultContent": '<i class="fas fa-circle text-lightgray"></i> ',
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var iconClass = row.onlineStatusIcon; // Class for the icon
@@ -122,12 +122,19 @@
                     return buttons;
                 }
             },
-            { "data": "roles" },
-            { "data": "updated" },
+            {
+                "data": "roles"
+            },
+            {
+                "data": "updated",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + data + '" data-toggle="tooltip">' + data + '</span>'
+                }
+            },
             {
                 "data": "updatedBy",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.updatedBy + '" data-toggle="tooltip">' + data + '</span>'
+                    return '<span title="' + data + '" data-toggle="tooltip">' + data + '</span>'
                 }
             },
             {

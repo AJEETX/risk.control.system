@@ -3,7 +3,6 @@
 @{
     ViewData["Title"] = @Applicationsettings.EDIT;
     var email = Model.Vendor.Email;
-
 }
 <section class="content">
     <form id="edit-form" asp-action="Edit" enctype="multipart/form-data">
@@ -22,7 +21,16 @@
                             <span asp-validation-for="VendorId" class="text-danger"></span>
                         </div>
                         <div class="form-group">
-                            <span class="input-group-label"> Email Address:</span>
+                            <span class="input-group-label"> Email Address:
+                                @if (@Model.IsPasswordChangeRequired)
+                                {
+                                    <i class="fa fa-check-circle text-light-green" title="User Login verified" data-toggle="tooltip"></i>
+                                }
+                                else
+                                {
+                                    <i class="fa fa-check-circle text-lightgray" title="User Login not verified" data-toggle="tooltip"></i>
+                                }
+                            </span>
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
                                     <span class="input-group-text" id="email"><i class="fas fa-at"></i> <i class="fa fa-asterisk asterik-style-none"></i></span>

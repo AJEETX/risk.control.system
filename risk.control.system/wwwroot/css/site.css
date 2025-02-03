@@ -1913,7 +1913,7 @@ select#PinCodeId {
 }
 
 .progress-bar-green {
-    background-color: green;
+    background-color: green !important;
     color: white;
 }
 

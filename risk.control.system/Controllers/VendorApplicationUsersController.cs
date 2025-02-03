@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.FeatureManagement;
 
 using NToastNotify;
 
@@ -33,12 +34,14 @@ namespace risk.control.system.Controllers
         private readonly ISmsService smsService;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly IToastNotification toastNotification;
+        private readonly IFeatureManager featureManager;
 
         public VendorApplicationUsersController(ApplicationDbContext context,
             UserManager<VendorApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             RoleManager<ApplicationRole> roleManager,
             INotyfService notifyService,
+            IFeatureManager featureManager,
             ISmsService SmsService,
             IWebHostEnvironment webHostEnvironment,
             IToastNotification toastNotification)
@@ -51,6 +54,7 @@ namespace risk.control.system.Controllers
             smsService = SmsService;
             this.webHostEnvironment = webHostEnvironment;
             this.toastNotification = toastNotification;
+            this.featureManager = featureManager;
         }
 
         // GET: VendorApplicationUsers
@@ -250,6 +254,7 @@ namespace risk.control.system.Controllers
                 var usersPage = new MvcBreadcrumbNode("Index", "VendorUser", $"Manage Users") { Parent = agencyPage, RouteValues = new { id = vendorApplicationUser.Vendor.VendorId } };
                 var editPage = new MvcBreadcrumbNode("Edit", "VendorApplicationUsers", $"Edit User") { Parent = usersPage, RouteValues = new { id = userId } };
                 ViewData["BreadcrumbNode"] = editPage;
+                vendorApplicationUser.IsPasswordChangeRequired = await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION) ? !vendorApplicationUser.IsPasswordChangeRequired : true;
 
                 return View(vendorApplicationUser);
             }

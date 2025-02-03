@@ -2,7 +2,6 @@
 @{
     ViewData["Title"] = @Applicationsettings.EDIT;
     var email = Model.ClientCompany.Email;
-
 }
 <section class="content">
     <form id="edit-form" asp-action="EditUser" enctype="multipart/form-data">
@@ -31,7 +30,7 @@
                                 }
                                 else
                                 {
-                                    <i class="fa fa-check text-lightgray" title="User Login not verified" data-toggle="tooltip"></i>
+                                    <i class="fa fa-check-circle text-lightgray" title="User Login not verified" data-toggle="tooltip"></i>
                                 }
                             </label>
                             <div class="input-group mb-3">

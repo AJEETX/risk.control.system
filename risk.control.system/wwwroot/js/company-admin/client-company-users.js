@@ -37,7 +37,11 @@
         columnDefs: [
             {
                 className: 'max-width-column-name', // Apply the CSS class,
-                targets: 4                      // Index of the column to style
+                targets: 3                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column', // Apply the CSS class,
+                targets: 5                      // Index of the column to style
             },
             {
                 className: 'max-width-column-name', // Apply the CSS class,
@@ -55,7 +59,7 @@
             },
             {
                 "data": "onlineStatus",
-                "sDefaultContent": '<i class="fas fa-circle" style="color: green;"></i> ',
+                "sDefaultContent": '<i class="fas fa-circle text-lightgray"></i> ',
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var iconClass = row.onlineStatusIcon; // Class for the icon
@@ -86,12 +90,6 @@
                 "data": "email",
                 "mRender": function (data, type, row) {
                     return '<span title="' + row.rawEmail + '" data-toggle="tooltip">' + data + '</span>'
-                }
-            },
-            {
-                "data": "name",
-                "mRender": function (data, type, row) {
-                    return '<span title="' + row.name + '" data-toggle="tooltip">' + data + '</span>'
                 }
             },
             {
@@ -134,10 +132,20 @@
                 }
             },
             {
-                "data": "roles",
+                "data": "roles"
             },
-            { "data": "updated" },
-            { "data": "updateBy" },
+            {
+                "data": "updated",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + data + '" data-toggle="tooltip">' + data + '</span>'
+                }
+            },
+            {
+                "data": "updatedBy",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + data + '" data-toggle="tooltip">' + data + '</span>'
+                }
+            },
             {
                 "sDefaultContent": "",
                 "bSortable": false,

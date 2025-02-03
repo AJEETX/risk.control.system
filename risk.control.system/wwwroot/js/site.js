@@ -25,6 +25,13 @@ document.addEventListener("DOMContentLoaded", function () {
     if (printButton) {
         printButton.addEventListener("click", printInvoice);
     }
+
+    var closeButton = document.getElementById("close-button");
+    if (closeButton) {
+        closeButton.addEventListener("click", function () {
+            window.close();
+        });
+    }
 });
 
 function checkFormCompletion(formSelector, create = false) {

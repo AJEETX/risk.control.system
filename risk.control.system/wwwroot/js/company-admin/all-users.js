@@ -11,7 +11,16 @@ $(document).ready(function () {
             loadingRecords: '&nbsp;',
             processing: '<i class="fas fa-sync fa-spin fa-4x fa-fw"></i><span class="sr-only">Loading...</span>'
         },
-        order: [[14, 'desc'], [14, 'desc']], // Sort by `isUpdated` and `lastModified`,
+        columnDefs: [
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 3                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column', // Apply the CSS class,
+                targets: 5                      // Index of the column to style
+            }],
+        order: [[12, 'desc'], [13, 'desc']], // Sort by `isUpdated` and `lastModified`,
         columns: [
             /* Name of the keys from
             data file source */
@@ -20,7 +29,7 @@ $(document).ready(function () {
             },
             {
                 "data": "onlineStatus",
-                "sDefaultContent": '<i class="fas fa-circle" style="color: green;"></i> ',
+                "sDefaultContent": '<i class="fas fa-circle text-lightgray"></i> ',
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var img = '<i class="' + row.onlineStatusIcon + '" style="color:' + data + ';" title="' + row.onlineStatusName + '" data-toggle="tooltip"></i> ';
@@ -44,24 +53,48 @@ $(document).ready(function () {
                     return img;
                 }
             },
-            { "data": "email" },
-            { "data": "name" },
+            {
+                "data": "email",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.rawEmail + '" data-toggle="tooltip">' + data + '</span>'
+                }
+            },
             {
                 "data": "phone",
                 "mRender": function (data, type, row) {
                     return '<span title="' + data + '" data-toggle="tooltip"> <img alt="' + data + '" title="' + data + '" src="' + row.flag + '" class="flag-icon" data-toggle="tooltip"/>' + data + '</span>'
                 }
             },
-            { "data": "addressline", bSortable : false },
-            { "data": "district" },
-            { "data": "state" },
+            {
+                "data": "addressline", bSortable: false,
+                "mRender": function (data, type, row) {
+                    return '<span title="' + data + '" data-toggle="tooltip">' + data + '</span>'
+                }
+            },
+            {
+                "data": "district",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + data + '" data-toggle="tooltip">' + data + '</span>'
+                }
+            },
+            {
+                "data": "state",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + data + '" data-toggle="tooltip">' + data + '</span>'
+                }
+            },
             {
                 "data": "country",
                 "mRender": function (data, type, row) {
                     return '<span title="' + row.country + '" data-toggle="tooltip"> <img alt="' + data + '" title="' + data + '" src="' + row.flag + '" class="flag-icon" data-toggle="tooltip"/>' + data + '</span>';
                 }
             },
-            { "data": "pincode" },
+            {
+                "data": "pincode",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + data + '" data-toggle="tooltip">' + data + '</span>'
+                }
+            },
             {
                 "sDefaultContent": "",
                 "bSortable": false,
@@ -77,7 +110,9 @@ $(document).ready(function () {
                     return buttons;
                 }
             },
-            { "data": "roles" },
+            {
+                "data": "roles"
+            },
             {
                 "sDefaultContent": "",
                 "bSortable": false,

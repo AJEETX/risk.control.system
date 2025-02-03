@@ -60,7 +60,7 @@
             },
             {
                 "data": "onlineStatus",
-                "sDefaultContent": '<i class="fas fa-circle" style="color: green;"></i> ',
+                "sDefaultContent": '<i class="fas fa-circle text-lightgray"></i> ',
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var iconClass = row.onlineStatusIcon; // Class for the icon
@@ -140,7 +140,9 @@
                     return buttons;
                 }
             },
-            { "data": "roles" },
+            {
+                "data": "roles"
+            },
             {
                 "data": "updatedBy",
                 "mRender": function (data, type, row) {
