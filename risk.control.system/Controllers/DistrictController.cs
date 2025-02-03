@@ -194,14 +194,13 @@ namespace risk.control.system.Controllers
                 return NotFound();
             }
 
-            var district = await _context.District.FindAsync(id);
+            var district = await _context.District.Include(d=>d.Country).Include(d=>d.State).FirstOrDefaultAsync(d => d.DistrictId == id);
             if (district == null)
             {
                 toastNotification.AddErrorToastMessage("district not found!");
                 return NotFound();
             }
-            ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", district.CountryId);
-            ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name", district.StateId);
+           
             return View(district);
         }
 
@@ -218,33 +217,28 @@ namespace risk.control.system.Controllers
                 return NotFound();
             }
 
-            if (district is not null)
+            try
             {
-                try
-                {
-                    district.Updated = DateTime.Now;
-                    district.UpdatedBy = HttpContext.User?.Identity?.Name;
-                    district.CountryId = district.SelectedCountryId;
-                    district.StateId = district.SelectedStateId;
-                    _context.Update(district);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!DistrictExists(district.DistrictId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                toastNotification.AddSuccessToastMessage("district edited successfully!");
-                return RedirectToAction(nameof(Index));
+                district.Updated = DateTime.Now;
+                district.UpdatedBy = HttpContext.User?.Identity?.Name;
+                district.CountryId = district.SelectedCountryId;
+                district.StateId = district.SelectedStateId;
+                _context.Update(district);
+                await _context.SaveChangesAsync();
             }
-            toastNotification.AddErrorToastMessage("Error to edit district!");
-            return Problem();
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!DistrictExists(district.DistrictId))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            toastNotification.AddWarningToastMessage("district edited successfully!");
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: District/Delete/5

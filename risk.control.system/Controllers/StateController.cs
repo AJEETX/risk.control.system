@@ -161,13 +161,13 @@ namespace risk.control.system.Controllers
         {
             var userEmail = HttpContext.User.Identity.Name;
 
-            var user = _context.ApplicationUser.FirstOrDefault(u => u.Email == userEmail);
+            var user = _context.ApplicationUser.Include(u=>u.Country).FirstOrDefault(u => u.Email == userEmail);
 
             if (user.IsSuperAdmin)
             {
                 return View();
             }
-            var state = new State { CountryId = user.CountryId.GetValueOrDefault(), SelectedCountryId = user.CountryId.GetValueOrDefault() };
+            var state = new State { Country = user.Country, CountryId = user.CountryId.GetValueOrDefault(), SelectedCountryId = user.CountryId.GetValueOrDefault() };
             return View(state);
         }
 

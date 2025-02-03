@@ -100,6 +100,56 @@
             });
         }
     })
+
+    var countryId = $("#SelectedCountryId").val();
+    var stateId = $("#SelectedStateId").val();
+    var districtId = $("#SelectedDistrictId").val();  // This holds the preselected district ID
+
+    // Prefill the district if state and country are pre-filled
+    if (countryId && stateId && districtId) {
+        fetchDistrict(districtId, stateId, countryId);
+    }
+
+    // When country or state changes, fetch districts again
+    $("#CountryId, #StateId").on("change", function () {
+        countryId = $("#SelectedCountryId").val();
+        stateId = $("#SelectedStateId").val();
+        fetchDistrict(districtId, stateId, countryId);
+    });
+
+    // Function to fetch districts based on StateId and CountryId
+    function fetchDistrict(districtId, stateId, countryId) {
+        $.ajax({
+            url: '/GetDistrictName', // Your backend route to fetch districts
+            type: 'GET',
+            data: { id: districtId, stateId: stateId, countryId: countryId },
+            success: function (data) {
+                var districtSuggestions = [];
+                if (data) {
+                    // Populate the district input with suggestions
+                    districtSuggestions.push({
+                        label: data.DistrictName,
+                        value: data.DistrictId
+                    });
+
+                    // Apply autocomplete on the DistrictId input field
+                    $("#DistrictId").autocomplete({
+                        source: districtSuggestions,
+                        select: function (event, ui) {
+                            $("#SelectedDistrictId").val(ui.item.value);
+                        }
+                    });
+
+                    // Set the district name into the input field
+                    $("#DistrictId").val(data.DistrictName);
+                    $("#SelectedDistrictId").val(data.DistrictId);  // Set the selected district ID
+                }
+            },
+            error: function () {
+                console.log("Error fetching district");
+            }
+        });
+    }
 });
 
 var country = $('#CountryId');

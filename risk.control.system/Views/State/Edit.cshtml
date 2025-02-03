@@ -21,7 +21,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" for="CountryId"><i class="fas fa-map-marked-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                     </div>
-                                    <input type="text" id="CountryId" class="form-control remarks auto-dropdown" data-placeholder="country" placeholder="Type country..." asp-for="CountryId" required value="" />
+                                    <input type="text" id="CountryId" class="form-control remarks auto-dropdown" data-placeholder="country" placeholder="Type country..." asp-for="CountryId" required value="@Model.Country.Name" />
                                     <span asp-validation-for="CountryId" class="text-danger"></span>
                                     <input asp-for="SelectedCountryId" type="hidden" id="SelectedCountryId" name="SelectedCountryId" value="@Model?.CountryId" />
                                 </div>

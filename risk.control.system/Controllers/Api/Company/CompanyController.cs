@@ -492,6 +492,25 @@ namespace risk.control.system.Controllers.Api.Company
             return Ok(state);
         }
 
+        [HttpGet("GetStateNameForCountry")]
+        public IActionResult GetStateNameForCountry(long countryId, long? id = null)
+        {
+            var states = _context.State
+                .Where(x => x.CountryId == countryId)
+                .OrderBy(x => x.Name)
+                .Select(x => new { StateId = x.StateId, StateName = x.Name })
+                .ToList();
+
+            if (id.HasValue)
+            {
+                // Return the state with the specific id if needed for pre-filling
+                var state = states.FirstOrDefault(x => x.StateId == id);
+                return Ok(state);
+            }
+
+            return Ok(states); // Return all states if no id is specified
+        }
+
         [HttpGet("GetDistrictName")]
         public IActionResult GetDistrictName(long id, long stateId, long countryId)
         {
@@ -711,7 +730,7 @@ namespace risk.control.system.Controllers.Api.Company
                      IsdCode = $"+{c.ISDCode.ToString()}",
                      Flag = "/flags/" + c.Code.ToLower() + ".png",
                      CountryId = $"{c.Code.ToString()}",
-                     Label = $"+{c.ISDCode.ToString()} {c.Name}[{c.Code}]"
+                     Label = $"+{c.ISDCode.ToString()} {c.Name}"
                  })?
                     .ToList());
 
@@ -724,7 +743,7 @@ namespace risk.control.system.Controllers.Api.Company
                         IsdCode = $"+{c.ISDCode.ToString()}",
                         Flag = "/flags/" + c.Code.ToLower() + ".png",
                         CountryId = $"{c.Code.ToString()}",
-                        Label = $"+{c.ISDCode.ToString()} {c.Name}[{c.Code}]"
+                        Label = $"+{c.ISDCode.ToString()} {c.Name}"
                     })?
                     .ToList();
             return Ok(countries);

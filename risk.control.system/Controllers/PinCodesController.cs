@@ -198,15 +198,13 @@ namespace risk.control.system.Controllers
                 return NotFound();
             }
 
-            var pinCode = await _context.PinCode.FindAsync(id);
+            var pinCode = await _context.PinCode.Include(d => d.Country).Include(d => d.State).Include(d => d.District).FirstOrDefaultAsync(p => p.PinCodeId == id);
             if (pinCode == null)
             {
                 toastNotification.AddErrorToastMessage("pincode not found!");
                 return NotFound();
             }
-            ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", pinCode.CountryId);
-            ViewData["StateId"] = new SelectList(_context.State.Where(s => s.CountryId == pinCode.CountryId), "StateId", "Name", pinCode?.StateId);
-            ViewData["DistrictId"] = new SelectList(_context.District.Where(s => s.StateId == pinCode.StateId), "DistrictId", "Name", pinCode?.DistrictId);
+            
             return View(pinCode);
         }
 
@@ -233,7 +231,7 @@ namespace risk.control.system.Controllers
                 _context.Update(pinCode);
                 if( await _context.SaveChangesAsync() > 0)
                 {
-                    toastNotification.AddSuccessToastMessage("pincode edited successfully!");
+                    toastNotification.AddWarningToastMessage("pincode edited successfully!");
                     return RedirectToAction(nameof(Index));
                 }
             }
@@ -287,11 +285,6 @@ namespace risk.control.system.Controllers
             await _context.SaveChangesAsync();
             toastNotification.AddSuccessToastMessage("pincode deleted successfully!");
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool PinCodeExists(long id)
-        {
-            return (_context.PinCode?.Any(e => e.PinCodeId == id)).GetValueOrDefault();
         }
     }
 }

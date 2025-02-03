@@ -2,7 +2,6 @@
 
 @{
     ViewData["Title"] = @Applicationsettings.CREATE;
-    
 }
 <section class="content">
     <div class="container-fluid">
@@ -27,6 +26,7 @@
                                                id="CountryId"
                                                class="form-control remarks"
                                                data-placeholder="country"
+                                               value="@Model.Country.Name"
                                                asp-for="CountryId" />
                                     }
                                     else
