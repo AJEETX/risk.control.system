@@ -130,7 +130,7 @@ namespace risk.control.system.Services
                 .Include(c => c.District)
                 .Include(c => c.State)
                 .Include(c => c.Country)
-                .FirstOrDefault(c => c.BeneficiaryDetailId == claimsInvestigation.BeneficiaryDetail.BeneficiaryDetailId
+                .FirstOrDefault(c => c.ClaimsInvestigationId == selectedcase
                 );
 
 

@@ -7,11 +7,13 @@ using risk.control.system.Data;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Text.RegularExpressions;
 using Google.Api;
+using SkiaSharp;
 
 namespace risk.control.system.Seeds
 {
     public static class PinCodeStateSeed
     {
+        private static string countriesFilePath = @"countries.csv";
         private static string au_stateWisePincodeFilePath = @"au_postcodes.csv";
         private static string all_india_pincodes = @"india_pincode.csv";
         private static string NO_DATA = " NO - DATA ";
@@ -54,6 +56,44 @@ namespace risk.control.system.Seeds
             }
         }
 
+        public static async Task<List<Country>> Countries(ApplicationDbContext context)
+        {
+            //GET ALL COUNTRIES FROM CSV
+            string countries_csv = await File.ReadAllTextAsync(countriesFilePath);
+            var countries = new List<Country>();
+
+            bool firstRow = true;
+            foreach (string row in countries_csv.Split('\n'))
+            {
+                if (!string.IsNullOrEmpty(row))
+                {
+                    if (!string.IsNullOrEmpty(row))
+                    {
+                        if (firstRow)
+                        {
+                            firstRow = false;
+                        }
+                        else
+                        {
+                            var output = regex.Replace(row, m => m.Value.Replace(',', '@'));
+                            var rowData = output.Split(',').ToList();
+                            var pincodeState = new Country
+                            {
+                                Name = rowData[0] ?? NO_DATA,
+                                Code = rowData[1] ?? NO_DATA,
+                                ISDCode = int.Parse(rowData[2].Trim()),
+                                Updated = DateTime.Now,
+                            };
+                            
+                            countries.Add(pincodeState);
+                        }
+                    }
+                }
+            }
+            context.Country.AddRange(countries);
+            await context.SaveChangesAsync(null, false);
+            return countries;
+        }
         public static async Task<Country> India(ApplicationDbContext context)
         {
             var country = new Country
@@ -69,6 +109,20 @@ namespace risk.control.system.Seeds
 
         }
 
+        public static async Task<Country> America(ApplicationDbContext context)
+        {
+            var country = new Country
+            {
+                Name = "UNITED STATES OF AMERICA",
+                Code = "US",
+                ISDCode = 1,
+                Updated = DateTime.Now,
+            };
+
+            var indiaCountry = await context.Country.AddAsync(country);
+            return indiaCountry.Entity;
+
+        }
         public static async Task<Country> Australia(ApplicationDbContext context)
         {
 

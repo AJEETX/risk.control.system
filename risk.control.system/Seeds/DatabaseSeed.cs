@@ -39,18 +39,19 @@ namespace risk.control.system.Seeds
             await roleManager.CreateAsync(new ApplicationRole(AppRoles.SUPERVISOR.ToString().Substring(0, 2).ToUpper(), AppRoles.SUPERVISOR.ToString()));
             await roleManager.CreateAsync(new ApplicationRole(AppRoles.AGENT.ToString().Substring(0, 2).ToUpper(), AppRoles.AGENT.ToString()));
 
-            var india = await PinCodeStateSeed.India(context);
+            var countries = await PinCodeStateSeed.Countries(context);
+            var india = countries.FirstOrDefault(c=>c.Code.ToLower() == "in");
             var indiaPincodes = await PinCodeStateSeed.CsvRead_India();
             var indianStates = indiaPincodes.Where(s=>s.StateName.ToLower() == "haryana" ||
-            s.StateName.ToLower() == "delhi" ||
-            s.StateCode.ToLower() == "up" 
-            ).Select(g => g.StateCode).Distinct()?.ToList();
+                s.StateName.ToLower() == "delhi" ||
+                s.StateCode.ToLower() == "up" 
+                ).Select(g => g.StateCode).Distinct()?.ToList();
 
             var filteredInPincodes = indiaPincodes.Where(g => indianStates.Contains(g.StateCode))?.ToList();
 
             await PinCodeStateSeed.SeedPincode(context, filteredInPincodes, india);
 
-            var au = await PinCodeStateSeed.Australia(context);
+            var au = countries.FirstOrDefault(c => c.Code.ToLower() == "au");
             var auPincodes = await PinCodeStateSeed.CsvRead_Au();
             var auStates = auPincodes.Where(s => s.StateCode.ToLower() == "nsw" ||
                 s.StateCode.ToLower() == "qld" ||

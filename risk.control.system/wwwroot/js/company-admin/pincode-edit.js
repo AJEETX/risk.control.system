@@ -100,7 +100,9 @@
             });
         }
     })
-
-    
-
 });
+
+var country = $('#CountryId');
+if (country) {
+    country.focus();
+}

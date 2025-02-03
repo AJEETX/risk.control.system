@@ -705,26 +705,26 @@ namespace risk.control.system.Controllers.Api.Company
             if (string.IsNullOrEmpty(term))
                 return Ok(allCountries
                     .OrderBy(x => x.Name)
-                 .Take(10)
+                 //.Take(10)
                  .Select(c => new
                  {
                      IsdCode = $"+{c.ISDCode.ToString()}",
                      Flag = "/flags/" + c.Code.ToLower() + ".png",
                      CountryId = $"{c.Code.ToString()}",
-                     Label = $"+{c.ISDCode.ToString()} {c.Code}"
+                     Label = $"+{c.ISDCode.ToString()} {c.Name}[{c.Code}]"
                  })?
                     .ToList());
 
             var countries = allCountries
-                    .Where(c => c.Name.Contains(term, StringComparison.OrdinalIgnoreCase) || c.ISDCode.ToString().Contains(term, StringComparison.OrdinalIgnoreCase) || c.Code.Contains(term, StringComparison.OrdinalIgnoreCase))
+                    .Where(c => c.Name.StartsWith(term, StringComparison.OrdinalIgnoreCase) || c.ISDCode.ToString().StartsWith(term, StringComparison.OrdinalIgnoreCase) || c.Code.StartsWith(term, StringComparison.OrdinalIgnoreCase))
                     .OrderBy(x => x.Name)
-                 .Take(10)
+                 //.Take(10)
                     .Select(c => new
                     {
                         IsdCode = $"+{c.ISDCode.ToString()}",
                         Flag = "/flags/" + c.Code.ToLower() + ".png",
                         CountryId = $"{c.Code.ToString()}",
-                        Label = $"+{c.ISDCode.ToString()} {c.Code}"
+                        Label = $"+{c.ISDCode.ToString()} {c.Name}[{c.Code}]"
                     })?
                     .ToList();
             return Ok(countries);

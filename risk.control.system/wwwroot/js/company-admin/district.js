@@ -99,3 +99,8 @@ $(document).ready(function () {
         }
     })
 });
+
+var country = $('#CountryId');
+if (country) {
+    country.focus();
+}

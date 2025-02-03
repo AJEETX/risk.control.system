@@ -10,7 +10,7 @@ $(document).ready(function () {
     validateInput('#ContractNumber, #IFSCCode, #Code', /[^a-zA-Z0-9]/g); // Allow only alphanumeric characters (no spaces)
     validateInput('', /[^a-zA-Z]/g); // Allow only alphabets characters (no spaces)
     validateInput('#CauseOfLoss, #Description, #Addressline, #Comments', /[^a-zA-Z0-9 ]/g); // Allow alphanumeric and spaces
-    validateInput('#CustomerName, #BeneficiaryName, #StateId, #DistrictId, #FirstName, #LastName, #Name, #Branch, #BankName, #Code', /[^a-zA-Z ]/g); // Allow alphabets and spaces
+    validateInput('#CustomerName, #BeneficiaryName, #StateId, #DistrictId, #FirstName, #LastName, #Name, #Branch, #BankName', /[^a-zA-Z ]/g); // Allow alphabets and spaces
     validateInput('#ContactNumber, #PhoneNumber, #BankAccountNumber, #ISDCode,#mobile', /[^0-9]/g); // Allow numeric only no spaces
 
     // Allow only numbers and a single dot
