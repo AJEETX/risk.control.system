@@ -5,7 +5,7 @@
             url: '/api/Company/AllUsers',
             dataSrc: ''
         },
-        order: [[1, 'desc'],[13, 'desc'], [14, 'desc']], // Sort by `isUpdated` and `lastModified`,
+        order: [[1, 'desc'],[12, 'desc'], [13, 'desc']], // Sort by `isUpdated` and `lastModified`,
         columnDefs: [{
             'targets': 0,
             'searchable': false,
@@ -17,15 +17,15 @@
         },
         {
             className: 'max-width-column', // Apply the CSS class,
-            targets: 3                      // Index of the column to style
+            targets: 2                      // Index of the column to style
         },
         {
             className: 'max-width-column', // Apply the CSS class,
-            targets: 5                      // Index of the column to style
+            targets: 4                      // Index of the column to style
         },
         {
             className: 'max-width-column-name', // Apply the CSS class,
-            targets: 11                      // Index of the column to style
+            targets: 10                      // Index of the column to style
         }],
         fixedHeader: true,
         processing: true,
@@ -41,38 +41,40 @@
                 "data": "id", "name": "Id", "bVisible": false
             },
             {
-                "data": "onlineStatus",
-                "sDefaultContent": '<i class="fas fa-circle text-lightgray"></i> ',
+                "data": "onlineStatus",  // This data can be used to determine online status
+                "sDefaultContent": '<i class="fas fa-circle text-lightgray"></i>',
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    var iconClass = row.onlineStatusIcon; // Class for the icon
-                    var colorClass = getColorClass(data); // Class for the color
-                    var tooltip = row.onlineStatusName; // Tooltip text
-                    var img = `<i class="${iconClass} ${colorClass}" title="${tooltip}" data-toggle="tooltip"></i>`;
-                    return img;
-                }
-            },
-            {
-                "sDefaultContent": '<i class="fa fa-toggle-on"></i>',
-                "bSortable": false,
-                "mRender": function (data, type, row) {
+                    // Get the appropriate class for the online status icon
+                    var iconClass = row.onlineStatusIcon || 'fas fa-circle'; // Default to 'fa-circle' if no icon class is available
+                    var colorClass = getColorClass(data); // A function that returns a color class (e.g., 'text-success' for online)
+                    var tooltip = row.onlineStatusName || 'User status unknown'; // Tooltip text for the status
+
+                    // Render the online status icon
+                    var onlineStatusIcon = `<i class="${iconClass} ${colorClass}" title="${tooltip}" data-toggle="tooltip"></i>`;
+
+                    // Render the user profile image
                     var img;
                     if (row.active) {
                         img = '<div class="image-container"><img alt="' + row.name + '" title="' + row.name + '" src="' + row.photo + '" class="table-profile-image" data-toggle="tooltip"/>';
-                    }
-                    else {
-                        img = '<div class="image-container"><img alt="' + row.name + '" title="Inactive !!! ' + row.name + '" src="' + row.photo + '" class="table-profile-image-user-inactive" data-toggle="tooltip"/>';
-                    }
-                    var buttons = "";
-                    buttons += '<span class="user-verified">';
-                    if (row.loginVerified) {
-                        buttons += '<i class="fa fa-check-circle text-light-green" title="User Login verified" data-toggle="tooltip"></i>';  // Green for checked
                     } else {
-                        buttons += '<i class="fa fa-check-circle text-lightgray" title="User Login not verified" data-toggle="tooltip"></i>';  // Grey for unchecked
+                        img = '<div class="image-container"><img alt="' + row.name + '" title="Inactive!!! ' + row.name + '" src="' + row.photo + '" class="table-profile-image-user-inactive" data-toggle="tooltip"/>';
+                    }
+
+                    // Add login verification icon
+                    var buttons = '<span class="user-verified">';
+                    if (row.loginVerified) {
+                        buttons += '<i class="fa fa-check-circle text-light-green" title="User Login Verified" data-toggle="tooltip"></i>';  // Green for verified
+                    } else {
+                        buttons += '<i class="fa fa-check-circle text-lightgray" title="User Login Not Verified" data-toggle="tooltip"></i>';  // Grey for unverified
                     }
                     buttons += '</span>';
-                    img += ' ' + buttons + '</div>';  // Close image container
-                    return img;
+
+                    // Combine the online status icon, profile image, and login verification button in one column
+                    img += ' ' + buttons + '</div>'; // Close image container
+
+                    // Return both the online status and the user profile in a single column
+                    return onlineStatusIcon + ' ' + img;
                 }
             },
             {

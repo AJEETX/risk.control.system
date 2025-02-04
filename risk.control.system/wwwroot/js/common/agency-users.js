@@ -31,19 +31,19 @@
             url: '/api/Agency/GetCompanyAgencyUser?id=' + $('#vendorId').val(),
             dataSrc: ''
         },
-        order: [[12, 'desc'], [13, 'desc']], // Sort by `isUpdated` and `lastModified`,
+        order: [[11, 'desc'], [12, 'desc']], // Sort by `isUpdated` and `lastModified`,
         columnDefs: [
             {
                 className: 'max-width-column', // Apply the CSS class,
-                targets: 3                      // Index of the column to style
+                targets: 2                      // Index of the column to style
             },
             {
                 className: 'max-width-column', // Apply the CSS class,
-                targets: 5                      // Index of the column to style
+                targets: 4                      // Index of the column to style
             },
             {
                 className: 'max-width-column-name', // Apply the CSS class,
-                targets: 10                      // Index of the column to style
+                targets: 9                      // Index of the column to style
             }],
         fixedHeader: true,
         processing: true,
@@ -63,17 +63,11 @@
                 "sDefaultContent": '<i class="fas fa-circle text-lightgray"></i> ',
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    var iconClass = row.onlineStatusIcon; // Class for the icon
+                    var iconClass = row.onlineStatusIcon || 'fas fa-circle';; // Class for the icon
                     var colorClass = getColorClass(data); // Class for the color
-                    var tooltip = row.onlineStatusName; // Tooltip text
-                    var img = `<i class="${iconClass} ${colorClass}" title="${tooltip}" data-toggle="tooltip"></i>`;
-                    return img;
-                }
-            },
-            {
-                "sDefaultContent": '<i class="fa fa-toggle-on"></i>',
-                "bSortable": false,
-                "mRender": function (data, type, row) {
+                    var tooltip = row.onlineStatusName || 'User status unknown'; // Tooltip text
+                    var onlineStatusIcon = `<i class="${iconClass} ${colorClass}" title="${tooltip}" data-toggle="tooltip"></i>`;
+                    
                     var img;
                     if (row.agentOnboarded) {
                         img = '<div class="image-container"><img alt="' + row.name + '" title="' + row.name + '" src="' + row.photo + '" class="table-profile-image" data-toggle="tooltip"/>';
@@ -90,7 +84,7 @@
                     }
                     buttons += '</span>';
                     img += ' ' + buttons + '</div>';  // Close image container
-                    return img;
+                    return onlineStatusIcon + ' ' + img;
                 }
             },
             {

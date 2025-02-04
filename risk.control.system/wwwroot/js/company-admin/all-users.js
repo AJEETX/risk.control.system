@@ -13,14 +13,18 @@ $(document).ready(function () {
         },
         columnDefs: [
             {
-                className: 'max-width-column-name', // Apply the CSS class,
-                targets: 3                      // Index of the column to style
+                className: 'max-width-column', // Apply the CSS class,
+                targets: 2                      // Index of the column to style
             },
             {
                 className: 'max-width-column', // Apply the CSS class,
-                targets: 5                      // Index of the column to style
+                targets: 4                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 10                      // Index of the column to style
             }],
-        order: [[12, 'desc'], [13, 'desc']], // Sort by `isUpdated` and `lastModified`,
+        order: [[11, 'desc'], [12, 'desc']], // Sort by `isUpdated` and `lastModified`,
         columns: [
             /* Name of the keys from
             data file source */
@@ -32,14 +36,14 @@ $(document).ready(function () {
                 "sDefaultContent": '<i class="fas fa-circle text-lightgray"></i> ',
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    var img = '<i class="' + row.onlineStatusIcon + '" style="color:' + data + ';" title="' + row.onlineStatusName + '" data-toggle="tooltip"></i> ';
-                    return img;
-                }
-            },
-            {
-                "sDefaultContent": "",
-                "bSortable": false,
-                "mRender": function (data, type, row) {
+                    // Get the appropriate class for the online status icon
+                    var iconClass = row.onlineStatusIcon || 'fas fa-circle'; // Default to 'fa-circle' if no icon class is available
+                    var colorClass = getColorClass(data); // A function that returns a color class (e.g., 'text-success' for online)
+                    var tooltip = row.onlineStatusName || 'User status unknown'; // Tooltip text for the status
+
+                    // Render the online status icon
+                    var onlineStatusIcon = `<i class="${iconClass} ${colorClass}" title="${tooltip}" data-toggle="tooltip"></i>`;
+                    
                     var img = '<div class="image-container"><img alt="' + row.name + '" title="' + row.name + '" src="' + row.photo + '" class="table-profile-image" data-toggle="tooltip"/>';
                     var buttons = "";
                     buttons += '<span class="user-verified">';
@@ -50,7 +54,7 @@ $(document).ready(function () {
                     }
                     buttons += '</span>';
                     img += ' ' + buttons + '</div>';  // Close image container
-                    return img;
+                    return onlineStatusIcon + ' '+img;
                 }
             },
             {
@@ -178,6 +182,17 @@ $(document).ready(function () {
     });
 });
 
+function getColorClass(color) {
+    switch (color.toLowerCase()) {
+        case "green":
+            return "online-status-green";
+
+        case "orange":
+            return "online-status-orange";
+        default:
+            return "online-icon-default"; // Fallback class
+    }
+}
 function showroles() {
     $("body").addClass("submit-progress-bg");
     // Wrap in setTimeout so the UI
