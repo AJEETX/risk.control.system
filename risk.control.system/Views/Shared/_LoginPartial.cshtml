@@ -1,25 +1,59 @@
-@inject SignInManager<ApplicationUser> SignInManager
-@inject UserManager<ApplicationUser> UserManager
+﻿@model LoginViewModel
+<div class="login-form">
+    <input type="hidden" id="defaultpassword" value="@Applicationsettings.Password" />
+    <img class="login-logo" src="/img/iCheckifyLogo.png" />™️
 
-<ul class="navbar-nav">
-    @if (SignInManager.IsSignedIn(User))
-    {
-        <li class="nav-item">
-            <a  class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @User.Identity.Name!</a>
-        </li>
-        <li class="nav-item">
-            <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Page("/", new { area = "" })" method="post" >
-                <button  type="submit" class="nav-link btn btn-link text-dark">Logout</button>
-            </form>
-        </li>
-    }
-    else
-    {
-        <li class="nav-item">
-            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Register</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">Login</a>
-        </li>
-    }
-</ul>
+    <div id="title" class="title" title="Default Password : @Applicationsettings.Password">
+        Login
+        <sup class="fa fa-info-circle password-info-icon"></sup>
+    </div>
+    @Html.AntiForgeryToken()
+    <form id="login-form" asp-controller="Account" method="post">
+        <div class="input-boxes">
+
+            <div class="input-box autocomplete-wrapper">
+                <i class="fas fa-envelope left-padd"></i>
+                <input asp-for=Email id="email" type="email" title="Email" class="form-control remarks auto-dropdown"
+                       placeholder="Enter your email" autocomplete="off" required />
+                <div class="input-group-append-caret">
+                    <span class="input-group-text"><i class="fas fa-caret-down"></i></span>
+                </div>
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <div class="input-box">
+                <i class="fas fa-lock left-padd"></i>
+                @if (Model.SetPassword)
+                {
+                    <input asp-for=Password id="Password" type="password" title="password" class="form-control remarks" placeholder="Enter your password" value="@Applicationsettings.Password" autocomplete="off" required />
+                }
+                else
+                {
+                    <input asp-for=Password id="Password" type="password" title="password" class="form-control remarks" placeholder="Enter your password" autocomplete="off" required />
+
+                }
+                <!-- Eye Icon for Toggling Password Visibility -->
+                <div class="password-toggle remarks">
+                    <span class="input-group-text toggle-password-visibility" data-target="Password">
+                        <i id="eyeIconCurrent" class="fa fa-eye-slash"></i>
+                    </span>
+                </div>
+            </div>
+
+            <p class="account">By clicking <strong><span class="fa fa-key" aria-hidden="true"></span> Login</strong>, you agree to <a class="termsLink" href="#">Terms & Conditions!</a></p>
+            <div class="button input-box">
+                <button data-testid="logintest" id="login" type="submit" value="Login" class="btn btn-secondary btn-block"><span class="fa fa-key" aria-hidden="true"></span> Login</button>
+            </div>
+            <div class="text-muted text-sm">Forgot Password? <span class="far fa-hand-point-right" aria-hidden="true"></span> <label for="flip" class="login-link"> Click Here</label></div>
+        </div>
+    </form>
+    <div class="error-message">
+
+        @if (Model?.LoginError != null)
+        {
+            <p class="account">
+                <a class="error"> @Model?.LoginError</a>
+            </p>
+        }
+    </div>
+    @* <div id="ipAddress" class="info-item"><span class="info-title">Location: </span><a href="/page/ip.html"> <span class="info-data">Loading...</span></a></div> *@
+</div>

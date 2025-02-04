@@ -44,7 +44,7 @@
                 </div> *@
             </div>
             <div class="back">
-                <img class="backImg" src="~/images/front-image.gif" alt="verify">
+                <img class="backImg" src="~/images/front-image.gif" alt="reset">
                 @* <div class="text">
                 <span class="text-1">Complete miles of journey <br> with one step</span>
                 <span class="text-2">Let's get started</span>
@@ -56,121 +56,8 @@
 
             <div class="form-content">
 
-                <div class="login-form">
-                    <input type="hidden" id="defaultpassword" value="@Applicationsettings.Password" />
-                    <img class="login-logo" src="/img/iCheckifyLogo.png" />™️
-
-                    <div id="title" class="title" title="Default Password : @Applicationsettings.Password">
-                        Login
-                        <sup class="fa fa-info-circle password-info-icon"></sup>
-                    </div>
-                    @Html.AntiForgeryToken()
-                    <form id="login-form" asp-controller="Account" method="post">
-                        <div class="input-boxes">
-
-                            <div class="input-box autocomplete-wrapper">
-                                <i class="fas fa-envelope left-padd"></i>
-                                <input asp-for=Email id="email" type="email" title="Email" class="form-control remarks auto-dropdown"
-                                       placeholder="Enter your email" autocomplete="off" required />
-                                <div class="input-group-append-caret">
-                                    <span class="input-group-text"><i class="fas fa-caret-down"></i></span>
-                                </div>
-                                <span asp-validation-for="Email" class="text-danger"></span>
-                            </div>
-                            <div class="input-box">
-                                <i class="fas fa-lock left-padd"></i>
-                                @if (Model.SetPassword)
-                                {
-                                    <input asp-for=Password id="Password" type="password" title="password" class="form-control remarks" placeholder="Enter your password" value="@Applicationsettings.Password" autocomplete="off" required />
-                                }
-                                else
-                                {
-                                    <input asp-for=Password id="Password" type="password" title="password" class="form-control remarks" placeholder="Enter your password" autocomplete="off" required />
-
-                                }
-                                <!-- Eye Icon for Toggling Password Visibility -->
-                                <div class="password-toggle remarks">
-                                    <span class="input-group-text toggle-password-visibility" data-target="Password">
-                                        <i id="eyeIconCurrent" class="fa fa-eye-slash"></i>
-                                    </span>
-                                </div>
-                            </div>
-                            
-                            <p class="account">By clicking <strong><span class="fa fa-key" aria-hidden="true"></span> Login</strong>, you agree to <a class="termsLink" href="#">Terms & Conditions!</a></p>
-                            <div class="button input-box">
-                                <button data-testid="logintest" id="login" type="submit" value="Login" class="btn btn-secondary btn-block"><span class="fa fa-key" aria-hidden="true"></span> Login</button>
-                            </div>
-                            <div class="text-muted text-sm">Forgot Password? <span class="far fa-hand-point-right" aria-hidden="true"></span> <label for="flip" class="login-link"> Click Here</label></div>
-                        </div>
-                    </form>
-                    <div class="error-message">
-
-                        @if (Model?.LoginError != null)
-                        {
-                            <p class="account">
-                                <a class="error"> @Model?.LoginError</a>
-                            </p>
-                        }
-                    </div>
-                    @* <div id="ipAddress" class="info-item"><span class="info-title">Location: </span><a href="/page/ip.html"> <span class="info-data">Loading...</span></a></div> *@
-                </div>
-                <div class="signup-form">
-                    <img class="login-logo" src="/img/iCheckifyLogo.png" />™️
-
-                    <div class="title" title="Get Password !!!">Password
-                        <sup class="fa fa-info-circle password-info-icon"></sup>
-
-                    </div>
-                    <form id="reset-form" asp-controller="Account" asp-action="Forgot" method="post" autocomplete="off">
-                        <div class="input-boxes">
-                            <div class="input-box">
-                                <div class="input-box autocomplete-wrapper">
-                                    <i class="fas fa-envelope left-padd"></i>
-                                    <input asp-for=Email id="resetemail" type="email" title="Email" class="form-control remarks auto-dropdown"
-                                           placeholder="Enter your email" autocomplete="off" required />
-                                    <div class="input-group-append-caret">
-                                        <span class="input-group-text"><i class="fas fa-caret-down"></i></span>
-                                    </div>
-                                    <span asp-validation-for="Email" class="text-danger"></span>
-                                </div>
-                            </div>
-
-                            <div class="input-box">
-                                <div class="input-group-prepend">
-                                    <span class="form-group input-group mb-3 input-group-text country-code-text" data-toggle="tooltip" title="Country Code">
-                                        <img id="country-flag" src="~/flags/blank-flag.png" class="flag-icon" data-toggle="tooltip" />
-                                    </span>
-                                </div>
-                                @* <i class="fa fa-globe left-padd" aria-hidden="true" title="Country code"></i> *@
-                                <input type="text" id="CountryId" name="CountryId" asp-for="CountryId" title="ISD code" class="form-control remarks country-code auto-dropdown" required placeholder="Isd code" maxlength="5" autocomplete="off">
-                                <div class="input-group-append-caret">
-                                    <span class="input-group-text"><i class="fas fa-caret-down"></i></span>
-                                </div>
-
-                                <span asp-validation-for="CountryId" class="text-danger"></span>
-                                <i class="fa fa-mobile right-padd-mobile-icon" aria-hidden="true"></i>
-                                <input asp-for="Mobile" id="mobile" name="mobile" class="form-control remarks" title="Phone number" maxlength="10" type="text" placeholder="Phone number" autocomplete="number" required>
-                                <span asp-validation-for="Mobile" class="text-danger"></span>
-                            </div>
-                            <p class="account">By clicking <strong> <span class="fa fa-unlock" aria-hidden="true"></span> Get</strong>, you agree to <a class="termsLink" href="#">Terms & Conditions!</a></p>
-
-                            <div class="button input-box">
-                                <button id="reset-pwd" type="submit" class="btn btn-secondary btn-block"> <span class="fa fa-unlock" aria-hidden="true"></span> Get </button>
-                            </div>
-                            <div class="text-muted">Already member? <span class="far fa-hand-point-right" aria-hidden="true"></span> <label for="flip" class="login-link"> Login Now</label></div>
-                        </div>
-                    </form>
-                    <div class="error-message">
-
-                        @if (Model?.ResetError != null)
-                        {
-                            <p class="account">
-                                <a class="error"> @Model?.ResetError</a>
-                            </p>
-                        }
-                    </div>
-                    @* <div id="ipAddress1" class="info-item"><span class="info-title">Location: </span><a href="/page/ip.html"> <span class="info-data">Loading...</span></a></div> *@
-                </div>
+                <partial name="_LoginPartial" model="Model" />
+                <partial name="_ResetPartial" model="Model" />
             </div>
         </div>
         

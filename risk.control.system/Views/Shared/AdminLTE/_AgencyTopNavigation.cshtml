@@ -1,4 +1,4 @@
-﻿@model bool
+﻿@model TopNavigation
 <!-- Navbar -->
 <nav class="main-header navbar navbar-expand navbar-light bg-light">
     <!-- Left navbar links -->
@@ -38,13 +38,21 @@
                 <div id="time"> </div>
             </a>
         </li>
+        <li class="">
+            @{
+                var img = "/flags/" + @Model.CountryCode.ToLower() + ".png";
+            }
+            <a class="nav-link" data-widget="control-sidebar" data-slide="true" role="button" title="@Model?.Country" data-toggle="tooltip">
+                <div id="country"><img src="@img" class="flag-icon" /> </div>
+            </a>
+        </li>
         <!-- Notifications Dropdown Menu -->
         <li class="dropdown">
             <a class="nav-link" data-toggle="dropdown" href="#">
                 <i class="fas fa-cog"></i>
             </a>
             <div class="dropdown-menu dropdown-menu dropdown-menu-right">
-                @if(Model)
+                @if(Model.CanChangePassword)
                 {
                    @*  <div class="accent-secondary">
                         <a id="password" class="dropdown-item" href="/agencyuserprofile/ChangePassword">
