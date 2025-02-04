@@ -252,7 +252,7 @@ namespace risk.control.system.Services
                     PincodeName = user.PinCode.Name +" - "+ user.PinCode.Code,
                     Country = user.Country.Code,
                     Flag = "/flags/" + user.Country.Code.ToLower() + ".png",
-                    Roles = string.Join(",", GetUserRoles(user).Result),
+                    Roles = user.UserRole.GetEnumDisplayName(),
                     Updated = user.Updated.HasValue ? user.Updated.Value.ToString("dd-MM-yyyy") : user.Created.ToString("dd-MM-yyyy"),
                     UpdatedBy = user.UpdatedBy,
                     OnlineStatus = status,
@@ -358,7 +358,7 @@ namespace risk.control.system.Services
                     StateName = user.State.Name,
                     Country = user.Country.Code,
                     Flag = "/flags/" + user.Country.Code.ToLower() + ".png",
-                    Roles = string.Join(",", GetUserRoles(user).Result),
+                    Role = user.UserRole.GetEnumDisplayName(),
                     Pincode = user.PinCode.Code,
                     PincodeName = user.PinCode.Name + " - "+ user.PinCode.Code,
                     OnlineStatus = status,
@@ -464,7 +464,7 @@ namespace risk.control.system.Services
                     StateName = user.State.Name,
                     Country = user.Country.Code,
                     Flag = "/flags/" + user.Country.Code.ToLower() + ".png",
-                    Roles = user.UserRole != null ? $"<span class=\"badge badge-light\">{user.UserRole.GetEnumDisplayName()}</span>" : "<span class=\"badge badge-light\">...</span>",
+                    Roles = user.UserRole.GetEnumDisplayName(),
                     Pincode = user.PinCode.Code,
                     PincodeName = user.PinCode.Name + " - " + user.PinCode.Code,
                     OnlineStatus = status,
@@ -589,7 +589,7 @@ namespace risk.control.system.Services
 
             foreach (var role in roles)
             {
-                var decoratedRole = "<span class=\"badge badge-light\">" + role + "</span>";
+                var decoratedRole = $"{role}";
                 decoratedRoles.Add(decoratedRole);
             }
             return decoratedRoles;

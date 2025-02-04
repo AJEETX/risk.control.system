@@ -83,11 +83,12 @@
         }
         else
         {
-            <div class="row">
+            <div class="row toggle-row">
 
                 <div class="col-md-6">
                     <div class="form-group">
-                        <span class="input-group-label"> Enable Mailbox:</span> <div class="checkbox-wrapper">
+                        <label class="input-group-label"> Enable Mailbox:</label>
+                        <div class="checkbox-wrapper">
                             <input asp-for="EnableMailbox" type="checkbox" id="EnableMailboxCheckbox" class="custom-checkbox">
                             <label for="EnableMailboxCheckbox" class="custom-checkbox-label"></label>
                         </div>
@@ -98,7 +99,7 @@
                 <div class="col-md-6">
 
                     <div class="form-group">
-                        <span class="input-group-label"> Profile edit:</span>
+                        <label class="input-group-label"> Profile edit:</label>
                         <div class="checkbox-wrapper">
                             <input asp-for="CanChangePassword" type="checkbox" id="CanChangePasswordCheckbox" class="custom-checkbox">
                             <label for="CanChangePasswordCheckbox" class="custom-checkbox-label"></label>

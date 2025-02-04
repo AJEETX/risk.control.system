@@ -114,16 +114,19 @@
                     var buttons = "";
                     buttons += '<span class="checkbox">';
                     if (row.active) {
-                        buttons += '<i class="fa fa-toggle-on"></i>';
+                        buttons += '<i class="fa fa-toggle-on" title="ACTIVE" data-toggle="tooltip"></i>';
                     } else {
-                        buttons += '<i class="fa fa-toggle-off"></i>';
+                        buttons += '<i class="fa fa-toggle-off" title="IN-ACTIVE" data-toggle="tooltip"></i>';
                     }
                     buttons += '</span>';
                     return buttons;
                 }
             },
             {
-                "data": "roles"
+                "data": "role",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + data + '" data-toggle="tooltip">' + data + '</span>'
+                }
             },
             {
                 "data": "updated",
@@ -176,9 +179,10 @@
             });
         },
         "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
-            if (!aData.active) {
-                $('td', nRow).css('background-color', '#FCFCEF');
-                $('td', nRow).css('color', 'lightgrey');
+            if (!aData.active || !aData.loginVerified) {
+                $('td', nRow).addClass('lightgrey');
+            } else {
+                $('td', nRow).removeClass('lightgrey');
             }
         },
         error: function (xhr, status, error) { alert('err ' + error) }

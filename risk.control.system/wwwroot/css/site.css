@@ -414,13 +414,13 @@ a.table-link {
     font-weight:lighter;
 }
 
-.disclaimer-body {
+/*.disclaimer-body {
     margin: 1rem;
     border: 1px solid darkgrey;
     box-shadow: 5px 5px #ccc;
     background: linear-gradient(45deg, #e3e3e3, transparent);
     border-radius: .3rem;
-}
+}*/
     .disclaimer-body p{
         font-weight:lighter;
         font-size:.8em;
@@ -1105,7 +1105,10 @@ a.CaseReadyToAssign {
     pointer-events: none;
     color: lightgrey;
 }
+.lightgrey{
+    color: lightgrey;
 
+}
 #map-type {
     float: right;
 }
@@ -1771,13 +1774,11 @@ ul#messagesList {
 
 /* Hover effect for dropdown items */
 .ui-menu .ui-menu-item:hover {
-    background-color: #007bff;
     color: darkblue;
 }
 
 /* Selected item style */
 .ui-state-active {
-    background-color: #007bff !important;
     color: white !important;
 }
 
@@ -2207,4 +2208,14 @@ img.claims-logo {
 
 .text-lightgray {
     color: lightgray;
+}
+
+.toggle-row {
+    background-color: #f9f9f9; /* Light background color */
+    border-radius: 4px; /* Rounded corners for the entire row */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Light shadow for depth */
+    display: flex;
+    padding:0px;
+    margin:0px;
+    flex-wrap: wrap; /* Allow items to wrap in smaller screens */
 }

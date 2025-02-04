@@ -81,8 +81,18 @@
                     return '<span title="' + row.address + '" data-toggle="tooltip">' + data + '</span>'
                 }
             },
-            { "data": "district" },
-            { "data": "state" },
+            {
+                "data": "district",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + data + '" data-toggle="tooltip">' + data + '</span>'
+                }
+            },
+            {
+                "data": "state",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + data + '" data-toggle="tooltip">' + data + '</span>'
+                }
+            },
             {
                 "data": "country",
                 "mRender": function (data, type, row) {
@@ -95,7 +105,12 @@
                     return '<span title="Total number of current cases = ' + row.caseCount + '" data-toggle="tooltip">' + data + '</span>';
                 }
             },
-            { "data": "updated" },
+            {
+                "data": "updated",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + data + '" data-toggle="tooltip">' + data + '</span>'
+                }
+            },
             {
                 "data": "updateBy",
                 "mRender": function (data, type, row) {

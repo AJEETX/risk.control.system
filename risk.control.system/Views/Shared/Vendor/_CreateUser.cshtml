@@ -127,16 +127,16 @@
                 <label class="input-group-label"> Status:</label>
                 <div class="input-group mb-3">
                     <div class="input-group-prepend">
-                        <span class="input-group-text" id="Addressline"><i class="fa fa-key"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                        <span class="input-group-text"><i class="fa fa-toggle-on"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                     </div>
-                    <div class="input-group-prepend">
-                    </div>
-                    <span class="checkbox">
-                        <input disabled asp-for="Active" type="checkbox" data-toggle="toggle" data-on="<i class='fa fa-check'></i> Active " data-onstyle="success" data-width="120">
+                    <div class="checkbox-wrapper">
+                        <input disabled asp-for="Active" type="checkbox" id="Active" class="custom-checkbox">
+                        <label for="Active" class="custom-checkbox-label"></label>
                         <input type="hidden" asp-for="Active">
-                    </span>
+                    </div>
                 </div>
             </div>
+            
         }
         else
         {
@@ -144,13 +144,12 @@
                 <label class="input-group-label"> Status:</label>
                 <div class="input-group mb-3">
                     <div class="input-group-prepend">
-                        <span class="input-group-text" id="Addressline"><i class="fa fa-key"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                        <span class="input-group-text"><i class="fa fa-toggle-on"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                     </div>
-                    <div class="input-group-prepend">
+                    <div class="checkbox-wrapper">
+                        <input asp-for="Active" type="checkbox" id="Active" class="custom-checkbox">
+                        <label for="Active" class="custom-checkbox-label"></label>
                     </div>
-                    <span class="checkbox">
-                        <input asp-for="Active" type="checkbox" data-toggle="toggle" data-on="<i class='fa fa-toggle-on'></i> Active " data-off="<i class='fa fa-toggle-off'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
-                    </span>
                 </div>
             </div>
         }
