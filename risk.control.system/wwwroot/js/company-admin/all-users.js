@@ -126,7 +126,6 @@ $(document).ready(function () {
                 "mRender": function (data, type, row) {
                     var buttons = "";
                     buttons += '<a id=edit' + row.id + ' href="/User/Edit?userId=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-user-minus"></i> Edit</a>&nbsp;'
-                    //buttons += '<a onclick="showroles()" href="/UserRoles/Index?userId=' + row.id + '"  class="btn btn-xs btn-info"><i class="fas fa-user-plus"></i> Roles</a>'
                     return buttons;
                 }
             },

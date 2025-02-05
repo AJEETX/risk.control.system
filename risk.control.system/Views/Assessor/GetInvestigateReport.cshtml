@@ -390,21 +390,7 @@
                         <a id="back" asp-controller="Assessor" class="btn btn-outline-secondary" asp-action="Assessor">
                             <i class="fas fa-arrow-left" aria-hidden="true"></i> Back
                         </a>
-                        @* @if (@Model.ClaimsInvestigation.IsQueryCase && @Model.ClaimsInvestigation.AgencyReport.EnquiryRequest != null)
-                        {
-
-                            <div class="btn btn-warning disabled">
-                                <i class="fa fa-edit"></i>  ENQUIRE
-                            </div>
-                        }
-                        else
-                        {
-                            <a id="enquire-case" asp-controller="ClaimsInvestigation" asp-action="SendEnquiry" onclick="showenquiry()"
-                               asp-route-selectedcase="@Model.ClaimsInvestigation.ClaimsInvestigationId" class="btn btn-warning">
-                                <i class="fa fa-edit"></i>  ENQUIRE
-                            </a>
-                        } *@
-                        <a id="enquire-case" asp-controller="Assessor" asp-action="SendEnquiry" onclick="showenquiry()"
+                        <a id="enquire-case" asp-controller="Assessor" asp-action="SendEnquiry"
                            asp-route-selectedcase="@Model.ClaimsInvestigation.ClaimsInvestigationId" class="btn btn-warning">
                             <i class="fa fa-edit"></i>  ENQUIRE
                         </a>

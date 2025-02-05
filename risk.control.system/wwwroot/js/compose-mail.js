@@ -103,7 +103,10 @@ $(document).ready(function () {
                         btnClass: 'btn-success',
                         action: function () {
                             askConfirmation = false;
+                           
+                            $('#send-email').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Send");
                             $('#email-form').submit();
+                            disableAllInteractiveElements();
                         }
                     },
                     cancel: {

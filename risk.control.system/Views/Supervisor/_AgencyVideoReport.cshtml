@@ -3,7 +3,7 @@
 @{
     var imageCapturedTime = @Model.AgencyReport?.VideoReport?.DocumentIdImageLongLatTime != null ? @Model.AgencyReport?.VideoReport?.DocumentIdImageLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt") : null;
 
-    string videoIdColor = "grey";
+    string videoIdColor = "progress-bar-grey";
     var videoIdColorBorderColor = "";
     if (Model.AgencyReport.VideoReport?.DocumentIdImageLongLat == null)
     {
@@ -12,12 +12,12 @@
     else if (Model.AgencyReport.VideoReport?.DocumentIdImageLongLat != null && (
     Model.AgencyReport?.VideoReport?.DocumentIdImageValid != null && Model.AgencyReport?.VideoReport?.DocumentIdImageValid == true))
     {
-        videoIdColor = "green";
+        videoIdColor = "progress-bar-green";
         videoIdColorBorderColor = "border-success";
     }
     else
     {
-        videoIdColor = "#dc3545!important";
+        videoIdColor = "progress-bar-red";
         videoIdColorBorderColor = "border-danger";
     }
 
@@ -37,7 +37,7 @@
                                     <b> Upload</b> Max image size 2 MB
                                 </div>
                             <div>
-                                    <i class='far fa-thumbs-down'></i> <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i> Valid Video
+                                    <i class='far fa-thumbs-down'></i> <i class='fa fa-times i-orangered' aria-hidden='true'></i> Valid Video
                                 </div>
                             </span>
                         }
@@ -49,7 +49,7 @@
                                     <b> Upload</b> Max image size 2 MB
                                 </div>
                                 <div>
-                                    <i class='far fa-thumbs-up'></i> <i style='color:green;' class='fas fa-check-circle'></i> InValid Video
+                                    <i class='far fa-thumbs-up'></i> <i class='fas fa-check-circle i-green'></i> InValid Video
                                 </div>
                             </span>
                         }
@@ -88,21 +88,21 @@
                 <span class="badge badge-light"><i class="far fa-image"></i> Valid : </span>
                 @if (@videoIdColor == "grey")
                 {
-                    <i style='color:grey;' class='fa fa-times' aria-hidden='true'></i>
+                    <i class='fa fa-times i-grey' aria-hidden='true'></i>
                 }
                 else if (@Model.AgencyReport?.VideoReport?.DocumentIdImageValid.Value ?? false)
                 {
-                    <i style='color:green;' class='fas fa-check-circle'></i>
+                    <i class='fas fa-check-circle i-green'></i>
                 }
 
                 else
                 {
-                    <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i>
+                    <i class='fa fa-times i-orangered' aria-hidden='true'></i>
                 }
             </div>
             <div class="progress">
                 <i class="far fa-bookmark bookmark-green"></i>
-                <div class="progress-bar" role="progressbar" style="width:100%;background-color:@videoIdColor;">
+                <div class="progress-bar @videoIdColor" role="progressbar">
                     video
                 </div>
             </div>

@@ -42,7 +42,7 @@
                     </a>
                 </div>
 
-                <button type="button" onclick="window.print();return false;" class="btn btn-default btn-sm" title="Print">
+                <button type="button" class="btn btn-default btn-sm print-me" title="Print">
                     <i class="fas fa-print"></i>
                 </button>
             </div>
@@ -54,11 +54,11 @@
         </div>
         @{
             var fileIcon = (Model.Extension == ".jpg" || Model.Extension == ".png") ? "fa fa-image" : "far fa-file-pdf";
-            var hasAttachment = (@Model.Attachment != null && @Model.Attachment.Length > 0) ? "" : "none";
+            var hasAttachment = (@Model.Attachment != null && @Model.Attachment.Length > 0) ? "" : "fileAttachment";
         }
         <div class="card-footer bg-white">
             <ul class="mailbox-attachments d-flex align-items-stretch clearfix">
-                <li style="display:@hasAttachment">
+                <li class="@hasAttachment">
                     <div class="mailbox-attachment-info">
                         <a asp-controller="Download" asp-action="SentDetailsDownloadFileAttachment" asp-route-id="@Model.SentMessageId" class="mailbox-attachment-name"><i class="fas fa-paperclip"></i> @Model.AttachmentName</a>
                         <span class="mailbox-attachment-size clearfix mt-1">
@@ -79,7 +79,7 @@
                 <a sp-action="SentDetailsReply" asp-route-id="@Model.SentMessageId" asp-route-actiontype="Forward" class="btn btn-default"><i class="fas fa-share"></i> Forward</a>
             </div>
             <a asp-action="SentDetailsDelete" asp-route-id="@Model.SentMessageId" class="btn btn-default"><i class="far fa-trash-alt"></i> Delete</a>
-            <button type="button" onclick="window.print();return false;" class="btn btn-default"><i class="fas fa-print"></i> Print</button>
+            <button type="button" class="btn btn-default print-me"><i class="fas fa-print"></i> Print</button>
         </div>
 
     </div>

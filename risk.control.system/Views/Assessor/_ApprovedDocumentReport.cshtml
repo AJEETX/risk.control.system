@@ -2,7 +2,7 @@
 
 @if (@Model.ClaimsInvestigation.AgencyReport?.PanIdReport?.DocumentIdImageData != null && @Model.ClaimsInvestigation.AgencyReport?.PanIdReport?.DocumentIdImageLongLatTime != null)
 {
-    string documentIdColor = "grey";
+    string documentIdColor = "progress-bar-grey";
     var borderColor = "";
     if (Model.ClaimsInvestigation.AgencyReport.PanIdReport?.DocumentIdImageLongLat == null)
     {
@@ -11,12 +11,12 @@
     else if (Model.ClaimsInvestigation.AgencyReport.PanIdReport?.DocumentIdImageLongLat != null && (
     Model.ClaimsInvestigation.AgencyReport?.PanIdReport?.DocumentIdImageValid != null && Model.ClaimsInvestigation.AgencyReport?.PanIdReport?.DocumentIdImageValid == true))
     {
-        documentIdColor = "green";
+        documentIdColor = "progress-bar-green";
         borderColor = "border-success";
     }
     else
     {
-        documentIdColor = "#dc3545!important";
+        documentIdColor = "progress-bar-red";
         borderColor = "border-danger";
     }
     <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
@@ -42,7 +42,7 @@
             </div>
             <div class="progress">
                 <i class="far fa-bookmark bookmark-green"></i>
-                <div class="progress-bar" role="progressbar" style="width:100%;background-color:@documentIdColor;">
+                <div class="progress-bar @documentIdColor" role="progressbar">
                     document-id
                 </div>
             </div>

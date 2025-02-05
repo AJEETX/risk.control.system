@@ -58,7 +58,7 @@
                             <tbody>
                                 @foreach (var item in Model)
                                 {
-                                    var masterData = item.MasterData ? "none" : "";
+                                    var masterData = item.MasterData ? "master-data" : "";
                                     <tr>
                                         <td>
                                             @Html.DisplayFor(modelItem => item.Name)
@@ -82,10 +82,10 @@
                                             <a class="btn btn-xs btn-info" asp-action="Details" asp-route-id="@item.InvestigationCaseSubStatusId">
                                                 <i class="fa fa-search"></i>  @Applicationsettings.VIEW
                                             </a> &nbsp;
-                                            <a class="btn btn-xs btn-warning" style="pointer-events:@masterData" asp-action="Edit" asp-route-id="@item.InvestigationCaseSubStatusId">
+                                            <a class="btn btn-xs btn-warning @masterData" asp-action="Edit" asp-route-id="@item.InvestigationCaseSubStatusId">
                                                 <i class="fas fa-pen"></i>  @Applicationsettings.EDIT
                                             </a> &nbsp;
-                                            <a class="btn btn-xs btn-danger" style="pointer-events:@masterData" asp-action="Delete" asp-route-id="@item.InvestigationCaseSubStatusId">
+                                            <a class="btn btn-xs btn-danger @masterData"  asp-action="Delete" asp-route-id="@item.InvestigationCaseSubStatusId">
                                                 <i class="fas fa-trash"></i>  @Applicationsettings.DELETE
                                             </a>
                                         </td>

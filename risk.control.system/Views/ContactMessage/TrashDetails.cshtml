@@ -38,7 +38,7 @@
 
                 </div>
 
-                <button type="button" onclick="window.print();return false;" class="btn btn-default btn-sm" title="Print">
+                <button type="button" class="btn btn-default btn-sm print-me" title="Print">
                     <i class="fas fa-print"></i>
                 </button>
             </div>
@@ -50,11 +50,11 @@
         </div>
         @{
             var fileIcon = (Model.Extension == ".jpg" || Model.Extension == ".png") ? "fa fa-image" : "far fa-file-pdf";
-            var hasAttachment = (@Model.Attachment != null && @Model.Attachment.Length > 0) ? "" : "none";
+            var hasAttachment = (@Model.Attachment != null && @Model.Attachment.Length > 0) ? "" : "fileAttachment";
         }
         <div class="card-footer bg-white">
             <ul class="mailbox-attachments d-flex align-items-stretch clearfix">
-                <li style="display:@hasAttachment">
+                <li class="@hasAttachment">
                     <span class="mailbox-attachment-icon"><i class="@fileIcon"></i></span>
                     <div class="mailbox-attachment-info">
                         <a asp-controller="Download" asp-action="TrashDetailsDownloadFileAttachment" asp-route-id="@Model.TrashMessageId" class="mailbox-attachment-name"><i class="fas fa-paperclip"></i> @Model.AttachmentName</a>
@@ -76,7 +76,7 @@
                 <button type="button" class="btn btn-default"><i class="fas fa-share"></i> Forward</button>*@
             </div>
             <a asp-action="TrashDetailsDelete" asp-route-id="@Model.TrashMessageId" class="btn btn-default"><i class="far fa-trash-alt"></i> Delete</a>
-            <button type="button" onclick="window.print();return false;" class="btn btn-default"><i class="fas fa-print"></i> Print</button>
+            <button type="button" class="btn btn-default print-me"><i class="fas fa-print"></i> Print</button>
         </div>
 
     </div>

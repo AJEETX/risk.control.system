@@ -51,7 +51,10 @@
                             @Html.DisplayNameFor(model => model.PhoneNumber)
                         </dt>
                         <dd class="col-sm-5">
-                            @Html.DisplayFor(model => model.PhoneNumber)
+                            @{
+                                var phone = $"+{Model.Country.ISDCode} (0) {Model.PhoneNumber}";
+                            }
+                            @Html.DisplayFor(model => phone)
                         </dd>
                     </dl>
                 </div>

@@ -17,8 +17,8 @@
                     <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
                         <thead>
                             <tr>
-                                <th id="table-header" colspan="6" style="background-color:#fff !important;">
-                                    <input style="margin-right:10px;" type="checkbox" id="checkall" />
+                                <th id="table-header" colspan="6">
+                                    <input type="checkbox" id="checkall" />
                                     <div class="btn-group">
                                         <button disabled="disabled" id="manage-vendors" type="submit" class="btn btn-default"><i class="fa fa-trash"></i> Delete</button>
                                         <a asp-action="Index" class="btn btn-default"><i class="fas fa-sync-alt"></i> Refresh</a>
@@ -55,7 +55,7 @@
                                     var fileAttachment = string.Empty;
                                     if (string.IsNullOrEmpty(message.AttachmentName))
                                     {
-                                        fileAttachment = "none";
+                                        fileAttachment = "fileAttachment";
                                     }
                                     <tr class="@(message.Read == false ? "message-unread" : "message-read")">
                                         <td>
@@ -71,7 +71,7 @@
 
                                         <td class="mailbox-attachment">
                                             <a class="row-links" asp-action="InboxDetails" asp-route-id="@message.InboxMessageId">
-                                                <span style="display:@fileAttachment"> <i class='fas fa-paperclip'></i></span>
+                                                <span class="@fileAttachment"> <i class='fas fa-paperclip'></i></span>
                                             </a>
                                         </td>
 

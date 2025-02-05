@@ -63,13 +63,13 @@
                 "data": "country",
                 bSortable: false,
                 "mRender": function (data, type, row) {
-                    return '<span title="' + data + '" data-toggle="tooltip">' + data + '</span>'
+                    return '<span title="' + data + '" data-toggle="tooltip"> <img alt="' + data + '" title="' + data + '" src="' + row.flag + '" class="flag-icon" data-toggle="tooltip"/>' + data + '</span>'
                 }
             },
             {
                 "data": "pincode",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + data + '" data-toggle="tooltip">' + data + '</span>'
+                    return '<span title="' + data + '" data-toggle="tooltip"> ' + data + '</span>'
                 }
             },
             {
@@ -105,7 +105,6 @@
                 "mRender": function (data, type, row) {
                     var buttons = "";
                     buttons += '<a id=details' + row.id + ' href="/Vendors/Details?Id=' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Details</a>&nbsp;'
-                    //buttons += '<a onclick="showedit()" href="/Vendors/Edit?Id=' + row.id + '"  class="btn btn-xs btn-warning"><i class="fas fa-pen"></i> Edit</a>&nbsp;'
                     buttons += '<a id=delete' + row.id + ' href="/Vendors/Delete?Id=' + row.id + '"  class="btn btn-xs btn-danger"><i class="fas fa-trash"></i></i> Delete</a>'
                     return buttons;
                 }

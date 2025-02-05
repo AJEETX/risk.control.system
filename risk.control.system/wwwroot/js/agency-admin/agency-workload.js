@@ -43,7 +43,7 @@
             },
             {
                 "data": "onlineStatus",
-                "sDefaultContent": '<i class="fas fa-circle" style="color: green;"></i> ',
+                "sDefaultContent": '<i class="fas fa-circle"></i> ',
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var iconClass = row.onlineStatusIcon || 'fas fa-circle';; // Class for the icon

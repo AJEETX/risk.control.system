@@ -117,9 +117,7 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    //buttons += '<a id=details' + row.id + ' onclick="showdetails(' + row.id + ')" href="/Vendors/Details?Id=' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Details</a>&nbsp;'
-                    //buttons += '<a onclick="showedit()" href="/Vendors/Edit?Id=' + row.id + '"  class="btn btn-xs btn-warning"><i class="fas fa-pen"></i> Edit</a>&nbsp;'
-                    buttons += '<a id=delete' + row.id + ' onclick="getdetails(' + row.id + ')" href="/Vendors/Delete?Id=' + row.id + '"  class="btn btn-xs btn-danger"><i class="fas fa-trash"></i></i> Delete</a>'
+                    buttons += '<a id="delete' + row.id + '" href="/Vendors/Delete?Id=' + row.id + '"  class="btn btn-xs btn-danger"><i class="fas fa-trash"></i> Delete</a>'
                     return buttons;
                 }
             },
@@ -141,8 +139,6 @@
                 window.location.href = $(this).attr('href'); // Navigate to the delete page
             });
 
-        },
-        "drawCallback": function (settings, start, end, max, total, pre) {
             var rowCount = (this.fnSettings().fnRecordsTotal()); // total number of rows
             if (rowCount > 0) {
                 $('#depanel-vendors').prop('disabled', false);
@@ -292,6 +288,12 @@
     });
 });
 
+function handleDeleteButtonClick(e) {
+    e.preventDefault(); // Prevent the default anchor behavior
+    var id = $(this).attr('id').replace('delete', ''); // Extract the ID from the button's ID attribute
+    getdetails(id); // Call the getdetails function with the ID
+    window.location.href = $(this).attr('href'); // Navigate to the delete page
+}
 function getdetails(id) {
     $("body").addClass("submit-progress-bg");
     // Wrap in setTimeout so the UI

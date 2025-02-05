@@ -1976,6 +1976,7 @@ select#PinCodeId {
 }
 .callout-info {
     margin-bottom: 0 !important;
+
 }
 /* Padding and alignment for result */
 .result-padding {
@@ -2217,4 +2218,24 @@ img.claims-logo {
     padding:0px;
     margin:0px;
     flex-wrap: wrap; /* Allow items to wrap in smaller screens */
+}
+.fileAttachment{
+    display:none;
+}
+.inbox-header, .table-header {
+    background-color: #fff !important;
+}
+input#checkall {
+        margin-right: 10px
+    }
+.master-data {
+    pointer-events:none;
+}
+
+.disable-elements {
+    pointer-events: none;
+    cursor:not-allowed;
+}
+.invoice-subtotal {
+    width: 50%;
 }

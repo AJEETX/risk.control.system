@@ -5,7 +5,7 @@
     {
         var imageCapturedTime = @Model.ClaimsInvestigation.AgencyReport?.VideoReport?.DocumentIdImageLongLatTime != null ? @Model.ClaimsInvestigation.AgencyReport?.VideoReport?.DocumentIdImageLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt") : null;
 
-        string audioColor = "grey";
+        string audioColor = "progress-bar-grey";
         var audioBorderColor = "";
         if (Model.ClaimsInvestigation.AgencyReport.VideoReport?.DocumentIdImageLongLat == null)
         {
@@ -14,12 +14,12 @@
         else if (Model.ClaimsInvestigation.AgencyReport.VideoReport?.DocumentIdImageLongLat != null && (
         Model.ClaimsInvestigation.AgencyReport?.VideoReport?.DocumentIdImageValid != null && Model.ClaimsInvestigation.AgencyReport?.VideoReport?.DocumentIdImageValid == true))
         {
-            audioColor = "green";
+            audioColor = "progress-bar-green";
             audioBorderColor = "border-success";
         }
         else
         {
-            audioColor = "#dc3545!important";
+            audioColor = "progress-bar-red";
             audioBorderColor = "border-danger";
         }
 
@@ -39,7 +39,7 @@
                                         <b> Upload</b> Max image size 2 MB
                                     </div>
                                     <div>
-                                        <i class='far fa-thumbs-down'></i> <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i> UnMatched VIDEO
+                                        <i class='far fa-thumbs-down'></i> <i class='fa fa-times i-orangered' aria-hidden='true'></i> UnMatched VIDEO
                                     </div>
                                 </span>
                             }
@@ -51,7 +51,7 @@
                                         <b> Upload</b> Max image size 2 MB
                                     </div>
                                     <div>
-                                        <i class='far fa-thumbs-up'></i> <i style='color:green;' class='fas fa-check-circle'></i> Matched VIDEO
+                                        <i class='far fa-thumbs-up'></i> <i class='fas fa-check-circle i-green'></i> Matched VIDEO
                                     </div>
                                 </span>
                             }
@@ -90,21 +90,21 @@
                     <span class="badge badge-light"><i class="far fa-image"></i> Valid : </span>
                     @if (@audioColor == "grey")
                     {
-                        <i style='color:grey;' class='fa fa-times' aria-hidden='true'></i>
+                        <i class='fa fa-times i-grey' aria-hidden='true'></i>
                     }
                     else if (@Model.ClaimsInvestigation.AgencyReport?.VideoReport?.DocumentIdImageValid.Value ?? false)
                     {
-                        <i style='color:green;' class='fas fa-check-circle'></i>
+                        <i class='fas fa-check-circle i-green'></i>
                     }
 
                     else
                     {
-                        <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i>
+                        <i class='fa fa-times i-orangered' aria-hidden='true'></i>
                     }
                 </div>
                 <div class="progress">
                     <i class="far fa-bookmark bookmark-green"></i>
-                    <div class="progress-bar" role="progressbar" style="width:100%;background-color:@audioColor;">
+                    <div class="progress-bar @audioColor" role="progressbar">
                         video
                     </div>
                 </div>

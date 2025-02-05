@@ -347,6 +347,9 @@ $(document).ready(function () {
             $('#assessorRemarkType').val('REJECT');
         }
     });
+    $('#enquire-case').on('click', function (e) {
+        howenquiry();
+    });
 
 });
 

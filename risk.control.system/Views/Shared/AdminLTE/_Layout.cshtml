@@ -35,7 +35,7 @@
                     {
                         CanChangePassword = @company.CanChangePassword,
                         CountryCode = company.Country.Code,
-                        Country = $"{company.Country.Name} ({company.Country.Code})"
+                        Country = $"(+{company.Country.ISDCode}) {company.Country.Name} ({company.Country.Code})"
                     };
                     <partial name="AdminLTE/_CompanyTopNavigation" model="@navigationModel" />
 
@@ -48,7 +48,7 @@
                     {
                         CanChangePassword = vendor.CanChangePassword,
                         CountryCode = vendor.Country.Code,
-                        Country = $"{vendor.Country.Name} ({vendor.Country.Code})"
+                        Country = $"(+{vendor.Country.ISDCode}) {vendor.Country.Name} ({vendor.Country.Code})"
                     };
                     <partial name="AdminLTE/_AgencyTopNavigation" model="@navigationModel" />
                     <partial name="AdminLTE/_VendorSidebar" model="@vendor" />

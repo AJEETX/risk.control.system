@@ -7,20 +7,20 @@
         </header>
         <div class="card card-solid">
             <div class="progress">
-                <i class="far fa-bookmark" style="font-size:1.1rem;"></i>
-                <div class="progress-bar" role="progressbar" style="width:32.5%;background-color:green;">
+                <i class="far fa-bookmark"></i>
+                <div class="progress-bar progress-bar-green" role="progressbar">
                     investigation report
                 </div>
-                <i class="far fa-caret-square-right" style="font-size:1.1rem;"></i>
-                <div class="progress-bar" role="progressbar" style="width:32.33%;background-color:green">
+                <i class="far fa-caret-square-right"></i>
+                <div class="progress-bar progress-bar-green" role="progressbar">
                     agent remarks
                 </div>
-                <i class="far fa-caret-square-right" style="font-size:1.1rem;"></i>
+                <i class="far fa-caret-square-right"></i>
 
-                <div class="progress-bar" role="progressbar" style="width:33.34%;background-color:green">
+                <div class="progress-bar progress-bar-green" role="progressbar">
                     supervisor comments
                 </div>
-                <i class="far fa-bookmark" style="font-size:1.1rem;"></i>
+                <i class="far fa-bookmark"></i>
             </div>
             <div class="card-body">
                 <div class="submit-progress hidden">
@@ -35,7 +35,7 @@
                                 <div class="card bg-light d-flex flex-fill">
                                     <div class="card-header text-muted border-bottom-0">
 
-                                        <i class="fas fa-portrait"></i> Digital <span class="badge badge-light">checkify</span> <span class="badge badge-light" style="float:right;">
+                                        <i class="fas fa-portrait"></i> Digital <span class="badge badge-light">checkify</span> <span class="badge badge-light">
                                             <i class="nav-icon fas fa-clock"></i> @Model.DigitalIdReport?.DigitalIdImageLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt")
                                         </span>
                                     </div>
@@ -43,11 +43,11 @@
                                         <span class="badge badge-light"><i class="fas fa-portrait"></i> Match :  </span>
                                         @if (@Model.DigitalIdReport?.Similarity < 70 && Model.DigitalIdReport?.DigitalIdImageLongLatTime != null)
                                         {
-                                            <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i>
+                                            <i class='fa fa-times i-orangered' aria-hidden='true'></i>
                                         }
                                         else
                                         {
-                                            <i style='color:green;' class='fas fa-check-circle'></i>
+                                            <i class='fas fa-check-circle i-green'></i>
                                         }
                                     </div>
                                     <div class="card-body pt-0">
@@ -117,7 +117,7 @@
                                     <div class="card-header text-muted border-bottom-0">
 
                                         <i class="fas fa-mobile-alt"></i> Document <span class="badge badge-light">checkify </span>
-                                        <span class="badge badge-light" style="float:right;">
+                                        <span class="badge badge-light">
                                             <i class="nav-icon fas fa-clock"></i>
                                             @Model?.PanIdReport.DocumentIdImageLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt")
                                         </span>
@@ -128,11 +128,11 @@
                                 @Model.PanIdReport.DocumentIdImageValid.HasValue
                                 && @Model.PanIdReport.DocumentIdImageValid.HasValue != null)
                                         {
-                                            <i style='color:green;' class='fas fa-check-circle'></i>
+                                            <i class='fas fa-check-circle i-green'></i>
                                         }
                                         else
                                         {
-                                            <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i>
+                                            <i class='fa fa-times i-orangered' aria-hidden='true'></i>
                                         }
                                     </div>
                                     <div class="card-body pt-0">
@@ -193,11 +193,11 @@
                                             <span class="badge badge-light">Valid : </span>
                                             @if (@Model.PanIdReport?.DocumentIdImageValid.Value ?? false)
                                             {
-                                                <i style='color:green;' class='fas fa-check-circle'></i>
+                                                <i class='fas fa-check-circle i-green'></i>
                                             }
                                             else
                                             {
-                                                <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i>
+                                                <i class='fa fa-times i-orangered' aria-hidden='true'></i>
                                             }
                                         </p>
                                     </div>
@@ -213,7 +213,7 @@
                     <div class="col-12 col-sm-4 d-flex align-items-stretch flex-column">
                         <div class="card bg-light d-flex flex-fill">
                             <div class="card-header text-muted border-bottom-0">
-                                <i class="far fa-comment"></i> Questionnaire <span class="badge badge-light">checkify</span> <span class="badge badge-light" style="float:right;"><i class="nav-icon fas fa-clock"></i> @questionTime </span>
+                                <i class="far fa-comment"></i> Questionnaire <span class="badge badge-light">checkify</span> <span class="badge badge-light"><i class="nav-icon fas fa-clock"></i> @questionTime </span>
                             </div>
                             <div class="card-footer text-muted border-bottom-0">
                                 <i class="fas fa-user-shield"></i>  Agent :<span class="badge badge-light">  @Model?.AgentEmail </span>
@@ -313,7 +313,7 @@
                     <div class="col-12 d-flex align-items-stretch flex-column">
                         <div class="card bg-light d-flex flex-fill">
                             <div class="card-header text-muted border-bottom-0">
-                                <i class="fas fa-user-edit"></i> Supervisor <span style="float:right;"><i class="nav-icon fas fa-clock"></i> @Model?.SupervisorRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt")</span>
+                                <i class="fas fa-user-edit"></i> Supervisor <span><i class="nav-icon fas fa-clock"></i> @Model?.SupervisorRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt")</span>
                             </div>
 
                             <div class="card-body pt-0">
@@ -341,7 +341,7 @@
                     <div class="col-12 d-flex align-items-stretch flex-column">
                         <div class="card bg-light d-flex flex-fill">
                             <div class="card-header text-muted border-bottom-0">
-                                <i class="fas fa-user-check"></i> Assessor <span style="float:right;"><i class="nav-icon fas fa-clock"></i> @Model?.AssessorRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt")</span>
+                                <i class="fas fa-user-check"></i> Assessor <span><i class="nav-icon fas fa-clock"></i> @Model?.AssessorRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt")</span>
                             </div>
                             <div class="card-body pt-0">
                                 <div class="row">

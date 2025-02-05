@@ -152,7 +152,6 @@
                 "mRender": function (data, type, row) {
                     var buttons = "";
                     buttons += '<a id=edit' + row.id + ' href="/Vendors/EditUser?userId=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-pen"></i> Edit</a>&nbsp;'
-                    //buttons += '<a id=role' + row.id + ' onclick="showroles(' + row.id + ')" href="/Vendors/UserRoles?userId=' + row.id + '"  class="btn btn-xs btn-info"><i class="fas fa-pen"></i> Role</a>'
                     if (row.role != "AGENCY_ADMIN") {
                         buttons += '<a id="details' + row.id + '" href="/Vendors/DeleteUser?userId=' + row.id + '" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i> Delete </a>'
                     } else {

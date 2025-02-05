@@ -338,6 +338,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Views\Confirm\" />
     <Folder Include="wwwroot\agency\" />
     <Folder Include="wwwroot\audio\" />
     <Folder Include="wwwroot\beneficiary-document\" />

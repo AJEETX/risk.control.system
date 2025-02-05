@@ -3,7 +3,7 @@
     ViewData["Title"] = "Chat";
 }
 
-<button class="open-button" onclick="openForm()">Chat</button>
+<button id="open-myForm" class="open-button">Chat</button>
 
 <div class="chat-popup" id="myForm">
     <div class="form-container">
@@ -11,7 +11,7 @@
         <div class="card card-outline">
             <div class="card-header">
                 <h3 class="card-title"><i class="fas fa-comments"></i> Quick Chat </h3>
-                <button class="close" type="button" data-dismiss="modal" aria-label="Close" onclick="closeForm()">
+                <button class="close close-myForm" type="button" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">×</span>
                 </button>
             </div>
@@ -50,7 +50,7 @@
                                         <ul id="messagesList"></ul>
                                         <input type="text" id="messageInput" placeholder="Message" class="form-control remarks" />
                                         <button id="sendButton" class="btn btn-primary">Send</button>
-                                        <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
+                                        <button type="button" class="btn cancel close-myForm">Close</button>
                                     </div>
                                 </div>
                             </div>

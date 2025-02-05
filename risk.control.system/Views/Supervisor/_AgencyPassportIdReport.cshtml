@@ -3,7 +3,7 @@
 @{
     var imageCapturedTime = @Model.AgencyReport?.PassportIdReport?.DocumentIdImageLongLatTime != null ? @Model.AgencyReport?.PassportIdReport?.DocumentIdImageLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt") : null;
 
-    string documentIdColor = "grey";
+    string documentIdColor = "progress-bar-grey";
     var borderColor = "";
     if (Model.AgencyReport.PassportIdReport?.DocumentIdImageLongLat == null)
     {
@@ -12,12 +12,12 @@
     else if (Model.AgencyReport.PassportIdReport?.DocumentIdImageLongLat != null && (
     Model.AgencyReport?.PassportIdReport?.DocumentIdImageValid != null && Model.AgencyReport?.PassportIdReport?.DocumentIdImageValid == true))
     {
-        documentIdColor = "green";
+        documentIdColor = "progress-bar-green";
         borderColor = "border-success";
     }
     else
     {
-        documentIdColor = "#dc3545!important";
+        documentIdColor = "progress-bar-red";
         borderColor = "border-danger";
     }
 
@@ -37,7 +37,7 @@
                                     <b> Upload</b> Max image size 2 MB
                                 </div>
                                 <div>
-                                    <i class='far fa-thumbs-down'></i> <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i> UnMatched PASSPORT
+                                    <i class='far fa-thumbs-down'></i> <i class='fa fa-times i-orangered' aria-hidden='true'></i> UnMatched PASSPORT
                                 </div>
                             </span>
                         }
@@ -49,7 +49,7 @@
                                     <b> Upload</b> Max image size 2 MB
                                 </div>
                                 <div>
-                                    <i class='far fa-thumbs-up'></i> <i style='color:green;' class='fas fa-check-circle'></i> Matched PASSPORT
+                                    <i class='far fa-thumbs-up'></i> <i class='fas fa-check-circle i-green'></i> Matched PASSPORT
                                 </div>
                             </span>
                         }
@@ -88,21 +88,21 @@
                 <span class="badge badge-light"><i class="far fa-image"></i> Valid : </span>
                 @if (@documentIdColor == "grey")
                 {
-                    <i style='color:grey;' class='fa fa-times' aria-hidden='true'></i>
+                    <i class='fa fa-times i-grey' aria-hidden='true'></i>
                 }
                 else if (@Model.AgencyReport?.PassportIdReport?.DocumentIdImageValid.Value ?? false)
                 {
-                    <i style='color:green;' class='fas fa-check-circle'></i>
+                    <i class='fas fa-check-circle i-green'></i>
                 }
 
                 else
                 {
-                    <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i>
+                    <i class='fa fa-times i-orangered' aria-hidden='true'></i>
                 }
             </div>
             <div class="progress">
                 <i class="far fa-bookmark bookmark-green"></i>
-                <div class="progress-bar" role="progressbar" style="width:100%;background-color:@documentIdColor;">
+                <div class="progress-bar @documentIdColor" role="progressbar">
                     passport
                 </div>
             </div>

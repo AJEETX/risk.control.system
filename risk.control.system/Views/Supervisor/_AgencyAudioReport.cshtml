@@ -3,7 +3,7 @@
 @{
     var imageCapturedTime = @Model.AgencyReport?.AudioReport?.DocumentIdImageLongLatTime != null ? @Model.AgencyReport?.AudioReport?.DocumentIdImageLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt") : null;
 
-    string audioIdColor = "grey";
+    string audioIdColor = "progress-bar-grey";
     var audioIdColorBorderColor = "";
     if (Model.AgencyReport.AudioReport?.DocumentIdImageLongLat == null)
     {
@@ -12,12 +12,12 @@
     else if (Model.AgencyReport.AudioReport?.DocumentIdImageLongLat != null && (
     Model.AgencyReport?.AudioReport?.DocumentIdImageValid != null && Model.AgencyReport?.AudioReport?.DocumentIdImageValid == true))
     {
-        audioIdColor = "green";
+        audioIdColor = "progress-bar-green";
         audioIdColorBorderColor = "border-success";
     }
     else
     {
-        audioIdColor = "#dc3545!important";
+        audioIdColor = "progress-bar-red";
         audioIdColorBorderColor = "border-danger";
     }
 
@@ -37,7 +37,7 @@
                                     <b> Upload</b> Max image size 2 MB
                                 </div>
                                 <div>
-                                    <i class='far fa-thumbs-down'></i> <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i> Valid Audio
+                                    <i class='far fa-thumbs-down'></i> <i class='fa fa-times i-orangered' aria-hidden='true'></i> Valid Audio
                                 </div>
                             </span>
                         }
@@ -49,7 +49,7 @@
                                     <b> Upload</b> Max image size 2 MB
                                 </div>
                                 <div>
-                                    <i class='far fa-thumbs-up'></i> <i style='color:green;' class='fas fa-check-circle'></i> InValid Audio
+                                    <i class='far fa-thumbs-up'></i> <i class='fas fa-check-circle i-green'></i> InValid Audio
                                 </div>
                             </span>
                         }
@@ -88,21 +88,21 @@
                 <span class="badge badge-light"><i class="far fa-image"></i> Valid : </span>
                 @if (@audioIdColor == "grey")
                 {
-                    <i style='color:grey;' class='fa fa-times' aria-hidden='true'></i>
+                    <i class='fa fa-times i-grey' aria-hidden='true'></i>
                 }
                 else if (@Model.AgencyReport?.AudioReport?.DocumentIdImageValid.Value ?? false)
                 {
-                    <i style='color:green;' class='fas fa-check-circle'></i>
+                    <i class='fas fa-check-circle i-green'></i>
                 }
 
                 else
                 {
-                    <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i>
+                    <i class='fa fa-times i-orangered' aria-hidden='true'></i>
                 }
             </div>
             <div class="progress">
                 <i class="far fa-bookmark bookmark-green"></i>
-                <div class="progress-bar" role="progressbar" style="width:100%;background-color:@audioIdColor;">
+                <div class="progress-bar @audioIdColor;" role="progressbar">
                     audio
                 </div>
             </div>

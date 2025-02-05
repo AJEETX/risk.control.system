@@ -78,7 +78,7 @@
                 "data": "address",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.address + '" data-toggle="tooltip">' + data + '</span>'
+                    return '<span title="' + data + '" data-toggle="tooltip">' + data + '</span>'
                 }
             },
             {

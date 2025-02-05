@@ -255,8 +255,22 @@ function getMobileType() {
     }
 }
 
+function print() {
+    window.print();
+    return false;
+}
 
 $(document).ready(function () {
+
+    $('.print-me').on('click', function () {
+        return print();
+    });
+    $('.close-myForm').on('click', function () {
+        closeForm();
+    });
+    $('#open-myForm').on('click', function () {
+        openForm();
+    });
     $('[data-toggle="tooltip"]').tooltip({
         animated: 'fade',
         placement: 'top',
@@ -743,10 +757,7 @@ function disableAllInteractiveElements() {
     });
 
     // Apply CSS to make interactive elements unclickable
-    $('button, a, .text').css({
-        'pointer-events': 'none',
-        'cursor': 'not-allowed'
-    });
+    $('button, a, .text').addClass('disable-elements');
 }
 function checkIfAllChecked(elements) {
     var totalElmentCount = elements.length;
