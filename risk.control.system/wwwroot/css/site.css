@@ -2114,6 +2114,7 @@ select#PinCodeId {
     padding:2px;
     border:1px solid #ddd;
     border-radius:2px;
+    display:inline;
 }
 #invalid-characters {
     color: brown;
@@ -2122,6 +2123,7 @@ select#PinCodeId {
     padding: 2px;
     border: 1px solid #ddd;
     border-radius: 2px;
+    display: inline;
 }
 /* Hide the default checkbox */
 .custom-checkbox {
@@ -2238,4 +2240,16 @@ input#checkall {
 }
 .invoice-subtotal {
     width: 50%;
+}
+.hidden-section {
+    display: none;
+    opacity: 0;
+    transition: opacity 2s ease-in-out; /* Smooth fade-in/fade-out transition */
+}
+.password-info-icon {
+    color: darkblue;
+    font-size: .7em;
+}
+.password-info-icon:hover{
+    cursor:pointer;
 }

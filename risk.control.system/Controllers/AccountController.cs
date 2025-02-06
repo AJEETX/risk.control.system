@@ -349,7 +349,8 @@ namespace risk.control.system.Controllers
             var model = new ChangePasswordViewModel
             {
                 Email = email,
-                CurrentPassword = user.Password
+                CurrentPassword = user.Password,
+                ProfilePicture = user.ProfilePicture
             };
             return View(model);
         }

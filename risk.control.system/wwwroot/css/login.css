@@ -570,6 +570,9 @@ img.logo {
     color: darkblue;
     font-size:.7em;
 }
+    .password-info-icon:hover {
+        cursor: pointer;
+    }
 .form-content .input-box input.country-code {
     padding: 1em;
 }

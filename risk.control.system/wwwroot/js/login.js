@@ -82,6 +82,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
+
     // Add event listeners to all elements with class `toggle-password-visibility`
     const toggleButtons = document.querySelectorAll('.toggle-password-visibility');
 
