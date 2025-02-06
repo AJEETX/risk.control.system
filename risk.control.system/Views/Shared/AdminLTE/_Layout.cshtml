@@ -55,7 +55,14 @@
                 }
                 else
                 {
-                    <partial name="AdminLTE/_TopNavigation" />
+                    var admin = _context.ApplicationUser.Include(c => c.Country).FirstOrDefault(c => c.Email == userEmail);
+                    var navigationModel = new TopNavigation
+                    {
+                        CanChangePassword = true,
+                        CountryCode = admin.Country.Code,
+                        Country = $"(+{admin.Country.ISDCode}) {admin.Country.Name} ({admin.Country.Code})"
+                    };
+                    <partial name="AdminLTE/_TopNavigation" model="@navigationModel" />
                     <partial name="AdminLTE/_Sidebar" />
                 }
                 <div class="content-wrapper content-wrapper-main">

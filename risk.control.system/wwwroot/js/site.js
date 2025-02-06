@@ -135,11 +135,11 @@ function validateInput(selector, regex) {
     });
 }
 function openForm() {
-    document.getElementById("myForm").style.display = "block";
+    document.getElementById("myForm").removeClass("hidden-section");
 }
 
 function closeForm() {
-    document.getElementById("myForm").style.display = "none";
+    document.getElementById("myForm").addClass("hidden-section");
 }
 function clearAllInputs(event) {
     var allInputs = document.querySelectorAll('input');

@@ -1,4 +1,5 @@
-﻿<!-- Navbar -->
+﻿@model TopNavigation
+<!-- Navbar -->
 <nav class="main-header navbar navbar-expand navbar-light bg-light">
     <!-- Left navbar links -->
     <ul class="navbar-nav">
@@ -27,23 +28,21 @@
 
     <!-- Right navbar links -->
     <ul class="navbar-nav ml-auto">
-        <li class="">
-            <a class="nav-link" data-widget="control-sidebar" data-slide="true" role="button">
-                <div class="space"><i id="hour-glass" class="fas fa-hourglass-end fa-spin"></i></div>
+        <li class="top-nav-header-border">
+            <a class="nav-link" data-widget="control-sidebar" data-slide="true" role="button" title="Idle time remaining" data-toggle="tooltip">
+                <div><i id="hour-glass" class="fas fa-hourglass-end fa-spin"></i>  <span id="time"> </span></div>
             </a>
         </li>
-        <li class="">
-            <a class="nav-link" data-widget="control-sidebar" data-slide="true" role="button">
-               <div id="time"> </div>
-            </a>
-        </li>
-        <li class="">
-            <a class="nav-link" data-widget="control-sidebar" data-slide="true" role="button">
-                <div id="country"> </div>
+        <li class="top-nav-header-border">
+            @{
+                var img = "/flags/" + @Model.CountryCode.ToLower() + ".png";
+            }
+            <a class="nav-link" data-widget="control-sidebar" data-slide="true" role="button" title="@Model?.Country" data-toggle="tooltip">
+                <div id="country"> <i class="fas fa-map-marker-alt"></i> <img src="@img" class="flag-icon" /> </div>
             </a>
         </li>
         <!-- Notifications Dropdown Menu -->
-        <li class="dropdown">
+        <li class="dropdown top-nav-header-border">
             <a class="nav-link" data-toggle="dropdown" href="#">
                 <i class="fas fa-cog fa-spin"></i>
             </a>

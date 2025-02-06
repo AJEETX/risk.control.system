@@ -1260,9 +1260,7 @@ img.doc-profile-image {
 
 .submit-progress-password {
     position: fixed;
-    left: 50%;
     height: 10em;
-    margin-left:10%;
     padding-top: 2.5em;
     /* The following rules are the
     ones most likely to change */
@@ -1370,10 +1368,9 @@ a#back-button {
     font-family: Tahoma;
     width: 4rem;
     text-align: center;
-    border: 2px solid #ccc;
     background-color: white;
     color: black;
-    border-radius: 4px;
+    padding-left:.4em;
 }
 
 .disabled-now {
@@ -2249,14 +2246,23 @@ input#checkall {
 .password-info-icon {
     color: darkblue;
     font-size: .7em;
+    cursor:default;
 }
-.password-info-icon:hover{
-    cursor:pointer;
-}
+    .password-info-icon:hover {
+        cursor: default;
+    }
 #password-advise {
     font-size: .7em;
     padding: 0px;
 }
 .password-content{
     padding:0px;
+}
+.top-nav-header-border {
+    padding: 0px;
+    margin: 0px;
+    cursor: default;
+    background-color:#f1f1f1;
+    border:1px solid #ddd;
+    border-radius:.5em;
 }

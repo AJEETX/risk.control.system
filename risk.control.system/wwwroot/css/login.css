@@ -569,9 +569,10 @@ img.logo {
 .password-info-icon {
     color: darkblue;
     font-size:.7em;
+    cursor:default;
 }
     .password-info-icon:hover {
-        cursor: pointer;
+        cursor: default;
     }
 .form-content .input-box input.country-code {
     padding: 1em;

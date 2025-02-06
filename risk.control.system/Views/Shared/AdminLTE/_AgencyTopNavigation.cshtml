@@ -28,17 +28,13 @@
 
     <!-- Right navbar links -->
     <ul class="navbar-nav ml-auto">
-        <li class="">
-            <a class="nav-link" data-widget="control-sidebar" data-slide="true" role="button" title="Hour glass counter" data-toggle="tooltip">
-                <div class="space"><i id="hour-glass" class="fas fa-hourglass-end fa-spin"></i></div>
-            </a>
-        </li>
-        <li class="">
+        
+        <li class="top-nav-header-border">
             <a class="nav-link" data-widget="control-sidebar" data-slide="true" role="button" title="Idle time remaining" data-toggle="tooltip">
-                <div id="time"> </div>
+                <div><i id="hour-glass" class="fas fa-hourglass-end fa-spin"></i>  <span id="time"> </span></div>
             </a>
         </li>
-        <li class="">
+        <li class="top-nav-header-border">
             @{
                 var img = "/flags/" + @Model.CountryCode.ToLower() + ".png";
             }
@@ -47,7 +43,7 @@
             </a>
         </li>
         <!-- Notifications Dropdown Menu -->
-        <li class="dropdown">
+        <li class="dropdown top-nav-header-border">
             <a class="nav-link" data-toggle="dropdown" href="#">
                 <i class="fas fa-cog fa-spin"></i>
             </a>

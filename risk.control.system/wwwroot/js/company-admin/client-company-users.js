@@ -41,11 +41,11 @@
             },
             {
                 className: 'max-width-column', // Apply the CSS class,
-                targets: 5                      // Index of the column to style
+                targets: 4                      // Index of the column to style
             },
             {
                 className: 'max-width-column-name', // Apply the CSS class,
-                targets: 11                      // Index of the column to style
+                targets: 10                      // Index of the column to style
             }],
         language: {
             loadingRecords: '&nbsp;',
@@ -65,14 +65,8 @@
                     var iconClass = row.onlineStatusIcon; // Class for the icon
                     var colorClass = getColorClass(data); // Class for the color
                     var tooltip = row.onlineStatusName; // Tooltip text
-                    var img = `<i class="${iconClass} ${colorClass}" title="${tooltip}" data-toggle="tooltip"></i>`;
-                    return img;
-                }
-            },
-            {
-                "sDefaultContent": "",
-                "bSortable": false,
-                "mRender": function (data, type, row) {
+                    var onlineStatusIcon = `<i class="${iconClass} ${colorClass}" title="${tooltip}" data-toggle="tooltip"></i>`;
+                    
                     var img = '<div class="image-container"><img alt="' + row.name + '" title="' + row.name + '" src="' + row.photo + '" class="table-profile-image" data-toggle="tooltip"/>';
                     var buttons = "";
                     buttons += '<span class="user-verified">';
@@ -83,7 +77,7 @@
                     }
                     buttons += '</span>';
                     img += ' ' + buttons + '</div>';  // Close image container
-                    return img;
+                    return onlineStatusIcon + ' ' + img;
                 }
             },
             {

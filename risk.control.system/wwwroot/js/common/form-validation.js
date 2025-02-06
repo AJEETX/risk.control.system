@@ -23,7 +23,7 @@ $(document).ready(function () {
     validateFileInput('#createImageInput', ['jpg', 'png', 'jpeg']); // Adjust the selector and extensions as per your needs
 
     // Common selector for required fields and specific inputs
-    const requiredFieldsSelector = 'select[required], input[required], input[type="file"], #Comments, #PinCodeId';
+    const requiredFieldsSelector = 'select[required], input[required], input[type="file"], input[type="checkbox"], #Comments, #PinCodeId';
 
     // Add event handlers for 'change' and 'blur' events
     $(requiredFieldsSelector).on('input change blur', function () {
