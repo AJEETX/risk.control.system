@@ -33,40 +33,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    var pwdModal = document.getElementById('passwordModal');
-    var closeTermsButton = document.getElementById('closeterms');
-    var pwdLinks = document.querySelectorAll('#update-password-description');
-
-
-    if (pwdLinks) {
-        pwdLinks.forEach(function (termsLink) {
-            termsLink.addEventListener('click', function (e) {
-                e.preventDefault(); // Prevent default link behavior (i.e., not navigating anywhere)
-
-                // Show the terms modal
-                var termsModal = document.querySelector('#passwordModal');
-                termsModal.classList.remove('hidden-section');
-                termsModal.classList.add('show');
-            });
-        });
-    }
-    
-    if (closeTermsButton) {
-        closeTermsButton.addEventListener('click', function () {
-            pwdModal.classList.add('hidden-section'); // Remove the 'show' class to hide the modal
-            pwdModal.classList.remove('show'); // Close the modal if clicked outside
-        });
-    }
-    
-
-    // Optionally, you can close the modal if clicked outside the modal content
-    window.addEventListener('click', function (e) {
-        if (e.target === pwdModal) {
-            pwdModal.classList.add('hidden-section'); // Remove the 'show' class to hide the modal
-            pwdModal.classList.remove('show'); // Close the modal if clicked outside
-        }
-    });
-
 
 });
 

@@ -125,6 +125,27 @@ namespace risk.control.system.Controllers
         }
 
         [HttpGet]
+        public async Task StreamTypingUpdates(CancellationToken cancellationToken)
+        {
+            Response.ContentType = "text/event-stream";
+            var responseMessage = "Welcome! First time user. \n\nPlease update password to continue.";
+            await Response.WriteAsync($"data: {responseMessage}\n\n");
+
+            var responseMessage2 = "Please update password to continue.";
+            await Response.WriteAsync($"data: {responseMessage2}\n\n");
+
+
+            var responseMessage3 = "Remember password for later.";
+            await Response.WriteAsync($"data: {responseMessage3}\n\n");
+            
+            // Send a completion signal to indicate no more messages
+            var doneMessage = "done";
+            await Response.WriteAsync($"data: {doneMessage}\n\n");
+
+            await Response.Body.FlushAsync(cancellationToken);
+        }
+
+        [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> Login()
         {
@@ -334,7 +355,6 @@ namespace risk.control.system.Controllers
             return View(model);
         }
 
-        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> ChangePassword(string email)
         {

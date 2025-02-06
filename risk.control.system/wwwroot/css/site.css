@@ -2253,3 +2253,10 @@ input#checkall {
 .password-info-icon:hover{
     cursor:pointer;
 }
+#password-advise {
+    font-size: .7em;
+    padding: 0px;
+}
+.password-content{
+    padding:0px;
+}

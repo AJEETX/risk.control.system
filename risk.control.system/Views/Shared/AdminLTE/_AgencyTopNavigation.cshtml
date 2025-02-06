@@ -29,7 +29,7 @@
     <!-- Right navbar links -->
     <ul class="navbar-nav ml-auto">
         <li class="">
-            <a class="nav-link" data-widget="control-sidebar" data-slide="true" role="button">
+            <a class="nav-link" data-widget="control-sidebar" data-slide="true" role="button" title="Hour glass counter" data-toggle="tooltip">
                 <div class="space"><i id="hour-glass" class="fas fa-hourglass-end fa-spin"></i></div>
             </a>
         </li>
@@ -43,13 +43,13 @@
                 var img = "/flags/" + @Model.CountryCode.ToLower() + ".png";
             }
             <a class="nav-link" data-widget="control-sidebar" data-slide="true" role="button" title="@Model?.Country" data-toggle="tooltip">
-                <div id="country"><img src="@img" class="flag-icon" /> </div>
+                <div id="country"> <i class="fas fa-map-marker-alt"></i> <img src="@img" class="flag-icon" /> </div>
             </a>
         </li>
         <!-- Notifications Dropdown Menu -->
         <li class="dropdown">
             <a class="nav-link" data-toggle="dropdown" href="#">
-                <i class="fas fa-cog"></i>
+                <i class="fas fa-cog fa-spin"></i>
             </a>
             <div class="dropdown-menu dropdown-menu dropdown-menu-right">
                 @if(Model.CanChangePassword)

@@ -89,4 +89,95 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     });
+
+
+
+    var pwdModal = document.getElementById('passwordModal');
+    var closeTermsButton = document.getElementById('closeterms');
+    var pwdLinks = document.querySelectorAll('#update-password-description');
+
+
+    if (pwdLinks) {
+        pwdLinks.forEach(function (termsLink) {
+            termsLink.addEventListener('click', function (e) {
+                e.preventDefault(); // Prevent default link behavior (i.e., not navigating anywhere)
+
+                // Show the terms modal
+                var termsModal = document.querySelector('#passwordModal');
+                termsModal.classList.remove('hidden-section');
+                termsModal.classList.add('show');
+            });
+        });
+    }
+
+    if (closeTermsButton) {
+        closeTermsButton.addEventListener('click', function () {
+            pwdModal.classList.add('hidden-section'); // Remove the 'show' class to hide the modal
+            pwdModal.classList.remove('show'); // Close the modal if clicked outside
+        });
+    }
+
+
+    // Optionally, you can close the modal if clicked outside the modal content
+    window.addEventListener('click', function (e) {
+        if (e.target === pwdModal) {
+            pwdModal.classList.add('hidden-section'); // Remove the 'show' class to hide the modal
+            pwdModal.classList.remove('show'); // Close the modal if clicked outside
+        }
+    });
+
 });
+// Flag to keep track of message typing
+let typingInProgress = false;
+let messageQueue = []; // Queue to store messages and process them in order
+const chatGPTMessage = document.getElementById('password-advise');
+if (chatGPTMessage) {
+    const eventSource = new EventSource('/Account/StreamTypingUpdates');
+
+    
+
+    eventSource.addEventListener('message', (event) => {
+        // If the message is "done", we stop the EventSource
+        if (event.data === "done") {
+            eventSource.close();  // Close the connection once all messages are received
+        } else {
+            // Add the message to the queue and start processing if not already typing
+            messageQueue.push(event.data);
+            processNextMessage();  // Try to process the next message
+        }
+    });
+}
+
+
+// Function to process messages in the queue
+function processNextMessage() {
+    if (typingInProgress || messageQueue.length === 0) {
+        return; // If typing is still in progress or there are no more messages, do nothing
+    }
+
+    typingInProgress = true; // Mark typing as in progress
+    const message = messageQueue.shift(); // Get the next message from the queue
+    simulateTypingEffect(message, () => {
+        typingInProgress = false; // Mark typing as finished
+        processNextMessage(); // Process the next message in the queue
+    });
+}
+
+// Function to simulate the typing effect
+function simulateTypingEffect(message, callback) {
+    // Create a new div to hold each message
+    const messageDiv = document.createElement('div');
+    chatGPTMessage.appendChild(messageDiv);  // Add the new message to the container
+    messageDiv.textContent = '';  // Start with an empty message
+
+    let index = 0;
+    const typingInterval = setInterval(() => {
+        if (index < message.length) {
+            messageDiv.textContent += message[index];
+            index++;
+        } else {
+            clearInterval(typingInterval);  // Stop typing simulation for this message
+            if (callback) callback(); // Call the callback once typing is finished
+        }
+    }, 100); // Adjust typing speed here (100ms per character)
+}
