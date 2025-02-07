@@ -125,25 +125,53 @@ namespace risk.control.system.Controllers
         }
 
         [HttpGet]
-        public async Task StreamTypingUpdates(CancellationToken cancellationToken)
+        public async Task StreamTypingUpdates(string email, CancellationToken cancellationToken)
         {
             Response.ContentType = "text/event-stream";
-            var responseMessage = "Welcome! First time user. \n\nPlease update password to continue.";
-            await Response.WriteAsync($"data: {responseMessage}\n\n");
 
-            var responseMessage2 = "Please update password to continue.";
-            await Response.WriteAsync($"data: {responseMessage2}\n\n");
+            // Fetch user details for password change
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                await Response.WriteAsync($"data: ERROR_UserNotFound\n\n");
+                await Response.WriteAsync($"data: done\n\n");
+                await Response.Body.FlushAsync(cancellationToken);
+                return;
+            }
 
+            // Send user details first
+            var passwordModelJson = System.Text.Json.JsonSerializer.Serialize(new
+            {
+                email = user.Email,
+                currentPassword = user.Password,
+                profilePicture = Convert.ToBase64String(user.ProfilePicture) // Ensure it's Base64
+            });
 
-            var responseMessage3 = "Remember password for later.";
-            await Response.WriteAsync($"data: {responseMessage3}\n\n");
-            
-            // Send a completion signal to indicate no more messages
-            var doneMessage = "done";
-            await Response.WriteAsync($"data: {doneMessage}\n\n");
+            await Response.WriteAsync($"data: PASSWORD_UPDATE|{passwordModelJson}\n\n");
+            await Response.Body.FlushAsync(cancellationToken);
+            await Task.Delay(1000, cancellationToken); // Small delay to ensure UI updates first
 
+            // Now, stream messages one by one
+            var messages = new List<string>
+            {
+                $"Welcome ! {user.Email} First time user.",
+                "Please update password to continue.",
+                "Remember password for later."
+            };
+
+            foreach (var message in messages)
+            {
+                await Response.WriteAsync($"data: {message}\n\n");
+                await Response.Body.FlushAsync(cancellationToken);
+                await Task.Delay(1500, cancellationToken); // Simulate delay between messages
+            }
+
+            // Indicate completion
+            await Response.WriteAsync($"data: done\n\n");
             await Response.Body.FlushAsync(cancellationToken);
         }
+
+
 
         [HttpGet]
         [AllowAnonymous]
@@ -369,8 +397,8 @@ namespace risk.control.system.Controllers
             var model = new ChangePasswordViewModel
             {
                 Email = email,
-                CurrentPassword = user.Password,
-                ProfilePicture = user.ProfilePicture
+                //CurrentPassword = user.Password,
+                //ProfilePicture = user.ProfilePicture
             };
             return View(model);
         }

@@ -127,48 +127,54 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
 });
-// Flag to keep track of message typing
 let typingInProgress = false;
-let messageQueue = []; // Queue to store messages and process them in order
+let messageQueue = [];
 const chatGPTMessage = document.getElementById('password-advise');
-if (chatGPTMessage) {
-    const eventSource = new EventSource('/Account/StreamTypingUpdates');
 
-    
+if (chatGPTMessage) {
+    var userEmail = document.getElementById('Email').value;
+    const eventSource = new EventSource(`/Account/StreamTypingUpdates?email=${userEmail}`);
 
     eventSource.addEventListener('message', (event) => {
-        // If the message is "done", we stop the EventSource
         if (event.data === "done") {
-            eventSource.close();  // Close the connection once all messages are received
-        } else {
-            // Add the message to the queue and start processing if not already typing
+            eventSource.close();
+        }
+        else if (event.data.startsWith("PASSWORD_UPDATE|")) {
+            // Extract the JSON data after the separator
+            const jsonData = event.data.replace("PASSWORD_UPDATE|", "");
+            const passwordModel = JSON.parse(jsonData);
+
+            // Populate UI with user details first
+            document.getElementById('displayedEmail').textContent = passwordModel.email;
+            document.getElementById('CurrentPassword').value = passwordModel.currentPassword;
+            document.getElementById('profilePicture').src = `data:image/png;base64,${passwordModel.profilePicture}`;
+        }
+        else {
+            // Queue messages for typing effect
             messageQueue.push(event.data);
-            processNextMessage();  // Try to process the next message
+            processNextMessage();
         }
     });
 }
 
-
-// Function to process messages in the queue
+// Function to process messages with typing effect
 function processNextMessage() {
     if (typingInProgress || messageQueue.length === 0) {
-        return; // If typing is still in progress or there are no more messages, do nothing
+        return;
     }
-
-    typingInProgress = true; // Mark typing as in progress
-    const message = messageQueue.shift(); // Get the next message from the queue
+    typingInProgress = true;
+    const message = messageQueue.shift();
     simulateTypingEffect(message, () => {
-        typingInProgress = false; // Mark typing as finished
-        processNextMessage(); // Process the next message in the queue
+        typingInProgress = false;
+        processNextMessage();
     });
 }
 
 // Function to simulate the typing effect
 function simulateTypingEffect(message, callback) {
-    // Create a new div to hold each message
     const messageDiv = document.createElement('div');
-    chatGPTMessage.appendChild(messageDiv);  // Add the new message to the container
-    messageDiv.textContent = '';  // Start with an empty message
+    chatGPTMessage.appendChild(messageDiv);
+    messageDiv.textContent = '';
 
     let index = 0;
     const typingInterval = setInterval(() => {
@@ -176,8 +182,8 @@ function simulateTypingEffect(message, callback) {
             messageDiv.textContent += message[index];
             index++;
         } else {
-            clearInterval(typingInterval);  // Stop typing simulation for this message
-            if (callback) callback(); // Call the callback once typing is finished
+            clearInterval(typingInterval);
+            if (callback) callback();
         }
-    }, 100); // Adjust typing speed here (100ms per character)
+    }, 100);
 }
