@@ -1,0 +1,6 @@
+services:
+  risk.control.system:
+    image: ${DOCKER_REGISTRY-}riskcontrolsystem
+    build:
+      context: .
+      dockerfile: risk.control.system/Dockerfile

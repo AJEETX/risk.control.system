@@ -4,6 +4,9 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>698875d0-c5b3-4793-b926-8a7fd0144245</UserSecretsId>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <DockerComposeProjectPath>..\docker-compose.dcproj</DockerComposeProjectPath>
   </PropertyGroup>
 
   <ItemGroup>
@@ -36,6 +39,7 @@
 	</PackageReference>
     <PackageReference Include="Microsoft.FeatureManagement" Version="4.0.0" />
     <PackageReference Include="Microsoft.FeatureManagement.AspNetCore" Version="4.0.0" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.7" />
     <PackageReference Include="Net8.Licensing" Version="1.0.0" />
     <PackageReference Include="NToastNotify" Version="8.0.0" />
