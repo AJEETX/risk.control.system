@@ -1,21 +1,18 @@
 ﻿using System.Net;
-using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Runtime.Serialization.Json;
-using Amazon.TranscribeService;
-using Amazon.TranscribeService.Model;
-using Azure;
-using Highsoft.Web.Mvc.Charts;
-using Newtonsoft.Json;
-using risk.control.system.AppConstant;
-using risk.control.system.Controllers.Api;
-using risk.control.system.Models;
-using risk.control.system.Models.ViewModel;
+
+using Amazon;
 using Amazon.S3;
 using Amazon.S3.Model;
-using Amazon;
 using Amazon.S3.Transfer;
-using Amazon.Textract;
+using Amazon.TranscribeService;
+using Amazon.TranscribeService.Model;
+
+using Newtonsoft.Json;
+
+using risk.control.system.AppConstant;
+using risk.control.system.Models;
+using risk.control.system.Models.ViewModel;
 
 namespace risk.control.system.Services
 {
@@ -45,7 +42,7 @@ namespace risk.control.system.Services
 
     public class HttpClientService : IHttpClientService
     {
-        private HttpClient httpClient = new HttpClient();
+        private static HttpClient httpClient = new HttpClient();
         private static string PinCodeBaseUrl = "https://india-pincode-with-latitude-and-longitude.p.rapidapi.com/api/v1/pincode";
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly IAmazonTranscribeService _amazonTranscribeService;
@@ -166,28 +163,23 @@ namespace risk.control.system.Services
         public async Task<LocationDetails_IpApi> GetAddressFromIp(string ipAddress)
         {
             var Ip_Api_Url = $"{Applicationsettings.IP_SITE}{ipAddress}"; // 206.189.139.232 - This is a sample IP address. You can pass yours if you want to test
-
-            // Use HttpClient to get the details from the Json response
-            using (HttpClient httpClient = new HttpClient())
+            httpClient.DefaultRequestHeaders.Accept.Clear();
+            httpClient.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+            // Pass API address to get the Geolocation details
+            httpClient.BaseAddress = new Uri(Ip_Api_Url);
+            HttpResponseMessage httpResponse = await httpClient.GetAsync(Ip_Api_Url);
+            // If API is success and receive the response, then get the location details
+            if (httpResponse.IsSuccessStatusCode)
             {
-                httpClient.DefaultRequestHeaders.Accept.Clear();
-                httpClient.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
-                // Pass API address to get the Geolocation details
-                httpClient.BaseAddress = new Uri(Ip_Api_Url);
-                HttpResponseMessage httpResponse = await httpClient.GetAsync(Ip_Api_Url);
-                // If API is success and receive the response, then get the location details
-                if (httpResponse.IsSuccessStatusCode)
+                var geolocationInfo = await httpResponse.Content.ReadFromJsonAsync<LocationDetails_IpApi>();
+                if (geolocationInfo != null)
                 {
-                    var geolocationInfo = await httpResponse.Content.ReadFromJsonAsync<LocationDetails_IpApi>();
-                    if (geolocationInfo != null)
-                    {
-                        Console.WriteLine("Country: " + geolocationInfo.country);
-                        Console.WriteLine("Region: " + geolocationInfo.regionName);
-                        Console.WriteLine("City: " + geolocationInfo.city);
-                        Console.WriteLine("Zip: " + geolocationInfo.zip);
-                        //Console.ReadKey();
-                        return geolocationInfo;
-                    }
+                    Console.WriteLine("Country: " + geolocationInfo.country);
+                    Console.WriteLine("Region: " + geolocationInfo.regionName);
+                    Console.WriteLine("City: " + geolocationInfo.city);
+                    Console.WriteLine("Zip: " + geolocationInfo.zip);
+                    //Console.ReadKey();
+                    return geolocationInfo;
                 }
             }
             return null!;

@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Hosting;
+﻿using System.Globalization;
+using System.Security.Claims;
+
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -9,14 +11,8 @@ using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
-using risk.control.system.Services;
-
-using System.Globalization;
-using System.Net.Http;
-using System.Security.Claims;
 
 using static risk.control.system.AppConstant.Applicationsettings;
-using static risk.control.system.Helpers.Permissions;
 
 using ControllerBase = Microsoft.AspNetCore.Mvc.ControllerBase;
 

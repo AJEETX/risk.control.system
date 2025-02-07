@@ -7,28 +7,28 @@
             <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars">&nbsp;&nbsp; </i></a>
         </li>
         @* <li class="nav-item d-none d-sm-inline-block">
-            <a href="/" class="nav-link">Home</a>
+        <a href="/" class="nav-link">Home</a>
         </li>
         <li class="nav-item d-none d-sm-inline-block">
-            <a href="#" class="nav-link">Contact</a>
+        <a href="#" class="nav-link">Contact</a>
         </li> *@
     </ul>
- 
+
     <!-- SEARCH FORM -->
     @* <form class="form-inline ml-3">
-        <div class="input-group input-group-sm">
-            <input class="form-control form-control-navbar" type="search" placeholder="Search" aria-label="Search">
-            <div class="input-group-append">
-                <button class="btn btn-navbar" type="submit">
-                    <i class="fas fa-search"></i>
-                </button>
-            </div>
-        </div>
+    <div class="input-group input-group-sm">
+    <input class="form-control form-control-navbar" type="search" placeholder="Search" aria-label="Search">
+    <div class="input-group-append">
+    <button class="btn btn-navbar" type="submit">
+    <i class="fas fa-search"></i>
+    </button>
+    </div>
+    </div>
     </form> *@
 
     <!-- Right navbar links -->
     <ul class="navbar-nav ml-auto">
-        
+
         <li class="top-nav-header-border">
             <a class="nav-link" data-widget="control-sidebar" data-slide="true" role="button" title="Idle time remaining" data-toggle="tooltip">
                 <div><i id="hour-glass" class="fas fa-hourglass-end fa-spin"></i>  <span id="time"> </span></div>
@@ -48,32 +48,32 @@
                 <i class="fas fa-cog fa-spin"></i>
             </a>
             <div class="dropdown-menu dropdown-menu dropdown-menu-right">
-                @if(Model.CanChangePassword)
+                @if (Model.CanChangePassword)
                 {
-                   @*  <div class="accent-secondary">
-                        <a id="password" class="dropdown-item" href="/agencyuserprofile/ChangePassword">
-                            <i class="fas fa-lock-open"></i>   Change Password
+                    @*  <div class="accent-secondary">
+                <a id="password" class="dropdown-item" href="/agencyuserprofile/ChangePassword">
+                <i class="fas fa-lock-open"></i>   Change Password
+                </a>
+                </div> *@
+
+                    <div class="accent-warning">
+                        <a class="dropdown-item" href="/agencyuserprofile">
+                            <img src="data:image/*;base64,@(Convert.ToBase64String(Model?.ProfilePicture))" class="elevation-2 sidebar-profile img-circle" data-toggle="tooltip" />  User Profile
                         </a>
-                    </div> *@
-                
-                <div class="accent-warning">
-                    <a class="dropdown-item" href="/agencyuserprofile">
-                     <i class="far fa-user-circle"></i>  User Profile 
-                    </a>
-                </div>
+                    </div>
                 }
 
                 <div class="accent-danger">
                     <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
-                      <i class="fas fa-sign-out-alt"></i>  Logout
+                        <i class="fas fa-sign-out-alt"></i>  Logout
                     </a>
                 </div>
             </div>
         </li>
-@*        <li class="nav-item">
-            <a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#" role="button">
-                <i class="fas fa-th-large"></i>
-            </a>
+        @*        <li class="nav-item">
+        <a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#" role="button">
+        <i class="fas fa-th-large"></i>
+        </a>
         </li>*@
     </ul>
 </nav>

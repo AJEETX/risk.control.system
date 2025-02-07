@@ -52,8 +52,8 @@ async function fetchIpInfo(latlong) {
     }
 }
 
-if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(success, error);
-} else {
-    console.error('Geolocation is not supported by this browser.');
-}
+//if (navigator.geolocation) {
+//    navigator.geolocation.getCurrentPosition(success, error);
+//} else {
+//    console.error('Geolocation is not supported by this browser.');
+//}

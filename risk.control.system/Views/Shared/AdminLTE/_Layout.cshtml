@@ -35,7 +35,8 @@
                     {
                         CanChangePassword = @company.CanChangePassword,
                         CountryCode = company.Country.Code,
-                        Country = $"(+{company.Country.ISDCode}) {company.Country.Name} ({company.Country.Code})"
+                        Country = $"(+{company.Country.ISDCode}) {company.Country.Name} ({company.Country.Code})",
+                        ProfilePicture = companyUser.ProfilePicture
                     };
                     <partial name="AdminLTE/_CompanyTopNavigation" model="@navigationModel" />
 
@@ -48,7 +49,8 @@
                     {
                         CanChangePassword = vendor.CanChangePassword,
                         CountryCode = vendor.Country.Code,
-                        Country = $"(+{vendor.Country.ISDCode}) {vendor.Country.Name} ({vendor.Country.Code})"
+                        Country = $"(+{vendor.Country.ISDCode}) {vendor.Country.Name} ({vendor.Country.Code})",
+                        ProfilePicture = vendorUser.ProfilePicture
                     };
                     <partial name="AdminLTE/_AgencyTopNavigation" model="@navigationModel" />
                     <partial name="AdminLTE/_VendorSidebar" model="@vendor" />
@@ -60,7 +62,8 @@
                     {
                         CanChangePassword = true,
                         CountryCode = admin.Country.Code,
-                        Country = $"(+{admin.Country.ISDCode}) {admin.Country.Name} ({admin.Country.Code})"
+                        Country = $"(+{admin.Country.ISDCode}) {admin.Country.Name} ({admin.Country.Code})",
+                        ProfilePicture = admin.ProfilePicture
                     };
                     <partial name="AdminLTE/_TopNavigation" model="@navigationModel" />
                     <partial name="AdminLTE/_Sidebar" />

@@ -13,7 +13,7 @@ namespace risk.control.system.Helpers
 {
     public class PdfReportRunner
     {
-
+        private static HttpClient client = new HttpClient();
         public static async Task<DocumentBuilder> Run(string imagePath, ClaimsInvestigation claim)
         {
             string photoIdJsonFile = CheckFile(Path.Combine("Files", "photo-id.json"));
@@ -159,7 +159,6 @@ namespace risk.control.system.Helpers
         }
         static async Task<string> DownloadMapImageAsync(string url, string outputFilePath)
         {
-            using HttpClient client = new HttpClient();
             var response = await client.GetAsync(url);
             if (response.IsSuccessStatusCode)
             {

@@ -196,13 +196,6 @@ async function fetchIpInfo(latlong) {
     } catch (err) {
         console.error('Error during IP info fetch operation:', err.message);
         displayUnavailableInfo();
-
-        if (navigator.geolocation) {
-            console.log('Retrying geolocation...');
-            navigator.geolocation.getCurrentPosition(success, error);
-        } else {
-            console.error('Geolocation is not supported by this browser.');
-        }
     }
 }
 
@@ -814,9 +807,3 @@ function DisableBackButton() {
 DisableBackButton();
 window.onload = DisableBackButton;
 window.onpageshow = function (evt) { if (evt.persisted) DisableBackButton() }
-//window.onunload = function () { void (0) }
-if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(success, error);
-} else {
-    console.error('Geolocation is not supported by this browser.');
-}

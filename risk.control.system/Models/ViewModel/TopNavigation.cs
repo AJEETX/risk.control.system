@@ -5,5 +5,6 @@
         public bool CanChangePassword { get; set; }
         public string Country { get; set; }
         public string CountryCode { get; set; }
+        public byte[]? ProfilePicture { get; set; }
     }
 }
