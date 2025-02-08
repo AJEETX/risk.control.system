@@ -39,6 +39,8 @@ namespace risk.control.system.Seeds
             await roleManager.CreateAsync(new ApplicationRole(AppRoles.SUPERVISOR.ToString().Substring(0, 2).ToUpper(), AppRoles.SUPERVISOR.ToString()));
             await roleManager.CreateAsync(new ApplicationRole(AppRoles.AGENT.ToString().Substring(0, 2).ToUpper(), AppRoles.AGENT.ToString()));
 
+            await PinCodeStateSeed.CurrenciesCode(context);
+            await PinCodeStateSeed.Currencies(context);
             var countries = await PinCodeStateSeed.Countries(context);
             var india = countries.FirstOrDefault(c=>c.Code.ToLower() == "in");
             var indiaPincodes = await PinCodeStateSeed.CsvRead_India();

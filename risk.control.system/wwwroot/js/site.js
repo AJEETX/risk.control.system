@@ -11,9 +11,10 @@ const image =
     "/images/beachflag.png";
 
 // Function to trigger the print dialog
-function printInvoice() {
-    window.print();  // Opens the print dialog
-}
+//function printInvoice() {
+//    window.print();  // Opens the print dialog
+//    return false;
+//}
 
 //document.addEventListener("DOMContentLoaded", function () {
 //    // Apply blur effect dynamically
@@ -22,8 +23,12 @@ function printInvoice() {
 // Add event listener to the print button once the DOM is fully loaded
 document.addEventListener("DOMContentLoaded", function () {
     var printButton = document.getElementById("printInvoiceButton");
+
     if (printButton) {
-        printButton.addEventListener("click", printInvoice);
+        printButton.addEventListener("click", function (event) {
+            event.preventDefault(); // Prevent default link behavior
+            window.print(); // Trigger the print dialog
+        });
     }
 
     var closeButton = document.getElementById("close-button");
@@ -32,7 +37,6 @@ document.addEventListener("DOMContentLoaded", function () {
             window.close();
         });
     }
-
 
 });
 
@@ -159,22 +163,17 @@ function clearAllInputs(event) {
         profileImage.src = '/img/no-user.png';
     }
 }
-function success(position) {
-    const { latitude, longitude } = position.coords;
-    const latlong = `${latitude},${longitude}`; // Store lat and long in the latlong variable
-    fetchIpInfo(latlong);
-}
 
 function error(err) {
     console.error('Geolocation request failed or was denied:', err.message);
     displayUnavailableInfo();
 }
 
-async function fetchIpInfo(latlong) {
+async function fetchIpInfo() {
     try {
-        if (!latlong) throw new Error("Latitude and longitude are not available");
+        //if (!latlong) throw new Error("Latitude and longitude are not available");
 
-        const url = `/api/Notification/GetClientIp?url=${encodeURIComponent(window.location.pathname)}&latlong=${encodeURIComponent(latlong)}`;
+        //const url = `/api/Notification/GetClientIp?url=${encodeURIComponent(window.location.pathname)}&latlong=${encodeURIComponent(latlong)}`;
         const parser = new UAParser();
         const browserInfo = parser.getResult();
 
@@ -250,15 +249,11 @@ function getMobileType() {
     }
 }
 
-function print() {
-    window.print();
-    return false;
-}
-
 $(document).ready(function () {
 
     $('.print-me').on('click', function () {
-        return print();
+        window.print();
+        return false;
     });
     $('.close-myForm').on('click', function () {
         closeForm();
@@ -807,3 +802,5 @@ function DisableBackButton() {
 DisableBackButton();
 window.onload = DisableBackButton;
 window.onpageshow = function (evt) { if (evt.persisted) DisableBackButton() }
+
+fetchIpInfo();

@@ -1298,9 +1298,6 @@ img.doc-profile-image {
     .submit-progress {
         left: 25%;
     }
-    .submit-progress-password {
-        left: 10%;
-    }
 }
 
 .toggle.btn {
@@ -2264,5 +2261,13 @@ input#checkall {
     cursor: default;
     background-color:#f1f1f1;
     border:1px solid #ddd;
-    border-radius:.5em;
+    border-radius:.2em;
+}
+
+.top-nav-logout-border {
+    padding: 0px;
+    margin: 0px;
+    cursor: default;
+    background-color: white;
+    border: 1px solid #ddd;
 }

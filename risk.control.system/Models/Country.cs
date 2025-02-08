@@ -19,6 +19,10 @@ public class Country : BaseEntity
     [Display(Name = "ISD Code")]
     [Required]
     public int ISDCode { get; set; } = default!;
+
+    public string? CurrencyName { get; set; } = "--";
+    public string? CurrencyCode { get; set; } = "--";
+    public string? Language { get; set; } = "--";
     public override string ToString()
     {
         return $"Country Information:\n" +

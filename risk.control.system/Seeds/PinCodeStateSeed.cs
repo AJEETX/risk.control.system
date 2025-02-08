@@ -13,10 +13,14 @@ namespace risk.control.system.Seeds
 {
     public static class PinCodeStateSeed
     {
+        private static string currenciesFilePath = @"lang-currency.csv";
+        private static string currenciesNameFilePath = @"currency.csv";
         private static string countriesFilePath = @"countries.csv";
         private static string au_stateWisePincodeFilePath = @"au_postcodes.csv";
         private static string all_india_pincodes = @"india_pincode.csv";
         private static string NO_DATA = " NO - DATA ";
+        private static List<Currency>  currencies = new List<Currency>();
+        private static List<Currency>  currenciesName = new List<Currency>();
 
         private static Regex regex = new Regex("\\\"(.*?)\\\"");
 
@@ -77,15 +81,23 @@ namespace risk.control.system.Seeds
                         {
                             var output = regex.Replace(row, m => m.Value.Replace(',', '@'));
                             var rowData = output.Split(',').ToList();
-                            var pincodeState = new Country
+                            var countryCode = rowData[1].Trim().ToLower();
+                            var currency = currencies.FirstOrDefault(c => c.CountryCode.Trim().ToLower() == countryCode);
+
+                            var currencyName = currenciesName.FirstOrDefault(c => c.CountryCode.Trim().ToLower() == countryCode);
+
+                            var country = new Country
                             {
                                 Name = rowData[0] ?? NO_DATA,
                                 Code = rowData[1] ?? NO_DATA,
                                 ISDCode = int.Parse(rowData[2].Trim()),
+                                CurrencyCode = currency?.CurrencyCode ?? currencyName?.CurrencyCode,
+                                CurrencyName = currencyName?.CurrencyName,
+                                Language = currency?.Language.ToUpper(),
                                 Updated = DateTime.Now,
                             };
                             
-                            countries.Add(pincodeState);
+                            countries.Add(country);
                         }
                     }
                 }
@@ -93,6 +105,71 @@ namespace risk.control.system.Seeds
             context.Country.AddRange(countries);
             await context.SaveChangesAsync(null, false);
             return countries;
+        }
+
+        public static async Task CurrenciesCode(ApplicationDbContext context)
+        {
+            //GET ALL CURRENCIES FROM CSV
+            string currencies_csv = await File.ReadAllTextAsync(currenciesFilePath);
+
+            bool firstRow = true;
+            foreach (string row in currencies_csv.Split('\n'))
+            {
+                if (!string.IsNullOrEmpty(row))
+                {
+                    if (!string.IsNullOrEmpty(row))
+                    {
+                        if (firstRow)
+                        {
+                            firstRow = false;
+                        }
+                        else
+                        {
+                            var output = regex.Replace(row, m => m.Value.Replace(',', '@'));
+                            var rowData = output.Split(',').ToList();
+                            var currency = new Currency
+                            {
+                                CountryCode = rowData[1].Trim('"'),
+                                CurrencyCode = rowData[5].Trim('"'),
+                                Language = rowData[6].Trim('"'),
+                            };
+                            currencies.Add(currency);
+                        }
+                    }
+                }
+            }
+        }
+        public static async Task Currencies(ApplicationDbContext context)
+        {
+            //GET ALL CURRENCIES FROM CSV
+            string currencies_csv = await File.ReadAllTextAsync(currenciesNameFilePath);
+
+            bool firstRow = true;
+            foreach (string row in currencies_csv.Split('\n'))
+            {
+                if (!string.IsNullOrEmpty(row))
+                {
+                    if (!string.IsNullOrEmpty(row))
+                    {
+                        if (firstRow)
+                        {
+                            firstRow = false;
+                        }
+                        else
+                        {
+                            var output = regex.Replace(row, m => m.Value.Replace(',', '@'));
+                            var rowData = output.Split(',').ToList();
+                            var currency = new Currency
+                            {
+                                CountryCode = rowData[1].Trim('"'),
+                                CurrencyName = rowData[2].Trim('"'),
+                                CurrencyCode = rowData[3].Trim('"'),
+                            };
+                            currenciesName.Add(currency);
+                        }
+                    }
+                }
+            }
         }
         public static async Task<Country> India(ApplicationDbContext context)
         {

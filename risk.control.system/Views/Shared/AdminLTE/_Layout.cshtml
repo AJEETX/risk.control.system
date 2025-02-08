@@ -36,7 +36,9 @@
                         CanChangePassword = @company.CanChangePassword,
                         CountryCode = company.Country.Code,
                         Country = $"(+{company.Country.ISDCode}) {company.Country.Name} ({company.Country.Code})",
-                        ProfilePicture = companyUser.ProfilePicture
+                        ProfilePicture = companyUser.ProfilePicture,
+                        CurrencyCode = company.Country.CurrencyCode,
+                        Language = company.Country.Language
                     };
                     <partial name="AdminLTE/_CompanyTopNavigation" model="@navigationModel" />
 
@@ -50,7 +52,9 @@
                         CanChangePassword = vendor.CanChangePassword,
                         CountryCode = vendor.Country.Code,
                         Country = $"(+{vendor.Country.ISDCode}) {vendor.Country.Name} ({vendor.Country.Code})",
-                        ProfilePicture = vendorUser.ProfilePicture
+                        ProfilePicture = vendorUser.ProfilePicture,
+                        CurrencyCode = vendor.Country.CurrencyCode,
+                        Language = vendor.Country.Language
                     };
                     <partial name="AdminLTE/_AgencyTopNavigation" model="@navigationModel" />
                     <partial name="AdminLTE/_VendorSidebar" model="@vendor" />
@@ -63,7 +67,9 @@
                         CanChangePassword = true,
                         CountryCode = admin.Country.Code,
                         Country = $"(+{admin.Country.ISDCode}) {admin.Country.Name} ({admin.Country.Code})",
-                        ProfilePicture = admin.ProfilePicture
+                        ProfilePicture = admin.ProfilePicture,
+                        CurrencyCode = admin.Country.CurrencyCode,
+                        Language = admin.Country.Language
                     };
                     <partial name="AdminLTE/_TopNavigation" model="@navigationModel" />
                     <partial name="AdminLTE/_Sidebar" />
