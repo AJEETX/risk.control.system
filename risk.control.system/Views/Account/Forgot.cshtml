@@ -3,45 +3,63 @@
     Layout = "/Views/Shared/_Layout.cshtml";
 }
 <section class="content">
-    <div class="row justify-content-center">
-            
-        <div class="col-md-8">
-            <div class="card card-light h-100">
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow-lg border-0 rounded-lg mt-5">
+                    <div class="card-header bg-light text-center">
+                        <h3 class="card-title text-dark">
+                            <i class="fa fa-lock"></i> Password Processed
+                        </h3>
+                    </div>
 
-                    <div class="card-header">
-                        <h3 class="card-title"><i class="fa fa-lock"></i>  Password processed</h3>
-                    </div>
-                <div class="card-body text-center">
-                        <div class="submit-progress hidden">
-                            <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+                    <div class="card-body text-center">
+                        <!-- Loading Spinner (Hidden Initially) -->
+                        <div class="submit-progress d-none">
+                            <i class="fas fa-sync fa-spin fa-4x fa-fw text-warning"></i>
                         </div>
-                    <!-- Add Image Below the Welcome Message -->
-                    <div class="text-center">
-                        <img class="icheckify-logo img-fluid" src="~/headers/information.gif" alt="Password processed" />
+
+                        <!-- Status Image -->
+                        <div class="mb-3">
+                            <img class="icheckify-logo img-fluid" src="~/headers/information.gif" alt="Password processed" />
+                        </div>
+
+                        <!-- Profile Picture & Email -->
+                        <div class="mb-3">
+                            <img id="profilePicture" src="data:image/*;base64,@(Convert.ToBase64String(Model?.ProfilePicture))"
+                                 class="rounded-circle elevation-2 sidebar-profile img-circle" />
+                            <p id="displayedEmail" class="text-muted mt-2 font-weight-bold"> @Model.Email </p>
+                        </div>
+
+                        <!-- Password Sent Confirmation -->
+                        <div class="alert alert-info d-flex align-items-center justify-content-center">
+                            <i class="fas fa-info-circle mr-2"></i>
+                            <span>Password has been sent to your mobile.</span>
+                            <img class="flag-icon ml-2" src="@Model.Flag" alt="Country flag" width="20" />
+                            <span class="ml-2 text-sm">@Model.Message</span>
+                        </div>
                     </div>
-                    <div class="text-muted"><span>Password sent to mobile: </span> <img class="flag-icon" src="@Model.Flag" alt="Country flag" />@Model.Message.</div>
-                    </div>
+
                     <div class="card-footer text-center">
-                        @if(Model.Reset)
+                        @if (Model.Reset)
                         {
-                            <a asp-controller="Account" asp-action="Login" class="btn btn-success">
-                                <i class="fa fa-key"></i>
-                                Login Now !
+                            <a asp-controller="Account" asp-action="Login" class="btn btn-success btn-lg px-4">
+                                <i class="fa fa-key"></i> Login Now
                             </a>
                         }
                         else
                         {
-                            <a asp-controller="Account" asp-action="Login" class="btn btn-danger">
-                                <i class="fa fa-key"></i>
-                                Try Again
+                            <a asp-controller="Account" asp-action="Login" class="btn btn-danger btn-lg px-4">
+                                <i class="fa fa-key"></i> Try Again
                             </a>
                         }
-
                     </div>
                 </div>
             </div>
+        </div>
     </div>
 </section>
+
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");

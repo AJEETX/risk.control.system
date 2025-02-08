@@ -33,7 +33,8 @@
                     company = _context.ClientCompany.Include(c=>c.Country).FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
                     var navigationModel = new TopNavigation
                     {
-                        CanChangePassword = @company.CanChangePassword,
+                        Email = companyUser.Email,
+                        CanChangePassword = company.CanChangePassword,
                         CountryCode = company.Country.Code,
                         Country = $"(+{company.Country.ISDCode}) {company.Country.Name} ({company.Country.Code})",
                         ProfilePicture = companyUser.ProfilePicture,
@@ -49,6 +50,7 @@
                     var vendor = _context.Vendor.Include(c => c.Country).FirstOrDefault(c => c.VendorId == vendorUser.VendorId);
                     var navigationModel = new TopNavigation
                     {
+                        Email = vendorUser.Email,
                         CanChangePassword = vendor.CanChangePassword,
                         CountryCode = vendor.Country.Code,
                         Country = $"(+{vendor.Country.ISDCode}) {vendor.Country.Name} ({vendor.Country.Code})",
@@ -64,6 +66,7 @@
                     var admin = _context.ApplicationUser.Include(c => c.Country).FirstOrDefault(c => c.Email == userEmail);
                     var navigationModel = new TopNavigation
                     {
+                        Email = admin.Email,
                         CanChangePassword = true,
                         CountryCode = admin.Country.Code,
                         Country = $"(+{admin.Country.ISDCode}) {admin.Country.Name} ({admin.Country.Code})",

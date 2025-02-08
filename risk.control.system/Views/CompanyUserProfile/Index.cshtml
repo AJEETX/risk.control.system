@@ -5,102 +5,98 @@
 }
 
 <section class="content">
-    <div class="card card-secondary">
-        <div class="card-header">
-            <h3 class="card-title"><i class="far fa-user-circle"></i> User Profile</h3>
-        </div>
-        <div class="card-body">
-            <div class="submit-progress hidden">
-                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+    <div class="container-fluid">
+        <div class="card shadow-lg border-0 rounded-lg">
+            <div class="card-header bg-secondary text-white text-center">
+                <h3 class="card-title"><i class="far fa-user-circle"></i> User Profile</h3>
             </div>
-            <div class="row">
-                <div class="col-md-6">
-                    <dl class="row">
-                        <dt class="col-sm-5">
-                            Profile photo
-                        </dt>
-                        <dd class="col-sm-5">
-                            @if (Model?.ProfilePictureUrl is not null)
-                            {
-                                <img id="ProfileImage" class="form-Image" src="@Model?.ProfilePictureUrl">
-                            }
-                            else
-                            {
-                                <img id="ProfileImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
-                            }
-                        </dd>
-                        <dt class="col-sm-5">
-                            @Html.DisplayNameFor(model => model.FirstName)
-                        </dt>
-                        <dd class="col-sm-5">
-                            @Html.DisplayFor(model => model.FirstName)
-                        </dd>
-                        <dt class="col-sm-5">
-                            @Html.DisplayNameFor(model => model.LastName)
-                        </dt>
-                        <dd class="col-sm-5">
-                            @Html.DisplayFor(model => model.LastName)
-                        </dd>
-                        <dt class="col-sm-5">
-                            @Html.DisplayNameFor(model => model.Email)
-                        </dt>
-                        <dd class="col-sm-5">
-                            <a href="#">  @Html.DisplayFor(model => model.Email)</a>
-                        </dd>
-                        <dt class="col-sm-5">
-                            @Html.DisplayNameFor(model => model.PhoneNumber)
-                        </dt>
-                        <dd class="col-sm-5">
-                            @{
-                                var phone = $"+{Model.Country.ISDCode} (0) {Model.PhoneNumber}";
-                            }
-                            @Html.DisplayFor(model => phone)
-                        </dd>
-                    </dl>
+            <div class="card-body">
+                <div class="submit-progress hidden">
+                    <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
                 </div>
-                <div class="col-md-6">
-                    <dl class="row">
-                        <dt class="col-sm-5">
-                            @Html.DisplayNameFor(model => model.UserRole)
-                        </dt>
-                        <dd class="col-sm-5">
-                            @Html.DisplayFor(model => model.UserRole)
-                        </dd>
-                        <dt class="col-sm-5">
-                            @Html.DisplayNameFor(model => model.Addressline)
-                        </dt>
-                        <dd class="col-sm-5">
-                            @Html.DisplayFor(model => model.Addressline)
-                        </dd>
-                        <dt class="col-sm-5">
-                            @Html.DisplayNameFor(model => model.District)
-                        </dt>
-                        <dd class="col-sm-5">
-                            @Html.DisplayFor(model => model.District.Name)
-                        </dd>
-                        <dt class="col-sm-5">
-                            @Html.DisplayNameFor(model => model.State)
-                        </dt>
-                        <dd class="col-sm-5">
-                            @Html.DisplayFor(model => model.State.Name)
-                        </dd>
-                        <dt class="col-sm-5">
-                            PinCode
-                        </dt>
-                        <dd class="col-sm-5">
-                            @Html.DisplayFor(model => model.PinCode.Code)
-                        </dd>
+                <div class="row">
+                    <div class="col-md-4 text-center">
 
-                        <dt class="col-sm-5">
-                            @Html.DisplayNameFor(model => model.Country)
-                        </dt>
-                        <dd class="col-sm-5">
-                            @Html.DisplayFor(model => model.Country.Name)
-                        </dd>
-                    </dl>
+                        <div class="profile-img-container">
+                            <img src="data:image/*;base64,@(Convert.ToBase64String(Model?.ProfilePicture))"
+                                 class="rounded-circle shadow-lg border profile-img" alt="User Profile" title="@Model.Email" data-toggle="tooltip" />
+                        </div>
+                        <h5 class="mt-3">@Model.FirstName @Model.LastName</h5>
+                        <p class="text-muted">@Model.UserRole</p>
+
+
+                        
+                    </div>
+                    <div class="col-md-8">
+                        <div class="row">
+                            <!-- Left Column -->
+                            <div class="col-md-6">
+                                <div class="info-box">
+                                    <span class="info-box-icon bg-primary"><i class="fas fa-envelope"></i></span>
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">Email</span>
+                                        <span class="info-box-number"><a href="#">@Model.Email</a></span>
+                                    </div>
+                                </div>
+
+                                <div class="info-box">
+                                    <span class="info-box-icon bg-success"><i class="fas fa-phone"></i></span>
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">Phone</span>
+                                        <span class="info-box-number">+@Model.Country.ISDCode (0) @Model.PhoneNumber</span>
+                                    </div>
+                                </div>
+
+                                <div class="info-box">
+                                    <span class="info-box-icon bg-info"><i class="fas fa-map-marker-alt"></i></span>
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">Address</span>
+                                        <span class="info-box-number">@Model.Addressline</span>
+                                    </div>
+                                </div>
+
+                                <div class="info-box">
+                                    <span class="info-box-icon bg-warning"><i class="fas fa-map-pin"></i></span>
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">Pin Code</span>
+                                        <span class="info-box-number">@Model.PinCode.Code</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Right Column -->
+                            <div class="col-md-6">
+                                <div class="info-box">
+                                    <span class="info-box-icon bg-secondary"><i class="fas fa-city"></i></span>
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">District</span>
+                                        <span class="info-box-number">@Model.District.Name</span>
+                                    </div>
+                                </div>
+
+                                <div class="info-box">
+                                    <span class="info-box-icon bg-danger"><i class="fas fa-flag"></i></span>
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">State</span>
+                                        <span class="info-box-number">@Model.State.Name</span>
+                                    </div>
+                                </div>
+
+                                <div class="info-box">
+                                    <span class="info-box-icon bg-dark"><i class="fas fa-globe"></i></span>
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">Country</span>
+                                        <span class="info-box-number">@Model.Country.Name</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
+
             </div>
-            <div class="row">
+            <div class="card-footer">
                 <div class="col-md-12 text-right">
                     <a id="editButton" asp-action="Edit" asp-route-userId="@Model.Id" class="btn btn-warning"><i class='far fa-user-circle'></i> User @Applicationsettings.PROFILE</a>
 
