@@ -5,6 +5,9 @@
     font-family: Tahoma;
 }
 
+html{
+    min-width:420px;
+}
 a.navbar-brand {
     white-space: normal;
     text-align: center;
@@ -1365,7 +1368,6 @@ a#back-button {
     font-family: Tahoma;
     width: 4rem;
     text-align: center;
-    background-color: white;
     color: black;
     padding-left:.4em;
 }

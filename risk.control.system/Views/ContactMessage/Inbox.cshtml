@@ -4,8 +4,8 @@
     ViewData["Title"] = "Inbox";
 }
 <section class="content">
-    <div class="card card-secondary">
-        <div class="card-header">
+    <div class="card shadow-lg border-0 rounded-lg">
+        <div class="card-header bg-secondary text-white text-center">
             <h3 class="card-title"><i class="fas fa-inbox"></i> Inbox</h3>
         </div>
         <form id="checkboxes" asp-controller="ContactMessage" asp-action="InboxDelete" method="post" id="listForm">

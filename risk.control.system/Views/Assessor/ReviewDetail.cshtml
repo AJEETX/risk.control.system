@@ -5,10 +5,12 @@
 
 }
 <section class="content">
+    <input type="hidden" id="policyDetailId" value="@Model.ClaimsInvestigation?.PolicyDetail.PolicyDetailId" />
+    <input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail.CustomerDetailId" />
+    <input type="hidden" id="beneficiaryId" value="@Model.Location?.BeneficiaryDetailId" />
+    <input type="hidden" id="claimId" value="@Model.ClaimsInvestigation?.ClaimsInvestigationId" />
     <div id="article" class="card card-secondary">
-        <input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail?.CustomerDetailId" />
-        <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
-        <input type="hidden" id="beneficiaryId" value="@Model.Location?.BeneficiaryDetailId" />
+        
         <div class="card-header">
             <h3 class="card-title">
                 <i class="fas fa-newspaper"></i> Detail
@@ -22,107 +24,46 @@
                 </span>
             </h3>
         </div>
-        @{
-            string address = string.Empty;
-            string baddress = string.Empty;
-            int currentAgeinYrs = 0;
-            int currentBAgeinYrs = 0;
-            bool customerExist = false;
-            bool beneficiaryExist = false;
-            if (Model.ClaimsInvestigation != null && Model.ClaimsInvestigation.CustomerDetail != null)
-            {
-                address = @Model.ClaimsInvestigation?.CustomerDetail.Addressline + " " + @Model.ClaimsInvestigation?.CustomerDetail.District.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.State.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.Country.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.PinCode.Code;
-                baddress = @Model.Location != null ? @Model.Location?.Addressline + " " +
-                @Model.Location?.District?.Name + " " + @Model.Location?.State?.Name + " " +
-                @Model.Location?.Country?.Name + " " + @Model.Location?.PinCode?.Code : string.Empty;
-                if (Model.ClaimsInvestigation?.CustomerDetail.DateOfBirth != null)
-                {
-                    var age = DateTime.Now.Subtract(Model.ClaimsInvestigation.CustomerDetail.DateOfBirth.GetValueOrDefault()).TotalDays;
-                    currentAgeinYrs = (int)age / 365;
-                }
-
-                if (Model.Location?.DateOfBirth != null)
-                {
-                    var age = DateTime.Now.Subtract(Model.Location.DateOfBirth.GetValueOrDefault()).TotalDays;
-                    currentBAgeinYrs = (int)age / 365;
-                }
-
-            }
-            if (!string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.PolicyDetail?.ContractNumber))
-            {
-                customerExist = true;
-            }
-            if (Model.Location?.BeneficiaryDetailId > 0)
-            {
-                beneficiaryExist = true;
-            }
-            string customerProgressColor = "grey";
-            if (@customerExist)
-            {
-                customerProgressColor = "green";
-            }
-            string benficiaryProgressColor = "lightgrey";
-            if (@customerExist && @beneficiaryExist)
-            {
-                benficiaryProgressColor = "green";
-            }
-            if (@customerExist && !@beneficiaryExist)
-            {
-                benficiaryProgressColor = "grey";
-            }
-            if (!@customerExist && !@beneficiaryExist)
-            {
-                benficiaryProgressColor = "lightgrey";
-            }
-            <input type="hidden" id="policyDetailId" value="@Model.ClaimsInvestigation?.PolicyDetail.PolicyDetailId" />
-            <input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail.CustomerDetailId" />
-            <input type="hidden" id="beneficiaryId" value="@Model.Location?.BeneficiaryDetailId" />
-            <input type="hidden" id="claimId" value="@Model.ClaimsInvestigation?.ClaimsInvestigationId" />
-            <article>
-                <div class="bb-blog-inner">
-                    <div class="card card-light expand-card">
-                        <div class="card-header">
-                            <h3 class="card-title">Claim: <span class="badge badge-light"><i class="far fa-file-powerpoint"></i>  @Model.ClaimsInvestigation?.PolicyDetail?.ContractNumber</span></h3>
-                            <div class="card-tools">
-                                <span data-toggle="tooltip" title="Claim # : @Model.ClaimsInvestigation?.PolicyDetail?.ContractNumber" class="badge badge-light"> <i class="far fa-file-powerpoint"></i> </span>
-                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                    <i class="fas fa-minus"></i>
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="card-body">
-
-                            <div class="row">
-                                <partial name="Creator/_DeletePolicy" model="Model" />
-                                <partial name="Creator/_DeleteCustomer" model="Model" />
-                                <partial name="Creator/_DeleteBeneficiary" model="Model" />
-                            </div>
-                        </div>
-                    </div>
-                </div> <!-- class bb-blog-inner -->
-            </article>
-            <div class="submit-progress hidden">
-                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
-            </div>
-
-            <partial name="_TimelineReport" model="@Model" />
-
-            <div class="card-footer">
-                <div class="row">
-                    <div class="col-md-12">
-
-                        <form id="create-form">
-
-                            <a id="active-list" asp-action="Review" class="btn btn-outline-secondary">
-                                <i class="fas fa-arrow-left"></i>
-                                <span class="badge badge-light"> <i class="fa fa-toggle-on"></i> </span> Back
-                            </a>
-                        </form>
-                    </div>
+        <div class="card card-light expand-card">
+            <div class="card-header">
+                <h3 class="card-title">Claim: <span class="badge badge-light"><i class="far fa-file-powerpoint"></i>  @Model.ClaimsInvestigation?.PolicyDetail?.ContractNumber</span></h3>
+                <div class="card-tools">
+                    <span data-toggle="tooltip" title="Claim # : @Model.ClaimsInvestigation?.PolicyDetail?.ContractNumber" class="badge badge-light"> <i class="far fa-file-powerpoint"></i> </span>
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                        <i class="fas fa-minus"></i>
+                    </button>
                 </div>
             </div>
-        }
+
+            <div class="card-body">
+
+                <div class="row">
+                    <partial name="Creator/_DeletePolicy" model="Model" />
+                    <partial name="Creator/_DeleteCustomer" model="Model" />
+                    <partial name="Creator/_DeleteBeneficiary" model="Model" />
+                </div>
+            </div>
+        </div>
+        <div class="submit-progress hidden">
+            <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+        </div>
+
+        <partial name="Company/_TimelineReport" model="@Model" />
+
+        <div class="card-footer">
+            <div class="row">
+                <div class="col-md-12">
+
+                    <form id="create-form">
+
+                        <a id="active-list" asp-action="Review" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left"></i>
+                            <span class="badge badge-light"> <i class="fa fa-toggle-on"></i> </span> Back
+                        </a>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 </section>
 

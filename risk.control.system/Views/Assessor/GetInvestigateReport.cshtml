@@ -14,8 +14,8 @@
         <input type="hidden" id="beneficiaryId" value="@Model.Location?.BeneficiaryDetailId" />
         <input type="hidden" id="reportAiSummary" value="@Model.ReportAiSummary" />
         <input type="hidden" id="assessorRemarkType" name="assessorRemarkType" value="OK" />
-        <div id="article" class="card card-secondary">
-            <div class="card-header">
+        <div id="article" class="card shadow-lg border-0 rounded-lg">
+            <div class="card-header bg-secondary text-white text-center">
                 <h3 class="card-title">
                     <i class="fas fa-newspaper"></i> Report
                     <span class="hover-text">
@@ -82,9 +82,8 @@
         {
             <partial name="_AgencyAiReport" model="@Model" />
         }
-        <div class="card card-light">
-
-            <div class="card-header">
+        <div class="card shadow-lg border-0 rounded-lg">
+            <div class="card-header bg-info text-white text-center">
                 <h3 class="card-title">
                     <i class="fas fa-user-check"></i> Assessment
                     <span class="hover-text">

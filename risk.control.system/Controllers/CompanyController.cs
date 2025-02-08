@@ -1180,10 +1180,10 @@ namespace risk.control.system.Controllers
                     .First(v => v.VendorInvestigationServiceTypeId == id);
 
                 ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", vendorInvestigationServiceType.LineOfBusinessId);
-                ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType
-                    .Include(i => i.LineOfBusiness)
-                    .Where(i => i.LineOfBusiness.LineOfBusinessId == vendorInvestigationServiceType.LineOfBusinessId),
-                    "InvestigationServiceTypeId", "Name", vendorInvestigationServiceType.InvestigationServiceTypeId);
+                //ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType
+                //    .Include(i => i.LineOfBusiness)
+                //    .Where(i => i.LineOfBusiness.LineOfBusinessId == vendorInvestigationServiceType.LineOfBusinessId),
+                //    "InvestigationServiceTypeId", "Name", vendorInvestigationServiceType.InvestigationServiceTypeId);
                 if (vendorInvestigationServiceType.DistrictId == null)
                 {
                     var pinCodes = new List<PinCode> { new PinCode { Name = ALL_PINCODE, Code = ALL_PINCODE_CODE } };
@@ -1203,7 +1203,7 @@ namespace risk.control.system.Controllers
                 }
                 else
                 {
-                    ViewBag.PinCodeId = _context.PinCode.Where(p => p.District.DistrictId == vendorInvestigationServiceType.DistrictId)
+                    ViewBag.PinCodeId = _context.PinCode.Include(c=>c.District).Where(p => p.District.DistrictId == vendorInvestigationServiceType.DistrictId)
                     .Select(x => new SelectListItem
                     {
                         Text = x.Name + " - " + x.Code,
