@@ -2250,7 +2250,7 @@ input#checkall {
     }
 #password-advise {
     font-size: .7em;
-    padding: 0px;
+    z-index: 9999;
 }
 .password-content{
     padding:0px;

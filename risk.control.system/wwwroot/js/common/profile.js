@@ -94,7 +94,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     var pwdModal = document.getElementById('passwordModal');
     var closeTermsButton = document.getElementById('closeterms');
-    var pwdLinks = document.querySelectorAll('#update-password-description');
+    var pwdLinks = document.querySelectorAll('.update-password-description');
 
 
     if (pwdLinks) {
@@ -103,9 +103,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 e.preventDefault(); // Prevent default link behavior (i.e., not navigating anywhere)
 
                 // Show the terms modal
-                var termsModal = document.querySelector('#passwordModal');
-                termsModal.classList.remove('hidden-section');
-                termsModal.classList.add('show');
+                //var termsModal = document.querySelector('#passwordModal');
+                pwdModal.classList.remove('hidden-section');
+                pwdModal.classList.add('show');
             });
         });
     }
@@ -147,7 +147,7 @@ if (chatGPTMessage) {
             // Populate UI with user details first
             document.getElementById('displayedEmail').textContent = passwordModel.email;
             document.getElementById('CurrentPassword').value = passwordModel.currentPassword;
-            document.getElementById('profilePicture').src = `data:image/png;base64,${passwordModel.profilePicture}`;
+            document.getElementById('profilePicture').src = `data:image/*;base64,${passwordModel.profilePicture}`;
         }
         else {
             // Queue messages for typing effect

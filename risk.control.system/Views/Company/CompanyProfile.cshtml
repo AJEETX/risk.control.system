@@ -6,330 +6,129 @@
 <section class="content">
     <input type="hidden" id="Latitude" asp-for="@Model.PinCode.Latitude" />
     <input type="hidden" id="Longitude" asp-for="@Model.PinCode.Longitude" />
-    <div id="article" class="card card-secondary expand-card">
-        <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-building"></i> Company Profile</h3>
-        </div>
-
-        <div class="card-body">
-            <div class="submit-progress hidden">
-                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+    <div class="container-fluid">
+        <div id="article" class="card card-secondary">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-building"></i> Company Profile</h3>
             </div>
-            <div class="row">
-                <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
-                    <div class="card bg-light d-flex flex-fill">
-                        <div class="card-footer">
-                            <i class="fas fa-building"></i> Company Details
-                        </div>
-                        <div class="progress">
-                            <i class="far fa-bookmark bookmark-green"></i>
-                            <div class="progress-bar progress-bar-green" role="progressbar">
-                                <i class="fas fa-building"></i>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-7">
-                                    <p class="text-muted text-sm">
-                                        <i class="fa fa-globe"></i>  <b>@Model.Email</b>
-                                    </p>
-                                    <ul class="ml-4 mb-0 fa-ul text-muted">
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fas fa-building"></i>
-                                            </span>
-                                            Company Name: <b> @Model.Name</b>
-                                        </li>
-                                        @* <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fas fa-code"></i>
-                                            </span>
-                                            Company Code: <b> @Model.Code</b>
-                                        </li> *@
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="far fa-building"></i>
-                                            </span>
-                                            Branch:<b> @Model.Branch</b>
-                                        </li>
-                                        @* <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fas fa-tools"></i>
-                                            </span>
-                                            Detail :<b>  @Model.Description</b>
-                                        </li> *@
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fas fa-phone"></i>
-                                            </span>
-                                            Phone #: <b>  @Model.PhoneNumber</b>
-                                        </li>
-                                        
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fas fa-home"></i>
-                                            </span>
-                                            Address: <b>@Model.Addressline @Model.District.Name @Model.State.Name @Model.PinCode.Code</b>
-                                        </li>
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fas fa-key"></i>
-                                            </span>
-                                            License Type: <b>@Html.DisplayFor(model => model.LicenseType)</b>
-                                        </li>
-                                        @{
-                                            if (Model.LicenseType == Standard.Licensing.LicenseType.Trial)
-                                            {
-                                                var expiryDate = Model.ExpiryDate.Value.ToString("dd-MMM-yyyy");
 
-                                                <li class="small">
-                                                    <span class="fa-li">
-                                                        <i class="fas fa-calendar-check"></i>
-                                                    </span>
-                                                    License Expiry Date:<b> @Html.DisplayFor(model => expiryDate)</b>
-                                                </li>
-                                                <li class="small">
-                                                    <span class="fa-li">
-                                                        <i class="fas fa-coins"></i>
-                                                    </span>
-                                                    MAX Claims: <b>@Html.DisplayFor(model => model.TotalCreatedClaimAllowed)</b>
-                                                </li>
-                                            }
-                                        }
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fas fa-sitemap"></i>
-                                            </span>
-                                            Whitelist Ip Addresses : <b>  @Model.WhitelistIpAddress</b>
-                                        </li>
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fas fa-project-diagram"></i>
-                                            </span>
-                                            Creator Sla (day(s):  <a href="#">  @Model.CreatorSla</a>
-                                        </li>
-
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fas fa-project-diagram"></i>
-                                            </span>
-                                            Assessor Sla(day(s):  <a href="#">  @Model.AssessorSla</a>
-                                        </li>
-
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fas fa-project-diagram"></i>
-                                            </span>
-                                            Supervisor Sla(day(s):  <a href="#">  @Model.SupervisorSla</a>
-                                        </li>
-
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fas fa-project-diagram"></i>
-                                            </span>
-                                            Agent Sla(day(s):  <a href="#">  @Model.AgentSla</a>
-                                        </li>
-                                    </ul>
-                                </div>
-                                <div class="col-5 text-center">
-                                    <p class="text-muted text-sm">
-
-                                    </p>
-                                    <p class="text-muted text-sm">
-                                        @if (Model?.DocumentUrl is not null)
-                                        {
-                                            <img id="documentImage" class="img-fluid" src="@Model?.DocumentUrl">
-                                        }
-                                        else
-                                        {
-                                            <img id="documentImage" alt="user-avatar"
-                                                 class="img-fluid form-Image" src="@Applicationsettings.NO_IMAGE">
-                                        }
-                                    </p>
-
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+            <div class="card-body">
+                <div class="submit-progress hidden">
+                    <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
                 </div>
-                <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
-                    <div class="card bg-light d-flex flex-fill">
-                        <div class="card-footer">
-                            <i class="fas fa-sitemap"></i> APIs Details
-                        </div>
-                        <div class="progress">
-                            <i class="far fa-bookmark bookmark-green"></i>
-                            <div class="progress-bar progress-bar-green" role="progressbar">
-                                <i class="fas fa-sitemap"></i>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-12">
-                                    <p class="text-muted text-sm">
-                                        <i class="fas fa-code-branch"></i> <b> External URl : </b>
-                                    </p>
-                                    <ul class="ml-4 mb-0 fa-ul text-muted">
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fas fa-project-diagram"></i>
-                                            </span>
-                                            API endpoint:  <a href="#">  @Model.PanIdfyUrl</a>
-                                        </li>
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fas fa-key"></i>
-                                            </span>
-                                            Api Key:  <b>  @Model.PanAPIKey</b>
-                                        </li>
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fas fa-code"></i>
-                                            </span>
-                                            Api Host:  <b>  @Model.PanAPIHost</b>
-                                        </li>
-                                       
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fas fa-code"></i>
-                                            </span>
-                                            Mobile App Url : <a href="#">  @Model.MobileAppUrl</a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-6">
-                                    <p class="text-muted text-sm">
-                                        <i class="fas fa-tools"></i> <b> Settings : </b>
-                                    </p>
-                                    <ul class="ml-4 mb-0 fa-ul text-muted">
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="far fa-paper-plane"></i>
-                                            </span>
-                                            Auto-Allocation <b>@Html.DisplayFor(model => model.AutoAllocation)</b>
-                                        </li>
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fas fa-business-time"></i>
-                                            </span>
-                                            Verify Pan: <b>  @Html.DisplayFor(model => model.VerifyPan)</b>
-                                        </li>
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fas fa-business-time"></i>
-                                            </span>
-                                            Verify Passport: <b>  @Html.DisplayFor(model => model.VerifyPassport)</b>
-                                        </li>
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fas fa-business-time"></i>
-                                            </span>
-                                            Enable Passport: <b>  @Html.DisplayFor(model => model.EnablePassport)</b>
-                                        </li>
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fas fa-business-time"></i>
-                                            </span>
-                                            Enable Media: <b>  @Html.DisplayFor(model => model.EnableMedia)</b>
-                                        </li>
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fas fa-comments"></i>
-                                            </span>
-                                            Enable SMS: <b>@Html.DisplayFor(model => model.SendSMS) </b>
-                                        </li>
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fa fa-upload"></i>
-                                            </span>
-                                            Bulk Upload: <b>@Html.DisplayFor(model => model.BulkUpload)</b>
-                                        </li>
-                                        
-                                        
-                                    </ul>
-                                </div>
-                                <div class="col-6">
-                                    ---
-                                    <ul class="ml-4 mb-0 fa-ul text-muted">
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fa fa-upload"></i>
-                                            </span>
-                                            AI enabled: <b>@Html.DisplayFor(model => model.AiEnabled)</b>
-                                        </li>
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fas fa-key"></i>
-                                            </span>
-                                            Edit Profile <b>@Html.DisplayFor(model => model.CanChangePassword) </b>
-                                        </li>
-                                        
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fa fa-upload"></i>
-                                            </span>
-                                            Edit Report (Supervisor): <b>@Html.DisplayFor(model => model.UpdateAgentReport)</b>
-                                        </li>
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fas fa-comments"></i>
-                                            </span>
-                                            Edit Answer update(Supervisor): <b>@Html.DisplayFor(model => model.UpdateAgentAnswer)</b>
-                                        </li>
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="far fa-comment-alt"></i>
-                                            </span>
-                                            Enable mailbox <b>@Html.DisplayFor(model => model.EnableMailbox) </b>
-                                        </li>
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fa fa-upload"></i>
-                                            </span>
-                                            Set Prefilled data: <b>@Html.DisplayFor(model => model.HasSampleData)</b>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
-                    <div class="card bg-light d-flex flex-fill">
-                        <div class="card-footer">
-                            <i class="fas fa-map-marked-alt"></i> Map View
-                        </div>
-                        <div class="progress">
-                            <i class="far fa-bookmark bookmark-green"></i>
-                            <div class="progress-bar progress-bar-green" role="progressbar">
-                                <i class="fas fa-map-marked-alt"></i>
-                            </div>
-                        </div>
-                        <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 text-center">
+                        <p class="info-box-number">Active Since: @Model.ActivatedDate?.ToString("dd-MMM-yyyy")</p>
 
+                        <div class="profile-img-container">
+                            <img src="data:image/*;base64,@(Convert.ToBase64String(Model?.DocumentImage))"
+                                 class="rounded-circle shadow-lg border profile-img" alt="User Profile" title="@Model.Email" data-toggle="tooltip" />
+                        </div>
+                        <h5 class="mt-3">@Model.Email</h5>
+                        <p class="text-muted">@Model.Name</p>
+                        
+                        <div class="dropdown-divider"></div>
+                        <div class="card-footer">
                             <div class="row">
                                 <div class="col-md-12">
-                                    <div id="company-map">
-                                        <img id="company-map-url" src="@Model.AddressMapLocation" />
+                                    <div class="form-group">
+                                        <a id="edit-company" asp-controller="Company" asp-action="Edit" class="btn btn-warning"><i class='fas fa-building'></i> Edit Company</a>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-        <div class="card-footer">
-            <div class="row float-right">
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <a asp-controller="Dashboard" asp-action="Index" id="back" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
-                        <a id="edit-company" asp-controller="Company" asp-action="Edit" class="btn btn-warning"><i class='fas fa-building'></i> Edit Company</a>
+                    <div class="col-md-8">
+                        <div class="row">
+                            <!-- Left Column -->
+                            <div class="col-md-6">
+                                <div class="info-box">
+                                    <span class="info-box-icon bg-primary"><i class="fas fa-envelope"></i></span>
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">Domain</span>
+                                        <span class="info-box-number"><a href="#">@Model.Email</a></span>
+                                    </div>
+                                </div>
+
+                                <div class="info-box">
+                                    <span class="info-box-icon bg-success"><i class="fas fa-phone"></i></span>
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">Phone</span>
+                                        <span class="info-box-number">+@Model.Country.ISDCode (0) @Model.PhoneNumber</span>
+                                    </div>
+                                </div>
+                                <div class="info-box">
+                                    <span class="info-box-icon bg-info"><i class="fas fa-landmark"></i></span>
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">Bank Name </span>
+                                        <span class="info-box-number">@Model.BankName</span>
+                                    </div>
+                                </div>
+
+                                <div class="info-box">
+                                    <span class="info-box-icon bg-warning"><i class="fab fa-btc"></i></span>
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">Bank Account #</span>
+                                        <span class="info-box-number">@Model.BankAccountNumber</span>
+                                    </div>
+                                </div>
+
+                                <div class="info-box">
+                                    <span class="info-box-icon bg-warning"><i class="fas fa-rupee-sign"></i></span>
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">IFSC Code</span>
+                                        <span class="info-box-number">@Model.IFSCCode</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Right Column -->
+                            <div class="col-md-6">
+                                <div class="info-box">
+                                    <span class="info-box-icon bg-info"><i class="fas fa-map-marker-alt"></i></span>
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">Address</span>
+                                        <span class="info-box-number">@Model.Addressline</span>
+                                    </div>
+                                </div>
+
+                                <div class="info-box">
+                                    <span class="info-box-icon bg-warning"><i class="fas fa-map-pin"></i></span>
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">Pin Code</span>
+                                        <span class="info-box-number">@Model.PinCode.Code</span>
+                                    </div>
+                                </div>
+                                <div class="info-box">
+                                    <span class="info-box-icon bg-secondary"><i class="fas fa-city"></i></span>
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">District</span>
+                                        <span class="info-box-number">@Model.District.Name</span>
+                                    </div>
+                                </div>
+
+                                <div class="info-box">
+                                    <span class="info-box-icon bg-danger"><i class="fas fa-flag"></i></span>
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">State</span>
+                                        <span class="info-box-number">@Model.State.Name</span>
+                                    </div>
+                                </div>
+
+                                <div class="info-box">
+                                    <span class="info-box-icon bg-dark"><i class="fas fa-globe"></i></span>
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">Country</span>
+                                        <span class="info-box-number">@Model.Country.Name</span>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
+            
         </div>
     </div>
 </section>

@@ -547,7 +547,9 @@ namespace risk.control.system.Controllers
             {
                 Message = message,
                 Reset = smsSent2User != null,
-                Flag = flagPath
+                Flag = flagPath,
+                ProfilePicture = smsSent2User.ProfilePicture,
+                Email = smsSent2User.Email
             };
             return View(model);
         }

@@ -7,165 +7,160 @@
 <section class="content">
     <input type="hidden" id="Latitude" asp-for="@Model.PinCode.Latitude" />
     <input type="hidden" id="Longitude" asp-for="@Model.PinCode.Longitude" />
-    <div class="card bg-light card-secondary">
-        <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-building"></i>  Agency Profile</h3>
-        </div>
-        <div class="card-body">
-            <div class="submit-progress hidden">
-                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+    <div class="container-fluid">
+        <div class="card bg-light card-secondary">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-building"></i>  Agency Profile</h3>
             </div>
-            <div class="row">
-                <div class="col-12 col-sm-7 d-flex align-items-stretch flex-column">
-                    <div class="card bg-light d-flex flex-fill">
-                        <div class="card-footer text-muted border-bottom-0">
-                            <i class="fas fa-building"></i> Edit Agency
+            <div class="card-body">
+                <div class="submit-progress hidden">
+                    <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 text-center">
+                        <p class="info-box-number">Active Since: @Model.ActivatedDate?.ToString("dd-MMM-yyyy")</p>
+
+                        <div class="profile-img-container">
+                            <img src="data:image/*;base64,@(Convert.ToBase64String(Model?.DocumentImage))"
+                                 class="rounded-circle shadow-lg border profile-img" alt="User Profile" title="@Model.Email" data-toggle="tooltip" />
                         </div>
-                        <div class="progress">
-                            <i class="far fa-bookmark bookmark-green"></i>
-                            <div class="progress-bar progress-bar-green" role="progressbar">
-                                <i class="fas fa-building"></i>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-7">
-                                    <p class="text-muted text-sm">
-                                        <b>Agency Domain: </b>  <i class="fa fa-globe"></i>  <a href="#">@Model.Email</a>
-                                    </p>
-                                    <ul class="ml-4 mb-0 fa-ul text-muted">
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fas fa-building"></i>
-                                            </span>
-                                            Agency Name: <i class="fas fa-business-time"></i> @Model.Name
-                                        </li>
-                                       
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fas fa-phone"></i>
-                                            </span>
-                                            Phone #: <i class="fas fa-phone"></i> @Model.PhoneNumber
-                                        </li>
-                                        
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fas fa-landmark"></i>
-                                            </span>
-                                            Bank Name: <i class="fas fa-landmark"></i> @Model.BankName
-                                        </li>
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fab fa-btc"></i>
-                                            </span>
-                                            Bank Account #: <i class="fab fa-btc"></i> @Model.BankAccountNumber
-                                        </li>
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fas fa-rupee-sign"></i>
-                                            </span>
-                                            IFSC Code: <i class="fas fa-rupee-sign"></i> @Model.IFSCCode
-                                        </li>
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fas fa-calendar-check"></i>
-                                            </span>
-                                            Active Date:  <i class="fas fa-calendar-check"></i>  @Model.ActivatedDate?.ToString("dd-MMM-yyyy")
-                                        </li>
-                                       
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fas fa-home"></i>
-                                            </span>
-                                            Address:  @Model.Addressline @Model.District.Name @Model.State.Name @Model.PinCode.Code
-                                        </li>
-                                        
-                                    </ul>
+                        <h5 class="mt-3">@Model.Email</h5>
+                        <p class="text-muted">@Model.Name</p>
+                        <p class="text-muted text-sm">
+                            <i class="fa fa-star"></i>  <b>Rating: </b>
+                        </p>
+
+                        <ul class="ml-4 mb-0 fa-ul text-muted">
+                            <li class="small">
+                                <div class="col-md-12" id="agency-rating">
+                                    <img src="~/images/StarFade.gif" alt="Star Rating" align="middle" id="1" class="main-rating" vendorId="@Model.VendorId" />
+                                    <img src="~/images/StarFade.gif" alt="Star Rating" align="middle" id="2" class="main-rating" vendorId="@Model.VendorId" />
+                                    <img src="~/images/StarFade.gif" alt="Star Rating" align="middle" id="3" class="main-rating" vendorId="@Model.VendorId" />
+                                    <img src="~/images/StarFade.gif" alt="Star Rating" align="middle" id="4" class="main-rating" vendorId="@Model.VendorId" />
+                                    <img src="~/images/StarFade.gif" alt="Star Rating" align="middle" id="5" class="main-rating" vendorId="@Model.VendorId" />
+
+                                    <span id="rating-result">
+                                        <span class="badge badge-light">
+                                            (@Model.RateCount)
+                                        </span>
+                                        @if (Model.RateCount != null && Model.RateCount > 0)
+                                        {
+                                            decimal a = @Model.RateTotal.Value / @Model.RateCount.Value;
+                                            <span class="avr"> @a</span>
+                                        }
+
+                                    </span>
+                                    <div class="badge badge-light">
+                                        <span id="rating-result-data" class="result"></span>
+                                    </div>
                                 </div>
-                                <div class="col-5 text-center">
-                                    <p class="text-muted text-sm">
-                                        <i class="fa fa-star"></i>  <b>Rating: </b>
-                                    </p>
-
-                                    <ul class="ml-4 mb-0 fa-ul text-muted">
-                                        <li class="small">
-                                            <div class="col-md-12" id="agency-rating">
-                                                <img src="~/images/StarFade.gif" alt="Star Rating" align="middle" id="1" class="main-rating" vendorId="@Model.VendorId" />
-                                                <img src="~/images/StarFade.gif" alt="Star Rating" align="middle" id="2" class="main-rating" vendorId="@Model.VendorId" />
-                                                <img src="~/images/StarFade.gif" alt="Star Rating" align="middle" id="3" class="main-rating" vendorId="@Model.VendorId" />
-                                                <img src="~/images/StarFade.gif" alt="Star Rating" align="middle" id="4" class="main-rating" vendorId="@Model.VendorId" />
-                                                <img src="~/images/StarFade.gif" alt="Star Rating" align="middle" id="5" class="main-rating" vendorId="@Model.VendorId" />
-
-                                                <span id="rating-result">
-                                                    <span class="badge badge-light">
-                                                        (@Model.RateCount)
-                                                    </span>
-                                                    @if (Model.RateCount != null && Model.RateCount > 0)
-                                                    {
-                                                        decimal a = @Model.RateTotal.Value / @Model.RateCount.Value;
-                                                        <span class="avr"> @a</span>
-                                                    }
-
-                                                </span>
-                                                <div class="badge badge-light">
-                                                    <span id="rating-result-data" class="result"></span>
-                                                </div>
-                                            </div>
-                                        </li>
-
-                                        <li class="small">
-                                            @if (Model?.DocumentUrl is not null)
-                                            {
-                                                <img id="documentImage" class="img-fluid" src="@Model?.DocumentUrl">
-                                            }
-                                            else
-                                            {
-                                                <img id="documentImage" alt="user-avatar"
-                                                     class="img-fluid form-Image" src="@Applicationsettings.NO_IMAGE">
-                                            }
-                                        </li>
-
-                                    </ul>
+                            </li>
+                        </ul>
+                        <div class="dropdown-divider"></div>
 
 
-                                </div>
-                            </div>
-                        </div>
                         <div class="card-footer">
-                            <div class="text-right">
-                                <a id="editagency" asp-controller="Agency" asp-action="Edit" class="btn btn-warning"><i class='fas fa-building'></i> Edit Agency</a>
-
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <p class="info-box-number">
+                                        <a id="editagency" asp-controller="Agency" asp-action="Edit" class="btn btn-warning"><i class='fas fa-building'></i> Edit Agency</a>
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                    <div class="col-md-8">
+                        <div class="row">
+                            <!-- Left Column -->
+                            <div class="col-md-6">
+                                <div class="info-box">
+                                    <span class="info-box-icon bg-primary"><i class="fas fa-envelope"></i></span>
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">Domain</span>
+                                        <span class="info-box-number"><a href="#">@Model.Email</a></span>
+                                    </div>
+                                </div>
 
-                <div class="col-12 col-sm-5 d-flex align-items-stretch flex-column">
-                    <div class="card bg-light d-flex flex-fill">
-                        <div class="card-footer text-muted border-bottom-0">
-                            <i class="fas fa-map-marked-alt"></i> Map View
-                        </div>
-                        <div class="progress">
-                            <i class="far fa-bookmark bookmark-green"></i>
-                            <div class="progress-bar progress-bar-green" role="progressbar">
-                                <i class="fas fa-map-marked-alt"></i>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div id="company-map">
-                                    <img id="company-map-url" src="@Model.AddressMapLocation" />
+                                <div class="info-box">
+                                    <span class="info-box-icon bg-success"><i class="fas fa-phone"></i></span>
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">Phone</span>
+                                        <span class="info-box-number">+@Model.Country.ISDCode (0) @Model.PhoneNumber</span>
+                                    </div>
+                                </div>
+                                <div class="info-box">
+                                    <span class="info-box-icon bg-info"><i class="fas fa-landmark"></i></span>
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">Bank Name </span>
+                                        <span class="info-box-number">@Model.BankName</span>
+                                    </div>
+                                </div>
+
+                                <div class="info-box">
+                                    <span class="info-box-icon bg-warning"><i class="fab fa-btc"></i></span>
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">Bank Account #</span>
+                                        <span class="info-box-number">@Model.BankAccountNumber</span>
+                                    </div>
+                                </div>
+
+                                <div class="info-box">
+                                    <span class="info-box-icon bg-warning"><i class="fas fa-rupee-sign"></i></span>
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">IFSC Code</span>
+                                        <span class="info-box-number">@Model.IFSCCode</span>
+                                    </div>
                                 </div>
                             </div>
 
+                            <!-- Right Column -->
+                            <div class="col-md-6">
+                                <div class="info-box">
+                                    <span class="info-box-icon bg-info"><i class="fas fa-map-marker-alt"></i></span>
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">Address</span>
+                                        <span class="info-box-number">@Model.Addressline</span>
+                                    </div>
+                                </div>
+
+                                <div class="info-box">
+                                    <span class="info-box-icon bg-warning"><i class="fas fa-map-pin"></i></span>
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">Pin Code</span>
+                                        <span class="info-box-number">@Model.PinCode.Code</span>
+                                    </div>
+                                </div>
+                                <div class="info-box">
+                                    <span class="info-box-icon bg-secondary"><i class="fas fa-city"></i></span>
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">District</span>
+                                        <span class="info-box-number">@Model.District.Name</span>
+                                    </div>
+                                </div>
+
+                                <div class="info-box">
+                                    <span class="info-box-icon bg-danger"><i class="fas fa-flag"></i></span>
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">State</span>
+                                        <span class="info-box-number">@Model.State.Name</span>
+                                    </div>
+                                </div>
+
+                                <div class="info-box">
+                                    <span class="info-box-icon bg-dark"><i class="fas fa-globe"></i></span>
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">Country</span>
+                                        <span class="info-box-number">@Model.Country.Name</span>
+                                    </div>
+                                </div>
+
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-
-
         </div>
-        
+
     </div>
 </section>
 
