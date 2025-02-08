@@ -2,13 +2,12 @@
 
 @{
     ViewData["Title"] = " Send Enquiry";
-    <link rel="stylesheet" href="~/plugins/summernote/summernote-bs4.css">
 }
 <section class="content">
     <form id="query-form" method="post" asp-controller="ClaimsVendorPost" asp-action="ReplyQuery" enctype="multipart/form-data" autocomplete="off">
         <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
-        <div id="article" class="card card-secondary">
-            <div class="card-header">
+        <div id="article" class="card shadow-lg border-0 rounded-lg">
+            <div class="card-header bg-secondary text-white text-center">
                 <h3 class="card-title">
                     <i class="fas fa-newspaper"></i> Reply Enquiry
                     <span class="hover-text">
@@ -43,8 +42,8 @@
             </div>
         </div>
 
-        <div class="card card-secondary">
-            <div class="card-header">
+        <div class="card shadow-lg border-0 rounded-lg">
+            <div class="card-header bg-secondary text-white text-center">
                 <h3 class="card-title">
                     <i class="fa fa-edit"></i>  Reply
                     <span class="hover-text">

@@ -1,8 +1,8 @@
 ﻿@model risk.control.system.Models.ClaimsInvestigation
 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-<div id="article" class="card bg-light card-secondary">
-    <input type="hidden" asp-for="PolicyDetail.LineOfBusinessId" value="@ViewBag.LineOfBusinessId" />
-    <div class="card-header">
+<input type="hidden" asp-for="PolicyDetail.LineOfBusinessId" value="@ViewBag.LineOfBusinessId" />
+<div id="article" class="card shadow-lg border-0 rounded-lg">
+    <div class="card-header bg-secondary text-white text-center">
         <h3 class="card-title">
             <i class="far fa-file-powerpoint"></i> Add Policy
             <span class="hover-text">

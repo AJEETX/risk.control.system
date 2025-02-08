@@ -4,8 +4,8 @@
     ViewData["Title"] = "Details";
 }
 <section class="content">
-    <div id="article" class="card card-secondary">
-        <div class="card-header">
+    <div id="article" class="card shadow-lg border-0 rounded-lg">
+        <div class="card-header bg-secondary text-white text-center">
             <h3 class="card-title">
                 <i class="fas fa-newspaper"></i> Details
                 <span class="hover-text">
@@ -58,8 +58,8 @@
         <input type="hidden" id="policyDetailId" value="@Model.ClaimsInvestigation?.PolicyDetail.PolicyDetailId" />
     </div>
 
-    <div class="card card-light">
-        <div class="card-header">
+    <div class="card shadow-lg border-0 rounded-lg">
+        <div class="card-header bg-light text-white text-center">
             <h3 class="card-title">
                 <span class="badge badge-info" data-toggle="tooltip" title="Status : @Model.ClaimsInvestigation?.InvestigationCaseSubStatus.Name">
                     <b>   @Model.ClaimsInvestigation?.InvestigationCaseSubStatus.Name</b>
@@ -104,21 +104,22 @@
                 <partial name="Creator/_DeleteBeneficiary" model="Model" />
 
             </div>
-        </div>
-    </div>
+            <partial name="Company/_TimelineReport" model="@Model" />
 
-    <partial name="Company/_TimelineReport" model="@Model" />
-
-    <div class="card-footer">
-        <div class="row">
-            <div class="col-md-12">
-                <a id="back" asp-controller="Manager" asp-action="Active" class="btn btn-outline-secondary">
-                    <i class="fas fa-arrow-left"></i>
-                    <span class="badge badge-light"> <i class="fa fa-toggle-on"></i> </span> Back
-                </a>
+            <div class="card-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <a id="back" asp-controller="Manager" asp-action="Active" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left"></i>
+                            <span class="badge badge-light"> <i class="fa fa-toggle-on"></i> </span> Back
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+
+    
 </section>
 
 

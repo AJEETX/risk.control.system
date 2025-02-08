@@ -26,7 +26,7 @@
                         $('a').addClass('disabled-anchor').on('click', function (e) {
                             e.preventDefault(); // Prevent default action for anchor clicks
                         });
-                        $('#updatebutton').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Update Password");
+                        $('#updatebutton').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Update");
                         form.submit();
                         var createForm = document.getElementById("edit-form");
                         if (createForm) {

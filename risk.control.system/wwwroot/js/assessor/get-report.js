@@ -348,7 +348,7 @@ $(document).ready(function () {
         }
     });
     $('#enquire-case').on('click', function (e) {
-        howenquiry();
+        showenquiry();
     });
 
 });
