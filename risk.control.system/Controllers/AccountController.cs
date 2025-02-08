@@ -1,8 +1,4 @@
-﻿using System;
-using System.Net.Mail;
-using System.Reflection;
-using System.Security.Claims;
-using System.Text;
+﻿using System.Text;
 using System.Web;
 
 using AspNetCoreHero.ToastNotification.Abstractions;
@@ -11,20 +7,12 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting;
 using Microsoft.FeatureManagement;
-using Microsoft.FeatureManagement.Mvc;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
-
-using NToastNotify;
-
-using NuGet.Packaging.Signing;
 
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
@@ -32,8 +20,6 @@ using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
-
-using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers
 {

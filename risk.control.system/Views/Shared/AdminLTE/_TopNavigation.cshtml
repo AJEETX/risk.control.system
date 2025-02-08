@@ -29,8 +29,9 @@
     <!-- Right navbar links -->
     <ul class="navbar-nav ml-auto">
         <li class="top-nav-header-border">
-            <a class="nav-link" data-widget="control-sidebar" data-slide="true" role="button" title="Idle time remaining" data-toggle="tooltip">
-                <div><i id="hour-glass" class="fas fa-hourglass-end fa-spin"></i>  <span id="time"> </span></div>
+
+            <a class="nav-link" data-widget="control-sidebar" data-slide="true" role="button" title="Currency : @Model?.CurrencyCode" data-toggle="tooltip">
+                <div id="currency"><i class="fa fa-money"></i> @Model?.CurrencyCode </div>
             </a>
         </li>
         <li class="top-nav-header-border">
@@ -41,8 +42,14 @@
                 <div id="country"> <i class="fas fa-map-marker-alt"></i> <img src="@img" class="flag-icon" /> </div>
             </a>
         </li>
+        <li class="top-nav-header-border">
+            <a class="nav-link" data-widget="control-sidebar" data-slide="true" role="button" title="Idle time remaining" data-toggle="tooltip">
+                <div><i id="hour-glass" class="fas fa-hourglass-end fa-spin"></i>  <span id="time"> </span></div>
+            </a>
+        </li>
+        
         <!-- Notifications Dropdown Menu -->
-        <li class="dropdown top-nav-header-border">
+        <li class="dropdown top-nav-logout-border">
             <a class="nav-link" data-toggle="dropdown" href="#">
                 <i class="fas fa-cog fa-spin"></i>
             </a>
