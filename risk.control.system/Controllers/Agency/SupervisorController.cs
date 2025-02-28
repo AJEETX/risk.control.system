@@ -105,9 +105,7 @@ namespace risk.control.system.Controllers.Agency
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
-
         }
-
 
         [HttpGet]
         [Breadcrumb("Re-Allocate", FromAction = "ClaimReport")]

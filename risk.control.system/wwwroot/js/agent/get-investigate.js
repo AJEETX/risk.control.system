@@ -819,6 +819,40 @@ if (questionDate) {
     questionDate.max = new Date().toISOString().split("T")[0];
 }
 
+document.addEventListener("DOMContentLoaded", function () {
+
+    // Reference to the modal and close button
+    var termsModal = document.getElementById('termsModal');
+    var closeTermsButton = document.getElementById('closeterms');
+    // Select all elements with the class 'termsLink'
+    var termsLinks = document.querySelectorAll('.termsLink');
+
+    // Add a click event listener to each element
+    termsLinks.forEach(function (termsLink) {
+        termsLink.addEventListener('click', function (e) {
+            e.preventDefault(); // Prevent default link behavior (i.e., not navigating anywhere)
+
+            // Show the terms modal
+            var termsModal = document.querySelector('#termsModal');
+            termsModal.classList.remove('hidden-section');
+            termsModal.classList.add('show');
+        });
+    });
+
+    // Close the modal when clicking the close button
+    closeTermsButton.addEventListener('click', function () {
+        termsModal.classList.add('hidden-section'); // Remove the 'show' class to hide the modal
+        termsModal.classList.remove('show'); // Remove the 'show' class to hide the modal
+    });
+
+    // Optionally, you can close the modal if clicked outside the modal content
+    window.addEventListener('click', function (e) {
+        if (e.target === termsModal) {
+            termsModal.classList.add('hidden-section'); // Remove the 'show' class to hide the modal
+            termsModal.classList.remove('show'); // Close the modal if clicked outside
+        }
+    });
+});
 //var nodes = document.getElementById("audio-video").getElementsByTagName('*');
 //for (var i = 0; i < nodes.length; i++) {
 //    nodes[i].disabled = true;

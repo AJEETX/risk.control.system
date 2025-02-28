@@ -96,10 +96,12 @@ namespace risk.control.system.Controllers.Api.Company
             var allocatedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
             var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
             var submitted2SuperStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR);
+            var enquiryRequestStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR);
             var claimsCases = _context.ClaimsInvestigation
                 .Where(c => c.ClientCompanyId == companyUser.ClientCompanyId &&
                 (c.InvestigationCaseSubStatusId == allocatedStatus.InvestigationCaseSubStatusId ||
                 c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId ||
+                c.InvestigationCaseSubStatusId == enquiryRequestStatus.InvestigationCaseSubStatusId ||
                 c.InvestigationCaseSubStatusId == submitted2SuperStatus.InvestigationCaseSubStatusId))
                 ?.ToList();
             var company = _context.ClientCompany

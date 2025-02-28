@@ -1,21 +1,16 @@
 ﻿@model ClaimsInvestigationVendorsModel
 <article>
     <div class="bb-blog-inner">
-        <div class="card card-light">
-            <div class="submit-progress hidden">
-                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
-            </div>
-            <div class="card-header">
+        <div class="card shadow-lg border-0 rounded-lg">
+            <div class="card-header bg-light text-white text-center"
                 <h3 class="card-title">
                     <i class="fas fa-user-shield"></i> Report: <span class="badge badge-light"> @Model.AgencyReport.AgentEmail </span>
                     <span class="hover-text">
                         <i class="fas fa-info-circle"></i>
                         <span class="tooltip-text" id="information">
                             <span>
-
                                 <i class="fas fa-user-shield"></i><b> @Model.AgencyReport.AgentEmail</b> report
                             </span>
-
                         </span>
                     </span>
                 </h3>
@@ -29,9 +24,10 @@
                     </button>
                 </div>
             </div>
-
+            <div class="submit-progress hidden">
+                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+            </div>
             <div class="card-body pb-0">
-
                 <div class="row">
                     <div class="col-md-4">
                         <partial name="_AgencyDigitalReport" model="@Model" />
