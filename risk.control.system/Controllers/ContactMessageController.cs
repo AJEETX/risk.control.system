@@ -379,8 +379,8 @@ namespace risk.control.system.Controllers
             var userEmail = HttpContext.User.Identity.Name;
 
             var userMessage = await sentMailService.GetSentMessagedetailReply(id, userEmail, actiontype);
+            userMessage.Message = string.Empty;
             ViewData["Users"] = new SelectList(_context.Users.Where(u => u.Email != userEmail).OrderBy(o => o.Email), "Email", "Email");
-
             ViewBag.ActionType = actiontype;
             return View(userMessage);
         }
@@ -398,7 +398,7 @@ namespace risk.control.system.Controllers
                     notifyService.Error("OOPs !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                contactMessage.Message = HttpUtility.HtmlEncode(contactMessage.RawMessage);
+                contactMessage.Message += HttpUtility.HtmlEncode(contactMessage.Message);
 
                 IFormFile? messageDocument = Request.Form?.Files?.FirstOrDefault();
 

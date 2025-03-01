@@ -33,8 +33,11 @@
 
                         <!-- Password Sent Confirmation -->
                         <div class="alert alert-info d-flex align-items-center justify-content-center">
-                            <i class="fas fa-info-circle mr-2"></i>
-                            <span>Password has been sent to your mobile.</span>
+                            @if (!Model.Reset)
+                            {
+                                <i class="fas fa-info-circle mr-2"></i>
+                                <span>Password has been sent to your mobile.</span>
+                            }
                             <img class="flag-icon ml-2" src="@Model.Flag" alt="Country flag" width="20" />
                             <span class="ml-2 text-sm">@Model.Message</span>
                         </div>
@@ -43,15 +46,15 @@
                     <div class="card-footer text-center">
                         @if (Model.Reset)
                         {
-                            <a asp-controller="Account" asp-action="Login" class="btn btn-success btn-lg px-4">
-                                <i class="fa fa-key"></i> Login Now
-                            </a>
+                                <a asp-controller="Account" asp-action="Login" class="btn btn-success btn-lg px-4">
+                                    <i class="fa fa-key"></i> Login Now
+                                </a>
                         }
                         else
                         {
-                            <a asp-controller="Account" asp-action="Login" class="btn btn-danger btn-lg px-4">
-                                <i class="fa fa-key"></i> Try Again
-                            </a>
+                                <a asp-controller="Account" asp-action="Login" class="btn btn-danger btn-lg px-4">
+                                    <i class="fa fa-key"></i> Try Again
+                                </a>
                         }
                     </div>
                 </div>

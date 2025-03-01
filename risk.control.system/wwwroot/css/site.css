@@ -2273,3 +2273,12 @@ input#checkall {
     background-color: white;
     border: 1px solid #ddd;
 }
+.reply-content {
+    background-color: whitesmoke;
+    padding: 0px 3em;
+    max-height: 200px;
+    overflow-y: auto;
+    font-family: monospace;
+    font-style: italic;
+    white-space: pre-wrap;
+}

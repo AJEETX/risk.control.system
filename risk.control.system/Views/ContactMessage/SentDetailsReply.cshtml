@@ -25,9 +25,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text" asp-for="ReceipientEmail"><i class="fas fa-at"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <select required id="receipient-email" asp-for="ReceipientEmail" title="Email" class="form-control remarks" asp-items="ViewBag.Users">
-                                    <option value=""> --- SELECT RECEPIENT --- </option>
-                                </select>
+                                <input readonly id="receipient-email" asp-for="ReceipientEmail" title="Email" class="form-control remarks" />
                                 <span asp-validation-for="ReceipientEmail" class="text-danger"></span>
                             </div>
                         </div>
@@ -52,9 +50,18 @@
                 </div>
                 <div class="form-group">
                     <div class="col-md-12">
-                        @Html.TextAreaFor(model => model.RawMessage, new { @class = "form-control remarks message-content", @row = 5 })
+                        <div class="reply-content">
+                            @Html.Raw(Model.RawMessage)
+                        </div>
                     </div>
                 </div>
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <!-- Display HTML content as text inside the textarea -->
+                        @Html.TextAreaFor(model => model.Message, new { @class = "form-control remarks message-content", @rows = 5 })
+                    </div>
+                </div>
+
                 <div class="form-group">
                     <div class="btn btn-default btn-file">
                         <i class="fas fa-paperclip"></i> Attachment

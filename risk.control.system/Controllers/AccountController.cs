@@ -26,6 +26,7 @@ namespace risk.control.system.Controllers
     public class AccountController : Controller
     {
         private readonly UserManager<Models.ApplicationUser> _userManager;
+        private readonly IWebHostEnvironment webHostEnvironment;
         private readonly SignInManager<Models.ApplicationUser> _signInManager;
         private readonly IConfiguration config;
         private readonly IHttpContextAccessor httpContextAccessor;
@@ -39,6 +40,7 @@ namespace risk.control.system.Controllers
 
         public AccountController(
             UserManager<Models.ApplicationUser> userManager,
+            IWebHostEnvironment webHostEnvironment,
             SignInManager<Models.ApplicationUser> signInManager,
             IConfiguration config,
              IHttpContextAccessor httpContextAccessor,
@@ -51,6 +53,7 @@ namespace risk.control.system.Controllers
             ApplicationDbContext context)
         {
             _userManager = userManager ?? throw new ArgumentNullException();
+            this.webHostEnvironment = webHostEnvironment;
             _signInManager = signInManager ?? throw new ArgumentNullException();
             this.config = config;
             this.httpContextAccessor = httpContextAccessor;
@@ -522,8 +525,23 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Forgot(LoginViewModel input)
         {
-            string message = string.Empty;
+            string message = "Incorrect details. Try Again";
+            string imagePath = Path.Combine(webHostEnvironment.WebRootPath,"img", "no-user.png");
+            byte[] image = System.IO.File.ReadAllBytes(imagePath);
+            var flagPath = $"/img/no-map.jpeg";
+            var model = new Models.ViewModel.ForgotPassword
+            {
+                Message = message,
+                Reset = false,
+                Flag = flagPath,
+                ProfilePicture = image,
+                Email = input.Email
+            };
             var user = await _userManager.FindByEmailAsync(input.Email);
+            if (user == null)
+            {
+                return View(model);
+            }
             //var token = await _userManager.GeneratePasswordResetTokenAsync(user);
 
             //// Encode the token to make it URL-safe
@@ -533,24 +551,14 @@ namespace risk.control.system.Controllers
             //var resetLink = Url.Action(nameof(ResetPassword), "Account", new { userId = user.Id, token = encodedToken }, Request.Scheme);
 
             var smsSent2User = await accountService.ForgotPassword(input.Email, input.Mobile, input.CountryId);
-            var flagPath = $"/img/no-map.jpeg";
             if (smsSent2User != null)
             {
-                message = $"{input.CountryId} (0) {input.Mobile}";
-                flagPath = $"/flags/{smsSent2User.Country.Code}.png";
+                model.Message = $"{input.CountryId} (0) {input.Mobile}";
+                model.Flag = $"/flags/{smsSent2User.Country.Code}.png";
+                model.ProfilePicture = smsSent2User.ProfilePicture;
+                model.Reset = true;
             }
-            else
-            {
-                message = "Incorrect details. Try Again";
-            }
-            var model = new Models.ViewModel.ForgotPassword
-            {
-                Message = message,
-                Reset = smsSent2User != null,
-                Flag = flagPath,
-                ProfilePicture = smsSent2User.ProfilePicture,
-                Email = smsSent2User.Email
-            };
+            
             return View(model);
         }
         [HttpGet]

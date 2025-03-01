@@ -5,6 +5,8 @@
     bool customerExist = false;
     bool beneficiaryExist = false;
     var imgPath = "/flags/in.png";
+    var country = string.Empty;
+    var phone = string.Empty;
     if (Model.ClaimsInvestigation.CustomerDetail != null)
     {
         customerExist = true;
@@ -15,7 +17,9 @@
         baddress = @Model.Location?.Addressline + " " + @Model.Location?.District?.Name + " " + @Model.Location?.State?.Name + " " + @Model.Location?.PinCode?.Code;
         var age = DateTime.Now.Subtract(Model.Location.DateOfBirth.GetValueOrDefault()).TotalDays;
         currentBAgeinYrs =$"{(int)(age/ 365 )} years";
-
+        country = @Model.Location?.Country?.Name;
+        phone = +@Model.Location?.Country.ISDCode +" (0) "+ @Model.Location?.ContactNumber;
+        imgPath = "/flags/" + @Model.Location.Country.Code.ToLower() + ".png";
     }
     string benficiaryProgressClass = "progress-bar-lightgrey"; // Default class
 
@@ -27,7 +31,6 @@
     {
         benficiaryProgressClass = "progress-bar-grey";
     }
-    imgPath = "/flags/" + @Model.Location.Country.Code.ToLower() + ".png";
 
 }
 <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
@@ -46,7 +49,7 @@
                 <div class="col-7">
                     <h2 class="lead"><b>@Model.Location?.Name</b></h2>
                     <p class="text-muted text-sm">
-                        <b>Relation: </b> @Model.Location?.BeneficiaryRelation.Name
+                        <b>Relation: </b> @Model.Location?.BeneficiaryRelation?.Name
                     </p>
                     <ul class="ml-4 mb-0 fa-ul text-muted">
                         <li class="small">
@@ -72,13 +75,21 @@
                             <span class="fa-li">
                                 <i class="fas fa-lg fa-globe"></i>
                             </span>
-                            Country: <img src="@imgPath" class="flag-icon" data-toggle="tooltip" /> @Model.Location?.Country.Name
+                            Country: 
+                            @if(!string.IsNullOrWhiteSpace(country))
+                            {
+                                <img src="@imgPath" class="flag-icon" data-toggle="tooltip" /> @country
+                            }
                         </li>
                         <li class="small">
                             <span class="fa-li">
                                 <i class="fas fa-lg fa-phone"></i>
                             </span>
-                            Phone #: +@Model.Location?.Country.ISDCode (0) @Model.Location?.ContactNumber
+                            Phone #: 
+                            @if(!string.IsNullOrWhiteSpace(phone))
+                            {
+                                @phone
+                            }
                         </li>
                     </ul>
                 </div>

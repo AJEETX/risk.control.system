@@ -110,7 +110,6 @@ document.addEventListener("DOMContentLoaded", function () {
 $(document).ready(function () {
 
     validateMobile('#mobile', /[^0-9]/g); // Allow numeric only no spaces
-    $('#mobile')
     $("#flip").change(function () {
         if ($(this).prop("checked")) {
             // If checkbox is checked (Forgot Password form)

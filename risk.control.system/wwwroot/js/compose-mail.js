@@ -5,7 +5,14 @@ $(document).ready(function () {
     //    maxHeight: null,             // set maximum height of editor
     //    focus: false                  // set focus to editable area after initializing summernote
     //});
-    $("#receipient-email").focus();
+    var recepient = $("#receipient-email");
+    var message = $("#Message");
+    if (!recepient.val()) {
+        recepient.focus();
+    }
+    else {
+        message.focus();
+    }
     var currentImage = document.getElementById('documentImage0').src;
 
     $("#document").on('change', function () {

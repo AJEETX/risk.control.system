@@ -4,16 +4,20 @@
     var imgPath = "/flags/in.png";
     int currentAgeinYrs = 0;
     bool customerExist = false;
+    var country = string.Empty;
+    var phone = string.Empty;
     if (Model.ClaimsInvestigation != null && Model.ClaimsInvestigation.CustomerDetail != null)
     {
         address = @Model.ClaimsInvestigation?.CustomerDetail.Addressline + " " + @Model.ClaimsInvestigation?.CustomerDetail.District.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.State.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.PinCode.Code;
-        
+
         if (Model.ClaimsInvestigation?.CustomerDetail.DateOfBirth != null)
         {
             var age = DateTime.Now.Subtract(Model.ClaimsInvestigation.CustomerDetail.DateOfBirth.GetValueOrDefault()).TotalDays;
             currentAgeinYrs = (int)age / 365;
         }
         customerExist = true;
+        country = @Model.ClaimsInvestigation?.CustomerDetail?.Country?.Name;
+        phone = +@Model.ClaimsInvestigation?.CustomerDetail?.Country?.ISDCode +"(0) "+ @Model.ClaimsInvestigation?.CustomerDetail?.ContactNumber;
         imgPath = "/flags/" + @Model.ClaimsInvestigation.CustomerDetail.Country.Code.ToLower() + ".png";
     }
 }
@@ -76,13 +80,21 @@
                             <span class="fa-li">
                                 <i class="fas fa-lg fa-globe"></i>
                             </span>
-                            Country: <img src="@imgPath" class="flag-icon" data-toggle="tooltip" /> @Model.ClaimsInvestigation?.CustomerDetail.Country.Name
+                            Country: 
+                            @if(!string.IsNullOrWhiteSpace(country))
+                            {
+                                <img src="@imgPath" class="flag-icon" data-toggle="tooltip" /> @country
+                            }
                         </li>
                         <li class="small">
                             <span class="fa-li">
                                 <i class="fas fa-lg fa-phone"></i>
                             </span>
-                            Phone #: +@Model.ClaimsInvestigation?.CustomerDetail.Country.ISDCode (0) @Model.ClaimsInvestigation?.CustomerDetail?.ContactNumber
+                            Phone #: 
+                            @if(!string.IsNullOrWhiteSpace(phone))
+                            {
+                                @phone
+                            }
                         </li>
                     </ul>
                 </div>
