@@ -45,7 +45,11 @@
             </div>
 
             <div class="mailbox-read-message">
-                @Html.Raw(@Model.RawMessage)
+                <div class="form-group">
+                    <div class="reply-content">
+                        @Html.Raw(Model.Message)
+                    </div>
+                </div>
             </div>
 
         </div>

@@ -546,6 +546,7 @@ textarea {
 .mailbox-read-message {
     min-height: 300px;
     overflow-y: auto;
+    padding:0px !important;
 }
 
 #table-header {

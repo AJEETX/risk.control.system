@@ -179,8 +179,8 @@ namespace risk.control.system.Services
                         var policy = await AllocateToVendor(userEmail, claimsInvestigation.ClaimsInvestigationId, selectedVendor.Vendor.VendorId);
 
                         autoAllocatedClaims.Add(claim);
-                        if (selectedVendor.Vendor.EnableMailbox)
-                            await mailboxService.NotifyClaimAllocationToVendor(userEmail, policy.PolicyDetail.ContractNumber, claimsInvestigation.ClaimsInvestigationId, selectedVendor.Vendor.VendorId);
+
+                        await mailboxService.NotifyClaimAllocationToVendor(userEmail, policy.PolicyDetail.ContractNumber, claimsInvestigation.ClaimsInvestigationId, selectedVendor.Vendor.VendorId);
                     }
                 }
             }

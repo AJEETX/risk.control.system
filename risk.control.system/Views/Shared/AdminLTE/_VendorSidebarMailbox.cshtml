@@ -1,6 +1,7 @@
 ﻿@using Microsoft.EntityFrameworkCore;
 @using risk.control.system.Helpers;
 @inject ApplicationDbContext context
+@model Vendor
 
 @{
     var userEmail = User?.Identity?.Name;
@@ -54,6 +55,9 @@
         </p>
     </a>
 </li>
+@if (Model.EnableMailbox)
+{
+
 <li class="nav-item">
     <a is-active-page asp-controller="ContactMessage" asp-action="Create" class="actual-link nav-link @Url.MakeActiveClass("ContactMessage","Create")">
         <i class="fa fa-edit nav-icon"></i>
@@ -86,3 +90,4 @@
         </p>
     </a>
 </li>
+}

@@ -79,10 +79,8 @@ namespace risk.control.system.Controllers.Agency
                     notifyService.Error("OOPs !!!..Error occurred.");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                if(vendorAgent.Vendor.EnableMailbox)
-                {
-                    await mailboxService.NotifyClaimAssignmentToVendorAgent(currentUserEmail, claimId, vendorAgent.Email, vendorAgent.VendorId.Value);
-                }
+                
+                await mailboxService.NotifyClaimAssignmentToVendorAgent(currentUserEmail, claimId, vendorAgent.Email, vendorAgent.VendorId.Value);
 
                 notifyService.Custom($"Claim #{claim.PolicyDetail.ContractNumber} tasked to {vendorAgent.Email}", 3, "green", "far fa-file-powerpoint");
 
@@ -147,10 +145,7 @@ namespace risk.control.system.Controllers.Agency
                     return RedirectToAction(nameof(AgentController.GetInvestigate), "Agent", new { selectedcase = claimId });
                 }
 
-                if(vendor.EnableMailbox)
-                {
-                    await mailboxService.NotifyClaimReportSubmitToVendorSupervisor(currentUserEmail, claimId);
-                }
+                await mailboxService.NotifyClaimReportSubmitToVendorSupervisor(currentUserEmail, claimId);
 
                 notifyService.Custom($"Claim # {contract}report submitted to supervisor", 3, "green", "far fa-file-powerpoint");
 
@@ -191,10 +186,9 @@ namespace risk.control.system.Controllers.Agency
                 if (success != null)
                 {
                     var agencyUser = _context.VendorApplicationUser.Include(a => a.Vendor).FirstOrDefault(c => c.Email == userEmail);
-                    if (agencyUser.Vendor.EnableMailbox)
-                    {
-                        await mailboxService.NotifyClaimReportSubmitToCompany(userEmail, claimId);
-                    }
+
+                    await mailboxService.NotifyClaimReportSubmitToCompany(userEmail, claimId);
+
                     notifyService.Custom($"Claim #{success.PolicyDetail.ContractNumber}  report submitted to Company", 3, "green", "far fa-file-powerpoint");
                 }
                 else
@@ -233,10 +227,7 @@ namespace risk.control.system.Controllers.Agency
                 }
                 var agency = await claimsInvestigationService.WithdrawCase(userEmail, model, claimId);
 
-                if(agency.EnableMailbox)
-                {
-                    await mailboxService.NotifyClaimWithdrawlToCompany(userEmail, claimId);
-                }
+                await mailboxService.NotifyClaimWithdrawlToCompany(userEmail, claimId);
 
                 notifyService.Custom($"Claim #{policyNumber}  declined successfully", 3, "red", "far fa-file-powerpoint");
 
@@ -279,10 +270,8 @@ namespace risk.control.system.Controllers.Agency
                 if (claim != null)
                 {
                     var agencyUser = _context.VendorApplicationUser.Include(a => a.Vendor).FirstOrDefault(c => c.Email == currentUserEmail);
-                    if(agencyUser.Vendor.EnableMailbox)
-                    {
-                        await mailboxService.NotifySubmitReplyToCompany(currentUserEmail, claimId);
-                    }
+
+                    await mailboxService.NotifySubmitReplyToCompany(currentUserEmail, claimId);
 
                     notifyService.Success("Enquiry Reply Sent to Company");
                     return RedirectToAction(nameof(SupervisorController.Allocate), "Supervisor");

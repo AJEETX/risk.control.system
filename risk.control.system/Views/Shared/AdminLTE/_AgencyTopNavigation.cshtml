@@ -28,29 +28,41 @@
 
     <!-- Right navbar links -->
     <ul class="navbar-nav ml-auto">
-        <li class="top-nav-header-border">
-            <a class="nav-link" data-widget="control-sidebar" data-slide="true" role="button" title="Currency : @Model?.CurrencyCode" data-toggle="tooltip">
-                <div id="currency"><i class="fa fa-money"></i> @Model?.CurrencyCode </div>
-            </a>
-        </li>
-        <li class="top-nav-header-border">
-            @{
-                var img = "/flags/" + @Model.CountryCode.ToLower() + ".png";
-            }
-            <a class="nav-link" data-widget="control-sidebar" data-slide="true" role="button" title="@Model?.Country" data-toggle="tooltip">
-                <div id="country"> <i class="fas fa-map-marker-alt"></i> <img src="@img" class="flag-icon" /> </div>
-            </a>
-        </li>
+        
         <li class="top-nav-header-border">
             <a class="nav-link" data-widget="control-sidebar" data-slide="true" role="button" title="Idle time remaining" data-toggle="tooltip">
-                <div><i id="hour-glass" class="fas fa-hourglass-end fa-spin"></i>  <span id="time"> </span></div>
+                <div><i id="hour-glass" class="fas fa-hourglass-end fa-spin"></i>  <span id="time"> 00:00 </span></div>
             </a>
         </li>
-        
+
         <!-- Notifications Dropdown Menu -->
         <li class="nav-item dropdown top-nav-logout-border">
             <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
-                <i class="fas fa-cog fa-spin"></i>
+                <i class="fa fa-info text-danger"></i> <span class="badge badge-light"> @Model?.Notification</span>
+            </a>
+
+            <div class="dropdown-menu dropdown-menu-right shadow-lg rounded-lg border-0">
+                @{
+                    var img = "/flags/" + @Model.CountryCode.ToLower() + ".png";
+                }
+                <a class="nav-link" data-widget="control-sidebar" data-slide="true" role="button" title="Currency : @Model?.CurrencyCode" data-toggle="tooltip">
+                    <div id="currency"><i class="fa fa-money"></i> @Model?.CurrencyCode </div>
+                </a>
+                <div class="dropdown-divider"></div>
+                <a class="nav-link" data-widget="control-sidebar" data-slide="true" role="button" title="@Model?.Country" data-toggle="tooltip">
+                    <div id="country"> <i class="fas fa-map-marker-alt"></i> <img src="@img" class="flag-icon" /> </div>
+                </a>
+                <div class="dropdown-divider"></div>
+
+                <a class="dropdown-item d-flex align-items-center py-2 hover-bg-light" href="/ContactMessage/Inbox">
+                    <i class="fa fa-info text-danger mr-2"></i><span class="badge badge-danger"> @Model?.Notification </span><span class="badge badge-light">case(s)</span>
+                </a>
+            </div>
+        </li>
+        <!-- Settings Dropdown Menu -->
+        <li class="nav-item dropdown top-nav-logout-border">
+            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                <i class="fas fa-cog"></i>
             </a>
 
             <div class="dropdown-menu dropdown-menu-right shadow-lg rounded-lg border-0">
