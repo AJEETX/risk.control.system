@@ -19,7 +19,7 @@
 
             }
         </div>
-        <a href="/companyuserprofile" class="d-block">
+        <a class="d-block">
             @UserManager.GetUserAsync(User).Result?.FirstName
             @if (User.IsInRole(AppRoles.COMPANY_ADMIN.ToString()))
             {

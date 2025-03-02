@@ -724,10 +724,9 @@ namespace risk.control.system.Controllers.Api
                     data.Email,
                     data.ClaimId,
                     data.Remarks, data.Question1, data.Question2, data.Question3, data.Question4);
-                if (vendor.EnableMailbox)
-                {
-                    await mailboxService.NotifyClaimReportSubmitToVendorSupervisor(data.Email, data.ClaimId);
-                }
+
+                await mailboxService.NotifyClaimReportSubmitToVendorSupervisor(data.Email, data.ClaimId);
+
                 var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
 
                 return Ok(new { data, Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId) });

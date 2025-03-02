@@ -2,7 +2,6 @@
 
 @{
     ViewData["Title"] = "Reply";
-    <link rel="stylesheet" href="~/plugins/summernote/summernote-bs4.css">
 }
 <section class="content">
     <form asp-controller="ContactMessage" id="email-form" method="post" enctype="multipart/form-data">
@@ -12,6 +11,7 @@
             </div>
 
             <input type="hidden" asp-for="SentMessageId" />
+            <input type="hidden" asp-for="RawMessage" value="@Model.RawMessage" />
             <div class="card-body">
                 <div class="submit-progress hidden">
                     <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
@@ -26,7 +26,6 @@
                                     <span class="input-group-text" asp-for="ReceipientEmail"><i class="fas fa-at"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
                                 <input readonly id="receipient-email" asp-for="ReceipientEmail" title="Email" class="form-control remarks" />
-                                <span asp-validation-for="ReceipientEmail" class="text-danger"></span>
                             </div>
                         </div>
                     </div>

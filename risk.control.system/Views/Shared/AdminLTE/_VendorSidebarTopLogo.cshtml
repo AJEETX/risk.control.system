@@ -22,7 +22,7 @@
                 <img class="elevation-0 sidebar-profile img-circle" src="@Applicationsettings.NO_IMAGE">
             </div>
         }
-        <a href="/agencyuserprofile" class="d-block">
+        <a  class="d-block">
             @UserManager.GetUserAsync(User).Result?.FirstName
             @if (User.IsInRole(AppRoles.AGENCY_ADMIN.ToString()))
             {

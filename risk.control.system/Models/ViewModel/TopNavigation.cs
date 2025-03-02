@@ -9,5 +9,6 @@
         public byte[]? ProfilePicture { get; set; }
         public string CurrencyCode { get; set; }
         public string Language { get; set; }
+        public string Notification { get; set; } = "--";
     }
 }

@@ -67,7 +67,7 @@ namespace risk.control.system.Services
 
             var userMessage = userMailbox.Inbox.FirstOrDefault(c => c.InboxMessageId == messageId);
 
-            var replyRawMessage = "<br />" + "<hr />" + "From: " + userMessage.SenderEmail + "<br />" + "<hr />" + "Sent:" + userMessage.SendDate + "<br />" + "<hr />" + userMessage.RawMessage;
+            var replyRawMessage = "<hr />" + "From: " + userMessage.SenderEmail + "<br />" + "<hr />" + "Sent:" + userMessage.SendDate + "<br />" + "<hr />" + userMessage.RawMessage;
 
             var userReplyMessage = new OutboxMessage
             {

@@ -101,10 +101,8 @@ namespace risk.control.system.Controllers.Company
                         var notAutoAllocated = claims.Except(autoAllocatedClaims)?.ToList();
 
                         await claimsInvestigationService.AssignToAssigner(HttpContext.User.Identity.Name, notAutoAllocated);
-                        if(company.EnableMailbox)
-                        {
-                            await mailboxService.NotifyClaimAssignmentToAssigner(HttpContext.User.Identity.Name, notAutoAllocated);
-                        }
+
+                        await mailboxService.NotifyClaimAssignmentToAssigner(HttpContext.User.Identity.Name, notAutoAllocated);
 
                         notifyService.Custom($"{notAutoAllocated.Count}/{claims.Count} claim(s) need assign manually", 3, "orange", "far fa-file-powerpoint");
 
@@ -115,10 +113,8 @@ namespace risk.control.system.Controllers.Company
                 else
                 {
                     await claimsInvestigationService.AssignToAssigner(HttpContext.User.Identity.Name, claims);
-                    if(company.EnableMailbox)
-                    {
-                        await mailboxService.NotifyClaimAssignmentToAssigner(HttpContext.User.Identity.Name, claims);
-                    }
+
+                    await mailboxService.NotifyClaimAssignmentToAssigner(HttpContext.User.Identity.Name, claims);
 
                     notifyService.Custom($"{claims.Count}/{claims.Count} claim(s) assigned", 3, "green", "far fa-file-powerpoint");
                 }
@@ -156,10 +152,8 @@ namespace risk.control.system.Controllers.Company
 
                 var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == selectedcase);
                 var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(v => v.Email == currentUserEmail);
-                if (companyUser.ClientCompany.EnableMailbox)
-                {
-                    await mailboxService.NotifyClaimAllocationToVendor(currentUserEmail, policy.PolicyDetail.ContractNumber, claimId, selectedcase);
-                }
+
+                await mailboxService.NotifyClaimAllocationToVendor(currentUserEmail, policy.PolicyDetail.ContractNumber, claimId, selectedcase);
 
                 notifyService.Custom($"Policy #{policy.PolicyDetail.ContractNumber} assigned to {vendor.Name}", 3, "green", "far fa-file-powerpoint");
 
@@ -193,10 +187,9 @@ namespace risk.control.system.Controllers.Company
                 }
 
                 var company = await claimsInvestigationService.WithdrawCaseByCompany(currentUserEmail, model, claimId);
-                if(company.EnableMailbox)
-                {
-                    await mailboxService.NotifyClaimWithdrawlToCompany(currentUserEmail, claimId);
-                }
+               
+                await mailboxService.NotifyClaimWithdrawlToCompany(currentUserEmail, claimId);
+
                 notifyService.Custom($"Claim #{policyNumber}  withdrawn successfully", 3, "green", "far fa-file-powerpoint");
                 return RedirectToAction(nameof(CreatorManualController.New), "CreatorManual");
             }
@@ -231,10 +224,7 @@ namespace risk.control.system.Controllers.Company
 
                 var (company, contract) = await claimsInvestigationService.ProcessCaseReport(currentUserEmail, assessorRemarks, claimId, reportUpdateStatus, reportAiSummary);
 
-                if(company.EnableMailbox)
-                {
-                    await mailboxService.NotifyClaimReportProcess(currentUserEmail, claimId);
-                }
+                await mailboxService.NotifyClaimReportProcess(currentUserEmail, claimId);
 
                 if (reportUpdateStatus == AssessorRemarkType.OK)
                 {
@@ -282,10 +272,9 @@ namespace risk.control.system.Controllers.Company
                 var reportUpdateStatus = AssessorRemarkType.REVIEW;
 
                 var (company, contract) = await claimsInvestigationService.ProcessCaseReport(currentUserEmail, assessorRemarks, claimId, reportUpdateStatus, reportAiSummary);
-                if(company.EnableMailbox)
-                {
-                    await mailboxService.NotifyClaimReportProcess(currentUserEmail, claimId);
-                }
+
+                await mailboxService.NotifyClaimReportProcess(currentUserEmail, claimId);
+
                 return RedirectToAction(nameof(AssessorController.Assessor), "Assessor");
             }
             catch (Exception ex)
@@ -322,10 +311,9 @@ namespace risk.control.system.Controllers.Company
                 if (model != null)
                 {
                     var company = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == currentUserEmail);
-                    if (company.ClientCompany.EnableMailbox)
-                    {
-                        await mailboxService.NotifySubmitQueryToAgency(currentUserEmail, claimId);
-                    }
+
+                    await mailboxService.NotifySubmitQueryToAgency(currentUserEmail, claimId);
+
                     notifyService.Success("Query Sent to Agency");
                     return RedirectToAction(nameof(AssessorController.Assessor), "Assessor");
                 }

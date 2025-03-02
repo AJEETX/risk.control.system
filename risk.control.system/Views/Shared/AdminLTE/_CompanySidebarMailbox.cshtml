@@ -1,15 +1,15 @@
 ﻿@using Microsoft.EntityFrameworkCore;
 @using risk.control.system.Helpers;
 @inject ApplicationDbContext context
+@model ClientCompany
 
 @{
     var userEmail = User?.Identity?.Name;
-    var applicationUser = context.ClientCompanyApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
     var userMailbox = context.Mailbox
     .Include(m => m.Inbox)
     .Include(m => m.Outbox)
     .Include(m => m.Sent)
-    .FirstOrDefault(c => c.Name == applicationUser.Email);
+    .FirstOrDefault(c => c.Name == userEmail);
 
     var roleCode = string.Empty;
     var newInboxMessgeDisplay = string.Empty;
@@ -53,6 +53,9 @@
         </p>
     </a>
 </li>
+
+@if (Model.EnableMailbox)
+{
 <li class="nav-item">
     <a is-active-page asp-controller="ContactMessage" asp-action="Create" class="actual-link nav-link @Url.MakeActiveClass("ContactMessage","Create")">
         <i class="fa fa-edit nav-icon"></i>
@@ -85,3 +88,4 @@
         </p>
     </a>
 </li>
+}
