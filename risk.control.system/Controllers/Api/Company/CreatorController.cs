@@ -44,7 +44,7 @@ namespace risk.control.system.Controllers.Api.Company
         [HttpGet("GetAuto")]
         public IActionResult GetAuto()
         {
-            IQueryable<ClaimsInvestigation> applicationDbContext = claimsService.GetClaims();
+            IQueryable<ClaimsInvestigation> claims = claimsService.GetClaims();
 
             var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
@@ -52,7 +52,7 @@ namespace risk.control.system.Controllers.Api.Company
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
 
-            applicationDbContext = applicationDbContext.Where(a =>
+            claims = claims.Where(a =>
                 a.ClientCompanyId == companyUser.ClientCompanyId &&
                      a.CREATEDBY == CREATEDBY.AUTO &&
                      a.UserEmailActioned == companyUser.Email &&
@@ -62,7 +62,7 @@ namespace risk.control.system.Controllers.Api.Company
 
             var claimsAssigned = new List<ClaimsInvestigation>();
             var newClaimsAssigned = new List<ClaimsInvestigation>();
-            foreach (var item in applicationDbContext)
+            foreach (var item in claims)
             {
                 item.AutoNew += 1;
                 if (item.AutoNew <= 1)
@@ -126,7 +126,7 @@ namespace risk.control.system.Controllers.Api.Company
         [HttpGet("GetManual")]
         public IActionResult GetManual()
         {
-            IQueryable<ClaimsInvestigation> applicationDbContext = claimsService.GetClaims().Include(a =>a.PreviousClaimReports);
+            IQueryable<ClaimsInvestigation> claims = claimsService.GetClaims().Include(a =>a.PreviousClaimReports);
 
             var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
              i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
@@ -144,7 +144,7 @@ namespace risk.control.system.Controllers.Api.Company
 
             var companyUser = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(c => c.Email == userEmail.Value);
 
-            applicationDbContext = applicationDbContext.Where(a => a.ClientCompanyId == companyUser.ClientCompanyId &&
+            claims = claims.Where(a => a.ClientCompanyId == companyUser.ClientCompanyId &&
                  (a.InvestigationCaseSubStatusId == withdrawnByAgency.InvestigationCaseSubStatusId &&
                         a.UserEmailActionedTo == string.Empty &&
                         a.UserRoleActionedTo == $"{companyUser.ClientCompany.Email}")
@@ -169,7 +169,7 @@ namespace risk.control.system.Controllers.Api.Company
             var claimsAssigned = new List<ClaimsInvestigation>();
             var newClaimsAssigned = new List<ClaimsInvestigation>();
 
-            foreach (var item in applicationDbContext)
+            foreach (var item in claims)
             {
                 item.ManualNew += 1;
                 if (item.ManualNew <= 1)

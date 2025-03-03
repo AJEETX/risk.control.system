@@ -15,7 +15,7 @@ namespace risk.control.system.Data
         {
             base.OnModelCreating(builder);
         }
-
+        public virtual DbSet<Notification> Notifications { get; set; }
         public virtual DbSet<RefreshTokenEntity> RefreshTokens { get; set; }
 
         public virtual DbSet<UserSessionAlive> UserSessionAlive { get; set; }

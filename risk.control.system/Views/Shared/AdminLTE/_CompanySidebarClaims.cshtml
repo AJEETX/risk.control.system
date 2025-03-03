@@ -4,7 +4,7 @@
 @{
     if (User.IsInRole(AppRoles.CREATOR.ToString()))
     {
-        <partial name="AdminLTE/_CompanySidebarClaimsCreator" />
+        <partial name="AdminLTE/_CompanySidebarClaimsCreator" model="@Model"/>
     }
     else if (User.IsInRole(AppRoles.ASSESSOR.ToString()))
     {

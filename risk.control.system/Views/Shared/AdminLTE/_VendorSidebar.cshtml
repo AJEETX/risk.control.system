@@ -39,7 +39,10 @@
                 <!-- Add icons to the links using the .nav-icon class with font-awesome or any other icon font library -->
 
                 <partial name="AdminLTE/_VendorSidebarDashboard" />
-                <partial name="AdminLTE/_VendorSidebarMailbox" model="Model" />
+                @if (Model.EnableMailbox)
+                {
+                    <partial name="AdminLTE/_VendorSidebarMailbox" model="Model" />
+                }
 
                 @if (User.IsInRole(AppRoles.AGENCY_ADMIN.ToString()) || User.IsInRole(AppRoles.SUPERVISOR.ToString()))
                 {
