@@ -1,4 +1,6 @@
-﻿    @model risk.control.system.Models.ClientCompany
+﻿    @using Microsoft.FeatureManagement;
+@inject IFeatureManager featureManager
+    @model risk.control.system.Models.ClientCompany
 
 @{
     ViewData["Title"] = "Manage Company";
@@ -259,7 +261,10 @@
                                             <span class="fa-li">
                                                 <i class="fas fa-comments"></i>
                                             </span>
-                                            Enable SMS: <b>@Html.DisplayFor(model => model.SendSMS) </b>
+                                            @{
+                                                var isSendSms = await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN);
+                                            }
+                                            Enable SMS: <b>@Html.DisplayFor(model => isSendSms) </b>
                                         </li>
                                         <li class="small">
                                             <span class="fa-li">

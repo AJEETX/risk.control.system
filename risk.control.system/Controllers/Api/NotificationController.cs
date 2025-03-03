@@ -27,20 +27,19 @@ namespace risk.control.system.Controllers.Api
             this.httpClientService = httpClientService;
         }
         [HttpPost("MarkAsRead")]
-        [AllowAnonymous]
         public async Task<IActionResult> MarkAsRead(NotificationRequest request)
         {
-            await service.MarkAsRead(request.Id);
+            var userEmail = HttpContext.User?.Identity?.Name;
+            await service.MarkAsRead(request.Id, userEmail);
             return Ok();
         }
-        [AllowAnonymous]
         [HttpGet("GetNotifications")]
         public async Task<ActionResult> GetNotifications()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             var notifications = await service.GetNotifications(userEmail);
-            var activeNotifications = notifications.Select(n => new { Id = n.NotificationId, n.Message, CreatedAt = n.CreatedAt.ToString("yyyy-MM-dd HH:mm") });
-            return Ok(activeNotifications?.ToList());
+            var activeNotifications = notifications.Select(n => new { Id = n.StatusNotificationId, n.Message, CreatedAt = n.CreatedAt.ToString("yyyy-MM-dd HH:mm") });
+            return Ok(activeNotifications?.Take(10).ToList());
         }
         [AllowAnonymous]
         [HttpGet("GetClientIp")]

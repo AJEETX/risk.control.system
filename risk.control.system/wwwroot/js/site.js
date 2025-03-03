@@ -30,7 +30,7 @@ function loadNotifications() {
         data.forEach(function (item) {
             $("#notificationList").append(
                 `<a href="#" class="dropdown-item notification-item" data-id="${item.id}">
-                            <i class="fas fa-tasks mr-2 badge bage-light"></i> ${item.message}
+                            <i class="fa fa-check"></i> <span class="text-muted text-sm badge bage-light"> ${item.message} </span>
                             <span class="float-right text-muted text-sm">${item.createdAt}</span>
                         </a>`
             );
