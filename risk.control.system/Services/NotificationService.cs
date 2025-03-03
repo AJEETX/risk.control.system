@@ -4,6 +4,7 @@ using Amazon.Rekognition.Model;
 
 using Google.Api;
 
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.FeatureManagement;
 
@@ -18,6 +19,8 @@ namespace risk.control.system.Services
 {
     public interface INotificationService
     {
+        Task MarkAsRead(int id);
+        Task<List<Notification>> GetNotifications(string userEmail);
         Task<ClaimsInvestigation> SendVerifySchedule(ClientSchedulingMessage message);
 
         Task<ClaimsInvestigation> ReplyVerifySchedule(string id, string confirm = "N");
@@ -606,6 +609,64 @@ namespace risk.control.system.Services
             context.SaveChanges();
             await smsService.DoSendSmsAsync("+"+isdCode + mobile, message);
             return beneficiary.Name;
+        }
+
+        public async Task<List<Notification>> GetNotifications(string userEmail)
+        {
+            
+            var companyUser = context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+            var vendorUser = context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+
+            ApplicationRole role = null!;
+            ClientCompany company = null!;
+            Vendor agency = null!;
+            if (companyUser != null)
+            {
+                role = context.ApplicationRole.FirstOrDefault(r => r.Name == companyUser.Role.ToString());
+                company = context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
+
+                var notifications = await context.Notifications
+                .Where(n => n.Role == role && n.Company == company && !n.IsRead)
+                .OrderByDescending(n => n.CreatedAt)
+                .ToListAsync();
+                return notifications;
+            }
+            else if (vendorUser != null)
+            {
+                role = context.ApplicationRole.FirstOrDefault(r => r.Name == vendorUser.Role.ToString());
+                agency = context.Vendor.FirstOrDefault(c => c.VendorId == vendorUser.VendorId);
+                
+                var notifications = context.Notifications
+                .Where(n => n.Agency == agency && !n.IsRead);
+
+                if (role.Name == AppRoles.AGENCY_ADMIN.ToString())
+                {
+                    var superRole = context.ApplicationRole.FirstOrDefault(r => r.Name == AppRoles.SUPERVISOR.ToString());
+                    notifications = notifications.Where(n => n.Role == superRole);
+                }
+
+                else if (role.Name == AppRoles.AGENT.ToString())
+                {
+                    notifications = notifications.Where(n => n.UserEmail == userEmail);
+                }
+
+               var activeNotifications = await notifications
+                    .OrderByDescending(n => n.CreatedAt).ToListAsync();
+                return activeNotifications;
+            }
+            var allNotifications = await context.Notifications
+                .OrderByDescending(n => n.CreatedAt)
+                .ToListAsync();
+            return allNotifications;
+        }
+
+        public async Task MarkAsRead(int id)
+        {
+            var notification = await context.Notifications.FindAsync(id);
+
+            notification.IsRead = true;
+            context.Notifications.Update(notification);
+            var rows = await context.SaveChangesAsync();
         }
     }
 }

@@ -21,6 +21,47 @@ const image =
 //    document.getElementById("main-container").classList.add("blur-background");
 //});
 // Add event listener to the print button once the DOM is fully loaded
+
+function loadNotifications() {
+    $.get('/api/Notification/GetNotifications', function (data) {
+        $("#notificationList").html("");
+        $("#notificationCount").text(data.length);
+
+        data.forEach(function (item) {
+            $("#notificationList").append(
+                `<a href="#" class="dropdown-item notification-item" data-id="${item.id}">
+                            <i class="fas fa-tasks mr-2 badge bage-light"></i> ${item.message}
+                            <span class="float-right text-muted text-sm">${item.createdAt}</span>
+                        </a>`
+            );
+        });
+
+        // Click event to mark as read
+        $(".notification-item").on("click", function () {
+            var notificationId = $(this).data("id");
+            markNotificationAsRead(notificationId);
+            $(this).remove(); // Remove notification from UI
+            let count = parseInt($("#notificationCount").text()) - 1;
+            $("#notificationCount").text(count > 0 ? count : "0");
+        });
+    });
+}
+
+function markNotificationAsRead(notificationId) {
+    $.ajax({
+        url: '/api/Notification/MarkAsRead',
+        type: 'POST',
+        contentType: 'application/json', // Specify JSON format
+        data: JSON.stringify({ Id: notificationId }), // Convert data to JSON
+        success: function () {
+            console.log("Notification marked as read:", notificationId);
+        },
+        error: function (xhr) {
+            console.error("Error:", xhr.responseText);
+        }
+    });
+}
+
 document.addEventListener("DOMContentLoaded", function () {
     var printButton = document.getElementById("printInvoiceButton");
 
@@ -250,7 +291,7 @@ function getMobileType() {
 }
 
 $(document).ready(function () {
-
+    loadNotifications();
     $('.print-me').on('click', function () {
         window.print();
         return false;

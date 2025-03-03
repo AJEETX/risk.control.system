@@ -34,11 +34,23 @@
                 <div><i id="hour-glass" class="fas fa-hourglass-end fa-spin"></i>  <span id="time"> 00:00 </span></div>
             </a>
         </li>
+        <li class="nav-item dropdown  top-nav-logout-border">
+    <a class="nav-link" data-toggle="dropdown" href="#">
+        <i class="far fa-bell"></i>
+        <span class="badge badge-warning" id="notificationCount">0</span>
+    </a>
+    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+        <span class="dropdown-header">Notifications</span>
+        <div class="dropdown-divider"></div>
+        <div id="notificationList"></div>
+    </div>
+</li>
+
 
         <!-- Notifications Dropdown Menu -->
-        <li class="nav-item dropdown top-nav-logout-border">
+        <li class="nav-item dropdown  top-nav-logout-border">
             <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
-                <i class="fa fa-info text-danger"></i> <span class="badge badge-light"> @Model?.Notification</span>
+                <i class="fa fa-info"></i>
             </a>
 
             <div class="dropdown-menu dropdown-menu-right shadow-lg rounded-lg border-0">
@@ -54,13 +66,10 @@
                 </a>
                 <div class="dropdown-divider"></div>
 
-                <a class="dropdown-item d-flex align-items-center py-2 hover-bg-light" href="/ContactMessage/Inbox">
-                    <i class="fa fa-info text-danger mr-2"></i><span class="badge badge-danger"> @Model?.Notification </span><span class="badge badge-light">case(s)</span>
-                </a>
             </div>
         </li>
         <!-- Settings Dropdown Menu -->
-        <li class="nav-item dropdown top-nav-logout-border">
+        <li class="nav-item dropdown  top-nav-logout-border">
             <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
                 <i class="fas fa-cog"></i>
             </a>

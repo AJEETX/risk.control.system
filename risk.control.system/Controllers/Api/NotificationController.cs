@@ -26,7 +26,22 @@ namespace risk.control.system.Controllers.Api
             this.smsService = smsService;
             this.httpClientService = httpClientService;
         }
-
+        [HttpPost("MarkAsRead")]
+        [AllowAnonymous]
+        public async Task<IActionResult> MarkAsRead(NotificationRequest request)
+        {
+            await service.MarkAsRead(request.Id);
+            return Ok();
+        }
+        [AllowAnonymous]
+        [HttpGet("GetNotifications")]
+        public async Task<ActionResult> GetNotifications()
+        {
+            var userEmail = HttpContext.User?.Identity?.Name;
+            var notifications = await service.GetNotifications(userEmail);
+            var activeNotifications = notifications.Select(n => new { Id = n.NotificationId, n.Message, CreatedAt = n.CreatedAt.ToString("yyyy-MM-dd HH:mm") });
+            return Ok(activeNotifications?.ToList());
+        }
         [AllowAnonymous]
         [HttpGet("GetClientIp")]
         public async Task<ActionResult> GetClientIp(CancellationToken ct, string url = "", string latlong = "")
@@ -105,5 +120,9 @@ namespace risk.control.system.Controllers.Api
             await smsService.DoSendSmsAsync("+" + mobile, finalMessage);
             return Ok();
         }
+    }
+    public class NotificationRequest
+    {
+        public int Id { get; set; }
     }
 }

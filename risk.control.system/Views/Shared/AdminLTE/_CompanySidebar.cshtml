@@ -10,8 +10,11 @@
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                 <!-- Add icons to the links using the .nav-icon class with font-awesome or any other icon font library -->
                 <partial name="AdminLTE/_CompanySidebarDashboard" />
-                <partial name="AdminLTE/_CompanySidebarMailbox" model="Model" />
-                <partial name="AdminLTE/_CompanySidebarClaims" />
+                @if (Model.EnableMailbox)
+                {
+                    <partial name="AdminLTE/_CompanySidebarMailbox" model="@Model" />
+                }
+                <partial name="AdminLTE/_CompanySidebarClaims" model="@Model" />
                 <partial name="AdminLTE/_CompanySidebarAdmin" />
             </ul>
         </nav>
