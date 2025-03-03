@@ -4,6 +4,7 @@ using Amazon.Auth.AccessControlPolicy;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.FeatureManagement;
 
 using Newtonsoft.Json;
 
@@ -49,15 +50,21 @@ namespace risk.control.system.Services
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly UserManager<ClientCompanyApplicationUser> userManager;
         private readonly UserManager<VendorApplicationUser> userVendorManager;
+        private readonly IFeatureManager featureManager;
 
         public MailboxService(ApplicationDbContext context,
             ISmsService SmsService,
-            IHttpContextAccessor httpContextAccessor, IWebHostEnvironment webHostEnvironment, UserManager<ClientCompanyApplicationUser> userManager, UserManager<VendorApplicationUser> userVendorManager)
+            IHttpContextAccessor httpContextAccessor, 
+            IWebHostEnvironment webHostEnvironment,
+            UserManager<ClientCompanyApplicationUser> userManager,
+            IFeatureManager featureManager,
+            UserManager<VendorApplicationUser> userVendorManager)
         {
             this._context = context;
             smsService = SmsService;
             this.httpContextAccessor = httpContextAccessor;
             this.webHostEnvironment = webHostEnvironment;
+            this.featureManager = featureManager;
             FilePath = Path.Combine(webHostEnvironment.WebRootPath, "Templates", "WelcomeTemplate.html");
             var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
             var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
@@ -101,7 +108,7 @@ namespace risk.control.system.Services
                 .Include(i => i.InvestigationCaseSubStatus)
                 .FirstOrDefault(v => v.ClaimsInvestigationId == claimsInvestigationId);
 
-            var notification = new Notification
+            var notification = new StatusNotification
             {
                 Role = supervisorRole,
                 Agency = claimsInvestigation.Vendor,
@@ -148,7 +155,7 @@ namespace risk.control.system.Services
                 _context.Mailbox.Attach(recepientMailbox);
                 _context.Mailbox.Update(recepientMailbox);
                 //SEND SMS
-                if (company.SendSMS)
+                if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
                 {
                     string message = $"Dear {userEmailToSend.Email},";
                     message += $"                                          ";
@@ -201,7 +208,7 @@ namespace risk.control.system.Services
                 .Include(i => i.InvestigationCaseSubStatus)
                 .Where(v => claims.Contains(v.ClaimsInvestigationId));
 
-            var notification = new Notification
+            var notification = new StatusNotification
             {
                 Role = creatorRole,
                 Company = clientCompanyUser.ClientCompany,
@@ -252,7 +259,7 @@ namespace risk.control.system.Services
                 _context.Mailbox.Attach(recepientMailbox);
                 _context.Mailbox.Update(recepientMailbox);
                 //SEND SMS
-                if (company.SendSMS)
+                if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
                 {
                     string message = $"Dear {userEmailToSend.Email},";
                     var policies =string.Join(",", claimsInvestigations.Select(c => c.PolicyDetail.ContractNumber)?.ToArray());
@@ -311,7 +318,7 @@ namespace risk.control.system.Services
                     .Include(i => i.InvestigationCaseSubStatus)
                     .FirstOrDefault(v => v.ClaimsInvestigationId == claimId);
 
-                var notification = new Notification
+                var notification = new StatusNotification
                 {
                     Role = creatorRole,
                     Company = company,
@@ -349,7 +356,7 @@ namespace risk.control.system.Services
                     recepientMailbox?.Inbox.Add(contactMessage);
                     _context.Mailbox.Attach(recepientMailbox);
                     _context.Mailbox.Update(recepientMailbox);
-                    if (company.SendSMS)
+                    if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
                     {
                         string message = $"Dear {user.Email},";
                         message += $"                                          ";
@@ -394,7 +401,7 @@ namespace risk.control.system.Services
                 .FirstOrDefault(v => v.ClaimsInvestigationId == claimId);
             var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claimsInvestigation.ClientCompanyId);
 
-            var notification = new Notification
+            var notification = new StatusNotification
             {
                 Role = agentRole,
                 Agency = claimsInvestigation.Vendor,
@@ -433,7 +440,7 @@ namespace risk.control.system.Services
             try
             {
                 var rows = await _context.SaveChangesAsync();
-                if (company.SendSMS)
+                if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
                 {
                     string message = $"Dear {recepientUser.Email},";
                     message += $"                                          ";
@@ -559,7 +566,7 @@ namespace risk.control.system.Services
                     }
                 }
             }
-            var notification = new Notification
+            var notification = new StatusNotification
             {
                 Role = managerRole,
                 Company = company,
@@ -603,7 +610,7 @@ namespace risk.control.system.Services
                 recepientMailbox?.Inbox.Add(contactMessage);
                 _context.Mailbox.Attach(recepientMailbox);
                 _context.Mailbox.Update(recepientMailbox);
-                if (company.SendSMS)
+                if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
                 {
                     string message = $"Dear {user.Email},";
                     message += $"                                          ";
@@ -657,7 +664,7 @@ namespace risk.control.system.Services
                     .FirstOrDefault(v => v.ClaimsInvestigationId == claimId);
                 var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claimsInvestigation.ClientCompanyId);
 
-                var notification = new Notification
+                var notification = new StatusNotification
                 {
                     Role = assessorRole,
                     Company = company,
@@ -695,7 +702,7 @@ namespace risk.control.system.Services
                     recepientMailbox?.Inbox.Add(contactMessage);
                     _context.Mailbox.Attach(recepientMailbox);
                     _context.Mailbox.Update(recepientMailbox);
-                    if (company.SendSMS)
+                    if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
                     {
                         string message = $"Dear {user.Email},";
                         
@@ -758,7 +765,7 @@ namespace risk.control.system.Services
             var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claimsInvestigation.ClientCompanyId);
 
 
-            var notification = new Notification
+            var notification = new StatusNotification
             {
                 Role = supervisorRole,
                 Agency = claimsInvestigation.Vendor,
@@ -796,7 +803,7 @@ namespace risk.control.system.Services
                 recepientMailbox?.Inbox.Add(contactMessage);
                 _context.Mailbox.Attach(recepientMailbox);
                 _context.Mailbox.Update(recepientMailbox);
-                if (company.SendSMS)
+                if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
                 {
                     string message = $"Dear {user.Email},";
                     
@@ -862,7 +869,7 @@ namespace risk.control.system.Services
 
             var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == clientCompanyUser.ClientCompanyId);
 
-            var notification = new Notification
+            var notification = new StatusNotification
             {
                 Role = supervisorRole,
                 Agency = claimsInvestigation.Vendor,
@@ -901,7 +908,7 @@ namespace risk.control.system.Services
                 _context.Mailbox.Attach(recepientMailbox);
                 _context.Mailbox.Update(recepientMailbox);
                 //SEND SMS
-                if (company.SendSMS)
+                if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
                 {
                     string message = $"Dear {userEmailToSend.Email},";
                     message += $"                                          ";
@@ -958,7 +965,7 @@ namespace risk.control.system.Services
                     .FirstOrDefault(v => v.ClaimsInvestigationId == claimId);
                 var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claimsInvestigation.ClientCompanyId);
 
-                var notification = new Notification
+                var notification = new StatusNotification
                 {
                     Role = assessorRole,
                     Company = company,
@@ -996,7 +1003,7 @@ namespace risk.control.system.Services
                     recepientMailbox?.Inbox.Add(contactMessage);
                     _context.Mailbox.Attach(recepientMailbox);
                     _context.Mailbox.Update(recepientMailbox);
-                    if (company.SendSMS)
+                    if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
                     {
                         string message = $"Dear {user.Email},";
 

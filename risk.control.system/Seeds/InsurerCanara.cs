@@ -89,7 +89,6 @@ namespace risk.control.system.Seeds
                 PassportApiUrl = globalSettings.PassportApiUrl,
                 PanAPIHost = globalSettings.PanAPIHost,
                 PanAPIKey = globalSettings.PanAPIKey,
-                SendSMS = globalSettings.SendSMS,
                 UpdateAgentAnswer = globalSettings.UpdateAgentAnswer,
                 UpdateAgentReport = globalSettings.UpdateAgentReport,
 

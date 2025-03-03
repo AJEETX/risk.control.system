@@ -2,7 +2,11 @@
 
 using Amazon.Rekognition.Model;
 
+using AspNetCoreHero.ToastNotification.Abstractions;
+
 using Google.Api;
+
+using Highsoft.Web.Mvc.Charts;
 
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
@@ -19,8 +23,8 @@ namespace risk.control.system.Services
 {
     public interface INotificationService
     {
-        Task MarkAsRead(int id);
-        Task<List<Notification>> GetNotifications(string userEmail);
+        Task MarkAsRead(int id, string userEmail);
+        Task<List<StatusNotification>> GetNotifications(string userEmail);
         Task<ClaimsInvestigation> SendVerifySchedule(ClientSchedulingMessage message);
 
         Task<ClaimsInvestigation> ReplyVerifySchedule(string id, string confirm = "N");
@@ -611,7 +615,7 @@ namespace risk.control.system.Services
             return beneficiary.Name;
         }
 
-        public async Task<List<Notification>> GetNotifications(string userEmail)
+        public async Task<List<StatusNotification>> GetNotifications(string userEmail)
         {
             
             var companyUser = context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
@@ -625,24 +629,36 @@ namespace risk.control.system.Services
                 role = context.ApplicationRole.FirstOrDefault(r => r.Name == companyUser.Role.ToString());
                 company = context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
 
-                var notifications = await context.Notifications
-                .Where(n => n.Role == role && n.Company == company && !n.IsRead)
-                .OrderByDescending(n => n.CreatedAt)
-                .ToListAsync();
-                return notifications;
+                var notifications = context.Notifications.Where(n => n.Role == role && n.Company == company && (!n.IsReportReadByAssessor || !n.IsReadByCreator || !n.IsReportReadByManager));
+                if (role.Name == AppRoles.ASSESSOR.ToString())
+                {
+                    notifications = notifications.Where(n => n.Role == role && !n.IsReportReadByAssessor);
+                }
+                else if (role.Name == AppRoles.MANAGER.ToString())
+                {
+                    notifications = notifications.Where(n => n.Role == role && !n.IsReportReadByManager);
+                }
+
+                else if (role.Name == AppRoles.CREATOR.ToString())
+                {
+                    notifications = notifications.Where(n => n.Role == role && !n.IsReadByCreator);
+                }
+
+                var activeNotifications = await notifications
+                    .OrderByDescending(n => n.CreatedAt).ToListAsync();
+                return activeNotifications;
             }
             else if (vendorUser != null)
             {
                 role = context.ApplicationRole.FirstOrDefault(r => r.Name == vendorUser.Role.ToString());
                 agency = context.Vendor.FirstOrDefault(c => c.VendorId == vendorUser.VendorId);
                 
-                var notifications = context.Notifications
-                .Where(n => n.Agency == agency && !n.IsRead);
+                var notifications = context.Notifications.Where(n => n.Agency == agency && (!n.IsReadByVendor || !n.IsReadByVendorAgent || !n.IsReportReadByVendor ));
 
-                if (role.Name == AppRoles.AGENCY_ADMIN.ToString())
+                if (role.Name == AppRoles.AGENCY_ADMIN.ToString() || role.Name == AppRoles.SUPERVISOR.ToString())
                 {
                     var superRole = context.ApplicationRole.FirstOrDefault(r => r.Name == AppRoles.SUPERVISOR.ToString());
-                    notifications = notifications.Where(n => n.Role == superRole);
+                    notifications = notifications.Where(n => n.Role == superRole && (!n.IsReadByVendor || !n.IsReportReadByVendor));
                 }
 
                 else if (role.Name == AppRoles.AGENT.ToString())
@@ -660,13 +676,54 @@ namespace risk.control.system.Services
             return allNotifications;
         }
 
-        public async Task MarkAsRead(int id)
+        public async Task MarkAsRead(int id, string userEmail)
         {
-            var notification = await context.Notifications.FindAsync(id);
+            var companyUser = context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+            var vendorUser = context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
 
-            notification.IsRead = true;
-            context.Notifications.Update(notification);
-            var rows = await context.SaveChangesAsync();
+            ApplicationRole role = null!;
+            ClientCompany company = null!;
+            Vendor agency = null!;
+            if(companyUser !=null)
+            {
+                role = context.ApplicationRole.FirstOrDefault(r => r.Name == companyUser.Role.ToString());
+                company = context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
+                var notification = context.Notifications.FirstOrDefault(s=>s.Role == role && s.Company == company && s.StatusNotificationId == id);
+                if (role.Name == AppRoles.ASSESSOR.ToString())
+                {
+                    notification.IsReportReadByAssessor = true;
+                }
+                else if(role.Name == AppRoles.MANAGER.ToString())
+                {
+                    notification.IsReportReadByManager = true;
+                }
+
+                else if (role.Name == AppRoles.CREATOR.ToString())
+                {
+                    notification.IsReadByCreator = true;
+                }
+                context.Notifications.Update(notification);
+                var rows = await context.SaveChangesAsync();
+            }
+            else if (vendorUser != null)
+            {
+                role = context.ApplicationRole.FirstOrDefault(r => r.Name == vendorUser.Role.ToString());
+                agency = context.Vendor.FirstOrDefault(c => c.VendorId == vendorUser.VendorId);
+                var notification = context.Notifications.FirstOrDefault(s=> s.Agency == agency && s.StatusNotificationId == id);
+                if (role.Name == AppRoles.AGENCY_ADMIN.ToString() || role.Name == AppRoles.SUPERVISOR.ToString())
+                {
+                    notification = context.Notifications.FirstOrDefault(s=> (s.Role == role || s.Role.Name == AppRoles.SUPERVISOR.ToString()));
+                    notification.IsReadByVendor = true;
+                    notification.IsReportReadByVendor = true;
+                }
+
+                else if (role.Name == AppRoles.AGENT.ToString())
+                {
+                    notification.IsReadByVendorAgent = true;
+                }
+                context.Notifications.Update(notification);
+                var rows = await context.SaveChangesAsync();
+            }
         }
     }
 }

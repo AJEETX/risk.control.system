@@ -1,4 +1,6 @@
-﻿@model risk.control.system.Models.ClientCompany
+﻿@using Microsoft.FeatureManagement;
+@inject IFeatureManager featureManager
+@model risk.control.system.Models.ClientCompany
 
 @{
     ViewData["Title"] = "Manage Company";
@@ -119,12 +121,7 @@
                         <dd class="col-sm-5">
                             @Html.DisplayFor(model => model.VerifyPassport)
                         </dd>
-                        <dt class="col-sm-5">
-                            Send SMS
-                        </dt>
-                        <dd class="col-sm-5">
-                            @Html.DisplayFor(model => model.SendSMS)
-                        </dd>
+                        
 
                     </dl>
                 </div>
