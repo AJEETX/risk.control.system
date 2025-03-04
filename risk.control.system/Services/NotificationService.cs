@@ -629,14 +629,14 @@ namespace risk.control.system.Services
                 role = context.ApplicationRole.FirstOrDefault(r => r.Name == companyUser.Role.ToString());
                 company = context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
 
-                var notifications = context.Notifications.Where(n => n.Role == role && n.Company == company && (!n.IsReportReadByAssessor || !n.IsReadByCreator || !n.IsReportReadByManager));
+                var notifications = context.Notifications.Where(n => n.Role == role && n.Company == company && (!n.IsReadByCreator || !n.IsReadByManager || !n.IsReadByAssessor));
                 if (role.Name == AppRoles.ASSESSOR.ToString())
                 {
-                    notifications = notifications.Where(n => n.Role == role && !n.IsReportReadByAssessor);
+                    notifications = notifications.Where(n => n.Role == role && !n.IsReadByAssessor);
                 }
                 else if (role.Name == AppRoles.MANAGER.ToString())
                 {
-                    notifications = notifications.Where(n => n.Role == role && !n.IsReportReadByManager);
+                    notifications = notifications.Where(n => n.Role == role && !n.IsReadByManager);
                 }
 
                 else if (role.Name == AppRoles.CREATOR.ToString())
@@ -653,12 +653,12 @@ namespace risk.control.system.Services
                 role = context.ApplicationRole.FirstOrDefault(r => r.Name == vendorUser.Role.ToString());
                 agency = context.Vendor.FirstOrDefault(c => c.VendorId == vendorUser.VendorId);
                 
-                var notifications = context.Notifications.Where(n => n.Agency == agency && (!n.IsReadByVendor || !n.IsReadByVendorAgent || !n.IsReportReadByVendor ));
+                var notifications = context.Notifications.Where(n => n.Agency == agency && (!n.IsReadByVendor || !n.IsReadByVendorAgent));
 
                 if (role.Name == AppRoles.AGENCY_ADMIN.ToString() || role.Name == AppRoles.SUPERVISOR.ToString())
                 {
                     var superRole = context.ApplicationRole.FirstOrDefault(r => r.Name == AppRoles.SUPERVISOR.ToString());
-                    notifications = notifications.Where(n => n.Role == superRole && (!n.IsReadByVendor || !n.IsReportReadByVendor));
+                    notifications = notifications.Where(n => n.Role == superRole && (!n.IsReadByVendor));
                 }
 
                 else if (role.Name == AppRoles.AGENT.ToString())
@@ -689,13 +689,17 @@ namespace risk.control.system.Services
                 role = context.ApplicationRole.FirstOrDefault(r => r.Name == companyUser.Role.ToString());
                 company = context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
                 var notification = context.Notifications.FirstOrDefault(s=>s.Role == role && s.Company == company && s.StatusNotificationId == id);
+                if(notification == null)
+                {
+                    return;
+                }
                 if (role.Name == AppRoles.ASSESSOR.ToString())
                 {
-                    notification.IsReportReadByAssessor = true;
+                    notification.IsReadByAssessor = true;
                 }
                 else if(role.Name == AppRoles.MANAGER.ToString())
                 {
-                    notification.IsReportReadByManager = true;
+                    notification.IsReadByManager = true;
                 }
 
                 else if (role.Name == AppRoles.CREATOR.ToString())
@@ -710,11 +714,13 @@ namespace risk.control.system.Services
                 role = context.ApplicationRole.FirstOrDefault(r => r.Name == vendorUser.Role.ToString());
                 agency = context.Vendor.FirstOrDefault(c => c.VendorId == vendorUser.VendorId);
                 var notification = context.Notifications.FirstOrDefault(s=> s.Agency == agency && s.StatusNotificationId == id);
+                if (notification == null)
+                {
+                    return;
+                }
                 if (role.Name == AppRoles.AGENCY_ADMIN.ToString() || role.Name == AppRoles.SUPERVISOR.ToString())
                 {
-                    notification = context.Notifications.FirstOrDefault(s=> (s.Role == role || s.Role.Name == AppRoles.SUPERVISOR.ToString()));
                     notification.IsReadByVendor = true;
-                    notification.IsReportReadByVendor = true;
                 }
 
                 else if (role.Name == AppRoles.AGENT.ToString())
