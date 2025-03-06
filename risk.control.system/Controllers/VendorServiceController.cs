@@ -20,7 +20,7 @@ using static risk.control.system.AppConstant.Applicationsettings;
 namespace risk.control.system.Controllers
 {
     [Breadcrumb(" Service")]
-    [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME}")]
+    [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME},{MANAGER.DISPLAY_NAME}")]
     public class VendorServiceController : Controller
     {
         private readonly ApplicationDbContext _context;

@@ -21,7 +21,7 @@ using static risk.control.system.AppConstant.Applicationsettings;
 namespace risk.control.system.Controllers
 {
     [Breadcrumb("Admin Settings ")]
-    [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME}")]
+    [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{MANAGER.DISPLAY_NAME}")]
     public class ClientCompanyController : Controller
     {
         private const string vendorMapSize = "800x800";

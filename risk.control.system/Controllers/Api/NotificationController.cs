@@ -38,7 +38,7 @@ namespace risk.control.system.Controllers.Api
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             var notifications = await service.GetNotifications(userEmail);
-            var activeNotifications = notifications.Select(n => new { Id = n.StatusNotificationId, n.Message, CreatedAt = n.CreatedAt.ToString("yyyy-MM-dd HH:mm") });
+            var activeNotifications = notifications.Select(n => new { Id = n.StatusNotificationId, Symbol = n.Symbol, n.Message, CreatedAt = n.CreatedAt.ToString("yyyy-MM-dd HH:mm") });
             return Ok(activeNotifications?.Take(10).ToList());
         }
         [AllowAnonymous]
@@ -83,7 +83,6 @@ namespace risk.control.system.Controllers.Api
             }
         }
 
-        [AllowAnonymous]
         [HttpPost("schedule")]
         public async Task<IActionResult> Schedule(ClientSchedulingMessage message)
         {
@@ -97,7 +96,6 @@ namespace risk.control.system.Controllers.Api
             return Ok(claim);
         }
 
-        [AllowAnonymous]
         [HttpGet("ConfirmSchedule")]
         public async Task<IActionResult> ConfirmSchedule(string id, string confirm = "N")
         {
@@ -109,7 +107,6 @@ namespace risk.control.system.Controllers.Api
             return Redirect("/page/confirm.html");
         }
 
-        [AllowAnonymous]
         [HttpPost("sms")]
         public async Task<IActionResult> SendSingleSMS(string mobile = "61432854196", string message = "SMS fom iCheckify team")
         {

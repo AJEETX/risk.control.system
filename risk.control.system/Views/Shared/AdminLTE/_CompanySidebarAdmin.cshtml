@@ -2,7 +2,7 @@
 @using risk.control.system.Models;
 @model ClientCompany
 @{
-    if (User.IsInRole(AppRoles.COMPANY_ADMIN.ToString()))
+    if (User.IsInRole(AppRoles.COMPANY_ADMIN.ToString()) || User.IsInRole(AppRoles.MANAGER.ToString()))
     {
         <partial name="AdminLTE/_CompanySidebarAdminManageCompany" />
         <partial name="AdminLTE/_CompanySidebarAdminManageAgency" />
