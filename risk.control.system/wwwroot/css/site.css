@@ -2283,3 +2283,8 @@ input#checkall {
     font-style: italic;
     white-space: pre-wrap;
 }
+.profile-img{
+    width:10em;
+    max-width:15em;
+    height:auto;
+}

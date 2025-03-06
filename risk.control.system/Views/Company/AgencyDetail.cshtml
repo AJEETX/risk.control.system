@@ -23,7 +23,7 @@
 
                         <div class="profile-img-container">
                             <img src="data:image/*;base64,@(Convert.ToBase64String(Model?.DocumentImage))"
-                                 class="rounded-circle shadow-lg border profile-img" alt="User Profile" title="@Model.Email" data-toggle="tooltip" />
+                                 class="shadow-lg border profile-img" alt="User Profile" title="@Model.Email" data-toggle="tooltip" />
                         </div>
                         <h5 class="mt-3">@Model.Email</h5>
                         <p class="text-muted">@Model.Name</p>
@@ -64,7 +64,7 @@
                                 <div class="col-md-12">
                                     <div class="form-group">
                                         <a id="back" asp-controller="Company" asp-action="EmpanelledVendors" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
-                                        <a id="edit-profile" asp-controller="Company" asp-action="EditAgency" asp-route-id="@Model.VendorId" class="btn btn-warning"><i class='fas fa-building'></i> Edit Agency</a>
+                                        <a id="edit-profile" asp-controller="Company" asp-action="EditAgency" asp-route-id="@Model.VendorId" class="btn btn-warning"><i class='fas fa-building'></i> Profile</a>
                                         <a asp-controller="Company" asp-action="AgencyUsers" asp-route-id="@Model.VendorId" class="btn btn-success"><i class="fas fa-user-friends"></i>  Users</a>
                                         <a asp-controller="Company" asp-action="Service" asp-route-id="@Model.VendorId" class="btn btn-danger"><i class="fas fa-truck"></i>  @Applicationsettings.SERVICE</a>
                                     </div>
