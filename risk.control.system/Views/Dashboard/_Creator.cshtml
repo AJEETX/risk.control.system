@@ -8,7 +8,7 @@
 
             <div class="small-box bg-warning">
                 <div class="inner">
-                    <h3 id="new-claims">@Model.FirstBlockCount</h3>
+                    <h3 id="new-claims">@Model.FirstBlockCount (@Model.SecondBlockCount)</h3>
                     <span>@Model.FirstBlockName</span>
                 </div>
                 <div class="icon">
@@ -18,7 +18,8 @@
             </div>
         </div>
     }
-
+    else
+    {
         <div class="col">
 
             <div class="small-box bg-danger">
@@ -32,6 +33,8 @@
                 <a href="@Model.SecondBlockUrl" class="details-page small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
             </div>
         </div>
+    }
+   
        @*  <div class="col">
 
             <div class="small-box bg-danger">

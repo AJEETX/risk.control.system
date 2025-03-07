@@ -47,8 +47,8 @@
             <input type="hidden" id="policyDetailId" value="@Model.ClaimsInvestigation?.PolicyDetail.PolicyDetailId" />
             <input type="hidden" id="beneficiaryId" value="@Model.Location?.BeneficiaryDetailId" />
             <div class="bb-blog-inner">
-                <div class="card card-light collapsed-card">
-                    <div class="card-header">
+                <div class="card shadow-lg border-0 rounded-lg collapsed-card">
+                    <div class="card-header bg-light">
                         <h3 class="card-title">
                             Claim: <span class="badge badge-light"><i class="far fa-file-powerpoint"></i>  @Model.ClaimsInvestigation?.PolicyDetail?.ContractNumber</span>
                             <span class="hover-text">
@@ -115,7 +115,14 @@
             <div class="card-footer">
                 <div class="row">
                     <div class="col-md-12">
-                        <a id="back" asp-action="New" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> Back</a>
+                        @if(Model.ClaimsInvestigation.ClientCompany.AutoAllocation)
+                        {
+                            <a id="back" asp-controller="CreatorAuto" asp-action="New" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> Back</a>
+                        }
+                        else
+                        {
+                            <a id="back" asp-controller="CreatorManual" asp-action="New" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> Back</a>
+                        }
                         <button disabled="disabled" id="allocatedcase" type="submit" class="btn btn-danger">
                             <i class="fas fa-external-link-alt" aria-hidden="true"></i> <b> Assign </b><sub>manual</sub>
                         </button>
@@ -126,6 +133,6 @@
     </div>
 </section>
 @section Scripts {
-    <script type="text/javascript" src="~/js/creator/get-empanelled-vendors.js"></script>
+    <script src="~/js/creator/get-empanelled-vendors.js"></script>
     <script src="~/js/common/claim-details.js"></script>
 }

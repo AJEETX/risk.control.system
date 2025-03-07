@@ -105,7 +105,10 @@ namespace risk.control.system.Controllers.Company
                         await mailboxService.NotifyClaimAssignmentToAssigner(HttpContext.User.Identity.Name, notAutoAllocated);
 
                         notifyService.Custom($"{notAutoAllocated.Count}/{claims.Count} claim(s) need assign manually", 3, "orange", "far fa-file-powerpoint");
-
+                        if(company.AutoAllocation)
+                        {
+                            return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
+                        }
                         return RedirectToAction(nameof(CreatorManualController.New), "CreatorManual");
 
                     }

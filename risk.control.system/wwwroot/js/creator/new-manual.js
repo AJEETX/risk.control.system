@@ -30,21 +30,8 @@
             }
         }
     });
-    $('#postedFile').on("change", function () {
-        var val = $(this).val(),
-            fbtn = $('#UploadFileButton');
-        var uploadType = $('#uploadtype').val();
-        val.endsWith('.zip') && (uploadType == "0" || uploadType == "1") ? fbtn.removeAttr("disabled") : fbtn.attr("disabled");
-    });
-
-    $('#uploadtype').on("change", function () {
-        var val = $(this).val(),
-            fbtn = $('#UploadFileButton');
-        var uploadType = $('#postedFile').val();
-        (val == "0" || val == "1") && uploadType.endsWith('.zip') ? fbtn.removeAttr("disabled") : fbtn.attr('disabled', 'disabled');
-    });
-
-    var table = $("#customerTable").DataTable({
+    
+    var table = $("#customerTableManual").DataTable({
         ajax: {
             url: '/api/Creator/GetManual',
             dataSrc: ''
@@ -217,8 +204,8 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += '<a id="edit' + row.id + '" href="Details?Id=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-pencil-alt"></i> Edit</a>&nbsp;'
-                    buttons += '<a id="details' + row.id + '" href="Delete?Id=' + row.id + '" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i> Delete </a>'
+                    buttons += '<a id="edit' + row.id + '" href="/CreatorManual/Details?Id=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-pencil-alt"></i> Edit</a>&nbsp;'
+                    buttons += '<a id="details' + row.id + '" href="/CreatorManual/Delete?Id=' + row.id + '" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i> Delete </a>'
                     return buttons;
                 }
             },
@@ -226,16 +213,16 @@
         ],
         "drawCallback": function (settings, start, end, max, total, pre) {
             
-            $('#customerTable tbody').on('click', '.btn-danger', function (e) {
+            $('#customerTableManual tbody').on('click', '.btn-danger', function (e) {
                 e.preventDefault(); // Prevent the default anchor behavior
                 var id = $(this).attr('id').replace('details', ''); // Extract the ID from the button's ID attribute
-                getdetails(id); // Call the getdetails function with the ID
+                getManualDetails(id); // Call the getdetails function with the ID
                 window.location.href = $(this).attr('href'); // Navigate to the delete page
             });
-            $('#customerTable tbody').on('click', '.btn-warning', function (e) {
+            $('#customerTableManual tbody').on('click', '.btn-warning', function (e) {
                 e.preventDefault(); // Prevent the default anchor behavior
                 var id = $(this).attr('id').replace('edit', ''); // Extract the ID from the button's ID attribute
-                showedit(id); // Call the getdetails function with the ID
+                showManualEdit(id); // Call the getdetails function with the ID
                 window.location.href = $(this).attr('href'); // Navigate to the edit page
             });
         },
@@ -246,7 +233,7 @@
         },
         error: function (xhr, status, error) { alert('err ' + error) }
     });
-    $('#customerTable')
+    $('#customerTableManual')
         .on('mouseenter', '.map-thumbnail', function () {
             const $this = $(this); // Cache the current element
 
@@ -265,7 +252,7 @@
             $this.find('.full-map').hide();
         });
 
-    $('#customerTable').on('draw.dt', function () {
+    $('#customerTableManual').on('draw.dt', function () {
         $('[data-toggle="tooltip"]').tooltip({
             animated: 'fade',
             placement: 'top',
@@ -273,44 +260,44 @@
         });
     });
 
-    $('#customerTable tbody').hide();
-    $('#customerTable tbody').fadeIn(2000);
+    $('#customerTableManual tbody').hide();
+    $('#customerTableManual tbody').fadeIn(2000);
 
     if ($("input[type='radio'].selected-case:checked").length) {
-        $("#allocatedcase").prop('disabled', false);
+        $("#allocate-manual").prop('disabled', false);
     }
     else {
-        $("#allocatedcase").prop('disabled', true);
+        $("#allocate-manual").prop('disabled', true);
     }
 
     // When user checks a radio button, Enable submit button
     $("input[type='radio'].selected-case").change(function (e) {
         if ($(this).is(":checked")) {
-            $("#allocatedcase").prop('disabled', false);
+            $("#allocate-manual").prop('disabled', false);
         }
         else {
-            $("#allocatedcase").prop('disabled', true);
+            $("#allocate-manual").prop('disabled', true);
         }
     });
 
     // Handle click on checkbox to set state of "Select all" control
-    $('#customerTable tbody').on('change', 'input[type="radio"]', function () {
+    $('#customerTableManual tbody').on('change', 'input[type="radio"]', function () {
         // If checkbox is not checked
         if (this.checked) {
-            $("#allocatedcase").prop('disabled', false);
+            $("#allocate-manual").prop('disabled', false);
         } else {
-            $("#allocatedcase").prop('disabled', true);
+            $("#allocate-manual").prop('disabled', true);
         }
     });
 
-    $('#allocatedcase').on('click', function (event) {
+    $('#allocate-manual').on('click', function (event) {
         $("body").addClass("submit-progress-bg");
 
         setTimeout(function () {
             $(".submit-progress").removeClass("hidden");
         }, 1);
         
-        $('#allocatedcase').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Assign <b> <sub>manual</sub></b>");
+        $('#allocate-manual').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Assign <b> <sub>manual</sub></b>");
         disableAllInteractiveElements();
 
         $('#radioButtons').submit();
@@ -322,131 +309,10 @@
             }
         }
     });
-    let askFileUploadConfirmation = true;
-
-    $("#postedFile").on('change', function () {
-        var MaxSizeInBytes = 1097152;
-        //Get count of selected files
-        var countFiles = $(this)[0].files.length;
-
-        var imgPath = $(this)[0].value;
-        var extn = imgPath.substring(imgPath.lastIndexOf('.') + 1).toLowerCase();
-
-        if (extn == "zip") {
-            if (typeof (FileReader) != "undefined") {
-
-                //loop for each file selected for uploaded.
-                for (var i = 0; i < countFiles; i++) {
-                    var fileSize = $(this)[0].files[i].size;
-                    if (fileSize > MaxSizeInBytes) {
-                        $.alert(
-                            {
-                                title: " UPLOAD issue !",
-                                content: " <i class='fa fa-upload'></i> Upload File size limit exceeded. <br />Max file size is 1 MB!",
-                                icon: 'fas fa-exclamation-triangle',
-                                type: 'red',
-                                closeIcon: true,
-                                buttons: {
-                                    cancel: {
-                                        text: "CLOSE",
-                                        btnClass: 'btn-danger'
-                                    }
-                                }
-                            }
-                        );
-                    }
-                }
-
-            } else {
-                $.alert(
-                    {
-                        title: "Outdated Browser !",
-                        content: "This browser does not support FileReader. Try on modern browser!",
-                        icon: 'fas fa-exclamation-triangle',
-            
-                        type: 'red',
-                        closeIcon: true,
-                        buttons: {
-                            cancel: {
-                                text: "CLOSE",
-                                btnClass: 'btn-danger'
-                            }
-                        }
-                    }
-                );
-            }
-        } else {
-            $.alert(
-                {
-                    title: "FILE UPLOAD TYPE !!",
-                    content: "Pls only select file with extension zip ! ",
-                    icon: 'fas fa-exclamation-triangle',
-        
-                    type: 'red',
-                    closeIcon: true,
-                    buttons: {
-                        cancel: {
-                            text: "CLOSE",
-                            btnClass: 'btn-danger'
-                        }
-                    }
-                }
-            );
-        }
-    });
-    $('#UploadFileButton').on('click', function (event) {
-        if (askFileUploadConfirmation) {
-            event.preventDefault();
-            $.confirm({
-                title: "Confirm File Upload",
-                content: "Are you sure to Upload ?",
-                icon: 'fas fa-upload',
-    
-                type: 'green',
-                closeIcon: true,
-                buttons: {
-                    confirm: {
-                        text: "File Upload",
-                        btnClass: 'btn-success',
-                        action: function () {
-                            askFileUploadConfirmation = false;
-
-                            $("body").addClass("submit-progress-bg");
-                            // Wrap in setTimeout so the UI
-                            // can update the spinners
-                            setTimeout(function () {
-                                $(".submit-progress").removeClass("hidden");
-                            }, 1);
-                            
-                            $('#UploadFileButton').html("<i class='fas fa-sync fa-spin'></i> Uploading");
-                            disableAllInteractiveElements();
-
-                            $('#upload-claims').submit();
-                            
-
-                            var article = document.getElementById("article");
-                            if (article) {
-                                var nodes = article.getElementsByTagName('*');
-                                for (var i = 0; i < nodes.length; i++) {
-                                    nodes[i].disabled = true;
-                                }
-                            }
-                        }
-                    },
-                    cancel: {
-                        text: "Cancel",
-                        btnClass: 'btn-default'
-                    }
-                }
-            });
-        }
-
-    });
-    //initMap("/api/CompanyAssignClaims/GetAssignerMap");
 });
 
 
-function showedit(id) {
+function showManualEdit(id) {
     $("body").addClass("submit-progress-bg");
     // Wrap in setTimeout so the UI
     // can update the spinners
@@ -465,7 +331,7 @@ function showedit(id) {
         }
     }
 }
-function getdetails(id) {
+function getManualDetails(id) {
     $("body").addClass("submit-progress-bg");
     // Wrap in setTimeout so the UI
     // can update the spinners

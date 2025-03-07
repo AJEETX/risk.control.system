@@ -13,8 +13,15 @@
                     <div class="form-group">
                     <form id="create-form" asp-controller="CreatorPost" asp-action="Delete">
                         <input type="hidden" asp-for="ClaimsInvestigation.CREATEDBY" value="@CREATEDBY.MANUAL" />
-                        <a id="back" asp-action="New" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
-                        <input type="hidden" asp-for="ClaimsInvestigation.ClaimsInvestigationId" />
+                        @if(Model.ClaimsInvestigation.ClientCompany.AutoAllocation)
+                            {
+                                <a id="back" asp-controller="CreatorAuto" asp-action="New" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
+                            }
+                            else
+                            {
+                                <a id="back" asp-controller="CreatorManual" asp-action="New" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
+                            }
+                            <input type="hidden" asp-for="ClaimsInvestigation.ClaimsInvestigationId" />
                         <input type="submit" value="Delete" class="btn btn-danger" />
                     </form>
                     </div>

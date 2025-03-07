@@ -23,8 +23,8 @@
     <input type="hidden" id="beneficiaryId" asp-for="ClaimsInvestigation.BeneficiaryDetail.BeneficiaryDetailId" />
     <input id="claimId" type="hidden" asp-for="ClaimsInvestigation.ClaimsInvestigationId" />
     <div class="bb-blog-inner">
-        <div class="card card-light expand-card">
-            <div class="card-header">
+        <div class="card shadow-lg border-0 rounded-lg expand-card">
+            <div class="card-header bg-light">
                 <h3 class="card-title">Claim: <span class="badge badge-light"><i class="far fa-file-powerpoint"></i>  @Model.ClaimsInvestigation?.PolicyDetail?.ContractNumber</span></h3>
                 <div class="card-tools">
                     <span data-toggle="tooltip" title="Claim # : @Model.ClaimsInvestigation?.PolicyDetail?.ContractNumber" class="badge badge-light"> <i class="far fa-file-powerpoint"></i> </span>

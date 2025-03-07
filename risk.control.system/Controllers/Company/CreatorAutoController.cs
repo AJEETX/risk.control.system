@@ -71,7 +71,7 @@ namespace risk.control.system.Controllers.Company
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
-        [Breadcrumb(" Assign(auto)")]
+        [Breadcrumb(" Assign")]
         public IActionResult New()
         {
             try

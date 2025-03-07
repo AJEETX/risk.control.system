@@ -22,14 +22,15 @@ namespace risk.control.system.Services
         }
         public ClaimTransactionModel Create(string currentUserEmail)
         {
+            var companyUser = context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(c => c.Email == currentUserEmail);
             var claim = new ClaimsInvestigation
             {
                 PolicyDetail = new PolicyDetail
                 {
                     LineOfBusinessId = context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == "claims").LineOfBusinessId
-                }
+                },
+                ClientCompany = companyUser.ClientCompany
             };
-            var companyUser = context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(c => c.Email == currentUserEmail);
             bool userCanCreate = true;
             int availableCount = 0;
             var trial = companyUser.ClientCompany.LicenseType == Standard.Licensing.LicenseType.Trial;
