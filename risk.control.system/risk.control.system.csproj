@@ -8,12 +8,12 @@
 
   <ItemGroup>
     <PackageReference Include="AspNetCoreHero.ToastNotification" Version="1.1.0" />
-    <PackageReference Include="AWSSDK.Core" Version="3.7.401.10" />
-    <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="3.7.301" />
-    <PackageReference Include="AWSSDK.Rekognition" Version="3.7.400.90" />
-    <PackageReference Include="AWSSDK.S3" Version="3.7.414" />
-    <PackageReference Include="AWSSDK.Textract" Version="3.7.400.90" />
-    <PackageReference Include="AWSSDK.TranscribeService" Version="3.7.401.12" />
+    <PackageReference Include="AWSSDK.Core" Version="3.7.402.14" />
+    <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="3.7.400" />
+    <PackageReference Include="AWSSDK.Rekognition" Version="3.7.400.108" />
+    <PackageReference Include="AWSSDK.S3" Version="3.7.415.13" />
+    <PackageReference Include="AWSSDK.Textract" Version="3.7.400.108" />
+    <PackageReference Include="AWSSDK.TranscribeService" Version="3.7.402.17" />
     <PackageReference Include="CsvHelper" Version="33.0.1" />
     <PackageReference Include="Google.Cloud.Vision.V1" Version="3.7.0" />
     <PackageReference Include="Highsoft.Highcharts" Version="11.4.6.5" />
@@ -40,21 +40,21 @@
     <PackageReference Include="Net8.Licensing" Version="1.0.0" />
     <PackageReference Include="NToastNotify" Version="8.0.0" />
     <PackageReference Include="SixLabors.Fonts" Version="2.1.2" />
-    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.6" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.7" />
     <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="2.1.5" />
     <PackageReference Include="SkiaSharp" Version="3.116.1" />
     <PackageReference Include="SkiaSharp.Views.Desktop.Common" Version="3.116.1" />
     <PackageReference Include="SmartBreadcrumbs" Version="3.6.1" />
-    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="7.2.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="7.2.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="7.3.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="7.3.1" />
     <PackageReference Include="Gehtsoft.PDFFlowLib" Version="2.1.1" />
     <PackageReference Include="Haru.Net" Version="1.0.11" />
     <PackageReference Include="Gehtsoft.PDFFlowLib.Barcodes" Version="1.0.0" />
-    <PackageReference Include="System.Drawing.Common" Version="8.0.1" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.3.1" />
+    <PackageReference Include="System.Drawing.Common" Version="9.0.2" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.6.0" />
     <PackageReference Include="System.Net.Http" Version="4.3.4" />
     <PackageReference Include="System.Security.Cryptography.Xml" Version="8.0.2" />
-    <PackageReference Include="System.Text.Json" Version="9.0.0" />
+    <PackageReference Include="System.Text.Json" Version="9.0.2" />
     <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
   </ItemGroup>
 

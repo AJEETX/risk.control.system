@@ -17,6 +17,6 @@ namespace risk.control.system.Models
         public bool IsReadByManager { get; set; } = false;
 
         public string Symbol { get; set; } = "fas fa-check-circle i-green";
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
     }
 }
