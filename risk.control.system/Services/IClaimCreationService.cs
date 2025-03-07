@@ -16,11 +16,11 @@ namespace risk.control.system.Services
 
         Task<ClaimsInvestigation> EdiPolicy(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? claimDocument);
 
-        Task<bool> CreateCustomer(string userEmail, CustomerDetail customerDetail, IFormFile? customerDocument);
+        Task<ClientCompany> CreateCustomer(string userEmail, CustomerDetail customerDetail, IFormFile? customerDocument);
 
-        Task<bool> EditCustomer(string userEmail, CustomerDetail customerDetail, IFormFile? customerDocument);
-        Task<bool> CreateBeneficiary(string userEmail, string ClaimsInvestigationId, BeneficiaryDetail beneficiary, IFormFile? customerDocument);
-        Task<bool> EditBeneficiary(string userEmail, long beneficiaryDetailId, BeneficiaryDetail beneficiary, IFormFile? customerDocument);
+        Task<ClientCompany> EditCustomer(string userEmail, CustomerDetail customerDetail, IFormFile? customerDocument);
+        Task<ClientCompany> CreateBeneficiary(string userEmail, string ClaimsInvestigationId, BeneficiaryDetail beneficiary, IFormFile? customerDocument);
+        Task<ClientCompany> EditBeneficiary(string userEmail, long beneficiaryDetailId, BeneficiaryDetail beneficiary, IFormFile? customerDocument);
     }
     public class ClaimCreationService : IClaimCreationService
     {
@@ -60,6 +60,7 @@ namespace risk.control.system.Services
                 claimsInvestigation.InvestigationCaseStatusId = initiatedStatusId;
                 claimsInvestigation.InvestigationCaseSubStatusId = createdSubStatusId;
                 claimsInvestigation.CreatorSla = currentUser.ClientCompany.CreatorSla;
+                claimsInvestigation.ClientCompany = currentUser.ClientCompany;
                 var aaddedClaimId = context.ClaimsInvestigation.Add(claimsInvestigation);
                 var log = new InvestigationTransaction
                 {
@@ -91,6 +92,7 @@ namespace risk.control.system.Services
             {
                 var existingPolicy = await context.ClaimsInvestigation
                     .Include(c => c.PolicyDetail)
+                    .Include(c => c.ClientCompany)
                         .FirstOrDefaultAsync(c => c.ClaimsInvestigationId == claimsInvestigation.ClaimsInvestigationId);
                 existingPolicy.PolicyDetail.ContractIssueDate = claimsInvestigation.PolicyDetail.ContractIssueDate;
                 existingPolicy.PolicyDetail.InvestigationServiceTypeId = claimsInvestigation.PolicyDetail.InvestigationServiceTypeId;
@@ -125,11 +127,12 @@ namespace risk.control.system.Services
             }
         }
 
-        public async Task<bool> EditCustomer(string userEmail, CustomerDetail customerDetail, IFormFile? customerDocument)
+        public async Task<ClientCompany> EditCustomer(string userEmail, CustomerDetail customerDetail, IFormFile? customerDocument)
         {
             try
             {
-                // If a new document is provided, set the ProfilePicture
+                var currentUser = context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
+
                 if (customerDocument is not null)
                 {
                     using var dataStream = new MemoryStream();
@@ -170,20 +173,21 @@ namespace risk.control.system.Services
                 context.Entry(customerDetail).State = EntityState.Modified;
 
                 // Save changes to the database
-                return await context.SaveChangesAsync() > 0;
+                return await context.SaveChangesAsync() > 0 ? currentUser.ClientCompany: null;
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"An error occurred: {ex.Message}");
                 Console.WriteLine(ex.StackTrace);
-                return false;
+                return null;
             }
         }
 
-        public async Task<bool> CreateCustomer(string userEmail, CustomerDetail customerDetail, IFormFile? customerDocument)
+        public async Task<ClientCompany> CreateCustomer(string userEmail, CustomerDetail customerDetail, IFormFile? customerDocument)
         {
             try
             {
+                var currentUser = context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
                 if (customerDocument is not null)
                 {
                     using var dataStream = new MemoryStream();
@@ -212,19 +216,20 @@ namespace risk.control.system.Services
 
                 var addedClaim = context.CustomerDetail.Add(customerDetail);
 
-                return await context.SaveChangesAsync() > 0;
+                return await context.SaveChangesAsync() > 0? currentUser.ClientCompany : null;
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.StackTrace);
-                return false;
+                return null;
             }
         }
 
-        public async Task<bool> CreateBeneficiary(string userEmail, string ClaimsInvestigationId, BeneficiaryDetail beneficiary, IFormFile? customerDocument)
+        public async Task<ClientCompany> CreateBeneficiary(string userEmail, string ClaimsInvestigationId, BeneficiaryDetail beneficiary, IFormFile? customerDocument)
         {
             try
             {
+                var currentUser = context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
                 beneficiary.Updated = DateTime.Now;
                 beneficiary.UpdatedBy = userEmail;
 
@@ -260,19 +265,20 @@ namespace risk.control.system.Services
                 claimsInvestigation.IsReady2Assign = true;
 
                 context.ClaimsInvestigation.Update(claimsInvestigation);
-                return await context.SaveChangesAsync() > 0;
+                return await context.SaveChangesAsync() > 0 ? currentUser.ClientCompany: null;
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.StackTrace);
-                return false;
+                return null;
             }
         }
 
-        public async Task<bool> EditBeneficiary(string userEmail, long beneficiaryDetailId, BeneficiaryDetail beneficiary, IFormFile? customerDocument)
+        public async Task<ClientCompany> EditBeneficiary(string userEmail, long beneficiaryDetailId, BeneficiaryDetail beneficiary, IFormFile? customerDocument)
         {
             try
             {
+                var currentUser = context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
                 if (customerDocument is not null)
                 {
                     using var dataStream = new MemoryStream();
@@ -308,13 +314,13 @@ namespace risk.control.system.Services
 
                 context.BeneficiaryDetail.Attach(beneficiary);
                 context.Entry(beneficiary).State = EntityState.Modified;
-                return (await context.SaveChangesAsync() > 0);
+                return await context.SaveChangesAsync() > 0 ? currentUser.ClientCompany : null;
                 
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.StackTrace);
-                return false;
+                return null;
             }
         }
     }

@@ -156,7 +156,7 @@ namespace risk.control.system.Services
 
             if (company.AutoAllocation)
             {
-                data.FirstBlockName = "Assign(auto)";
+                data.FirstBlockName = "Assign";
                 data.FirstBlockCount = GetCreatorAssignAuto(userEmail);
                 data.FirstBlockUrl = "/CreatorAuto/New";
             }

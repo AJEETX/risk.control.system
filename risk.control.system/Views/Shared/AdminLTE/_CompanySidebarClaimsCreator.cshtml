@@ -34,6 +34,7 @@
         <li class="nav-item">
             <a is-active-page asp-controller="CreatorAuto" asp-action="New" class="actual-link nav-link
                         @Url.MakeActiveClass("CreatorAuto","New")
+                        @Url.MakeActiveClass("CreatorManual","New")
                         @Url.MakeActiveClass("CreatorAuto","Details")
                             @Url.MakeActiveClass("CreatorAuto","Create")
                             @Url.MakeActiveClass("CreatorAuto","CreatePolicy")
@@ -42,35 +43,49 @@
                             @Url.MakeActiveClass("CreatorAuto","EditCustomer")
                                 @Url.MakeActiveClass("CreatorAuto","CreateBeneficiary")
                                 @Url.MakeActiveClass("CreatorAuto","EditBeneficiary")
-                        @Url.MakeActiveClass("CreatorAuto","Delete")">
+                            @Url.MakeActiveClass("CreatorAuto","Delete") 
+                            @Url.MakeActiveClass("CreatorManual","Details")
+                                            @Url.MakeActiveClass("CreatorManual","Create")
+                                        @Url.MakeActiveClass("CreatorManual","CreatePolicy")
+                                    @Url.MakeActiveClass("CreatorManual","EditPolicy")
+                                            @Url.MakeActiveClass("CreatorManual","CreateCustomer")
+                                                    @Url.MakeActiveClass("CreatorManual","EditCustomer")
+                                                            @Url.MakeActiveClass("CreatorManual","CreateBeneficiary")
+                                                                    @Url.MakeActiveClass("CreatorManual","EditBeneficiary")
+                                                                        @Url.MakeActiveClass("CreatorManual","Delete")
+                                                             @Url.MakeActiveClass("CreatorManual", "VendorDetail")
+                                    @Url.MakeActiveClass("CreatorManual","EmpanelledVendors")">
                 <i class="fas fa-random nav-icon"></i>
                 <p>
-                    <span class="badge badge-warning">ASSIGN </span><sub>auto</sub>
+                    <span class="badge badge-warning">ASSIGN
                 </p>
             </a>
         </li>
     }
-
-    <li class="nav-item">
-        <a is-active-page asp-controller="CreatorManual" asp-action="New" class="actual-link nav-link
-                                @Url.MakeActiveClass("CreatorManual","New")
-                                        @Url.MakeActiveClass("CreatorManual","Details")
-                                        @Url.MakeActiveClass("CreatorManual","Create")
-                                    @Url.MakeActiveClass("CreatorManual","CreatePolicy")
-                                @Url.MakeActiveClass("CreatorManual","EditPolicy")
-                                        @Url.MakeActiveClass("CreatorManual","CreateCustomer")
-                                                @Url.MakeActiveClass("CreatorManual","EditCustomer")
-                                                        @Url.MakeActiveClass("CreatorManual","CreateBeneficiary")
-                                                                @Url.MakeActiveClass("CreatorManual","EditBeneficiary")
-                                                                    @Url.MakeActiveClass("CreatorManual","Delete")
-                                                         @Url.MakeActiveClass("CreatorManual", "VendorDetail")
-                                @Url.MakeActiveClass("CreatorManual","EmpanelledVendors")">
-            <i class="fas fa-external-link-alt nav-icon"></i>
-            <p>
-                <span class="badge badge-danger">ASSIGN </span><sub>manual</sub>
-            </p>
-        </a>
-    </li>
+    else
+    {
+        <li class="nav-item">
+            <a is-active-page asp-controller="CreatorManual" asp-action="New" class="actual-link nav-link
+                                    @Url.MakeActiveClass("CreatorManual","New")
+                                            @Url.MakeActiveClass("CreatorManual","Details")
+                                            @Url.MakeActiveClass("CreatorManual","Create")
+                                        @Url.MakeActiveClass("CreatorManual","CreatePolicy")
+                                    @Url.MakeActiveClass("CreatorManual","EditPolicy")
+                                            @Url.MakeActiveClass("CreatorManual","CreateCustomer")
+                                                    @Url.MakeActiveClass("CreatorManual","EditCustomer")
+                                                            @Url.MakeActiveClass("CreatorManual","CreateBeneficiary")
+                                                                    @Url.MakeActiveClass("CreatorManual","EditBeneficiary")
+                                                                        @Url.MakeActiveClass("CreatorManual","Delete")
+                                                             @Url.MakeActiveClass("CreatorManual", "VendorDetail")
+                                    @Url.MakeActiveClass("CreatorManual","EmpanelledVendors")">
+                <i class="fas fa-external-link-alt nav-icon"></i>
+                <p>
+                    <span class="badge badge-danger">ASSIGN </span><sub>manual</sub>
+                </p>
+            </a>
+        </li>
+    }
+    
     // else
     // {
     //     <li class="nav-item">

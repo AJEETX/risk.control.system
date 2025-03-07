@@ -50,9 +50,18 @@
                         <span class="detail-wizard"> <i class="far fa-hand-point-up"></i>  Complete  details to <b> Assign </b> <i class="far fa-hand-point-down"></i></span>
                     </div>
                     <div>
-                        <a id="back" asp-action="New" class="btn btn-outline-secondary">
-                            <span class="badge badge-light"> <i class="fas fa-arrow-left"></i> </span> Back
-                        </a>
+                        @if (Model.ClaimsInvestigation.ClientCompany.AutoAllocation)
+                        {
+                            <a id="back" asp-controller="CreatorAuto" asp-action="New" class="btn btn-outline-secondary">
+                                <span class="badge badge-light"> <i class="fas fa-arrow-left"></i> </span> Back
+                            </a>
+                        }
+                        else
+                        {
+                            <a id="back" asp-controller="CreatorManual" asp-action="New" class="btn btn-outline-secondary">
+                                <span class="badge badge-light"> <i class="fas fa-arrow-left"></i> </span> Back
+                            </a>
+                        }
                         <button disabled id="assign-list" class="btn btn-danger disabled">
                             <span class="badge badge-danger"> <i class="fas fa-external-link-alt"></i></span><b> Assign </b> <sub> manual</sub>
                         </button>

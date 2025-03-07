@@ -1,38 +1,6 @@
 ﻿$(document).ready(function () {
-    $('a.create-policy').on('click', function () {
-        $("body").addClass("submit-progress-bg");
-        // Wrap in setTimeout so the UI
-        // can update the spinners
-        setTimeout(function () {
-            $(".submit-progress").removeClass("hidden");
-        }, 1);
-       
-        $('a.create-policy').html("<i class='fas fa-sync fa-spin'></i> Add New");
-        disableAllInteractiveElements();
-        var article = document.getElementById("article");
-        if (article) {
-            var nodes = article.getElementsByTagName('*');
-            for (var i = 0; i < nodes.length; i++) {
-                nodes[i].disabled = true;
-            }
-        }
-    });
-    $('#postedFile').on("change", function () {
-        var val = $(this).val(),
-            fbtn = $('#UploadFileButton');
-        var uploadType = $('#uploadtype').val();
-        val.endsWith('.zip') && (uploadType == "0" || uploadType == "1") ? fbtn.removeAttr("disabled") : fbtn.attr("disabled");
-    });
 
-    $('#uploadtype').on("change", function () {
-        var val = $(this).val(),
-            fbtn = $('#UploadFileButton');
-        var uploadType = $('#postedFile').val();
-        (val == "0" || val == "1") && uploadType.endsWith('.zip') ? fbtn.removeAttr("disabled") : fbtn.attr('disabled', 'disabled');
-    });
-
-
-    var table = $("#customerTable").DataTable({
+    var table = $("#customerTableAuto").DataTable({
         ajax: {
             url: '/api/Creator/GetAuto',
             dataSrc: ''
@@ -216,13 +184,13 @@
             if (rowCount > 0) {
                 $('#allocatedcase').prop('disabled', false);
             }
-            $('#customerTable tbody').on('click', '.btn-danger', function (e) {
+            $('#customerTableAuto tbody').on('click', '.btn-danger', function (e) {
                 e.preventDefault(); // Prevent the default anchor behavior
                 var id = $(this).attr('id').replace('details', ''); // Extract the ID from the button's ID attribute
                 getdetails(id); // Call the getdetails function with the ID
                 window.location.href = $(this).attr('href'); // Navigate to the delete page
             });
-            $('#customerTable tbody').on('click', '.btn-warning', function (e) {
+            $('#customerTableAuto tbody').on('click', '.btn-warning', function (e) {
                 e.preventDefault(); // Prevent the default anchor behavior
                 var id = $(this).attr('id').replace('edit', ''); // Extract the ID from the button's ID attribute
                 showedit(id); // Call the getdetails function with the ID
@@ -237,7 +205,7 @@
         error: function (xhr, status, error) { alert('err ' + error) }
     });
 
-    $('#customerTable')
+    $('#customerTableAuto')
         .on('mouseenter', '.map-thumbnail', function () {
             const $this = $(this); // Cache the current element
 
@@ -256,7 +224,7 @@
             $this.find('.full-map').hide();
         });
 
-    $('#customerTable').on('draw.dt', function () {
+    $('#customerTableAuto').on('draw.dt', function () {
         $('[data-toggle="tooltip"]').tooltip({
             animated: 'fade',
             placement: 'top',
@@ -264,8 +232,8 @@
         });
     });
 
-    $('#customerTable tbody').hide();
-    $('#customerTable tbody').fadeIn(2000);
+    $('#customerTableAuto tbody').hide();
+    $('#customerTableAuto tbody').fadeIn(2000);
 
     // Handle click on "Select all" control
     $('#checkall').on('click', function () {
@@ -276,7 +244,7 @@
     });
 
     // Handle click on checkbox to set state of "Select all" control
-    $('#customerTable tbody').on('change', 'input[type="checkbox"]', function () {
+    $('#customerTableAuto tbody').on('change', 'input[type="checkbox"]', function () {
         // If checkbox is not checked
         if (!this.checked) {
             var el = $('#checkall').get(0);
@@ -316,8 +284,8 @@
         if (!anyChecked) {
             e.preventDefault();
             $.alert({
-                title: "ASSIGN<span class='badge badge-light'>(auto)</span> !",
-                content: "Please select Claim<span class='badge badge-light'>(s)</span> to Assign<span class='badge badge-light'>(auto)</span>!",
+                title: "ASSIGN !",
+                content: "Please select Claim<span class='badge badge-light'>(s)</span> to Assign",
                 icon: 'fas fa-random fa-sync',
                 type: 'red',
                 closeIcon: true,
@@ -332,14 +300,14 @@
         else if (!askConfirmation) {
             e.preventDefault();
             $.confirm({
-                title: "Confirm Assign<span class='badge badge-light'>(auto)</span>",
-                content: "Are you sure to Assign<span class='badge badge-light'>(auto)</span> ?",
+                title: "Confirm Assign",
+                content: "Are you sure to Assign ?",
                 icon: 'fas fa-random',
                 type: 'orange',
                 closeIcon: true,
                 buttons: {
                     confirm: {
-                        text: "Assign <span class='badge badge-warning'>(auto)</span>",
+                        text: "Assign ",
                         btnClass: 'btn-warning',
                         action: function () {
                             askConfirmation = true;
@@ -351,7 +319,7 @@
                                 $(".submit-progress").removeClass("hidden");
                             }, 1);
                            
-                            $('#allocatedcase').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Assign<span class='badge badge-warning'>(auto)</span>");
+                            $('#allocatedcase').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Assign");
 
                             disableAllInteractiveElements();
 
@@ -373,7 +341,6 @@
             });
         }
     });
-    let askFileUploadConfirmation = true;
 
     $("#postedFile").on('change', function () {
         var MaxSizeInBytes = 1097152;
@@ -445,55 +412,56 @@
             );
         }
     });
-    $('#upload-claims').on('submit', function (event) {
-        if (askFileUploadConfirmation) {
-            event.preventDefault();
-            $.confirm({
-                title: "Confirm File Upload",
-                content: "Are you sure to Upload ?",
-                icon: 'fas fa-upload',
-    
-                type: 'green',
-                closeIcon: true,
-                buttons: {
-                    confirm: {
-                        text: "File Upload",
-                        btnClass: 'btn-success',
-                        action: function () {
-                            askFileUploadConfirmation = false;
-                           
-                            $("body").addClass("submit-progress-bg");
-                            // Wrap in setTimeout so the UI
-                            // can update the spinners
-                            setTimeout(function () {
-                                $(".submit-progress").removeClass("hidden");
-                            }, 1);
-                            
+    let askFileUploadConfirmation = true;
 
-                            $('#UploadFileButton').html("<i class='fas fa-sync fa-spin'></i> Uploading");
-                            disableAllInteractiveElements();
-                            $('#upload-claims').submit();
-                            
-                            var article = document.getElementById("article");
-                            if (article) {
-                                var nodes = article.getElementsByTagName('*');
-                                for (var i = 0; i < nodes.length; i++) {
-                                    nodes[i].disabled = true;
+    function handleUploadConfirmation(formId, buttonId) {
+        $(formId).on('submit', function (event) {
+            if (askFileUploadConfirmation) {
+                event.preventDefault();
+                $.confirm({
+                    title: "Confirm File Upload",
+                    content: "Are you sure to Upload?",
+                    icon: 'fas fa-upload',
+                    type: 'green',
+                    closeIcon: true,
+                    buttons: {
+                        confirm: {
+                            text: "File Upload",
+                            btnClass: 'btn-success',
+                            action: function () {
+                                askFileUploadConfirmation = false;
+
+                                $("body").addClass("submit-progress-bg");
+                                setTimeout(function () {
+                                    $(".submit-progress").removeClass("hidden");
+                                }, 1);
+
+                                $(buttonId).html("<i class='fas fa-sync fa-spin'></i> Uploading");
+                                disableAllInteractiveElements();
+                                $(formId).submit();
+
+                                var article = document.getElementById("article");
+                                if (article) {
+                                    var nodes = article.getElementsByTagName('*');
+                                    for (var i = 0; i < nodes.length; i++) {
+                                        nodes[i].disabled = true;
+                                    }
                                 }
                             }
+                        },
+                        cancel: {
+                            text: "Cancel",
+                            btnClass: 'btn-default'
                         }
-                    },
-                    cancel: {
-                        text: "Cancel",
-                        btnClass: 'btn-default'
                     }
-                }
-            });
-        }
-        
-    });
+                });
+            }
+        });
+    }
 
-    //initMap("/api/CompanyDraftClaims/GetAssignMap");
+    // Apply confirmation to both forms
+    handleUploadConfirmation("#upload-claims", "#UploadFileButton");
+    handleUploadConfirmation("#upload-claims-manual", "#UploadFileButton");
 
 });
 

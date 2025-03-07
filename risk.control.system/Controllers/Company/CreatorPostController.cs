@@ -61,6 +61,7 @@ namespace risk.control.system.Controllers.Company
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
+                var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(c => c.Email == currentUserEmail);
 
                 if (postedFile == null || model == null ||
                 string.IsNullOrWhiteSpace(Path.GetFileName(postedFile.FileName)) ||
@@ -74,7 +75,7 @@ namespace risk.control.system.Controllers.Company
                         return RedirectToAction(nameof(Index), "Dashboard");
                     }
 
-                    if (model.CREATEDBY == CREATEDBY.AUTO)
+                    if (model.CREATEDBY == CREATEDBY.AUTO || companyUser.ClientCompany.AutoAllocation)
                     {
                         return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
                     }
@@ -104,7 +105,7 @@ namespace risk.control.system.Controllers.Company
                 {
                     notifyService.Information($"{model.Uploadtype.GetEnumDisplayName()} Error. Check limit <i class='fa fa-upload' ></i>", 3);
                 }
-                if(model.CREATEDBY == CREATEDBY.AUTO)
+                if(model.CREATEDBY == CREATEDBY.AUTO || companyUser.ClientCompany.AutoAllocation)
                 {
                     return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
                 }
@@ -156,7 +157,7 @@ namespace risk.control.system.Controllers.Company
                 if (claim == null)
                 {
                     notifyService.Error("OOPs !!!..Error creating policy");
-                    if (model.CREATEDBY == CREATEDBY.AUTO)
+                    if (model.CREATEDBY == CREATEDBY.AUTO || claim.ClientCompany.AutoAllocation)
                     {
                         return RedirectToAction(nameof(CreatorAutoController.Create), "CreatorAuto");
                     }
@@ -222,7 +223,7 @@ namespace risk.control.system.Controllers.Company
                 }
                 notifyService.Custom($"Policy #{claim.PolicyDetail.ContractNumber} edited successfully", 3, "orange", "far fa-file-powerpoint");
                 
-                if (model.CREATEDBY == CREATEDBY.AUTO)
+                if (model.CREATEDBY == CREATEDBY.AUTO || claim.ClientCompany.AutoAllocation)
                 {
                     return RedirectToAction(nameof(CreatorAutoController.Details), "CreatorAuto", new { id = claim.ClaimsInvestigationId });
 
@@ -265,13 +266,13 @@ namespace risk.control.system.Controllers.Company
                     }
                 }
                 var claim = await creationService.CreateCustomer(currentUserEmail, customerDetail, profileFile);
-                if (!claim)
+                if (claim == null)
                 {
                     notifyService.Error("OOPs !!!..Error creating customer");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 notifyService.Custom($"Customer {customerDetail.Name} added successfully", 3, "green", "fas fa-user-plus");
-                if(customerDetail.CREATEDBY == CREATEDBY.AUTO)
+                if(customerDetail.CREATEDBY == CREATEDBY.AUTO || claim.AutoAllocation)
                     {
                     return RedirectToAction(nameof(CreatorAutoController.Details), "CreatorAuto", new { id = customerDetail.ClaimsInvestigationId });
                 }
@@ -314,13 +315,13 @@ namespace risk.control.system.Controllers.Company
                 }
 
                 var claim = await creationService.EditCustomer(currentUserEmail, customerDetail, profileFile);
-                if (!claim)
+                if (claim == null)
                 {
                     notifyService.Error("OOPs !!!..Error edting customer");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 notifyService.Custom($"Customer {customerDetail.Name} edited successfully", 3, "orange", "fas fa-user-plus");
-                if (customerDetail.CREATEDBY == CREATEDBY.AUTO)
+                if (customerDetail.CREATEDBY == CREATEDBY.AUTO || claim.AutoAllocation)
                 {
                     return RedirectToAction(nameof(CreatorAutoController.Details), "CreatorAuto", new { id = customerDetail.ClaimsInvestigationId });
                 }
@@ -362,14 +363,14 @@ namespace risk.control.system.Controllers.Company
                         profileFile = file;
                     }
                 }
-                var created = await creationService.CreateBeneficiary(currentUserEmail, ClaimsInvestigationId, beneficiary, profileFile);
-                if (created)
+                var company = await creationService.CreateBeneficiary(currentUserEmail, ClaimsInvestigationId, beneficiary, profileFile);
+                if (company != null)
                 {
                     notifyService.Custom($"Beneficiary {beneficiary.Name} added successfully", 3, "green", "fas fa-user-tie");
 
                 }
 
-                if(beneficiary.CREATEDBY == CREATEDBY.AUTO)
+                if(beneficiary.CREATEDBY == CREATEDBY.AUTO || company.AutoAllocation)
                 {
                     return RedirectToAction(nameof(CreatorAutoController.Details), "CreatorAuto", new { id = beneficiary.ClaimsInvestigationId });
                 }
@@ -411,13 +412,13 @@ namespace risk.control.system.Controllers.Company
                         profileFile = file;
                     }
                 }
-                var created = await creationService.EditBeneficiary(currentUserEmail, beneficiaryDetailId, beneficiary, profileFile);
-                if (created)
+                var company = await creationService.EditBeneficiary(currentUserEmail, beneficiaryDetailId, beneficiary, profileFile);
+                if (company != null)
                 {
                     notifyService.Custom($"Beneficiary {beneficiary.Name} edited successfully", 3, "orange", "fas fa-user-tie");
                 }
 
-                if (beneficiary.CREATEDBY == CREATEDBY.AUTO)
+                if (beneficiary.CREATEDBY == CREATEDBY.AUTO || company.AutoAllocation)
                 {
                     return RedirectToAction(nameof(CreatorAutoController.Details), "CreatorAuto", new { id = beneficiary.ClaimsInvestigationId });
                 }
@@ -460,7 +461,7 @@ namespace risk.control.system.Controllers.Company
                 _context.ClaimsInvestigation.Update(claimsInvestigation);
                 await _context.SaveChangesAsync();
                 notifyService.Custom("Claim deleted", 3, "red", "far fa-file-powerpoint");
-                if(model.ClaimsInvestigation.CREATEDBY == CREATEDBY.AUTO)
+                if(model.ClaimsInvestigation.CREATEDBY == CREATEDBY.AUTO || model.ClaimsInvestigation.ClientCompany.AutoAllocation)
                 {
                     return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
                 }

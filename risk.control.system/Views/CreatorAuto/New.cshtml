@@ -6,7 +6,7 @@
     <div id="article" class="card shadow-lg border-0 rounded-lg">
         <div class="card-header bg-secondary text-white text-center">
             <h3 class="card-title">
-                <i class="fas fa-random"></i> Assign<span class="badge badge-secondary">auto</span>
+                <i class="fas fa-random"></i> Assign<span class="badge badge-secondary"></span>
                 <span class="hover-text">
                     <i class="fas fa-info-circle"></i>
                     <span class="tooltip-text" id="information">
@@ -58,12 +58,12 @@
                                 </button>
                             </li>
                         }
-                         @if (Model.HasClaims)
+                        @if (Model.HasClaims)
                         {
                             <li>
                                 <i class='far fa-thumbs-up'></i>
                                 <button class="btn btn-warning btn-xs">
-                                    <span class="badge badge-warning btn-xs"> <i class="fas fa-random"></i> </span> Assign<span class="badge badge-warning">auto</span>
+                                    <span class="badge badge-warning btn-xs"> <i class="fas fa-random"></i> </span> Assign<span class="badge badge-warning"></span>
                                 </button>
                             </li>
                         }
@@ -72,7 +72,7 @@
                             <li>
                                 <i class='far fa-thumbs-up'></i>
                                 <button disabled class="btn btn-warning btn-xs">
-                                    <span class="badge badge-warning btn-xs"> <i class="fas fa-random"></i> </span> Assign<span class="badge badge-warning">auto</span>
+                                    <span class="badge badge-warning btn-xs"> <i class="fas fa-random"></i> </span> Assign<span class="badge badge-warning"></span>
                                 </button>
                             </li>
                         }
@@ -80,164 +80,159 @@
                 </span>
 
             </h3>
-            @* <h3 id="view-type" class="card-title">
-            <a href="#" id="map-type" class="input-group-label"> <i class="far fa-map"></i> Map</a>
-            <a href="#" id="list-type" class="input-group-label"> <i class="fas fa-server"></i> List</a>
-            </h3> *@
         </div>
-        <article>
-            <div class="bb-blog-inner">
-                <div class="card card-light collapsed-card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <span class="download-file badge badge-light">
-                                <a class="ziplink" href="@Url.Content($"~/headers/single-{Model.FileSampleIdentifier}.zip")">
-                                    <i class="nav-icon fa fa-download"></i>  1 claim
-                                </a>
-                            </span>
-                            <span class="download-file badge badge-light">
-                                <a class="ziplink" href="@Url.Content($"~/headers/double-{Model.FileSampleIdentifier}.zip")">
-                                    <i class="nav-icon fa fa-download"></i> 2 claims
-                                </a>
-                            </span>
-                            <span class="hover-text">
-                                <i class="fas fa-info-circle"></i>
-                                <span class="tooltip-text">
-                                    
-                                    <li>
-                                        <i class='far fa-hand-point-left'></i> <b> Download </b>  Sample File(s)
-                                    </li>
-                                    <li>
-                                    <i class='far fa-hand-point-right'></i> <b> Upload</b> Max file size 1 MB
-                                    </li>
-                                </span>
-                            </span>
-                        </h3>
-                        <div class="card-tools">
-                            <span data-toggle="tooltip" title="Click on + to Upload File"><span class="badge badge-light"><i class="fa fa-upload"></i> Upload File:</span>  <i class='far fa-hand-point-right'></i> </span>
-                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                <i class="fas fa-plus"></i>
-                            </button>
+        <!-- Tabs Navigation -->
+        <ul class="nav nav-tabs" id="assignmentTabs" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="auto-tab" data-toggle="tab" href="#autoAssign" role="tab"><i class="fas fa-random"></i> Assign <sub>auto</sub></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="manual-tab" data-toggle="tab" href="#manualAssign" role="tab"><i class="fas fa-external-link-alt"></i> Assign <sub>manual</sub></a>
+            </li>
+        </ul>
+
+        <div class="tab-content">
+            <div class="submit-progress hidden">
+                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+            </div>
+            <!-- Auto Assign Tab -->
+            <div class="tab-pane fade show active" id="autoAssign" role="tabpanel">
+                <article>
+                    <div class="bb-blog-inner">
+                        <div class="card shadow-lg border-0 rounded-lg collapsed-card">
+                            <partial name="Creator/_UploadSample" model="Model" />
+
+                            <div class="card-body">
+                                <form id="upload-claims" asp-controller="CreatorPost" asp-action="New" method="post" enctype="multipart/form-data">
+                                    <input type="hidden" asp-for="CREATEDBY" value="@CREATEDBY.AUTO" />
+                                    <partial name="Creator/_Upload" model="Model" />
+                                </form>
+
+                            </div>
                         </div>
                     </div>
+                </article>
+                <form id="checkboxes" asp-action="Assign" asp-controller="ClaimsInvestigationPost" method="post">
                     <div class="card-body">
-                        <form id="upload-claims" asp-controller="CreatorPost" asp-action="New" method="post" enctype="multipart/form-data">
-                            <input type="hidden" asp-for="CREATEDBY" value="@CREATEDBY.AUTO" />
-                            @* <input type="hidden" id="autoManual" name="autoManual" value="auto" /> *@
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <span class="input-group-label"> Upload Type:</span>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text"><i class="fa fa-file-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                            </div>
-                                            @if (Model.BulkUpload)
-                                            {
-                                                <select asp-for="Uploadtype" data-toggle="tooltip" title="Select upload type" name="uploadtype" id="uploadtype" required class="form-control remarks" asp-items="Html.GetEnumSelectList<UploadType>()">
-                                                    <option value="" title="SELECT">--- SELECT---</option>
-                                                </select>
-                                            }
-                                            else
-                                            {
-                                                <select disabled data-toggle="tooltip" title=" --- DISABLED --- " name="uploadtype" id="uploadtype" required class="form-control remarks">
-                                                    <option value="">--- DISABLED---</option>
-                                                </select>
-                                            }
-                                        </div>
-                                    </div>
-                                </div>
+                        <table id="customerTableAuto" class="table table-bordered table-hover dt-responsive nowrap w-100">
+                            <thead>
+                                <tr>
+                                    <th><input type="checkbox" name="select_all" id="checkall" value="0" data-toggle="tooltip" title="Select Claim(s) to Assign(auto)" /></th>
+                                    <th><img class="action-image" src="~/headers/policy-num.gif" data-toggle="tooltip" title="Policy Number" alt="Policy Number" /></th>
+                                    <th><img class="action-image" src="~/headers/amount.gif" data-toggle="tooltip" title="Insured Amount" alt="Insured Amount" /></th>
+                                    <th><img class="action-image" src="~/headers/pincode.gif" data-toggle="tooltip" title="Address of Interest" alt="Address of Interest" /></th>
+                                    <th><img class="action-image" src="~/headers/policy-doc.gif" data-toggle="tooltip" title="Policy Document" alt="Policy Document" /></th>
 
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <span class="input-group-label"> Perform Upload: </span>
-                                        <div class="input-group mb-3">
-                                            <img class="form-Image" id="ftpImage" src="/img/upload.png">
-                                            @if (Model.BulkUpload)
-                                            {
-                                                <input accept=".zip" type="file" class="form-control remarks" name="postedFile" id="postedFile" data-toggle="tooltip" title="Select file to upload" />
-                                                <button id="UploadFileButton" disabled type="submit" class="btn btn-info upload"><i class="nav-icon fa fa-upload"></i> Upload</button>
-                                            }
-                                            else
-                                            {
-                                                <input disabled type="file" class="form-control remarks" name="postedFile" id="postedFile" data-toggle="tooltip" title="--- DISABLED --- " />
-                                                <button disabled class="btn btn-info"><i class="nav-icon fa fa-upload"></i> Upload</button>
-                                            }
-                                        </div>
-                                    </div>
-                                </div>
+                                    <th><img class="action-image" src="~/headers/portrait.gif" data-toggle="tooltip" title="Customer Photo" alt="Customer Photo" /></th>
+                                    <th><img class="action-image" src="~/headers/customer.gif" data-toggle="tooltip" title="Customer Name" alt="Customer Name" /></th>
+                                    <th><img class="action-image" src="~/headers/portrait.gif" data-toggle="tooltip" title="Beneficiary Photo" alt="Beneficiary Photo" /></th>
+                                    <th><img class="action-image" src="~/headers/customer.gif" data-toggle="tooltip" title="Beneficiary Name" alt="Beneficiary Name" /></th>
+                                    <th><img class="action-image" src="~/headers/claim-type.gif" data-toggle="tooltip" title="Claim Type" alt="Claim Type" /></th>
+                                    <th><img class="action-image" src="~/headers/service.gif" data-toggle="tooltip" title="Service" alt="Service" /></th>
+
+                                    <th><img class="action-image" src="~/headers/status.gif" data-toggle="tooltip" title="Source" alt="Source" /></th>
+                                    <th><img class="action-image" src="~/headers/created.gif" data-toggle="tooltip" title="Created date" alt="Created Date" /></th>
+                                    <th>
+                                        <img class="action-image" src="~/headers/timer.gif" data-toggle="tooltip" title="Days since Drafted" />
+                                    </th>
+                                    <th><img class="action-image" src="~/headers/action.gif" data-toggle="tooltip" title="Action" /></th>
+
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                    <div class="card-footer">
+                        <div class="row">
+                            <div class="col-md-12">
+                                @if (@Model.UserCanCreate)
+                                {
+                                    <a class="create-policy btn btn-success" asp-action="Create"><i class="far fa-edit"></i> @Applicationsettings.CREATE New</a>
+                                }
+                                else
+                                {
+                                    <button disabled class="create-policy btn btn-success"><i class="far fa-edit"></i> @Applicationsettings.CREATE New</button>
+                                }
+
+                                <button disabled id="allocatedcase" type="submit" class="btn btn-warning">
+                                    <i class="fas fa-random"></i> Assign <span class="badge badge-warning">Auto</span>
+                                </button>
                             </div>
-                        </form>
-
+                        </div>
                     </div>
-                </div>
+                </form>
             </div>
-        </article>
 
-        <form id="checkboxes" asp-action="Assign" asp-controller="ClaimsInvestigationPost" method="post">
+            <!-- Manual Assign Tab -->
+            <div class="tab-pane fade" id="manualAssign" role="tabpanel">
+                <article>
+                    <div class="bb-blog-inner">
+                        <div class="card shadow-lg border-0 rounded-lg collapsed-card">
+                            <partial name="Creator/_UploadSample" model="Model" />
 
-            <div class="card-body ">
-                <div class="submit-progress hidden">
-                    <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
-                </div>
+                            <div class="card-body">
+                                <form id="upload-claims-manual" asp-controller="CreatorPost" asp-action="New" method="post" enctype="multipart/form-data">
+                                    <input type="hidden" asp-for="CREATEDBY" value="@CREATEDBY.MANUAL" />
+                                    <partial name="Creator/_Upload" model="Model" />
+                                </form>
 
-                <table id="customerTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
-                    <thead>
-                        <tr>
-                            <th><input type="checkbox" name="select_all" id="checkall" value="0" data-toggle="tooltip" title="Select Claim(s) to Assign(auto)" /></th>
-                            <th><img class="action-image" src="~/headers/policy-num.gif" data-toggle="tooltip" title="Policy Number" alt="Policy Number" /></th>
-                            <th><img class="action-image" src="~/headers/amount.gif" data-toggle="tooltip" title="Insured Amount" alt="Insured Amount" /></th>
-                            <th><img class="action-image" src="~/headers/pincode.gif" data-toggle="tooltip" title="Address of Interest" alt="Address of Interest" /></th>
-                            <th><img class="action-image" src="~/headers/policy-doc.gif" data-toggle="tooltip" title="Policy Document" alt="Policy Document" /></th>
-                            
-                            <th><img class="action-image" src="~/headers/portrait.gif" data-toggle="tooltip" title="Customer Photo" alt="Customer Photo" /></th>
-                            <th><img class="action-image" src="~/headers/customer.gif" data-toggle="tooltip" title="Customer Name" alt="Customer Name" /></th>
-                            <th><img class="action-image" src="~/headers/portrait.gif" data-toggle="tooltip" title="Beneficiary Photo" alt="Beneficiary Photo" /></th>
-                            <th><img class="action-image" src="~/headers/customer.gif" data-toggle="tooltip" title="Beneficiary Name" alt="Beneficiary Name" /></th>
-                            <th><img class="action-image" src="~/headers/claim-type.gif" data-toggle="tooltip" title="Claim Type" alt="Claim Type" /></th>
-                            <th><img class="action-image" src="~/headers/service.gif" data-toggle="tooltip" title="Service" alt="Service" /></th>
-
-                            <th><img class="action-image" src="~/headers/status.gif" data-toggle="tooltip" title="Source" alt="Source" /></th>
-                            <th><img class="action-image" src="~/headers/created.gif" data-toggle="tooltip" title="Created date" alt="Created Date" /></th>
-                            <th>
-                                <img class="action-image" src="~/headers/timer.gif" data-toggle="tooltip" title="Days since Drafted" />
-                            </th>
-                            <th><img class="action-image" src="~/headers/action.gif" data-toggle="tooltip" title="Action" /></th>
-
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-
-                <div id="maps" class="col-md-12">
-                    <div id="map"></div>
-
-                </div>
-            </div>
-            <div class="card-footer">
-                <div class="row">
-                    <div class="col-md-12">
-                        @if(@Model.UserCanCreate)
-                        {
-                            <a class="create-policy btn btn-success" asp-action="Create"><i class="far fa-edit"></i> @Applicationsettings.CREATE New</a>
-                        }
-                        else
-                        {
-                            <button disabled class="create-policy btn btn-success"><i class="far fa-edit"></i> @Applicationsettings.CREATE New</button>
-                        }
-                        <button disabled id="allocatedcase" type="submit" class="btn btn-warning">
-                            <span class="badge badge-warning"> <i class="fas fa-random"></i> </span> Assign<span class="badge badge-warning">auto</span>
-                        </button>
-
+                            </div>
+                        </div>
                     </div>
-                </div>
+                </article>
+                <form id="radioButtons" asp-controller="CreatorManual" asp-action="EmpanelledVendors" method="get" enctype="multipart/form-data">
+                    <div class="card-body">
+                        <table id="customerTableManual" class="table table-bordered table-hover dt-responsive nowrap w-100">
+                            <thead>
+                                <tr>
+                                    <th><img class="action-image" src="~/headers/arrow-down.gif" data-toggle="tooltip" title="Select Claim to Assign(manual)" /></th>
+                                    <th><img class="action-image" src="~/headers/policy-doc.gif" data-toggle="tooltip" title="Policy Document" alt="Policy Document" /></th>
+                                    <th><img class="action-image" src="~/headers/policy-num.gif" data-toggle="tooltip" title="Policy Number" alt="Policy Number" /></th>
+                                    <th><img class="action-image" src="~/headers/pincode.gif" data-toggle="tooltip" title="Address of Interest" alt="Address of Interest" /></th>
+
+                                    <th><img class="action-image" src="~/headers/amount.gif" data-toggle="tooltip" title="Insured Amount" alt="Insured Amount" /></th>
+                                    <th><img class="action-image" src="~/headers/portrait.gif" data-toggle="tooltip" title="Customer Photo" alt="Customer Photo" /></th>
+                                    <th><img class="action-image" src="~/headers/customer.gif" data-toggle="tooltip" title="Customer Name" alt="Customer Name" /></th>
+                                    <th><img class="action-image" src="~/headers/portrait.gif" data-toggle="tooltip" title="Beneficiary Photo" alt="Beneficiary Photo" /></th>
+                                    <th><img class="action-image" src="~/headers/customer.gif" data-toggle="tooltip" title="Beneficiary Name" alt="Beneficiary Name" /></th>
+                                    <th><img class="action-image" src="~/headers/claim-type.gif" data-toggle="tooltip" title="Claim Type" alt="Claim Type" /></th>
+                                    <th><img class="action-image" src="~/headers/service.gif" data-toggle="tooltip" title="Service" alt="Service" /></th>
+
+                                    <th><img class="action-image" src="~/headers/status.gif" data-toggle="tooltip" title="Source" alt="Source" /></th>
+                                    <th><img class="action-image" src="~/headers/created.gif" data-toggle="tooltip" title="Created date" alt="Created Date" /></th>
+                                    <th>
+                                        <img class="action-image" src="~/headers/timer.gif" data-toggle="tooltip" title="Days since Assigned" />
+                                    </th>
+                                    <th><img class="action-image" src="~/headers/action.gif" data-toggle="tooltip" title="Action" /></th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                    <div class="card-footer">
+                        <div class="row">
+                            <div class="col-md-12">
+                                @if (@Model.UserCanCreate)
+                                {
+                                    <a class="create-policy btn btn-success" asp-controller="CreatorManual" asp-action="Create"><i class="far fa-edit"></i> @Applicationsettings.CREATE New</a>
+                                }
+                                else
+                                {
+                                    <button disabled class="create-policy btn btn-success"><i class="far fa-edit"></i> @Applicationsettings.CREATE New</button>
+                                }
+
+                                <button disabled id="allocate-manual" type="submit" class="btn btn-danger">
+                                    <i class="fas fa-external-link-alt"></i> Assign <b><sub>Manual</sub></b>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
             </div>
-
-        </form>
-
-
+        </div>
     </div>
 </section>
 @section Scripts {
     <script src="~/js/creator/new.js"></script>
+    <script src="~/js/creator/new-manual.js"></script>
 }
