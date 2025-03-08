@@ -127,7 +127,7 @@
                             <div class="text-center">
                                 @if (@Model.ClaimsInvestigation.ClientCompany.AutoAllocation)
                                 {
-                                    <a id="back" asp-controller="CreatorAuto" asp-action="New" class="btn btn-outline-secondary">
+                                    <a id="back" asp-controller="CreatorAuto" asp-action="New" asp-route-mode="@CREATEDBY.MANUAL" class="btn btn-outline-secondary">
                                         <span class="badge badge-light">
                                             <i class="fas fa-arrow-left"></i>
                                         </span> Back
@@ -135,7 +135,7 @@
                                 }
                                 else
                                 {
-                                    <a id="back" asp-action="New" class="btn btn-outline-secondary">
+                                    <a id="back" asp-controller="CreatorManual" asp-action="New" class="btn btn-outline-secondary">
                                         <span class="badge badge-light">
                                             <i class="fas fa-arrow-left"></i>
                                         </span> Back
@@ -157,11 +157,22 @@
                                     <i class="far fa-hand-point-down"></i>
                                 </span>
                                 <br />
-                                <a id="back" asp-action="New" class="btn btn-outline-secondary">
-                                    <span class="badge badge-light">
-                                        <i class="fas fa-arrow-left"></i>
-                                    </span> Back
-                                </a>
+                                @if (@Model.ClaimsInvestigation.ClientCompany.AutoAllocation)
+                                {
+                                    <a id="back" asp-controller="CreatorAuto" asp-action="New" asp-route-mode="@CREATEDBY.MANUAL" class="btn btn-outline-secondary">
+                                        <span class="badge badge-light">
+                                            <i class="fas fa-arrow-left"></i>
+                                        </span> Back
+                                    </a>
+                                }
+                                else
+                                {
+                                    <a id="back" asp-controller="CreatorManual" asp-action="New" class="btn btn-outline-secondary">
+                                        <span class="badge badge-light">
+                                            <i class="fas fa-arrow-left"></i>
+                                        </span> Back
+                                    </a>
+                                }
                                 <a id="assign-manual-list" asp-action="EmpanelledVendors" asp-route-selectedcase="@Model.ClaimsInvestigation.ClaimsInvestigationId" class="btn btn-danger">
                                     <span class="badge badge-danger">
                                         <i class="fas fa-external-link-alt"></i>

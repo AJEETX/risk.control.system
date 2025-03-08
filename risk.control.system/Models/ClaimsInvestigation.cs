@@ -56,6 +56,8 @@ namespace risk.control.system.Models
         public List<ClaimNote>? ClaimNotes { get; set; } = new();
         public string? CurrentClaimOwner { get; set; }
         public List<ClaimMessage>? ClaimMessages { get; set; } = new();
+        public List<SmsNotification>? SmsNotifications { get; set; } = new();
+        public List<StatusNotification>? Notifications { get; set; } = new();
         public CREATEDBY CREATEDBY { get; set; } = CREATEDBY.MANUAL;
         public ORIGIN ORIGIN { get; set; } = ORIGIN.USER;
 

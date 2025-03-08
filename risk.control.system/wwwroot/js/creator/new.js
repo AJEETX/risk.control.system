@@ -256,7 +256,6 @@
             }
         }
     });
-    let askConfirmation = false;
     // Handle form submission event
     $('#checkboxes').on('submit', function (e) {
         var form = this;
@@ -413,6 +412,7 @@
         }
     });
     let askFileUploadConfirmation = true;
+    let askConfirmation = false;
 
     function handleUploadConfirmation(formId, buttonId) {
         $(formId).on('submit', function (event) {

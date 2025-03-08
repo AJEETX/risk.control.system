@@ -1,0 +1,79 @@
+﻿@model CreateClaims
+
+<div class="card-header bg-secondary text-white text-center">
+    <h3 class="card-title">
+        <i class="fas fa-random"></i> Assign<span class="badge badge-secondary"></span>
+        <span class="hover-text">
+            <i class="fas fa-info-circle"></i>
+            <span class="tooltip-text" id="information">
+                <li>
+                    <i class='far fa-hand-point-right'></i>
+                    @if (Model.BulkUpload)
+                    {
+                        <button class='btn btn-info  btn-xs'><i class='fa fa-upload'></i> Upload  </button>
+                    }
+
+                    else
+                    {
+                        <button disabled class='btn btn-info  btn-xs'><i class='fa fa-upload'></i> Upload  </button>
+                    }
+                </li>
+                @if (Model.HasClaims)
+                {
+                    <li>
+                        <i class='far fa-hand-point-right'></i>
+                        <button class="btn btn-warning  btn-xs">
+                            <i class="fas fa-pencil-alt"></i> Edit
+                        </button>
+                    </li>
+                    <li>
+                        <i class='far fa-hand-point-right'></i>
+                        <button class="btn btn-danger  btn-xs">
+                            <span class="badge badge-danger"> <i class="fa fa-trash"></i></span><b> Delete </b>
+                        </button>
+                    </li>
+                    <li>
+                        <i class='far fa-hand-point-right'></i> Select <span class="badge badge-light btn"> <input type='checkbox' /></span>  claim(s)
+                    </li>
+                }
+                @if (@Model.UserCanCreate)
+                {
+                    <li>
+                        <i class='far fa-hand-point-right'></i>
+                        <button class="btn btn-success  btn-xs">
+                            <span class="badge badge-success btn-xs"> <i class="far fa-edit"></i> </span>  <b> ADD NEW </b>
+                        </button>
+                    </li>
+                }
+                else
+                {
+                    <li>
+                        <i class='far fa-hand-point-right'></i>
+                        <button class="btn btn-success disabled btn-xs">
+                            <span class="disabled badge badge-success btn-xs"> <i class="far fa-edit"></i> </span>  <b> ADD NEW </b>
+                        </button>
+                    </li>
+                }
+                @if (Model.HasClaims)
+                {
+                    <li>
+                        <i class='far fa-thumbs-up'></i>
+                        <button class="btn btn-warning btn-xs">
+                            <span class="badge badge-warning btn-xs"> <i class="fas fa-random"></i> </span> Assign<span class="badge badge-warning"></span>
+                        </button>
+                    </li>
+                }
+                else
+                {
+                    <li>
+                        <i class='far fa-thumbs-up'></i>
+                        <button disabled class="btn btn-warning btn-xs">
+                            <span class="badge badge-warning btn-xs"> <i class="fas fa-random"></i> </span> Assign<span class="badge badge-warning"></span>
+                        </button>
+                    </li>
+                }
+            </span>
+        </span>
+
+    </h3>
+</div>

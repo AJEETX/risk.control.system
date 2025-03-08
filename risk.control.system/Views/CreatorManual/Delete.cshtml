@@ -15,7 +15,7 @@
                         <input type="hidden" asp-for="ClaimsInvestigation.CREATEDBY" value="@CREATEDBY.MANUAL" />
                         @if(Model.ClaimsInvestigation.ClientCompany.AutoAllocation)
                             {
-                                <a id="back" asp-controller="CreatorAuto" asp-action="New" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
+                                <a id="back" asp-controller="CreatorAuto" asp-action="New" asp-route-mode="manual" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
                             }
                             else
                             {

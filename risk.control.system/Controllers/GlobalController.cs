@@ -3,11 +3,13 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.FeatureManagement;
 
 using NToastNotify;
 
 using risk.control.system.Data;
 using risk.control.system.Models;
+using risk.control.system.Models.ViewModel;
 
 using SmartBreadcrumbs.Attributes;
 
@@ -21,11 +23,13 @@ namespace risk.control.system.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly INotyfService notifyService;
+        private readonly IFeatureManager manager;
 
-        public GlobalController(ApplicationDbContext context, INotyfService notifyService)
+        public GlobalController(ApplicationDbContext context, INotyfService notifyService, IFeatureManager manager)
         {
             _context = context;
             this.notifyService = notifyService;
+            this.manager = manager;
         }
 
         // GET: RiskCaseStatus
@@ -52,14 +56,14 @@ namespace risk.control.system.Controllers
                 notifyService.Error("Global-settings not found!");
                 return NotFound();
             }
-
+            manager.IsEnabledAsync(nameof(FeatureFlags.SMS4ADMIN));
             if (ModelState.IsValid)
             {
                 try
                 {
                     var globalSettings =await _context.GlobalSettings.FirstOrDefaultAsync(x => x.GlobalSettingsId == id);
                     globalSettings.EnableMailbox = settings.EnableMailbox;
-                    globalSettings.SendSMS = settings.SendSMS;
+                    globalSettings.SendSMS = await manager.IsEnabledAsync(nameof(FeatureFlags.SMS4ADMIN));
                     globalSettings.CanChangePassword = settings.CanChangePassword;
                     globalSettings.ShowTimer = settings.ShowTimer;
                     globalSettings.ShowDetailFooter = settings.ShowDetailFooter;

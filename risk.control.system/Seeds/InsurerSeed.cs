@@ -70,6 +70,8 @@ namespace risk.control.system.Seeds
                 ExpiryDate = DateTime.Now.AddDays(5),
                 EmpanelledVendors = vendors,
                 Status = CompanyStatus.ACTIVE,
+                AutoAllocation = globalSettings.AutoAllocation,
+                BulkUpload = globalSettings.BulkUpload,
                 EnableMailbox = globalSettings.EnableMailbox,
                 MobileAppUrl = globalSettings.MobileAppUrl,
                 VerifyPan = globalSettings.VerifyPan,

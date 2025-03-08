@@ -75,9 +75,16 @@ namespace risk.control.system.Controllers.Company
                         return RedirectToAction(nameof(Index), "Dashboard");
                     }
 
-                    if (model.CREATEDBY == CREATEDBY.AUTO || companyUser.ClientCompany.AutoAllocation)
+                    if (companyUser.ClientCompany.AutoAllocation)
                     {
-                        return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
+                        if(model.CREATEDBY == CREATEDBY.MANUAL)
+                        {
+                            return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto", new { mode = CREATEDBY.MANUAL });
+                        }
+                        else
+                        {
+                            return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto", new { mode = CREATEDBY.AUTO });
+                        }
                     }
                     else
                     {
@@ -105,9 +112,16 @@ namespace risk.control.system.Controllers.Company
                 {
                     notifyService.Information($"{model.Uploadtype.GetEnumDisplayName()} Error. Check limit <i class='fa fa-upload' ></i>", 3);
                 }
-                if(model.CREATEDBY == CREATEDBY.AUTO || companyUser.ClientCompany.AutoAllocation)
+                if(companyUser.ClientCompany.AutoAllocation)
                 {
-                    return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
+                    if (model.CREATEDBY == CREATEDBY.MANUAL)
+                    {
+                        return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto", new { mode = CREATEDBY.MANUAL });
+                    }
+                    else
+                    {
+                        return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto", new { mode = CREATEDBY.AUTO });
+                    }
                 }
                 else
                 {
@@ -136,29 +150,34 @@ namespace risk.control.system.Controllers.Company
                     notifyService.Error("OOPs !!!..Claim Not Found");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                IFormFile documentFile = null;
-                IFormFile profileFile = null;
                 var files = Request.Form?.Files;
 
-                if (files != null && files.Count > 0)
+                if (files == null || files.Count == 0)
                 {
-                    var file = files.FirstOrDefault(f => f.FileName == model.PolicyDetail?.Document?.FileName && f.Name == model.PolicyDetail?.Document?.Name);
-                    if (file != null && file.Length > 2000000)
-                    {
-                        notifyService.Warning("Uploaded File size morer than 2MB !!! ");
-                        return RedirectToAction(nameof(CreatorAutoController.Create), "CreatorAuto", new { model });
-                    }
-                    if (file != null)
-                    {
-                        documentFile = file;
-                    }
+                    notifyService.Warning("Uploaded Error !!! ");
+                    return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var claim = await creationService.CreatePolicy(currentUserEmail, model, documentFile);
+                var file = files.FirstOrDefault(f => f.FileName == model.PolicyDetail?.Document?.FileName && f.Name == model.PolicyDetail?.Document?.Name);
+                if (file == null)
+                {
+                    notifyService.Warning("Uploaded Error !!! ");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+
+                var claim = await creationService.CreatePolicy(currentUserEmail, model, file);
                 if (claim == null)
                 {
                     notifyService.Error("OOPs !!!..Error creating policy");
-                    if (model.CREATEDBY == CREATEDBY.AUTO || claim.ClientCompany.AutoAllocation)
+                    if (claim.ClientCompany.AutoAllocation)
                     {
+                        if (model.CREATEDBY == CREATEDBY.MANUAL)
+                        {
+                            ViewBag.ActiveTab = CREATEDBY.MANUAL;
+                        }
+                        else
+                        {
+                            ViewBag.ActiveTab = CREATEDBY.AUTO;
+                        }
                         return RedirectToAction(nameof(CreatorAutoController.Create), "CreatorAuto");
                     }
                     else
@@ -171,9 +190,16 @@ namespace risk.control.system.Controllers.Company
                     notifyService.Custom($"Policy #{claim.PolicyDetail.ContractNumber} created successfully", 3, "green", "far fa-file-powerpoint");
                 }
 
-                if (model.CREATEDBY == CREATEDBY.AUTO)
+                if (claim.ClientCompany.AutoAllocation)
                 {
-                    return RedirectToAction(nameof(CreatorAutoController.Details), "CreatorAuto", new { id = claim.ClaimsInvestigationId });
+                    if (model.CREATEDBY == CREATEDBY.MANUAL)
+                    {
+                        return RedirectToAction(nameof(CreatorManualController.Details), "CreatorManual", new { id = claim.ClaimsInvestigationId });
+                    }
+                    else
+                    {
+                        return RedirectToAction(nameof(CreatorAutoController.Details), "CreatorAuto", new { id = claim.ClaimsInvestigationId });
+                    }
                 }
                 else
                 {
@@ -202,20 +228,22 @@ namespace risk.control.system.Controllers.Company
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                IFormFile documentFile = null;
-                IFormFile profileFile = null;
                 var files = Request.Form?.Files;
 
-                if (files != null && files.Count > 0)
+                if (files == null || files.Count == 0)
                 {
-                    var file = files.FirstOrDefault(f => f.FileName == model.PolicyDetail?.Document?.FileName && f.Name == model.PolicyDetail?.Document?.Name);
-                    if (file != null)
-                    {
-                        documentFile = file;
-                    }
+                    notifyService.Warning("Uploaded Error !!! ");
+                    return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                var claim = await creationService.EdiPolicy(currentUserEmail, model, documentFile);
+                var file = files.FirstOrDefault(f => f.FileName == model.PolicyDetail?.Document?.FileName && f.Name == model.PolicyDetail?.Document?.Name);
+                if (file == null)
+                {
+                    notifyService.Warning("Uploaded Error !!! ");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+
+                var claim = await creationService.EdiPolicy(currentUserEmail, model, file);
                 if (claim == null)
                 {
                     notifyService.Error("OOPs !!!..Error editing policy");
@@ -223,9 +251,17 @@ namespace risk.control.system.Controllers.Company
                 }
                 notifyService.Custom($"Policy #{claim.PolicyDetail.ContractNumber} edited successfully", 3, "orange", "far fa-file-powerpoint");
                 
-                if (model.CREATEDBY == CREATEDBY.AUTO || claim.ClientCompany.AutoAllocation)
+                if (claim.ClientCompany.AutoAllocation)
                 {
-                    return RedirectToAction(nameof(CreatorAutoController.Details), "CreatorAuto", new { id = claim.ClaimsInvestigationId });
+                    if (model.CREATEDBY == CREATEDBY.MANUAL)
+                    {
+                        ViewBag.ActiveTab = "manual";
+                        return RedirectToAction(nameof(CreatorManualController.Details), "CreatorManual", new { id = claim.ClaimsInvestigationId });
+                    }
+                    else
+                    {
+                        return RedirectToAction(nameof(CreatorAutoController.Details), "CreatorAuto", new { id = claim.ClaimsInvestigationId });
+                    }
 
                 }
                 else
@@ -255,26 +291,35 @@ namespace risk.control.system.Controllers.Company
                 }
 
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                IFormFile profileFile = null;
                 var files = Request.Form?.Files;
-                if (files != null && files.Count > 0)
+                if (files == null || files.Count == 0)
                 {
-                    var file = files.FirstOrDefault(f => f.FileName == customerDetail?.ProfileImage?.FileName && f.Name == customerDetail?.ProfileImage?.Name);
-                    if (file != null)
-                    {
-                        profileFile = file;
-                    }
+                    notifyService.Warning("Uploaded Error !!! ");
+                    return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var claim = await creationService.CreateCustomer(currentUserEmail, customerDetail, profileFile);
-                if (claim == null)
+                var file = files.FirstOrDefault(f => f.FileName == customerDetail?.ProfileImage?.FileName && f.Name == customerDetail?.ProfileImage?.Name);
+                if (file == null)
+                {
+                    notifyService.Warning("Uploaded Error !!! ");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var company = await creationService.CreateCustomer(currentUserEmail, customerDetail, file);
+                if (company == null)
                 {
                     notifyService.Error("OOPs !!!..Error creating customer");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 notifyService.Custom($"Customer {customerDetail.Name} added successfully", 3, "green", "fas fa-user-plus");
-                if(customerDetail.CREATEDBY == CREATEDBY.AUTO || claim.AutoAllocation)
+                if(company.AutoAllocation)
+                {
+                    if (customerDetail.CREATEDBY == CREATEDBY.MANUAL)
                     {
-                    return RedirectToAction(nameof(CreatorAutoController.Details), "CreatorAuto", new { id = customerDetail.ClaimsInvestigationId });
+                        return RedirectToAction(nameof(CreatorManualController.Details), "CreatorManual", new { id = customerDetail.ClaimsInvestigationId });
+                    }
+                    else
+                    {
+                        return RedirectToAction(nameof(CreatorAutoController.Details), "CreatorAuto", new { id = customerDetail.ClaimsInvestigationId });
+                    }
                 }
                 else
                 {
@@ -302,28 +347,36 @@ namespace risk.control.system.Controllers.Company
                     return RedirectToAction(nameof(CreatorAutoController.Details), "CreatorAuto", new { id = customerDetail.ClaimsInvestigationId });
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                IFormFile profileFile = null;
                 var files = Request.Form?.Files;
-
-                if (files != null && files.Count > 0)
+                if (files == null || files.Count == 0)
                 {
-                    var file = files.FirstOrDefault(f => f.FileName == customerDetail?.ProfileImage?.FileName && f.Name == customerDetail?.ProfileImage?.Name);
-                    if (file != null)
-                    {
-                        profileFile = file;
-                    }
+                    notifyService.Warning("Uploaded Error !!! ");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var file = files.FirstOrDefault(f => f.FileName == customerDetail?.ProfileImage?.FileName && f.Name == customerDetail?.ProfileImage?.Name);
+                if (file == null)
+                {
+                    notifyService.Warning("Uploaded Error !!! ");
+                    return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                var claim = await creationService.EditCustomer(currentUserEmail, customerDetail, profileFile);
-                if (claim == null)
+                var company = await creationService.EditCustomer(currentUserEmail, customerDetail, file);
+                if (company == null)
                 {
                     notifyService.Error("OOPs !!!..Error edting customer");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 notifyService.Custom($"Customer {customerDetail.Name} edited successfully", 3, "orange", "fas fa-user-plus");
-                if (customerDetail.CREATEDBY == CREATEDBY.AUTO || claim.AutoAllocation)
+                if ( company.AutoAllocation)
                 {
-                    return RedirectToAction(nameof(CreatorAutoController.Details), "CreatorAuto", new { id = customerDetail.ClaimsInvestigationId });
+                    if (customerDetail.CREATEDBY == CREATEDBY.MANUAL)
+                    {
+                        return RedirectToAction(nameof(CreatorManualController.Details), "CreatorManual", new { id = customerDetail.ClaimsInvestigationId });
+                    }
+                    else
+                    {
+                        return RedirectToAction(nameof(CreatorAutoController.Details), "CreatorAuto", new { id = customerDetail.ClaimsInvestigationId });
+                    }
                 }
                 else
                 {
@@ -352,27 +405,36 @@ namespace risk.control.system.Controllers.Company
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
-                IFormFile profileFile = null;
                 var files = Request.Form?.Files;
-
-                if (files != null && files.Count > 0)
+                if (files == null || files.Count == 0)
                 {
-                    var file = files.FirstOrDefault(f => f.FileName == beneficiary?.ProfileImage?.FileName && f.Name == beneficiary?.ProfileImage?.Name);
-                    if (file != null)
-                    {
-                        profileFile = file;
-                    }
+                    notifyService.Warning("Uploaded Error !!! ");
+                    return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var company = await creationService.CreateBeneficiary(currentUserEmail, ClaimsInvestigationId, beneficiary, profileFile);
+
+                var file = files.FirstOrDefault(f => f.FileName == beneficiary?.ProfileImage?.FileName && f.Name == beneficiary?.ProfileImage?.Name);
+                if (file == null)
+                {
+                    notifyService.Warning("Uploaded Error !!! ");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var company = await creationService.CreateBeneficiary(currentUserEmail, ClaimsInvestigationId, beneficiary, file);
                 if (company != null)
                 {
                     notifyService.Custom($"Beneficiary {beneficiary.Name} added successfully", 3, "green", "fas fa-user-tie");
 
                 }
 
-                if(beneficiary.CREATEDBY == CREATEDBY.AUTO || company.AutoAllocation)
+                if(company.AutoAllocation)
                 {
-                    return RedirectToAction(nameof(CreatorAutoController.Details), "CreatorAuto", new { id = beneficiary.ClaimsInvestigationId });
+                    if (beneficiary.CREATEDBY == CREATEDBY.MANUAL)
+                    {
+                        return RedirectToAction(nameof(CreatorManualController.Details), "CreatorManual", new { id = beneficiary.ClaimsInvestigationId });
+                    }
+                    else
+                    {
+                        return RedirectToAction(nameof(CreatorAutoController.Details), "CreatorAuto", new { id = beneficiary.ClaimsInvestigationId });
+                    }
                 }
                 else
                 {
@@ -401,26 +463,36 @@ namespace risk.control.system.Controllers.Company
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
-                IFormFile profileFile = null;
                 var files = Request.Form?.Files;
-
-                if (files != null && files.Count > 0)
+                if (files == null || files.Count == 0)
                 {
-                    var file = files.FirstOrDefault(f => f.FileName == beneficiary?.ProfileImage?.FileName && f.Name == beneficiary?.ProfileImage?.Name);
-                    if (file != null)
-                    {
-                        profileFile = file;
-                    }
+                    notifyService.Warning("Uploaded Error !!! ");
+                    return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var company = await creationService.EditBeneficiary(currentUserEmail, beneficiaryDetailId, beneficiary, profileFile);
+
+                var file = files.FirstOrDefault(f => f.FileName == beneficiary?.ProfileImage?.FileName && f.Name == beneficiary?.ProfileImage?.Name);
+                if (file == null)
+                {
+                    notifyService.Warning("Uploaded Error !!! ");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                
+                var company = await creationService.EditBeneficiary(currentUserEmail, beneficiaryDetailId, beneficiary, file);
                 if (company != null)
                 {
                     notifyService.Custom($"Beneficiary {beneficiary.Name} edited successfully", 3, "orange", "fas fa-user-tie");
                 }
 
-                if (beneficiary.CREATEDBY == CREATEDBY.AUTO || company.AutoAllocation)
+                if (company.AutoAllocation)
                 {
-                    return RedirectToAction(nameof(CreatorAutoController.Details), "CreatorAuto", new { id = beneficiary.ClaimsInvestigationId });
+                    if (beneficiary.CREATEDBY == CREATEDBY.MANUAL)
+                    {
+                        return RedirectToAction(nameof(CreatorManualController.Details), "CreatorManual", new { id = beneficiary.ClaimsInvestigationId });
+                    }
+                    else
+                    {
+                        return RedirectToAction(nameof(CreatorAutoController.Details), "CreatorAuto", new { id = beneficiary.ClaimsInvestigationId });
+                    }
                 }
                 else
                 {
@@ -442,7 +514,8 @@ namespace risk.control.system.Controllers.Company
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                
+                var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(c => c.Email == currentUserEmail);
+
                 if (model is null)
                 {
                     notifyService.Error("Not Found!!!..Contact Admin");
@@ -461,9 +534,17 @@ namespace risk.control.system.Controllers.Company
                 _context.ClaimsInvestigation.Update(claimsInvestigation);
                 await _context.SaveChangesAsync();
                 notifyService.Custom("Claim deleted", 3, "red", "far fa-file-powerpoint");
-                if(model.ClaimsInvestigation.CREATEDBY == CREATEDBY.AUTO || model.ClaimsInvestigation.ClientCompany.AutoAllocation)
+                if(companyUser.ClientCompany.AutoAllocation)
                 {
-                    return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
+                    if (model.ClaimsInvestigation.CREATEDBY == CREATEDBY.MANUAL)
+                    {
+                        ViewBag.ActiveTab = CREATEDBY.MANUAL;
+                    }
+                    else
+                    {
+                        ViewBag.ActiveTab = CREATEDBY.AUTO;
+                    }
+                    return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto", new {mode = ViewBag.ActiveTab });
                 }
                 else
                 {

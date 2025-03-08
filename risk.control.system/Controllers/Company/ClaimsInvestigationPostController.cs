@@ -68,7 +68,7 @@ namespace risk.control.system.Controllers.Company
                     notifyService.Error("OOPs !!!..Unauthenticated Access");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var companyUser = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(u => u.Email == currentUserEmail);
+                var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == currentUserEmail);
 
                 var company = _context.ClientCompany
                     .Include(c => c.EmpanelledVendors)
@@ -77,7 +77,7 @@ namespace risk.control.system.Controllers.Company
                     .Include(c => c.EmpanelledVendors.Where(v => v.Status == VendorStatus.ACTIVE && !v.Deleted))
                     .ThenInclude(e => e.VendorInvestigationServiceTypes)
                     .ThenInclude(v => v.District)
-                    .FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompany.ClientCompanyId);
+                    .FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
 
                 //IF AUTO ALLOCATION TRUE
                 if (company.AutoAllocation)
@@ -87,8 +87,6 @@ namespace risk.control.system.Controllers.Company
                     if (claims.Count == autoAllocatedClaims.Count)
                     {
                         notifyService.Custom($"{autoAllocatedClaims.Count}/{claims.Count} claim(s) auto-assigned", 3, "green", "far fa-file-powerpoint");
-                        return RedirectToAction(nameof(ClaimsActiveController.Active), "ClaimsActive");
-
                     }
 
                     else if (claims.Count > autoAllocatedClaims.Count)
@@ -105,12 +103,7 @@ namespace risk.control.system.Controllers.Company
                         await mailboxService.NotifyClaimAssignmentToAssigner(HttpContext.User.Identity.Name, notAutoAllocated);
 
                         notifyService.Custom($"{notAutoAllocated.Count}/{claims.Count} claim(s) need assign manually", 3, "orange", "far fa-file-powerpoint");
-                        if(company.AutoAllocation)
-                        {
-                            return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
-                        }
-                        return RedirectToAction(nameof(CreatorManualController.New), "CreatorManual");
-
+                        return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto", new { mode = "manual" });
                     }
                 }
                 else
@@ -145,11 +138,6 @@ namespace risk.control.system.Controllers.Company
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (currentUserEmail == null)
-                {
-                    notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
 
                 var policy = await claimsInvestigationService.AllocateToVendor(currentUserEmail, claimId, selectedcase, false);
 
@@ -178,11 +166,7 @@ namespace risk.control.system.Controllers.Company
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (currentUserEmail == null)
-                {
-                    notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
+                
                 if (model == null || string.IsNullOrWhiteSpace(claimId))
                 {
                     notifyService.Error("OOPs !!!..Contact Admin");
@@ -217,11 +201,6 @@ namespace risk.control.system.Controllers.Company
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (string.IsNullOrWhiteSpace(currentUserEmail))
-                {
-                    notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
 
                 AssessorRemarkType reportUpdateStatus = (AssessorRemarkType)Enum.Parse(typeof(AssessorRemarkType), assessorRemarkType, true);
 
@@ -266,12 +245,7 @@ namespace risk.control.system.Controllers.Company
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (string.IsNullOrWhiteSpace(currentUserEmail))
-                {
-                    notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-
+                
                 var reportUpdateStatus = AssessorRemarkType.REVIEW;
 
                 var (company, contract) = await claimsInvestigationService.ProcessCaseReport(currentUserEmail, assessorRemarks, claimId, reportUpdateStatus, reportAiSummary);
@@ -300,11 +274,6 @@ namespace risk.control.system.Controllers.Company
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (string.IsNullOrWhiteSpace(currentUserEmail))
-                {
-                    notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
                 
                 request.AgencyReport.EnquiryRequest.Description = HttpUtility.HtmlEncode(request.AgencyReport.EnquiryRequest.Description);
 
@@ -339,11 +308,6 @@ namespace risk.control.system.Controllers.Company
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (string.IsNullOrWhiteSpace(currentUserEmail))
-                {
-                    notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
 
                 var model = await claimsInvestigationService.SubmitNotes(currentUserEmail, claimId, name);
                 if (model)
