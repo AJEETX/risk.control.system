@@ -2314,3 +2314,7 @@ input#checkall {
 .nav-tabs {
     border-bottom: 2px solid lightgrey;
 }
+
+.isNewAssigned {
+    background-color: #FCFCC4;
+}

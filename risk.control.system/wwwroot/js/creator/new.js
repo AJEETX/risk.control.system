@@ -184,6 +184,9 @@
             if (rowCount > 0) {
                 $('#allocatedcase').prop('disabled', false);
             }
+            else {
+                $('#allocatedcase').prop('disabled', true);
+            }
             $('#customerTableAuto tbody').on('click', '.btn-danger', function (e) {
                 e.preventDefault(); // Prevent the default anchor behavior
                 var id = $(this).attr('id').replace('details', ''); // Extract the ID from the button's ID attribute
@@ -199,7 +202,7 @@
         },
         "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
             if (aData.isNewAssigned) {
-                $('td', nRow).css('background-color', '#FCFCC4');
+                $('td', nRow).addClass('isNewAssigned');
             }
         },
         error: function (xhr, status, error) { alert('err ' + error) }
@@ -284,13 +287,13 @@
             e.preventDefault();
             $.alert({
                 title: "ASSIGN !",
-                content: "Please select Claim<span class='badge badge-light'>(s)</span> to Assign",
+                content: "Please select Case<span class='badge badge-light'>(s)</span> to Assign",
                 icon: 'fas fa-random fa-sync',
                 type: 'red',
                 closeIcon: true,
                 buttons: {
                     cancel: {
-                        text: "SELECT Claim<span class='badge badge-danger'>(s)</span>",
+                        text: "SELECT Case<span class='badge badge-danger'>(s)</span>",
                         btnClass: 'btn-danger'
                     }
                 }

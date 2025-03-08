@@ -193,7 +193,7 @@
         },
         "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
             if (aData.isNewAssigned) {
-                $('td', nRow).css('background-color', '#ffa');
+                $('td', nRow).addClass('isNewAssigned');
             }
         },
         error: function (xhr, status, error) { alert('err ' + error) }
