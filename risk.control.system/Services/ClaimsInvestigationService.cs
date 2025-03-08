@@ -67,6 +67,7 @@ namespace risk.control.system.Services
             foreach (var claim in claims)
             {
                 string pinCode2Verify = string.Empty;
+                
                 //1. GET THE PINCODE FOR EACH CLAIM
                 var claimsInvestigation = _context.ClaimsInvestigation
                     .Include(c => c.PolicyDetail)
@@ -84,10 +85,10 @@ namespace risk.control.system.Services
                 {
                     pinCode2Verify = claimsInvestigation.BeneficiaryDetail.PinCode?.Code;
                 }
-
+                var pincodeDistrictState = _context.PinCode.Include(d => d.District).Include(s => s.State).FirstOrDefault(p => p.Code == pinCode2Verify);
                 var vendorsInPincode = new List<Vendor>();
 
-                //2. GET THE VENDORID FOR EACH CLAIM BASED ON PINCODE
+                //2. GET THE VENDORID FOR EACH CASE BASED ON PINCODE
                 foreach (var empanelledVendor in company.EmpanelledVendors)
                 {
                     foreach (var serviceType in empanelledVendor.VendorInvestigationServiceTypes)
@@ -102,6 +103,16 @@ namespace risk.control.system.Services
                                     vendorsInPincode.Add(empanelledVendor);
                                     continue;
                                 }
+                                if (pincodeService.Pincode == ALL_PINCODE && serviceType.StateId == pincodeDistrictState.StateId && serviceType.DistrictId == null)
+                                {
+                                    vendorsInPincode.Add(empanelledVendor);
+                                    continue;
+                                }
+                                if (pincodeService.Pincode == ALL_PINCODE && serviceType.StateId == pincodeDistrictState.StateId && serviceType.DistrictId == pincodeDistrictState.DistrictId)
+                                {
+                                    vendorsInPincode.Add(empanelledVendor);
+                                    continue;
+                                }
                             }
                         }
                         var added = vendorsInPincode.Any(v => v.VendorId == empanelledVendor.VendorId);
@@ -112,62 +123,9 @@ namespace risk.control.system.Services
                     }
                 }
 
-                if (vendorsInPincode.Count == 0)
-                {
-                    foreach (var empanelledVendor in company.EmpanelledVendors)
-                    {
-                        foreach (var serviceType in empanelledVendor.VendorInvestigationServiceTypes)
-                        {
-                            if (serviceType.InvestigationServiceTypeId == claimsInvestigation.PolicyDetail.InvestigationServiceTypeId &&
-                                    serviceType.LineOfBusinessId == claimsInvestigation.PolicyDetail.LineOfBusinessId)
-                            {
-                                foreach (var pincodeService in serviceType.PincodeServices)
-                                {
-                                    if (pincodeService.Pincode.StartsWith(pinCode2Verify.Substring(0, pinCode2Verify.Length - 2)))
-                                    {
-                                        vendorsInPincode.Add(empanelledVendor);
-                                        continue;
-                                    }
-                                }
-                            }
-                            var added = vendorsInPincode.Any(v => v.VendorId == empanelledVendor.VendorId);
-                            if (added)
-                            {
-                                continue;
-                            }
-                        }
-                    }
-                }
-
-                if (vendorsInPincode.Count == 0)
-                {
-                    foreach (var empanelledVendor in company.EmpanelledVendors)
-                    {
-                        foreach (var serviceType in empanelledVendor.VendorInvestigationServiceTypes)
-                        {
-                            if (serviceType.InvestigationServiceTypeId == claimsInvestigation.PolicyDetail.InvestigationServiceTypeId &&
-                                    serviceType.LineOfBusinessId == claimsInvestigation.PolicyDetail.LineOfBusinessId)
-                            {
-                                var pincode = _context.PinCode.Include(p => p.District).FirstOrDefault(p => p.Code == pinCode2Verify);
-
-                                if (serviceType.District?.DistrictId == pincode.District.DistrictId)
-                                {
-                                    vendorsInPincode.Add(empanelledVendor);
-                                    continue;
-                                }
-                            }
-                            var added = vendorsInPincode.Any(v => v.VendorId == empanelledVendor.VendorId);
-                            if (added)
-                            {
-                                continue;
-                            }
-                        }
-                    }
-                }
-
                 var distinctVendors = vendorsInPincode.Distinct()?.ToList();
 
-                //3. CALL SERVICE WITH VENDORID
+                //3. CALL SERVICE WITH VENDOR_ID
                 if (vendorsInPincode is not null && vendorsInPincode.Count > 0)
                 {
                     var vendorsWithCaseLoad = GetAgencyLoad(distinctVendors).OrderBy(o => o.CaseCount)?.ToList();
@@ -383,6 +341,7 @@ namespace risk.control.system.Services
             }
             return company;
         }
+
         public async Task<Vendor> WithdrawCase(string userEmail, ClaimTransactionModel model, string claimId)
         {
             var currentUser = _context.VendorApplicationUser.Include(u => u.Vendor).FirstOrDefault(u => u.Email == userEmail);
@@ -816,6 +775,7 @@ namespace risk.control.system.Services
             }
             return (null!, string.Empty);
         }
+        
         private async Task<(ClientCompany, string)> ApproveCaseReport(string userEmail, string assessorRemarks, string claimsInvestigationId, AssessorRemarkType assessorRemarkType, string reportAiSummary)
         {
             var approved = _context.InvestigationCaseSubStatus

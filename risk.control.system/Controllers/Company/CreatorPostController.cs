@@ -150,21 +150,23 @@ namespace risk.control.system.Controllers.Company
                     notifyService.Error("OOPs !!!..Claim Not Found");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
+                IFormFile documentFile = null;
                 var files = Request.Form?.Files;
 
-                if (files == null || files.Count == 0)
+                if (files != null && files.Count > 0)
                 {
-                    notifyService.Warning("Uploaded Error !!! ");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    var file = files.FirstOrDefault(f => f.FileName == model.PolicyDetail?.Document?.FileName && f.Name == model.PolicyDetail?.Document?.Name);
+                    if (file != null && file.Length > 2000000)
+                    {
+                        notifyService.Warning("Uploaded File size morer than 2MB !!! ");
+                        return RedirectToAction(nameof(CreatorAutoController.Create), "CreatorAuto", new { model });
+                    }
+                    if (file != null)
+                    {
+                        documentFile = file;
+                    }
                 }
-                var file = files.FirstOrDefault(f => f.FileName == model.PolicyDetail?.Document?.FileName && f.Name == model.PolicyDetail?.Document?.Name);
-                if (file == null)
-                {
-                    notifyService.Warning("Uploaded Error !!! ");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-
-                var claim = await creationService.CreatePolicy(currentUserEmail, model, file);
+                var claim = await creationService.CreatePolicy(currentUserEmail, model, documentFile);
                 if (claim == null)
                 {
                     notifyService.Error("OOPs !!!..Error creating policy");
@@ -227,23 +229,20 @@ namespace risk.control.system.Controllers.Company
                     notifyService.Error("OOPs !!!..Claim Not found");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-
+                IFormFile documentFile = null;
+                IFormFile profileFile = null;
                 var files = Request.Form?.Files;
 
-                if (files == null || files.Count == 0)
+                if (files != null && files.Count > 0)
                 {
-                    notifyService.Warning("Uploaded Error !!! ");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    var file = files.FirstOrDefault(f => f.FileName == model.PolicyDetail?.Document?.FileName && f.Name == model.PolicyDetail?.Document?.Name);
+                    if (file != null)
+                    {
+                        documentFile = file;
+                    }
                 }
 
-                var file = files.FirstOrDefault(f => f.FileName == model.PolicyDetail?.Document?.FileName && f.Name == model.PolicyDetail?.Document?.Name);
-                if (file == null)
-                {
-                    notifyService.Warning("Uploaded Error !!! ");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-
-                var claim = await creationService.EdiPolicy(currentUserEmail, model, file);
+                var claim = await creationService.EdiPolicy(currentUserEmail, model, documentFile);
                 if (claim == null)
                 {
                     notifyService.Error("OOPs !!!..Error editing policy");
@@ -294,13 +293,13 @@ namespace risk.control.system.Controllers.Company
                 var files = Request.Form?.Files;
                 if (files == null || files.Count == 0)
                 {
-                    notifyService.Warning("Uploaded Error !!! ");
+                    notifyService.Warning("Image Uploaded Error !!! ");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var file = files.FirstOrDefault(f => f.FileName == customerDetail?.ProfileImage?.FileName && f.Name == customerDetail?.ProfileImage?.Name);
                 if (file == null)
                 {
-                    notifyService.Warning("Uploaded Error !!! ");
+                    notifyService.Warning("Image Uploaded Error !!! ");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var company = await creationService.CreateCustomer(currentUserEmail, customerDetail, file);
@@ -347,20 +346,18 @@ namespace risk.control.system.Controllers.Company
                     return RedirectToAction(nameof(CreatorAutoController.Details), "CreatorAuto", new { id = customerDetail.ClaimsInvestigationId });
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
+                IFormFile profileFile = null;
                 var files = Request.Form?.Files;
-                if (files == null || files.Count == 0)
+                if (files != null && files.Count > 0)
                 {
-                    notifyService.Warning("Uploaded Error !!! ");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-                var file = files.FirstOrDefault(f => f.FileName == customerDetail?.ProfileImage?.FileName && f.Name == customerDetail?.ProfileImage?.Name);
-                if (file == null)
-                {
-                    notifyService.Warning("Uploaded Error !!! ");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    var file = files.FirstOrDefault(f => f.FileName == customerDetail?.ProfileImage?.FileName && f.Name == customerDetail?.ProfileImage?.Name);
+                    if (file != null)
+                    {
+                        profileFile = file;
+                    }
                 }
 
-                var company = await creationService.EditCustomer(currentUserEmail, customerDetail, file);
+                var company = await creationService.EditCustomer(currentUserEmail, customerDetail, profileFile);
                 if (company == null)
                 {
                     notifyService.Error("OOPs !!!..Error edting customer");
@@ -408,21 +405,20 @@ namespace risk.control.system.Controllers.Company
                 var files = Request.Form?.Files;
                 if (files == null || files.Count == 0)
                 {
-                    notifyService.Warning("Uploaded Error !!! ");
+                    notifyService.Warning("Image Uploaded Error !!! ");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
                 var file = files.FirstOrDefault(f => f.FileName == beneficiary?.ProfileImage?.FileName && f.Name == beneficiary?.ProfileImage?.Name);
                 if (file == null)
                 {
-                    notifyService.Warning("Uploaded Error !!! ");
+                    notifyService.Warning("Image Uploaded Error !!! ");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var company = await creationService.CreateBeneficiary(currentUserEmail, ClaimsInvestigationId, beneficiary, file);
                 if (company != null)
                 {
                     notifyService.Custom($"Beneficiary {beneficiary.Name} added successfully", 3, "green", "fas fa-user-tie");
-
                 }
 
                 if(company.AutoAllocation)
@@ -463,21 +459,18 @@ namespace risk.control.system.Controllers.Company
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
+                IFormFile profileFile = null;
                 var files = Request.Form?.Files;
-                if (files == null || files.Count == 0)
-                {
-                    notifyService.Warning("Uploaded Error !!! ");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
 
-                var file = files.FirstOrDefault(f => f.FileName == beneficiary?.ProfileImage?.FileName && f.Name == beneficiary?.ProfileImage?.Name);
-                if (file == null)
+                if (files != null && files.Count > 0)
                 {
-                    notifyService.Warning("Uploaded Error !!! ");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    var file = files.FirstOrDefault(f => f.FileName == beneficiary?.ProfileImage?.FileName && f.Name == beneficiary?.ProfileImage?.Name);
+                    if (file != null)
+                    {
+                        profileFile = file;
+                    }
                 }
-                
-                var company = await creationService.EditBeneficiary(currentUserEmail, beneficiaryDetailId, beneficiary, file);
+                var company = await creationService.EditBeneficiary(currentUserEmail, beneficiaryDetailId, beneficiary, profileFile);
                 if (company != null)
                 {
                     notifyService.Custom($"Beneficiary {beneficiary.Name} edited successfully", 3, "orange", "fas fa-user-tie");
