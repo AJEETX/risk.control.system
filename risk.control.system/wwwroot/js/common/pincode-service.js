@@ -44,7 +44,7 @@ function PopulatePinCode(dropDownId, list, option, showDefaultOption) {
         $('#DistrictId').focus();
         $.alert({
             title: "SERVICE EXISTS",
-            content: "Please select other district.",
+            content: "Please select other option.",
             icon: 'fas fa-exclamation-triangle',
             type: 'red',
             closeIcon: true,

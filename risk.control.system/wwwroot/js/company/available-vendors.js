@@ -37,12 +37,15 @@
             /* Name of the keys from
             data file source */
             {
-                "sDefaultContent": "<span><i class='far fa-edit' data-toggle='tooltip' title='NOT ACTIVE and/or No service available'></i></span>",
+                "sDefaultContent": "<span><i class='far fa-edit i-blue' data-toggle='tooltip' title='No User and/or service available'></i></span>",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    if (row.canOnboard){
+                    if (row.canOnboard) {
                         var img = '<input class="vendors" name="vendors" type="checkbox" id="' + row.id + '"  value="' + row.id + '"  />';
                         return img;
+                    }
+                    else {
+                        return '<a id="edit' + row.id + '" href="/Vendors/Details?Id=' + row.id + '"  class="btn btn-xs btn-warning" data-toggle="tooltip" title="No User and/or service available"><i class="fas fa-edit"></i> Complete</a>';
                     }
                 }
             },
@@ -138,7 +141,12 @@
                 getdetails(id); // Call the getdetails function with the ID
                 window.location.href = $(this).attr('href'); // Navigate to the delete page
             });
-
+            $('#customerTable tbody').on('click', '.btn-warning', function (e) {
+                e.preventDefault(); // Prevent the default anchor behavior
+                var id = $(this).attr('id').replace('edit', ''); // Extract the ID from the button's ID attribute
+                showedit(id); // Call the getdetails function with the ID
+                window.location.href = $(this).attr('href'); // Navigate to the edit page
+            });
             var rowCount = (this.fnSettings().fnRecordsTotal()); // total number of rows
             if (rowCount > 0) {
                 $('#depanel-vendors').prop('disabled', false);
@@ -310,6 +318,27 @@ function getdetails(id) {
     });
 
     $('a#delete' + id + '.btn.btn-xs.btn-danger').html("<i class='fas fa-sync fa-spin'></i> Delete");
+    var article = document.getElementById("article");
+    if (article) {
+        var nodes = article.getElementsByTagName('*');
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].disabled = true;
+        }
+    }
+}
+
+function showedit(id) {
+    $("body").addClass("submit-progress-bg");
+    // Wrap in setTimeout so the UI
+    // can update the spinners
+    setTimeout(function () {
+        $(".submit-progress").removeClass("hidden");
+    }, 1);
+    $('a.btn').attr('disabled', 'disabled');
+    var editbtn = $('a#edit' + id + '.btn.btn-xs.btn-warning')
+
+    editbtn.html("<i class='fas fa-sync fa-spin'></i> Complete");
+
     var article = document.getElementById("article");
     if (article) {
         var nodes = article.getElementsByTagName('*');

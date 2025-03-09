@@ -1946,7 +1946,10 @@ select#PinCodeId {
     color: orangered;
 }
 .i-green {
-    color: green;;
+    color: green;
+}
+.i-blue {
+    color: darkblue;
 }
 .terms-condition {
     margin-top: 0.2em !important;

@@ -58,8 +58,27 @@
             },
             {
                 "data": "domain",
+                "bSortable": false,
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.name + '" data-toggle="tooltip">' + data + '</span>'
+                    var img = '';
+                    for (var i = 1; i <= 5; i++) {
+                        img += '<img id="' + i + '" src="/images/StarFade.gif" class="rating" vendorId="' + row.id + '"/>';
+                    }
+
+                    // Add the rate count badge
+                    img += ' <span title="(Total count of user rated) star ratings" class="badge badge-light" data-toggle="tooltip"> (' + row.rateCount + ')';
+
+                    // Calculate and display the average rating if available
+                    if (row.rateCount && row.rateCount > 0) {
+                        var averageRating = row.rateTotal / row.rateCount;
+                        img += '<span class="avr"><sup>' + averageRating + '</sup></span>';
+                    }
+                    img += '</span>';
+                    // Add the result span
+                    img += '<br /> <span class="result"></span>';
+
+                    // Return the domain with the appended rating images and information
+                    return '<span title="' + row.name + '" data-toggle="tooltip">' + data + '</span>' + '<br /> ' + img;
                 }
             },
             {
