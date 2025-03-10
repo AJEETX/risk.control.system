@@ -44,6 +44,11 @@
                 <span asp-validation-for="Price" class="text-danger"></span>
             </div>
         </div>
+        
+
+    </div>
+    <div class="col-md-6">
+
         <div class="form-group">
             <label class="input-group-label" for="StateId"> State:</label>
             <div class="input-group mb-3 autocomplete-wrapper">
@@ -55,7 +60,7 @@
                         <img src="@imgPath" class="flag-icon" data-toggle="tooltip" />  @Model?.Country.Code
                     </span>
                 </div>
-                <input type="text" id="StateId" class="form-control remarks auto-dropdown" data-placeholder="state" placeholder="Search state ..." asp-for="StateId" required value=""/>
+                <input type="text" id="StateId" class="form-control remarks auto-dropdown" data-placeholder="state" placeholder="Search state ..." asp-for="StateId" required value="" />
                 <span asp-validation-for="StateId" class="text-danger"></span>
                 <input asp-for="SelectedStateId" type="hidden" id="SelectedStateId" name="SelectedStateId" value="@Model?.StateId" />
                 <div id="state-loading" class="loading-spinner">
@@ -80,17 +85,6 @@
                 </div>
             </div>
         </div>
-
-    </div>
-    <div class="col-md-6">
-        <div class="form-group">
-            <label class="input-group-label" for="SelectedMultiPincodeId"> <i class="fas fa-map-pin"></i> Pincodes: <i class='far fa-hand-point-down'></i></label>
-            <div class="input-group">
-                <select id="PinCodeId" asp-for="SelectedMultiPincodeId" class="form-control remarks selectPincode" asp-items="ViewBag.PinCodeId" multiple required>
-                </select>
-                <span asp-validation-for="SelectedMultiPincodeId" class="text-danger"></span>
-            </div>
-
-        </div>
+       
     </div>
 </div>

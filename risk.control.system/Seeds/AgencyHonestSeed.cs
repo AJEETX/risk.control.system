@@ -87,14 +87,6 @@ namespace risk.control.system.Seeds
                     DistrictId = honestPinCode.DistrictId,
                     StateId = honestPinCode.StateId,
                     CountryId = honestPinCode.CountryId,
-                    PincodeServices = new List<ServicedPinCode>
-                    {
-                        new ServicedPinCode
-                        {
-                            Pincode = context.PinCode.FirstOrDefault(s => s.Code == honestPinCode.Code)?.Code ?? default !,
-                            Name = context.PinCode.FirstOrDefault(s => s.Code == honestPinCode.Code)?.Name ?? default !
-                        }
-                    },
                     Updated = DateTime.Now,
                 },
                 new VendorInvestigationServiceType{
@@ -105,14 +97,6 @@ namespace risk.control.system.Seeds
                     StateId = honestPinCode.StateId,
                     CountryId = honestPinCode.CountryId,
                     LineOfBusiness = lineOfBusiness,
-                    PincodeServices = new List<ServicedPinCode>
-                    {
-                        new ServicedPinCode
-                        {
-                            Pincode = context.PinCode.FirstOrDefault(s => s.Code == honestPinCode.Code)?.Code ?? default !,
-                            Name = context.PinCode.FirstOrDefault(s => s.Code == honestPinCode.Code)?.Name ?? default !
-                        }
-                    },
                     Updated = DateTime.Now,
                 }
             };

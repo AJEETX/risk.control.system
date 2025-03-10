@@ -18,5 +18,6 @@ namespace risk.control.system.Models
 
         public string Symbol { get; set; } = "fas fa-check-circle i-green";
         public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public string? CreatedBy { get; set; }
     }
 }

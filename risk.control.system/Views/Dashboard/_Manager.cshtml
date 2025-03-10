@@ -70,7 +70,35 @@
     </div>
 
 </div>
+<div class="row">
+    <div class="col">
 
+        <div class="small-box bg-warning">
+            <div class="inner">
+                <h3 id="submit-claims">@Model.FifthBlockCount</h3>
+                <p>@Model.FifthBlockName</p>
+            </div>
+            <div class="icon">
+                <i class="fas fa-handshake"></i>
+            </div>
+            <a href="@Model.FifthBlockUrl" class="details-page small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+        </div>
+    </div>
+
+    <div class="col">
+
+        <div class="small-box bg-danger">
+            <div class="inner">
+                <h3 id="approved-claims">@Model.SixthBlockCount</h3>
+                <p>@Model.SixthBlockName</p>
+            </div>
+            <div class="icon">
+                <i class="fas fa-hand-pointer"></i>
+            </div>
+            <a href="@Model.SixthBlockUrl" class="details-page small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+        </div>
+    </div>
+</div>
 <div class="row">
     <div class="col-md-6">
         <div class="card card-light collapsed-card">

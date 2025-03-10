@@ -67,7 +67,7 @@
     // Initialize DataTable with enhanced configurations
     const table = $("#customerTable").DataTable({
         ajax: { url: '/api/Agency/AllServices', dataSrc: '' },
-        order: [[11, 'desc'], [12, 'desc']],
+        order: [[10, 'desc'], [11, 'desc']],
         columnDefs: [
             { className: 'max-width-column', targets: 7 },
             { className: 'max-width-column-name', targets: 8 }
@@ -87,7 +87,6 @@
             { data: "district", mRender: (data, type, row) => `<span title="${row.district}" data-toggle="tooltip">${data}</span>` },
             { data: "state", mRender: (data, type, row) => `<span title="${row.state}" data-toggle="tooltip">${data}</span>` },
             { data: "country", mRender: (data, type, row) => `<span title="${row.country}" data-toggle="tooltip"> <img alt="${data}" title="${data}" src="${row.flag}" class="flag-icon" />(${row.country})</span>` },
-            { data: "pincodes", mRender: (data, type, row) => `<span title="${row.rawPincodes}" data-toggle="tooltip">${data}</span>` },
             { data: "updatedBy", mRender: (data, type, row) => `<span title="${row.updatedBy}" data-toggle="tooltip">${data}</span>` },
             { data: "updated", mRender: (data, type, row) => `<span title="${row.updated}" data-toggle="tooltip">${data}</span>` },
             {
@@ -117,29 +116,14 @@
             const district = data.district ? data.district.toLowerCase() : '';
             const pincodes = data.pincodes ? data.pincodes.toLowerCase() : '';
 
-            if (district === 'all districts' && pincodes === 'all pincodes') {
+            if (district === 'all districts') {
                 $(rowNode).find('td:nth-child(4)').addClass('text-light-green'); // Column index starts from 1
                 $(rowNode).find('td:nth-child(5)').addClass('text-light-green'); // Column index starts from 1
                 $(rowNode).find('td:nth-child(6)').addClass('text-light-green'); // Column index starts from 1
-                $(rowNode).find('td:nth-child(7)').addClass('text-light-green'); // Column index starts from 1
             } else {
                 $(rowNode).find('td:nth-child(4)').removeClass('text-light-green');
                 $(rowNode).find('td:nth-child(5)').removeClass('text-light-green');
                 $(rowNode).find('td:nth-child(6)').removeClass('text-light-green');
-                $(rowNode).find('td:nth-child(7)').removeClass('text-light-green');
-            }
-
-            // Apply text color for `pincodes` column
-            if (district != 'all districts' && pincodes === 'all pincodes') {
-                $(rowNode).find('td:nth-child(4)').addClass('text-light-blue');
-                $(rowNode).find('td:nth-child(5)').addClass('text-light-blue');
-                $(rowNode).find('td:nth-child(6)').addClass('text-light-blue');
-                $(rowNode).find('td:nth-child(7)').addClass('text-light-blue');
-            } else {
-                $(rowNode).find('td:nth-child(4)').removeClass('text-light-blue');
-                $(rowNode).find('td:nth-child(5)').removeClass('text-light-blue');
-                $(rowNode).find('td:nth-child(6)').removeClass('text-light-blue');
-                $(rowNode).find('td:nth-child(7)').removeClass('text-light-blue');
             }
 
             if (data.isUpdated) {

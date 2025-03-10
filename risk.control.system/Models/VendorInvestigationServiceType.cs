@@ -49,12 +49,12 @@ namespace risk.control.system.Models
         [Column(TypeName = "decimal(10,2)")]
         public decimal Price { get; set; }
 
-        [NotMapped]
-        [Display(Name = "Choose Multiple Pincodes")]
-        public List<long> SelectedMultiPincodeId { get; set; } = new List<long> { }!;
+        //[NotMapped]
+        //[Display(Name = "Choose Multiple Pincodes")]
+        //public List<long> SelectedMultiPincodeId { get; set; } = new List<long> { }!;
 
-        [Display(Name = "Serviced pincodes")]
-        public List<ServicedPinCode> PincodeServices { get; set; } = default!;
+        //[Display(Name = "Serviced pincodes")]
+        //public List<ServicedPinCode> PincodeServices { get; set; } = default!;
 
         public long VendorId { get; set; }
         public Vendor Vendor { get; set; }
@@ -68,7 +68,6 @@ namespace risk.control.system.Models
                 $"- State: {State}\n" +
                 $"- District: {District}\n" +
                 $"- Price: {Price}\n" +
-                $"- Serviced Pincodes: {PincodeServices}\n" +
                 $"- Vendor: {Vendor}\n" +
                 $"- Deleted: {Deleted}";
         }

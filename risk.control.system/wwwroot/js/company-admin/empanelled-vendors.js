@@ -78,7 +78,7 @@
                     img += '<br /> <span class="result"></span>';
 
                     // Return the domain with the appended rating images and information
-                    return '<span title="' + row.name + '" data-toggle="tooltip">' + data + '</span>' + '<br /> ' + img;
+                    return '<span title="' + row.name + '" data-toggle="tooltip"><a id="edit' + row.id + '" href="/Company/AgencyDetail?Id=' + row.id + '"> ' + data +'</a></span>' + '<br /> ' + img;
                 }
             },
             {

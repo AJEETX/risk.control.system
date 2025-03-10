@@ -198,7 +198,6 @@ namespace risk.control.system.Controllers.Api.Agency
                 .ThenInclude(i => i.InvestigationServiceType)
                 .Include(i => i.State)
                 .Include(i => i.VendorInvestigationServiceTypes)
-                .ThenInclude(i => i.PincodeServices)
                 .FirstOrDefault(a => a.VendorId == vendorUser.VendorId && !a.Deleted);
 
             var services = vendor.VendorInvestigationServiceTypes?
@@ -209,20 +208,20 @@ namespace risk.control.system.Controllers.Api.Agency
                 var IsAllDistrict = (service.DistrictId == null);
                 string pincodes = $"{ALL_PINCODE}";
                 string rawPincodes = $"{ALL_PINCODE}";
-                if (!IsAllDistrict)
-                {
-                    var allPinCodesForDistrict = await _context.PinCode.CountAsync(p => p.DistrictId == service.DistrictId);
-                    if(allPinCodesForDistrict == service.PincodeServices.Count && allPinCodesForDistrict > 1)
-                    {
-                        pincodes = ALL_PINCODE;
-                        rawPincodes = ALL_PINCODE;
-                    }
-                    else
-                    {
-                        pincodes = string.Join(", ", service.PincodeServices.Select(c => c.Pincode).Distinct());
-                        rawPincodes = string.Join(", ", service.PincodeServices.Select(c => c.Name).Distinct());
-                    }
-                }   
+                //if (!IsAllDistrict)
+                //{
+                //    var allPinCodesForDistrict = await _context.PinCode.CountAsync(p => p.DistrictId == service.DistrictId);
+                //    if(allPinCodesForDistrict == service.PincodeServices.Count && allPinCodesForDistrict > 1)
+                //    {
+                //        pincodes = ALL_PINCODE;
+                //        rawPincodes = ALL_PINCODE;
+                //    }
+                //    else
+                //    {
+                //        pincodes = string.Join(", ", service.PincodeServices.Select(c => c.Pincode).Distinct());
+                //        rawPincodes = string.Join(", ", service.PincodeServices.Select(c => c.Name).Distinct());
+                //    }
+                //}   
 
                 serviceResponse.Add(new AgencyServiceResponse
                 {

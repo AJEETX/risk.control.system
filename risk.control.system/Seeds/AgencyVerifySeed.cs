@@ -86,14 +86,6 @@ namespace risk.control.system.Seeds
                     StateId = verifyPinCode.StateId,
                     CountryId = verifyPinCode.CountryId,
                     LineOfBusinessId = lineOfBusiness.LineOfBusinessId,
-                    PincodeServices = new List<ServicedPinCode>
-                    {
-                        new ServicedPinCode
-                        {
-                            Pincode = context.PinCode.FirstOrDefault(s => s.Code == verifyPinCode.Code)?.Code ?? default !,
-                            Name = context.PinCode.FirstOrDefault(s => s.Code == verifyPinCode.Code)?.Name ?? default !
-                        }
-                    },
                     Updated = DateTime.Now,
                 },
                 new VendorInvestigationServiceType{
@@ -104,14 +96,6 @@ namespace risk.control.system.Seeds
                     StateId = verifyPinCode.StateId,
                     CountryId = verifyPinCode.CountryId,
                     LineOfBusinessId = lineOfBusiness.LineOfBusinessId,
-                    PincodeServices = new List<ServicedPinCode>
-                    {
-                        new ServicedPinCode
-                        {
-                            Pincode = context.PinCode.FirstOrDefault(s => s.Code == verifyPinCode.Code)?.Code ?? default !,
-                            Name = context.PinCode.FirstOrDefault(s => s.Code == verifyPinCode.Code)?.Name ?? default !
-                        }
-                    },
                     Updated = DateTime.Now,
                 }
             };

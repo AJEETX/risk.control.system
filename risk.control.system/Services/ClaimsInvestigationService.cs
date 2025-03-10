@@ -96,23 +96,15 @@ namespace risk.control.system.Services
                         if (serviceType.InvestigationServiceTypeId == claimsInvestigation.PolicyDetail.InvestigationServiceTypeId &&
                                 serviceType.LineOfBusinessId == claimsInvestigation.PolicyDetail.LineOfBusinessId)
                         {
-                            foreach (var pincodeService in serviceType.PincodeServices)
+                            if (serviceType.StateId == pincodeDistrictState.StateId && serviceType.DistrictId == null)
                             {
-                                if (pincodeService.Pincode == pinCode2Verify)
-                                {
-                                    vendorsInPincode.Add(empanelledVendor);
-                                    continue;
-                                }
-                                if (pincodeService.Pincode == ALL_PINCODE && serviceType.StateId == pincodeDistrictState.StateId && serviceType.DistrictId == null)
-                                {
-                                    vendorsInPincode.Add(empanelledVendor);
-                                    continue;
-                                }
-                                if (pincodeService.Pincode == ALL_PINCODE && serviceType.StateId == pincodeDistrictState.StateId && serviceType.DistrictId == pincodeDistrictState.DistrictId)
-                                {
-                                    vendorsInPincode.Add(empanelledVendor);
-                                    continue;
-                                }
+                                vendorsInPincode.Add(empanelledVendor);
+                                continue;
+                            }
+                            if (serviceType.StateId == pincodeDistrictState.StateId && serviceType.DistrictId == pincodeDistrictState.DistrictId)
+                            {
+                                vendorsInPincode.Add(empanelledVendor);
+                                continue;
                             }
                         }
                         var added = vendorsInPincode.Any(v => v.VendorId == empanelledVendor.VendorId);

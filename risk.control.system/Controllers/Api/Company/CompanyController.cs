@@ -166,7 +166,6 @@ namespace risk.control.system.Controllers.Api.Company
                 .Include(v => v.VendorInvestigationServiceTypes)
                 .ThenInclude(v => v.InvestigationServiceType)
                 .Include(v => v.VendorInvestigationServiceTypes)
-                .ThenInclude(v => v.PincodeServices)
                 .OrderBy(u => u.Name)
                 .AsQueryable();
 
@@ -194,7 +193,8 @@ namespace risk.control.system.Controllers.Api.Company
                         u.VendorInvestigationServiceTypes.Count > 0,
                     VendorName = u.Email,
                     IsUpdated = u.IsUpdated,
-                    LastModified = u.Updated
+                    LastModified = u.Updated,
+                    Deletable = u.CreatedUser == userEmail
                 })?.ToArray();
             availableVendors?.ToList().ForEach(u => u.IsUpdated = false);
             await _context.SaveChangesAsync();
@@ -221,7 +221,6 @@ namespace risk.control.system.Controllers.Api.Company
                 .ThenInclude(i => i.InvestigationServiceType)
                 .Include(i => i.State)
                 .Include(i => i.VendorInvestigationServiceTypes)
-                .ThenInclude(i => i.PincodeServices)
                 .FirstOrDefault(a => a.VendorId == id);
 
             var services = vendor.VendorInvestigationServiceTypes?
@@ -232,20 +231,20 @@ namespace risk.control.system.Controllers.Api.Company
                 var IsAllDistrict = (service.DistrictId == null);
                 string pincodes = $"{ALL_PINCODE}";
                 string rawPincodes = $"{ALL_PINCODE}";
-                if (!IsAllDistrict)
-                {
-                    var allPinCodesForDistrict = await _context.PinCode.CountAsync(p => p.DistrictId == service.DistrictId);
-                    if (allPinCodesForDistrict == service.PincodeServices.Count)
-                    {
-                        pincodes = ALL_PINCODE;
-                        rawPincodes = ALL_PINCODE;
-                    }
-                    else
-                    {
-                        pincodes = string.Join(", ", service.PincodeServices.Select(c => c.Pincode).Distinct());
-                        rawPincodes = string.Join(", ", service.PincodeServices.Select(c => c.Name).Distinct());
-                    }
-                }
+                //if (!IsAllDistrict)
+                //{
+                //    var allPinCodesForDistrict = await _context.PinCode.CountAsync(p => p.DistrictId == service.DistrictId);
+                //    if (allPinCodesForDistrict == service.PincodeServices.Count)
+                //    {
+                //        pincodes = ALL_PINCODE;
+                //        rawPincodes = ALL_PINCODE;
+                //    }
+                //    else
+                //    {
+                //        pincodes = string.Join(", ", service.PincodeServices.Select(c => c.Pincode).Distinct());
+                //        rawPincodes = string.Join(", ", service.PincodeServices.Select(c => c.Name).Distinct());
+                //    }
+                //}
 
                 serviceResponse.Add(new AgencyServiceResponse
                 {

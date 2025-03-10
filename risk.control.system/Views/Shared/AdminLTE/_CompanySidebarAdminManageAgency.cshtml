@@ -2,7 +2,7 @@
 @using risk.control.system.Models;
 @model ClientCompany
 @{
-    if (User.IsInRole(AppRoles.COMPANY_ADMIN.ToString()))
+    if (User.IsInRole(AppRoles.MANAGER.ToString()))
     {
         <li class="nav-item">
 
@@ -18,8 +18,8 @@
         </li>
 
         <li class="nav-item">
-            <a is-active-page asp-controller="Company" asp-action="EmpanelledVendors" class="actual-link nav-link
-                        @Url.MakeActiveClass("Company","EmpanelledVendors") 
+            <a is-active-page asp-controller="Vendors" asp-action="EmpanelledVendors" class="actual-link nav-link
+                            @Url.MakeActiveClass("Vendors","EmpanelledVendors")
                         @Url.MakeActiveClass("Company","AgencyDetail") @Url.MakeActiveClass("Company","EditAgency") 
     @Url.MakeActiveClass("Company","Service") @Url.MakeActiveClass("Company","EditService") @Url.MakeActiveClass("Company","CreateService") @Url.MakeActiveClass("Company","DeleteService")
 @Url.MakeActiveClass("Company","AgencyUsers") @Url.MakeActiveClass("Company","CreateAgencyUser") @Url.MakeActiveClass("Company","EditAgencyUser") 
@@ -31,7 +31,7 @@
             </a>
         </li>
         <li class="nav-item">
-            <a is-active-page asp-controller="Company" asp-action="AvailableVendors" class="actual-link nav-link @Url.MakeActiveClass("Company","AvailableVendors")
+            <a is-active-page asp-controller="Vendors" asp-action="AvailableVendors" class="actual-link nav-link @Url.MakeActiveClass("Vendors","AvailableVendors")
                           @Url.MakeActiveClass("Vendors","Details")  @Url.MakeActiveClass("Vendors","Edit") @Url.MakeActiveClass("Vendors","Delete")
                         @Url.MakeActiveClass("Vendors","Service") @Url.MakeActiveClass("VendorService","")
                                 @Url.MakeActiveClass("Vendors","Users") @Url.MakeActiveClass("Vendors","CreateUser") @Url.MakeActiveClass("Vendors","EditUser")  @Url.MakeActiveClass("Vendors","DeleteUser")

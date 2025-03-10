@@ -30,18 +30,6 @@
                                     <dd class="col-sm-5">
                                         @Html.DisplayFor(model => model.InvestigationServiceType.Name)
                                     </dd>
-
-                                    <dt class="col-sm-5">
-                                        Service Pincodes
-                                    </dt>
-                                    <dd class="col-sm-5">
-                                        @foreach (var svc in Model?.PincodeServices)
-                                        {
-                                            var pinCodeDetail = svc.Pincode + "- " + svc.Name;
-                                            @Html.DisplayFor(modelItem => pinCodeDetail)
-                                            ;
-                                        }
-                                    </dd>
                                     <dt class="col-sm-5">
                                         @Html.DisplayNameFor(model => model.District)
                                     </dt>

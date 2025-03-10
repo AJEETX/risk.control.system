@@ -87,14 +87,6 @@ namespace risk.control.system.Seeds
                     StateId = investigatePinCode.StateId,
                     CountryId = investigatePinCode.CountryId,
                     LineOfBusinessId = lineOfBusiness.LineOfBusinessId,
-                    PincodeServices = new List<ServicedPinCode>
-                    {
-                        new ServicedPinCode
-                        {
-                            Pincode = context.PinCode.FirstOrDefault(s => s.Code == investigatePinCode.Code)?.Code ?? default !,
-                            Name = context.PinCode.FirstOrDefault(s => s.Code == investigatePinCode.Code)?.Name ?? default !
-                        }
-                    },
                     Updated = DateTime.Now,
                 },
                 new VendorInvestigationServiceType{
@@ -105,14 +97,6 @@ namespace risk.control.system.Seeds
                     StateId = investigatePinCode.StateId,
                     CountryId = investigatePinCode.CountryId,
                     LineOfBusinessId = lineOfBusiness.LineOfBusinessId,
-                    PincodeServices = new List<ServicedPinCode>
-                    {
-                        new ServicedPinCode
-                        {
-                            Pincode = context.PinCode.FirstOrDefault(s => s.Code == investigatePinCode.Code)?.Code ?? default !,
-                            Name = context.PinCode.FirstOrDefault(s => s.Code == investigatePinCode.Code)?.Name ?? default !
-                        }
-                    },
                     Updated = DateTime.Now,
                 },
                 new VendorInvestigationServiceType{
@@ -123,14 +107,6 @@ namespace risk.control.system.Seeds
                     StateId = investigatePinCode.StateId,
                     CountryId = investigatePinCode.CountryId,
                     LineOfBusinessId = lineOfBusiness.LineOfBusinessId,
-                    PincodeServices = new List<ServicedPinCode>
-                    {
-                        new ServicedPinCode
-                        {
-                            Pincode = context.PinCode.FirstOrDefault(s => s.Code == investigatePinCode.Code)?.Code ?? default !,
-                            Name = context.PinCode.FirstOrDefault(s => s.Code == investigatePinCode.Code)?.Name ?? default !
-                        }
-                    },
                     Updated = DateTime.Now,
                 }
             };

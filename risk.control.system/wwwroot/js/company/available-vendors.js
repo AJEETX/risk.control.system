@@ -37,15 +37,15 @@
             /* Name of the keys from
             data file source */
             {
-                "sDefaultContent": "<span><i class='far fa-edit i-blue' data-toggle='tooltip' title='No User and/or service available'></i></span>",
+                "sDefaultContent": "<span><i class='far fa-edit i-blue' data-toggle='tooltip' title='Agency detail Incomplete'></i></span>",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     if (row.canOnboard) {
-                        var img = '<input class="vendors" name="vendors" type="checkbox" id="' + row.id + '"  value="' + row.id + '"  />';
+                        var img = '<input class="vendors" name="vendors" type="checkbox" id="' + row.id + '"  value="' + row.id + '" data-toggle="tooltip" title="Select Agency to empanel" />';
                         return img;
                     }
                     else {
-                        return '<a id="edit' + row.id + '" href="/Vendors/Details?Id=' + row.id + '"  class="btn btn-xs btn-warning" data-toggle="tooltip" title="No User and/or service available"><i class="fas fa-edit"></i> Complete</a>';
+                        return '<a id="edit' + row.id + '" href="/Vendors/Details?Id=' + row.id + '"  class="btn-xs btn-warning" data-toggle="tooltip" title="Agency detail Incomplete"><i class="fas fa-edit"></i> </a>';
                     }
                 }
             },
@@ -116,11 +116,17 @@
                 }
             },
             {
-                "sDefaultContent": "",
+                "sDefaultContent": '<button disabled class="btn btn-xs btn-danger"><i class="fas fa-trash"></i> Delete</a>',
+                "data":"deletable",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += '<a id="delete' + row.id + '" href="/Vendors/Delete?Id=' + row.id + '"  class="btn btn-xs btn-danger"><i class="fas fa-trash"></i> Delete</a>'
+                    if (data) {
+                        buttons += '<a id="delete' + row.id + '" href="/Vendors/Delete?Id=' + row.id + '"  class="btn btn-xs btn-danger"><i class="fas fa-trash"></i> Delete</a>'
+                    }
+                    else {
+                        buttons += '<button disabled class="btn btn-xs btn-danger"><i class="fas fa-trash"></i> Delete</a>';
+                    }
                     return buttons;
                 }
             },

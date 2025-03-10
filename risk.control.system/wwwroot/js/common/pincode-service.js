@@ -123,11 +123,11 @@ $(document).ready(function () {
             // Disable StateId and PinCodeId if any of the fields are blank
             $("#StateId").prop("disabled", true).val("").addClass('disabled');
             $("#DistrictId").prop("disabled", true).val("");
-            $("#PinCodeId").prop("disabled", true).val("");
+            //$("#PinCodeId").prop("disabled", true).val("");
         } else {
             // Enable StateId and PinCodeId if all fields have values
             $("#StateId").prop("disabled", false);
-            $("#PinCodeId").prop("disabled", false);
+            //$("#PinCodeId").prop("disabled", false);
             $("#DistrictId").prop("disabled", false);
         }
     }
@@ -137,10 +137,10 @@ $(document).ready(function () {
 
     // Run the function whenever LineOfBusinessId, InvestigationServiceTypeId, or Price changes
     $("#LineOfBusinessId, #InvestigationServiceTypeId, #Price").on("change keyup", toggleStateAndPinCodeFields);
-    $("#DistrictId").on("blur change", function () {
-        // Call the GetRemainingServicePinCode function with the necessary parameters
-        GetRemainingServicePinCode(false);
-    });
+    //$("#DistrictId").on("blur change", function () {
+    //    // Call the GetRemainingServicePinCode function with the necessary parameters
+    //    GetRemainingServicePinCode(false);
+    //});
 
     // Bind the change event to the dropdown
     $("#LineOfBusinessId").on("change", function () {
@@ -292,9 +292,9 @@ function fetchAndSetFieldValue(url, data, inputSelector, responseKey, callback) 
  * Initializes autocomplete for all relevant fields.
  */
 function initializeAutocomplete() {
-    const countryDependentFields = ["#StateId", "#DistrictId", "#PinCodeId"];
-    const stateDependentFields = ["#DistrictId", "#PinCodeId"];
-    const districtDependentFields = ["#PinCodeId"];
+    const countryDependentFields = ["#StateId", "#DistrictId"];
+    const stateDependentFields = ["#DistrictId"];
+    //const districtDependentFields = ["#PinCodeId"];
     const autocompleteConfig = [
         {
             field: "#CountryId",
@@ -316,8 +316,8 @@ function initializeAutocomplete() {
                 countryId: $("#SelectedCountryId").val(),
                 stateId: $("#SelectedStateId").val()
             }),
-            onSelect: (ui) => handleAutocompleteSelect(ui, "#DistrictId", "#SelectedDistrictId", districtDependentFields),
-            dependentFields: districtDependentFields
+            onSelect: (ui) => handleAutocompleteSelect(ui, "#DistrictId", "#SelectedDistrictId", null),
+            dependentFields: []
         },
         //{
         //    field: "#PinCodeId",
@@ -342,7 +342,9 @@ function initializeAutocomplete() {
 function handleAutocompleteSelect(ui, inputSelector, hiddenSelector, dependentFields = []) {
     $(inputSelector).val(ui.item.label);
     $(hiddenSelector).val(ui.item.id);
-    dependentFields.forEach(field => resetField(field));
+    if (dependentFields) {
+        dependentFields.forEach(field => resetField(field));
+    }
 }
 
 /**
@@ -533,16 +535,16 @@ function setAutocomplete(fieldSelector, url, extraDataCallback, onSelectCallback
         }
     });
 
-    // Reinitialize dependent fields' autocomplete on focus
-    $(dependentFields.join(',')).on("focus", function () {
-        const $field = $(this);
+    //// Reinitialize dependent fields' autocomplete on focus
+    //$(dependentFields.join(',')).on("focus", function () {
+    //    const $field = $(this);
 
-        // Restore autocomplete source dynamically
-        const originalSource = $field.data('originalSource'); // Store the original source during initialization
-        if (originalSource) {
-            $field.autocomplete("option", "source", originalSource);
-        }
-    });
+    //    // Restore autocomplete source dynamically
+    //    const originalSource = $field.data('originalSource'); // Store the original source during initialization
+    //    if (originalSource) {
+    //        $field.autocomplete("option", "source", originalSource);
+    //    }
+    //});
 }
 
 /**
