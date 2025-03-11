@@ -1,8 +1,9 @@
-﻿@model ClaimsInvestigationVendorsModel
+﻿@using risk.control.system.Helpers
+@model ClaimsInvestigationVendorsModel
 
 @{
     var imageCapturedTime = @Model.AgencyReport?.PanIdReport?.DocumentIdImageLongLatTime != null ? @Model.AgencyReport?.PanIdReport?.DocumentIdImageLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt") : null;
-
+    var documentName = @Model.AgencyReport?.PanIdReport?.DocumentIdReportType.GetEnumDisplayName();
     string documentIdColor = "progress-bar-grey";
     var borderColor = "";
     if (Model.AgencyReport.PanIdReport?.DocumentIdImageLongLat == null)
@@ -25,7 +26,7 @@
         <div class="card bg-light d-flex flex-fill @borderColor">
             <div class="card-header text-muted border-bottom-0">
                 <h3 class="card-title">
-                    <i class="fas fa-mobile-alt"></i> PAN CARD
+                    <i class="fas fa-mobile-alt"></i> @documentName
                     <span class="hover-text">
                         <i class="fas fa-info-circle"></i>
 
@@ -37,7 +38,7 @@
                                     <b> Upload</b> Max image size 2 MB
                                 </div>
                             <div>
-                                    <i class='far fa-thumbs-down'></i> <i class='fa fa-times i-orangered' aria-hidden='true'></i> UnMatched PAN CARD
+                                    <i class='far fa-thumbs-down'></i> <i class='fa fa-times i-orangered' aria-hidden='true'></i> UnMatched @documentName
                                 </div>
                             </span>
                         }
@@ -49,7 +50,7 @@
                                     <b> Upload</b> Max image size 2 MB
                                 </div>
                                 <div>
-                                    <i class='far fa-thumbs-up'></i> <i class='fas fa-check-circle i-green'></i> Matched PAN CARD
+                                    <i class='far fa-thumbs-up'></i> <i class='fas fa-check-circle i-green'></i> Matched @documentName
                                 </div>
                             </span>
                         }
@@ -65,8 +66,8 @@
                                 <button class='btn btn-info btn-xs'>
                                         <span class='badge badge-info btn-xs'>
                                             <i class='fa fa-upload'></i>
-                                    </span> Upload 
-                                </button>  PAN CARD
+                                    </span> Upload
+                                    </button>  @documentName
                                 </div>
                             </span>
 
@@ -103,7 +104,7 @@
             <div class="progress">
                 <i class="far fa-bookmark bookmark-green"></i>
                 <div class="progress-bar @documentIdColor" role="progressbar">
-                    pan-card
+                    @documentName
                 </div>
             </div>
             <div class="card-body">
@@ -133,17 +134,17 @@
                 <div class="row">
                     <div class="col-6">
                         <p class="text-muted text-sm">
-                            <span class="badge badge-light"><i class="fas fa-film"></i> Pan card Image</span>:
+                            <span class="badge badge-light"><i class="fas fa-film"></i> @documentName Image</span>:
                             <br />
                             @{
                                 if (Model.AgencyReport?.PanIdReport?.DocumentIdImage != null)
                                 {
-                                    <img id="agentOcrPicture" class="img-fluid ocr-Image" data-toggle="tooltip" title="PAN card Image" 
-                                    src="data:image/*;base64,@(Convert.ToBase64String(@Model.AgencyReport?.PanIdReport?.DocumentIdImage))">
+                                    <img id="agentOcrPicture" class="img-fluid ocr-Image" data-toggle="tooltip" title="@documentName Image"
+                                         src="data:image/*;base64,@(Convert.ToBase64String(@Model.AgencyReport?.PanIdReport?.DocumentIdImage))">
                                 }
                                 else
                                 {
-                                    <img id="agentOcrPicture" class="img-fluid no-Image" data-toggle="tooltip" title="No PAN card Image"
+                                    <img id="agentOcrPicture" class="img-fluid no-Image" data-toggle="tooltip" title="No @documentName Image"
                                          src=@Applicationsettings.NO_PHOTO_IMAGE>
                                 }
                             }
@@ -192,10 +193,10 @@
                 <div class="card-footer">
 
                     <div class="form-group">
-                        <span class="input-group-label">Upload PAN CARD : </span>
+                        <span class="input-group-label">Upload @documentName : </span>
                         <div class="input-group mb-3">
-                            <img class="form-Image" id="pan-Image" src="@Applicationsettings.NO_IMAGE" title="PAN card" />
-                            <input accept=".jpg,jpeg,png" type="file" class="form-control remarks" name="panImage" id="panImage" data-toggle="tooltip" title="Upload PAN card Image" />
+                            <img class="form-Image" id="pan-Image" src="@Applicationsettings.NO_IMAGE" title="@documentName" />
+                            <input accept=".jpg,jpeg,png" type="file" class="form-control remarks" name="panImage" id="panImage" data-toggle="tooltip" title="Upload @documentName Image" />
                             <button id="UploadPanImageButton" disabled type="submit" class="btn btn-info upload"><i class="nav-icon fa fa-upload"></i> Upload</button>
                         </div>
                     </div>

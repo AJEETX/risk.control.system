@@ -70,16 +70,113 @@ namespace risk.control.system.Controllers
         {
             return View();
         }
-        [Breadcrumb("Empanelled Agencies", FromAction = "Index", FromController = typeof(VendorsController))]
+        [Breadcrumb("Empanelled Agencies", FromAction = "Index")]
         public IActionResult EmpanelledVendors()
         {
             return View();
         }
 
-        [Breadcrumb("Available Agencies", FromAction = "Index", FromController = typeof(VendorsController))]
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EmpanelledVendors(List<string> vendors)
+        {
+            try
+            {
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+
+                if (vendors is null || vendors.Count == 0)
+                {
+                    notifyService.Error("OOPs !!!..Not Agency Found");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+
+                var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == currentUserEmail);
+                if (companyUser == null)
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var company = _context.ClientCompany
+                    .Include(c => c.EmpanelledVendors)
+                    .FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
+                if (company == null)
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var empanelledVendors2Depanel = _context.Vendor.AsNoTracking().Where(v => vendors.Contains(v.VendorId.ToString()));
+
+                foreach (var empanelledVendor2Depanel in empanelledVendors2Depanel)
+                {
+                    var empanelled = company.EmpanelledVendors.FirstOrDefault(v => v.VendorId == empanelledVendor2Depanel.VendorId);
+                    company.EmpanelledVendors.Remove(empanelled);
+                }
+                company.Updated = DateTime.Now;
+                company.UpdatedBy = currentUserEmail;
+                _context.ClientCompany.Update(company);
+                var savedRows = await _context.SaveChangesAsync();
+                notifyService.Custom($"Agency(s) de-panelled.", 3, "orange", "far fa-thumbs-down");
+                return RedirectToAction("EmpanelledVendors", "Vendors");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+        }
+
+        [Breadcrumb("Available Agencies", FromAction = "Index")]
         public IActionResult AvailableVendors()
         {
             return View();
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AvailableVendors(List<string> vendors)
+        {
+            if (vendors is null || vendors.Count == 0)
+            {
+                notifyService.Error("No agency selected !!!");
+                return RedirectToAction(nameof(AvailableVendors), "Company");
+            }
+            try
+            {
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+
+                var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == currentUserEmail);
+                if (companyUser == null)
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var company = _context.ClientCompany.Include(c => c.EmpanelledVendors)
+                    .FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
+
+                if (company == null)
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var vendors2Empanel = _context.Vendor.AsNoTracking().Where(v => vendors.Contains(v.VendorId.ToString()));
+                company.EmpanelledVendors.AddRange(vendors2Empanel.ToList());
+
+                company.Updated = DateTime.Now;
+                company.UpdatedBy = currentUserEmail;
+                _context.ClientCompany.Update(company);
+                var savedRows = await _context.SaveChangesAsync();
+
+                notifyService.Custom($"Agency(s) empanelled.", 3, "green", "fas fa-thumbs-up");
+                return RedirectToAction("AvailableVendors", "Vendors");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+
         }
         public JsonResult PostRating(int rating, long mid)
         {
