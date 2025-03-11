@@ -42,22 +42,15 @@ namespace risk.control.system.Services
     public class ClaimsInvestigationService : IClaimsInvestigationService
     {
         private readonly ApplicationDbContext _context;
-        private readonly RoleManager<ApplicationRole> roleManager;
-        private readonly ICustomApiCLient customApiCLient;
         private readonly IMailboxService mailboxService;
-        private readonly UserManager<ApplicationUser> userManager;
         private readonly IWebHostEnvironment webHostEnvironment;
 
-        public ClaimsInvestigationService(ApplicationDbContext context, RoleManager<ApplicationRole> roleManager,
-            ICustomApiCLient customApiCLient,
-            IMailboxService mailboxService, IWebHostEnvironment webHostEnvironment,
-            UserManager<ApplicationUser> userManager)
+        public ClaimsInvestigationService(ApplicationDbContext context,
+            IMailboxService mailboxService, 
+            IWebHostEnvironment webHostEnvironment)
         {
             this._context = context;
-            this.roleManager = roleManager;
-            this.customApiCLient = customApiCLient;
             this.mailboxService = mailboxService;
-            this.userManager = userManager;
             this.webHostEnvironment = webHostEnvironment;
         }
 
@@ -145,6 +138,8 @@ namespace risk.control.system.Services
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
             var submitted2SuperStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR);
+            var requestedByAssessor = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR);
 
             var claimsCases = _context.ClaimsInvestigation
                 .Include(c => c.BeneficiaryDetail)
@@ -153,6 +148,7 @@ namespace risk.control.system.Services
                 c.VendorId.HasValue &&
                 (c.InvestigationCaseSubStatusId == allocatedStatus.InvestigationCaseSubStatusId ||
                                     c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId ||
+                                    c.InvestigationCaseSubStatusId == requestedByAssessor.InvestigationCaseSubStatusId ||
                                     c.InvestigationCaseSubStatusId == submitted2SuperStatus.InvestigationCaseSubStatusId)
                 );
 
@@ -167,6 +163,7 @@ namespace risk.control.system.Services
                     {
                         if (claimsCase.InvestigationCaseSubStatusId == allocatedStatus.InvestigationCaseSubStatusId ||
                                 claimsCase.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId ||
+                                claimsCase.InvestigationCaseSubStatusId == requestedByAssessor.InvestigationCaseSubStatusId ||
                                 claimsCase.InvestigationCaseSubStatusId == submitted2SuperStatus.InvestigationCaseSubStatusId
                                 )
                         {
