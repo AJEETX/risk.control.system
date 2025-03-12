@@ -12,7 +12,7 @@
         public string Flag { get; set; }
         public string RawPincodes { get; set; }
         public string Pincodes { get; set; }
-        public decimal Rate { get; set; }
+        public string Rate { get; set; }
         public string UpdatedBy { get; set; }
         public string Updated { get; set; }
         public bool IsUpdated { get; set; }

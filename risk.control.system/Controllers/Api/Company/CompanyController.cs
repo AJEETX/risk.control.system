@@ -1,4 +1,7 @@
 ﻿using System.Data;
+using System.Globalization;
+
+using Google.Api;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -22,6 +25,8 @@ namespace risk.control.system.Controllers.Api.Company
     [ApiController]
     public class CompanyController : ControllerBase
     {
+        private static CultureInfo hindi = new CultureInfo("hi-IN");
+        private static NumberFormatInfo hindiNFO = (NumberFormatInfo)hindi.NumberFormat.Clone();
         private readonly string noUserImagefilePath = string.Empty;
         private readonly ApplicationDbContext _context;
         private readonly IUserService userService;
@@ -258,7 +263,7 @@ namespace risk.control.system.Controllers.Api.Company
                     Flag = "/flags/" + service.Country.Code.ToLower() + ".png",
                     Pincodes = pincodes,
                     RawPincodes = rawPincodes,
-                    Rate = service.Price,
+                    Rate = string.Format(Extensions.GetCultureByCountry(service.Country.Code.ToUpper()), "{0:c}", service.Price),
                     UpdatedBy = service.UpdatedBy,
                     Updated = service.Updated.HasValue ? service.Updated.Value.ToString("dd-MM-yyyy") : service.Created.ToString("dd-MM-yyyy"),
                     IsUpdated = service.IsUpdated,
@@ -270,7 +275,7 @@ namespace risk.control.system.Controllers.Api.Company
             await _context.SaveChangesAsync();
             return Ok(serviceResponse);
         }
-
+        
         [HttpGet("SearchCountry")]
         public IActionResult SearchCountry(string term = "")
         {
@@ -366,6 +371,104 @@ namespace risk.control.system.Controllers.Api.Company
             return Ok(result);
         }
 
+        [HttpGet("SearchRemainingDistrict")]
+        public IActionResult SearchRemainingDistrict(long stateId, long countryId, long vendorId, long lobId, long serviceId, string term = "")
+        {
+            var existingServices = _context.VendorInvestigationServiceType.AsNoTracking().
+                        Where(v =>
+                            v.VendorId == vendorId &&
+                            v.LineOfBusinessId == lobId &&
+                            v.InvestigationServiceTypeId == serviceId &&
+                            v.StateId == stateId);
+            if(existingServices is null)
+            {
+                // If the search term is empty or null, fetch the first 10 districts
+                var districts = string.IsNullOrEmpty(term?.Trim())
+                    ? _context.District
+                        .Where(x => x.CountryId == countryId && x.StateId == stateId)
+                        .OrderBy(x => x.Name)
+                        .Take(10)
+                        .Select(x => new
+                        {
+                            DistrictId = x.DistrictId,
+                            DistrictName = $"{x.Name}"
+                        })
+                        .ToList()
+                    : _context.District
+                        .Where(x => x.CountryId == countryId && x.StateId == stateId && x.Name.ToLower().Contains(term.ToLower()))
+                        .OrderBy(x => x.Name)
+                        .Take(10)
+                        .Select(x => new
+                        {
+                            DistrictId = x.DistrictId,
+                            DistrictName = $"{x.Name}"
+                        })
+                        .ToList();
+
+                // Add the "ALL DISTRICTS" option to the response
+                var result = new List<object>
+                {
+                    new
+                    {
+                        DistrictId = -1, // Special value for "ALL DISTRICTS"
+                        DistrictName = Applicationsettings.ALL_DISTRICT
+                    }
+                };
+
+                // Append the queried districts to the result
+                result.AddRange(districts);
+
+                // Return the final response
+                return Ok(result);
+            }
+            if (existingServices is not null && existingServices.Any(e=>e.DistrictId == null))
+            {
+                return Ok();
+            }
+            if (existingServices is not null && existingServices.All(e => e.DistrictId != null))
+            {
+                var existingDistricts = existingServices.Select(e => e.DistrictId).ToList();
+                // If the search term is empty or null, fetch the first 10 districts
+                var districts = string.IsNullOrEmpty(term?.Trim())
+                    ? _context.District
+                        .Where(x => x.CountryId == countryId && x.StateId == stateId && !existingDistricts.Contains(x.DistrictId))
+                        .OrderBy(x => x.Name)
+                        .Take(10)
+                        .Select(x => new
+                        {
+                            DistrictId = x.DistrictId,
+                            DistrictName = $"{x.Name}"
+                        })
+                        .ToList()
+                    : _context.District
+                        .Where(x => x.CountryId == countryId && x.StateId == stateId && x.Name.ToLower().Contains(term.ToLower()))
+                        .OrderBy(x => x.Name)
+                        .Take(10)
+                        .Select(x => new
+                        {
+                            DistrictId = x.DistrictId,
+                            DistrictName = $"{x.Name}"
+                        })
+                        .ToList();
+
+                // Add the "ALL DISTRICTS" option to the response
+                var result = new List<object>
+                {
+                    new
+                    {
+                        DistrictId = -1, // Special value for "ALL DISTRICTS"
+                        DistrictName = Applicationsettings.ALL_DISTRICT
+                    }
+                };
+
+                // Append the queried districts to the result
+                result.AddRange(districts);
+
+                // Return the final response
+                return Ok(result);
+            }
+            return Ok();
+        }
         [HttpGet("SearchPincode")]
         public IActionResult SearchPincode(long districtId, long stateId, long countryId, string term = "")
         {

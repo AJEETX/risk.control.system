@@ -1,4 +1,5 @@
-﻿using System.Net.Http;
+﻿using System.Globalization;
+using System.Net.Http;
 
 using Highsoft.Web.Mvc.Charts;
 
@@ -26,6 +27,8 @@ namespace risk.control.system.Controllers.Api.Agency
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME},{MANAGER.DISPLAY_NAME},{AGENCY_ADMIN.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME}")]
     public class AgencyController : ControllerBase
     {
+        private static CultureInfo hindi = new CultureInfo("hi-IN");
+        private static NumberFormatInfo hindiNFO = (NumberFormatInfo)hindi.NumberFormat.Clone();
         private readonly string noUserImagefilePath = string.Empty;
         private readonly string noDataImagefilePath = string.Empty;
         private readonly ApplicationDbContext _context;
@@ -235,7 +238,7 @@ namespace risk.control.system.Controllers.Api.Agency
                     Flag = "/flags/" + service.Country.Code.ToLower() + ".png",
                     Pincodes = pincodes,
                     RawPincodes = rawPincodes,
-                    Rate = service.Price,
+                    Rate = string.Format(Extensions.GetCultureByCountry(service.Country.Code.ToUpper()), "{0:c}", service.Price),
                     UpdatedBy = service.UpdatedBy,
                     Updated = service.Updated.HasValue ? service.Updated.Value.ToString("dd-MM-yyyy") : service.Created.ToString("dd-MM-yyyy"),
                     IsUpdated = service.IsUpdated,

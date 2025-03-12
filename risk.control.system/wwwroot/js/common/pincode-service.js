@@ -1,36 +1,23 @@
 ﻿$("#CountryId").val('');
-function GetRemainingServicePinCode(showDefaultOption = true) {
-    var pinCode = $('#PinCodeId');
-    var pinCodeId = $('#SelectedMultiPincodeId');
-
+function SearchRemainingDistrict(showDefaultOption = true) {
     var state = document.getElementById('StateId').value;
     var stateId = document.getElementById('SelectedStateId').value;
+    var lobId = document.getElementById('LineOfBusinessId').value;
+    var serviceId = document.getElementById('InvestigationServiceTypeId').value;
+    var vendorId = document.getElementById('vendorId').value;
 
-    var district = document.getElementById('DistrictId').value;
-    var districtId = document.getElementById('SelectedDistrictId').value;
-
-    if (state == '' || stateId == '' || district == '' || districtId == '') {
-        $(pinCode).empty();
-        $(pinCode).val('');
-    }
-    else {
-        var lobId = document.getElementById('LineOfBusinessId').value;
-        var serviceId = document.getElementById('InvestigationServiceTypeId').value;
-        var vendorId = document.getElementById('vendorId').value;
-
-        $.get("/api/MasterData/GetPincodesByDistrictIdWithoutPreviousSelectedService",
-            {
-                stateId: stateId,
-                districtId: districtId,
-                district: district,
-                vendorId: vendorId,
-                lobId: lobId,
-                serviceId: serviceId
-            },
-            function (data) {
+    $.get("/api/MasterData/GetPincodesByDistrictIdWithoutPreviousSelectedService",
+        {
+            stateId: stateId,
+            districtId: districtId,
+            district: district,
+            vendorId: vendorId,
+            lobId: lobId,
+            serviceId: serviceId
+        },
+        function (data) {
             PopulatePinCode("#PinCodeId", data, "<option>--SELECT PINCODE--</option>", showDefaultOption);
         });
-    }
 }
 
 function PopulatePinCode(dropDownId, list, option, showDefaultOption) {
@@ -113,6 +100,8 @@ function PopulateInvestigationServices(dropDownId, list, option) {
 }
 
 $(document).ready(function () {
+    // Trigger change event on page load
+    $("#LineOfBusinessId").trigger("change");
     function toggleStateAndPinCodeFields() {
         // Check if LineOfBusinessId, InvestigationServiceTypeId, and Price have values
         if (
@@ -137,26 +126,14 @@ $(document).ready(function () {
 
     // Run the function whenever LineOfBusinessId, InvestigationServiceTypeId, or Price changes
     $("#LineOfBusinessId, #InvestigationServiceTypeId, #Price").on("change keyup", toggleStateAndPinCodeFields);
-    //$("#DistrictId").on("blur change", function () {
-    //    // Call the GetRemainingServicePinCode function with the necessary parameters
-    //    GetRemainingServicePinCode(false);
-    //});
+    $("#StateId").on("blur change", function () {
+        // Call the GetRemainingServicePinCode function with the necessary parameters
+        //SearchRemainingDistrict(false);
+        console.log('state changes');
+    });
 
     // Bind the change event to the dropdown
-    $("#LineOfBusinessId").on("change", function () {
-        var value = $(this).val();
-
-        if (value === '') {
-            // Clear and reset InvestigationServiceTypeId dropdown
-            $('#InvestigationServiceTypeId').empty();
-            $('#InvestigationServiceTypeId').append("<option value=''>--- SELECT ---</option>");
-        } else {
-            // Fetch investigation services via AJAX and populate the dropdown
-            $.get("/api/MasterData/GetInvestigationServicesByLineOfBusinessId", { LineOfBusinessId: value }, function (data) {
-                PopulateInvestigationServices("#InvestigationServiceTypeId", data, "<option>--- SELECT ---</option>");
-            });
-        }
-    });
+    
 
     const inputSelector = "#SelectedCountryId";
     const preloadedCountryId = $("#SelectedCountryId").val();
@@ -196,6 +173,21 @@ $(document).ready(function () {
     });
 });
 
+
+$("#LineOfBusinessId").on("change", function () {
+    var value = $(this).val();
+
+    if (value === '') {
+        // Clear and reset InvestigationServiceTypeId dropdown
+        $('#InvestigationServiceTypeId').empty();
+        $('#InvestigationServiceTypeId').append("<option value=''>--- SELECT ---</option>");
+    } else {
+        // Fetch investigation services via AJAX and populate the dropdown
+        $.get("/api/MasterData/GetInvestigationServicesByLineOfBusinessId", { LineOfBusinessId: value }, function (data) {
+            PopulateInvestigationServices("#InvestigationServiceTypeId", data, "<option>--- SELECT ---</option>");
+        });
+    }
+});
 /**
  * Preloads field data from hidden fields (e.g., SelectedCountryId).
  */

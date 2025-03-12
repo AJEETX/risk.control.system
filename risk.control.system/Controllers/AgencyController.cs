@@ -806,7 +806,6 @@ namespace risk.control.system.Controllers
                     notifyService.Error("Vendor not found. Please check your login or vendor configuration.");
                     return RedirectToAction(nameof(CreateService), "Agency");
                 }
-                bool removedExistingService = false;
                 var isCountryValid = await _context.Country.AnyAsync(c => c.CountryId == service.SelectedCountryId);
                 var isStateValid = await _context.State.AnyAsync(s => s.StateId == service.SelectedStateId);
                 var isDistrictValid = service.SelectedDistrictId == -1 ||
@@ -825,26 +824,37 @@ namespace risk.control.system.Controllers
                             v.LineOfBusinessId == service.LineOfBusinessId &&
                             v.InvestigationServiceTypeId == service.InvestigationServiceTypeId &&
                             v.CountryId == (long?)service.SelectedCountryId &&
-                            v.StateId == (long?)service.SelectedStateId &&
-                            v.DistrictId == null)
+                            v.StateId == (long?)service.SelectedStateId)?
                         .ToList();
-
-                List<PinCode> pinCodes = new List<PinCode>();
 
                 // Handle state-wide service existence
                 if (service.SelectedDistrictId == -1)
                 {
                     // Handle state-wide service creation
-                    if (stateWideService is not null && stateWideService.Any())
+                    if (stateWideService is not null && stateWideService.Any(s=>s.DistrictId == null))
                     {
-                        stateWideService.FirstOrDefault().IsUpdated = true;
-                        _context.VendorInvestigationServiceType.Update(stateWideService.FirstOrDefault());
+                        var currentService = stateWideService.FirstOrDefault(s => s.DistrictId == null);
+                        currentService.IsUpdated = true;
+                        _context.VendorInvestigationServiceType.Update(currentService);
                         await _context.SaveChangesAsync();
                         notifyService.Custom($"Service [{ALL_DISTRICT}] already exists for the State!", 3, "orange", "fas fa-truck");
-                        return RedirectToAction(nameof(VendorsController.Service), "Vendors", new { id = service.VendorId });
+                        return RedirectToAction(nameof(Service), "Agency");
                     }
                 }
-
+                else
+                {
+                    // Handle state-wide service creation
+                    if (stateWideService is not null && stateWideService.Any(s => s.DistrictId != null && s.DistrictId == service.SelectedDistrictId))
+                    {
+                        var currentService = stateWideService.FirstOrDefault(s => s.DistrictId == service.SelectedDistrictId
+                        );
+                        currentService.IsUpdated = true;
+                        _context.VendorInvestigationServiceType.Update(currentService);
+                        await _context.SaveChangesAsync();
+                        notifyService.Custom($"Service already exists for the District!", 3, "orange", "fas fa-truck");
+                        return RedirectToAction(nameof(Service), "Agency");
+                    }
+                }
                 service.VendorId = vendorUser.VendorId.Value;
                 service.CountryId = service.SelectedCountryId;
                 service.StateId = service.SelectedStateId;
@@ -896,8 +906,6 @@ namespace risk.control.system.Controllers
                 }
 
                 var vendorInvestigationServiceType = _context.VendorInvestigationServiceType
-                    .Include(v => v.LineOfBusiness)
-                    .Include(v => v.InvestigationServiceType)
                     .Include(v => v.Country)
                     .Include(v => v.District)
                     .Include(v => v.State)
@@ -905,7 +913,6 @@ namespace risk.control.system.Controllers
                     .First(v => v.VendorInvestigationServiceTypeId == id);
 
                 ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", vendorInvestigationServiceType.LineOfBusinessId);
-                ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType, "InvestigationServiceTypeId", "Name", vendorInvestigationServiceType.InvestigationServiceTypeId);
 
                 if (vendorInvestigationServiceType.DistrictId == null)
                 {
@@ -939,14 +946,41 @@ namespace risk.control.system.Controllers
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 var vendorUser = _context.VendorApplicationUser.FirstOrDefault(user => user.Email == currentUserEmail);
-                var stateWideService = await _context.VendorInvestigationServiceType.AsNoTracking().
-                        FirstOrDefaultAsync(v =>
-                            v.VendorId == vendorUser.VendorId.Value &&
-                            v.LineOfBusinessId == service.LineOfBusinessId &&
-                            v.InvestigationServiceTypeId == service.InvestigationServiceTypeId &&
-                            v.CountryId == (long?)service.SelectedCountryId &&
-                            v.StateId == (long?)service.SelectedStateId &&
-                            v.DistrictId == null);
+                var stateWideService = _context.VendorInvestigationServiceType
+                       .AsEnumerable() // Switch to client-side evaluation
+                       .Where(v =>
+                           v.VendorId == vendorUser.VendorId.Value &&
+                           v.LineOfBusinessId == service.LineOfBusinessId &&
+                           v.InvestigationServiceTypeId == service.InvestigationServiceTypeId &&
+                           v.CountryId == (long?)service.SelectedCountryId &&
+                           v.StateId == (long?)service.SelectedStateId)?
+                       .ToList();
+                if (service.SelectedDistrictId == -1)
+                {
+                    // Handle state-wide service creation
+                    if (stateWideService is not null && stateWideService.Any(s => s.DistrictId == null))
+                    {
+                        var currentService = stateWideService.FirstOrDefault(s => s.DistrictId == null);
+                        currentService.IsUpdated = true;
+                        _context.VendorInvestigationServiceType.Update(currentService);
+                        await _context.SaveChangesAsync();
+                        notifyService.Custom($"Service [{ALL_DISTRICT}] already exists for the State!", 3, "orange", "fas fa-truck");
+                        return RedirectToAction(nameof(Service), "Agency");
+                    }
+                }
+                else
+                {
+                    // Handle state-wide service creation
+                    if (stateWideService is not null && stateWideService.Any(s => s.DistrictId != null && s.DistrictId == service.SelectedDistrictId && s.VendorInvestigationServiceTypeId != service.VendorInvestigationServiceTypeId))
+                    {
+                        var currentService = stateWideService.FirstOrDefault(s => s.DistrictId == service.SelectedDistrictId);
+                        currentService.IsUpdated = true;
+                        _context.VendorInvestigationServiceType.Update(currentService);
+                        await _context.SaveChangesAsync();
+                        notifyService.Custom($"Service already exists for the District!", 3, "orange", "fas fa-truck");
+                        return RedirectToAction(nameof(Service), "Agency");
+                    }
+                }
                 service.CountryId = service.SelectedCountryId;
                 service.StateId = service.SelectedStateId;
                 if (service.SelectedDistrictId == -1)
@@ -965,7 +999,7 @@ namespace risk.control.system.Controllers
                 await _context.SaveChangesAsync();
 
                 notifyService.Custom($"Service updated successfully.", 3, "orange", "fas fa-truck");
-                return RedirectToAction(nameof(AgencyController.Service), "Agency");
+                return RedirectToAction(nameof(Service), "Agency");
             }
             catch (Exception ex)
             {
