@@ -26,5 +26,13 @@
         public string BulkUploadBlockName { get; set; }
         public int BulkUploadBlockCount { get; set; }
         public string BulkUploadBlockUrl { get; set; } = string.Empty;
+
+        public string? FifthBlockName { get; set; }
+        public int? FifthBlockCount { get; set; }
+        public string? FifthBlockUrl { get; set; } = string.Empty;
+
+        public string? SixthBlockName { get; set; }
+        public int? SixthBlockCount { get; set; }
+        public string? SixthBlockUrl { get; set; } = string.Empty;
     }
 }

@@ -74,7 +74,7 @@ namespace risk.control.system.Controllers
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                
+
                 var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == currentUserEmail);
                 if (companyUser is null)
                 {
@@ -110,7 +110,7 @@ namespace risk.control.system.Controllers
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                
+
                 var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == currentUserEmail);
                 if (companyUser is null)
                 {
@@ -128,7 +128,7 @@ namespace risk.control.system.Controllers
                     notifyService.Error("OOPs !!!..Company Not Found");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                
+
                 return View(clientCompany);
             }
             catch (Exception ex)
@@ -150,14 +150,14 @@ namespace risk.control.system.Controllers
         {
             try
             {
-                if(clientCompany is null || clientCompany.SelectedCountryId < 1 || clientCompany.SelectedStateId < 1 || clientCompany.SelectedDistrictId < 1 || clientCompany.SelectedPincodeId < 1)
+                if (clientCompany is null || clientCompany.SelectedCountryId < 1 || clientCompany.SelectedStateId < 1 || clientCompany.SelectedDistrictId < 1 || clientCompany.SelectedPincodeId < 1)
                 {
                     notifyService.Custom($"OOPs !!!..Invalid Data.", 3, "red", "fas fa-building");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                
+
                 if (clientCompany.ClientCompanyId < 1)
                 {
                     notifyService.Error("OOPs !!!..Company Not Found");
@@ -169,8 +169,8 @@ namespace risk.control.system.Controllers
                     notifyService.Error("OOPs !!!..User Not Found");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                
-                var existCompany = _context.ClientCompany.Include(c=>c.Country).FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
+
+                var existCompany = _context.ClientCompany.Include(c => c.Country).FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
 
                 IFormFile? companyDocument = Request.Form?.Files?.FirstOrDefault();
                 if (companyDocument is not null)
@@ -215,9 +215,9 @@ namespace risk.control.system.Controllers
                 _context.ClientCompany.Update(existCompany);
                 await _context.SaveChangesAsync();
 
-                await smsService.DoSendSmsAsync(existCompany.Country.ISDCode+ existCompany.PhoneNumber, "Company edited. Domain : " + clientCompany.Email);
+                await smsService.DoSendSmsAsync(existCompany.Country.ISDCode + existCompany.PhoneNumber, "Company edited. Domain : " + clientCompany.Email);
             }
-            
+
             catch (Exception ex)
             {
                 notifyService.Error("OOPs !!!..Contact Admin");
@@ -245,14 +245,14 @@ namespace risk.control.system.Controllers
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                
+
                 var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == currentUserEmail);
                 if (companyUser is null)
                 {
                     notifyService.Error("OOPs !!!..User Not Found");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var company = _context.ClientCompany.Include(c=>c.Country).FirstOrDefault(v => v.ClientCompanyId == companyUser.ClientCompanyId);
+                var company = _context.ClientCompany.Include(c => c.Country).FirstOrDefault(v => v.ClientCompanyId == companyUser.ClientCompanyId);
                 if (company == null)
                 {
                     notifyService.Error("OOPs !!!..Contact Admin");
@@ -275,7 +275,7 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateUser(ClientCompanyApplicationUser user, string emailSuffix)
         {
-            if(user is null || user.SelectedCountryId < 1 || user.SelectedStateId < 1 || user.SelectedDistrictId < 1 || user.SelectedPincodeId < 1)
+            if (user is null || user.SelectedCountryId < 1 || user.SelectedStateId < 1 || user.SelectedDistrictId < 1 || user.SelectedPincodeId < 1)
             {
                 notifyService.Custom($"OOPs !!!..Invalid Data.", 3, "red", "fas fa-building");
                 return RedirectToAction(nameof(CreateUser), "Company");
@@ -283,7 +283,7 @@ namespace risk.control.system.Controllers
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                
+
                 var userFullEmail = user.Email.Trim().ToLower() + "@" + emailSuffix;
                 if (user.ProfileImage != null && user.ProfileImage.Length > 0)
                 {
@@ -350,7 +350,7 @@ namespace risk.control.system.Controllers
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                
+
                 if (userId == null || _context.ClientCompanyApplicationUser == null)
                 {
                     notifyService.Error("OOPs !!!..Contact Admin");
@@ -360,7 +360,7 @@ namespace risk.control.system.Controllers
                 var clientCompanyApplicationUser = await _context.ClientCompanyApplicationUser
                     .Include(u => u.Country).
                     Include(u => u.ClientCompany)
-                    .FirstOrDefaultAsync(c => c.Id== userId);
+                    .FirstOrDefaultAsync(c => c.Id == userId);
 
                 if (clientCompanyApplicationUser == null)
                 {
@@ -390,12 +390,12 @@ namespace risk.control.system.Controllers
             if (applicationUser is null || applicationUser.SelectedCountryId < 1 || applicationUser.SelectedStateId < 1 || applicationUser.SelectedDistrictId < 1 || applicationUser.SelectedPincodeId < 1)
             {
                 notifyService.Custom($"OOPs !!!..Invalid Data.", 3, "red", "fas fa-building");
-                return RedirectToAction(nameof(EditUser), "Company",new {userid = id });
+                return RedirectToAction(nameof(EditUser), "Company", new { userid = id });
             }
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                
+
                 if (id != applicationUser.Id.ToString())
                 {
                     notifyService.Error("USER NOT FOUND!");
@@ -505,8 +505,8 @@ namespace risk.control.system.Controllers
                     notifyService.Error("OOPS!!!.Id Not Found.Try Again");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-               
-                var model =await _context.ClientCompanyApplicationUser.Include(v => v.Country).Include(v => v.State).Include(v => v.District).Include(v => v.PinCode)
+
+                var model = await _context.ClientCompanyApplicationUser.Include(v => v.Country).Include(v => v.State).Include(v => v.District).Include(v => v.PinCode)
                     .FirstOrDefaultAsync(c => c.Id == userId);
                 if (model == null)
                 {
@@ -531,13 +531,13 @@ namespace risk.control.system.Controllers
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                
+
                 if (string.IsNullOrWhiteSpace(email))
                 {
                     notifyService.Error("Not Found!!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var model =await _context.ClientCompanyApplicationUser.Include(v => v.Country).Include(v => v.State).Include(v => v.District).Include(v => v.PinCode)
+                var model = await _context.ClientCompanyApplicationUser.Include(v => v.Country).Include(v => v.State).Include(v => v.District).Include(v => v.PinCode)
                     .FirstOrDefaultAsync(c => c.Email == email);
                 if (model == null)
                 {
@@ -550,7 +550,7 @@ namespace risk.control.system.Controllers
                 model.Deleted = true;
                 _context.ClientCompanyApplicationUser.Update(model);
                 await _context.SaveChangesAsync();
-                notifyService.Custom($"User {model.Email} deleted", 3, "red", "fas fa-user-minus");
+                notifyService.Custom($"User {model.Email} deleted", 3, "orange", "fas fa-user-minus");
                 return RedirectToAction(nameof(CompanyController.Users), "Company");
             }
             catch (Exception ex)
@@ -580,18 +580,18 @@ namespace risk.control.system.Controllers
         }
 
         // GET: Vendors/Details/5
-        [Breadcrumb(" Manage Agency", FromAction = "EmpanelledVendors")]
+        [Breadcrumb("Agency Profile", FromAction = "EmpanelledVendors", FromController = typeof(VendorsController))]
         public async Task<IActionResult> AgencyDetail(long id)
         {
             try
             {
-                if (id <= 0 )
+                if (id <= 0)
                 {
                     notifyService.Error("OOPS !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                
+
                 var vendor = await _context.Vendor
                     .Include(v => v.ratings)
                     .Include(v => v.Country)
@@ -599,7 +599,6 @@ namespace risk.control.system.Controllers
                     .Include(v => v.State)
                     .Include(v => v.District)
                     .Include(v => v.VendorInvestigationServiceTypes)
-                    .ThenInclude(v => v.PincodeServices)
                     .Include(v => v.VendorInvestigationServiceTypes)
                     .ThenInclude(v => v.State)
                     .Include(v => v.VendorInvestigationServiceTypes)
@@ -641,7 +640,7 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                var vendor = await _context.Vendor.Include(v=>v.Country).FirstOrDefaultAsync(v=>v.VendorId == id);
+                var vendor = await _context.Vendor.Include(v => v.Country).FirstOrDefaultAsync(v => v.VendorId == id);
                 if (vendor == null)
                 {
                     notifyService.Error("OOPS !!!..Contact Admin");
@@ -672,7 +671,7 @@ namespace risk.control.system.Controllers
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                
+
                 IFormFile? vendorDocument = Request.Form?.Files?.FirstOrDefault();
                 if (vendorDocument is not null)
                 {
@@ -747,7 +746,7 @@ namespace risk.control.system.Controllers
         public IActionResult CreateAgencyUser(long id)
         {
             var currentUserEmail = HttpContext.User?.Identity?.Name;
-            
+
             if (id <= 0)
             {
                 notifyService.Error("OOPS !!!..Error creating user");
@@ -755,7 +754,7 @@ namespace risk.control.system.Controllers
             }
             var allRoles = Enum.GetValues(typeof(AgencyRole)).Cast<AgencyRole>()?.ToList();
 
-            var vendor = _context.Vendor.Include(v=>v.Country).FirstOrDefault(v => v.VendorId == id);
+            var vendor = _context.Vendor.Include(v => v.Country).FirstOrDefault(v => v.VendorId == id);
             if (vendor == null)
             {
                 notifyService.Error("OOPS !!!..Contact Admin");
@@ -770,7 +769,7 @@ namespace risk.control.system.Controllers
             {
                 allRoles = allRoles.Where(r => r != AgencyRole.AGENCY_ADMIN).ToList();
             }
-            var model = new VendorApplicationUser {Country = vendor.Country, CountryId = vendor.CountryId, Vendor = vendor, AgencyRole = allRoles };
+            var model = new VendorApplicationUser { Country = vendor.Country, CountryId = vendor.CountryId, Vendor = vendor, AgencyRole = allRoles };
 
             return View(model);
         }
@@ -787,7 +786,7 @@ namespace risk.control.system.Controllers
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                
+
                 if (string.IsNullOrEmpty(emailSuffix) || user is null)
                 {
                     notifyService.Error("OOPS !!!..Contact Admin");
@@ -917,7 +916,7 @@ namespace risk.control.system.Controllers
                 }
 
                 var vendorApplicationUser = _context.VendorApplicationUser
-                    .Include(u=>u.Vendor)
+                    .Include(u => u.Vendor)
                     .Include(v => v.Country).Where(v => v.Id == userId)
                     ?.FirstOrDefault();
 
@@ -947,7 +946,7 @@ namespace risk.control.system.Controllers
                     notifyService.Error("OOPS!!!.Id Not Found.Try Again");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                
+
                 var model = await _context.VendorApplicationUser.Include(v => v.Country).Include(v => v.State).Include(v => v.District).Include(v => v.PinCode).FirstOrDefaultAsync(c => c.Id == userId);
                 if (model == null)
                 {
@@ -982,7 +981,7 @@ namespace risk.control.system.Controllers
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                
+
                 if (string.IsNullOrWhiteSpace(email))
                 {
                     notifyService.Error("Not Found!!!..Contact Admin");
@@ -1000,7 +999,7 @@ namespace risk.control.system.Controllers
                 model.Deleted = true;
                 _context.VendorApplicationUser.Update(model);
                 await _context.SaveChangesAsync();
-                notifyService.Custom($"User {model.Email} deleted", 3, "red", "fas fa-user-minus");
+                notifyService.Custom($"User {model.Email} deleted", 3, "orange", "fas fa-user-minus");
                 return RedirectToAction(nameof(AgencyUsers), "Company", new { id = vendorId });
             }
             catch (Exception ex)
@@ -1020,19 +1019,19 @@ namespace risk.control.system.Controllers
                 notifyService.Error("OOPS !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
-            
+
             ViewData["vendorId"] = id;
 
             return View();
         }
-        [Breadcrumb(" Add", FromAction = "Service")]
+        [Breadcrumb(" Add Service", FromAction = "Service")]
         public IActionResult CreateService(long id)
         {
             try
             {
-                var vendor = _context.Vendor.Include(v=>v.Country).FirstOrDefault(v => v.VendorId == id);
+                var vendor = _context.Vendor.Include(v => v.Country).FirstOrDefault(v => v.VendorId == id);
                 ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name");
-                var model = new VendorInvestigationServiceType { Country = vendor.Country, CountryId = vendor.CountryId, SelectedMultiPincodeId = new List<long>(), Vendor = vendor, PincodeServices = new List<ServicedPinCode>() };
+                var model = new VendorInvestigationServiceType { Country = vendor.Country, CountryId = vendor.CountryId, Vendor = vendor };
 
                 return View(model);
             }
@@ -1057,8 +1056,6 @@ namespace risk.control.system.Controllers
             }
             try
             {
-                bool removedExistingService = false;
-                int removedExistingServiceCount = 0;
                 var isCountryValid = await _context.Country.AnyAsync(c => c.CountryId == service.SelectedCountryId);
                 var isStateValid = await _context.State.AnyAsync(s => s.StateId == service.SelectedStateId);
                 var isDistrictValid = service.SelectedDistrictId == -1 ||
@@ -1071,51 +1068,44 @@ namespace risk.control.system.Controllers
                 }
 
                 var stateWideService = _context.VendorInvestigationServiceType
-                        .AsEnumerable() // Switch to client-side evaluation
-                        .Where(v =>
-                            v.VendorId == VendorId &&
-                            v.LineOfBusinessId == service.LineOfBusinessId &&
-                            v.InvestigationServiceTypeId == service.InvestigationServiceTypeId &&
-                            v.CountryId == (long?)service.SelectedCountryId &&
-                            v.StateId == (long?)service.SelectedStateId &&
-                            v.DistrictId == null)
-                        .ToList();
-
-                List<PinCode> pinCodes = new List<PinCode>();
+                       .AsEnumerable() // Switch to client-side evaluation
+                       .Where(v =>
+                           v.VendorId == VendorId &&
+                           v.LineOfBusinessId == service.LineOfBusinessId &&
+                           v.InvestigationServiceTypeId == service.InvestigationServiceTypeId &&
+                           v.CountryId == (long?)service.SelectedCountryId &&
+                           v.StateId == (long?)service.SelectedStateId)?
+                       .ToList();
 
                 // Handle state-wide service existence
                 if (service.SelectedDistrictId == -1)
                 {
                     // Handle state-wide service creation
-                    if (stateWideService is null || !stateWideService.Any())
+                    if (stateWideService is not null && stateWideService.Any(s => s.DistrictId == null))
                     {
-                        pinCodes = new List<PinCode> { new PinCode { Name = ALL_PINCODE, Code = ALL_PINCODE } };
-                    }
-                    else
-                    {
-                        stateWideService.FirstOrDefault().IsUpdated = true;
-                        _context.VendorInvestigationServiceType.Update(stateWideService.FirstOrDefault());
+                        var currentService = stateWideService.FirstOrDefault(s => s.DistrictId == null);
+                        currentService.IsUpdated = true;
+                        _context.VendorInvestigationServiceType.Update(currentService);
                         await _context.SaveChangesAsync();
                         notifyService.Custom($"Service [{ALL_DISTRICT}] already exists for the State!", 3, "orange", "fas fa-truck");
                         return RedirectToAction(nameof(CompanyController.Service), "Company", new { id = service.VendorId });
                     }
                 }
-
-                // Handle district-specific services
                 else
                 {
-                    pinCodes = await _context.PinCode.Where(p => service.SelectedMultiPincodeId.Contains(p.PinCodeId)).ToListAsync();
+                    // Handle state-wide service creation
+                    if (stateWideService is not null && stateWideService.Any(s => s.DistrictId != null && s.DistrictId == service.SelectedDistrictId))
+                    {
+                        var currentService = stateWideService.FirstOrDefault(s => s.DistrictId == service.SelectedDistrictId
+                        );
+                        currentService.IsUpdated = true;
+                        _context.VendorInvestigationServiceType.Update(currentService);
+                        await _context.SaveChangesAsync();
+                        notifyService.Custom($"Service already exists for the District!", 3, "orange", "fas fa-truck");
+                        return RedirectToAction(nameof(CompanyController.Service), "Company", new { id = service.VendorId });
+                    }
                 }
 
-                var servicePinCodes = pinCodes.Select(p =>
-                    new ServicedPinCode
-                    {
-                        Name = p.Name,
-                        Pincode = p.Code,
-                        VendorInvestigationServiceTypeId = service.VendorInvestigationServiceTypeId
-                    }).ToList();
-
-                service.PincodeServices = servicePinCodes;
                 service.VendorId = VendorId;
                 service.CountryId = service.SelectedCountryId;
                 service.StateId = service.SelectedStateId;
@@ -1135,7 +1125,7 @@ namespace risk.control.system.Controllers
 
                 _context.Add(service);
                 await _context.SaveChangesAsync();
-                if (removedExistingService)
+                if (service.DistrictId == null)
                 {
                     notifyService.Custom($"Service [{ALL_DISTRICT}] added successfully.", 3, "orange", "fas fa-truck");
                 }
@@ -1154,79 +1144,36 @@ namespace risk.control.system.Controllers
             }
         }
 
-        [Breadcrumb(" Edit", FromAction = "Service")]
+        [Breadcrumb(" Edit Service", FromAction = "Service")]
         public async Task<IActionResult> EditService(long id)
         {
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                
-                if (id <= 0 )
+
+                if (id <= 0)
                 {
                     notifyService.Error("OOPs !!!..Agency Id Not Found");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                var vendorInvestigationServiceType = await _context.VendorInvestigationServiceType.FindAsync(id);
-                if (vendorInvestigationServiceType == null)
-                {
-                    notifyService.Custom($"Error to edit service.", 3, "red", "fas fa-truck");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-                var services = _context.VendorInvestigationServiceType
+                var vendorInvestigationServiceType = _context.VendorInvestigationServiceType
+                    .Include(v => v.LineOfBusiness)
+                    .Include(v => v.InvestigationServiceType)
                     .Include(v => v.Country)
+                    .Include(v => v.District)
+                    .Include(v => v.State)
                     .Include(v => v.Vendor)
-                    .Include(v => v.PincodeServices)
                     .First(v => v.VendorInvestigationServiceTypeId == id);
 
                 ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", vendorInvestigationServiceType.LineOfBusinessId);
-                //ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType
-                //    .Include(i => i.LineOfBusiness)
-                //    .Where(i => i.LineOfBusiness.LineOfBusinessId == vendorInvestigationServiceType.LineOfBusinessId),
-                //    "InvestigationServiceTypeId", "Name", vendorInvestigationServiceType.InvestigationServiceTypeId);
+                ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType, "InvestigationServiceTypeId", "Name", vendorInvestigationServiceType.InvestigationServiceTypeId);
+
                 if (vendorInvestigationServiceType.DistrictId == null)
                 {
-                    var pinCodes = new List<PinCode> { new PinCode { Name = ALL_PINCODE, Code = ALL_PINCODE_CODE } };
-                    services.PincodeServices = pinCodes.Select(p =>
-                        new ServicedPinCode
-                        {
-                            Name = p.Name,
-                            Pincode = p.Code,
-                            VendorInvestigationServiceTypeId = vendorInvestigationServiceType.VendorInvestigationServiceTypeId
-                        }).ToList();
-                    ViewBag.PinCodeId = pinCodes
-                    .Select(x => new SelectListItem
-                    {
-                        Text = x.Name,
-                        Value = x.Code
-                    }).ToList();
+                    vendorInvestigationServiceType.SelectedDistrictId = -1;
                 }
-                else
-                {
-                    ViewBag.PinCodeId = _context.PinCode.Include(c=>c.District).Where(p => p.District.DistrictId == vendorInvestigationServiceType.DistrictId)
-                    .Select(x => new SelectListItem
-                    {
-                        Text = x.Name + " - " + x.Code,
-                        Value = x.PinCodeId.ToString()
-                    }).ToList();
-                }
-
-
-                var selectedPincodeWithArea = services.PincodeServices;
-                var vendorServiceTypes = new List<long>();
-
-                foreach (var service in selectedPincodeWithArea)
-                {
-                    var pincodeServices = _context.PinCode.Where(p => p.Code == service.Pincode && p.Name == service.Name).Select(p => p.PinCodeId)?.ToList();
-                    vendorServiceTypes.AddRange(pincodeServices);
-                }
-
-                services.SelectedMultiPincodeId = vendorServiceTypes;
-                if (services.DistrictId == null)
-                {
-                    services.SelectedDistrictId = -1;
-                }
-                return View(services);
+                return View(vendorInvestigationServiceType);
             }
             catch (Exception ex)
             {
@@ -1240,7 +1187,7 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditService(long VendorInvestigationServiceTypeId, VendorInvestigationServiceType service, long VendorId)
         {
-            if (VendorInvestigationServiceTypeId != service.VendorInvestigationServiceTypeId || service.SelectedMultiPincodeId.Count <= 0 || service is null || service.SelectedCountryId < 1 || service.SelectedStateId < 1 ||
+            if (VendorInvestigationServiceTypeId != service.VendorInvestigationServiceTypeId || service is null || service.SelectedCountryId < 1 || service.SelectedStateId < 1 ||
                 (service.SelectedDistrictId != -1 && service.SelectedDistrictId < 1) || VendorId < 1)
             {
                 notifyService.Custom($"Error to edit service.", 3, "red", "fas fa-truck");
@@ -1248,49 +1195,41 @@ namespace risk.control.system.Controllers
             }
             try
             {
-                var stateWideService = await _context.VendorInvestigationServiceType.AsNoTracking().
-                        FirstOrDefaultAsync(v =>
+                var stateWideService = _context.VendorInvestigationServiceType
+                        .AsEnumerable() // Switch to client-side evaluation
+                        .Where(v =>
                             v.VendorId == VendorId &&
                             v.LineOfBusinessId == service.LineOfBusinessId &&
                             v.InvestigationServiceTypeId == service.InvestigationServiceTypeId &&
                             v.CountryId == (long?)service.SelectedCountryId &&
-                            v.StateId == (long?)service.SelectedStateId &&
-                            v.DistrictId == null);
-                List<PinCode> pinCodes = new List<PinCode>();
-                // Remove all state-level services
+                            v.StateId == (long?)service.SelectedStateId)?
+                        .ToList();
                 if (service.SelectedDistrictId == -1)
                 {
-                    if (stateWideService is null)
+                    // Handle state-wide service creation
+                    if (stateWideService is not null && stateWideService.Any(s => s.DistrictId == null))
                     {
-                        pinCodes = new List<PinCode>
-                        {
-                            new PinCode { Name = ALL_PINCODE, Code = ALL_PINCODE }
-                        };
+                        var currentService = stateWideService.FirstOrDefault(s => s.DistrictId == null);
+                        currentService.IsUpdated = true;
+                        _context.VendorInvestigationServiceType.Update(currentService);
+                        await _context.SaveChangesAsync();
+                        notifyService.Custom($"Service [{ALL_DISTRICT}] already exists for the State!", 3, "orange", "fas fa-truck");
+                        return RedirectToAction(nameof(CompanyController.Service), "Company", new { id = service.VendorId });
                     }
                 }
                 else
                 {
-                    var agencyServicedPincodes = _context.ServicedPinCode.Where(s =>
-                        s.VendorInvestigationServiceTypeId == service.VendorInvestigationServiceTypeId);
-                    if (agencyServicedPincodes is not null)
+                    // Handle state-wide service creation
+                    if (stateWideService is not null && stateWideService.Any(s => s.DistrictId != null && s.DistrictId == service.SelectedDistrictId && s.VendorInvestigationServiceTypeId != service.VendorInvestigationServiceTypeId))
                     {
-                        _context.ServicedPinCode.RemoveRange(agencyServicedPincodes);
+                        var currentService = stateWideService.FirstOrDefault(s => s.DistrictId == service.SelectedDistrictId);
+                        currentService.IsUpdated = true;
+                        _context.VendorInvestigationServiceType.Update(currentService);
+                        await _context.SaveChangesAsync();
+                        notifyService.Custom($"Service already exists for the District!", 3, "orange", "fas fa-truck");
+                        return RedirectToAction(nameof(CompanyController.Service), "Company", new { id = service.VendorId });
                     }
-
-                    // Retrieve the selected pin codes
-                    pinCodes = await _context.PinCode
-                        .Where(pinCode => service.SelectedMultiPincodeId.Distinct().Contains(pinCode.PinCodeId))
-                        .ToListAsync();
                 }
-
-                service.PincodeServices = pinCodes.Select(p =>
-                new ServicedPinCode
-                {
-                    Name = p.Name,
-                    Pincode = p.Code,
-                    VendorInvestigationServiceTypeId = VendorInvestigationServiceTypeId
-                })?.ToList();
-
                 service.CountryId = service.SelectedCountryId;
                 service.StateId = service.SelectedStateId;
                 if (service.SelectedDistrictId == -1)
@@ -1307,8 +1246,6 @@ namespace risk.control.system.Controllers
                 service.IsUpdated = true;
                 _context.Update(service);
                 await _context.SaveChangesAsync();
-                _context.Update(service);
-                await _context.SaveChangesAsync();
                 notifyService.Custom($"Service updated successfully.", 3, "orange", "fas fa-truck");
                 return RedirectToAction(nameof(CompanyController.Service), "Company", new { id = service.VendorId });
             }
@@ -1321,21 +1258,20 @@ namespace risk.control.system.Controllers
         }
 
         // GET: VendorService/Delete/5
-        [Breadcrumb(" Delete", FromAction = "Service")]
+        [Breadcrumb(" Delete Service", FromAction = "Service")]
         public async Task<IActionResult> DeleteService(long id)
         {
             try
             {
-                if (id <= 0 )
+                if (id <= 0)
                 {
                     notifyService.Error("OOPs !!!..Id Not Found");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                
+
                 var vendorInvestigationServiceType = await _context.VendorInvestigationServiceType
                     .Include(v => v.InvestigationServiceType)
                     .Include(v => v.LineOfBusiness)
-                    .Include(v => v.PincodeServices)
                     .Include(v => v.State)
                     .Include(v => v.District)
                     .Include(v => v.Country)
@@ -1369,7 +1305,7 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                
+
                 var vendorInvestigationServiceType = await _context.VendorInvestigationServiceType.FindAsync(id);
                 if (vendorInvestigationServiceType != null)
                 {
@@ -1377,7 +1313,7 @@ namespace risk.control.system.Controllers
                     vendorInvestigationServiceType.UpdatedBy = currentUserEmail;
                     _context.VendorInvestigationServiceType.Remove(vendorInvestigationServiceType);
                     await _context.SaveChangesAsync();
-                    notifyService.Custom($"Service deleted successfully.", 3, "red", "fas fa-truck");
+                    notifyService.Custom($"Service deleted successfully.", 3, "orange", "fas fa-truck");
                     return RedirectToAction("Service", "Company", new { id = vendorInvestigationServiceType.VendorId });
                 }
                 notifyService.Error($"Err Service delete.", 3);
@@ -1402,7 +1338,7 @@ namespace risk.control.system.Controllers
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                
+
                 var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == currentUserEmail);
                 if (companyUser == null)
                 {
@@ -1426,7 +1362,7 @@ namespace risk.control.system.Controllers
                 var savedRows = await _context.SaveChangesAsync();
 
                 notifyService.Custom($"Agency(s) empanelled.", 3, "green", "fas fa-thumbs-up");
-                return RedirectToAction("AvailableVendors");
+                return RedirectToAction("AvailableVendors", "Vendors");
             }
             catch (Exception ex)
             {
@@ -1450,13 +1386,13 @@ namespace risk.control.system.Controllers
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                
+
                 if (vendors is null || vendors.Count == 0)
                 {
                     notifyService.Error("OOPs !!!..Not Agency Found");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                
+
                 var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == currentUserEmail);
                 if (companyUser == null)
                 {
@@ -1472,7 +1408,7 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var empanelledVendors2Depanel = _context.Vendor.AsNoTracking().Where(v => vendors.Contains(v.VendorId.ToString()));
-                
+
                 foreach (var empanelledVendor2Depanel in empanelledVendors2Depanel)
                 {
                     var empanelled = company.EmpanelledVendors.FirstOrDefault(v => v.VendorId == empanelledVendor2Depanel.VendorId);
@@ -1482,8 +1418,8 @@ namespace risk.control.system.Controllers
                 company.UpdatedBy = currentUserEmail;
                 _context.ClientCompany.Update(company);
                 var savedRows = await _context.SaveChangesAsync();
-                notifyService.Custom($"Agency(s) de-panelled.", 3, "red", "far fa-thumbs-down");
-                return RedirectToAction("EmpanelledVendors");
+                notifyService.Custom($"Agency(s) de-panelled.", 3, "orange", "far fa-thumbs-down");
+                return RedirectToAction("EmpanelledVendors", "Vendors");
             }
             catch (Exception ex)
             {
@@ -1498,7 +1434,7 @@ namespace risk.control.system.Controllers
         {
             try
             {
-                if (1 > id )
+                if (1 > id)
                 {
                     notifyService.Error("AGENCY NOT FOUND!");
                     return RedirectToAction(nameof(DashboardController.Index), "Dashboard");
@@ -1508,8 +1444,6 @@ namespace risk.control.system.Controllers
                     .Include(v => v.Country)
                     .Include(v => v.PinCode)
                     .Include(v => v.State)
-                    .Include(v => v.VendorInvestigationServiceTypes)
-                    .ThenInclude(v => v.PincodeServices)
                     .Include(v => v.VendorInvestigationServiceTypes)
                     .ThenInclude(v => v.State)
                     .Include(v => v.VendorInvestigationServiceTypes)
@@ -1541,7 +1475,7 @@ namespace risk.control.system.Controllers
         {
             try
             {
-                if (1 > id )
+                if (1 > id)
                 {
                     notifyService.Error("AGENCY NOT FOUND!");
                     return RedirectToAction(nameof(DashboardController.Index), "Dashboard");
@@ -1551,8 +1485,6 @@ namespace risk.control.system.Controllers
                     .Include(v => v.Country)
                     .Include(v => v.PinCode)
                     .Include(v => v.State)
-                    .Include(v => v.VendorInvestigationServiceTypes)
-                    .ThenInclude(v => v.PincodeServices)
                     .Include(v => v.VendorInvestigationServiceTypes)
                     .ThenInclude(v => v.State)
                     .Include(v => v.VendorInvestigationServiceTypes)

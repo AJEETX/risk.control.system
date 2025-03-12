@@ -538,7 +538,6 @@ namespace risk.control.system.Controllers.Company
                     .Include(v => v.State)
                     .Include(v => v.District)
                     .Include(v => v.VendorInvestigationServiceTypes)
-                    .ThenInclude(v => v.PincodeServices)
                     .Include(v => v.VendorInvestigationServiceTypes)
                     .ThenInclude(v => v.State)
                     .Include(v => v.VendorInvestigationServiceTypes)

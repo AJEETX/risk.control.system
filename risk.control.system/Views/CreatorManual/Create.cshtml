@@ -52,7 +52,7 @@
                     <div>
                         @if (Model.ClaimsInvestigation.ClientCompany.AutoAllocation)
                         {
-                            <a id="back" asp-controller="CreatorAuto" asp-action="New" class="btn btn-outline-secondary">
+                            <a id="back" asp-controller="CreatorAuto" asp-action="New" asp-route-mode="@CREATEDBY.MANUAL" class="btn btn-outline-secondary">
                                 <span class="badge badge-light"> <i class="fas fa-arrow-left"></i> </span> Back
                             </a>
                         }

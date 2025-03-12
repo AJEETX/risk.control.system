@@ -31,7 +31,7 @@ using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers
 {
-    [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME},{AGENCY_ADMIN.DISPLAY_NAME}")]
+    [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME},{AGENCY_ADMIN.DISPLAY_NAME},{MANAGER.DISPLAY_NAME}")]
     public class AgencyController : Controller
     {
         private readonly SignInManager<ApplicationUser> signInManager;
@@ -89,8 +89,6 @@ namespace risk.control.system.Controllers
                     .Include(v => v.PinCode)
                     .Include(v => v.State)
                     .Include(v => v.District)
-                    .Include(v => v.VendorInvestigationServiceTypes)
-                    .ThenInclude(v => v.PincodeServices)
                     .Include(v => v.VendorInvestigationServiceTypes)
                     .ThenInclude(v => v.State)
                     .Include(v => v.VendorInvestigationServiceTypes)
@@ -777,7 +775,7 @@ namespace risk.control.system.Controllers
                 var vendor = _context.Vendor.Include(v => v.Country).FirstOrDefault(v => v.VendorId == vendorUser.VendorId);
 
                 ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name");
-                var model = new VendorInvestigationServiceType { Country = vendor.Country, CountryId = vendor.CountryId, SelectedMultiPincodeId = new List<long>(), Vendor = vendor, PincodeServices = new List<ServicedPinCode>() };
+                var model = new VendorInvestigationServiceType { Country = vendor.Country, CountryId = vendor.CountryId, Vendor = vendor };
                 return View(model);
             }
             catch (Exception ex)
@@ -808,7 +806,6 @@ namespace risk.control.system.Controllers
                     notifyService.Error("Vendor not found. Please check your login or vendor configuration.");
                     return RedirectToAction(nameof(CreateService), "Agency");
                 }
-                bool removedExistingService = false;
                 var isCountryValid = await _context.Country.AnyAsync(c => c.CountryId == service.SelectedCountryId);
                 var isStateValid = await _context.State.AnyAsync(s => s.StateId == service.SelectedStateId);
                 var isDistrictValid = service.SelectedDistrictId == -1 ||
@@ -827,45 +824,37 @@ namespace risk.control.system.Controllers
                             v.LineOfBusinessId == service.LineOfBusinessId &&
                             v.InvestigationServiceTypeId == service.InvestigationServiceTypeId &&
                             v.CountryId == (long?)service.SelectedCountryId &&
-                            v.StateId == (long?)service.SelectedStateId &&
-                            v.DistrictId == null)
+                            v.StateId == (long?)service.SelectedStateId)?
                         .ToList();
-
-                List<PinCode> pinCodes = new List<PinCode>();
 
                 // Handle state-wide service existence
                 if (service.SelectedDistrictId == -1)
                 {
                     // Handle state-wide service creation
-                    if (stateWideService is null || !stateWideService.Any())
+                    if (stateWideService is not null && stateWideService.Any(s=>s.DistrictId == null))
                     {
-                        pinCodes = new List<PinCode> { new PinCode { Name = ALL_PINCODE, Code = ALL_PINCODE } };
-                    }
-                    else
-                    {
-                        stateWideService.FirstOrDefault().IsUpdated = true;
-                        _context.VendorInvestigationServiceType.Update(stateWideService.FirstOrDefault());
+                        var currentService = stateWideService.FirstOrDefault(s => s.DistrictId == null);
+                        currentService.IsUpdated = true;
+                        _context.VendorInvestigationServiceType.Update(currentService);
                         await _context.SaveChangesAsync();
                         notifyService.Custom($"Service [{ALL_DISTRICT}] already exists for the State!", 3, "orange", "fas fa-truck");
                         return RedirectToAction(nameof(Service), "Agency");
                     }
                 }
-
-                // Handle district-specific services
                 else
                 {
-                    pinCodes = await _context.PinCode.Where(p => service.SelectedMultiPincodeId.Contains(p.PinCodeId)).ToListAsync();
-                }
-
-                var servicePinCodes = pinCodes.Select(p =>
-                    new ServicedPinCode
+                    // Handle state-wide service creation
+                    if (stateWideService is not null && stateWideService.Any(s => s.DistrictId != null && s.DistrictId == service.SelectedDistrictId))
                     {
-                        Name = p.Name,
-                        Pincode = p.Code,
-                        VendorInvestigationServiceTypeId = service.VendorInvestigationServiceTypeId
-                    }).ToList();
-
-                service.PincodeServices = servicePinCodes;
+                        var currentService = stateWideService.FirstOrDefault(s => s.DistrictId == service.SelectedDistrictId
+                        );
+                        currentService.IsUpdated = true;
+                        _context.VendorInvestigationServiceType.Update(currentService);
+                        await _context.SaveChangesAsync();
+                        notifyService.Custom($"Service already exists for the District!", 3, "orange", "fas fa-truck");
+                        return RedirectToAction(nameof(Service), "Agency");
+                    }
+                }
                 service.VendorId = vendorUser.VendorId.Value;
                 service.CountryId = service.SelectedCountryId;
                 service.StateId = service.SelectedStateId;
@@ -886,7 +875,7 @@ namespace risk.control.system.Controllers
 
                 _context.Add(service);
                 await _context.SaveChangesAsync();
-                if (removedExistingService)
+                if (service.DistrictId == null)
                 {
                     notifyService.Custom($"Service [{ALL_DISTRICT}] added successfully.", 3, "orange", "fas fa-truck");
                 }
@@ -906,7 +895,7 @@ namespace risk.control.system.Controllers
 
 
         [Breadcrumb("Edit Service", FromAction = "Service")]
-        public async Task<IActionResult> EditService(long id)
+        public IActionResult EditService(long id)
         {
             try
             {
@@ -916,65 +905,20 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                var vendorInvestigationServiceType = await _context.VendorInvestigationServiceType.FindAsync(id);
-
-                if (vendorInvestigationServiceType is null)
-                {
-                    notifyService.Custom($"Error to edit service.", 3, "red", "fas fa-truck");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-
-                var services = _context.VendorInvestigationServiceType
+                var vendorInvestigationServiceType = _context.VendorInvestigationServiceType
                     .Include(v => v.Country)
+                    .Include(v => v.District)
+                    .Include(v => v.State)
                     .Include(v => v.Vendor)
-                    .Include(v => v.PincodeServices)
                     .First(v => v.VendorInvestigationServiceTypeId == id);
 
                 ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", vendorInvestigationServiceType.LineOfBusinessId);
-                
+
                 if (vendorInvestigationServiceType.DistrictId == null)
                 {
-                    var pinCodes = new List<PinCode> { new PinCode { Name = ALL_PINCODE, Code = ALL_PINCODE_CODE } };
-                    services.PincodeServices = pinCodes.Select(p =>
-                        new ServicedPinCode
-                        {
-                            Name = p.Name,
-                            Pincode = p.Code,
-                            VendorInvestigationServiceTypeId = vendorInvestigationServiceType.VendorInvestigationServiceTypeId
-                        }).ToList();
-                    ViewBag.PinCodeId = pinCodes
-                    .Select(x => new SelectListItem
-                    {
-                        Text = x.Name,
-                        Value = x.Code
-                    }).ToList();
+                    vendorInvestigationServiceType.SelectedDistrictId = -1;
                 }
-                else
-                {
-                    ViewBag.PinCodeId = _context.PinCode.Include(c=>c.District).Where(p => p.District.DistrictId == vendorInvestigationServiceType.DistrictId)
-                    .Select(x => new SelectListItem
-                    {
-                        Text = x.Name + " - " + x.Code,
-                        Value = x.PinCodeId.ToString()
-                    }).ToList();
-                }
-
-
-                var selectedPincodeWithArea = services.PincodeServices;
-                var vendorServiceTypes = new List<long>();
-
-                foreach (var service in selectedPincodeWithArea)
-                {
-                    var pincodeServices = _context.PinCode.Where(p => p.Code == service.Pincode && p.Name == service.Name).Select(p => p.PinCodeId)?.ToList();
-                    vendorServiceTypes.AddRange(pincodeServices);
-                }
-
-                services.SelectedMultiPincodeId = vendorServiceTypes;
-                if (services.DistrictId == null)
-                {
-                    services.SelectedDistrictId = -1;
-                }
-                return View(services);
+                return View(vendorInvestigationServiceType);
             }
             catch (Exception ex)
             {
@@ -992,7 +936,7 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditService(long vendorInvestigationServiceTypeId, VendorInvestigationServiceType service)
         {
-            if (vendorInvestigationServiceTypeId != service.VendorInvestigationServiceTypeId || service.SelectedMultiPincodeId.Count <= 0 ||service is null || service.SelectedCountryId < 1 || service.SelectedStateId < 1 ||
+            if (vendorInvestigationServiceTypeId != service.VendorInvestigationServiceTypeId ||service is null || service.SelectedCountryId < 1 || service.SelectedStateId < 1 ||
                 (service.SelectedDistrictId != -1 && service.SelectedDistrictId < 1))
             {
                 notifyService.Custom($"Error to edit service.", 3, "red", "fas fa-truck");
@@ -1001,52 +945,42 @@ namespace risk.control.system.Controllers
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-
-                // Get the current vendor user
                 var vendorUser = _context.VendorApplicationUser.FirstOrDefault(user => user.Email == currentUserEmail);
-                var stateWideService = await _context.VendorInvestigationServiceType.AsNoTracking().
-                        FirstOrDefaultAsync(v =>
-                            v.VendorId == vendorUser.VendorId.Value &&
-                            v.LineOfBusinessId == service.LineOfBusinessId &&
-                            v.InvestigationServiceTypeId == service.InvestigationServiceTypeId &&
-                            v.CountryId == (long?)service.SelectedCountryId &&
-                            v.StateId == (long?)service.SelectedStateId &&
-                            v.DistrictId == null);
-                List<PinCode> pinCodes = new List<PinCode>();
-                // Remove all state-level services
+                var stateWideService = _context.VendorInvestigationServiceType
+                       .AsEnumerable() // Switch to client-side evaluation
+                       .Where(v =>
+                           v.VendorId == vendorUser.VendorId.Value &&
+                           v.LineOfBusinessId == service.LineOfBusinessId &&
+                           v.InvestigationServiceTypeId == service.InvestigationServiceTypeId &&
+                           v.CountryId == (long?)service.SelectedCountryId &&
+                           v.StateId == (long?)service.SelectedStateId)?
+                       .ToList();
                 if (service.SelectedDistrictId == -1)
                 {
-                    if (stateWideService is null)
+                    // Handle state-wide service creation
+                    if (stateWideService is not null && stateWideService.Any(s => s.DistrictId == null))
                     {
-                        pinCodes = new List<PinCode>
-                        {
-                            new PinCode { Name = ALL_PINCODE, Code = ALL_PINCODE }
-                        };
+                        var currentService = stateWideService.FirstOrDefault(s => s.DistrictId == null);
+                        currentService.IsUpdated = true;
+                        _context.VendorInvestigationServiceType.Update(currentService);
+                        await _context.SaveChangesAsync();
+                        notifyService.Custom($"Service [{ALL_DISTRICT}] already exists for the State!", 3, "orange", "fas fa-truck");
+                        return RedirectToAction(nameof(Service), "Agency");
                     }
                 }
                 else
                 {
-                    var agencyServicedPincodes = _context.ServicedPinCode.Where(s =>
-                        s.VendorInvestigationServiceTypeId == service.VendorInvestigationServiceTypeId);
-                    if(agencyServicedPincodes is not null)
+                    // Handle state-wide service creation
+                    if (stateWideService is not null && stateWideService.Any(s => s.DistrictId != null && s.DistrictId == service.SelectedDistrictId && s.VendorInvestigationServiceTypeId != service.VendorInvestigationServiceTypeId))
                     {
-                        _context.ServicedPinCode.RemoveRange(agencyServicedPincodes);
+                        var currentService = stateWideService.FirstOrDefault(s => s.DistrictId == service.SelectedDistrictId);
+                        currentService.IsUpdated = true;
+                        _context.VendorInvestigationServiceType.Update(currentService);
+                        await _context.SaveChangesAsync();
+                        notifyService.Custom($"Service already exists for the District!", 3, "orange", "fas fa-truck");
+                        return RedirectToAction(nameof(Service), "Agency");
                     }
-
-                    // Retrieve the selected pin codes
-                    pinCodes = await _context.PinCode
-                        .Where(pinCode => service.SelectedMultiPincodeId.Distinct().Contains(pinCode.PinCodeId))
-                        .ToListAsync();
                 }
-
-                service.PincodeServices = pinCodes.Select(p => 
-                new ServicedPinCode 
-                { 
-                    Name = p.Name, 
-                    Pincode = p.Code, 
-                    VendorInvestigationServiceTypeId = vendorInvestigationServiceTypeId 
-                })?.ToList();
-
                 service.CountryId = service.SelectedCountryId;
                 service.StateId = service.SelectedStateId;
                 if (service.SelectedDistrictId == -1)
@@ -1065,7 +999,7 @@ namespace risk.control.system.Controllers
                 await _context.SaveChangesAsync();
 
                 notifyService.Custom($"Service updated successfully.", 3, "orange", "fas fa-truck");
-                return RedirectToAction(nameof(AgencyController.Service), "Agency");
+                return RedirectToAction(nameof(Service), "Agency");
             }
             catch (Exception ex)
             {
@@ -1092,7 +1026,6 @@ namespace risk.control.system.Controllers
                 var vendorInvestigationServiceType = await _context.VendorInvestigationServiceType
                     .Include(v => v.InvestigationServiceType)
                     .Include(v => v.LineOfBusiness)
-                    .Include(v => v.PincodeServices)
                     .Include(v => v.Country)
                     .Include(v => v.State)
                     .Include(v => v.District)
@@ -1162,7 +1095,6 @@ namespace risk.control.system.Controllers
                 var vendorInvestigationServiceType = await _context.VendorInvestigationServiceType
                     .Include(v => v.InvestigationServiceType)
                     .Include(v => v.LineOfBusiness)
-                    .Include(v => v.PincodeServices)
                     .Include(v => v.State)
                     .Include(v => v.District)
                     .Include(v => v.Country)

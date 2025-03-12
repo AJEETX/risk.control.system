@@ -80,7 +80,7 @@
             url: `/api/Company/AllServices?id=${$('#vendorId').val()}`,
             dataSrc: ''
         },
-        order: [[11, 'desc'], [12, 'desc']],
+        order: [[10, 'desc'], [11, 'desc']],
         columnDefs: [
             { className: 'max-width-column-name', targets: 1 },
             { className: 'max-width-column', targets: 7 },
@@ -124,10 +124,6 @@
                     </span>`
             },
             {
-                data: "pincodes",
-                render: (data, type, row) => `<span title="${row.rawPincodes}" data-toggle="tooltip">${data}</span>`
-            },
-            {
                 data: "updatedBy",
                 render: (data, type, row) => `<span title="${row.updatedBy}" data-toggle="tooltip">${data}</span>`
             },
@@ -168,29 +164,14 @@
             const district = data.district ? data.district.toLowerCase() : '';
             const pincodes = data.pincodes ? data.pincodes.toLowerCase() : '';
 
-            if (district === 'all districts' && pincodes === 'all pincodes') {
+            if (district === 'all districts') {
                 $(rowNode).find('td:nth-child(4)').addClass('text-light-green'); // Column index starts from 1
                 $(rowNode).find('td:nth-child(5)').addClass('text-light-green'); // Column index starts from 1
                 $(rowNode).find('td:nth-child(6)').addClass('text-light-green'); // Column index starts from 1
-                $(rowNode).find('td:nth-child(7)').addClass('text-light-green'); // Column index starts from 1
             } else {
                 $(rowNode).find('td:nth-child(4)').removeClass('text-light-green');
                 $(rowNode).find('td:nth-child(5)').removeClass('text-light-green');
                 $(rowNode).find('td:nth-child(6)').removeClass('text-light-green');
-                $(rowNode).find('td:nth-child(7)').removeClass('text-light-green');
-            }
-
-            // Apply text color for `pincodes` column
-            if (district != 'all districts' && pincodes === 'all pincodes') {
-                $(rowNode).find('td:nth-child(4)').addClass('text-light-blue');
-                $(rowNode).find('td:nth-child(5)').addClass('text-light-blue');
-                $(rowNode).find('td:nth-child(6)').addClass('text-light-blue');
-                $(rowNode).find('td:nth-child(7)').addClass('text-light-blue');
-            } else {
-                $(rowNode).find('td:nth-child(4)').removeClass('text-light-blue');
-                $(rowNode).find('td:nth-child(5)').removeClass('text-light-blue');
-                $(rowNode).find('td:nth-child(6)').removeClass('text-light-blue');
-                $(rowNode).find('td:nth-child(7)').removeClass('text-light-blue');
             }
 
             if (data.isUpdated) {

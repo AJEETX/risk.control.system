@@ -32,21 +32,13 @@
                                     </dd>
 
                                     <dt class="col-sm-5">
-                                        Service Pincodes
-                                    </dt>
-                                    <dd class="col-sm-5">
-                                        @foreach (var svc in Model?.PincodeServices)
-                                        {
-                                            var pinCodeDetail = svc.Pincode + "- " + svc.Name;
-                                            @Html.DisplayFor(modelItem => pinCodeDetail)
-                                            ;
-                                        }
-                                    </dd>
-                                    <dt class="col-sm-5">
                                         @Html.DisplayNameFor(model => model.District)
                                     </dt>
+                                    @{
+                                        var district = Model.District == null ? "ALL DISTRICTS" : Model.District.Name;
+                                    }
                                     <dd class="col-sm-5">
-                                        @Html.DisplayFor(model => model.District.Name)
+                                        @Html.DisplayFor(model => @district)
                                     </dd>
 
                                     <dt class="col-sm-5">

@@ -636,7 +636,7 @@ namespace risk.control.system.Services
                 }
                 else if (role.Name == AppRoles.MANAGER.ToString())
                 {
-                    notifications = notifications.Where(n => n.Role == role && !n.IsReadByManager);
+                    notifications = notifications.Where(n => n.Role == role && !n.IsReadByManager && n.CreatedBy != userEmail);
                 }
 
                 else if (role.Name == AppRoles.CREATOR.ToString())

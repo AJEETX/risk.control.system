@@ -146,7 +146,6 @@ namespace risk.control.system.Controllers.Api
                     .Include(c => c.VendorInvestigationServiceTypes)
                     .ThenInclude(v => v.District)
                     .Include(c => c.VendorInvestigationServiceTypes)
-                    .ThenInclude(v => v.PincodeServices)
                     .FirstOrDefault(c => c.VendorId == vendorId);
 
                 var existingVendorServices = vendor.VendorInvestigationServiceTypes.Where(i=>i.StateId == stateId);
@@ -168,10 +167,10 @@ namespace risk.control.system.Controllers.Api
                         else if (existingVendorService.LineOfBusinessId == lobId && existingVendorService.InvestigationServiceTypeId == serviceId && 
                             existingVendorService.StateId == stateId && existingVendorService.DistrictId == districtId)
                         {
-                            foreach (var pincodeService in existingVendorService.PincodeServices)
-                            {
-                                existingServicedPincodes.Add(pincodeService);
-                            }
+                            //foreach (var pincodeService in existingVendorService.PincodeServices)
+                            //{
+                            //    existingServicedPincodes.Add(pincodeService);
+                            //}
                         }
                     }
 

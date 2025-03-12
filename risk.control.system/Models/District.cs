@@ -10,7 +10,7 @@ namespace risk.control.system.Models
         public long DistrictId { get; set; }
 
         [Display(Name = "District name")]
-        public string Name { get; set; } = default!;
+        public string Name { get; set; } = "ALL DISTRICTS";
 
         [Display(Name = "District code")]
         [Required]

@@ -130,9 +130,7 @@
                                     <th>
                                         State
                                     </th>
-                                    <th>
-                                        Pincodes
-                                    </th>
+                                    
                                 </tr>
                             </thead>
                             <tbody>
@@ -154,14 +152,7 @@
                                         <td>
                                             @Html.DisplayFor(modelItem => item.State.Name)
                                         </td>
-                                        <td>
-                                            @foreach (var pin in item.PincodeServices)
-                                            {
-                                                <span>
-                                                    @pin.Pincode
-                                                </span>
-                                            }
-                                        </td>
+                                        
                                     </tr>
                                 }
                             </tbody>

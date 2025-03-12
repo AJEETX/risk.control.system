@@ -33,7 +33,7 @@
 
                         <!-- Password Sent Confirmation -->
                         <div class="alert alert-info d-flex align-items-center justify-content-center">
-                            @if (!Model.Reset)
+                            @if (Model.Reset)
                             {
                                 <i class="fas fa-info-circle mr-2"></i>
                                 <span>Password has been sent to your mobile.</span>

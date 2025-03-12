@@ -18,13 +18,7 @@ namespace risk.control.system.Controllers
         // GET: DigitalIdReports
         public async Task<IActionResult> Index()
         {
-            var userEmail = HttpContext?.User?.Identity?.Name;
-            var user = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
-            var model = await _context.DigitalIdReport
-                .Include(d => d.ClientCompany)
-                .Where(c => c.ClientCompanyId == user.ClientCompanyId)?.ToListAsync();
-
-            return View(model);
+            return View();
         }
 
         // GET: DigitalIdReports/Details/5
@@ -62,7 +56,6 @@ namespace risk.control.system.Controllers
             {
                 var userEmail = HttpContext?.User?.Identity?.Name;
                 var user = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
-                digitalIdReport.ClientCompanyId = user.ClientCompanyId;
                 digitalIdReport.Updated = DateTime.Now;
                 digitalIdReport.UpdatedBy = userEmail;
 
@@ -107,7 +100,6 @@ namespace risk.control.system.Controllers
                 {
                     var userEmail = HttpContext?.User?.Identity?.Name;
                     var user = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
-                    digitalIdReport.ClientCompanyId = user.ClientCompanyId;
                     digitalIdReport.Updated = DateTime.Now;
                     digitalIdReport.UpdatedBy = userEmail;
                     _context.Update(digitalIdReport);

@@ -4,90 +4,18 @@
 }
 <section class="content">
     <div id="article" class="card shadow-lg border-0 rounded-lg">
-        <div class="card-header bg-secondary text-white text-center">
-            <h3 class="card-title">
-                <i class="fas fa-random"></i> Assign<span class="badge badge-secondary"></span>
-                <span class="hover-text">
-                    <i class="fas fa-info-circle"></i>
-                    <span class="tooltip-text" id="information">
-                        <li>
-                            <i class='far fa-hand-point-right'></i>
-                            @if (Model.BulkUpload)
-                            {
-                                <button class='btn btn-info  btn-xs'><i class='fa fa-upload'></i> Upload  </button>
-                            }
-
-                            else
-                            {
-                                <button disabled class='btn btn-info  btn-xs'><i class='fa fa-upload'></i> Upload  </button>
-                            }
-                        </li>
-                        @if (Model.HasClaims)
-                        {
-                            <li>
-                                <i class='far fa-hand-point-right'></i>
-                                <button class="btn btn-warning  btn-xs">
-                                    <i class="fas fa-pencil-alt"></i> Edit
-                                </button>
-                            </li>
-                            <li>
-                                <i class='far fa-hand-point-right'></i>
-                                <button class="btn btn-danger  btn-xs">
-                                    <span class="badge badge-danger"> <i class="fa fa-trash"></i></span><b> Delete </b>
-                                </button>
-                            </li>
-                            <li>
-                                <i class='far fa-hand-point-right'></i> Select <span class="badge badge-light btn"> <input type='checkbox' /></span>  claim(s)
-                            </li>
-                        }
-                        @if (@Model.UserCanCreate)
-                        {
-                            <li>
-                                <i class='far fa-hand-point-right'></i>
-                                <button class="btn btn-success  btn-xs">
-                                    <span class="badge badge-success btn-xs"> <i class="far fa-edit"></i> </span>  <b> ADD NEW </b>
-                                </button>
-                            </li>
-                        }
-                        else
-                        {
-                            <li>
-                                <i class='far fa-hand-point-right'></i>
-                                <button class="btn btn-success disabled btn-xs">
-                                    <span class="disabled badge badge-success btn-xs"> <i class="far fa-edit"></i> </span>  <b> ADD NEW </b>
-                                </button>
-                            </li>
-                        }
-                        @if (Model.HasClaims)
-                        {
-                            <li>
-                                <i class='far fa-thumbs-up'></i>
-                                <button class="btn btn-warning btn-xs">
-                                    <span class="badge badge-warning btn-xs"> <i class="fas fa-random"></i> </span> Assign<span class="badge badge-warning"></span>
-                                </button>
-                            </li>
-                        }
-                        else
-                        {
-                            <li>
-                                <i class='far fa-thumbs-up'></i>
-                                <button disabled class="btn btn-warning btn-xs">
-                                    <span class="badge badge-warning btn-xs"> <i class="fas fa-random"></i> </span> Assign<span class="badge badge-warning"></span>
-                                </button>
-                            </li>
-                        }
-                    </span>
-                </span>
-
-            </h3>
-        </div>
+        <partial name="Creator/_ClaimTitle" model="Model" />
         <!-- Tabs Navigation -->
         <ul class="nav nav-tabs" id="assignmentTabs" role="tablist">
             <li class="nav-item">
-                <a class="nav-link active" id="auto-tab" data-toggle="tab" href="#autoAssign" role="tab"><i class="fas fa-random"></i> Assign <sub>auto</sub></a>
+                <a class="nav-link @(ViewBag.ActiveTab == @CREATEDBY.AUTO ? "active" : "")" id="auto-tab" data-toggle="tab" href="#autoAssign" role="tab">
+                    <i class="fas fa-random"></i> Assign <sub>auto</sub>
+                </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" id="manual-tab" data-toggle="tab" href="#manualAssign" role="tab"><i class="fas fa-external-link-alt"></i> Assign <sub>manual</sub></a>
+                <a class="nav-link @(ViewBag.ActiveTab == @CREATEDBY.MANUAL ? "active" : "")" id="manual-tab" data-toggle="tab" href="#manualAssign" role="tab">
+                    <i class="fas fa-external-link-alt"></i> Assign <sub>manual</sub>
+                </a>
             </li>
         </ul>
 
@@ -96,7 +24,7 @@
                 <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
             </div>
             <!-- Auto Assign Tab -->
-            <div class="tab-pane fade show active" id="autoAssign" role="tabpanel">
+            <div class="tab-pane fade @(ViewBag.ActiveTab == @CREATEDBY.AUTO ? "show active" : "")" id="autoAssign" role="tabpanel">
                 <article>
                     <div class="bb-blog-inner">
                         <div class="card shadow-lg border-0 rounded-lg collapsed-card">
@@ -164,7 +92,7 @@
             </div>
 
             <!-- Manual Assign Tab -->
-            <div class="tab-pane fade" id="manualAssign" role="tabpanel">
+            <div class="tab-pane fade @(ViewBag.ActiveTab == @CREATEDBY.MANUAL ? "show active" : "")" id="manualAssign" role="tabpanel">
                 <article>
                     <div class="bb-blog-inner">
                         <div class="card shadow-lg border-0 rounded-lg collapsed-card">

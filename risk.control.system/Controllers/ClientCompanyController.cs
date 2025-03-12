@@ -352,7 +352,6 @@ namespace risk.control.system.Controllers
                 .Include(v => v.VendorInvestigationServiceTypes)
                 .ThenInclude(v => v.InvestigationServiceType)
                 .Include(v => v.VendorInvestigationServiceTypes)
-                .ThenInclude(v => v.PincodeServices)
                 .AsQueryable();
 
             var applicationDbContextResult = await applicationDbContext.ToListAsync();
@@ -379,7 +378,6 @@ namespace risk.control.system.Controllers
                 .Include(v => v.VendorInvestigationServiceTypes)
                 .ThenInclude(v => v.InvestigationServiceType)
                 .Include(v => v.VendorInvestigationServiceTypes)
-                .ThenInclude(v => v.PincodeServices)
                 .AsQueryable();
 
             var applicationDbContextResult = await applicationDbContext.ToListAsync();
@@ -406,8 +404,7 @@ namespace risk.control.system.Controllers
                     .ThenInclude(v => v.LineOfBusiness)
                     .Include(v => v.VendorInvestigationServiceTypes)
                     .ThenInclude(v => v.InvestigationServiceType)
-                    .Include(v => v.VendorInvestigationServiceTypes)
-                    .ThenInclude(v => v.PincodeServices);
+                    .Include(v => v.VendorInvestigationServiceTypes);
 
                     company.EmpanelledVendors.AddRange(empanelledVendors);
 
@@ -444,8 +441,7 @@ namespace risk.control.system.Controllers
                 .ThenInclude(v => v.LineOfBusiness)
                 .Include(v => v.VendorInvestigationServiceTypes)
                 .ThenInclude(v => v.InvestigationServiceType)
-                .Include(v => v.VendorInvestigationServiceTypes)
-                .ThenInclude(v => v.PincodeServices);
+                .Include(v => v.VendorInvestigationServiceTypes);
             foreach (var v in empanelledVendors)
             {
                 company.EmpanelledVendors.Remove(v);
@@ -474,7 +470,6 @@ namespace risk.control.system.Controllers
                 .Include(v => v.PinCode)
                 .Include(v => v.State)
                 .Include(v => v.VendorInvestigationServiceTypes)
-                .ThenInclude(v => v.PincodeServices)
                 .Include(v => v.VendorInvestigationServiceTypes)
                 .ThenInclude(v => v.State)
                 .Include(v => v.VendorInvestigationServiceTypes)

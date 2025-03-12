@@ -62,7 +62,7 @@ namespace risk.control.system.Controllers
         [Breadcrumb("Manage Agency(s)")]
         public IActionResult Index()
         {
-            return RedirectToAction("Agencies");
+            return RedirectToAction("EmpanelledVendors");
         }
 
         [Breadcrumb("Agencies", FromAction = "Index")]
@@ -70,7 +70,114 @@ namespace risk.control.system.Controllers
         {
             return View();
         }
+        [Breadcrumb("Empanelled Agencies", FromAction = "Index")]
+        public IActionResult EmpanelledVendors()
+        {
+            return View();
+        }
 
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EmpanelledVendors(List<string> vendors)
+        {
+            try
+            {
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+
+                if (vendors is null || vendors.Count == 0)
+                {
+                    notifyService.Error("OOPs !!!..Not Agency Found");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+
+                var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == currentUserEmail);
+                if (companyUser == null)
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var company = _context.ClientCompany
+                    .Include(c => c.EmpanelledVendors)
+                    .FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
+                if (company == null)
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var empanelledVendors2Depanel = _context.Vendor.AsNoTracking().Where(v => vendors.Contains(v.VendorId.ToString()));
+
+                foreach (var empanelledVendor2Depanel in empanelledVendors2Depanel)
+                {
+                    var empanelled = company.EmpanelledVendors.FirstOrDefault(v => v.VendorId == empanelledVendor2Depanel.VendorId);
+                    company.EmpanelledVendors.Remove(empanelled);
+                }
+                company.Updated = DateTime.Now;
+                company.UpdatedBy = currentUserEmail;
+                _context.ClientCompany.Update(company);
+                var savedRows = await _context.SaveChangesAsync();
+                notifyService.Custom($"Agency(s) de-panelled.", 3, "orange", "far fa-thumbs-down");
+                return RedirectToAction("EmpanelledVendors", "Vendors");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+        }
+
+        [Breadcrumb("Available Agencies", FromAction = "Index")]
+        public IActionResult AvailableVendors()
+        {
+            return View();
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AvailableVendors(List<string> vendors)
+        {
+            if (vendors is null || vendors.Count == 0)
+            {
+                notifyService.Error("No agency selected !!!");
+                return RedirectToAction(nameof(AvailableVendors), "Company");
+            }
+            try
+            {
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+
+                var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == currentUserEmail);
+                if (companyUser == null)
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var company = _context.ClientCompany.Include(c => c.EmpanelledVendors)
+                    .FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
+
+                if (company == null)
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var vendors2Empanel = _context.Vendor.AsNoTracking().Where(v => vendors.Contains(v.VendorId.ToString()));
+                company.EmpanelledVendors.AddRange(vendors2Empanel.ToList());
+
+                company.Updated = DateTime.Now;
+                company.UpdatedBy = currentUserEmail;
+                _context.ClientCompany.Update(company);
+                var savedRows = await _context.SaveChangesAsync();
+
+                notifyService.Custom($"Agency(s) empanelled.", 3, "green", "fas fa-thumbs-up");
+                return RedirectToAction("AvailableVendors", "Vendors");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+
+        }
         public JsonResult PostRating(int rating, long mid)
         {
             var rt = new AgencyRating();
@@ -85,7 +192,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: Vendors/Details/5
-        [Breadcrumb(" Manage Agency", FromAction = "AvailableVendors", FromController =typeof(CompanyController))]
+        [Breadcrumb("Agency Profile", FromAction = "AvailableVendors")]
         public async Task<IActionResult> Details(long id)
         {
             try
@@ -103,8 +210,6 @@ namespace risk.control.system.Controllers
                     .Include(v => v.PinCode)
                     .Include(v => v.State)
                     .Include(v => v.District)
-                    .Include(v => v.VendorInvestigationServiceTypes)
-                    .ThenInclude(v => v.PincodeServices)
                     .Include(v => v.VendorInvestigationServiceTypes)
                     .ThenInclude(v => v.State)
                     .Include(v => v.VendorInvestigationServiceTypes)
@@ -141,9 +246,9 @@ namespace risk.control.system.Controllers
         {
             ViewData["vendorId"] = id;
 
-            var agencysPage = new MvcBreadcrumbNode("AvailableVendors", "Company", "Manager Agency(s)");
-            var agency2Page = new MvcBreadcrumbNode("AvailableVendors", "Company", "Available Agencies") { Parent = agencysPage, };
-            var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Manage Agency") { Parent = agency2Page, RouteValues = new { id = id } };
+            var agencysPage = new MvcBreadcrumbNode("AvailableVendors", "Vendors", "Manager Agency(s)");
+            var agency2Page = new MvcBreadcrumbNode("AvailableVendors", "Vendors", "Available Agencies") { Parent = agencysPage, };
+            var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Agency Profile") { Parent = agency2Page, RouteValues = new { id = id } };
             var editPage = new MvcBreadcrumbNode("Users", "Vendors", $"Manager Users") { Parent = agencyPage, RouteValues = new { id = id } };
             ViewData["BreadcrumbNode"] = editPage;
 
@@ -342,9 +447,9 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                var agencysPage = new MvcBreadcrumbNode("AvailableVendors", "Company", "Manager Agency(s)");
-                var agency2Page = new MvcBreadcrumbNode("AvailableVendors", "Company", "Available Agencies") { Parent = agencysPage, };
-                var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Manage Agency") { Parent = agency2Page, RouteValues = new { id = vendorApplicationUser.Vendor.VendorId } };
+                var agencysPage = new MvcBreadcrumbNode("AvailableVendors", "Vendors", "Manager Agency(s)");
+                var agency2Page = new MvcBreadcrumbNode("AvailableVendors", "Vendors", "Available Agencies") { Parent = agencysPage, };
+                var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Agency Profile") { Parent = agency2Page, RouteValues = new { id = vendorApplicationUser.Vendor.VendorId } };
                 var usersPage = new MvcBreadcrumbNode("Users", "Vendors", $"Manager Users") { Parent = agencyPage, RouteValues = new { id = vendorApplicationUser.Vendor.VendorId } };
                 var editPage = new MvcBreadcrumbNode("EditUser", "Vendors", $"Edit User") { Parent = usersPage, RouteValues = new { id = userId } };
                 ViewData["BreadcrumbNode"] = editPage;
@@ -698,9 +803,9 @@ namespace risk.control.system.Controllers
             
             ViewData["vendorId"] = id;
 
-            var agencysPage = new MvcBreadcrumbNode("AvailableVendors", "Company", "Manager Agency(s)");
-            var agency2Page = new MvcBreadcrumbNode("AvailableVendors", "Company", "Available Agencies") { Parent = agencysPage, };
-            var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Manage Agency") { Parent = agency2Page, RouteValues = new { id = id } };
+            var agencysPage = new MvcBreadcrumbNode("AvailableVendors", "Vendors", "Manager Agency(s)");
+            var agency2Page = new MvcBreadcrumbNode("AvailableVendors", "Vendors", "Available Agencies") { Parent = agencysPage, };
+            var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Agency Profile") { Parent = agency2Page, RouteValues = new { id = id } };
             var servicesPage = new MvcBreadcrumbNode("Service", "Vendors", $"Manager Service") { Parent = agencyPage, RouteValues = new { id = id } };
             ViewData["BreadcrumbNode"] = servicesPage;
 
@@ -760,6 +865,7 @@ namespace risk.control.system.Controllers
                 vendor.DomainName = domainData;
                 vendor.Updated = DateTime.Now;
                 vendor.UpdatedBy = currentUserEmail;
+                vendor.CreatedUser = currentUserEmail;
 
                 vendor.PinCodeId = vendor.SelectedPincodeId;
                 vendor.DistrictId = vendor.SelectedDistrictId;
@@ -776,12 +882,26 @@ namespace risk.control.system.Controllers
                 vendor.AddressLongitude = companyCoordinates.Longitude;
                 vendor.AddressMapLocation = url;
                 _context.Add(vendor);
-                await _context.SaveChangesAsync();
 
-                await smsService.DoSendSmsAsync(pinCode.Country.ISDCode+ vendor.PhoneNumber, "Agency created. Domain : " + vendor.Email);
+                var managerRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.MANAGER.ToString()));
+                var companyUser = _context.ClientCompanyApplicationUser.Include(c=>c.ClientCompany).FirstOrDefault(c => c.Email == currentUserEmail);
+
+                var notification = new StatusNotification
+                {
+                    Role = managerRole,
+                    Company = companyUser.ClientCompany,
+                    Symbol = "fa fa-info i-blue",
+                    Message = $"Agency {vendor.Email}: To Empanel."
+                };
+                _context.Notifications.Add(notification);
+                await _context.SaveChangesAsync();
+                if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
+                {
+                    await smsService.DoSendSmsAsync(pinCode.Country.ISDCode + vendor.PhoneNumber, "Agency created. Domain : " + vendor.Email);
+                }
 
                 notifyService.Custom($"Agency created successfully.", 3, "green", "fas fa-building");
-                return RedirectToAction(nameof(CompanyController.AvailableVendors), "Company");
+                return RedirectToAction(nameof(CompanyController.AvailableVendors), "Vendors");
             }
             catch (Exception ex)
             {
@@ -791,7 +911,7 @@ namespace risk.control.system.Controllers
             }
         }
 
-        //[Breadcrumb(" Edit Agency", FromAction = "Details")]
+        [Breadcrumb(" Edit Agency", FromAction = "Details")]
         public async Task<IActionResult> Edit(long id)
         {
             try
@@ -809,9 +929,9 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                var agencysPage = new MvcBreadcrumbNode("AvailableVendors", "Company", "Manager Agency(s)");
-                var agency2Page = new MvcBreadcrumbNode("AvailableVendors", "Company", "Available Agencies") { Parent = agencysPage, };
-                var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Manage Agency") { Parent = agency2Page, RouteValues = new { id = id } };
+                var agencysPage = new MvcBreadcrumbNode("AvailableVendors", "Vendors", "Manager Agency(s)");
+                var agency2Page = new MvcBreadcrumbNode("AvailableVendors", "Vendors", "Available Agencies") { Parent = agencysPage, };
+                var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Agency Profile") { Parent = agency2Page, RouteValues = new { id = id } };
                 var editPage = new MvcBreadcrumbNode("Edit", "Vendors", $"Edit Agency") { Parent = agencyPage } ;
                 ViewData["BreadcrumbNode"] = editPage;
 
@@ -920,7 +1040,6 @@ namespace risk.control.system.Controllers
                     .Include(v => v.State)
                     .Include(v => v.District)
                     .Include(v => v.VendorInvestigationServiceTypes)
-                    .ThenInclude(v => v.PincodeServices)
                     .Include(v => v.VendorInvestigationServiceTypes)
                     .ThenInclude(v => v.State)
                     .Include(v => v.VendorInvestigationServiceTypes)
@@ -944,8 +1063,8 @@ namespace risk.control.system.Controllers
                     ).Select(s => s.InvestigationCaseSubStatusId).ToList();
 
                 var hasClaims = _context.ClaimsInvestigation.Any(c => agencySubStatuses.Contains(c.InvestigationCaseSubStatus.InvestigationCaseSubStatusId) && c.VendorId == id );
-                var agencysPage = new MvcBreadcrumbNode("AvailableVendors", "Company", "Manager Agency(s)");
-                var agencyPage = new MvcBreadcrumbNode("AvailableVendors", "Company", "Available Agencies") { Parent = agencysPage, };
+                var agencysPage = new MvcBreadcrumbNode("AvailableVendors", "Vendors", "Manager Agency(s)");
+                var agencyPage = new MvcBreadcrumbNode("AvailableVendors", "Vendors", "Available Agencies") { Parent = agencysPage, };
                 var editPage = new MvcBreadcrumbNode("Delete", "Vendors", $"Delete Agency") { Parent = agencyPage, RouteValues = new { id = id } };
                 ViewData["BreadcrumbNode"] = editPage;
                 vendor.HasClaims = hasClaims;

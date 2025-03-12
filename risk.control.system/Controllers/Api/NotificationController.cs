@@ -38,7 +38,7 @@ namespace risk.control.system.Controllers.Api
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             var notifications = await service.GetNotifications(userEmail);
-            var activeNotifications = notifications.Select(n => new { Id = n.StatusNotificationId, Symbol = n.Symbol, n.Message, CreatedAt = n.CreatedAt.ToString("yyyy-MM-dd HH:mm") });
+            var activeNotifications = notifications.Select(n => new { Id = n.StatusNotificationId, Symbol = n.Symbol, n.Message, CreatedAt = GetTimeAgo(n.CreatedAt) });
             return Ok(activeNotifications?.Take(10).ToList());
         }
         [AllowAnonymous]
@@ -115,6 +115,24 @@ namespace risk.control.system.Controllers.Api
             var finalMessage = $"{message} Date: {DateTime.Now.ToString("dd-MMM-yyyy HH:mm")} {logo}";
             await smsService.DoSendSmsAsync("+" + mobile, finalMessage);
             return Ok();
+        }
+
+        private static string GetTimeAgo(DateTime createdAt)
+        {
+            var timeSpan = DateTime.Now - createdAt;
+
+            if (timeSpan.TotalSeconds < 60)
+                return $"{timeSpan.Seconds} seconds ago";
+            if (timeSpan.TotalMinutes < 60)
+                return $"{timeSpan.Minutes} minutes ago";
+            if (timeSpan.TotalHours < 24)
+                return $"{timeSpan.Hours} hours ago";
+            if (timeSpan.TotalHours < 48)
+                return "Yesterday";
+            if (timeSpan.TotalDays < 7)
+                return createdAt.DayOfWeek.ToString(); // Returns 'Wednesday', 'Thursday', etc.
+
+            return $"{(int)timeSpan.TotalDays} days ago";
         }
     }
     public class NotificationRequest

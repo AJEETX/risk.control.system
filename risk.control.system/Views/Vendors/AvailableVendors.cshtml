@@ -1,25 +1,30 @@
 ﻿@{
-    ViewData["Title"] = "Empanelled Agencies";
+    ViewData["Title"] = @Applicationsettings.SERVICE;
+    var data = @ViewBag.CompanyId;
 }
 
 <section class="content">
     <div id="article" class="card shadow-lg border-0 rounded-lg">
         <div class="card-header bg-secondary text-white text-center">
-            <h3 class="card-title"><i class="fas fa-handshake"></i> Empanelled Agencies</h3>
+            <h3 class="card-title"><i class="fas fa-hand-pointer"></i> Available Agencies</h3>
 
         </div>
-        <form id="checkboxes" method="post" asp-action="EmpanelledVendors">
+        <form id="checkboxes" asp-action="AvailableVendors" method="post" asp-route-id="@ViewBag.CompanyId" enctype="multipart/form-data">
             <div class="card-body">
                 <div class="submit-progress hidden">
                     <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
                 </div>
 
+                <input type="hidden" id="@ViewBag.CompanyId" />
                 <table id="customerTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
                     <thead>
                         <tr>
-                            <th data-orderable="false"><input type="checkbox" name="select_all" id="checkall" value="0" /></th>
-                            <th data-orderable="false">
-                                <i class="far fa-file-word"></i>
+                            <th><input type="checkbox" name="select_all" id="checkall" value="0" /></th>
+                            <th>
+                                Id
+                            </th>
+                            <th>
+                                #
                             </th>
                             <th>
                                 Domain
@@ -44,32 +49,34 @@
                             <th>
                                 Country
                             </th>
-                            <th>Current Case(s)</th>
                             <th>
                                 Updated
                             </th>
                             <th>
                                 UpdatedBy
                             </th>
+                            <th>Actions</th>
+
                         </tr>
                     </thead>
                 </table>
-
+                
             </div>
             <div class="card-footer">
                 <div class="col-md-12">
                     <a id="back" asp-controller="Dashboard" asp-action="Index" class="btn btn-default"><i class="fas fa-arrow-left"></i> Back</a>
 
-                    <button id="empanel-vendors" disabled type="submit" class="btn btn-danger">
-                        <i class="fas fa-hand-pointer" aria-hidden="true"></i> Depanel
+                    <button id="depanel-vendors" disabled type="submit" class="btn btn-success">
+                        <i class="fas fa-handshake"></i> Empanel
                     </button>
                 </div>
             </div>
         </form>
     </div>
+
 </section>
 @section Scripts {
-    <script src="~/js/company-admin/empanelled-vendors.js">
+    <script src="~/js/company/available-vendors.js">
 
     </script>
 }

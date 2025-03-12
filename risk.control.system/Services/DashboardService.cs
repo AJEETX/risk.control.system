@@ -196,6 +196,8 @@ namespace risk.control.system.Services
             var claimsReject = GetManagerReject(userEmail);
             var claimsCompleted = GetCompanyManagerApproved(userEmail);
             var actives = GetManagerActive(userEmail);
+            var empanelledAgenciesCount = GetEmpanelledAgencies(userEmail);
+            var availableAgenciesCount = GetAvailableAgencies(userEmail);
 
             var data = new DashboardData();
             data.FirstBlockName = "Assess(new)";
@@ -218,6 +220,14 @@ namespace risk.control.system.Services
             data.LastBlockName = "Rejected";
             data.LastBlockCount = claimsReject;
             data.LastBlockUrl = "/Manager/Rejected";
+
+            data.FifthBlockName = "Empanelled Agencies";
+            data.FifthBlockCount = empanelledAgenciesCount;
+            data.FifthBlockUrl = "/Vendors/EmpanelledVendors";
+
+            data.SixthBlockName = "Available Agencies";
+            data.SixthBlockCount = availableAgenciesCount;
+            data.SixthBlockUrl = "/Vendors/AvailableVendors";
 
             return data;
         }
@@ -253,8 +263,8 @@ namespace risk.control.system.Services
         {
             var companyUsersCount = GetCompanyUsers(userEmail);
             //var allAgenciesCount = GetAllAgencies(userEmail);
-            var empanelledAgenciesCount = GetEmpanelledAgencies(userEmail);
-            var availableAgenciesCount = GetAvailableAgencies(userEmail);
+            //var empanelledAgenciesCount = GetEmpanelledAgencies(userEmail);
+            //var availableAgenciesCount = GetAvailableAgencies(userEmail);
 
             var data = new DashboardData();
             data.FirstBlockName = "All Users";
@@ -265,13 +275,13 @@ namespace risk.control.system.Services
             //data.SecondBlockCount = allAgenciesCount;
             //data.SecondBlockUrl = "/Vendors/Agencies";
 
-            data.ThirdBlockName = "Empanelled Agencies";
-            data.ThirdBlockCount = empanelledAgenciesCount;
-            data.ThirdBlockUrl = "/Company/EmpanelledVendors";
+            //data.ThirdBlockName = "Empanelled Agencies";
+            //data.ThirdBlockCount = empanelledAgenciesCount;
+            //data.ThirdBlockUrl = "/Company/EmpanelledVendors";
 
-            data.LastBlockName = "Available Agencies";
-            data.LastBlockCount = availableAgenciesCount;
-            data.LastBlockUrl = "/Company/AvailableVendors";
+            //data.LastBlockName = "Available Agencies";
+            //data.LastBlockCount = availableAgenciesCount;
+            //data.LastBlockUrl = "/Company/AvailableVendors";
 
             return data;
         }
@@ -1041,8 +1051,6 @@ namespace risk.control.system.Services
                 .ThenInclude(v => v.LineOfBusiness)
                 .Include(v => v.VendorInvestigationServiceTypes)
                 .ThenInclude(v => v.InvestigationServiceType)
-                .Include(v => v.VendorInvestigationServiceTypes)
-                .ThenInclude(v => v.PincodeServices)
                 .ToList();
 
             if (companyUser == null)
@@ -1120,7 +1128,6 @@ namespace risk.control.system.Services
                 .Include(v => v.VendorInvestigationServiceTypes)
                 .ThenInclude(v => v.InvestigationServiceType)
                 .Include(v => v.VendorInvestigationServiceTypes)
-                .ThenInclude(v => v.PincodeServices)
                 .FirstOrDefault(v => v.VendorId == vendorUser.VendorId);
 
             var claimsCases = _context.ClaimsInvestigation

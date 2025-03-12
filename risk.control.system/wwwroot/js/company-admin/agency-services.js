@@ -23,7 +23,7 @@
             url: '/api/Company/AllServices?id=' + $('#vendorId').val(),
             dataSrc: ''
         },
-        order: [[11, 'desc'], [12, 'desc']], // Sort by `isUpdated` and `lastModified`,
+        order: [[10, 'desc'], [11, 'desc']], // Sort by `isUpdated` and `lastModified`,
         columnDefs: [
             {
                 className: 'max-width-column-name', // Apply the CSS class,
@@ -87,12 +87,6 @@
                 }
             },
             {
-                "data": "pincodes",
-                "mRender": function (data, type, row) {
-                    return '<span title="' + row.rawPincodes + '" data-toggle="tooltip">' + data + '</span>';
-                }
-            },
-            {
                 "data": "updatedBy",
                 "mRender": function (data, type, row) {
                     return '<span title="' + row.updatedBy + '" data-toggle="tooltip">' + data + '</span>';
@@ -143,20 +137,29 @@
 
     table.on('draw', function () {
         table.rows().every(function () {
-            var data = this.data(); // Get row data
-            console.log(data); // Debug row data
+            const data = this.data();
+            const rowNode = this.node();
 
-            if (data.isUpdated) { // Check if the row should be highlighted
-                var rowNode = this.node();
+            // Convert to lowercase for case-insensitive comparison
+            const district = data.district ? data.district.toLowerCase() : '';
+            const pincodes = data.pincodes ? data.pincodes.toLowerCase() : '';
 
-                // Highlight the row
+            if (district === 'all districts') {
+                $(rowNode).find('td:nth-child(4)').addClass('text-light-green'); // Column index starts from 1
+                $(rowNode).find('td:nth-child(5)').addClass('text-light-green'); // Column index starts from 1
+                $(rowNode).find('td:nth-child(6)').addClass('text-light-green'); // Column index starts from 1
+            } else {
+                $(rowNode).find('td:nth-child(4)').removeClass('text-light-green');
+                $(rowNode).find('td:nth-child(5)').removeClass('text-light-green');
+                $(rowNode).find('td:nth-child(6)').removeClass('text-light-green');
+            }
+
+            if (data.isUpdated) {
+
                 $(rowNode).addClass('highlight-new-user');
-
-                // Scroll the row into view
                 rowNode.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
-                // Optionally, remove the highlight after a delay
-                setTimeout(function () {
+                setTimeout(() => {
                     $(rowNode).removeClass('highlight-new-user');
                 }, 3000);
             }

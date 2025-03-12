@@ -18,13 +18,7 @@ namespace risk.control.system.Controllers
         // GET: DocumentIdReports
         public async Task<IActionResult> Index()
         {
-            var userEmail = HttpContext?.User?.Identity?.Name;
-            var user = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
-            var model = await _context.PanIdReport
-                .Include(d => d.ClientCompany)
-                .Where(c => c.ClientCompanyId == user.ClientCompanyId)?.ToListAsync();
-
-            return View(model);
+            return View();
         }
 
         // GET: DocumentIdReports/Details/5
@@ -64,7 +58,6 @@ namespace risk.control.system.Controllers
                 documentIdReport.Updated = DateTime.Now;
                 documentIdReport.UpdatedBy = userEmail;
                 var user = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
-                documentIdReport.ClientCompanyId = user.ClientCompanyId;
 
                 _context.Add(documentIdReport);
                 await _context.SaveChangesAsync();
@@ -109,7 +102,6 @@ namespace risk.control.system.Controllers
                     documentIdReport.Updated = DateTime.Now;
                     documentIdReport.UpdatedBy = userEmail;
                     var user = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
-                    documentIdReport.ClientCompanyId = user.ClientCompanyId;
                     _context.Update(documentIdReport);
                     await _context.SaveChangesAsync();
                 }

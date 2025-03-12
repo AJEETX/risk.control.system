@@ -67,6 +67,8 @@ namespace risk.control.system.Services
                 Console.WriteLine("Error sending SMS: " + ex.Message);
             }
         }
+
+
         static List<string> GetActiveIPAddressesInNetwork()
         {
             List<string> activeIPs = new List<string>();

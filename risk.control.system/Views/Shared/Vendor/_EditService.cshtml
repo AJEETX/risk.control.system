@@ -41,6 +41,9 @@
                 <span asp-validation-for="Price" class="text-danger"></span>
             </div>
         </div>
+        
+    </div>
+    <div class="col-md-6">
         <div class="form-group">
             <label class="input-group-label" for="StateId"> State:</label>
             <div class="input-group mb-3 autocomplete-wrapper">
@@ -75,20 +78,6 @@
                 <div id="district-loading" class="loading-spinner">
                     <i class="fas fa-spinner fa-spin"></i>
                 </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-6">
-        <div class="form-group">
-            <label class="input-group-label" for="SelectedMultiPincodeId"> <i class="fas fa-map-pin"></i> Pincodes: <i class='far fa-hand-point-down'></i> </label>
-
-            @{
-                var pincodes = ViewBag.PinCodeId as List<SelectListItem>;
-            }
-            <div class="input-group">
-
-                @Html.ListBoxFor(model => model.SelectedMultiPincodeId, new MultiSelectList(pincodes, "Value", "Text"), new { @class = "form-control remarks", multiple = "multiple", id = "PinCodeId" })
-
             </div>
         </div>
     </div>

@@ -1946,7 +1946,10 @@ select#PinCodeId {
     color: orangered;
 }
 .i-green {
-    color: green;;
+    color: green;
+}
+.i-blue {
+    color: darkblue;
 }
 .terms-condition {
     margin-top: 0.2em !important;
@@ -2287,4 +2290,34 @@ input#checkall {
     width:10em;
     max-width:15em;
     height:auto;
+}
+/* Highlight active tab */
+.nav-tabs .nav-link.active {
+    background-color: lightgrey !important; /* Light grey background */
+    color: black !important; /* Change text color for better contrast */
+    font-weight: bold; /* Make text bold */
+    border-radius: 5px 5px 0 0; /* Rounded top corners */
+    border:1px solid grey;
+}
+
+/* Change inactive tabs */
+.nav-tabs .nav-link {
+    color: #007bff; /* Default text color */
+    border: 1px solid transparent; /* Avoid border flicker */
+    transition: all 0.3s ease;
+}
+
+    /* Hover effect on tabs */
+    .nav-tabs .nav-link:hover {
+        background-color: #e9ecef;
+        border-radius: 5px;
+    }
+
+/* Optional: Add a bottom border to the active tab */
+.nav-tabs {
+    border-bottom: 2px solid lightgrey;
+}
+
+.isNewAssigned {
+    background-color: #FCFCC4;
 }

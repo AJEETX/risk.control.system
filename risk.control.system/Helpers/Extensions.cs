@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using System.Reflection;
 using System.Text.RegularExpressions;
 
@@ -9,26 +10,45 @@ namespace risk.control.system.Helpers
     public static class Extensions
     {
         private static readonly Dictionary<string, string> FileSignatures = new Dictionary<string, string>
-    {
-        { "89504E47", ".png" },      // PNG
-        { "FFD8FFE0", ".jpg" },      // JPG (JPEG)
-        { "FFD8FFE1", ".jpg" },      // JPG (JPEG with EXIF)
-        { "FFD8FFE2", ".jpg" },      // JPG (JPEG with ICC)
-        { "47494638", ".gif" },      // GIF
-        { "25504446", ".pdf" },      // PDF
-        { "504B0304", ".zip" },      // ZIP
-        { "494433",   ".mp3" },      // MP3
-        { "52494646", ".wav" },      // WAV
-        { "4D546864", ".mid" },      // MIDI
-        { "52494646", ".avi" },      // AVI
-        { "00000018", ".mp4" },      // MP4
-        { "66747970", ".mp4" },      // MP4 (ftyp)
-        { "1A45DFA3", ".mkv" },      // MKV
-        { "00000014", ".mov" },      // MOV
-        { "464C56",   ".flv" },      // FLV
-        { "3026B275", ".wmv" },      // WMV
-    };
+        {
+            { "89504E47", ".png" },      // PNG
+            { "FFD8FFE0", ".jpg" },      // JPG (JPEG)
+            { "FFD8FFE1", ".jpg" },      // JPG (JPEG with EXIF)
+            { "FFD8FFE2", ".jpg" },      // JPG (JPEG with ICC)
+            { "47494638", ".gif" },      // GIF
+            { "25504446", ".pdf" },      // PDF
+            { "504B0304", ".zip" },      // ZIP
+            { "494433",   ".mp3" },      // MP3
+            { "52494646", ".wav" },      // WAV
+            { "4D546864", ".mid" },      // MIDI
+            { "52494646", ".avi" },      // AVI
+            { "00000018", ".mp4" },      // MP4
+            { "66747970", ".mp4" },      // MP4 (ftyp)
+            { "1A45DFA3", ".mkv" },      // MKV
+            { "00000014", ".mov" },      // MOV
+            { "464C56",   ".flv" },      // FLV
+            { "3026B275", ".wmv" },      // WMV
+        };
 
+        public static CultureInfo GetCultureByCountry(string countryCode)
+        {
+            // Dictionary of country codes to valid culture names
+            var countryToCulture = new Dictionary<string, string>
+            {
+                { "US", "en-US" }, // United States
+                { "AU", "en-AU" }, // United States
+                { "IN", "hi-IN" }, // India (Hindi)
+                { "FR", "fr-FR" }, // France
+                { "JP", "ja-JP" }, // Japan
+                { "DE", "de-DE" }, // Germany
+                { "GB", "en-GB" }, // United Kingdom
+                { "CN", "zh-CN" }, // China
+                { "AE", "ar-AE" }  // United Arab Emirates
+            };
+
+            // Return CultureInfo based on country code, or default to "en-US"
+            return new CultureInfo(countryToCulture.ContainsKey(countryCode) ? countryToCulture[countryCode] : "en-US");
+        }
         public static string GetFileExtension(this byte[] fileBytes)
         {
             if (fileBytes == null || fileBytes.Length < 4)

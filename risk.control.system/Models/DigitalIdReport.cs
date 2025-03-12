@@ -9,12 +9,6 @@ namespace risk.control.system.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long DigitalIdReportId { get; set; }
 
-        [Display(Name = "Insurer name")]
-        public long? ClientCompanyId { get; set; }
-
-        [Display(Name = "Insurer name")]
-        public virtual ClientCompany? ClientCompany { get; set; }
-
         [Display(Name = "Digital Id Image")]
         public string? DigitalIdImagePath { get; set; }
 

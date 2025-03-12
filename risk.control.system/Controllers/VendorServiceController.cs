@@ -42,7 +42,6 @@ namespace risk.control.system.Controllers
             var applicationDbContext = _context.VendorInvestigationServiceType
                 .Include(v => v.InvestigationServiceType)
                 .Include(v => v.LineOfBusiness)
-                .Include(v => v.PincodeServices)
                 .Include(v => v.State)
                 .Include(v => v.Vendor);
             return View(await applicationDbContext.ToListAsync());
@@ -62,7 +61,6 @@ namespace risk.control.system.Controllers
                 var vendorInvestigationServiceType = await _context.VendorInvestigationServiceType
                     .Include(v => v.InvestigationServiceType)
                     .Include(v => v.LineOfBusiness)
-                    .Include(v => v.PincodeServices)
                     .Include(v => v.District)
                     .Include(v => v.Country)
                     .Include(v => v.State)
@@ -93,11 +91,11 @@ namespace risk.control.system.Controllers
                 var vendor = _context.Vendor.Include(v=>v.Country).FirstOrDefault(v => v.VendorId == id);
                 ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name");
                 //ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
-                var model = new VendorInvestigationServiceType { Country = vendor.Country, SelectedMultiPincodeId = new List<long>(), CountryId = vendor.CountryId, Vendor = vendor, PincodeServices = new List<ServicedPinCode>() };
+                var model = new VendorInvestigationServiceType { Country = vendor.Country, CountryId = vendor.CountryId, Vendor = vendor };
 
-                var agencysPage = new MvcBreadcrumbNode("Agencies", "Vendors", "Manage Agency(s)");
-                var agencyPage = new MvcBreadcrumbNode("Agencies", "Vendors", "Agencies") { Parent = agencysPage };
-                var agencyDetailPage = new MvcBreadcrumbNode("Details", "Vendors", "Manage Agency") { Parent = agencyPage, RouteValues = new { id = id } };
+                var agencysPage = new MvcBreadcrumbNode("EmpanelledVendors", "Vendors", "Manage Agency(s)");
+                var agencyPage = new MvcBreadcrumbNode("EmpanelledVendors", "Vendors", "Agencies") { Parent = agencysPage };
+                var agencyDetailPage = new MvcBreadcrumbNode("Details", "Vendors", "Agency Profile") { Parent = agencyPage, RouteValues = new { id = id } };
                 var editPage = new MvcBreadcrumbNode("Service", "Vendors", $"Manage Service") { Parent = agencyDetailPage, RouteValues = new { id = id } };
                 var createPage = new MvcBreadcrumbNode("Create", "VendorService", $"Add Service") { Parent = editPage, RouteValues = new { id = id } };
                 ViewData["BreadcrumbNode"] = createPage;
@@ -125,8 +123,6 @@ namespace risk.control.system.Controllers
             }
             try
             {
-                bool removedExistingService = false;
-                int removedExistingServiceCount = 0;
                 var isCountryValid = await _context.Country.AnyAsync(c => c.CountryId == service.SelectedCountryId);
                 var isStateValid = await _context.State.AnyAsync(s => s.StateId == service.SelectedStateId);
                 var isDistrictValid = service.SelectedDistrictId == -1 ||
@@ -139,55 +135,43 @@ namespace risk.control.system.Controllers
                 }
 
                 var stateWideService = _context.VendorInvestigationServiceType
-                        .AsEnumerable() // Switch to client-side evaluation
-                        .Where(v =>
-                            v.VendorId == VendorId &&
-                            v.LineOfBusinessId == service.LineOfBusinessId &&
-                            v.InvestigationServiceTypeId == service.InvestigationServiceTypeId &&
-                            v.CountryId == (long?)service.SelectedCountryId &&
-                            v.StateId == (long?)service.SelectedStateId &&
-                            v.DistrictId == null)
-                        .ToList();
-
-                List<PinCode> pinCodes = new List<PinCode>();
+                       .AsEnumerable() // Switch to client-side evaluation
+                       .Where(v =>
+                           v.VendorId == VendorId &&
+                           v.LineOfBusinessId == service.LineOfBusinessId &&
+                           v.InvestigationServiceTypeId == service.InvestigationServiceTypeId &&
+                           v.CountryId == (long?)service.SelectedCountryId &&
+                           v.StateId == (long?)service.SelectedStateId)?
+                       .ToList();
 
                 // Handle state-wide service existence
                 if (service.SelectedDistrictId == -1)
                 {
                     // Handle state-wide service creation
-                    if (stateWideService is null || !stateWideService.Any())
+                    if (stateWideService is not null && stateWideService.Any(s => s.DistrictId == null))
                     {
-                        pinCodes = new List<PinCode> { new PinCode { Name = ALL_PINCODE, Code = ALL_PINCODE } };
-                    }
-                    else
-                    {
-                        stateWideService.FirstOrDefault().IsUpdated = true;
-                        _context.VendorInvestigationServiceType.Update(stateWideService.FirstOrDefault());
+                        var currentService = stateWideService.FirstOrDefault(s => s.DistrictId == null);
+                        currentService.IsUpdated = true;
+                        _context.VendorInvestigationServiceType.Update(currentService);
                         await _context.SaveChangesAsync();
                         notifyService.Custom($"Service [{ALL_DISTRICT}] already exists for the State!", 3, "orange", "fas fa-truck");
                         return RedirectToAction(nameof(VendorsController.Service), "Vendors", new { id = VendorId });
                     }
                 }
-
-                // Handle district-specific services
                 else
                 {
-                    pinCodes = await _context.PinCode.Where(p => service.SelectedMultiPincodeId.Contains(p.PinCodeId)).ToListAsync();
-                }
-
-                var servicePinCodes = pinCodes.Select(p =>
-                    new ServicedPinCode
+                    // Handle state-wide service creation
+                    if (stateWideService is not null && stateWideService.Any(s => s.DistrictId != null && s.DistrictId == service.SelectedDistrictId))
                     {
-                        Name = p.Name,
-                        Pincode = p.Code,
-                        VendorInvestigationServiceTypeId = service.VendorInvestigationServiceTypeId
-                    }).ToList();
-
-                service.PincodeServices = servicePinCodes;
-                service.VendorId = VendorId;
-                service.CountryId = service.SelectedCountryId;
-                service.StateId = service.SelectedStateId;
-
+                        var currentService = stateWideService.FirstOrDefault(s => s.DistrictId == service.SelectedDistrictId
+                        );
+                        currentService.IsUpdated = true;
+                        _context.VendorInvestigationServiceType.Update(currentService);
+                        await _context.SaveChangesAsync();
+                        notifyService.Custom($"Service already exists for the District!", 3, "orange", "fas fa-truck");
+                        return RedirectToAction(nameof(VendorsController.Service), "Vendors", new { id = VendorId });
+                    }
+                }
                 if (service.SelectedDistrictId == -1)
                 {
                     service.DistrictId = null;
@@ -200,10 +184,13 @@ namespace risk.control.system.Controllers
                 service.Updated = DateTime.Now;
                 service.UpdatedBy = HttpContext.User?.Identity?.Name;
                 service.Created = DateTime.Now;
+                service.VendorId = VendorId;
+                service.CountryId = service.SelectedCountryId;
+                service.StateId = service.SelectedStateId;
 
                 _context.Add(service);
                 await _context.SaveChangesAsync();
-                if (removedExistingService)
+                if (service.DistrictId == null)
                 {
                     notifyService.Custom($"Service [{ALL_DISTRICT}] added successfully.", 3, "orange", "fas fa-truck");
                 }
@@ -224,7 +211,7 @@ namespace risk.control.system.Controllers
 
         // GET: VendorService/Edit/5
         [Breadcrumb(" Edit", FromAction = "Details")]
-        public async Task<IActionResult> Edit(long id)
+        public IActionResult Edit(long id)
         {
             try
             {
@@ -234,75 +221,30 @@ namespace risk.control.system.Controllers
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                var vendorInvestigationServiceType = await _context.VendorInvestigationServiceType.FindAsync(id);
-                if (vendorInvestigationServiceType == null)
-                {
-                    notifyService.Custom($"Error to edit service.", 3, "red", "fas fa-truck");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-                var services = _context.VendorInvestigationServiceType
+                var vendorInvestigationServiceType = _context.VendorInvestigationServiceType
+                    .Include(v => v.LineOfBusiness)
+                    .Include(v => v.InvestigationServiceType)
                     .Include(v => v.Country)
+                    .Include(v => v.District)
+                    .Include(v => v.State)
                     .Include(v => v.Vendor)
-                    .Include(v => v.PincodeServices)
                     .First(v => v.VendorInvestigationServiceTypeId == id);
 
                 ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", vendorInvestigationServiceType.LineOfBusinessId);
-                //ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType
-                //    .Include(i => i.LineOfBusiness)
-                //    .Where(i => i.LineOfBusiness.LineOfBusinessId == vendorInvestigationServiceType.LineOfBusinessId),
-                //    "InvestigationServiceTypeId", "Name", vendorInvestigationServiceType.InvestigationServiceTypeId);
 
                 if (vendorInvestigationServiceType.DistrictId == null)
                 {
-                    var pinCodes = new List<PinCode> { new PinCode { Name = ALL_PINCODE, Code = ALL_PINCODE_CODE } };
-                    services.PincodeServices = pinCodes.Select(p =>
-                        new ServicedPinCode
-                        {
-                            Name = p.Name,
-                            Pincode = p.Code,
-                            VendorInvestigationServiceTypeId = vendorInvestigationServiceType.VendorInvestigationServiceTypeId
-                        }).ToList();
-                    ViewBag.PinCodeId = pinCodes
-                    .Select(x => new SelectListItem
-                    {
-                        Text = x.Name,
-                        Value = x.Code
-                    }).ToList();
-                }
-                else
-                {
-                    ViewBag.PinCodeId = _context.PinCode.Include(c => c.District).Where(p => p.District.DistrictId == vendorInvestigationServiceType.DistrictId)
-                    .Select(x => new SelectListItem
-                    {
-                        Text = x.Name + " - " + x.Code,
-                        Value = x.PinCodeId.ToString()
-                    }).ToList();
+                    vendorInvestigationServiceType.SelectedDistrictId = -1;
                 }
 
-
-                var selectedPincodeWithArea = services.PincodeServices;
-                var vendorServiceTypes = new List<long>();
-
-                foreach (var service in selectedPincodeWithArea)
-                {
-                    var pincodeServices = _context.PinCode.Where(p => p.Code == service.Pincode && p.Name == service.Name).Select(p => p.PinCodeId)?.ToList();
-                    vendorServiceTypes.AddRange(pincodeServices);
-                }
-
-                services.SelectedMultiPincodeId = vendorServiceTypes;
-                if (services.DistrictId == null)
-                {
-                    services.SelectedDistrictId = -1;
-                }
-
-                var agencysPage = new MvcBreadcrumbNode("Agencies", "Vendors", "Manage Agency(s)");
-                var agencyPage = new MvcBreadcrumbNode("Agencies", "Vendors", "Agencies") { Parent = agencysPage };
-                var agencyDetailPage = new MvcBreadcrumbNode("Details", "Vendors", "Manage Agency") { Parent = agencyPage, RouteValues = new { id = services.VendorId } };
-                var editPage = new MvcBreadcrumbNode("Service", "Vendors", $"Manage Service") { Parent = agencyDetailPage, RouteValues = new { id = services.VendorId } };
+                var agencysPage = new MvcBreadcrumbNode("EmpanelledVendors", "Vendors", "Manage Agency(s)");
+                var agencyPage = new MvcBreadcrumbNode("EmpanelledVendors", "Vendors", "Agencies") { Parent = agencysPage };
+                var agencyDetailPage = new MvcBreadcrumbNode("Details", "Vendors", "Agency Profile") { Parent = agencyPage, RouteValues = new { id = vendorInvestigationServiceType.VendorId } };
+                var editPage = new MvcBreadcrumbNode("Service", "Vendors", $"Manage Service") { Parent = agencyDetailPage, RouteValues = new { id = vendorInvestigationServiceType.VendorId } };
                 var createPage = new MvcBreadcrumbNode("Edit", "VendorService", $"Edit Service") { Parent = editPage, RouteValues = new { id = id } };
                 ViewData["BreadcrumbNode"] = createPage;
 
-                return View(services);
+                return View(vendorInvestigationServiceType);
             }
             catch (Exception ex)
             {
@@ -319,7 +261,7 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(long VendorInvestigationServiceTypeId, VendorInvestigationServiceType service, long VendorId)
         {
-            if (VendorInvestigationServiceTypeId != service.VendorInvestigationServiceTypeId || service.SelectedMultiPincodeId.Count <= 0 || service is null || service.SelectedCountryId < 1 || service.SelectedStateId < 1 ||
+            if (VendorInvestigationServiceTypeId != service.VendorInvestigationServiceTypeId || service is null || service.SelectedCountryId < 1 || service.SelectedStateId < 1 ||
                 (service.SelectedDistrictId != -1 && service.SelectedDistrictId < 1) || VendorId < 1)
             {
                 notifyService.Custom($"Error to edit service.", 3, "red", "fas fa-truck");
@@ -327,48 +269,41 @@ namespace risk.control.system.Controllers
             }
             try
             {
-                var stateWideService = await _context.VendorInvestigationServiceType.AsNoTracking().
-                        FirstOrDefaultAsync(v =>
+                var stateWideService = _context.VendorInvestigationServiceType
+                        .AsEnumerable() // Switch to client-side evaluation
+                        .Where(v =>
                             v.VendorId == VendorId &&
                             v.LineOfBusinessId == service.LineOfBusinessId &&
                             v.InvestigationServiceTypeId == service.InvestigationServiceTypeId &&
                             v.CountryId == (long?)service.SelectedCountryId &&
-                            v.StateId == (long?)service.SelectedStateId &&
-                            v.DistrictId == null);
-                List<PinCode> pinCodes = new List<PinCode>();
-                // Remove all state-level services
+                            v.StateId == (long?)service.SelectedStateId)?
+                        .ToList();
                 if (service.SelectedDistrictId == -1)
                 {
-                    if (stateWideService is null)
+                    // Handle state-wide service creation
+                    if (stateWideService is not null && stateWideService.Any(s => s.DistrictId == null))
                     {
-                        pinCodes = new List<PinCode>
-                        {
-                            new PinCode { Name = ALL_PINCODE, Code = ALL_PINCODE }
-                        };
+                        var currentService = stateWideService.FirstOrDefault(s => s.DistrictId == null);
+                        currentService.IsUpdated = true;
+                        _context.VendorInvestigationServiceType.Update(currentService);
+                        await _context.SaveChangesAsync();
+                        notifyService.Custom($"Service [{ALL_DISTRICT}] already exists for the State!", 3, "orange", "fas fa-truck");
+                        return RedirectToAction(nameof(VendorsController.Service), "Vendors", new { id = service.VendorId });
                     }
                 }
                 else
                 {
-                    var agencyServicedPincodes = _context.ServicedPinCode.Where(s =>
-                        s.VendorInvestigationServiceTypeId == service.VendorInvestigationServiceTypeId);
-                    if (agencyServicedPincodes is not null)
+                    // Handle state-wide service creation
+                    if (stateWideService is not null && stateWideService.Any(s => s.DistrictId != null && s.DistrictId == service.SelectedDistrictId && s.VendorInvestigationServiceTypeId != service.VendorInvestigationServiceTypeId))
                     {
-                        _context.ServicedPinCode.RemoveRange(agencyServicedPincodes);
+                        var currentService = stateWideService.FirstOrDefault(s => s.DistrictId == service.SelectedDistrictId);
+                        currentService.IsUpdated = true;
+                        _context.VendorInvestigationServiceType.Update(currentService);
+                        await _context.SaveChangesAsync();
+                        notifyService.Custom($"Service already exists for the District!", 3, "orange", "fas fa-truck");
+                        return RedirectToAction(nameof(VendorsController.Service), "Vendors", new { id = service.VendorId });
                     }
-
-                    // Retrieve the selected pin codes
-                    pinCodes = await _context.PinCode
-                        .Where(pinCode => service.SelectedMultiPincodeId.Distinct().Contains(pinCode.PinCodeId))
-                        .ToListAsync();
                 }
-
-                service.PincodeServices = pinCodes.Select(p =>
-                new ServicedPinCode
-                {
-                    Name = p.Name,
-                    Pincode = p.Code,
-                    VendorInvestigationServiceTypeId = VendorInvestigationServiceTypeId
-                })?.ToList();
 
                 service.CountryId = service.SelectedCountryId;
                 service.StateId = service.SelectedStateId;
@@ -414,7 +349,6 @@ namespace risk.control.system.Controllers
                 var vendorInvestigationServiceType = await _context.VendorInvestigationServiceType
                     .Include(v => v.InvestigationServiceType)
                     .Include(v => v.LineOfBusiness)
-                    .Include(v => v.PincodeServices)
                     .Include(v => v.State)
                     .Include(v => v.District)
                     .Include(v => v.Country)
@@ -424,9 +358,9 @@ namespace risk.control.system.Controllers
                 {
                     return NotFound();
                 }
-                var agencysPage = new MvcBreadcrumbNode("Agencies", "Vendors", "Manage Agency(s)");
-                var agencyPage = new MvcBreadcrumbNode("Agencies", "Vendors", "Agencies") { Parent = agencysPage };
-                var agencyDetailPage = new MvcBreadcrumbNode("Details", "Vendors", "Manage Agency") { Parent = agencyPage, RouteValues = new { id = vendorInvestigationServiceType.VendorId } };
+                var agencysPage = new MvcBreadcrumbNode("EmpanelledVendors", "Vendors", "Manage Agency(s)");
+                var agencyPage = new MvcBreadcrumbNode("EmpanelledVendors", "Vendors", "Agencies") { Parent = agencysPage };
+                var agencyDetailPage = new MvcBreadcrumbNode("Details", "Vendors", "Agency Profile") { Parent = agencyPage, RouteValues = new { id = vendorInvestigationServiceType.VendorId } };
                 var editPage = new MvcBreadcrumbNode("Service", "Vendors", $"Manage Service") { Parent = agencyDetailPage, RouteValues = new { id = vendorInvestigationServiceType.VendorId } };
                 var createPage = new MvcBreadcrumbNode("Delete", "VendorService", $"Delete Service") { Parent = editPage, RouteValues = new { id = vendorInvestigationServiceType.VendorId } };
                 ViewData["BreadcrumbNode"] = createPage;

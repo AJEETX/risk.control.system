@@ -1,6 +1,8 @@
 ﻿//var apiKey = 'AIzaSyCYPyGotbPJAcE9Ap_ATSKkKOrXCQC4ops';
 $(function () {
+    $.get('/api/Agency/GetCompanyAgencyUser', function (data) {
 
+    });
     $('#edit-company.btn.btn-warning').on('click', function () {
         $("body").addClass("submit-progress-bg");
         // Wrap in setTimeout so the UI
