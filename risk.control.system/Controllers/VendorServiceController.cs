@@ -231,6 +231,7 @@ namespace risk.control.system.Controllers
                     .First(v => v.VendorInvestigationServiceTypeId == id);
 
                 ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", vendorInvestigationServiceType.LineOfBusinessId);
+                ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType.Where(i => i.LineOfBusinessId == vendorInvestigationServiceType.LineOfBusinessId), "InvestigationServiceTypeId", "Name", vendorInvestigationServiceType.InvestigationServiceTypeId);
 
                 if (vendorInvestigationServiceType.DistrictId == null)
                 {
@@ -262,28 +263,29 @@ namespace risk.control.system.Controllers
         public async Task<IActionResult> Edit(long VendorInvestigationServiceTypeId, VendorInvestigationServiceType service, long VendorId)
         {
             if (VendorInvestigationServiceTypeId != service.VendorInvestigationServiceTypeId || service is null || service.SelectedCountryId < 1 || service.SelectedStateId < 1 ||
-                (service.SelectedDistrictId != -1 && service.SelectedDistrictId < 1) || VendorId < 1)
+                (service.SelectedDistrictId != -1 && service.SelectedDistrictId < 1 && service.SelectedDistrictId != 0) || VendorId < 1)
             {
                 notifyService.Custom($"Error to edit service.", 3, "red", "fas fa-truck");
                 return RedirectToAction(nameof(Edit), "VendorService", new { id = VendorInvestigationServiceTypeId });
             }
             try
             {
-                var stateWideService = _context.VendorInvestigationServiceType
-                        .AsEnumerable() // Switch to client-side evaluation
+                var existingVendorServices = _context.VendorInvestigationServiceType
+                         .AsNoTracking() // Switch to client-side evaluation
                         .Where(v =>
                             v.VendorId == VendorId &&
                             v.LineOfBusinessId == service.LineOfBusinessId &&
                             v.InvestigationServiceTypeId == service.InvestigationServiceTypeId &&
                             v.CountryId == (long?)service.SelectedCountryId &&
-                            v.StateId == (long?)service.SelectedStateId)?
+                            v.StateId == (long?)service.SelectedStateId &&
+                            v.VendorInvestigationServiceTypeId != service.VendorInvestigationServiceTypeId)?
                         .ToList();
-                if (service.SelectedDistrictId == -1)
+                if (service.SelectedDistrictId == 0 || service.SelectedDistrictId == -1)
                 {
                     // Handle state-wide service creation
-                    if (stateWideService is not null && stateWideService.Any(s => s.DistrictId == null))
+                    if (existingVendorServices is not null && existingVendorServices.Any(s => s.DistrictId == null))
                     {
-                        var currentService = stateWideService.FirstOrDefault(s => s.DistrictId == null);
+                        var currentService = existingVendorServices.FirstOrDefault(s => s.DistrictId == null);
                         currentService.IsUpdated = true;
                         _context.VendorInvestigationServiceType.Update(currentService);
                         await _context.SaveChangesAsync();
@@ -294,9 +296,9 @@ namespace risk.control.system.Controllers
                 else
                 {
                     // Handle state-wide service creation
-                    if (stateWideService is not null && stateWideService.Any(s => s.DistrictId != null && s.DistrictId == service.SelectedDistrictId && s.VendorInvestigationServiceTypeId != service.VendorInvestigationServiceTypeId))
+                    if (existingVendorServices is not null && existingVendorServices.Any(s => s.DistrictId != null && s.DistrictId == service.SelectedDistrictId))
                     {
-                        var currentService = stateWideService.FirstOrDefault(s => s.DistrictId == service.SelectedDistrictId);
+                        var currentService = existingVendorServices.FirstOrDefault(s => s.DistrictId == service.SelectedDistrictId);
                         currentService.IsUpdated = true;
                         _context.VendorInvestigationServiceType.Update(currentService);
                         await _context.SaveChangesAsync();
@@ -307,7 +309,7 @@ namespace risk.control.system.Controllers
 
                 service.CountryId = service.SelectedCountryId;
                 service.StateId = service.SelectedStateId;
-                if (service.SelectedDistrictId == -1)
+                if (service.SelectedDistrictId == 0 || service.SelectedDistrictId == -1)
                 {
                     service.DistrictId = null;
                 }

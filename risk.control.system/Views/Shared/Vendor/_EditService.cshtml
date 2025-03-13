@@ -1,6 +1,8 @@
 ﻿@model risk.control.system.Models.VendorInvestigationServiceType
 <input type="hidden" id="CountryId" asp-for="CountryId" />
 <input asp-for="SelectedCountryId" type="hidden" id="SelectedCountryId" name="SelectedCountryId" value="@Model?.CountryId" />
+<input type="hidden" asp-for="VendorInvestigationServiceTypeId" />
+<input id="vendorId" type="hidden" asp-for="VendorId" value="@Model.Vendor.VendorId" />
 <div class="row">
     <div class="col-md-6">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -24,7 +26,7 @@
                 <div class="input-group-prepend">
                     <span class="input-group-text" for="InvestigationServiceTypeId"><i class="fas fa-tools"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                 </div>
-                <select id="InvestigationServiceTypeId" name="InvestigationServiceTypeId" asp-for="InvestigationServiceTypeId" class="form-control remarks" required>
+                <select id="InvestigationServiceTypeId" name="InvestigationServiceTypeId" asp-for="InvestigationServiceTypeId" class="form-control remarks" asp-items="ViewBag.InvestigationServiceTypeId" required>
                     <option value="">--- SELECT ---</option>
                 </select>
                 <span asp-validation-for="InvestigationServiceTypeId" class="text-danger"></span>

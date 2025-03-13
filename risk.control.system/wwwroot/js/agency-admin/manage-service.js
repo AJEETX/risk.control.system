@@ -111,11 +111,4 @@
     // Initialize validation
     $("#create-form").validate();
     $("#edit-form").validate();
-
-    // Set attributes for PinCodeId select element
-    $('#PinCodeId').attr({
-        'data-live-search': true,
-        'multiple': true,
-        'data-selected-text-format': 'count'
-    });
 });

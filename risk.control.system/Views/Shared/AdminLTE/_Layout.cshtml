@@ -19,35 +19,6 @@
     @{
         var timeout = Context.Items["timeout"];
         var userEmail = User?.Identity?.Name;
-        var userMailbox = _context.Mailbox
-        .Include(m => m.Inbox)
-        .Include(m => m.Outbox)
-        .Include(m => m.Sent)
-        .FirstOrDefault(c => c.Name == userEmail);
-
-        var roleCode = string.Empty;
-        var newInboxMessgeDisplay = "(0)";
-        var newOutboxMessgeDisplay = string.Empty;
-        var newSentMessgeDisplay = string.Empty;
-        var newTrashMessgeDisplay = string.Empty;
-
-
-        var newInboxMessages = userMailbox?.Inbox.Count(i => i.Read == false);
-        if (newInboxMessages is not null && newInboxMessages > 0)
-        {
-            newInboxMessgeDisplay = "(" + newInboxMessages?.ToString() + ")";
-        }
-
-        var newOutboxMessages = userMailbox?.Outbox.Count(i => i.Read == false);
-        if (newOutboxMessages is not null && newOutboxMessages > 0)
-        {
-            newOutboxMessgeDisplay = "(" + newOutboxMessages?.ToString() + ")";
-        }
-        var newSentMessages = userMailbox?.Sent.Count(i => i.Read == false);
-        if (newSentMessages is not null && newSentMessages > 0)
-        {
-            newSentMessgeDisplay = "(" + newSentMessages?.ToString() + ")";
-        }
     }
     <div class="wrapper">
         <div id="main-container">
@@ -68,8 +39,7 @@
                         Country = $"(+{company.Country.ISDCode}) {company.Country.Name} ({company.Country.Code})",
                         ProfilePicture = companyUser.ProfilePicture,
                         CurrencyCode = company.Country.CurrencyCode,
-                        Language = company.Country.Language,
-                        Notification = newInboxMessgeDisplay
+                        Language = company.Country.Language
                     };
                     <partial name="AdminLTE/_CompanyTopNavigation" model="@navigationModel" />
 
@@ -86,8 +56,7 @@
                         Country = $"(+{vendor.Country.ISDCode}) {vendor.Country.Name} ({vendor.Country.Code})",
                         ProfilePicture = vendorUser.ProfilePicture,
                         CurrencyCode = vendor.Country.CurrencyCode,
-                        Language = vendor.Country.Language,
-                        Notification = newInboxMessgeDisplay
+                        Language = vendor.Country.Language
                     };
                     <partial name="AdminLTE/_AgencyTopNavigation" model="@navigationModel" />
                     <partial name="AdminLTE/_VendorSidebar" model="@vendor" />

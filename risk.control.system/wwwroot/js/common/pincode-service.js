@@ -102,30 +102,45 @@ function PopulateInvestigationServices(dropDownId, list, option) {
 $(document).ready(function () {
     // Trigger change event on page load
     $("#LineOfBusinessId").trigger("change");
-    function toggleStateAndPinCodeFields() {
-        // Check if LineOfBusinessId, InvestigationServiceTypeId, and Price have values
-        if (
-            !$("#LineOfBusinessId").val() ||
-            !$("#InvestigationServiceTypeId").val() ||
-            !$("#Price").val()
-        ) {
-            // Disable StateId and PinCodeId if any of the fields are blank
-            $("#StateId").prop("disabled", true).val("").addClass('disabled');
-            $("#DistrictId").prop("disabled", true).val("");
-            //$("#PinCodeId").prop("disabled", true).val("");
+
+    $("#LineOfBusinessId").on("change", function () {
+        var value = $(this).val();
+
+        if (value === '') {
+            // Clear and reset InvestigationServiceTypeId dropdown
+            $('#InvestigationServiceTypeId').empty();
+            $('#InvestigationServiceTypeId').append("<option value=''>--- SELECT ---</option>");
         } else {
-            // Enable StateId and PinCodeId if all fields have values
-            $("#StateId").prop("disabled", false);
-            //$("#PinCodeId").prop("disabled", false);
-            $("#DistrictId").prop("disabled", false);
+            // Fetch investigation services via AJAX and populate the dropdown
+            $.get("/api/MasterData/GetInvestigationServicesByLineOfBusinessId", { LineOfBusinessId: value }, function (data) {
+                PopulateInvestigationServices("#InvestigationServiceTypeId", data, "<option>--- SELECT ---</option>");
+            });
         }
-    }
+    });
+    //function toggleStateAndPinCodeFields() {
+    //    // Check if LineOfBusinessId, InvestigationServiceTypeId, and Price have values
+    //    if (
+    //        !$("#LineOfBusinessId").val() ||
+    //        !$("#InvestigationServiceTypeId").val() ||
+    //        !$("#Price").val()
+    //    ) {
+    //        // Disable StateId and PinCodeId if any of the fields are blank
+    //        $("#StateId").prop("disabled", true).val("").addClass('disabled');
+    //        $("#DistrictId").prop("disabled", true).val("");
+    //        //$("#PinCodeId").prop("disabled", true).val("");
+    //    } else {
+    //        // Enable StateId and PinCodeId if all fields have values
+    //        $("#StateId").prop("disabled", false);
+    //        //$("#PinCodeId").prop("disabled", false);
+    //        $("#DistrictId").prop("disabled", false);
+    //    }
+    //}
 
-    // Run the function on page load
-    toggleStateAndPinCodeFields();
+    //// Run the function on page load
+    //toggleStateAndPinCodeFields();
 
-    // Run the function whenever LineOfBusinessId, InvestigationServiceTypeId, or Price changes
-    $("#LineOfBusinessId, #InvestigationServiceTypeId, #Price").on("change keyup", toggleStateAndPinCodeFields);
+    //// Run the function whenever LineOfBusinessId, InvestigationServiceTypeId, or Price changes
+    //$("#LineOfBusinessId, #InvestigationServiceTypeId, #Price").on("change keyup", toggleStateAndPinCodeFields);
     $("#StateId").on("blur change", function () {
         // Call the GetRemainingServicePinCode function with the necessary parameters
         //SearchRemainingDistrict(false);
@@ -174,20 +189,7 @@ $(document).ready(function () {
 });
 
 
-$("#LineOfBusinessId").on("change", function () {
-    var value = $(this).val();
 
-    if (value === '') {
-        // Clear and reset InvestigationServiceTypeId dropdown
-        $('#InvestigationServiceTypeId').empty();
-        $('#InvestigationServiceTypeId').append("<option value=''>--- SELECT ---</option>");
-    } else {
-        // Fetch investigation services via AJAX and populate the dropdown
-        $.get("/api/MasterData/GetInvestigationServicesByLineOfBusinessId", { LineOfBusinessId: value }, function (data) {
-            PopulateInvestigationServices("#InvestigationServiceTypeId", data, "<option>--- SELECT ---</option>");
-        });
-    }
-});
 /**
  * Preloads field data from hidden fields (e.g., SelectedCountryId).
  */
