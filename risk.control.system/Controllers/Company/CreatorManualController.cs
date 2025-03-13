@@ -171,7 +171,8 @@ namespace risk.control.system.Controllers.Company
                 ViewData["CostCentreId"] = new SelectList(_context.CostCentre.OrderBy(s => s.Code), "CostCentreId", "Name");
                 ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType.Where(i => i.LineOfBusinessId == lineOfBusinessId).OrderBy(s => s.Code), "InvestigationServiceTypeId", "Name");
 
-                var currentUser = await _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
+                var currentUser = await _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
+                ViewData["Currency"] = currentUser.ClientCompany.Country.CurrencyCode;
                 if (currentUser.ClientCompany.HasSampleData)
                 {
                     var model = claimPolicyService.AddClaimPolicy(currentUserEmail, lineOfBusinessId);
@@ -213,6 +214,9 @@ namespace risk.control.system.Controllers.Company
                     notifyService.Error("Claim Not Found!!!");
                     return RedirectToAction(nameof(CreatePolicy));
                 }
+                var currentUser = await _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
+                ViewData["Currency"] = currentUser.ClientCompany.Country.CurrencyCode;
+
                 ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType.Where(i =>
                i.LineOfBusinessId == claimsInvestigation.PolicyDetail.LineOfBusinessId).OrderBy(s => s.Code), "InvestigationServiceTypeId", "Name", claimsInvestigation.PolicyDetail.InvestigationServiceTypeId);
                 ViewData["CaseEnablerId"] = new SelectList(_context.CaseEnabler.OrderBy(s => s.Code), "CaseEnablerId", "Name", claimsInvestigation.PolicyDetail.CaseEnablerId);
@@ -264,7 +268,8 @@ namespace risk.control.system.Controllers.Company
                 var editPage = new MvcBreadcrumbNode("CreateCustomer", "CreatorManual", $"Create Customer") { Parent = details1Page, RouteValues = new { id = id } };
                 ViewData["BreadcrumbNode"] = editPage;
 
-                var currentUser = await _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c=>c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
+                var currentUser = await _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
+                ViewData["Currency"] = currentUser.ClientCompany.Country.CurrencyCode;
 
                 if (currentUser.ClientCompany.HasSampleData)
                 {
@@ -332,6 +337,8 @@ namespace risk.control.system.Controllers.Company
                     notifyService.Error("OOPS!!!.Claim Not Found.Try Again");
                     return RedirectToAction(nameof(CreatePolicy));
                 }
+                var currentUser = await _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
+                ViewData["Currency"] = currentUser.ClientCompany.Country.CurrencyCode;
 
                 var claimsPage = new MvcBreadcrumbNode("New", "CreatorManual", "Claims");
                 var agencyPage = new MvcBreadcrumbNode("New", "CreatorManual", "Assign(manual)") { Parent = claimsPage, };
@@ -373,7 +380,8 @@ namespace risk.control.system.Controllers.Company
                 ViewData["BreadcrumbNode"] = editPage;
                 ViewBag.ClaimId = id;
 
-                var currentUser = await _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c=>c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
+                var currentUser = await _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
+                ViewData["Currency"] = currentUser.ClientCompany.Country.CurrencyCode;
 
                 if (currentUser.ClientCompany.HasSampleData)
                 {
@@ -441,7 +449,9 @@ namespace risk.control.system.Controllers.Company
                     .First(v => v.BeneficiaryDetailId == id);
 
                 ViewData["BeneficiaryRelationId"] = new SelectList(_context.BeneficiaryRelation.OrderBy(s => s.Code), "BeneficiaryRelationId", "Name", beneficiary.BeneficiaryRelationId);
-
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                var currentUser = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefault(c => c.Email == currentUserEmail);
+                ViewData["Currency"] = currentUser.ClientCompany.Country.CurrencyCode;
 
                 var claimsPage = new MvcBreadcrumbNode("New", "CreatorManual", "Claims");
                 var agencyPage = new MvcBreadcrumbNode("New", "CreatorManual", "Assign(manual)") { Parent = claimsPage, };
