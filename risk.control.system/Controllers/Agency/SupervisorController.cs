@@ -96,6 +96,7 @@ namespace risk.control.system.Controllers.Agency
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var model = await vendorService.SelectVendorAgent(currentUserEmail, selectedcase);
+                ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 return View(model);
             }
@@ -125,6 +126,7 @@ namespace risk.control.system.Controllers.Agency
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var model = await vendorService.ReSelectVendorAgent(currentUserEmail, selectedcase);
+                ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 return View(model);
             }
@@ -179,6 +181,7 @@ namespace risk.control.system.Controllers.Agency
                     .ToList();
 
                 var model = await vendorService.GetInvestigateReport(currentUserEmail, selectedcase);
+                ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 return View(model);
             }
@@ -220,6 +223,7 @@ namespace risk.control.system.Controllers.Agency
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var model = await vendorService.GetClaimsDetails(currentUserEmail, id);
+                ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
                 return View(model);
             }
             catch (Exception ex)
@@ -247,6 +251,7 @@ namespace risk.control.system.Controllers.Agency
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var model = await vendorService.GetClaimsDetails(currentUserEmail, id);
+                ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
                 return View(model);
             }
             catch (Exception ex)
@@ -287,6 +292,8 @@ namespace risk.control.system.Controllers.Agency
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var model = await investigationReportService.SubmittedDetail(id, currentUserEmail);
+                ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+
                 return View(model);
             }
             catch (Exception ex)
@@ -312,6 +319,8 @@ namespace risk.control.system.Controllers.Agency
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
             var model = await vendorService.GetInvestigateReport(currentUserEmail, id);
+            ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+
             ViewData["claimId"] = id;
 
             return View(model);

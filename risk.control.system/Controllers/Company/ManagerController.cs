@@ -11,6 +11,7 @@ using SmartBreadcrumbs.Attributes;
 using SmartBreadcrumbs.Nodes;
 
 using static risk.control.system.AppConstant.Applicationsettings;
+using risk.control.system.Helpers;
 
 namespace risk.control.system.Controllers.Company
 {
@@ -75,6 +76,7 @@ namespace risk.control.system.Controllers.Company
                 }
 
                 var model = await claimPolicyService.GetClaimDetail(id);
+                ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 return View(model);
             }
@@ -123,6 +125,7 @@ namespace risk.control.system.Controllers.Company
                 }
 
                 var model = await claimPolicyService.GetClaimDetail(id);
+                ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 return View(model);
             }
@@ -162,6 +165,7 @@ namespace risk.control.system.Controllers.Company
                 }
 
                 var model = await investigationReportService.SubmittedDetail(id, currentUserEmail);
+                ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 return View(model);
             }
@@ -203,6 +207,7 @@ namespace risk.control.system.Controllers.Company
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var model = await investigationReportService.SubmittedDetail(id, currentUserEmail);
+                ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 return View(model);
             }

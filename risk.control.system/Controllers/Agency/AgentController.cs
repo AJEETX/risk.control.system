@@ -9,6 +9,7 @@ using risk.control.system.Services;
 using SmartBreadcrumbs.Attributes;
 
 using static risk.control.system.AppConstant.Applicationsettings;
+using risk.control.system.Helpers;
 
 namespace risk.control.system.Controllers.Agency
 {
@@ -62,6 +63,7 @@ namespace risk.control.system.Controllers.Agency
                 }
 
                 var model = await vendorService.GetInvestigate(currentUserEmail, selectedcase, uploaded);
+                ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 return View(model);
             }
@@ -101,6 +103,7 @@ namespace risk.control.system.Controllers.Agency
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 var model = await investigationReportService.SubmittedDetail(id, currentUserEmail);
+                ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 return View(model);
             }
