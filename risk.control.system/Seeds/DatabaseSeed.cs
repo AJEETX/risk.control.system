@@ -42,17 +42,20 @@ namespace risk.control.system.Seeds
             await PinCodeStateSeed.CurrenciesCode(context);
             await PinCodeStateSeed.Currencies(context);
             var countries = await PinCodeStateSeed.Countries(context);
-            var india = countries.FirstOrDefault(c=>c.Code.ToLower() == "in");
+
+            // seed INDIA
+            var india = countries.FirstOrDefault(c => c.Code.ToLower() == "in");
             var indiaPincodes = await PinCodeStateSeed.CsvRead_India();
-            var indianStates = indiaPincodes.Where(s=>s.StateName.ToLower() == "haryana" ||
+            var indianStates = indiaPincodes.Where(s => s.StateName.ToLower() == "haryana" ||
                 s.StateName.ToLower() == "delhi" ||
-                s.StateCode.ToLower() == "up" 
+                s.StateCode.ToLower() == "up"
                 ).Select(g => g.StateCode).Distinct()?.ToList();
 
             var filteredInPincodes = indiaPincodes.Where(g => indianStates.Contains(g.StateCode))?.ToList();
 
             await PinCodeStateSeed.SeedPincode(context, filteredInPincodes, india);
 
+            // seed AUSTRALIA
             var au = countries.FirstOrDefault(c => c.Code.ToLower() == "au");
             var auPincodes = await PinCodeStateSeed.CsvRead_Au();
             var auStates = auPincodes.Where(s => s.StateCode.ToLower() == "nsw" ||
@@ -63,6 +66,17 @@ namespace risk.control.system.Seeds
             var filteredAuPincodes = auPincodes.Where(g => auStates.Contains(g.StateCode))?.ToList();
 
             await PinCodeStateSeed.SeedPincode(context, filteredAuPincodes, au);
+
+            // seed USA
+            var us = countries.FirstOrDefault(c => c.Code.ToLower() == "us");
+            var usPincodes = await PinCodeStateSeed.CsvRead_Us();
+            var usStates = usPincodes.Where(s => s.StateCode.ToLower() == "nc" ||
+                s.StateCode.ToLower() == "ny"
+                ).Select(g => g.StateCode).Distinct()?.ToList();
+
+            var filteredUsPincodes = usPincodes.Where(g => usStates.Contains(g.StateCode))?.ToList();
+
+            await PinCodeStateSeed.SeedPincode(context, filteredUsPincodes, us);
 
             await context.SaveChangesAsync(null, false);
 

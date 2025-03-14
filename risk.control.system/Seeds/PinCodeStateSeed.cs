@@ -16,6 +16,7 @@ namespace risk.control.system.Seeds
         private static string currenciesFilePath = @"lang-currency.csv";
         private static string currenciesNameFilePath = @"currency.csv";
         private static string countriesFilePath = @"countries.csv";
+        private static string us_stateWisePincodeFilePath = @"us_zipcode.csv";
         private static string au_stateWisePincodeFilePath = @"au_postcodes.csv";
         private static string all_india_pincodes = @"india_pincode.csv";
         private static string NO_DATA = " NO - DATA ";
@@ -171,50 +172,7 @@ namespace risk.control.system.Seeds
                 }
             }
         }
-        public static async Task<Country> India(ApplicationDbContext context)
-        {
-            var country = new Country
-            {
-                Name = "INDIA",
-                Code = "IN",
-                ISDCode = 91,
-                Updated = DateTime.Now,
-            };
-
-            var indiaCountry = await context.Country.AddAsync(country);
-            return indiaCountry.Entity;
-
-        }
-
-        public static async Task<Country> America(ApplicationDbContext context)
-        {
-            var country = new Country
-            {
-                Name = "UNITED STATES OF AMERICA",
-                Code = "US",
-                ISDCode = 1,
-                Updated = DateTime.Now,
-            };
-
-            var indiaCountry = await context.Country.AddAsync(country);
-            return indiaCountry.Entity;
-
-        }
-        public static async Task<Country> Australia(ApplicationDbContext context)
-        {
-
-            var country = new Country
-            {
-                Name = "AUSTRALIA",
-                Code = "AU",
-                ISDCode = 61,
-                Updated = DateTime.Now,
-            };
-            var australiaCountry = await context.Country.AddAsync(country);
-            return australiaCountry.Entity;
-
-        }
-
+       
         public static async Task<List<PinCodeState>> CsvRead_Au()
         {
             var pincodes = new List<PinCodeState>();
@@ -238,13 +196,52 @@ namespace risk.control.system.Seeds
 
                             var pincodeState = new PinCodeState
                             {
-                                Code = rowData[0] ?? NO_DATA,
-                                Name = rowData[1] ?? NO_DATA,
-                                District = rowData[1] ?? NO_DATA,
-                                StateName = rowData[2] ?? NO_DATA,
-                                StateCode = rowData[3] ?? NO_DATA,
-                                Latitude = rowData[4] ?? NO_DATA,
-                                Longitude = rowData[5] ?? NO_DATA,
+                                Code = rowData[0]?.Trim() ?? NO_DATA,
+                                Name = rowData[1]?.Trim() ?? NO_DATA,
+                                District = rowData[1]?.Trim() ?? NO_DATA,
+                                StateName = rowData[2]?.Trim() ?? NO_DATA,
+                                StateCode = rowData[3]?.Trim() ?? NO_DATA,
+                                Latitude = rowData[4]?.Trim() ?? NO_DATA,
+                                Longitude = rowData[5]?.Trim() ?? NO_DATA,
+                            };
+                            var isDupicate = pincodes.FirstOrDefault(p => p.Code == pincodeState.Code);
+                            pincodes.Add(pincodeState);
+                        }
+                    }
+                }
+            }
+            return pincodes;
+        }
+        public static async Task<List<PinCodeState>> CsvRead_Us()
+        {
+            var pincodes = new List<PinCodeState>();
+            string csvData = await File.ReadAllTextAsync(us_stateWisePincodeFilePath);
+
+            bool firstRow = true;
+            foreach (string row in csvData.Split('\n'))
+            {
+                if (!string.IsNullOrEmpty(row))
+                {
+                    if (!string.IsNullOrEmpty(row))
+                    {
+                        if (firstRow)
+                        {
+                            firstRow = false;
+                        }
+                        else
+                        {
+                            var output = regex.Replace(row, m => m.Value.Replace(',', '@'));
+                            var rowData = output.Split(',').ToList();
+
+                            var pincodeState = new PinCodeState
+                            {
+                                Code = rowData[3]?.Trim() ?? NO_DATA,
+                                Name = rowData[5]?.Trim() ?? NO_DATA,
+                                District = rowData[4]?.Trim() ?? NO_DATA,
+                                StateName = rowData[1]?.Trim() ?? NO_DATA,
+                                StateCode = rowData[2]?.Trim() ?? NO_DATA,
+                                Latitude = NO_DATA,
+                                Longitude = NO_DATA,
                             };
                             var isDupicate = pincodes.FirstOrDefault(p => p.Code == pincodeState.Code);
                             pincodes.Add(pincodeState);
@@ -277,11 +274,11 @@ namespace risk.control.system.Seeds
                             var rowData = output.Split(',').ToList();
                             var pincodeState = new PinCodeState
                             {
-                                Name = rowData[1] ?? NO_DATA,
-                                Code = rowData[2] ?? NO_DATA,
-                                District = rowData[3] ?? NO_DATA,
-                                StateName = rowData[4] ?? NO_DATA,
-                                StateCode = GetInitials(rowData[4]) ?? NO_DATA,
+                                Name = rowData[1]?.Trim() ?? NO_DATA,
+                                Code = rowData[2]?.Trim() ?? NO_DATA,
+                                District = rowData[3]?.Trim() ?? NO_DATA,
+                                StateName = rowData[4]?.Trim() ?? NO_DATA,
+                                StateCode = GetInitials(rowData[4])?.Trim() ?? NO_DATA,
                                 Latitude =  NO_DATA,
                                 Longitude = NO_DATA,
                             };
