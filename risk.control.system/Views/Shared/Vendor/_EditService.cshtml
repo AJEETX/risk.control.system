@@ -34,12 +34,12 @@
         </div>
 
         <div class="form-group">
-            <label class="input-group-label"> Service Price (in @Model.Country.CurrencyCode):</label>
+            <label class="input-group-label"> Service Price in @Model.Country.CurrencyCode (@ViewBag.Currency):</label>
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
                     <span class="input-group-text" for="Price"> <i class="fa fa-money"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                 </div>
-                <input asp-for="Price" class="form-control remarks" type="text" placeholder="Service Price (in @Model.Country.CurrencyCode)" required maxlength="10" />
+                <input asp-for="Price" class="form-control remarks" type="text" placeholder="Service Price in @Model.Country.CurrencyCode (@ViewBag.Currency)" required maxlength="10" />
                 <span asp-validation-for="Price" class="text-danger"></span>
             </div>
         </div>

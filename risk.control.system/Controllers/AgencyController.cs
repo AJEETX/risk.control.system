@@ -28,6 +28,7 @@ using SmartBreadcrumbs.Attributes;
 
 using static Google.Cloud.Vision.V1.ProductSearchResults.Types;
 using static risk.control.system.AppConstant.Applicationsettings;
+using risk.control.system.Helpers;
 
 namespace risk.control.system.Controllers
 {
@@ -775,6 +776,9 @@ namespace risk.control.system.Controllers
                 var vendor = _context.Vendor.Include(v => v.Country).FirstOrDefault(v => v.VendorId == vendorUser.VendorId);
 
                 ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name");
+
+                ViewData["Currency"] = Extensions.GetCultureByCountry(vendor.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+
                 var model = new VendorInvestigationServiceType { Country = vendor.Country, CountryId = vendor.CountryId, Vendor = vendor };
                 return View(model);
             }
@@ -904,7 +908,9 @@ namespace risk.control.system.Controllers
                     notifyService.Custom($"Error to edit service.", 3, "red", "fas fa-truck");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                var currentUser = _context.VendorApplicationUser.Include(c => c.Vendor).ThenInclude(c => c.Country).FirstOrDefault(c => c.Email == currentUserEmail);
+                ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.Vendor.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
                 var vendorInvestigationServiceType = _context.VendorInvestigationServiceType
                     .Include(v => v.Country)
                     .Include(v => v.District)
@@ -1016,13 +1022,15 @@ namespace risk.control.system.Controllers
         {
             try
             {
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-
                 if (id <= 0)
                 {
                     notifyService.Custom($"NOT FOUND.", 3, "red", "fas fa-truck");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
+
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                var currentUser = _context.VendorApplicationUser.Include(c => c.Vendor).ThenInclude(c => c.Country).FirstOrDefault(c => c.Email == currentUserEmail);
+                ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.Vendor.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 var vendorInvestigationServiceType = await _context.VendorInvestigationServiceType
                     .Include(v => v.InvestigationServiceType)

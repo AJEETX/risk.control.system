@@ -191,20 +191,22 @@ namespace risk.control.system.Services
             var claimsInvestigation = await _context.ClaimsInvestigation
                 .Include(c => c.PolicyDetail)
                 .ThenInclude(c => c.LineOfBusiness)
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.CaseEnabler)
+                 .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.InvestigationServiceType)
+                 .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.CostCentre)
                 .Include(c => c.ClientCompany)
                 .Include(c => c.AgencyReport)
                     .ThenInclude(c => c.EnquiryRequest)
-              .Include(c => c.PreviousClaimReports)
-              .Include(c => c.AgencyReport.DigitalIdReport)
-              .Include(c => c.AgencyReport.PanIdReport)
-              .Include(c => c.AgencyReport.PassportIdReport)
-              .Include(c => c.AgencyReport.AudioReport)
-              .Include(c => c.AgencyReport.VideoReport)
-              .Include(c => c.AgencyReport.ReportQuestionaire)
-                .Include(c => c.PolicyDetail)
-                .Include(c => c.ClientCompany)
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.CaseEnabler)
+                  .Include(c => c.PreviousClaimReports)
+                  .Include(c => c.AgencyReport.DigitalIdReport)
+                  .Include(c => c.AgencyReport.PanIdReport)
+                  .Include(c => c.AgencyReport.PassportIdReport)
+                  .Include(c => c.AgencyReport.AudioReport)
+                  .Include(c => c.AgencyReport.VideoReport)
+                  .Include(c => c.AgencyReport.ReportQuestionaire)
                 .Include(c=> c.Vendor)
                 .Include(c => c.BeneficiaryDetail)
                 .ThenInclude(c => c.PinCode)
@@ -216,22 +218,16 @@ namespace risk.control.system.Services
                 .ThenInclude(c => c.Country)
                 .Include(c => c.BeneficiaryDetail)
                 .ThenInclude(c => c.BeneficiaryRelation)
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.CostCentre)
                 .Include(c => c.CustomerDetail)
                 .ThenInclude(c => c.Country)
                 .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.State)
+                .Include(c => c.CustomerDetail)
                 .ThenInclude(c => c.District)
-                .Include(c => c.InvestigationCaseStatus)
-                .Include(c => c.InvestigationCaseSubStatus)
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.InvestigationServiceType)
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.LineOfBusiness)
                 .Include(c => c.CustomerDetail)
                 .ThenInclude(c => c.PinCode)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.State)
+                .Include(c => c.InvestigationCaseStatus)
+                .Include(c => c.InvestigationCaseSubStatus)
                 .Include(c=>c.ClaimNotes)
                 .Include(c=>c.ClaimMessages)
                 .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == id);
@@ -239,9 +235,7 @@ namespace risk.control.system.Services
             var location = claimsInvestigation.BeneficiaryDetail;
             var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
-            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u=>u.Email == currentUserEmail);
-            var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
-
+            var companyUser = _context.ClientCompanyApplicationUser.Include(u=>u.ClientCompany).FirstOrDefault(u=>u.Email == currentUserEmail);
 
             var model = new ClaimTransactionModel
             {
@@ -249,7 +243,7 @@ namespace risk.control.system.Services
                 Log = caseLogs,
                 Location = location,
                 Assigned = claimsInvestigation.InvestigationCaseSubStatus == assignedStatus,
-                AutoAllocation = company.AutoAllocation
+                AutoAllocation = companyUser.ClientCompany.AutoAllocation
             };
 
             return model;

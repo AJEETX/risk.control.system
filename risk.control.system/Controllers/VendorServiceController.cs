@@ -16,6 +16,7 @@ using SmartBreadcrumbs.Attributes;
 using SmartBreadcrumbs.Nodes;
 
 using static risk.control.system.AppConstant.Applicationsettings;
+using risk.control.system.Helpers;
 
 namespace risk.control.system.Controllers
 {
@@ -90,7 +91,8 @@ namespace risk.control.system.Controllers
             {
                 var vendor = _context.Vendor.Include(v=>v.Country).FirstOrDefault(v => v.VendorId == id);
                 ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name");
-                //ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
+                ViewData["Currency"] = Extensions.GetCultureByCountry(vendor.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+
                 var model = new VendorInvestigationServiceType { Country = vendor.Country, CountryId = vendor.CountryId, Vendor = vendor };
 
                 var agencysPage = new MvcBreadcrumbNode("EmpanelledVendors", "Vendors", "Manage Agency(s)");
@@ -220,7 +222,9 @@ namespace risk.control.system.Controllers
                     notifyService.Error("OOPs !!!..Agency Id Not Found");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                var currentUser = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefault(c => c.Email == currentUserEmail);
+                ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
                 var vendorInvestigationServiceType = _context.VendorInvestigationServiceType
                     .Include(v => v.LineOfBusiness)
                     .Include(v => v.InvestigationServiceType)
@@ -347,7 +351,10 @@ namespace risk.control.system.Controllers
                     notifyService.Error("OOPs !!!..Id Not Found");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                var currentUser = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefault(c => c.Email == currentUserEmail);
+                ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+
                 var vendorInvestigationServiceType = await _context.VendorInvestigationServiceType
                     .Include(v => v.InvestigationServiceType)
                     .Include(v => v.LineOfBusiness)

@@ -172,7 +172,7 @@ namespace risk.control.system.Controllers.Company
                 ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType.Where(i => i.LineOfBusinessId == lineOfBusinessId).OrderBy(s => s.Code), "InvestigationServiceTypeId", "Name");
 
                 var currentUser = await _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
-                ViewData["Currency"] = currentUser.ClientCompany.Country.CurrencyCode;
+                ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
                 if (currentUser.ClientCompany.HasSampleData)
                 {
                     var model = claimPolicyService.AddClaimPolicy(currentUserEmail, lineOfBusinessId);
@@ -215,7 +215,7 @@ namespace risk.control.system.Controllers.Company
                     return RedirectToAction(nameof(CreatePolicy));
                 }
                 var currentUser = await _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
-                ViewData["Currency"] = currentUser.ClientCompany.Country.CurrencyCode;
+                ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType.Where(i =>
                i.LineOfBusinessId == claimsInvestigation.PolicyDetail.LineOfBusinessId).OrderBy(s => s.Code), "InvestigationServiceTypeId", "Name", claimsInvestigation.PolicyDetail.InvestigationServiceTypeId);
@@ -269,7 +269,7 @@ namespace risk.control.system.Controllers.Company
                 ViewData["BreadcrumbNode"] = editPage;
 
                 var currentUser = await _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
-                ViewData["Currency"] = currentUser.ClientCompany.Country.CurrencyCode;
+                ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 if (currentUser.ClientCompany.HasSampleData)
                 {
@@ -338,7 +338,7 @@ namespace risk.control.system.Controllers.Company
                     return RedirectToAction(nameof(CreatePolicy));
                 }
                 var currentUser = await _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
-                ViewData["Currency"] = currentUser.ClientCompany.Country.CurrencyCode;
+                ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 var claimsPage = new MvcBreadcrumbNode("New", "CreatorManual", "Claims");
                 var agencyPage = new MvcBreadcrumbNode("New", "CreatorManual", "Assign(manual)") { Parent = claimsPage, };
@@ -381,7 +381,7 @@ namespace risk.control.system.Controllers.Company
                 ViewBag.ClaimId = id;
 
                 var currentUser = await _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
-                ViewData["Currency"] = currentUser.ClientCompany.Country.CurrencyCode;
+                ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 if (currentUser.ClientCompany.HasSampleData)
                 {
@@ -451,7 +451,7 @@ namespace risk.control.system.Controllers.Company
                 ViewData["BeneficiaryRelationId"] = new SelectList(_context.BeneficiaryRelation.OrderBy(s => s.Code), "BeneficiaryRelationId", "Name", beneficiary.BeneficiaryRelationId);
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 var currentUser = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefault(c => c.Email == currentUserEmail);
-                ViewData["Currency"] = currentUser.ClientCompany.Country.CurrencyCode;
+                ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 var claimsPage = new MvcBreadcrumbNode("New", "CreatorManual", "Claims");
                 var agencyPage = new MvcBreadcrumbNode("New", "CreatorManual", "Assign(manual)") { Parent = claimsPage, };
@@ -484,7 +484,8 @@ namespace risk.control.system.Controllers.Company
                 }
 
                 var model = await investigationReportService.GetClaimDetails(currentUserEmail, id);
-
+                var currentUser = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefault(c => c.Email == currentUserEmail);
+                ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
                 if (model == null)
                 {
                     notifyService.Error("OOPS!!!.Claim Not Found.Try Again");
@@ -592,6 +593,8 @@ namespace risk.control.system.Controllers.Company
                     notifyService.Error("NOT FOUND !!!..");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
+                var currentUser = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefault(c => c.Email == currentUserEmail);
+                ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 var model = await investigationReportService.GetClaimDetails(currentUserEmail, id);
 
