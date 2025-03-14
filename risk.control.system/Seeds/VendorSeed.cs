@@ -31,9 +31,12 @@ namespace risk.control.system.Seeds
             var investigate = await AgencyInvestigateSeed.Seed(context, webHostEnvironment, investigationServiceType, discreetServiceType, docServiceType, lineOfBusiness, httpAccessor, customApiCLient, vendorUserManager);
 
             var proper = await AgencyProperSeed.Seed(context, webHostEnvironment, investigationServiceType, discreetServiceType, docServiceType, lineOfBusiness, httpAccessor, customApiCLient, vendorUserManager);
+            
             var honest = await AgencyHonestSeed.Seed(context, webHostEnvironment, investigationServiceType, discreetServiceType, docServiceType, lineOfBusiness, httpAccessor, customApiCLient, vendorUserManager);
+            
+            var nicer = await AgencyNicerSeed.Seed(context, webHostEnvironment, investigationServiceType, discreetServiceType, docServiceType, lineOfBusiness, httpAccessor, customApiCLient, vendorUserManager);
 
-            var vendors = new List<Vendor> { checker, verify, investigate, proper, honest };
+            var vendors = new List<Vendor> { checker, verify, investigate, proper, honest, nicer };
             return vendors;
         }
     }

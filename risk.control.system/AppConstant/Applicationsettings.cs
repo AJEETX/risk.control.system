@@ -199,11 +199,11 @@
         public const string CANARALOGO = "/img/chl.jpg";
         public const string CANARA_CREATOR = "creator@" + CANARADOMAIN;
 
-        public const string BAJAJ = "bajaj life";
-        public const string BAJAJ_CODE = "bal";
-        public const string BAJAJ_DOMAIN = "bajajlife.com";
-        public const string BAJAJ_LOGO = "/img/bajaj-allianz.jpg";
-        public const string BAJAJ_CREATOR = "creator@" + BAJAJ_DOMAIN;
+        public const string ALLIANZ = "allianz";
+        public const string ALLIANZ_CODE = "alz";
+        public const string ALLIANZ_DOMAIN = "allianz.com";
+        public const string ALLIANZ_LOGO = "/img/allianz.png";
+        public const string ALLIANZ_CREATOR = "creator@" + ALLIANZ_DOMAIN;
 
         public const string TATA = "Tata life";
         public const string TATA_CODE = "tli";
@@ -241,6 +241,11 @@
         public const string AGENCY5CODE = "HNT";
         public const string AGENCY5DOMAIN = "honest.com";
         public const string AGENCY5PHOTO = "/img/honest.png";
+
+        public const string AGENCY6NAME = "Nicer";
+        public const string AGENCY6CODE = "NCR";
+        public const string AGENCY6DOMAIN = "nicer.com";
+        public const string AGENCY6PHOTO = "/img/honest.png";
 
         public const string NO_IMAGE = "/img/no-image.png";
         public const string AUDIO_UPLOAD_IMAGE = "/img/upload-audio.png";
