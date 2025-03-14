@@ -138,7 +138,7 @@
                                                     <span class="fa-li">
                                                         <i class="fas fa-money-bill-wave"></i>
                                                     </span>
-                                                    Amount: <i class="fas fa-rupee-sign"></i>@Model.ClaimsInvestigation?.PolicyDetail.SumAssuredValue
+                                                    Amount: (@ViewBag.Currency) @Model.ClaimsInvestigation?.PolicyDetail.SumAssuredValue
                                                 </li>
                                                 <li class="small">
                                                     <span class="fa-li">
@@ -268,7 +268,7 @@
                                                     <span class="fa-li">
                                                         <i class="fas fa-rupee-sign"></i>
                                                     </span>
-                                                    Income: @Model.ClaimsInvestigation?.CustomerDetail?.Income
+                                                    Income:(@ViewBag.Currency) @Model.ClaimsInvestigation?.CustomerDetail?.Income
                                                 </li>
                                                 <li class="small">
                                                     <span class="fa-li">
@@ -286,7 +286,7 @@
                                                     <span class="fa-li">
                                                         <i class="fas fa-user-alt"></i>
                                                     </span>
-                                                    Age: @currentAgeinYrs
+                                                    Age: (years) @currentAgeinYrs
                                                 </li>
                                                 <li class="small">
                                                     <span class="fa-li">
@@ -380,13 +380,13 @@
                                                     <span class="fa-li">
                                                         <i class="fas fa-rupee-sign"></i>
                                                     </span>
-                                                    Income: @Model.Location?.Income
+                                                    Income: (@ViewBag.Currency) @Model.Location?.Income
                                                 </li>
                                                 <li class="small">
                                                     <span class="fa-li">
                                                         <i class="fas fa-user-alt"></i>
                                                     </span>
-                                                    Age: @beneficaryAge
+                                                    Age (years): @beneficaryAge
                                                 </li>
 
                                                 <li class="small">

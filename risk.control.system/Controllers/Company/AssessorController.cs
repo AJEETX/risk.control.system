@@ -13,6 +13,7 @@ using SmartBreadcrumbs.Attributes;
 using SmartBreadcrumbs.Nodes;
 
 using static risk.control.system.AppConstant.Applicationsettings;
+using risk.control.system.Helpers;
 
 namespace risk.control.system.Controllers.Company
 {
@@ -87,6 +88,8 @@ namespace risk.control.system.Controllers.Company
                     var investigationSummary = await chatSummarizer.SummarizeDataAsync(model.ClaimsInvestigation);
                     model.ReportAiSummary = investigationSummary;
                 }
+                ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+
                 return View(model);
             }
             catch (Exception ex)
@@ -114,6 +117,7 @@ namespace risk.control.system.Controllers.Company
                 }
                 var model = investigationReportService.GetInvestigateReport(currentUserEmail, selectedcase);
                 ViewData["claimId"] = selectedcase;
+                ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
 
                 var claimsPage = new MvcBreadcrumbNode("Assessor", "Assessor", "Claims");
@@ -199,6 +203,7 @@ namespace risk.control.system.Controllers.Company
                 }
 
                 var model = await claimPolicyService.GetClaimDetail(id);
+                ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 return View(model);
             }
@@ -238,6 +243,8 @@ namespace risk.control.system.Controllers.Company
                     var investigationSummary = await chatSummarizer.SummarizeDataAsync(model.ClaimsInvestigation);
                     model.ReportAiSummary = investigationSummary;
                 }
+                ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+
                 return View(model);
             }
             catch (Exception ex)
@@ -274,6 +281,7 @@ namespace risk.control.system.Controllers.Company
                     var investigationSummary = await chatSummarizer.SummarizeDataAsync(model.ClaimsInvestigation);
                     model.ReportAiSummary = investigationSummary;
                 }
+                ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
                 return View(model);
             }
             catch (Exception ex)
@@ -303,7 +311,7 @@ namespace risk.control.system.Controllers.Company
                 }
 
                 var invoice = await invoiceService.GetInvoice(id);
-
+                ViewData["Currency"] = Extensions.GetCultureByCountry(invoice.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
                 var claimsPage = new MvcBreadcrumbNode("Assessor", "Assessor", "Claims");
                 var agencyPage = new MvcBreadcrumbNode("Approved", "Assessor", "Approved") { Parent = claimsPage, };
                 var detailsPage = new MvcBreadcrumbNode("ApprovedDetail", "Assessor", $"Details") { Parent = agencyPage, RouteValues = new { id = invoice.ClaimId } };
@@ -338,6 +346,7 @@ namespace risk.control.system.Controllers.Company
                 }
 
                 var invoice = await invoiceService.GetInvoice(id);
+                ViewData["Currency"] = Extensions.GetCultureByCountry(invoice.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 return View(invoice);
             }

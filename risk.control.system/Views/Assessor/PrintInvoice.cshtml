@@ -95,16 +95,16 @@
                     <table class="table">
                         <tr>
                             <th class="subtotal">Subtotal:</th>
-                            <td>$ @Model.SubTotal.ToString()</td>
+                            <td>(@ViewBag.Currency)  @Model.SubTotal.ToString()</td>
                         </tr>
 
                         <tr>
                             <th>Tax</th>
-                            <td>$ @Model.TaxAmount.ToString()</td>
+                            <td>(@ViewBag.Currency)  @Model.TaxAmount.ToString()</td>
                         </tr>
                         <tr>
                             <th>Total:</th>
-                            <td>$ @Model.GrandTotal</td>
+                            <td>(@ViewBag.Currency)  @Model.GrandTotal</td>
                         </tr>
                     </table>
                 </div>
