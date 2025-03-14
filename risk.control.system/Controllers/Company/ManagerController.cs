@@ -238,6 +238,7 @@ namespace risk.control.system.Controllers.Company
                 }
 
                 var invoice = await invoiceService.GetInvoice(id);
+                ViewData["Currency"] = Extensions.GetCultureByCountry(invoice.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 var claimsPage = new MvcBreadcrumbNode("Assessor", "Manager", "Claims");
                 var agencyPage = new MvcBreadcrumbNode("Approved", "Manager", "Approved") { Parent = claimsPage, };
@@ -273,6 +274,7 @@ namespace risk.control.system.Controllers.Company
                 }
 
                 var invoice = await invoiceService.GetInvoice(id);
+                ViewData["Currency"] = Extensions.GetCultureByCountry(invoice.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
                 return View(invoice);
             }
