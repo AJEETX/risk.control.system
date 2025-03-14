@@ -47,7 +47,7 @@ namespace risk.control.system.Controllers.Api.Agency
             IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
 
-            var vendorUser = _context.VendorApplicationUser.Include(u => u.Vendor).FirstOrDefault(c => c.Email == userEmail.Value);
+            var vendorUser = _context.VendorApplicationUser.Include(c=>c.Country).Include(u => u.Vendor).FirstOrDefault(c => c.Email == userEmail.Value);
 
             if (vendorUser != null)
             {
@@ -100,7 +100,7 @@ namespace risk.control.system.Controllers.Api.Agency
                        Id = a.ClaimsInvestigationId,
                        AssignedToAgency = a.AssignedToAgency,
                        PolicyId = a.PolicyDetail.ContractNumber,
-                       Amount = string.Format(hindiNFO, "{0:C}", a.PolicyDetail.SumAssuredValue),
+                       Amount = string.Format(Extensions.GetCultureByCountry(vendorUser.Country.Code.ToUpper()), "{0:C}", a.PolicyDetail.SumAssuredValue),
                        Agent = !string.IsNullOrWhiteSpace(a.UserEmailActionedTo) ? a.UserEmailActionedTo : a.UserRoleActionedTo,
                        OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(GetOwner(a))),
                        CaseWithPerson = !string.IsNullOrWhiteSpace(a.UserEmailActionedTo) ? true : false,
@@ -201,7 +201,7 @@ namespace risk.control.system.Controllers.Api.Agency
             var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
             var currentUserEmail = HttpContext.User?.Identity?.Name;
 
-            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == currentUserEmail);
+            var vendorUser = _context.VendorApplicationUser.Include(v=>v.Country).FirstOrDefault(c => c.Email == currentUserEmail);
 
             applicationDbContext = applicationDbContext
                     .Include(a => a.PolicyDetail)
@@ -258,7 +258,7 @@ namespace risk.control.system.Controllers.Api.Agency
                 {
                     Id = a.ClaimsInvestigationId,
                     PolicyId = a.PolicyDetail.ContractNumber,
-                    Amount = string.Format(hindiNFO, "{0:C}", a.PolicyDetail.SumAssuredValue),
+                    Amount = string.Format(Extensions.GetCultureByCountry(vendorUser.Country.Code.ToUpper()), "{0:C}", a.PolicyDetail.SumAssuredValue),
                     Company = a.ClientCompany.Name,
                     OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.ClientCompany.DocumentImage)),
                     Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
@@ -396,7 +396,7 @@ namespace risk.control.system.Controllers.Api.Agency
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
             var currentUserEmail = HttpContext.User?.Identity?.Name;
 
-            var vendorUser = _context.VendorApplicationUser.Include(u => u.Vendor).FirstOrDefault(c => c.Email == currentUserEmail);
+            var vendorUser = _context.VendorApplicationUser.Include(v=>v.Country).Include(u => u.Vendor).FirstOrDefault(c => c.Email == currentUserEmail);
             var claims = applicationDbContext.Where(i => i.VendorId == vendorUser.VendorId &&
             i.UserEmailActionedTo == string.Empty &&
             i.UserRoleActionedTo == $"{vendorUser.Vendor.Email}" &&
@@ -423,7 +423,7 @@ namespace risk.control.system.Controllers.Api.Agency
                    {
                        Id = a.ClaimsInvestigationId,
                        PolicyId = a.PolicyDetail.ContractNumber,
-                       Amount = string.Format(hindiNFO, "{0:C}", a.PolicyDetail.SumAssuredValue),
+                       Amount = string.Format(Extensions.GetCultureByCountry(vendorUser.Country.Code.ToUpper()), "{0:C}", a.PolicyDetail.SumAssuredValue),
                        AssignedToAgency = a.AssignedToAgency,
                        Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
                        PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
@@ -478,7 +478,7 @@ namespace risk.control.system.Controllers.Api.Agency
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
             var currentUserEmail = HttpContext.User?.Identity?.Name;
 
-            var agencyUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == currentUserEmail);
+            var agencyUser = _context.VendorApplicationUser.Include(v=>v.Country).FirstOrDefault(c => c.Email == currentUserEmail);
 
             IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
 
@@ -542,7 +542,7 @@ namespace risk.control.system.Controllers.Api.Agency
                       {
                           Id = a.ClaimsInvestigationId,
                           PolicyId = a.PolicyDetail.ContractNumber,
-                          Amount = string.Format(hindiNFO, "{0:C}", a.PolicyDetail.SumAssuredValue),
+                          Amount = string.Format(Extensions.GetCultureByCountry(agencyUser.Country.Code.ToUpper()), "{0:C}", a.PolicyDetail.SumAssuredValue),
                           AssignedToAgency = a.AssignedToAgency,
                           Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
                           PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),

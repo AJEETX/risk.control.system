@@ -56,7 +56,7 @@ namespace risk.control.system.Controllers.Api.Agency
 
             var currentUserEmail = HttpContext.User?.Identity?.Name;
 
-            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == currentUserEmail);
+            var vendorUser = _context.VendorApplicationUser.Include(v => v.Country).FirstOrDefault(c => c.Email == currentUserEmail);
 
             applicationDbContext = applicationDbContext
                     .Include(a => a.PolicyDetail)
@@ -88,7 +88,7 @@ namespace risk.control.system.Controllers.Api.Agency
                    {
                        Id = a.ClaimsInvestigationId,
                        PolicyId = a.PolicyDetail.ContractNumber,
-                       Amount = string.Format(hindiNFO, "{0:C}", a.PolicyDetail.SumAssuredValue),
+                       Amount = string.Format(Extensions.GetCultureByCountry(vendorUser.Country.Code.ToUpper()), "{0:C}", a.PolicyDetail.SumAssuredValue),
                        Company = a.ClientCompany.Name,
                        Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
                        PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
@@ -136,7 +136,7 @@ namespace risk.control.system.Controllers.Api.Agency
 
             var currentUserEmail = HttpContext.User?.Identity?.Name;
 
-            var agentUser = _context.VendorApplicationUser.Include(u => u.Vendor).FirstOrDefault(c => c.Email == currentUserEmail);
+            var agentUser = _context.VendorApplicationUser.Include(v=>v.Country).Include(u => u.Vendor).FirstOrDefault(c => c.Email == currentUserEmail);
             var submittedToSupervisorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR);
 
@@ -157,7 +157,7 @@ namespace risk.control.system.Controllers.Api.Agency
                    {
                        Id = a.ClaimsInvestigationId,
                        PolicyId = a.PolicyDetail.ContractNumber,
-                       Amount = string.Format(hindiNFO, "{0:C}", a.PolicyDetail.SumAssuredValue),
+                       Amount = string.Format(Extensions.GetCultureByCountry(agentUser.Country.Code.ToUpper()), "{0:C}", a.PolicyDetail.SumAssuredValue),
                        AssignedToAgency = a.AssignedToAgency,
                        Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
                        PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),

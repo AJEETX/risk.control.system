@@ -1,13 +1,9 @@
 ﻿@model risk.control.system.Models.VendorInvestigationServiceType
-
 @{
     ViewData["Title"] = @Applicationsettings.EDIT;
 }
 <section class="content">
-    <form id="edit-form" asp-action="EditService" enctype="multipart/form-data">
-        <input type="hidden" asp-for="VendorInvestigationServiceTypeId" />
-        <input id="vendorId" type="hidden" asp-for="VendorId" value="@Model.Vendor.VendorId" />
-
+    <form id="edit-form" asp-controller="Agency" asp-action="EditService" method="post" enctype="multipart/form-data">
         <div class="card shadow-lg border-0 rounded-lg">
             <div class="card-header bg-secondary text-white text-center">
                 <h3 class="card-title"><i class="fas fa-truck"></i> @Applicationsettings.EDIT @Applicationsettings.SERVICE</h3>

@@ -83,14 +83,14 @@ builder.Services.Configure<FormOptions>(x =>
     x.ValueLengthLimit = 5000000; //not recommended value
     x.MemoryBufferThreshold = 5000000;
 });
-builder.Services.AddRateLimiter(_ => _
-    .AddFixedWindowLimiter(policyName: "fixed", options =>
-    {
-        options.PermitLimit = 100;
-        options.Window = TimeSpan.FromSeconds(1);
-        options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
-        options.QueueLimit = 10;
-    }));
+//builder.Services.AddRateLimiter(_ => _
+//    .AddFixedWindowLimiter(policyName: "fixed", options =>
+//    {
+//        options.PermitLimit = 100;
+//        options.Window = TimeSpan.FromSeconds(1);
+//        options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+//        options.QueueLimit = 10;
+//    }));
 // forward headers configuration for reverse proxy
 builder.Services.Configure<ForwardedHeadersOptions>(options => {
     options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
@@ -363,7 +363,7 @@ await DatabaseSeed.SeedDatabase(app);
 app.UseStaticFiles();
 
 app.UseRouting();
-app.UseRateLimiter();
+//app.UseRateLimiter();
 app.UseSwaggerUI(options =>
 {
     options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");

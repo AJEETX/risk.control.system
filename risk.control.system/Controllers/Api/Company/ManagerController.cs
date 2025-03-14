@@ -48,7 +48,7 @@ namespace risk.control.system.Controllers.Api.Company
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
 
-            var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(c => c.Email == userEmail.Value);
+            var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.Country).Include(u => u.ClientCompany).FirstOrDefault(c => c.Email == userEmail.Value);
             applicationDbContext = applicationDbContext.Where(i => i.ClientCompanyId == companyUser.ClientCompanyId &&
             i.InvestigationCaseSubStatusId == submittedToAssessorStatus.InvestigationCaseSubStatusId &&
             i.UserEmailActionedTo == string.Empty &&
@@ -78,7 +78,7 @@ namespace risk.control.system.Controllers.Api.Company
                 Id = a.ClaimsInvestigationId,
                 AutoAllocated = a.AutoAllocated,
                 PolicyId = a.PolicyDetail.ContractNumber,
-                Amount = string.Format(hindiNFO, "{0:c}", a.PolicyDetail.SumAssuredValue),
+                Amount = string.Format(Extensions.GetCultureByCountry(companyUser.Country.Code.ToUpper()), "{0:c}", a.PolicyDetail.SumAssuredValue),
                 AssignedToAgency = a.AssignedToAgency,
                 Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
                 PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
@@ -116,7 +116,7 @@ namespace risk.control.system.Controllers.Api.Company
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = claimsService.GetClaims().Include(a => a.PreviousClaimReports);
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
-            var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(c => c.Email == userEmail.Value);
+            var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.Country).Include(u => u.ClientCompany).FirstOrDefault(c => c.Email == userEmail.Value);
             applicationDbContext = applicationDbContext.Where(i => i.ClientCompanyId == companyUser.ClientCompanyId);
 
             var openStatuses = _context.InvestigationCaseStatus.Where(i => !i.Name.Contains(CONSTANTS.CASE_STATUS.FINISHED)).ToList();
@@ -167,7 +167,7 @@ namespace risk.control.system.Controllers.Api.Company
                         CustomerFullName = string.IsNullOrWhiteSpace(a.CustomerDetail?.Name) ? "" : a.CustomerDetail.Name,
                         BeneficiaryFullName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.Name) ? "" : a.BeneficiaryDetail.Name,
                         PolicyId = a.PolicyDetail.ContractNumber,
-                        Amount = string.Format(hindiNFO, "{0:c}", a.PolicyDetail.SumAssuredValue),
+                        Amount = string.Format(Extensions.GetCultureByCountry(companyUser.Country.Code.ToUpper()), "{0:c}", a.PolicyDetail.SumAssuredValue),
                         AssignedToAgency = a.AssignedToAgency,
                         Agent = !string.IsNullOrWhiteSpace(a.UserEmailActionedTo) ? a.UserEmailActionedTo : a.UserRoleActionedTo,
                         OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(GetOwner(a))),
@@ -213,7 +213,7 @@ namespace risk.control.system.Controllers.Api.Company
                 .Where(c => c.CustomerDetail != null && c.AgencyReport != null);
             var user = HttpContext.User.Identity.Name;
 
-            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == user);
+            var companyUser = _context.ClientCompanyApplicationUser.Include(c => c.Country).FirstOrDefault(u => u.Email == user);
             var approvedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR);
             var rejectdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
@@ -240,7 +240,7 @@ namespace risk.control.system.Controllers.Api.Company
                 Id = a.ClaimsInvestigationId,
                 AutoAllocated = a.AutoAllocated,
                 PolicyId = a.PolicyDetail.ContractNumber,
-                Amount = String.Format(hindiNFO, "{0:C}", a.PolicyDetail.SumAssuredValue),
+                Amount = String.Format(Extensions.GetCultureByCountry(companyUser.Country.Code.ToUpper()), "{0:C}", a.PolicyDetail.SumAssuredValue),
                 AssignedToAgency = a.AssignedToAgency,
                 Agent = !string.IsNullOrWhiteSpace(a.UserEmailActionedTo) ?
                         string.Join("", "<span class='badge badge-light'>" + a.UserEmailActionedTo + "</span>") :
@@ -283,7 +283,7 @@ namespace risk.control.system.Controllers.Api.Company
                 .Where(c => c.CustomerDetail != null && c.AgencyReport != null);
             var userEmail = HttpContext.User.Identity.Name;
 
-            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+            var companyUser = _context.ClientCompanyApplicationUser.Include(c => c.Country).FirstOrDefault(c => c.Email == userEmail);
 
             var rejectdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR);
@@ -304,7 +304,7 @@ namespace risk.control.system.Controllers.Api.Company
                 Id = a.ClaimsInvestigationId,
                 AutoAllocated = a.AutoAllocated,
                 PolicyId = a.PolicyDetail.ContractNumber,
-                Amount = String.Format(hindiNFO, "{0:C}", a.PolicyDetail.SumAssuredValue),
+                Amount = String.Format(Extensions.GetCultureByCountry(companyUser.Country.Code.ToUpper()), "{0:C}", a.PolicyDetail.SumAssuredValue),
                 AssignedToAgency = a.AssignedToAgency,
                 Agent = !string.IsNullOrWhiteSpace(a.UserEmailActionedTo) ?
                         string.Join("", "<span class='badge badge-light'>" + a.UserEmailActionedTo + "</span>") :
