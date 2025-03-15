@@ -28,28 +28,9 @@
 
     <!-- Right navbar links -->
     <ul class="navbar-nav ml-auto">
-        
-        <li class="nav-item top-nav-logout-border">
-            <a class="nav-link" data-widget="control-sidebar" data-slide="true" role="button" title="Idle time remaining" data-toggle="tooltip">
-                <div><i id="hour-glass" class="fas fa-hourglass-end fa-spin"></i>  <span id="time"> 00:00 </span></div>
-            </a>
-        </li>
         <li class="nav-item dropdown  top-nav-logout-border">
-    <a class="nav-link" data-toggle="dropdown" href="#">
-        <i class="far fa-bell"></i>
-        <span class="badge badge-warning" id="notificationCount">0</span>
-    </a>
-    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-        <span class="dropdown-header">Notifications</span>
-        <div class="dropdown-divider"></div>
-        <div id="notificationList"></div>
-    </div>
-</li>
-
-        <!-- Notifications Dropdown Menu -->
-        <li class="nav-item dropdown  top-nav-logout-border">
-             <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
-                <i class="fa fa-info"></i>
+             <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" title="Idle Time Remaining" aria-expanded="false">
+                <i id="hour-glass" class="fas fa-hourglass-end fa-spin"></i>  <span id="time" class="badge badge-light"> 00:00 </span>
             </a>
 
             <div class="dropdown-menu dropdown-menu-right shadow-lg rounded-lg border-0">
@@ -73,9 +54,22 @@
             </div>
         </li>
 
+        <!-- Notifications Dropdown Menu -->
+        <li class="nav-item dropdown  top-nav-logout-border">
+            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false" title="Notifications">
+                <i class="far fa-bell"></i>
+                <span class="badge badge-warning" id="notificationCount">0</span>
+            </a>
+            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+                <span class="dropdown-header">Notifications</span>
+                <div class="dropdown-divider"></div>
+                <div id="notificationList"></div>
+            </div>
+        </li>
+
         <!-- Settings Dropdown Menu -->
         <li class="nav-item dropdown  top-nav-logout-border">
-             <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false" title="Settings">
                 <i class="fas fa-cog"></i>
             </a>
 
