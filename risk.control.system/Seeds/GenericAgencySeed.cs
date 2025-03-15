@@ -57,7 +57,6 @@ namespace risk.control.system.Seeds
                 Name = Applicationsettings.AGENCY1NAME,
                 Addressline = checkerAddressline,
                 Branch = "MAHATTAN",
-                Code = Applicationsettings.AGENCY1CODE,
                 ActivatedDate = DateTime.Now,
                 AgreementDate = DateTime.Now,
                 BankName = "WESTPAC",

@@ -50,7 +50,6 @@ namespace risk.control.system.Seeds
                 Name = Applicationsettings.CANARA,
                 Addressline = companyAddressline,
                 Branch = "FOREST HILL CHASE",
-                //Code = Applicationsettings.CANARACODE,
                 ActivatedDate = DateTime.Now,
                 AgreementDate = DateTime.Now,
                 BankName = "NAB",

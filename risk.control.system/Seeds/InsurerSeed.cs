@@ -50,7 +50,6 @@ namespace risk.control.system.Seeds
                 Name = Applicationsettings.INSURER,
                 Addressline = companyAddressline,
                 Branch = "FOREST HILL CHASE",
-                //Code = Applicationsettings.INSURERCODE,
                 ActivatedDate = DateTime.Now,
                 AgreementDate = DateTime.Now,
                 BankName = "NAB",

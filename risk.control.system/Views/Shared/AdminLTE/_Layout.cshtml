@@ -34,11 +34,11 @@
                     var navigationModel = new TopNavigation
                     {
                         Email = companyUser.Email,
+                        ProfilePicture = companyUser.ProfilePicture,
                         CanChangePassword = company.CanChangePassword,
                         CountryCode = company.Country.Code,
                         Country = $"{company.Country.Name}",
                         IsdCode = $"(+{company.Country.ISDCode})",
-                        ProfilePicture = companyUser.ProfilePicture,
                         CurrencyCode = company.Country.CurrencyCode,
                         CurrencyName = company.Country.CurrencyName,
                         Language = company.Country.Language
@@ -53,13 +53,13 @@
                     var navigationModel = new TopNavigation
                     {
                         Email = vendorUser.Email,
+                        ProfilePicture = vendorUser.ProfilePicture,
                         CanChangePassword = vendor.CanChangePassword,
                         CountryCode = vendor.Country.Code,
                         Country = $"{vendor.Country.Name}",
                         IsdCode = $"(+{vendor.Country.ISDCode})",
-                        ProfilePicture = vendorUser.ProfilePicture,
                         CurrencyCode = vendor.Country.CurrencyCode,
-                        CurrencyName = company.Country.CurrencyName,
+                        CurrencyName = vendor.Country.CurrencyName,
                         Language = vendor.Country.Language
                     };
                     <partial name="AdminLTE/_AgencyTopNavigation" model="@navigationModel" />
@@ -71,13 +71,13 @@
                     var navigationModel = new TopNavigation
                     {
                         Email = admin.Email,
+                        ProfilePicture = admin.ProfilePicture,
                         CanChangePassword = true,
                         CountryCode = admin.Country.Code,
                         Country = $"{admin.Country.Name}",
                         IsdCode = $"(+{admin.Country.ISDCode})",
-                        ProfilePicture = admin.ProfilePicture,
                         CurrencyCode = admin.Country.CurrencyCode,
-                        CurrencyName = company.Country.CurrencyName,
+                        CurrencyName = admin.Country.CurrencyName,
                         Language = admin.Country.Language
                     };
                     <partial name="AdminLTE/_TopNavigation" model="@navigationModel" />

@@ -58,17 +58,18 @@
                 }
 
                 <a class="nav-link" data-widget="control-sidebar" data-slide="true" role="button" title="Country: @Model?.Country" data-toggle="tooltip">
-                    <div id="country"> <img src="@img" class="flag-icon" /> <span class="badge badge-light">@Model?.CountryCode</span></div>
+                    <span class="badge badge-light"><div id="country"> <img src="@img" class="flag-icon" /><span class="badge badge-light">@Model?.Country</span></div></span>
                 </a>
                 <div class="dropdown-divider"></div>
                 <a class="nav-link" data-widget="control-sidebar" data-slide="true" role="button" title="Currency: @Model?.CurrencyName" data-toggle="tooltip">
-                    <div id="currency"><i class="fa fa-money"></i> <span class="badge badge-light">@Model?.CurrencyCode</span></div>
+                    <span class="badge badge-light"><div id="currency"><i class="fa fa-money"></i><span class="badge badge-light">@Model?.CurrencyName</span></div></span>
                 </a>
                 <div class="dropdown-divider"></div>
-                <a class="nav-link" data-widget="control-sidebar" data-slide="true" role="button" title="ISD code: @Model?.IsdCode" data-toggle="tooltip">
-                    <div id="isdcode"><i class="fa fa-phone"></i> <span class="badge badge-light">@Model?.IsdCode</span></div>
+                <a class="nav-link" data-widget="control-sidebar" data-slide="true" role="button" title="Isd code: @Model?.IsdCode" data-toggle="tooltip">
+                    <span class="badge badge-light"><div id="isdcode"><i class="fa fa-phone"></i><span class="badge badge-light">@Model?.IsdCode</span></div></span>
                 </a>
                 <div class="dropdown-divider"></div>
+
             </div>
         </li>
         <!-- Settings Dropdown Menu -->

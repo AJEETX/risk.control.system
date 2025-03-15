@@ -47,7 +47,6 @@ namespace risk.control.system.Seeds
                 Name = Applicationsettings.AGENCY6NAME,
                 Addressline = properAddressline,
                 Branch = "Yankee Rd",
-                Code = Applicationsettings.AGENCY6CODE,
                 ActivatedDate = DateTime.Now,
                 AgreementDate = DateTime.Now,
                 BankName = "Morgan Stanley",

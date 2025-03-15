@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
+using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
 
 namespace risk.control.system.Seeds
@@ -20,18 +21,30 @@ namespace risk.control.system.Seeds
                     InvestigationServiceType docServiceType, LineOfBusiness lineOfBusiness, IHttpContextAccessor httpAccessor,
                     ICustomApiCLient customApiCLient, UserManager<ClientCompanyApplicationUser> clientUserManager)
         {
-            var allianz = await InsurerAllianz.Seed(context, vendors, webHostEnvironment, investigationServiceType, discreetServiceType, docServiceType, lineOfBusiness, httpAccessor, customApiCLient, clientUserManager);
+            var allianz = new SeedInput { COUNTRY = "us", DOMAIN = "allianz.com", NAME = "Allianz", PHOTO = "/img/allianz.png" };
+            var insurer = new SeedInput { COUNTRY = "au", DOMAIN = "insurer.com", NAME = "Insurer", PHOTO = "/img/insurer.jpg" };
+            var canara = new SeedInput { COUNTRY = "in", DOMAIN = "canara.com", NAME = "Allianz", PHOTO = "/img/chl.jpg" };
             
-            var insurer = await InsurerSeed.Seed(context, vendors, webHostEnvironment, investigationServiceType, discreetServiceType, docServiceType, lineOfBusiness, httpAccessor, customApiCLient, clientUserManager);
+            var companies = new List<SeedInput> { allianz, insurer, canara };
 
-            var insurerCanara = await InsurerCanara.Seed(context, vendors, webHostEnvironment, investigationServiceType, discreetServiceType, docServiceType, lineOfBusiness, httpAccessor, customApiCLient, clientUserManager);
-            var companies = new List<ClientCompany> { 
-                insurer
-                //, insurerCanara 
-            };
+            foreach (var company in companies)
+            {
+                _ = await InsurerAllianz.Seed(context, vendors, webHostEnvironment, investigationServiceType, discreetServiceType, docServiceType, lineOfBusiness, httpAccessor, customApiCLient, clientUserManager, company);
+            }
+
+            //var company = await InsurerAllianz.Seed(context, vendors, webHostEnvironment, investigationServiceType, discreetServiceType, docServiceType, lineOfBusiness, httpAccessor, customApiCLient, clientUserManager);
+            
+            ////var insurer = await InsurerSeed.Seed(context, vendors, webHostEnvironment, investigationServiceType, discreetServiceType, docServiceType, lineOfBusiness, httpAccessor, customApiCLient, clientUserManager);
+
+            //var insurerCanara = await InsurerCanara.Seed(context, vendors, webHostEnvironment, investigationServiceType, discreetServiceType, docServiceType, lineOfBusiness, httpAccessor, customApiCLient, clientUserManager);
+            
+            //var companies = new List<ClientCompany> { 
+            //    insurer
+            //    //, insurerCanara 
+            //};
 
             await context.SaveChangesAsync(null, false);
-            return companies;
+            return null;
         }
     }
 }

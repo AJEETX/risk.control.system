@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
+using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
 
 namespace risk.control.system.Seeds
@@ -21,13 +22,13 @@ namespace risk.control.system.Seeds
         public static async Task<ClientCompany> Seed(ApplicationDbContext context, List<Vendor> vendors, IWebHostEnvironment webHostEnvironment,
                     InvestigationServiceType investigationServiceType, InvestigationServiceType discreetServiceType,
                     InvestigationServiceType docServiceType, LineOfBusiness lineOfBusiness, IHttpContextAccessor httpAccessor,
-                    ICustomApiCLient customApiCLient, UserManager<ClientCompanyApplicationUser> clientUserManager)
+                    ICustomApiCLient customApiCLient, UserManager<ClientCompanyApplicationUser> clientUserManager, SeedInput input)
         {
             string noCompanyImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", @Applicationsettings.NO_IMAGE);
 
             var globalSettings = context.GlobalSettings.FirstOrDefault();
 
-            var companyPinCode = context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).FirstOrDefault(s => s.District.Code.ToLower().Contains("new york"));
+            var companyPinCode = context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).FirstOrDefault(s => s.Country.Code.ToLower() == input.COUNTRY);
 
             var companyAddressline = "34 Lasiandra Avenue ";
             var companyAddress = companyAddressline + ", " + companyPinCode.District.Name + ", " + companyPinCode.State.Name + ", " + companyPinCode.Country.Code;
@@ -36,7 +37,7 @@ namespace risk.control.system.Seeds
             var companyAddressUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={companyAddressCoordinatesLatLong}&zoom=14&size={companyMapSize}&maptype=roadmap&markers=color:red%7Clabel:S%7C{companyAddressCoordinatesLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
 
             //CREATE COMPANY1
-            string insurerImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(Applicationsettings.ALLIANZ_LOGO));
+            string insurerImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(input.PHOTO));
             var insurerImage = File.ReadAllBytes(insurerImagePath);
 
             if (insurerImage == null)
@@ -47,10 +48,9 @@ namespace risk.control.system.Seeds
 
             var insurer = new ClientCompany
             {
-                Name = Applicationsettings.ALLIANZ,
+                Name = input.NAME,
                 Addressline = companyAddressline,
                 Branch = "FOREST HILL CHASE",
-                //Code = Applicationsettings.CANARACODE,
                 ActivatedDate = DateTime.Now,
                 AgreementDate = DateTime.Now,
                 BankName = "NAB",
@@ -63,8 +63,8 @@ namespace risk.control.system.Seeds
                 DistrictId = companyPinCode.DistrictId,
                 PinCodeId = companyPinCode.PinCodeId,
                 //Description = "CORPORATE OFFICE ",
-                Email = Applicationsettings.ALLIANZ_DOMAIN,
-                DocumentUrl = Applicationsettings.ALLIANZ_LOGO,
+                Email = input.DOMAIN,
+                DocumentUrl = input.PHOTO,
                 DocumentImage = insurerImage,
                 PhoneNumber = "9988004739",
                 ExpiryDate = DateTime.Now.AddDays(5),
