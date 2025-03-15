@@ -16,31 +16,29 @@ namespace risk.control.system.Seeds
         public static async Task Seed(ApplicationDbContext context, 
             IWebHostEnvironment webHostEnvironment, 
             UserManager<ClientCompanyApplicationUser> userManager, 
-            ClientCompany clientCompany,
-            IHttpContextAccessor httpAccessor, string companyDomain, PinCode pinCode)
+            ClientCompany clientCompany, PinCode pinCode, string managorEmailwithSuffix, string photo, string firstName, string lastName)
         {
             //Seed client creator
             string noUserImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", @Applicationsettings.NO_USER);
 
-            string adminEmailwithSuffix = Applicationsettings.COMPANY_ADMIN.CODE + "@" + companyDomain;
             var caMailBox = new Mailbox
             {
-                Name = adminEmailwithSuffix
+                Name = managorEmailwithSuffix
             };
-            string adminImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(COMPANY_ADMIN.PROFILE_IMAGE));
-            var adminImage = File.ReadAllBytes(adminImagePath);
+            string managerImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(photo));
+            var managerImage = File.ReadAllBytes(managerImagePath);
 
-            if (adminImage == null)
+            if (managerImage == null)
             {
-                adminImage = File.ReadAllBytes(noUserImagePath);
+                managerImage = File.ReadAllBytes(noUserImagePath);
             }
-            var clientAdmin = new ClientCompanyApplicationUser()
+            var manager = new ClientCompanyApplicationUser()
             {
                 Mailbox = caMailBox,
-                UserName = adminEmailwithSuffix,
-                Email = adminEmailwithSuffix,
-                FirstName = COMPANY_ADMIN.FIRST_NAME,
-                LastName = COMPANY_ADMIN.LAST_NAME,
+                UserName = managorEmailwithSuffix,
+                Email = managorEmailwithSuffix,
+                FirstName = firstName,
+                LastName = lastName,
                 EmailConfirmed = true,
                 PhoneNumberConfirmed = true,
                 Password = Password,
@@ -56,19 +54,19 @@ namespace risk.control.system.Seeds
                 DistrictId = pinCode?.DistrictId ?? default!,
                 StateId = pinCode?.StateId ?? default!,
                 PinCodeId = pinCode?.PinCodeId ?? default!,
-                ProfilePictureUrl = COMPANY_ADMIN.PROFILE_IMAGE,
-                ProfilePicture = adminImage,
-                Role = AppRoles.COMPANY_ADMIN,
-                UserRole = CompanyRole.COMPANY_ADMIN,
+                ProfilePictureUrl = photo,
+                ProfilePicture = managerImage,
+                Role = AppRoles.MANAGER,
+                UserRole = CompanyRole.MANAGER,
                 Updated = DateTime.Now,
             };
-            if (userManager.Users.All(u => u.Id != clientAdmin.Id))
+            if (userManager.Users.All(u => u.Id != manager.Id))
             {
-                var user = await userManager.FindByEmailAsync(clientAdmin.Email);
+                var user = await userManager.FindByEmailAsync(manager.Email);
                 if (user == null)
                 {
-                    await userManager.CreateAsync(clientAdmin, Password);
-                    await userManager.AddToRoleAsync(clientAdmin, AppRoles.COMPANY_ADMIN.ToString());
+                    await userManager.CreateAsync(manager, Password);
+                    await userManager.AddToRoleAsync(manager, AppRoles.MANAGER.ToString());
                     //var clientAdminRole = new ApplicationRole(AppRoles.COMPANY_ADMIN.ToString(), AppRoles.COMPANY_ADMIN.ToString());
                     //clientAdmin.ApplicationRoles.Add(clientAdminRole);
 

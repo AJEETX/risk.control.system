@@ -32,17 +32,6 @@ namespace risk.control.system.Seeds
                 _ = await InsurerAllianz.Seed(context, vendors, webHostEnvironment, investigationServiceType, discreetServiceType, docServiceType, lineOfBusiness, httpAccessor, customApiCLient, clientUserManager, company);
             }
 
-            //var company = await InsurerAllianz.Seed(context, vendors, webHostEnvironment, investigationServiceType, discreetServiceType, docServiceType, lineOfBusiness, httpAccessor, customApiCLient, clientUserManager);
-            
-            ////var insurer = await InsurerSeed.Seed(context, vendors, webHostEnvironment, investigationServiceType, discreetServiceType, docServiceType, lineOfBusiness, httpAccessor, customApiCLient, clientUserManager);
-
-            //var insurerCanara = await InsurerCanara.Seed(context, vendors, webHostEnvironment, investigationServiceType, discreetServiceType, docServiceType, lineOfBusiness, httpAccessor, customApiCLient, clientUserManager);
-            
-            //var companies = new List<ClientCompany> { 
-            //    insurer
-            //    //, insurerCanara 
-            //};
-
             await context.SaveChangesAsync(null, false);
             return null;
         }

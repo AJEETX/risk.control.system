@@ -30,7 +30,6 @@ namespace risk.control.system.Seeds
 
             var companies = await CompanyInsurer.Seed(context, vendors, webHostEnvironment, investigationServiceType, discreetServiceType, docServiceType, lineOfBusiness, httpAccessor, customApiCLient, clientUserManager);
 
-            await context.SaveChangesAsync(null, false);
             return (vendors, companies);
         }
     }

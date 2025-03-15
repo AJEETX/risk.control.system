@@ -27,13 +27,25 @@ namespace risk.control.system.Seeds
             await CompanyAdminSeed.Seed(context, webHostEnvironment, userManager, clientCompany, httpAccessor, company.Email, pinCode);
 
             //Seed client creator
-            await CreatorSeed.Seed(context, webHostEnvironment, userManager, clientCompany, httpAccessor,company.Email, pinCode);
+            string creatorEmailwithSuffix = CREATOR.CODE + "@" + company.Email;
+            string firstName = CREATOR.FIRST_NAME;
+            string lastName = CREATOR.LAST_NAME;
+            string photo = CREATOR.PROFILE_IMAGE;
+            await CreatorSeed.Seed(context, webHostEnvironment, userManager, clientCompany, pinCode, creatorEmailwithSuffix, photo, firstName, lastName);
 
             //Seed client assigner
-            await ManagerSeed.Seed(context,webHostEnvironment, userManager, clientCompany, httpAccessor, company.Email, pinCode);
+            string managerEmailwithSuffix = MANAGER.CODE + "@" + company.Email;
+            firstName = MANAGER.FIRST_NAME;
+            lastName = MANAGER.LAST_NAME;
+            photo = MANAGER.PROFILE_IMAGE;
+            await ManagerSeed.Seed(context,webHostEnvironment, userManager, clientCompany, pinCode, managerEmailwithSuffix, photo, firstName, lastName);
 
             //Seed client assessor
-            await AssessorSeed.Seed(context, webHostEnvironment, userManager, clientCompany, httpAccessor, company.Email,pinCode);
+            string assessorEmailwithSuffix = ASSESSOR.CODE + "@" + company.Email;
+            firstName = ASSESSOR.FIRST_NAME;
+            lastName = ASSESSOR.LAST_NAME;
+            photo = ASSESSOR.PROFILE_IMAGE;
+            await AssessorSeed.Seed(context, webHostEnvironment, userManager, clientCompany, pinCode, assessorEmailwithSuffix, photo, firstName, lastName);
         }
     }
 }

@@ -16,19 +16,17 @@ namespace risk.control.system.Seeds
         public static async Task Seed(ApplicationDbContext context, 
             IWebHostEnvironment webHostEnvironment, 
             UserManager<ClientCompanyApplicationUser> userManager, 
-            ClientCompany clientCompany,
-            IHttpContextAccessor httpAccessor, string companyDomain, PinCode pinCode)
+            ClientCompany clientCompany, PinCode pinCode, string creatorEmailwithSuffix, string photo, string firstName, string lastName)
         {
             //Seed client creator
-            string noUserImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", @Applicationsettings.NO_USER);
+            string noUserImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", NO_USER);
             
-            string creatorEmailwithSuffix = Applicationsettings.CREATOR.CODE + "@" + companyDomain;
             var ccMailBox = new Mailbox
             {
                 Name = creatorEmailwithSuffix
             };
 
-            string creatorImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(CREATOR.PROFILE_IMAGE));
+            string creatorImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(photo));
 
             var creatorImage = File.ReadAllBytes(creatorImagePath);
 
@@ -41,8 +39,8 @@ namespace risk.control.system.Seeds
                 Mailbox = ccMailBox,
                 UserName = creatorEmailwithSuffix,
                 Email = creatorEmailwithSuffix,
-                FirstName = CREATOR.FIRST_NAME,
-                LastName = CREATOR.LAST_NAME,
+                FirstName = firstName,
+                LastName = lastName,
                 Active = true,
                 EmailConfirmed = true,
                 Password = Password,
@@ -51,7 +49,7 @@ namespace risk.control.system.Seeds
                 IsSuperAdmin = false,
                 IsClientAdmin = false,
                 Addressline = "987 Canterbury Road",
-                PhoneNumber = Applicationsettings.PORTAL_ADMIN_MOBILE,
+                PhoneNumber = PORTAL_ADMIN_MOBILE,
                 IsVendorAdmin = false,
                 PinCode = pinCode,
                 Country = pinCode.Country,
@@ -59,7 +57,7 @@ namespace risk.control.system.Seeds
                 DistrictId = pinCode?.DistrictId ?? default!,
                 StateId = pinCode?.StateId ?? default!,
                 PinCodeId = pinCode?.PinCodeId ?? default!,
-                ProfilePictureUrl = CREATOR.PROFILE_IMAGE,
+                ProfilePictureUrl = photo,
                 ProfilePicture = creatorImage,
                 Role = AppRoles.CREATOR,
                 UserRole = CompanyRole.CREATOR,
