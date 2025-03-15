@@ -35,17 +35,16 @@
             </a>
         </li>
         <li class="nav-item dropdown  top-nav-logout-border">
-    <a class="nav-link" data-toggle="dropdown" href="#">
-        <i class="far fa-bell"></i>
-        <span class="badge badge-warning" id="notificationCount">0</span>
-    </a>
-    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-        <span class="dropdown-header">Notifications</span>
-        <div class="dropdown-divider"></div>
-        <div id="notificationList"></div>
-    </div>
-</li>
-
+            <a class="nav-link" data-toggle="dropdown" href="#">
+                <i class="far fa-bell"></i>
+                <span class="badge badge-warning" id="notificationCount">0</span>
+            </a>
+            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+                <span class="dropdown-header">Notifications</span>
+                <div class="dropdown-divider"></div>
+                <div id="notificationList"></div>
+            </div>
+        </li>
 
         <!-- Notifications Dropdown Menu -->
         <li class="nav-item dropdown  top-nav-logout-border">
@@ -57,15 +56,19 @@
                 @{
                     var img = "/flags/" + @Model.CountryCode.ToLower() + ".png";
                 }
-                <a class="nav-link" data-widget="control-sidebar" data-slide="true" role="button" title="Currency : @Model?.CurrencyCode" data-toggle="tooltip">
-                    <div id="currency"><i class="fa fa-money"></i> @Model?.CurrencyCode </div>
-                </a>
-                <div class="dropdown-divider"></div>
-                <a class="nav-link" data-widget="control-sidebar" data-slide="true" role="button" title="@Model?.Country" data-toggle="tooltip">
-                    <div id="country"> <i class="fas fa-map-marker-alt"></i> <img src="@img" class="flag-icon" /> </div>
-                </a>
-                <div class="dropdown-divider"></div>
 
+                <a class="nav-link" data-widget="control-sidebar" data-slide="true" role="button" title="Country: @Model?.Country" data-toggle="tooltip">
+                    <div id="country"> <img src="@img" class="flag-icon" /> <span class="badge badge-light">@Model?.CountryCode</span></div>
+                </a>
+                <div class="dropdown-divider"></div>
+                <a class="nav-link" data-widget="control-sidebar" data-slide="true" role="button" title="Currency: @Model?.CurrencyName" data-toggle="tooltip">
+                    <div id="currency"><i class="fa fa-money"></i> <span class="badge badge-light">@Model?.CurrencyCode</span></div>
+                </a>
+                <div class="dropdown-divider"></div>
+                <a class="nav-link" data-widget="control-sidebar" data-slide="true" role="button" title="ISD code: @Model?.IsdCode" data-toggle="tooltip">
+                    <div id="isdcode"><i class="fa fa-phone"></i> <span class="badge badge-light">@Model?.IsdCode</span></div>
+                </a>
+                <div class="dropdown-divider"></div>
             </div>
         </li>
         <!-- Settings Dropdown Menu -->

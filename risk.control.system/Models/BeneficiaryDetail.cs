@@ -12,7 +12,7 @@ namespace risk.control.system.Models
         [Display(Name = "Beneficiary name")]
         public string Name { get; set; }
 
-        [Display(Name = "BRelation")]
+        [Display(Name = "Relation")]
         public long BeneficiaryRelationId { get; set; }
 
         [Display(Name = "Relation")]
@@ -22,7 +22,7 @@ namespace risk.control.system.Models
         [Display(Name = "Phone")]
         public string ContactNumber { get; set; }
 
-        [Display(Name = "Income")]
+        [Display(Name = "Annual Income")]
         public Income? Income { get; set; }
 
         [FileExtensions(Extensions = "jpg,jpeg,png")]

@@ -127,7 +127,7 @@
                     self.setContentAppend('<div class="row">');
                     self.setContentAppend('<b> Claim Type: </b>' + response.claimType);
                     self.setContentAppend('<br><p class="fa-li">');
-                    self.setContentAppend('<b><i class="fas fa-rupee-sign"></i> Insured Amount</b>:  ' + response.sumAssuredValue);
+                    self.setContentAppend('<b><i class="fa fa-money"></i> Assured Amount</b>:  ' + response.sumAssuredValue);
                     self.setContentAppend('</p');
                     self.setContentAppend('<br><p class="fa-li">');
                     self.setContentAppend('<b><i class="far fa-clock"></i> Policy Issue Date</b>:  ' + response.contractIssueDate);
@@ -192,7 +192,7 @@
                     self.setContentAppend('</header>');
                     self.setContentAppend('<br><b><i class="far fa-clock"></i> Date of birth</b> : ' + response.dateOfBirth);
                     self.setContentAppend('<br><b><i class="fas fa-tools"></i> Occupation</b> : ' + response.occupation);
-                    self.setContentAppend('<br><b><i class="fas fa-rupee-sign"></i> Income</b> : ' + response.income);
+                    self.setContentAppend('<br><b><i class="fa fa-money"></i> Annual Income</b> : ' + response.income);
                     self.setContentAppend('<br><b><i class="fas fa-user-graduate"></i> Education</b> : ' + response.education);
                     self.setContentAppend('<br><b><i class="fas fa-home"></i> Address</b> : ' + response.address);
                     self.setContentAppend('<br><b><i class="fas fa-lg fa-phone"></i> Phone</b> : ' + response.contactNumber);
@@ -236,7 +236,7 @@
                     self.setContentAppend('</header>');
                     self.setContentAppend('<br><b><i class="fas fa-user-tag"></i>  Relation</b> : ' + response.beneficiaryRelation);
                     self.setContentAppend('<br><b><i class="fas fa-lg fa-phone"></i> Phone</b>: ' + response.contactNumber);
-                    self.setContentAppend('<br><b><i class="fas fa-rupee-sign"></i> Income</b>: ' + response.income);
+                    self.setContentAppend('<br><b><i class="fa fa-money"></i> Annual Income</b>: ' + response.income);
                     self.setContentAppend('<br><b><i class="fas fa-home"></i> Address</b>: ' + response.address);
                     self.setContentAppend('<br><b><i class="far fa-id-badge"></i> Beneficiary Image</b>:');
                     self.setContentAppend('<br><img id="agentLocationPicture" class="img-fluid investigation-actual-image" src="' + response.beneficiary + '" /> ');
