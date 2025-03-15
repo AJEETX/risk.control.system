@@ -36,9 +36,11 @@
                         Email = companyUser.Email,
                         CanChangePassword = company.CanChangePassword,
                         CountryCode = company.Country.Code,
-                        Country = $"(+{company.Country.ISDCode}) {company.Country.Name} ({company.Country.Code})",
+                        Country = $"{company.Country.Name}",
+                        IsdCode = $"(+{company.Country.ISDCode})",
                         ProfilePicture = companyUser.ProfilePicture,
                         CurrencyCode = company.Country.CurrencyCode,
+                        CurrencyName = company.Country.CurrencyName,
                         Language = company.Country.Language
                     };
                     <partial name="AdminLTE/_CompanyTopNavigation" model="@navigationModel" />
@@ -53,9 +55,11 @@
                         Email = vendorUser.Email,
                         CanChangePassword = vendor.CanChangePassword,
                         CountryCode = vendor.Country.Code,
-                        Country = $"(+{vendor.Country.ISDCode}) {vendor.Country.Name} ({vendor.Country.Code})",
+                        Country = $"{vendor.Country.Name}",
+                        IsdCode = $"(+{vendor.Country.ISDCode})",
                         ProfilePicture = vendorUser.ProfilePicture,
                         CurrencyCode = vendor.Country.CurrencyCode,
+                        CurrencyName = company.Country.CurrencyName,
                         Language = vendor.Country.Language
                     };
                     <partial name="AdminLTE/_AgencyTopNavigation" model="@navigationModel" />
@@ -69,9 +73,11 @@
                         Email = admin.Email,
                         CanChangePassword = true,
                         CountryCode = admin.Country.Code,
-                        Country = $"(+{admin.Country.ISDCode}) {admin.Country.Name} ({admin.Country.Code})",
+                        Country = $"{admin.Country.Name}",
+                        IsdCode = $"(+{admin.Country.ISDCode})",
                         ProfilePicture = admin.ProfilePicture,
                         CurrencyCode = admin.Country.CurrencyCode,
+                        CurrencyName = company.Country.CurrencyName,
                         Language = admin.Country.Language
                     };
                     <partial name="AdminLTE/_TopNavigation" model="@navigationModel" />

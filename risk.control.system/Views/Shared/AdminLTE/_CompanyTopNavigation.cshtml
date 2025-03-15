@@ -56,12 +56,17 @@
                 @{
                     var img = "/flags/" + @Model.CountryCode.ToLower() + ".png";
                 }
-                <a class="nav-link" data-widget="control-sidebar" data-slide="true" role="button" title="Currency : @Model?.CurrencyCode" data-toggle="tooltip">
-                    <div id="currency"><i class="fa fa-money"></i> @Model?.CurrencyCode </div>
+                
+                <a class="nav-link" data-widget="control-sidebar" data-slide="true" role="button" title="Country: @Model?.Country" data-toggle="tooltip">
+                    <div id="country"> <img src="@img" class="flag-icon" /> <span class="badge badge-light">@Model?.CountryCode</span></div>
                 </a>
                 <div class="dropdown-divider"></div>
-                <a class="nav-link" data-widget="control-sidebar" data-slide="true" role="button" title="@Model?.Country" data-toggle="tooltip">
-                    <div id="country"> <i class="fas fa-map-marker-alt"></i> <img src="@img" class="flag-icon" /> </div>
+                <a class="nav-link" data-widget="control-sidebar" data-slide="true" role="button" title="Currency: @Model?.CurrencyName" data-toggle="tooltip">
+                    <div id="currency"><i class="fa fa-money"></i> <span class="badge badge-light">@Model?.CurrencyCode</span></div>
+                </a>
+                <div class="dropdown-divider"></div>
+                <a class="nav-link" data-widget="control-sidebar" data-slide="true" role="button" title="Isd code: @Model?.IsdCode" data-toggle="tooltip">
+                    <div id="isdcode"><i class="fa fa-phone"></i> <span class="badge badge-light">@Model?.IsdCode</span></div>
                 </a>
                 <div class="dropdown-divider"></div>
                

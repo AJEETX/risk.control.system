@@ -155,7 +155,7 @@
                                                 <span class="fa-li">
                                                     <i class="fas fa-money-bill-wave"></i>
                                                 </span>
-                                                Amount: <i class="fas fa-rupee-sign"></i>@Model.ClaimsInvestigation?.PolicyDetail.SumAssuredValue
+                                               Assured Amount: (@ViewBag.Currency) @Model.ClaimsInvestigation?.PolicyDetail.SumAssuredValue
                                             </li>
                                             <li class="small">
                                                 <span class="fa-li">
@@ -284,9 +284,9 @@
                                             </li>
                                             <li class="small">
                                                 <span class="fa-li">
-                                                    <i class="fas fa-rupee-sign"></i>
+                                                    <i class="fa fa-money"></i>
                                                 </span>
-                                                Income: @Model.ClaimsInvestigation?.CustomerDetail?.Income
+                                                Annual Income: @Model.ClaimsInvestigation?.CustomerDetail?.Income
                                             </li>
                                             <li class="small">
                                                 <span class="fa-li">
@@ -396,9 +396,9 @@
                                         <ul class="ml-4 mb-0 fa-ul text-muted">
                                             <li class="small">
                                                 <span class="fa-li">
-                                                    <i class="fas fa-rupee-sign"></i>
+                                                    <i class="fas fa-money"></i>
                                                 </span>
-                                                Income: @Model.Location?.Income
+                                                Annual Income: @Model.Location?.Income
                                             </li>
                                             <li class="small">
                                                 <span class="fa-li">

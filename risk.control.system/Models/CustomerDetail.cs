@@ -74,7 +74,7 @@ namespace risk.control.system.Models
         public CustomerType? CustomerType { get; set; }
 
         [Required]
-        [Display(Name = "Income")]
+        [Display(Name = "Annual Income")]
         public Income? Income { get; set; }
 
         [Required]
