@@ -9,7 +9,7 @@
         digitalIdColor = "progress-bar-grey";
         borderColor = "";
     }
-    else if (Model.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime != null && @Model.AgencyReport?.DigitalIdReport?.Similarity < 70 )
+    else if (Model.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime != null && @Model.AgencyReport?.DigitalIdReport?.Similarity < 70)
     {
         digitalIdColor = "progress-bar-red";
         borderColor = "border-danger";
@@ -22,8 +22,8 @@
 
 
     <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
-       
-         <div class="card bg-light d-flex flex-fill @borderColor">
+
+        <div class="card bg-light d-flex flex-fill @borderColor">
 
             <div class="card-header text-muted border-bottom-0">
                 <h3 class="card-title">
@@ -70,7 +70,7 @@
                                 </div>
                                 <div>
                                     <i class='far fa-thumbs-up'></i> <i class='fas fa-check-circlei-green'></i> Matched Photo ID
-                            </div>
+                                </div>
                             </div>
                         }
 
@@ -86,7 +86,7 @@
             </div>
 
             <div class="card-footer text-center">
-                <span class="badge badge-light"><i class="fas fa-portrait"></i> Match :  </span>
+                <span class="badge badge-light"><i class="fas fa-portrait"></i> Match :  @Model.AgencyReport?.DigitalIdReport?.Similarity</span>
                 @if (@Model.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime == null)
                 {
                     <i class='fa fa-times i-grey' aria-hidden='true'></i>
@@ -138,7 +138,7 @@
                             @{
                                 if (Model.AgencyReport?.DigitalIdReport?.DigitalIdImage != null)
                                 {
-                                    <img  data-toggle="tooltip" title="Face Image" id="agentLocationPicture" class="img-fluid face-Image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.AgencyReport?.DigitalIdReport?.DigitalIdImage))">
+                                    <img data-toggle="tooltip" title="Face Image" id="agentLocationPicture" class="img-fluid face-Image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.AgencyReport?.DigitalIdReport?.DigitalIdImage))">
                                 }
                                 else
                                 {
@@ -146,7 +146,7 @@
                                 }
                             }
                         </p>
-                       
+
                     </div>
                     <div class="col-6">
                         <p class="text-muted text-sm">
@@ -165,7 +165,7 @@
                     </div>
                 </div>
                 <p class="text-center">
-                    <span class="badge badge-light"><i class="fas fa-portrait"></i> Match :  </span>
+                    <span class="badge badge-light"><i class="fas fa-portrait"></i> Match : @Model.AgencyReport?.DigitalIdReport?.Similarity </span>
                     @if (@Model.AgencyReport.DigitalIdReport?.DigitalIdImageLongLatTime == null)
                     {
                         <i class='fa fa-times i-grey' aria-hidden='true'></i>
@@ -200,6 +200,6 @@
                 </div>
             </form>
         </div>
-        
+
     </div>
 }

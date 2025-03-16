@@ -1,5 +1,15 @@
 ﻿@model ClaimTransactionModel
-<div class="card shadow-lg border-0 rounded-lg collapsed-card">
+
+@{
+    var cardView = "expanding-card";
+    var cardViewIcon = "fas fa-minus";
+    if (@Model.ClaimsInvestigation.AgencyReport != null)
+    {
+        cardView = "collapsed-card";
+        cardViewIcon = "fas fa-plus";
+    }
+}
+<div class="card shadow-lg border-0 rounded-lg @cardView">
     <div class="card-header bg-light text-white text-center">
         <h3 class="card-title">
             <span class="badge badge-info" data-toggle="tooltip" title="Status : @Model.ClaimsInvestigation?.InvestigationCaseSubStatus.Name">
@@ -28,9 +38,8 @@
                         <i class='far fa-file-powerpoint'></i> Policy details.
                     </li>
                     <li>
-                        <i class='fa fa-user-plus'></i> Customer details.
+                        <i class='fa fa-user-plus'></i> Claimant details.
                     </li>
-                    <li> <i class='fas fa-user-tie'></i> Beneficiary details </li>
 
                 </span>
             </span>
@@ -40,7 +49,7 @@
                 <i class='far fa-hand-point-right'></i>
             </span>
             <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                <i class="fas fa-plus"></i>
+                <i class="@cardViewIcon"></i>
             </button>
         </div>
     </div>
