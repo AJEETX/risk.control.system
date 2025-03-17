@@ -6,7 +6,7 @@
     <input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail.CustomerDetailId" />
     <input type="hidden" id="beneficiaryId" value="@Model.Location?.BeneficiaryDetailId" />
     <input type="hidden" id="claimId" value="@Model.ClaimsInvestigation?.ClaimsInvestigationId" />
-    <div class="card shadow-lg border-0 rounded-lg collapsed-card">
+    <div class="card shadow-lg border-1 rounded-lg collapsed-card">
         <div class="card-header bg-light text-white text-center">
             <h3 class="card-title">
                 Policy: <span class="badge badge-light">
@@ -20,11 +20,9 @@
                             <i class='far fa-file-powerpoint'></i> Policy details
                         </li>
                         <li>
-                            <i class='fa fa-user-plus'></i> Customer details
+                            <i class='fa fa-user-plus'></i> Claimant details
                         </li>
-                        <li>
-                            <i class='fas fa-user-tie'></i> Beneficiary details
-                        </li>
+                       
                     </span>
                 </span>
             </h3>

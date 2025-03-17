@@ -9,7 +9,7 @@
         <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
         <input type="hidden" id="policyDetailId" value="@Model.ClaimsInvestigation?.PolicyDetail.PolicyDetailId" />
         <input type="hidden" id="beneficiaryId" value="@Model.Location?.BeneficiaryDetailId" />
-    <div id="article" class="card shadow-lg border-0 rounded-lg">
+    <div id="article" class="card shadow-lg border-1 rounded-lg">
         <div class="card-header bg-secondary text-white text-center">
             <h3 class="card-title">
                 <i class="fas fa-newspaper"></i> Details
@@ -42,7 +42,7 @@
             <partial name="_AgentSubmittedReport" model="@Model" />
     @if (@Model.ClaimsInvestigation.AgencyReport != null)
     {
-        <div class="card shadow-lg border-0 rounded-lg expanded-card">
+        <div class="card shadow-lg border-1 rounded-lg expanded-card">
             <div class="card-header bg-light text-white text-center">
                 <h3 class="card-title">
                     <i class="fas fa-print nav-icon"></i> Agent: <span class="badge badge-light">@Model.ClaimsInvestigation.AgencyReport.AgentEmail</span>

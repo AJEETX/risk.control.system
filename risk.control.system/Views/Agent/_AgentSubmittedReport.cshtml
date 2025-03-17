@@ -1,7 +1,7 @@
 ﻿@model ClaimTransactionModel
 <article>
     <div class="bb-blog-inner">
-        <div class="card shadow-lg border-0 rounded-lg collapsed-card">
+        <div class="card shadow-lg border-1 rounded-lg collapsed-card">
             <div class="card-header bg-light text-white">
                 <h3 class="card-title">
                     <span class="badge badge-info" data-toggle="tooltip" title="Status : @Model.ClaimsInvestigation?.InvestigationCaseSubStatus.Name">
@@ -67,7 +67,7 @@
         </div>
         @if (@Model.ClaimsInvestigation.AgencyReport != null)
         {
-            <div class="card shadow-lg border-0 rounded-lg expanding-card">
+            <div class="card shadow-lg border-1 rounded-lg expanding-card">
                 <div class="card-header bg-light text-white">
                     <h3 class="card-title">
                         <i class="fas fa-print nav-icon"></i> Agent: <span class="badge badge-light">@Model.ClaimsInvestigation.AgencyReport.AgentEmail</span>

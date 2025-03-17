@@ -21,13 +21,14 @@ const image =
 //    document.getElementById("main-container").classList.add("blur-background");
 //});
 // Add event listener to the print button once the DOM is fully loaded
-
+var moreInfo = "...";
 function loadNotifications() {
-    $.get('/api/Notification/GetNotifications', function (data) {
+    $.get('/api/Notification/GetNotifications', function (response) {
         $("#notificationList").html("");
-        $("#notificationCount").text(data.length);
+        var totalCount = response.total;
+        $("#notificationCount").text(totalCount);
 
-        data.forEach(function (item) {
+        response.data.forEach(function (item) {
             $("#notificationList").append(
                 `<a href="#" class="dropdown-item notification-item" data-id="${item.id}">
                             <i class="${item.symbol}"></i> <span class="text-muted text-sm"> ${item.message} </span>
@@ -35,13 +36,17 @@ function loadNotifications() {
                         </a>`
             );
         });
-
+        if (totalCount > response.data.length) {
+            $("#notificationList").append(
+                `<hr><span class="float-right text-muted text-sm">${moreInfo}</span>`
+            );
+        }
         // Click event to mark as read
         $(".notification-item").on("click", function () {
             var notificationId = $(this).data("id");
             markNotificationAsRead(notificationId);
             $(this).remove(); // Remove notification from UI
-            let count = parseInt($("#notificationCount").text()) - 1;
+            let count = totalCount - 1;
             $("#notificationCount").text(count > 0 ? count : "0");
         });
     });

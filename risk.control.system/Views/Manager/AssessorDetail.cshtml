@@ -9,7 +9,7 @@
         <input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail.CustomerDetailId" />
         <input type="hidden" id="beneficiaryId" value="@Model.Location?.BeneficiaryDetailId" />
         <input type="hidden" id="claimId" value="@Model.ClaimsInvestigation?.ClaimsInvestigationId" />
-    <div id="article" class="card shadow-lg border-0 rounded-lg">
+    <div id="article" class="card shadow-lg border-1 rounded-lg">
         <div class="card-header bg-secondary text-white text-center">
             <h3 class="card-title">
                 <i class="fas fa-newspaper"></i> Details
@@ -32,7 +32,7 @@
         </div>
     </div>
 
-    <div class="card shadow-lg border-0 rounded-lg collapsed-card">
+    <div class="card shadow-lg border-1 rounded-lg collapsed-card">
         <div class="card-header bg-light text-white text-center">
                 <h3 class="card-title">Claim: <span class="badge badge-light"><i class="far fa-file-powerpoint"></i>  @Model.ClaimsInvestigation?.PolicyDetail?.ContractNumber</span></h3>
             <div class="card-tools">
@@ -58,7 +58,7 @@
     <div class="submit-progress hidden">
         <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
     </div>
-    <div class="card shadow-lg border-0 rounded-lg expanding-card">
+    <div class="card shadow-lg border-1 rounded-lg expanding-card">
         <div class="card-header bg-light text-white text-center">
             <h3 class="card-title">
                 <i class="fas fa-print nav-icon"></i> Agency: <span class="badge badge-light">@Model.ClaimsInvestigation.Vendor.Email</span>

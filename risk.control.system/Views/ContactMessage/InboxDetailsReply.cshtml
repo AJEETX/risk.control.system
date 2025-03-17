@@ -8,7 +8,7 @@
     <form asp-controller="ContactMessage" id="email-form" method="post" enctype="multipart/form-data">
         <input type="hidden" asp-for="OutboxMessageId" />
         <input type="hidden" asp-for="RawMessage" value="@Model.RawMessage" />
-        <div class="card shadow-lg border-0 rounded-lg">
+        <div class="card shadow-lg border-1 rounded-lg">
             <div class="card-header bg-secondary text-white text-center">
                 <h3 class="card-title">@ViewBag.ActionType Mail</h3>
             </div>

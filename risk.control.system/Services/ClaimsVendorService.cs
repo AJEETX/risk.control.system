@@ -93,7 +93,6 @@ namespace risk.control.system.Services
         {
             var claim = claimsService.GetClaims()
                 .Include(c => c.ClaimNotes)
-                .Include(c => c.ClientCompany)
                 .Include(c => c.AgencyReport)
                 .ThenInclude(c => c.DigitalIdReport)
                 .Include(c => c.AgencyReport)

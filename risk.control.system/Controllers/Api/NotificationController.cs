@@ -39,7 +39,7 @@ namespace risk.control.system.Controllers.Api
             var userEmail = HttpContext.User?.Identity?.Name;
             var notifications = await service.GetNotifications(userEmail);
             var activeNotifications = notifications.Select(n => new { Id = n.StatusNotificationId, Symbol = n.Symbol, n.Message, CreatedAt = GetTimeAgo(n.CreatedAt) });
-            return Ok(activeNotifications?.Take(10).ToList());
+            return Ok(new { Data = activeNotifications?.Take(10).ToList(), total = notifications.Count });
         }
         [AllowAnonymous]
         [HttpGet("GetClientIp")]
