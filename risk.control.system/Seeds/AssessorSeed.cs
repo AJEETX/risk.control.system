@@ -16,19 +16,17 @@ namespace risk.control.system.Seeds
         public static async Task Seed(ApplicationDbContext context, 
             IWebHostEnvironment webHostEnvironment, 
             UserManager<ClientCompanyApplicationUser> userManager, 
-            ClientCompany clientCompany,
-            IHttpContextAccessor httpAccessor, string companyDomain, PinCode pinCode)
+            ClientCompany clientCompany, PinCode pinCode, string assessorEmailwithSuffix, string photo, string firstName, string lastName)
         {
             //Seed client creator
             string noUserImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", @Applicationsettings.NO_USER);
 
-            string assessorEmailwithSuffix = Applicationsettings.ASSESSOR.CODE + "@" + companyDomain;
             var ssMailBox = new Mailbox
             {
                 Name = assessorEmailwithSuffix
             };
 
-            string assessorImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(ASSESSOR.PROFILE_IMAGE));
+            string assessorImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(photo));
             var assessorImage = File.ReadAllBytes(assessorImagePath);
 
             if (assessorImage == null)
@@ -41,8 +39,8 @@ namespace risk.control.system.Seeds
                 Mailbox = ssMailBox,
                 UserName = assessorEmailwithSuffix,
                 Email = assessorEmailwithSuffix,
-                FirstName = ASSESSOR.FIRST_NAME,
-                LastName = ASSESSOR.LAST_NAME,
+                FirstName = firstName,
+                LastName = lastName,
                 EmailConfirmed = true,
                 PhoneNumberConfirmed = true,
                 Password = Password,
@@ -60,7 +58,7 @@ namespace risk.control.system.Seeds
                 DistrictId = pinCode?.DistrictId ?? default!,
                 StateId = pinCode?.StateId ?? default!,
                 PinCodeId = pinCode?.PinCodeId ?? default!,
-                ProfilePictureUrl = ASSESSOR.PROFILE_IMAGE,
+                ProfilePictureUrl = photo,
                 ProfilePicture = assessorImage,
                 Role = AppRoles.ASSESSOR,
                 UserRole = CompanyRole.ASSESSOR,

@@ -22,25 +22,25 @@ namespace risk.control.system.Seeds
             //Seed client creator
             string noUserImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", @Applicationsettings.NO_USER);
             
-            string managererEmailwithSuffix = Applicationsettings.MANAGER.CODE + "@" + companyDomain;
+            string adminEmailwithSuffix = Applicationsettings.COMPANY_ADMIN.CODE + "@" + companyDomain;
             var asMailBox = new Mailbox
             {
-                Name = managererEmailwithSuffix
+                Name = adminEmailwithSuffix
             };
-            string managerImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(MANAGER.PROFILE_IMAGE));
+            string adminImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(COMPANY_ADMIN.PROFILE_IMAGE));
 
-            var managerImage = File.ReadAllBytes(managerImagePath);
+            var adminImage = File.ReadAllBytes(adminImagePath);
 
-            if (managerImage == null)
+            if (adminImage == null)
             {
-                managerImage = File.ReadAllBytes(noUserImagePath);
+                adminImage = File.ReadAllBytes(noUserImagePath);
             }
 
-            var manager = new ClientCompanyApplicationUser()
+            var admin = new ClientCompanyApplicationUser()
             {
                 Mailbox = asMailBox,
-                UserName = managererEmailwithSuffix,
-                Email = managererEmailwithSuffix,
+                UserName = adminEmailwithSuffix,
+                Email = adminEmailwithSuffix,
                 FirstName = MANAGER.FIRST_NAME,
                 LastName = MANAGER.LAST_NAME,
                 Active = true,
@@ -58,19 +58,19 @@ namespace risk.control.system.Seeds
                 DistrictId = pinCode?.DistrictId ?? default!,
                 StateId = pinCode?.StateId ?? default!,
                 PinCodeId = pinCode?.PinCodeId ?? default!,
-                ProfilePictureUrl = MANAGER.PROFILE_IMAGE,
-                ProfilePicture = managerImage,
-                Role = AppRoles.MANAGER,
-                UserRole = CompanyRole.MANAGER,
+                ProfilePictureUrl = COMPANY_ADMIN.PROFILE_IMAGE,
+                ProfilePicture = adminImage,
+                Role = AppRoles.COMPANY_ADMIN,
+                UserRole = CompanyRole.COMPANY_ADMIN,
                 Updated = DateTime.Now,
             };
-            if (userManager.Users.All(u => u.Id != manager.Id))
+            if (userManager.Users.All(u => u.Id != admin.Id))
             {
-                var user = await userManager.FindByEmailAsync(manager.Email);
+                var user = await userManager.FindByEmailAsync(admin.Email);
                 if (user == null)
                 {
-                    await userManager.CreateAsync(manager, Password);
-                    await userManager.AddToRoleAsync(manager, AppRoles.MANAGER.ToString());
+                    await userManager.CreateAsync(admin, Password);
+                    await userManager.AddToRoleAsync(admin, AppRoles.COMPANY_ADMIN.ToString());
                     //var clientAssignerRole = new ApplicationRole(AppRoles.Assigner.ToString(), AppRoles.Assigner.ToString());
                     //clientAssigner.ApplicationRoles.Add(clientAssignerRole);
                 }

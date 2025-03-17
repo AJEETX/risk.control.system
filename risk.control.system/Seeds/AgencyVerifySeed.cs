@@ -48,7 +48,6 @@ namespace risk.control.system.Seeds
                 Name = Applicationsettings.AGENCY2NAME,
                 Addressline = verifyAddressline,
                 Branch = "BLACKBURN",
-                Code = Applicationsettings.AGENCY2CODE,
                 ActivatedDate = DateTime.Now,
                 AgreementDate = DateTime.Now,
                 BankName = "SBI BANK",

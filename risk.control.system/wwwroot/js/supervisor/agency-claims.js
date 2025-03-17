@@ -207,7 +207,7 @@
                         buttons += '<a id="details' + row.id + '" href="/SuperVisor/ReplyEnquiry?Id=' + row.id + '"  class="btn btn-xs btn-warning"><i class="fas fa-question" aria-hidden="true"></i> ENQUIRY </a>'
                     }
                     else {
-                        buttons += '<a id="details' + row.id + '" href="/SuperVisor/CaseDetail?Id=' + row.id + '"  class="btn btn-xs btn-danger"><i class="fas fa-undo"></i> Decline</a>'
+                        buttons += '<a id="details' + row.id + '" href="/SuperVisor/CaseDetail?Id=' + row.id + '"  class="btn btn-xs btn-info"><i class="fas fa-search"></i> Details</a>'
                     }
                     return buttons;
                 }
@@ -216,7 +216,7 @@
         ],
         "drawCallback": function (settings, start, end, max, total, pre) {
 
-            $('#customerTable tbody').on('click', '.btn-danger', function (e) {
+            $('#customerTable tbody').on('click', '.btn-info', function (e) {
                 e.preventDefault(); // Prevent the default anchor behavior
                 var id = $(this).attr('id').replace('details', ''); // Extract the ID from the button's ID attribute
                 showdetails(id); // Call the getdetails function with the ID
@@ -332,7 +332,7 @@ function showdetails(id) {
         $(".submit-progress").removeClass("hidden");
     }, 1);
     
-    $('a#details' + id + '.btn.btn-xs.btn-danger').html("<i class='fas fa-sync fa-spin'></i> Decline");
+    $('a#details' + id + '.btn.btn-xs.btn-info').html("<i class='fas fa-sync fa-spin'></i> Details");
     disableAllInteractiveElements();
 
     var article = document.getElementById("article");

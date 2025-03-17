@@ -47,7 +47,6 @@ namespace risk.control.system.Seeds
                 Name = Applicationsettings.AGENCY4NAME,
                 Addressline = properAddressline,
                 Branch = "Ram nagar",
-                Code = Applicationsettings.AGENCY4CODE,
                 ActivatedDate = DateTime.Now,
                 AgreementDate = DateTime.Now,
                 BankName = "HDFC",

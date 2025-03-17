@@ -188,64 +188,48 @@
         //public const string CURRENT_STATE = "VIC";
 
         public const string INSURER = "Insurer life";
-        public const string INSURERCODE = "ili";
         public const string INSURERDOMAIN = "insurer.com";
         public const string INSURERLOGO = "/img/insurer.jpg";
-        public const string INSURER_CREATOR = "creator@" + INSURERDOMAIN;
 
-        public const string CANARA = "canara hsbc life";
-        public const string CANARACODE = "chl";
-        public const string CANARADOMAIN = "canarahsbclife.com";
+        public const string CANARA = "Canara Hsbc";
+        public const string CANARADOMAIN = "canarahsbc.com";
         public const string CANARALOGO = "/img/chl.jpg";
-        public const string CANARA_CREATOR = "creator@" + CANARADOMAIN;
 
-        public const string ALLIANZ = "allianz";
-        public const string ALLIANZ_CODE = "alz";
+        public const string ALLIANZ = "Allianz";
         public const string ALLIANZ_DOMAIN = "allianz.com";
         public const string ALLIANZ_LOGO = "/img/allianz.png";
-        public const string ALLIANZ_CREATOR = "creator@" + ALLIANZ_DOMAIN;
 
-        public const string TATA = "Tata life";
-        public const string TATA_CODE = "tli";
+        public const string TATA = "Tata Aia";
         public const string TATA_DOMAIN = "tataaia.com";
         public const string TATA_LOGO = "/img/tata_logo.png";
-        public const string TATA_CREATOR = "creator@" + TATA_DOMAIN;
 
-        public const string HDFC = "hdfc life";
-        public const string HDFCCODE = "hdl";
+        public const string HDFC = "Hdfc Life";
         public const string HDFCDOMAIN = "hdfclife.com";
         public const string HDFCLOGO = "/img/hdfc.jpg";
-        public const string HDFC_CREATOR = "creator@" + HDFCDOMAIN;
 
         public const string AGENCY1NAME = "Checker";
-        public const string AGENCY1CODE = "CHA";
         public const string AGENCY1DOMAIN = "checker.com";
         public const string AGENCY1PHOTO = "/img/checker.png";
 
         public const string AGENCY2NAME = "Verify";
-        public const string AGENCY2CODE = "VEA";
         public const string AGENCY2DOMAIN = "verify.com";
         public const string AGENCY2PHOTO = "/img/verify.png";
 
         public const string AGENCY3NAME = "Investigate";
-        public const string AGENCY3CODE = "INA";
         public const string AGENCY3DOMAIN = "investigate.com";
         public const string AGENCY3PHOTO = "/img/investigate.png";
 
         public const string AGENCY4NAME = "Proper";
-        public const string AGENCY4CODE = "PPR";
         public const string AGENCY4DOMAIN = "proper.com";
         public const string AGENCY4PHOTO = "/img/proper.png";
 
         public const string AGENCY5NAME = "Honest";
-        public const string AGENCY5CODE = "HNT";
         public const string AGENCY5DOMAIN = "honest.com";
         public const string AGENCY5PHOTO = "/img/honest.png";
 
         public const string AGENCY6NAME = "Nicer";
-        public const string AGENCY6CODE = "NCR";
         public const string AGENCY6DOMAIN = "nicer.com";
-        public const string AGENCY6PHOTO = "/img/honest.png";
+        public const string AGENCY6PHOTO = "/img/nicer.png";
 
         public const string NO_IMAGE = "/img/no-image.png";
         public const string AUDIO_UPLOAD_IMAGE = "/img/upload-audio.png";

@@ -47,7 +47,6 @@ namespace risk.control.system.Seeds
                 Name = Applicationsettings.AGENCY5NAME,
                 Addressline = honestAddressline,
                 Branch = "IndiraPuram",
-                Code = Applicationsettings.AGENCY5CODE,
                 ActivatedDate = DateTime.Now,
                 AgreementDate = DateTime.Now,
                 BankName = "HDFC",

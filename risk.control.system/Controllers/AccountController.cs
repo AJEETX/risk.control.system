@@ -282,13 +282,8 @@ namespace risk.control.system.Controllers
                             if (admin != null)
                             {
                                 message = $"Dear {admin.Email}";
-                                message += $"                                       ";
-                                message += $"                       ";
                                 message += $"User {user.Email} logged in";
-                                message += $"                                       ";
                                 message += $"Thanks                                         ";
-                                message += $"                                       ";
-                                message += $"                                       ";
                                 message += $"{BaseUrl}";
                                 try
                                 {
@@ -310,12 +305,8 @@ namespace risk.control.system.Controllers
                 {
                     var adminForFailed = _context.ApplicationUser.Include(a => a.Country).FirstOrDefault(u => u.IsSuperAdmin);
                     string failedMessage = $"Dear {admin.Email}";
-                    failedMessage += $"                         ";
                     failedMessage += $"Locked user {user.Email} logged in";
-                    failedMessage += $"                                       ";
                     failedMessage += $"Thanks                                       ";
-                    failedMessage += $"                                       ";
-                    failedMessage += $"                                       ";
                     failedMessage += $"{BaseUrl}";
                     await smsService.DoSendSmsAsync("+" + adminForFailed.Country.ISDCode + adminForFailed.PhoneNumber, failedMessage);
                 }
@@ -330,12 +321,8 @@ namespace risk.control.system.Controllers
                 if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
                 {
                     string message = $"Dear {admin.Email}";
-                    message += $"                           ";
                     message += $"{model.Email} locked out";
-                    message += $"                                       ";
                     message += $"Thanks                                         ";
-                    message += $"                                       ";
-                    message += $"                                       ";
                     message += $"{BaseUrl}";
                     await smsService.DoSendSmsAsync("+" + admin.Country.ISDCode + admin.PhoneNumber, message);
                 }
@@ -350,12 +337,8 @@ namespace risk.control.system.Controllers
                 if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
                 {
                     string message = $"Dear {admin.Email}";
-                    message += $"                          ";
                     message += $"{model.Email} failed login attempt. {nameof(result.IsNotAllowed)}. Contact admin.";
-                    message += $"                                       ";
                     message += $"Thanks                                         ";
-                    message += $"                                       ";
-                    message += $"                                       ";
                     message += $"{BaseUrl}";
                     await smsService.DoSendSmsAsync("+" + admin.Country.ISDCode + admin.PhoneNumber, message);
                 }
@@ -476,13 +459,8 @@ namespace risk.control.system.Controllers
                             if (admin != null)
                             {
                                 message = $"Dear {admin.Email}";
-                                message += $"                                       ";
-                                message += $"                       ";
                                 message += $"User {user.Email} logged in";
-                                message += $"                                       ";
                                 message += $"Thanks                                         ";
-                                message += $"                                       ";
-                                message += $"                                       ";
                                 message += $"{BaseUrl}";
                                 try
                                 {
@@ -504,12 +482,8 @@ namespace risk.control.system.Controllers
                 {
                     var adminForFailed = _context.ApplicationUser.Include(a => a.Country).FirstOrDefault(u => u.IsSuperAdmin);
                     string failedMessage = $"Dear {admin.Email}";
-                    failedMessage += $"                         ";
                     failedMessage += $"Locked user {user.Email} logged in";
-                    failedMessage += $"                                       ";
                     failedMessage += $"Thanks                                       ";
-                    failedMessage += $"                                       ";
-                    failedMessage += $"                                       ";
                     failedMessage += $"{BaseUrl}";
                     await smsService.DoSendSmsAsync("+" + adminForFailed.Country.ISDCode + adminForFailed.PhoneNumber, failedMessage);
                 }

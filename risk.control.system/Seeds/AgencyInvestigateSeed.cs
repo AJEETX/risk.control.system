@@ -48,7 +48,6 @@ namespace risk.control.system.Seeds
                 Name = Applicationsettings.AGENCY3NAME,
                 Addressline = investigateAddressline,
                 Branch = "CLAYTON ROAD",
-                Code = Applicationsettings.AGENCY3CODE,
                 ActivatedDate = DateTime.Now,
                 AgreementDate = DateTime.Now,
                 BankName = "HDFC BANK",

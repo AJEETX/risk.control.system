@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
+using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
 
 namespace risk.control.system.Seeds
@@ -18,7 +19,7 @@ namespace risk.control.system.Seeds
         private const string vendorMapSize = "800x800";
         public static async Task<Vendor> Seed(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment,
                     InvestigationServiceType investigationServiceType, InvestigationServiceType discreetServiceType, InvestigationServiceType docServiceType, 
-                    LineOfBusiness lineOfBusiness, IHttpContextAccessor httpAccessor, ICustomApiCLient customApiCLient, UserManager<VendorApplicationUser> vendorUserManager)
+                    LineOfBusiness lineOfBusiness, IHttpContextAccessor httpAccessor, ICustomApiCLient customApiCLient, UserManager<VendorApplicationUser> vendorUserManager, SeedInput input)
         {
             string noCompanyImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", @Applicationsettings.NO_IMAGE);
 
@@ -26,7 +27,7 @@ namespace risk.control.system.Seeds
 
             //CREATE VENDOR COMPANY
 
-            var checkerPinCode = context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).FirstOrDefault(s => s.Country.Code.ToLower() == "au");
+            var checkerPinCode = context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).FirstOrDefault(s => s.Country.Code.ToLower() == input.COUNTRY);
             var checkerAddressline = "1, Nice Road";
 
             var checkerAddress = checkerAddressline + ", " + checkerPinCode.District.Name + ", " + checkerPinCode.State.Name + ", " + checkerPinCode.Country.Code;
@@ -34,7 +35,7 @@ namespace risk.control.system.Seeds
             var checkerLatLong = checkerCoordinates.Latitude + "," + checkerCoordinates.Longitude;
             var checkerUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={checkerLatLong}&zoom=14&size={vendorMapSize}&maptype=roadmap&markers=color:red%7Clabel:S%7C{checkerLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
 
-            string checkerImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(Applicationsettings.AGENCY1PHOTO));
+            string checkerImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(input.PHOTO));
             var checkerImage = File.ReadAllBytes(checkerImagePath);
 
             if (checkerImage == null)
@@ -44,10 +45,9 @@ namespace risk.control.system.Seeds
 
             var checker = new Vendor
             {
-                Name = Applicationsettings.AGENCY1NAME,
+                Name = input.NAME,
                 Addressline = checkerAddressline,
                 Branch = "MAHATTAN",
-                Code = Applicationsettings.AGENCY1CODE,
                 ActivatedDate = DateTime.Now,
                 AgreementDate = DateTime.Now,
                 BankName = "WESTPAC",
@@ -60,9 +60,9 @@ namespace risk.control.system.Seeds
                 StateId = checkerPinCode.StateId,
                 PinCodeId = checkerPinCode.PinCodeId,
                 Description = "HEAD OFFICE ",
-                Email = Applicationsettings.AGENCY1DOMAIN,
+                Email = input.DOMAIN,
                 PhoneNumber = "8888004739",
-                DocumentUrl = Applicationsettings.AGENCY1PHOTO,
+                DocumentUrl = input.PHOTO,
                 DocumentImage = checkerImage,
                 Updated = DateTime.Now,
                 Status = VendorStatus.ACTIVE,
