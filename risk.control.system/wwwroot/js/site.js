@@ -31,7 +31,7 @@ function loadNotifications() {
         response.data.forEach(function (item) {
             $("#notificationList").append(
                 `<a href="#" class="dropdown-item notification-item" data-id="${item.id}">
-                            <i class="${item.symbol}"></i> <span class="text-muted text-sm"> ${item.message} </span>
+                            <i class="${item.symbol}"></i> <span class="text-muted text-sm"> ${item.message} </span> :<span class="badge badge-light text-muted text-sm"> ${item.status} </span>
                             <span class="float-right text-muted text-sm">${item.createdAt}</span>
                         </a>`
             );
@@ -173,8 +173,6 @@ function validateFileInput(inputElement, allowedExtensions) {
     }
     return true;
 }
-
-
 
 // Generic input validation function
 function validateInput(selector, regex) {

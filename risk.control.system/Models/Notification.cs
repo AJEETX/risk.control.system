@@ -6,6 +6,7 @@ namespace risk.control.system.Models
     {
         public int StatusNotificationId { get; set; }
         public ApplicationRole? Role { get; set; }
+        public string? Status { get; set; }
         public ClientCompany? Company { get; set; }
         public Vendor? Agency { get; set; }
         public string? UserEmail { get; set; }

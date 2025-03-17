@@ -112,7 +112,8 @@ namespace risk.control.system.Services
                 {
                     Role = supervisorRole,
                     Agency = claimsInvestigation.Vendor,
-                    Message = $"Case #{claimsInvestigation.PolicyDetail.ContractNumber}:{claimsInvestigation.InvestigationCaseSubStatus.Name}."
+                    Message = $"Case #{claimsInvestigation.PolicyDetail.ContractNumber}",
+                    Status = claimsInvestigation.InvestigationCaseSubStatus.Name
                 };
                 _context.Notifications.Add(notification);
                 claimsInvestigation.Notifications.Add(notification);
@@ -267,7 +268,9 @@ namespace risk.control.system.Services
                     {
                         Role = creatorRole,
                         Company = clientCompanyUser.ClientCompany,
-                        Message = $"Case #{claimsInvestigation.PolicyDetail.ContractNumber}:{claimsInvestigation.InvestigationCaseSubStatus.Name}."
+                        Symbol = "fa fa-info i-blue",
+                        Message = $"Case #{claimsInvestigation.PolicyDetail.ContractNumber}",
+                        Status = claimsInvestigation.InvestigationCaseSubStatus.Name
                     };
                     _context.Notifications.Add(notification);
                     claimsInvestigation.Notifications.Add(notification);
@@ -339,7 +342,8 @@ namespace risk.control.system.Services
                     Role = vendorRole,
                     Agency = claimsInvestigation.Vendor,
                     Symbol = "fa fa-times i-orangered",
-                    Message = $"Case #{claimsInvestigation.PolicyDetail.ContractNumber}:{claimsInvestigation.InvestigationCaseSubStatus.Name}."
+                    Message = $"Case #{claimsInvestigation.PolicyDetail.ContractNumber}",
+                    Status = claimsInvestigation.InvestigationCaseSubStatus.Name
                 };
 
                 var notification = new StatusNotification
@@ -347,7 +351,8 @@ namespace risk.control.system.Services
                     Role = creatorRole,
                     Company = company,
                     Symbol = "fa fa-times i-orangered",
-                    Message = $"Case #{claimsInvestigation.PolicyDetail.ContractNumber}:{claimsInvestigation.InvestigationCaseSubStatus.Name}."
+                    Message = $"Case #{claimsInvestigation.PolicyDetail.ContractNumber}",
+                    Status = claimsInvestigation.InvestigationCaseSubStatus.Name
                 };
                 _context.Notifications.Add(notification);
                 claimsInvestigation.Notifications.Add(vendorNotification);
@@ -440,7 +445,8 @@ namespace risk.control.system.Services
                     Role = agentRole,
                     Agency = claimsInvestigation.Vendor,
                     UserEmail = agentEmail,
-                    Message = $"Case #{claimsInvestigation.PolicyDetail.ContractNumber}:{claimsInvestigation.InvestigationCaseSubStatus.Name}."
+                    Message = $"Case #{claimsInvestigation.PolicyDetail.ContractNumber}",
+                    Status = claimsInvestigation.InvestigationCaseSubStatus.Name
                 };
                 _context.Notifications.Add(notification);
                 claimsInvestigation.Notifications.Add(notification);
@@ -612,7 +618,8 @@ namespace risk.control.system.Services
                     Role = managerRole,
                     Company = company,
                     Symbol = claimsInvestigation.InvestigationCaseSubStatus.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR ? "fa fa-check i-green" : "fa fa-times i-orangered",
-                    Message = $"Case #{claimsInvestigation.PolicyDetail.ContractNumber}:{claimsInvestigation.InvestigationCaseSubStatus.Name}."
+                    Message = $"Case #{claimsInvestigation.PolicyDetail.ContractNumber}",
+                    Status = claimsInvestigation.InvestigationCaseSubStatus.Name
                 };
                 _context.Notifications.Add(notification);
                 claimsInvestigation.Notifications.Add(notification);
@@ -707,7 +714,8 @@ namespace risk.control.system.Services
                 {
                     Role = assessorRole,
                     Company = company,
-                    Message = $"Case #{claimsInvestigation.PolicyDetail.ContractNumber} report:{claimsInvestigation.InvestigationCaseSubStatus.Name}."
+                    Message = $"Case #{claimsInvestigation.PolicyDetail.ContractNumber}",
+                    Status = claimsInvestigation.InvestigationCaseSubStatus.Name
                 };
                 _context.Notifications.Add(notification);
                 claimsInvestigation.Notifications.Add(notification);
@@ -813,7 +821,8 @@ namespace risk.control.system.Services
                 {
                     Role = supervisorRole,
                     Agency = claimsInvestigation.Vendor,
-                    Message = $"Case #{claimsInvestigation.PolicyDetail.ContractNumber}:{claimsInvestigation.InvestigationCaseSubStatus.Name}."
+                    Message = $"Case #{claimsInvestigation.PolicyDetail.ContractNumber}",
+                    Status = claimsInvestigation.InvestigationCaseSubStatus.Name
                 };
                 _context.Notifications.Add(notification);
                 claimsInvestigation.Notifications.Add(notification);
@@ -924,7 +933,8 @@ namespace risk.control.system.Services
                     Role = supervisorRole,
                     Agency = claimsInvestigation.Vendor,
                     Symbol = "fa fa-question",
-                    Message = $"Case #{claimsInvestigation.PolicyDetail.ContractNumber}:{claimsInvestigation.InvestigationCaseSubStatus.Name}."
+                    Message = $"Case #{claimsInvestigation.PolicyDetail.ContractNumber}",
+                    Status = claimsInvestigation.InvestigationCaseSubStatus.Name
                 };
                 _context.Notifications.Add(notification);
                 claimsInvestigation.Notifications.Add(notification);
@@ -1024,7 +1034,8 @@ namespace risk.control.system.Services
                 {
                     Role = assessorRole,
                     Company = company,
-                    Message = $"Case #{claimsInvestigation.PolicyDetail.ContractNumber}:{claimsInvestigation.InvestigationCaseSubStatus.Name}."
+                    Message = $"Case #{claimsInvestigation.PolicyDetail.ContractNumber}",
+                    Status = claimsInvestigation.InvestigationCaseSubStatus.Name
                 };
                 _context.Notifications.Add(notification);
                 claimsInvestigation.Notifications.Add(notification);
