@@ -13,7 +13,7 @@ using risk.control.system.Helpers;
 
 namespace risk.control.system.Controllers.Agency
 {
-    [Breadcrumb(" Claims")]
+    [Breadcrumb(" Cases")]
         [Authorize(Roles = AGENT.DISPLAY_NAME)]
     public class AgentController : Controller
     {

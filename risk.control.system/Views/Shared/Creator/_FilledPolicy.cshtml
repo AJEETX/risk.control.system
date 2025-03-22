@@ -9,11 +9,11 @@
     <div class="card bg-light d-flex flex-fill">
         <!-- Card Header -->
         <div class="card-header text-muted border-bottom-0">
-            <i class="far fa-file-powerpoint"></i> Policy Details
+            <i class="far fa-file-powerpoint"></i> Case Details
             <span class="hover-text">
                 <i class="fas fa-info-circle"></i>
                 <span class="tooltip-text" id="policy-information">
-                    <i class="far fa-file-powerpoint"></i> Policy details.
+                    <i class="far fa-file-powerpoint"></i> Case details.
                 </span>
             </span>
         </div>
@@ -96,13 +96,13 @@
                 {
                     <input type="hidden" asp-for="ClaimsInvestigation.ClaimsInvestigationId" />
                     <a id="edit-policy" class="btn btn-warning" asp-action="EditPolicy" asp-route-id="@Model.ClaimsInvestigation.ClaimsInvestigationId">
-                        <i class="far fa-file-powerpoint"></i> Edit Policy
+                        <i class="far fa-file-powerpoint"></i> Edit Case
                     </a>
                 }
                 else
                 {
                     <a class="btn btn-success" asp-action="CreatePolicy">
-                        <i class="far fa-file-powerpoint"></i> Add Policy
+                        <i class="far fa-file-powerpoint"></i> Add Case
                     </a>
                 }
             </div>

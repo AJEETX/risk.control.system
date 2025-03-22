@@ -35,10 +35,9 @@ namespace risk.control.system.Services
             {
                 PolicyDetail = new PolicyDetail
                 {
-                    LineOfBusinessId = lineOfBusinessId,
                     CaseEnablerId = _context.CaseEnabler.FirstOrDefault().CaseEnablerId,
                     CauseOfLoss = "LOST IN ACCIDENT",
-                    ClaimType = ClaimType.HEALTH,
+                    ClaimType = ClaimType.DEATH,
                     ContractIssueDate = DateTime.Now.AddDays(-10),
                     CostCentreId = _context.CostCentre.FirstOrDefault().CostCentreId,
                     DateOfIncident = DateTime.Now.AddDays(-3),
@@ -46,6 +45,7 @@ namespace risk.control.system.Services
                     Comments = "SOMETHING FISHY",
                     SumAssuredValue = new Random().Next(10000, 99999),
                     ContractNumber = contractNumber,
+                    InsuranceType = InsuranceType.LIFE,
                 },
                 InvestigationCaseSubStatusId = createdStatus.InvestigationCaseSubStatusId,
                 UserEmailActioned = userEmail,
@@ -202,7 +202,7 @@ namespace risk.control.system.Services
             return null!;
         }
 
-        private string GetElapsedTime(List<InvestigationTransaction> caseLogs)
+        private static string GetElapsedTime(List<InvestigationTransaction> caseLogs)
         {
             var orderedLogs = caseLogs.OrderBy(l => l.Created);
 

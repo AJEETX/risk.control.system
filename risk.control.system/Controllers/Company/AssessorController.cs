@@ -120,7 +120,7 @@ namespace risk.control.system.Controllers.Company
                 ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
 
-                var claimsPage = new MvcBreadcrumbNode("Assessor", "Assessor", "Claims");
+                var claimsPage = new MvcBreadcrumbNode("Assessor", "Assessor", "Cases");
                 var agencyPage = new MvcBreadcrumbNode("Assessor", "Assessor", "Assess(report)") { Parent = claimsPage, };
                 var detailsPage = new MvcBreadcrumbNode("GetInvestigateReport", "Assessor", $"Details") { Parent = agencyPage, RouteValues = new { selectedcase = selectedcase } };
                 var editPage = new MvcBreadcrumbNode("SendEnquiry", "Assessor", $"Send Enquiry") { Parent = detailsPage, RouteValues = new { id = selectedcase } };
@@ -312,7 +312,7 @@ namespace risk.control.system.Controllers.Company
 
                 var invoice = await invoiceService.GetInvoice(id);
                 ViewData["Currency"] = Extensions.GetCultureByCountry(invoice.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
-                var claimsPage = new MvcBreadcrumbNode("Assessor", "Assessor", "Claims");
+                var claimsPage = new MvcBreadcrumbNode("Assessor", "Assessor", "Cases");
                 var agencyPage = new MvcBreadcrumbNode("Approved", "Assessor", "Approved") { Parent = claimsPage, };
                 var detailsPage = new MvcBreadcrumbNode("ApprovedDetail", "Assessor", $"Details") { Parent = agencyPage, RouteValues = new { id = invoice.ClaimId } };
                 var editPage = new MvcBreadcrumbNode("ShowInvoice", "Assessor", $"Invoice") { Parent = detailsPage, RouteValues = new { id = id } };

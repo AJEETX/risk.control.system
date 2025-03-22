@@ -240,7 +240,7 @@ namespace risk.control.system.Controllers.Company
                 var invoice = await invoiceService.GetInvoice(id);
                 ViewData["Currency"] = Extensions.GetCultureByCountry(invoice.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
-                var claimsPage = new MvcBreadcrumbNode("Assessor", "Manager", "Claims");
+                var claimsPage = new MvcBreadcrumbNode("Assessor", "Manager", "Cases");
                 var agencyPage = new MvcBreadcrumbNode("Approved", "Manager", "Approved") { Parent = claimsPage, };
                 var detailsPage = new MvcBreadcrumbNode("ApprovedDetail", "Manager", $"Details") { Parent = agencyPage, RouteValues = new { id = invoice.ClaimId } };
                 var editPage = new MvcBreadcrumbNode("ShowInvoice", "Manager", $"Invoice") { Parent = detailsPage, RouteValues = new { id = id } };

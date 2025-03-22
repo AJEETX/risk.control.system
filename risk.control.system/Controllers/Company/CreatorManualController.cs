@@ -95,7 +95,7 @@ namespace risk.control.system.Controllers.Company
                     if (totalClaimsCreated >= companyUser.ClientCompany.TotalCreatedClaimAllowed)
                     {
                         userCanCreate = false;
-                        notifyService.Information($"MAX Claim limit = <b>{companyUser.ClientCompany.TotalCreatedClaimAllowed}</b> reached");
+                        notifyService.Information($"MAX Case limit = <b>{companyUser.ClientCompany.TotalCreatedClaimAllowed}</b> reached");
                     }
                     else
                     {
@@ -141,7 +141,7 @@ namespace risk.control.system.Controllers.Company
                 {
                     if (!model.AllowedToCreate)
                     {
-                        notifyService.Information($"MAX Claim limit = <b>{model.TotalCount}</b> reached");
+                        notifyService.Information($"MAX Case limit = <b>{model.TotalCount}</b> reached");
                     }
                     else
                     {

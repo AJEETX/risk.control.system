@@ -1,0 +1,42 @@
+﻿@model CaseVerification
+@{
+    ViewData["Title"] = "Delete";
+}
+<section class="content">
+    <div class="card card-secondary">
+        <div class="card-header">
+            <h3 class="card-title">
+                <i class="fas fa-new">Delete</i>
+            </h3>
+        </div>
+        <div class="card-body">
+            <div class="submit-progress hidden">
+                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+            </div>
+            <div class="row">
+                <partial name="Creator/_DeletePrePolicy" model="Model" />
+                <partial name="Creator/_DeleteClaimant" model="Model" />
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <form id="create-form" asp-controller="CreatorPre" asp-action="Delete">
+                        <input type="hidden" asp-for="CREATEDBY" value="@CREATEDBY.AUTO" />
+                        <a id="back" asp-action="New" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> Back</a>
+                        <input type="hidden" asp-for="CaseVerificationId" />
+                        <input type="submit" value="Delete" class="btn btn-danger" />
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script src="~/js/creator/delete-claim.js">
+    </script>
+}

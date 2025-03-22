@@ -25,7 +25,7 @@ using risk.control.system.Helpers;
 namespace risk.control.system.Controllers.Company
 {
     [Authorize(Roles = CREATOR.DISPLAY_NAME)]
-    [Breadcrumb(" Claims")]
+    [Breadcrumb(" Cases")]
     public class ClaimsActiveController : Controller
     {
         private readonly ApplicationDbContext _context;

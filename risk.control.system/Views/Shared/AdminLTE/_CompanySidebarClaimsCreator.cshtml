@@ -3,33 +3,17 @@
 
 @{
     <li class="nav-item">
-        <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("ClaimsActive","")
-                                                            @Url.MakeActiveClass("CreatorAuto","")
-                                                            @Url.MakeActiveClass("CreatorManual","")
-                                                    @Url.MakeActiveClass("ClaimsLog","") ">
+        <a is-active-page class="navlink-border nav-link  @Url.MakeActiveClass("CreatorAuto","")
+                                                            @Url.MakeActiveClass("CreatorManual","") 
+                                                                @Url.MakeActiveClass("ClaimsActive","") @Url.MakeActiveClass("ClaimsLog","")">
             <i class="nav-icon far fa-money-bill-alt"></i>
             <p class="sidebar-menu-header-label">
-                @Applicationsettings.INVESTIGATION_CLAIM
+                CASES
                 <i class="right fas fa-angle-right"></i>
             </p>
         </a>
     </li>
 
-    // <li class="nav-item">
-    //     <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Incomplete" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Incomplete")
-    //     @Url.MakeActiveClass("InsurancePolicy","CreatePolicy") @Url.MakeActiveClass("ClaimsInvestigation","Details")
-    //         @Url.MakeActiveClass("InsurancePolicy","Delete") @Url.MakeActiveClass("Beneficiary","Details")
-    //     @Url.MakeActiveClass("InsurancePolicy","EditPolicy") @Url.MakeActiveClass("InsuranceClaims","Index")
-    //     @Url.MakeActiveClass("CustomerInsurancePolicy","CreateCustomer") @Url.MakeActiveClass("CustomerInsurancePolicy","EditCustomer")
-    //             @Url.MakeActiveClass("Beneficiary","Create") @Url.MakeActiveClass("Beneficiary","Edit")
-    //     ">
-    //         <i class="far fa-edit nav-icon"></i>
-    //         <p>
-    //             <span class="badge badge-success">NEW & DRAFT </span>
-    //         </p>
-
-    //     </a>
-    // </li>
     if (Model.AutoAllocation)
     {
         <li class="nav-item">
@@ -45,6 +29,7 @@
                                 @Url.MakeActiveClass("CreatorAuto","CreateBeneficiary")
                                 @Url.MakeActiveClass("CreatorAuto","EditBeneficiary")
                             @Url.MakeActiveClass("CreatorAuto","Delete") 
+                            @Url.MakeActiveClass("CreatorAuto","EmpanelledVendors")
                             @Url.MakeActiveClass("CreatorManual","Details")
                                             @Url.MakeActiveClass("CreatorManual","Create")
                                         @Url.MakeActiveClass("CreatorManual","CreatePolicy")
@@ -58,7 +43,7 @@
                                     @Url.MakeActiveClass("CreatorManual","EmpanelledVendors")">
                 <i class="fas fa-random nav-icon"></i>
                 <p>
-                    <span class="badge badge-warning">ASSIGN
+                    <span class="badge badge-warning">ASSIGN</span>
                 </p>
             </a>
         </li>
@@ -86,46 +71,53 @@
             </a>
         </li>
     }
-    
-    // else
-    // {
-    //     <li class="nav-item">
-    //         <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Assigner" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Assigner")
-    //              @Url.MakeActiveClass("CustomerInsurancePolicy","EditCustomerManual") @Url.MakeActiveClass("ClaimsInvestigation","AllocateToVendor") @Url.MakeActiveClass("InsurancePolicy","EditPolicyManual")
-    //              @Url.MakeActiveClass("ClaimsInvestigation","DetailsManual") @Url.MakeActiveClass("InsurancePolicy","DeleteManual")
-    //              @Url.MakeActiveClass("ClaimsInvestigation", "VendorDetail")
-    //                     @Url.MakeActiveClass("InsuranceClaims","IndexManual")
-    //                             @Url.MakeActiveClass("CustomerInsurancePolicy","CreateCustomerManual")
-    //                         @Url.MakeActiveClass("InsurancePolicy","CreatePolicyManual")
-    //                                 @Url.MakeActiveClass("Beneficiary","CreateManual")
-    //                                 @Url.MakeActiveClass("Beneficiary","EditManual")">
-    //             <i class="fas fa-external-link-alt nav-icon"></i>
-    //             <p>
-    //                 <span class="badge badge-warning">ASSIGN</span>
-    //             </p>
-    //         </a>
-    //     </li>
-    //     <li class="nav-item">
-    //         <a is-active-page asp-controller="ClaimsInvestigation" asp-action="ReAssigner" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","ReAssigner")
-    //                 @Url.MakeActiveClass("InsurancePolicy","CreatePolicy") @Url.MakeActiveClass("ClaimsInvestigation","Details")
-    //             @Url.MakeActiveClass("InsurancePolicy","DeleteReAssigner") @Url.MakeActiveClass("Beneficiary","Details")
-    //         @Url.MakeActiveClass("InsurancePolicy","EditPolicy")
-    //         @Url.MakeActiveClass("InsuranceClaims","Index")
-    //         @Url.MakeActiveClass("CustomerInsurancePolicy","CreateCustomer") @Url.MakeActiveClass("CustomerInsurancePolicy","EditCustomer")
-    //                     @Url.MakeActiveClass("Beneficiary","Create") @Url.MakeActiveClass("Beneficiary","Edit")
-    //                      @Url.MakeActiveClass("ClaimsInvestigation","EmpanelledVendors")
-    //             @Url.MakeActiveClass("ClaimsInvestigation","ReAssign2EmpanelledVendors")">
-    //             <i class="fas fa-external-link-alt nav-icon"></i>
-    //             <p>
-    //                 <span class="badge badge-danger">REASSIGN</span>
-    //             </p>
-    //         </a>
-    //     </li>
-    // }
 
+
+    // <hr class="sidebar-divider">
+
+
+    // <li class="nav-item">
+    //     <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("Underwriting","")">
+    //         <i class="nav-icon fa fa-money"></i>
+    //         <p class="sidebar-menu-header-label">
+    //             UNDERWRITINGS
+    //             <i class="right fas fa-angle-right"></i>
+    //         </p>
+    //     </a>
+    // </li>
+
+    // <li class="nav-item">
+    //     <a is-active-page asp-controller="Underwriting" asp-action="New" class="actual-link nav-link
+    //                                 @Url.MakeActiveClass("Underwriting","New")
+    //                                 @Url.MakeActiveClass("Underwriting","Create")
+    //                                 @Url.MakeActiveClass("Underwriting","CreatePolicy")
+    //                             @Url.MakeActiveClass("Underwriting","EditPolicy")
+    //                                     @Url.MakeActiveClass("Underwriting","CreateCustomer")
+    //                                 @Url.MakeActiveClass("Underwriting","EditCustomer")
+    //                                     @Url.MakeActiveClass("Underwriting","CreateBeneficiary")
+    //                                     @Url.MakeActiveClass("Underwriting","EditBeneficiary")
+    //                                 @Url.MakeActiveClass("Underwriting","Delete")
+    //                                 @Url.MakeActiveClass("Underwriting","EmpanelledVendors")
+    //                                 @Url.MakeActiveClass("Underwriting","Details")">
+    //         <i class="fas fa-random nav-icon"></i>
+    //         <p>
+    //             <span class="badge badge-warning">ASSIGN</span>
+    //         </p>
+    //     </a>
+    // </li>
+
+    // <li class="nav-item">
+    //     <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("ClaimsActive","") @Url.MakeActiveClass("ClaimsLog","")">
+    //         <i class="nav-icon fa fa-toggle-on"></i><i class="nav-icon fa fa-upload"></i>
+    //         <p class="sidebar-menu-header-label">
+    //             ACTIVE/LOG
+    //             <i class="right fas fa-angle-right"></i>
+    //         </p>
+    //     </a>
+    // </li>
     <li class="nav-item">
         <a is-active-page asp-controller="ClaimsActive" asp-action="Active" class="actual-link nav-link @Url.MakeActiveClass("ClaimsActive","Active")
-                                            @Url.MakeActiveClass("ClaimsActive","ActiveDetail") ">
+                                                @Url.MakeActiveClass("ClaimsActive","ActiveDetail") ">
             <i class="fa fa-toggle-on nav-icon"></i>
             <p>
                 <span class="badge badge-primary">ACTIVE</span>
@@ -133,16 +125,6 @@
         </a>
     </li>
 
-    // <li class="nav-item">
-    //     <a is-active-page asp-controller="Report" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Report","Index")
-    //                                                 @Url.MakeActiveClass("Report","Detail") @Url.MakeActiveClass("Report","ShowInvoice")
-    //                                                                         @Url.MakeActiveClass("Report","PrintInvoice")">
-    //         <i class="fas fa-print nav-icon"></i>
-    //         <p>
-    //             <span class="badge badge-info"> COMPLETED </span>
-    //         </p>
-    //     </a>
-    // </li>
     <li class="nav-item">
         <a is-active-page asp-controller="ClaimsLog" asp-action="Uploads" class="actual-link nav-link @Url.MakeActiveClass("ClaimsLog","Uploads")">
             <i class="nav-icon fa fa-upload"></i>

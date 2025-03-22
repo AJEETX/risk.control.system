@@ -17,7 +17,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace risk.control.system.Controllers.Agency
 {
-    [Breadcrumb(" Claims")]
+    [Breadcrumb(" Cases")]
     [Authorize(Roles = $"{AGENCY_ADMIN.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME}")]
     public class SupervisorController : Controller
     {
@@ -345,7 +345,7 @@ namespace risk.control.system.Controllers.Agency
                 var invoice = await invoiceService.GetInvoice(id);
                 ViewData["Currency"] = Extensions.GetCultureByCountry(invoice.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
-                var claimsPage = new MvcBreadcrumbNode("Allocate", "SuperVisor", "Claims");
+                var claimsPage = new MvcBreadcrumbNode("Allocate", "SuperVisor", "Cases");
                 var agencyPage = new MvcBreadcrumbNode("Completed", "SuperVisor", "Completed") { Parent = claimsPage, };
                 var detailsPage = new MvcBreadcrumbNode("CompletedDetail", "SuperVisor", $"Details") { Parent = agencyPage, RouteValues = new { id = invoice.ClaimId } };
                 var editPage = new MvcBreadcrumbNode("ShowInvoice", "SuperVisor", $"Invoice") { Parent = detailsPage, RouteValues = new { id = id } };

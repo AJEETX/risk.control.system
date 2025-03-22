@@ -81,14 +81,14 @@ namespace risk.control.system.Controllers.Company
 
                     if (claims.Count == autoAllocatedClaims.Count)
                     {
-                        notifyService.Custom($"{autoAllocatedClaims.Count}/{claims.Count} claim(s) auto-assigned", 3, "green", "far fa-file-powerpoint");
+                        notifyService.Custom($"{autoAllocatedClaims.Count}/{claims.Count} case(s) auto-assigned", 3, "green", "far fa-file-powerpoint");
                     }
 
                     else if (claims.Count > autoAllocatedClaims.Count)
                     {
                         if (autoAllocatedClaims.Count > 0)
                         {
-                            notifyService.Custom($"{autoAllocatedClaims.Count}/{claims.Count} claim(s) auto-assigned", 3, "green", "far fa-file-powerpoint");
+                            notifyService.Custom($"{autoAllocatedClaims.Count}/{claims.Count} case(s) auto-assigned", 3, "green", "far fa-file-powerpoint");
                         }
 
                         var notAutoAllocated = claims.Except(autoAllocatedClaims)?.ToList();
@@ -99,7 +99,7 @@ namespace risk.control.system.Controllers.Company
 
                         notifyService.Custom($"{notAutoAllocated.Count}/{claims.Count} case(s) need assign manually", 3, "orange", "far fa-file-powerpoint");
                         
-                        return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto", new { mode = CREATEDBY.MANUAL });
+                        return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
                     }
                 }
                 else
@@ -180,11 +180,11 @@ namespace risk.control.system.Controllers.Company
                 {
                     if (model.ClaimsInvestigation.CREATEDBY == CREATEDBY.MANUAL)
                     {
-                        return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto", new { mode = CREATEDBY.MANUAL });
+                        return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
                     }
                     else
                     {
-                        return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto", new { mode = CREATEDBY.AUTO });
+                        return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
                     }
                 }
                 else 
@@ -222,15 +222,15 @@ namespace risk.control.system.Controllers.Company
 
                 if (reportUpdateStatus == AssessorRemarkType.OK)
                 {
-                    notifyService.Custom($"Policy #{contract} report approved", 3, "green", "far fa-file-powerpoint");
+                    notifyService.Custom($"Case #{contract} report approved", 3, "green", "far fa-file-powerpoint");
                 }
                 else if (reportUpdateStatus == AssessorRemarkType.REJECT)
                 {
-                    notifyService.Custom($"Policy #{contract} rejected", 3, "red", "far fa-file-powerpoint");
+                    notifyService.Custom($"Case #{contract} rejected", 3, "red", "far fa-file-powerpoint");
                 }
                 else
                 {
-                    notifyService.Custom($"Policy #{contract} reassigned", 3, "yellow", "far fa-file-powerpoint");
+                    notifyService.Custom($"Case #{contract} reassigned", 3, "yellow", "far fa-file-powerpoint");
                 }
 
                 return RedirectToAction(nameof(AssessorController.Assessor), "Assessor");

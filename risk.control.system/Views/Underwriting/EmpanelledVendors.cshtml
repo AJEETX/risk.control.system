@@ -1,0 +1,138 @@
+﻿@model ClaimsInvestigationVendorsModel
+
+@{
+    ViewData["Title"] = "Empanelled Agencies";
+}
+
+<section class="content">
+    <div id="article" class="card shadow-lg border-1 rounded-lg">
+        <div class="card-header bg-secondary text-white text-center">
+            <h3 class="card-title">
+                <i class="fas fa-tasks"></i> Empanelled Agencies
+                <span class="hover-text">
+                    <i class="fas fa-info-circle"></i>
+                    <span class="tooltip-text" id="information">
+                        <li>
+
+                            <i class='far fa-hand-point-right'></i> Claim: <b>
+                                <i class="far fa-file-powerpoint"></i>
+                                @Model.ClaimsInvestigation?.PolicyDetail?.ContractNumber
+                            </b>
+                        </li>
+                        <li>
+                            <i class='far fa-hand-point-right'></i> Select <strong><input type='radio' /></strong>
+                            <strong>AGENCY</strong>
+                        </li>
+                        <li>
+                            <i class='far fa-thumbs-up'></i>
+                            <button class='btn btn-danger btn-xs'><i class='fas fa-external-link-alt'></i> <b> Assign </b><sub>manual</sub></button>
+                        </li>
+
+                    </span>
+                </span>
+
+            </h3>
+        </div>
+        @{
+            ClaimTransactionModel detailedModel = new ClaimTransactionModel { };
+            if (Model.ClaimsInvestigation != null)
+            {
+                detailedModel.ClaimsInvestigation = Model.ClaimsInvestigation;
+                detailedModel.Location = Model.Location;
+            };
+        }
+        <article>
+            <input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail?.CustomerDetailId" />
+            <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
+            <input type="hidden" id="policyDetailId" value="@Model.ClaimsInvestigation?.PolicyDetail.PolicyDetailId" />
+            <input type="hidden" id="beneficiaryId" value="@Model.Location?.BeneficiaryDetailId" />
+            <div class="bb-blog-inner">
+                <div class="card shadow-lg border-1 rounded-lg collapsed-card">
+                    <div class="card-header bg-light">
+                        <h3 class="card-title">
+                            Claim: <span class="badge badge-light"><i class="far fa-file-powerpoint"></i>  @Model.ClaimsInvestigation?.PolicyDetail?.ContractNumber</span>
+                            <span class="hover-text">
+                                <i class="fas fa-info-circle"></i>
+                                <span class="tooltip-text" id="policy-information">
+                                    <li>
+                                        <i class='far fa-file-powerpoint'></i> Policy details.
+                                    </li>
+                                    <li>
+                                        <i class='fa fa-user-plus'></i> Customer details.
+                                    </li>
+                                    <li> <i class='fas fa-user-tie'></i> Beneficiary details </li>
+
+                                </span>
+                            </span>
+                        </h3>
+                        <div class="card-tools">
+                            <span data-toggle="tooltip" title="Claim # : @Model.ClaimsInvestigation?.PolicyDetail?.ContractNumber"> <i class='far fa-hand-point-right'></i> </span>
+                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="row">
+                            <partial name="Creator/_DeletePolicy" model="@detailedModel" />
+                            <partial name="Creator/_DeleteCustomer" model="@detailedModel" />
+                            <partial name="Creator/_DeleteBeneficiary" model="@detailedModel" />
+                        </div>
+                    </div>
+                </div>
+            </div> <!-- class bb-blog-inner -->
+        </article>
+
+        <form id="radioButtons" method="post" asp-controller="UnderwritingInvestigationPost" asp-action="CaseAllocatedToVendor">
+            <div class="card-body">
+                <div class="submit-progress hidden">
+                    <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+                </div>
+                <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
+                <input type="hidden" id="CaseLocationId" name="CaseLocationId" value="@Model.Location.BeneficiaryDetailId" />
+                <table id="customerTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
+                    <thead>
+                        <tr>
+                            <th data-orderable="false">
+                                <img class="action-image" src="~/headers/arrow-down.gif" title="Select Agency" alt="Select Agency" />
+                            </th>
+                            <th>Domain</th>
+                            <th data-orderable="false">
+                                <span> <i class="far fa-file-word"></i></span>
+                            </th>
+                            <th>Name</th>
+                            <th>Phone</th>
+                            <th>Address</th>
+                            <th>District</th>
+                            <th>State</th>
+                            <th>Country</th>
+                            <th>Current Case(s)</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+            <div class="card-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        @if(Model.ClaimsInvestigation.ClientCompany.AutoAllocation)
+                        {
+                            <a id="back" asp-controller="Underwriting" asp-action="New" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> Back</a>
+                        }
+                        else
+                        {
+                            <a id="back" asp-controller="CreatorManual" asp-action="New" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> Back</a>
+                        }
+                        <button disabled="disabled" id="allocatedcase" type="submit" class="btn btn-info">
+                            <i class="fas fa-external-link-alt" aria-hidden="true"></i> <b> Assign </b><sub>manual</sub>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+@section Scripts {
+    <script src="~/js/creator/get-empanelled-vendors.js"></script>
+    <script src="~/js/common/claim-details.js"></script>
+}

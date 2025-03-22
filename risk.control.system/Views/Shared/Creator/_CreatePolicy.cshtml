@@ -1,15 +1,14 @@
 ﻿@model risk.control.system.Models.ClaimsInvestigation
 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-<input type="hidden" asp-for="PolicyDetail.LineOfBusinessId" value="@ViewBag.LineOfBusinessId" />
 <div id="article" class="card shadow-lg border-1 rounded-lg">
     <div class="card-header bg-secondary text-white text-center">
         <h3 class="card-title">
-            <i class="far fa-file-powerpoint"></i> Add Policy
+            <i class="far fa-file-powerpoint"></i> Add Case
             <span class="hover-text">
                 <i class="fas fa-info-circle"></i>
                 <span class="tooltip-text" id="information">
                     <li>
-                        <i class='far fa-hand-point-right'></i> Add Policy details
+                        <i class='far fa-hand-point-right'></i> Add Case details
                     </li>
                     <li>
                         <i class='far fa-thumbs-up'></i> Complete wizard
@@ -48,7 +47,7 @@
             <div class="col-sm-6">
 
                 <div class="form-group">
-                    <label class="input-group-label"> Policy #:</label>
+                    <label class="input-group-label"> Case #:</label>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
                             <span class="input-group-text" asp-for="ContractNumber"><i class="far fa-file-powerpoint"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
@@ -78,31 +77,32 @@
                         <span asp-validation-for="PolicyDetail.ContractIssueDate" class="text-danger"></span>
                     </div>
                 </div>
+                
                 <div class="form-group">
-                    <label class="input-group-label"> Claim Type:</label>
+                    <label class="input-group-label"> Case Type:</label>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
-                            <span class="input-group-text" asp-for="ClaimType"><i class="nav-icon fas fa-file-invoice"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                            <span class="input-group-text" asp-for="LineOfBusinessId"><i class="nav-icon fas fa-tools"></i> <i class="fa fa-asterisk asterik-style"></i> </span>
                         </div>
-                        <select required asp-for="PolicyDetail.ClaimType" class="form-control remarks" asp-items="Html.GetEnumSelectList<ClaimType>()">
+                        <select id="LineOfBusinessId" required asp-for="PolicyDetail.LineOfBusinessId" class="form-control remarks" asp-items="ViewBag.LineOfBusinessId">
                             <option value="">--- SELECT ---</option>
                         </select>
-                        <span asp-validation-for="PolicyDetail.ClaimType" class="text-danger"></span>
+                        <span asp-validation-for="PolicyDetail.LineOfBusinessId" class="text-danger"></span>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="input-group-label"> Service Type:</label>
+                    <label class="input-group-label"> Verification Type:</label>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
                             <span class="input-group-text" asp-for="InvestigationServiceTypeId"><i class="nav-icon fas fa-tools"></i> <i class="fa fa-asterisk asterik-style"></i> </span>
                         </div>
-                        <select required asp-for="PolicyDetail.InvestigationServiceTypeId" class="form-control remarks" asp-items="ViewBag.InvestigationServiceTypeId">
+                        <select id="InvestigationServiceTypeId" required asp-for="PolicyDetail.InvestigationServiceTypeId" class="form-control remarks" asp-items="ViewBag.InvestigationServiceTypeId">
                             <option value="">--- SELECT ---</option>
                         </select>
                         <span asp-validation-for="PolicyDetail.InvestigationServiceTypeId" class="text-danger"></span>
                     </div>
                 </div>
-
+                
             </div>
             <div class="col-sm-6">
 
@@ -153,12 +153,12 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="input-group-label"> Policy Document:</label>
+                    <label class="input-group-label"> Case Document:</label>
                     <div class="input-group mb-3">
-                        <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="@Applicationsettings.NO_POLICY_IMAGE" data-toggle="tooltip" title="No Policy Document" />
+                        <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="@Applicationsettings.NO_POLICY_IMAGE" data-toggle="tooltip" title="No Case Document" />
                         <i class="fa fa-asterisk asterik-style"></i>
                         <input accept=".jpg,.jpeg,.png" asp-for="PolicyDetail.Document" type="file"
-                               class="form-control remarks document-image-input" id="createImageInput" data-preview-id="createProfileImage" required data-toggle="tooltip" title="Upload Policy Document"
+                               class="form-control remarks document-image-input" id="createImageInput" data-preview-id="createProfileImage" required data-toggle="tooltip" title="Upload Case Document"
                                data-default-image="@Applicationsettings.NO_POLICY_IMAGE" />
                     </div>
                 </div>
@@ -167,16 +167,13 @@
     </div>
     <div class="card-footer">
         <div class="text-right">
-            @*  <button id="reset" type="submit" onclick="clearAllInputs()" class="btn btn-outline-secondary">
-            <i class="fas fa-undo"></i> Reset
-            </button> *@
             <a id="cancel" asp-action="Create" class="btn btn-secondary">
                 <i class="fa fa-window-close"></i>
                 @Applicationsettings.CANCEL
             </a>
 
             <button disabled id="create" type="submit" class="btn btn-success">
-                <i class="far fa-file-powerpoint"></i> Add Policy
+                <i class="far fa-file-powerpoint"></i> Add Case
             </button>
 
         </div>

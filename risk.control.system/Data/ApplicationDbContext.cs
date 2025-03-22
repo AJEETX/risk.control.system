@@ -15,6 +15,8 @@ namespace risk.control.system.Data
         {
             base.OnModelCreating(builder);
         }
+        public virtual DbSet<CaseVerificationTransaction> CaseVerificationTransaction { get; set; }
+        public virtual DbSet<CaseVerification> CaseVerification { get; set; }
         public virtual DbSet<SmsNotification> SmsNotifications { get; set; }
         public virtual DbSet<StatusNotification> Notifications { get; set; }
         public virtual DbSet<RefreshTokenEntity> RefreshTokens { get; set; }

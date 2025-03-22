@@ -351,7 +351,7 @@ namespace risk.control.system.Controllers
                                 System.Net.WebClient client = new System.Net.WebClient();
                                 string tinyUrl = client.DownloadString(address);
 
-                                var message = $"Dear {user.FirstName}";
+                                var message = $"Dear {user.FirstName}, ";
                                 message += "                                                                                ";
                                 message += $"Click on link below to install the mobile app";
                                 message += "                                                                                ";

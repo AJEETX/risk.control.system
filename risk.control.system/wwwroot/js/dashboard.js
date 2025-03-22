@@ -1,29 +1,29 @@
 ﻿$(document).ready(function () {
-    GetWeekly('Claim', 'GetWeeklyClaim', 'container-claim');
-    GetWeeklyTat('Claim', 'GetClaimWeeklyTat', 'container-claim-tat');
-    GetWeeklyPie('Claim', 'GetWeeklyClaim', 'container-claim-pie');
+    GetWeekly('Case', 'GetWeeklyClaim', 'container-claim');
+    GetWeeklyTat('Case', 'GetClaimWeeklyTat', 'container-claim-tat');
+    GetWeeklyPie('Case', 'GetWeeklyClaim', 'container-claim-pie');
     GetWeeklyPie('Agency ', 'GetAgentClaim', 'container-agency-pie');
 
-    GetChart('Claim', 'GetClaimChart', 'container-monthly-claim')
+    GetChart('Case', 'GetClaimChart', 'container-monthly-claim')
 
     $("#btnWeeklyReport").click(function () {
-        GetWeekly('Claim', 'GetWeeklyClaim', 'container-claim');
+        GetWeekly('Case', 'GetWeeklyClaim', 'container-claim');
     })
 
     $("#btnMonthlyReport").click(function () {
-        GetMonthly('Claim', 'GetMonthlyClaim', 'container-claim');
+        GetMonthly('Case', 'GetMonthlyClaim', 'container-claim');
     })
     $("#btnWeeklyPie").click(function () {
-        GetWeeklyPie('Claim', 'GetWeeklyClaim', 'container-claim-pie');
+        GetWeeklyPie('Case', 'GetWeeklyClaim', 'container-claim-pie');
     })
     $("#btnMonthlyPie").click(function () {
-        GetMonthlyPie('Claim', 'GetMonthlyClaim', 'container-claim-pie');
+        GetMonthlyPie('Case', 'GetMonthlyClaim', 'container-claim-pie');
     })
     $("#btnWeeklyTat").click(function () {
-        GetWeeklyTat('Claim', 'GetClaimWeeklyTat', 'container-claim-tat');
+        GetWeeklyTat('Case', 'GetClaimWeeklyTat', 'container-claim-tat');
     })
     $("#btnMonthlyTat").click(function () {
-        //GetMonthly('Claim', 'GetClaimWeeklyTat', 'container-claim-tat');
+        //GetMonthly('Case', 'GetClaimWeeklyTat', 'container-claim-tat');
     })
 
     $('.details-page').on('click', function () {

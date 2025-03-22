@@ -123,6 +123,17 @@ namespace risk.control.system.Models
         HEALTH
     }
 
+    public enum InsuranceType
+    {
+        [Display(Name = "LIFE")]
+        [Description("Insurance type life")]
+        LIFE,
+
+        [Display(Name = "Health")]
+        [Description("Insurance type health")]
+        HEALTH
+    }
+
     public enum Gender
     {
         [Display(Name = "Male")]

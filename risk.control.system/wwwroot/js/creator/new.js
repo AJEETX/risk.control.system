@@ -1,5 +1,35 @@
 ﻿$(document).ready(function () {
+    $('a.create-policy').on('click', function () {
+        $("body").addClass("submit-progress-bg");
+        // Wrap in setTimeout so the UI
+        // can update the spinners
+        setTimeout(function () {
+            $(".submit-progress").removeClass("hidden");
+        }, 1);
 
+        $('a.create-policy').html("<i class='fas fa-sync fa-spin'></i> Add New");
+
+        // Disable all buttons, submit inputs, and anchors
+        $('button, input[type="submit"], a').prop('disabled', true);
+
+        // Add a class to visually indicate disabled state for anchors
+        $('a').addClass('disabled-anchor').on('click', function (e) {
+            e.preventDefault(); // Prevent default action for anchor clicks
+        });
+        $('a').attr('disabled', 'disabled');
+        $('button').attr('disabled', 'disabled');
+        $('html button').css('pointer-events', 'none');
+        $('html a').css({ 'pointer-events': 'none' }, { 'cursor': 'none' });
+        $('.text').css({ 'pointer-events': 'none' }, { 'cursor': 'none' });
+
+        var article = document.getElementById("article");
+        if (article) {
+            var nodes = article.getElementsByTagName('*');
+            for (var i = 0; i < nodes.length; i++) {
+                nodes[i].disabled = true;
+            }
+        }
+    });
     var table = $("#customerTableAuto").DataTable({
         ajax: {
             url: '/api/Creator/GetAuto',
@@ -30,7 +60,7 @@
                 className: 'max-width-column-name', // Apply the CSS class,
                 targets: 8                      // Index of the column to style
             }],
-        order: [[15, 'asc']],
+        order: [[14, 'asc']],
         fixedHeader: true,
         processing: true,
         paging: true,
@@ -43,11 +73,14 @@
             /* Name of the keys from
             data file source */
             {
-                "sDefaultContent": "<i class='far fa-edit' data-toggle='tooltip' title='Incomplete claim !!!'></i>",
+                "sDefaultContent": "<i class='far fa-edit' data-toggle='tooltip' title='Incomplete'></i>",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    if (row.ready2Assign) {
+                    if (row.ready2Assign && row.autoAllocated) {
                         var img = '<input class="vendors" name="claims" type="checkbox" id="' + row.id + '"  value="' + row.id + '"  data-toggle="tooltip" title="Ready to allocate(auto)" />';
+                        return img;
+                    } else if (row.ready2Assign && !row.autoAllocated) {
+                        var img = "<i class='fas fa-external-link-alt' data-toggle='tooltip' title='Assign manual'></i>";
                         return img;
                     }
                 }
@@ -146,13 +179,6 @@
                 }
             },
             {
-                "data": "service",
-                "mRender": function (data, type, row) {
-                    return '<span title="' + row.service + '" data-toggle="tooltip">' + data + '</span>'
-                }
-            },
-            
-            {
                 "data": "location",
                 "mRender": function (data, type, row) {
                     return '<span title="' + row.location + '" data-toggle="tooltip">' + data + '</span>'
@@ -172,6 +198,11 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
+                    if (row.ready2Assign) {
+                        buttons += '<a id="assign' + row.id + '" href="EmpanelledVendors?Id=' + row.id + '" class="btn btn-xs btn-info"><i class="fas fa-external-link-alt"></i> Assign</a>&nbsp;';
+                    } else {
+                        buttons += '<button disabled class="btn btn-xs btn-info"><i class="fas fa-external-link-alt"></i> Assign</button>&nbsp;';
+                    }
                     buttons += '<a id="edit' + row.id + '" href="Details?Id=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-pencil-alt"></i> Edit</a>&nbsp;'
                     buttons += '<a id="details' + row.id + '" href="Delete?Id=' + row.id + '" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i> Delete </a>'
                     return buttons;
@@ -187,6 +218,12 @@
             else {
                 $('#allocatedcase').prop('disabled', true);
             }
+            $('#customerTableAuto tbody').on('click', '.btn-info', function (e) {
+                e.preventDefault(); // Prevent the default anchor behavior
+                var id = $(this).attr('id').replace('assign', ''); // Extract the ID from the button's ID attribute
+                assign(id); // Call the getdetails function with the ID
+                window.location.href = $(this).attr('href'); // Navigate to the delete page
+            });
             $('#customerTableAuto tbody').on('click', '.btn-danger', function (e) {
                 e.preventDefault(); // Prevent the default anchor behavior
                 var id = $(this).attr('id').replace('details', ''); // Extract the ID from the button's ID attribute
@@ -464,8 +501,6 @@
 
     // Apply confirmation to both forms
     handleUploadConfirmation("#upload-claims", "#UploadFileButton");
-    handleUploadConfirmation("#upload-claims-manual", "#UploadFileButton");
-
 });
 
 function showedit(id) {
@@ -476,7 +511,7 @@ function showedit(id) {
         $(".submit-progress").removeClass("hidden");
     }, 1);
     
-    $('a#edit' + id + '.btn.btn-xs.btn-warning').html("<i class='fas fa-sync fa-spin'></i> EDIT");
+    $('a#edit' + id + '.btn.btn-xs.btn-warning').html("<i class='fas fa-sync fa-spin'></i> Edit");
 
     disableAllInteractiveElements();
 
@@ -498,6 +533,25 @@ function getdetails(id) {
    
 
     $('a#details' + id + '.btn.btn-xs.btn-danger').html("<i class='fas fa-sync fa-spin'></i> Delete");
+    disableAllInteractiveElements();
+    var article = document.getElementById("article");
+    if (article) {
+        var nodes = article.getElementsByTagName('*');
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].disabled = true;
+        }
+    }
+}
+function assign(id) {
+    $("body").addClass("submit-progress-bg");
+    // Wrap in setTimeout so the UI
+    // can update the spinners
+    setTimeout(function () {
+        $(".submit-progress").removeClass("hidden");
+    }, 1);
+
+
+    $('a#assign' + id + '.btn.btn-xs.btn-info').html("<i class='fas fa-sync fa-spin'></i> Assign");
     disableAllInteractiveElements();
     var article = document.getElementById("article");
     if (article) {

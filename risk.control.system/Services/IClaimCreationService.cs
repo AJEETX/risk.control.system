@@ -12,6 +12,7 @@ namespace risk.control.system.Services
 {
     public interface IClaimCreationService
     {
+        Task<CaseVerification> Create(string userEmail, CaseVerification claimsInvestigation, IFormFile? claimDocument);
         Task<ClaimsInvestigation> CreatePolicy(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? claimDocument);
 
         Task<ClaimsInvestigation> EdiPolicy(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? claimDocument);
@@ -24,6 +25,8 @@ namespace risk.control.system.Services
     }
     public class ClaimCreationService : IClaimCreationService
     {
+        private const string CLAIMS = "claims";
+        private const string UNDERWRITING = "underwriting";
         private readonly ApplicationDbContext context;
         private readonly ICustomApiCLient customApiCLient;
 
@@ -37,7 +40,8 @@ namespace risk.control.system.Services
             try
             {
                 var currentUser = context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
-                claimsInvestigation.ClientCompanyId = currentUser.ClientCompanyId;
+                var claimId = context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == CLAIMS).LineOfBusinessId;
+                var underwritingId = context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == UNDERWRITING).LineOfBusinessId;
 
                 if (claimDocument is not null)
                 {
@@ -50,6 +54,7 @@ namespace risk.control.system.Services
                 var createdSubStatusId = context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR).InvestigationCaseSubStatusId;
 
+                claimsInvestigation.PolicyDetail.ClaimType = claimsInvestigation.PolicyDetail.LineOfBusinessId == claimId ? ClaimType.DEATH : ClaimType.HEALTH;
                 claimsInvestigation.Updated = DateTime.Now;
                 claimsInvestigation.UserEmailActioned = userEmail;
                 claimsInvestigation.UserEmailActionedTo = userEmail;
@@ -90,6 +95,7 @@ namespace risk.control.system.Services
         {
             try
             {
+                var claimId = context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == CLAIMS).LineOfBusinessId;
                 var existingPolicy = await context.ClaimsInvestigation
                     .Include(c => c.PolicyDetail)
                     .Include(c => c.ClientCompany)
@@ -107,7 +113,7 @@ namespace risk.control.system.Services
                 existingPolicy.UpdatedBy = userEmail;
                 existingPolicy.CurrentUserEmail = userEmail;
                 existingPolicy.CurrentClaimOwner = userEmail;
-
+                existingPolicy.PolicyDetail.ClaimType = claimsInvestigation.PolicyDetail.LineOfBusinessId == claimId? ClaimType.DEATH: ClaimType.HEALTH;
                 if (claimDocument is not null)
                 {
                     using var dataStream = new MemoryStream();
@@ -321,6 +327,60 @@ namespace risk.control.system.Services
             {
                 Console.WriteLine(ex.StackTrace);
                 return null;
+            }
+        }
+
+        public async Task<CaseVerification> Create(string userEmail, CaseVerification caseVerification, IFormFile? claimDocument)
+        {
+            try
+            {
+                var currentUser = context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
+                caseVerification.ClientCompanyId = currentUser.ClientCompanyId;
+
+                if (claimDocument is not null)
+                {
+                    using var dataStream = new MemoryStream();
+                    claimDocument.CopyTo(dataStream);
+                    caseVerification.CustomerDetail.ProfilePicture = dataStream.ToArray();
+                }
+                var initiatedStatusId = context.InvestigationCaseStatus.FirstOrDefault(i =>
+                i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INITIATED).InvestigationCaseStatusId;
+                var createdSubStatusId = context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR).InvestigationCaseSubStatusId;
+
+                caseVerification.Updated = DateTime.Now;
+                caseVerification.UserEmailActioned = userEmail;
+                caseVerification.UserEmailActionedTo = userEmail;
+                caseVerification.UserRoleActionedTo = $"{currentUser.ClientCompany.Email}";
+                caseVerification.UpdatedBy = userEmail;
+                caseVerification.CurrentUserEmail = userEmail;
+                caseVerification.CurrentClaimOwner = currentUser.Email;
+                caseVerification.InvestigationCaseStatusId = initiatedStatusId;
+                caseVerification.InvestigationCaseSubStatusId = createdSubStatusId;
+                caseVerification.CreatorSla = currentUser.ClientCompany.CreatorSla;
+                caseVerification.ClientCompany = currentUser.ClientCompany;
+                var aaddedClaimId = context.CaseVerification.Add(caseVerification);
+                var log = new CaseVerificationTransaction
+                {
+                    CaseVerificationId = caseVerification.CaseVerificationId,
+                    UserEmailActioned = userEmail,
+                    UserEmailActionedTo = userEmail,
+                    UserRoleActionedTo = $"{currentUser.ClientCompany.Email}",
+                    CurrentClaimOwner = currentUser.Email,
+                    HopCount = 0,
+                    Time2Update = 0,
+                    InvestigationCaseStatusId = initiatedStatusId,
+                    InvestigationCaseSubStatusId = createdSubStatusId,
+                    UpdatedBy = userEmail,
+                };
+                context.CaseVerificationTransaction.Add(log);
+
+                return await context.SaveChangesAsync() > 0 ? caseVerification : null!;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                return null!;
             }
         }
     }

@@ -82,20 +82,20 @@ $(document).ready(function () {
     // Handle form submissions
     $('#create-form').submit(function (e) {
         handleFormSubmit(e, "create-form", askConfirmation, {
-            title: "Confirm Add Policy",
+            title: "Confirm Add Case",
             content: "Are you sure to add?",
             type: "green",
-            buttonText: "Add Policy",
+            buttonText: "Add Case",
             buttonClass: "btn-success"
         });
     });
 
     $('#edit-form').submit(function (e) {
         handleFormSubmit(e, "edit-form", askEditConfirmation, {
-            title: "Confirm Edit Policy",
+            title: "Confirm Edit Case",
             content: "Are you sure to save?",
             type: "orange",
-            buttonText: "Save Policy",
+            buttonText: "Save Case",
             buttonClass: "btn-warning"
         });
     });
@@ -114,7 +114,7 @@ $(document).ready(function () {
             $(".submit-progress").removeClass("hidden");
         }, 1);
 
-        $('#create-policy').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Add Policy");
+        $('#create-policy').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Add Case");
         disableAllInteractiveElements();
 
         var article = document.getElementById("article");
@@ -129,4 +129,26 @@ $(document).ready(function () {
     // Set max dates for contract and incident dates
     var maxDate = new Date().toISOString().split("T")[0];
     $("#ContractIssueDate, #DateOfIncident").attr("max", maxDate);
+
+    $("#LineOfBusinessId").on("change", function () {
+        var value = $(this).val();
+
+        if (value === '') {
+            // Clear and reset InvestigationServiceTypeId dropdown
+            $('#InvestigationServiceTypeId').empty();
+            $('#InvestigationServiceTypeId').append("<option value=''>--- SELECT ---</option>");
+        } else {
+            // Fetch investigation services via AJAX and populate the dropdown
+            $.get("/api/MasterData/GetInvestigationServicesByLineOfBusinessId", { LineOfBusinessId: value }, function (data) {
+                PopulateInvestigationServices("#InvestigationServiceTypeId", data, "<option>--- SELECT ---</option>");
+            });
+        }
+    });
 });
+function PopulateInvestigationServices(dropDownId, list, option) {
+    $(dropDownId).empty();
+    $(dropDownId).append(option)
+    $.each(list, function (index, row) {
+        $(dropDownId).append("<option value='" + row.investigationServiceTypeId + "'>" + row.name + "</option>")
+    });
+}

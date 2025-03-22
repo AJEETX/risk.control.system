@@ -22,34 +22,30 @@ namespace risk.control.system.Models
         [Display(Name = "Investigation type")]
         public InvestigationServiceType? InvestigationServiceType { get; set; } = default!;
 
-        [Display(Name = "Contract number")]
+        [Display(Name = "Case number")]
         public string ContractNumber { get; set; } = default!;
 
-        [Required]
         [Display(Name = "Case issue date")]
         [DataType(DataType.Date)]
         public DateTime ContractIssueDate { get; set; }
 
         [Display(Name = "Claim type")]
-        public ClaimType? ClaimType { get; set; }
+        public ClaimType? ClaimType { get; set; } = Models.ClaimType.DEATH;
+        public InsuranceType? InsuranceType { get; set; } = Models.InsuranceType.LIFE;
 
-        [Required]
         [Display(Name = "Date of incident")]
         [DataType(DataType.Date)]
         public DateTime DateOfIncident { get; set; }
 
-        [Required]
         [Display(Name = "Cause of loss")]
         public string CauseOfLoss { get; set; }
 
-        [Required]
         [Display(Name = "Sum assured value")]
         [Column(TypeName = "decimal(15,2)")]
         public decimal SumAssuredValue { get; set; }
 
-        [Required]
         [Display(Name = "Budget centre")]
-        public long CostCentreId { get; set; }
+        public long? CostCentreId { get; set; }
 
         [Display(Name = "Budget centre")]
         public CostCentre? CostCentre { get; set; }
@@ -59,23 +55,23 @@ namespace risk.control.system.Models
         [Display(Name = "Reason To Verify")]
         public CaseEnabler? CaseEnabler { get; set; }
 
-        [Display(Name = "Claim Document")]
+        [Display(Name = "Case Document")]
         [NotMapped]
         public IFormFile? Document { get; set; }
 
-        [Display(Name = "Claim Document")]
+        [Display(Name = "Case Document")]
         public byte[]? DocumentImage { get; set; } = default!;
 
-        [Display(Name = "Claim remarks")]
+        [Display(Name = "Case remarks")]
         public string? Comments { get; set; }
 
         public override string ToString()
         {
-            return $"Claim Information:\n" +
+            return $"Case Information:\n" +
            $"- Contract Number: {ContractNumber}\n" +
            $"- Line Of Business: {LineOfBusiness}\n" +
            $"- Investigation Service Type: {InvestigationServiceType}\n" +
-           $"- Contract Issue Date: ${ContractIssueDate}\n" +
+           $"- Case Issue Date: ${ContractIssueDate}\n" +
            $"- Claim Type: {ClaimType.GetEnumDisplayName()}\n" +
            $"- Date Of Incident: {DateOfIncident}\n" +
            $"- Cause Of Loss: {CauseOfLoss}\n" +

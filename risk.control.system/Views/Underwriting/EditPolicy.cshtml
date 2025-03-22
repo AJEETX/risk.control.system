@@ -1,0 +1,22 @@
+﻿@model risk.control.system.Models.ClaimsInvestigation
+
+@{
+    ViewData["Title"] = "Edit";
+
+    var hasClientCompany = @Model.HasClientCompany ? "none" : "";
+}
+<section class="content">
+    <form id="edit-form" method="post" asp-controller="UnderwritingPost" asp-action="EditPolicy" enctype="multipart/form-data">
+        <input type="hidden" asp-for="CREATEDBY" value="@CREATEDBY.AUTO" />
+        <partial name="Creator/_EditPolicy" model="Model" />
+        
+    </form>
+</section>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script src="~/js/creator/policy.js"></script>
+    <script src="~/js/common/profile-image-upload.js"></script>
+    <script src="~/js/common/form-validation.js"></script>
+}
