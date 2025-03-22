@@ -148,7 +148,7 @@ namespace risk.control.system.Controllers
         public JsonResult GetClaimChart()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
-            Dictionary<string, int> monthlyExpense = dashboardService.CalculateCaseChart(userEmail);
+            var monthlyExpense = dashboardService.CalculateCaseChart(userEmail);
             return new JsonResult(monthlyExpense);
         }
 

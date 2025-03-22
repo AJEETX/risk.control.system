@@ -113,6 +113,7 @@ namespace risk.control.system.Services
                 existingPolicy.UpdatedBy = userEmail;
                 existingPolicy.CurrentUserEmail = userEmail;
                 existingPolicy.CurrentClaimOwner = userEmail;
+                existingPolicy.PolicyDetail.LineOfBusinessId = claimsInvestigation.PolicyDetail.LineOfBusinessId;
                 existingPolicy.PolicyDetail.ClaimType = claimsInvestigation.PolicyDetail.LineOfBusinessId == claimId? ClaimType.DEATH: ClaimType.HEALTH;
                 if (claimDocument is not null)
                 {

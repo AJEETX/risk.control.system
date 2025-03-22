@@ -27,7 +27,7 @@ namespace risk.control.system.Services
 
         Dictionary<string, (int count1, int count2)> CalculateMonthlyCaseStatus(string userEmail);
 
-        Dictionary<string, int> CalculateCaseChart(string userEmail);
+        Dictionary<string, (int count1, int count2)> CalculateCaseChart(string userEmail);
 
         TatResult CalculateTimespan(string userEmail);
 
@@ -1083,24 +1083,21 @@ namespace risk.control.system.Services
             {
                 if (claimsCase.BeneficiaryDetail?.BeneficiaryDetailId > 0)
                 {
-                    if (claimsCase.VendorId.HasValue)
-                    {
-                        if (claimsCase.InvestigationCaseSubStatusId == allocatedStatus.InvestigationCaseSubStatusId ||
+                    if (claimsCase.VendorId.HasValue && (claimsCase.InvestigationCaseSubStatusId == allocatedStatus.InvestigationCaseSubStatusId ||
                                 claimsCase.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId ||
                                 claimsCase.InvestigationCaseSubStatusId == enquiryStatus.InvestigationCaseSubStatusId ||
-                                claimsCase.InvestigationCaseSubStatusId == submitted2SuperStatus.InvestigationCaseSubStatusId
+                                claimsCase.InvestigationCaseSubStatusId == submitted2SuperStatus.InvestigationCaseSubStatusId)
                                 )
+                    {
+                        if (!vendorCaseCount.TryGetValue(claimsCase.VendorId.Value.ToString(), out countOfCases))
                         {
-                            if (!vendorCaseCount.TryGetValue(claimsCase.VendorId.Value.ToString(), out countOfCases))
-                            {
-                                vendorCaseCount.Add(claimsCase.VendorId.Value.ToString(), 1);
-                            }
-                            else
-                            {
-                                int currentCount = vendorCaseCount[claimsCase.VendorId.Value.ToString()];
-                                ++currentCount;
-                                vendorCaseCount[claimsCase.VendorId.Value.ToString()] = currentCount;
-                            }
+                            vendorCaseCount.Add(claimsCase.VendorId.Value.ToString(), 1);
+                        }
+                        else
+                        {
+                            int currentCount = vendorCaseCount[claimsCase.VendorId.Value.ToString()];
+                            ++currentCount;
+                            vendorCaseCount[claimsCase.VendorId.Value.ToString()] = currentCount;
                         }
                     }
                 }
@@ -1195,9 +1192,9 @@ namespace risk.control.system.Services
             return vendorCaseCount;
         }
 
-        public Dictionary<string, int> CalculateCaseChart(string userEmail)
+        public Dictionary<string, (int count1, int count2)> CalculateCaseChart(string userEmail)
         {
-            Dictionary<string, int> dictMonthlySum = new Dictionary<string, int>();
+            Dictionary<string, (int count1, int count2)> dictMonthlySum = new Dictionary<string, (int count1, int count2)>();
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
             var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
             var startDate = new DateTime(DateTime.Now.Year, 1, 1);
@@ -1223,18 +1220,29 @@ namespace risk.control.system.Services
 
                 foreach (var monthName in months)
                 {
-                    var casesWithSameStatus = new List<InvestigationTransaction> { };
+                    var claimsWithSameStatus = new List<InvestigationTransaction> { };
+                    var underwritingWithSameStatus = new List<InvestigationTransaction> { };
 
                     foreach (var _case in cases)
                     {
                         var caseCurrentStatus = _case.OrderByDescending(o => o.Created).FirstOrDefault();
-                        if (userSubStatuses.Contains(caseCurrentStatus.InvestigationCaseSubStatusId) && caseCurrentStatus.Created > monthName.Date && caseCurrentStatus.Created <= monthName.AddMonths(1))
+                        if (userSubStatuses.Contains(caseCurrentStatus.InvestigationCaseSubStatusId) && 
+                            caseCurrentStatus.Created > monthName.Date && 
+                            caseCurrentStatus.Created <= monthName.AddMonths(1))
                         {
-                            casesWithSameStatus.Add(caseCurrentStatus);
+
+                            if (caseCurrentStatus.ClaimsInvestigation.PolicyDetail.LineOfBusinessId == claimLineOfBusinessId)
+                            {
+                                claimsWithSameStatus.Add(caseCurrentStatus);
+                            }
+                            else if (caseCurrentStatus.ClaimsInvestigation.PolicyDetail.LineOfBusinessId == underwritingLineOfBusinessId)
+                            {
+                                underwritingWithSameStatus.Add(caseCurrentStatus);
+                            }
                         }
                     }
 
-                    dictMonthlySum.Add(monthName.ToString("MMM"), casesWithSameStatus.Count);
+                    dictMonthlySum.Add(monthName.ToString("MMM"), (claimsWithSameStatus.Count, underwritingWithSameStatus.Count));
                 }
             }
             else if (vendorUser != null)
@@ -1260,18 +1268,26 @@ namespace risk.control.system.Services
 
                 foreach (var monthName in months)
                 {
-                    var casesWithSameStatus = new List<InvestigationTransaction> { };
+                    var claimsWithSameStatus = new List<InvestigationTransaction> { };
+                    var underwritingWithSameStatus = new List<InvestigationTransaction> { };
 
                     foreach (var _case in cases)
                     {
                         var caseCurrentStatus = _case.OrderByDescending(o => o.Created).FirstOrDefault();
                         if (userSubStatuses.Contains(caseCurrentStatus.InvestigationCaseSubStatusId) && caseCurrentStatus.Created > monthName.Date && caseCurrentStatus.Created <= monthName.AddMonths(1))
                         {
-                            casesWithSameStatus.Add(caseCurrentStatus);
+                            if (caseCurrentStatus.ClaimsInvestigation.PolicyDetail.LineOfBusinessId == claimLineOfBusinessId)
+                            {
+                                claimsWithSameStatus.Add(caseCurrentStatus);
+                            }
+                            else if (caseCurrentStatus.ClaimsInvestigation.PolicyDetail.LineOfBusinessId == underwritingLineOfBusinessId)
+                            {
+                                underwritingWithSameStatus.Add(caseCurrentStatus);
+                            }
                         }
                     }
 
-                    dictMonthlySum.Add(monthName.ToString("MMM"), casesWithSameStatus.Count);
+                    dictMonthlySum.Add(monthName.ToString("MMM"), (claimsWithSameStatus.Count, underwritingWithSameStatus.Count));
                 }
             }
             return dictMonthlySum;
