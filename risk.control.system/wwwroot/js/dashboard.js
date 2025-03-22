@@ -91,7 +91,7 @@ function createCharts(container, txn, sum, titleText, totalspent) {
         }]
     });
 }
-function createChartColumn(container, txn, sum, titleText, totalspent) {
+function createChartColumn(container, txn, sum1, sum2, titleText, totalspent) {
     Highcharts.chart(container, {
         credits: {
             enabled: false
@@ -107,7 +107,7 @@ function createChartColumn(container, txn, sum, titleText, totalspent) {
             }
         },
         xAxis: {
-            type: 'category',
+            categories: [...new Set([...sum1.map(item => item[0]), ...sum2.map(item => item[0])])],
             labels: {
                 rotation: -45,
                 style: {
@@ -123,15 +123,25 @@ function createChartColumn(container, txn, sum, titleText, totalspent) {
             }
         },
         legend: {
-            enabled: false
+            enabled: true
         },
         tooltip: {
-            pointFormat: 'Total ' + txn + ': Count <b>{point.y} </b>'
+            shared: true
         },
-        series: [{
-            type: 'column',
-            data: sum,
-        }]
+        series: [
+            {
+                name: 'Count 1',
+                type: 'column',
+                data: sum1.map(item => item[1]), // Extract count1 values
+                color: '#1f77b4' // Blue
+            },
+            {
+                name: 'Count 2',
+                type: 'column',
+                data: sum2.map(item => item[1]), // Extract count2 values
+                color: '#ff7f0e' // Orange
+            }
+        ]
     });
 }
 function createMonthChart(container, titleText, data, keys, total) {
@@ -194,7 +204,7 @@ function GetChart(title, url, container) {
 }
 
 function GetWeekly(title, url, container) {
-    var titleMessage = "All Current " + title + ":Grouped by status";
+    var titleMessage = "All Current " + title + ": Grouped by status";
     $.ajax({
         type: "GET",
         url: "/Dashboard/" + url,
@@ -203,19 +213,24 @@ function GetWeekly(title, url, container) {
         success: function (result) {
             if (result) {
                 var keys = Object.keys(result);
-                var weeklydata = new Array();
+                var weeklydata1 = [];
+                var weeklydata2 = [];
                 var totalspent = 0.0;
+
                 for (var i = 0; i < keys.length; i++) {
-                    var arrL = new Array();
-                    arrL.push(keys[i]);
-                    arrL.push(result[keys[i]]);
-                    totalspent += result[keys[i]];
-                    weeklydata.push(arrL);
+                    if (keys[i].includes("count1")) {
+                        weeklydata1.push([keys[i].replace("count1", ""), result[keys[i]]]);
+                        totalspent += result[keys[i]];
+                    } else if (keys[i].includes("count2")) {
+                        weeklydata2.push([keys[i].replace("count2", ""), result[keys[i]]]);
+                        totalspent += result[keys[i]];
+                    }
                 }
-                createChartColumn(container, title, weeklydata, titleMessage, totalspent);
+
+                createChartColumn(container, title, weeklydata1, weeklydata2, titleMessage, totalspent);
             }
         }
-    })
+    });
 }
 function GetWeeklyPie(title, url, container) {
     var titleMessage = "All Current " + title + ":Count";
@@ -254,16 +269,21 @@ function GetMonthly(title, url, container) {
         success: function (result) {
             if (result) {
                 var keys = Object.keys(result);
-                var monthlydata = new Array();
+                var weeklydata1 = [];
+                var weeklydata2 = [];
                 var totalspent = 0.0;
+
                 for (var i = 0; i < keys.length; i++) {
-                    var arrL = new Array();
-                    arrL.push(keys[i]);
-                    arrL.push(result[keys[i]]);
-                    totalspent += result[keys[i]];
-                    monthlydata.push(arrL);
+                    if (keys[i].includes("count1")) {
+                        weeklydata1.push([keys[i].replace("count1", ""), result[keys[i]]]);
+                        totalspent += result[keys[i]];
+                    } else if (keys[i].includes("count2")) {
+                        weeklydata2.push([keys[i].replace("count2", ""), result[keys[i]]]);
+                        totalspent += result[keys[i]];
+                    }
                 }
-                createChartColumn(container, title, monthlydata, titleMessage, totalspent);
+
+                createChartColumn(container, title, weeklydata1, weeklydata2, titleMessage, totalspent);
             }
         }
     })

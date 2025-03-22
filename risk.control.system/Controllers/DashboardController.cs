@@ -134,14 +134,14 @@ namespace risk.control.system.Controllers
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            Dictionary<string, int> monthlyExpense = dashboardService.CalculateMonthlyCaseStatus(userEmail);
+            var monthlyExpense = dashboardService.CalculateMonthlyCaseStatus(userEmail);
             return new JsonResult(monthlyExpense);
         }
 
         public JsonResult GetWeeklyClaim()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
-            Dictionary<string, int> monthlyExpense = dashboardService.CalculateWeeklyCaseStatus(userEmail);
+            var monthlyExpense = dashboardService.CalculateWeeklyCaseStatus(userEmail);
             return new JsonResult(monthlyExpense);
         }
 
