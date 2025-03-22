@@ -82,7 +82,7 @@ namespace risk.control.system.Controllers.Agency
                 
                 await mailboxService.NotifyClaimAssignmentToVendorAgent(currentUserEmail, claimId, vendorAgent.Email, vendorAgent.VendorId.Value);
 
-                notifyService.Custom($"Claim #{claim.PolicyDetail.ContractNumber} tasked to {vendorAgent.Email}", 3, "green", "far fa-file-powerpoint");
+                notifyService.Custom($"Case #{claim.PolicyDetail.ContractNumber} tasked to {vendorAgent.Email}", 3, "green", "far fa-file-powerpoint");
 
                 return RedirectToAction(nameof(SupervisorController.Allocate), "Supervisor");
             }
@@ -147,7 +147,7 @@ namespace risk.control.system.Controllers.Agency
 
                 await mailboxService.NotifyClaimReportSubmitToVendorSupervisor(currentUserEmail, claimId);
 
-                notifyService.Custom($"Claim # {contract}report submitted to supervisor", 3, "green", "far fa-file-powerpoint");
+                notifyService.Custom($"Case #{contract}report submitted", 3, "green", "far fa-file-powerpoint");
 
                 return RedirectToAction(nameof(AgentController.Index), "Agent");
             }
@@ -189,11 +189,11 @@ namespace risk.control.system.Controllers.Agency
 
                     await mailboxService.NotifyClaimReportSubmitToCompany(userEmail, claimId);
 
-                    notifyService.Custom($"Claim #{success.PolicyDetail.ContractNumber}  report submitted to Company", 3, "green", "far fa-file-powerpoint");
+                    notifyService.Custom($"Case #{success.PolicyDetail.ContractNumber}  report submitted to Company", 3, "green", "far fa-file-powerpoint");
                 }
                 else
                 {
-                    notifyService.Custom($"Claim #{success.PolicyDetail.ContractNumber}  report sent to review", 3, "orange", "far fa-file-powerpoint");
+                    notifyService.Custom($"Case #{success.PolicyDetail.ContractNumber}  report sent to review", 3, "orange", "far fa-file-powerpoint");
                 }
                 return RedirectToAction(nameof(SupervisorController.ClaimReport), "Supervisor");
             }
@@ -229,7 +229,7 @@ namespace risk.control.system.Controllers.Agency
 
                 await mailboxService.NotifyClaimWithdrawlToCompany(userEmail, claimId);
 
-                notifyService.Custom($"Claim #{policyNumber}  declined successfully", 3, "red", "far fa-file-powerpoint");
+                notifyService.Custom($"Case #{policyNumber}  declined successfully", 3, "red", "far fa-file-powerpoint");
 
                 return RedirectToAction(nameof(SupervisorController.Allocate), "Supervisor");
             }

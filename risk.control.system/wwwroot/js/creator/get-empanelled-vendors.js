@@ -262,9 +262,9 @@
         if (askConfirmation) {
             e.preventDefault(); $.confirm({
                 title: "Confirm Assign", content: "Are you sure ?",
-                icon: 'fas fa-external-link-alt', type: 'red', closeIcon: true, buttons: {
+                icon: 'fas fa-external-link-alt', type: 'blue', closeIcon: true, buttons: {
                     confirm: {
-                        text: "Assign <sub>manual</sub>", btnClass: 'btn-danger', action: function () {
+                        text: "Assign <sub>manual</sub>", btnClass: 'btn-info', action: function () {
                             askConfirmation = false;
                             $("body").addClass("submit-progress-bg");
                             // Wrap in setTimeout so the UI

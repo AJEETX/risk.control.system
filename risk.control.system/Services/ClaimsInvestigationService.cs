@@ -231,6 +231,8 @@ namespace risk.control.system.Services
                     claimsInvestigation.CurrentClaimOwner = currentUser.Email;
                     claimsInvestigation.AssignedToAgency = false;
                     claimsInvestigation.IsReady2Assign = true;
+                    claimsInvestigation.CREATEDBY = CREATEDBY.MANUAL;
+                    claimsInvestigation.AutoAllocated = false;
                     claimsInvestigation.InvestigationCaseSubStatusId = assigned.InvestigationCaseSubStatusId;
 
 

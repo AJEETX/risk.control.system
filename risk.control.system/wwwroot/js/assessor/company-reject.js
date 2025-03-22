@@ -22,7 +22,7 @@
                 className: 'max-width-column-name', // Apply the CSS class,
                 targets: 10                      // Index of the column to style
             }],
-        order: [[16, 'asc']],
+        order: [[14, 'asc']],
         fixedHeader: true,
         processing: true,
         paging: true,
@@ -132,12 +132,7 @@
                     return '<span title="' + row.serviceType + '" data-toggle="tooltip">' + data + '</span>'
                 }
             },
-            {
-                "data": "service",
-                "mRender": function (data, type, row) {
-                    return '<span title="' + row.service + '" data-toggle="tooltip">' + data + '</span>'
-                }
-            },
+           
             {
                 "data": "created",
                 "mRender": function (data, type, row) {

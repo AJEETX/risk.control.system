@@ -28,11 +28,11 @@
         <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
             <div class="card bg-light d-flex flex-fill">
                 <div class="card-header bg-light border-bottom">
-                    <i class="far fa-file-powerpoint"></i> Policy Details
+                    <i class="far fa-file-powerpoint"></i> Case Details
                     <span class="hover-text">
                         <i class="fas fa-info-circle"></i>
                         <span class="tooltip-text" id="policy-information">
-                            <i class='far fa-file-powerpoint'></i> Add Policy details
+                            <i class='far fa-file-powerpoint'></i> Add Case details
                         </span>
                     </span>
                 </div>
@@ -45,7 +45,7 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-7">
-                            <h2 class="lead"><b>Policy #: ...</b></h2>
+                            <h2 class="lead"><b>Case #: ...</b></h2>
                             <p class="text-muted text-sm">
                                 <b>Claim Type: </b>...
                             </p>
@@ -66,7 +66,7 @@
                                     <span class="fa-li">
                                         <i class="fas fa-tools"></i>
                                     </span>
-                                    Service Type: ...
+                                    Verification Type: ...
                                 </li>
                                 <li class="small">
                                     <span class="fa-li">
@@ -81,12 +81,7 @@
                                     </span>
                                     Cause: ...
                                 </li>
-                                <li class="small">
-                                    <span class="fa-li">
-                                        <i class="fas fas fa-puzzle-piece"></i>
-                                    </span>
-                                    Reason: ...
-                                </li>
+                                
                                 <li class="small">
                                     <span class="fa-li">
                                         <i class="fas fa-money-check-alt"></i>
@@ -97,7 +92,7 @@
                             </ul>
                         </div>
                         <div class="col-5 text-center">
-                            <img id="documentImage" alt="policy-image" class="img-fluid form-Image" src=@Applicationsettings.POLICY_BLANK_IMAGE data-toggle="tooltip" title="Policy Document" />
+                            <img id="documentImage" alt="policy-image" class="img-fluid form-Image" src=@Applicationsettings.POLICY_BLANK_IMAGE data-toggle="tooltip" title="Case Document" />
                         </div>
                     </div>
                 </div>
@@ -105,11 +100,11 @@
                     <div class="text-right">
                         @if (Model.AllowedToCreate)
                         {
-                            <a id="create-policy" class="btn btn-success" asp-action="CreatePolicy"><i class="far fa-file-powerpoint"></i> Add Policy</a>
+                            <a id="create-policy" class="btn btn-success" asp-action="CreatePolicy"><i class="far fa-file-powerpoint"></i> Add Case</a>
                         }
                         else
                         {
-                            <button disabled id="create-policy" class="btn btn-secondary"><i class="far fa-file-powerpoint"></i> Add Policy</button>
+                            <button disabled id="create-policy" class="btn btn-secondary"><i class="far fa-file-powerpoint"></i> Add Case</button>
                         }
                     </div>
                 </div>

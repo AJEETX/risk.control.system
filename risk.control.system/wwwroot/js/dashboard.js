@@ -1,29 +1,29 @@
 ﻿$(document).ready(function () {
-    GetWeekly('Claim', 'GetWeeklyClaim', 'container-claim');
-    GetWeeklyTat('Claim', 'GetClaimWeeklyTat', 'container-claim-tat');
-    GetWeeklyPie('Claim', 'GetWeeklyClaim', 'container-claim-pie');
+    GetWeekly('Case', 'GetWeeklyClaim', 'container-claim');
+    GetWeeklyTat('Case', 'GetClaimWeeklyTat', 'container-claim-tat');
+    GetWeeklyPie('Case', 'GetWeeklyClaim', 'container-claim-pie');
     GetWeeklyPie('Agency ', 'GetAgentClaim', 'container-agency-pie');
 
-    GetChart('Claim', 'GetClaimChart', 'container-monthly-claim')
+    GetChart('Case', 'GetClaimChart', 'container-monthly-claim')
 
     $("#btnWeeklyReport").click(function () {
-        GetWeekly('Claim', 'GetWeeklyClaim', 'container-claim');
+        GetWeekly('Case', 'GetWeeklyClaim', 'container-claim');
     })
 
     $("#btnMonthlyReport").click(function () {
-        GetMonthly('Claim', 'GetMonthlyClaim', 'container-claim');
+        GetMonthly('Case', 'GetMonthlyClaim', 'container-claim');
     })
     $("#btnWeeklyPie").click(function () {
-        GetWeeklyPie('Claim', 'GetWeeklyClaim', 'container-claim-pie');
+        GetWeeklyPie('Case', 'GetWeeklyClaim', 'container-claim-pie');
     })
     $("#btnMonthlyPie").click(function () {
-        GetMonthlyPie('Claim', 'GetMonthlyClaim', 'container-claim-pie');
+        GetMonthlyPie('Case', 'GetMonthlyClaim', 'container-claim-pie');
     })
     $("#btnWeeklyTat").click(function () {
-        GetWeeklyTat('Claim', 'GetClaimWeeklyTat', 'container-claim-tat');
+        GetWeeklyTat('Case', 'GetClaimWeeklyTat', 'container-claim-tat');
     })
     $("#btnMonthlyTat").click(function () {
-        //GetMonthly('Claim', 'GetClaimWeeklyTat', 'container-claim-tat');
+        //GetMonthly('Case', 'GetClaimWeeklyTat', 'container-claim-tat');
     })
 
     $('.details-page').on('click', function () {
@@ -48,7 +48,7 @@
 });
 
 
-function createCharts(container, txn, sum, titleText, totalspent) {
+function createCharts(container, txn, sum1, sum2, titleText, totalspent) {
     Highcharts.chart(container, {
         credits: {
             enabled: false
@@ -63,35 +63,37 @@ function createCharts(container, txn, sum, titleText, totalspent) {
                 fontFamily: 'Arial Narrow, sans-serif'
             }
         },
-        xAxis: {
-            type: 'category',
-            labels: {
-                rotation: -45,
-                style: {
-                    fontSize: '12px',
-                    fontFamily: 'Arial Narrow, sans-serif'
+        tooltip: {
+            pointFormat: '{series.name}: <b>{point.y}</b> ({point.percentage:.1f}%)'
+        },
+        plotOptions: {
+            pie: {
+                allowPointSelect: true,
+                cursor: 'pointer',
+                dataLabels: {
+                    enabled: true,
+                    format: '<b>{point.name}</b>: {point.y}'
                 }
             }
         },
-        yAxis: {
-            min: 0,
-            title: {
-                text: txn + ' Count'
+        series: [
+            {
+                name: 'claims',
+                type: 'pie',
+                data: sum1,
+                colorByPoint: true
+            },
+            {
+                name: 'underwriting',
+                type: 'pie',
+                data: sum2,
+                colorByPoint: true
             }
-        },
-        legend: {
-            enabled: false
-        },
-        tooltip: {
-            pointFormat: 'Total ' + txn + ': Count <b>{point.y} </b>'
-        },
-        series: [{
-            type: 'pie',
-            data: sum,
-        }]
+        ]
     });
 }
-function createChartColumn(container, txn, sum, titleText, totalspent) {
+
+function createChartColumn(container, txn, sum1, sum2, titleText, totalspent) {
     Highcharts.chart(container, {
         credits: {
             enabled: false
@@ -107,7 +109,7 @@ function createChartColumn(container, txn, sum, titleText, totalspent) {
             }
         },
         xAxis: {
-            type: 'category',
+            categories: [...new Set([...sum1.map(item => item[0]), ...sum2.map(item => item[0])])],
             labels: {
                 rotation: -45,
                 style: {
@@ -123,24 +125,34 @@ function createChartColumn(container, txn, sum, titleText, totalspent) {
             }
         },
         legend: {
-            enabled: false
+            enabled: true
         },
         tooltip: {
-            pointFormat: 'Total ' + txn + ': Count <b>{point.y} </b>'
+            shared: true
         },
-        series: [{
-            type: 'column',
-            data: sum,
-        }]
+        series: [
+            {
+                name: 'claims',
+                type: 'column',
+                data: sum1.map(item => item[1]), // Extract count1 values
+                color: '#1f77b4' // Blue
+            },
+            {
+                name: 'underwriting',
+                type: 'column',
+                data: sum2.map(item => item[1]), // Extract count2 values
+                color: '#ff7f0e' // Orange
+            }
+        ]
     });
 }
-function createMonthChart(container, titleText, data, keys, total) {
+function createMonthChart(container, titleText, data1, data2, keys, total) {
     Highcharts.chart(container, {
         credits: {
             enabled: false
         },
         chart: {
-            marginRight: 0
+            type: 'column' // Can be changed to 'line' if needed
         },
         title: {
             text: 'Total ' + titleText + ' Count ' + total,
@@ -149,24 +161,38 @@ function createMonthChart(container, titleText, data, keys, total) {
                 fontFamily: 'Arial Narrow, sans-serif'
             }
         },
-        legend: {
-            enabled: false
-        },
         xAxis: {
-            categories: keys
+            categories: keys, // Month names or categories
+            crosshair: true
         },
         yAxis: {
             min: 0,
             title: {
-                text: ' Count'
+                text: 'Count'
             }
         },
-        series: [{
-            data: data,
-            color: 'green'
-        }]
+        tooltip: {
+            shared: true,
+            pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b><br/>'
+        },
+        legend: {
+            enabled: true
+        },
+        series: [
+            {
+                name: 'claims',
+                data: data1,
+                color: '#1f77b4' // Blue
+            },
+            {
+                name: 'underwriting',
+                data: data2,
+                color: '#ff7f0e' // Orange
+            }
+        ]
     });
 }
+
 
 function GetChart(title, url, container) {
     var titleMessage = "Last 12 month " + title + ":Count";
@@ -178,23 +204,27 @@ function GetChart(title, url, container) {
         success: function (result) {
             if (result) {
                 var keys = Object.keys(result);
-                var weeklydata = new Array();
+                var weeklydata1 = [];
+                var weeklydata2 = [];
                 var totalspent = 0.0;
-                for (var i = 0; i < keys.length; i++) {
-                    var arrL = new Array();
-                    arrL.push(keys[i]);
-                    arrL.push(result[keys[i]]);
-                    totalspent += result[keys[i]];
-                    weeklydata.push(arrL);
-                }
-                createMonthChart(container, title, weeklydata, keys, totalspent);
+
+                Object.keys(result).forEach(key => {
+                    var count1 = result[key].item1 || 0; // Extract count1
+                    var count2 = result[key].item2 || 0; // Extract count2
+
+                    weeklydata1.push([key, count1]);
+                    weeklydata2.push([key, count2]);
+
+                    totalspent += count1 + count2;
+                });
+                createMonthChart(container, title, weeklydata1, weeklydata2, keys, totalspent);
             }
         }
     })
 }
 
 function GetWeekly(title, url, container) {
-    var titleMessage = "All Current " + title + ":Grouped by status";
+    var titleMessage = "All Current " + title + ": Grouped by status";
     $.ajax({
         type: "GET",
         url: "/Dashboard/" + url,
@@ -203,19 +233,24 @@ function GetWeekly(title, url, container) {
         success: function (result) {
             if (result) {
                 var keys = Object.keys(result);
-                var weeklydata = new Array();
+                var weeklydata1 = [];
+                var weeklydata2 = [];
                 var totalspent = 0.0;
-                for (var i = 0; i < keys.length; i++) {
-                    var arrL = new Array();
-                    arrL.push(keys[i]);
-                    arrL.push(result[keys[i]]);
-                    totalspent += result[keys[i]];
-                    weeklydata.push(arrL);
-                }
-                createChartColumn(container, title, weeklydata, titleMessage, totalspent);
+
+                Object.keys(result).forEach(key => {
+                    var count1 = result[key].item1 || 0; // Extract count1
+                    var count2 = result[key].item2 || 0; // Extract count2
+
+                    weeklydata1.push([key, count1]);
+                    weeklydata2.push([key, count2]);
+
+                    totalspent += count1 + count2;
+                });
+
+                createChartColumn(container, title, weeklydata1, weeklydata2, titleMessage, totalspent);
             }
         }
-    })
+    });
 }
 function GetWeeklyPie(title, url, container) {
     var titleMessage = "All Current " + title + ":Count";
@@ -227,17 +262,20 @@ function GetWeeklyPie(title, url, container) {
         success: function (result) {
             if (result) {
                 var keys = Object.keys(result);
-                var weeklydata = new Array();
+                var weeklydata1 = [];
+                var weeklydata2 = [];
                 var totalspent = 0.0;
-                for (var i = 0; i < keys.length; i++) {
-                    var arrL = new Array();
-                    arrL.push(keys[i]);
-                    arrL.push(result[keys[i]]);
-                    totalspent += result[keys[i]];
-                    weeklydata.push(arrL);
-                }
+                Object.keys(result).forEach(key => {
+                    var count1 = result[key].item1 || 0; // Extract count1
+                    var count2 = result[key].item2 || 0; // Extract count2
 
-                createCharts(container, title, weeklydata, titleMessage, totalspent);
+                    weeklydata1.push([key, count1]);
+                    weeklydata2.push([key, count2]);
+
+                    totalspent += count1 + count2;
+                });
+
+                createCharts(container, title, weeklydata1, weeklydata2, titleMessage, totalspent);
             }
         }
     })
@@ -254,16 +292,21 @@ function GetMonthly(title, url, container) {
         success: function (result) {
             if (result) {
                 var keys = Object.keys(result);
-                var monthlydata = new Array();
+                var weeklydata1 = [];
+                var weeklydata2 = [];
                 var totalspent = 0.0;
-                for (var i = 0; i < keys.length; i++) {
-                    var arrL = new Array();
-                    arrL.push(keys[i]);
-                    arrL.push(result[keys[i]]);
-                    totalspent += result[keys[i]];
-                    monthlydata.push(arrL);
-                }
-                createChartColumn(container, title, monthlydata, titleMessage, totalspent);
+
+                Object.keys(result).forEach(key => {
+                    var count1 = result[key].item1 || 0; // Extract count1
+                    var count2 = result[key].item2 || 0; // Extract count2
+
+                    weeklydata1.push([key, count1]);
+                    weeklydata2.push([key, count2]);
+
+                    totalspent += count1 + count2;
+                });
+
+                createChartColumn(container, title, weeklydata1, weeklydata2, titleMessage, totalspent);
             }
         }
     })
@@ -279,17 +322,20 @@ function GetMonthlyPie(title, url, container) {
         success: function (result) {
             if (result) {
                 var keys = Object.keys(result);
-                var monthlydata = new Array();
+                var weeklydata1 = [];
+                var weeklydata2 = [];
                 var totalspent = 0.0;
-                for (var i = 0; i < keys.length; i++) {
-                    var arrL = new Array();
-                    arrL.push(keys[i]);
-                    arrL.push(result[keys[i]]);
-                    totalspent += result[keys[i]];
-                    monthlydata.push(arrL);
-                }
+                Object.keys(result).forEach(key => {
+                    var count1 = result[key].item1 || 0; // Extract count1
+                    var count2 = result[key].item2 || 0; // Extract count2
 
-                createCharts(container, title, monthlydata, titleMessage, totalspent);
+                    weeklydata1.push([key, count1]);
+                    weeklydata2.push([key, count2]);
+
+                    totalspent += count1 + count2;
+                });
+
+                createCharts(container, title, weeklydata1, weeklydata2, titleMessage, totalspent);
             }
         }
     })

@@ -24,7 +24,7 @@ using static risk.control.system.AppConstant.Applicationsettings;
 namespace risk.control.system.Controllers.Company
 {
     [Authorize(Roles = CREATOR.DISPLAY_NAME)]
-    [Breadcrumb(" Claims")]
+    [Breadcrumb(" Cases")]
     public class ClaimsLogController : Controller
     {
         private readonly ApplicationDbContext _context;

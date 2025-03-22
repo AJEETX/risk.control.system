@@ -136,7 +136,7 @@ namespace risk.control.system.Controllers.Api
                         if (request.SendSMS)
                         {
                             //SEND SMS
-                            string message = $"Dear {user2Onboard.Email}";
+                            string message = $"Dear {user2Onboard.Email}, ";
                             message += $"                                ";
                             message += $"icheckifyApp Pin:{user2Onboard.SecretPin}";
                             message += $"                                      ";

@@ -1,0 +1,24 @@
+﻿@model risk.control.system.Models.BeneficiaryDetail
+
+@{
+    ViewData["Title"] = @Applicationsettings.CREATE;
+}
+
+<section class="content">
+    <form id="create-form" asp-controller="UnderwritingPost" asp-action="CreateBeneficiary" enctype="multipart/form-data">
+        <input type="hidden" asp-for="CREATEDBY" value="@CREATEDBY.AUTO" />
+        <partial name="Creator/_CreateBeneficiary" model="Model" />
+    </form>
+</section>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script src="~/js/creator/beneficiary.js">
+    </script>
+    <script src="~/js/company-admin/pincode.js"></script>
+    <script src="~/js/common/profile-image-upload.js"></script>
+    <script src="~/js/common/form-validation.js"></script>
+
+}

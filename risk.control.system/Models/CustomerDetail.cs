@@ -55,8 +55,8 @@ namespace risk.control.system.Models
         [Display(Name = "District")]
         public District? District { get; set; } = default!;
 
-        public string ClaimsInvestigationId { get; set; }
-        public ClaimsInvestigation ClaimsInvestigation { get; set; }
+        public string? ClaimsInvestigationId { get; set; }
+        public ClaimsInvestigation? ClaimsInvestigation { get; set; }
         [NotMapped]
         public long SelectedPincodeId { get; set; }
         [NotMapped]

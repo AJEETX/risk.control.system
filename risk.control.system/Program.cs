@@ -99,6 +99,9 @@ builder.Services.Configure<ForwardedHeadersOptions>(options => {
 });
 
 builder.Services.AddFeatureManagement().AddFeatureFilter<TimeWindowFilter>();
+builder.Services.AddScoped<IUnderwritingService, UnderwritingService>();
+builder.Services.AddScoped<ICaseInvestigationService,CaseInvestigationService>();
+builder.Services.AddScoped<IManageCaseService,ManageCaseService>();
 builder.Services.AddSingleton<IValidationService,ValidationService>();
 builder.Services.AddScoped<ITokenService,TokenService>();
 builder.Services.AddScoped<IUserService,UserService>();

@@ -8,17 +8,24 @@
     <div class="card shadow-lg border-1 rounded-lg collapsed-card">
         <div class="card-header bg-light text-white text-center">
             <h3 class="card-title">
-                Policy: <span class="badge badge-light"><i class="far fa-file-powerpoint"></i>  @Model.ClaimsInvestigation?.PolicyDetail?.ContractNumber</span>
+                Case: <span class="badge badge-light"><i class="far fa-file-powerpoint"></i>  @Model.ClaimsInvestigation?.PolicyDetail?.ContractNumber</span>
                 <span class="hover-text">
                     <i class="fas fa-info-circle"></i>
                     <span class="tooltip-text" id="information">
                         <li>
 
-                            <i class='far fa-file-powerpoint'></i> Policy details
+                            <i class='far fa-file-powerpoint'></i> Case details
                         </li>
-                        <li>
-                            <i class='fa fa-user-plus'></i> Claimant details
-                        </li>
+                        @if (Model.ClaimsInvestigation.PolicyDetail.ClaimType == ClaimType.HEALTH)
+                        {
+                            <li>
+                                <i class='fa fa-user-plus'></i> Customer details
+                            </li>
+                        }
+                        else
+                        {
+                            <li> <i class='fas fa-user-tie'></i> Beneficiary details </li>
+                        }
                     </span>
                 </span>
             </h3>

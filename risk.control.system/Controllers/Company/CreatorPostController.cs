@@ -23,6 +23,7 @@ namespace risk.control.system.Controllers.Company
     [Authorize(Roles = CREATOR.DISPLAY_NAME)]
     public class CreatorPostController : Controller
     {
+        private const string CLAIMS = "claims";
         private readonly ApplicationDbContext _context;
         private readonly IEmpanelledAgencyService empanelledAgencyService;
         private readonly ICustomApiCLient customApiCLient;
@@ -62,6 +63,7 @@ namespace risk.control.system.Controllers.Company
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(c => c.Email == currentUserEmail);
+                var lineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == CLAIMS).LineOfBusinessId;
 
                 if (postedFile == null || model == null ||
                 string.IsNullOrWhiteSpace(Path.GetFileName(postedFile.FileName)) ||
@@ -79,11 +81,11 @@ namespace risk.control.system.Controllers.Company
                     {
                         if(model.CREATEDBY == CREATEDBY.MANUAL)
                         {
-                            return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto", new { mode = CREATEDBY.MANUAL });
+                            return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
                         }
                         else
                         {
-                            return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto", new { mode = CREATEDBY.AUTO });
+                            return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
                         }
                     }
                     else
@@ -95,13 +97,13 @@ namespace risk.control.system.Controllers.Company
                 bool processed = false;
                 if (model.Uploadtype == UploadType.FTP)
                 {
-                    processed = await ftpService.UploadFtpFile(currentUserEmail, postedFile, model.CREATEDBY);
+                    processed = await ftpService.UploadFtpFile(currentUserEmail, postedFile, model.CREATEDBY, lineOfBusinessId);
                 }
 
                 if (model.Uploadtype == UploadType.FILE && Path.GetExtension(postedFile.FileName) == ".zip")
                 {
 
-                    processed = await ftpService.UploadFile(currentUserEmail, postedFile, model.CREATEDBY);
+                    processed = await ftpService.UploadFile(currentUserEmail, postedFile, model.CREATEDBY, lineOfBusinessId);
                 }
 
                 if (processed)
@@ -116,11 +118,11 @@ namespace risk.control.system.Controllers.Company
                 {
                     if (model.CREATEDBY == CREATEDBY.MANUAL)
                     {
-                        return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto", new { mode = CREATEDBY.MANUAL });
+                        return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
                     }
                     else
                     {
-                        return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto", new { mode = CREATEDBY.AUTO });
+                        return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
                     }
                 }
                 else
@@ -172,14 +174,6 @@ namespace risk.control.system.Controllers.Company
                     notifyService.Error("OOPs !!!..Error creating policy");
                     if (claim.ClientCompany.AutoAllocation)
                     {
-                        if (model.CREATEDBY == CREATEDBY.MANUAL)
-                        {
-                            ViewBag.ActiveTab = CREATEDBY.MANUAL;
-                        }
-                        else
-                        {
-                            ViewBag.ActiveTab = CREATEDBY.AUTO;
-                        }
                         return RedirectToAction(nameof(CreatorAutoController.Create), "CreatorAuto");
                     }
                     else
@@ -529,15 +523,7 @@ namespace risk.control.system.Controllers.Company
                 notifyService.Custom("Claim deleted", 3, "red", "far fa-file-powerpoint");
                 if(companyUser.ClientCompany.AutoAllocation)
                 {
-                    if (model.ClaimsInvestigation.CREATEDBY == CREATEDBY.MANUAL)
-                    {
-                        ViewBag.ActiveTab = CREATEDBY.MANUAL;
-                    }
-                    else
-                    {
-                        ViewBag.ActiveTab = CREATEDBY.AUTO;
-                    }
-                    return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto", new {mode = ViewBag.ActiveTab });
+                    return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
                 }
                 else
                 {

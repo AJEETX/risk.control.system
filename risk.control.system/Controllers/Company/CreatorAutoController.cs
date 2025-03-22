@@ -20,7 +20,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace risk.control.system.Controllers.Company
 {
-    [Breadcrumb(" Claims")]
+    [Breadcrumb(" Cases")]
     [Authorize(Roles = CREATOR.DISPLAY_NAME)]
     public partial class CreatorAutoController : Controller
     {
@@ -72,7 +72,7 @@ namespace risk.control.system.Controllers.Company
             }
         }
         [Breadcrumb(" Assign")]
-        public IActionResult New(CREATEDBY? mode)
+        public IActionResult New()
         {
             try
             {
@@ -88,7 +88,7 @@ namespace risk.control.system.Controllers.Company
                     if (totalClaimsCreated >= companyUser.ClientCompany.TotalCreatedClaimAllowed)
                     {
                         userCanCreate = false;
-                        notifyService.Information($"MAX Claim limit = <b>{companyUser.ClientCompany.TotalCreatedClaimAllowed}</b> reached");
+                        notifyService.Information($"MAX Case limit = <b>{companyUser.ClientCompany.TotalCreatedClaimAllowed}</b> reached");
                     }
                     else
                     {
@@ -100,14 +100,7 @@ namespace risk.control.system.Controllers.Company
                 !c.Deleted &&
                 c.InvestigationCaseSubStatus == createdClaimsStatus);
                 var fileIdentifier = companyUser.ClientCompany.Country.Code.ToLower();
-                if(mode is not null)
-                {
-                    ViewBag.ActiveTab = mode;
-                }
-                else
-                {
-                    ViewBag.ActiveTab = CREATEDBY.AUTO;
-                }
+                
                 return View(new CreateClaims { BulkUpload = companyUser.ClientCompany.BulkUpload, UserCanCreate = userCanCreate, HasClaims = hasClaim, FileSampleIdentifier = fileIdentifier });
             }
             catch (Exception ex)
@@ -129,7 +122,7 @@ namespace risk.control.system.Controllers.Company
                 {
                     if (!model.AllowedToCreate)
                     {
-                        notifyService.Information($"MAX Claim limit = <b>{model.TotalCount}</b> reached");
+                        notifyService.Information($"MAX Case limit = <b>{model.TotalCount}</b> reached");
                     }
                     else
                     {
@@ -145,7 +138,7 @@ namespace risk.control.system.Controllers.Company
                 return RedirectToAction(nameof(Create));
             }
         }
-        [Breadcrumb(title: " Add Policy", FromAction = "Create")]
+        [Breadcrumb(title: " Add Case", FromAction = "Create")]
         public async Task<IActionResult> CreatePolicy()
         {
             try
@@ -153,12 +146,13 @@ namespace risk.control.system.Controllers.Company
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 var lineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == CLAIMS).LineOfBusinessId;
 
-                ViewData["lineOfBusinessId"] = lineOfBusinessId;
+                ViewData["lineOfBusinessId"] = new SelectList(_context.LineOfBusiness.OrderBy(s => s.Code), "LineOfBusinessId", "Name",lineOfBusinessId);
+                ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType.Where(i =>
+                i.LineOfBusinessId == lineOfBusinessId).OrderBy(s => s.Code), "InvestigationServiceTypeId", "Name");
+
                 ViewData["CaseEnablerId"] = new SelectList(_context.CaseEnabler.OrderBy(s => s.Code), "CaseEnablerId", "Name");
                 ViewData["CostCentreId"] = new SelectList(_context.CostCentre.OrderBy(s => s.Code), "CostCentreId", "Name");
 
-                ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType.Where(i =>
-                i.LineOfBusinessId == lineOfBusinessId).OrderBy(s => s.Code), "InvestigationServiceTypeId", "Name");
                 var currentUser = await _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c=>c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
                 ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
                 if (currentUser.ClientCompany.HasSampleData)
@@ -179,12 +173,12 @@ namespace risk.control.system.Controllers.Company
             }
         }
 
-        [Breadcrumb(title: " Edit Policy", FromAction = "Details")]
+        [Breadcrumb(title: " Edit Case", FromAction = "Details")]
         public async Task<IActionResult> EditPolicy(string id)
         {
             if (string.IsNullOrWhiteSpace(id))
             {
-                notifyService.Error("OOPS!!!.Policy Not Found.Try Again");
+                notifyService.Error("OOPS!!!.Case Not Found.Try Again");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
             try
@@ -198,22 +192,22 @@ namespace risk.control.system.Controllers.Company
 
                 if (claimsInvestigation == null)
                 {
-                    notifyService.Error("Claim Not Found!!!");
+                    notifyService.Error("Case Not Found!!!");
                     return RedirectToAction(nameof(CreatePolicy));
                 }
                 var currentUser = await _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
                 ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+                ViewData["lineOfBusinessId"] = new SelectList(_context.LineOfBusiness.OrderBy(s => s.Code), "LineOfBusinessId", "Name", claimsInvestigation.PolicyDetail.LineOfBusinessId);
 
                 ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType.Where(i =>
                 i.LineOfBusinessId == claimsInvestigation.PolicyDetail.LineOfBusinessId).OrderBy(s => s.Code), "InvestigationServiceTypeId", "Name", claimsInvestigation.PolicyDetail.InvestigationServiceTypeId);
                 ViewData["CaseEnablerId"] = new SelectList(_context.CaseEnabler.OrderBy(s => s.Code), "CaseEnablerId", "Name", claimsInvestigation.PolicyDetail.CaseEnablerId);
                 ViewData["CostCentreId"] = new SelectList(_context.CostCentre.OrderBy(s => s.Code), "CostCentreId", "Name", claimsInvestigation.PolicyDetail.CostCentreId);
 
-                var claimsPage = new MvcBreadcrumbNode("New", "CreatorAuto", "Claims");
-                var agencyPage = new MvcBreadcrumbNode("New", "CreatorAuto", "Assign(auto)") { Parent = claimsPage, };
-                var detailsPage = new MvcBreadcrumbNode("Create", "CreatorAuto", $"Add New") { Parent = agencyPage };
-                var details1Page = new MvcBreadcrumbNode("Details", "CreatorAuto", $"Details") { Parent = detailsPage, RouteValues = new { id = id } };
-                var editPage = new MvcBreadcrumbNode("EditPolicy", "CreatorAuto", $"Edit Policy") { Parent = details1Page, RouteValues = new { id = id } };
+                var claimsPage = new MvcBreadcrumbNode("New", "CreatorAuto", "Cases");
+                var agencyPage = new MvcBreadcrumbNode("New", "CreatorAuto", "Assign") { Parent = claimsPage, };
+                var details1Page = new MvcBreadcrumbNode("Details", "CreatorAuto", $"Details") { Parent = agencyPage, RouteValues = new { id = id } };
+                var editPage = new MvcBreadcrumbNode("EditPolicy", "CreatorAuto", $"Edit Case") { Parent = details1Page, RouteValues = new { id = id } };
                 ViewData["BreadcrumbNode"] = editPage;
 
                 return View(claimsInvestigation);
@@ -231,17 +225,16 @@ namespace risk.control.system.Controllers.Company
         {
             if (string.IsNullOrWhiteSpace(id))
             {
-                notifyService.Error("OOPS!!!.Policy Not Found.Try Again");
+                notifyService.Error("OOPS!!!.Case Not Found.Try Again");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
-                var claimsPage = new MvcBreadcrumbNode("New", "CreatorAuto", "Claims");
-                var agencyPage = new MvcBreadcrumbNode("New", "CreatorAuto", "Assign(auto)") { Parent = claimsPage, };
-                var detailsPage = new MvcBreadcrumbNode("Create", "CreatorAuto", $"Add New") { Parent = agencyPage };
-                var details1Page = new MvcBreadcrumbNode("Details", "CreatorAuto", $"Details") { Parent = detailsPage, RouteValues = new { id = id } };
+                var claimsPage = new MvcBreadcrumbNode("New", "CreatorAuto", "Cases");
+                var agencyPage = new MvcBreadcrumbNode("New", "CreatorAuto", "Assign") { Parent = claimsPage, };
+                var details1Page = new MvcBreadcrumbNode("Details", "CreatorAuto", $"Details") { Parent = agencyPage, RouteValues = new { id = id } };
                 var editPage = new MvcBreadcrumbNode("CreateCustomer", "CreatorAuto", $"Create Customer") { Parent = details1Page, RouteValues = new { id = id } };
                 ViewData["BreadcrumbNode"] = editPage;
 
@@ -292,7 +285,7 @@ namespace risk.control.system.Controllers.Company
         {
             if (string.IsNullOrWhiteSpace(id))
             {
-                notifyService.Error("OOPS!!!.Policy Not Found.Try Again");
+                notifyService.Error("OOPS!!!.Case Not Found.Try Again");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
             try
@@ -308,16 +301,15 @@ namespace risk.control.system.Controllers.Company
 
                 if (customer == null)
                 {
-                    notifyService.Error("OOPS!!!.Claim Not Found.Try Again");
+                    notifyService.Error("OOPS!!!.Case Not Found.Try Again");
                     return RedirectToAction(nameof(CreatePolicy));
                 }
                 var currentUser = await _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefaultAsync(c => c.Email == currentUserEmail);
                 ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
-                var claimsPage = new MvcBreadcrumbNode("New", "CreatorAuto", "Claims");
-                var agencyPage = new MvcBreadcrumbNode("New", "CreatorAuto", "Assign(auto)") { Parent = claimsPage, };
-                var detailsPage = new MvcBreadcrumbNode("Create", "CreatorAuto", $"Add New") { Parent = agencyPage };
-                var details1Page = new MvcBreadcrumbNode("Details", "CreatorAuto", $"Details") { Parent = detailsPage, RouteValues = new { id = id } };
+                var claimsPage = new MvcBreadcrumbNode("New", "CreatorAuto", "Cases");
+                var agencyPage = new MvcBreadcrumbNode("New", "CreatorAuto", "Assign") { Parent = claimsPage, };
+                var details1Page = new MvcBreadcrumbNode("Details", "CreatorAuto", $"Details") { Parent = agencyPage, RouteValues = new { id = id } };
                 var editPage = new MvcBreadcrumbNode("EditCustomer", "CreatorAuto", $"Edit Customer") { Parent = details1Page, RouteValues = new { id = id } };
                 ViewData["BreadcrumbNode"] = editPage;
                 return View(customer);
@@ -336,7 +328,7 @@ namespace risk.control.system.Controllers.Company
         {
             if(string.IsNullOrWhiteSpace(id))
             {
-                notifyService.Error("OOPS!!!.Policy Not Found.Try Again");
+                notifyService.Error("OOPS!!!.Case Not Found.Try Again");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
             try
@@ -345,10 +337,9 @@ namespace risk.control.system.Controllers.Company
 
                 ViewData["BeneficiaryRelationId"] = new SelectList(_context.BeneficiaryRelation, "BeneficiaryRelationId", "Name");
 
-                var claimsPage = new MvcBreadcrumbNode("New", "CreatorAuto", "Claims");
-                var agencyPage = new MvcBreadcrumbNode("New", "CreatorAuto", "Assign(auto)") { Parent = claimsPage, };
-                var detailsPage = new MvcBreadcrumbNode("Create", "CreatorAuto", $"Add New") { Parent = agencyPage };
-                var details1Page = new MvcBreadcrumbNode("Details", "CreatorAuto", $"Details") { Parent = detailsPage, RouteValues = new { id = id } };
+                var claimsPage = new MvcBreadcrumbNode("New", "CreatorAuto", "Cases");
+                var agencyPage = new MvcBreadcrumbNode("New", "CreatorAuto", "Assign") { Parent = claimsPage, };
+                var details1Page = new MvcBreadcrumbNode("Details", "CreatorAuto", $"Details") { Parent = agencyPage, RouteValues = new { id = id } };
                 var editPage = new MvcBreadcrumbNode("CreateBeneficiary", "CreatorAuto", $"Add beneficiary") { Parent = details1Page, RouteValues = new { id = id } };
                 ViewData["BreadcrumbNode"] = editPage;
                 ViewBag.ClaimId = id;
@@ -402,7 +393,7 @@ namespace risk.control.system.Controllers.Company
         {
             if (id == null || id < 1)
             {
-                notifyService.Error("OOPS!!!.Policy Not Found.Try Again");
+                notifyService.Error("OOPS!!!.Case Not Found.Try Again");
                     return RedirectToAction(nameof(CreatePolicy));
             }
             try
@@ -419,10 +410,9 @@ namespace risk.control.system.Controllers.Company
                 var currentUser = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefault(c => c.Email == currentUserEmail);
                 ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
 
-                var claimsPage = new MvcBreadcrumbNode("New", "CreatorAuto", "Claims");
-                var agencyPage = new MvcBreadcrumbNode("New", "CreatorAuto", "Assign(auto)") { Parent = claimsPage, };
-                var detailsPage = new MvcBreadcrumbNode("Create", "CreatorAuto", $"Add New") { Parent = agencyPage };
-                var details1Page = new MvcBreadcrumbNode("Details", "CreatorAuto", $"Details") { Parent = detailsPage, RouteValues = new { id = id } };
+                var claimsPage = new MvcBreadcrumbNode("New", "CreatorAuto", "Cases");
+                var agencyPage = new MvcBreadcrumbNode("New", "CreatorAuto", "Assign") { Parent = claimsPage, };
+                var details1Page = new MvcBreadcrumbNode("Details", "CreatorAuto", $"Details") { Parent = agencyPage, RouteValues = new { id = id } };
                 var editPage = new MvcBreadcrumbNode("CreateBeneficiary", "CreatorAuto", $"Edit beneficiary") { Parent = details1Page, RouteValues = new { id = id } };
                 ViewData["BreadcrumbNode"] = editPage;
 
@@ -445,7 +435,7 @@ namespace risk.control.system.Controllers.Company
                 
                 if (id == null || string.IsNullOrWhiteSpace(id))
                 {
-                    notifyService.Error("OOPS!!!.Claim Not Found.Try Again");
+                    notifyService.Error("OOPS!!!.Case Not Found.Try Again");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
@@ -454,7 +444,7 @@ namespace risk.control.system.Controllers.Company
                 ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
                 if (model == null)
                 {
-                    notifyService.Error("OOPS!!!.Claim Not Found.Try Again");
+                    notifyService.Error("OOPS!!!.Case Not Found.Try Again");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
@@ -468,12 +458,12 @@ namespace risk.control.system.Controllers.Company
             }
 
         }
-        [Breadcrumb("Details", FromAction = "Create")]
+        [Breadcrumb("Details", FromAction = "New")]
         public async Task<IActionResult> Details(string id)
         {
             if (string.IsNullOrWhiteSpace(id))
             {
-                notifyService.Error("OOPS!!!.Policy Not Found.Try Again");
+                notifyService.Error("OOPS!!!.Case Not Found.Try Again");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
             try
@@ -482,6 +472,32 @@ namespace risk.control.system.Controllers.Company
                 var currentUser = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefault(c => c.Email == currentUserEmail);
                 ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
                 var model = await investigationReportService.GetClaimDetails(currentUserEmail, id);
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+        }
+        [HttpGet]
+        [Breadcrumb(" Empanelled Agencies", FromAction = "New")]
+        public async Task<IActionResult> EmpanelledVendors(string id)
+        {
+            try
+            {
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+
+                if (string.IsNullOrWhiteSpace(id))
+                {
+                    notifyService.Error("No Case selected!!!. Please select Case to allocate.");
+                    return RedirectToAction(nameof(New));
+                }
+
+                var model = await empanelledAgencyService.GetEmpanelledVendors(id);
+                var currentUser = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefault(c => c.Email == currentUserEmail);
+                ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
                 return View(model);
             }
             catch (Exception ex)

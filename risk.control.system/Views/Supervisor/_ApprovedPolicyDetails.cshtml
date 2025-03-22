@@ -3,12 +3,12 @@
 <div class="card card-light collapsed-card">
     <div class="card-header">
         <h3 class="card-title">
-            <i class="far fa-file-powerpoint"></i> Claim #: <span class="badge badge-light"> @Model.ClaimsInvestigation.PolicyDetail.ContractNumber</span>
+            <i class="far fa-file-powerpoint"></i> Case #: <span class="badge badge-light"> @Model.ClaimsInvestigation.PolicyDetail.ContractNumber</span>
             <span class="hover-text">
                 <i class="fas fa-info-circle"></i>
                 <span class="tooltip-text" id="information">
                     <li>
-                        <i class='far fa-file-powerpoint'></i> Policy details.
+                        <i class='far fa-file-powerpoint'></i> Case details.
                     </li>
                     <li>
                         <i class='fa fa-user-plus'></i> Customer details.
@@ -32,11 +32,11 @@
             <div class="col-12 col-sm-6 col-md-6 d-flex align-items-stretch flex-column">
                 <div class="card bg-light d-flex flex-fill">
                     <div class="card-header text-muted border-bottom-0">
-                        <i class="far fa-file-powerpoint"></i> Policy Details
+                        <i class="far fa-file-powerpoint"></i> Case description
                         <span class="hover-text">
                             <i class="fas fa-info-circle"></i>
                             <span class="tooltip-text" id="policy-information">
-                                <i class='far fa-file-powerpoint'></i> Policy details.
+                                <i class='far fa-file-powerpoint'></i> Case details.
                             </span>
                         </span>
                     </div>
@@ -49,9 +49,9 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col-7">
-                                <h2 class="lead"><b>@Model.ClaimsInvestigation?.PolicyDetail.LineOfBusiness.Name</b></h2>
+                                <h2 class="lead"><b>@Model.ClaimsInvestigation?.PolicyDetail.ContractNumber</b></h2>
                                 <p class="text-muted text-sm">
-                                    <b>Claim Type: </b>@Model.ClaimsInvestigation?.PolicyDetail.ClaimType
+                                    <b>Case Type: </b>@Model.ClaimsInvestigation?.PolicyDetail.LineOfBusiness.Name
                                 </p>
                                 <ul class="ml-4 mb-0 fa-ul text-muted">
                                     <li class="small">
