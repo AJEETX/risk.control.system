@@ -115,6 +115,7 @@ namespace risk.control.system.Services
                 existingPolicy.CurrentClaimOwner = userEmail;
                 existingPolicy.PolicyDetail.LineOfBusinessId = claimsInvestigation.PolicyDetail.LineOfBusinessId;
                 existingPolicy.PolicyDetail.ClaimType = claimsInvestigation.PolicyDetail.LineOfBusinessId == claimId? ClaimType.DEATH: ClaimType.HEALTH;
+                existingPolicy.AutoNew = 0;
                 if (claimDocument is not null)
                 {
                     using var dataStream = new MemoryStream();
@@ -155,7 +156,11 @@ namespace risk.control.system.Services
                     customerDetail.ProfilePicture ??= existingCustomer.ProfilePicture;
                 }
 
-                // Update foreign key IDs
+                var claimsInvestigation = await context.ClaimsInvestigation
+                    .FirstOrDefaultAsync(c => c.ClaimsInvestigationId == customerDetail.ClaimsInvestigationId);
+                claimsInvestigation.AutoNew = 0;
+                claimsInvestigation.Updated = DateTime.Now;
+
                 customerDetail.CountryId = customerDetail.SelectedCountryId;
                 customerDetail.StateId = customerDetail.SelectedStateId;
                 customerDetail.DistrictId = customerDetail.SelectedDistrictId;
@@ -178,7 +183,7 @@ namespace risk.control.system.Services
                 // Attach the customerDetail object to the context and mark it as modified
                 context.CustomerDetail.Attach(customerDetail);
                 context.Entry(customerDetail).State = EntityState.Modified;
-
+                context.ClaimsInvestigation.Update(claimsInvestigation);
                 // Save changes to the database
                 return await context.SaveChangesAsync() > 0 ? currentUser.ClientCompany: null;
             }
@@ -202,6 +207,11 @@ namespace risk.control.system.Services
                     customerDetail.ProfilePicture = dataStream.ToArray();
                 }
 
+                var claimsInvestigation = await context.ClaimsInvestigation
+                    .FirstOrDefaultAsync(c => c.ClaimsInvestigationId == customerDetail.ClaimsInvestigationId);
+                claimsInvestigation.AutoNew = 0;
+                claimsInvestigation.Updated = DateTime.Now;
+
                 customerDetail.CountryId = customerDetail.SelectedCountryId;
                 customerDetail.StateId = customerDetail.SelectedStateId;
                 customerDetail.DistrictId = customerDetail.SelectedDistrictId;
@@ -222,7 +232,7 @@ namespace risk.control.system.Services
                 customerDetail.CustomerLocationMap = url;
 
                 var addedClaim = context.CustomerDetail.Add(customerDetail);
-
+                context.ClaimsInvestigation.Update(claimsInvestigation);
                 return await context.SaveChangesAsync() > 0? currentUser.ClientCompany : null;
             }
             catch (Exception ex)
@@ -246,6 +256,11 @@ namespace risk.control.system.Services
                     customerDocument.CopyTo(dataStream);
                     beneficiary.ProfilePicture = dataStream.ToArray();
                 }
+                var claimsInvestigation = await context.ClaimsInvestigation
+                    .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == ClaimsInvestigationId);
+                claimsInvestigation.AutoNew = 0;
+                claimsInvestigation.Updated = DateTime.Now;
+                claimsInvestigation.IsReady2Assign = true;
 
                 beneficiary.CountryId = beneficiary.SelectedCountryId;
                 beneficiary.StateId = beneficiary.SelectedStateId;
@@ -266,10 +281,6 @@ namespace risk.control.system.Services
                 beneficiary.Latitude = latlong.Latitude;
                 beneficiary.Longitude = latlong.Longitude;
                 context.BeneficiaryDetail.Add(beneficiary);
-
-                var claimsInvestigation = await context.ClaimsInvestigation
-                .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == ClaimsInvestigationId);
-                claimsInvestigation.IsReady2Assign = true;
 
                 context.ClaimsInvestigation.Update(claimsInvestigation);
                 return await context.SaveChangesAsync() > 0 ? currentUser.ClientCompany: null;
@@ -300,6 +311,12 @@ namespace risk.control.system.Services
                         beneficiary.ProfilePicture = existingBeneficiary.ProfilePicture;
                     }
                 }
+
+                var claimsInvestigation = await context.ClaimsInvestigation
+                    .FirstOrDefaultAsync(c => c.ClaimsInvestigationId == beneficiary.ClaimsInvestigationId);
+                claimsInvestigation.AutoNew = 0;
+                claimsInvestigation.Updated = DateTime.Now;
+
                 beneficiary.CountryId = beneficiary.SelectedCountryId;
                 beneficiary.StateId = beneficiary.SelectedStateId;
                 beneficiary.DistrictId = beneficiary.SelectedDistrictId;
@@ -321,6 +338,7 @@ namespace risk.control.system.Services
 
                 context.BeneficiaryDetail.Attach(beneficiary);
                 context.Entry(beneficiary).State = EntityState.Modified;
+                context.ClaimsInvestigation.Update(claimsInvestigation);
                 return await context.SaveChangesAsync() > 0 ? currentUser.ClientCompany : null;
                 
             }

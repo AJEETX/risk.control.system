@@ -240,11 +240,12 @@
         "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
             if (aData.isNewAssigned) {
                 $('td', nRow).addClass('isNewAssigned');
+                // Remove the class after 3 seconds
+                setTimeout(function () {
+                    $('td', nRow).removeClass('isNewAssigned');
+                }, 3000);
             }
-            // Remove the class after 3 seconds
-            setTimeout(function () {
-                $('td', nRow).removeClass('isNewAssigned');
-            }, 3000);
+            
         },
         error: function (xhr, status, error) { alert('err ' + error) }
     });

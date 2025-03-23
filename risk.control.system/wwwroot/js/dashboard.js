@@ -3,8 +3,8 @@
     GetWeeklyTat('Case', 'GetClaimWeeklyTat', 'container-claim-tat');
     GetWeeklyPie('Claim', 'GetWeeklyPieClaim', 'container-claim-pie');
     GetWeeklyPie('Underwriting', 'GetWeeklyPieUnderwriting', 'container-underwriting-pie');
-    GetWeeklyAgencyPie('Agency ', 'GetAgentClaim', 'container-agency-claim-pie');
-    GetWeeklyAgencyPie('Agency ', 'GetAgentUnderwriting', 'container-agency-underwriting-pie');
+    GetWeeklyAgencyPie('Agency-wise Claim ', 'GetAgentClaim', 'container-agency-claim-pie');
+    GetWeeklyAgencyPie('Agency-wise Underwriting ', 'GetAgentUnderwriting', 'container-agency-underwriting-pie');
 
     //GetChart('Case', 'GetClaimChart', 'container-monthly-claim')
 
@@ -233,7 +233,7 @@ function GetChart(title, url, container) {
 }
 
 function GetWeekly(title, url, container) {
-    var titleMessage = "All Current " + title + ": Grouped by status";
+    var titleMessage = title + ": Grouped by status";
     $.ajax({
         type: "GET",
         url: "/Dashboard/" + url,
@@ -262,7 +262,7 @@ function GetWeekly(title, url, container) {
     });
 }
 function GetWeeklyPie(title, url, container) {
-    var titleMessage = "All Current " + title + ":Count";
+    var titleMessage = title + ":Count";
     $.ajax({
         type: "GET",
         url: "/Dashboard/" + url,
@@ -330,7 +330,7 @@ function createPieCharts(container, txn, sum, titleText, totalspent) {
     });
 }
 function GetMonthly(title, url, container) {
-    var titleMessage = "All Current " + title + "Count by status";
+    var titleMessage = title + "Count by status";
 
     $.ajax({
         type: "GET",
@@ -361,7 +361,7 @@ function GetMonthly(title, url, container) {
 }
 
 function GetMonthlyPie(title, url, container) {
-    var titleMessage = "All Current " + title + "Count by status";
+    var titleMessage = title + "Count by status";
 
     $.ajax({
         type: "GET",
@@ -424,7 +424,7 @@ function createChartTat(container, txn, sum, titleText, totalspent) {
     });
 }
 function GetWeeklyTat(title, url, container) {
-    var titleMessage = "All Current " + title + ":Status changes";
+    var titleMessage = title + ":Status changes";
     $.ajax({
         type: "GET",
         url: "/Dashboard/" + url,
@@ -499,7 +499,7 @@ function createAgencyCharts(container, txn, sum, titleText, totalspent) {
 }
 
 function GetWeeklyAgencyPie(title, url, container) {
-    var titleMessage = "All Current " + title + ":Count";
+    var titleMessage = title + ":Count";
     $.ajax({
         type: "GET",
         url: "/Dashboard/" + url,

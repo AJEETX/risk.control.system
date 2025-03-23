@@ -63,6 +63,79 @@
     <div class="col-md-6">
         <div class="card card-light collapsed-card">
             <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-tachometer-alt"></i> Claims Pie Chart</h3>
+                <div class="card-tools">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div id="container-claim-pie" class="container-claim">
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card card-light collapsed-card">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-tachometer-alt"></i> Underwritings Pie Chart</h3>
+                <div class="card-tools">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div id="container-underwriting-pie" class="container-claim">
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6">
+        <div class="card card-light  collapsed-card">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-tachometer-alt"></i> Claims(Agency-wise): Pie Chart</h3>
+                <div class="card-tools">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div id="container-agency-claim-pie" class="container-agency">
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card card-light  collapsed-card">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-tachometer-alt"></i> Underwritings(Agency-wise): Pie Chart</h3>
+                <div class="card-tools">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div id="container-agency-underwriting-pie" class="container-agency">
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card card-light collapsed-card">
+            <div class="card-header">
                 <h3 class="card-title"><i class="fas fa-tachometer-alt"></i> Cases Bar Chart</h3>
                 <div class="card-tools">
                     <button type="button" class="btn btn-tool" data-card-widget="collapse">
@@ -95,93 +168,4 @@
         </div>
     </div>
 
-</div>
-<div class="row">
-    <div class="col-md-6">
-        <div class="card card-light collapsed-card">
-            <div class="card-header">
-                <h3 class="card-title"><i class="fas fa-tachometer-alt"></i> Claims Pie Chart</h3>
-                <div class="card-tools">
-                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                        <i class="fas fa-plus"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="card-body">
-                <div id="container-claim-pie" class="container-claim">
-                </div>
-            </div>
-
-        </div>
-    </div>
-    <div class="col-md-6">
-        <div class="card card-light collapsed-card">
-            <div class="card-header">
-                <h3 class="card-title"><i class="fas fa-tachometer-alt"></i> Underwritings Pie Chart</h3>
-                <div class="card-tools">
-                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                        <i class="fas fa-plus"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="card-body">
-                <div id="container-underwriting-pie" class="container-claim">
-                </div>
-            </div>
-
-        </div>
-    </div>
-    @* <div class="col-md-6">
-    <div class="card card-light  collapsed-card">
-    <div class="card-header">
-    <h3 class="card-title"><i class="fas fa-tachometer-alt"></i> Month-wise Cases</h3>
-    <div class="card-tools">
-    <button type="button" class="btn btn-tool" data-card-widget="collapse">
-    <i class="fas fa-plus"></i>
-    </button>
-    </div>
-    </div>
-    <div class="card-body">
-    <div id="container-monthly-claim" class="container-claim">
-    </div>
-    </div>
-    </div>
-    </div> *@
-
-</div>
-<div class="row">
-    <div class="col-md-6">
-        <div class="card card-light  collapsed-card">
-            <div class="card-header">
-                <h3 class="card-title"><i class="fas fa-tachometer-alt"></i> Agency Current Claim Count: Pie Chart</h3>
-                <div class="card-tools">
-                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                        <i class="fas fa-plus"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="card-body">
-                <div id="container-agency-claim-pie" class="container-agency">
-                </div>
-            </div>
-
-        </div>
-    </div>
-    <div class="col-md-6">
-        <div class="card card-light  collapsed-card">
-            <div class="card-header">
-                <h3 class="card-title"><i class="fas fa-tachometer-alt"></i> Agency Current Underwriting Count: Pie Chart</h3>
-                <div class="card-tools">
-                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                        <i class="fas fa-plus"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="card-body">
-                <div id="container-agency-underwriting-pie" class="container-agency">
-                </div>
-            </div>
-
-        </div>
-    </div>
 </div>
