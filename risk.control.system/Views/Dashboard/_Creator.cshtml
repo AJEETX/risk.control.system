@@ -8,7 +8,7 @@
 
             <div class="small-box bg-warning">
                 <div class="inner">
-                    <h3 id="new-claims">@Model.FirstBlockCount (@Model.SecondBlockCount)</h3>
+                    <h3 id="new-claims" title="CLAIMS | UNDERWRITINGS" data-toggle="tooltip">@Model.FirstBlockCount | @Model.SecondBlockCount</h3>
                     <span>@Model.FirstBlockName</span>
                 </div>
                 <div class="icon">
@@ -24,7 +24,7 @@
 
             <div class="small-box bg-danger">
                 <div class="inner">
-                    <h3 id="active-claims">@Model.SecondBlockCount</h3>
+                    <h3 id="active-claims" title="CLAIMS | UNDERWRITINGS" data-toggle="tooltip">@Model.FirstBlockCount | @Model.SecondBlockCount</h3>
                     <span>@Model.SecondBlockName</span>
                 </div>
                 <div class="icon">

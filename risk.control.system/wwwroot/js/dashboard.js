@@ -2,7 +2,7 @@
     GetWeekly('Case', 'GetWeeklyClaim', 'container-claim');
     GetWeeklyTat('Case', 'GetClaimWeeklyTat', 'container-claim-tat');
     GetWeeklyPie('Case', 'GetWeeklyClaim', 'container-claim-pie');
-    GetWeeklyPie('Agency ', 'GetAgentClaim', 'container-agency-pie');
+    GetWeeklyAgencyPie('Agency ', 'GetAgentClaim', 'container-agency-pie');
 
     GetChart('Case', 'GetClaimChart', 'container-monthly-claim')
 
@@ -75,6 +75,9 @@ function createCharts(container, txn, sum1, sum2, titleText, totalspent) {
                     format: '<b>{point.name}</b>: {point.y}'
                 }
             }
+        },
+        legend: {
+            enabled: true
         },
         series: [
             {
@@ -395,6 +398,81 @@ function GetWeeklyTat(title, url, container) {
                 }
 
                 createChartTat(container, title, result.tatDetails, titleMessage, result.count);
+            }
+        }
+    })
+}
+
+function createAgencyCharts(container, txn, sum, titleText, totalspent) {
+    Highcharts.chart(container, {
+        credits: {
+            enabled: false
+        },
+        chart: {
+            type: 'pie'
+        },
+        title: {
+            text: titleText + ' ' + totalspent,
+            style: {
+                fontSize: '.9rem',
+                fontFamily: 'Arial Narrow, sans-serif'
+            }
+        },
+        xAxis: {
+            type: 'category',
+            labels: {
+                rotation: -45,
+                style: {
+                    fontSize: '12px',
+                    fontFamily: 'Arial Narrow, sans-serif'
+                }
+            }
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: txn + ' Count'
+            }
+        },
+        legend: {
+            enabled: true, // Enables the legend
+            layout: 'horizontal', // Horizontal legend
+            align: 'center', // Center align
+            verticalAlign: 'bottom' // Place legend at the bottom
+        },
+        tooltip: {
+            pointFormat: 'Total ' + txn + ': Count <b>{point.y} </b>'
+        },
+        series: [{
+            type: 'pie',
+            name: txn + ' Count',
+            data: sum,
+            showInLegend: true // Ensure items appear in the legend
+        }]
+    });
+}
+
+function GetWeeklyAgencyPie(title, url, container) {
+    var titleMessage = "All Current " + title + ":Count";
+    $.ajax({
+        type: "GET",
+        url: "/Dashboard/" + url,
+        contentType: "application/json",
+        dataType: "json",
+        success: function (result) {
+            if (result) {
+                var keys = Object.keys(result);
+                var weeklydata = new Array();
+                var totalspent = 0.0;
+                for (var i = 0; i < keys.length; i++) {
+                    var arrL = new Array();
+                    arrL.push(keys[i]);
+                    arrL.push(result[keys[i]]);
+                    totalspent += result[keys[i]];
+                    weeklydata.push(arrL);
+                }
+
+                createAgencyCharts(container, title, weeklydata, titleMessage, totalspent);
             }
         }
     })

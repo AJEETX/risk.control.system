@@ -80,7 +80,7 @@
                         var img = '<input class="vendors" name="claims" type="checkbox" id="' + row.id + '"  value="' + row.id + '"  data-toggle="tooltip" title="Ready to allocate(auto)" />';
                         return img;
                     } else if (row.ready2Assign && !row.autoAllocated) {
-                        var img = "<i class='fas fa-external-link-alt' data-toggle='tooltip' title='Assign manual'></i>";
+                        var img = '<input class="vendors" name="claims" type="checkbox" id="' + row.id + '"  value="' + row.id + '"  data-toggle="tooltip" title="Allocate manual" />';
                         return img;
                     }
                 }
@@ -241,6 +241,10 @@
             if (aData.isNewAssigned) {
                 $('td', nRow).addClass('isNewAssigned');
             }
+            // Remove the class after 3 seconds
+            setTimeout(function () {
+                $('td', nRow).removeClass('isNewAssigned');
+            }, 3000);
         },
         error: function (xhr, status, error) { alert('err ' + error) }
     });
