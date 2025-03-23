@@ -10,11 +10,16 @@
                     <li>
                         <i class='far fa-file-powerpoint'></i> Case details.
                     </li>
-                    <li>
-                        <i class='fa fa-user-plus'></i> Customer details.
-                    </li>
+                    @if (Model?.ClaimsInvestigation?.PolicyDetail.ClaimType == ClaimType.HEALTH)
+                    {
+                        <li>
+                            <i class='fa fa-user-plus'></i> Customer details.
+                        </li>
+                    }
+                    else
+                    {
                     <li> <i class='fas fa-user-tie'></i> Beneficiary details </li>
-
+                    }
                 </span>
             </span>
         </h3>

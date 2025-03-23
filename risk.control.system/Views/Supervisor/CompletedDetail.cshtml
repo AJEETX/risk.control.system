@@ -19,10 +19,16 @@
                         <li>
                             <i class='far fa-file-powerpoint'></i> Policy details.
                         </li>
-                        <li>
-                            <i class='fa fa-user-plus'></i> Customer details.
-                        </li>
-                        <li> <i class='fas fa-user-tie'></i> Beneficiary details </li>
+                        @if (Model.ClaimsInvestigation.PolicyDetail.ClaimType == ClaimType.HEALTH)
+                        {
+                            <li>
+                                <i class='fa fa-user-plus'></i> Customer details
+                            </li>
+                        }
+                        else
+                        {
+                            <li> <i class='fas fa-user-tie'></i> Beneficiary details </li>
+                        }
                         <li> <i class="fas fa-newspaper"></i> Agency report </li>
                         <li><i class="far fa-comment"></i> Assessor Remarks </li>
                         <li><i class="fas fa-clock"></i> Timeline </li>

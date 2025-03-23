@@ -147,7 +147,7 @@ namespace risk.control.system.Controllers.Agency
 
                 await mailboxService.NotifyClaimReportSubmitToVendorSupervisor(currentUserEmail, claimId);
 
-                notifyService.Custom($"Case #{contract}report submitted", 3, "green", "far fa-file-powerpoint");
+                notifyService.Custom($"Case #{contract} report submitted", 3, "green", "far fa-file-powerpoint");
 
                 return RedirectToAction(nameof(AgentController.Index), "Agent");
             }

@@ -237,14 +237,14 @@
                                     <div class="col-md-12">
                                         @if (Model.TrialVersion)
                                         {
-                                            <div class="form-group">
+                                            @* <div class="form-group">
                                                 <div class="form-check form-switch">
                                                     <input disabled class="form-check-input selected-case" type="radio" name="flexRadioDefault" id="flexRadioDefault2">
                                                     <label class="form-check-label" for="flexRadioDefault2">
                                                         <b> REVIEW </b> <span class="trial-case">  disabled in trial version </span>
                                                     </label>
                                                 </div>
-                                            </div>
+                                            </div> *@
                                             @if (@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.Similarity < 70 ||
                                            @Model.ClaimsInvestigation.AgencyReport.PanIdReport?.DocumentIdImageValid == null ||
                                            !@Model.ClaimsInvestigation.AgencyReport.PanIdReport.DocumentIdImageValid.Value)
@@ -288,7 +288,7 @@
                                         }
                                         else
                                         {
-                                            if (Model.ClaimsInvestigation.ReviewCount == 1)
+                                            @* if (Model.ClaimsInvestigation.ReviewCount == 1)
                                             {
                                                 <div class="form-group">
 
@@ -310,7 +310,7 @@
                                                         </label>
                                                     </div>
                                                 </div>
-                                            }
+                                            } *@
                                             @if (@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.Similarity < 70 ||
                                            @Model.ClaimsInvestigation.AgencyReport.PanIdReport?.DocumentIdImageValid == null ||
                                            !@Model.ClaimsInvestigation.AgencyReport.PanIdReport.DocumentIdImageValid.Value)
