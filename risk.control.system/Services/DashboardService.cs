@@ -19,7 +19,8 @@ namespace risk.control.system.Services
 {
     public interface IDashboardService
     {
-        Dictionary<string, int> CalculateAgencyCaseStatus(string userEmail);
+        Dictionary<string, int> CalculateAgencyClaimStatus(string userEmail);
+        Dictionary<string, int> CalculateAgencyUnderwritingStatus(string userEmail);
 
         Dictionary<string, int> CalculateAgentCaseStatus(string userEmail);
 
@@ -28,6 +29,10 @@ namespace risk.control.system.Services
         Dictionary<string, (int count1, int count2)> CalculateMonthlyCaseStatus(string userEmail);
 
         Dictionary<string, (int count1, int count2)> CalculateCaseChart(string userEmail);
+
+        Dictionary<string, int> CalculateWeeklyCaseStatusPieClaims(string userEmail);
+
+        Dictionary<string, int> CalculateWeeklyCaseStatusPieUnderwritings(string userEmail);
 
         TatResult CalculateTimespan(string userEmail);
 
@@ -165,13 +170,29 @@ namespace risk.control.system.Services
             if (company.AutoAllocation)
             {
                 data.FirstBlockName = "Assign";
-                data.FirstBlockCount = GetCreatorAssignAuto(userEmail);
+                //data.FirstBlockCount = GetCreatorAssignAuto(userEmail);
                 data.FirstBlockUrl = "/CreatorAuto/New";
+                var claimCount = GetCreatorAssignAuto(userEmail, claimLineOfBusinessId);
+                var underWritingCount = GetCreatorAssignAuto(userEmail, underwritingLineOfBusinessId);
+                data.FirstBlockCount = claimCount;
+                data.SecondBlockCount = underWritingCount;
+                //var underWritingCount = GetCreatorAssignAuto(userEmail, underwritingLineOfBusinessId);
+                //data.FirstBlock2Count = $"{claimCount} | {underWritingCount}";
             }
-
+            else
+            {
+                var claimManualCount = GetCreatorReAssignAuto(userEmail, claimLineOfBusinessId);
+                var underWritingManualCount = GetCreatorReAssignAuto(userEmail, underwritingLineOfBusinessId);
+                data.FirstBlockCount = claimManualCount;
+                data.SecondBlockCount = underWritingManualCount;
+            }
             data.SecondBlockName = "Assign(manual)";
-                data.SecondBlockUrl = "/CreatorManual/New";
-                data.SecondBlockCount = GetCreatorReAssignAuto(userEmail);
+            data.SecondBlockUrl = "/CreatorManual/New";
+            //var claimManualCount = GetCreatorReAssignAuto(userEmail, claimLineOfBusinessId);
+            //var underWritingManualCount = GetCreatorReAssignAuto(userEmail, underwritingLineOfBusinessId);
+            //data.SecondBlockCount = claimManualCount + underWritingManualCount;
+            //var underWritingManualCount = GetCreatorReAssignAuto(userEmail, underwritingLineOfBusinessId);
+            //data.SecondBlock2Count = $"{claimManualCount} | {underWritingManualCount}";
             //else
             //{
             //    data.FirstBlockName = "Assign";
@@ -737,10 +758,9 @@ namespace risk.control.system.Services
             }
             return count;
         }
-        private int GetCreatorReAssignAuto(string userEmail)
+        private int GetCreatorReAssignAuto(string userEmail, long lineOfBusinessId = 0)
         {
-            IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
-
+            IQueryable<ClaimsInvestigation> claims = GetClaims();
 
             var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
 
@@ -753,9 +773,7 @@ namespace risk.control.system.Services
             var withdrawnByCompany = _context.InvestigationCaseSubStatus.FirstOrDefault(
                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY);
             var companyUser = _context.ClientCompanyApplicationUser.Include(u=>u.ClientCompany).FirstOrDefault(c => c.Email == userEmail);
-
-            // SHOWING DIFFERRENT PAGES AS PER ROLES
-            var count = applicationDbContext.Count(a => a.ClientCompanyId == companyUser.ClientCompanyId &&
+            return claims.Count(a => a.ClientCompanyId == companyUser.ClientCompanyId &&
                 (a.InvestigationCaseSubStatusId == withdrawnByAgency.InvestigationCaseSubStatusId &&
                         a.UserEmailActionedTo == string.Empty &&
                         a.UserRoleActionedTo == $"{companyUser.ClientCompany.Email}")
@@ -775,28 +793,33 @@ namespace risk.control.system.Services
                 (a.IsReviewCase && a.InvestigationCaseSubStatusId == reAssignedStatus.InvestigationCaseSubStatusId &&
                 a.UserEmailActionedTo == string.Empty &&
                 a.UserRoleActionedTo == $"{companyUser.ClientCompany.Email}"));
-
-            return count;
         }
 
-        private int GetCreatorReAssign(string userEmail)
+        private int GetCreatorAssignAuto(string userEmail, long lineOfBusinessId = 0)
         {
-            IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
-            var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
-               i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
+            IQueryable<ClaimsInvestigation> claims = lineOfBusinessId > 0 ? GetClaims().Where(c=>c.PolicyDetail.LineOfBusinessId == lineOfBusinessId) : GetClaims();
 
+            var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
+            var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
             var reAssignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER);
+
             var withdrawnByAgency = _context.InvestigationCaseSubStatus.FirstOrDefault(
                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY);
             var withdrawnByCompany = _context.InvestigationCaseSubStatus.FirstOrDefault(
                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY);
 
-            var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(c => c.Email == userEmail);
-
-            // SHOWING DIFFERRENT PAGES AS PER ROLES
-            var count = applicationDbContext.Count(a => a.ClientCompanyId == companyUser.ClientCompanyId &&
-                (a.InvestigationCaseSubStatusId == withdrawnByAgency.InvestigationCaseSubStatusId &&
+            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+            
+            var count= claims.Count(a =>
+                a.ClientCompanyId == companyUser.ClientCompanyId &&
+                     (a.UserEmailActioned == companyUser.Email &&
+                         a.UserEmailActionedTo == companyUser.Email &&
+                         a.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId)
+                         ||
+                         (a.InvestigationCaseSubStatusId == withdrawnByAgency.InvestigationCaseSubStatusId &&
                         a.UserEmailActionedTo == string.Empty &&
                         a.UserRoleActionedTo == $"{companyUser.ClientCompany.Email}")
                  ||
@@ -807,48 +830,12 @@ namespace risk.control.system.Services
                  ||
                  (a.UserEmailActioned == companyUser.Email &&
                         a.UserEmailActionedTo == companyUser.Email &&
-                        a.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId) 
-                        ||
-                (a.IsReviewCase && a.InvestigationCaseSubStatusId == reAssignedStatus.InvestigationCaseSubStatusId &&
-                a.UserEmailActionedTo == string.Empty &&
-                a.UserRoleActionedTo == $"{companyUser.ClientCompany.Email}"));
+                        a.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId)
 
+                 );
             return count;
         }
 
-        private int GetCreatorAssignManual(string userEmail)
-        {
-            IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
-
-            var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
-                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
-            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-            var count = applicationDbContext.Count(a => a.ClientCompanyId == companyUser.ClientCompanyId &&
-                (
-                    (a.UserEmailActioned == companyUser.Email &&
-                        a.UserEmailActionedTo == companyUser.Email &&
-                        a.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId)
-                ));
-
-            return count;
-        }
-        private int GetCreatorAssignAuto(string userEmail)
-        {
-            IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
-
-            var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
-                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
-            
-            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-            var count = applicationDbContext.Count(a => a.ClientCompanyId == companyUser.ClientCompanyId &&
-                (
-                    (a.UserEmailActioned == companyUser.Email && a.CREATEDBY == CREATEDBY.AUTO &&
-                        a.UserEmailActionedTo == companyUser.Email &&
-                        a.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId)
-                ));
-
-            return count;
-        }
         private IQueryable<ClaimsInvestigation> GetClaims()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
@@ -1043,7 +1030,16 @@ namespace risk.control.system.Services
             return data;
         }
 
-        public Dictionary<string, int> CalculateAgencyCaseStatus(string userEmail) 
+        public Dictionary<string, int> CalculateAgencyClaimStatus(string userEmail) 
+        {
+            return CalculateAgencyCaseStatus(userEmail, claimLineOfBusinessId);
+        }
+
+        public Dictionary<string, int> CalculateAgencyUnderwritingStatus(string userEmail)
+        {
+            return CalculateAgencyCaseStatus(userEmail, underwritingLineOfBusinessId);
+        }
+        Dictionary<string, int> CalculateAgencyCaseStatus(string userEmail, long lineOfBusinessId)
         {
             var vendorCaseCount = new Dictionary<string, int>();
 
@@ -1068,7 +1064,8 @@ namespace risk.control.system.Services
 
             var claimsCases = _context.ClaimsInvestigation
                .Include(c => c.Vendors)
-               .Include(c => c.BeneficiaryDetail);
+               .Include(c => c.PolicyDetail)
+               .Include(c => c.BeneficiaryDetail).Where(c=>c.PolicyDetail.LineOfBusinessId == lineOfBusinessId && !c.Deleted);
 
             var allocatedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
@@ -1117,7 +1114,6 @@ namespace risk.control.system.Services
             }
             return vendorWithCaseCounts;
         }
-
         public Dictionary<string, int> CalculateAgentCaseStatus(string userEmail)
         {
             var vendorCaseCount = new Dictionary<string, int>();
@@ -1231,11 +1227,11 @@ namespace risk.control.system.Services
                             caseCurrentStatus.Created <= monthName.AddMonths(1))
                         {
 
-                            if (caseCurrentStatus.ClaimsInvestigation.PolicyDetail.LineOfBusinessId == claimLineOfBusinessId)
+                            if (caseCurrentStatus.ClaimsInvestigation.PolicyDetail.LineOfBusinessId == claimLineOfBusinessId && !caseCurrentStatus.ClaimsInvestigation.Deleted)
                             {
                                 claimsWithSameStatus.Add(caseCurrentStatus);
                             }
-                            else if (caseCurrentStatus.ClaimsInvestigation.PolicyDetail.LineOfBusinessId == underwritingLineOfBusinessId)
+                            else if (caseCurrentStatus.ClaimsInvestigation.PolicyDetail.LineOfBusinessId == underwritingLineOfBusinessId && !caseCurrentStatus.ClaimsInvestigation.Deleted)
                             {
                                 underwritingWithSameStatus.Add(caseCurrentStatus);
                             }
@@ -1321,11 +1317,11 @@ namespace risk.control.system.Services
                     {
                         var caseCurrentStatus = _case.OrderByDescending(o => o.Created).FirstOrDefault();
 
-                        if (caseCurrentStatus.ClaimsInvestigation.PolicyDetail.LineOfBusinessId == claimLineOfBusinessId)
+                        if (caseCurrentStatus.ClaimsInvestigation.PolicyDetail.LineOfBusinessId == claimLineOfBusinessId && !caseCurrentStatus.ClaimsInvestigation.Deleted)
                         {
                             claimsWithSameStatus.Add(caseCurrentStatus);
                         }
-                        else if (caseCurrentStatus.ClaimsInvestigation.PolicyDetail.LineOfBusinessId == underwritingLineOfBusinessId)
+                        else if (caseCurrentStatus.ClaimsInvestigation.PolicyDetail.LineOfBusinessId == underwritingLineOfBusinessId && !caseCurrentStatus.ClaimsInvestigation.Deleted)
                         {
                             underwritingWithSameStatus.Add(caseCurrentStatus);
                         }
@@ -1362,11 +1358,11 @@ namespace risk.control.system.Services
                     {
                         var caseCurrentStatus = _case.OrderByDescending(o => o.Created).FirstOrDefault();
 
-                        if (caseCurrentStatus.ClaimsInvestigation.PolicyDetail.LineOfBusinessId == claimLineOfBusinessId)
+                        if (caseCurrentStatus.ClaimsInvestigation.PolicyDetail.LineOfBusinessId == claimLineOfBusinessId && !caseCurrentStatus.ClaimsInvestigation.Deleted)
                         {
                             claimsWithSameStatus.Add(caseCurrentStatus);
                         }
-                        else if (caseCurrentStatus.ClaimsInvestigation.PolicyDetail.LineOfBusinessId == underwritingLineOfBusinessId)
+                        else if (caseCurrentStatus.ClaimsInvestigation.PolicyDetail.LineOfBusinessId == underwritingLineOfBusinessId && !caseCurrentStatus.ClaimsInvestigation.Deleted)
                         {
                             underwritingWithSameStatus.Add(caseCurrentStatus);
                         }
@@ -1520,7 +1516,7 @@ namespace risk.control.system.Services
                     {
                         var caseCurrentStatus = _case.OrderByDescending(o => o.Created).FirstOrDefault();
 
-                        if (caseCurrentStatus != null && caseCurrentStatus.InvestigationCaseSubStatusId == subStatus.InvestigationCaseSubStatusId)
+                        if (caseCurrentStatus != null && caseCurrentStatus.InvestigationCaseSubStatusId == subStatus.InvestigationCaseSubStatusId && !caseCurrentStatus.ClaimsInvestigation.Deleted)
                         {
                             if(caseCurrentStatus.ClaimsInvestigation.PolicyDetail.LineOfBusinessId == claimLineOfBusinessId)
                             {
@@ -1562,16 +1558,106 @@ namespace risk.control.system.Services
                     {
                         var caseCurrentStatus = _case.OrderByDescending(o => o.Created).FirstOrDefault();
 
-                        if (caseCurrentStatus.ClaimsInvestigation.PolicyDetail.LineOfBusinessId == claimLineOfBusinessId)
+                        if (caseCurrentStatus.ClaimsInvestigation.PolicyDetail.LineOfBusinessId == claimLineOfBusinessId && !caseCurrentStatus.ClaimsInvestigation.Deleted)
                         {
                             claimsWithSameStatus.Add(caseCurrentStatus);
                         }
-                        else if (caseCurrentStatus.ClaimsInvestigation.PolicyDetail.LineOfBusinessId == underwritingLineOfBusinessId)
+                        else if (caseCurrentStatus.ClaimsInvestigation.PolicyDetail.LineOfBusinessId == underwritingLineOfBusinessId && !caseCurrentStatus.ClaimsInvestigation.Deleted)
                         {
                             underwritingWithSameStatus.Add(caseCurrentStatus);
                         }
                     }
                     dictWeeklyCases.Add(subStatus.Name, (claimsWithSameStatus.Count, underwritingWithSameStatus.Count));
+                }
+            }
+            return dictWeeklyCases;
+        }
+
+        public Dictionary<string, int> CalculateWeeklyCaseStatusPieClaims(string userEmail)
+        {
+            return CalculateWeeklyCaseStatusPie(userEmail, claimLineOfBusinessId);
+        }
+        public Dictionary<string, int> CalculateWeeklyCaseStatusPieUnderwritings(string userEmail)
+        {
+            return CalculateWeeklyCaseStatusPie(userEmail, underwritingLineOfBusinessId);
+        }
+        private Dictionary<string, int> CalculateWeeklyCaseStatusPie(string userEmail, long lineOfBusinessId)
+        {
+            Dictionary<string, int> dictWeeklyCases = new Dictionary<string, int>();
+
+            var tdetailDays = _context.InvestigationTransaction
+                    .Include(i => i.ClaimsInvestigation)
+                    .ThenInclude(i => i.PolicyDetail)
+                    .Include(i => i.ClaimsInvestigation)
+             .ThenInclude(i => i.BeneficiaryDetail)
+             .Where(d =>
+             d.Created > DateTime.Now.AddDays(-28));
+
+            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+
+            if (companyUser != null)
+            {
+                var statuses = _context.InvestigationCaseStatus;
+                var tdetail = tdetailDays.Where(d =>
+                    (companyUser.IsClientAdmin || d.UpdatedBy == userEmail) &&
+                    d.ClaimsInvestigation.ClientCompanyId == companyUser.ClientCompanyId);
+
+                var userSubStatuses = tdetail.Select(s => s.InvestigationCaseSubStatusId).Distinct()?.ToList();
+                var subStatuses = _context.InvestigationCaseSubStatus;
+                var filteredCases = subStatuses.Where(c => userSubStatuses.Contains(c.InvestigationCaseSubStatusId));
+
+                var cases = tdetail.GroupBy(g => g.ClaimsInvestigationId);
+
+                foreach (var subStatus in filteredCases)
+                {
+                    var casesWithSameStatus = new List<InvestigationTransaction> { };
+                    foreach (var _case in cases)
+                    {
+                        var caseCurrentStatus = _case.OrderByDescending(o => o.Created).FirstOrDefault();
+
+                        if (caseCurrentStatus != null && 
+                            caseCurrentStatus.InvestigationCaseSubStatusId == subStatus.InvestigationCaseSubStatusId && 
+                            !caseCurrentStatus.ClaimsInvestigation.Deleted && 
+                            caseCurrentStatus.ClaimsInvestigation.PolicyDetail.LineOfBusinessId == lineOfBusinessId)
+                        {
+                            casesWithSameStatus.Add(caseCurrentStatus);
+                        }
+                    }
+                    dictWeeklyCases.Add(subStatus.Name, casesWithSameStatus.Count);
+                }
+            }
+            else if (vendorUser != null)
+            {
+                var subStatuses = _context.InvestigationCaseSubStatus.Where(s =>
+                   s.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR ||
+                   s.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR ||
+                   s.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT ||
+                   s.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR
+                   );
+                var statuses = _context.InvestigationCaseStatus;
+                var tdetail = tdetailDays.Where(d =>
+                    (vendorUser.IsVendorAdmin || d.UpdatedBy == userEmail) &&
+                    d.ClaimsInvestigation.VendorId == vendorUser.VendorId);
+
+                var userSubStatuses = tdetail.Select(s => s.InvestigationCaseSubStatusId).Distinct()?.ToList();
+                var filteredCases = subStatuses.Where(c => userSubStatuses.Contains(c.InvestigationCaseSubStatusId));
+
+                var cases = tdetail.GroupBy(g => g.ClaimsInvestigationId);
+
+                foreach (var subStatus in filteredCases)
+                {
+                    var casesWithSameStatus = new List<InvestigationTransaction> { };
+                    foreach (var _case in cases)
+                    {
+                        var caseCurrentStatus = _case.OrderByDescending(o => o.Created).FirstOrDefault();
+
+                        if (caseCurrentStatus != null && caseCurrentStatus.InvestigationCaseSubStatusId == subStatus.InvestigationCaseSubStatusId)
+                        {
+                            casesWithSameStatus.Add(caseCurrentStatus);
+                        }
+                    }
+                    dictWeeklyCases.Add(subStatus.Name, casesWithSameStatus.Count);
                 }
             }
             return dictWeeklyCases;

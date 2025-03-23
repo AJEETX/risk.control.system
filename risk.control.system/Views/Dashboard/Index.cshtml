@@ -50,9 +50,16 @@
         </div>
     </div>
 </section>
-@section Scripts {
-    <script src="~/js/highcharts.js"></script>
-    <script src="/js/exporting.js"></script>
-    <script src="~/js/dashboard.js"></script>
+@if (userRole.Value.Contains(AppRoles.COMPANY_ADMIN.ToString()) || 
+   userRole.Value.Contains(AppRoles.CREATOR.ToString()) ||
+    userRole.Value.Contains(AppRoles.ASSESSOR.ToString()) ||
+    userRole.Value.Contains(AppRoles.MANAGER.ToString())
+)
+{
+    @section Scripts {
+        <script src="~/js/highcharts.js"></script>
+        <script src="/js/exporting.js"></script>
+        <script src="~/js/dashboard.js"></script>
 
+    }
 }

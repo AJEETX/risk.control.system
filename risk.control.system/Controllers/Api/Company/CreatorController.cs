@@ -219,7 +219,7 @@ namespace risk.control.system.Controllers.Api.Company
                     BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.Name) ?
                         "<span class=\"badge badge-light\">beneficiary name</span>" :
                         a.BeneficiaryDetail.Name,
-                    TimeElapsed = DateTime.Now.Subtract(a.Created).TotalSeconds,
+                    TimeElapsed = DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).TotalSeconds,
                     IsNewAssigned = a.AutoNew <= 1,
                     BeneficiaryFullName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.Name) ? "?" : a.BeneficiaryDetail.Name,
                     CustomerFullName = string.IsNullOrWhiteSpace(a.CustomerDetail?.Name) ? "?" : a.CustomerDetail.Name,

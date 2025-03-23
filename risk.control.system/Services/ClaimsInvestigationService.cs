@@ -289,6 +289,7 @@ namespace risk.control.system.Services
             claimsInvestigation.ActiveView = 0;
             claimsInvestigation.ManualNew = 0;
             claimsInvestigation.AllocateView = 0;
+            claimsInvestigation.AutoNew = 0;
             claimsInvestigation.VendorId = null;
             claimsInvestigation.Vendor = null;
 
