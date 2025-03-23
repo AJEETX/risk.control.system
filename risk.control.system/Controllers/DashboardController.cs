@@ -112,12 +112,38 @@ namespace risk.control.system.Controllers
             var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
             if (userRole != null)
             {
-                if (userRole.Value.Contains(AppRoles.PORTAL_ADMIN.ToString())
+                if (userRole.Value.Contains(AppRoles.MANAGER.ToString())
+                                || userRole.Value.Contains(AppRoles.ASSESSOR.ToString())
                                 || userRole.Value.Contains(AppRoles.COMPANY_ADMIN.ToString())
                                 || userRole.Value.Contains(AppRoles.CREATOR.ToString())
                                 )
                 {
-                    Dictionary<string, int> monthlyExpense = dashboardService.CalculateAgencyCaseStatus(userEmail);
+                    Dictionary<string, int> monthlyExpense = dashboardService.CalculateAgencyClaimStatus(userEmail);
+                    return new JsonResult(monthlyExpense);
+                }
+                else if (userRole.Value.Contains(AppRoles.AGENCY_ADMIN.ToString()) || userRole.Value.Contains(AppRoles.SUPERVISOR.ToString()))
+                {
+                    Dictionary<string, int> monthlyExpense = dashboardService.CalculateAgentCaseStatus(userEmail);
+                    return new JsonResult(monthlyExpense);
+                }
+            }
+
+            return new JsonResult(null);
+        }
+
+        public JsonResult GetAgentUnderwriting()
+        {
+            var userEmail = HttpContext.User?.Identity?.Name;
+            var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
+            if (userRole != null)
+            {
+                if (userRole.Value.Contains(AppRoles.MANAGER.ToString())
+                                || userRole.Value.Contains(AppRoles.ASSESSOR.ToString())
+                                || userRole.Value.Contains(AppRoles.COMPANY_ADMIN.ToString())
+                                || userRole.Value.Contains(AppRoles.CREATOR.ToString())
+                                )
+                {
+                    Dictionary<string, int> monthlyExpense = dashboardService.CalculateAgencyUnderwritingStatus(userEmail);
                     return new JsonResult(monthlyExpense);
                 }
                 else if (userRole.Value.Contains(AppRoles.AGENCY_ADMIN.ToString()) || userRole.Value.Contains(AppRoles.SUPERVISOR.ToString()))
@@ -145,6 +171,20 @@ namespace risk.control.system.Controllers
             return new JsonResult(monthlyExpense);
         }
 
+        public JsonResult GetWeeklyPieClaim()
+        {
+            var userEmail = HttpContext.User?.Identity?.Name;
+            var monthlyExpense = dashboardService.CalculateWeeklyCaseStatusPieClaims(userEmail);
+            return new JsonResult(monthlyExpense);
+        }
+
+
+        public JsonResult GetWeeklyPieUnderwriting()
+        {
+            var userEmail = HttpContext.User?.Identity?.Name;
+            var monthlyExpense = dashboardService.CalculateWeeklyCaseStatusPieUnderwritings(userEmail);
+            return new JsonResult(monthlyExpense);
+        }
         public JsonResult GetClaimChart()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
