@@ -1,4 +1,5 @@
-﻿@model ClaimTransactionModel
+﻿@using risk.control.system.Helpers
+@model ClaimTransactionModel
 @{
     string baddress = string.Empty;
     string currentBAgeinYrs = string.Empty;
@@ -56,7 +57,7 @@
                             <span class="fa-li">
                                 <i class="fa fa-money"></i>
                             </span>
-                            Annual Income: (@ViewBag.Currency) @Model.Location?.Income
+                            Annual Income: (@ViewBag.Currency) @Model.Location?.Income.GetEnumDisplayName()
                         </li>
                         <li class="small">
                             <span class="fa-li">

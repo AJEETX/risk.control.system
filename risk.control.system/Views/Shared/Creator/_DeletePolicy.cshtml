@@ -19,7 +19,12 @@
                         <b>Case Type: </b>@Model.ClaimsInvestigation?.PolicyDetail.LineOfBusiness.Name
                     </p>
                     <ul class="ml-4 mb-0 fa-ul text-muted">
-                        
+                        <li class="small">
+                            <span class="fa-li">
+                                <i class="fas fa-tools"></i>
+                            </span>
+                            Service: @Model.ClaimsInvestigation?.PolicyDetail.InvestigationServiceType.Name
+                        </li>
                         <li class="small">
                             <span class="fa-li">
                                 <i class="fas fa-money-bill-wave"></i>
@@ -32,12 +37,7 @@
                             </span>
                             Cause: @Model.ClaimsInvestigation?.PolicyDetail.CauseOfLoss
                         </li>
-                        <li class="small">
-                            <span class="fa-li">
-                                <i class="fas fa-tools"></i>
-                            </span>
-                            Service: @Model.ClaimsInvestigation?.PolicyDetail.InvestigationServiceType.Name
-                        </li>
+                       
                         <li class="small">
                             <span class="fa-li">
                                 <i class="fas fa-money-check-alt"></i>

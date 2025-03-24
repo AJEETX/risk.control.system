@@ -145,6 +145,7 @@ namespace risk.control.system.Services
                 .Include(c => c.BeneficiaryDetail)
                 .Include(c => c.Vendors)
                 .Where(c =>
+                !c.Deleted &&
                 c.VendorId.HasValue &&
                 (c.InvestigationCaseSubStatusId == allocatedStatus.InvestigationCaseSubStatusId ||
                                     c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId ||

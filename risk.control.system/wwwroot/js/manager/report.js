@@ -21,6 +21,10 @@
             {
                 className: 'max-width-column-name', // Apply the CSS class,
                 targets: 10                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 11                      // Index of the column to style
             }],
         order: [[10, 'asc']],
         fixedHeader: true,

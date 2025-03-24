@@ -21,6 +21,10 @@
             {
                 className: 'max-width-column-name', // Apply the CSS class,
                 targets: 10                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 11                      // Index of the column to style
             }],
         order: [[13, 'desc']],
         fixedHeader: true,
@@ -196,13 +200,7 @@
             // Immediately hide the full map
             $this.find('.full-map').hide();
         });
-    $('#customerTable').on('draw.dt', function () {
-        $('[data-toggle="tooltip"]').tooltip({
-            animated: 'fade',
-            placement: 'top',
-            html: true
-        });
-    });
+    
     //initMap("/api/CompanyCompletedClaims/GetReportMap");
 });
 

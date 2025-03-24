@@ -59,6 +59,7 @@ function markNotificationAsRead(notificationId) {
         contentType: 'application/json', // Specify JSON format
         data: JSON.stringify({ Id: notificationId }), // Convert data to JSON
         success: function () {
+            loadNotifications();
             console.log("Notification marked as read:", notificationId);
         },
         error: function (xhr) {
@@ -294,6 +295,15 @@ function getMobileType() {
 }
 
 $(document).ready(function () {
+
+    $('#customerTable').on('draw.dt', function () {
+        $('[data-toggle="tooltip"]').tooltip({
+            animated: 'fade',
+            placement: 'top',
+            html: true
+        });
+    });
+
     loadNotifications();
     $('.print-me').on('click', function () {
         window.print();

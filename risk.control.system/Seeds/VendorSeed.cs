@@ -41,7 +41,11 @@ namespace risk.control.system.Seeds
             var investigatos = new SeedInput { COUNTRY = "us", DOMAIN = "investigatos.com", NAME = "Investigatos", PHOTO = "/img/investigation.png" };
             var greates = new SeedInput { COUNTRY = "us", DOMAIN = "greates.com", NAME = "Greates", PHOTO = "/img/company.png" };
 
-            var agencies = new List<SeedInput> { checker, verify, investigate, investigator, greatez, proper, honest, greater, investigatoz, nicer, demoz, investigatos, greates };
+            var agencies = new List<SeedInput> { 
+                checker, verify, investigate, investigator, greatez
+                , proper, honest, greater, investigatoz
+                , nicer, demoz, investigatos, greates
+            };
             var vendors = new List<Vendor> { };
 
             foreach (var agency in agencies)

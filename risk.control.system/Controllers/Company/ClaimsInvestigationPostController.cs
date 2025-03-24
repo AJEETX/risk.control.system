@@ -63,7 +63,7 @@ namespace risk.control.system.Controllers.Company
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                
+                var distinctClaims = claims.Distinct().ToList();
                 var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == currentUserEmail);
 
                 var company = _context.ClientCompany
@@ -77,36 +77,36 @@ namespace risk.control.system.Controllers.Company
                 //IF AUTO ALLOCATION TRUE
                 if (company.AutoAllocation)
                 {
-                    var autoAllocatedClaims = await claimsInvestigationService.ProcessAutoAllocation(claims, company, currentUserEmail);
+                    var autoAllocatedClaims = await claimsInvestigationService.ProcessAutoAllocation(distinctClaims, company, currentUserEmail);
 
-                    if (claims.Count == autoAllocatedClaims.Count)
+                    if (distinctClaims.Count == autoAllocatedClaims.Count)
                     {
-                        notifyService.Custom($"{autoAllocatedClaims.Count}/{claims.Count} case(s) auto-assigned", 3, "green", "far fa-file-powerpoint");
+                        notifyService.Custom($"{autoAllocatedClaims.Count}/{distinctClaims.Count} case(s) auto-assigned", 3, "green", "far fa-file-powerpoint");
                     }
 
-                    else if (claims.Count > autoAllocatedClaims.Count)
+                    else if (distinctClaims.Count > autoAllocatedClaims.Count)
                     {
                         if (autoAllocatedClaims.Count > 0)
                         {
-                            notifyService.Custom($"{autoAllocatedClaims.Count}/{claims.Count} case(s) auto-assigned", 3, "green", "far fa-file-powerpoint");
+                            notifyService.Custom($"{autoAllocatedClaims.Count}/{distinctClaims.Count} case(s) auto-assigned", 3, "green", "far fa-file-powerpoint");
                         }
 
-                        var notAutoAllocated = claims.Except(autoAllocatedClaims)?.ToList();
+                        var notAutoAllocated = distinctClaims.Except(autoAllocatedClaims)?.ToList();
 
                         await claimsInvestigationService.AssignToAssigner(HttpContext.User.Identity.Name, notAutoAllocated);
 
                         await mailboxService.NotifyClaimAssignmentToAssigner(HttpContext.User.Identity.Name, notAutoAllocated);
 
-                        notifyService.Custom($"{notAutoAllocated.Count}/{claims.Count} case(s) need assign manually", 3, "orange", "far fa-file-powerpoint");
+                        notifyService.Custom($"{notAutoAllocated.Count}/{distinctClaims.Count} case(s) assign manually", 3, "orange", "far fa-file-powerpoint");
                         
                         return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
                     }
                 }
                 else
                 {
-                    await claimsInvestigationService.AssignToAssigner(HttpContext.User.Identity.Name, claims);
+                    await claimsInvestigationService.AssignToAssigner(HttpContext.User.Identity.Name, distinctClaims);
 
-                    await mailboxService.NotifyClaimAssignmentToAssigner(HttpContext.User.Identity.Name, claims);
+                    await mailboxService.NotifyClaimAssignmentToAssigner(HttpContext.User.Identity.Name, distinctClaims);
 
                     notifyService.Custom($"{claims.Count}/{claims.Count} case(s) assigned", 3, "green", "far fa-file-powerpoint");
                 }

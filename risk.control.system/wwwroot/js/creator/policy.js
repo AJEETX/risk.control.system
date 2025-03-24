@@ -105,7 +105,7 @@ $(document).ready(function () {
     $("#edit-form").validate();
 
     // Automatically set focus
-    $("#ContractNumber").focus();
+    $("#LineOfBusinessId").focus();
 
     // Handle add policy click
     $('#create-policy').on('click', function () {

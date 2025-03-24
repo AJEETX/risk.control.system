@@ -59,6 +59,10 @@
             {
                 className: 'max-width-column-name', // Apply the CSS class,
                 targets: 8                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 9                      // Index of the column to style
             }],
         order: [[14, 'asc']],
         fixedHeader: true,
@@ -77,10 +81,10 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     if (row.ready2Assign && row.autoAllocated) {
-                        var img = '<input class="vendors" name="claims" type="checkbox" id="' + row.id + '"  value="' + row.id + '"  data-toggle="tooltip" title="Ready to allocate(auto)" />';
+                        var img = '<input class="vendors" name="claims" type="checkbox" id="' + row.id + '"  value="' + row.id + '"  data-toggle="tooltip" title="Ready to assign(auto)" />';
                         return img;
                     } else if (row.ready2Assign && !row.autoAllocated) {
-                        var img = '<input class="vendors" name="claims" type="checkbox" id="' + row.id + '"  value="' + row.id + '"  data-toggle="tooltip" title="Allocate manual" />';
+                        var img = '<input class="vendors" name="claims" type="checkbox" id="' + row.id + '"  value="' + row.id + '"  data-toggle="tooltip" title="Assign manually" />';
                         return img;
                     }
                 }

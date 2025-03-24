@@ -103,15 +103,15 @@ namespace risk.control.system.Models
 
         [DataType(DataType.DateTime)]
         public DateTime? ExpiryDate { get; set; } = DateTime.Now.AddDays(10);
-        [Range(5, 50)]
-        public int TotalCreatedClaimAllowed { get; set; } = 10;
+        [Range(10, 50)]
+        public int TotalCreatedClaimAllowed { get; set; } = 50;
         public bool Deleted { get; set; } = false;
         public bool HasClaims { get; set; } = false;
         public bool AiEnabled { get; set; } = false;
 
-        public int CreatorSla { get; set; } = 5;
-        public int AssessorSla { get; set; } = 5;
-        public int SupervisorSla { get; set; } = 5;
+        public int CreatorSla { get; set; } = 2;
+        public int AssessorSla { get; set; } = 4;
+        public int SupervisorSla { get; set; } = 2;
         public int AgentSla { get; set; } = 5;
         public bool UpdateAgentReport { get; set; } = false;
         public bool UpdateAgentAnswer { get; set; } = false;

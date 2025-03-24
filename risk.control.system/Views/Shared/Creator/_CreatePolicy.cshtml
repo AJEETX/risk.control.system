@@ -45,7 +45,30 @@
         </div>
         <div class="row">
             <div class="col-sm-6">
-
+                <div class="form-group">
+                    <label class="input-group-label"> Case Type:</label>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" asp-for="LineOfBusinessId"><i class="nav-icon fas fa-tools"></i> <i class="fa fa-asterisk asterik-style"></i> </span>
+                        </div>
+                        <select id="LineOfBusinessId" required asp-for="PolicyDetail.LineOfBusinessId" class="form-control remarks" asp-items="ViewBag.LineOfBusinessId">
+                            <option value="">--- SELECT ---</option>
+                        </select>
+                        <span asp-validation-for="PolicyDetail.LineOfBusinessId" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="input-group-label"> Verification Type:</label>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" asp-for="InvestigationServiceTypeId"><i class="nav-icon fas fa-tools"></i> <i class="fa fa-asterisk asterik-style"></i> </span>
+                        </div>
+                        <select id="InvestigationServiceTypeId" required asp-for="PolicyDetail.InvestigationServiceTypeId" class="form-control remarks" asp-items="ViewBag.InvestigationServiceTypeId">
+                            <option value="">--- SELECT ---</option>
+                        </select>
+                        <span asp-validation-for="PolicyDetail.InvestigationServiceTypeId" class="text-danger"></span>
+                    </div>
+                </div>
                 <div class="form-group">
                     <label class="input-group-label"> Case #:</label>
                     <div class="input-group mb-3">
@@ -78,30 +101,7 @@
                     </div>
                 </div>
                 
-                <div class="form-group">
-                    <label class="input-group-label"> Case Type:</label>
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text" asp-for="LineOfBusinessId"><i class="nav-icon fas fa-tools"></i> <i class="fa fa-asterisk asterik-style"></i> </span>
-                        </div>
-                        <select id="LineOfBusinessId" required asp-for="PolicyDetail.LineOfBusinessId" class="form-control remarks" asp-items="ViewBag.LineOfBusinessId">
-                            <option value="">--- SELECT ---</option>
-                        </select>
-                        <span asp-validation-for="PolicyDetail.LineOfBusinessId" class="text-danger"></span>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="input-group-label"> Verification Type:</label>
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text" asp-for="InvestigationServiceTypeId"><i class="nav-icon fas fa-tools"></i> <i class="fa fa-asterisk asterik-style"></i> </span>
-                        </div>
-                        <select id="InvestigationServiceTypeId" required asp-for="PolicyDetail.InvestigationServiceTypeId" class="form-control remarks" asp-items="ViewBag.InvestigationServiceTypeId">
-                            <option value="">--- SELECT ---</option>
-                        </select>
-                        <span asp-validation-for="PolicyDetail.InvestigationServiceTypeId" class="text-danger"></span>
-                    </div>
-                </div>
+                
                 
             </div>
             <div class="col-sm-6">

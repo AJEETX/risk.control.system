@@ -1,4 +1,5 @@
-﻿@model ClaimTransactionModel
+﻿@using risk.control.system.Helpers
+@model ClaimTransactionModel
 
 @{
     var customerDetail = Model.ClaimsInvestigation?.CustomerDetail;
@@ -55,7 +56,7 @@
                         <li class="small"><span class="fa-li"><i class="fas fa-restroom"></i></span>Gender: @customerDetail?.Gender</li>
                         <li class="small"><span class="fa-li"><i class="fas fa-graduation-cap"></i></span>Education: @customerDetail?.Education</li>
                         <li class="small"><span class="fa-li"><i class="fas fa-user-alt"></i></span>Age: @currentAgeInYrs</li>
-                        <li class="small"><span class="fa-li"><i class="fa fa-money"></i></span>Annual Income:(@ViewBag.Currency) @customerDetail?.Income</li>
+                        <li class="small"><span class="fa-li"><i class="fa fa-money"></i></span>Annual Income:(@ViewBag.Currency) @customerDetail?.Income.GetEnumDisplayName()</li>
                         <li class="small"><span class="fa-li"><i class="fas fa-lg fa-building"></i></span>Address: @address</li>
                         <li class="small"><span class="fa-li"><i class="fas fa-lg fa-globe"></i></span>Country:  <img src="@imgPath" class="flag-icon" data-toggle="tooltip" />@customerDetail.Country.Name</li>
                         <li class="small"><span class="fa-li"><i class="fas fa-lg fa-phone"></i></span>Phone #: (+@customerDetail?.Country.ISDCode) @customerDetail?.ContactNumber</li>

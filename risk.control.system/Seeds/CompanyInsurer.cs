@@ -25,7 +25,11 @@ namespace risk.control.system.Seeds
             var insurer = new SeedInput { COUNTRY = "au", DOMAIN = "insurer.com", NAME = "Insurer", PHOTO = "/img/insurer.jpg" };
             var canara = new SeedInput { COUNTRY = "in", DOMAIN = "canara.com", NAME = "Allianz", PHOTO = "/img/chl.jpg" };
             
-            var companies = new List<SeedInput> { allianz, insurer, canara };
+            var companies = new List<SeedInput> {
+                allianz,
+                insurer
+                ,canara
+            };
 
             foreach (var company in companies)
             {
