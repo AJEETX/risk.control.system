@@ -828,22 +828,25 @@ document.addEventListener("DOMContentLoaded", function () {
     var termsLinks = document.querySelectorAll('.termsLink');
 
     // Add a click event listener to each element
-    termsLinks.forEach(function (termsLink) {
-        termsLink.addEventListener('click', function (e) {
-            e.preventDefault(); // Prevent default link behavior (i.e., not navigating anywhere)
+    if (termsLinks) {
+            termsLinks.forEach(function (termsLink) {
+            termsLink.addEventListener('click', function (e) {
+                e.preventDefault(); // Prevent default link behavior (i.e., not navigating anywhere)
 
-            // Show the terms modal
-            var termsModal = document.querySelector('#termsModal');
-            termsModal.classList.remove('hidden-section');
-            termsModal.classList.add('show');
+                // Show the terms modal
+                var termsModal = document.querySelector('#termsModal');
+                termsModal.classList.remove('hidden-section');
+                termsModal.classList.add('show');
+            });
         });
-    });
-
+    }
     // Close the modal when clicking the close button
-    closeTermsButton.addEventListener('click', function () {
-        termsModal.classList.add('hidden-section'); // Remove the 'show' class to hide the modal
-        termsModal.classList.remove('show'); // Remove the 'show' class to hide the modal
-    });
+    if (closeTermsButton) {
+            closeTermsButton.addEventListener('click', function () {
+            termsModal.classList.add('hidden-section'); // Remove the 'show' class to hide the modal
+            termsModal.classList.remove('show'); // Remove the 'show' class to hide the modal
+        });
+    }
 
     // Optionally, you can close the modal if clicked outside the modal content
     window.addEventListener('click', function (e) {
@@ -853,98 +856,3 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 });
-//var nodes = document.getElementById("audio-video").getElementsByTagName('*');
-//for (var i = 0; i < nodes.length; i++) {
-//    nodes[i].disabled = true;
-//}
-//const startButton = document.getElementById('audio-start');
-//const stopButton = document.getElementById('audio-stop');
-//const playButton = document.getElementById('audio-play');
-//let output = document.getElementById('audio-output');
-//let audioRecorder;
-//let audioChunks = [];
-//navigator.mediaDevices.getUserMedia({ audio: true })
-//    .then(stream => {
-//        // Initialize the media recorder object
-//        audioRecorder = new MediaRecorder(stream);
-
-//        // dataavailable event is fired when the recording is stopped
-//        audioRecorder.addEventListener('dataavailable', e => {
-//            audioChunks.push(e.data);
-//        });
-
-//        // start recording when the start button is clicked
-//        startButton.addEventListener('click', (e) => {
-//            e.preventDefault();
-
-//            audioChunks = [];
-//            audioRecorder.start();
-//            output.innerHTML = 'Recording started! Speak now.';
-//        });
-
-//        // stop recording when the stop button is clicked
-//        stopButton.addEventListener('click', (e) => {
-//            e.preventDefault();
-//            audioRecorder.stop();
-//            output.innerHTML = 'Recording stopped! Click on the play button to play the recorded audio.';
-//        });
-
-//        // play the recorded audio when the play button is clicked
-//        playButton.addEventListener('click', (e) => {
-//            e.preventDefault();
-//            const blobObj = new Blob(audioChunks, { type: 'audio/webm' });
-//            const audioUrl = URL.createObjectURL(blobObj);
-//            const audio = new Audio(audioUrl);
-//            audio.play();
-//            output.innerHTML = 'Playing the recorded audio!';
-//        });
-//    }).catch(err => {
-//        // If the user denies permission to record audio, then display an error.
-//        console.log('Error: ' + err);
-//    });
-
-//const videostartButton = document.getElementById('video-start');
-//const videostopButton = document.getElementById('video-stop');
-//const videoplayButton = document.getElementById('video-play');
-//let videoOutput = document.getElementById('video-output');
-//let videoRecorder;
-//let videoChunks = [];
-//navigator.mediaDevices.getUserMedia({ audio: true })
-//    .then(stream => {
-//        // Initialize the media recorder object
-//        videoRecorder = new MediaRecorder(stream);
-
-//        // dataavailable event is fired when the recording is stopped
-//        videoRecorder.addEventListener('dataavailable', e => {
-//            videoChunks.push(e.data);
-//        });
-
-//        // start recording when the start button is clicked
-//        vstartButton.addEventListener('click', (e) => {
-//            e.preventDefault();
-
-//            videoChunks = [];
-//            videoRecorder.start();
-//            videoOutput.innerHTML = 'Recording started! Speak now.';
-//        });
-
-//        // stop recording when the stop button is clicked
-//        vstopButton.addEventListener('click', (e) => {
-//            e.preventDefault();
-//            videoRecorder.stop();
-//            videoOutput.innerHTML = 'Recording stopped! Click on the play button to play the recorded audio.';
-//        });
-
-//        // play the recorded audio when the play button is clicked
-//        vplayButton.addEventListener('click', (e) => {
-//            e.preventDefault();
-//            const blobObj = new Blob(videoChunks, { type: 'audio/webm' });
-//            const audioUrl = URL.createObjectURL(blobObj);
-//            const audio = new Video(audioUrl);
-//            audio.play();
-//            videoOutput.innerHTML = 'Playing the recorded audio!';
-//        });
-//    }).catch(err => {
-//        // If the user denies permission to record audio, then display an error.
-//        console.log('Error: ' + err);
-//    });

@@ -743,22 +743,10 @@ namespace risk.control.system.Services
                 };
 
                 _context.VendorInvoice.Add(invoice);
-
-                string folder = Path.Combine(webHostEnvironment.WebRootPath, "report");
-
-                if (!Directory.Exists(folder))
-                {
-                    Directory.CreateDirectory(folder);
-                }
-
-                var filename = "report" + claimsInvestigationId + ".pdf";
-
-                var filePath = Path.Combine(webHostEnvironment.WebRootPath, "report", filename);
-
-                (await PdfReportRunner.Run(webHostEnvironment.WebRootPath, claim)).Build(filePath);
-
-                claim.AgencyReport.PdfReportFilePath = filePath;
+                
                 var saveCount = await _context.SaveChangesAsync();
+
+                Task.Run(() => DoTask(claim, claimsInvestigationId));
 
                 return saveCount > 0 ? (currentUser.ClientCompany, claim.PolicyDetail.ContractNumber) : (null!, string.Empty);
             }
@@ -880,23 +868,9 @@ namespace risk.control.system.Services
 
                 _context.VendorInvoice.Add(invoice);
 
-                //create and save report
-
-                string folder = Path.Combine(webHostEnvironment.WebRootPath, "report");
-
-                if (!Directory.Exists(folder))
-                {
-                    Directory.CreateDirectory(folder);
-                }
-
-                var filename = "report" + claimsInvestigationId + ".pdf";
-
-                var filePath = Path.Combine(webHostEnvironment.WebRootPath, "report", filename);
-
-                (await PdfReportRunner.Run(webHostEnvironment.WebRootPath, claim)).Build(filePath);
-
-                claim.AgencyReport.PdfReportFilePath = filePath;
                 var saveCount = await _context.SaveChangesAsync();
+
+                Task.Run(() => DoTask(claim, claimsInvestigationId));
 
                 return saveCount > 0 ? (currentUser.ClientCompany, claim.PolicyDetail.ContractNumber) : (null!, string.Empty);
             }
@@ -906,7 +880,28 @@ namespace risk.control.system.Services
             }
             return (null!, string.Empty);
         }
+        private async Task<int> DoTask(ClaimsInvestigation claim, string claimsInvestigationId)
+        {
+            //create and save report
 
+            string folder = Path.Combine(webHostEnvironment.WebRootPath, "report");
+
+            if (!Directory.Exists(folder))
+            {
+                Directory.CreateDirectory(folder);
+            }
+
+            var filename = "report" + claimsInvestigationId + ".pdf";
+
+            var filePath = Path.Combine(webHostEnvironment.WebRootPath, "report", filename);
+
+            (await PdfReportRunner.Run(webHostEnvironment.WebRootPath, claim)).Build(filePath);
+
+            claim.AgencyReport.PdfReportFilePath = filePath;
+
+            var saveCount = await _context.SaveChangesAsync();
+            return saveCount;
+        }
         private async Task<(ClientCompany, string)> ReAssignToCreator(string userEmail, string claimsInvestigationId, string assessorRemarks, AssessorRemarkType assessorRemarkType, string reportAiSummary)
         {
             var currentUser = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(u => u.Email == userEmail);

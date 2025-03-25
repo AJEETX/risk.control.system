@@ -12,7 +12,6 @@ namespace risk.control.system.Services
 {
     public interface IClaimCreationService
     {
-        Task<CaseVerification> Create(string userEmail, CaseVerification claimsInvestigation, IFormFile? claimDocument);
         Task<ClaimsInvestigation> CreatePolicy(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? claimDocument);
 
         Task<ClaimsInvestigation> EdiPolicy(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? claimDocument);
@@ -56,6 +55,7 @@ namespace risk.control.system.Services
 
                 claimsInvestigation.PolicyDetail.ClaimType = claimsInvestigation.PolicyDetail.LineOfBusinessId == claimId ? ClaimType.DEATH : ClaimType.HEALTH;
                 claimsInvestigation.Updated = DateTime.Now;
+                claimsInvestigation.ORIGIN = ORIGIN.USER;
                 claimsInvestigation.UserEmailActioned = userEmail;
                 claimsInvestigation.UserEmailActionedTo = userEmail;
                 claimsInvestigation.UserRoleActionedTo = $"{currentUser.ClientCompany.Email}";
@@ -111,6 +111,7 @@ namespace risk.control.system.Services
                 existingPolicy.PolicyDetail.CauseOfLoss = claimsInvestigation.PolicyDetail.CauseOfLoss;
                 existingPolicy.Updated = DateTime.Now;
                 existingPolicy.UpdatedBy = userEmail;
+                existingPolicy.ORIGIN = ORIGIN.USER;
                 existingPolicy.CurrentUserEmail = userEmail;
                 existingPolicy.CurrentClaimOwner = userEmail;
                 existingPolicy.PolicyDetail.LineOfBusinessId = claimsInvestigation.PolicyDetail.LineOfBusinessId;
@@ -160,6 +161,7 @@ namespace risk.control.system.Services
                     .FirstOrDefaultAsync(c => c.ClaimsInvestigationId == customerDetail.ClaimsInvestigationId);
                 claimsInvestigation.AutoNew = 0;
                 claimsInvestigation.Updated = DateTime.Now;
+                claimsInvestigation.ORIGIN = ORIGIN.USER;
 
                 customerDetail.CountryId = customerDetail.SelectedCountryId;
                 customerDetail.StateId = customerDetail.SelectedStateId;
@@ -211,6 +213,7 @@ namespace risk.control.system.Services
                     .FirstOrDefaultAsync(c => c.ClaimsInvestigationId == customerDetail.ClaimsInvestigationId);
                 claimsInvestigation.AutoNew = 0;
                 claimsInvestigation.Updated = DateTime.Now;
+                claimsInvestigation.ORIGIN = ORIGIN.USER;
 
                 customerDetail.CountryId = customerDetail.SelectedCountryId;
                 customerDetail.StateId = customerDetail.SelectedStateId;
@@ -261,6 +264,7 @@ namespace risk.control.system.Services
                 claimsInvestigation.AutoNew = 0;
                 claimsInvestigation.Updated = DateTime.Now;
                 claimsInvestigation.IsReady2Assign = true;
+                claimsInvestigation.ORIGIN = ORIGIN.USER;
 
                 beneficiary.CountryId = beneficiary.SelectedCountryId;
                 beneficiary.StateId = beneficiary.SelectedStateId;
@@ -316,6 +320,7 @@ namespace risk.control.system.Services
                     .FirstOrDefaultAsync(c => c.ClaimsInvestigationId == beneficiary.ClaimsInvestigationId);
                 claimsInvestigation.AutoNew = 0;
                 claimsInvestigation.Updated = DateTime.Now;
+                claimsInvestigation.ORIGIN = ORIGIN.USER;
 
                 beneficiary.CountryId = beneficiary.SelectedCountryId;
                 beneficiary.StateId = beneficiary.SelectedStateId;
@@ -346,60 +351,6 @@ namespace risk.control.system.Services
             {
                 Console.WriteLine(ex.StackTrace);
                 return null;
-            }
-        }
-
-        public async Task<CaseVerification> Create(string userEmail, CaseVerification caseVerification, IFormFile? claimDocument)
-        {
-            try
-            {
-                var currentUser = context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
-                caseVerification.ClientCompanyId = currentUser.ClientCompanyId;
-
-                if (claimDocument is not null)
-                {
-                    using var dataStream = new MemoryStream();
-                    claimDocument.CopyTo(dataStream);
-                    caseVerification.CustomerDetail.ProfilePicture = dataStream.ToArray();
-                }
-                var initiatedStatusId = context.InvestigationCaseStatus.FirstOrDefault(i =>
-                i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INITIATED).InvestigationCaseStatusId;
-                var createdSubStatusId = context.InvestigationCaseSubStatus.FirstOrDefault(i =>
-                i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR).InvestigationCaseSubStatusId;
-
-                caseVerification.Updated = DateTime.Now;
-                caseVerification.UserEmailActioned = userEmail;
-                caseVerification.UserEmailActionedTo = userEmail;
-                caseVerification.UserRoleActionedTo = $"{currentUser.ClientCompany.Email}";
-                caseVerification.UpdatedBy = userEmail;
-                caseVerification.CurrentUserEmail = userEmail;
-                caseVerification.CurrentClaimOwner = currentUser.Email;
-                caseVerification.InvestigationCaseStatusId = initiatedStatusId;
-                caseVerification.InvestigationCaseSubStatusId = createdSubStatusId;
-                caseVerification.CreatorSla = currentUser.ClientCompany.CreatorSla;
-                caseVerification.ClientCompany = currentUser.ClientCompany;
-                var aaddedClaimId = context.CaseVerification.Add(caseVerification);
-                var log = new CaseVerificationTransaction
-                {
-                    CaseVerificationId = caseVerification.CaseVerificationId,
-                    UserEmailActioned = userEmail,
-                    UserEmailActionedTo = userEmail,
-                    UserRoleActionedTo = $"{currentUser.ClientCompany.Email}",
-                    CurrentClaimOwner = currentUser.Email,
-                    HopCount = 0,
-                    Time2Update = 0,
-                    InvestigationCaseStatusId = initiatedStatusId,
-                    InvestigationCaseSubStatusId = createdSubStatusId,
-                    UpdatedBy = userEmail,
-                };
-                context.CaseVerificationTransaction.Add(log);
-
-                return await context.SaveChangesAsync() > 0 ? caseVerification : null!;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.StackTrace);
-                return null!;
             }
         }
     }

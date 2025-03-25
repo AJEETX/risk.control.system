@@ -5,16 +5,10 @@
     @Model.AgencyReport.AgentRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt") : null;
 }
 
-@if (Model.ClaimsInvestigation.UpdateAgentAnswer)
+@if (!string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.AgencyReport.AgentRemarks))
 {
-    <partial name="_Questionaire" model="@Model" />
-
-}
-else @if (!string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.AgencyReport.AgentRemarks))
-{
-
-    <div class="card bg-light d-flex flex-fill border-success">
-        <div class="card bg-light d-flex flex-fill border-success collapsed-card">
+    <div class="card border-success">
+        <div class="card direct-chat-warning collapsed-card">
             <div class="card-header text-muted border-bottom-0">
                 <h3 class="card-title">
                     <i class="far fa-comment"></i> Questionnaire
@@ -126,13 +120,26 @@ else @if (!string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.AgencyReport.Agen
                                     <span class="fa-li">
                                         <i class="far fa-comment"></i>
                                     </span>
-                                    @Model.AgencyReport?.AgentRemarks
+
+                                    @if (Model.ClaimsInvestigation.UpdateAgentAnswer)
+                                    {
+                                        <input required name="remarks" asp-for="AgencyReport.AgentRemarks" class="form-control remarks" data-toggle="tooltip" title="Edit Agent Remarks"
+                                               type="text" placeholder="Remarks" maxlength="50" />
+                                        <span asp-validation-for="AgencyReport.AgentRemarks" class="text-danger"></span>
+                                    }
+                                    else
+                                    {
+                                        @Model.AgencyReport?.AgentRemarks
+
+                                    }
+
                                 </li>
                             </ul>
                         </p>
                     </div>
                 </div>
             </div>
+
         </div>
 
         <div class="text-center">
