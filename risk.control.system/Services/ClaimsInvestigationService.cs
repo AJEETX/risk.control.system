@@ -746,7 +746,7 @@ namespace risk.control.system.Services
                 
                 var saveCount = await _context.SaveChangesAsync();
 
-                Task.Run(() => DoTask(claim, claimsInvestigationId));
+                await DoTask(claim, claimsInvestigationId);
 
                 return saveCount > 0 ? (currentUser.ClientCompany, claim.PolicyDetail.ContractNumber) : (null!, string.Empty);
             }
@@ -870,7 +870,7 @@ namespace risk.control.system.Services
 
                 var saveCount = await _context.SaveChangesAsync();
 
-                Task.Run(() => DoTask(claim, claimsInvestigationId));
+                await DoTask(claim, claimsInvestigationId);
 
                 return saveCount > 0 ? (currentUser.ClientCompany, claim.PolicyDetail.ContractNumber) : (null!, string.Empty);
             }
