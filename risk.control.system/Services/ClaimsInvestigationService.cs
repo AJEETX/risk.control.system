@@ -44,12 +44,14 @@ namespace risk.control.system.Services
         private readonly ApplicationDbContext _context;
         private readonly IMailboxService mailboxService;
         private readonly IWebHostEnvironment webHostEnvironment;
-
+        private readonly IHttpContextAccessor accessor;
         public ClaimsInvestigationService(ApplicationDbContext context,
+            IHttpContextAccessor accessor,
             IMailboxService mailboxService, 
             IWebHostEnvironment webHostEnvironment)
         {
             this._context = context;
+            this.accessor = accessor;
             this.mailboxService = mailboxService;
             this.webHostEnvironment = webHostEnvironment;
         }
@@ -745,8 +747,8 @@ namespace risk.control.system.Services
                 _context.VendorInvoice.Add(invoice);
                 
                 var saveCount = await _context.SaveChangesAsync();
-
-                await DoTask(claim, claimsInvestigationId);
+                var svc = accessor.HttpContext.RequestServices.GetService<BackgroundTaskService>();
+                svc.ProcessTask(claim, claimsInvestigationId);
 
                 return saveCount > 0 ? (currentUser.ClientCompany, claim.PolicyDetail.ContractNumber) : (null!, string.Empty);
             }
@@ -870,7 +872,8 @@ namespace risk.control.system.Services
 
                 var saveCount = await _context.SaveChangesAsync();
 
-                await DoTask(claim, claimsInvestigationId);
+                var svc = accessor.HttpContext.RequestServices.GetService<BackgroundTaskService>();
+                svc.ProcessTask(claim, claimsInvestigationId);
 
                 return saveCount > 0 ? (currentUser.ClientCompany, claim.PolicyDetail.ContractNumber) : (null!, string.Empty);
             }

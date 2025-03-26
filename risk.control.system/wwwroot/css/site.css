@@ -196,7 +196,9 @@ a.table-link {
 #agentLocationPicture {
     cursor: pointer;
 }
-
+.agentLocationPicture {
+    cursor: pointer;
+}
 #maps {
     height: 600px;
     margin: 0;
@@ -324,8 +326,16 @@ a.table-link {
     height: 300px;
     width: auto;
 }
+#agent-map {
+    height: 300px;
+    width: auto;
+}
 
 #face-map-url {
+    height: 100%;
+    width: 100%;
+}
+#agent-map-url {
     height: 100%;
     width: 100%;
 }

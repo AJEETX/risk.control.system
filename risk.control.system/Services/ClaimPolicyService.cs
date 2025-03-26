@@ -73,6 +73,7 @@ namespace risk.control.system.Services
                 .Include(c => c.AgencyReport)
                     .ThenInclude(c => c.EnquiryRequest)
               .Include(c => c.PreviousClaimReports)
+              .Include(c => c.AgencyReport.AgentIdReport)
               .Include(c => c.AgencyReport.DigitalIdReport)
               .Include(c => c.AgencyReport.PanIdReport)
               .Include(c => c.AgencyReport.PassportIdReport)

@@ -1,4 +1,7 @@
 ﻿@model ClaimTransactionModel
+@if (Model.ClaimsInvestigation.AgencyReport.EnquiryRequests.Count > 0)
+{
+    
 <div class="col-12 d-flex align-items-stretch flex-column">
     <div class="card bg-light d-flex flex-fill">
         <div class="card-header">
@@ -83,3 +86,4 @@
         </div>
     </div>
 </div>
+}

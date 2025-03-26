@@ -90,6 +90,63 @@ namespace risk.control.system.Controllers
         [HttpPost]
         [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AgentUpload(string selectedcase, IFormFile agentImage, string agentIdLatitude, string agentIdLongitude, bool supervisorPhotoIdUpdate = false)
+        {
+            try
+            {
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (currentUserEmail == null)
+                {
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+
+                if (string.IsNullOrWhiteSpace(currentUserEmail) ||
+                    (agentImage == null) ||
+                    string.IsNullOrWhiteSpace(selectedcase) ||
+                    string.IsNullOrWhiteSpace(agentIdLatitude) ||
+                    string.IsNullOrWhiteSpace(Path.GetFileName(agentImage.FileName)) ||
+                    string.IsNullOrWhiteSpace(Path.GetExtension(Path.GetFileName(agentImage.FileName))) ||
+                    string.IsNullOrWhiteSpace(Path.GetFileName(agentImage.Name)) ||
+                    string.IsNullOrWhiteSpace(agentIdLongitude))
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                if (string.IsNullOrWhiteSpace(selectedcase))
+                {
+                    notifyService.Custom($"No claim selected!!!. ", 3, "orange", "fas fa-portrait");
+                    return Redirect("/Agent/GetInvestigate?selectedcase=" + selectedcase);
+                }
+
+                using (var ds = new MemoryStream())
+                {
+                    agentImage.CopyTo(ds);
+                    var imageByte = ds.ToArray();
+                    var response = await agentService.PostAgentId(currentUserEmail, selectedcase, agentIdLatitude, agentIdLongitude, imageByte);
+
+                    notifyService.Custom($"Agent Image Uploaded", 3, "green", "fas fa-portrait");
+                    if (supervisorPhotoIdUpdate)
+                    {
+                        return Redirect("/Supervisor/GetInvestigateReport?selectedcase=" + selectedcase);
+                    }
+                    else
+                    {
+                        return Redirect("/Agent/GetInvestigate?selectedcase=" + selectedcase);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+        }
+
+        [HttpPost]
+        [RequestSizeLimit(2_000_000)] // Checking for 2 MB
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> FaceUpload(string selectedcase, IFormFile digitalImage, string digitalIdLatitude, string digitalIdLongitude, bool supervisorPhotoIdUpdate = false)
         {
             try

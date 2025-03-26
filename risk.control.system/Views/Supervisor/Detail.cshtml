@@ -5,10 +5,10 @@
 
 }
 <section class="content">
-        <input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail?.CustomerDetailId" />
-        <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
-        <input type="hidden" id="policyDetailId" value="@Model.ClaimsInvestigation?.PolicyDetail.PolicyDetailId" />
-        <input type="hidden" id="beneficiaryId" value="@Model.Location?.BeneficiaryDetailId" />
+    <input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail?.CustomerDetailId" />
+    <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
+    <input type="hidden" id="policyDetailId" value="@Model.ClaimsInvestigation?.PolicyDetail.PolicyDetailId" />
+    <input type="hidden" id="beneficiaryId" value="@Model.Location?.BeneficiaryDetailId" />
     <div id="article" class="card shadow-lg border-1 rounded-lg">
         <div class="card-header bg-secondary text-white text-center">
             <h3 class="card-title">
@@ -36,17 +36,17 @@
         </div>
     </div>
 
-        @{
-            var data = new ClaimsInvestigationVendorsModel
+    @{
+        var data = new ClaimsInvestigationVendorsModel
             {
                 Location = Model.Location,
                 ClaimsInvestigation = Model.ClaimsInvestigation,
             };
-            }
-            <div class="submit-progress hidden">
-                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
-            </div>
-            <partial name="_AgentSubmittedReport" model="@Model" />
+    }
+    <div class="submit-progress hidden">
+        <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+    </div>
+    <partial name="_AgentSubmittedReport" model="@Model" />
     @if (@Model.ClaimsInvestigation.AgencyReport != null)
     {
         <div class="card shadow-lg border-1 rounded-lg expanded-card">
@@ -76,6 +76,7 @@
             <div class="card-body pb-0">
                 <div class="row">
                     @{
+                        <partial name="_AgentSubmittedAgentdReport" model="@Model" />
                         <partial name="_AgentSubmittedDigitalIdReport" model="@Model" />
                         <partial name="_AgentSubmittedDocumentIdReport" model="@Model" />
                         if (Model.ClaimsInvestigation.EnablePassport)
@@ -88,14 +89,16 @@
                             <partial name="_AgentSubmittedVideoReport" model="@Model" />
                         }
                     }
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        @if (!string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.AgencyReport?.AgentRemarks))
+                        {
+                            var questionTime = @Model.ClaimsInvestigation.AgencyReport.AgentRemarksUpdated != null ?
+                            @Model.ClaimsInvestigation.AgencyReport.AgentRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt") : null;
+                            <div class="card  border-success">
 
-                    @if (!string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.AgencyReport?.AgentRemarks))
-                    {
-                        var questionTime = @Model.ClaimsInvestigation.AgencyReport.AgentRemarksUpdated != null ?
-                        @Model.ClaimsInvestigation.AgencyReport.AgentRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt") : null;
-
-                        <div class="col-12 col-sm-4 d-flex align-items-stretch flex-column">
-                            <div class="card bg-light d-flex flex-fill border-success">
+                            <div class="card direct-chat-warning collapsed-card">
                                 <div class="card-header text-muted border-bottom-0">
                                     <h3 class="card-title">
                                         <i class="far fa-comment"></i> Questionnaire
@@ -114,6 +117,9 @@
                                             <i class="nav-icon fas fa-clock"></i>
                                             @Model.ClaimsInvestigation.AgencyReport?.AgentRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt")
                                         </span>
+                                        <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
                                     </div>
                                 </div>
                                 <div class="card-footer text-muted border-bottom-0">
@@ -231,11 +237,14 @@
 
                                 </div>
                             </div>
-
-                        </div>
-                    }
-
-                    <div class="col-12">
+                                <div class="text-center">
+                                    <i class='fas fa-check-circle i-green'></i>
+                                </div>
+                            </div>
+                           
+                        }
+                    </div>
+                    <div class="col-6">
                         @if (!string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.AgencyReport?.SupervisorRemarks))
                         {
                             <div class="card bg-light  border-success">
@@ -327,13 +336,13 @@
 
                         }
                     </div>
-
+                </div>
+                <div class="row">
                     @if (@Model.ClaimsInvestigation.IsQueryCase && @Model.ClaimsInvestigation.AgencyReport.EnquiryRequest != null)
                     {
                         <partial name="_EnquiryReport" model="@Model" />
                     }
                 </div>
-
             </div>
         </div>
     }
@@ -358,7 +367,7 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-     <script src="~/js/common/claim-details.js">
+    <script src="~/js/common/claim-details.js">
     </script>
     <script src="~/js/map.js"></script>
     <script>
@@ -366,5 +375,5 @@
     </script>
     <script src="~/js/supervisor/claims-details.js">
     </script>
-   
+
 }

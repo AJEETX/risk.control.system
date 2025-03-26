@@ -27,6 +27,34 @@ function initReportMap() {
     var url;
     var distance;
     var duration;
+    //AGENT ID
+    var response = $.ajax({
+        type: "GET",
+        url: "/api/ClaimsInvestigation/GetAgentDetail?claimId=" + claimId,
+        async: false
+    }).responseText;
+    if (response) {
+        var data = JSON.parse(response);
+        if (data && data.center && data.dakota && data.frick && data.url && data.distance && data.duration) {
+
+            var faceMapUrl = document.getElementById('agent-map-url');
+            if (faceMapUrl) {
+                faceMapUrl.src = data.url;
+            }
+            var faceMsg = document.getElementById('agent-msg');
+            if (faceMsg) {
+                faceMsg.innerHTML = `<p>Distance: <em> ${data.distance} </em>, Duration <em>${data.duration}</em>.</p>`;
+            }
+
+
+            //center = data.center;
+            //dakota = data.dakota;
+            //frick = data.frick,
+            //url = data.url,
+            //    distance = data.distance,
+            //duration = data.duration
+        }
+    }
     //FACE ID
     var response = $.ajax({
         type: "GET",

@@ -8,7 +8,7 @@
     {
         questionaire = "progress-bar-green";
     }
-    <div class="col-12 col-sm-4 d-flex align-items-stretch flex-column">
+    <div class="col-12 col-sm-4 col-md-12 d-flex align-items-stretch flex-column">
         <div id="questionaire-border" class="card bg-light d-flex flex-fill">
             <div class="card-header text-muted border-bottom-0">
 
@@ -48,7 +48,7 @@
                 <input type="hidden" id="usertype" value="@Applicationsettings.AGENT.DISPLAY_NAME" />
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-12">
+                        <div class="col-6">
                             <div class="form-group">
                                 <span class="input-group-label"> Ownership of residence ?</span>
                                 <div class="input-group mb-3">
@@ -86,6 +86,9 @@
                                     <span asp-validation-for="AgencyReport.ReportQuestionaire.Answer3" class="text-danger"></span>
                                 </div>
                             </div>
+                            
+                        </div>
+                        <div class="col-6">
                             <div class="form-group">
                                 <span class="input-group-label"> Date met with neighbour ?:</span>
                                 <div class="input-group mb-3">
@@ -96,7 +99,7 @@
                                         var maxDate = @DateTime.Now.ToString("dd-MM-yyyy");
                                     }
                                     <input required asp-for="AgencyReport.ReportQuestionaire.Answer4" name="question4" id="question4" data-toggle="tooltip" title="Select Date met with neighbour"
-                                    class="form-control remarks date-width" min="2000-01-01" max="@maxDate" type="date" />
+                                           class="form-control remarks date-width" min="2000-01-01" max="@maxDate" type="date" />
                                     <span asp-validation-for="AgencyReport.ReportQuestionaire.Answer4" class="text-danger"></span>
                                 </div>
                             </div>
@@ -107,22 +110,24 @@
                                         <span class="input-group-text" asp-for="AgencyReport.AgentRemarks"><i class="fas fa-comment"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
                                     </div>
                                     <input required name="remarks" id="remarks" asp-for="AgencyReport.AgentRemarks" class="form-control remarks" data-toggle="tooltip" title="Enter remarks"
-                                    type="text" placeholder="Remarks" maxlength="50" />
+                                           type="text" placeholder="Remarks" maxlength="50" />
                                     <span asp-validation-for="AgencyReport.AgentRemarks" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-12 d-flex justify-content-center align-items-center">
+                                <div class="ml-4 mb-0 fa-ul text-muted">
+
+                                    <div class="form-group">
+                                        <input type="checkbox" id="terms_and_conditions" value="1" />
+                                        <label class="account" for="terms_and_conditions" data-toggle="tooltip" title="I agree to the Terms & Conditions"> I agree to the <a class="termsLink" href="#">Terms & Conditions</a></label>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+                    
                     <div class="row">
-                        <div class="col-12 d-flex justify-content-center align-items-center">
-                            <div class="ml-4 mb-0 fa-ul text-muted">
-
-                                <li class="form-group">
-                                    <input type="checkbox" id="terms_and_conditions" value="1" />
-                                    <label class="account" for="terms_and_conditions" data-toggle="tooltip" title="I agree to the Terms & Conditions"> I agree to the <a class="termsLink" href="#">Terms & Conditions</a></label>
-                                </li>
-                            </div>
-                        </div>
+                        
                     </div>
                 </div>
 

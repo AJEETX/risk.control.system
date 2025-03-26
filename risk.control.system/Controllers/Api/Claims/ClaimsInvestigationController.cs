@@ -442,6 +442,61 @@ namespace risk.control.system.Controllers.Api.Claims
             return Ok(data);
         }
 
+        [HttpGet("GetAgentDetail")]
+        public IActionResult GetAgentDetail(string claimid)
+        {
+            var claim = claimsService.GetClaims()
+                .Include(c => c.AgencyReport)
+                .Include(c => c.AgencyReport.AgentIdReport)
+                .FirstOrDefault(c => c.ClaimsInvestigationId == claimid);
+
+            if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
+            {
+                var center = new { Lat = decimal.Parse(claim.CustomerDetail.Latitude), Lng = decimal.Parse(claim.CustomerDetail.Longitude) };
+                var dakota = new { Lat = decimal.Parse(claim.CustomerDetail.Latitude), Lng = decimal.Parse(claim.CustomerDetail.Longitude) };
+
+                if (claim.AgencyReport is not null && claim.AgencyReport?.AgentIdReport?.DigitalIdImageLongLat is not null)
+                {
+                    var longLat = claim.AgencyReport.AgentIdReport.DigitalIdImageLongLat.IndexOf("/");
+                    var latitude = claim.AgencyReport?.AgentIdReport?.DigitalIdImageLongLat.Substring(0, longLat)?.Trim();
+                    var longitude = claim.AgencyReport?.AgentIdReport?.DigitalIdImageLongLat.Substring(longLat + 1)?.Trim();
+                    var frick = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) };
+                    return Ok(new
+                    {
+                        center,
+                        dakota,
+                        frick,
+                        url = claim.AgencyReport?.AgentIdReport.DigitalIdImageLocationUrl,
+                        distance = claim.AgencyReport.AgentIdReport.Distance,
+                        duration = claim.AgencyReport.AgentIdReport.Duration,
+                    });
+                }
+            }
+            else
+            {
+                var center = new { Lat = decimal.Parse(claim.BeneficiaryDetail.Latitude), Lng = decimal.Parse(claim.BeneficiaryDetail.Longitude) };
+                var dakota = new { Lat = decimal.Parse(claim.BeneficiaryDetail.Latitude), Lng = decimal.Parse(claim.BeneficiaryDetail.Longitude) };
+
+                if (claim.AgencyReport is not null && claim.AgencyReport?.AgentIdReport?.DigitalIdImageLongLat is not null)
+                {
+                    var longLat = claim.AgencyReport.AgentIdReport.DigitalIdImageLongLat.IndexOf("/");
+                    var latitude = claim.AgencyReport?.AgentIdReport?.DigitalIdImageLongLat.Substring(0, longLat)?.Trim();
+                    var longitude = claim.AgencyReport?.AgentIdReport?.DigitalIdImageLongLat.Substring(longLat + 1)?.Trim();
+                    var frick = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) };
+                    return Ok(new
+                    {
+                        center,
+                        dakota,
+                        frick,
+                        url = claim.AgencyReport?.AgentIdReport.DigitalIdImageLocationUrl,
+                        distance = claim.AgencyReport.AgentIdReport.Distance,
+                        duration = claim.AgencyReport.AgentIdReport.Duration,
+                    });
+                }
+            }
+            return Ok();
+        }
+
         [HttpGet("GetFaceDetail")]
         public IActionResult GetFaceDetail(string claimid)
         {
@@ -464,10 +519,12 @@ namespace risk.control.system.Controllers.Api.Claims
                     var latLongString = latitude + "," + longitude;
 
                     var frick = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) };
-                    return Ok(new { 
-                        center, dakota, 
-                        frick, 
-                        url = claim.AgencyReport?.DigitalIdReport.DigitalIdImageLocationUrl, 
+                    return Ok(new
+                    {
+                        center,
+                        dakota,
+                        frick,
+                        url = claim.AgencyReport?.DigitalIdReport.DigitalIdImageLocationUrl,
                         distance = claim.AgencyReport.DigitalIdReport.Distance,
                         duration = claim.AgencyReport.DigitalIdReport.Duration,
                     });
@@ -485,10 +542,11 @@ namespace risk.control.system.Controllers.Api.Claims
                     var longitude = claim.AgencyReport?.DigitalIdReport?.DigitalIdImageLongLat.Substring(longLat + 1)?.Trim();
 
                     var frick = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) };
-                    return Ok(new { 
-                        center, 
-                        dakota, 
-                        frick, 
+                    return Ok(new
+                    {
+                        center,
+                        dakota,
+                        frick,
                         url = claim.AgencyReport?.DigitalIdReport.DigitalIdImageLocationUrl,
                         distance = claim.AgencyReport.DigitalIdReport.Distance,
                         duration = claim.AgencyReport.DigitalIdReport.Duration,

@@ -25,6 +25,7 @@
         </div>
         <div class="row">
 
+            <partial name="_AgentIdReport" model="@Model" />
             <partial name="_DigitalIdReport" model="@Model" />
             <partial name="_DocumentIdReport" model="@Model" />
             @if (Model.ClaimsInvestigation.EnablePassport)
@@ -36,7 +37,10 @@
                 <partial name="_AudioReport" model="@Model" />
                 <partial name="_VideoReport" model="@Model" />
             }
+        </div>
+        <div class="row">
             <partial name="_Questionaire" model="@Model" />
+
         </div>
     </div>
 </div>

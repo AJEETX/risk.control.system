@@ -85,6 +85,7 @@
         <div class="card-body">
             <div class="row">
                 @{
+                    <partial name="_AgentSubmittedAgentdReport" model="@Model" />
                     <partial name="_AgentSubmittedDigitalIdReport" model="@Model" />
                     <partial name="_AgentSubmittedDocumentIdReport" model="@Model" />
                     if (Model.ClaimsInvestigation.EnablePassport)
@@ -97,11 +98,15 @@
                         <partial name="_AgentSubmittedVideoReport" model="@Model" />
                     }
                 }
-                @if (!string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.AgencyReport?.AgentRemarks))
-                {
-                    var questionTime = @Model.ClaimsInvestigation.AgencyReport.AgentRemarksUpdated != null ? @Model.ClaimsInvestigation.AgencyReport.AgentRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt") : null;
+                
 
-                    <div class="col-12 col-sm-4 d-flex align-items-stretch flex-column">
+            </div>
+            <div class="row">
+                <div class="col-6">
+                    @if (!string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.AgencyReport?.AgentRemarks))
+                    {
+                        var questionTime = @Model.ClaimsInvestigation.AgencyReport.AgentRemarksUpdated != null ? @Model.ClaimsInvestigation.AgencyReport.AgentRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt") : null;
+
                         <div class="card bg-light d-flex flex-fill border-success">
                             <div class="card-header text-muted border-bottom-0">
                                 <h3 class="card-title">
@@ -246,12 +251,10 @@
                                 </div>
                             </div>
                         </div>
-
-                    </div>
-                }
-
+                    }
+                </div>
             </div>
-            <div class="col-12">
+            <div class="col-6">
                 @if (!string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.AgencyReport?.SupervisorRemarks))
                 {
                     <div class="card bg-light border-success">

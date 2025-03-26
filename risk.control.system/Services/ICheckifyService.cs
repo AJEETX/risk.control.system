@@ -15,11 +15,13 @@ using System.Text.RegularExpressions;
 using risk.control.system.Controllers.Api.Claims;
 using static Google.Apis.Requests.BatchRequest;
 using System.Threading.Tasks;
+using Google.Api;
 
 namespace risk.control.system.Services;
 
 public interface IICheckifyService
 {
+    Task<AppiCheckifyResponse> GetAgentId(FaceData data);
     Task<AppiCheckifyResponse> GetFaceId(FaceData data);
     Task<AppiCheckifyResponse> GetDocumentId(DocumentData data);
     Task<AppiCheckifyResponse> GetPassportId(DocumentData data);
@@ -80,6 +82,112 @@ public class ICheckifyService : IICheckifyService
         return true;
     }
 
+
+    public async Task<AppiCheckifyResponse> GetAgentId(FaceData data)
+    {
+        ClaimsInvestigation claim = null;
+        try
+        {
+            claim = claimsService.GetClaims().Include(c => c.AgencyReport).ThenInclude(c => c.AgentIdReport).FirstOrDefault(c => c.ClaimsInvestigationId == data.ClaimId);
+
+            if (claim.AgencyReport == null)
+            {
+                claim.AgencyReport = new AgencyReport();
+            }
+            claim.AgencyReport.AgentEmail = data.Email;
+            var agent = _context.VendorApplicationUser.FirstOrDefault(u=>u.Email == data.Email);
+            claim.AgencyReport.AgentIdReport.Updated = DateTime.Now;
+            claim.AgencyReport.AgentIdReport.UpdatedBy = data.Email;
+            claim.AgencyReport.AgentIdReport.DigitalIdImageLongLatTime = DateTime.Now;
+            claim.AgencyReport.AgentIdReport.DigitalIdImageLongLat = data.LocationLongLat;
+            var longLat = claim.AgencyReport.AgentIdReport.DigitalIdImageLongLat.IndexOf("/");
+            var latitude = claim.AgencyReport.AgentIdReport.DigitalIdImageLongLat.Substring(0, longLat)?.Trim();
+            var longitude = claim.AgencyReport.AgentIdReport.DigitalIdImageLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
+            var latLongString = latitude + "," + longitude;
+            var weatherUrl = $"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current=temperature_2m,windspeed_10m&hourly=temperature_2m,relativehumidity_2m,windspeed_10m";
+
+            byte[]? registeredImage = agent.ProfilePicture;
+            var expectedLat = agent.AddressLatitude;
+            var expectedLong = agent.AddressLongitude;
+
+            var mapTask = customApiCLient.GetMap(double.Parse(expectedLat), double.Parse(expectedLong), double.Parse(latitude), double.Parse(longitude), "A", "X", "300", "300", "green", "red");
+
+            #region FACE IMAGE PROCESSING
+
+            var faceMatchTask = faceMatchService.GetFaceMatchAsync(registeredImage, data.LocationImage);
+            var weatherTask = httpClient.GetFromJsonAsync<Weather>(weatherUrl);
+            var addressTask = httpClientService.GetRawAddress(latitude, longitude);
+            #endregion FACE IMAGE PROCESSING
+
+            await Task.WhenAll(faceMatchTask, addressTask, weatherTask, mapTask);
+
+            var (confidence, compressImage, similarity) = await faceMatchTask;
+            var address = await addressTask;
+            var weatherData = await weatherTask;
+            var (distance, distanceInMetres, duration, durationInSecs, map) = await mapTask;
+
+
+            claim.AgencyReport.AgentIdReport.DigitalIdImageLocationUrl = map;
+            claim.AgencyReport.AgentIdReport.Duration = duration;
+            claim.AgencyReport.AgentIdReport.Distance = distance;
+            claim.AgencyReport.AgentIdReport.DistanceInMetres = distanceInMetres;
+            claim.AgencyReport.AgentIdReport.DurationInSeconds = durationInSecs;
+
+
+            string weatherCustomData = $"Temperature:{weatherData.current.temperature_2m} {weatherData.current_units.temperature_2m}." +
+                $"\r\n" +
+                $"\r\nWindspeed:{weatherData.current.windspeed_10m} {weatherData.current_units.windspeed_10m}" +
+                $"\r\n" +
+                $"\r\nElevation(sea level):{weatherData.elevation} metres";
+
+            claim.AgencyReport.AgentIdReport.DigitalIdImageData = weatherCustomData;
+            claim.AgencyReport.AgentIdReport.DigitalIdImage = compressImage;
+            claim.AgencyReport.AgentIdReport.DigitalIdImageMatchConfidence = confidence;
+            claim.AgencyReport.AgentIdReport.DigitalIdImageLocationAddress = address;
+            claim.AgencyReport.AgentIdReport.MatchExecuted = true;
+            claim.AgencyReport.AgentIdReport.Similarity = similarity;
+            var updateClaim = _context.ClaimsInvestigation.Update(claim);
+
+            var rows = await _context.SaveChangesAsync();
+
+            var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-photo.jpg");
+
+            var noDataimage = await File.ReadAllBytesAsync(noDataImagefilePath);
+            return new AppiCheckifyResponse
+            {
+                BeneficiaryId = updateClaim.Entity.BeneficiaryDetail.BeneficiaryDetailId,
+                LocationImage = updateClaim.Entity.AgencyReport?.AgentIdReport?.DigitalIdImage != null ?
+                Convert.ToBase64String(claim.AgencyReport?.AgentIdReport?.DigitalIdImage) :
+                Convert.ToBase64String(noDataimage),
+                LocationLongLat = claim.AgencyReport.AgentIdReport?.DigitalIdImageLongLat,
+                LocationTime = claim.AgencyReport.AgentIdReport?.DigitalIdImageLongLatTime,
+                FacePercent = claim.AgencyReport.AgentIdReport?.DigitalIdImageMatchConfidence
+            };
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.StackTrace);
+            claim.AgencyReport.AgentIdReport.DigitalIdImageData = "No Weather Data";
+            claim.AgencyReport.AgentIdReport.DigitalIdImage = Convert.FromBase64String(data.LocationImage);
+            claim.AgencyReport.AgentIdReport.DigitalIdImageMatchConfidence = string.Empty;
+            claim.AgencyReport.AgentIdReport.DigitalIdImageLocationAddress = "No Address data";
+            claim.AgencyReport.AgentIdReport.MatchExecuted = true;
+            var updateClaim = _context.ClaimsInvestigation.Update(claim);
+            var rows = await _context.SaveChangesAsync();
+            var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-photo.jpg");
+            var noData = await File.ReadAllBytesAsync(noDataImagefilePath);
+            return new AppiCheckifyResponse
+            {
+                BeneficiaryId = updateClaim.Entity.BeneficiaryDetail.BeneficiaryDetailId,
+                LocationImage = updateClaim.Entity.AgencyReport?.AgentIdReport?.DigitalIdImage != null ?
+                Convert.ToBase64String(claim.AgencyReport?.AgentIdReport?.DigitalIdImage) :
+                Convert.ToBase64String(noData),
+                LocationLongLat = claim.AgencyReport.AgentIdReport?.DigitalIdImageLongLat,
+                LocationTime = claim.AgencyReport.AgentIdReport?.DigitalIdImageLongLatTime,
+                FacePercent = claim.AgencyReport.AgentIdReport?.DigitalIdImageMatchConfidence
+            };
+        }
+    }
     public async Task<AppiCheckifyResponse> GetFaceId(FaceData data)
     {
         ClaimsInvestigation claim = null;

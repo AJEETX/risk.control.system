@@ -33,6 +33,7 @@
             <div class="card-body">
 
                 <div class="row">
+                    <partial name="_AgencyAgentReport" model="@Model" />
                     <partial name="_AgencyDigitalReport" model="@Model" />
                     <partial name="_AgencyDocumentReport" model="@Model" />
                     @if(Model.ClaimsInvestigation.EnablePassport)
@@ -44,10 +45,11 @@
                         <partial name="_AgencyAudioReport" model="@Model" />
                         <partial name="_AgencyVideoReport" model="@Model" />
                     }
+                    
+                </div>
+                <div class="row">
                     <partial name="_AgencyAgentAnswer" model="@Model" />
                     <partial name="_AgencySupervisorAnswer" model="@Model" />
-                    
-
                 </div>
             </div>
         </div>
