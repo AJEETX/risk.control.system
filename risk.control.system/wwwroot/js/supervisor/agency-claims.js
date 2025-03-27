@@ -102,7 +102,7 @@
                 "mRender": function (data, type, row) {
                     if (!row.isQueryCase) {
 
-                        var img = '<input name="selectedcase" class="selected-case" type="radio" id="' + row.id + '"  value="' + row.id + '"  data-toggle="tooltip" title="Allocate" />';
+                        var img = '<input name="selectedcase" class="selected-case" type="radio" id="' + row.id + '"  value="' + row.id + '"  data-toggle="tooltip" title="Select Case to Allocate" />';
                         return img;
                     }
                 }

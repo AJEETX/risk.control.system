@@ -16,85 +16,33 @@ namespace risk.control.system.Helpers
         private static HttpClient client = new HttpClient();
         public static async Task<DocumentBuilder> Run(string imagePath, ClaimsInvestigation claim)
         {
-            string photoIdJsonFile = CheckFile(Path.Combine("Files", "photo-id.json"));
-            string photoIdJsonContent = File.ReadAllText(photoIdJsonFile);
-            IdData photoIdData = JsonConvert.DeserializeObject<IdData>(photoIdJsonContent);
-            photoIdData.Passenger = "Photo Id";
-            var photoMatch = claim.AgencyReport.DigitalIdReport.Similarity > 70;
-            photoIdData.FaceMatchStatus = photoMatch ? "YES" : "NO";
-            photoIdData.MatchFont = photoMatch ? Fonts.Helvetica(16f).SetColor(Color.Green) : Fonts.Helvetica(16f).SetColor(Color.Red);
-            var photoStatusImage = photoMatch ? "yes.png" : "cancel.png";
-            photoIdData.StatusImagePath = Path.Combine(imagePath,"img",photoStatusImage);
-
             string detailReportJsonFile = CheckFile(Path.Combine("Files", "detail-report.json"));
             string detailReportJsonContent = File.ReadAllText(detailReportJsonFile);
             DetailedReport detailReport = JsonConvert.DeserializeObject<DetailedReport>(detailReportJsonContent);
-
             detailReport.ReportTime = claim.ProcessedByAssessorTime?.ToString("dd-MMM-yyyy HH:mm:ss");
             detailReport.PolicyNum = claim.PolicyDetail.ContractNumber;
             detailReport.AgencyName = claim.Vendor.Email;
-            detailReport.ClaimType = claim.PolicyDetail.ClaimType.GetEnumDisplayName();
+            detailReport.ClaimType = claim.PolicyDetail.LineOfBusiness.Name;
             detailReport.InsuredAmount = claim.PolicyDetail.SumAssuredValue.ToString();
-                detailReport.Reason2Verify = claim.PolicyDetail.CaseEnabler.Name.ToLower();
+            detailReport.Reason2Verify = claim.PolicyDetail.CaseEnabler.Name.ToLower();
 
             string filePath = claim.ClientCompany.DocumentUrl;
             string fileName = Path.GetFileName(filePath); // "image.jpg"
             string folderPath = Path.GetDirectoryName(filePath); // "/img"
             string folderName = Path.GetFileName(folderPath);
             detailReport.InsurerLogo = Path.Combine(imagePath, folderName, fileName);
-            
             filePath = claim.Vendor.DocumentUrl;
             fileName = Path.GetFileName(filePath); // "image.jpg"
             folderPath = Path.GetDirectoryName(filePath); // "/img"
             folderName = Path.GetFileName(folderPath);    // "img"
             detailReport.AgencyLogo = Path.Combine(imagePath, folderName, fileName);
 
-            var photoIdFilename = $"photo-id-{DateTime.Now.ToString("ddMMMyyyHHmmsss")}.jpg";
-            await File.WriteAllBytesAsync(Path.Combine(imagePath, "report", photoIdFilename), claim.AgencyReport.DigitalIdReport.DigitalIdImage);
-            photoIdData.PhotoIdPath = Path.Combine(imagePath, "report", photoIdFilename);
-
-            string googlePhotoImagePath = Path.Combine(imagePath, "report", $"google-photo-map-{DateTime.Now.ToString("ddMMMyyyHHmmsss")}.png");
-            var photoPath = await DownloadMapImageAsync(claim.AgencyReport.DigitalIdReport.DigitalIdImageLocationUrl, googlePhotoImagePath);
-            photoIdData.PhotoIdMapUrl = claim.AgencyReport.DigitalIdReport.DigitalIdImageLocationUrl;
-            photoIdData.PhotoIdMapPath = photoPath;
-
-
-            string personAddressUrl = string.Empty;
             string contactNumer = string.Empty;
-            if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
-            {
-                detailReport.PersonOfInterestName = claim.CustomerDetail.Name;
-                detailReport.VerifyAddress = claim.CustomerDetail.Addressline + "," + claim.CustomerDetail.District.Name +"," +claim.CustomerDetail.State.Code + "," + claim.CustomerDetail.Country.Code +"," + claim.CustomerDetail.PinCode.Code;
-                contactNumer = new string('*', claim.CustomerDetail.ContactNumber.Length - 4) + claim.CustomerDetail.ContactNumber.Substring(claim.CustomerDetail.ContactNumber.Length - 4); 
-                personAddressUrl = claim.CustomerDetail.CustomerLocationMap;
-            }
-            else
-            {
-                detailReport.PersonOfInterestName = claim.BeneficiaryDetail.Name;
-                detailReport.VerifyAddress = claim.BeneficiaryDetail.Addressline + "," + claim.BeneficiaryDetail.District.Name + "," + claim.BeneficiaryDetail.State.Code + "," + claim.BeneficiaryDetail.Country.Code + "," + claim.BeneficiaryDetail.PinCode.Code;
-                contactNumer = claim.BeneficiaryDetail.ContactNumber;
-                personAddressUrl = claim.BeneficiaryDetail.BeneficiaryLocationMap;
-            }
-            string googlePersonAddressImagePath = Path.Combine(imagePath, "report", $"google-person-address-map-{DateTime.Now.ToString("ddMMMyyyHHmmsss")}.png");
-            var addressPath = await DownloadMapImageAsync(personAddressUrl, googlePersonAddressImagePath);
+            IdData photoIdData = null;
 
-            photoIdData.PersonAddressImage = addressPath;
-            photoIdData.PersonName = detailReport.PersonOfInterestName;
-            photoIdData.Salutation = "MR/MS";
-            photoIdData.PersonContact = contactNumer;
-            photoIdData.BoardingTill = claim.AgencyReport.DigitalIdReport.DigitalIdImageLongLatTime.GetValueOrDefault();
-            photoIdData.PhotoIdTime = claim.AgencyReport.DigitalIdReport.DigitalIdImageLongLatTime.GetValueOrDefault();
-            photoIdData.WeatherData = claim.AgencyReport.DigitalIdReport.DigitalIdImageData;
-            photoIdData.ArrivalAirport = "";
-            photoIdData.ArrivalAbvr = claim.AgencyReport.DigitalIdReport.DigitalIdImageLocationAddress;
-            if(photoMatch)
-            {
-                photoIdData.PhotoIdRemarks = $"CONFIRM";
-            }
-            else
-            {
-                photoIdData.PhotoIdRemarks = $"NOT SURE";
-            }
+            (photoIdData, detailReport, contactNumer) = await SetFaceIdReport(imagePath, claim, detailReport);
+            var agentIdData = await SetAgentIdReport(imagePath, claim, detailReport);
+
             string panIdDataFile = CheckFile(Path.Combine("Files", "pan-id.json"));
             string panIdDataJsonContent = File.ReadAllText(panIdDataFile);
             IdData panIdData = JsonConvert.DeserializeObject<IdData>(panIdDataJsonContent);
@@ -144,11 +92,131 @@ namespace risk.control.system.Helpers
             ConcertTicketBuilder.DetailedReport = detailReport;
             ConcertTicketBuilder.AgencyDetailData = agencyDetailData;
             ConcertTicketBuilder.PhotoIdData = photoIdData;
+            ConcertTicketBuilder.AgentIdData = agentIdData;
             ConcertTicketBuilder.PanData = panIdData;
 
             return ConcertTicketBuilder.Build(imagePath);
         }
 
+        private static async Task<IdData> SetAgentIdReport(string imagePath, ClaimsInvestigation claim, DetailedReport detailReport)
+        {
+            string photoIdJsonFile = CheckFile(Path.Combine("Files", "photo-id.json"));
+            string photoIdJsonContent = File.ReadAllText(photoIdJsonFile);
+            IdData photoIdData = JsonConvert.DeserializeObject<IdData>(photoIdJsonContent);
+
+            photoIdData.Passenger = "Agent Id";
+            var photoMatch = claim.AgencyReport.AgentIdReport.Similarity > 70;
+            photoIdData.FaceMatchStatus = photoMatch ? "YES" : "NO";
+            photoIdData.MatchFont = photoMatch ? Fonts.Helvetica(16f).SetColor(Color.Green) : Fonts.Helvetica(16f).SetColor(Color.Red);
+            var photoStatusImage = photoMatch ? "yes.png" : "cancel.png";
+            photoIdData.StatusImagePath = Path.Combine(imagePath, "img", photoStatusImage);
+
+            string personAddressUrl = string.Empty;
+            string contactNumer = string.Empty;
+            detailReport.PersonOfInterestName = claim.AgencyReport.AgentEmail;
+            contactNumer = string.Empty;
+            if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
+            {
+                detailReport.VerifyAddress = claim.CustomerDetail.Addressline + "," + claim.CustomerDetail.District.Name + "," + claim.CustomerDetail.State.Code + "," + claim.CustomerDetail.Country.Code + "," + claim.CustomerDetail.PinCode.Code;
+                contactNumer = claim.CustomerDetail.ContactNumber;
+                personAddressUrl = claim.CustomerDetail.CustomerLocationMap;
+            }
+            else
+            {
+                detailReport.VerifyAddress = claim.BeneficiaryDetail.Addressline + "," + claim.BeneficiaryDetail.District.Name + "," + claim.BeneficiaryDetail.State.Code + "," + claim.BeneficiaryDetail.Country.Code + "," + claim.BeneficiaryDetail.PinCode.Code;
+                contactNumer = claim.BeneficiaryDetail.ContactNumber;
+                personAddressUrl = claim.BeneficiaryDetail.BeneficiaryLocationMap;
+            }
+
+            string googlePersonAddressImagePath = Path.Combine(imagePath, "report", $"google-agent-address-map-{DateTime.Now.ToString("ddMMMyyyHHmmsss")}.png");
+            var addressPath = await DownloadMapImageAsync(personAddressUrl, googlePersonAddressImagePath);
+
+            var photoIdFilename = $"agent-id-{DateTime.Now.ToString("ddMMMyyyHHmmsss")}.jpg";
+            await File.WriteAllBytesAsync(Path.Combine(imagePath, "report", photoIdFilename), claim.AgencyReport.AgentIdReport.DigitalIdImage);
+            photoIdData.PhotoIdPath = Path.Combine(imagePath, "report", photoIdFilename);
+
+            string googlePhotoImagePath = Path.Combine(imagePath, "report", $"google-agent-map-{DateTime.Now.ToString("ddMMMyyyHHmmsss")}.png");
+            var photoPath = await DownloadMapImageAsync(claim.AgencyReport.AgentIdReport.DigitalIdImageLocationUrl, googlePhotoImagePath);
+            photoIdData.PhotoIdMapUrl = claim.AgencyReport.AgentIdReport.DigitalIdImageLocationUrl;
+            photoIdData.PhotoIdMapPath = photoPath;
+            photoIdData.PersonAddressImage = addressPath;
+            photoIdData.PersonName = detailReport.PersonOfInterestName;
+            photoIdData.Salutation = "MR/MS";
+            photoIdData.PersonContact = contactNumer;
+            photoIdData.BoardingTill = claim.AgencyReport.AgentIdReport.DigitalIdImageLongLatTime.GetValueOrDefault();
+            photoIdData.PhotoIdTime = claim.AgencyReport.AgentIdReport.DigitalIdImageLongLatTime.GetValueOrDefault();
+            photoIdData.WeatherData = claim.AgencyReport.AgentIdReport.DigitalIdImageData;
+            photoIdData.ArrivalAirport = "";
+            photoIdData.ArrivalAbvr = claim.AgencyReport.AgentIdReport.DigitalIdImageLocationAddress;
+            if (photoMatch)
+            {
+                photoIdData.PhotoIdRemarks = $"CONFIRM";
+            }
+            else
+            {
+                photoIdData.PhotoIdRemarks = $"NOT SURE";
+            }
+            return photoIdData;
+        }
+        private static async Task<(IdData, DetailedReport, string)> SetFaceIdReport(string imagePath, ClaimsInvestigation claim, DetailedReport detailReport)
+        {
+            string photoIdJsonFile = CheckFile(Path.Combine("Files", "photo-id.json"));
+            string photoIdJsonContent = File.ReadAllText(photoIdJsonFile);
+            IdData photoIdData = JsonConvert.DeserializeObject<IdData>(photoIdJsonContent);
+
+            photoIdData.Passenger = "Photo Id";
+            var photoMatch = claim.AgencyReport.DigitalIdReport.Similarity > 70;
+            photoIdData.FaceMatchStatus = photoMatch ? "YES" : "NO";
+            photoIdData.MatchFont = photoMatch ? Fonts.Helvetica(16f).SetColor(Color.Green) : Fonts.Helvetica(16f).SetColor(Color.Red);
+            var photoStatusImage = photoMatch ? "yes.png" : "cancel.png";
+            photoIdData.StatusImagePath = Path.Combine(imagePath, "img", photoStatusImage);
+
+            string personAddressUrl = string.Empty;
+            string contactNumer = string.Empty;
+            if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
+            {
+                detailReport.PersonOfInterestName = claim.CustomerDetail.Name;
+                detailReport.VerifyAddress = claim.CustomerDetail.Addressline + "," + claim.CustomerDetail.District.Name + "," + claim.CustomerDetail.State.Code + "," + claim.CustomerDetail.Country.Code + "," + claim.CustomerDetail.PinCode.Code;
+                contactNumer = new string('*', claim.CustomerDetail.ContactNumber.Length - 4) + claim.CustomerDetail.ContactNumber.Substring(claim.CustomerDetail.ContactNumber.Length - 4);
+                personAddressUrl = claim.CustomerDetail.CustomerLocationMap;
+            }
+            else
+            {
+                detailReport.PersonOfInterestName = claim.BeneficiaryDetail.Name;
+                detailReport.VerifyAddress = claim.BeneficiaryDetail.Addressline + "," + claim.BeneficiaryDetail.District.Name + "," + claim.BeneficiaryDetail.State.Code + "," + claim.BeneficiaryDetail.Country.Code + "," + claim.BeneficiaryDetail.PinCode.Code;
+                contactNumer = claim.BeneficiaryDetail.ContactNumber;
+                personAddressUrl = claim.BeneficiaryDetail.BeneficiaryLocationMap;
+            }
+            string googlePersonAddressImagePath = Path.Combine(imagePath, "report", $"google-person-address-map-{DateTime.Now.ToString("ddMMMyyyHHmmsss")}.png");
+            var addressPath = await DownloadMapImageAsync(personAddressUrl, googlePersonAddressImagePath);
+
+            var photoIdFilename = $"photo-id-{DateTime.Now.ToString("ddMMMyyyHHmmsss")}.jpg";
+            await File.WriteAllBytesAsync(Path.Combine(imagePath, "report", photoIdFilename), claim.AgencyReport.DigitalIdReport.DigitalIdImage);
+            photoIdData.PhotoIdPath = Path.Combine(imagePath, "report", photoIdFilename);
+
+            string googlePhotoImagePath = Path.Combine(imagePath, "report", $"google-photo-map-{DateTime.Now.ToString("ddMMMyyyHHmmsss")}.png");
+            var photoPath = await DownloadMapImageAsync(claim.AgencyReport.DigitalIdReport.DigitalIdImageLocationUrl, googlePhotoImagePath);
+            photoIdData.PhotoIdMapUrl = claim.AgencyReport.DigitalIdReport.DigitalIdImageLocationUrl;
+            photoIdData.PhotoIdMapPath = photoPath;
+            photoIdData.PersonAddressImage = addressPath;
+            photoIdData.PersonName = detailReport.PersonOfInterestName;
+            photoIdData.Salutation = "MR/MS";
+            photoIdData.PersonContact = contactNumer;
+            photoIdData.BoardingTill = claim.AgencyReport.DigitalIdReport.DigitalIdImageLongLatTime.GetValueOrDefault();
+            photoIdData.PhotoIdTime = claim.AgencyReport.DigitalIdReport.DigitalIdImageLongLatTime.GetValueOrDefault();
+            photoIdData.WeatherData = claim.AgencyReport.DigitalIdReport.DigitalIdImageData;
+            photoIdData.ArrivalAirport = "";
+            photoIdData.ArrivalAbvr = claim.AgencyReport.DigitalIdReport.DigitalIdImageLocationAddress;
+            if (photoMatch)
+            {
+                photoIdData.PhotoIdRemarks = $"CONFIRM";
+            }
+            else
+            {
+                photoIdData.PhotoIdRemarks = $"NOT SURE";
+            }
+            return (photoIdData, detailReport, contactNumer);
+        }
         private static string CheckFile(string file)
         {
             if (!File.Exists(file))

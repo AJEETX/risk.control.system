@@ -443,9 +443,13 @@ namespace risk.control.system.Services
             IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
             var submittedToAssessorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
+            var replyToAssessorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR);
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
             var count = applicationDbContext.Count(i => i.ClientCompanyId == companyUser.ClientCompanyId &&
-            i.InvestigationCaseSubStatusId == submittedToAssessorStatus.InvestigationCaseSubStatusId);
+            (i.InvestigationCaseSubStatusId == submittedToAssessorStatus.InvestigationCaseSubStatusId ||
+            i.InvestigationCaseSubStatusId == replyToAssessorStatus.InvestigationCaseSubStatusId)
+            );
             
             return count;
         }
@@ -726,12 +730,16 @@ namespace risk.control.system.Services
                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
             var submitted2AssessorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
+            var replyToAssessorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR);
+
             var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(c => c.Email == userEmail);
 
             var count = applicationDbContext.Count(a => openStatusesIds.Contains(a.InvestigationCaseStatusId) &&
             a.ClientCompanyId == companyUser.ClientCompanyId &&
             a.InvestigationCaseSubStatusId != createdStatus.InvestigationCaseSubStatusId  &&
             a.InvestigationCaseSubStatusId != submitted2AssessorStatus.InvestigationCaseSubStatusId  && 
+            a.InvestigationCaseSubStatusId != replyToAssessorStatus.InvestigationCaseSubStatusId  && 
             a.InvestigationCaseSubStatusId != assigned2AssignerStatus.InvestigationCaseSubStatusId
             );
             

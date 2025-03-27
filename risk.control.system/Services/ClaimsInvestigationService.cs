@@ -19,7 +19,7 @@ namespace risk.control.system.Services
 
         Task<ClaimsInvestigation> AllocateToVendor(string userEmail, string claimsInvestigationId, long vendorId, bool AutoAllocated = true);
 
-        Task<ClaimsInvestigation> AssignToVendorAgent(string vendorAgentEmail, string currentUser, long vendorId, string claimsInvestigationId, string drivingMap, string drivingDistance, string drivingDuration, string distanceInMeters, string durationInSeconds);
+        Task<ClaimsInvestigation> AssignToVendorAgent(string vendorAgentEmail, string currentUser, long vendorId, string claimsInvestigationId);
 
         Task<(Vendor, string)> SubmitToVendorSupervisor(string userEmail, string claimsInvestigationId, string remarks, string? answer1, string? answer2, string? answer3, string? answer4);
 
@@ -45,13 +45,20 @@ namespace risk.control.system.Services
         private readonly IMailboxService mailboxService;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly IHttpContextAccessor accessor;
+        //private readonly BackgroundTaskService backgroundTaskService;
+        private readonly ICustomApiCLient customApiCLient;
+
         public ClaimsInvestigationService(ApplicationDbContext context,
             IHttpContextAccessor accessor,
+            //BackgroundTaskService backgroundTaskService,
+            ICustomApiCLient customApiCLient,
             IMailboxService mailboxService, 
             IWebHostEnvironment webHostEnvironment)
         {
             this._context = context;
             this.accessor = accessor;
+            //this.backgroundTaskService = backgroundTaskService;
+            this.customApiCLient = customApiCLient;
             this.mailboxService = mailboxService;
             this.webHostEnvironment = webHostEnvironment;
         }
@@ -474,8 +481,7 @@ namespace risk.control.system.Services
             return null;
         }
 
-        public async Task<ClaimsInvestigation> AssignToVendorAgent(string vendorAgentEmail, string currentUser, long vendorId, string claimsInvestigationId, string drivingMap, string drivingDistance, 
-            string drivingDuration, string distanceInMeters, string durationInSeconds)
+        public async Task<ClaimsInvestigation> AssignToVendorAgent(string vendorAgentEmail, string currentUser, long vendorId, string claimsInvestigationId)
         {
             var inProgress = _context.InvestigationCaseStatus.FirstOrDefault(
                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS);
@@ -483,10 +489,30 @@ namespace risk.control.system.Services
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
             var claim = _context.ClaimsInvestigation
                 .Include(c=>c.PolicyDetail)
+                .Include(c => c.CustomerDetail)
+                    .ThenInclude(c => c.PinCode)
+                    .Include(c => c.BeneficiaryDetail)
                 .Where(c => c.ClaimsInvestigationId == claimsInvestigationId).FirstOrDefault();
             if (claim != null)
             {
                 var agentUser = _context.VendorApplicationUser.Include(u => u.Vendor).FirstOrDefault(u => u.Email == vendorAgentEmail);
+
+                string drivingDistance, drivingDuration, drivingMap;
+                float distanceInMeters;
+                int durationInSeconds;
+                string LocationLatitude = string.Empty;
+                string LocationLongitude = string.Empty;
+                if (claim.PolicyDetail?.ClaimType == ClaimType.HEALTH)
+                {
+                    LocationLatitude = claim.CustomerDetail?.Latitude;
+                    LocationLongitude = claim.CustomerDetail?.Longitude;
+                }
+                else
+                {
+                    LocationLatitude = claim.BeneficiaryDetail?.Latitude;
+                    LocationLongitude = claim.BeneficiaryDetail?.Longitude;
+                }
+                (drivingDistance, distanceInMeters, drivingDuration, durationInSeconds, drivingMap) = await customApiCLient.GetMap(double.Parse(agentUser.AddressLatitude), double.Parse(agentUser.AddressLongitude), double.Parse(LocationLatitude), double.Parse(LocationLongitude));
                 claim.UserEmailActioned = currentUser;
                 claim.UserEmailActionedTo = agentUser.Email;
                 claim.UserRoleActionedTo = $"{AppRoles.AGENT.GetEnumDisplayName()} ({agentUser.Vendor.Email})";
@@ -500,8 +526,8 @@ namespace risk.control.system.Services
                 claim.InvestigationCaseSubStatusId = assignedToAgent.InvestigationCaseSubStatusId;
                 claim.SelectedAgentDrivingDistance = drivingDistance;
                 claim.SelectedAgentDrivingDuration = drivingDuration;
-                claim.SelectedAgentDrivingDistanceInMetres = float.Parse(distanceInMeters);
-                claim.SelectedAgentDrivingDurationInSeconds = int.Parse(durationInSeconds);
+                claim.SelectedAgentDrivingDistanceInMetres = distanceInMeters;
+                claim.SelectedAgentDrivingDurationInSeconds = durationInSeconds;
                 claim.SelectedAgentDrivingMap = drivingMap;
                 claim.TaskToAgentTime = DateTime.Now;
                 var lastLog = _context.InvestigationTransaction.Where(i =>
@@ -648,29 +674,33 @@ namespace risk.control.system.Services
             try
             {
                 var claim = _context.ClaimsInvestigation
-                    .Include(c => c.CustomerDetail)
-                    .ThenInclude(c => c.District)
-                    .Include(c => c.CustomerDetail)
-                    .ThenInclude(c => c.State)
-                    .Include(c => c.CustomerDetail)
-                    .ThenInclude(c => c.Country)
-                    .Include(c => c.CustomerDetail)
-                    .ThenInclude(c=>c.PinCode)
-                    .Include(c => c.BeneficiaryDetail)
-                    .ThenInclude(c => c.District)
-                    .Include(c => c.BeneficiaryDetail)
-                    .ThenInclude(c => c.State)
-                    .Include(c => c.BeneficiaryDetail)
-                    .ThenInclude(c => c.Country)
-                    .Include(c => c.BeneficiaryDetail)
-                    .ThenInclude(c => c.PinCode)
-                    .Include(c => c.ClientCompany)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.CaseEnabler)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.District)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.State)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.Country)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c=>c.PinCode)
+                .Include(c => c.BeneficiaryDetail)
+                .ThenInclude(c => c.District)
+                .Include(c => c.BeneficiaryDetail)
+                .ThenInclude(c => c.State)
+                .Include(c => c.BeneficiaryDetail)
+                .ThenInclude(c => c.Country)
+                .Include(c => c.BeneficiaryDetail)
+                .ThenInclude(c => c.PinCode)
+                .Include(c => c.ClientCompany)
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.CaseEnabler)
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.LineOfBusiness)
                 .Include(r => r.AgencyReport)
                 .ThenInclude(r => r.DigitalIdReport)
                 .Include(r => r.AgencyReport)
                 .ThenInclude(r => r.PanIdReport)
+                .Include(r => r.AgencyReport)
+                .ThenInclude(r => r.AgentIdReport)
                 .Include(r => r.Vendor)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimsInvestigationId);
 
@@ -747,8 +777,10 @@ namespace risk.control.system.Services
                 _context.VendorInvoice.Add(invoice);
                 
                 var saveCount = await _context.SaveChangesAsync();
-                var svc = accessor.HttpContext.RequestServices.GetService<BackgroundTaskService>();
-                svc.ProcessTask(claim, claimsInvestigationId);
+
+                await DoTask(claim, claimsInvestigationId);
+
+                //backgroundTaskService.EnqueueTask(claim, claimsInvestigationId);
 
                 return saveCount > 0 ? (currentUser.ClientCompany, claim.PolicyDetail.ContractNumber) : (null!, string.Empty);
             }
@@ -785,6 +817,8 @@ namespace risk.control.system.Services
                     .Include(c => c.BeneficiaryDetail)
                     .ThenInclude(c => c.PinCode)
                     .Include(c => c.ClientCompany)
+                    .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.LineOfBusiness)
                .Include(c => c.PolicyDetail)
                .ThenInclude(c => c.CaseEnabler)
                 .Include(r => r.AgencyReport)
@@ -872,8 +906,7 @@ namespace risk.control.system.Services
 
                 var saveCount = await _context.SaveChangesAsync();
 
-                var svc = accessor.HttpContext.RequestServices.GetService<BackgroundTaskService>();
-                svc.ProcessTask(claim, claimsInvestigationId);
+                await DoTask(claim, claimsInvestigationId);
 
                 return saveCount > 0 ? (currentUser.ClientCompany, claim.PolicyDetail.ContractNumber) : (null!, string.Empty);
             }

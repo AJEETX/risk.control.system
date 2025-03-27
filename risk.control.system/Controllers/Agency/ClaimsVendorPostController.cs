@@ -51,7 +51,7 @@ namespace risk.control.system.Controllers.Agency
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = $"{AGENCY_ADMIN.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME}")]
-        public async Task<IActionResult> AllocateToVendorAgent(string selectedcase, string claimId, string drivingMap, string drivingDistance, string drivingDuration, string distanceInMeters, string durationInSeconds)
+        public async Task<IActionResult> AllocateToVendorAgent(string selectedcase, string claimId)
         {
             try
             {
@@ -73,7 +73,7 @@ namespace risk.control.system.Controllers.Agency
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                var claim = await claimsInvestigationService.AssignToVendorAgent(vendorAgent.Email, currentUserEmail, vendorAgent.VendorId.Value, claimId, drivingMap,drivingDistance, drivingDuration,distanceInMeters,durationInSeconds);
+                var claim = await claimsInvestigationService.AssignToVendorAgent(vendorAgent.Email, currentUserEmail, vendorAgent.VendorId.Value, claimId);
                 if (claim == null)
                 {
                     notifyService.Error("OOPs !!!..Error occurred.");

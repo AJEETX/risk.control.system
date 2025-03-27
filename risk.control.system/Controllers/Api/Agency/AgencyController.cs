@@ -359,30 +359,7 @@ namespace risk.control.system.Controllers.Api.Agency
                 $"\r\nElevation(sea level):{weatherData.elevation} metres";
                     claim.BeneficiaryDetail.AddressLocationInfo = weatherCustomData;
                 }
-                if (agentExistingDrivingMap == null)
-                {
-                    (distance, distanceInMetre, duration, durationInSec, map) = await customApiCLient.GetMap(double.Parse(u.AgencyUser.AddressLatitude), double.Parse(u.AgencyUser.AddressLongitude), double.Parse(LocationLatitude), double.Parse(LocationLongitude));
-
-                    var agentDrivingMap = new AgentDrivingMap
-                    {
-                        AgentId = u.AgencyUser.Id,
-                        ClaimsInvestigationId = id,
-                        Distance = distance,
-                        DistanceInMetres = distanceInMetre,
-                        Duration = duration,
-                        DurationInSeconds = durationInSec,
-                        DrivingMap = map
-                    };
-                    _context.AgentDrivingMap.Add(agentDrivingMap);
-                }
-                else
-                {
-                    distance = agentExistingDrivingMap.Distance;
-                    duration = agentExistingDrivingMap.Duration;
-                    map = agentExistingDrivingMap.DrivingMap;
-                    distanceInMetre = agentExistingDrivingMap.DistanceInMetres.GetValueOrDefault();
-                    durationInSec = agentExistingDrivingMap.DurationInSeconds.GetValueOrDefault();
-                }
+                (distance, distanceInMetre, duration, durationInSec, map) = await customApiCLient.GetMap(double.Parse(u.AgencyUser.AddressLatitude), double.Parse(u.AgencyUser.AddressLongitude), double.Parse(LocationLatitude), double.Parse(LocationLongitude));
 
                 var mapDetails = $"Driving distance : {distance}; Duration : {duration}";
                 var agentData = new AgentData

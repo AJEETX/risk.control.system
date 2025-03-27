@@ -1,4 +1,6 @@
-﻿using risk.control.system.Data;
+﻿using System.Collections.Concurrent;
+
+using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 
@@ -7,43 +9,59 @@ namespace risk.control.system.Services
     public class BackgroundTaskService : BackgroundService
     {
         private readonly IServiceScopeFactory _serviceScopeFactory;
-        private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly ILogger<BackgroundTaskService> _logger;
+        private readonly ConcurrentQueue<(ClaimsInvestigation claim, string id)> _taskQueue = new();
 
-        public BackgroundTaskService(IServiceScopeFactory serviceScopeFactory, IWebHostEnvironment webHostEnvironment)
+        public BackgroundTaskService(IServiceScopeFactory serviceScopeFactory, ILogger<BackgroundTaskService> logger)
         {
             _serviceScopeFactory = serviceScopeFactory;
-            _webHostEnvironment = webHostEnvironment;
+            _logger = logger;
+        }
+
+        public void EnqueueTask(ClaimsInvestigation claim, string claimsInvestigationId)
+        {
+            _taskQueue.Enqueue((claim, claimsInvestigationId));
+            _logger.LogInformation($"Task queued for claimsInvestigationId: {claimsInvestigationId}");
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                // Here you can implement a queue to process tasks
-                await Task.Delay(5000, stoppingToken); // Example delay
+                if (_taskQueue.TryDequeue(out var task))
+                {
+                    try
+                    {
+                        await ProcessTask(task.claim, task.id);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Error processing task for {id}", task.id);
+                    }
+                }
+                await Task.Delay(1000, stoppingToken); // Prevents excessive CPU usage
             }
         }
 
-        public async Task ProcessTask(ClaimsInvestigation claim, string claimsInvestigationId)
+        private async Task ProcessTask(ClaimsInvestigation claim, string claimsInvestigationId)
         {
             using var scope = _serviceScopeFactory.CreateScope();
             var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            var webHostEnvironment = scope.ServiceProvider.GetRequiredService<IWebHostEnvironment>();
 
-            string folder = Path.Combine(_webHostEnvironment.WebRootPath, "report");
-
-            if (!Directory.Exists(folder))
-            {
-                Directory.CreateDirectory(folder);
-            }
+            string folder = Path.Combine(webHostEnvironment.WebRootPath, "report");
+            Directory.CreateDirectory(folder);
 
             var filename = $"report{claimsInvestigationId}.pdf";
             var filePath = Path.Combine(folder, filename);
 
-            (await PdfReportRunner.Run(_webHostEnvironment.WebRootPath, claim)).Build(filePath);
+            (await PdfReportRunner.Run(webHostEnvironment.WebRootPath, claim)).Build(filePath);
 
             claim.AgencyReport.PdfReportFilePath = Path.Combine("report", filename);
             context.Update(claim);
             await context.SaveChangesAsync();
+
+            _logger.LogInformation($"Task completed for claimsInvestigationId: {claimsInvestigationId}");
         }
     }
 

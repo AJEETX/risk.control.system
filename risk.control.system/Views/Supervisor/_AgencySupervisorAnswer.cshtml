@@ -4,12 +4,12 @@
     <div class="card bg-light border-success">
         <div class="card-header">
             <h3 class="card-title">
-                <i class="fas fa-user-edit"></i> Supervisor : <span class="badge badge-light"> @Model?.AgencyReport?.SupervisorEmail</span>
+                <i class="fas fa-user-edit"></i> Supervisor comments:
                 <span class="hover-text">
                     <i class="fas fa-info-circle"></i>
                     <span class="tooltip-text" id="information">
                         <span>
-                            <i class="fas fa-user-shield"></i><b> @Model?.AgencyReport?.SupervisorEmail</b> remark
+                            <i class="fas fa-user-shield"></i><b> @Model?.AgencyReport?.SupervisorEmail</b> comments
                         </span>
 
                     </span>
@@ -22,12 +22,22 @@
             </div>
 
         </div>
+        <div class="progress">
+            <i class="far fa-bookmark bookmark-green"></i>
+            <div class="progress-bar progress-bar-green" role="progressbar">
+                supervisor comments
+            </div>
+        </div>
+        <div class="card-footer text-muted border-bottom-0">
+            <i class="fas fa-user-shield"></i>  Supervisor :<span class="badge badge-light">  @Model.AgencyReport.SupervisorEmail </span>
+        </div>
+       
         <div class="card-body">
             <div class="row">
                 <div class="col-12">
                     <p class="text-muted text-sm">
 
-                        <span>Supervisor comments: </span>
+                        <span>comments: </span>
                     </p>
                     <table id="customerTable" class="table-bordered table-hover dt-responsive nowrap w-100">
                         <thead>

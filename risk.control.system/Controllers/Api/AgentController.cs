@@ -633,6 +633,24 @@ namespace risk.control.system.Controllers.Api
         }
 
         [AllowAnonymous]
+        [HttpPost("agentid")]
+        public async Task<IActionResult> AgentId(FaceData data)
+        {
+            if (data == null ||
+                     string.IsNullOrWhiteSpace(data.LocationImage) ||
+                     !data.LocationImage.IsBase64String() ||
+                     string.IsNullOrEmpty(data.LocationLongLat))
+            {
+                return BadRequest();
+            }
+            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
+
+            var response = await iCheckifyService.GetAgentId(data);
+            response.Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId);
+            return Ok(response);
+        }
+
+        [AllowAnonymous]
         [HttpPost("faceid")]
         public async Task<IActionResult> FaceId(FaceData data)
         {
