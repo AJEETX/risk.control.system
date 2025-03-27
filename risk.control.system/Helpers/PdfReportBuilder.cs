@@ -124,7 +124,10 @@ namespace risk.control.system.Helpers
                 .AddColumnPercentToTable("", 25);
 
             var row3Builder = infoTable.AddRow();
-            FillAssessorRemarks(start: 0, end: 10, row3Builder.AddCell("").SetFont(FNT10));
+            FillAgentRemarks(start: 0, end: 10, row3Builder.AddCell("").SetFont(FNT10));
+            
+            //FillAssessorRemarks(start: 0, end: 10, row3Builder.AddCell("").SetFont(FNT10));
+            
             FillReportSummaryule(row3Builder.AddCell("", 2, 0).SetFont(FNT10));
 
             var row4Builder = infoTable.AddRow();
@@ -198,17 +201,26 @@ namespace risk.control.system.Helpers
                               Color.Black, Color.White, false).SetHeight(100);
         }
 
-        private void FillAssessorRemarks(int start, int end, TableCellBuilder cellBuilder)
+        private void FillAgentRemarks(int start, int end, TableCellBuilder cellBuilder)
         {
             cellBuilder.AddParagraph(AgencyDetailData.AgentReportTitle).SetFont(FNT12B).SetMargins(10, 10, 1, 4);
             cellBuilder.SetBorderStroke(strokeLeft: Stroke.Solid, strokeTop: Stroke.Solid, strokeRight: Stroke.None, strokeBottom: Stroke.Solid);
 
             foreach (var item in AgencyDetailData.ReportSummaryDescription)
             {
-                cellBuilder.AddParagraph(item).SetFont(FNT9).SetMargins(20, 0, 10, 2);
+                cellBuilder.AddParagraph(item.Question).SetFont(FNT9).SetMargins(20, 0, 10, 2);
+                cellBuilder.AddParagraph(item.Answer).SetFont(FNT9).SetMargins(20, 0, 10, 2);
             }
         }
 
+        private void FillAssessorRemarks(int start, int end, TableCellBuilder cellBuilder)
+        {
+            cellBuilder.AddParagraph(AgencyDetailData.AgentReportTitle).SetFont(FNT12B).SetMargins(10, 10, 1, 4);
+            cellBuilder.SetBorderStroke(strokeLeft: Stroke.Solid, strokeTop: Stroke.Solid, strokeRight: Stroke.None, strokeBottom: Stroke.Solid);
+
+            cellBuilder.AddParagraph(AgencyDetailData.AssessorSummary).SetFont(FNT9).SetMargins(20, 0, 10, 2);
+
+        }
         private void FillReportSummaryule(TableCellBuilder cellBuilder)
         {
             cellBuilder.AddParagraph(AgencyDetailData.SupervisorCommentsTitle).SetFont(FNT12B).SetMargins(10, 10, 1, 4);
@@ -285,7 +297,7 @@ namespace risk.control.system.Helpers
             cellBuilder.AddParagraph(DetailedReport.PersonOfInterestName).SetLineSpacing(1.4f);
         }
 
-        private void FillIdData(TableBuilder tableBuilder, IdInfo[,] agentItems, IdInfo[,] boardingItems, IdInfo[,] boardingItems0)
+        private void FillIdData(TableBuilder tableBuilder, IdInfo[,] agentId, IdInfo[,] photoId, IdInfo[,] pandId)
         {
             tableBuilder
                 .SetWidth(XUnit.FromPercent(100))
@@ -293,12 +305,12 @@ namespace risk.control.system.Helpers
                 .AddColumnToTable("", 415.5f)
                 .AddColumn("", 138.5f);
 
-            FillIdTableFirstRow(tableBuilder, agentItems[0, 0]);
+            FillIdTableFirstRow(tableBuilder, agentId[0, 0]);
             var rowBuilder = tableBuilder.AddRow();
             rowBuilder.AddCell().AddTable(builder =>
             {
                 builder.SetWidth(415.5f);
-                FillIdTable(builder, agentItems, 1);
+                FillIdTable(builder, agentId, 1);
             });
             rowBuilder.AddCell(FillAgentMap);
 
@@ -314,12 +326,12 @@ namespace risk.control.system.Helpers
             });
             rr.AddCell(FillBlank);
 
-            FillIdTableFirstRow(tableBuilder, boardingItems[0, 0]);
+            FillIdTableFirstRow(tableBuilder, photoId[0, 0]);
             rowBuilder = tableBuilder.AddRow();
             rowBuilder.AddCell().AddTable(builder =>
             {
                 builder.SetWidth(415.5f);
-                FillIdTable(builder, boardingItems, 1);
+                FillIdTable(builder, photoId, 1);
             });
             rowBuilder.AddCell(FillPhotoMap);
 
@@ -335,12 +347,12 @@ namespace risk.control.system.Helpers
             });
             rr.AddCell(FillBlank);
 
-            FillIdTableFirstRow(tableBuilder, boardingItems0[0, 0]);
+            FillIdTableFirstRow(tableBuilder, pandId[0, 0]);
             var rb = tableBuilder.AddRow();
             rb.AddCell().AddTable(builder =>
             {
                 builder.SetWidth(415.5f);
-                FillIdTable(builder, boardingItems0, 1);
+                FillIdTable(builder, pandId, 1);
             });
             rb.AddCell(FillPanMap);
         }
@@ -393,133 +405,6 @@ namespace risk.control.system.Helpers
                 .AddUrl(PanData.PanMapUrl, "map");
         }
 
-        private void FillIdTable(TableBuilder tableBuilder,
-         IdInfo[,] boardingItems, int startRow = 0)
-        {
-            tableBuilder
-                .SetBorder(Stroke.None)
-                .AddColumnPercentToTable("", 25)
-                .AddColumnPercentToTable("", 25)
-                .AddColumnPercentToTable("", 25)
-                .AddColumnPercent("", 25);
-            int rows = boardingItems.GetLength(0);
-            int columns = boardingItems.GetLength(1);
-            for (int i = startRow; i < rows; i++)
-            {
-                for (int k = 0; k < 2; k++)
-                {
-                    var rowBuilder = tableBuilder.AddRow();
-                    if (k == 0)
-                    {
-                        rowBuilder.ApplyStyle(
-                            StyleBuilder.New()
-                                .SetPaddingTop(4)
-                            );
-                    }
-                    else if (i < rows - 1)
-                    {
-                        rowBuilder.ApplyStyle(
-                            StyleBuilder.New()
-                                .SetBorderBottom(0.5f,
-                                    Stroke.Solid, Color.Black)
-                                .SetPaddingBottom(4)
-                            );
-                    }
-                    for (int j = 0; j < columns; j++)
-                    {
-                        IdInfo bi = boardingItems[i, j];
-                        if (!bi.isEmpty())
-                        {
-                            var cellBuilder = rowBuilder.AddCell();
-                            if (bi.colSpan > 1)
-                            {
-                                cellBuilder.SetColSpan(bi.colSpan);
-                            }
-                            if (k == 0)
-                            {
-                                cellBuilder
-                                    .AddParagraph(bi.name).SetFont(FNT9);
-                            }
-                            else
-                            {
-                                if (bi.image != null)
-                                {
-                                    cellBuilder.AddTable(builder =>
-                                    {
-                                        ImageThenText(builder, bi);
-                                    });
-                                }
-                                else
-                                {
-                                    TextOnly(cellBuilder.AddParagraph(), bi);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        private void ImageThenText(TableBuilder tableBuilder, IdInfo bi)
-        {
-            tableBuilder
-                .SetWidth(XUnit.FromPercent(100))
-                .SetBorder(Stroke.None)
-                .AddColumnToTable("", 13)
-                .AddColumn("");
-            var rowBuilder = tableBuilder.AddRow();
-            rowBuilder.AddCell()
-                .SetPadding(0, 4, 0, 0)
-                //.SetVerticalAlignment(VerticalAlignment.Bottom)
-                .AddImage(Path.Combine(imgPath, "images", bi.image),
-                    XSize.FromHeight(100));
-            TextOnly(rowBuilder.AddCell().AddParagraph(), bi);
-        }
-
-        private void TextOnly(ParagraphBuilder paragraphBuilder, IdInfo bi)
-        {
-            foreach (FontText ft in bi.fontTexts)
-            {
-                paragraphBuilder.AddText(ft.text).SetFont(ft.font);
-            }
-        }
-
-        private void FillIdTableFirstRow(TableBuilder tableBuilder,
-                IdInfo bi)
-        {
-            for (int k = 0; k < 2; k++)
-            {
-                var rowBuilder = tableBuilder.AddRow();
-                if (k == 1)
-                {
-                    rowBuilder.ApplyStyle(
-                        StyleBuilder.New()
-                            .SetBorderBottom(0.5f, Stroke.Solid, Color.Black)
-                            .SetPaddingBottom(6)
-                        );
-                }
-                var cellBuilder = rowBuilder.AddCell();
-                cellBuilder.SetColSpan(2);
-                if (k == 0)
-                {
-                    cellBuilder.SetFont(FNT9).AddParagraph(bi.name);
-                }
-                else
-                {
-                    if (bi.image != null)
-                    {
-                        cellBuilder.AddTable(builder =>
-                        {
-                            ImageThenText(builder, bi);
-                        });
-                    }
-                    else
-                    {
-                        TextOnly(cellBuilder.AddParagraph(), bi);
-                    }
-                }
-            }
-        }
 
         private IdInfo[,] GetAgentItems()
         {
@@ -651,6 +536,134 @@ namespace risk.control.system.Helpers
             };
             return result;
         }
+        private void FillIdTable(TableBuilder tableBuilder,
+         IdInfo[,] boardingItems, int startRow = 0)
+        {
+            tableBuilder
+                .SetBorder(Stroke.None)
+                .AddColumnPercentToTable("", 25)
+                .AddColumnPercentToTable("", 25)
+                .AddColumnPercentToTable("", 25)
+                .AddColumnPercent("", 25);
+            int rows = boardingItems.GetLength(0);
+            int columns = boardingItems.GetLength(1);
+            for (int i = startRow; i < rows; i++)
+            {
+                for (int k = 0; k < 2; k++)
+                {
+                    var rowBuilder = tableBuilder.AddRow();
+                    if (k == 0)
+                    {
+                        rowBuilder.ApplyStyle(
+                            StyleBuilder.New()
+                                .SetPaddingTop(4)
+                            );
+                    }
+                    else if (i < rows - 1)
+                    {
+                        rowBuilder.ApplyStyle(
+                            StyleBuilder.New()
+                                .SetBorderBottom(0.5f,
+                                    Stroke.Solid, Color.Black)
+                                .SetPaddingBottom(4)
+                            );
+                    }
+                    for (int j = 0; j < columns; j++)
+                    {
+                        IdInfo bi = boardingItems[i, j];
+                        if (!bi.isEmpty())
+                        {
+                            var cellBuilder = rowBuilder.AddCell();
+                            if (bi.colSpan > 1)
+                            {
+                                cellBuilder.SetColSpan(bi.colSpan);
+                            }
+                            if (k == 0)
+                            {
+                                cellBuilder
+                                    .AddParagraph(bi.name).SetFont(FNT9);
+                            }
+                            else
+                            {
+                                if (bi.image != null)
+                                {
+                                    cellBuilder.AddTable(builder =>
+                                    {
+                                        ImageThenText(builder, bi);
+                                    });
+                                }
+                                else
+                                {
+                                    TextOnly(cellBuilder.AddParagraph(), bi);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private void ImageThenText(TableBuilder tableBuilder, IdInfo bi)
+        {
+            tableBuilder
+                .SetWidth(XUnit.FromPercent(100))
+                .SetBorder(Stroke.None)
+                .AddColumnToTable("", 13)
+                .AddColumn("");
+            var rowBuilder = tableBuilder.AddRow();
+            rowBuilder.AddCell()
+                .SetPadding(0, 4, 0, 0)
+                //.SetVerticalAlignment(VerticalAlignment.Bottom)
+                .AddImage(Path.Combine(imgPath, "images", bi.image),
+                    XSize.FromHeight(100));
+            TextOnly(rowBuilder.AddCell().AddParagraph(), bi);
+        }
+
+        private void TextOnly(ParagraphBuilder paragraphBuilder, IdInfo bi)
+        {
+            foreach (FontText ft in bi.fontTexts)
+            {
+                paragraphBuilder.AddText(ft.text).SetFont(ft.font);
+            }
+        }
+
+        private void FillIdTableFirstRow(TableBuilder tableBuilder,
+                IdInfo bi)
+        {
+            for (int k = 0; k < 2; k++)
+            {
+                var rowBuilder = tableBuilder.AddRow();
+                if (k == 1)
+                {
+                    rowBuilder.ApplyStyle(
+                        StyleBuilder.New()
+                            .SetBorderBottom(0.5f, Stroke.Solid, Color.Black)
+                            .SetPaddingBottom(6)
+                        );
+                }
+                var cellBuilder = rowBuilder.AddCell();
+                cellBuilder.SetColSpan(2);
+                if (k == 0)
+                {
+                    cellBuilder.SetFont(FNT9).AddParagraph(bi.name);
+                }
+                else
+                {
+                    if (bi.image != null)
+                    {
+                        cellBuilder.AddTable(builder =>
+                        {
+                            ImageThenText(builder, bi);
+                        });
+                    }
+                    else
+                    {
+                        TextOnly(cellBuilder.AddParagraph(), bi);
+                    }
+                }
+            }
+        }
+
 
         internal struct IdInfo
         {

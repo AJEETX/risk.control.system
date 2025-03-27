@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Hangfire;
+
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 using risk.control.system.AppConstant;
@@ -701,6 +703,8 @@ namespace risk.control.system.Services
                 .ThenInclude(r => r.PanIdReport)
                 .Include(r => r.AgencyReport)
                 .ThenInclude(r => r.AgentIdReport)
+                .Include(r => r.AgencyReport)
+                .ThenInclude(r => r.ReportQuestionaire)
                 .Include(r => r.Vendor)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimsInvestigationId);
 
@@ -778,9 +782,9 @@ namespace risk.control.system.Services
                 
                 var saveCount = await _context.SaveChangesAsync();
 
-                await DoTask(claim, claimsInvestigationId);
+                //BackgroundJob.Enqueue(() => DoTask(claim, claimsInvestigationId));
 
-                //backgroundTaskService.EnqueueTask(claim, claimsInvestigationId);
+                await DoTask(claim, claimsInvestigationId);
 
                 return saveCount > 0 ? (currentUser.ClientCompany, claim.PolicyDetail.ContractNumber) : (null!, string.Empty);
             }
@@ -828,7 +832,10 @@ namespace risk.control.system.Services
                 .Include(r => r.Vendor)
                .Include(c => c.PolicyDetail)
                .ThenInclude(c => c.CaseEnabler)
+                .Include(r => r.AgencyReport)       
+                .ThenInclude(r => r.AgentIdReport)
                 .Include(r => r.AgencyReport)
+                .ThenInclude(r => r.ReportQuestionaire)
                 .Include(r => r.Vendor)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimsInvestigationId);
 
@@ -906,6 +913,8 @@ namespace risk.control.system.Services
 
                 var saveCount = await _context.SaveChangesAsync();
 
+                //BackgroundJob.Enqueue(() => DoTask(claim, claimsInvestigationId));
+
                 await DoTask(claim, claimsInvestigationId);
 
                 return saveCount > 0 ? (currentUser.ClientCompany, claim.PolicyDetail.ContractNumber) : (null!, string.Empty);
@@ -936,6 +945,7 @@ namespace risk.control.system.Services
             claim.AgencyReport.PdfReportFilePath = filePath;
 
             var saveCount = await _context.SaveChangesAsync();
+
             return saveCount;
         }
         private async Task<(ClientCompany, string)> ReAssignToCreator(string userEmail, string claimsInvestigationId, string assessorRemarks, AssessorRemarkType assessorRemarkType, string reportAiSummary)

@@ -118,6 +118,23 @@
                                             <div class="form-check form-switch">
 
                                                 <label class="form-check-label" for="flexRadioDefault2">
+                                                    @if (@Model.ClaimsInvestigation.AgencyReport?.AgentIdReport?.Similarity <= 70)
+                                                    {
+                                                        <i class='fa fa-times i-orangered' aria-hidden='true'></i>
+                                                    }
+                                                    else
+                                                    {
+                                                        <i class='fas fa-check-circle i-green'></i>
+                                                    }<span class="process-case"> </span>
+                                                    <i class="fas fa-portrait"></i> <b> Agent Id Match </b>
+                                                </label>
+                                            </div>
+
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="form-check form-switch">
+
+                                                <label class="form-check-label" for="flexRadioDefault2">
                                                     @if (@Model.ClaimsInvestigation.AgencyReport?.DigitalIdReport?.Similarity <= 70)
                                                     {
                                                         <i class='fa fa-times i-orangered' aria-hidden='true'></i>

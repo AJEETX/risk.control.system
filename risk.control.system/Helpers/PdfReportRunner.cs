@@ -84,7 +84,29 @@ namespace risk.control.system.Helpers
             agencyDetailData.SupervisorEmail = claim.AgencyReport?.SupervisorEmail;
             agencyDetailData.AddressVisited = detailReport.VerifyAddress;
             agencyDetailData.WeatherDetail = claim.AgencyReport.AssessorRemarks;
-            agencyDetailData.ReportSummaryDescription =new List<string> { claim.AgencyReport?.AgentRemarks };
+            agencyDetailData.AssessorSummary = claim.AgencyReport?.AgentRemarks ;
+
+            agencyDetailData.ReportSummaryDescription =new List<AgentQuestionAnswer> {
+                new AgentQuestionAnswer
+                {
+                    Question =  claim.AgencyReport?.ReportQuestionaire.Question1,
+                    Answer = claim.AgencyReport?.ReportQuestionaire.Answer1
+                },
+                new AgentQuestionAnswer
+                {
+                    Question =  claim.AgencyReport?.ReportQuestionaire.Question2,
+                    Answer = claim.AgencyReport?.ReportQuestionaire.Answer2
+                },
+                new AgentQuestionAnswer
+                {
+                    Question =  claim.AgencyReport?.ReportQuestionaire.Question3,
+                    Answer = claim.AgencyReport?.ReportQuestionaire.Answer3
+                },
+                new AgentQuestionAnswer
+                {
+                    Question =  claim.AgencyReport?.ReportQuestionaire.Question4,
+                    Answer = claim.AgencyReport?.ReportQuestionaire.Answer4
+                }};
             
 
             PdfReportBuilder ConcertTicketBuilder = new PdfReportBuilder();

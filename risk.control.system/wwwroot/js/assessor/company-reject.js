@@ -26,7 +26,7 @@
                 className: 'max-width-column-name', // Apply the CSS class,
                 targets: 11                      // Index of the column to style
             }],
-        order: [[14, 'desc']],
+        order: [[16, 'asc']],
         fixedHeader: true,
         processing: true,
         paging: true,

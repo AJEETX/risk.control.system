@@ -86,13 +86,13 @@ namespace risk.control.system.Models
         public string? Type { get; set; }
 
         public bool Optional { get; set; } = true;
-        public string? Question1 { get; set; }
+        public string? Question1 { get; set; } = "Ownership of residence ?";
         public string? Answer1 { get; set; }
-        public string? Question2 { get; set; }
+        public string? Question2 { get; set; } = "Perceived financial status ?";
         public string? Answer2 { get; set; }
-        public string? Question3 { get; set; }
+        public string? Question3 { get; set; } = "Name of neighbour met ?";
         public string? Answer3 { get; set; }
-        public string? Question4 { get; set; }
+        public string? Question4 { get; set; } = "Date when met with neighbour ?";
         public string? Answer4 { get; set; }
         public byte[]? Audio { get; set; }
         public string? AudioUrl { get; set; }

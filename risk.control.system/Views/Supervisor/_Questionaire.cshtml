@@ -45,7 +45,7 @@
                 <div class="row">
                     <div class="col-12">
                         <div class="form-group">
-                            <label for="question1" class="input-group-label">Ownership of residence?</label>
+                            <label for="question1" class="input-group-label">@Model.AgencyReport.ReportQuestionaire.Question1</label>
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
                                     <span class="input-group-text">
@@ -65,7 +65,7 @@
                         </div>
 
                         <div class="form-group">
-                            <span class="input-group-label"> Perceived financial status (@ViewBag.Currency)?</span>
+                            <span class="input-group-label"> @Model.AgencyReport.ReportQuestionaire.Question2 (@ViewBag.Currency)</span>
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
                                     <span class="input-group-text" asp-for="AgencyReport.ReportQuestionaire.Answer2">
@@ -83,7 +83,7 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <span class="input-group-label"> Name of neighbour met ?</span>
+                            <span class="input-group-label"> @Model.AgencyReport.ReportQuestionaire.Question3</span>
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
                                     <span class="input-group-text" asp-for="AgencyReport.ReportQuestionaire.Answer3">
@@ -96,7 +96,7 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <span class="input-group-label"> Date met with neighbour ?:</span>
+                            <span class="input-group-label"> @Model.AgencyReport.ReportQuestionaire.Question4</span>
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
                                     <span class="input-group-text" asp-for="AgencyReport.ReportQuestionaire.Answer4">

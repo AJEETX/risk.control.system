@@ -328,7 +328,28 @@ namespace risk.control.system.Controllers.Api.Agency
                     agents.Add(agentData);
                 }
             }
-
+            if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH && claim.CustomerDetail != null)
+            {
+                var weatherUrl = $"https://api.open-meteo.com/v1/forecast?latitude={claim.CustomerDetail.Latitude}&longitude={claim.CustomerDetail.Longitude}&current=temperature_2m,windspeed_10m&hourly=temperature_2m,relativehumidity_2m,windspeed_10m";
+                var weatherData = await httpClient.GetFromJsonAsync<Weather>(weatherUrl);
+                string weatherCustomData = $"Temperature:{weatherData.current.temperature_2m} {weatherData.current_units.temperature_2m}." +
+            $"\r\n" +
+            $"\r\nWindspeed:{weatherData.current.windspeed_10m} {weatherData.current_units.windspeed_10m}" +
+            $"\r\n" +
+            $"\r\nElevation(sea level):{weatherData.elevation} metres";
+                claim.CustomerDetail.AddressLocationInfo = weatherCustomData;
+            }
+            else if (claim.PolicyDetail.ClaimType == ClaimType.DEATH && claim.BeneficiaryDetail != null)
+            {
+                var weatherUrl = $"https://api.open-meteo.com/v1/forecast?latitude={claim.BeneficiaryDetail.Latitude}&longitude={claim.BeneficiaryDetail.Longitude}&current=temperature_2m,windspeed_10m&hourly=temperature_2m,relativehumidity_2m,windspeed_10m";
+                var weatherData = await httpClient.GetFromJsonAsync<Weather>(weatherUrl);
+                string weatherCustomData = $"Temperature:{weatherData.current.temperature_2m} {weatherData.current_units.temperature_2m}." +
+            $"\r\n" +
+            $"\r\nWindspeed:{weatherData.current.windspeed_10m} {weatherData.current_units.windspeed_10m}" +
+            $"\r\n" +
+            $"\r\nElevation(sea level):{weatherData.elevation} metres";
+                claim.BeneficiaryDetail.AddressLocationInfo = weatherCustomData;
+            }
             var agentList = new List<AgentData>();
             foreach (var u in agents)
             {
@@ -337,28 +358,7 @@ namespace risk.control.system.Controllers.Api.Agency
                 int durationInSec;
                 var agentExistingDrivingMap = _context.AgentDrivingMap.FirstOrDefault(a => a.AgentId == u.AgencyUser.Id && a.ClaimsInvestigationId == id);
 
-                if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH && claim.CustomerDetail != null)
-                {
-                    var weatherUrl = $"https://api.open-meteo.com/v1/forecast?latitude={claim.CustomerDetail.Latitude}&longitude={claim.CustomerDetail.Longitude}&current=temperature_2m,windspeed_10m&hourly=temperature_2m,relativehumidity_2m,windspeed_10m";
-                    var weatherData = await httpClient.GetFromJsonAsync<Weather>(weatherUrl);
-                    string weatherCustomData = $"Temperature:{weatherData.current.temperature_2m} {weatherData.current_units.temperature_2m}." +
-                $"\r\n" +
-                $"\r\nWindspeed:{weatherData.current.windspeed_10m} {weatherData.current_units.windspeed_10m}" +
-                $"\r\n" +
-                $"\r\nElevation(sea level):{weatherData.elevation} metres";
-                    claim.CustomerDetail.AddressLocationInfo = weatherCustomData;
-                }
-                else if (claim.PolicyDetail.ClaimType == ClaimType.DEATH && claim.BeneficiaryDetail != null)
-                {
-                    var weatherUrl = $"https://api.open-meteo.com/v1/forecast?latitude={claim.BeneficiaryDetail.Latitude}&longitude={claim.BeneficiaryDetail.Longitude}&current=temperature_2m,windspeed_10m&hourly=temperature_2m,relativehumidity_2m,windspeed_10m";
-                    var weatherData = await httpClient.GetFromJsonAsync<Weather>(weatherUrl);
-                    string weatherCustomData = $"Temperature:{weatherData.current.temperature_2m} {weatherData.current_units.temperature_2m}." +
-                $"\r\n" +
-                $"\r\nWindspeed:{weatherData.current.windspeed_10m} {weatherData.current_units.windspeed_10m}" +
-                $"\r\n" +
-                $"\r\nElevation(sea level):{weatherData.elevation} metres";
-                    claim.BeneficiaryDetail.AddressLocationInfo = weatherCustomData;
-                }
+                
                 (distance, distanceInMetre, duration, durationInSec, map) = await customApiCLient.GetMap(double.Parse(u.AgencyUser.AddressLatitude), double.Parse(u.AgencyUser.AddressLongitude), double.Parse(LocationLatitude), double.Parse(LocationLongitude));
 
                 var mapDetails = $"Driving distance : {distance}; Duration : {duration}";

@@ -222,15 +222,15 @@ namespace risk.control.system.Controllers.Company
 
                 if (reportUpdateStatus == AssessorRemarkType.OK)
                 {
-                    notifyService.Custom($"Case #{contract} report approved", 3, "green", "far fa-file-powerpoint");
+                    notifyService.Custom($"Case #{contract} Approved", 3, "green", "far fa-file-powerpoint");
                 }
                 else if (reportUpdateStatus == AssessorRemarkType.REJECT)
                 {
-                    notifyService.Custom($"Case #{contract} rejected", 3, "red", "far fa-file-powerpoint");
+                    notifyService.Custom($"Case #{contract} Rejected", 3, "red", "far fa-file-powerpoint");
                 }
                 else
                 {
-                    notifyService.Custom($"Case #{contract} reassigned", 3, "yellow", "far fa-file-powerpoint");
+                    notifyService.Custom($"Case #{contract} Re-Assigned", 3, "yellow", "far fa-file-powerpoint");
                 }
 
                 return RedirectToAction(nameof(AssessorController.Assessor), "Assessor");
