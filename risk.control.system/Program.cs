@@ -17,6 +17,9 @@ using AspNetCoreHero.ToastNotification.Extensions;
 
 using Google.Api;
 
+using Hangfire;
+using Hangfire.MemoryStorage;
+
 using Highsoft.Web.Mvc.Charts;
 
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -56,6 +59,7 @@ using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
 var builder = WebApplication.CreateBuilder(args);
 ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls13;
+
 
 builder.Services.AddBreadcrumbs(Assembly.GetExecutingAssembly(), options =>
 {
@@ -184,6 +188,9 @@ builder.Services.AddNotyf(config =>
     config.IsDismissable = true;
     config.Position = NotyfPosition.TopCenter;
 });
+
+builder.Services.AddHangfire(config => config.UseMemoryStorage());
+builder.Services.AddHangfireServer();
 
 var isProd = builder.Configuration.GetSection("IsProd").Value;
 var prod = bool.Parse(isProd);
@@ -347,6 +354,7 @@ builder.Services.AddMvcCore(config =>
 builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
+app.UseHangfireDashboard();
 app.UseMiddleware<RequirePasswordChangeMiddleware>();
 app.UseMiddleware<UpdateUserLastActivityMiddleware>();
 //app.UseWebSockets();
