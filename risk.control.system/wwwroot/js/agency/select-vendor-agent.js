@@ -33,7 +33,7 @@
                 targets: 8                      // Index of the column to style
             }
         ],
-        order: [[11, 'asc']],
+        order: [[10, 'asc']],
         fixedHeader: true,
         processing: true,
         paging: true,
@@ -94,12 +94,7 @@
                     return '<span title="' + row.personMapAddressUrl + '" data-toggle="tooltip">' + data + '</span>';
                 }
             },
-            {
-                "data": "addressLocationInfo",
-                "mRender": function (data, type, row) {
-                    return '<span title="' + row.addressLocationInfo + '" data-toggle="tooltip">' + data + '</span>'
-                }
-            },
+            
             {
                 "data": "distance",
                 "mRender": function (data, type, row) {

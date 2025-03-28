@@ -1,6 +1,7 @@
 ﻿using System.Net.Http.Headers;
 
 using Amazon.Auth.AccessControlPolicy;
+using Amazon.Rekognition.Model;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -585,6 +586,7 @@ namespace risk.control.system.Services
             {
                 var claimsInvestigation = _context.ClaimsInvestigation
                 .Include(i => i.PolicyDetail)
+                .Include(i => i.Vendor)
                 .Include(i => i.InvestigationCaseSubStatus)
                 .FirstOrDefault(v => v.ClaimsInvestigationId == claimId);
                 var companyUsers = _context.ClientCompanyApplicationUser
@@ -597,7 +599,7 @@ namespace risk.control.system.Services
                 var managerRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.MANAGER.ToString()));
                 var creatorRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.CREATOR.ToString()));
 
-                List<ClientCompanyApplicationUser> users = new List<ClientCompanyApplicationUser>();
+                List<ApplicationUser> users = new List<ApplicationUser>();
                 foreach (var user in companyUsers)
                 {
                     var isManager = await userManager.IsInRoleAsync(user, managerRole?.Name);
@@ -614,6 +616,27 @@ namespace risk.control.system.Services
                         }
                     }
                 }
+                var vendorRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.SUPERVISOR.ToString()));
+                var vendorUsers = _context.VendorApplicationUser.Where(u => u.VendorId == claimsInvestigation.VendorId);
+
+                foreach(var agencyUser in vendorUsers)
+                {
+                    var isAgencyUser = await userVendorManager.IsInRoleAsync(agencyUser, vendorRole?.Name);
+                    if(isAgencyUser)
+                    {
+                        users.Add(agencyUser);
+                    }
+                }
+
+                var vendorNotification = new StatusNotification
+                {
+                    Role = vendorRole,
+                    Agency = claimsInvestigation.Vendor,
+                    Symbol = claimsInvestigation.InvestigationCaseSubStatus.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR ? "fa fa-check i-green" : "fa fa-times i-orangered",
+                    Message = $"Case #{claimsInvestigation.PolicyDetail.ContractNumber}",
+                    Status = claimsInvestigation.InvestigationCaseSubStatus.Name
+                };
+
                 var notification = new StatusNotification
                 {
                     Role = managerRole,
@@ -622,6 +645,10 @@ namespace risk.control.system.Services
                     Message = $"Case #{claimsInvestigation.PolicyDetail.ContractNumber}",
                     Status = claimsInvestigation.InvestigationCaseSubStatus.Name
                 };
+
+                claimsInvestigation.Notifications.Add(vendorNotification);
+                _context.Notifications.Add(vendorNotification);
+
                 _context.Notifications.Add(notification);
                 claimsInvestigation.Notifications.Add(notification);
                 string claimsUrl = $"{BaseUrl + claimId}";

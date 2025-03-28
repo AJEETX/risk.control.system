@@ -1,68 +1,110 @@
-﻿using System.Collections.Concurrent;
+﻿//using System.Collections.Concurrent;
 
-using risk.control.system.Data;
-using risk.control.system.Helpers;
-using risk.control.system.Models;
+//using Microsoft.EntityFrameworkCore;
 
-namespace risk.control.system.Services
-{
-    public class BackgroundTaskService : BackgroundService
-    {
-        private readonly IServiceScopeFactory _serviceScopeFactory;
-        private readonly ILogger<BackgroundTaskService> _logger;
-        private readonly ConcurrentQueue<(ClaimsInvestigation claim, string id)> _taskQueue = new();
+//using risk.control.system.Data;
+//using risk.control.system.Helpers;
+//using risk.control.system.Models;
 
-        public BackgroundTaskService(IServiceScopeFactory serviceScopeFactory, ILogger<BackgroundTaskService> logger)
-        {
-            _serviceScopeFactory = serviceScopeFactory;
-            _logger = logger;
-        }
+//namespace risk.control.system.Services
+//{
+//    public interface IBackgroundTaskService
+//    {
+//        void EnqueueTask(string claimsInvestigationId);
+//    }
+//    public class BackgroundTaskService : IBackgroundTaskService
+//    {
+//        private readonly IServiceScopeFactory _serviceScopeFactory;
+//        private readonly ILogger<BackgroundTaskService> _logger;
+//        private readonly ConcurrentQueue<string> _taskQueue = new();
 
-        public void EnqueueTask(ClaimsInvestigation claim, string claimsInvestigationId)
-        {
-            _taskQueue.Enqueue((claim, claimsInvestigationId));
-            _logger.LogInformation($"Task queued for claimsInvestigationId: {claimsInvestigationId}");
-        }
+//        public BackgroundTaskService(IServiceScopeFactory serviceScopeFactory, ILogger<BackgroundTaskService> logger)
+//        {
+//            _serviceScopeFactory = serviceScopeFactory;
+//            _logger = logger;
+//        }
 
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-        {
-            while (!stoppingToken.IsCancellationRequested)
-            {
-                if (_taskQueue.TryDequeue(out var task))
-                {
-                    try
-                    {
-                        await ProcessTask(task.claim, task.id);
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex, "Error processing task for {id}", task.id);
-                    }
-                }
-                await Task.Delay(1000, stoppingToken); // Prevents excessive CPU usage
-            }
-        }
+//        public void EnqueueTask(string claimsInvestigationId)
+//        {
+//            _taskQueue.Enqueue(claimsInvestigationId);
+//            _logger.LogInformation($"Task queued for claimsInvestigationId: {claimsInvestigationId}");
+//        }
 
-        private async Task ProcessTask(ClaimsInvestigation claim, string claimsInvestigationId)
-        {
-            using var scope = _serviceScopeFactory.CreateScope();
-            var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-            var webHostEnvironment = scope.ServiceProvider.GetRequiredService<IWebHostEnvironment>();
+//        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+//        {
+//            while (!stoppingToken.IsCancellationRequested)
+//            {
+//                if (_taskQueue.TryDequeue(out var task))
+//                {
+//                    try
+//                    {
+//                        await ProcessTask(task.id);
+//                    }
+//                    catch (Exception ex)
+//                    {
+//                        _logger.LogError(ex, "Error processing task for {id}", task.id);
+//                    }
+//                }
+//                await Task.Delay(1000, stoppingToken); // Prevents excessive CPU usage
+//            }
+//        }
 
-            string folder = Path.Combine(webHostEnvironment.WebRootPath, "report");
-            Directory.CreateDirectory(folder);
+//        private async Task ProcessTask(string claimsInvestigationId)
+//        {
+//            using var scope = _serviceScopeFactory.CreateScope();
+//            var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+//            var claim = context.ClaimsInvestigation
+//                    .Include(c => c.CustomerDetail)
+//                    .ThenInclude(c => c.District)
+//                    .Include(c => c.CustomerDetail)
+//                    .ThenInclude(c => c.State)
+//                    .Include(c => c.CustomerDetail)
+//                    .ThenInclude(c => c.Country)
+//                    .Include(c => c.CustomerDetail)
+//                    .ThenInclude(c => c.PinCode)
+//                    .Include(c => c.BeneficiaryDetail)
+//                    .ThenInclude(c => c.District)
+//                    .Include(c => c.BeneficiaryDetail)
+//                    .ThenInclude(c => c.State)
+//                    .Include(c => c.BeneficiaryDetail)
+//                    .ThenInclude(c => c.Country)
+//                    .Include(c => c.BeneficiaryDetail)
+//                    .ThenInclude(c => c.PinCode)
+//                    .Include(c => c.ClientCompany)
+//                    .Include(c => c.PolicyDetail)
+//                .ThenInclude(c => c.LineOfBusiness)
+//               .Include(c => c.PolicyDetail)
+//               .ThenInclude(c => c.CaseEnabler)
+//                .Include(r => r.AgencyReport)
+//                .ThenInclude(r => r.DigitalIdReport)
+//                .Include(r => r.AgencyReport)
+//                .ThenInclude(r => r.PanIdReport)
+//                .Include(r => r.Vendor)
+//                .ThenInclude(v => v.Country)
+//               .Include(c => c.PolicyDetail)
+//               .ThenInclude(c => c.CaseEnabler)
+//                .Include(r => r.AgencyReport)
+//                .ThenInclude(r => r.AgentIdReport)
+//                .Include(r => r.AgencyReport)
+//                .ThenInclude(r => r.ReportQuestionaire)
+//                .Include(r => r.Vendor)
+//                .FirstOrDefault(c => c.ClaimsInvestigationId == claimsInvestigationId);
+//            var webHostEnvironment = scope.ServiceProvider.GetRequiredService<IWebHostEnvironment>();
 
-            var filename = $"report{claimsInvestigationId}.pdf";
-            var filePath = Path.Combine(folder, filename);
+//            string folder = Path.Combine(webHostEnvironment.WebRootPath, "report");
+//            Directory.CreateDirectory(folder);
 
-            (await PdfReportRunner.Run(webHostEnvironment.WebRootPath, claim)).Build(filePath);
+//            var filename = $"report{claimsInvestigationId}.pdf";
+//            var filePath = Path.Combine(folder, filename);
 
-            claim.AgencyReport.PdfReportFilePath = Path.Combine("report", filename);
-            context.Update(claim);
-            await context.SaveChangesAsync();
+//            (await PdfReportRunner.Run(webHostEnvironment.WebRootPath, claim)).Build(filePath);
 
-            _logger.LogInformation($"Task completed for claimsInvestigationId: {claimsInvestigationId}");
-        }
-    }
+//            claim.AgencyReport.PdfReportFilePath = Path.Combine("report", filename);
+//            context.Update(claim);
+//            await context.SaveChangesAsync();
 
-}
+//            _logger.LogInformation($"Task completed for claimsInvestigationId: {claimsInvestigationId}");
+//        }
+//    }
+
+//}
