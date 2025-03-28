@@ -706,6 +706,7 @@ namespace risk.control.system.Services
                 .Include(r => r.AgencyReport)
                 .ThenInclude(r => r.ReportQuestionaire)
                 .Include(r => r.Vendor)
+                .ThenInclude(v=>v.Country)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimsInvestigationId);
 
                 claim.AgencyReport.AiSummary = reportAiSummary;
@@ -830,6 +831,7 @@ namespace risk.control.system.Services
                 .Include(r => r.AgencyReport)
                 .ThenInclude(r => r.PanIdReport)
                 .Include(r => r.Vendor)
+                .ThenInclude(v=>v.Country)
                .Include(c => c.PolicyDetail)
                .ThenInclude(c => c.CaseEnabler)
                 .Include(r => r.AgencyReport)       

@@ -418,7 +418,7 @@ namespace risk.control.system.Helpers
                     EMPTY_ITEM
                 },
                 {
-                new IdInfo("Person Name", new FontText[] {
+                new IdInfo("Agent Name", new FontText[] {
                     new FontText (FNT12, AgentIdData.PersonName + " / "),
                     new FontText (FNT12B, AgentIdData.Salutation)
                 }, 2),

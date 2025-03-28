@@ -125,7 +125,9 @@ namespace risk.control.system.Controllers.Api.Agency
                         "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>" :
                         a.BeneficiaryDetail.Name,
                        TimeElapsed = DateTime.Now.Subtract(a.InvestigationCaseSubStatus == assignedToAgentStatus ?
-                       a.TaskToAgentTime.Value : a.InvestigationCaseSubStatus == submittedToAssesssorStatus ? a.SubmittedToAssessorTime.Value : a.Created).TotalSeconds,
+                       a.TaskToAgentTime.Value : a.InvestigationCaseSubStatus == submittedToAssesssorStatus ? 
+                       a.SubmittedToAssessorTime.Value : a.InvestigationCaseSubStatus == replyStatus ? 
+                       a.EnquiryReplyByAssessorTime.Value: a.Created).TotalSeconds,
                        PersonMapAddressUrl = a.SelectedAgentDrivingMap,
                        Distance = a.SelectedAgentDrivingDistance,
                        Duration = a.SelectedAgentDrivingDuration

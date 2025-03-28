@@ -23,7 +23,8 @@ namespace risk.control.system.Helpers
             detailReport.PolicyNum = claim.PolicyDetail.ContractNumber;
             detailReport.AgencyName = claim.Vendor.Email;
             detailReport.ClaimType = claim.PolicyDetail.LineOfBusiness.Name;
-            detailReport.InsuredAmount = claim.PolicyDetail.SumAssuredValue.ToString();
+            var currency = Extensions.GetCultureByCountry(claim.Vendor.Country.Code.ToUpper()).NumberFormat.CurrencySymbol; 
+            detailReport.InsuredAmount = $"{currency} {claim.PolicyDetail.SumAssuredValue.ToString()}";
             detailReport.Reason2Verify = claim.PolicyDetail.CaseEnabler.Name.ToLower();
 
             string filePath = claim.ClientCompany.DocumentUrl;
@@ -135,7 +136,7 @@ namespace risk.control.system.Helpers
 
             string personAddressUrl = string.Empty;
             string contactNumer = string.Empty;
-            detailReport.PersonOfInterestName = claim.AgencyReport.AgentEmail;
+            detailReport.AgentOfInterestName = claim.AgencyReport.AgentEmail;
             contactNumer = string.Empty;
             if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
             {
@@ -162,7 +163,7 @@ namespace risk.control.system.Helpers
             photoIdData.PhotoIdMapUrl = claim.AgencyReport.AgentIdReport.DigitalIdImageLocationUrl;
             photoIdData.PhotoIdMapPath = photoPath;
             photoIdData.PersonAddressImage = addressPath;
-            photoIdData.PersonName = detailReport.PersonOfInterestName;
+            photoIdData.PersonName = claim.AgencyReport.AgentEmail;
             photoIdData.Salutation = "MR/MS";
             photoIdData.PersonContact = contactNumer;
             photoIdData.BoardingTill = claim.AgencyReport.AgentIdReport.DigitalIdImageLongLatTime.GetValueOrDefault();

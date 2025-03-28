@@ -19,6 +19,7 @@
         public string InsuredAmount { get; set; }
         public string PersonOfInterestNameTitle { get; set; }
         public string PersonOfInterestName { get; set; }
+        public string AgentOfInterestName { get; set; }
         public string Reason2VerifyTitle { get; set; }
         public string Reason2Verify { get; set; }
         public string VerifyAddressTitle { get; set; }
