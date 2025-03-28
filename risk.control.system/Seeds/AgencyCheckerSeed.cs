@@ -19,7 +19,7 @@ namespace risk.control.system.Seeds
         private const string vendorMapSize = "800x800";
         public static async Task<Vendor> Seed(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment,
                     InvestigationServiceType investigationServiceType, InvestigationServiceType discreetServiceType, InvestigationServiceType docServiceType, 
-                    LineOfBusiness lineOfBusiness, IHttpContextAccessor httpAccessor, ICustomApiCLient customApiCLient, UserManager<VendorApplicationUser> vendorUserManager, SeedInput input)
+                    LineOfBusiness lineOfBusiness, IHttpContextAccessor httpAccessor, ICustomApiCLient customApiCLient, UserManager<VendorApplicationUser> vendorUserManager, SeedInput input, InvestigationServiceType claimNonComprehensiveService)
         {
             string noCompanyImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", @Applicationsettings.NO_IMAGE);
 
@@ -27,7 +27,7 @@ namespace risk.control.system.Seeds
 
             //CREATE VENDOR COMPANY
 
-            var checkerPinCode = context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).FirstOrDefault(s => s.Country.Code.ToLower() == input.COUNTRY);
+            var checkerPinCode = context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District).OrderBy(o=>o.State.Code).LastOrDefault(s => s.Country.Code.ToLower() == input.COUNTRY);
             var checkerAddressline = "1, Nice Road";
 
             var checkerAddress = checkerAddressline + ", " + checkerPinCode.District.Name + ", " + checkerPinCode.State.Name + ", " + checkerPinCode.Country.Code;
@@ -82,9 +82,9 @@ namespace risk.control.system.Seeds
                 new VendorInvestigationServiceType{
                     VendorId = checkerAgency.Entity.VendorId,
                     InvestigationServiceTypeId = investigationServiceType.InvestigationServiceTypeId,
-                    Price = 199,
+                    Price = 399,
                     LineOfBusiness = lineOfBusiness,
-                    DistrictId = checkerPinCode.DistrictId,
+                    DistrictId = null,
                     StateId = checkerPinCode.StateId,
                     CountryId = checkerPinCode.CountryId,
                     Updated = DateTime.Now,
@@ -92,8 +92,28 @@ namespace risk.control.system.Seeds
                 new VendorInvestigationServiceType{
                     VendorId = checkerAgency.Entity.VendorId,
                     InvestigationServiceTypeId = docServiceType.InvestigationServiceTypeId,
+                    Price = 299,
+                    DistrictId = null,
+                    StateId = checkerPinCode.StateId,
+                    CountryId = checkerPinCode.CountryId,
+                    LineOfBusiness = lineOfBusiness,
+                    Updated = DateTime.Now,
+                },
+                new VendorInvestigationServiceType{
+                    VendorId = checkerAgency.Entity.VendorId,
+                    InvestigationServiceTypeId = discreetServiceType.InvestigationServiceTypeId,
+                    Price = 199,
+                    DistrictId = null,
+                    StateId = checkerPinCode.StateId,
+                    CountryId = checkerPinCode.CountryId,
+                    LineOfBusiness = lineOfBusiness,
+                    Updated = DateTime.Now,
+                },
+                new VendorInvestigationServiceType{
+                    VendorId = checkerAgency.Entity.VendorId,
+                    InvestigationServiceTypeId = claimNonComprehensiveService.InvestigationServiceTypeId,
                     Price = 99,
-                    DistrictId = checkerPinCode.DistrictId,
+                    DistrictId = null,
                     StateId = checkerPinCode.StateId,
                     CountryId = checkerPinCode.CountryId,
                     LineOfBusiness = lineOfBusiness,

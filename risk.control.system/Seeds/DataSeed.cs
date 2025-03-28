@@ -309,7 +309,7 @@ namespace risk.control.system.Seeds
 
             var (vendors, companyIds) = await ClientVendorSeed.Seed(context, webHostEnvironment, claimComprehensiveService.Entity,
                 claimDiscreetService.Entity, claimDocumentCollectionService.Entity, claimCaseType.Entity,
-                httpAccessor,customApiCLient, clientUserManager, vendorUserManager);
+                httpAccessor,customApiCLient, clientUserManager, vendorUserManager, claimNonComprehensiveService.Entity);
 
             #endregion CLIENT/ VENDOR COMPANY
 
