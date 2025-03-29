@@ -507,5 +507,56 @@ namespace risk.control.system.Controllers.Company
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
+
+        [Breadcrumb(" Agency Detail", FromAction = "EmpanelledVendors")]
+        public async Task<IActionResult> VendorDetail(long id, string selectedcase)
+        {
+            try
+            {
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+
+                if (id == 0 || selectedcase is null)
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+
+                var vendor = await _context.Vendor
+                    .Include(v => v.ratings)
+                    .Include(v => v.Country)
+                    .Include(v => v.PinCode)
+                    .Include(v => v.State)
+                    .Include(v => v.District)
+                    .Include(v => v.VendorInvestigationServiceTypes)        
+                    .FirstOrDefaultAsync(m => m.VendorId == id);
+                if (vendor == null)
+                {
+                    notifyService.Error("OOPS!!!.Agency Not Found.Try Again");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var vendorUserCount = await _context.VendorApplicationUser.CountAsync(c => c.VendorId == vendor.VendorId);
+                
+                // HACKY
+                var currentCases = claimsInvestigationService.GetAgencyLoad(new List<Vendor> {vendor });
+                vendor.SelectedStateId = currentCases.FirstOrDefault().CaseCount;
+                vendor.SelectedCountryId = vendorUserCount;
+                vendor.MobileAppUrl = selectedcase;
+
+                var claimsPage = new MvcBreadcrumbNode("New", "CreatorAuto", "Case");
+                var agencyPage = new MvcBreadcrumbNode("New", "CreatorAuto", "Assign") { Parent = claimsPage, };
+                var detailsPage = new MvcBreadcrumbNode("EmpanelledVendors", "CreatorAuto", $"Empanelled Agencies") { Parent = agencyPage, RouteValues = new { selectedcase = selectedcase } };
+                var editPage = new MvcBreadcrumbNode("VendorDetail", "CreatorAuto", $"Agency Detail") { Parent = detailsPage, RouteValues = new { id = id } };
+                ViewData["BreadcrumbNode"] = editPage;
+
+
+                return View(vendor);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+        }
     }
 }

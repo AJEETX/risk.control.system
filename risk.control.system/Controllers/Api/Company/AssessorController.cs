@@ -222,7 +222,7 @@ namespace risk.control.system.Controllers.Api.Company
                         BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.Name) ?
                         "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>" :
                         a.BeneficiaryDetail.Name,
-                        TimeElapsed = DateTime.Now.Subtract(a.SubmittedToAssessorTime.Value).TotalSeconds, // TOD-DO: Check if this is the correct time to use,
+                        TimeElapsed = DateTime.Now.Subtract(a.ReviewByAssessorTime.Value).TotalSeconds, // TOD-DO: Check if this is the correct time to use,
                         PersonMapAddressUrl = a.SelectedAgentDrivingMap,
                         Distance = a.SelectedAgentDrivingDistance,
                         Duration = a.SelectedAgentDrivingDuration

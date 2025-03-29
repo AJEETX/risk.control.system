@@ -1,4 +1,5 @@
 ﻿$(function () {
+    var claimId = $('#claimId').val();
     var table = $("#customerTable").DataTable({
         ajax: {
             url: '/api/Company/GetEmpanelledVendors',
@@ -112,7 +113,26 @@
                 "mRender": function (data, type, row) {
                     return '<span title="Total number of current cases = ' + row.caseCount + '" data-toggle="tooltip">' + data + '</span>';
                 }
+            },
+            {
+                "sDefaultContent": "",
+                "bSortable": false,
+                "mRender": function (data, type, row) {
+                    var buttons = "";
+                    buttons += '<a id="details' + row.id + '" href="/CreatorAuto/VendorDetail?Id=' + row.id + '&selectedcase=' + claimId + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Agency Info</a>&nbsp;'
+                    return buttons;
+                }
             }],
+        "drawCallback": function (settings, start, end, max, total, pre) {
+
+            $('#customerTable tbody').on('click', '.btn-info', function (e) {
+                e.preventDefault(); // Prevent the default anchor behavior
+                var id = $(this).attr('id').replace('details', ''); // Extract the ID from the button's ID attribute
+                getdetails(id); // Call the getdetails function with the ID
+                window.location.href = $(this).attr('href'); // Navigate to the delete page
+            });
+
+        },
         "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
             if (aData.caseCount > 10) {
                 $('td', nRow).css('background-color', '#ffa');
@@ -298,18 +318,17 @@ function giveRating(img, image) {
     var img = $(img1).closest('tr').find("img[id='" + parseInt(rt) + "']");
     img.attr("src", "/images/FilledStar.jpeg").prevAll("img.rating").attr("src", "/images/FilledStar.jpeg");
 }
-function showVendor(id) {
+
+function getdetails(id) {
     $("body").addClass("submit-progress-bg");
     // Wrap in setTimeout so the UI
-    // can update the spinners    
+    // can update the spinners
     setTimeout(function () {
         $(".submit-progress").removeClass("hidden");
     }, 1);
-    var editbtn = $('a#' + id + '.btn.btn-xs.btn-info')
-    
-    editbtn.html("<i class='fas fa-sync fa-spin'></i> Details");
-    disableAllInteractiveElements();
 
+    $('a#details' + id + '.btn.btn-xs.btn-info').html("<i class='fas fa-sync fa-spin'></i> Agency Info");
+    disableAllInteractiveElements()
     var article = document.getElementById("article");
     if (article) {
         var nodes = article.getElementsByTagName('*');

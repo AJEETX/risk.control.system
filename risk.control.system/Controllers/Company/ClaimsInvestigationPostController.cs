@@ -123,9 +123,9 @@ namespace risk.control.system.Controllers.Company
         [ValidateAntiForgeryToken]
         [HttpPost]
         [Authorize(Roles = CREATOR.DISPLAY_NAME)]
-        public async Task<IActionResult> CaseAllocatedToVendor(long selectedcase, string claimId)
+        public async Task<IActionResult> CaseAllocatedToVendor(long selectedcase, string caseId)
         {
-            if (selectedcase < 1 || string.IsNullOrWhiteSpace(claimId))
+            if (selectedcase < 1 || string.IsNullOrWhiteSpace(caseId))
             {
                 notifyService.Custom($"Error!!! Try again", 3, "red", "far fa-file-powerpoint");
                 return RedirectToAction(nameof(CreatorManualController.New), "CreatorManual");
@@ -135,13 +135,11 @@ namespace risk.control.system.Controllers.Company
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
-                var policy = await claimsInvestigationService.AllocateToVendor(currentUserEmail, claimId, selectedcase, false);
+                var policy = await claimsInvestigationService.AllocateToVendor(currentUserEmail, caseId, selectedcase, false);
 
                 var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == selectedcase);
 
-                var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(v => v.Email == currentUserEmail);
-
-                await mailboxService.NotifyClaimAllocationToVendor(currentUserEmail, policy.PolicyDetail.ContractNumber, claimId, selectedcase);
+                await mailboxService.NotifyClaimAllocationToVendor(currentUserEmail, policy.PolicyDetail.ContractNumber, caseId, selectedcase);
 
                 notifyService.Custom($"Case #{policy.PolicyDetail.ContractNumber} {policy.InvestigationCaseSubStatus.Name} to {vendor.Name}", 3, "green", "far fa-file-powerpoint");
 

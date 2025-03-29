@@ -46,6 +46,28 @@
         <div class="row">
             <div class="col-sm-6">
                 <div class="form-group">
+                    <label class="input-group-label"> Case #:</label>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" asp-for="ContractNumber"><i class="far fa-file-powerpoint"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
+                        </div>
+                        <input id="ContractNumber" required asp-for="PolicyDetail.ContractNumber" class="form-control remarks" type="text" placeholder="Policy #" maxlength="20" autocomplete="off" />
+                        <span asp-validation-for="PolicyDetail.ContractNumber" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="input-group-label"> Reason To Verify:</label>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" asp-for="CaseEnablerId"><i class="nav-icon fas fa-puzzle-piece"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                        </div>
+                        <select required asp-for="PolicyDetail.CaseEnablerId" class="form-control remarks" asp-items="ViewBag.CaseEnablerId">
+                            <option value="">--- SELECT ---</option>
+                        </select>
+                        <span asp-validation-for="PolicyDetail.CaseEnablerId" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-group">
                     <label class="input-group-label"> Case Type:</label>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
@@ -69,16 +91,7 @@
                         <span asp-validation-for="PolicyDetail.InvestigationServiceTypeId" class="text-danger"></span>
                     </div>
                 </div>
-                <div class="form-group">
-                    <label class="input-group-label"> Case #:</label>
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text" asp-for="ContractNumber"><i class="far fa-file-powerpoint"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
-                        </div>
-                        <input id="ContractNumber" required asp-for="PolicyDetail.ContractNumber" class="form-control remarks" type="text" placeholder="Policy #" maxlength="20" autocomplete="off" />
-                        <span asp-validation-for="PolicyDetail.ContractNumber" class="text-danger"></span>
-                    </div>
-                </div>
+                
                 <div class="form-group">
                     <label class="input-group-label"> Assured Amount (@ViewBag.Currency):</label>
                     <div class="input-group mb-3">
@@ -90,6 +103,12 @@
                     </div>
                 </div>
 
+                
+                
+                
+                
+            </div>
+            <div class="col-sm-6">
                 <div class="form-group">
                     <label class="input-group-label"> Issue Date:</label>
                     <div class="input-group mb-3">
@@ -100,12 +119,6 @@
                         <span asp-validation-for="PolicyDetail.ContractIssueDate" class="text-danger"></span>
                     </div>
                 </div>
-                
-                
-                
-            </div>
-            <div class="col-sm-6">
-
                 <div class="form-group">
                     <label class="input-group-label"> Incident Date:</label>
                     <div class="input-group mb-3">
@@ -127,18 +140,7 @@
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label class="input-group-label"> Reason To Verify:</label>
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text" asp-for="CaseEnablerId"><i class="nav-icon fas fa-puzzle-piece"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                        </div>
-                        <select required asp-for="PolicyDetail.CaseEnablerId" class="form-control remarks" asp-items="ViewBag.CaseEnablerId">
-                            <option value="">--- SELECT ---</option>
-                        </select>
-                        <span asp-validation-for="PolicyDetail.CaseEnablerId" class="text-danger"></span>
-                    </div>
-                </div>
+                
 
                 <div class="form-group">
                     <label class="input-group-label"> Budget Centre:</label>

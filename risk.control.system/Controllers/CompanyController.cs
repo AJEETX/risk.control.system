@@ -600,22 +600,17 @@ namespace risk.control.system.Controllers
                     .Include(v => v.State)
                     .Include(v => v.District)
                     .Include(v => v.VendorInvestigationServiceTypes)
-                    .Include(v => v.VendorInvestigationServiceTypes)
-                    .ThenInclude(v => v.State)
-                    .Include(v => v.VendorInvestigationServiceTypes)
-                    .ThenInclude(v => v.District)
-                    .Include(v => v.VendorInvestigationServiceTypes)
-                    .ThenInclude(v => v.LineOfBusiness)
-                    .Include(v => v.VendorInvestigationServiceTypes)
-                    .ThenInclude(v => v.InvestigationServiceType)
                     .FirstOrDefaultAsync(m => m.VendorId == id);
                 if (vendor == null)
                 {
                     notifyService.Error("OOPS !!!..Contact Admin");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
+                var vendorUserCount = await _context.VendorApplicationUser.CountAsync(c => c.VendorId == vendor.VendorId);
                 var superAdminUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == currentUserEmail);
 
+                // HACKY
+                vendor.SelectedCountryId = vendorUserCount;
                 if (superAdminUser.IsSuperAdmin)
                 {
                     vendor.SelectedByCompany = true;

@@ -89,7 +89,7 @@
                 <div class="submit-progress hidden">
                     <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
                 </div>
-                <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
+                <input type="hidden" id="caseId" name="caseId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
                 <input type="hidden" id="CaseLocationId" name="CaseLocationId" value="@Model.Location.BeneficiaryDetailId" />
                 <table id="customerTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
                     <thead>
@@ -108,6 +108,7 @@
                             <th>State</th>
                             <th>Country</th>
                             <th>Current Case(s)</th>
+                            <th>Agency Detail</th>
                         </tr>
                     </thead>
                 </table>

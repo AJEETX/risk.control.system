@@ -97,9 +97,6 @@ namespace risk.control.system.Services
 
         public async Task<ClaimsInvestigationVendorsModel> GetEmpanelledVendors(string selectedcase)
         {
-            var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
-                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
-
             var claimsInvestigation = await _context.ClaimsInvestigation
                 .Include(c => c.PolicyDetail)
                 .Include(c => c.ClientCompany)

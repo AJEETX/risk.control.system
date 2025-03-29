@@ -26,7 +26,7 @@
                 className: 'max-width-column-name', // Apply the CSS class,
                 targets: 11                      // Index of the column to style
             }],
-        order: [[13, 'desc']],
+        order: [[16, 'asc']],
         fixedHeader: true,
         processing: true,
         paging: true,
@@ -168,7 +168,8 @@
                     buttons += '<a href="/Report/PrintPdfReport?Id=' + row.id + '" class="btn btn-xs btn-danger"><i class="far fa-file-pdf"></i> PDF</a>'
                     return buttons;
                 }
-            }
+            },
+            { "data": "timeElapsed", "bVisible": false }
         ],
         "drawCallback": function (settings, start, end, max, total, pre) {
 

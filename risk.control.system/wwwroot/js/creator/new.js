@@ -203,7 +203,7 @@
                 "mRender": function (data, type, row) {
                     var buttons = "";
                     if (row.ready2Assign) {
-                        buttons += '<a id="assign' + row.id + '" href="EmpanelledVendors?Id=' + row.id + '" class="btn btn-xs btn-info"><i class="fas fa-external-link-alt"></i> Assign</a>&nbsp;';
+                        buttons += '<a id="assign' + row.id + '" href="/CreatorAuto/EmpanelledVendors?Id=' + row.id + '" class="btn btn-xs btn-info"><i class="fas fa-external-link-alt"></i> Assign</a>&nbsp;';
                     } else {
                         buttons += '<button disabled class="btn btn-xs btn-info"><i class="fas fa-external-link-alt"></i> Assign</button>&nbsp;';
                     }

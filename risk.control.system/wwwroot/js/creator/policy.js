@@ -105,7 +105,7 @@ $(document).ready(function () {
     $("#edit-form").validate();
 
     // Automatically set focus
-    $("#LineOfBusinessId").focus();
+    $("#ContractNumber").focus();
 
     // Handle add policy click
     $('#create-policy').on('click', function () {
@@ -131,23 +131,21 @@ $(document).ready(function () {
     $("#ContractIssueDate, #DateOfIncident").attr("max", maxDate);
 
     $("#LineOfBusinessId").on("change", function () {
+        // Clear and reset InvestigationServiceTypeId dropdown
+        $('#InvestigationServiceTypeId').empty();
+        $('#InvestigationServiceTypeId').append("<option value=''>--- SELECT ---</option>");
+
         var value = $(this).val();
 
-        if (value === '') {
-            // Clear and reset InvestigationServiceTypeId dropdown
-            $('#InvestigationServiceTypeId').empty();
-            $('#InvestigationServiceTypeId').append("<option value=''>--- SELECT ---</option>");
-        } else {
+        if (value != '') {
             // Fetch investigation services via AJAX and populate the dropdown
             $.get("/api/MasterData/GetInvestigationServicesByLineOfBusinessId", { LineOfBusinessId: value }, function (data) {
-                PopulateInvestigationServices("#InvestigationServiceTypeId", data, "<option>--- SELECT ---</option>");
+                PopulateInvestigationServices("#InvestigationServiceTypeId", data);
             });
         }
     });
 });
-function PopulateInvestigationServices(dropDownId, list, option) {
-    $(dropDownId).empty();
-    $(dropDownId).append(option)
+function PopulateInvestigationServices(dropDownId, list) {
     $.each(list, function (index, row) {
         $(dropDownId).append("<option value='" + row.investigationServiceTypeId + "'>" + row.name + "</option>")
     });

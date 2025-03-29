@@ -2331,3 +2331,7 @@ input#checkall {
 .isNewAssigned {
     background-color: #FCFCC4;
 }
+#notificationList{
+    max-height: 300px;
+    overflow-y: auto;
+}

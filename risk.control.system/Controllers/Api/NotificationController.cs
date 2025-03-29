@@ -18,6 +18,7 @@ namespace risk.control.system.Controllers.Api
     [ApiController]
     public class NotificationController : ControllerBase
     {
+        private readonly int maxCountReached = 10;
         private readonly INotificationService service;
         private readonly ISmsService smsService;
         private readonly IHttpClientService httpClientService;
@@ -41,7 +42,7 @@ namespace risk.control.system.Controllers.Api
             var userEmail = HttpContext.User?.Identity?.Name;
             var notifications = await service.GetNotifications(userEmail);
             var activeNotifications = notifications.Select(n => new { Id = n.StatusNotificationId, Symbol = n.Symbol, n.Message, n.Status, CreatedAt = GetTimeAgo(n.CreatedAt) });
-            return Ok(new { Data = activeNotifications?.Take(10).ToList(), total = notifications.Count });
+            return Ok(new { Data = activeNotifications?.Take(maxCountReached).ToList(), total = notifications.Count, MaxCountReached = notifications.Count > maxCountReached, MaxCount = maxCountReached });
         }
         [AllowAnonymous]
         [HttpGet("GetClientIp")]

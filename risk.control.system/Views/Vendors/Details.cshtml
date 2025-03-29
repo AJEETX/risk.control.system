@@ -17,7 +17,7 @@
                     <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
                 </div>
                 <div class="row">
-                    <div class="col-md-4 text-center">
+                    <div class="col-md-5 text-center">
                         <p class="info-box-number">Active Since: @Model.ActivatedDate?.ToString("dd-MMM-yyyy")</p>
 
                         <div class="profile-img-container">
@@ -46,7 +46,7 @@
                                         @if (Model.RateCount != null && Model.RateCount > 0)
                                         {
                                             decimal a = @Model.RateTotal.Value / @Model.RateCount.Value;
-                                            <span class="avr"> @a</span>
+                                                    <span class="avr"> @a</span>
                                         }
 
                                     </span>
@@ -61,26 +61,22 @@
                         <div class="card-footer">
                             <div class="row">
                                 <div class="col-md-12">
-                                    <p class="info-box-number">
-                                        <div class="form-group">
-                                            @if (Model.SelectedByCompany)
-                                            {
-                                                <a id="back" asp-controller="Vendors" asp-action="Agencies" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
-                                            }
-                                            else
-                                            {
-                                                <a id="back" asp-controller="Vendors" asp-action="AvailableVendors" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
-                                            }
-                                            <a asp-controller="Vendors" asp-action="Users" asp-route-id="@Model.VendorId" class="btn btn-success"><i class="fas fa-user-friends"></i>  Users</a>
-                                            <a asp-controller="Vendors" asp-action="Service" asp-route-id="@Model.VendorId" class="btn btn-danger"><i class="fas fa-truck"></i>  @Applicationsettings.SERVICE</a>
-                                        </div>
-                                    </p>
+                                    @if (Model.SelectedByCompany)
+                                    {
+                                                            <a id="back" asp-controller="Vendors" asp-action="Agencies" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
+                                    }
+                                    else
+                                    {
+                                                            <a id="back" asp-controller="Vendors" asp-action="AvailableVendors" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
+                                    }
+                                            <a asp-controller="Vendors" asp-action="Users" asp-route-id="@Model.VendorId" class="btn btn-success"><i class="fas fa-user-friends"></i>  Users (@Model.SelectedCountryId)</a>
+                                            <a asp-controller="Vendors" asp-action="Service" asp-route-id="@Model.VendorId" class="btn btn-danger"><i class="fas fa-truck"></i>  @Applicationsettings.SERVICE (@Model.VendorInvestigationServiceTypes.Count)</a>
 
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-8">
+                    <div class="col-md-7">
                         <div class="row">
                             <!-- Left Column -->
                             <div class="col-md-6">
@@ -180,5 +176,5 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-    <script src="~/js/common/companies.js"></script>
+            <script src="~/js/common/companies.js"></script>
 }

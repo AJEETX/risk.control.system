@@ -274,6 +274,9 @@ namespace risk.control.system.Helpers
             cellBuilder.AddParagraph(DetailedReport.PersonOfInterestName).SetLineSpacing(1.4f);
             cellBuilder.AddParagraph(DetailedReport.Reason2Verify).SetLineSpacing(1.4f);
             cellBuilder.AddParagraph(DetailedReport.VerifyAddress).SetLineSpacing(1.4f);
+            cellBuilder.AddParagraph().SetLineSpacing(1.4f);
+            cellBuilder.AddParagraph().SetLineSpacing(1.4f);
+            cellBuilder.SetBorderStroke(Stroke.Dashed);
         }
 
         private void SetDisclaimer(TableCellBuilder cellBuilder)

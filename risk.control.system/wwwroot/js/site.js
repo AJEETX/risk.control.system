@@ -26,7 +26,13 @@ function loadNotifications() {
     $.get('/api/Notification/GetNotifications', function (response) {
         $("#notificationList").html("");
         var totalCount = response.total;
-        $("#notificationCount").text(totalCount);
+        if (response.maxCountReached) {
+            var maxText = `${response.maxCount}+`;
+            $("#notificationCount").text(maxText);
+        }
+        else {
+            $("#notificationCount").text(totalCount);
+        }
 
         response.data.forEach(function (item) {
             $("#notificationList").append(
@@ -38,16 +44,16 @@ function loadNotifications() {
         });
         if (totalCount > response.data.length) {
             $("#notificationList").append(
-                `<hr><span class="float-right text-muted text-sm">${moreInfo}</span>`
+                `<hr><div class="text-muted text-sm">${moreInfo}</div>`
             );
         }
         // Click event to mark as read
         $(".notification-item").on("click", function () {
             var notificationId = $(this).data("id");
             markNotificationAsRead(notificationId);
-            $(this).remove(); // Remove notification from UI
-            let count = totalCount - 1;
-            $("#notificationCount").text(count > 0 ? count : "0");
+            //$(this).remove(); // Remove notification from UI
+            //let count = totalCount - 1;
+            //$("#notificationCount").text(count > 0 ? count : "0");
         });
     });
 }
@@ -100,7 +106,8 @@ function checkFormCompletion(formSelector, create = false) {
         }
 
         // Check if the field has a value
-        if (!$(this).val()) {
+        var inputValue = $(this).val();
+        if (!inputValue) {
             isFormComplete = false;
             return false; // Exit loop early if a required field is empty
         }

@@ -497,9 +497,7 @@ namespace risk.control.system.Controllers.Api.Company
                 _context.ClaimsInvestigation.UpdateRange(newClaims);
                 _context.SaveChanges();
             }
-            var profilebuilder = new StringBuilder();
-            profilebuilder.Append("<i class='fas fa-portrait'></i> Profile Image <span class='badge badge-light'></span>");
-
+           
             var response = claimsSubmitted
                     .Select(a => new ClaimsInvestigationResponse
                     {
