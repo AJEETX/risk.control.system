@@ -284,7 +284,7 @@ namespace risk.control.system.Controllers.Company
             try
             {
                 if (customerDetail == null || customerDetail.SelectedCountryId < 1 || customerDetail.SelectedStateId < 1 || customerDetail.SelectedDistrictId < 1 || customerDetail.SelectedPincodeId < 1 ||
-                    string.IsNullOrWhiteSpace(customerDetail.Addressline) || customerDetail.Income == null || string.IsNullOrWhiteSpace(customerDetail.ContactNumber) || customerDetail.CustomerType == null ||
+                    string.IsNullOrWhiteSpace(customerDetail.Addressline) || customerDetail.Income == null || string.IsNullOrWhiteSpace(customerDetail.ContactNumber) ||
                     customerDetail.DateOfBirth == null || customerDetail.Education == null || customerDetail.Gender == null || customerDetail.Occupation == null || customerDetail.ProfileImage == null)
                 {
                     notifyService.Error("OOPs !!!..Incomplete/Invalid input");
@@ -343,7 +343,7 @@ namespace risk.control.system.Controllers.Company
             try
             {
                 if (customerDetail == null || customerDetail.SelectedCountryId < 1 || customerDetail.SelectedStateId < 1 || customerDetail.SelectedDistrictId < 1 || customerDetail.SelectedPincodeId < 1 || 
-                    string.IsNullOrWhiteSpace(customerDetail.Addressline) || customerDetail.Income == null || string.IsNullOrWhiteSpace(customerDetail.ContactNumber) || customerDetail.CustomerType == null ||
+                    string.IsNullOrWhiteSpace(customerDetail.Addressline) || customerDetail.Income == null || string.IsNullOrWhiteSpace(customerDetail.ContactNumber)  ||
                     customerDetail.DateOfBirth == null || customerDetail.Education == null || customerDetail.Gender == null || customerDetail.Occupation == null)
                 {
                     notifyService.Error("OOPs !!!..Error creating customer");
@@ -401,7 +401,7 @@ namespace risk.control.system.Controllers.Company
             {
                 if (string.IsNullOrWhiteSpace(ClaimsInvestigationId) ||
                     beneficiary == null || beneficiary.SelectedCountryId < 1 || beneficiary.SelectedStateId < 1 || beneficiary.SelectedDistrictId < 1 || beneficiary.SelectedPincodeId < 1 ||
-                    string.IsNullOrWhiteSpace(beneficiary.Addressline) || beneficiary.BeneficiaryRelation == null || string.IsNullOrWhiteSpace(beneficiary.ContactNumber) ||
+                    string.IsNullOrWhiteSpace(beneficiary.Addressline) || beneficiary.BeneficiaryRelationId < 1 || string.IsNullOrWhiteSpace(beneficiary.ContactNumber) ||
                     beneficiary.DateOfBirth == null || beneficiary.Income == null || beneficiary.ProfileImage == null)
                 {
                     notifyService.Error("OOPs !!!..Error creating customer");
@@ -460,7 +460,7 @@ namespace risk.control.system.Controllers.Company
             try
             {
                 if (beneficiaryDetailId < 0 || beneficiary == null || beneficiary.SelectedCountryId < 1 || beneficiary.SelectedStateId < 1 || beneficiary.SelectedDistrictId < 1 || beneficiary.SelectedPincodeId < 1 ||
-                    string.IsNullOrWhiteSpace(beneficiary.Addressline) || beneficiary.BeneficiaryRelation == null || string.IsNullOrWhiteSpace(beneficiary.ContactNumber) ||
+                    string.IsNullOrWhiteSpace(beneficiary.Addressline) || beneficiary.BeneficiaryRelationId < 1 || string.IsNullOrWhiteSpace(beneficiary.ContactNumber) ||
                     beneficiary.DateOfBirth == null || beneficiary.Income == null)
                 {
                     notifyService.Error("OOPs !!!..Error creating customer");

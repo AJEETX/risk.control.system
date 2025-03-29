@@ -320,7 +320,6 @@
             }
         });
     });
-    //initMap("/api/ClaimsVendor/GetNewMap");
 
 });
 

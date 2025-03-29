@@ -144,7 +144,7 @@ namespace risk.control.system.Services
                             claim.CustomerDetail = new CustomerDetail
                             {
                                 Name = rowData[10]?.Trim(),
-                                CustomerType = (CustomerType)Enum.Parse(typeof(CustomerType), rowData[11]?.Trim()),
+                                //CustomerType = (CustomerType)Enum.Parse(typeof(CustomerType), rowData[11]?.Trim()),
                                 Gender = (Gender)Enum.Parse(typeof(Gender), rowData[12]?.Trim()),
                                 DateOfBirth = DateTime.ParseExact(rowData[13]?.Trim(), "dd-MM-yyyy", CultureInfo.InvariantCulture),
                                 ContactNumber = (rowData[14]?.Trim()),
@@ -156,7 +156,7 @@ namespace risk.control.system.Services
                                 PinCodeId = pinCode.PinCodeId,
                                 StateId = state.StateId,
                                 DistrictId = district.DistrictId,
-                                Description = rowData[20]?.Trim(),
+                                //Description = rowData[20]?.Trim(),
                                 ProfilePicture = customerNewImage,
                             };
 

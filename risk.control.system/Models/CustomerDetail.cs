@@ -69,7 +69,6 @@ namespace risk.control.system.Models
         [NotMapped]
         public CREATEDBY CREATEDBY { get; set; } = CREATEDBY.MANUAL;
 
-        [Required]
         [Display(Name = "Customer type")]
         public CustomerType? CustomerType { get; set; }
 
@@ -112,11 +111,9 @@ namespace risk.control.system.Models
            $"- State: {State}\n" +
            $"- Country: {Country}\n" +
            $"- Contact Number: {ContactNumber}\n" +
-           $"- Customer Type: {CustomerType.GetEnumDisplayName()}\n" +
            $"- Income: {Income}\n" +
            $"- Occupation: {Occupation.GetEnumDisplayName}\n" +
-           $"- Education: {Education.GetEnumDisplayName}\n" +
-           $"- Remarks: {Description}";
+           $"- Education: {Education.GetEnumDisplayName}\n";
         }
     }
 }

@@ -19,6 +19,15 @@
                 </div>
                 <div class="row">
                     <div class="col-md-5 text-center">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                        <label class="card-header text-sm bg-warning" data-toggle="tooltip" title="Total Cases (@Model.SelectedDistrictId)">  Total Cases (@Model.SelectedDistrictId)</label>
+                                        <label class="card-header text-sm bg-info" data-toggle="tooltip" title="Current Cases (@Model.SelectedStateId)"> Current Cases (@Model.SelectedStateId)</label>
+                                    </div>
+                            </div>
+                        </div>
+                        <div class="dropdown-divider"></div>
                         <p class="info-box-number">Active Since: @Model.ActivatedDate?.ToString("dd-MMM-yyyy")</p>
 
                         <div class="profile-img-container">
@@ -58,9 +67,8 @@
                             </li>
                         </ul>
                         <div class="dropdown-divider"></div>
-
-                        <div class="card-footer">
-                            <div class="row">
+                        
+                        <div class="row">
                                 <div class="col-md-12">
                                     <div class="form-group">
                                         <a id="back" asp-controller="Company" asp-action="EmpanelledVendors" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
@@ -69,7 +77,6 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
                     </div>
                     <div class="col-md-7">
                         <div class="row">

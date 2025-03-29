@@ -254,8 +254,8 @@ namespace risk.control.system.Controllers.Company
                         Income = Income.UPPER_INCOME,
                         Name = NameGenerator.GenerateName(),
                         Occupation = Occupation.SELF_EMPLOYED,
-                        CustomerType = CustomerType.HNI,
-                        Description = "DODGY PERSON",
+                        //CustomerType = CustomerType.HNI,
+                        //Description = "DODGY PERSON",
                         Country= pinCode.Country,
                         CountryId = pinCode.CountryId,
                         SelectedCountryId = pinCode.CountryId,
@@ -534,12 +534,22 @@ namespace risk.control.system.Controllers.Company
                     notifyService.Error("OOPS!!!.Agency Not Found.Try Again");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
+                var approvedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR);
+                var rejectedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR);
+
+                var vendorAllCasesCount = await _context.ClaimsInvestigation.CountAsync(c => c.VendorId == vendor.VendorId &&
+                c.InvestigationCaseSubStatusId == approvedStatus.InvestigationCaseSubStatusId ||
+                c.InvestigationCaseSubStatusId == rejectedStatus.InvestigationCaseSubStatusId);
+
                 var vendorUserCount = await _context.VendorApplicationUser.CountAsync(c => c.VendorId == vendor.VendorId);
-                
+
                 // HACKY
                 var currentCases = claimsInvestigationService.GetAgencyLoad(new List<Vendor> {vendor });
-                vendor.SelectedStateId = currentCases.FirstOrDefault().CaseCount;
                 vendor.SelectedCountryId = vendorUserCount;
+                vendor.SelectedStateId = currentCases.FirstOrDefault().CaseCount;
+                vendor.SelectedDistrictId = vendorAllCasesCount;
                 vendor.MobileAppUrl = selectedcase;
 
                 var claimsPage = new MvcBreadcrumbNode("New", "CreatorAuto", "Case");

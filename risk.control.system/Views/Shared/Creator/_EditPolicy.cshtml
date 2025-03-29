@@ -62,18 +62,6 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="input-group-label"> Reason To Verify:</label>
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text" asp-for="CaseEnablerId"><i class="nav-icon fas fa-puzzle-piece"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                        </div>
-                        <select required asp-for="PolicyDetail.CaseEnablerId" class="form-control remarks" asp-items="ViewBag.CaseEnablerId">
-                            <option value="">--- SELECT ---</option>
-                        </select>
-                        <span asp-validation-for="PolicyDetail.CaseEnablerId" class="text-danger"></span>
-                    </div>
-                </div>
-                <div class="form-group">
                     <label class="input-group-label"> Case Type:</label>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
@@ -91,10 +79,22 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text" asp-for="InvestigationServiceTypeId"><i class="nav-icon fas fa-tools"></i> <i class="fa fa-asterisk asterik-style"></i> </span>
                         </div>
-                        <select required id="InvestigationServiceTypeId" asp-for="PolicyDetail.InvestigationServiceTypeId" class="form-control remarks" asp-items="ViewBag.InvestigationServiceTypeId">
+                        <select id="InvestigationServiceTypeId" required asp-for="PolicyDetail.InvestigationServiceTypeId" class="form-control remarks" asp-items="ViewBag.InvestigationServiceTypeId">
                             <option value="">--- SELECT ---</option>
                         </select>
                         <span asp-validation-for="PolicyDetail.InvestigationServiceTypeId" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="input-group-label"> Reason To Verify:</label>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" asp-for="CaseEnablerId"><i class="nav-icon fas fa-puzzle-piece"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                        </div>
+                        <select required asp-for="PolicyDetail.CaseEnablerId" class="form-control remarks" asp-items="ViewBag.CaseEnablerId">
+                            <option value="">--- SELECT ---</option>
+                        </select>
+                        <span asp-validation-for="PolicyDetail.CaseEnablerId" class="text-danger"></span>
                     </div>
                 </div>
                 

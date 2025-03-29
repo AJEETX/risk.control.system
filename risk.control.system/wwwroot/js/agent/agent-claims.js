@@ -246,5 +246,4 @@ $(document).ready(function () {
             }
         });
     });
-    //initMap("/api/ClaimsVendor/GetNewMap");
 });
