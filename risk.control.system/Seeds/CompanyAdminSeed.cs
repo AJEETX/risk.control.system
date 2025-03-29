@@ -16,8 +16,7 @@ namespace risk.control.system.Seeds
         public static async Task Seed(ApplicationDbContext context, 
             IWebHostEnvironment webHostEnvironment, 
             UserManager<ClientCompanyApplicationUser> userManager, 
-            ClientCompany clientCompany,
-            IHttpContextAccessor httpAccessor, string companyDomain, PinCode pinCode)
+            ClientCompany clientCompany,string companyDomain, PinCode pinCode)
         {
             //Seed client creator
             string noUserImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", @Applicationsettings.NO_USER);

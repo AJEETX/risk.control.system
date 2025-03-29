@@ -14,9 +14,7 @@ namespace risk.control.system.Seeds
     public class ClientVendorSeed
     {
         public static async Task<(List<Vendor> vendors, List<ClientCompany> companyIds)> Seed(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment,
-                    InvestigationServiceType investigationServiceType, InvestigationServiceType discreetServiceType,
-                    InvestigationServiceType docServiceType, LineOfBusiness lineOfBusiness, IHttpContextAccessor httpAccessor,
-                    ICustomApiCLient customApiCLient, UserManager<ClientCompanyApplicationUser> clientUserManager, UserManager<VendorApplicationUser> vendorUserManager, InvestigationServiceType claimNonComprehensiveService)
+                    ICustomApiCLient customApiCLient, UserManager<ClientCompanyApplicationUser> clientUserManager, UserManager<VendorApplicationUser> vendorUserManager)
         {
             string noCompanyImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", @Applicationsettings.NO_IMAGE);
 
@@ -26,9 +24,9 @@ namespace risk.control.system.Seeds
             var newGlobalSetting = await context.GlobalSettings.AddAsync(globalSetting);
             await context.SaveChangesAsync(null, false);
 
-            var vendors = await VendorSeed.Seed(context, webHostEnvironment, investigationServiceType, discreetServiceType, docServiceType, lineOfBusiness, httpAccessor, customApiCLient, vendorUserManager, claimNonComprehensiveService);
+            var vendors = await VendorSeed.Seed(context, webHostEnvironment,customApiCLient, vendorUserManager);
 
-            var companies = await CompanyInsurer.Seed(context, vendors, webHostEnvironment, investigationServiceType, discreetServiceType, docServiceType, lineOfBusiness, httpAccessor, customApiCLient, clientUserManager);
+            var companies = await CompanyInsurer.Seed(context, vendors, webHostEnvironment, customApiCLient, clientUserManager);
 
             return (vendors, companies);
         }

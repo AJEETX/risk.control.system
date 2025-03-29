@@ -16,12 +16,9 @@ namespace risk.control.system.Seeds
 {
     public class VendorSeed
     {
-        public static async Task<List<Vendor>> Seed(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment,
-                    InvestigationServiceType investigationServiceType, InvestigationServiceType discreetServiceType, InvestigationServiceType docServiceType, 
-                    LineOfBusiness lineOfBusiness, IHttpContextAccessor httpAccessor, ICustomApiCLient customApiCLient, UserManager<VendorApplicationUser> vendorUserManager, InvestigationServiceType claimNonComprehensiveService)
+        public static async Task<List<Vendor>> Seed(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, 
+                    ICustomApiCLient customApiCLient, UserManager<VendorApplicationUser> vendorUserManager)
         {
-            string noCompanyImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", @Applicationsettings.NO_IMAGE);
-
             var countries = context.Country.ToList();
 
             //CREATE VENDOR COMPANY
@@ -50,7 +47,7 @@ namespace risk.control.system.Seeds
 
             foreach (var agency in agencies)
             {
-                var vendor = await AgencyCheckerSeed.Seed(context, webHostEnvironment, investigationServiceType, discreetServiceType, docServiceType, lineOfBusiness, httpAccessor, customApiCLient, vendorUserManager, agency, claimNonComprehensiveService);
+                var vendor = await AgencyCheckerSeed.Seed(context, webHostEnvironment, customApiCLient, vendorUserManager, agency);
                 vendors.Add(vendor);
             }
             return vendors;

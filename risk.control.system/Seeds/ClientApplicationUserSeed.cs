@@ -16,15 +16,14 @@ namespace risk.control.system.Seeds
         public static async Task Seed(ApplicationDbContext context, 
             IWebHostEnvironment webHostEnvironment, 
             UserManager<ClientCompanyApplicationUser> userManager, 
-            ClientCompany clientCompany,
-            IHttpContextAccessor httpAccessor)
+            ClientCompany clientCompany)
         {
             var company = context.ClientCompany.FirstOrDefault(c => c.Email == clientCompany.Email);
             string noUserImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", @Applicationsettings.NO_USER);
             var pinCode = context.PinCode.Include(p => p.District).Include(p => p.State).Include(p => p.Country).FirstOrDefault(p => p.PinCodeId == clientCompany.PinCodeId);
 
             //Seed client admin
-            await CompanyAdminSeed.Seed(context, webHostEnvironment, userManager, clientCompany, httpAccessor, company.Email, pinCode);
+            await CompanyAdminSeed.Seed(context, webHostEnvironment, userManager, clientCompany, company.Email, pinCode);
 
             //Seed client creator
             string creatorEmailwithSuffix = CREATOR.CODE + "@" + company.Email;

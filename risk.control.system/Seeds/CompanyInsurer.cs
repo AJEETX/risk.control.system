@@ -17,8 +17,6 @@ namespace risk.control.system.Seeds
     public class CompanyInsurer
     {
         public static async Task< List<ClientCompany>> Seed(ApplicationDbContext context, List<Vendor> vendors, IWebHostEnvironment webHostEnvironment,
-                    InvestigationServiceType investigationServiceType, InvestigationServiceType discreetServiceType, 
-                    InvestigationServiceType docServiceType, LineOfBusiness lineOfBusiness, IHttpContextAccessor httpAccessor,
                     ICustomApiCLient customApiCLient, UserManager<ClientCompanyApplicationUser> clientUserManager)
         {
             var allianz = new SeedInput { COUNTRY = "us", DOMAIN = "allianz.com", NAME = "Allianz", PHOTO = "/img/allianz.png" };
@@ -33,7 +31,7 @@ namespace risk.control.system.Seeds
 
             foreach (var company in companies)
             {
-                _ = await InsurerAllianz.Seed(context, vendors, webHostEnvironment, investigationServiceType, discreetServiceType, docServiceType, lineOfBusiness, httpAccessor, customApiCLient, clientUserManager, company);
+                _ = await InsurerAllianz.Seed(context, vendors, webHostEnvironment, customApiCLient, clientUserManager, company);
             }
 
             await context.SaveChangesAsync(null, false);

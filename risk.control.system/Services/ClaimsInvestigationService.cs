@@ -103,9 +103,8 @@ namespace risk.control.system.Services
                             if (serviceType.StateId == pincodeDistrictState.StateId && serviceType.DistrictId == null)
                             {
                                 vendorsInPincode.Add(empanelledVendor);
-                                continue;
                             }
-                            if (serviceType.StateId == pincodeDistrictState.StateId && serviceType.DistrictId == pincodeDistrictState.DistrictId)
+                            else if (serviceType.StateId == pincodeDistrictState.StateId && serviceType.DistrictId == pincodeDistrictState.DistrictId)
                             {
                                 vendorsInPincode.Add(empanelledVendor);
                                 continue;
@@ -117,9 +116,14 @@ namespace risk.control.system.Services
                             continue;
                         }
                     }
+                    var addedVendor = vendorsInPincode.Any(v => v.VendorId == empanelledVendor.VendorId);
+                    if (addedVendor)
+                    {
+                        continue;
+                    }
                 }
 
-                var distinctVendors = vendorsInPincode.Distinct()?.ToList();
+                var distinctVendors = vendorsInPincode.GroupBy(p => p.VendorId).Select(g => g.First())?.ToList();
 
                 //3. CALL SERVICE WITH VENDOR_ID
                 if (vendorsInPincode is not null && vendorsInPincode.Count > 0)
@@ -128,7 +132,7 @@ namespace risk.control.system.Services
 
                     if (vendorsWithCaseLoad is not null && vendorsWithCaseLoad.Count > 0)
                     {
-                        var selectedVendor = vendorsWithCaseLoad.FirstOrDefault();
+                        var selectedVendor = vendorsWithCaseLoad.OrderBy(o=>o.CaseCount).FirstOrDefault();
 
                         var policy = await AllocateToVendor(userEmail, claimsInvestigation.ClaimsInvestigationId, selectedVendor.Vendor.VendorId);
 
