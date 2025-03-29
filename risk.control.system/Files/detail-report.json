@@ -16,5 +16,7 @@
   "Reason2VerifyTitle": "Reason to verify",
   "Reason2Verify": "Doubtful background",
   "VerifyAddressTitle": "Verified Address",
-  "VerifyAddress": "205 1st St. Vermont VIC 3133"
+  "VerifyAddress": "205 1st St. Vermont VIC 3133",
+  "ServiceType": "",
+  "ServiceTypeTitle": "Type of Investigation Service"
 }

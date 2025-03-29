@@ -47,19 +47,22 @@ namespace risk.control.system.Services
         private readonly IMailboxService mailboxService;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly IHttpContextAccessor accessor;
-        //private readonly BackgroundTaskService backgroundTaskService;
+        private readonly IPdfReportService reportService;
+        private readonly IBackgroundJobClient backgroundJobClient;
         private readonly ICustomApiCLient customApiCLient;
 
         public ClaimsInvestigationService(ApplicationDbContext context,
             IHttpContextAccessor accessor,
-            //BackgroundTaskService backgroundTaskService,
+            IPdfReportService reportService,
+            IBackgroundJobClient backgroundJobClient,
             ICustomApiCLient customApiCLient,
             IMailboxService mailboxService, 
             IWebHostEnvironment webHostEnvironment)
         {
             this._context = context;
             this.accessor = accessor;
-            //this.backgroundTaskService = backgroundTaskService;
+            this.reportService = reportService;
+            this.backgroundJobClient = backgroundJobClient;
             this.customApiCLient = customApiCLient;
             this.mailboxService = mailboxService;
             this.webHostEnvironment = webHostEnvironment;
@@ -680,37 +683,9 @@ namespace risk.control.system.Services
             try
             {
                 var claim = _context.ClaimsInvestigation
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.District)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.State)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.Country)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c=>c.PinCode)
-                .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.District)
-                .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.State)
-                .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.Country)
-                .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(c => c.PinCode)
                 .Include(c => c.ClientCompany)
                 .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.CaseEnabler)
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.LineOfBusiness)
                 .Include(r => r.AgencyReport)
-                .ThenInclude(r => r.DigitalIdReport)
-                .Include(r => r.AgencyReport)
-                .ThenInclude(r => r.PanIdReport)
-                .Include(r => r.AgencyReport)
-                .ThenInclude(r => r.AgentIdReport)
-                .Include(r => r.AgencyReport)
-                .ThenInclude(r => r.ReportQuestionaire)
-                .Include(r => r.Vendor)
-                .ThenInclude(v=>v.Country)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimsInvestigationId);
 
                 claim.AgencyReport.AiSummary = reportAiSummary;
@@ -752,45 +727,11 @@ namespace risk.control.system.Services
 
                 _context.InvestigationTransaction.Add(finalLog);
 
-                //create invoice
-
-                var vendor = _context.Vendor.Include(s => s.VendorInvestigationServiceTypes).FirstOrDefault(v => v.VendorId == claim.VendorId);
-                var currentUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
-                var investigationServiced = vendor.VendorInvestigationServiceTypes.FirstOrDefault(s => s.InvestigationServiceTypeId == claim.PolicyDetail.InvestigationServiceTypeId);
-
-                //THIS SHOULD NOT HAPPEN IN PROD : demo purpose
-                if (investigationServiced == null)
-                {
-                    investigationServiced = vendor.VendorInvestigationServiceTypes.FirstOrDefault();
-                }
-                //END
-                var investigatService = _context.InvestigationServiceType.FirstOrDefault(i => i.InvestigationServiceTypeId == claim.PolicyDetail.InvestigationServiceTypeId);
-
-                var invoice = new VendorInvoice
-                {
-                    ClientCompanyId = currentUser.ClientCompany.ClientCompanyId,
-                    GrandTotal = investigationServiced.Price + investigationServiced.Price * 10,
-                    NoteToRecipient = "Auto generated Invoice",
-                    Updated = DateTime.Now,
-                    Vendor = vendor,
-                    ClientCompany = currentUser.ClientCompany,
-                    UpdatedBy = userEmail,
-                    VendorId = vendor.VendorId,
-                    AgencyReportId = claim.AgencyReport?.AgencyReportId,
-                    SubTotal = investigationServiced.Price,
-                    TaxAmount = investigationServiced.Price * 10,
-                    InvestigationServiceType = investigatService,
-                    ClaimId = claimsInvestigationId
-                };
-
-                _context.VendorInvoice.Add(invoice);
-                
                 var saveCount = await _context.SaveChangesAsync();
 
-                //BackgroundJob.Enqueue(() => DoTask(claim, claimsInvestigationId));
+                backgroundJobClient.Enqueue(() => reportService.Run(userEmail, claimsInvestigationId));
 
-                await DoTask(claim, claimsInvestigationId);
-
+                var currentUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
                 return saveCount > 0 ? (currentUser.ClientCompany, claim.PolicyDetail.ContractNumber) : (null!, string.Empty);
             }
             catch (Exception ex)
@@ -809,40 +750,9 @@ namespace risk.control.system.Services
             try
             {
                 var claim = _context.ClaimsInvestigation
-                    .Include(c => c.CustomerDetail)
-                    .ThenInclude(c => c.District)
-                    .Include(c => c.CustomerDetail)
-                    .ThenInclude(c => c.State)
-                    .Include(c => c.CustomerDetail)
-                    .ThenInclude(c => c.Country)
-                    .Include(c => c.CustomerDetail)
-                    .ThenInclude(c => c.PinCode)
-                    .Include(c => c.BeneficiaryDetail)
-                    .ThenInclude(c => c.District)
-                    .Include(c => c.BeneficiaryDetail)
-                    .ThenInclude(c => c.State)
-                    .Include(c => c.BeneficiaryDetail)
-                    .ThenInclude(c => c.Country)
-                    .Include(c => c.BeneficiaryDetail)
-                    .ThenInclude(c => c.PinCode)
-                    .Include(c => c.ClientCompany)
-                    .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.LineOfBusiness)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.CaseEnabler)
+                .Include(c => c.ClientCompany)
+                .Include(c => c.PolicyDetail)
                 .Include(r => r.AgencyReport)
-                .ThenInclude(r => r.DigitalIdReport)
-                .Include(r => r.AgencyReport)
-                .ThenInclude(r => r.PanIdReport)
-                .Include(r => r.Vendor)
-                .ThenInclude(v=>v.Country)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.CaseEnabler)
-                .Include(r => r.AgencyReport)       
-                .ThenInclude(r => r.AgentIdReport)
-                .Include(r => r.AgencyReport)
-                .ThenInclude(r => r.ReportQuestionaire)
-                .Include(r => r.Vendor)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimsInvestigationId);
 
                 claim.AgencyReport.AiSummary = reportAiSummary;
@@ -884,44 +794,11 @@ namespace risk.control.system.Services
 
                 _context.InvestigationTransaction.Add(finalLog);
 
-                //create invoice
-
-                var vendor = _context.Vendor.Include(s => s.VendorInvestigationServiceTypes).FirstOrDefault(v => v.VendorId == claim.VendorId);
-                var currentUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
-                var investigationServiced = vendor.VendorInvestigationServiceTypes.FirstOrDefault(s => s.InvestigationServiceTypeId == claim.PolicyDetail.InvestigationServiceTypeId);
-
-                //THIS SHOULD NOT HAPPEN IN PROD : demo purpose
-                if (investigationServiced == null)
-                {
-                    investigationServiced = vendor.VendorInvestigationServiceTypes.FirstOrDefault();
-                }
-                //END
-                var investigatService = _context.InvestigationServiceType.FirstOrDefault(i => i.InvestigationServiceTypeId == claim.PolicyDetail.InvestigationServiceTypeId);
-
-                var invoice = new VendorInvoice
-                {
-                    ClientCompanyId = currentUser.ClientCompany.ClientCompanyId,
-                    GrandTotal = investigationServiced.Price + investigationServiced.Price * 10,
-                    NoteToRecipient = "Auto generated Invoice",
-                    Updated = DateTime.Now,
-                    Vendor = vendor,
-                    ClientCompany = currentUser.ClientCompany,
-                    UpdatedBy = userEmail,
-                    VendorId = vendor.VendorId,
-                    AgencyReportId = claim.AgencyReport?.AgencyReportId,
-                    SubTotal = investigationServiced.Price,
-                    TaxAmount = investigationServiced.Price * 10,
-                    InvestigationServiceType = investigatService,
-                    ClaimId = claimsInvestigationId
-                };
-
-                _context.VendorInvoice.Add(invoice);
-
                 var saveCount = await _context.SaveChangesAsync();
 
-                //BackgroundJob.Enqueue(() => DoTask(claim, claimsInvestigationId));
+                var currentUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
 
-                await DoTask(claim, claimsInvestigationId);
+                backgroundJobClient.Enqueue(() => reportService.Run(userEmail, claimsInvestigationId));
 
                 return saveCount > 0 ? (currentUser.ClientCompany, claim.PolicyDetail.ContractNumber) : (null!, string.Empty);
             }
@@ -931,29 +808,7 @@ namespace risk.control.system.Services
             }
             return (null!, string.Empty);
         }
-        private async Task<int> DoTask(ClaimsInvestigation claim, string claimsInvestigationId)
-        {
-            //create and save report
-
-            string folder = Path.Combine(webHostEnvironment.WebRootPath, "report");
-
-            if (!Directory.Exists(folder))
-            {
-                Directory.CreateDirectory(folder);
-            }
-
-            var filename = "report" + claimsInvestigationId + ".pdf";
-
-            var filePath = Path.Combine(webHostEnvironment.WebRootPath, "report", filename);
-
-            (await PdfReportRunner.Run(webHostEnvironment.WebRootPath, claim)).Build(filePath);
-
-            claim.AgencyReport.PdfReportFilePath = filePath;
-
-            var saveCount = await _context.SaveChangesAsync();
-
-            return saveCount;
-        }
+        
         private async Task<(ClientCompany, string)> ReAssignToCreator(string userEmail, string claimsInvestigationId, string assessorRemarks, AssessorRemarkType assessorRemarkType, string reportAiSummary)
         {
             var currentUser = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(u => u.Email == userEmail);

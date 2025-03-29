@@ -12,26 +12,40 @@ using Standard.Licensing;
 using risk.control.system.Data;
 using Microsoft.EntityFrameworkCore;
 using risk.control.system.AppConstant;
+using Microsoft.AspNetCore.Hosting;
 namespace risk.control.system.Services
 {
     public interface IPdfReportService
     {
-        Task Run(string imagePath, string reportFilePath);
+        Task Run(string userEmail,string claimsInvestigationId);
     }
     public class PdfReportService : IPdfReportService
     {
         private static HttpClient client = new HttpClient();
         private readonly ApplicationDbContext _context;
-        public PdfReportService(ApplicationDbContext context)
+        private readonly IWebHostEnvironment webHostEnvironment;
+
+        public PdfReportService(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment)
         {
             this._context = context;
+            this.webHostEnvironment = webHostEnvironment;
         }
-        public async Task Run(string imagePath, string reportFilePath)
+
+        public async Task Run(string userEmail,string claimsInvestigationId)
         {
-            var approvedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR);
-            var rejectedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR);
+
+            var (builder,filePath) = await CreateReport(userEmail,claimsInvestigationId);
+
+            builder.Build(filePath);
+
+        }
+        private async Task<(DocumentBuilder builder, string filePath)> CreateReport(string userEmail, string claimsInvestigationId)
+        {
+            var imagePath = webHostEnvironment.WebRootPath;
+            //var approvedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+            //           i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR);
+            //var rejectedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+            //           i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR);
             
             var claim = _context.ClaimsInvestigation
                     .Include(c => c.CustomerDetail)
@@ -59,22 +73,62 @@ namespace risk.control.system.Services
                 .ThenInclude(r => r.DigitalIdReport)
                 .Include(r => r.AgencyReport)
                 .ThenInclude(r => r.PanIdReport)
-                .Include(r => r.Vendor)
-                .ThenInclude(v => v.Country)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.CaseEnabler)
                 .Include(r => r.AgencyReport)
                 .ThenInclude(r => r.AgentIdReport)
                 .Include(r => r.AgencyReport)
                 .ThenInclude(r => r.ReportQuestionaire)
-                .Include(r => r.Vendor)
-                .FirstOrDefault(c => c.InvestigationCaseSubStatus == approvedStatus || c.InvestigationCaseSubStatus == rejectedStatus);
+                .FirstOrDefault(c => c.ClaimsInvestigationId == claimsInvestigationId);
+
+            //create invoice
+
+            var vendor = _context.Vendor.Include(s => s.VendorInvestigationServiceTypes).FirstOrDefault(v => v.VendorId == claim.VendorId);
+            var currentUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
+            var investigationServiced = vendor.VendorInvestigationServiceTypes.FirstOrDefault(s => s.InvestigationServiceTypeId == claim.PolicyDetail.InvestigationServiceTypeId);
+
+            //THIS SHOULD NOT HAPPEN IN PROD : demo purpose
+            if (investigationServiced == null)
+            {
+                investigationServiced = vendor.VendorInvestigationServiceTypes.FirstOrDefault();
+            }
+            //END
+            var investigatService = _context.InvestigationServiceType.FirstOrDefault(i => i.InvestigationServiceTypeId == claim.PolicyDetail.InvestigationServiceTypeId);
+
+            var invoice = new VendorInvoice
+            {
+                ClientCompanyId = currentUser.ClientCompany.ClientCompanyId,
+                GrandTotal = investigationServiced.Price + investigationServiced.Price * (1 / 10),
+                NoteToRecipient = "Auto generated Invoice",
+                Updated = DateTime.Now,
+                Vendor = vendor,
+                ClientCompany = currentUser.ClientCompany,
+                UpdatedBy = userEmail,
+                VendorId = vendor.VendorId,
+                AgencyReportId = claim.AgencyReport?.AgencyReportId,
+                SubTotal = investigationServiced.Price,
+                TaxAmount = investigationServiced.Price * (1 / 10),
+                InvestigationServiceType = investigatService,
+                ClaimId = claimsInvestigationId
+            };
+
+            _context.VendorInvoice.Add(invoice);
+
+            string folder = Path.Combine(webHostEnvironment.WebRootPath, "report");
+
+            if (!Directory.Exists(folder))
+            {
+                Directory.CreateDirectory(folder);
+            }
+
+            var reportFilename = "report" + claim.ClaimsInvestigationId + ".pdf";
+
+            var ReportFilePath = Path.Combine(webHostEnvironment.WebRootPath, "report", reportFilename);
 
             string detailReportJsonFile = CheckFile(Path.Combine("Files", "detail-report.json"));
             string detailReportJsonContent = File.ReadAllText(detailReportJsonFile);
             DetailedReport detailReport = JsonConvert.DeserializeObject<DetailedReport>(detailReportJsonContent);
             detailReport.ReportTime = claim.ProcessedByAssessorTime?.ToString("dd-MMM-yyyy HH:mm:ss");
             detailReport.PolicyNum = claim.PolicyDetail.ContractNumber;
+            detailReport.ServiceType = claim.PolicyDetail.InvestigationServiceType.Name;
             detailReport.AgencyName = claim.Vendor.Email;
             detailReport.ClaimType = claim.PolicyDetail.LineOfBusiness.Name;
             var currency = Extensions.GetCultureByCountry(claim.Vendor.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
@@ -172,9 +226,12 @@ namespace risk.control.system.Services
             ConcertTicketBuilder.AgentIdData = agentIdData;
             ConcertTicketBuilder.PanData = panIdData;
 
-            ConcertTicketBuilder.Build(imagePath).Build(reportFilePath);
-            claim.AgencyReport.PdfReportFilePath = reportFilePath;
+            claim.AgencyReport.PdfReportFilePath = ReportFilePath;
+
             var saveCount = await _context.SaveChangesAsync();
+
+            return (ConcertTicketBuilder.Build(imagePath), ReportFilePath);
+
         }
 
         private static async Task<IdData> SetAgentIdReport(string imagePath, ClaimsInvestigation claim, DetailedReport detailReport)
@@ -196,13 +253,13 @@ namespace risk.control.system.Services
             contactNumer = string.Empty;
             if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
             {
-                detailReport.VerifyAddress = claim.CustomerDetail.Addressline + "," + claim.CustomerDetail.District.Name + "," + claim.CustomerDetail.State.Code + "," + claim.CustomerDetail.Country.Code + "," + claim.CustomerDetail.PinCode.Code;
+                detailReport.VerifyAddress = claim.CustomerDetail.Addressline + ", " + claim.CustomerDetail.District.Name + ", " + claim.CustomerDetail.State.Name + ", (" + claim.CustomerDetail.Country.Code + "), " + claim.CustomerDetail.PinCode.Code;
                 contactNumer = claim.CustomerDetail.ContactNumber;
                 personAddressUrl = claim.CustomerDetail.CustomerLocationMap;
             }
             else
             {
-                detailReport.VerifyAddress = claim.BeneficiaryDetail.Addressline + "," + claim.BeneficiaryDetail.District.Name + "," + claim.BeneficiaryDetail.State.Code + "," + claim.BeneficiaryDetail.Country.Code + "," + claim.BeneficiaryDetail.PinCode.Code;
+                detailReport.VerifyAddress = claim.BeneficiaryDetail.Addressline + ", " + claim.BeneficiaryDetail.District.Name + ", " + claim.BeneficiaryDetail.State.Name + ", (" + claim.BeneficiaryDetail.Country.Code + "), " + claim.BeneficiaryDetail.PinCode.Code;
                 contactNumer = claim.BeneficiaryDetail.ContactNumber;
                 personAddressUrl = claim.BeneficiaryDetail.BeneficiaryLocationMap;
             }
@@ -254,15 +311,11 @@ namespace risk.control.system.Services
             string contactNumer = string.Empty;
             if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
             {
-                detailReport.PersonOfInterestName = claim.CustomerDetail.Name;
-                detailReport.VerifyAddress = claim.CustomerDetail.Addressline + "," + claim.CustomerDetail.District.Name + "," + claim.CustomerDetail.State.Code + "," + claim.CustomerDetail.Country.Code + "," + claim.CustomerDetail.PinCode.Code;
                 contactNumer = new string('*', claim.CustomerDetail.ContactNumber.Length - 4) + claim.CustomerDetail.ContactNumber.Substring(claim.CustomerDetail.ContactNumber.Length - 4);
                 personAddressUrl = claim.CustomerDetail.CustomerLocationMap;
             }
             else
             {
-                detailReport.PersonOfInterestName = claim.BeneficiaryDetail.Name;
-                detailReport.VerifyAddress = claim.BeneficiaryDetail.Addressline + "," + claim.BeneficiaryDetail.District.Name + "," + claim.BeneficiaryDetail.State.Code + "," + claim.BeneficiaryDetail.Country.Code + "," + claim.BeneficiaryDetail.PinCode.Code;
                 contactNumer = claim.BeneficiaryDetail.ContactNumber;
                 personAddressUrl = claim.BeneficiaryDetail.BeneficiaryLocationMap;
             }

@@ -15,6 +15,8 @@
         public string PolicyNumTitle { get; set; }
         public string PolicyNum { get; set; }
         public string ClaimType { get; set; }
+        public string ServiceTypeTitle { get; set; } = "Investigation Type";
+        public string ServiceType { get; set; }
         public string InsuredAmountTitle { get; set; }
         public string InsuredAmount { get; set; }
         public string PersonOfInterestNameTitle { get; set; }

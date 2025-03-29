@@ -81,14 +81,14 @@ namespace risk.control.system.Controllers.Company
 
                     if (distinctClaims.Count == autoAllocatedClaims.Count)
                     {
-                        notifyService.Custom($"{autoAllocatedClaims.Count}/{distinctClaims.Count} case(s) auto-assigned", 3, "green", "far fa-file-powerpoint");
+                        notifyService.Custom($"{autoAllocatedClaims.Count}/{distinctClaims.Count} case(s) Assigned(auto)", 3, "green", "far fa-file-powerpoint");
                     }
 
                     else if (distinctClaims.Count > autoAllocatedClaims.Count)
                     {
                         if (autoAllocatedClaims.Count > 0)
                         {
-                            notifyService.Custom($"{autoAllocatedClaims.Count}/{distinctClaims.Count} case(s) auto-assigned", 3, "green", "far fa-file-powerpoint");
+                            notifyService.Custom($"{autoAllocatedClaims.Count}/{distinctClaims.Count} case(s) Assigned(auto)", 3, "green", "far fa-file-powerpoint");
                         }
 
                         var notAutoAllocated = distinctClaims.Except(autoAllocatedClaims)?.ToList();
@@ -97,7 +97,7 @@ namespace risk.control.system.Controllers.Company
 
                         await mailboxService.NotifyClaimAssignmentToAssigner(HttpContext.User.Identity.Name, notAutoAllocated);
 
-                        notifyService.Custom($"{notAutoAllocated.Count}/{distinctClaims.Count} case(s) assign manually", 3, "orange", "far fa-file-powerpoint");
+                        notifyService.Custom($"{notAutoAllocated.Count}/{distinctClaims.Count} case(s) Assign manual", 3, "orange", "far fa-file-powerpoint");
                         
                         return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
                     }
@@ -108,7 +108,7 @@ namespace risk.control.system.Controllers.Company
 
                     await mailboxService.NotifyClaimAssignmentToAssigner(HttpContext.User.Identity.Name, distinctClaims);
 
-                    notifyService.Custom($"{claims.Count}/{claims.Count} case(s) assigned", 3, "green", "far fa-file-powerpoint");
+                    notifyService.Custom($"{claims.Count}/{claims.Count} case(s) Assigned", 3, "green", "far fa-file-powerpoint");
                 }
             }
             catch (Exception ex)

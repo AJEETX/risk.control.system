@@ -257,6 +257,7 @@ namespace risk.control.system.Helpers
         {
             cellBuilder.AddParagraph(DetailedReport.PolicyNumTitle).SetLineSpacing(1.4f);
             cellBuilder.AddParagraph(DetailedReport.ClaimTypeTitle).SetLineSpacing(1.4f);
+            cellBuilder.AddParagraph(DetailedReport.ServiceTypeTitle).SetLineSpacing(1.4f);
             cellBuilder.AddParagraph(DetailedReport.InsuredAmountTitle).SetLineSpacing(1.4f);
             cellBuilder.AddParagraph(DetailedReport.PersonOfInterestNameTitle).SetLineSpacing(1.4f);
             cellBuilder.AddParagraph(DetailedReport.Reason2VerifyTitle).SetLineSpacing(1.4f);
@@ -268,6 +269,7 @@ namespace risk.control.system.Helpers
         {
             cellBuilder.AddParagraph(DetailedReport.PolicyNum).SetLineSpacing(1.4f);
             cellBuilder.AddParagraph(DetailedReport.ClaimType).SetLineSpacing(1.4f);
+            cellBuilder.AddParagraph(DetailedReport.ServiceType).SetLineSpacing(1.4f);
             cellBuilder.AddParagraph(DetailedReport.InsuredAmount).SetLineSpacing(1.4f);
             cellBuilder.AddParagraph(DetailedReport.PersonOfInterestName).SetLineSpacing(1.4f);
             cellBuilder.AddParagraph(DetailedReport.Reason2Verify).SetLineSpacing(1.4f);
