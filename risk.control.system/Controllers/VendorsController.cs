@@ -261,7 +261,7 @@ namespace risk.control.system.Controllers
             var agencysPage = new MvcBreadcrumbNode("AvailableVendors", "Vendors", "Manager Agency(s)");
             var agency2Page = new MvcBreadcrumbNode("AvailableVendors", "Vendors", "Available Agencies") { Parent = agencysPage, };
             var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Agency Profile") { Parent = agency2Page, RouteValues = new { id = id } };
-            var editPage = new MvcBreadcrumbNode("Users", "Vendors", $"Manager Users") { Parent = agencyPage, RouteValues = new { id = id } };
+            var editPage = new MvcBreadcrumbNode("Users", "Vendors", $"Manager Users") { Parent = agencyPage };
             ViewData["BreadcrumbNode"] = editPage;
 
             return View();
@@ -303,7 +303,7 @@ namespace risk.control.system.Controllers
             var agency2Page = new MvcBreadcrumbNode("AvailableVendors", "Company", "Available Agencies") { Parent = agencysPage, };
             var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Agency Profile") { Parent = agency2Page, RouteValues = new { id = id } };
             var usersPage = new MvcBreadcrumbNode("Users", "Vendors", $"Manager Users") { Parent = agencyPage, RouteValues = new { id = id } };
-            var editPage = new MvcBreadcrumbNode("CreateUser", "Vendors", $"Add User") { Parent = usersPage, RouteValues = new { id = id } };
+            var editPage = new MvcBreadcrumbNode("CreateUser", "Vendors", $"Add User") { Parent = usersPage };
             ViewData["BreadcrumbNode"] = editPage;
 
             return View(model);
@@ -463,7 +463,7 @@ namespace risk.control.system.Controllers
                 var agency2Page = new MvcBreadcrumbNode("AvailableVendors", "Vendors", "Available Agencies") { Parent = agencysPage, };
                 var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Agency Profile") { Parent = agency2Page, RouteValues = new { id = vendorApplicationUser.Vendor.VendorId } };
                 var usersPage = new MvcBreadcrumbNode("Users", "Vendors", $"Manager Users") { Parent = agencyPage, RouteValues = new { id = vendorApplicationUser.Vendor.VendorId } };
-                var editPage = new MvcBreadcrumbNode("EditUser", "Vendors", $"Edit User") { Parent = usersPage, RouteValues = new { id = userId } };
+                var editPage = new MvcBreadcrumbNode("EditUser", "Vendors", $"Edit User") { Parent = usersPage };
                 ViewData["BreadcrumbNode"] = editPage;
 
                 vendorApplicationUser.IsPasswordChangeRequired = await featureManager.IsEnabledAsync(FeatureFlags.FIRST_LOGIN_CONFIRMATION) ? !vendorApplicationUser.IsPasswordChangeRequired : true;
@@ -663,6 +663,14 @@ namespace risk.control.system.Controllers
 
                 var hasClaims = _context.ClaimsInvestigation.Any(c => agencySubStatuses.Contains(c.InvestigationCaseSubStatus.InvestigationCaseSubStatusId) && c.VendorId == model.VendorId);
                 model.HasClaims = hasClaims;
+
+                var agencysPage = new MvcBreadcrumbNode("AvailableVendors", "Vendors", "Manager Agency(s)");
+                var agency2Page = new MvcBreadcrumbNode("AvailableVendors", "Vendors", "Available Agencies") { Parent = agencysPage, };
+                var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Agency Profile") { Parent = agency2Page, RouteValues = new { id = model.VendorId } };
+                var usersPage = new MvcBreadcrumbNode("Users", "Vendors", $"Manager Users") { Parent = agencyPage, RouteValues = new { id = model.VendorId } };
+                var editPage = new MvcBreadcrumbNode("DeleteUser", "Vendors", $"Delete User") { Parent = usersPage };
+                ViewData["BreadcrumbNode"] = editPage;
+
                 return View(model);
             }
             catch (Exception ex)
@@ -1077,7 +1085,7 @@ namespace risk.control.system.Controllers
                 var hasClaims = _context.ClaimsInvestigation.Any(c => agencySubStatuses.Contains(c.InvestigationCaseSubStatus.InvestigationCaseSubStatusId) && c.VendorId == id );
                 var agencysPage = new MvcBreadcrumbNode("AvailableVendors", "Vendors", "Manager Agency(s)");
                 var agencyPage = new MvcBreadcrumbNode("AvailableVendors", "Vendors", "Available Agencies") { Parent = agencysPage, };
-                var editPage = new MvcBreadcrumbNode("Delete", "Vendors", $"Delete Agency") { Parent = agencyPage, RouteValues = new { id = id } };
+                var editPage = new MvcBreadcrumbNode("Delete", "Vendors", $"Delete Agency") { Parent = agencyPage };
                 ViewData["BreadcrumbNode"] = editPage;
                 vendor.HasClaims = hasClaims;
                 var superAdminUser = await _context.ApplicationUser.FirstOrDefaultAsync(c => c.Email == currentUserEmail);

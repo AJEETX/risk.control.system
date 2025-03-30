@@ -104,7 +104,7 @@
                 "mRender": function (data, type, row) {
                     var buttons = "";
                     buttons += '<a id=edit' + row.id + ' href="/Company/EditService?id=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-pen"></i> Edit</a>&nbsp;'
-                    buttons += '<a id=delete' + row.id + ' href="/Company/DeleteService?id=' + row.id + '"  class="btn btn-xs btn-danger"><i class="fas fa-trash"></i> Delete</a>'
+                    buttons += '<a id=details' + row.id + ' href="/Company/DeleteService?id=' + row.id + '"  class="btn btn-xs btn-danger"><i class="fas fa-trash"></i> Delete</a>'
                     return buttons;
                 }
             },
@@ -122,7 +122,7 @@
             $('#customerTable tbody').on('click', '.btn-danger', function (e) {
                 e.preventDefault(); // Prevent the default anchor behavior
                 var id = $(this).attr('id').replace('details', ''); // Extract the ID from the button's ID attribute
-                getdetails(id); // Call the getdetails function with the ID
+                getdelete(id); // Call the getdetails function with the ID
                 window.location.href = $(this).attr('href'); // Navigate to the delete page
             });
             $('#customerTable tbody').on('click', '.btn-warning', function (e) {
@@ -175,7 +175,7 @@
     });
 });
 
-function showdetails(id) {
+function getdelete(id) {
     $("body").addClass("submit-progress-bg");
     // Wrap in setTimeout so the UI
     // can update the spinners
@@ -190,8 +190,8 @@ function showdetails(id) {
         e.preventDefault(); // Prevent default action for anchor clicks
     });
 
-    var detailbtn = $('a#details' + id + '.btn.btn-xs.btn-info')
-    detailbtn.html("<i class='fas fa-sync fa-spin'></i> Detail");
+    var detailbtn = $('a#details' + id + '.btn.btn-xs.btn-danger')
+    detailbtn.html("<i class='fas fa-sync fa-spin'></i> Delete");
 
     var article = document.getElementById("article");
     if (article) {

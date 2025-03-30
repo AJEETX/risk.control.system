@@ -22,8 +22,8 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="form-group">
-                                        <label class="card-header text-sm bg-warning" data-toggle="tooltip" title="Total Cases (@Model.SelectedDistrictId)">  Total Cases (@Model.SelectedDistrictId)</label>
-                                        <label class="card-header text-sm bg-info" data-toggle="tooltip" title="Current Cases (@Model.SelectedStateId)"> Current Cases (@Model.SelectedStateId)</label>
+                                        <label class="card-header shadow-lg rounded-lg text-sm bg-light" data-toggle="tooltip" title="Total Cases (@Model.SelectedDistrictId)">  Total Cases (@Model.SelectedDistrictId)</label>
+                                        <label class="card-header shadow-lg rounded-lg text-sm bg-light" data-toggle="tooltip" title="Current Cases (@Model.SelectedStateId)"> Current Cases (@Model.SelectedStateId)</label>
                                     </div>
                             </div>
                         </div>
@@ -71,7 +71,14 @@
                         <div class="row">
                                 <div class="col-md-12">
                                     <div class="form-group">
-                                        <a id="back" asp-controller="Company" asp-action="EmpanelledVendors" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
+                                        @if (Model.SelectedByCompany)
+                                    {
+                                                            <a id="back" asp-controller="Vendors" asp-action="Agencies" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
+                                    }
+                                    else
+                                    {
+                                                            <a id="back" asp-controller="Vendors" asp-action="EmpanelledVendors" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
+                                    }
                                         <a asp-controller="Company" asp-action="AgencyUsers" asp-route-id="@Model.VendorId" class="btn btn-success"><i class="fas fa-user-friends"></i>  Users (@Model.SelectedCountryId)</a>
                                         <a asp-controller="Company" asp-action="Service" asp-route-id="@Model.VendorId" class="btn btn-danger"><i class="fas fa-truck"></i>  @Applicationsettings.SERVICE (@Model.VendorInvestigationServiceTypes.Count)</a>
                                     </div>
