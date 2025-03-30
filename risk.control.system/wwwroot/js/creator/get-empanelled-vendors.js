@@ -139,15 +139,14 @@
             }
         }, error: function (xhr, status, error) { alert('err ' + error) }
     });
-    $('#customerTable').on('draw.dt', function () {
+    table.on('draw.dt', function () {
         $('[data-toggle="tooltip"]').tooltip({
             animated: 'fade',
             placement: 'bottom',
             html: true
         });
     });
-    $('#customerTable')
-        .on('mouseenter', '.map-thumbnail', function () {
+    table.on('mouseenter', '.map-thumbnail', function () {
             const $this = $(this); // Cache the current element
 
             // Set a timeout to show the full map after 1 second
@@ -310,6 +309,10 @@
             });
         }
     })
+
+    $('#refreshTable').click(function () {
+        table.ajax.reload(null, false); // false => Retains current page
+    });
 });
 function giveRating(img, image) {
     img.attr("src", "/Images/" + image).prevAll("img.rating").attr("src", "/Images/" + image);

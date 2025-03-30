@@ -23,6 +23,7 @@ namespace risk.control.system.Services
 {
     public interface INotificationService
     {
+        Task ClearAll(string userEmail);
         Task MarkAsRead(int id, string userEmail);
         Task<List<StatusNotification>> GetNotifications(string userEmail);
         Task<ClaimsInvestigation> SendVerifySchedule(ClientSchedulingMessage message);
@@ -729,6 +730,15 @@ namespace risk.control.system.Services
                 }
                 context.Notifications.Update(notification);
                 var rows = await context.SaveChangesAsync();
+            }
+        }
+
+        public async Task ClearAll(string userEmail)
+        {
+            var notifications = await GetNotifications(userEmail);
+            foreach (var notification in notifications)
+            {
+                await MarkAsRead(notification.StatusNotificationId,userEmail);
             }
         }
     }

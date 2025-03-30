@@ -29,6 +29,14 @@ namespace risk.control.system.Controllers.Api
             this.smsService = smsService;
             this.httpClientService = httpClientService;
         }
+        [HttpPost("ClearAll")]
+        public async Task<IActionResult> ClearAllNotifications()
+        {
+            var userEmail = HttpContext.User?.Identity?.Name;
+            await service.ClearAll(userEmail); ;
+            return Ok();
+        }
+
         [HttpPost("MarkAsRead")]
         public async Task<IActionResult> MarkAsRead(NotificationRequest request)
         {

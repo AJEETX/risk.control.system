@@ -56,13 +56,18 @@
 
         <!-- Notifications Dropdown Menu -->
         <li class="nav-item dropdown  top-nav-logout-border">
-            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false" title="Notifications">
+            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false" title="Notifications" id="notificationToggle">
                 <i class="far fa-bell"></i>
                 <span class="badge badge-warning" id="notificationCount">0</span>
             </a>
-            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-                <span class="dropdown-header">Notifications</span>
-                <div class="dropdown-divider"></div>
+            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right" id="notificationDropdown">
+                <span class="dropdown-header">
+                    <span class="card-header">
+                        Notifications   <i id="notification-refresh" class="fas fa-sync" title="Refresh" data-toggle="tooltip"></i>
+                            <i id="clearNotifications" class="fa fa-trash" title="Clear All" data-toggle="tooltip"></i>
+                    </span>
+                   
+                </span>
                 <div id="notificationList"></div>
             </div>
         </li>

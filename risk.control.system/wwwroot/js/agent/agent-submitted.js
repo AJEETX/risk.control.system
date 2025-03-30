@@ -1,6 +1,6 @@
 ﻿$(document).ready(function () {
    
-    $("#customerTable").DataTable({
+    var table = $("#customerTable").DataTable({
         ajax: {
             url: '/api/agency/agent/GetSubmitted',
             dataSrc: ''
@@ -139,8 +139,7 @@
     // Function to show loading state
     
 
-    $('#customerTable')
-        .on('mouseenter', '.map-thumbnail', function () {
+    table.on('mouseenter', '.map-thumbnail', function () {
             const $this = $(this); // Cache the current element
 
             // Set a timeout to show the full map after 1 second
@@ -157,14 +156,16 @@
             // Immediately hide the full map
             $this.find('.full-map').hide();
         });
-    $('#customerTable').on('draw.dt', function () {
+    table.on('draw.dt', function () {
         $('[data-toggle="tooltip"]').tooltip({
             animated: 'fade',
             placement: 'top',
             html: true
         });
     });
-    //initMap("/api/ClaimsVendor/GetReportMap");
+    $('#refreshTable').click(function () {
+        table.ajax.reload(null, false); // false => Retains current page
+    });
 });
 function getdetails(id) {
     

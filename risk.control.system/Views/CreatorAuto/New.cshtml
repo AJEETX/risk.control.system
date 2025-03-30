@@ -5,26 +5,25 @@
 <section class="content">
     <div id="article" class="card shadow-lg border-1 rounded-lg">
         <partial name="Creator/_ClaimTitle" model="Model" />
-        <article>
-            <div class="bb-blog-inner">
-                <div class="card shadow-lg border-1 rounded-lg collapsed-card">
-                    <partial name="Creator/_UploadSample" model="Model" />
+        <div class="card shadow-lg border-1 rounded-lg collapsed-card">
+            <partial name="Creator/_UploadSample" model="Model" />
 
-                    <div class="card-body">
-                        <form id="upload-claims" asp-controller="CreatorPost" asp-action="New" method="post" enctype="multipart/form-data">
-                            <input type="hidden" asp-for="CREATEDBY" value="@CREATEDBY.AUTO" />
-                            <partial name="Creator/_Upload" model="Model" />
-                        </form>
+            <div class="card-body">
+                <form id="upload-claims" asp-controller="CreatorPost" asp-action="New" method="post" enctype="multipart/form-data">
+                    <input type="hidden" asp-for="CREATEDBY" value="@CREATEDBY.AUTO" />
+                    <partial name="Creator/_Upload" model="Model" />
+                </form>
 
-                    </div>
-                </div>
             </div>
-        </article>
+        </div>
+        <button id="refreshTable" class="btn btn-default"> <i class="fas fa-sync"></i> Refresh</button>
+
         <form id="checkboxes" asp-action="Assign" asp-controller="ClaimsInvestigationPost" method="post">
             <div class="card-body">
                 <div class="submit-progress hidden">
                     <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
                 </div>
+
                 <table id="customerTableAuto" class="table table-bordered table-hover dt-responsive nowrap w-100">
                     <thead>
                         <tr>

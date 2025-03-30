@@ -2335,3 +2335,31 @@ input#checkall {
     max-height: 300px;
     overflow-y: auto;
 }
+/* Styles for notification list */
+.notification-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    border-bottom: 1px solid #ddd;
+    transition: background 0.2s ease-in-out;
+}
+
+    /* Hover effect for better UX */
+    .notification-item:hover {
+        background: #f8f9fa;
+    }
+
+/* Style for the delete icon */
+.delete-notification {
+    cursor: pointer;
+    margin-left: 15px; /* Adds spacing between message and delete icon */
+    font-size: 14px;
+    color: #dc3545;
+    transition: color 0.2s ease-in-out;
+}
+
+    /* Hover effect for delete icon */
+    .delete-notification:hover {
+        color: #b22222;
+    }

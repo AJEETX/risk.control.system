@@ -21,58 +21,7 @@ const image =
 //    document.getElementById("main-container").classList.add("blur-background");
 //});
 // Add event listener to the print button once the DOM is fully loaded
-var moreInfo = "...";
-function loadNotifications() {
-    $.get('/api/Notification/GetNotifications', function (response) {
-        $("#notificationList").html("");
-        var totalCount = response.total;
-        if (response.maxCountReached) {
-            var maxText = `${response.maxCount}+`;
-            $("#notificationCount").text(maxText);
-        }
-        else {
-            $("#notificationCount").text(totalCount);
-        }
 
-        response.data.forEach(function (item) {
-            $("#notificationList").append(
-                `<a href="#" class="dropdown-item notification-item" data-id="${item.id}">
-                            <i class="${item.symbol}"></i> <span class="text-muted text-sm"> ${item.message} </span> :<span class="badge badge-light text-muted text-sm"> ${item.status} </span>
-                            <span class="float-right text-muted text-sm">${item.createdAt}</span>
-                        </a>`
-            );
-        });
-        if (totalCount > response.data.length) {
-            $("#notificationList").append(
-                `<hr><div class="text-muted text-sm">${moreInfo}</div>`
-            );
-        }
-        // Click event to mark as read
-        $(".notification-item").on("click", function () {
-            var notificationId = $(this).data("id");
-            markNotificationAsRead(notificationId);
-            //$(this).remove(); // Remove notification from UI
-            //let count = totalCount - 1;
-            //$("#notificationCount").text(count > 0 ? count : "0");
-        });
-    });
-}
-
-function markNotificationAsRead(notificationId) {
-    $.ajax({
-        url: '/api/Notification/MarkAsRead',
-        type: 'POST',
-        contentType: 'application/json', // Specify JSON format
-        data: JSON.stringify({ Id: notificationId }), // Convert data to JSON
-        success: function () {
-            loadNotifications();
-            console.log("Notification marked as read:", notificationId);
-        },
-        error: function (xhr) {
-            console.error("Error:", xhr.responseText);
-        }
-    });
-}
 
 document.addEventListener("DOMContentLoaded", function () {
     var printButton = document.getElementById("printInvoiceButton");
@@ -301,6 +250,98 @@ function getMobileType() {
     }
 }
 
+var moreInfo = "...";
+
+
+function markNotificationAsRead(notificationId) {
+    $.ajax({
+        url: '/api/Notification/MarkAsRead',
+        type: 'POST',
+        contentType: 'application/json', // Specify JSON format
+        data: JSON.stringify({ Id: notificationId }), // Convert data to JSON
+        success: function () {
+            $("#notificationDropdown").addClass("show");
+            $("#notificationToggle").attr("aria-expanded", "true");
+            loadNotifications(true);
+            console.log("Notification marked as read:", notificationId);
+            $("#notificationDropdown").addClass("show");
+            $("#notificationToggle").attr("aria-expanded", "true");
+        },
+        error: function (xhr) {
+            console.error("Error:", xhr.responseText);
+        }
+    });
+}
+function loadNotifications(keepOpen = false) {
+    $.get('/api/Notification/GetNotifications', function (response) {
+        $("#notificationList").html("");
+        var totalCount = response.total;
+        if (totalCount == 0) {
+            $("#notificationList").html('<div class="text-muted text-center">No notifications</div>');
+            $("#notificationCount").text('0');
+
+        }
+        else if (response.maxCountReached) {
+            var maxText = `${response.maxCount}+`;
+            $("#notificationCount").text(maxText);
+        }
+        else {
+            $("#notificationCount").text(totalCount);
+        }
+
+        response.data.forEach(function (item) {
+            $("#notificationList").append(
+                `<div class="dropdown-item d-flex justify-content-between align-items-center notification-item" data-id="${item.id}">
+                    <span>
+                        <i class="${item.symbol}"></i> 
+                        <span class="text-muted text-sm"> ${item.message} </span> :
+                        <span class="badge badge-light text-muted text-sm"> ${item.status} </span>
+                        <span class="float-right text-muted text-sm">${item.createdAt}</span>
+                    </span>
+                    <i class="fa fa-trash delete-notification" data-id="${item.id}" title="Delete"></i>
+                </div>`
+            );
+        });
+        if (totalCount > response.data.length) {
+            $("#notificationList").append(
+                `<hr><div class="text-muted text-sm">${moreInfo}</div>`
+            );
+        }
+        // Click event to mark as read
+        $(".delete-notification").on("click", function (e) {
+            e.stopPropagation(); // Prevent closing the dropdown
+            $("#notificationDropdown").addClass("show");
+            $("#notificationToggle").attr("aria-expanded", "true");
+            $(this).addClass("fa-spin");
+            var notificationId = $(this).data("id");
+            markNotificationAsRead(notificationId);
+            setTimeout(() => $(this).removeClass("fa-spin"), 1000);
+        });
+
+        if (keepOpen) {
+            $("#notificationDropdown").addClass("show");
+            $("#notificationToggle").attr("aria-expanded", "true");
+        }
+    });
+}
+function clearAllNotifications() {
+    $.ajax({
+        url: '/api/Notification/ClearAll', // Backend endpoint to clear notifications
+        type: 'POST',
+        success: function () {
+            $("#notificationList").html('<div class="text-muted text-center">No notifications</div>');
+            $("#notificationCount").text("0");
+            console.log("All notifications cleared.");
+            // Keep dropdown open after clearing
+            $("#notificationDropdown").addClass("show");
+            $("#notificationToggle").attr("aria-expanded", "true");
+        },
+        error: function (xhr) {
+            console.error("Error clearing notifications:", xhr.responseText);
+        }
+    });
+}
+
 $(document).ready(function () {
 
     $('#customerTable').on('draw.dt', function () {
@@ -311,7 +352,47 @@ $(document).ready(function () {
         });
     });
 
-    loadNotifications();
+    // Load notifications on page load WITHOUT keeping it open
+    loadNotifications(false);
+
+    $(".delete-notification").on("click", function (e) {
+        e.stopPropagation(); // Prevent closing the dropdown
+        $("#notificationDropdown").addClass("show");
+        $("#notificationToggle").attr("aria-expanded", "true");
+        $(this).addClass("fa-spin");
+        var notificationId = $(this).data("id");
+        markNotificationAsRead(notificationId);
+        setTimeout(() => $(this).removeClass("fa-spin"), 1000);
+    });
+
+    $("#notification-refresh").on("click", function (e) {
+        e.stopPropagation(); // Prevent Bootstrap from closing the dropdown
+        $("#notificationDropdown").addClass("show");
+        $("#notificationToggle").attr("aria-expanded", "true");
+        $(this).addClass("fa-spin");
+
+        loadNotifications(true); // Reload notifications & keep open
+
+        setTimeout(() => $(this).removeClass("fa-spin"), 1000);
+    });
+
+    $("#clearNotifications").on("click", function (e) {
+        e.stopPropagation(); // Prevent Bootstrap from closing the dropdown
+        $("#notificationDropdown").addClass("show");
+        $("#notificationToggle").attr("aria-expanded", "true");
+        $(this).addClass("fa-spin");
+
+        clearAllNotifications(); // Reload notifications & keep open
+
+        setTimeout(() => $(this).removeClass("fa-spin"), 1000);
+    });
+    // Close dropdown when clicking outside
+    $(document).on("click", function (event) {
+        if (!$(event.target).closest("#notificationDropdown, #notificationToggle").length) {
+            $("#notificationDropdown").removeClass("show");
+            $("#notificationToggle").attr("aria-expanded", "false");
+        }
+    });
     $('.print-me').on('click', function () {
         window.print();
         return false;

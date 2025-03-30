@@ -1,6 +1,6 @@
 ﻿$(document).ready(function () {
 
-    $("#customerTable").DataTable({
+    var table = $("#customerTable").DataTable({
         ajax: {
             url: '/api/Creator/GetActive',
             dataSrc: ''
@@ -202,8 +202,12 @@
         },
         error: function (xhr, status, error) { alert('err ' + error) }
     });
+
+    $('#refreshTable').click(function () {
+        table.ajax.reload(null, false); // false => Retains current page
+    });
     // Show the full map on hover and hide it when the mouse leaves
-    $('#customerTable')
+    table
         .on('mouseenter', '.map-thumbnail', function () {
             const $this = $(this); // Cache the current element
 
@@ -221,7 +225,7 @@
             // Immediately hide the full map
             $this.find('.full-map').hide();
         });
-    $('#customerTable').on('draw.dt', function () {
+    table.on('draw.dt', function () {
         $('[data-toggle="tooltip"]').tooltip({
             animated: 'fade',
             placement: 'bottom',

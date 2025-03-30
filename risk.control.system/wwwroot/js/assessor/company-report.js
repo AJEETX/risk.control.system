@@ -1,6 +1,6 @@
 ﻿$(document).ready(function () {
 
-    $("#customerTable").DataTable({
+    var table = $("#customerTable").DataTable({
         ajax: {
             url: '/api/Assessor/GetReport',
             dataSrc: ''
@@ -183,14 +183,8 @@
         },
         error: function (xhr, status, error) { alert('err ' + error) }
     });
-    $('#customerTable').on('mouseenter', '.map-thumbnail', function () {
-        $(this).find('.full-map').show(); // Show full map
-    }).on('mouseleave', '.map-thumbnail', function () {
-        $(this).find('.full-map').hide(); // Hide full map
-    });
-
-    $('#customerTable')
-        .on('mouseenter', '.map-thumbnail', function () {
+    
+    table.on('mouseenter', '.map-thumbnail', function () {
             const $this = $(this); // Cache the current element
 
             // Set a timeout to show the full map after 1 second
@@ -207,7 +201,9 @@
             // Immediately hide the full map
             $this.find('.full-map').hide();
         });
-    //initMap("/api/CompanyCompletedClaims/GetReportMap");
+    $('#refreshTable').click(function () {
+        table.ajax.reload(null, false); // false => Retains current page
+    });
 });
 
 function getdetails(id) {

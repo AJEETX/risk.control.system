@@ -2,7 +2,7 @@
 $(document).ready(function () {
 
 
-    $("#customerTable").DataTable({
+    var table  = $("#customerTable").DataTable({
         ajax: {
             url: '/api/Manager/GetActive',
             dataSrc: ''
@@ -187,8 +187,7 @@ $(document).ready(function () {
         },
         error: function (xhr, status, error) { alert('err ' + error) }
     });
-    $('#customerTable')
-        .on('mouseenter', '.map-thumbnail', function () {
+    table.on('mouseenter', '.map-thumbnail', function () {
             const $this = $(this); // Cache the current element
 
             // Set a timeout to show the full map after 1 second
@@ -205,7 +204,7 @@ $(document).ready(function () {
             // Immediately hide the full map
             $this.find('.full-map').hide();
         });
-    $('#customerTable').on('draw.dt', function () {
+    table.on('draw.dt', function () {
         $('[data-toggle="tooltip"]').tooltip({
             animated: 'fade',
             placement: 'top',
@@ -214,9 +213,9 @@ $(document).ready(function () {
     });
     $('#customerTable tbody').hide();
     $('#customerTable tbody').fadeIn(2000);
-
-
-    //initMap("/api/CompanyActiveClaims/GetActiveMap");
+    $('#refreshTable').click(function () {
+        table.ajax.reload(null, false); // false => Retains current page
+    });
 });
 
 function getdetails(id) {

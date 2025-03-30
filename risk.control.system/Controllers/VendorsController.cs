@@ -910,8 +910,9 @@ namespace risk.control.system.Controllers
                 {
                     Role = managerRole,
                     Company = companyUser.ClientCompany,
-                    Symbol = "fa fa-info i-blue",
-                    Message = $"Agency {vendor.Email}: To Empanel."
+                    Symbol = "far fa-hand-point-right i-orangered",
+                    Message = $"Agency {vendor.Email} created",
+                    Status = "Empanel"
                 };
                 _context.Notifications.Add(notification);
                 await _context.SaveChangesAsync();

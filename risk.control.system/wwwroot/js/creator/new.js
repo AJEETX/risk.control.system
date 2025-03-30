@@ -254,8 +254,10 @@
         error: function (xhr, status, error) { alert('err ' + error) }
     });
 
-    $('#customerTableAuto')
-        .on('mouseenter', '.map-thumbnail', function () {
+    $('#refreshTable').click(function () {
+        table.ajax.reload(null, false); // false => Retains current page
+    });
+    table.on('mouseenter', '.map-thumbnail', function () {
             const $this = $(this); // Cache the current element
 
             // Set a timeout to show the full map after 1 second
@@ -273,7 +275,7 @@
             $this.find('.full-map').hide();
         });
 
-    $('#customerTableAuto').on('draw.dt', function () {
+    table.on('draw.dt', function () {
         $('[data-toggle="tooltip"]').tooltip({
             animated: 'fade',
             placement: 'top',
