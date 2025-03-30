@@ -276,12 +276,7 @@ function loadNotifications(keepOpen = false) {
     $.get('/api/Notification/GetNotifications', function (response) {
         $("#notificationList").html("");
         var totalCount = response.total;
-        if (totalCount == 0) {
-            $("#notificationList").html('<div class="text-muted text-center">No notifications</div>');
-            $("#notificationCount").text('0');
-
-        }
-        else if (response.maxCountReached) {
+        if (response.maxCountReached) {
             var maxText = `${response.maxCount}+`;
             $("#notificationCount").text(maxText);
         }
@@ -289,23 +284,31 @@ function loadNotifications(keepOpen = false) {
             $("#notificationCount").text(totalCount);
         }
 
-        response.data.forEach(function (item) {
-            $("#notificationList").append(
-                `<div class="dropdown-item d-flex justify-content-between align-items-center notification-item" data-id="${item.id}">
-                    <span>
-                        <i class="${item.symbol}"></i> 
-                        <span class="text-muted text-sm"> ${item.message} </span> :
-                        <span class="badge badge-light text-muted text-sm"> ${item.status} </span>
-                        <span class="float-right text-muted text-sm">${item.createdAt}</span>
-                    </span>
-                    <i class="fa fa-trash delete-notification" data-id="${item.id}" title="Delete"></i>
-                </div>`
-            );
-        });
-        if (totalCount > response.data.length) {
-            $("#notificationList").append(
-                `<hr><div class="text-muted text-sm">${moreInfo}</div>`
-            );
+        if (response.data.length > 0) {
+            response.data.forEach(function (item) {
+                $("#notificationList").append(
+                    `<a href="#" class="dropdown-item notification-item" data-id="${item.id}">
+                        <div class="notification-content">
+                            <i class="${item.symbol}"></i> 
+                            <span class="notification-message text-muted text-sm">${item.message}</span>
+                                <span class="badge badge-light text-muted text-sm">${item.status}</span>
+                            <span class="notification-time">${item.createdAt}</span>
+                        </div>
+                        <span class="delete-notification" data-id="${item.id}">
+                            <i class="fas fa-trash"></i>
+                        </span>
+                    </a>`
+                );
+            });
+
+            // Enable the "Clear All" icon
+            $("#clearNotifications").removeClass("clear-disabled");
+
+        } else {
+            $("#notificationList").append("<div class='text-center text-muted'>No notifications</div>");
+
+            // Disable the "Clear All" icon when no notifications exist
+            $("#clearNotifications").addClass("clear-disabled");
         }
         // Click event to mark as read
         $(".delete-notification").on("click", function (e) {
@@ -377,6 +380,8 @@ $(document).ready(function () {
     });
 
     $("#clearNotifications").on("click", function (e) {
+        if ($(this).hasClass("clear-disabled")) return; // Prevent action when disabled
+
         e.stopPropagation(); // Prevent Bootstrap from closing the dropdown
         $("#notificationDropdown").addClass("show");
         $("#notificationToggle").attr("aria-expanded", "true");

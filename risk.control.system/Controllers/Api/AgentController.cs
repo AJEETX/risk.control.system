@@ -5,6 +5,8 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.RegularExpressions;
 
+using Hangfire;
+
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -39,6 +41,7 @@ namespace risk.control.system.Controllers.Api
         private readonly ICompareFaces compareFaces;
         private readonly UserManager<VendorApplicationUser> userVendorManager;
         private readonly IAgentService agentService;
+        private readonly IBackgroundJobClient backgroundJobClient;
         private readonly ISmsService smsService;
         private readonly IClaimsInvestigationService claimsInvestigationService;
         private readonly IMailboxService mailboxService;
@@ -55,6 +58,7 @@ namespace risk.control.system.Controllers.Api
             UserManager<VendorApplicationUser> userVendorManager,
              IHttpContextAccessor httpContextAccessor,
             IAgentService agentService,
+            IBackgroundJobClient backgroundJobClient,
             ISmsService SmsService,
             IClaimsInvestigationService claimsInvestigationService, IMailboxService mailboxService,
             IWebHostEnvironment webHostEnvironment, IICheckifyService iCheckifyService)
@@ -65,6 +69,7 @@ namespace risk.control.system.Controllers.Api
             this.compareFaces = compareFaces;
             this.userVendorManager = userVendorManager;
             this.agentService = agentService;
+            this.backgroundJobClient = backgroundJobClient;
             smsService = SmsService;
             this.claimsInvestigationService = claimsInvestigationService;
             this.mailboxService = mailboxService;
@@ -743,7 +748,7 @@ namespace risk.control.system.Controllers.Api
                     data.ClaimId,
                     data.Remarks, data.Question1, data.Question2, data.Question3, data.Question4);
 
-                await mailboxService.NotifyClaimReportSubmitToVendorSupervisor(data.Email, data.ClaimId);
+                backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimReportSubmitToVendorSupervisor(data.Email, data.ClaimId));
 
                 var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
 

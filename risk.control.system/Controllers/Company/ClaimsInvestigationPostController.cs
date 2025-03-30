@@ -1,5 +1,7 @@
 ﻿using AspNetCoreHero.ToastNotification.Abstractions;
 
+using Hangfire;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -38,14 +40,17 @@ namespace risk.control.system.Controllers.Company
         private readonly IClaimsInvestigationService claimsInvestigationService;
         private readonly IMailboxService mailboxService;
         private readonly INotyfService notifyService;
+        private readonly IBackgroundJobClient backgroundJobClient;
 
         public ClaimsInvestigationPostController(ApplicationDbContext context,
             IClaimsInvestigationService claimsInvestigationService,
+            IBackgroundJobClient backgroundJobClient,
             IMailboxService mailboxService,
             INotyfService notifyService)
         {
             _context = context;
             this.claimsInvestigationService = claimsInvestigationService;
+            this.backgroundJobClient = backgroundJobClient;
             this.mailboxService = mailboxService;
             this.notifyService = notifyService;
         }
@@ -95,7 +100,9 @@ namespace risk.control.system.Controllers.Company
 
                         await claimsInvestigationService.AssignToAssigner(HttpContext.User.Identity.Name, notAutoAllocated);
 
-                        await mailboxService.NotifyClaimAssignmentToAssigner(HttpContext.User.Identity.Name, notAutoAllocated);
+                        backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimAssignmentToAssigner(HttpContext.User.Identity.Name, notAutoAllocated));
+
+                        //await mailboxService.NotifyClaimAssignmentToAssigner(HttpContext.User.Identity.Name, notAutoAllocated);
 
                         notifyService.Custom($"{notAutoAllocated.Count}/{distinctClaims.Count} case(s) Assign manual", 3, "orange", "far fa-file-powerpoint");
                         
@@ -106,7 +113,8 @@ namespace risk.control.system.Controllers.Company
                 {
                     await claimsInvestigationService.AssignToAssigner(HttpContext.User.Identity.Name, distinctClaims);
 
-                    await mailboxService.NotifyClaimAssignmentToAssigner(HttpContext.User.Identity.Name, distinctClaims);
+                    backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimAssignmentToAssigner(HttpContext.User.Identity.Name, distinctClaims));
+                    //await mailboxService.NotifyClaimAssignmentToAssigner(HttpContext.User.Identity.Name, distinctClaims);
 
                     notifyService.Custom($"{claims.Count}/{claims.Count} case(s) Assigned", 3, "green", "far fa-file-powerpoint");
                 }
@@ -139,7 +147,8 @@ namespace risk.control.system.Controllers.Company
 
                 var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == selectedcase);
 
-                await mailboxService.NotifyClaimAllocationToVendor(currentUserEmail, policy.PolicyDetail.ContractNumber, caseId, selectedcase);
+                backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimAllocationToVendor(currentUserEmail, policy.PolicyDetail.ContractNumber, caseId, selectedcase));
+                //await mailboxService.NotifyClaimAllocationToVendor(currentUserEmail, policy.PolicyDetail.ContractNumber, caseId, selectedcase);
 
                 notifyService.Custom($"Case #{policy.PolicyDetail.ContractNumber} {policy.InvestigationCaseSubStatus.Name} to {vendor.Name}", 3, "green", "far fa-file-powerpoint");
 
@@ -170,7 +179,8 @@ namespace risk.control.system.Controllers.Company
 
                 var company = await claimsInvestigationService.WithdrawCaseByCompany(currentUserEmail, model, claimId);
                
-                await mailboxService.NotifyClaimWithdrawlToCompany(currentUserEmail, claimId);
+                backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimWithdrawlToCompany(currentUserEmail, claimId));
+                //await mailboxService.NotifyClaimWithdrawlToCompany(currentUserEmail, claimId);
 
                 notifyService.Custom($"Case #{policyNumber}  withdrawn successfully", 3, "green", "far fa-file-powerpoint");
 
@@ -216,7 +226,7 @@ namespace risk.control.system.Controllers.Company
 
                 var (company, contract) = await claimsInvestigationService.ProcessCaseReport(currentUserEmail, assessorRemarks, claimId, reportUpdateStatus, reportAiSummary);
 
-                await mailboxService.NotifyClaimReportProcess(currentUserEmail, claimId);
+                backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimReportProcess(currentUserEmail, claimId));
 
                 if (reportUpdateStatus == AssessorRemarkType.OK)
                 {
@@ -260,7 +270,7 @@ namespace risk.control.system.Controllers.Company
 
                 var (company, contract) = await claimsInvestigationService.ProcessCaseReport(currentUserEmail, assessorRemarks, claimId, reportUpdateStatus, reportAiSummary);
 
-                await mailboxService.NotifyClaimReportProcess(currentUserEmail, claimId);
+                backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimReportProcess(currentUserEmail, claimId));
 
                 return RedirectToAction(nameof(AssessorController.Assessor), "Assessor");
             }
@@ -295,7 +305,7 @@ namespace risk.control.system.Controllers.Company
                 {
                     var company = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == currentUserEmail);
 
-                    await mailboxService.NotifySubmitQueryToAgency(currentUserEmail, claimId);
+                    backgroundJobClient.Enqueue(() => mailboxService.NotifySubmitQueryToAgency(currentUserEmail, claimId));
 
                     notifyService.Success("Query Sent to Agency");
                     return RedirectToAction(nameof(AssessorController.Assessor), "Assessor");

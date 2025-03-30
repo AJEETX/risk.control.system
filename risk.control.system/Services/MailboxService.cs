@@ -179,7 +179,6 @@ namespace risk.control.system.Services
                     //SMS ::END
                 }
 
-
                 var rows = await _context.SaveChangesAsync();
             }
             catch (Exception ex)

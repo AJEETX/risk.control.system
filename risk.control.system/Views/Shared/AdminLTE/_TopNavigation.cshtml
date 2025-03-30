@@ -28,65 +28,89 @@
 
     <!-- Right navbar links -->
     <ul class="navbar-nav ml-auto">
-        <li class="nav-item dropdown  top-nav-logout-border">
+        <li class="nav-item dropdown top-nav-logout-border">
             <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false" title="Info">
                 <i class="fa fa-info-circle i-blue"></i>
             </a>
 
-            <div class="dropdown-menu dropdown-menu-right shadow-lg rounded-lg border-0">
+            <div class="dropdown-menu dropdown-menu-right shadow-lg rounded-lg border-0 info-dropdown">
                 @{
                     var img = "/flags/" + @Model.CountryCode.ToLower() + ".png";
                 }
 
-                <a class="nav-link" data-widget="control-sidebar" data-slide="true" role="button" title="Country: @Model?.Country" data-toggle="tooltip">
-                    <span class="badge badge-light"><span id="country"> <img src="@img" class="flag-icon" /><span class="badge badge-light">@Model?.Country</span></span></span>
-                </a>
-                <div class="dropdown-divider"></div>
-                <a class="nav-link" data-widget="control-sidebar" data-slide="true" role="button" title="Currency: @Model?.CurrencyName" data-toggle="tooltip">
-                    <span class="badge badge-light"><span id="currency"><i class="fa fa-money"></i><span class="badge badge-light">@Model?.CurrencyName</span></span></span>
-                </a>
-                <div class="dropdown-divider"></div>
-                <a class="nav-link" data-widget="control-sidebar" data-slide="true" role="button" title="Isd code: @Model?.IsdCode" data-toggle="tooltip">
-                    <span class="badge badge-light"><span id="isdcode"><i class="fa fa-phone"></i><span class="badge badge-light">@Model?.IsdCode</span></span></span>
-                </a>
+                <!-- Country -->
+                <div class="dropdown-item d-flex align-items-center info-item">
+                    <img src="@img" class="flag-icon mr-2" />
+                    <span class="info-label">Country:</span>
+                    <span class="ml-auto font-weight-bold text-primary">@Model?.Country</span>
+                </div>
+
                 <div class="dropdown-divider"></div>
 
+                <!-- Currency -->
+                <div class="dropdown-item d-flex align-items-center info-item">
+                    <i class="fa fa-money mr-2 text-success"></i>
+                    <span class="info-label">Currency:</span>
+                    <span class="ml-auto font-weight-bold text-success">@Model?.CurrencyName</span>
+                </div>
+
+                <div class="dropdown-divider"></div>
+
+                <!-- ISD Code -->
+                <div class="dropdown-item d-flex align-items-center info-item">
+                    <i class="fa fa-phone mr-2 text-dangez"></i>
+                    <span class="info-label">ISD Code:</span>
+                    <span class="ml-auto font-weight-bold text-dangez">@Model?.IsdCode</span>
+                </div>
             </div>
         </li>
 
+
+
         <!-- Notifications Dropdown Menu -->
-        <li class="nav-item dropdown  top-nav-logout-border">
-            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false" title="Notifications">
+        <li class="nav-item dropdown top-nav-logout-border">
+            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false" title="Notifications" id="notificationToggle">
                 <i class="far fa-bell"></i>
                 <span class="badge badge-warning" id="notificationCount">0</span>
             </a>
-            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-                <span class="dropdown-header">Notifications</span>
-                <div class="dropdown-divider"></div>
+            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right" id="notificationDropdown">
+                <span class="dropdown-header">
+                    Notifications
+                    <span class="notification-actions">
+                        <i id="notification-refresh" class="fas fa-sync" title="Refresh" data-toggle="tooltip"></i>
+                        <i id="clearNotifications" class="fa fa-trash" title="Clear All" data-toggle="tooltip"></i>
+                    </span>
+                </span>
                 <div id="notificationList"></div>
             </div>
         </li>
-        
-        <!-- Notifications Dropdown Menu -->
-        
+
         <li class="nav-item dropdown top-nav-logout-border">
-            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
-                <i class="fas fa-cog fa-spin"></i>
+            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false" title="Settings">
+                <i class="fas fa-cog fa-lg"></i>
             </a>
 
-            <div class="dropdown-menu dropdown-menu-right shadow-lg rounded-lg border-0">
-                <div class="dropdown-header text-center bg-light py-2 rounded-top">
+            <div class="dropdown-menu dropdown-menu-right shadow-lg rounded-lg border-0 settings-dropdown">
+                <!-- Profile Section -->
+                <div class="text-center profile-section">
                     <img src="data:image/*;base64,@(Convert.ToBase64String(Model?.ProfilePicture))"
-                         class="rounded-circle shadow-lg border sidebar-profile" alt="User Profile" title="@Model.Email" data-toggle="tooltip" />
+                         class="rounded-circle shadow-sm border sidebar-profile"
+                         alt="User Profile" title="@Model.Email" data-toggle="tooltip" />
+                    <p class="text-muted user-email">@Model.Email</p>
                 </div>
-                <div class="dropdown-divider"></div>
 
                 <!-- Logout Link -->
-                <a class="dropdown-item d-flex align-items-center py-2 text-danger font-weight-bold hover-bg-danger"
+                <a class="dropdown-item d-flex align-items-center text-danger font-weight-bold btn-outline-danger"
                    href="#" data-toggle="modal" data-target="#logoutModal">
                     <i class="fas fa-sign-out-alt mr-2"></i> Logout
                 </a>
             </div>
         </li>
+
+        @*        <li class="nav-item">
+        <a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#" role="button">
+        <i class="fas fa-th-large"></i>
+        </a>
+        </li>*@
     </ul>
 </nav>

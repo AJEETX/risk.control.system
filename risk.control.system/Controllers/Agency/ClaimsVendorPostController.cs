@@ -3,6 +3,8 @@ using System.Web;
 
 using AspNetCoreHero.ToastNotification.Abstractions;
 
+using Hangfire;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -32,10 +34,12 @@ namespace risk.control.system.Controllers.Agency
         private readonly IClaimsVendorService vendorService;
         private readonly IMailboxService mailboxService;
         private readonly ApplicationDbContext _context;
+        private readonly IBackgroundJobClient backgroundJobClient;
 
         public ClaimsVendorPostController(
             IClaimsInvestigationService claimsInvestigationService,
             INotyfService notifyService,
+            IBackgroundJobClient backgroundJobClient,
             IClaimsVendorService vendorService,
             IMailboxService mailboxService,
             ApplicationDbContext context)
@@ -44,6 +48,7 @@ namespace risk.control.system.Controllers.Agency
             this.notifyService = notifyService;
             this.vendorService = vendorService;
             this.mailboxService = mailboxService;
+            this.backgroundJobClient = backgroundJobClient;
             _context = context;
             UserList = new List<UsersViewModel>();
         }
@@ -80,7 +85,7 @@ namespace risk.control.system.Controllers.Agency
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
                 
-                await mailboxService.NotifyClaimAssignmentToVendorAgent(currentUserEmail, claimId, vendorAgent.Email, vendorAgent.VendorId.Value);
+                backgroundJobClient.Enqueue(()=> mailboxService.NotifyClaimAssignmentToVendorAgent(currentUserEmail, claimId, vendorAgent.Email, vendorAgent.VendorId.Value));
 
                 notifyService.Custom($"Case #{claim.PolicyDetail.ContractNumber} tasked to {vendorAgent.Email}", 3, "green", "far fa-file-powerpoint");
 
@@ -145,7 +150,7 @@ namespace risk.control.system.Controllers.Agency
                     return RedirectToAction(nameof(AgentController.GetInvestigate), "Agent", new { selectedcase = claimId });
                 }
 
-                await mailboxService.NotifyClaimReportSubmitToVendorSupervisor(currentUserEmail, claimId);
+                backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimReportSubmitToVendorSupervisor(currentUserEmail, claimId));
 
                 notifyService.Custom($"Case #{contract} report submitted", 3, "green", "far fa-file-powerpoint");
 
@@ -187,7 +192,8 @@ namespace risk.control.system.Controllers.Agency
                 {
                     var agencyUser = _context.VendorApplicationUser.Include(a => a.Vendor).FirstOrDefault(c => c.Email == userEmail);
 
-                    await mailboxService.NotifyClaimReportSubmitToCompany(userEmail, claimId);
+                    backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimReportSubmitToCompany(userEmail, claimId));
+                    //await mailboxService.NotifyClaimReportSubmitToCompany(userEmail, claimId);
 
                     notifyService.Custom($"Case #{success.PolicyDetail.ContractNumber}  report submitted to Company", 3, "green", "far fa-file-powerpoint");
                 }
@@ -227,7 +233,7 @@ namespace risk.control.system.Controllers.Agency
                 }
                 var agency = await claimsInvestigationService.WithdrawCase(userEmail, model, claimId);
 
-                await mailboxService.NotifyClaimWithdrawlToCompany(userEmail, claimId);
+                backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimWithdrawlToCompany(userEmail, claimId));
 
                 notifyService.Custom($"Case #{policyNumber}  declined successfully", 3, "red", "far fa-file-powerpoint");
 
@@ -271,7 +277,7 @@ namespace risk.control.system.Controllers.Agency
                 {
                     var agencyUser = _context.VendorApplicationUser.Include(a => a.Vendor).FirstOrDefault(c => c.Email == currentUserEmail);
 
-                    await mailboxService.NotifySubmitReplyToCompany(currentUserEmail, claimId);
+                    backgroundJobClient.Enqueue(() => mailboxService.NotifySubmitReplyToCompany(currentUserEmail, claimId));
 
                     notifyService.Success("Enquiry Reply Sent to Company");
                     return RedirectToAction(nameof(SupervisorController.Allocate), "Supervisor");

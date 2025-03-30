@@ -41,7 +41,7 @@
                 <partial name="AdminLTE/_VendorSidebarDashboard" />
                 @if (Model.EnableMailbox)
                 {
-                    <partial name="AdminLTE/_VendorSidebarMailbox" model="Model" />
+                    <partial name="AdminLTE/_VendorSidebarMailbox" />
                 }
 
                 @if (User.IsInRole(AppRoles.AGENCY_ADMIN.ToString()) || User.IsInRole(AppRoles.SUPERVISOR.ToString()))
