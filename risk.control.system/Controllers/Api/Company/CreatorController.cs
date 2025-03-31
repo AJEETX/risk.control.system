@@ -544,6 +544,30 @@ namespace risk.control.system.Controllers.Api.Company
 
             return Ok(response);
         }
+
+        [HttpGet("GetFilesData")]
+        public async Task<IActionResult> GetFilesData()
+        {
+            var userEmail = HttpContext.User.Identity.Name;
+
+            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == userEmail);
+
+            var files = await _context.FilesOnFileSystem.Where(f => f.CompanyId == companyUser.ClientCompanyId && f.UploadedBy == userEmail).ToListAsync();
+
+            var result = files.OrderByDescending(o=>o.CreatedOn).Select(file => new
+            {
+                file.Id,
+                file.Name,
+                file.Description,
+                file.FileType,
+                CreatedOn = file.CreatedOn.GetValueOrDefault().ToString("yyyy-MM-dd"),
+                file.UploadedBy,
+                file.Message,
+                Status = file.Icon // or use some other status representation
+            }).ToList();
+
+            return Ok(new { data = result });
+        }
         private byte[] GetOwner(ClaimsInvestigation a)
         {
             string ownerEmail = string.Empty;

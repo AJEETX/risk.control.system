@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using SmartBreadcrumbs.Nodes;
 using risk.control.system.Helpers;
 using Microsoft.AspNetCore.Authorization;
+using Hangfire;
 
 namespace risk.control.system.Controllers.Company
 {
@@ -32,6 +33,7 @@ namespace risk.control.system.Controllers.Company
         private readonly IFtpService ftpService;
         private readonly INotyfService notifyService;
         private readonly IInvestigationReportService investigationReportService;
+        private readonly IBackgroundJobClient backgroundJobClient;
         private readonly IClaimPolicyService claimPolicyService;
 
         public CreatorPostController(ApplicationDbContext context,
@@ -42,6 +44,7 @@ namespace risk.control.system.Controllers.Company
             IFtpService ftpService,
             INotyfService notifyService,
             IInvestigationReportService investigationReportService,
+            IBackgroundJobClient backgroundJobClient,
             IClaimPolicyService claimPolicyService)
         {
             _context = context;
@@ -53,6 +56,7 @@ namespace risk.control.system.Controllers.Company
             this.ftpService = ftpService;
             this.notifyService = notifyService;
             this.investigationReportService = investigationReportService;
+            this.backgroundJobClient = backgroundJobClient;
         }
         [HttpPost]
         [RequestSizeLimit(2_000_000)] // Checking for 2 MB
@@ -94,27 +98,35 @@ namespace risk.control.system.Controllers.Company
                     }
                 }
 
-                bool processed = false;
-                if (model.Uploadtype == UploadType.FTP)
+
+
+                //bool processed = false;
+                //if (model.Uploadtype == UploadType.FTP)
+                //{
+                //    //backgroundJobClient.Enqueue(() => ftpService.UploadFtpFile(currentUserEmail, postedFile, model.CREATEDBY, lineOfBusinessId));
+
+                //    processed = await ftpService.UploadFtpFile(currentUserEmail, postedFile, model.CREATEDBY, lineOfBusinessId);
+                //}
+
+                if (model.Uploadtype == UploadType.FILE && Path.GetExtension(Path.GetFileName(postedFile.FileName)) == ".zip")
                 {
-                    processed = await ftpService.UploadFtpFile(currentUserEmail, postedFile, model.CREATEDBY, lineOfBusinessId);
+
+                    //backgroundJobClient.Enqueue(() => ftpService.UploadFile(currentUserEmail, postedFile, model.CREATEDBY, lineOfBusinessId));
+                    var uploadId = await ftpService.UploadFile(currentUserEmail, postedFile, model.CREATEDBY, lineOfBusinessId);
+                    backgroundJobClient.Enqueue(() => ftpService.StartUpload(uploadId));
                 }
 
-                if (model.Uploadtype == UploadType.FILE && Path.GetExtension(postedFile.FileName) == ".zip")
-                {
+                notifyService.Custom($"{model.Uploadtype.GetEnumDisplayName()} in progress ", 3, "blue", "fa fa-upload");
 
-                    processed = await ftpService.UploadFile(currentUserEmail, postedFile, model.CREATEDBY, lineOfBusinessId);
-                }
-
-                if (processed)
-                {
-                    notifyService.Custom($"{model.Uploadtype.GetEnumDisplayName()} complete ", 3, "green", "fa fa-upload");
-                }
-                else
-                {
-                    notifyService.Information($"{model.Uploadtype.GetEnumDisplayName()} Error. Check limit <i class='fa fa-upload' ></i>", 3);
-                }
-                if(companyUser.ClientCompany.AutoAllocation)
+                //if (processed)
+                //{
+                //    notifyService.Custom($"{model.Uploadtype.GetEnumDisplayName()} complete ", 3, "green", "fa fa-upload");
+                //}
+                //else
+                //{
+                //    notifyService.Information($"{model.Uploadtype.GetEnumDisplayName()} Error. Check limit <i class='fa fa-upload' ></i>", 3);
+                //}
+                if (companyUser.ClientCompany.AutoAllocation)
                 {
                     if (model.CREATEDBY == CREATEDBY.MANUAL)
                     {

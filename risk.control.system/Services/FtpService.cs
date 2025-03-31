@@ -18,7 +18,8 @@ namespace risk.control.system.Services
 {
     public interface IFtpService
     {
-        Task<bool> UploadFile(string userEmail, IFormFile postedFile, CREATEDBY autoOrManual,long lineOfBusinessId);
+        Task<int> UploadFile(string userEmail, IFormFile postedFile, CREATEDBY autoOrManual,long lineOfBusinessId);
+        Task StartUpload(int uploadId);
         Task<bool> UploadCaseFile(string userEmail, IFormFile postedFile, CREATEDBY autoOrManual);
 
         Task<bool> UploadFtpFile(string userEmail, IFormFile postedFile, CREATEDBY autoOrManual, long lineOfBusinessId);
@@ -26,6 +27,7 @@ namespace risk.control.system.Services
 
     public class FtpService : IFtpService
     {
+        private const string CLAIMS = "claims";
         private static string NO_DATA = " NO - DATA ";
         private static Regex regex = new Regex("\\\"(.*?)\\\"");
         private readonly ApplicationDbContext _context;
@@ -72,8 +74,13 @@ namespace risk.control.system.Services
                 {
                     return false;
                 }
-
-                await SaveUpload(postedFile, localZipFilePath, "Ftp download", userEmail);
+                byte[] byteData;
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    postedFile.CopyTo(ms);
+                    byteData = ms.ToArray();
+                }
+                var uploadId = await SaveUpload(postedFile, localZipFilePath, "File upload", userEmail, byteData, autoOrManual, ORIGIN.FILE);
                 return true;
             }
             catch (Exception ex)
@@ -128,45 +135,57 @@ namespace risk.control.system.Services
             return true;
         }
 
-        public async Task<bool> UploadFile(string userEmail, IFormFile postedFile, CREATEDBY autoOrManual, long lineOfBusinessId)
+        public async Task<int> UploadFile(string userEmail, IFormFile postedFile, CREATEDBY autoOrManual, long lineOfBusinessId)
         {
             string path = Path.Combine(webHostEnvironment.WebRootPath, "upload-file");
+
+            // Ensure the directory exists
             if (!Directory.Exists(path))
             {
                 Directory.CreateDirectory(path);
             }
 
-            string filePath = Path.Combine(path, Path.GetTempFileName());
+            // Use the actual file name instead of a temp file name
+            string filePath = Path.Combine(path, Path.GetFileName(postedFile.FileName));
 
-            using (FileStream stream = new FileStream(filePath, FileMode.Create))
+            //using (FileStream stream = new FileStream(filePath, FileMode.Create))
+            //{
+            //    postedFile.CopyTo(stream);
+            //}
+
+            // If you need the file as bytes:
+            byte[] byteData;
+            using (MemoryStream ms = new MemoryStream())
             {
-                postedFile.CopyTo(stream);
+                postedFile.CopyTo(ms);
+                byteData = ms.ToArray();
             }
 
-            var rows = _context.SaveChanges();
-            using (var stream = postedFile.OpenReadStream())
-            {
-                using (var archive = new ZipArchive(stream))
-                {
-                    var csvFileCount = archive.Entries.Count(e => Path.GetExtension(e.FullName).Equals(".csv"));
-                    var innerFile = archive.Entries.FirstOrDefault(e => Path.GetExtension(e.FullName).Equals(".csv"));
-                    if (innerFile == null || csvFileCount != 1)
-                    {
-                        return false;
-                    }
-                    var processed = await ProcessFile(userEmail, archive, autoOrManual, ORIGIN.FILE, lineOfBusinessId);
-                    if (!processed)
-                    {
-                        return false;
-                    }
+            // filePath now contains the saved file location
 
-                }
-            }
-            await SaveUpload(postedFile, filePath, "File upload", userEmail);
-            return true;
+            //using (var stream = postedFile.OpenReadStream())
+            //{
+            //    using (var archive = new ZipArchive(stream))
+            //    {
+            //        var csvFileCount = archive.Entries.Count(e => Path.GetExtension(e.FullName).Equals(".csv"));
+            //        var innerFile = archive.Entries.FirstOrDefault(e => Path.GetExtension(e.FullName).Equals(".csv"));
+            //        if (innerFile == null || csvFileCount != 1)
+            //        {
+            //            return false;
+            //        }
+            //        var processed = await ProcessFile(userEmail, archive, autoOrManual, ORIGIN.FILE, lineOfBusinessId);
+            //        if (!processed)
+            //        {
+            //            return false;
+            //        }
+
+            //    }
+            //}
+            var uploadId = await SaveUpload(postedFile, filePath, "File upload", userEmail, byteData, autoOrManual, ORIGIN.FILE);
+            return uploadId;
         }
 
-        private async Task SaveUpload(IFormFile file, string filePath, string description, string uploadedBy)
+        private async Task<int> SaveUpload(IFormFile file, string filePath, string description, string uploadedBy, byte[] byteData, CREATEDBY autoOrManual, ORIGIN fileOrFtp)
         {
             var fileName = Path.GetFileNameWithoutExtension(file.FileName);
             var extension = Path.GetExtension(file.FileName);
@@ -180,10 +199,80 @@ namespace risk.control.system.Services
                 Description = description,
                 FilePath = filePath,
                 UploadedBy = uploadedBy,
-                CompanyId = company.ClientCompanyId
+                CompanyId = company.ClientCompanyId,
+                ByteData = byteData,
+                AutoOrManual = autoOrManual,
+                FileOrFtp = fileOrFtp
             };
-            _context.FilesOnFileSystem.Add(fileModel);
+            var uploadData = _context.FilesOnFileSystem.Add(fileModel);
             await _context.SaveChangesAsync();
+            return uploadData.Entity.Id;
+        }
+
+        public async Task StartUpload(int uploadId)
+        {
+            var uploadFileData = await _context.FilesOnFileSystem.FindAsync(uploadId);
+            var csvData = ReadFirstCsvFromZip(uploadFileData.ByteData);
+            var lineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == CLAIMS).LineOfBusinessId;
+
+            var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(c => c.Email == uploadFileData.UploadedBy);
+            var totalClaimsCreated = await _context.ClaimsInvestigation.CountAsync(c => !c.Deleted && c.ClientCompanyId == companyUser.ClientCompanyId);
+            var totalIncludingUploaded = totalClaimsCreated + csvData.Count - 1;
+            var userCanCreate = true;
+            if (companyUser.ClientCompany.LicenseType == Standard.Licensing.LicenseType.Trial)
+            {
+                if (totalClaimsCreated >= companyUser.ClientCompany.TotalCreatedClaimAllowed)
+                {
+                    userCanCreate = false;
+                }
+            }
+            else {
+                userCanCreate = companyUser.ClientCompany.TotalCreatedClaimAllowed >= totalIncludingUploaded;
+            }
+            if (userCanCreate)
+            {
+                var uploaded = await uploadService.PerformUpload(companyUser, csvData.ToArray(), uploadFileData.AutoOrManual, uploadFileData.FileOrFtp, lineOfBusinessId,uploadFileData.ByteData);
+                if(uploaded)
+                {
+                    uploadFileData.Completed = true;
+                    uploadFileData.Icon = "fas fa-check-circle i-green";
+                    uploadFileData.Message = "Upload process completed";
+                }
+                else
+                {
+                    uploadFileData.Completed = false;
+                    uploadFileData.Icon = "fas fa-times-circle i-red";
+                    uploadFileData.Message = "Some Error occurred";
+                }
+                await _context.SaveChangesAsync();
+
+            }
+        }
+
+        public static List<string>? ReadFirstCsvFromZip(byte[] zipData)
+        {
+            using (MemoryStream zipStream = new MemoryStream(zipData))
+            using (ZipArchive archive = new ZipArchive(zipStream, ZipArchiveMode.Read))
+            {
+                // Find the first file that has a .csv extension
+                ZipArchiveEntry? csvEntry = archive.Entries.FirstOrDefault(e =>
+                    e.FullName.EndsWith(".csv", StringComparison.OrdinalIgnoreCase));
+
+                if (csvEntry != null)
+                {
+                    using (StreamReader reader = new StreamReader(csvEntry.Open()))
+                    {
+                        List<string> lines = new List<string>();
+                        string? line;
+                        while ((line = reader.ReadLine()) != null)
+                        {
+                            lines.Add(line);
+                        }
+                        return lines; // Return the list of lines from the first CSV found
+                    }
+                }
+            }
+            return null; // Return null if no CSV file is found
         }
 
         private async Task<bool> ProcessFile(string userEmail, ZipArchive archive, CREATEDBY autoOrManual, ORIGIN fileOrFtp, long lineOfBusinessId)
@@ -206,6 +295,7 @@ namespace risk.control.system.Services
             }
 
             var innerFile = archive.Entries.FirstOrDefault(e => Path.GetExtension(e.FullName).Equals(".csv"));
+
             string csvData = string.Empty;
             using (var ss = innerFile.Open())
             {
@@ -217,6 +307,7 @@ namespace risk.control.system.Services
                 }
             }
             var dataRows = csvData.Split('\n');
+
             var totalIncludingUploaded = totalClaimsCreated + dataRows.Length - 1;
             var userCanUpload = true;
             if (companyUser.ClientCompany.LicenseType == Standard.Licensing.LicenseType.Trial)
@@ -295,7 +386,7 @@ namespace risk.control.system.Services
 
                 }
             }
-            await SaveUpload(postedFile, filePath, "File upload", userEmail);
+            //await SaveUpload(postedFile, filePath, "File upload", userEmail);
             return true;
         }
 

@@ -90,21 +90,7 @@ namespace risk.control.system.Controllers.Company
         {
             try
             {
-                var userEmail = HttpContext.User.Identity.Name;
-                if (string.IsNullOrWhiteSpace(userEmail))
-                {
-                    notifyService.Error("OOPs !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-                var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == userEmail);
-                if (companyUser == null)
-                {
-                    notifyService.Error("OOPs !!!..Contact Admin");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-                var files = await _context.FilesOnFileSystem.Where(f => f.CompanyId == companyUser.ClientCompanyId && f.UploadedBy == userEmail).ToListAsync();
-                ViewBag.Message = TempData["Message"];
-                return View(new FileUploadViewModel { FilesOnFileSystem = files });
+                return View();
             }
             catch (Exception ex)
             {
@@ -112,7 +98,6 @@ namespace risk.control.system.Controllers.Company
                 notifyService.Error("OOPs !!!..Contact Admin");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
-
         }
     }
 }

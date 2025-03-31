@@ -79,15 +79,15 @@ namespace risk.control.system.Controllers.Company
                 }
 
                 bool processed = false;
-                if (model.Uploadtype == UploadType.FTP)
-                {
-                    processed = await ftpService.UploadFtpFile(currentUserEmail, postedFile, model.CREATEDBY, lineOfBusinessId);
-                }
+                //if (model.Uploadtype == UploadType.FTP)
+                //{
+                //    processed = await ftpService.UploadFtpFile(currentUserEmail, postedFile, model.CREATEDBY, lineOfBusinessId);
+                //}
 
                 if (model.Uploadtype == UploadType.FILE && Path.GetExtension(postedFile.FileName) == ".zip")
                 {
 
-                    processed = await  ftpService.UploadFile(currentUserEmail, postedFile, model.CREATEDBY, lineOfBusinessId);
+                    var uploadId = await  ftpService.UploadFile(currentUserEmail, postedFile, model.CREATEDBY, lineOfBusinessId);
                 }
 
                 if (processed)

@@ -44,7 +44,6 @@ namespace risk.control.system.Controllers
             return View();
         }
 
-
         public async Task<IActionResult> DownloadLog(long id)
         {
             try

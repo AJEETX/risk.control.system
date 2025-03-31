@@ -105,11 +105,12 @@ namespace risk.control.system.Models
     {
         [Display(Name = "File Upload")]
         [Description("Data upload type through file")]
-        FILE,
+        FILE
+        //    ,
 
-        [Display(Name = "FTP Upload")]
-        [Description("Data upload type through ftp")]
-        FTP,
+        //[Display(Name = "FTP Upload")]
+        //[Description("Data upload type through ftp")]
+        //FTP,
     }
 
     public enum ClaimType
