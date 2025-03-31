@@ -9,6 +9,7 @@ using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 
+using System.Collections.Concurrent;
 using System.Data;
 
 using static risk.control.system.AppConstant.Applicationsettings;
@@ -43,6 +44,8 @@ namespace risk.control.system.Services
 
     public class ClaimsInvestigationService : IClaimsInvestigationService
     {
+        private const string CLAIMS = "claims";
+        private const string UNDERWRITING = "underwriting";
         private readonly ApplicationDbContext _context;
         private readonly IMailboxService mailboxService;
         private readonly IWebHostEnvironment webHostEnvironment;
@@ -70,84 +73,61 @@ namespace risk.control.system.Services
 
         public async Task<List<string>> ProcessAutoAllocation(List<string> claims, ClientCompany company, string userEmail)
         {
-            var autoAllocatedClaims = new List<string>();
-            foreach (var claim in claims)
+            var claimTasks = claims.Select(async claim =>
             {
-                string pinCode2Verify = string.Empty;
-                
-                //1. GET THE PINCODE FOR EACH CLAIM
-                var claimsInvestigation = _context.ClaimsInvestigation
+                // 1. Fetch Claim Details & Pincode in Parallel
+                var claimsInvestigation = await _context.ClaimsInvestigation
+                    .AsNoTracking()
                     .Include(c => c.PolicyDetail)
                     .Include(c => c.CustomerDetail)
-                    .ThenInclude(c => c.PinCode)
+                        .ThenInclude(c => c.PinCode)
                     .Include(c => c.BeneficiaryDetail)
-                    .ThenInclude(c => c.PinCode)
-                    .First(c => c.ClaimsInvestigationId == claim);
+                        .ThenInclude(c => c.PinCode)
+                    .FirstOrDefaultAsync(c => c.ClaimsInvestigationId == claim);
 
-                if (claimsInvestigation.PolicyDetail?.ClaimType == ClaimType.HEALTH)
-                {
-                    pinCode2Verify = claimsInvestigation.CustomerDetail?.PinCode?.Code;
-                }
-                else
-                {
-                    pinCode2Verify = claimsInvestigation.BeneficiaryDetail.PinCode?.Code;
-                }
-                var pincodeDistrictState = _context.PinCode.Include(d => d.District).Include(s => s.State).FirstOrDefault(p => p.Code == pinCode2Verify);
-                var vendorsInPincode = new List<Vendor>();
+                string pinCode2Verify = claimsInvestigation.PolicyDetail?.ClaimType == ClaimType.HEALTH
+                    ? claimsInvestigation.CustomerDetail?.PinCode?.Code
+                    : claimsInvestigation.BeneficiaryDetail?.PinCode?.Code;
 
-                //2. GET THE VENDORID FOR EACH CASE BASED ON PINCODE
-                foreach (var empanelledVendor in company.EmpanelledVendors)
-                {
-                    foreach (var serviceType in empanelledVendor.VendorInvestigationServiceTypes)
-                    {
-                        if (serviceType.InvestigationServiceTypeId == claimsInvestigation.PolicyDetail.InvestigationServiceTypeId &&
-                                serviceType.LineOfBusinessId == claimsInvestigation.PolicyDetail.LineOfBusinessId)
-                        {
-                            if (serviceType.StateId == pincodeDistrictState.StateId && serviceType.DistrictId == null)
-                            {
-                                vendorsInPincode.Add(empanelledVendor);
-                            }
-                            else if (serviceType.StateId == pincodeDistrictState.StateId && serviceType.DistrictId == pincodeDistrictState.DistrictId)
-                            {
-                                vendorsInPincode.Add(empanelledVendor);
-                                continue;
-                            }
-                        }
-                        var added = vendorsInPincode.Any(v => v.VendorId == empanelledVendor.VendorId);
-                        if (added)
-                        {
-                            continue;
-                        }
-                    }
-                    var addedVendor = vendorsInPincode.Any(v => v.VendorId == empanelledVendor.VendorId);
-                    if (addedVendor)
-                    {
-                        continue;
-                    }
-                }
+                var pincodeDistrictState = await _context.PinCode
+                    .AsNoTracking()
+                    .Include(d => d.District)
+                    .Include(s => s.State)
+                    .FirstOrDefaultAsync(p => p.Code == pinCode2Verify);
 
-                var distinctVendors = vendorsInPincode.GroupBy(p => p.VendorId).Select(g => g.First())?.ToList();
+                // 2. Find Vendors Using LINQ
+                var distinctVendors = company.EmpanelledVendors
+                    .Where(vendor => vendor.VendorInvestigationServiceTypes.Any(serviceType =>
+                        serviceType.InvestigationServiceTypeId == claimsInvestigation.PolicyDetail.InvestigationServiceTypeId &&
+                        serviceType.LineOfBusinessId == claimsInvestigation.PolicyDetail.LineOfBusinessId &&
+                        (serviceType.StateId == pincodeDistrictState.StateId &&
+                         (serviceType.DistrictId == null || serviceType.DistrictId == pincodeDistrictState.DistrictId))
+                    ))
+                    .GroupBy(v => v.VendorId)  // Ensure unique vendors
+                    .Select(g => g.First())
+                    .ToList();
 
-                //3. CALL SERVICE WITH VENDOR_ID
-                if (vendorsInPincode is not null && vendorsInPincode.Count > 0)
-                {
-                    var vendorsWithCaseLoad = GetAgencyLoad(distinctVendors).OrderBy(o => o.CaseCount)?.ToList();
+                if (!distinctVendors.Any()) return null; // No vendors found, skip this claim
 
-                    if (vendorsWithCaseLoad is not null && vendorsWithCaseLoad.Count > 0)
-                    {
-                        var selectedVendor = vendorsWithCaseLoad.OrderBy(o=>o.CaseCount).FirstOrDefault();
+                // 3. Get Vendor Load & Allocate
+                var vendorsWithCaseLoad = GetAgencyLoad(distinctVendors)
+                    .OrderBy(o => o.CaseCount)
+                    .ToList();
 
-                        var policy = await AllocateToVendor(userEmail, claimsInvestigation.ClaimsInvestigationId, selectedVendor.Vendor.VendorId);
+                var selectedVendor = vendorsWithCaseLoad.FirstOrDefault();
+                if (selectedVendor == null) return null; // No vendors available
 
-                        autoAllocatedClaims.Add(claim);
+                var policy = await AllocateToVendor(userEmail, claimsInvestigation.ClaimsInvestigationId, selectedVendor.Vendor.VendorId);
 
-                        backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimAllocationToVendor(userEmail, policy.PolicyDetail.ContractNumber, claimsInvestigation.ClaimsInvestigationId, selectedVendor.Vendor.VendorId));
+                // 4. Send Notification in Background
+                backgroundJobClient.Enqueue(() =>
+                    mailboxService.NotifyClaimAllocationToVendor(userEmail, policy.PolicyDetail.ContractNumber, claimsInvestigation.ClaimsInvestigationId, selectedVendor.Vendor.VendorId));
 
-                        //await mailboxService.NotifyClaimAllocationToVendor(userEmail, policy.PolicyDetail.ContractNumber, claimsInvestigation.ClaimsInvestigationId, selectedVendor.Vendor.VendorId);
-                    }
-                }
-            }
-            return autoAllocatedClaims;
+                return claim; // Return allocated claim
+            });
+
+            var results = await Task.WhenAll(claimTasks); // Run all tasks in parallel
+            return results.Where(r => r != null).ToList(); // Remove nulls and return allocated claims
         }
 
         public List<VendorCaseModel> GetAgencyLoad(List<Vendor> existingVendors)
@@ -494,77 +474,87 @@ namespace risk.control.system.Services
 
         public async Task<ClaimsInvestigation> AssignToVendorAgent(string vendorAgentEmail, string currentUser, long vendorId, string claimsInvestigationId)
         {
-            var inProgress = _context.InvestigationCaseStatus.FirstOrDefault(
-                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS);
-            var assignedToAgent = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
-            var claim = _context.ClaimsInvestigation
-                .Include(c=>c.PolicyDetail)
-                .Include(c => c.CustomerDetail)
-                    .ThenInclude(c => c.PinCode)
-                    .Include(c => c.BeneficiaryDetail)
+            var inProgress = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS);
+            var assignedToAgent = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
+            var claim = _context.ClaimsInvestigation.Include(c=>c.PolicyDetail).Include(c => c.AgencyReport)
+                .Include(c => c.CustomerDetail).ThenInclude(c => c.PinCode).Include(c => c.BeneficiaryDetail)
                 .Where(c => c.ClaimsInvestigationId == claimsInvestigationId).FirstOrDefault();
-            if (claim != null)
+            var agentUser = _context.VendorApplicationUser.Include(u => u.Vendor).FirstOrDefault(u => u.Email == vendorAgentEmail);
+
+            string drivingDistance, drivingDuration, drivingMap;
+            float distanceInMeters;
+            int durationInSeconds;
+            string LocationLatitude = string.Empty;
+            string LocationLongitude = string.Empty;
+            if (claim.PolicyDetail?.ClaimType == ClaimType.HEALTH)
             {
-                var agentUser = _context.VendorApplicationUser.Include(u => u.Vendor).FirstOrDefault(u => u.Email == vendorAgentEmail);
+                LocationLatitude = claim.CustomerDetail?.Latitude;
+                LocationLongitude = claim.CustomerDetail?.Longitude;
+            }
+            else
+            {
+                LocationLatitude = claim.BeneficiaryDetail?.Latitude;
+                LocationLongitude = claim.BeneficiaryDetail?.Longitude;
+            }
+            (drivingDistance, distanceInMeters, drivingDuration, durationInSeconds, drivingMap) = await customApiCLient.GetMap(double.Parse(agentUser.AddressLatitude), double.Parse(agentUser.AddressLongitude), double.Parse(LocationLatitude), double.Parse(LocationLongitude));
+            claim.UserEmailActioned = currentUser;
+            claim.UserEmailActionedTo = agentUser.Email;
+            claim.UserRoleActionedTo = $"{AppRoles.AGENT.GetEnumDisplayName()} ({agentUser.Vendor.Email})";
+            claim.Updated = DateTime.Now;
+            claim.UpdatedBy = currentUser;
+            claim.CurrentUserEmail = currentUser;
+            claim.InvestigateView = 0;
+            claim.NotWithdrawable = true;
+            claim.NotDeclinable = true;
+            claim.CurrentClaimOwner = agentUser.Email;
+            claim.InvestigationCaseSubStatusId = assignedToAgent.InvestigationCaseSubStatusId;
+            claim.SelectedAgentDrivingDistance = drivingDistance;
+            claim.SelectedAgentDrivingDuration = drivingDuration;
+            claim.SelectedAgentDrivingDistanceInMetres = distanceInMeters;
+            claim.SelectedAgentDrivingDurationInSeconds = durationInSeconds;
+            claim.SelectedAgentDrivingMap = drivingMap;
+            claim.TaskToAgentTime = DateTime.Now;
+            var lastLog = _context.InvestigationTransaction.Where(i =>
+            i.ClaimsInvestigationId == claim.ClaimsInvestigationId).OrderByDescending(o => o.Created)?.FirstOrDefault();
 
-                string drivingDistance, drivingDuration, drivingMap;
-                float distanceInMeters;
-                int durationInSeconds;
-                string LocationLatitude = string.Empty;
-                string LocationLongitude = string.Empty;
-                if (claim.PolicyDetail?.ClaimType == ClaimType.HEALTH)
-                {
-                    LocationLatitude = claim.CustomerDetail?.Latitude;
-                    LocationLongitude = claim.CustomerDetail?.Longitude;
-                }
-                else
-                {
-                    LocationLatitude = claim.BeneficiaryDetail?.Latitude;
-                    LocationLongitude = claim.BeneficiaryDetail?.Longitude;
-                }
-                (drivingDistance, distanceInMeters, drivingDuration, durationInSeconds, drivingMap) = await customApiCLient.GetMap(double.Parse(agentUser.AddressLatitude), double.Parse(agentUser.AddressLongitude), double.Parse(LocationLatitude), double.Parse(LocationLongitude));
-                claim.UserEmailActioned = currentUser;
-                claim.UserEmailActionedTo = agentUser.Email;
-                claim.UserRoleActionedTo = $"{AppRoles.AGENT.GetEnumDisplayName()} ({agentUser.Vendor.Email})";
-                claim.Updated = DateTime.Now;
-                claim.UpdatedBy = currentUser;
-                claim.CurrentUserEmail = currentUser;
-                claim.InvestigateView = 0;
-                claim.NotWithdrawable = true;
-                claim.NotDeclinable = true;
-                claim.CurrentClaimOwner = agentUser.Email;
-                claim.InvestigationCaseSubStatusId = assignedToAgent.InvestigationCaseSubStatusId;
-                claim.SelectedAgentDrivingDistance = drivingDistance;
-                claim.SelectedAgentDrivingDuration = drivingDuration;
-                claim.SelectedAgentDrivingDistanceInMetres = distanceInMeters;
-                claim.SelectedAgentDrivingDurationInSeconds = durationInSeconds;
-                claim.SelectedAgentDrivingMap = drivingMap;
-                claim.TaskToAgentTime = DateTime.Now;
-                var lastLog = _context.InvestigationTransaction.Where(i =>
-                i.ClaimsInvestigationId == claim.ClaimsInvestigationId).OrderByDescending(o => o.Created)?.FirstOrDefault();
+            var lastLogHop = _context.InvestigationTransaction.Where(i => i.ClaimsInvestigationId == claim.ClaimsInvestigationId).AsNoTracking().Max(s => s.HopCount);
+            string timeElapsed = GetTimeElaspedFromLog(lastLog);
 
-                var lastLogHop = _context.InvestigationTransaction
-                                        .Where(i => i.ClaimsInvestigationId == claim.ClaimsInvestigationId)
-                                        .AsNoTracking().Max(s => s.HopCount);
-                string timeElapsed = GetTimeElaspedFromLog(lastLog);
+            var log = new InvestigationTransaction
+            {
+                UserEmailActioned = currentUser,
+                UserEmailActionedTo = agentUser.Email,
+                UserRoleActionedTo = $"{AppRoles.AGENT.GetEnumDisplayName()} ({agentUser.Vendor.Email})",
+                HopCount = lastLogHop + 1,
+                ClaimsInvestigationId = claim.ClaimsInvestigationId,
+                CurrentClaimOwner = claim.CurrentClaimOwner,
+                Time2Update = DateTime.Now.Subtract(lastLog.Created).Days,
+                InvestigationCaseStatusId = inProgress.InvestigationCaseStatusId,
+                InvestigationCaseSubStatusId = assignedToAgent.InvestigationCaseSubStatusId,
+                UpdatedBy = currentUser,
+                Updated = DateTime.Now,
+                TimeElapsed = timeElapsed
+            };
+            _context.InvestigationTransaction.Add(log);
 
-                var log = new InvestigationTransaction
-                {
-                    UserEmailActioned = currentUser,
-                    UserEmailActionedTo = agentUser.Email,
-                    UserRoleActionedTo = $"{AppRoles.AGENT.GetEnumDisplayName()} ({agentUser.Vendor.Email})",
-                    HopCount = lastLogHop + 1,
-                    ClaimsInvestigationId = claim.ClaimsInvestigationId,
-                    CurrentClaimOwner = claim.CurrentClaimOwner,
-                    Time2Update = DateTime.Now.Subtract(lastLog.Created).Days,
-                    InvestigationCaseStatusId = inProgress.InvestigationCaseStatusId,
-                    InvestigationCaseSubStatusId = assignedToAgent.InvestigationCaseSubStatusId,
-                    UpdatedBy = currentUser,
-                    Updated = DateTime.Now,
-                    TimeElapsed = timeElapsed
-                };
-                _context.InvestigationTransaction.Add(log);
+
+            var claimsLineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == CLAIMS).LineOfBusinessId;
+
+            var isClaim = claim.PolicyDetail.LineOfBusinessId == claimsLineOfBusinessId;
+
+            if (isClaim)
+            {
+                claim.AgencyReport.ReportQuestionaire.Question1 = "Medical report question ?";
+                claim.AgencyReport.ReportQuestionaire.Question2 = "Detailed Diagnosis of death ?";
+                claim.AgencyReport.ReportQuestionaire.Question3 = "Name of Doctor met ?";
+                claim.AgencyReport.ReportQuestionaire.Question4 = "Date when met with Doctor ?";
+            }
+            else
+            {
+                claim.AgencyReport.ReportQuestionaire.Question1 = "Ownership of residence ?";
+                claim.AgencyReport.ReportQuestionaire.Question2 = "Perceived financial status ?";
+                claim.AgencyReport.ReportQuestionaire.Question3 = "Name of neighbour met ?";
+                claim.AgencyReport.ReportQuestionaire.Question4 = "Date when met with neighbour ?";
             }
             _context.ClaimsInvestigation.Update(claim);
             var rows = await _context.SaveChangesAsync();

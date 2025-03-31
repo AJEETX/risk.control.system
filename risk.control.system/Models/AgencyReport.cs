@@ -11,11 +11,14 @@ namespace risk.control.system.Models
         public long? VendorId { get; set; }
         public Vendor? Vendor { get; set; }
 
+        public long? DigitalIdReportId { get; set; }
         public DigitalIdReport? DigitalIdReport { get; set; } = new();
+
+        public long? AgentIdReportId { get; set; }
         public DigitalIdReport? AgentIdReport { get; set; } = new();
 
+
         public ReportQuestionaire? ReportQuestionaire { get; set; } = new();
-        public ReportQuestionaire? ClaimQuestionaire { get; set; } = new();
 
         public DocumentIdReport? PanIdReport { get; set; } = new();
         public DocumentIdReport? PassportIdReport { get; set; } = new();

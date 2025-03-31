@@ -247,5 +247,6 @@ $(document).ready(function () {
     });
     $('#refreshTable').click(function () {
         table.ajax.reload(null, false); // false => Retains current page
+            $("#allocatedcase").prop('disabled', true);
     });
 });

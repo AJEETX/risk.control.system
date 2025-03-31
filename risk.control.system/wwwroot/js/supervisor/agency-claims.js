@@ -238,6 +238,8 @@
     });
     $('#refreshTable').click(function () {
         table.ajax.reload(null, false); // false => Retains current page
+        $("#allocatedcase").prop('disabled', true);
+        $("#investigatecase").prop('disabled', true);
     });
     table.on('mouseenter', '.map-thumbnail', function () {
             const $this = $(this); // Cache the current element

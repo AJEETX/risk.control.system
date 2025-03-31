@@ -1,6 +1,6 @@
 ﻿@model ClaimTransactionModel
 
-<div class="card shadow-lg border-1 rounded-lg collapsed-card">
+<div class="card shadow-lg border-1 rounded-lg direct-chat-warning collapsed-card">
     <div class="card-header bg-light text-white">
         <h3 class="card-title">
             <i class="fas fa-print nav-icon"></i> Agency: <span class="badge badge-light">@Model.ClaimsInvestigation.Vendor.Email</span>
@@ -9,14 +9,14 @@
                 <span class="tooltip-text" id="information">
                     <span>
                         <i class='far fa-hand-point-right'></i>
-                        <b> @Model.ClaimsInvestigation.Vendor.Email</b> report  <i class="fas fa-print nav-icon"></i>.
+                        <b> @Model.ClaimsInvestigation.Vendor.Email</b> report  (@Model.ClaimsInvestigation?.PolicyDetail.LineOfBusiness.Name)<i class="fas fa-print nav-icon"></i>.
                     </span>
 
                 </span>
             </span>
         </h3>
         <div class="card-tools">
-            <span data-toggle="tooltip" title="Agent report # : @Model.ClaimsInvestigation.AgencyReport.AgentEmail" class="badge badge-light">
+            <span data-toggle="tooltip" title="Agent report (@Model.ClaimsInvestigation?.PolicyDetail.LineOfBusiness.Name): @Model.ClaimsInvestigation.AgencyReport.AgentEmail" class="badge badge-light">
                 <i class='far fa-hand-point-right'></i>
             </span>
             <button type="button" class="btn btn-tool" data-card-widget="collapse">
@@ -51,15 +51,15 @@
                     @Model.ClaimsInvestigation.AgencyReport.AgentRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt") : null;
                     <div class="card  border-success">
 
-                        <div class="card direct-chat-warning collapsed-card">
+                        <div class="card direct-chat-warning">
                             <div class="card-header text-muted border-bottom-0">
                                 <h3 class="card-title">
-                                    <i class="far fa-comment"></i> Questionnaire
+                                    <i class="far fa-comment"></i> Questionnaire (@Model.ClaimsInvestigation?.PolicyDetail.LineOfBusiness.Name)
                                     <span class="hover-text">
                                         <i class="fas fa-info-circle"></i>
                                         <span class="tooltip-text" id="information">
                                             <span>
-                                                <i class="far fa-comment"></i><b> Questionnaire.</b>
+                                                <i class="far fa-comment"></i><b> Questionnaire (@Model.ClaimsInvestigation?.PolicyDetail.LineOfBusiness.Name)</b>
                                             </span>
 
                                         </span>
@@ -70,9 +70,7 @@
                                         <i class="nav-icon fas fa-clock"></i>
                                         @Model.ClaimsInvestigation.AgencyReport?.AgentRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt")
                                     </span>
-                                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                        <i class="fas fa-plus"></i>
-                                    </button>
+                                    
                                 </div>
                             </div>
                             <div class="card-footer text-muted border-bottom-0">
@@ -81,7 +79,7 @@
                             <div class="progress">
                                 <i class="far fa-bookmark bookmark-green"></i>
                                 <div class="progress-bar progress-bar-green" role="progressbar">
-                                    questionaaire
+                                    questionaaire (@Model.ClaimsInvestigation?.PolicyDetail.LineOfBusiness.Name)
                                 </div>
                             </div>
                             <div class="card-body">
@@ -128,6 +126,13 @@
                                                         <i class="far fa-comment"></i>
                                                     </span>
                                                 </li>
+                                                <br />
+                                                <li class="small">
+                                                    Edit Remarks?
+                                                    <span class="fa-li">
+                                                        <i class="far fa-comment"></i>
+                                                    </span>
+                                                </li>
                                             </ul>
                                         </p>
                                     </div>
@@ -170,18 +175,14 @@
                                                     <span class="fa-li">
                                                         <i class="far fa-comment"></i>
                                                     </span>
-                                                    @{
-                                                        var remarks = Model.ClaimsInvestigation.AgencyReport?.AgentRemarks;
-                                                        if (Model.ClaimsInvestigation.UpdateAgentAnswer)
-                                                        {
-                                                            var edited = Model.ClaimsInvestigation.AgencyReport?.AgentRemarks != Model.ClaimsInvestigation.AgencyReport?.AgentRemarksEdit;
-                                                            if (edited)
-                                                            {
-                                                                remarks = Model.ClaimsInvestigation.AgencyReport?.AgentRemarksEdit; ;
-                                                            }
-                                                        }
-                                                    }
-                                                    @remarks
+                                                    @Model.ClaimsInvestigation.AgencyReport?.AgentRemarks
+                                                </li>
+                                                <br />
+                                                <li class="small">
+                                                    <span class="fa-li">
+                                                        <i class="far fa-comment"></i>
+                                                    </span>
+                                                    @Model.ClaimsInvestigation.AgencyReport?.AgentRemarksEdit
                                                 </li>
                                             </ul>
                                         </p>

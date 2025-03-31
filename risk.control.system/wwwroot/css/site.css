@@ -2516,3 +2516,8 @@ input#checkall {
 .text-dangez {
     color: #dc3545 !important;
 }
+#agency-rating img.rating {
+    height: 1rem;
+    width: 1rem;
+    border: none;
+}

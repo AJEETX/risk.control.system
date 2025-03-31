@@ -183,15 +183,63 @@ namespace risk.control.system.Controllers
         }
         public JsonResult PostRating(int rating, long mid)
         {
+            var currentUserEmail = HttpContext.User?.Identity?.Name;
+
+            var existingRating = _context.Ratings.FirstOrDefault(r => r.VendorId == mid && r.UserEmail == currentUserEmail);
+            if (existingRating != null)
+            {
+                existingRating.Rate = rating;
+                _context.Ratings.Update(existingRating);
+                _context.SaveChanges();
+                return Json("You rated again " + rating.ToString() + " star(s)");
+            }
+
             var rt = new AgencyRating();
             string ip = "123";
             rt.Rate = rating;
             rt.IpAddress = ip;
             rt.VendorId = mid;
-
+            rt.UserEmail = currentUserEmail;
             _context.Ratings.Add(rt);
             _context.SaveChanges();
             return Json("You rated this " + rating.ToString() + " star(s)");
+        }
+
+        public JsonResult PostDetailRating(int rating, long vendorId)
+        {
+            var currentUserEmail = HttpContext.User?.Identity?.Name;
+
+            if (string.IsNullOrEmpty(currentUserEmail))
+            {
+                return Json(new { success = false, message = "You must be logged in to rate." });
+            }
+
+            var existingRating = _context.Ratings.FirstOrDefault(r => r.VendorId == vendorId && r.UserEmail == currentUserEmail);
+
+            if (existingRating != null)
+            {
+                existingRating.Rate = rating;
+                _context.Ratings.Update(existingRating);
+            }
+            else
+            {
+                var newRating = new AgencyRating
+                {
+                    VendorId = vendorId,
+                    Rate = rating,
+                    UserEmail = currentUserEmail,
+                    IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString(),
+                };
+                _context.Ratings.Add(newRating);
+            }
+
+            _context.SaveChanges();
+
+            // Calculate new average rating
+            var ratings = _context.Ratings.Where(r => r.VendorId == vendorId);
+            double avgRating = ratings.Any() ? ratings.Average(r => r.Rate) : 0;
+
+            return Json(new { success = true, message = $"You rated {rating} star(s)", avgRating = avgRating });
         }
 
         // GET: Vendors/Details/5

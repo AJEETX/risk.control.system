@@ -32,6 +32,7 @@ public interface IICheckifyService
 
 public class ICheckifyService : IICheckifyService
 {
+        private const string CLAIMS = "claims";
     private static Regex panRegex = new Regex(@"[A-Z]{5}\d{4}[A-Z]{1}");
     private static Regex passportRegex = new Regex(@"[A-Z]{1,2}[0-9]{6,7}");
     private static Regex dateOfBirthRegex = new Regex(@"^(0[1-9]|[12][0-9]|3[01])/(0[1-9]|1[0-2])/([12]\d{3})$");
@@ -94,6 +95,24 @@ public class ICheckifyService : IICheckifyService
             {
                 claim.AgencyReport = new AgencyReport();
             }
+            var claimsLineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == CLAIMS).LineOfBusinessId;
+
+            var isClaim = claim.PolicyDetail.LineOfBusinessId == claimsLineOfBusinessId;
+            if (isClaim)
+            {
+                claim.AgencyReport.ReportQuestionaire.Question1 = "Medical report question ?";
+                claim.AgencyReport.ReportQuestionaire.Question2 = "Detailed Diagnosis of death ?";
+                claim.AgencyReport.ReportQuestionaire.Question3 = "Name of Doctor met ?";
+                claim.AgencyReport.ReportQuestionaire.Question4 = "Date when met with Doctor ?";
+            }
+            else
+            {
+                claim.AgencyReport.ReportQuestionaire.Question1 = "Ownership of residence ?";
+                claim.AgencyReport.ReportQuestionaire.Question2 = "Perceived financial status ?";
+                claim.AgencyReport.ReportQuestionaire.Question3 = "Name of neighbour met ?";
+                claim.AgencyReport.ReportQuestionaire.Question4 = "Date when met with neighbour ?";
+            }
+
             claim.AgencyReport.AgentEmail = data.Email;
             var agent = _context.VendorApplicationUser.FirstOrDefault(u=>u.Email == data.Email);
             claim.AgencyReport.AgentIdReport.Updated = DateTime.Now;
@@ -199,6 +218,24 @@ public class ICheckifyService : IICheckifyService
             {
                 claim.AgencyReport = new AgencyReport();
             }
+            var claimsLineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == CLAIMS).LineOfBusinessId;
+
+            var isClaim = claim.PolicyDetail.LineOfBusinessId == claimsLineOfBusinessId;
+            if (isClaim)
+            {
+                claim.AgencyReport.ReportQuestionaire.Question1 = "Medical report question ?";
+                claim.AgencyReport.ReportQuestionaire.Question2 = "Detailed Diagnosis of death ?";
+                claim.AgencyReport.ReportQuestionaire.Question3 = "Name of Doctor met ?";
+                claim.AgencyReport.ReportQuestionaire.Question4 = "Date when met with Doctor ?";
+            }
+            else
+            {
+                claim.AgencyReport.ReportQuestionaire.Question1 = "Ownership of residence ?";
+                claim.AgencyReport.ReportQuestionaire.Question2 = "Perceived financial status ?";
+                claim.AgencyReport.ReportQuestionaire.Question3 = "Name of neighbour met ?";
+                claim.AgencyReport.ReportQuestionaire.Question4 = "Date when met with neighbour ?";
+            }
+
             claim.AgencyReport.AgentEmail = data.Email;
             claim.AgencyReport.DigitalIdReport.Updated = DateTime.Now;
             claim.AgencyReport.DigitalIdReport.UpdatedBy = data.Email;
@@ -316,6 +353,24 @@ public class ICheckifyService : IICheckifyService
             {
                 claim.AgencyReport = new AgencyReport();
             }
+            var claimsLineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == CLAIMS).LineOfBusinessId;
+
+            var isClaim = claim.PolicyDetail.LineOfBusinessId == claimsLineOfBusinessId;
+            if (isClaim)
+            {
+                claim.AgencyReport.ReportQuestionaire.Question1 = "Medical report question ?";
+                claim.AgencyReport.ReportQuestionaire.Question2 = "Detailed Diagnosis of death ?";
+                claim.AgencyReport.ReportQuestionaire.Question3 = "Name of Doctor met ?";
+                claim.AgencyReport.ReportQuestionaire.Question4 = "Date when met with Doctor ?";
+            }
+            else
+            {
+                claim.AgencyReport.ReportQuestionaire.Question1 = "Ownership of residence ?";
+                claim.AgencyReport.ReportQuestionaire.Question2 = "Perceived financial status ?";
+                claim.AgencyReport.ReportQuestionaire.Question3 = "Name of neighbour met ?";
+                claim.AgencyReport.ReportQuestionaire.Question4 = "Date when met with neighbour ?";
+            }
+
             claim.AgencyReport.AgentEmail = data.Email;
             claim.AgencyReport.PanIdReport.DocumentIdImageLongLat = data.OcrLongLat;
             claim.AgencyReport.PanIdReport.DocumentIdImageLongLatTime = DateTime.Now;
@@ -502,6 +557,24 @@ public class ICheckifyService : IICheckifyService
             {
                 claim.AgencyReport = new AgencyReport();
             }
+            var claimsLineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == CLAIMS).LineOfBusinessId;
+
+            var isClaim = claim.PolicyDetail.LineOfBusinessId == claimsLineOfBusinessId;
+            if (isClaim)
+            {
+                claim.AgencyReport.ReportQuestionaire.Question1 = "Medical report question ?";
+                claim.AgencyReport.ReportQuestionaire.Question2 = "Detailed Diagnosis of death ?";
+                claim.AgencyReport.ReportQuestionaire.Question3 = "Name of Doctor met ?";
+                claim.AgencyReport.ReportQuestionaire.Question4 = "Date when met with Doctor ?";
+            }
+            else
+            {
+                claim.AgencyReport.ReportQuestionaire.Question1 = "Ownership of residence ?";
+                claim.AgencyReport.ReportQuestionaire.Question2 = "Perceived financial status ?";
+                claim.AgencyReport.ReportQuestionaire.Question3 = "Name of neighbour met ?";
+                claim.AgencyReport.ReportQuestionaire.Question4 = "Date when met with neighbour ?";
+            }
+
             claim.AgencyReport.AgentEmail = data.Email;
             claim.AgencyReport.AudioReport.DocumentIdImageLongLat = data.LongLat;
             claim.AgencyReport.AudioReport.DocumentIdImageLongLatTime = DateTime.Now;
@@ -616,6 +689,24 @@ public class ICheckifyService : IICheckifyService
             {
                 claim.AgencyReport = new AgencyReport();
             }
+            var claimsLineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == CLAIMS).LineOfBusinessId;
+
+            var isClaim = claim.PolicyDetail.LineOfBusinessId == claimsLineOfBusinessId;
+            if (isClaim)
+            {
+                claim.AgencyReport.ReportQuestionaire.Question1 = "Medical report question ?";
+                claim.AgencyReport.ReportQuestionaire.Question2 = "Detailed Diagnosis of death ?";
+                claim.AgencyReport.ReportQuestionaire.Question3 = "Name of Doctor met ?";
+                claim.AgencyReport.ReportQuestionaire.Question4 = "Date when met with Doctor ?";
+            }
+            else
+            {
+                claim.AgencyReport.ReportQuestionaire.Question1 = "Ownership of residence ?";
+                claim.AgencyReport.ReportQuestionaire.Question2 = "Perceived financial status ?";
+                claim.AgencyReport.ReportQuestionaire.Question3 = "Name of neighbour met ?";
+                claim.AgencyReport.ReportQuestionaire.Question4 = "Date when met with neighbour ?";
+            }
+
             claim.AgencyReport.AgentEmail = data.Email;
             claim.AgencyReport.VideoReport.DocumentIdImageLongLat = data.LongLat;
             claim.AgencyReport.VideoReport.DocumentIdImageLongLatTime = DateTime.Now;
@@ -718,6 +809,24 @@ public class ICheckifyService : IICheckifyService
             {
                 claim.AgencyReport = new AgencyReport();
             }
+            var claimsLineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == CLAIMS).LineOfBusinessId;
+
+            var isClaim = claim.PolicyDetail.LineOfBusinessId == claimsLineOfBusinessId;
+            if (isClaim)
+            {
+                claim.AgencyReport.ReportQuestionaire.Question1 = "Medical report question ?";
+                claim.AgencyReport.ReportQuestionaire.Question2 = "Detailed Diagnosis of death ?";
+                claim.AgencyReport.ReportQuestionaire.Question3 = "Name of Doctor met ?";
+                claim.AgencyReport.ReportQuestionaire.Question4 = "Date when met with Doctor ?";
+            }
+            else
+            {
+                claim.AgencyReport.ReportQuestionaire.Question1 = "Ownership of residence ?";
+                claim.AgencyReport.ReportQuestionaire.Question2 = "Perceived financial status ?";
+                claim.AgencyReport.ReportQuestionaire.Question3 = "Name of neighbour met ?";
+                claim.AgencyReport.ReportQuestionaire.Question4 = "Date when met with neighbour ?";
+            }
+
             claim.AgencyReport.AgentEmail = data.Email;
             claim.AgencyReport.PassportIdReport.DocumentIdImageLongLat = data.OcrLongLat;
             claim.AgencyReport.PassportIdReport.DocumentIdImageLongLatTime = DateTime.Now;
