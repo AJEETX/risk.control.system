@@ -44,26 +44,26 @@
                 return '<input type="checkbox" name="id[]" value="' + $('<div/>').text(data).html() + '">';
             }
         },
-            {
-                className: 'max-width-column-name', // Apply the CSS class,
-                targets: 1                      // Index of the column to style
-            },
-            {
-                className: 'max-width-column-number', // Apply the CSS class,
-                targets: 2                      // Index of the column to style
-            },
-            {
-                className: 'max-width-column-name', // Apply the CSS class,
-                targets: 6                      // Index of the column to style
-            },
-            {
-                className: 'max-width-column-name', // Apply the CSS class,
-                targets: 8                      // Index of the column to style
-            },
-            {
-                className: 'max-width-column-name', // Apply the CSS class,
-                targets: 9                      // Index of the column to style
-            }],
+        {
+            className: 'max-width-column-name', // Apply the CSS class,
+            targets: 1                      // Index of the column to style
+        },
+        {
+            className: 'max-width-column-number', // Apply the CSS class,
+            targets: 2                      // Index of the column to style
+        },
+        {
+            className: 'max-width-column-name', // Apply the CSS class,
+            targets: 6                      // Index of the column to style
+        },
+        {
+            className: 'max-width-column-name', // Apply the CSS class,
+            targets: 8                      // Index of the column to style
+        },
+        {
+            className: 'max-width-column-name', // Apply the CSS class,
+            targets: 9                      // Index of the column to style
+        }],
         order: [[14, 'asc']],
         fixedHeader: true,
         processing: true,
@@ -80,6 +80,10 @@
                 "sDefaultContent": "<i class='far fa-edit' data-toggle='tooltip' title='Incomplete'></i>",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
+                    var isPending = row.status === "PENDING"; // Check if status is "READY"
+                    if (isPending) {
+                        return '<i class="fas fa-exclamation-triangle" data-toggle="tooltip" title="Processing ,,,"></i>';
+                    }
                     if (row.ready2Assign && row.autoAllocated) {
                         var img = '<input class="vendors" name="claims" type="checkbox" id="' + row.id + '"  value="' + row.id + '"  data-toggle="tooltip" title="Ready to assign(auto)" />';
                         return img;
@@ -159,7 +163,7 @@
                 "mRender": function (data, type, row) {
                     if (row.beneficiaryFullName == "?") {
                         var img = '<img alt="' + row.beneficiaryFullName + '" title="' + row.beneficiaryFullName + '" src="' + row.beneficiaryPhoto + '" class="table-profile-image-no-user" data-toggle="tooltip"/>';
-                    return img;
+                        return img;
                     }
                     else {
                         var img = '<div class="map-thumbnail table-profile-image">';
@@ -198,20 +202,33 @@
                 "data": "timePending"
             },
             {
-                "sDefaultContent": "status",
+                "sDefaultContent": "",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    var isPending = data === "Pending";
-                    var disabled = isPending ? "disabled" : "";
+                    var isPending = row.status === "PENDING"; // Check if status is "READY"
+                    var disabled = isPending ? "disabled" : "";  // Disable buttons if pending
                     var spinClass = isPending ? "fa-spin" : ""; // Add spin class if pending
                     var buttons = "";
-                    if (row.ready2Assign) {
-                        buttons += '<a id="assign' + row.id + '" href="/CreatorAuto/EmpanelledVendors?Id=' + row.id + '" class="btn btn-xs btn-info refresh-btn '+ disabled +'" data-id="'+ row.id +'"><i class="fas fa-external-link-alt '+ spinClass+'""></i> Assign</a>&nbsp;';
-                    } else {
-                        buttons += '<button disabled class="btn btn-xs btn-info"><i class="fas fa-external-link-alt"></i> Assign</button>&nbsp;';
+                    console.log(row.status);
+                    if (isPending) {
+                        buttons += '<button disabled class="btn btn-xs btn-info"><i class="fa fa-sync fa-spin"></i> "' + row.status+'"</button>&nbsp;';
+                        buttons += '<button disabled class="btn btn-xs btn-warning"><i class="fa fa-sync fa-spin"></i> Edit</button>&nbsp;';
+                        buttons += '<button disabled class="btn btn-xs btn-warning"><i class="fa fa-sync fa-spin"></i> Delete</button>&nbsp;';
                     }
-                    buttons += '<a id="edit' + row.id + '" href="Details?Id=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-pencil-alt ' + disabled +'"></i> Edit</a>&nbsp;'
-                    buttons += '<a id="details' + row.id + '" href="Delete?Id=' + row.id + '" class="btn btn-xs btn-danger"><i class="fa fa-trash ' + disabled +'"></i> Delete </a>'
+
+                    else {
+                        if (row.ready2Assign) {
+                            buttons += '<a id="assign' + row.id + '" href="/CreatorAuto/EmpanelledVendors?Id=' + row.id + '" class="btn btn-xs btn-info refresh-btn ' + disabled + '" data-id="' + row.id + '">';
+                            buttons += '<i class="fas fa-external-link-alt ' + spinClass + '"></i> Assign</a>&nbsp;';
+                        } else {
+                            buttons += '<button disabled class="btn btn-xs btn-info"><i class="fas fa-external-link-alt"></i> Assign</button>&nbsp;';
+                        }
+
+                        buttons += '<a id="edit' + row.id + '" href="Details?Id=' + row.id + '" class="btn btn-xs btn-warning ' + disabled + '"><i class="fas fa-pencil-alt ' + disabled + '"></i> Edit</a>&nbsp;';
+
+                        buttons += '<a id="details' + row.id + '" href="Delete?Id=' + row.id + '" class="btn btn-xs btn-danger ' + disabled + '"><i class="fa fa-trash ' + disabled + '"></i> Delete </a>';
+                    }
+
                     return buttons;
                 }
             },
@@ -220,15 +237,20 @@
         rowCallback: function (row, data) {
             var $row = $(row);
 
-            if (data.status.toLowerCase() === "pending") {
+            if (data.status === "PENDING") {
+                // Disable the anchor tags for this row
+                $(row).find('a.disabled').on('click', function (e) {
+                    e.preventDefault();
+                });
                 $row.addClass('row-opacity-50 watermarked'); // Make row semi-transparent with watermark
+            } else if (data.status === "COMPLETED") {
+                $row.remove(); // Remove the row if status is "COMPLETED"
             } else {
-                $row.removeClass('row-opacity-50 watermarked'); // Remove styling
+                $row.removeClass('row-opacity-50 watermarked'); // Remove styling for other statuses
             }
         },
         "drawCallback": function (settings, start, end, max, total, pre) {
-            checkPendingStatus(); // Disable buttons and add spinning effect dynamically
-            removeCompletedRows(); // Remove completed rows
+
 
             var rowCount = (this.fnSettings().fnRecordsTotal()); // total number of rows
             if (rowCount > 0) {
@@ -264,58 +286,115 @@
                     $('td', nRow).removeClass('isNewAssigned');
                 }, 3000);
             }
-            
+
         },
         error: function (xhr, status, error) { alert('err ' + error) }
     });
 
-    function checkPendingStatus() {
-        var hasPending = false;
+    // Function to check if there are any "Pending" rows
+    function hasPendingRows() {
+        var table = $("#customerTableAuto").DataTable();
+        var pendingExists = false;
 
         table.rows().every(function () {
             var data = this.data();
-            if (data.status.toLowerCase() === "pending") {
-                hasPending = true;
+            if (data.status === "PENDING") {
+                pendingExists = true;
+                return false; // Stop iterating once a "Pending" row is found
             }
         });
 
-        if (hasPending) {
-            $(".refresh-btn").prop("disabled", true); // Disable all buttons
-            $(".refresh-btn i").addClass("fa-spin"); // Add spinning effect to all buttons
+        return pendingExists;
+    }
+
+
+    // Function to refresh data for a specific row
+    function refreshRowData(rowId, rowElement) {
+        $.ajax({
+            url: '/api/Creator/RefreshData', // URL for the refresh data endpoint
+            type: 'GET',
+            data: { id: rowId },
+            success: function (data) {
+                // Update the row's data with the refreshed data
+                var table = $("#customerTableAuto").DataTable();
+                table.row(rowElement).data(data).draw();
+            },
+            error: function (xhr, status, error) {
+                console.error('Error refreshing row data:', error);
+            }
+        });
+    }
+
+    // Refresh all "Pending" rows after some interval (optional)
+    function refreshPendingRows() {
+        var table = $("#customerTableAuto").DataTable();
+        table.rows().every(function () {
+            var data = this.data();
+            if (data) {
+                console.log(data.status);
+                if (data.status === "PENDING") {
+                    var row = this.node();
+                    refreshRowData(data.id, row); // Refresh each pending row
+                }
+                else if (data.status === "COMPLETED") {
+                    this.remove(); // Remove the row
+                }
+            }
+        });
+    }
+    // Call refreshPendingRows() periodically but only if there are pending rows
+    var refreshInterval = setInterval(function () {
+        if (!hasPendingRows()) {
+            clearInterval(refreshInterval); // Stop refreshing if no rows are "Pending"
         } else {
-            $(".refresh-btn").prop("disabled", false); // Enable buttons
-            $(".refresh-btn i").removeClass("fa-spin"); // Remove spinning effect
+            refreshPendingRows(); // Refresh pending rows
         }
-    }
+    }, 5000); // Check every 5 seconds (adjust interval as needed)
 
-    function removeCompletedRows() {
-        table.rows().every(function () {
-            var data = this.data();
-            if (data.status.toLowerCase() === "complete") {
-                this.remove(); // Remove completed rows
-            }
-        });
-        table.draw(false);
-        $('#checkall').prop('checked', false);
-
-    }
-
-    function refreshUntilNoComplete() {
-        table.ajax.reload(function (json) {
-            var hasComplete = json.some(row => row.status.toLowerCase() === "complete");
-
-            if (hasComplete) {
-                setTimeout(refreshUntilNoComplete, 1000); // Keep refreshing every second
-            }
-        }, false);
-        $('#checkall').prop('checked', false);
-    }
-
-    refreshUntilNoComplete(); // Start automatic refresh
     $('#refreshTable').click(function () {
-        table.ajax.reload(null, false); // false => Retains current page
+        table.ajax.reload(null, false);
         $('#checkall').prop('checked', false);
     });
+
+    var refresh = $('#refresh').val();
+    console.log(refresh);
+    var previousData = null; // Initially, previousData is null
+
+    if (refresh && refresh.toLocaleLowerCase() === 'true') {
+        function reloadDataUntilReady() {
+            // Reload the DataTable
+            table.ajax.reload(function (json) {
+                // Ensure valid data exists in the response
+                if (json && json.length > 0) {
+                    // If previousData is null, set it to the current data
+                    if (!previousData) {
+                        previousData = json;  // Set initial data
+                        //refresh = 'false';  // Stop refreshing
+                        //$('#checkall').prop('checked', false);  // Uncheck the 'checkall' checkbox
+                    } else {
+                        // Compare current data with previousData
+                        if (JSON.stringify(json) !== JSON.stringify(previousData)) {
+                            // Data has changed, update previousData and reload
+                            previousData = json;  // Update previousData
+                            refresh = 'false';  // Stop refreshing
+                            $('#checkall').prop('checked', false);  // Uncheck the 'checkall' checkbox
+                        } else {
+                            // Data is the same, reload again after 5 seconds
+                            setTimeout(reloadDataUntilReady, 5000);
+                        }
+                    }
+                } else {
+                    // No data or data is empty, reload again after 5 seconds
+                    setTimeout(reloadDataUntilReady, 5000);
+                }
+            }, false); // false to preserve the pagination
+        }
+
+        // Start the process of reloading the DataTable
+        reloadDataUntilReady();
+    }
+
+
     table.on('mouseenter', '.map-thumbnail', function () {
             const $this = $(this); // Cache the current element
 

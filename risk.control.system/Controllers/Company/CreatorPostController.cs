@@ -76,10 +76,7 @@ namespace risk.control.system.Controllers.Company
                 )
                 {
                     notifyService.Custom($"Upload Error. Contact Admin", 3, "red", "far fa-file-powerpoint");
-                    if (model == null)
-                    {
                         return RedirectToAction(nameof(Index), "Dashboard");
-                    }
 
                     if (companyUser.ClientCompany.AutoAllocation)
                     {
@@ -108,15 +105,14 @@ namespace risk.control.system.Controllers.Company
                 //    processed = await ftpService.UploadFtpFile(currentUserEmail, postedFile, model.CREATEDBY, lineOfBusinessId);
                 //}
 
-                if (model.Uploadtype == UploadType.FILE && Path.GetExtension(Path.GetFileName(postedFile.FileName)) == ".zip")
+                if (model.Uploadtype == UploadType.FILE)
                 {
-
                     //backgroundJobClient.Enqueue(() => ftpService.UploadFile(currentUserEmail, postedFile, model.CREATEDBY, lineOfBusinessId));
                     var uploadId = await ftpService.UploadFile(currentUserEmail, postedFile, model.CREATEDBY, lineOfBusinessId);
                     backgroundJobClient.Enqueue(() => ftpService.StartUpload(uploadId));
                 }
 
-                notifyService.Custom($"{model.Uploadtype.GetEnumDisplayName()} in progress ", 3, "blue", "fa fa-upload");
+                notifyService.Custom($"{model.Uploadtype.GetEnumDisplayName()} in progress ", 3, "green", "fa fa-upload");
 
                 //if (processed)
                 //{
@@ -134,7 +130,7 @@ namespace risk.control.system.Controllers.Company
                     }
                     else
                     {
-                        return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
+                        return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto",new { refresh = true });
                     }
                 }
                 else

@@ -72,7 +72,7 @@ namespace risk.control.system.Controllers.Company
             }
         }
         [Breadcrumb(" Assign")]
-        public IActionResult New()
+        public IActionResult New(bool refresh = false)
         {
             try
             {
@@ -101,7 +101,13 @@ namespace risk.control.system.Controllers.Company
                 c.InvestigationCaseSubStatus == createdClaimsStatus);
                 var fileIdentifier = companyUser.ClientCompany.Country.Code.ToLower();
                 
-                return View(new CreateClaims { BulkUpload = companyUser.ClientCompany.BulkUpload, UserCanCreate = userCanCreate, HasClaims = hasClaim, FileSampleIdentifier = fileIdentifier });
+                return View(new CreateClaims { 
+                    BulkUpload = companyUser.ClientCompany.BulkUpload, 
+                    UserCanCreate = userCanCreate, 
+                    HasClaims = hasClaim, 
+                    FileSampleIdentifier = fileIdentifier,
+                     Refresh = refresh
+                });
             }
             catch (Exception ex)
             {

@@ -58,11 +58,11 @@ namespace risk.control.system.Controllers.Company
         [HttpPost]
         [Authorize(Roles = CREATOR.DISPLAY_NAME)]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Auto(List<string> claims)
+        public async Task<IActionResult> AssignAuto(List<string> claims)
         {
             if (claims == null || claims.Count == 0)
             {
-                notifyService.Custom($"No case selected!!!. Please select case to be assigned.", 3, "red", "far fa-file-powerpoint");
+                notifyService.Custom($"No Case selected!!!. Please select Case to be assigned.", 3, "red", "far fa-file-powerpoint");
                 return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
             }
             try
@@ -70,7 +70,7 @@ namespace risk.control.system.Controllers.Company
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 var distinctClaims = claims.Distinct().ToList();
 
-                // AUTO ALLOCATION TRUE
+                // AUTO ALLOCATION COUNT
                 var allocatedClaims = await claimsInvestigationService.UpdateCaseAllocationStatus( currentUserEmail, distinctClaims);
 
                 backgroundJobClient.Enqueue(() => claimsInvestigationService.BackgroundAutoAllocation(distinctClaims, currentUserEmail));
@@ -80,9 +80,8 @@ namespace risk.control.system.Controllers.Company
             {
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
             }
-            return RedirectToAction(nameof(ClaimsActiveController.Active), "ClaimsActive");
+            return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
         }
 
         [HttpPost]
@@ -93,67 +92,23 @@ namespace risk.control.system.Controllers.Company
             if (claims == null || claims.Count == 0)
             {
                 notifyService.Custom($"No case selected!!!. Please select case to be assigned.", 3, "red", "far fa-file-powerpoint");
-                return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
+                return RedirectToAction(nameof(CreatorManualController.New), "CreatorManual");
             }
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 var distinctClaims = claims.Distinct().ToList();
-                var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == currentUserEmail);
+                await claimsInvestigationService.AssignToAssigner(HttpContext.User.Identity.Name, distinctClaims);
 
-                var company = _context.ClientCompany
-                    .Include(c => c.EmpanelledVendors)
-                    .ThenInclude(e => e.VendorInvestigationServiceTypes)
-                    .Include(c => c.EmpanelledVendors.Where(v => v.Status == VendorStatus.ACTIVE && !v.Deleted))
-                    .ThenInclude(e => e.VendorInvestigationServiceTypes)
-                    .ThenInclude(v => v.District)
-                    .FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
+                backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimAssignmentToAssigner(HttpContext.User.Identity.Name, distinctClaims));
 
-                //IF AUTO ALLOCATION TRUE
-                if (company.AutoAllocation)
-                {
-                    var autoAllocatedClaims = await claimsInvestigationService.ProcessAutoAllocation(distinctClaims, company, currentUserEmail);
-
-                    if (distinctClaims.Count == autoAllocatedClaims.Count)
-                    {
-                        notifyService.Custom($"{autoAllocatedClaims.Count}/{distinctClaims.Count} case(s) Assigned(auto)", 3, "green", "far fa-file-powerpoint");
-                    }
-
-                    else if (distinctClaims.Count > autoAllocatedClaims.Count)
-                    {
-                        if (autoAllocatedClaims.Count > 0)
-                        {
-                            notifyService.Custom($"{autoAllocatedClaims.Count}/{distinctClaims.Count} case(s) Assigned(auto)", 3, "green", "far fa-file-powerpoint");
-                        }
-
-                        var notAutoAllocated = distinctClaims.Except(autoAllocatedClaims)?.ToList();
-
-                        await claimsInvestigationService.AssignToAssigner(HttpContext.User.Identity.Name, notAutoAllocated);
-
-                        backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimAssignmentToAssigner(HttpContext.User.Identity.Name, notAutoAllocated));
-
-                        //await mailboxService.NotifyClaimAssignmentToAssigner(HttpContext.User.Identity.Name, notAutoAllocated);
-
-                        notifyService.Custom($"{notAutoAllocated.Count}/{distinctClaims.Count} case(s) Assign manual", 3, "orange", "far fa-file-powerpoint");
-                        
-                        return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
-                    }
-                }
-                else
-                {
-                    await claimsInvestigationService.AssignToAssigner(HttpContext.User.Identity.Name, distinctClaims);
-
-                    backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimAssignmentToAssigner(HttpContext.User.Identity.Name, distinctClaims));
-                    //await mailboxService.NotifyClaimAssignmentToAssigner(HttpContext.User.Identity.Name, distinctClaims);
-
-                    notifyService.Custom($"{claims.Count}/{claims.Count} case(s) Assigned", 3, "green", "far fa-file-powerpoint");
-                }
+                notifyService.Custom($"{claims.Count}/{claims.Count} case(s) Assigned", 3, "green", "far fa-file-powerpoint");
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
+                return RedirectToAction(nameof(CreatorManualController.New), "CreatorManual");
             }
             return RedirectToAction(nameof(ClaimsActiveController.Active), "ClaimsActive");
         }

@@ -223,6 +223,72 @@ namespace risk.control.system.Controllers.Api.Company
             return Ok(response);
         }
 
+        [HttpGet("RefreshData")]
+        public IActionResult RefreshData(string id)
+        {
+            var currentUserEmail = HttpContext.User?.Identity?.Name;
+            var companyUser = _context.ClientCompanyApplicationUser
+                .Include(c => c.Country)
+                .FirstOrDefault(c => c.Email == currentUserEmail);
+
+            if (companyUser == null)
+                return NotFound("User not found.");
+
+            // Fetching all relevant substatuses in a single query for efficiency
+            var subStatuses = _context.InvestigationCaseSubStatus
+                .Where(i => new[]
+                {
+            CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR,
+            CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER,
+            CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER,
+            CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY,
+            CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY
+                }.Contains(i.Name.ToUpper()))
+                .ToDictionary(i => i.Name.ToUpper(), i => i.InvestigationCaseSubStatusId);
+
+            if (subStatuses.Count < 5)
+                return BadRequest("Missing required sub-statuses.");
+
+            var a = claimsService.GetClaims()
+                .FirstOrDefault(a => a.ClaimsInvestigationId == id);
+
+            // Prepare response
+            var response =  new ClaimsInvestigationResponse
+                {
+                    Id = a.ClaimsInvestigationId,
+                    Amount = string.Format(Extensions.GetCultureByCountry(companyUser.Country.Code.ToUpper()), "{0:C}", a.PolicyDetail.SumAssuredValue),
+                    PolicyId = a.PolicyDetail.ContractNumber,
+                    AssignedToAgency = a.AssignedToAgency,
+                    AutoAllocated = a.AutoAllocated,
+                    Agent = !string.IsNullOrWhiteSpace(a.UserEmailActionedTo) ? a.UserEmailActionedTo : a.UserRoleActionedTo,
+                    Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
+                    PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
+                    Document = a.PolicyDetail?.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail?.DocumentImage)) : Applicationsettings.NO_POLICY_IMAGE,
+                    Customer = a.CustomerDetail?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail?.ProfilePicture)) : Applicationsettings.NO_USER,
+                    Name = a.CustomerDetail?.Name ?? "<span class=\"badge badge-light\">customer name</span>",
+                    Policy = a.PolicyDetail?.LineOfBusiness.Name,
+                    Status = a.STATUS.GetEnumDisplayName(),
+                    SubStatus = a.InvestigationCaseSubStatus.Name,
+                    Ready2Assign = a.IsReady2Assign,
+                    ServiceType = $"{a.PolicyDetail?.LineOfBusiness.Name} ( {a.PolicyDetail.InvestigationServiceType.Name})",
+                    Service = a.PolicyDetail.InvestigationServiceType.Name,
+                    Location = a.ORIGIN.GetEnumDisplayName(),
+                    Created = a.Created.ToString("dd-MM-yyyy"),
+                    timePending = a.GetCreatorTimePending(),
+                    Withdrawable = !a.NotWithdrawable,
+                    PolicyNum = a.GetPolicyNum(),
+                    BeneficiaryPhoto = a.BeneficiaryDetail?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.BeneficiaryDetail.ProfilePicture)) : Applicationsettings.NO_USER,
+                    BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.Name) ? "<span class=\"badge badge-light\">beneficiary name</span>" : a.BeneficiaryDetail.Name,
+                    TimeElapsed = DateTime.Now.Subtract(a.Updated.GetValueOrDefault()).TotalSeconds,
+                    IsNewAssigned = a.AutoNew <= 1,
+                    BeneficiaryFullName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.Name) ? "?" : a.BeneficiaryDetail.Name,
+                    CustomerFullName = string.IsNullOrWhiteSpace(a.CustomerDetail?.Name) ? "?" : a.CustomerDetail.Name,
+                    PersonMapAddressUrl = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail) != "..." ?
+                        a.PolicyDetail.ClaimType == ClaimType.HEALTH ? a.CustomerDetail.CustomerLocationMap : a.BeneficiaryDetail.BeneficiaryLocationMap : null
+                };
+
+            return Ok(response);
+        }
 
         [HttpGet("GetUnderwriting")]
         public IActionResult GetUnderwriting()
