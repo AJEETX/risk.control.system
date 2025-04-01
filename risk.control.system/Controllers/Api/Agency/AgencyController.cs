@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System.Collections.Concurrent;
+using System.Globalization;
 using System.Net.Http;
 
 using Highsoft.Web.Mvc.Charts;
@@ -272,105 +273,117 @@ namespace risk.control.system.Controllers.Api.Agency
         public async Task<IActionResult> GetAgentLoad(string id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
-            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+            var vendorUser = await _context.VendorApplicationUser
+                .FirstOrDefaultAsync(c => c.Email == userEmail);
+            if (vendorUser == null)
+            {
+                return NotFound("Vendor user not found.");
+            }
+
             List<VendorUserClaim> agents = new List<VendorUserClaim>();
             var onboardingEnabled = await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED);
 
-            var vendorUsers = _context.VendorApplicationUser
+            var vendorUsersQuery = _context.VendorApplicationUser
                 .Include(u => u.Country)
                 .Include(u => u.State)
                 .Include(u => u.District)
                 .Include(u => u.PinCode)
                 .Where(c => c.VendorId == vendorUser.VendorId && !c.Deleted && c.Active && c.Role == AppRoles.AGENT);
+
             if (onboardingEnabled)
             {
-                vendorUsers = vendorUsers.Where(c => !string.IsNullOrWhiteSpace(c.MobileUId));
+                vendorUsersQuery = vendorUsersQuery.Where(c => !string.IsNullOrWhiteSpace(c.MobileUId));
             }
-            var users = vendorUsers?
+
+            var vendorUsers = await vendorUsersQuery
                 .OrderBy(u => u.FirstName)
                 .ThenBy(u => u.LastName)
-                .AsQueryable();
-            var result = dashboardService.CalculateAgentCaseStatus(userEmail);
+                .ToListAsync();
 
-            var claim = _context.ClaimsInvestigation.Include(c => c.PolicyDetail).Include(c => c.CustomerDetail).Include(c => c.BeneficiaryDetail).FirstOrDefault(c => c.ClaimsInvestigationId == id);
-            var LocationLatitude = string.Empty;
-            var LocationLongitude = string.Empty;
-            var addressOfInterest = string.Empty;
-            if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
-            {
-                LocationLatitude = claim.CustomerDetail.Latitude;
-                LocationLongitude = claim.CustomerDetail.Longitude;
-            }
-            else
-            {
-                LocationLatitude = claim.BeneficiaryDetail.Latitude;
-                LocationLongitude = claim.BeneficiaryDetail.Longitude;
-            }
-            foreach (var user in users)
-            {
-                int claimCount = 0;
-                if (result.TryGetValue(user.Email, out claimCount))
-                {
-                    var agentData = new VendorUserClaim
-                    {
-                        AgencyUser = user,
-                        CurrentCaseCount = claimCount,
-                    };
-                    agents.Add(agentData);
-                }
-                else
-                {
-                    var agentData = new VendorUserClaim
-                    {
-                        AgencyUser = user,
-                        CurrentCaseCount = 0,
-                    };
-                    agents.Add(agentData);
-                }
-            }
-            
-            var agentList = new List<AgentData>();
-            foreach (var u in agents)
-            {
-                string distance, duration, map;
-                float distanceInMetre;
-                int durationInSec;
-                (distance, distanceInMetre, duration, durationInSec, map) = await customApiCLient.GetMap(double.Parse(u.AgencyUser.AddressLatitude), double.Parse(u.AgencyUser.AddressLongitude), double.Parse(LocationLatitude), double.Parse(LocationLongitude));
+            var result =  dashboardService.CalculateAgentCaseStatus(userEmail);  // Assume this is async
 
-                var mapDetails = $"Driving distance : {distance}; Duration : {duration}";
-                var agentData = new AgentData
+            var claim = await _context.ClaimsInvestigation
+                .Include(c => c.PolicyDetail)
+                .Include(c => c.CustomerDetail)
+                .Include(c => c.BeneficiaryDetail)
+                .FirstOrDefaultAsync(c => c.ClaimsInvestigationId == id);
+
+            if (claim == null)
+            {
+                return NotFound("Claim not found.");
+            }
+
+            string LocationLatitude = claim.PolicyDetail.ClaimType == ClaimType.HEALTH
+                ? claim.CustomerDetail.Latitude
+                : claim.BeneficiaryDetail.Latitude;
+
+            string LocationLongitude = claim.PolicyDetail.ClaimType == ClaimType.HEALTH
+                ? claim.CustomerDetail.Longitude
+                : claim.BeneficiaryDetail.Longitude;
+
+            // Use Parallel.ForEach to run agent processing in parallel
+            var agentList = new ConcurrentBag<AgentData>(); // Using a thread-safe collection
+
+            await Task.WhenAll(vendorUsers.Select(async user =>
+            {
+                int claimCount = result.GetValueOrDefault(user.Email, 0);
+                var agentData = new VendorUserClaim
                 {
-                    Id = u.AgencyUser.Id,
-                    Photo = u.AgencyUser.ProfilePicture == null ? noUserImagefilePath : string.Format("data:image/*;base64,{0}", Convert.ToBase64String(u.AgencyUser.ProfilePicture)),
-                    Email = (u.AgencyUser.UserRole == AgencyRole.AGENT && !string.IsNullOrWhiteSpace(u.AgencyUser.MobileUId) || u.AgencyUser.UserRole != AgencyRole.AGENT) ?
-                    "<a href=/Agency/EditUser?userId=" + u.AgencyUser.Id + ">" + u.AgencyUser.Email + "</a>" :
-                    "<a href=/Agency/EditUser?userId=" + u.AgencyUser.Id + ">" + u.AgencyUser.Email + "</a><span title=\"Onboarding incomplete !!!\" data-toggle=\"tooltip\"><i class='fa fa-asterisk asterik-style'></i></span>",
-                    Name = u.AgencyUser.FirstName + " " + u.AgencyUser.LastName,
-                    Phone = "(+" + u.AgencyUser.Country.ISDCode + ") " + u.AgencyUser.PhoneNumber,
-                    Addressline = u.AgencyUser.Addressline + ", " + u.AgencyUser.District.Name + ", " + u.AgencyUser.State.Code + ", " + u.AgencyUser.Country.Code,
-                    Country = u.AgencyUser.Country.Code,
-                    Flag = "/flags/" + u.AgencyUser.Country.Code.ToLower() + ".png",
-                    Active = u.AgencyUser.Active,
-                    Roles = u.AgencyUser.UserRole != null ? $"<span class=\"badge badge-light\">{u.AgencyUser.UserRole.GetEnumDisplayName()}</span>" : "<span class=\"badge badge-light\">...</span>",
-                    Count = u.CurrentCaseCount,
-                    UpdateBy = u.AgencyUser.UpdatedBy,
-                    Role = u.AgencyUser.UserRole.GetEnumDisplayName(),
-                    AgentOnboarded = (u.AgencyUser.UserRole == AgencyRole.AGENT && !string.IsNullOrWhiteSpace(u.AgencyUser.MobileUId) || u.AgencyUser.UserRole != AgencyRole.AGENT),
-                    RawEmail = u.AgencyUser.Email,
+                    AgencyUser = user,
+                    CurrentCaseCount = claimCount,
+                };
+                agents.Add(agentData);
+
+                // Get map data asynchronously
+                var (distance, distanceInMetre, duration, durationInSec, map) = await customApiCLient.GetMap(
+                    double.Parse(user.AddressLatitude),
+                    double.Parse(user.AddressLongitude),
+                    double.Parse(LocationLatitude),
+                    double.Parse(LocationLongitude));
+
+                var mapDetails = $"Driving distance: {distance}; Duration: {duration}";
+
+                var agentInfo = new AgentData
+                {
+                    Id = user.Id,
+                    Photo = user.ProfilePicture == null
+                        ? noUserImagefilePath
+                        : $"data:image/*;base64,{Convert.ToBase64String(user.ProfilePicture)}",
+                    Email = user.UserRole == AgencyRole.AGENT && !string.IsNullOrWhiteSpace(user.MobileUId)
+                        ? $"<a href='/Agency/EditUser?userId={user.Id}'>{user.Email}</a>"
+                        : $"<a href='/Agency/EditUser?userId={user.Id}'>{user.Email}</a><span title='Onboarding incomplete !!!' data-toggle='tooltip'><i class='fa fa-asterisk asterik-style'></i></span>",
+                    Name = $"{user.FirstName} {user.LastName}",
+                    Phone = $"(+{user.Country.ISDCode}) {user.PhoneNumber}",
+                    Addressline = $"{user.Addressline}, {user.District.Name}, {user.State.Code}, {user.Country.Code}",
+                    Country = user.Country.Code,
+                    Flag = $"/flags/{user.Country.Code.ToLower()}.png",
+                    Active = user.Active,
+                    Roles = user.UserRole != null
+                        ? $"<span class='badge badge-light'>{user.UserRole.GetEnumDisplayName()}</span>"
+                        : "<span class='badge badge-light'>...</span>",
+                    Count = claimCount,
+                    UpdateBy = user.UpdatedBy,
+                    Role = user.UserRole.GetEnumDisplayName(),
+                    AgentOnboarded = user.UserRole != AgencyRole.AGENT || !string.IsNullOrWhiteSpace(user.MobileUId),
+                    RawEmail = user.Email,
                     PersonMapAddressUrl = map,
                     MapDetails = mapDetails,
-                    PinCode = u.AgencyUser.PinCode.Code,
+                    PinCode = user.PinCode.Code,
                     Distance = distance,
                     DistanceInMetres = distanceInMetre,
                     Duration = duration,
                     DurationInSeconds = durationInSec,
-                    AddressLocationInfo = claim.PolicyDetail.ClaimType == ClaimType.HEALTH ? claim.CustomerDetail.AddressLocationInfo : claim.BeneficiaryDetail.AddressLocationInfo
+                    AddressLocationInfo = claim.PolicyDetail.ClaimType == ClaimType.HEALTH
+                        ? claim.CustomerDetail.AddressLocationInfo
+                        : claim.BeneficiaryDetail.AddressLocationInfo
                 };
-                agentList.Add(agentData);
-            }
-            
+
+                agentList.Add(agentInfo);
+            }));
+
             return Ok(agentList);
         }
+
     }
 
     public class AgentData

@@ -622,7 +622,7 @@ namespace risk.control.system.Controllers
                 c.InvestigationCaseSubStatusId == rejectedStatus.InvestigationCaseSubStatusId);
 
                 // HACKY
-                var currentCases = claimsInvestigationService.GetAgencyLoad(new List<Vendor> { vendor });
+                var currentCases = claimsInvestigationService.GetAgencyIdsLoad(new List<long> {vendor.VendorId });
                 vendor.SelectedCountryId = vendorUserCount;
                 vendor.SelectedStateId = currentCases.FirstOrDefault().CaseCount;
                 vendor.SelectedDistrictId = vendorAllCasesCount;

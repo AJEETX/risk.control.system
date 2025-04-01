@@ -125,5 +125,14 @@ namespace risk.control.system.Models
         [Display(Name = "Duration")]
         public string? SelectedAgentDrivingDuration { get; set; } = default!;
         public int? SelectedAgentDrivingDurationInSeconds { get; set; } = default!;
+        public ALLOCATION_STATUS STATUS { get; set; } = ALLOCATION_STATUS.READY;
+    }
+    public enum ALLOCATION_STATUS
+    {
+        READY,
+        PENDING,
+        COMPLETED,
+        ERROR,
+        UNKNOWN
     }
 }

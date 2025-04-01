@@ -48,21 +48,14 @@ namespace risk.control.system.Controllers
         {
             try
             {
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (currentUserEmail == null)
+                var file = await _context.FilesOnFileSystem.Where(x => x.Id == id).FirstOrDefaultAsync();
+                if (file == null)
                 {
-                    notifyService.Error("OOPs !!!..Unauthenticated Access");
+                    notifyService.Error("OOPs !!!.. Download error");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                var file = await _context.FilesOnFileSystem.Where(x => x.Id == id).FirstOrDefaultAsync();
-                if (file == null) return null!;
-                var memory = new MemoryStream();
-                using (var stream = new FileStream(file.FilePath, FileMode.Open))
-                {
-                    await stream.CopyToAsync(memory);
-                }
-                memory.Position = 0;
-                return File(memory, file.FileType, file.Name + file.Extension);
+                var fileBytes = file.ByteData;
+                return File(fileBytes, file.FileType, file.Name + file.Extension);
             }
             catch (Exception ex)
             {
@@ -72,19 +65,33 @@ namespace risk.control.system.Controllers
             }
         }
 
-        public async Task<IActionResult> DeleteLog(long id)
+        [HttpPost]
+        public IActionResult DeleteLog(int id)
         {
-            var file = await _context.FilesOnFileSystem.Where(x => x.Id == id).FirstOrDefaultAsync();
-            if (file == null) return null;
-            if (System.IO.File.Exists(file.FilePath))
+            var file = _context.FilesOnFileSystem.FirstOrDefault(f => f.Id == id);
+            if (file == null)
             {
-                System.IO.File.Delete(file.FilePath);
+                return NotFound(new { success = false, message = "File not found." });
             }
-            _context.FilesOnFileSystem.Remove(file);
-            _context.SaveChanges();
-            TempData["Message"] = $"Removed {file.Name + file.Extension} successfully from File System.";
-            return RedirectToAction("Uploads");
+
+            try
+            {
+                if (System.IO.File.Exists(file.FilePath))
+                {
+                    System.IO.File.Delete(file.FilePath); // Delete the file from storage
+                }
+
+                _context.FilesOnFileSystem.Remove(file); // Remove from database
+                _context.SaveChanges();
+
+                return Ok(new { success = true, message = "File deleted successfully." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = "Error deleting file: " + ex.Message });
+            }
         }
+
 
         [HttpPost]
         [RequestSizeLimit(2_000_000)] // Checking for 2 MB

@@ -198,23 +198,38 @@
                 "data": "timePending"
             },
             {
-                "sDefaultContent": "",
+                "sDefaultContent": "status",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
+                    var isPending = data === "Pending";
+                    var disabled = isPending ? "disabled" : "";
+                    var spinClass = isPending ? "fa-spin" : ""; // Add spin class if pending
                     var buttons = "";
                     if (row.ready2Assign) {
-                        buttons += '<a id="assign' + row.id + '" href="/CreatorAuto/EmpanelledVendors?Id=' + row.id + '" class="btn btn-xs btn-info"><i class="fas fa-external-link-alt"></i> Assign</a>&nbsp;';
+                        buttons += '<a id="assign' + row.id + '" href="/CreatorAuto/EmpanelledVendors?Id=' + row.id + '" class="btn btn-xs btn-info refresh-btn '+ disabled +'" data-id="'+ row.id +'"><i class="fas fa-external-link-alt '+ spinClass+'""></i> Assign</a>&nbsp;';
                     } else {
                         buttons += '<button disabled class="btn btn-xs btn-info"><i class="fas fa-external-link-alt"></i> Assign</button>&nbsp;';
                     }
-                    buttons += '<a id="edit' + row.id + '" href="Details?Id=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-pencil-alt"></i> Edit</a>&nbsp;'
-                    buttons += '<a id="details' + row.id + '" href="Delete?Id=' + row.id + '" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i> Delete </a>'
+                    buttons += '<a id="edit' + row.id + '" href="Details?Id=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-pencil-alt ' + disabled +'"></i> Edit</a>&nbsp;'
+                    buttons += '<a id="details' + row.id + '" href="Delete?Id=' + row.id + '" class="btn btn-xs btn-danger"><i class="fa fa-trash ' + disabled +'"></i> Delete </a>'
                     return buttons;
                 }
             },
-            { "data": "timeElapsed", bVisible: false }
+            { "data": "timeElapsed", bVisible: false },
         ],
+        rowCallback: function (row, data) {
+            var $row = $(row);
+
+            if (data.status.toLowerCase() === "pending") {
+                $row.addClass('row-opacity-50 watermarked'); // Make row semi-transparent with watermark
+            } else {
+                $row.removeClass('row-opacity-50 watermarked'); // Remove styling
+            }
+        },
         "drawCallback": function (settings, start, end, max, total, pre) {
+            checkPendingStatus(); // Disable buttons and add spinning effect dynamically
+            removeCompletedRows(); // Remove completed rows
+
             var rowCount = (this.fnSettings().fnRecordsTotal()); // total number of rows
             if (rowCount > 0) {
                 $('#allocatedcase').prop('disabled', false);
@@ -254,6 +269,49 @@
         error: function (xhr, status, error) { alert('err ' + error) }
     });
 
+    function checkPendingStatus() {
+        var hasPending = false;
+
+        table.rows().every(function () {
+            var data = this.data();
+            if (data.status.toLowerCase() === "pending") {
+                hasPending = true;
+            }
+        });
+
+        if (hasPending) {
+            $(".refresh-btn").prop("disabled", true); // Disable all buttons
+            $(".refresh-btn i").addClass("fa-spin"); // Add spinning effect to all buttons
+        } else {
+            $(".refresh-btn").prop("disabled", false); // Enable buttons
+            $(".refresh-btn i").removeClass("fa-spin"); // Remove spinning effect
+        }
+    }
+
+    function removeCompletedRows() {
+        table.rows().every(function () {
+            var data = this.data();
+            if (data.status.toLowerCase() === "complete") {
+                this.remove(); // Remove completed rows
+            }
+        });
+        table.draw(false);
+        $('#checkall').prop('checked', false);
+
+    }
+
+    function refreshUntilNoComplete() {
+        table.ajax.reload(function (json) {
+            var hasComplete = json.some(row => row.status.toLowerCase() === "complete");
+
+            if (hasComplete) {
+                setTimeout(refreshUntilNoComplete, 1000); // Keep refreshing every second
+            }
+        }, false);
+        $('#checkall').prop('checked', false);
+    }
+
+    refreshUntilNoComplete(); // Start automatic refresh
     $('#refreshTable').click(function () {
         table.ajax.reload(null, false); // false => Retains current page
         $('#checkall').prop('checked', false);

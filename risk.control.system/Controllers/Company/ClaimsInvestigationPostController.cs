@@ -54,10 +54,40 @@ namespace risk.control.system.Controllers.Company
             this.mailboxService = mailboxService;
             this.notifyService = notifyService;
         }
-
-        [ValidateAntiForgeryToken]
+        
         [HttpPost]
         [Authorize(Roles = CREATOR.DISPLAY_NAME)]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Auto(List<string> claims)
+        {
+            if (claims == null || claims.Count == 0)
+            {
+                notifyService.Custom($"No case selected!!!. Please select case to be assigned.", 3, "red", "far fa-file-powerpoint");
+                return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
+            }
+            try
+            {
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                var distinctClaims = claims.Distinct().ToList();
+
+                // AUTO ALLOCATION TRUE
+                var allocatedClaims = await claimsInvestigationService.UpdateCaseAllocationStatus( currentUserEmail, distinctClaims);
+
+                backgroundJobClient.Enqueue(() => claimsInvestigationService.BackgroundAutoAllocation(distinctClaims, currentUserEmail));
+                notifyService.Custom($"Case(s) Assigned(auto) started", 3, "green", "far fa-file-powerpoint");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
+            }
+            return RedirectToAction(nameof(ClaimsActiveController.Active), "ClaimsActive");
+        }
+
+        [HttpPost]
+        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Assign(List<string> claims)
         {
             if (claims == null || claims.Count == 0)
@@ -143,14 +173,20 @@ namespace risk.control.system.Controllers.Company
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
 
-                var policy = await claimsInvestigationService.AllocateToVendor(currentUserEmail, caseId, selectedcase, false);
+                var (policy, status) = await claimsInvestigationService.AllocateToVendor(currentUserEmail, caseId, selectedcase, false);
+
+                if(string.IsNullOrEmpty(policy) || string.IsNullOrEmpty(status))
+                {
+                    notifyService.Custom($"Error!!! Try again", 3, "red", "far fa-file-powerpoint");
+                    return RedirectToAction(nameof(CreatorManualController.New), "CreatorManual");
+                }
 
                 var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == selectedcase);
 
-                backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimAllocationToVendor(currentUserEmail, policy.PolicyDetail.ContractNumber, caseId, selectedcase));
+                backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimAllocationToVendor(currentUserEmail, policy, caseId, selectedcase));
                 //await mailboxService.NotifyClaimAllocationToVendor(currentUserEmail, policy.PolicyDetail.ContractNumber, caseId, selectedcase);
 
-                notifyService.Custom($"Case #{policy.PolicyDetail.ContractNumber} {policy.InvestigationCaseSubStatus.Name} to {vendor.Name}", 3, "green", "far fa-file-powerpoint");
+                notifyService.Custom($"Case #{policy} {status} to {vendor.Name}", 3, "green", "far fa-file-powerpoint");
 
                 return RedirectToAction(nameof(ClaimsActiveController.Active), "ClaimsActive");
             }

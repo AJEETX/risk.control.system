@@ -1,9 +1,12 @@
-﻿using Hangfire;
+﻿using AspNetCoreHero.ToastNotification.Notyf;
+
+using Hangfire;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 using risk.control.system.AppConstant;
+using risk.control.system.Controllers.Company;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
@@ -11,6 +14,7 @@ using risk.control.system.Models.ViewModel;
 
 using System.Collections.Concurrent;
 using System.Data;
+using System.Linq;
 
 using static risk.control.system.AppConstant.Applicationsettings;
 
@@ -19,8 +23,9 @@ namespace risk.control.system.Services
     public interface IClaimsInvestigationService
     {
         Task AssignToAssigner(string userEmail, List<string> claimsInvestigations);
+        Task<List<string>> UpdateCaseAllocationStatus(string userEmail, List<string> claimsInvestigations);
 
-        Task<ClaimsInvestigation> AllocateToVendor(string userEmail, string claimsInvestigationId, long vendorId, bool AutoAllocated = true);
+        Task<(string, string)> AllocateToVendor(string userEmail, string claimsInvestigationId, long vendorId, bool AutoAllocated = true);
 
         Task<ClaimsInvestigation> AssignToVendorAgent(string vendorAgentEmail, string currentUser, long vendorId, string claimsInvestigationId);
 
@@ -31,6 +36,7 @@ namespace risk.control.system.Services
         Task<(ClientCompany, string)> ProcessCaseReport(string userEmail, string assessorRemarks, string claimsInvestigationId, AssessorRemarkType assessorRemarkType, string reportAiSummary);
 
         List<VendorCaseModel> GetAgencyLoad(List<Vendor> existingVendors);
+        List<VendorIdWithCases> GetAgencyIdsLoad(List<long> existingVendors);
 
         Task<Vendor> WithdrawCase(string userEmail, ClaimTransactionModel model, string claimId);
 
@@ -40,6 +46,7 @@ namespace risk.control.system.Services
 
         Task<ClaimsInvestigation> SubmitQueryToAgency(string userEmail, string claimId, EnquiryRequest request, IFormFile messageDocument);
         Task<ClaimsInvestigation> SubmitQueryReplyToCompany(string userEmail, string claimId, EnquiryRequest request, IFormFile messageDocument, List<string> flexRadioDefault);
+        Task BackgroundAutoAllocation(List<string> claims, string userEmail);
     }
 
     public class ClaimsInvestigationService : IClaimsInvestigationService
@@ -70,7 +77,89 @@ namespace risk.control.system.Services
             this.mailboxService = mailboxService;
             this.webHostEnvironment = webHostEnvironment;
         }
+        public async Task BackgroundAutoAllocation(List<string> claimIds, string userEmail)
+        {
+            var autoAllocatedCases = await DoAutoAllocation(claimIds, userEmail); // Run all tasks in parallel
 
+            if (claimIds.Count > autoAllocatedCases.Count)
+            {
+                var notAutoAllocated = claimIds.Except(autoAllocatedCases)?.ToList();
+
+                await AssignToAssigner(userEmail, notAutoAllocated);
+
+                await mailboxService.NotifyClaimAssignmentToAssigner(userEmail, notAutoAllocated);
+            }
+        }
+        async Task<List<string>> DoAutoAllocation(List<string> claims, string userEmail)
+        {
+            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == userEmail);
+
+            var company = _context.ClientCompany
+                    .Include(c => c.EmpanelledVendors)
+                    .ThenInclude(e => e.VendorInvestigationServiceTypes)
+                    .Include(c => c.EmpanelledVendors.Where(v => v.Status == VendorStatus.ACTIVE && !v.Deleted))
+                    .ThenInclude(e => e.VendorInvestigationServiceTypes)
+                    .ThenInclude(v => v.District)
+                    .FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
+            var claimTasks = claims.Select(async claim =>
+            {
+                // 1. Fetch Claim Details & Pincode in Parallel
+                var claimsInvestigation = await _context.ClaimsInvestigation
+                    .AsNoTracking()
+                    .Include(c => c.PolicyDetail)
+                    .Include(c => c.CustomerDetail)
+                        .ThenInclude(c => c.PinCode)
+                    .Include(c => c.BeneficiaryDetail)
+                        .ThenInclude(c => c.PinCode)
+                    .FirstOrDefaultAsync(c => c.ClaimsInvestigationId == claim);
+
+                string pinCode2Verify = claimsInvestigation.PolicyDetail?.ClaimType == ClaimType.HEALTH
+                    ? claimsInvestigation.CustomerDetail?.PinCode?.Code
+                    : claimsInvestigation.BeneficiaryDetail?.PinCode?.Code;
+
+                var pincodeDistrictState = await _context.PinCode
+                    .AsNoTracking()
+                    .Include(d => d.District)
+                    .Include(s => s.State)
+                    .FirstOrDefaultAsync(p => p.Code == pinCode2Verify);
+
+                // 2. Find Vendors Using LINQ
+                var distinctVendorIds = company.EmpanelledVendors
+                    .Where(vendor => vendor.VendorInvestigationServiceTypes.Any(serviceType =>
+                        serviceType.InvestigationServiceTypeId == claimsInvestigation.PolicyDetail.InvestigationServiceTypeId &&
+                        serviceType.LineOfBusinessId == claimsInvestigation.PolicyDetail.LineOfBusinessId &&
+                        (serviceType.StateId == pincodeDistrictState.StateId &&
+                         (serviceType.DistrictId == null || serviceType.DistrictId == pincodeDistrictState.DistrictId))
+                    ))
+                    .Select(v => v.VendorId) // Select only VendorId
+                    .Distinct() // Ensure uniqueness
+                    .ToList();
+
+                if (!distinctVendorIds.Any()) return null; // No vendors found, skip this claim
+
+                // 3. Get Vendor Load & Allocate
+                var vendorsWithCaseLoad = GetAgencyIdsLoad(distinctVendorIds)
+                    .OrderBy(o => o.CaseCount)
+                    .ToList();
+
+                var selectedVendorId = vendorsWithCaseLoad.FirstOrDefault();
+                if (selectedVendorId == null) return null; // No vendors available
+
+                var (policy, status) = await AllocateToVendor(userEmail, claimsInvestigation.ClaimsInvestigationId, selectedVendorId.VendorId);
+
+                if (string.IsNullOrEmpty(policy) || string.IsNullOrEmpty(status))
+                {
+                    return null;
+                }
+
+                await mailboxService.NotifyClaimAllocationToVendor(userEmail, policy, claimsInvestigation.ClaimsInvestigationId, selectedVendorId.VendorId);
+
+                return claim; // Return allocated claim
+            });
+
+            var results = await Task.WhenAll(claimTasks); // Run all tasks in parallel
+            return results.Where(r => r != null).ToList(); // Remove nulls and return allocated claims
+        }
         public async Task<List<string>> ProcessAutoAllocation(List<string> claims, ClientCompany company, string userEmail)
         {
             var claimTasks = claims.Select(async claim =>
@@ -96,38 +185,75 @@ namespace risk.control.system.Services
                     .FirstOrDefaultAsync(p => p.Code == pinCode2Verify);
 
                 // 2. Find Vendors Using LINQ
-                var distinctVendors = company.EmpanelledVendors
+                var distinctVendorIds = company.EmpanelledVendors
                     .Where(vendor => vendor.VendorInvestigationServiceTypes.Any(serviceType =>
                         serviceType.InvestigationServiceTypeId == claimsInvestigation.PolicyDetail.InvestigationServiceTypeId &&
                         serviceType.LineOfBusinessId == claimsInvestigation.PolicyDetail.LineOfBusinessId &&
                         (serviceType.StateId == pincodeDistrictState.StateId &&
                          (serviceType.DistrictId == null || serviceType.DistrictId == pincodeDistrictState.DistrictId))
                     ))
-                    .GroupBy(v => v.VendorId)  // Ensure unique vendors
-                    .Select(g => g.First())
+                    .Select(v => v.VendorId) // Select only VendorId
+                    .Distinct() // Ensure uniqueness
                     .ToList();
 
-                if (!distinctVendors.Any()) return null; // No vendors found, skip this claim
+                if (!distinctVendorIds.Any()) return null; // No vendors found, skip this claim
 
                 // 3. Get Vendor Load & Allocate
-                var vendorsWithCaseLoad = GetAgencyLoad(distinctVendors)
+                var vendorsWithCaseLoad = GetAgencyIdsLoad(distinctVendorIds)
                     .OrderBy(o => o.CaseCount)
                     .ToList();
 
-                var selectedVendor = vendorsWithCaseLoad.FirstOrDefault();
-                if (selectedVendor == null) return null; // No vendors available
+                var selectedVendorId = vendorsWithCaseLoad.FirstOrDefault();
+                if (selectedVendorId == null) return null; // No vendors available
 
-                var policy = await AllocateToVendor(userEmail, claimsInvestigation.ClaimsInvestigationId, selectedVendor.Vendor.VendorId);
+                var (policy, status) = await AllocateToVendor(userEmail, claimsInvestigation.ClaimsInvestigationId, selectedVendorId.VendorId);
+
+                if (string.IsNullOrEmpty(policy) || string.IsNullOrEmpty(status))
+                {
+                    return null;
+                }
 
                 // 4. Send Notification in Background
                 backgroundJobClient.Enqueue(() =>
-                    mailboxService.NotifyClaimAllocationToVendor(userEmail, policy.PolicyDetail.ContractNumber, claimsInvestigation.ClaimsInvestigationId, selectedVendor.Vendor.VendorId));
+                    mailboxService.NotifyClaimAllocationToVendor(userEmail, policy, claimsInvestigation.ClaimsInvestigationId, selectedVendorId.VendorId));
 
                 return claim; // Return allocated claim
             });
 
             var results = await Task.WhenAll(claimTasks); // Run all tasks in parallel
             return results.Where(r => r != null).ToList(); // Remove nulls and return allocated claims
+        }
+        public List<VendorIdWithCases> GetAgencyIdsLoad(List<long> existingVendors)
+        {
+            // Get relevant status IDs in one query
+            var relevantStatuses = _context.InvestigationCaseSubStatus
+                .Where(i => new[]
+                {
+                    CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR,
+                    CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT,
+                    CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR,
+                    CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR
+                }.Contains(i.Name.ToUpper()))
+                .Select(i => i.InvestigationCaseSubStatusId)
+                .ToHashSet(); // Improves lookup performance
+
+            // Fetch cases that match the criteria
+            var vendorCaseCount = _context.ClaimsInvestigation
+                .Where(c => !c.Deleted &&
+                            c.VendorId.HasValue &&
+                            c.AssignedToAgency &&
+                            relevantStatuses.Contains(c.InvestigationCaseSubStatusId))
+                .GroupBy(c => c.VendorId.Value)
+                .ToDictionary(g => g.Key, g => g.Count());
+
+            // Create the list of VendorIdWithCases
+            return existingVendors
+                .Select(vendorId => new VendorIdWithCases
+                {
+                    VendorId = vendorId,
+                    CaseCount = vendorCaseCount.GetValueOrDefault(vendorId, 0)
+                })
+                .ToList();
         }
 
         public List<VendorCaseModel> GetAgencyLoad(List<Vendor> existingVendors)
@@ -142,70 +268,31 @@ namespace risk.control.system.Services
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR);
 
             var claimsCases = _context.ClaimsInvestigation
-                .Include(c => c.BeneficiaryDetail)
-                .Include(c => c.Vendors)
                 .Where(c =>
                 !c.Deleted &&
                 c.VendorId.HasValue &&
+                c.AssignedToAgency &&
                 (c.InvestigationCaseSubStatusId == allocatedStatus.InvestigationCaseSubStatusId ||
                                     c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId ||
                                     c.InvestigationCaseSubStatusId == requestedByAssessor.InvestigationCaseSubStatusId ||
                                     c.InvestigationCaseSubStatusId == submitted2SuperStatus.InvestigationCaseSubStatusId)
                 );
 
-            var vendorCaseCount = new Dictionary<long, int>();
+            var vendorCaseCount = claimsCases
+                .Where(c => c.VendorId.HasValue)
+                .GroupBy(c => c.VendorId.Value)
+                .ToDictionary(g => g.Key, g => g.Count());
 
-            int countOfCases = 0;
-            foreach (var claimsCase in claimsCases)
-            {
-                if (claimsCase.BeneficiaryDetail.BeneficiaryDetailId > 0)
+            var vendorWithCaseCounts = existingVendors
+                .Select(vendor => new VendorCaseModel
                 {
-                    if (claimsCase.VendorId.HasValue)
-                    {
-                        if (claimsCase.InvestigationCaseSubStatusId == allocatedStatus.InvestigationCaseSubStatusId ||
-                                claimsCase.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId ||
-                                claimsCase.InvestigationCaseSubStatusId == requestedByAssessor.InvestigationCaseSubStatusId ||
-                                claimsCase.InvestigationCaseSubStatusId == submitted2SuperStatus.InvestigationCaseSubStatusId
-                                )
-                        {
-                            if (!vendorCaseCount.TryGetValue(claimsCase.VendorId.Value, out countOfCases))
-                            {
-                                vendorCaseCount.Add(claimsCase.VendorId.Value, 1);
-                            }
-                            else
-                            {
-                                int currentCount = vendorCaseCount[claimsCase.VendorId.Value];
-                                ++currentCount;
-                                vendorCaseCount[claimsCase.VendorId.Value] = currentCount;
-                            }
-                        }
-                    }
-                }
-            }
+                    Vendor = vendor,
+                    CaseCount = vendorCaseCount.GetValueOrDefault(vendor.VendorId, 0)
+                })
+                .ToList();
 
-            List<VendorCaseModel> vendorWithCaseCounts = new();
-
-            foreach (var existingVendor in existingVendors)
-            {
-                var vendorCase = vendorCaseCount.FirstOrDefault(v => v.Key == existingVendor.VendorId);
-                if (vendorCase.Key == existingVendor.VendorId)
-                {
-                    vendorWithCaseCounts.Add(new VendorCaseModel
-                    {
-                        CaseCount = vendorCase.Value,
-                        Vendor = existingVendor,
-                    });
-                }
-                else
-                {
-                    vendorWithCaseCounts.Add(new VendorCaseModel
-                    {
-                        CaseCount = 0,
-                        Vendor = existingVendor,
-                    });
-                }
-            }
             return vendorWithCaseCounts;
+
         }
 
         public async Task AssignToAssigner(string userEmail, List<string> claims)
@@ -401,75 +488,108 @@ namespace risk.control.system.Services
             return currentUser.Vendor;
         }
 
-        public async Task<ClaimsInvestigation> AllocateToVendor(string userEmail, string claimsInvestigationId, long vendorId, bool AutoAllocated = true)
+        public async Task<(string,string)> AllocateToVendor(string userEmail, string claimsInvestigationId, long vendorId, bool autoAllocated = true)
         {
-            var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == vendorId);
-            var currentUser = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
+            // Fetch vendor & user details
+            var vendor = await _context.Vendor.FindAsync(vendorId);
+            var currentUser = await _context.ClientCompanyApplicationUser
+                .Include(c => c.ClientCompany)
+                .FirstOrDefaultAsync(u => u.Email == userEmail);
 
-            var inProgress = _context.InvestigationCaseStatus.FirstOrDefault(
-                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS);
-            var allocatedToVendor = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
-            if (vendor != null)
-            {
-                var claimsCaseToAllocateToVendor = _context.ClaimsInvestigation
-                    .Include(c => c.PolicyDetail)
-                    .FirstOrDefault(v => v.ClaimsInvestigationId == claimsInvestigationId);
-                claimsCaseToAllocateToVendor.AssignedToAgency = true;
-                claimsCaseToAllocateToVendor.Updated = DateTime.Now;
-                claimsCaseToAllocateToVendor.UpdatedBy = currentUser.FirstName + " " + currentUser.LastName + " (" + currentUser.Email + ")";
-                claimsCaseToAllocateToVendor.CurrentUserEmail = userEmail;
+            if (vendor == null || currentUser == null) return (string.Empty,string.Empty); // Handle missing data
 
-                claimsCaseToAllocateToVendor.EnablePassport = currentUser.ClientCompany.EnablePassport;
-                claimsCaseToAllocateToVendor.AiEnabled = currentUser.ClientCompany.AiEnabled;
-                claimsCaseToAllocateToVendor.EnableMedia = currentUser.ClientCompany.EnableMedia;
-
-                claimsCaseToAllocateToVendor.InvestigationCaseSubStatusId = allocatedToVendor.InvestigationCaseSubStatusId;
-                claimsCaseToAllocateToVendor.UserEmailActioned = userEmail;
-                claimsCaseToAllocateToVendor.UserEmailActionedTo = string.Empty;
-                claimsCaseToAllocateToVendor.UserRoleActionedTo = $"{vendor.Email}";
-                claimsCaseToAllocateToVendor.Vendors.Add(vendor);
-                claimsCaseToAllocateToVendor.VendorId = vendorId;
-                claimsCaseToAllocateToVendor.AllocateView = 0;
-                claimsCaseToAllocateToVendor.AutoAllocated = AutoAllocated;
-                claimsCaseToAllocateToVendor.AllocatedToAgencyTime = DateTime.Now;
-                claimsCaseToAllocateToVendor.CreatorSla = currentUser.ClientCompany.CreatorSla;
-                claimsCaseToAllocateToVendor.AssessorSla = currentUser.ClientCompany.AssessorSla;
-                claimsCaseToAllocateToVendor.SupervisorSla = currentUser.ClientCompany.SupervisorSla;
-                claimsCaseToAllocateToVendor.AgentSla = currentUser.ClientCompany.AgentSla;
-                claimsCaseToAllocateToVendor.UpdateAgentReport = currentUser.ClientCompany.UpdateAgentReport;
-                claimsCaseToAllocateToVendor.UpdateAgentAnswer = currentUser.ClientCompany.UpdateAgentAnswer;
-                _context.ClaimsInvestigation.Update(claimsCaseToAllocateToVendor);
-                var lastLog = _context.InvestigationTransaction.Where(i =>
-                i.ClaimsInvestigationId == claimsCaseToAllocateToVendor.ClaimsInvestigationId).OrderByDescending(o => o.Created)?.FirstOrDefault();
-
-                var lastLogHop = _context.InvestigationTransaction
-                        .Where(i => i.ClaimsInvestigationId == claimsInvestigationId)
-                        .AsNoTracking().Max(s => s.HopCount);
-                string timeElapsed = GetTimeElaspedFromLog(lastLog);
-
-                var log = new InvestigationTransaction
+            // Fetch case statuses in one query
+            var caseStatuses = await _context.InvestigationCaseStatus
+                .Where(i => new[]
                 {
-                    UserEmailActioned = userEmail,
-                    UserRoleActionedTo = $"{vendor.Email}",
-                    UserEmailActionedTo = "",
-                    HopCount = lastLogHop + 1,
-                    ClaimsInvestigationId = claimsCaseToAllocateToVendor.ClaimsInvestigationId,
-                    CurrentClaimOwner = claimsCaseToAllocateToVendor.CurrentClaimOwner,
-                    Time2Update = DateTime.Now.Subtract(lastLog.Created).Days,
-                    InvestigationCaseStatusId = inProgress.InvestigationCaseStatusId,
-                    InvestigationCaseSubStatusId = allocatedToVendor.InvestigationCaseSubStatusId,
-                    UpdatedBy = currentUser.Email,
-                    Updated = DateTime.Now,
-                    TimeElapsed = timeElapsed
-                };
-                _context.InvestigationTransaction.Add(log);
+            CONSTANTS.CASE_STATUS.INPROGRESS
+                }.Contains(i.Name))
+                .ToDictionaryAsync(i => i.Name, i => i.InvestigationCaseStatusId);
 
-                await _context.SaveChangesAsync();
+            var subStatuses = await _context.InvestigationCaseSubStatus
+                .Where(i => new[]
+                {
+            CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR
+                }.Contains(i.Name))
+                .ToDictionaryAsync(i => i.Name, i => i.InvestigationCaseSubStatusId);
 
-                return claimsCaseToAllocateToVendor;
+            if (!caseStatuses.TryGetValue(CONSTANTS.CASE_STATUS.INPROGRESS, out var inProgressId) ||
+                !subStatuses.TryGetValue(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR, out var allocatedToVendorId))
+            {
+                return (string.Empty, string.Empty); // Handle missing status/substatus
             }
-            return null;
+
+            // Fetch case
+            var claimsCase = await _context.ClaimsInvestigation
+                .Include(c => c.PolicyDetail)
+                .FirstOrDefaultAsync(v => v.ClaimsInvestigationId == claimsInvestigationId);
+
+            if (claimsCase == null) return (string.Empty, string.Empty); // Handle missing case
+
+            // Update case details
+            claimsCase.STATUS = ALLOCATION_STATUS.COMPLETED ;
+            claimsCase.AssignedToAgency = true;
+            claimsCase.Updated = DateTime.Now;
+            claimsCase.UpdatedBy = $"{currentUser.FirstName} {currentUser.LastName} ({currentUser.Email})";
+            claimsCase.CurrentUserEmail = userEmail;
+            claimsCase.EnablePassport = currentUser.ClientCompany.EnablePassport;
+            claimsCase.AiEnabled = currentUser.ClientCompany.AiEnabled;
+            claimsCase.EnableMedia = currentUser.ClientCompany.EnableMedia;
+            claimsCase.InvestigationCaseSubStatusId = allocatedToVendorId;
+            claimsCase.UserEmailActioned = userEmail;
+            claimsCase.UserEmailActionedTo = string.Empty;
+            claimsCase.UserRoleActionedTo = vendor.Email;
+            claimsCase.VendorId = vendorId;
+            claimsCase.AllocateView = 0;
+            claimsCase.AutoAllocated = autoAllocated;
+            claimsCase.AllocatedToAgencyTime = DateTime.Now;
+            claimsCase.CreatorSla = currentUser.ClientCompany.CreatorSla;
+            claimsCase.AssessorSla = currentUser.ClientCompany.AssessorSla;
+            claimsCase.SupervisorSla = currentUser.ClientCompany.SupervisorSla;
+            claimsCase.AgentSla = currentUser.ClientCompany.AgentSla;
+            claimsCase.UpdateAgentReport = currentUser.ClientCompany.UpdateAgentReport;
+            claimsCase.UpdateAgentAnswer = currentUser.ClientCompany.UpdateAgentAnswer;
+
+            claimsCase.Vendors.Add(vendor); // Ensures relationship update
+            _context.ClaimsInvestigation.Update(claimsCase);
+
+            // Get last transaction log
+            var lastLog = await _context.InvestigationTransaction
+                .Where(i => i.ClaimsInvestigationId == claimsInvestigationId)
+                .OrderByDescending(o => o.Created)
+                .FirstOrDefaultAsync();
+
+            var lastLogHop = await _context.InvestigationTransaction
+                .Where(i => i.ClaimsInvestigationId == claimsInvestigationId)
+                .AsNoTracking()
+                .MaxAsync(s => (int?)s.HopCount) ?? 0;
+
+            // Calculate time elapsed
+            string timeElapsed = GetTimeElaspedFromLog(lastLog);
+
+            // Create new transaction log
+            var log = new InvestigationTransaction
+            {
+                UserEmailActioned = userEmail,
+                UserRoleActionedTo = vendor.Email,
+                UserEmailActionedTo = string.Empty,
+                HopCount = lastLogHop + 1,
+                ClaimsInvestigationId = claimsInvestigationId,
+                CurrentClaimOwner = claimsCase.CurrentClaimOwner,
+                Time2Update = lastLog != null ? (DateTime.Now - lastLog.Created).Days : 0,
+                InvestigationCaseStatusId = inProgressId,
+                InvestigationCaseSubStatusId = allocatedToVendorId,
+                UpdatedBy = currentUser.Email,
+                Updated = DateTime.Now,
+                TimeElapsed = timeElapsed
+            };
+
+            _context.InvestigationTransaction.Add(log);
+
+            // Save changes
+            await _context.SaveChangesAsync();
+
+            return (claimsCase.PolicyDetail.ContractNumber, claimsCase.InvestigationCaseSubStatus.Name);
         }
 
         public async Task<ClaimsInvestigation> AssignToVendorAgent(string vendorAgentEmail, string currentUser, long vendorId, string claimsInvestigationId)
@@ -1254,6 +1374,23 @@ namespace risk.control.system.Services
                 timeElapsed = "Just Now";
             }
             return timeElapsed;
+        }
+
+        public async Task<List<string>> UpdateCaseAllocationStatus(string userEmail, List<string> claimsInvestigations)
+        {
+            var cases = new List<ClaimsInvestigation>();
+            foreach(var claimsInvestigationId in claimsInvestigations)
+            {
+                var claimsCase = await _context.ClaimsInvestigation
+                .FirstOrDefaultAsync(v => v.ClaimsInvestigationId == claimsInvestigationId);
+                claimsCase.STATUS = ALLOCATION_STATUS.PENDING;
+                claimsCase.UpdatedBy = userEmail;
+                claimsCase.Updated = DateTime.Now;
+                cases.Add(claimsCase);
+            }
+            _context.ClaimsInvestigation.UpdateRange(cases);
+            await _context.SaveChangesAsync();
+            return claimsInvestigations;
         }
     }
 }

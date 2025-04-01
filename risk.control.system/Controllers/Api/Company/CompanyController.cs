@@ -97,54 +97,101 @@ namespace risk.control.system.Controllers.Api.Company
         [HttpGet("GetEmpanelledVendors")]
         public async Task<IActionResult> GetEmpanelledVendors()
         {
-            var userEmail = HttpContext.User?.Identity?.Name; 
-            var companyUser = await _context.ClientCompanyApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
-            var allocatedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
-            var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
-            var submitted2SuperStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR);
-            var enquiryRequestStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR);
-            var claimsCases = _context.ClaimsInvestigation
-                .Where(c => c.ClientCompanyId == companyUser.ClientCompanyId &&
-                (c.InvestigationCaseSubStatusId == allocatedStatus.InvestigationCaseSubStatusId ||
-                c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId ||
-                c.InvestigationCaseSubStatusId == enquiryRequestStatus.InvestigationCaseSubStatusId ||
-                c.InvestigationCaseSubStatusId == submitted2SuperStatus.InvestigationCaseSubStatusId))
-                ?.ToList();
-            var company = _context.ClientCompany
-                .Include(c => c.CompanyApplicationUser)
-                .Include(c => c.EmpanelledVendors).ThenInclude(c => c.State)
-                .Include(c => c.EmpanelledVendors).ThenInclude(c => c.District)
-                .Include(c => c.EmpanelledVendors).ThenInclude(c => c.Country)
-                .Include(c => c.EmpanelledVendors).ThenInclude(c => c.PinCode)
-                .Include(c => c.EmpanelledVendors).ThenInclude(c => c.ratings)
-                .FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
+            var userEmail = HttpContext.User?.Identity?.Name;
+            if (string.IsNullOrEmpty(userEmail))
+            {
+                return BadRequest("User identity is missing.");
+            }
 
-            var result = company.EmpanelledVendors?.Where(v => !v.Deleted && v.Status == VendorStatus.ACTIVE)
-                .OrderBy(u => u.Name).Select(u => new
+            // Fetch the company user
+            var companyUser = await _context.ClientCompanyApplicationUser
+                .FirstOrDefaultAsync(c => c.Email == userEmail);
+            if (companyUser == null)
+            {
+                return NotFound("Company user not found.");
+            }
+
+            // Fetch statuses in one batch to optimize performance
+            var statusNames = new[]
+            {
+        CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR,
+        CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT,
+        CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR,
+        CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR
+    };
+
+            var statuses = await _context.InvestigationCaseSubStatus
+                .Where(i => statusNames.Contains(i.Name.ToUpper()))
+                .ToListAsync();
+
+            var allocatedStatus = statuses.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
+            var assignedToAgentStatus = statuses.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
+            var submitted2SuperStatus = statuses.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR);
+            var enquiryRequestStatus = statuses.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR);
+
+            // Fetch claims only once and filter them based on status
+            var claimsCases = await _context.ClaimsInvestigation
+                .Where(c => c.ClientCompanyId == companyUser.ClientCompanyId &&
+                    (c.InvestigationCaseSubStatusId == allocatedStatus.InvestigationCaseSubStatusId ||
+                    c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId ||
+                    c.InvestigationCaseSubStatusId == enquiryRequestStatus.InvestigationCaseSubStatusId ||
+                    c.InvestigationCaseSubStatusId == submitted2SuperStatus.InvestigationCaseSubStatusId))
+                .ToListAsync();
+
+            // Fetch the company with necessary relationships
+            var company = await _context.ClientCompany
+                .Include(c => c.CompanyApplicationUser)
+                .Include(c => c.EmpanelledVendors)
+                    .ThenInclude(v => v.State)
+                .Include(c => c.EmpanelledVendors)
+                    .ThenInclude(v => v.District)
+                .Include(c => c.EmpanelledVendors)
+                    .ThenInclude(v => v.Country)
+                .Include(c => c.EmpanelledVendors)
+                    .ThenInclude(v => v.PinCode)
+                .Include(c => c.EmpanelledVendors)
+                    .ThenInclude(v => v.ratings)
+                .FirstOrDefaultAsync(c => c.ClientCompanyId == companyUser.ClientCompanyId);
+
+            if (company == null)
+            {
+                return NotFound("Company not found.");
+            }
+
+            // Process the vendors
+            var result = company.EmpanelledVendors?
+                .Where(v => !v.Deleted && v.Status == VendorStatus.ACTIVE)
+                .OrderBy(u => u.Name)
+                .Select(u => new
                 {
                     Id = u.VendorId,
                     Document = string.IsNullOrWhiteSpace(u.DocumentUrl) ? Applicationsettings.NO_IMAGE : u.DocumentUrl,
-                    Domain = companyUser.Role == AppRoles.COMPANY_ADMIN ? "<a href=/Company/AgencyDetail?id=" + u.VendorId + ">" + u.Email + "</a>" : u.Email,
+                    Domain = companyUser.Role == AppRoles.COMPANY_ADMIN ?
+                        $"<a href='/Company/AgencyDetail?id={u.VendorId}'>{u.Email}</a>" :
+                        u.Email,
                     Name = u.Name,
                     Code = u.Code,
-                    Phone = "(+" + u.Country.ISDCode + ") " + u.PhoneNumber,
+                    Phone = $"(+{u.Country.ISDCode}) {u.PhoneNumber}",
                     Address = $"{u.Addressline}",
                     District = u.District.Name,
                     State = u.State.Code,
                     Country = u.Country.Code,
-                    Flag = "/flags/" + u.Country.Code.ToLower() + ".png",
-                    Updated = u.Updated.HasValue ? u.Updated.Value.ToString("dd-MM-yyyy") : u.Created.ToString("dd-MM-yyyy"),
+                    Flag = $"/flags/{u.Country.Code.ToLower()}.png",
+                    Updated = u.Updated?.ToString("dd-MM-yyyy") ?? u.Created.ToString("dd-MM-yyyy"),
                     UpdateBy = u.UpdatedBy,
                     CaseCount = claimsCases.Count(c => c.VendorId == u.VendorId),
                     RateCount = u.RateCount,
                     RateTotal = u.RateTotal,
-                    RawAddress = u.Addressline + "," + u.District.Name + ", " + u.State.Code + ", " + u.Country.Code,
+                    RawAddress = $"{u.Addressline}, {u.District.Name}, {u.State.Code}, {u.Country.Code}",
                     IsUpdated = u.IsUpdated,
                     LastModified = u.Updated
-                })?.ToArray();
+                })
+                .ToArray();
 
+            // Update vendors in the context
             company.EmpanelledVendors?.ToList().ForEach(u => u.IsUpdated = false);
             await _context.SaveChangesAsync();
+
             return Ok(result);
         }
 
