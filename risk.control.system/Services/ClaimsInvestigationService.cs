@@ -105,6 +105,7 @@ namespace risk.control.system.Services
                 var claimsInvestigation = await _context.ClaimsInvestigation
                     .AsNoTracking()
                     .Include(c => c.PolicyDetail)
+                    .ThenInclude(c => c.LineOfBusiness)
                     .Include(c => c.CustomerDetail)
                     .ThenInclude(c => c.PinCode)
                     .Include(c => c.BeneficiaryDetail)
@@ -172,6 +173,7 @@ namespace risk.control.system.Services
             var claimsInvestigation = await _context.ClaimsInvestigation
                 .AsNoTracking()
                 .Include(c => c.PolicyDetail)
+                    .ThenInclude(c => c.LineOfBusiness)
                 .Include(c => c.CustomerDetail)
                     .ThenInclude(c => c.PinCode)
                 .Include(c => c.BeneficiaryDetail)

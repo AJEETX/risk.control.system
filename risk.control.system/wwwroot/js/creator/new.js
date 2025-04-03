@@ -259,7 +259,7 @@
         "drawCallback": function (settings) {
             var api = this.api();
             var rowCount = (this.fnSettings().fnRecordsTotal()); // total number of rows
-            if (rowCount > 0) {
+            if (rowCount > 0 && hasAssignedRows()) {
                 $('.top-info').prop('disabled', false);
                 $('#allocatedcase').prop('disabled', false);
                 $('#deletecase').prop('disabled', false);
@@ -296,6 +296,20 @@
         error: function (xhr, status, error) { alert('err ' + error) }
     });
 
+    function hasAssignedRows() {
+        var table = $("#customerTableAuto").DataTable();
+        var assignedExists = false;
+
+        table.rows().every(function () {
+            var data = this.data();
+            if (data.ready2Assign === true) {
+                assignedExists = true;
+                return false; // Stop iterating once an "assigned" row is found
+            }
+        });
+
+        return assignedExists;
+    }
         // Function to check if there are any "Pending" rows
     function hasPendingRows() {
         var table = $("#customerTableAuto").DataTable();
@@ -517,7 +531,7 @@
                 closeIcon: true,
                 buttons: {
                     cancel: {
-                        text: "SELECT Case<span class='badge badge-danger'>(s)</span>",
+                        text: "OK",
                         btnClass: 'btn-danger'
                     }
                 }
