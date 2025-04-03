@@ -10,6 +10,7 @@
         public bool TrialVersion { get; set; }
 
         public string? ReportAiSummary { get; set; }
+        public bool FromEditPage { get; set; } = false;
     }
 
     public class VendorCaseModel

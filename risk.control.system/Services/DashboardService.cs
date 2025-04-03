@@ -169,7 +169,7 @@ namespace risk.control.system.Services
 
             if (company.AutoAllocation)
             {
-                data.FirstBlockName = "Assign";
+                data.FirstBlockName = "Add/Assign";
                 //data.FirstBlockCount = GetCreatorAssignAuto(userEmail);
                 data.FirstBlockUrl = "/CreatorAuto/New";
                 var claimCount = GetCreatorAssignAuto(userEmail, claimLineOfBusinessId);

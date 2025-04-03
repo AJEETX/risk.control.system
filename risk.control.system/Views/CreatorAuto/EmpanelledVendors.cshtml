@@ -1,5 +1,4 @@
 ﻿@model ClaimsInvestigationVendorsModel
-
 @{
     ViewData["Title"] = "Empanelled Agencies";
 }
@@ -84,7 +83,7 @@
             </div> <!-- class bb-blog-inner -->
         </article>
         <div class="card shadow-lg border-1 rounded-lg">
-            <button id="refreshTable" class="btn btn-default"> <i class="fas fa-sync"></i> Refresh</button>
+            <button id="refreshTable" class="btn btn-default"> <i id="refreshIcon" class="fas fa-sync"></i> Refresh</button>
         </div>
         <form id="radioButtons" method="post" asp-controller="ClaimsInvestigationPost" asp-action="CaseAllocatedToVendor">
             <div class="card-body">
@@ -120,7 +119,14 @@
                     <div class="col-md-12">
                         @if(Model.ClaimsInvestigation.ClientCompany.AutoAllocation)
                         {
-                            <a id="back" asp-controller="CreatorAuto" asp-action="New" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> Back</a>
+                            if (!@Model.FromEditPage)
+                            {
+                                <a id="back" asp-controller="CreatorAuto" asp-action="New" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> Back</a>
+                            }
+                            else
+                            {
+                                <a id="back" asp-controller="CreatorAuto" asp-action="Details" asp-route-id="@Model.ClaimsInvestigation.ClaimsInvestigationId" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> Back</a>
+                            }
                         }
                         else
                         {

@@ -489,7 +489,7 @@ namespace risk.control.system.Controllers.Company
         }
         [HttpGet]
         [Breadcrumb(" Empanelled Agencies", FromAction = "New")]
-        public async Task<IActionResult> EmpanelledVendors(string id)
+        public async Task<IActionResult> EmpanelledVendors(string id,bool fromEditPage = false)
         {
             try
             {
@@ -502,6 +502,7 @@ namespace risk.control.system.Controllers.Company
                 }
 
                 var model = await empanelledAgencyService.GetEmpanelledVendors(id);
+                model.FromEditPage = fromEditPage;
                 var currentUser = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefault(c => c.Email == currentUserEmail);
                 ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
                 return View(model);
@@ -546,8 +547,9 @@ namespace risk.control.system.Controllers.Company
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR);
 
                 var vendorAllCasesCount = await _context.ClaimsInvestigation.CountAsync(c => c.VendorId == vendor.VendorId &&
-                c.InvestigationCaseSubStatusId == approvedStatus.InvestigationCaseSubStatusId ||
-                c.InvestigationCaseSubStatusId == rejectedStatus.InvestigationCaseSubStatusId);
+                !c.Deleted &&
+                (c.InvestigationCaseSubStatusId == approvedStatus.InvestigationCaseSubStatusId ||
+                c.InvestigationCaseSubStatusId == rejectedStatus.InvestigationCaseSubStatusId));
 
                 var vendorUserCount = await _context.VendorApplicationUser.CountAsync(c => c.VendorId == vendor.VendorId);
 

@@ -7,7 +7,7 @@
             $(".submit-progress").removeClass("hidden");
         }, 1);
 
-        $('a.create-policy').html("<i class='fas fa-sync fa-spin'></i> Add New");
+        $('a.create-policy').html("<i class='fas fa-sync fa-spin'></i> Add ");
 
         // Disable all buttons, submit inputs, and anchors
         $('button, input[type="submit"], a').prop('disabled', true);
@@ -213,7 +213,7 @@
                     if (isPending) {
                         buttons += '<button disabled class="btn btn-xs btn-info"><i class="fa fa-sync fa-spin"></i> ' + row.status+'</button>&nbsp;';
                         buttons += '<button disabled class="btn btn-xs btn-warning"><i class="fa fa-sync fa-spin"></i> Edit</button>&nbsp;';
-                        buttons += '<button disabled class="btn btn-xs btn-warning"><i class="fa fa-sync fa-spin"></i> Delete</button>&nbsp;';
+                        buttons += '<button disabled class="btn btn-xs btn-danger"><i class="fa fa-sync fa-spin"></i> Delete</button>&nbsp;';
                     }
 
                     else {
@@ -387,7 +387,9 @@
         table.ajax.reload(null, false);
         $('#checkall').prop('checked', false);
     });
-
+    table.on('xhr.dt', function () {
+        $('#refreshIcon').removeClass('fa-spin');
+    });
     var refreshInterval = 3000; // 3 seconds interval
     var maxAttempts = 3; // Prevent infinite loop
     var attempts = 0;
@@ -428,9 +430,7 @@
             }
         }, false);
     }
-    table.on('xhr.dt', function () {
-        $('#refreshIcon').removeClass('fa-spin');
-    });
+    
     table.on('mouseenter', '.map-thumbnail', function () {
             const $this = $(this); // Cache the current element
 

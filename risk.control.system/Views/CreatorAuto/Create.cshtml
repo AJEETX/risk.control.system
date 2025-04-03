@@ -32,9 +32,15 @@
                             @if (Model.AutoAllocation)
                             {
                                 <li>
-                                    <i class='far fa-thumbs-up'></i>
+                                    <i class='far fa-hand-point-down'></i>
                                     <button disabled class="btn btn-warning  btn-xs">
-                                        <span class="badge badge-warning"> <i class="fas fa-random"></i></span><b> Assign </b> <i class="small-suffix"> auto</i>
+                                        <span class="badge badge-warning"> <i class="fas fa-random"></i></span><b> Assign </b><i class="small-suffix">auto</i>
+                                    </button>
+                                </li>
+                                <li>
+                                    <i class='far fa-hand-point-down'></i>
+                                    <button disabled class="btn btn-info  btn-xs">
+                                        <span class="badge badge-info"> <i class="fas fa-external-link-alt"></i></span><b> Assign </b><sub>manual</sub>
                                     </button>
                                 </li>
                             }
@@ -56,8 +62,11 @@
                         <a id="back" asp-action="New" class="btn btn-outline-secondary">
                             <span class="badge badge-light"> <i class="fas fa-arrow-left"></i> </span> Back
                         </a>
-                        <button disabled id="assign-list" class="btn btn-warning disabled">
-                            <span class="badge badge-warning"> <i class="fas fa-random"></i></span><b> Assign </b> <i class="small-suffix"> auto</i>
+                        <button disabled class="btn btn-warning disabled">
+                            <span class="badge badge-warning"> <i class="fas fa-random"></i></span><b> Assign </b><i class="small-suffix">auto</i>
+                        </button>
+                        <button disabled class="btn btn-info disabled">
+                            <span class="badge badge-info"> <i class="fas fa-external-link-alt"></i></span><b> Assign </b><sub>manual</sub>
                         </button>
                     </div>
                 </div>

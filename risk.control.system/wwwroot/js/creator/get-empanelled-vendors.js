@@ -139,6 +139,18 @@
             }
         }, error: function (xhr, status, error) { alert('err ' + error) }
     });
+    $('#refreshTable').click(function () {
+        var $icon = $('#refreshIcon');
+        if ($icon) {
+            $icon.addClass('fa-spin');
+        }
+        table.ajax.reload(null, false);
+        $("#allocatedcase").prop('disabled', true);
+    });
+    table.on('xhr.dt', function () {
+        $('#refreshIcon').removeClass('fa-spin');
+    });
+
     table.on('draw.dt', function () {
         $('[data-toggle="tooltip"]').tooltip({
             animated: 'fade',
@@ -309,11 +321,7 @@
             });
         }
     })
-
-    $('#refreshTable').click(function () {
-        table.ajax.reload(null, false); // false => Retains current page
-        $("#allocatedcase").prop('disabled', true);
-    });
+    
 });
 function giveRating(img, image) {
     img.attr("src", "/Images/" + image).prevAll("img.rating").attr("src", "/Images/" + image);

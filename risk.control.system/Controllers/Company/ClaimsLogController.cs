@@ -114,14 +114,15 @@ namespace risk.control.system.Controllers.Company
                 !c.Deleted &&
                 c.InvestigationCaseSubStatus == createdClaimsStatus);
                 var fileIdentifier = companyUser.ClientCompany.Country.Code.ToLower();
-
+                var hasFileUploads = _context.FilesOnFileSystem.Any();
                 return View(new CreateClaims
                 {
                     BulkUpload = companyUser.ClientCompany.BulkUpload,
                     UserCanCreate = userCanCreate,
                     HasClaims = hasClaim,
                     FileSampleIdentifier = fileIdentifier,
-                    UploadId = uploadId
+                    UploadId = uploadId,
+                    HasFileUploads = hasFileUploads
                 });
             }
             catch (Exception ex)

@@ -71,20 +71,34 @@
                         @if (!customerExist || !beneficiaryExist)
                         {
                             <li>
-                                <i class='far fa-thumbs-up'></i>
+                                <i class='far fa-hand-point-down'></i>
 
                                 <button class="btn btn-warning  btn-xs disabled">
                                     <span class="badge badge-warning"> <i class="fas fa-random"></i></span><b> Assign(auto)</b>
+                                </button>
+                            </li>
+                            <li>
+                                <i class='far fa-hand-point-down'></i>
+
+                                <button class="btn btn-info  btn-xs disabled">
+                                    <span class="badge badge-info"> <i class="fas fa-external-link-alt"></i></span><b> Assign<sub>manual</sub></b>
                                 </button>
                             </li>
                         }
                         else
                         {
                             <li>
-                                <i class='far fa-thumbs-up'></i>
+                                <i class='far fa-hand-point-down'></i>
 
                                 <button class="btn btn-warning  btn-xs">
                                     <span class="badge badge-warning"> <i class="fas fa-random"></i></span><b>Assign(auto)</b>
+                                </button>
+                            </li>
+                            <li>
+                                <i class='far fa-hand-point-down'></i>
+
+                                <button class="btn btn-info  btn-xs">
+                                    <span class="badge badge-info"> <i class="fas fa-external-link-alt"></i></span><b> Assign<sub>manual</sub></b>
                                 </button>
                             </li>
                         }
@@ -119,7 +133,7 @@
             </div>
 
         </div>
-        <form id="create-form" method="post" asp-controller="ClaimsInvestigationPost" asp-action="Assign">
+        <form id="create-form" method="post" asp-controller="ClaimsInvestigationPost" asp-action="AssignAuto">
             <input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail?.CustomerDetailId" />
             <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
             <input type="hidden" id="claims" name="claims" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
@@ -157,13 +171,19 @@
                                 {
 
                                     <button type="submit" id="assign-list" class="btn btn-warning">
-                                        <span class="badge badge-warning"> <i class="fas fa-random"></i></span><b> Assign </b><span class="badge badge-warning">auto</span>
+                                        <span class="badge badge-warning"> <i class="fas fa-random"></i></span><b> Assign</b><sub>auto</sub>
                                     </button>
+                                    <a id="assign-manual" href="/CreatorAuto/EmpanelledVendors?Id=@Model.ClaimsInvestigation.ClaimsInvestigationId&fromEditPage=true" class="btn btn-info">
+                                        <span class="badge badge-info"> <i class="fas fa-external-link-alt"></i></span><b> Assign</b><sub>manual</sub>
+                                    </a>
                                 }
                                 else
                                 {
                                     <button disabled class="btn btn-warning disabled">
                                         <span class="badge badge-warning"> <i class="fas fa-random"></i></span><b> Assign </b> <i class="small-suffix"> auto</i>
+                                    </button>
+                                    <button disabled class="btn btn-info disabled">
+                                        <span class="badge badge-info"> <i class="fas fa-external-link-alt"></i></span><b>Assign</b><sub>manual</sub>
                                     </button>
                                 }
                             </div>

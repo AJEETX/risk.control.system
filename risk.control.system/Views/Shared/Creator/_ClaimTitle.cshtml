@@ -6,10 +6,34 @@
         <span class="hover-text">
             <i class="fas fa-info-circle"></i>
             <span class="tooltip-text" id="information">
+                
+                @if (Model.HasClaims)
+                {
+                    <li>
+                        <i class='far fa-hand-point-right'></i> <button class='badge badge-info xs'>
+                            <span class="badge badge-info"><i class='fas fa-external-link-alt'></i> </span> Assign
+                        </button>
+                    </li>
+
+                    <li>
+                        <i class='far fa-hand-point-right'></i>  <button class='badge badge-warning xs'>
+                            <span class="badge badge-warning"><i class='fas fa-pencil-alt'></i> </span> Edit
+                        </button>
+                    </li>
+                    <li>
+                        <i class='far fa-hand-point-right'></i> <button class='badge badge-danger xs'>
+                            <span class="badge badge-danger"><i class='fa fa-trash'></i> </span> Delete
+                        </button>
+                    </li>
+
+                    <li>
+                        <i class='far fa-hand-point-left'></i> <span class="badge badge-light btn"> <input type='checkbox' /></span>  case(s)
+                    </li>
+                }
                 @if (@Model.UserCanCreate)
                 {
                     <li>
-                        <i class='far fa-hand-point-right'></i>
+                        <i class='fa fa-hand-point-down'></i>
                         <button class="btn btn-success  btn-xs">
                             <span class="badge badge-success btn-xs"> <i class="far fa-edit"></i> </span>  <b> ADD </b>
                         </button>
@@ -18,7 +42,7 @@
                 else
                 {
                     <li>
-                        <i class='far fa-hand-point-right'></i>
+                        <i class='far fa-hand-point-down'></i>
                         <button class="btn btn-success disabled btn-xs">
                             <span class="disabled badge badge-success btn-xs"> <i class="far fa-edit"></i> </span>  <b> ADD </b>
                         </button>
@@ -27,37 +51,30 @@
                 @if (Model.HasClaims)
                 {
                     <li>
-                        <i class='far fa-hand-point-right'></i>
-                        <button class="btn btn-warning  btn-xs">
-                            <i class="fas fa-pencil-alt"></i> Edit
-                        </button>
-                    </li>
-                    <li>
-                        <i class='far fa-hand-point-right'></i>
-                        <button class="btn btn-danger  btn-xs">
-                            <span class="badge badge-danger"> <i class="fa fa-trash"></i></span><b> Delete </b>
-                        </button>
-                    </li>
-                    <li>
-                        <i class='far fa-hand-point-right'></i> Select <span class="badge badge-light btn"> <input type='checkbox' /></span>  case(s)
-                    </li>
-                }
-                
-                @if (Model.HasClaims)
-                {
-                    <li>
-                        <i class='far fa-thumbs-up'></i>
+                        <i class='far fa-hand-point-down'></i>
                         <button class="btn btn-warning btn-xs">
-                            <span class="badge badge-warning btn-xs"> <i class="fas fa-random"></i> </span> Assign
+                            <span class="badge badge-warning btn-xs"> <i class="fas fa-random"></i> </span> Assign<sub>auto</sub>
+                        </button>
+                    </li>
+                    <li>
+                        <i class='far fa-hand-point-down'></i>
+                        <button class="btn btn-danger btn-xs">
+                            <span class="badge badge-danger btn-xs"> <i class="fas fa-trash"></i> </span> Delete
                         </button>
                     </li>
                 }
                 else
                 {
                     <li>
-                        <i class='far fa-thumbs-up'></i>
+                        <i class='far fa-hand-point-down'></i>
                         <button disabled class="btn btn-warning btn-xs">
-                            <span class="badge badge-warning btn-xs"> <i class="fas fa-random"></i> </span> Assign
+                            <span class="badge badge-warning btn-xs"> <i class="fas fa-random"></i> </span> Assign<sub>auto</sub>
+                        </button>
+                    </li>
+                    <li>
+                        <i class='far fa-hand-point-down'></i>
+                        <button disabled class="btn btn-danger btn-xs">
+                            <span class="badge badge-danger btn-xs"> <i class="fas fa-trash"></i> </span> Delete
                         </button>
                     </li>
                 }
