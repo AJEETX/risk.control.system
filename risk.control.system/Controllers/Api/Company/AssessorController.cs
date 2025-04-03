@@ -25,6 +25,7 @@ namespace risk.control.system.Controllers.Api.Company
     [Authorize(Roles = ASSESSOR.DISPLAY_NAME)]
     public class AssessorController : ControllerBase
     {
+        private const string UNDERWRITING = "underwriting";
         private static CultureInfo hindi = new CultureInfo("hi-IN");
         private static NumberFormatInfo hindiNFO = (NumberFormatInfo)hindi.NumberFormat.Clone();
         private readonly ApplicationDbContext _context;
@@ -97,6 +98,7 @@ namespace risk.control.system.Controllers.Api.Company
                 await _context.SaveChangesAsync();
             }
 
+            var underWritingLineOfBusiness = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == UNDERWRITING).LineOfBusinessId;
             // Prepare the response
             var response = claimsAssigned
                 .Select(a => new ClaimsInvestigationResponse
@@ -106,8 +108,8 @@ namespace risk.control.system.Controllers.Api.Company
                     PolicyId = a.PolicyDetail.ContractNumber,
                     Amount = string.Format(Extensions.GetCultureByCountry(companyUser.Country.Code.ToUpper()), "{0:c}", a.PolicyDetail.SumAssuredValue),
                     AssignedToAgency = a.AssignedToAgency,
-                    Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
-                    PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
+                    Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness, a.CustomerDetail, a.BeneficiaryDetail),
+                    PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness, a.CustomerDetail, a.BeneficiaryDetail),
                     Document = a.PolicyDetail.DocumentImage != null ?
                                string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) :
                                Applicationsettings.NO_POLICY_IMAGE,
@@ -203,6 +205,7 @@ namespace risk.control.system.Controllers.Api.Company
                 ));
             }
 
+            var underWritingLineOfBusiness = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == UNDERWRITING).LineOfBusinessId;
             var response = claimsSubmitted
                 .Select(a => new ClaimsInvestigationResponse
                 {
@@ -215,8 +218,8 @@ namespace risk.control.system.Controllers.Api.Company
                     AssignedToAgency = a.AssignedToAgency,
                     Agent = !string.IsNullOrWhiteSpace(a.UserEmailActionedTo) ? a.UserEmailActionedTo : a.UserRoleActionedTo,
                     OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(GetOwner(a))),
-                    Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
-                    PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
+                    Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness, a.CustomerDetail, a.BeneficiaryDetail),
+                    PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness, a.CustomerDetail, a.BeneficiaryDetail),
                     Document = a.PolicyDetail?.DocumentImage != null ?
                         string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail?.DocumentImage)) :
                         Applicationsettings.NO_POLICY_IMAGE,
@@ -316,6 +319,7 @@ namespace risk.control.system.Controllers.Api.Company
                 }
             }
 
+            var underWritingLineOfBusiness = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == UNDERWRITING).LineOfBusinessId;
             var response = claimsSubmitted
                 .Select(a => new ClaimsInvestigationResponse
                 {
@@ -327,8 +331,8 @@ namespace risk.control.system.Controllers.Api.Company
                     Agent = !string.IsNullOrWhiteSpace(a.UserEmailActionedTo) ?
                         $"<span class='badge badge-light'>{a.UserEmailActionedTo}</span>" :
                         $"<span class='badge badge-light'>{a.UserRoleActionedTo}</span>",
-                    Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
-                    PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
+                    Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness, a.CustomerDetail, a.BeneficiaryDetail),
+                    PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness, a.CustomerDetail, a.BeneficiaryDetail),
                     Document = a.PolicyDetail?.DocumentImage != null ?
                         $"data:image/*;base64,{Convert.ToBase64String(a.PolicyDetail.DocumentImage)}" :
                         Applicationsettings.NO_POLICY_IMAGE,
@@ -423,6 +427,7 @@ namespace risk.control.system.Controllers.Api.Company
                 }
             }
 
+            var underWritingLineOfBusiness = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == UNDERWRITING).LineOfBusinessId;
             var response = claimsSubmitted
                 .Select(a => new ClaimsInvestigationResponse
                 {
@@ -434,8 +439,8 @@ namespace risk.control.system.Controllers.Api.Company
                     Agent = !string.IsNullOrWhiteSpace(a.UserEmailActionedTo) ?
                         $"<span class='badge badge-light'>{a.UserEmailActionedTo}</span>" :
                         $"<span class='badge badge-light'>{a.UserRoleActionedTo}</span>",
-                    Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
-                    PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
+                    Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness, a.CustomerDetail, a.BeneficiaryDetail),
+                    PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness, a.CustomerDetail, a.BeneficiaryDetail),
                     Document = a.PolicyDetail?.DocumentImage != null ?
                         $"data:image/*;base64,{Convert.ToBase64String(a.PolicyDetail.DocumentImage)}" :
                         Applicationsettings.NO_POLICY_IMAGE,

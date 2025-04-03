@@ -1,11 +1,9 @@
 ﻿@model CreateClaims
 @{
     ViewData["Title"] = "Assign";
-    var uploadId = Context.Request.Query["uploadId"];
 }
 <section class="content">
     <div id="article" class="card shadow-lg border-1 rounded-lg">
-        <input type="hidden" id="uploadId" value="@uploadId" />
         <partial name="Creator/_ClaimTitle" model="Model" />
         
         <button id="refreshTable" class="btn btn-default"> <i id="refreshIcon" class="fas fa-sync"></i> Refresh</button>

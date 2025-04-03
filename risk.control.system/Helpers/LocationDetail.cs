@@ -29,9 +29,9 @@ namespace risk.control.system.Helpers
             return (NewLat, NewLng);
         }
 
-        public static string GetAddress(ClaimType? claimType, CustomerDetail a, BeneficiaryDetail location)
+        public static string GetAddress(bool claimType, CustomerDetail a, BeneficiaryDetail location)
         {
-            if (claimType == ClaimType.HEALTH)
+            if (claimType)
             {
                 if (a is null)
                     return string.Empty;

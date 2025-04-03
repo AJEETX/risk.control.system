@@ -21,6 +21,8 @@ namespace risk.control.system.Services
     }
     public class PdfReportService : IPdfReportService
     {
+        private const string CLAIMS = "claims";
+        private const string UNDERWRITING = "underwriting";
         private static HttpClient client = new HttpClient();
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment webHostEnvironment;
@@ -251,7 +253,7 @@ namespace risk.control.system.Services
             string contactNumer = string.Empty;
             detailReport.AgentOfInterestName = claim.AgencyReport.AgentEmail;
             contactNumer = string.Empty;
-            if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
+            if (claim.PolicyDetail.LineOfBusiness.Name.ToLower() == UNDERWRITING)
             {
                 detailReport.VerifyAddress = claim.CustomerDetail.Addressline + ", " + claim.CustomerDetail.District.Name + ", " + claim.CustomerDetail.State.Name + ", (" + claim.CustomerDetail.Country.Code + "), " + claim.CustomerDetail.PinCode.Code;
                 contactNumer = claim.CustomerDetail.ContactNumber;
@@ -309,7 +311,7 @@ namespace risk.control.system.Services
 
             string personAddressUrl = string.Empty;
             string contactNumer = string.Empty;
-            if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
+            if (claim.PolicyDetail.LineOfBusiness.Name.ToLower() == UNDERWRITING)
             {
                 contactNumer = new string('*', claim.CustomerDetail.ContactNumber.Length - 4) + claim.CustomerDetail.ContactNumber.Substring(claim.CustomerDetail.ContactNumber.Length - 4);
                 personAddressUrl = claim.CustomerDetail.CustomerLocationMap;

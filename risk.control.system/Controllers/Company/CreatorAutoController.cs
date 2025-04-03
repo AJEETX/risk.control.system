@@ -72,7 +72,7 @@ namespace risk.control.system.Controllers.Company
             }
         }
         [Breadcrumb(" Add/Assign")]
-        public IActionResult New(int uploadId)
+        public IActionResult New()
         {
             try
             {
@@ -105,8 +105,7 @@ namespace risk.control.system.Controllers.Company
                     BulkUpload = companyUser.ClientCompany.BulkUpload, 
                     UserCanCreate = userCanCreate, 
                     HasClaims = hasClaim, 
-                    FileSampleIdentifier = fileIdentifier,
-                    UploadId = uploadId
+                    FileSampleIdentifier = fileIdentifier
                 });
             }
             catch (Exception ex)

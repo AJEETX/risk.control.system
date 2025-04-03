@@ -13,6 +13,8 @@ namespace risk.control.system.Helpers
 {
     public class PdfReportRunner
     {
+        private const string CLAIM = "claims";
+        private const string UNDERWRITING = "underwriting";
         private static HttpClient client = new HttpClient();
         public static async Task<DocumentBuilder> Run(string imagePath, ClaimsInvestigation claim)
         {
@@ -138,7 +140,8 @@ namespace risk.control.system.Helpers
             string contactNumer = string.Empty;
             detailReport.AgentOfInterestName = claim.AgencyReport.AgentEmail;
             contactNumer = string.Empty;
-            if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
+
+            if (claim.PolicyDetail.LineOfBusiness.Name.ToLower() == UNDERWRITING)
             {
                 detailReport.VerifyAddress = claim.CustomerDetail.Addressline + "," + claim.CustomerDetail.District.Name + "," + claim.CustomerDetail.State.Code + "," + claim.CustomerDetail.Country.Code + "," + claim.CustomerDetail.PinCode.Code;
                 contactNumer = claim.CustomerDetail.ContactNumber;
@@ -196,7 +199,7 @@ namespace risk.control.system.Helpers
 
             string personAddressUrl = string.Empty;
             string contactNumer = string.Empty;
-            if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
+            if (claim.PolicyDetail.LineOfBusiness.Name.ToLower() == UNDERWRITING)
             {
                 detailReport.PersonOfInterestName = claim.CustomerDetail.Name;
                 detailReport.VerifyAddress = claim.CustomerDetail.Addressline + "," + claim.CustomerDetail.District.Name + "," + claim.CustomerDetail.State.Code + "," + claim.CustomerDetail.Country.Code + "," + claim.CustomerDetail.PinCode.Code;

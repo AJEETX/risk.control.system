@@ -31,6 +31,8 @@ namespace risk.control.system.Controllers.Api
     [ApiController]
     public class AgentController : ControllerBase
     {
+        private const string CLAIM = "claims";
+        private const string UNDERWRITING = "underwriting";
         private Regex regex = new Regex(@"^[\w/\:.-]+;base64,");
         private static string PanIdfyUrl = "https://pan-card-verification-at-lowest-price.p.rapidapi.com/verification/marketing/pan";
         private static string RapidAPIKey = "df0893831fmsh54225589d7b9ad1p15ac51jsnb4f768feed6f";
@@ -501,6 +503,8 @@ namespace risk.control.system.Controllers.Api
                 filePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "user.png");
 
                 var noCustomerimage = await System.IO.File.ReadAllBytesAsync(filePath);
+                var claimLineOfBusiness = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == CLAIM).LineOfBusinessId;
+                var underWritingLineOfBusiness = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == UNDERWRITING).LineOfBusinessId;
 
                 var claim2Agent = claimsAssigned
                     .Select(c =>
@@ -510,12 +514,12 @@ namespace risk.control.system.Controllers.Api
                     Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId),
                     Coordinate = new
                     {
-                        Lat = c.PolicyDetail.ClaimType == ClaimType.HEALTH ?
+                        Lat = c.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness ?
                             decimal.Parse(c.CustomerDetail.Latitude) : decimal.Parse(c.BeneficiaryDetail.Latitude),
-                        Lng = c.PolicyDetail.ClaimType == ClaimType.HEALTH ?
+                        Lng = c.PolicyDetail.LineOfBusinessId == claimLineOfBusiness ?
                              decimal.Parse(c.CustomerDetail.Longitude) : decimal.Parse(c.BeneficiaryDetail.Longitude)
                     },
-                    Address = LocationDetail.GetAddress(c.PolicyDetail.ClaimType, c.CustomerDetail, c.BeneficiaryDetail),
+                    Address = LocationDetail.GetAddress(c.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness, c.CustomerDetail, c.BeneficiaryDetail),
                     PolicyNumber = c.PolicyDetail.ContractNumber,
                 });
                 return Ok(claim2Agent);

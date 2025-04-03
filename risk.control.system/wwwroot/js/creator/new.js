@@ -260,6 +260,7 @@
             var api = this.api();
             var rowCount = (this.fnSettings().fnRecordsTotal()); // total number of rows
             if (rowCount > 0) {
+                $('.top-info').prop('disabled', false);
                 $('#allocatedcase').prop('disabled', false);
                 $('#deletecase').prop('disabled', false);
                 var pendingRows = hasPendingRows();
@@ -269,6 +270,7 @@
                 }
             }
             else {
+                $('.top-info').prop('disabled', true);
                 $('#allocatedcase').prop('disabled', true);
                 $('#deletecase').prop('disabled', true);
             }

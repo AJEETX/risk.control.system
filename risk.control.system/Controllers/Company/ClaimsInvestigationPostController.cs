@@ -83,7 +83,35 @@ namespace risk.control.system.Controllers.Company
             }
             return RedirectToAction(nameof(ClaimsActiveController.Active), "ClaimsActive");
         }
-
+        [HttpPost]
+        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AssignAutoSingle(string claims)
+        {
+            if (claims == null)
+            {
+                notifyService.Custom($"No case selected!!!. Please select case to be assigned.", 3, "red", "far fa-file-powerpoint");
+                return RedirectToAction(nameof(CreatorManualController.New), "CreatorManual");
+            }
+            try
+            {
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                var allocatedCaseNumber = await claimsInvestigationService.ProcessAutoAllocation(claims, currentUserEmail);
+                if(string.IsNullOrWhiteSpace(allocatedCaseNumber))
+                {
+                    notifyService.Custom($"Case #:{allocatedCaseNumber} Not Assigned", 3, "orange", "far fa-file-powerpoint");
+                    return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
+                }
+                notifyService.Custom($"Case #:{allocatedCaseNumber} Assigned", 3, "green", "far fa-file-powerpoint");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(CreatorManualController.New), "CreatorManual");
+            }
+            return RedirectToAction(nameof(ClaimsActiveController.Active), "ClaimsActive");
+        }
         [HttpPost]
         [Authorize(Roles = CREATOR.DISPLAY_NAME)]
         [ValidateAntiForgeryToken]

@@ -305,13 +305,13 @@ namespace risk.control.system.Helpers
             return string.Join("", "<span class='badge badge-light'>now</span>");
         }
 
-        public static string GetMapUrl(this ClaimsInvestigation claim,bool tasked2Agent = false, bool submitted2Supervisor = false, bool enquiry = false)
+        public static string GetMapUrl(this ClaimsInvestigation claim,bool caseType, bool tasked2Agent = false, bool submitted2Supervisor = false, bool enquiry = false)
         {
             if(tasked2Agent || submitted2Supervisor || enquiry)
             {
                 return claim.SelectedAgentDrivingMap;
             }
-            return claim.PolicyDetail.ClaimType == ClaimType.HEALTH ? claim.CustomerDetail.CustomerLocationMap : claim.BeneficiaryDetail.BeneficiaryLocationMap;
+            return caseType ? claim.CustomerDetail.CustomerLocationMap : claim.BeneficiaryDetail.BeneficiaryLocationMap;
         }
         public static string GetPolicyNum(this ClaimsInvestigation a)
         {
@@ -362,9 +362,9 @@ namespace risk.control.system.Helpers
             return string.Join("", a.PolicyDetail?.ContractNumber + "<i class=\"fa fa-asterisk asterik-style-none\"></i>");
         }
 
-        public static string GetPincode(ClaimType? claimType, CustomerDetail cdetail, BeneficiaryDetail location)
+        public static string GetPincode(bool claimType, CustomerDetail cdetail, BeneficiaryDetail location)
         {
-            if (claimType == ClaimType.HEALTH)
+            if (claimType)
             {
                 if (cdetail is null)
                     return "<span class=\"badge badge-danger\"> <i class=\"fas fa-question\" ></i>  </span>";
@@ -378,16 +378,16 @@ namespace risk.control.system.Helpers
             }
         }
 
-        public static string GetPersonPhoto(ClaimType? claimType, CustomerDetail cdetail, BeneficiaryDetail beneficiary)
+        public static string GetPersonPhoto(bool claimType, CustomerDetail cdetail, BeneficiaryDetail beneficiary)
         {
-            if (claimType == ClaimType.HEALTH)
+            if (claimType)
             {
                 if (cdetail is not null)
                 {
                     return string.Format("data:image/*;base64,{0}", Convert.ToBase64String(cdetail.ProfilePicture));
                 }
             }
-            if (claimType == ClaimType.DEATH)
+            else
             {
                 if(beneficiary is not null)
                 {
@@ -396,9 +396,10 @@ namespace risk.control.system.Helpers
             }
             return Applicationsettings.NO_USER;
         }
-        public static string GetPincodeName(ClaimType? claimType, CustomerDetail cdetail, BeneficiaryDetail location)
+        
+        public static string GetPincodeName(bool claimType, CustomerDetail cdetail, BeneficiaryDetail location)
         {
-            if (claimType == ClaimType.HEALTH)
+            if (claimType)
             {
                 if (cdetail is null)
                     return "...";

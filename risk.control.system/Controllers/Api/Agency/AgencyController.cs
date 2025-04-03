@@ -28,6 +28,7 @@ namespace risk.control.system.Controllers.Api.Agency
     [Authorize(Roles = $"{PORTAL_ADMIN.DISPLAY_NAME},{COMPANY_ADMIN.DISPLAY_NAME},{MANAGER.DISPLAY_NAME},{AGENCY_ADMIN.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME}")]
     public class AgencyController : ControllerBase
     {
+        private const string UNDERWRITING = "underwriting";
         private static CultureInfo hindi = new CultureInfo("hi-IN");
         private static NumberFormatInfo hindiNFO = (NumberFormatInfo)hindi.NumberFormat.Clone();
         private readonly string noUserImagefilePath = string.Empty;
@@ -312,12 +313,13 @@ namespace risk.control.system.Controllers.Api.Agency
             {
                 return NotFound("Claim not found.");
             }
+            var underWritingLineOfBusiness = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == UNDERWRITING).LineOfBusinessId;
 
-            string LocationLatitude = claim.PolicyDetail.ClaimType == ClaimType.HEALTH
+            string LocationLatitude = claim.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness
                 ? claim.CustomerDetail.Latitude
                 : claim.BeneficiaryDetail.Latitude;
 
-            string LocationLongitude = claim.PolicyDetail.ClaimType == ClaimType.HEALTH
+            string LocationLongitude = claim.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness
                 ? claim.CustomerDetail.Longitude
                 : claim.BeneficiaryDetail.Longitude;
 
@@ -373,7 +375,7 @@ namespace risk.control.system.Controllers.Api.Agency
                     DistanceInMetres = distanceInMetre,
                     Duration = duration,
                     DurationInSeconds = durationInSec,
-                    AddressLocationInfo = claim.PolicyDetail.ClaimType == ClaimType.HEALTH
+                    AddressLocationInfo = claim.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness
                         ? claim.CustomerDetail.AddressLocationInfo
                         : claim.BeneficiaryDetail.AddressLocationInfo
                 };

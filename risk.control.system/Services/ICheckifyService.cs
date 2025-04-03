@@ -16,6 +16,7 @@ using risk.control.system.Controllers.Api.Claims;
 using static Google.Apis.Requests.BatchRequest;
 using System.Threading.Tasks;
 using Google.Api;
+using static risk.control.system.Helpers.Permissions;
 
 namespace risk.control.system.Services;
 
@@ -32,7 +33,8 @@ public interface IICheckifyService
 
 public class ICheckifyService : IICheckifyService
 {
-        private const string CLAIMS = "claims";
+    private const string CLAIMS = "claims";
+        private const string UNDERWRITING = "underwriting";
     private static Regex panRegex = new Regex(@"[A-Z]{5}\d{4}[A-Z]{1}");
     private static Regex passportRegex = new Regex(@"[A-Z]{1,2}[0-9]{6,7}");
     private static Regex dateOfBirthRegex = new Regex(@"^(0[1-9]|[12][0-9]|3[01])/(0[1-9]|1[0-2])/([12]\d{3})$");
@@ -246,17 +248,18 @@ public class ICheckifyService : IICheckifyService
             var longitude = claim.AgencyReport.DigitalIdReport.DigitalIdImageLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
             var latLongString = latitude + "," + longitude;
             var weatherUrl = $"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current=temperature_2m,windspeed_10m&hourly=temperature_2m,relativehumidity_2m,windspeed_10m";
+            var underWritingLineOfBusiness = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == UNDERWRITING).LineOfBusinessId;
 
             var expectedLat = string.Empty;
             var expectedLong = string.Empty;
             byte[]? registeredImage = null;
-            if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
+            if (claim.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness)
             {
                 registeredImage = claim.CustomerDetail.ProfilePicture;
                 expectedLat = claim.CustomerDetail.Latitude ;
                 expectedLong =  claim.CustomerDetail.Longitude;
             }
-            if (claim.PolicyDetail.ClaimType == ClaimType.DEATH)
+            else
             {
                 registeredImage = claim.BeneficiaryDetail.ProfilePicture;
                 expectedLat = claim.BeneficiaryDetail.Latitude;
@@ -379,15 +382,16 @@ public class ICheckifyService : IICheckifyService
             var longitude = claim.AgencyReport.PanIdReport.DocumentIdImageLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
             var latLongString = latitude + "," + longitude;
             var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
+            var underWritingLineOfBusiness = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == UNDERWRITING).LineOfBusinessId;
 
             var expectedLat = string.Empty;
             var expectedLong = string.Empty;
-            if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
+            if (claim.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness)
             {
                 expectedLat = claim.CustomerDetail.Latitude;
                 expectedLong = claim.CustomerDetail.Longitude;
             }
-            if (claim.PolicyDetail.ClaimType == ClaimType.DEATH)
+            else
             {
                 expectedLat = claim.BeneficiaryDetail.Latitude;
                 expectedLong = claim.BeneficiaryDetail.Longitude;
@@ -582,15 +586,16 @@ public class ICheckifyService : IICheckifyService
             var latitude = claim.AgencyReport.AudioReport.DocumentIdImageLongLat.Substring(0, longLat)?.Trim();
             var longitude = claim.AgencyReport.AudioReport.DocumentIdImageLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
             var latLongString = latitude + "," + longitude;
+            var underWritingLineOfBusiness = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == UNDERWRITING).LineOfBusinessId;
 
             var expectedLat = string.Empty;
             var expectedLong = string.Empty;
-            if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
+            if (claim.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness)
             {
                 expectedLat = claim.CustomerDetail.Latitude;
                 expectedLong = claim.CustomerDetail.Longitude;
             }
-            if (claim.PolicyDetail.ClaimType == ClaimType.DEATH)
+            else
             {
                 expectedLat = claim.BeneficiaryDetail.Latitude;
                 expectedLong = claim.BeneficiaryDetail.Longitude;
@@ -715,15 +720,16 @@ public class ICheckifyService : IICheckifyService
             var longitude = claim.AgencyReport.VideoReport.DocumentIdImageLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
             var latLongString = latitude + "," + longitude;
 
+            var underWritingLineOfBusiness = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == UNDERWRITING).LineOfBusinessId;
 
             var expectedLat = string.Empty;
             var expectedLong = string.Empty;
-            if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
+            if (claim.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness)
             {
                 expectedLat = claim.CustomerDetail.Latitude;
                 expectedLong = claim.CustomerDetail.Longitude;
             }
-            if (claim.PolicyDetail.ClaimType == ClaimType.DEATH)
+            else
             {
                 expectedLat = claim.BeneficiaryDetail.Latitude;
                 expectedLong = claim.BeneficiaryDetail.Longitude;
@@ -834,16 +840,17 @@ public class ICheckifyService : IICheckifyService
             var latitude = claim.AgencyReport.PassportIdReport.DocumentIdImageLongLat.Substring(0, longLat)?.Trim();
             var longitude = claim.AgencyReport.PassportIdReport.DocumentIdImageLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
             var latLongString = latitude + "," + longitude;
+            var underWritingLineOfBusiness = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == UNDERWRITING).LineOfBusinessId;
 
 
             var expectedLat = string.Empty;
             var expectedLong = string.Empty;
-            if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
+            if (claim.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness)
             {
                 expectedLat = claim.CustomerDetail.Latitude;
                 expectedLong = claim.CustomerDetail.Longitude;
             }
-            if (claim.PolicyDetail.ClaimType == ClaimType.DEATH)
+            else
             {
                 expectedLat = claim.BeneficiaryDetail.Latitude;
                 expectedLong = claim.BeneficiaryDetail.Longitude;

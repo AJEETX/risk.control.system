@@ -24,6 +24,8 @@ namespace risk.control.system.Controllers.Api.Agency
     [Authorize(Roles = $"{AGENCY_ADMIN.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME}")]
     public class SupervisorController : ControllerBase
     {
+        private const string CLAIM = "claims";
+        private const string UNDERWRITING = "underwriting";
         private static CultureInfo hindi = new CultureInfo("hi-IN");
         private static NumberFormatInfo hindiNFO = (NumberFormatInfo)hindi.NumberFormat.Clone();
         private readonly ApplicationDbContext _context;
@@ -117,6 +119,7 @@ namespace risk.control.system.Controllers.Api.Agency
 
             claimsSubmitted = await applicationDbContext.ToListAsync();
 
+            var underWritingLineOfBusiness = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == UNDERWRITING).LineOfBusinessId;
             var response = claimsSubmitted?.Select(a => new ClaimsInvestigationResponse
             {
                 Id = a.ClaimsInvestigationId,
@@ -126,8 +129,8 @@ namespace risk.control.system.Controllers.Api.Agency
                 Agent = !string.IsNullOrWhiteSpace(a.UserEmailActionedTo) ? a.UserEmailActionedTo : a.UserRoleActionedTo,
                 OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(GetOwner(a))),
                 CaseWithPerson = !string.IsNullOrWhiteSpace(a.UserEmailActionedTo),
-                Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
-                PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
+                Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness, a.CustomerDetail, a.BeneficiaryDetail),
+                PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness, a.CustomerDetail, a.BeneficiaryDetail),
                 Company = a.ClientCompany.Name,
                 Document = a.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : Applicationsettings.NO_POLICY_IMAGE,
                 Customer = a.CustomerDetail.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail.ProfilePicture)) : Applicationsettings.NO_USER,
@@ -256,6 +259,8 @@ namespace risk.control.system.Controllers.Api.Agency
                 .ToListAsync();
 
             var newAllocateClaims = new List<ClaimsInvestigation>();
+            var claimLineOfBusiness = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == CLAIM).LineOfBusinessId;
+            var underWritingLineOfBusiness = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == UNDERWRITING).LineOfBusinessId;
 
             // Process each claim and update as necessary
             foreach (var claim in claims)
@@ -266,12 +271,12 @@ namespace risk.control.system.Controllers.Api.Agency
                     newAllocateClaims.Add(claim);
                 }
 
-                if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH && claim.CustomerDetail != null)
+                if (claim.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness && claim.CustomerDetail != null)
                 {
                     // Fetch weather data for HEALTH claims
                     claim.CustomerDetail.AddressLocationInfo = await UpdateWeatherDataAsync(double.Parse(claim.CustomerDetail.Latitude), double.Parse(claim.CustomerDetail.Longitude));
                 }
-                else if (claim.PolicyDetail.ClaimType == ClaimType.DEATH && claim.BeneficiaryDetail != null)
+                else if (claim.PolicyDetail.LineOfBusinessId == claimLineOfBusiness && claim.BeneficiaryDetail != null)
                 {
                     // Fetch weather data for DEATH claims
                     claim.BeneficiaryDetail.AddressLocationInfo = await UpdateWeatherDataAsync(double.Parse(claim.BeneficiaryDetail.Latitude), double.Parse(claim.BeneficiaryDetail.Longitude));
@@ -292,12 +297,12 @@ namespace risk.control.system.Controllers.Api.Agency
                 Amount = string.Format(Extensions.GetCultureByCountry(vendorUser.Country.Code.ToUpper()), "{0:C}", a.PolicyDetail.SumAssuredValue),
                 Company = a.ClientCompany.Name,
                 OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.ClientCompany.DocumentImage)),
-                Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
-                PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
+                Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness, a.CustomerDetail, a.BeneficiaryDetail),
+                PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness, a.CustomerDetail, a.BeneficiaryDetail),
                 AssignedToAgency = a.AssignedToAgency,
                 Document = a.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : Applicationsettings.NO_POLICY_IMAGE,
-                Customer = ClaimsInvestigationExtension.GetPersonPhoto(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
-                Name = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? a.CustomerDetail.Name : a.BeneficiaryDetail.Name,
+                Customer = ClaimsInvestigationExtension.GetPersonPhoto(a.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness, a.CustomerDetail, a.BeneficiaryDetail),
+                Name = a.PolicyDetail.LineOfBusinessId ==underWritingLineOfBusiness ? a.CustomerDetail.Name : a.BeneficiaryDetail.Name,
                 Policy = a.PolicyDetail?.LineOfBusiness.Name,
                 Status = a.InvestigationCaseStatus.Name,
                 ServiceType = a.PolicyDetail?.LineOfBusiness.Name,
@@ -315,8 +320,8 @@ namespace risk.control.system.Controllers.Api.Agency
                 TimeElapsed = DateTime.Now.Subtract(a.AllocatedToAgencyTime.Value).TotalSeconds,
                 IsNewAssigned = a.AllocateView <= 1,
                 IsQueryCase = a.InvestigationCaseSubStatusId == statuses[CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR],
-                PersonMapAddressUrl = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? a.CustomerDetail.CustomerLocationMap : a.BeneficiaryDetail.BeneficiaryLocationMap,
-                AddressLocationInfo = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? a.CustomerDetail.AddressLocationInfo : a.BeneficiaryDetail.AddressLocationInfo
+                PersonMapAddressUrl = a.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness ? a.CustomerDetail.CustomerLocationMap : a.BeneficiaryDetail.BeneficiaryLocationMap,
+                AddressLocationInfo = a.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness ? a.CustomerDetail.AddressLocationInfo : a.BeneficiaryDetail.AddressLocationInfo
             }).ToList();
 
             return Ok(response);
@@ -387,6 +392,7 @@ namespace risk.control.system.Controllers.Api.Agency
                             i.UserRoleActionedTo == vendorUser.Vendor.Email &&
                             i.InvestigationCaseSubStatusId == statuses[CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR])
                 .ToListAsync();
+            var underWritingLineOfBusiness = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == UNDERWRITING).LineOfBusinessId;
 
             var claimsSubmitted = claims.Select(a =>
             {
@@ -405,13 +411,13 @@ namespace risk.control.system.Controllers.Api.Agency
                     PolicyId = a.PolicyDetail.ContractNumber,
                     Amount = string.Format(Extensions.GetCultureByCountry(vendorUser.Country.Code.ToUpper()), "{0:C}", a.PolicyDetail.SumAssuredValue),
                     AssignedToAgency = a.AssignedToAgency,
-                    Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
-                    PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
+                    Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness, a.CustomerDetail, a.BeneficiaryDetail),
+                    PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness, a.CustomerDetail, a.BeneficiaryDetail),
                     Company = a.ClientCompany.Name,
                     OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.ClientCompany.DocumentImage)),
                     Document = a.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : Applicationsettings.NO_POLICY_IMAGE,
-                    Customer = ClaimsInvestigationExtension.GetPersonPhoto(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
-                    Name = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? a.CustomerDetail.Name : a.BeneficiaryDetail.Name,
+                    Customer = ClaimsInvestigationExtension.GetPersonPhoto(a.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness, a.CustomerDetail, a.BeneficiaryDetail),
+                    Name = a.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness ? a.CustomerDetail.Name : a.BeneficiaryDetail.Name,
                     Policy = a.PolicyDetail?.LineOfBusiness.Name,
                     Status = a.InvestigationCaseStatus.Name,
                     ServiceType = a.PolicyDetail?.LineOfBusiness.Name,
@@ -540,6 +546,7 @@ namespace risk.control.system.Controllers.Api.Agency
                     }
                 }
             }
+            var underWritingLineOfBusiness = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == UNDERWRITING).LineOfBusinessId;
 
             var response = claimsSubmitted
                 .Select(a => new ClaimsInvestigationAgencyResponse
@@ -548,15 +555,15 @@ namespace risk.control.system.Controllers.Api.Agency
                     PolicyId = a.PolicyDetail.ContractNumber,
                     Amount = string.Format(Extensions.GetCultureByCountry(agencyUser.Country.Code.ToUpper()), "{0:C}", a.PolicyDetail.SumAssuredValue),
                     AssignedToAgency = a.AssignedToAgency,
-                    Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
-                    PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
+                    Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness, a.CustomerDetail, a.BeneficiaryDetail),
+                    PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.LineOfBusinessId== underWritingLineOfBusiness, a.CustomerDetail, a.BeneficiaryDetail),
                     Company = a.ClientCompany.Name,
                     OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.ClientCompany.DocumentImage)),
                     Document = a.PolicyDetail.DocumentImage != null ?
                                 string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) :
                                 Applicationsettings.NO_POLICY_IMAGE,
-                    Customer = ClaimsInvestigationExtension.GetPersonPhoto(a.PolicyDetail.ClaimType, a.CustomerDetail, a.BeneficiaryDetail),
-                    Name = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? a.CustomerDetail.Name : a.BeneficiaryDetail.Name,
+                    Customer = ClaimsInvestigationExtension.GetPersonPhoto(a.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness, a.CustomerDetail, a.BeneficiaryDetail),
+                    Name = a.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness ? a.CustomerDetail.Name : a.BeneficiaryDetail.Name,
                     Policy = a.PolicyDetail?.LineOfBusiness.Name,
                     Status = a.InvestigationCaseStatus.Name,
                     ServiceType = a.PolicyDetail?.LineOfBusiness.Name,

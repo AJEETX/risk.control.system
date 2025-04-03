@@ -43,6 +43,8 @@ namespace risk.control.system.Services
 
     public class NotificationService : INotificationService
     {
+        private const string CLAIMS = "claims";
+        private const string UNDERWRITING = "underwriting";
         private readonly ApplicationDbContext context;
         private readonly ISmsService smsService;
         private readonly IWebHostEnvironment webHostEnvironment;
@@ -245,13 +247,14 @@ namespace risk.control.system.Services
             string recepientName = string.Empty;
             string recepientPhone = string.Empty;
             int isdCode = claim.CustomerDetail.PinCode.Country.ISDCode;
-            if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
+            var underWritingLineOfBusiness = context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == UNDERWRITING).LineOfBusinessId;
+            if (claim.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness)
             {
                 mobile = claim.CustomerDetail.ContactNumber.ToString();
                 recepientName = claim.CustomerDetail.Name;
                 recepientPhone = claim.CustomerDetail.ContactNumber.ToString();
             }
-            else if (claim.PolicyDetail.ClaimType == ClaimType.DEATH)
+            else
             {
                 mobile = beneficiary.ContactNumber.ToString();
                 recepientName = beneficiary.Name;
@@ -354,16 +357,17 @@ namespace risk.control.system.Services
                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
             var beneficiary = context.BeneficiaryDetail.Include(b=>b.Country)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == id);
+            var underWritingLineOfBusiness = context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == UNDERWRITING).LineOfBusinessId;
 
             string recepientName = string.Empty;
             string recepientPhone = string.Empty;
             int isdCode = claim.CustomerDetail.Country.ISDCode;
-            if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
+            if (claim.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness)
             {
                 recepientName = claim.CustomerDetail.Name;
                 recepientPhone = claim.CustomerDetail.ContactNumber.ToString();
             }
-            else if (claim.PolicyDetail.ClaimType == ClaimType.DEATH)
+            else
             {
                 recepientName = beneficiary.Name;
                 recepientPhone = beneficiary.ContactNumber.ToString();
@@ -436,15 +440,16 @@ namespace risk.control.system.Services
                 .Include(c => c.Country)
                 .Include(c => c.State)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == id);
+            var underWritingLineOfBusiness = context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == UNDERWRITING).LineOfBusinessId;
 
             string mobile = string.Empty;
             string recepientName = string.Empty;
-            if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
+            if (claim.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness)
             {
                 mobile = claim.CustomerDetail.ContactNumber.ToString();
                 recepientName = claim.CustomerDetail.Name;
             }
-            else if (claim.PolicyDetail.ClaimType == ClaimType.DEATH)
+            else 
             {
                 mobile = beneficiary.ContactNumber.ToString();
                 recepientName = beneficiary.Name;

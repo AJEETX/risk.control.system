@@ -40,7 +40,7 @@ namespace risk.control.system.Services
 
         Task<Vendor> WithdrawCase(string userEmail, ClaimTransactionModel model, string claimId);
 
-        Task<List<string>> ProcessAutoAllocation(List<string> claims, ClientCompany company, string userEmail);
+        Task<string> ProcessAutoAllocation(string claim, string userEmail);
         Task<ClientCompany> WithdrawCaseByCompany(string userEmail, ClaimTransactionModel model, string claimId);
         Task<bool> SubmitNotes(string userEmail, string claimId, string notes);
 
@@ -106,12 +106,12 @@ namespace risk.control.system.Services
                     .AsNoTracking()
                     .Include(c => c.PolicyDetail)
                     .Include(c => c.CustomerDetail)
-                        .ThenInclude(c => c.PinCode)
+                    .ThenInclude(c => c.PinCode)
                     .Include(c => c.BeneficiaryDetail)
                         .ThenInclude(c => c.PinCode)
                     .FirstOrDefaultAsync(c => c.ClaimsInvestigationId == claim);
 
-                string pinCode2Verify = claimsInvestigation.PolicyDetail?.ClaimType == ClaimType.HEALTH
+                string pinCode2Verify = claimsInvestigation.PolicyDetail?.LineOfBusiness.Name.ToLower() == CLAIMS
                     ? claimsInvestigation.CustomerDetail?.PinCode?.Code
                     : claimsInvestigation.BeneficiaryDetail?.PinCode?.Code;
 
@@ -158,68 +158,72 @@ namespace risk.control.system.Services
             var results = await Task.WhenAll(claimTasks); // Run all tasks in parallel
             return results.Where(r => r != null).ToList(); // Remove nulls and return allocated claims
         }
-        public async Task<List<string>> ProcessAutoAllocation(List<string> claims, ClientCompany company, string userEmail)
+        public async Task<string> ProcessAutoAllocation(string claim, string userEmail)
         {
-            var claimTasks = claims.Select(async claim =>
+            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == userEmail);
+
+            var company = _context.ClientCompany
+                    .Include(c => c.EmpanelledVendors.Where(v => v.Status == VendorStatus.ACTIVE && !v.Deleted))
+                    .ThenInclude(e => e.VendorInvestigationServiceTypes)
+                    .ThenInclude(v => v.District)
+                    .FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
+
+            // 1. Fetch Claim Details & Pincode in Parallel
+            var claimsInvestigation = await _context.ClaimsInvestigation
+                .AsNoTracking()
+                .Include(c => c.PolicyDetail)
+                .Include(c => c.CustomerDetail)
+                    .ThenInclude(c => c.PinCode)
+                .Include(c => c.BeneficiaryDetail)
+                    .ThenInclude(c => c.PinCode)
+                .FirstOrDefaultAsync(c => c.ClaimsInvestigationId == claim);
+
+            string pinCode2Verify = claimsInvestigation.PolicyDetail?.LineOfBusiness.Name.ToLower() == CLAIMS
+                ? claimsInvestigation.CustomerDetail?.PinCode?.Code
+                : claimsInvestigation.BeneficiaryDetail?.PinCode?.Code;
+
+            var pincodeDistrictState = await _context.PinCode
+                .AsNoTracking()
+                .Include(d => d.District)
+                .Include(s => s.State)
+                .FirstOrDefaultAsync(p => p.Code == pinCode2Verify);
+
+            // 2. Find Vendors Using LINQ
+            var distinctVendorIds = company.EmpanelledVendors
+                .Where(vendor => vendor.VendorInvestigationServiceTypes.Any(serviceType =>
+                    serviceType.InvestigationServiceTypeId == claimsInvestigation.PolicyDetail.InvestigationServiceTypeId &&
+                    serviceType.LineOfBusinessId == claimsInvestigation.PolicyDetail.LineOfBusinessId &&
+                    (serviceType.StateId == pincodeDistrictState.StateId &&
+                     (serviceType.DistrictId == null || serviceType.DistrictId == pincodeDistrictState.DistrictId))
+                ))
+                .Select(v => v.VendorId) // Select only VendorId
+                .Distinct() // Ensure uniqueness
+                .ToList();
+
+            if (!distinctVendorIds.Any()) return null; // No vendors found, skip this claim
+
+            // 3. Get Vendor Load & Allocate
+            var vendorsWithCaseLoad = GetAgencyIdsLoad(distinctVendorIds)
+                .OrderBy(o => o.CaseCount)
+                .ToList();
+
+            var selectedVendorId = vendorsWithCaseLoad.FirstOrDefault();
+            if (selectedVendorId == null) return null; // No vendors available
+
+            var (policy, status) = await AllocateToVendor(userEmail, claimsInvestigation.ClaimsInvestigationId, selectedVendorId.VendorId);
+
+            if (string.IsNullOrEmpty(policy) || string.IsNullOrEmpty(status))
             {
-                // 1. Fetch Claim Details & Pincode in Parallel
-                var claimsInvestigation = await _context.ClaimsInvestigation
-                    .AsNoTracking()
-                    .Include(c => c.PolicyDetail)
-                    .Include(c => c.CustomerDetail)
-                        .ThenInclude(c => c.PinCode)
-                    .Include(c => c.BeneficiaryDetail)
-                        .ThenInclude(c => c.PinCode)
-                    .FirstOrDefaultAsync(c => c.ClaimsInvestigationId == claim);
+                await AssignToAssigner(userEmail, new List<string> { claim });
+                await mailboxService.NotifyClaimAssignmentToAssigner(userEmail, new List<string> { claim });
+                return null;
+            }
 
-                string pinCode2Verify = claimsInvestigation.PolicyDetail?.ClaimType == ClaimType.HEALTH
-                    ? claimsInvestigation.CustomerDetail?.PinCode?.Code
-                    : claimsInvestigation.BeneficiaryDetail?.PinCode?.Code;
+            // 4. Send Notification in Background
+            backgroundJobClient.Enqueue(() =>
+                mailboxService.NotifyClaimAllocationToVendor(userEmail, policy, claimsInvestigation.ClaimsInvestigationId, selectedVendorId.VendorId));
 
-                var pincodeDistrictState = await _context.PinCode
-                    .AsNoTracking()
-                    .Include(d => d.District)
-                    .Include(s => s.State)
-                    .FirstOrDefaultAsync(p => p.Code == pinCode2Verify);
-
-                // 2. Find Vendors Using LINQ
-                var distinctVendorIds = company.EmpanelledVendors
-                    .Where(vendor => vendor.VendorInvestigationServiceTypes.Any(serviceType =>
-                        serviceType.InvestigationServiceTypeId == claimsInvestigation.PolicyDetail.InvestigationServiceTypeId &&
-                        serviceType.LineOfBusinessId == claimsInvestigation.PolicyDetail.LineOfBusinessId &&
-                        (serviceType.StateId == pincodeDistrictState.StateId &&
-                         (serviceType.DistrictId == null || serviceType.DistrictId == pincodeDistrictState.DistrictId))
-                    ))
-                    .Select(v => v.VendorId) // Select only VendorId
-                    .Distinct() // Ensure uniqueness
-                    .ToList();
-
-                if (!distinctVendorIds.Any()) return null; // No vendors found, skip this claim
-
-                // 3. Get Vendor Load & Allocate
-                var vendorsWithCaseLoad = GetAgencyIdsLoad(distinctVendorIds)
-                    .OrderBy(o => o.CaseCount)
-                    .ToList();
-
-                var selectedVendorId = vendorsWithCaseLoad.FirstOrDefault();
-                if (selectedVendorId == null) return null; // No vendors available
-
-                var (policy, status) = await AllocateToVendor(userEmail, claimsInvestigation.ClaimsInvestigationId, selectedVendorId.VendorId);
-
-                if (string.IsNullOrEmpty(policy) || string.IsNullOrEmpty(status))
-                {
-                    return null;
-                }
-
-                // 4. Send Notification in Background
-                backgroundJobClient.Enqueue(() =>
-                    mailboxService.NotifyClaimAllocationToVendor(userEmail, policy, claimsInvestigation.ClaimsInvestigationId, selectedVendorId.VendorId));
-
-                return claim; // Return allocated claim
-            });
-
-            var results = await Task.WhenAll(claimTasks); // Run all tasks in parallel
-            return results.Where(r => r != null).ToList(); // Remove nulls and return allocated claims
+            return claimsInvestigation.PolicyDetail.ContractNumber; // Return allocated claim
         }
         public List<VendorIdWithCases> GetAgencyIdsLoad(List<long> existingVendors)
         {
@@ -601,13 +605,14 @@ namespace risk.control.system.Services
                 .Include(c => c.CustomerDetail).ThenInclude(c => c.PinCode).Include(c => c.BeneficiaryDetail)
                 .Where(c => c.ClaimsInvestigationId == claimsInvestigationId).FirstOrDefault();
             var agentUser = _context.VendorApplicationUser.Include(u => u.Vendor).FirstOrDefault(u => u.Email == vendorAgentEmail);
+            var underWritingLineOfBusiness = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == UNDERWRITING).LineOfBusinessId;
 
             string drivingDistance, drivingDuration, drivingMap;
             float distanceInMeters;
             int durationInSeconds;
             string LocationLatitude = string.Empty;
             string LocationLongitude = string.Empty;
-            if (claim.PolicyDetail?.ClaimType == ClaimType.HEALTH)
+            if (claim.PolicyDetail?.LineOfBusinessId == underWritingLineOfBusiness)
             {
                 LocationLatitude = claim.CustomerDetail?.Latitude;
                 LocationLongitude = claim.CustomerDetail?.Longitude;
