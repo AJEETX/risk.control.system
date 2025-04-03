@@ -13,7 +13,18 @@
             </p>
         </a>
     </li>
-
+    if (Model.BulkUpload)
+    {
+        <li class="nav-item">
+            <a is-active-page asp-controller="ClaimsLog" asp-action="Uploads" class="actual-link nav-link @Url.MakeActiveClass("ClaimsLog","Uploads")">
+                <i class="nav-icon fa fa-upload"></i>
+                <p>
+                    <span class="badge badge-secondary"> UPLOAD <sub>file</sub></span>
+                </p>
+            </a>
+        </li>
+    }
+   
     if (Model.AutoAllocation)
     {
         <li class="nav-item">
@@ -44,7 +55,7 @@
                                     @Url.MakeActiveClass("CreatorManual","EmpanelledVendors")">
                 <i class="fas fa-random nav-icon"></i>
                 <p>
-                    <span class="badge badge-warning">ASSIGN</span>
+                    <span class="badge badge-warning">ADD/ASSIGN</span>
                 </p>
             </a>
         </li>
@@ -126,12 +137,5 @@
         </a>
     </li>
 
-    <li class="nav-item">
-        <a is-active-page asp-controller="ClaimsLog" asp-action="Uploads" class="actual-link nav-link @Url.MakeActiveClass("ClaimsLog","Uploads")">
-            <i class="nav-icon fa fa-upload"></i>
-            <p>
-                <span class="badge badge-secondary"> UPLOAD Log</span>
-            </p>
-        </a>
-    </li>
+    
 }

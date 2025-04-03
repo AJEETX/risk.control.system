@@ -4,7 +4,7 @@
     {
         public bool BulkUpload { get; set; }
         public bool UserCanCreate { get; set; }
-        public bool Refresh { get; set; }
+        public int UploadId { get; set; }
         public bool HasClaims { get; set; }
         public UploadType? Uploadtype { get; set; }
         public CREATEDBY CREATEDBY { get; set; }

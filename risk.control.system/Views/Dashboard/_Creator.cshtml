@@ -2,7 +2,22 @@
 
 <div class="row">
 
-@if(Model.AutoAllocation)
+    @if(Model.BulkUpload)
+    {
+        <div class="col">
+            <div class="small-box bg-secondary">
+                <div class="inner">
+                    <h3 id="upload-claims">@Model.BulkUploadBlockCount</h3>
+                    <span>@Model.BulkUploadBlockName</span>
+                </div>
+                <div class="icon">
+                    <i class="fa fa-upload"></i>
+                </div>
+                <a href="@Model.BulkUploadBlockUrl" class="details-page small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+        </div>
+    }
+    @if(Model.AutoAllocation)
 {
         <div class="col">
 
@@ -62,18 +77,7 @@
             </div>
         </div>
 
-    <div class="col">
-        <div class="small-box bg-secondary">
-            <div class="inner">
-                <h3 id="upload-claims">@Model.BulkUploadBlockCount</h3>
-                <span>@Model.BulkUploadBlockName</span>
-            </div>
-            <div class="icon">
-                <i class="fa fa-upload"></i>
-            </div>
-            <a href="@Model.BulkUploadBlockUrl" class="details-page small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
-        </div>
-    </div>
+    
 </div>
 
 <div class="row">

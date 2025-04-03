@@ -1,21 +1,35 @@
-﻿@{
+﻿@model CreateClaims
+@{
     ViewData["Title"] = "File Upload";
+    var uploadId = Context.Request.Query["uploadId"];
 }
 
 <section class="content">
-    <div class="card shadow-lg border-1 rounded-lg">
-        <div class="card-header bg-secondary text-white">
-            <h3 class="card-title"><i class="nav-icon fa fa-upload"></i> Upload log</h3>
+    <div id="article" class="card shadow-lg border-1 rounded-lg">
+        <input type="hidden" id="uploadId" value="@uploadId" />
+        <partial name="Creator/_UploadTitle" model="Model" />
+
+       
+        <div class="card shadow-lg border-1 rounded-lg direct-chat-warning collapsed-card">
+            <partial name="Creator/_UploadSample" model="Model" />
+
+            <div class="card-body">
+                <form id="upload-claims" asp-controller="CreatorPost" asp-action="New" method="post" enctype="multipart/form-data">
+                    <input type="hidden" asp-for="CREATEDBY" value="@CREATEDBY.AUTO" />
+                    <partial name="Creator/_Upload" model="Model" />
+                </form>
+
+            </div>
         </div>
         <div class="card shadow-lg border-1 rounded-lg">
-            <button id="refreshTable" class="btn btn-default"> <i class="fas fa-sync"></i> Refresh</button>
+            <button id="refreshTable" class="btn btn-default"> <i id="refreshIcon" class="fas fa-sync"></i> Refresh</button>
         </div>
         
         <div class="card-body">
             <div class="submit-progress hidden">
                 <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
             </div>
-            <table id="file-table" class="table table-bordered table-hover dt-responsive nowrap w-100">
+            <table id="customerTableAuto" class="table table-bordered table-hover dt-responsive nowrap w-100">
                 <thead>
                     <tr>
                         <th>#</th>

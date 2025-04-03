@@ -211,7 +211,7 @@
                     var buttons = "";
                     console.log(row.status);
                     if (isPending) {
-                        buttons += '<button disabled class="btn btn-xs btn-info"><i class="fa fa-sync fa-spin"></i> "' + row.status+'"</button>&nbsp;';
+                        buttons += '<button disabled class="btn btn-xs btn-info"><i class="fa fa-sync fa-spin"></i> ' + row.status+'</button>&nbsp;';
                         buttons += '<button disabled class="btn btn-xs btn-warning"><i class="fa fa-sync fa-spin"></i> Edit</button>&nbsp;';
                         buttons += '<button disabled class="btn btn-xs btn-warning"><i class="fa fa-sync fa-spin"></i> Delete</button>&nbsp;';
                     }
@@ -235,6 +235,13 @@
             { "data": "timeElapsed", bVisible: false },
         ],
         rowCallback: function (row, data) {
+            if (data.isNewAssigned) {
+                $('td', row).addClass('isNewAssigned');
+                // Remove the class after 3 seconds
+                setTimeout(function () {
+                    $('td', row).removeClass('isNewAssigned');
+                }, 3000);
+            }
             var $row = $(row);
 
             if (data.status === "PENDING") {
@@ -249,15 +256,21 @@
                 $row.removeClass('row-opacity-50 watermarked'); // Remove styling for other statuses
             }
         },
-        "drawCallback": function (settings, start, end, max, total, pre) {
-
-
+        "drawCallback": function (settings) {
+            var api = this.api();
             var rowCount = (this.fnSettings().fnRecordsTotal()); // total number of rows
             if (rowCount > 0) {
                 $('#allocatedcase').prop('disabled', false);
+                $('#deletecase').prop('disabled', false);
+                var pendingRows = hasPendingRows();
+                if (pendingRows) {
+                    table.ajax.reload(null, false);
+                    $('#checkall').prop('checked', false);
+                }
             }
             else {
                 $('#allocatedcase').prop('disabled', true);
+                $('#deletecase').prop('disabled', true);
             }
             $('#customerTableAuto tbody').on('click', '.btn-info', function (e) {
                 e.preventDefault(); // Prevent the default anchor behavior
@@ -278,20 +291,10 @@
                 window.location.href = $(this).attr('href'); // Navigate to the edit page
             });
         },
-        "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
-            if (aData.isNewAssigned) {
-                $('td', nRow).addClass('isNewAssigned');
-                // Remove the class after 3 seconds
-                setTimeout(function () {
-                    $('td', nRow).removeClass('isNewAssigned');
-                }, 3000);
-            }
-
-        },
         error: function (xhr, status, error) { alert('err ' + error) }
     });
 
-    // Function to check if there are any "Pending" rows
+        // Function to check if there are any "Pending" rows
     function hasPendingRows() {
         var table = $("#customerTableAuto").DataTable();
         var pendingExists = false;
@@ -307,25 +310,6 @@
         return pendingExists;
     }
 
-
-    // Function to refresh data for a specific row
-    function refreshRowData(rowId, rowElement) {
-        $.ajax({
-            url: '/api/Creator/RefreshData', // URL for the refresh data endpoint
-            type: 'GET',
-            data: { id: rowId },
-            success: function (data) {
-                // Update the row's data with the refreshed data
-                var table = $("#customerTableAuto").DataTable();
-                table.row(rowElement).data(data).draw();
-            },
-            error: function (xhr, status, error) {
-                console.error('Error refreshing row data:', error);
-            }
-        });
-    }
-
-    // Refresh all "Pending" rows after some interval (optional)
     function refreshPendingRows() {
         var table = $("#customerTableAuto").DataTable();
         table.rows().every(function () {
@@ -342,6 +326,50 @@
             }
         });
     }
+    // Function to refresh data for a specific row
+    function refreshRowData(rowId, rowElement) {
+        $.ajax({
+            url: '/api/Creator/RefreshData', // URL for the refresh data endpoint
+            type: 'GET',
+            data: { id: rowId },
+            success: function (data) {
+                // Update the row's data with the refreshed data
+                var table = $("#customerTableAuto").DataTable();
+                if (data) {
+                    table.row(rowElement).data(data).draw();
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error('Error refreshing row data:', error);
+            }
+        });
+    }
+
+    // Function to refresh data for a specific row
+    function refreshRowData(rowId, rowElement) {
+        $.ajax({
+            url: '/api/Creator/RefreshData', // URL for the refresh data endpoint
+            type: 'GET',
+            data: { id: rowId },
+            success: function (data) {
+                // Update the row's data with the refreshed data
+                var table = $("#customerTableAuto").DataTable();
+                if (data) {
+                    // Find the row in DataTable using rowId
+                    var row = table.row(`#row_${rowId}`); // Assuming row ID is set as `id="row_123"`
+
+                    if (row.any()) {  // Check if the row exists
+                        row.data(data).draw();
+                    } else {
+                        console.warn(`Row with ID ${rowId} not found in DataTable.`);
+                    }
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error('Error refreshing row data:', error);
+            }
+        });
+    }
     // Call refreshPendingRows() periodically but only if there are pending rows
     var refreshInterval = setInterval(function () {
         if (!hasPendingRows()) {
@@ -352,49 +380,57 @@
     }, 5000); // Check every 5 seconds (adjust interval as needed)
 
     $('#refreshTable').click(function () {
+        var $icon = $('#refreshIcon');
+        if ($icon) {
+            $icon.addClass('fa-spin');
+        }
         table.ajax.reload(null, false);
         $('#checkall').prop('checked', false);
     });
 
-    var refresh = $('#refresh').val();
-    console.log(refresh);
-    var previousData = null; // Initially, previousData is null
+    var refreshInterval = 3000; // 3 seconds interval
+    var maxAttempts = 3; // Prevent infinite loop
+    var attempts = 0;
+    var initialCount = sessionStorage.getItem("InitialRecordCount");
 
-    if (refresh && refresh.toLocaleLowerCase() === 'true') {
-        function reloadDataUntilReady() {
-            // Reload the DataTable
-            table.ajax.reload(function (json) {
-                // Ensure valid data exists in the response
-                if (json && json.length > 0) {
-                    // If previousData is null, set it to the current data
-                    if (!previousData) {
-                        previousData = json;  // Set initial data
-                        //refresh = 'false';  // Stop refreshing
-                        //$('#checkall').prop('checked', false);  // Uncheck the 'checkall' checkbox
-                    } else {
-                        // Compare current data with previousData
-                        if (JSON.stringify(json) !== JSON.stringify(previousData)) {
-                            // Data has changed, update previousData and reload
-                            previousData = json;  // Update previousData
-                            refresh = 'false';  // Stop refreshing
-                            $('#checkall').prop('checked', false);  // Uncheck the 'checkall' checkbox
-                        } else {
-                            // Data is the same, reload again after 5 seconds
-                            setTimeout(reloadDataUntilReady, 5000);
-                        }
-                    }
-                } else {
-                    // No data or data is empty, reload again after 5 seconds
-                    setTimeout(reloadDataUntilReady, 5000);
-                }
-            }, false); // false to preserve the pagination
+    // Check if a refresh is needed after upload
+    var refreshDatatble = sessionStorage.getItem("RefreshDataTable");
+    if (sessionStorage.getItem("RefreshDataTable") == "RefreshDataTable") {
+        if (initialCount === null) {
+            initialCount = table.data().count(); // Save the current record count
+            sessionStorage.setItem("InitialRecordCount", initialCount);
+        } else {
+            initialCount = parseInt(initialCount, 10); // Convert to number
         }
-
-        // Start the process of reloading the DataTable
-        reloadDataUntilReady();
+        pollForNewData();
+        sessionStorage.removeItem("RefreshDataTable"); // Clear the refresh flag
     }
 
+    function pollForNewData() {
+        attempts++;
 
+        if (attempts > maxAttempts) {
+            console.log("Max attempts reached, stopping refresh.");
+            sessionStorage.removeItem("InitialRecordCount"); // Clean up
+            return;
+        }
+
+        console.log("Refreshing DataTable... Attempt: " + attempts);
+
+        table.ajax.reload(function () {
+            var newCount = table.data().count(); // Get updated row count
+
+            if (newCount > initialCount) {
+                console.log("New records detected! Stopping refresh.");
+                sessionStorage.removeItem("InitialRecordCount"); // Clean up
+            } else {
+                setTimeout(pollForNewData, refreshInterval);
+            }
+        }, false);
+    }
+    table.on('xhr.dt', function () {
+        $('#refreshIcon').removeClass('fa-spin');
+    });
     table.on('mouseenter', '.map-thumbnail', function () {
             const $this = $(this); // Cache the current element
 
@@ -530,6 +566,93 @@
         }
     });
 
+    $('#deletecase').on('click', function (e) {
+        e.preventDefault(); // Prevent form submission
+
+        var selectedCases = [];
+        $("input[type='checkbox'].vendors:checked").each(function () {
+            selectedCases.push($(this).val()); // Get checked case IDs
+        });
+
+        if (selectedCases.length === 0) {
+            $.alert({
+                title: "Delete !",
+                content: "Please select Case(s) to delete.",
+                type: 'red',
+                closeIcon: true,
+                buttons: {
+                    cancel: {
+                        text: "OK",
+                        btnClass: 'btn-danger'
+                    }
+                }
+            });
+            return;
+        }
+
+        $.confirm({
+            title: "Confirm Delete",
+            content: "Are you sure you want to delete selected case(s) <span class='badge badge-light'>max 10 </span>?",
+            icon: 'fas fa-trash',
+            type: 'red',
+            closeIcon: true,
+            buttons: {
+                confirm: {
+                    text: "Delete",
+                    btnClass: 'btn-danger',
+                    action: function () {
+                        deleteSelectedCases(selectedCases);
+                    }
+                },
+                cancel: {
+                    text: "Cancel",
+                    btnClass: 'btn-default'
+                }
+            }
+        });
+    });
+    function deleteSelectedCases(claims) {
+        $.ajax({
+            url: "/CreatorPost/DeleteCases", // Update with your actual delete endpoint
+            type: "POST",
+            data: JSON.stringify({ claims: claims }),
+            contentType: "application/json",
+            success: function (response) {
+                if (response.success) {
+                    $.alert({
+                        title: "Deleted!",
+                        content: "Selected case(s) have been deleted.",
+                        type: 'red',
+                        buttons: {
+                            ok: {
+                                text: "OK",
+                                btnClass: 'btn-danger'
+                            }
+                        }
+                    });
+
+                    // Refresh DataTable
+                    $('#customerTableAuto').DataTable().ajax.reload(null, false);
+                    $('#checkall').prop('checked', false);
+
+                } else {
+                    $.alert({
+                        title: "Error!",
+                        content: response.message || "Failed to delete cases.",
+                        type: 'red'
+                    });
+                }
+            },
+            error: function () {
+                $.alert({
+                    title: "Error!",
+                    content: "Something went wrong. Please try again.",
+                    type: 'red'
+                });
+            }
+        });
+    }
+
     $("#postedFile").on('change', function () {
         var MaxSizeInBytes = 1097152;
         //Get count of selected files
@@ -569,7 +692,7 @@
                         title: "Outdated Browser !",
                         content: "This browser does not support FileReader. Try on modern browser!",
                         icon: 'fas fa-exclamation-triangle',
-            
+
                         type: 'red',
                         closeIcon: true,
                         buttons: {
@@ -587,7 +710,7 @@
                     title: "FILE UPLOAD TYPE !!",
                     content: "Pls only select file with extension zip ! ",
                     icon: 'fas fa-exclamation-triangle',
-        
+
                     type: 'red',
                     closeIcon: true,
                     buttons: {
@@ -602,7 +725,6 @@
     });
     let askFileUploadConfirmation = true;
     let askConfirmation = false;
-
     function handleUploadConfirmation(formId, buttonId) {
         $(formId).on('submit', function (event) {
             if (askFileUploadConfirmation) {
@@ -627,6 +749,7 @@
 
                                 $(buttonId).html("<i class='fas fa-sync fa-spin'></i> Uploading");
                                 disableAllInteractiveElements();
+                                setRefreshFlag();
                                 $(formId).submit();
 
                                 var article = document.getElementById("article");
@@ -652,6 +775,12 @@
     handleUploadConfirmation("#upload-claims", "#UploadFileButton");
 });
 
+function setRefreshFlag() {
+    var table = $('#customerTableAuto').DataTable();
+    sessionStorage.setItem("InitialRecordCount", table.data().count()); // Save count before reload
+    sessionStorage.setItem("RefreshDataTable", 'RefreshDataTable');
+    console.log('stored data')
+}
 function showedit(id) {
     $("body").addClass("submit-progress-bg");
     // Wrap in setTimeout so the UI

@@ -8,7 +8,7 @@
                 <div class="input-group-prepend">
                     <span class="input-group-text"><i class="fa fa-file-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                 </div>
-                @if (Model.BulkUpload)
+                @if (Model.BulkUpload && Model.UserCanCreate)
                 {
                     <select asp-for="Uploadtype" data-toggle="tooltip" title="Select upload type" name="uploadtype" id="uploadtype" required class="form-control remarks" asp-items="Html.GetEnumSelectList<UploadType>()">
                         <option value="" title="SELECT">--- SELECT---</option>
@@ -16,7 +16,7 @@
                 }
                 else
                 {
-                    <select disabled data-toggle="tooltip" title=" --- DISABLED --- " name="uploadtype" id="uploadtype" required class="form-control remarks">
+                    <select disabled data-toggle="tooltip" title=" --- DISABLED --- "  class="form-control remarks">
                         <option value="">--- DISABLED---</option>
                     </select>
                 }
@@ -29,7 +29,7 @@
             <span class="input-group-label"> Perform Upload: </span>
             <div class="input-group mb-3">
                 <img class="form-Image" id="ftpImage" src="/img/upload.png">
-                @if (Model.BulkUpload)
+                @if (Model.BulkUpload && Model.UserCanCreate)
                 {
                     <input accept=".zip" type="file" class="form-control remarks" name="postedFile" id="postedFile" data-toggle="tooltip" title="Select file to upload" required/>
                     <button id="UploadFileButton" type="submit" class="btn btn-info upload"><i class="nav-icon fa fa-upload"></i> Upload</button>

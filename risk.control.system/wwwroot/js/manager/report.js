@@ -182,6 +182,17 @@
 
         },
         error: function (xhr, status, error) { alert('err ' + error) }
+   });
+    table.on('xhr.dt', function () {
+        $('#refreshIcon').removeClass('fa-spin');
+    });
+
+    $('#refreshTable').click(function () {
+        var $icon = $('#refreshIcon');
+        if ($icon) {
+            $icon.addClass('fa-spin');
+        }
+        table.ajax.reload(null, false); // false => Retains current page
     });
    table.on('mouseenter', '.map-thumbnail', function () {
             const $this = $(this); // Cache the current element
@@ -206,9 +217,6 @@
             placement: 'top',
             html: true
         });
-    });
-    $('#refreshTable').click(function () {
-        table.ajax.reload(null, false); // false => Retains current page
     });
 });
 

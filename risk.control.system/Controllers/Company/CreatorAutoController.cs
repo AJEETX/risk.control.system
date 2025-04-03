@@ -71,8 +71,8 @@ namespace risk.control.system.Controllers.Company
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
-        [Breadcrumb(" Assign")]
-        public IActionResult New(bool refresh = false)
+        [Breadcrumb(" Add/Assign")]
+        public IActionResult New(int uploadId)
         {
             try
             {
@@ -106,7 +106,7 @@ namespace risk.control.system.Controllers.Company
                     UserCanCreate = userCanCreate, 
                     HasClaims = hasClaim, 
                     FileSampleIdentifier = fileIdentifier,
-                     Refresh = refresh
+                    UploadId = uploadId
                 });
             }
             catch (Exception ex)

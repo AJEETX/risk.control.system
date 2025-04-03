@@ -19,21 +19,6 @@ $(document).ready(function () {
         }
         
     });
-    $('#view-type a').on('click', function () {
-        var id = this.id;
-        if (this.id == 'map-type') {
-            $('#checkboxes').css('display', 'none');
-            $('#maps').css('display', 'block');
-            $('#map-type').css('display', 'none');
-            $('#list-type').css('display', 'block');
-        }
-        else {
-            $('#checkboxes').css('display', 'block');
-            $('#maps').css('display', 'none');
-            $('#map-type').css('display', 'block');
-            $('#list-type').css('display', 'none');
-        }
-    });
 
     var table = $("#customerTable").DataTable({
         ajax: {
@@ -167,6 +152,9 @@ $(document).ready(function () {
         },
         error: function (xhr, status, error) { alert('err ' + error) }
     });
+    table.on('xhr.dt', function () {
+        $('#refreshIcon').removeClass('fa-spin');
+    });
     table.on('mouseenter', '.map-thumbnail', function () {
             const $this = $(this); // Cache the current element
 
@@ -246,7 +234,11 @@ $(document).ready(function () {
         });
     });
     $('#refreshTable').click(function () {
+        var $icon = $('#refreshIcon');
+        if ($icon) {
+            $icon.addClass('fa-spin');
+        }
         table.ajax.reload(null, false); // false => Retains current page
-            $("#allocatedcase").prop('disabled', true);
+        $("#allocatedcase").prop('disabled', true);
     });
 });

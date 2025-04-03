@@ -85,18 +85,50 @@ namespace risk.control.system.Controllers.Company
             }
         }
 
-        [Breadcrumb(" Upload Log")]
-        public async Task<IActionResult> Uploads()
+        [Breadcrumb(" Upload File")]
+        public async Task<IActionResult> Uploads(int uploadId = 0)
         {
             try
             {
-                return View();
+                bool userCanCreate = true;
+                int availableCount = 0;
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+
+                var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).ThenInclude(c => c.Country).FirstOrDefault(u => u.Email == currentUserEmail);
+                if (companyUser.ClientCompany.LicenseType == Standard.Licensing.LicenseType.Trial)
+                {
+                    var totalClaimsCreated = _context.ClaimsInvestigation.Count(c => !c.Deleted && c.ClientCompanyId == companyUser.ClientCompanyId);
+                    availableCount = companyUser.ClientCompany.TotalCreatedClaimAllowed - totalClaimsCreated;
+                    if (totalClaimsCreated >= companyUser.ClientCompany.TotalCreatedClaimAllowed)
+                    {
+                        userCanCreate = false;
+                        notifyService.Information($"MAX Case limit = <b>{companyUser.ClientCompany.TotalCreatedClaimAllowed}</b> reached");
+                    }
+                    else
+                    {
+                        notifyService.Information($"Limit available = <b>{availableCount}</b>");
+                    }
+                }
+                var createdClaimsStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(s => s.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
+                var hasClaim = _context.ClaimsInvestigation.Any(c => c.ClientCompanyId == companyUser.ClientCompany.ClientCompanyId &&
+                !c.Deleted &&
+                c.InvestigationCaseSubStatus == createdClaimsStatus);
+                var fileIdentifier = companyUser.ClientCompany.Country.Code.ToLower();
+
+                return View(new CreateClaims
+                {
+                    BulkUpload = companyUser.ClientCompany.BulkUpload,
+                    UserCanCreate = userCanCreate,
+                    HasClaims = hasClaim,
+                    FileSampleIdentifier = fileIdentifier,
+                    UploadId = uploadId
+                });
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return RedirectToAction(nameof(Uploads), "ClaimsLog");
             }
         }
     }

@@ -206,7 +206,7 @@ namespace risk.control.system.Services
             //}
 
             var filesUploadCount = _context.FilesOnFileSystem.Count(f => f.CompanyId == company.ClientCompanyId && f.UploadedBy == companyUser.Email);
-            data.BulkUploadBlockName = "Upload Log";
+            data.BulkUploadBlockName = "Upload file";
             data.BulkUploadBlockUrl = "/ClaimsLog/Uploads";
             data.BulkUploadBlockCount = filesUploadCount;
 

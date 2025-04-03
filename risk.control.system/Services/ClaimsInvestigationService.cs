@@ -95,8 +95,6 @@ namespace risk.control.system.Services
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == userEmail);
 
             var company = _context.ClientCompany
-                    .Include(c => c.EmpanelledVendors)
-                    .ThenInclude(e => e.VendorInvestigationServiceTypes)
                     .Include(c => c.EmpanelledVendors.Where(v => v.Status == VendorStatus.ACTIVE && !v.Deleted))
                     .ThenInclude(e => e.VendorInvestigationServiceTypes)
                     .ThenInclude(v => v.District)
@@ -318,6 +316,7 @@ namespace risk.control.system.Services
                     claimsInvestigation.UserRoleActionedTo = $"{currentUser.ClientCompany.Email}";
                     claimsInvestigation.CurrentClaimOwner = currentUser.Email;
                     claimsInvestigation.AssignedToAgency = false;
+                    claimsInvestigation.STATUS = ALLOCATION_STATUS.READY;
                     claimsInvestigation.IsReady2Assign = true;
                     claimsInvestigation.CREATEDBY = CREATEDBY.MANUAL;
                     claimsInvestigation.AutoAllocated = false;
@@ -368,6 +367,7 @@ namespace risk.control.system.Services
             claimsInvestigation.Updated = DateTime.Now;
             claimsInvestigation.UpdatedBy = currentUser.FirstName + " " + currentUser.LastName + "( " + currentUser.Email + ")";
             claimsInvestigation.CurrentUserEmail = userEmail;
+                    claimsInvestigation.STATUS = ALLOCATION_STATUS.READY;
             claimsInvestigation.AssignedToAgency = false;
             claimsInvestigation.CurrentClaimOwner = userEmail;
             claimsInvestigation.UserEmailActioned = userEmail;
@@ -439,6 +439,7 @@ namespace risk.control.system.Services
             claimsInvestigation.Updated = DateTime.Now;
             claimsInvestigation.UpdatedBy = currentUser.FirstName + " " + currentUser.LastName + "( " + currentUser.Email + ")";
             claimsInvestigation.CurrentUserEmail = userEmail;
+                    claimsInvestigation.STATUS = ALLOCATION_STATUS.READY;
             claimsInvestigation.AssignedToAgency = false;
             claimsInvestigation.CurrentClaimOwner = currentUser.Email;
             claimsInvestigation.UserEmailActioned = userEmail;

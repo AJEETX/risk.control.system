@@ -103,6 +103,7 @@ builder.Services.Configure<ForwardedHeadersOptions>(options => {
 });
 
 builder.Services.AddFeatureManagement().AddFeatureFilter<TimeWindowFilter>();
+builder.Services.AddScoped<ICaseCreationService, CaseCreationService>();
 builder.Services.AddScoped<IPdfReportService, PdfReportService>();
 builder.Services.AddScoped<IUploadService, UploadService>();
 builder.Services.AddScoped<IUnderwritingService, UnderwritingService>();

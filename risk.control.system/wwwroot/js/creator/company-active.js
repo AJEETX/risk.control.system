@@ -204,7 +204,15 @@
     });
 
     $('#refreshTable').click(function () {
+        var $icon = $('#refreshIcon');
+        if ($icon) {
+            $icon.addClass('fa-spin');
+        }
         table.ajax.reload(null, false); // false => Retains current page
+    });
+
+    table.on('xhr.dt', function () {
+        $('#refreshIcon').removeClass('fa-spin');
     });
     // Show the full map on hover and hide it when the mouse leaves
     table

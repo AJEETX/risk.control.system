@@ -236,13 +236,13 @@ namespace risk.control.system.Services
                 {
                     uploadFileData.Completed = true;
                     uploadFileData.Icon = "fas fa-check-circle i-green";
-                    uploadFileData.Message = "Upload process completed";
+                    uploadFileData.Message = "Completed";
                 }
                 else
                 {
                     uploadFileData.Completed = false;
-                    uploadFileData.Icon = "fas fa-times-circle i-red";
-                    uploadFileData.Message = "Some Error occurred";
+                    uploadFileData.Icon = "fas fa-times-circle i-orangered";
+                    uploadFileData.Message = "Error";
                 }
                 await _context.SaveChangesAsync();
 

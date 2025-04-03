@@ -40,21 +40,6 @@
         }
     });
 
-    $('#view-type a').on('click', function () {
-        var id = this.id;
-        if (this.id == 'map-type') {
-            $('#radioButtons').css('display', 'none');
-            $('#maps').css('display', 'block');
-            $('#map-type').css('display', 'none');
-            $('#list-type').css('display', 'block');
-        }
-        else {
-            $('#radioButtons').css('display', 'block');
-            $('#maps').css('display', 'none');
-            $('#map-type').css('display', 'block');
-            $('#list-type').css('display', 'none');
-        }
-    });
     var table = $("#customerTable").DataTable({
         ajax: {
             url: '/api/agency/supervisor/GetNew',
@@ -236,8 +221,16 @@
         },
         error: function (xhr, status, error) { alert('err ' + error) }
     });
+
+    table.on('xhr.dt', function () {
+        $('#refreshIcon').removeClass('fa-spin');
+    });
     $('#refreshTable').click(function () {
-        table.ajax.reload(null, false); // false => Retains current page
+        var $icon = $('#refreshIcon');
+        if ($icon) {
+            $icon.addClass('fa-spin');
+        }
+        table.ajax.reload(null, false);
         $("#allocatedcase").prop('disabled', true);
         $("#investigatecase").prop('disabled', true);
     });

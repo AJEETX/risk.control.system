@@ -167,7 +167,15 @@
             html: true
         });
     });
+    table.on('xhr.dt', function () {
+        $('#refreshIcon').removeClass('fa-spin');
+    });
+
     $('#refreshTable').click(function () {
+        var $icon = $('#refreshIcon');
+        if ($icon) {
+            $icon.addClass('fa-spin');
+        }
         table.ajax.reload(null, false); // false => Retains current page
     });
 });

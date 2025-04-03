@@ -81,7 +81,7 @@ namespace risk.control.system.Controllers.Company
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
             }
-            return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
+            return RedirectToAction(nameof(ClaimsActiveController.Active), "ClaimsActive");
         }
 
         [HttpPost]

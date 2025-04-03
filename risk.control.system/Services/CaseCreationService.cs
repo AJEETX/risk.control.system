@@ -11,103 +11,23 @@ using risk.control.system.Models;
 
 namespace risk.control.system.Services
 {
-    public interface IUploadService
+    public interface ICaseCreationService
     {
-        Task<bool> DoUpload(ClientCompanyApplicationUser companyUser, string[] dataRows, CREATEDBY autoOrManual, ZipArchive archive, ORIGIN fileOrFtp, long lineOfBusinessId);
-        Task<bool> PerformUpload(ClientCompanyApplicationUser companyUser, string[] dataRows, CREATEDBY autoOrManual, ORIGIN fileOrFtp, long lineOfBusinessId, byte[] data);
+        Task<bool> PerformUpload(ClientCompanyApplicationUser companyUser, string row, CREATEDBY autoOrManual, ORIGIN fileOrFtp, long lineOfBusinessId, byte[] data, DataTable dt);
     }
-    public class UploadService : IUploadService
+    public class CaseCreationService : ICaseCreationService
     {
         private readonly ApplicationDbContext _context;
         private readonly ICustomApiCLient customApiCLient;
         private readonly Regex regex = new Regex("\"(.*?)\"");
         private const string NO_DATA = "NO DATA";
-        private readonly ICaseCreationService _caseCreationService;
-
-        public UploadService(ICaseCreationService caseCreationService,ApplicationDbContext context, ICustomApiCLient customApiCLient)
+        public CaseCreationService(ApplicationDbContext context, ICustomApiCLient customApiCLient)
         {
             _context = context;
-            _caseCreationService = caseCreationService;
             this.customApiCLient = customApiCLient;
         }
-        public async Task<bool> DoUpload(ClientCompanyApplicationUser companyUser, string[] dataRows, CREATEDBY autoOrManual, ZipArchive archive, ORIGIN fileOrFtp, long lineOfBusinessId)
-        {
-            try
-            {
-                
-                DataTable dt = new DataTable();
-                bool firstRow = true;
 
-                foreach (string row in dataRows)
-                {
-                    if (!string.IsNullOrEmpty(row))
-                    {
-                        if (firstRow)
-                        {
-                            foreach (string cell in row.Split(','))
-                            {
-                                dt.Columns.Add(cell.Trim());
-                            }
-                            firstRow = false;
-                        }
-                        else
-                        {
-                            try
-                            {
-                                dt.Rows.Add();
-                                int i = 0;
-                                var output = regex.Replace(row, m => m.Value.Replace(',', '@'));
-                                var rowData = output.Split(',').ToList();
-                                foreach (string cell in rowData)
-                                {
-                                    dt.Rows[dt.Rows.Count - 1][i] = cell?.Trim() ?? NO_DATA;
-                                    i++;
-                                }
-                                
-                                var claim = await CreatePolicy(rowData, companyUser,autoOrManual,archive, fileOrFtp,lineOfBusinessId);
-
-                                if(claim is null)
-                                {
-                                    continue;
-                                }
-                                //CREATE CUSTOMER
-                                var customerTask = CreateCustomer(companyUser, rowData, claim, archive);
-                                
-                                //CREATE BENEFICIARY
-                                var beneficiaryTask = CreateBeneficiary(companyUser, rowData, claim, archive);
-
-                                // Await both tasks
-                                await Task.WhenAll(customerTask, beneficiaryTask);
-
-                                // Get the results
-                                var customer = await customerTask;
-                                var beneficiary = await beneficiaryTask;
-
-                                if (customer is null || beneficiary is null)
-                                {
-                                    continue;
-                                }
-                                _context.ClaimsInvestigation.Add(claim);
-                                
-                            }
-                            catch (Exception ex)
-                            {
-                                Console.WriteLine(ex.StackTrace);
-                                return false;
-                            }
-                        }
-                    }
-                }
-            
-                return _context.SaveChanges() > 0;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.StackTrace);
-                return false;
-            }
-        }
-        private async Task<ClaimsInvestigation> CreatePolicy(List<string> rowData, ClientCompanyApplicationUser companyUser, CREATEDBY autoOrManual, ZipArchive archive, ORIGIN fileOrFtp, long lineOfBusinessId)
+        private ClaimsInvestigation CreateNewPolicy(List<string> rowData, ClientCompanyApplicationUser companyUser, CREATEDBY autoOrManual, ORIGIN fileOrFtp, long lineOfBusinessId, byte[] data)
         {
             //CREATE CLAIM
             var status = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.INITIATED));
@@ -141,16 +61,10 @@ namespace risk.control.system.Services
 
             //CREATE POLICY
             var servicetype = _context.InvestigationServiceType.FirstOrDefault(s => s.Code.ToLower() == (rowData[4].Trim().ToLower()));
-            var policyImage = archive.Entries.FirstOrDefault(p => p.FullName.ToLower().EndsWith(rowData[0]?.Trim().ToLower() + "/policy.jpg"));
-            byte[] savedNewImage = null;
-            using (var pImage = policyImage.Open())
-            {
-                using (var ps = new MemoryStream())
-                {
-                    await pImage.CopyToAsync(ps);
-                    savedNewImage = ps.ToArray();
-                }
-            }
+            var imagesWithData = GetImagesWithDataInSubfolder(data, rowData[0]?.Trim().ToLower());
+
+            var savedNewImage = imagesWithData.FirstOrDefault(s=>s.FileName.ToLower().EndsWith("policy.jpg"));
+            //+ "/policy.jpg"
             claim.PolicyDetail = new PolicyDetail
             {
                 ContractNumber = rowData[0]?.Trim(),
@@ -163,7 +77,7 @@ namespace risk.control.system.Services
                 CaseEnablerId = _context.CaseEnabler.FirstOrDefault(c => c.Code.ToLower() == rowData[7].Trim().ToLower()).CaseEnablerId,
                 CostCentreId = _context.CostCentre.FirstOrDefault(c => c.Code.ToLower() == rowData[8].Trim().ToLower()).CostCentreId,
                 LineOfBusinessId = lineOfBusinessId,
-                DocumentImage = savedNewImage,
+                DocumentImage = savedNewImage.ImageData,
                 Updated = DateTime.Now,
                 UpdatedBy = companyUser.Email
             };
@@ -185,8 +99,7 @@ namespace risk.control.system.Services
 
             return claim;
         }
-
-        private async Task<CustomerDetail> CreateCustomer(ClientCompanyApplicationUser companyUser, List<string> rowData, ClaimsInvestigation claim, ZipArchive archive)
+        private async Task<CustomerDetail> CreateNewCustomer(ClientCompanyApplicationUser companyUser, List<string> rowData, ClaimsInvestigation claim, byte[] data)
         {
             var pinCode = _context.PinCode
                                     .Include(p => p.District)
@@ -197,18 +110,11 @@ namespace risk.control.system.Services
             {
                 return null;
             }
-            
 
-            var customerImage = archive.Entries.FirstOrDefault(p => p.FullName.ToLower().EndsWith(rowData[0]?.Trim().ToLower() + "/customer.jpg"));
-            byte[] customerNewImage = null;
-            using (var cImage = customerImage.Open())
-            {
-                using (var cs = new MemoryStream())
-                {
-                    await cImage.CopyToAsync(cs);
-                    customerNewImage = cs.ToArray();
-                }
-            }
+
+            var imagesWithData = GetImagesWithDataInSubfolder(data, rowData[0]?.Trim().ToLower());
+            var customerNewImage = imagesWithData.FirstOrDefault(s => s.FileName.ToLower().EndsWith("customer.jpg"));
+            
             var customerDetail = new CustomerDetail
             {
                 Name = rowData[10]?.Trim(),
@@ -225,10 +131,11 @@ namespace risk.control.system.Services
                 StateId = pinCode.StateId,
                 DistrictId = pinCode.DistrictId,
                 //Description = rowData[20]?.Trim(),
-                ProfilePicture = customerNewImage,
+                ProfilePicture = customerNewImage.ImageData,
                 UpdatedBy = companyUser.Email,
                 Updated = DateTime.Now,
-                ClaimsInvestigation = claim
+                ClaimsInvestigation = claim,
+                ClaimsInvestigationId = claim.ClaimsInvestigationId
             };
             var address = customerDetail.Addressline + ", " +
                 pinCode.District.Name + ", " +
@@ -246,30 +153,21 @@ namespace risk.control.system.Services
             return customerDetail;
         }
 
-        private async Task<BeneficiaryDetail> CreateBeneficiary(ClientCompanyApplicationUser companyUser,List<string> rowData, ClaimsInvestigation claim, ZipArchive archive)
+        private async Task<BeneficiaryDetail> CreateNewBeneficiary(ClientCompanyApplicationUser companyUser, List<string> rowData, ClaimsInvestigation claim, byte[] data)
         {
             var pinCode = _context.PinCode
                                     .Include(p => p.District)
                                     .Include(p => p.State)
                                     .Include(p => p.Country)
                                     .FirstOrDefault(p => p.Code == rowData[28].Trim());
-            if (pinCode.CountryId != companyUser.ClientCompany.CountryId)
+            if (pinCode is null || pinCode.CountryId != companyUser.ClientCompany.CountryId)
             {
                 return null;
             }
             var relation = _context.BeneficiaryRelation.FirstOrDefault(b => b.Code.ToLower() == rowData[23].Trim().ToLower());
 
-            var beneficiaryImage = archive.Entries.FirstOrDefault(p => p.FullName.ToLower().EndsWith(rowData[0]?.Trim().ToLower() + "/beneficiary.jpg"));
-            byte[] beneficiaryNewImage = null;
-            using (var bImage = beneficiaryImage.Open())
-            {
-                using var bs = new MemoryStream();
-                {
-                    await bImage.CopyToAsync(bs);
-
-                    beneficiaryNewImage = bs.ToArray();
-                }
-            }
+            var imagesWithData = GetImagesWithDataInSubfolder(data, rowData[0]?.Trim().ToLower());
+            var beneficiaryNewImage = imagesWithData.FirstOrDefault(s => s.FileName.ToLower().EndsWith("beneficiary.jpg"));
 
             var beneficairy = new BeneficiaryDetail
             {
@@ -283,9 +181,10 @@ namespace risk.control.system.Services
                 DistrictId = pinCode.District.DistrictId,
                 StateId = pinCode.State.StateId,
                 CountryId = pinCode.Country.CountryId,
-                ProfilePicture = beneficiaryNewImage,
+                ProfilePicture = beneficiaryNewImage.ImageData,
                 Updated = DateTime.Now,
                 UpdatedBy = companyUser.Email,
+                ClaimsInvestigationId = claim.ClaimsInvestigationId,
                 ClaimsInvestigation = claim
             };
 
@@ -307,35 +206,44 @@ namespace risk.control.system.Services
             return beneficairy;
         }
 
-        public async Task<bool> PerformUpload(ClientCompanyApplicationUser companyUser, string[] dataRows, CREATEDBY autoOrManual, ORIGIN fileOrFtp, long lineOfBusinessId, byte[] data)
+        public async Task<bool> PerformUpload(ClientCompanyApplicationUser companyUser, string row, CREATEDBY autoOrManual, ORIGIN fileOrFtp, long lineOfBusinessId, byte[] data, DataTable dt)
         {
             try
             {
-                DataTable dt = new DataTable();
-                bool firstRow = true;
-
-                foreach (string row in dataRows)
+                dt.Rows.Add();
+                int i = 0;
+                var output = regex.Replace(row, m => m.Value.Replace(',', '@'));
+                var rowData = output.Split(',').ToList();
+                foreach (string cell in rowData)
                 {
-                    if (!string.IsNullOrEmpty(row))
-                    {
-                        if (firstRow)
-                        {
-                            foreach (string cell in row.Split(','))
-                            {
-                                dt.Columns.Add(cell.Trim());
-                            }
-                            firstRow = false;
-                        }
-                        else
-                        {
-                           var allGood = await _caseCreationService.PerformUpload(companyUser, row, autoOrManual, fileOrFtp, lineOfBusinessId, data, dt);
-                            if(!allGood)
-                            {
-                                return false;
-                            }
-                        }
-                    }
+                    dt.Rows[dt.Rows.Count - 1][i] = cell?.Trim() ?? NO_DATA;
+                    i++;
                 }
+
+                var claim = CreateNewPolicy(rowData, companyUser, autoOrManual, fileOrFtp, lineOfBusinessId, data);
+
+                if (claim is null)
+                {
+                    return false;
+                }
+                //CREATE CUSTOMER
+                var customerTask = CreateNewCustomer(companyUser, rowData, claim, data);
+
+                //CREATE BENEFICIARY
+                var beneficiaryTask = CreateNewBeneficiary(companyUser, rowData, claim, data);
+
+                // Await both tasks
+                await Task.WhenAll(customerTask, beneficiaryTask);
+
+                // Get the results
+                var customer = await customerTask;
+                var beneficiary = await beneficiaryTask;
+
+                if (customer is null || beneficiary is null)
+                {
+                    return false;
+                }
+                _context.ClaimsInvestigation.Add(claim);
 
             }
             catch (Exception ex)
@@ -343,8 +251,7 @@ namespace risk.control.system.Services
                 Console.WriteLine(ex.StackTrace);
                 return false;
             }
-            return _context.SaveChanges() > 0;
-
+            return true;
         }
         public static List<(string FileName, byte[] ImageData)> GetImagesWithDataInSubfolder(byte[] zipData, string subfolderName)
         {

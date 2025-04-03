@@ -104,11 +104,11 @@ namespace risk.control.system.Controllers.Company
 
                 //    processed = await ftpService.UploadFtpFile(currentUserEmail, postedFile, model.CREATEDBY, lineOfBusinessId);
                 //}
-
+                int uploadId = 0;
                 if (model.Uploadtype == UploadType.FILE)
                 {
                     //backgroundJobClient.Enqueue(() => ftpService.UploadFile(currentUserEmail, postedFile, model.CREATEDBY, lineOfBusinessId));
-                    var uploadId = await ftpService.UploadFile(currentUserEmail, postedFile, model.CREATEDBY, lineOfBusinessId);
+                    uploadId = await ftpService.UploadFile(currentUserEmail, postedFile, model.CREATEDBY, lineOfBusinessId);
                     backgroundJobClient.Enqueue(() => ftpService.StartUpload(uploadId));
                 }
 
@@ -122,21 +122,23 @@ namespace risk.control.system.Controllers.Company
                 //{
                 //    notifyService.Information($"{model.Uploadtype.GetEnumDisplayName()} Error. Check limit <i class='fa fa-upload' ></i>", 3);
                 //}
-                if (companyUser.ClientCompany.AutoAllocation)
-                {
-                    if (model.CREATEDBY == CREATEDBY.MANUAL)
-                    {
-                        return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
-                    }
-                    else
-                    {
-                        return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto",new { refresh = true });
-                    }
-                }
-                else
-                {
-                    return RedirectToAction(nameof(CreatorManualController.New), "CreatorManual");
-                }
+                //if (companyUser.ClientCompany.AutoAllocation)
+                //{
+                //    if (model.CREATEDBY == CREATEDBY.MANUAL)
+                //    {
+                //        return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
+                //    }
+                //    else
+                //    {
+                //        return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto",new { uploadId = uploadId });
+                //    }
+                //}
+                //else
+                //{
+                //    return RedirectToAction(nameof(CreatorManualController.New), "CreatorManual");
+                //}
+                return RedirectToAction(nameof(ClaimsLogController.Uploads), "ClaimsLog", new { uploadId = uploadId });
+
             }
             catch (Exception ex)
             {
@@ -560,5 +562,47 @@ namespace risk.control.system.Controllers.Company
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
+
+        [HttpPost, ActionName("DeleteCases")]
+        public async Task<IActionResult> DeleteCases([FromBody] DeleteRequestModel request)
+        {
+            if (request.claims == null || request.claims.Count == 0)
+            {
+                return Json(new { success = false, message = "No cases selected for deletion." });
+            }
+
+            try
+            {
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+
+                foreach (var claim in request.claims)
+                {
+                    var claimsInvestigation = await _context.ClaimsInvestigation.FindAsync(claim);
+                    if (claimsInvestigation == null)
+                    {
+                        notifyService.Error("Not Found!!!..Contact Admin");
+                        return RedirectToAction(nameof(Index), "Dashboard");
+                    }
+
+                    claimsInvestigation.Updated = DateTime.Now;
+                    claimsInvestigation.UpdatedBy = currentUserEmail;
+                    claimsInvestigation.Deleted = true;
+                    _context.ClaimsInvestigation.Update(claimsInvestigation);
+                }
+                await _context.SaveChangesAsync();
+
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        public class DeleteRequestModel
+        {
+            public List<string> claims { get; set; }
+        }
+
     }
 }
