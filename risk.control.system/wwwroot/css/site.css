@@ -2554,3 +2554,21 @@ input#checkall {
         z-index: 1000;
         opacity: 0.3; /* Watermark opacity */
     }
+
+.watermark-row {
+    position: relative;
+    background-color: rgba(255, 255, 0, 0.2); /* Light yellow background */
+}
+
+.watermark-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 18px;
+    font-weight: bold;
+    color: rgba(0, 0, 0, 0.2); /* Light watermark effect */
+    pointer-events: none; /* Prevents interference with clicking */
+    text-transform: uppercase;
+}
+

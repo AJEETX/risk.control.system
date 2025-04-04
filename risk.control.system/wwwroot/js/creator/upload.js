@@ -17,27 +17,37 @@
         },
         "columns": [
             { "data": "id", "bVisible": false },
+            
             { "data": "sequenceNumber" },   
             { "data": "name" },
-            { "data": "description" },
             { "data": "fileType" },
             { "data": "createdOn" },
             { "data": "uploadedBy" },
+            
             {
-                "data": "status",
+                "data": "message",
+                "bSortable": false,
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.message + '" class=badge badge-light" data-toggle="tooltip"> '+data +'</span>';
+                }
+            },
+            {
+                "data": "icon",
+                "bSortable": false,
                 "mRender": function (data, type, row) {
                     return '<i title="' + row.message + '" class="' + data + '" data-toggle="tooltip"></i>';
                 }
             },
             {
                 "data": null,
+                "bSortable": false,
                 "render": function (data, type, row) {
                     return '<a href="/Uploads/DownloadLog/' + row.id + '" class="btn btn-xs btn-primary"><i class="nav-icon fa fa-download"></i> Download</a> ' +
                         '<button class="btn btn-xs btn-danger delete-file" data-id="' + row.id + '"><i class="fas fa-trash"></i> Delete</button>';
                 }
             }
         ],
-        "order": [[5, "desc"]],  // ✅ Sort by 'createdOn' (5th column, index 4) in descending order
+        "order": [[4, "desc"]],  // ✅ Sort by 'createdOn' (5th column, index 4) in descending order
         "columnDefs": [
             {
                 "targets": 4,   // ✅ Apply sorting to 'createdOn' column
@@ -142,7 +152,14 @@
 
         table.rows().every(function () {
             var data = this.data();
+            var rowNode = this.node(); // Get the row element
+
             if (data.status === "Processing" && data.id == uploadId) {
+                // Apply watermark effect
+                $(rowNode).addClass("watermark-row");
+
+                // You can also add an overlay text dynamically
+                $(rowNode).append('<div class="watermark-text">Processing...</div>');
                 pendingExists = true;
                 return false; // Stop iterating once a "Pending" row is found
             }

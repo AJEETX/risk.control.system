@@ -21,7 +21,7 @@ using Hangfire;
 
 namespace risk.control.system.Controllers.Company
 {
-    [Authorize(Roles = CREATOR.DISPLAY_NAME)]
+    [Authorize(Roles = $"{CREATOR.DISPLAY_NAME},{MANAGER.DISPLAY_NAME}")]
     public class CreatorPostController : Controller
     {
         private const string CLAIMS = "claims";
@@ -151,6 +151,7 @@ namespace risk.control.system.Controllers.Company
         [HttpPost]
         [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
         public async Task<IActionResult> CreatePolicy(ClaimsInvestigation model)
         {
             try
@@ -223,6 +224,7 @@ namespace risk.control.system.Controllers.Company
         [ValidateAntiForgeryToken]
         [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [HttpPost]
+        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
         public async Task<IActionResult> EditPolicy(string claimsInvestigationId, ClaimsInvestigation model)
         {
             try
@@ -289,6 +291,7 @@ namespace risk.control.system.Controllers.Company
         [ValidateAntiForgeryToken]
         [HttpPost]
         [RequestSizeLimit(2_000_000)] // Checking for 2 MB
+        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
         public async Task<IActionResult> CreateCustomer(CustomerDetail customerDetail)
         {
             try
@@ -465,6 +468,7 @@ namespace risk.control.system.Controllers.Company
         [HttpPost]
         [ValidateAntiForgeryToken]
         [RequestSizeLimit(2_000_000)] // Checking for 2 MB
+        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
         public async Task<IActionResult> EditBeneficiary(long beneficiaryDetailId, BeneficiaryDetail beneficiary)
         {
             try
@@ -564,6 +568,7 @@ namespace risk.control.system.Controllers.Company
         }
 
         [HttpPost, ActionName("DeleteCases")]
+        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
         public async Task<IActionResult> DeleteCases([FromBody] DeleteRequestModel request)
         {
             if (request.claims == null || request.claims.Count == 0)

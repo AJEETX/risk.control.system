@@ -191,10 +191,14 @@ namespace risk.control.system.Services
             var fileName = Path.GetFileNameWithoutExtension(file.FileName);
             var extension = Path.GetExtension(file.FileName);
             var company = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == uploadedBy);
-            int lastSequence = await _context.FilesOnFileSystem.Where(f => f.CompanyId == company.ClientCompanyId).MaxAsync(f => (int?)f.SequenceNumber) ?? 0;
+            int lastCompanySequence = await _context.FilesOnFileSystem.Where(f => f.CompanyId == company.ClientCompanyId).MaxAsync(f => (int?)f.CompanySequenceNumber) ?? 0;
+
+            // Get the last User-Level sequence (within the company)
+            int lastUserSequence = await _context.FilesOnFileSystem.Where(f => f.CompanyId == company.ClientCompanyId && f.UploadedBy == uploadedBy).MaxAsync(f => (int?)f.UserSequenceNumber) ?? 0;
             var fileModel = new FileOnFileSystemModel
             {
-                SequenceNumber = lastSequence + 1,
+                CompanySequenceNumber = lastCompanySequence + 1,
+                UserSequenceNumber = lastUserSequence + 1,
                 CreatedOn = DateTime.Now,
                 FileType = file.ContentType,
                 Extension = extension,
@@ -234,18 +238,21 @@ namespace risk.control.system.Services
             }
             if (userCanCreate)
             {
-                var uploaded = await uploadService.PerformUpload(companyUser, csvData.ToArray(), uploadFileData.AutoOrManual, uploadFileData.FileOrFtp, lineOfBusinessId,uploadFileData.ByteData);
-                if(uploaded)
+                var uploadedCount = await uploadService.PerformUpload(companyUser, csvData.ToArray(), uploadFileData.AutoOrManual, uploadFileData.FileOrFtp, lineOfBusinessId,uploadFileData.ByteData);
+                if(uploadedCount > 0)
                 {
                     uploadFileData.Completed = true;
                     uploadFileData.Icon = "fas fa-check-circle i-green";
-                    uploadFileData.Message = "Completed";
+                    uploadFileData.Status = "Completed";
+                    uploadFileData.Message = $"Total cases uploaded : {uploadedCount}";
+                    uploadFileData.RecordCount = uploadedCount;
                 }
                 else
                 {
                     uploadFileData.Completed = false;
                     uploadFileData.Icon = "fas fa-times-circle i-orangered";
-                    uploadFileData.Message = "Error";
+                    uploadFileData.Status = "Error";
+                    uploadFileData.Message = "Error uploading the file";
                 }
                 await _context.SaveChangesAsync();
 

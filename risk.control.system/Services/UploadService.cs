@@ -14,7 +14,7 @@ namespace risk.control.system.Services
     public interface IUploadService
     {
         Task<bool> DoUpload(ClientCompanyApplicationUser companyUser, string[] dataRows, CREATEDBY autoOrManual, ZipArchive archive, ORIGIN fileOrFtp, long lineOfBusinessId);
-        Task<bool> PerformUpload(ClientCompanyApplicationUser companyUser, string[] dataRows, CREATEDBY autoOrManual, ORIGIN fileOrFtp, long lineOfBusinessId, byte[] data);
+        Task<int> PerformUpload(ClientCompanyApplicationUser companyUser, string[] dataRows, CREATEDBY autoOrManual, ORIGIN fileOrFtp, long lineOfBusinessId, byte[] data);
     }
     public class UploadService : IUploadService
     {
@@ -24,7 +24,7 @@ namespace risk.control.system.Services
         private const string NO_DATA = "NO DATA";
         private readonly ICaseCreationService _caseCreationService;
 
-        public UploadService(ICaseCreationService caseCreationService,ApplicationDbContext context, ICustomApiCLient customApiCLient)
+        public UploadService(ICaseCreationService caseCreationService, ApplicationDbContext context, ICustomApiCLient customApiCLient)
         {
             _context = context;
             _caseCreationService = caseCreationService;
@@ -34,7 +34,7 @@ namespace risk.control.system.Services
         {
             try
             {
-                
+
                 DataTable dt = new DataTable();
                 bool firstRow = true;
 
@@ -63,16 +63,16 @@ namespace risk.control.system.Services
                                     dt.Rows[dt.Rows.Count - 1][i] = cell?.Trim() ?? NO_DATA;
                                     i++;
                                 }
-                                
-                                var claim = await CreatePolicy(rowData, companyUser,autoOrManual,archive, fileOrFtp,lineOfBusinessId);
 
-                                if(claim is null)
+                                var claim = await CreatePolicy(rowData, companyUser, autoOrManual, archive, fileOrFtp, lineOfBusinessId);
+
+                                if (claim is null)
                                 {
                                     continue;
                                 }
                                 //CREATE CUSTOMER
                                 var customerTask = CreateCustomer(companyUser, rowData, claim, archive);
-                                
+
                                 //CREATE BENEFICIARY
                                 var beneficiaryTask = CreateBeneficiary(companyUser, rowData, claim, archive);
 
@@ -88,7 +88,7 @@ namespace risk.control.system.Services
                                     continue;
                                 }
                                 _context.ClaimsInvestigation.Add(claim);
-                                
+
                             }
                             catch (Exception ex)
                             {
@@ -98,7 +98,7 @@ namespace risk.control.system.Services
                         }
                     }
                 }
-            
+
                 return _context.SaveChanges() > 0;
             }
             catch (Exception ex)
@@ -197,7 +197,7 @@ namespace risk.control.system.Services
             {
                 return null;
             }
-            
+
 
             var customerImage = archive.Entries.FirstOrDefault(p => p.FullName.ToLower().EndsWith(rowData[0]?.Trim().ToLower() + "/customer.jpg"));
             byte[] customerNewImage = null;
@@ -246,7 +246,7 @@ namespace risk.control.system.Services
             return customerDetail;
         }
 
-        private async Task<BeneficiaryDetail> CreateBeneficiary(ClientCompanyApplicationUser companyUser,List<string> rowData, ClaimsInvestigation claim, ZipArchive archive)
+        private async Task<BeneficiaryDetail> CreateBeneficiary(ClientCompanyApplicationUser companyUser, List<string> rowData, ClaimsInvestigation claim, ZipArchive archive)
         {
             var pinCode = _context.PinCode
                                     .Include(p => p.District)
@@ -307,13 +307,13 @@ namespace risk.control.system.Services
             return beneficairy;
         }
 
-        public async Task<bool> PerformUpload(ClientCompanyApplicationUser companyUser, string[] dataRows, CREATEDBY autoOrManual, ORIGIN fileOrFtp, long lineOfBusinessId, byte[] data)
+        public async Task<int> PerformUpload(ClientCompanyApplicationUser companyUser, string[] dataRows, CREATEDBY autoOrManual, ORIGIN fileOrFtp, long lineOfBusinessId, byte[] data)
         {
             try
             {
+                var uploadedRecordsCount = 0;
                 DataTable dt = new DataTable();
                 bool firstRow = true;
-
                 foreach (string row in dataRows)
                 {
                     if (!string.IsNullOrEmpty(row))
@@ -328,23 +328,23 @@ namespace risk.control.system.Services
                         }
                         else
                         {
-                           var allGood = await _caseCreationService.PerformUpload(companyUser, row, autoOrManual, fileOrFtp, lineOfBusinessId, data, dt);
-                            if(!allGood)
+                            var allGood = await _caseCreationService.PerformUpload(companyUser, row, autoOrManual, fileOrFtp, lineOfBusinessId, data, dt);
+                            if (!allGood)
                             {
-                                return false;
+                                return 0;
                             }
+                            uploadedRecordsCount++;
                         }
                     }
                 }
-
+                var rowsSaved = _context.SaveChanges() > 0;
+                return rowsSaved ? uploadedRecordsCount : 0;
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.StackTrace);
-                return false;
+                return 0;
             }
-            return _context.SaveChanges() > 0;
-
         }
         public static List<(string FileName, byte[] ImageData)> GetImagesWithDataInSubfolder(byte[] zipData, string subfolderName)
         {

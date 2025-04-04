@@ -25,7 +25,7 @@ namespace risk.control.system.Controllers.Api.Company
     [ApiExplorerSettings(IgnoreApi = true)]
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = $"{CREATOR.DISPLAY_NAME}")]
+    [Authorize(Roles = $"{CREATOR.DISPLAY_NAME},{MANAGER.DISPLAY_NAME}")]
     public class CreatorController : ControllerBase
     {
         private const string UNDERWRITING = "underwriting";
@@ -50,6 +50,7 @@ namespace risk.control.system.Controllers.Api.Company
             this.claimsService = claimsService;
         }
         
+        [Authorize(Roles = $"{CREATOR.DISPLAY_NAME}")]
         [HttpGet("GetAuto")]
         public IActionResult GetAuto()
         {
@@ -149,6 +150,7 @@ namespace risk.control.system.Controllers.Api.Company
             return Ok(response);
         }
 
+        [Authorize(Roles = $"{CREATOR.DISPLAY_NAME}")]
         [HttpGet("RefreshData")]
         public async Task<IActionResult> RefreshData(string id)
         {
@@ -208,6 +210,7 @@ namespace risk.control.system.Controllers.Api.Company
         }
 
         
+        [Authorize(Roles = $"{CREATOR.DISPLAY_NAME}")]
         public IActionResult GetManual()
         {
             IQueryable<ClaimsInvestigation> claims = claimsService.GetClaims();
@@ -312,10 +315,12 @@ namespace risk.control.system.Controllers.Api.Company
 
             return Ok(response);
         }
+        
+        [Authorize(Roles = $"{CREATOR.DISPLAY_NAME}")]
         [HttpGet("GetActive")]
         public IActionResult GetActive()
         {
-            var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+            var userEmail = HttpContext.User.Identity.Name;
             var companyUser = _context.ClientCompanyApplicationUser
                 .Include(u => u.Country)
                 .Include(u => u.ClientCompany)
@@ -453,20 +458,21 @@ namespace risk.control.system.Controllers.Api.Company
             var userEmail = HttpContext.User.Identity.Name;
 
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == userEmail);
+            var isManager = HttpContext.User.IsInRole(MANAGER.DISPLAY_NAME);
 
-            var files = await _context.FilesOnFileSystem.Where(f => f.CompanyId == companyUser.ClientCompanyId && f.UploadedBy == userEmail).ToListAsync();
-
+            var files = await _context.FilesOnFileSystem.Where(f => f.CompanyId == companyUser.ClientCompanyId && (f.UploadedBy == userEmail || isManager)).ToListAsync();
             var result = files.OrderBy(o=>o.CreatedOn).Select(file => new
             {
                 file.Id,
-                file.SequenceNumber,
+                SequenceNumber = isManager ? file.CompanySequenceNumber : file.UserSequenceNumber,
                 file.Name,
                 file.Description,
                 file.FileType,
                 CreatedOn = file.CreatedOn.GetValueOrDefault().ToString("dd-MMM-yyyy HH:mm:ss"),
                 file.UploadedBy,
+                Status = file.Status,
                 file.Message,
-                Status = file.Icon // or use some other status representation
+                Icon = file.Icon // or use some other status representation
             }).ToList();
 
             return Ok(new { data = result });

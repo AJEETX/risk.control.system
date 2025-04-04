@@ -35,9 +35,11 @@
                                     <div class="timeline-item">
                                         <span class="time"><i class="nav-icon fas fa-clock"></i> @log.Created.ToString("hh:mm tt")</span>
                                         <span class="time"><i class="nav-icon fas fa-stopwatch"></i> @log?.TimeElapsed</span>
-                                        <h3 class="timeline-header"><a href="#">@log.UserEmailActioned</a> has actioned the case to: <span class="badge badge-success"> @log.InvestigationCaseStatus.Name : @log.InvestigationCaseSubStatus.Name.</span></h3>
+                                        <h3 class="timeline-header"><a href="#">@log.UserEmailActioned</a> has actioned the case to:
+                                            <span class="badge badge-light i-green"> @log.InvestigationCaseStatus.Name</span> : <span class="badge badge-light i-orangered">@log.InvestigationCaseSubStatus.Name.</span>
+                                        </h3>
                                         <div class="timeline-body">
-                                            Case passed to <span class="badge badge-info">@movedTo</span>
+                                            Case passed to <span class="badge badge-light i-blue">@movedTo</span>
                                         </div>
 
                                     </div>
