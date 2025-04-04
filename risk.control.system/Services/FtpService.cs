@@ -220,6 +220,7 @@ namespace risk.control.system.Services
         {
             var uploadFileData = await _context.FilesOnFileSystem.FindAsync(uploadId);
             var csvData = ReadFirstCsvFromZip(uploadFileData.ByteData);
+            
             var lineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == CLAIMS).LineOfBusinessId;
 
             var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(c => c.Email == uploadFileData.UploadedBy);
@@ -238,7 +239,7 @@ namespace risk.control.system.Services
             }
             if (userCanCreate)
             {
-                var uploadedCount = await uploadService.PerformUpload(companyUser, csvData.ToArray(), uploadFileData.AutoOrManual, uploadFileData.FileOrFtp, lineOfBusinessId,uploadFileData.ByteData);
+                var uploadedCount = await uploadService.PerformUpload(companyUser, csvData.ToArray(), uploadFileData, lineOfBusinessId);
                 if(uploadedCount > 0)
                 {
                     uploadFileData.Completed = true;

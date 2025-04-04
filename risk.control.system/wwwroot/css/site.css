@@ -2572,3 +2572,26 @@ input#checkall {
     text-transform: uppercase;
 }
 
+
+.hidden {
+    display: none;
+}
+
+#progressContainer {
+    width: 100%;
+    background-color: #ddd;
+    border-radius: 5px;
+    margin-top: 5px;
+    overflow: hidden;
+}
+
+#progressBar {
+    width: 0%;
+    height: 5px;
+    background-color: green;
+    text-align: center;
+    color: white;
+    line-height: 5px;
+    border-radius: 5px;
+    transition: width 0.3s ease-in-out;
+}

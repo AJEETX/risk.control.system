@@ -8,27 +8,31 @@ using Microsoft.EntityFrameworkCore;
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
+using risk.control.system.Models.ViewModel;
 
 namespace risk.control.system.Services
 {
     public interface IUploadService
     {
         Task<bool> DoUpload(ClientCompanyApplicationUser companyUser, string[] dataRows, CREATEDBY autoOrManual, ZipArchive archive, ORIGIN fileOrFtp, long lineOfBusinessId);
-        Task<int> PerformUpload(ClientCompanyApplicationUser companyUser, string[] dataRows, CREATEDBY autoOrManual, ORIGIN fileOrFtp, long lineOfBusinessId, byte[] data);
+        Task<int> PerformUpload(ClientCompanyApplicationUser companyUser, string[] dataRows, FileOnFileSystemModel model, long lineOfBusinessId);
     }
     public class UploadService : IUploadService
     {
         private readonly ApplicationDbContext _context;
         private readonly ICustomApiCLient customApiCLient;
+        private readonly IUploadProgressService uploadProgressService;
         private readonly Regex regex = new Regex("\"(.*?)\"");
         private const string NO_DATA = "NO DATA";
         private readonly ICaseCreationService _caseCreationService;
 
-        public UploadService(ICaseCreationService caseCreationService, ApplicationDbContext context, ICustomApiCLient customApiCLient)
+        public UploadService(ICaseCreationService caseCreationService, ApplicationDbContext context, ICustomApiCLient customApiCLient,
+            IUploadProgressService uploadProgressService)
         {
             _context = context;
             _caseCreationService = caseCreationService;
             this.customApiCLient = customApiCLient;
+            this.uploadProgressService = uploadProgressService;
         }
         public async Task<bool> DoUpload(ClientCompanyApplicationUser companyUser, string[] dataRows, CREATEDBY autoOrManual, ZipArchive archive, ORIGIN fileOrFtp, long lineOfBusinessId)
         {
@@ -307,13 +311,14 @@ namespace risk.control.system.Services
             return beneficairy;
         }
 
-        public async Task<int> PerformUpload(ClientCompanyApplicationUser companyUser, string[] dataRows, CREATEDBY autoOrManual, ORIGIN fileOrFtp, long lineOfBusinessId, byte[] data)
+        public async Task<int> PerformUpload(ClientCompanyApplicationUser companyUser, string[] dataRows, FileOnFileSystemModel model, long lineOfBusinessId)
         {
             try
             {
                 var uploadedRecordsCount = 0;
                 DataTable dt = new DataTable();
                 bool firstRow = true;
+                int totalCount = firstRow ? dataRows.Length -1 : dataRows.Length; // remove count for header records
                 foreach (string row in dataRows)
                 {
                     if (!string.IsNullOrEmpty(row))
@@ -328,12 +333,15 @@ namespace risk.control.system.Services
                         }
                         else
                         {
-                            var allGood = await _caseCreationService.PerformUpload(companyUser, row, autoOrManual, fileOrFtp, lineOfBusinessId, data, dt);
+                            var allGood = await _caseCreationService.PerformUpload(companyUser, row, model, dt, lineOfBusinessId);
                             if (!allGood)
                             {
                                 return 0;
                             }
+                            int progress = (int)(((uploadedRecordsCount + 1) / (double)totalCount) * 100);
+                            uploadProgressService.UpdateProgress(model.Id, progress);
                             uploadedRecordsCount++;
+                            
                         }
                     }
                 }

@@ -33,6 +33,7 @@ namespace risk.control.system.Controllers.Company
         private readonly IFtpService ftpService;
         private readonly INotyfService notifyService;
         private readonly IInvestigationReportService investigationReportService;
+        private readonly IUploadProgressService progressService;
         private readonly IBackgroundJobClient backgroundJobClient;
         private readonly IClaimPolicyService claimPolicyService;
 
@@ -44,6 +45,7 @@ namespace risk.control.system.Controllers.Company
             IFtpService ftpService,
             INotyfService notifyService,
             IInvestigationReportService investigationReportService,
+            IUploadProgressService progressService,
             IBackgroundJobClient backgroundJobClient,
             IClaimPolicyService claimPolicyService)
         {
@@ -56,6 +58,7 @@ namespace risk.control.system.Controllers.Company
             this.ftpService = ftpService;
             this.notifyService = notifyService;
             this.investigationReportService = investigationReportService;
+            this.progressService = progressService;
             this.backgroundJobClient = backgroundJobClient;
         }
         [HttpPost]
@@ -146,6 +149,11 @@ namespace risk.control.system.Controllers.Company
                 notifyService.Custom($"File Upload Error.", 3, "red", "fa fa-upload");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
+        }
+        public IActionResult GetJobProgress(int jobId)
+        {
+            int progress = progressService.GetProgress(jobId);
+            return Json(new { progress });
         }
 
         [HttpPost]

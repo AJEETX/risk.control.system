@@ -127,7 +127,44 @@
         }
         table.ajax.reload(null, false);
     });
+    function TrackProgress(uploadId) {
+        if (uploadId == null || uploadId == undefined || uploadId == "") {
+            uploadId = 0; // Default value if not set
+        }
+        var table = $('#customerTableAuto').DataTable();
 
+        if (uploadId > 0) {
+            let progressBar = document.getElementById("progressBar");
+            let progressContainer = document.getElementById("progressContainer");
+
+            // Remove 'hidden' class to show progress bar
+            progressContainer.classList.remove("hidden");
+
+            let interval = setInterval(() => {
+                fetch(`/CreatorPost/GetJobProgress?jobId=${uploadId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        let progress = data.progress;
+                        progressBar.style.width = progress + "%";
+                        progressBar.innerText = progress + "%";
+
+                        if (progress >= 100) {
+                            clearInterval(interval);
+                            setTimeout(() => {
+                                table.ajax.reload(function () {
+                                    var newCount = table.data().count(); // Get updated row count
+                                    if (newCount > 0 && !hasPendingRows()) {
+                                        console.log("No New records detected! Stopping refresh.");
+                                    }
+                                }, true);
+                                progressContainer.classList.add("hidden"); // Hide after 1 sec
+                            }, 1000);
+                        }
+                    });
+            }, 1000);
+
+        }
+    }
     var refreshInterval = 5000; // 3 seconds interval
     var maxAttempts = 5; // Prevent infinite loop
     var attempts = 0;

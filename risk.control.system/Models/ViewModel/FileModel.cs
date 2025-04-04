@@ -9,7 +9,7 @@
         public string Description { get; set; }
         public long? CompanyId { get; set; }
         public bool? Completed { get; set; }
-        public string? Icon { get; set; } = "fas fa-sync fa-spin";
+        public string? Icon { get; set; } = "fas fa-sync fa-spin i-blue";
         public string? Status { get; set; } = "Processing";
         public string? Message { get; set; } = "Upload In progress";
         public byte[] ByteData { get; set; }

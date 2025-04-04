@@ -8,12 +8,13 @@ using Microsoft.EntityFrameworkCore;
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
+using risk.control.system.Models.ViewModel;
 
 namespace risk.control.system.Services
 {
     public interface ICaseCreationService
     {
-        Task<bool> PerformUpload(ClientCompanyApplicationUser companyUser, string row, CREATEDBY autoOrManual, ORIGIN fileOrFtp, long lineOfBusinessId, byte[] data, DataTable dt);
+        Task<bool> PerformUpload(ClientCompanyApplicationUser companyUser, string row, FileOnFileSystemModel model, DataTable dt,long lineOfBusinessId);
     }
     public class CaseCreationService : ICaseCreationService
     {
@@ -27,7 +28,7 @@ namespace risk.control.system.Services
             this.customApiCLient = customApiCLient;
         }
 
-        public async Task<bool> PerformUpload(ClientCompanyApplicationUser companyUser, string row, CREATEDBY autoOrManual, ORIGIN fileOrFtp, long lineOfBusinessId, byte[] data, DataTable dt)
+        public async Task<bool> PerformUpload(ClientCompanyApplicationUser companyUser, string row, FileOnFileSystemModel model, DataTable dt, long lineOfBusinessId)
         {
             try
             {
@@ -42,7 +43,7 @@ namespace risk.control.system.Services
                     i++;
                 }
 
-                var claimAdded = await CreateNewPolicy(rowData, companyUser, autoOrManual, fileOrFtp, lineOfBusinessId, data);
+                var claimAdded = await CreateNewPolicy(rowData, companyUser, model, lineOfBusinessId);
 
                 if (!claimAdded)
                 {
@@ -57,14 +58,14 @@ namespace risk.control.system.Services
             }
         }
 
-        private async Task<bool> CreateNewPolicy(List<string> rowData, ClientCompanyApplicationUser companyUser, CREATEDBY autoOrManual, ORIGIN fileOrFtp, long lineOfBusinessId, byte[] data)
+        private async Task<bool> CreateNewPolicy(List<string> rowData, ClientCompanyApplicationUser companyUser, FileOnFileSystemModel model, long lineOfBusinessId)
         {
             //CREATE CLAIM
             var status = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.INITIATED));
             var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
             var autoEnabled = companyUser.ClientCompany.AutoAllocation;
             var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
-            var subStatus = companyUser.ClientCompany.AutoAllocation && autoOrManual == CREATEDBY.AUTO ? createdStatus : assignedStatus;
+            var subStatus = companyUser.ClientCompany.AutoAllocation && model.AutoOrManual == CREATEDBY.AUTO ? createdStatus : assignedStatus;
             var claim = new ClaimsInvestigation
             {
                 InvestigationCaseStatusId = status.InvestigationCaseStatusId,
@@ -82,8 +83,8 @@ namespace risk.control.system.Services
                 IsReviewCase = false,
                 UserEmailActioned = companyUser.Email,
                 UserEmailActionedTo = companyUser.Email,
-                CREATEDBY = autoOrManual,
-                ORIGIN = fileOrFtp,
+                CREATEDBY = model.AutoOrManual,
+                ORIGIN = model.FileOrFtp,
                 ClientCompanyId = companyUser.ClientCompanyId,
                 UserRoleActionedTo = $"{companyUser.ClientCompany.Email}",
                 CreatorSla = companyUser.ClientCompany.CreatorSla
@@ -91,7 +92,7 @@ namespace risk.control.system.Services
 
             //CREATE POLICY
             var servicetype = _context.InvestigationServiceType.FirstOrDefault(s => s.Code.ToLower() == (rowData[4].Trim().ToLower()));
-            var imagesWithData = GetImagesWithDataInSubfolder(data, rowData[0]?.Trim().ToLower());
+            var imagesWithData = GetImagesWithDataInSubfolder(model.ByteData, rowData[0]?.Trim().ToLower());
 
             var savedNewImage = imagesWithData.FirstOrDefault(s=>s.FileName.ToLower().EndsWith("policy.jpg"));
             //+ "/policy.jpg"
@@ -111,8 +112,8 @@ namespace risk.control.system.Services
                 Updated = DateTime.Now,
                 UpdatedBy = companyUser.Email
             };
-            var customerTask = CreateNewCustomer(companyUser, rowData, data);
-            var beneficiaryTask =  CreateNewBeneficiary(companyUser, rowData, data);
+            var customerTask = CreateNewCustomer(companyUser, rowData, model.ByteData);
+            var beneficiaryTask =  CreateNewBeneficiary(companyUser, rowData, model.ByteData);
             await Task.WhenAll(customerTask, beneficiaryTask);
 
             // Get the results
