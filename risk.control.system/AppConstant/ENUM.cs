@@ -176,6 +176,30 @@ namespace risk.control.system.Models
         SHARED
     }
 
+    public enum YESNO
+    {
+        [Display(Name = "YES")]
+        [Description("Affirmative response")]
+        YES,
+
+        [Display(Name = "NO")]
+        [Description("Negative response")]
+        NO
+    }
+    public enum DURATION
+    {
+        [Display(Name = "No Time")]
+        [Description("No specific duration assigned")]
+        ZERO,
+
+        [Display(Name = "Less than 6 Months")]
+        [Description("The duration is less than 6 months")]
+        LESS_THAN_6_MONTHS,
+
+        [Display(Name = "More than 6 Months")]
+        [Description("The duration exceeds 6 months")]
+        MORE_THAN_6_MONTHS
+    }
     public enum SupervisorRemarkType
     {
         OK,

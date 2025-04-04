@@ -1,5 +1,5 @@
 ﻿$(document).ready(function () {
-    
+    var uploadId = $('#uploadId').val();
     var table = $('#customerTableAuto').DataTable({
         "ajax": {
             "url": '/api/Creator/GetFilesData',
@@ -16,7 +16,8 @@
             processing: '<i class="fas fa-sync fa-spin fa-4x fa-fw"></i><span class="sr-only">Loading...</span>'
         },
         "columns": [
-            { "data": "id" },
+            { "data": "id", "bVisible": false },
+            { "data": "sequenceNumber" },   
             { "data": "name" },
             { "data": "description" },
             { "data": "fileType" },
@@ -36,7 +37,7 @@
                 }
             }
         ],
-        "order": [[4, "desc"]],  // ✅ Sort by 'createdOn' (5th column, index 4) in descending order
+        "order": [[5, "desc"]],  // ✅ Sort by 'createdOn' (5th column, index 4) in descending order
         "columnDefs": [
             {
                 "targets": 4,   // ✅ Apply sorting to 'createdOn' column
@@ -137,12 +138,11 @@
 
     // Function to check if there are any "Pending" rows
     function hasPendingRows() {
-        var table = $("#customerTableAuto").DataTable();
         var pendingExists = false;
 
         table.rows().every(function () {
             var data = this.data();
-            if (data.status === "Processing") {
+            if (data.status === "Processing" && data.id == uploadId) {
                 pendingExists = true;
                 return false; // Stop iterating once a "Pending" row is found
             }

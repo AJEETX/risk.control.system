@@ -2397,7 +2397,7 @@ input#checkall {
 
 /* Notification content */
 .notification-content {
-    display: flex;
+    display: block;
     align-items: center;
     flex-grow: 1;
 }

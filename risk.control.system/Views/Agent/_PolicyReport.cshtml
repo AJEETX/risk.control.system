@@ -39,13 +39,13 @@
             }
         </div>
         <div class="row">
-            @if(Model.ClaimsInvestigation.PolicyDetail.ClaimType == ClaimType.HEALTH)
+            @if (Model.ClaimsInvestigation.PolicyDetail.LineOfBusiness.Name.ToLower() == "claims")
             {
-                <partial name="_Questionaire" model="@Model" />
+                <partial name="_ClaimQuestionaire" model="@Model" />
             }
             else
             {
-                <partial name="_ClaimQuestionaire" model="@Model" />
+                <partial name="_Questionaire" model="@Model" />
             }
 
         </div>

@@ -125,19 +125,6 @@ namespace risk.control.system.Controllers.Agency
                     return RedirectToAction(nameof(AgentController.GetInvestigate), "Agent", new { selectedcase = claimId });
                 }
 
-                //END : POST FACE IMAGE AND DOCUMENT
-
-                if (!string.IsNullOrWhiteSpace(question1))
-                {
-                    DwellType question1Enum = (DwellType)Enum.Parse(typeof(DwellType), question1, true);
-                    question1 = question1Enum.GetEnumDisplayName();
-                }
-
-                if (!string.IsNullOrWhiteSpace(question2))
-                {
-                    Income question2Enum = (Income)Enum.Parse(typeof(Income), question2, true);
-                    question2 = question2Enum.GetEnumDisplayName();
-                }
                 var (vendor , contract )= await claimsInvestigationService.SubmitToVendorSupervisor(currentUserEmail, claimId,
                     WebUtility.HtmlDecode(remarks),
                     WebUtility.HtmlDecode(question1),

@@ -9,7 +9,8 @@ namespace risk.control.system.Models
         public string? Status { get; set; }
         public ClientCompany? Company { get; set; }
         public Vendor? Agency { get; set; }
-        public string? UserEmail { get; set; }
+        public string? NotifierUserEmail { get; set; }
+        public string? AgenctUserEmail { get; set; }
         public string Message { get; set; }
         public bool IsReadByCreator { get; set; } = false;
         public bool IsReadByVendor { get; set; } = false;

@@ -17,5 +17,6 @@
         public string UploadedBy { get; set; }
         public DateTime? CreatedOn { get; set; }
         public bool? Saved { get; set; } = false;
+        public int SequenceNumber { get; set; } // Company-specific sequence number
     }
 }

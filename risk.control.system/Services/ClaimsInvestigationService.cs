@@ -679,10 +679,10 @@ namespace risk.control.system.Services
 
             if (isClaim)
             {
-                claim.AgencyReport.ReportQuestionaire.Question1 = "Medical report question ?";
-                claim.AgencyReport.ReportQuestionaire.Question2 = "Detailed Diagnosis of death ?";
-                claim.AgencyReport.ReportQuestionaire.Question3 = "Name of Doctor met ?";
-                claim.AgencyReport.ReportQuestionaire.Question4 = "Date when met with Doctor ?";
+                claim.AgencyReport.ReportQuestionaire.Question1 = "Injury/Illness prior to commencement/revival ?";
+                claim.AgencyReport.ReportQuestionaire.Question2 = "Duration of treatment ?";
+                claim.AgencyReport.ReportQuestionaire.Question3 = "Name of person met at the cemetery ?";
+                claim.AgencyReport.ReportQuestionaire.Question4 = "Date and time of death ?";
             }
             else
             {
@@ -723,10 +723,38 @@ namespace risk.control.system.Services
             claim.SubmittedToSupervisorTime = DateTime.Now;
             var claimReport = claim.AgencyReport;
 
-            claimReport.ReportQuestionaire.Answer1 = answer1;
+            if(claim.PolicyDetail?.LineOfBusiness.Name.ToLower() == UNDERWRITING)
+            {
+                if (!string.IsNullOrWhiteSpace(answer1))
+                {
+                    DwellType question1Enum = (DwellType)Enum.Parse(typeof(DwellType), answer1, true);
+                    answer1 = question1Enum.GetEnumDisplayName();
+                }
 
-            Income? income = HtmlHelperExtensions.GetEnumFromDisplayName<Income>(answer2);
-            claimReport.ReportQuestionaire.Answer2 = income.ToString();
+                if (!string.IsNullOrWhiteSpace(answer2))
+                {
+                    Income question2Enum = (Income)Enum.Parse(typeof(Income), answer2, true);
+                    answer2 = question2Enum.GetEnumDisplayName();
+                }
+            }
+
+            else
+            {
+                if (!string.IsNullOrWhiteSpace(answer1))
+                {
+                    YESNO question1Enum = (YESNO)Enum.Parse(typeof(YESNO), answer1, true);
+                    answer1 = question1Enum.GetEnumDisplayName();
+                }
+
+                if (!string.IsNullOrWhiteSpace(answer2))
+                {
+                    DURATION question2Enum = (DURATION)Enum.Parse(typeof(DURATION), answer2, true);
+                    answer2 = question2Enum.GetEnumDisplayName();
+                }
+            }
+
+            claimReport.ReportQuestionaire.Answer1 = answer1;
+            claimReport.ReportQuestionaire.Answer2 = answer2;
             claimReport.ReportQuestionaire.Answer3 = answer3;
             claimReport.ReportQuestionaire.Answer4 = answer4;
             claimReport.AgentRemarks = remarks;

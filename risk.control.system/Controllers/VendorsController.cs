@@ -960,7 +960,8 @@ namespace risk.control.system.Controllers
                     Company = companyUser.ClientCompany,
                     Symbol = "far fa-hand-point-right i-orangered",
                     Message = $"Agency {vendor.Email} created",
-                    Status = "Empanel"
+                    Status = "Empanel",
+                    NotifierUserEmail = currentUserEmail
                 };
                 _context.Notifications.Add(notification);
                 await _context.SaveChangesAsync();

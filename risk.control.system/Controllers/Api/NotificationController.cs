@@ -49,7 +49,7 @@ namespace risk.control.system.Controllers.Api
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             var notifications = await service.GetNotifications(userEmail);
-            var activeNotifications = notifications.Select(n => new { Id = n.StatusNotificationId, Symbol = n.Symbol, n.Message, n.Status, CreatedAt = GetTimeAgo(n.CreatedAt) });
+            var activeNotifications = notifications.Select(n => new { Id = n.StatusNotificationId, Symbol = n.Symbol, n.Message, n.Status, CreatedAt = GetTimeAgo(n.CreatedAt), user = n.NotifierUserEmail });
             return Ok(new { Data = activeNotifications?.Take(maxCountReached).ToList(), total = notifications.Count, MaxCountReached = notifications.Count > maxCountReached, MaxCount = maxCountReached });
         }
         [AllowAnonymous]

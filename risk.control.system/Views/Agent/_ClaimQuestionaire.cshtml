@@ -55,8 +55,8 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" asp-for="AgencyReport.ReportQuestionaire.Answer1"><i class="nav-icon fas fa-home"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                     </div>
-                                    <select name="question1" id="question1" required asp-for="AgencyReport.ReportQuestionaire.Answer1" data-toggle="tooltip" title="Select Ownership of Residence" 
-                                    class="form-control remarks" asp-items="Html.GetEnumSelectList<DwellType>()">
+                                    <select name="question1" id="question1" required asp-for="AgencyReport.ReportQuestionaire.Answer1" data-toggle="tooltip" title="Select Ownership of Residence"
+                                            class="form-control remarks" asp-items="Html.GetEnumSelectList<YESNO>()">
                                         <option>--- SELECT ---</option>
                                     </select>
                                     <span asp-validation-for="AgencyReport.ReportQuestionaire.Answer1" class="text-danger"></span>
@@ -69,7 +69,7 @@
                                         <span class="input-group-text" asp-for="AgencyReport.ReportQuestionaire.Answer2"><i class="far fa-money-bill-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                     </div>
                                     <select name="question2" id="question2" required asp-for="AgencyReport.ReportQuestionaire.Answer2" data-toggle="tooltip" title="Select Perceived financial status"
-                                            class="form-control remarks" asp-items="Html.GetEnumSelectList<Income>()">
+                                            class="form-control remarks" asp-items="Html.GetEnumSelectList<DURATION>()">
                                         <option>--- SELECT---</option>
                                     </select>
                                     <span asp-validation-for="AgencyReport.ReportQuestionaire.Answer2" class="text-danger"></span>
@@ -135,7 +135,8 @@
 
                     <div class="text-right">
                         <a id="back" asp-controller="Agent" asp-action="Agent" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a> &nbsp;
-                        @if (@Model.AgencyReport?.DigitalIdReport?.DigitalIdImageLocationUrl != null && @Model.AgencyReport?.PanIdReport?.DocumentIdImageLocationUrl != null)
+                        @if (@Model.AgencyReport?.AgentIdReport?.DigitalIdImageLocationUrl != null && @Model.AgencyReport?.DigitalIdReport?.DigitalIdImageLocationUrl != null && 
+                            @Model.AgencyReport?.PanIdReport?.DocumentIdImageLocationUrl != null)
                         {
                             <button disabled id="submit-case" type="submit" class="btn btn-danger">
                                 <i class="fa fa-binoculars" aria-hidden="true"></i> SUBMIT

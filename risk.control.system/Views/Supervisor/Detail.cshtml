@@ -47,7 +47,7 @@
         <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
     </div>
     <partial name="_AgentSubmittedReport" model="@Model" />
-    @if (@Model.ClaimsInvestigation.AgencyReport != null)
+    @if (@Model.ClaimsInvestigation.AgencyReport.AgentRemarks != null)
     {
         <div class="card shadow-lg border-1 rounded-lg direct-chat-warning expanded-card">
             <div class="card-header bg-light text-white text-center">

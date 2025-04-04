@@ -3,7 +3,7 @@
 @{
     var cardView = "expanding-card";
     var cardViewIcon = "fas fa-minus";
-    if (@Model.ClaimsInvestigation.AgencyReport != null)
+    if (@Model.ClaimsInvestigation.AgencyReport.AgentRemarks != null)
     {
         cardView = "collapsed-card";
         cardViewIcon = "fas fa-plus";

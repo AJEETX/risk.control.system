@@ -459,6 +459,7 @@ namespace risk.control.system.Controllers.Api.Company
             var result = files.OrderBy(o=>o.CreatedOn).Select(file => new
             {
                 file.Id,
+                file.SequenceNumber,
                 file.Name,
                 file.Description,
                 file.FileType,

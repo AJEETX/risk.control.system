@@ -664,7 +664,7 @@ namespace risk.control.system.Services
 
                 if (role.Name == AppRoles.AGENT.ToString())
                 {
-                    notifications = notifications.Where(n => n.UserEmail == userEmail);
+                    notifications = notifications.Where(n => n.AgenctUserEmail == userEmail);
                 }
                 else
                 {

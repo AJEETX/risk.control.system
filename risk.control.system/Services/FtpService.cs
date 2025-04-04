@@ -7,6 +7,7 @@ using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 
+using System.ComponentModel.Design;
 using System.Data;
 using System.IO.Compression;
 using System.Net;
@@ -190,8 +191,10 @@ namespace risk.control.system.Services
             var fileName = Path.GetFileNameWithoutExtension(file.FileName);
             var extension = Path.GetExtension(file.FileName);
             var company = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == uploadedBy);
+            int lastSequence = await _context.FilesOnFileSystem.Where(f => f.CompanyId == company.ClientCompanyId).MaxAsync(f => (int?)f.SequenceNumber) ?? 0;
             var fileModel = new FileOnFileSystemModel
             {
+                SequenceNumber = lastSequence + 1,
                 CreatedOn = DateTime.Now,
                 FileType = file.ContentType,
                 Extension = extension,

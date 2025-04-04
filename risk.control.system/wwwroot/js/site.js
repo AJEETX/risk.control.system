@@ -288,16 +288,23 @@ function loadNotifications(keepOpen = false) {
             response.data.forEach(function (item) {
                 $("#notificationList").append(
                     `<a href="#" class="dropdown-item notification-item" data-id="${item.id}">
-                        <div class="notification-content">
-                            <i class="${item.symbol}"></i> 
-                            <span class="notification-message text-muted text-sm">${item.message}</span>
-                                <span class="badge badge-light text-muted text-sm">${item.status}</span>
-                            <span class="notification-time">${item.createdAt}</span>
-                        </div>
-                        <span class="delete-notification" data-id="${item.id}">
-                            <i class="fas fa-trash"></i>
-                        </span>
-                    </a>`
+        <!-- First Row: Icon, Message, Status -->
+        <div class="notification-content">
+            <i class="${item.symbol}"></i> 
+            <span class="notification-message text-muted text-sm">${item.message}</span>
+            <span class="badge badge-light text-muted text-sm">${item.status}</span>
+            <span class="notification-time text-muted text-xs">
+                <i class="far fa-clock"></i> ${item.createdAt}
+            </span>
+        </div>
+        <br />
+        <!-- Second Row: User, Time, Delete Icon -->
+        <div class="notification-content">
+            <span class="delete-notification" data-id="${item.id}">
+                <i class="fas fa-trash"></i>
+            </span>
+        </div>
+    </a>`
                 );
             });
 
@@ -354,9 +361,6 @@ $(document).ready(function () {
             html: true
         });
     });
-
-    // Load notifications on page load WITHOUT keeping it open
-    loadNotifications(false);
 
     $(".delete-notification").on("click", function (e) {
         e.stopPropagation(); // Prevent closing the dropdown
@@ -460,7 +464,6 @@ $(document).ready(function () {
             }
         });
     });
-
 
     $('#back').on('click', function () {
         refreshSession();
@@ -951,3 +954,6 @@ window.onload = DisableBackButton;
 window.onpageshow = function (evt) { if (evt.persisted) DisableBackButton() }
 
 fetchIpInfo();
+
+    // Load notifications on page load WITHOUT keeping it open
+    loadNotifications(false);

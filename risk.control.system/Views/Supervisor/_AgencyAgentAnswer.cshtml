@@ -11,7 +11,7 @@
         <div class="card direct-chat-warning collapsed-card">
             <div class="card-header text-muted border-bottom-0">
                 <h3 class="card-title">
-                    <i class="far fa-comment"></i> Questionnaire (@Model.ClaimsInvestigation?.PolicyDetail.LineOfBusiness.Name)
+                    <i class="far fa-comment"></i> Questionnaire
                     <span class="hover-text">
                         <i class="fas fa-info-circle"></i>
                         <span class="tooltip-text" id="information">
@@ -39,6 +39,8 @@
                 </div>
             </div>
             <div class="card-body">
+                <partial name="_Chat" model="@Model" />
+
                 <div class="row">
                     <div class="col-6">
                         <p class="text-muted text-sm">
@@ -149,6 +151,5 @@
         </div>
 
     </div>
-    <partial name="_Chat" model="@Model" />
 
 }
