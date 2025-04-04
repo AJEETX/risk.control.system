@@ -660,17 +660,18 @@ namespace risk.control.system.Services
                 agency = context.Vendor.FirstOrDefault(c => c.VendorId == vendorUser.VendorId);
                 
                 var notifications = context.Notifications.Where(n => n.Agency == agency && (!n.IsReadByVendor || !n.IsReadByVendorAgent));
+                var notificationsss = context.Notifications.Where(n => n.Agency == agency && (!n.IsReadByVendor || !n.IsReadByVendorAgent)).ToList();
 
-                if (role.Name == AppRoles.AGENCY_ADMIN.ToString() || role.Name == AppRoles.SUPERVISOR.ToString())
+                if (role.Name == AppRoles.AGENT.ToString())
+                {
+                    notifications = notifications.Where(n => n.UserEmail == userEmail);
+                }
+                else
                 {
                     var superRole = context.ApplicationRole.FirstOrDefault(r => r.Name == AppRoles.SUPERVISOR.ToString());
                     notifications = notifications.Where(n => n.Role == superRole && (!n.IsReadByVendor));
                 }
 
-                else if (role.Name == AppRoles.AGENT.ToString())
-                {
-                    notifications = notifications.Where(n => n.UserEmail == userEmail);
-                }
 
                var activeNotifications = await notifications
                     .OrderByDescending(n => n.CreatedAt).ToListAsync();

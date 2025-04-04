@@ -1,36 +1,5 @@
 ﻿$(document).ready(function () {
-    $('a.create-policy').on('click', function () {
-        $("body").addClass("submit-progress-bg");
-        // Wrap in setTimeout so the UI
-        // can update the spinners
-        setTimeout(function () {
-            $(".submit-progress").removeClass("hidden");
-        }, 1);
-
-        $('a.create-policy').html("<i class='fas fa-sync fa-spin'></i> Add");
-
-        // Disable all buttons, submit inputs, and anchors
-        $('button, input[type="submit"], a').prop('disabled', true);
-
-        // Add a class to visually indicate disabled state for anchors
-        $('a').addClass('disabled-anchor').on('click', function (e) {
-            e.preventDefault(); // Prevent default action for anchor clicks
-        });
-        $('a').attr('disabled', 'disabled');
-        $('button').attr('disabled', 'disabled');
-        $('html button').css('pointer-events', 'none');
-        $('html a').css({ 'pointer-events': 'none' }, { 'cursor': 'none' });
-        $('.text').css({ 'pointer-events': 'none' }, { 'cursor': 'none' });
-
-        var article = document.getElementById("article");
-        if (article) {
-            var nodes = article.getElementsByTagName('*');
-            for (var i = 0; i < nodes.length; i++) {
-                nodes[i].disabled = true;
-            }
-        }
-    });
-
+    
     var table = $('#customerTableAuto').DataTable({
         "ajax": {
             "url": '/api/Creator/GetFilesData',
@@ -107,7 +76,15 @@
                                 $.alert({
                                     title: 'File has been Deleted!',
                                     content: response.message,
-                                    type: 'red'
+                                    type: 'red',
+                                    icon: 'fas fa-exclamation-triangle',
+                                    closeIcon: true,
+                                    buttons: {
+                                        cancel: {
+                                            text: "CLOSE",
+                                            btnClass: 'btn-danger'
+                                        }
+                                    }
                                 });
                                 table.ajax.reload(null, false); // Reload table without changing the page
                             },
@@ -138,7 +115,6 @@
             $icon.addClass('fa-spin');
         }
         table.ajax.reload(null, false);
-        $('#checkall').prop('checked', false);
     });
 
     var refreshInterval = 5000; // 3 seconds interval

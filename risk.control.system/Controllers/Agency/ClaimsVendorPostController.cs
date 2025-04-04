@@ -233,7 +233,7 @@ namespace risk.control.system.Controllers.Agency
                 }
                 var agency = await claimsInvestigationService.WithdrawCase(userEmail, model, claimId);
 
-                backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimWithdrawlToCompany(userEmail, claimId));
+                backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimWithdrawlToCompany(userEmail, claimId, agency.VendorId));
 
                 notifyService.Custom($"Case #{policyNumber}  declined successfully", 3, "red", "far fa-file-powerpoint");
 

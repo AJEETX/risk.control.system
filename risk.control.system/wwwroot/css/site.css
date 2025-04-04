@@ -2525,3 +2525,32 @@ input#checkall {
 .timeline-date {
     margin-left: 1em;
 }
+/* Opacity for the entire row */
+.row-opacity-50 {
+    opacity: 0.5; /* Set the row opacity when pending */
+}
+
+.row-opacity-100 {
+    opacity: 1; /* Full opacity for non-pending rows */
+}
+
+/* Watermark class for pending status */
+.watermarked {
+    position: relative;
+}
+
+    /* Watermark text (opacity, font-size, color) */
+    .watermarked::before {
+        content: "Pending";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 40px;
+        color: rgba(0, 0, 0, 0.1);
+        font-weight: bold;
+        pointer-events: none;
+        user-select: none;
+        z-index: 1000;
+        opacity: 0.3; /* Watermark opacity */
+    }

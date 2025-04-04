@@ -41,7 +41,7 @@ namespace risk.control.system.Services
         Task<Vendor> WithdrawCase(string userEmail, ClaimTransactionModel model, string claimId);
 
         Task<string> ProcessAutoAllocation(string claim, string userEmail);
-        Task<ClientCompany> WithdrawCaseByCompany(string userEmail, ClaimTransactionModel model, string claimId);
+        Task<(ClientCompany, long)> WithdrawCaseByCompany(string userEmail, ClaimTransactionModel model, string claimId);
         Task<bool> SubmitNotes(string userEmail, string claimId, string notes);
 
         Task<ClaimsInvestigation> SubmitQueryToAgency(string userEmail, string claimId, EnquiryRequest request, IFormFile messageDocument);
@@ -112,7 +112,7 @@ namespace risk.control.system.Services
                         .ThenInclude(c => c.PinCode)
                     .FirstOrDefaultAsync(c => c.ClaimsInvestigationId == claim);
 
-                string pinCode2Verify = claimsInvestigation.PolicyDetail?.LineOfBusiness.Name.ToLower() == CLAIMS
+                string pinCode2Verify = claimsInvestigation.PolicyDetail?.LineOfBusiness.Name.ToLower() == UNDERWRITING
                     ? claimsInvestigation.CustomerDetail?.PinCode?.Code
                     : claimsInvestigation.BeneficiaryDetail?.PinCode?.Code;
 
@@ -180,7 +180,7 @@ namespace risk.control.system.Services
                     .ThenInclude(c => c.PinCode)
                 .FirstOrDefaultAsync(c => c.ClaimsInvestigationId == claim);
 
-            string pinCode2Verify = claimsInvestigation.PolicyDetail?.LineOfBusiness.Name.ToLower() == CLAIMS
+            string pinCode2Verify = claimsInvestigation.PolicyDetail?.LineOfBusiness.Name.ToLower() == UNDERWRITING
                 ? claimsInvestigation.CustomerDetail?.PinCode?.Code
                 : claimsInvestigation.BeneficiaryDetail?.PinCode?.Code;
 
@@ -366,11 +366,12 @@ namespace risk.control.system.Services
             }
         }
 
-        public async Task<ClientCompany> WithdrawCaseByCompany(string userEmail, ClaimTransactionModel model, string claimId)
+        public async Task<(ClientCompany,long)> WithdrawCaseByCompany(string userEmail, ClaimTransactionModel model, string claimId)
         {
             var currentUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == userEmail);
             var claimsInvestigation = _context.ClaimsInvestigation
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimId);
+            var vendorId = claimsInvestigation.VendorId;
             var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claimsInvestigation.ClientCompanyId);
 
             var inProgress = _context.InvestigationCaseStatus.FirstOrDefault(
@@ -433,7 +434,7 @@ namespace risk.control.system.Services
                 Console.WriteLine(ex.StackTrace);
                 throw;
             }
-            return company;
+            return (company, vendorId.GetValueOrDefault());
         }
 
         public async Task<Vendor> WithdrawCase(string userEmail, ClaimTransactionModel model, string claimId)

@@ -196,9 +196,9 @@ namespace risk.control.system.Controllers.Company
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
-                var company = await claimsInvestigationService.WithdrawCaseByCompany(currentUserEmail, model, claimId);
+                var (company, vendorId) = await claimsInvestigationService.WithdrawCaseByCompany(currentUserEmail, model, claimId);
                
-                backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimWithdrawlToCompany(currentUserEmail, claimId));
+                backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimWithdrawlToCompany(currentUserEmail, claimId, vendorId));
                 //await mailboxService.NotifyClaimWithdrawlToCompany(currentUserEmail, claimId);
 
                 notifyService.Custom($"Case #{policyNumber}  withdrawn successfully", 3, "green", "far fa-file-powerpoint");

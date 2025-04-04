@@ -33,10 +33,10 @@ namespace risk.control.system.Seeds
             var greater = new SeedInput { COUNTRY = "in", DOMAIN = "greater.com", NAME = "Greater", PHOTO = "/img/company.png" };
             var investigatoz = new SeedInput { COUNTRY = "in", DOMAIN = "investigatoz.com", NAME = "Investigatoz", PHOTO = "/img/investigation.png" };
             
-            var nicer = new SeedInput { COUNTRY = "us", DOMAIN = "nicer.com", NAME = "Nicer", PHOTO = "/img/nicer.png" };
-            var demoz = new SeedInput { COUNTRY = "us", DOMAIN = "demoz.com", NAME = "Demoz", PHOTO = "/img/demo.png" };
-            var investigatos = new SeedInput { COUNTRY = "us", DOMAIN = "investigatos.com", NAME = "Investigatos", PHOTO = "/img/investigation.png" };
-            var greates = new SeedInput { COUNTRY = "us", DOMAIN = "greates.com", NAME = "Greates", PHOTO = "/img/company.png" };
+            var nicer = new SeedInput { COUNTRY = "au", DOMAIN = "nicer.com", NAME = "Nicer", PHOTO = "/img/nicer.png" };
+            var demoz = new SeedInput { COUNTRY = "au", DOMAIN = "demoz.com", NAME = "Demoz", PHOTO = "/img/demo.png" };
+            var investigatos = new SeedInput { COUNTRY = "au", DOMAIN = "investigatos.com", NAME = "Investigatos", PHOTO = "/img/investigation.png" };
+            var greates = new SeedInput { COUNTRY = "au", DOMAIN = "greates.com", NAME = "Greates", PHOTO = "/img/company.png" };
 
             var agencies = new List<SeedInput> { 
                 checker, verify, investigate, investigator, greatez
