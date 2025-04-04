@@ -2521,3 +2521,7 @@ input#checkall {
     width: 1rem;
     border: none;
 }
+
+.timeline-date {
+    margin-left: 1em;
+}

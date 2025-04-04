@@ -27,7 +27,37 @@ namespace risk.control.system.Services
             this.customApiCLient = customApiCLient;
         }
 
-        private ClaimsInvestigation CreateNewPolicy(List<string> rowData, ClientCompanyApplicationUser companyUser, CREATEDBY autoOrManual, ORIGIN fileOrFtp, long lineOfBusinessId, byte[] data)
+        public async Task<bool> PerformUpload(ClientCompanyApplicationUser companyUser, string row, CREATEDBY autoOrManual, ORIGIN fileOrFtp, long lineOfBusinessId, byte[] data, DataTable dt)
+        {
+            try
+            {
+                var status = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.INITIATED));
+                dt.Rows.Add();
+                int i = 0;
+                var output = regex.Replace(row, m => m.Value.Replace(',', '@'));
+                var rowData = output.Split(',').ToList();
+                foreach (string cell in rowData)
+                {
+                    dt.Rows[dt.Rows.Count - 1][i] = cell?.Trim() ?? NO_DATA;
+                    i++;
+                }
+
+                var claimAdded = await CreateNewPolicy(rowData, companyUser, autoOrManual, fileOrFtp, lineOfBusinessId, data);
+
+                if (!claimAdded)
+                {
+                    return false;
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                return false;
+            }
+        }
+
+        private async Task<bool> CreateNewPolicy(List<string> rowData, ClientCompanyApplicationUser companyUser, CREATEDBY autoOrManual, ORIGIN fileOrFtp, long lineOfBusinessId, byte[] data)
         {
             //CREATE CLAIM
             var status = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.INITIATED));
@@ -81,7 +111,20 @@ namespace risk.control.system.Services
                 Updated = DateTime.Now,
                 UpdatedBy = companyUser.Email
             };
+            var customerTask = CreateNewCustomer(companyUser, rowData, data);
+            var beneficiaryTask =  CreateNewBeneficiary(companyUser, rowData, data);
+            await Task.WhenAll(customerTask, beneficiaryTask);
 
+            // Get the results
+            var customer = await customerTask;
+            var beneficiary = await beneficiaryTask;
+            if (customer is null || beneficiary is null)
+            {
+                return false;
+            }
+            claim.CustomerDetail = customer;
+            claim.BeneficiaryDetail = beneficiary;
+            _context.ClaimsInvestigation.Add(claim);
             var log = new InvestigationTransaction
             {
                 ClaimsInvestigationId = claim.ClaimsInvestigationId,
@@ -96,10 +139,9 @@ namespace risk.control.system.Services
             };
 
             _context.InvestigationTransaction.Add(log);
-
-            return claim;
+            return true;
         }
-        private async Task<CustomerDetail> CreateNewCustomer(ClientCompanyApplicationUser companyUser, List<string> rowData, ClaimsInvestigation claim, byte[] data)
+        private async Task<CustomerDetail> CreateNewCustomer(ClientCompanyApplicationUser companyUser, List<string> rowData, byte[] data)
         {
             var pinCode = _context.PinCode
                                     .Include(p => p.District)
@@ -133,9 +175,7 @@ namespace risk.control.system.Services
                 //Description = rowData[20]?.Trim(),
                 ProfilePicture = customerNewImage.ImageData,
                 UpdatedBy = companyUser.Email,
-                Updated = DateTime.Now,
-                ClaimsInvestigation = claim,
-                ClaimsInvestigationId = claim.ClaimsInvestigationId
+                Updated = DateTime.Now
             };
             var address = customerDetail.Addressline + ", " +
                 pinCode.District.Name + ", " +
@@ -149,11 +189,10 @@ namespace risk.control.system.Services
             var customerLatLong = coordinates.Latitude + "," + coordinates.Longitude;
             var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:A%7C{customerLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
             customerDetail.CustomerLocationMap = url;
-            _context.CustomerDetail.Add(customerDetail);
             return customerDetail;
         }
 
-        private async Task<BeneficiaryDetail> CreateNewBeneficiary(ClientCompanyApplicationUser companyUser, List<string> rowData, ClaimsInvestigation claim, byte[] data)
+        private async Task<BeneficiaryDetail> CreateNewBeneficiary(ClientCompanyApplicationUser companyUser, List<string> rowData, byte[] data)
         {
             var pinCode = _context.PinCode
                                     .Include(p => p.District)
@@ -183,9 +222,7 @@ namespace risk.control.system.Services
                 CountryId = pinCode.Country.CountryId,
                 ProfilePicture = beneficiaryNewImage.ImageData,
                 Updated = DateTime.Now,
-                UpdatedBy = companyUser.Email,
-                ClaimsInvestigationId = claim.ClaimsInvestigationId,
-                ClaimsInvestigation = claim
+                UpdatedBy = companyUser.Email
             };
 
             var address = beneficairy.Addressline + ", " +
@@ -206,53 +243,6 @@ namespace risk.control.system.Services
             return beneficairy;
         }
 
-        public async Task<bool> PerformUpload(ClientCompanyApplicationUser companyUser, string row, CREATEDBY autoOrManual, ORIGIN fileOrFtp, long lineOfBusinessId, byte[] data, DataTable dt)
-        {
-            try
-            {
-                dt.Rows.Add();
-                int i = 0;
-                var output = regex.Replace(row, m => m.Value.Replace(',', '@'));
-                var rowData = output.Split(',').ToList();
-                foreach (string cell in rowData)
-                {
-                    dt.Rows[dt.Rows.Count - 1][i] = cell?.Trim() ?? NO_DATA;
-                    i++;
-                }
-
-                var claim = CreateNewPolicy(rowData, companyUser, autoOrManual, fileOrFtp, lineOfBusinessId, data);
-
-                if (claim is null)
-                {
-                    return false;
-                }
-                //CREATE CUSTOMER
-                var customerTask = CreateNewCustomer(companyUser, rowData, claim, data);
-
-                //CREATE BENEFICIARY
-                var beneficiaryTask = CreateNewBeneficiary(companyUser, rowData, claim, data);
-
-                // Await both tasks
-                await Task.WhenAll(customerTask, beneficiaryTask);
-
-                // Get the results
-                var customer = await customerTask;
-                var beneficiary = await beneficiaryTask;
-
-                if (customer is null || beneficiary is null)
-                {
-                    return false;
-                }
-                _context.ClaimsInvestigation.Add(claim);
-
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.StackTrace);
-                return false;
-            }
-            return true;
-        }
         public static List<(string FileName, byte[] ImageData)> GetImagesWithDataInSubfolder(byte[] zipData, string subfolderName)
         {
             List<(string FileName, byte[] ImageData)> images = new List<(string, byte[])>();

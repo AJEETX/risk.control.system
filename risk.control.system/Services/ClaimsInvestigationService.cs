@@ -326,6 +326,14 @@ namespace risk.control.system.Services
                     claimsInvestigation.IsReady2Assign = true;
                     claimsInvestigation.CREATEDBY = CREATEDBY.MANUAL;
                     claimsInvestigation.AutoAllocated = false;
+                    claimsInvestigation.ActiveView = 0;
+                    claimsInvestigation.ManualNew = 0;
+                    claimsInvestigation.AllocateView = 0;
+                    claimsInvestigation.AutoNew = 0;
+                    claimsInvestigation.VendorId = null;
+                    claimsInvestigation.Vendor = null;
+
+                    claimsInvestigation.InvestigationCaseStatusId = inProgress.InvestigationCaseStatusId;
                     claimsInvestigation.InvestigationCaseSubStatusId = assigned.InvestigationCaseSubStatusId;
 
 
@@ -437,15 +445,13 @@ namespace risk.control.system.Services
 
             var inProgress = _context.InvestigationCaseStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS);
-            var assigned = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
             var withdrawnByAgency = _context.InvestigationCaseSubStatus.FirstOrDefault(
                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_AGENCY);
 
             claimsInvestigation.Updated = DateTime.Now;
             claimsInvestigation.UpdatedBy = currentUser.FirstName + " " + currentUser.LastName + "( " + currentUser.Email + ")";
             claimsInvestigation.CurrentUserEmail = userEmail;
-                    claimsInvestigation.STATUS = ALLOCATION_STATUS.READY;
+            claimsInvestigation.STATUS = ALLOCATION_STATUS.READY;
             claimsInvestigation.AssignedToAgency = false;
             claimsInvestigation.CurrentClaimOwner = currentUser.Email;
             claimsInvestigation.UserEmailActioned = userEmail;
