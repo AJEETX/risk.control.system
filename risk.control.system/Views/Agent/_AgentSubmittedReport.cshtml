@@ -29,7 +29,7 @@
                             <li>
                                 <i class='far fa-file-powerpoint'></i> Policy details.
                             </li>
-                            @if (Model.ClaimsInvestigation.PolicyDetail.ClaimType == ClaimType.HEALTH)
+                            @if (Model.ClaimsInvestigation.PolicyDetail.LineOfBusiness.Name.ToLower() == "underwriting")
                             {
                                 <li>
                                     <i class='fa fa-user-plus'></i> Customer details
@@ -61,11 +61,11 @@
                         };
                     }
                     <partial name="_ClaimPolicyDetails" model="@data" />
-                    @if (Model.ClaimsInvestigation.PolicyDetail.ClaimType == ClaimType.HEALTH)
+                    @if (Model.ClaimsInvestigation.PolicyDetail.LineOfBusiness.Name.ToLower() == "underwriting")
                     {
                         <partial name="_ClaimCustomerDetails" model="@data" />
                     }
-                    @if (Model.ClaimsInvestigation.PolicyDetail.ClaimType == ClaimType.DEATH)
+                    else
                     {
                         <partial name="_ClaimBeneficiaryDetails" model="@data" />
                     }

@@ -642,7 +642,7 @@ namespace risk.control.system.Services
                 }
                 else if (role.Name == AppRoles.MANAGER.ToString())
                 {
-                    notifications = notifications.Where(n => n.Role == role && !n.IsReadByManager && n.CreatedBy != userEmail);
+                    notifications = notifications.Where(n => !n.IsReadByManager);
                 }
 
                 else if (role.Name == AppRoles.CREATOR.ToString())

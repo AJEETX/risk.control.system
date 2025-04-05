@@ -10,7 +10,7 @@
                     <li>
                         <i class='far fa-file-powerpoint'></i> Case details.
                     </li>
-                    @if (Model?.ClaimsInvestigation?.PolicyDetail.ClaimType == ClaimType.HEALTH)
+                        @if (Model.ClaimsInvestigation.PolicyDetail.LineOfBusiness.Name.ToLower() == "underwriting")
                     {
                         <li>
                             <i class='fa fa-user-plus'></i> Customer details.
@@ -153,7 +153,7 @@
                 }
 
 
-                @if (Model.ClaimsInvestigation.PolicyDetail.ClaimType == ClaimType.HEALTH)
+                @if (Model.ClaimsInvestigation.PolicyDetail.LineOfBusiness.Name.ToLower() == "underwriting")
                 {
                     <div class="col-12 col-sm-6 col-md-6 d-flex align-items-stretch flex-column">
                         <div class="card bg-light d-flex flex-fill">
@@ -237,7 +237,7 @@
                         </div>
                     </div>
                 }
-                @if (Model.ClaimsInvestigation.PolicyDetail.ClaimType == ClaimType.DEATH)
+                @if (Model.ClaimsInvestigation.PolicyDetail.LineOfBusiness.Name.ToLower() == "underwriting")
                 {
                     <div class="col-12 col-sm-6 col-md-6 d-flex align-items-stretch flex-column">
                         <div class="card bg-light d-flex flex-fill">

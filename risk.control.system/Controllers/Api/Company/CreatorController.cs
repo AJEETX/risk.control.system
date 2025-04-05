@@ -288,7 +288,7 @@ namespace risk.control.system.Controllers.Api.Company
                         Name = a.CustomerDetail?.Name != null ? a.CustomerDetail?.Name : "<span class=\"badge badge-light\">customer name</span>",
                         Policy = a.PolicyDetail?.LineOfBusiness.Name,
                         Status = a.InvestigationCaseStatus.Name,
-                        ServiceType = a.PolicyDetail?.ClaimType.GetEnumDisplayName(),
+                        ServiceType = a.PolicyDetail?.LineOfBusiness.Name,
                         Service = a.PolicyDetail.InvestigationServiceType.Name,
                         Location = a.ORIGIN.GetEnumDisplayName(),
                         Created = a.Created.ToString("dd-MM-yyyy"),
@@ -370,29 +370,19 @@ namespace risk.control.system.Controllers.Api.Company
                 .ThenInclude(p => p.InvestigationServiceType)
                 .ToList();
 
-            var transactionQuery = _context.InvestigationTransaction
-                .Where(c => claims.Select(claim => claim.ClaimsInvestigationId).Contains(c.ClaimsInvestigationId));
-
-            var claimIds = claims.Select(c => c.ClaimsInvestigationId).ToList();
-            var userHasClaimLogsDict = transactionQuery
-                .Where(c => claimIds.Contains(c.ClaimsInvestigationId))
-                .GroupBy(c => c.ClaimsInvestigationId)
-                .ToDictionary(
-                    group => group.Key,
-                    group => group.Where(c => c.UserEmailActioned == companyUser.Email && c.HopCount >= group.Max(g => g.HopCount)).Any()
-                );
-
             var claimsSubmitted = new List<ClaimsInvestigation>();
             var newClaims = new List<ClaimsInvestigation>();
 
             foreach (var claim in claims)
             {
-                var reviewLogCount = transactionQuery
-                    .Where(c => c.ClaimsInvestigationId == claim.ClaimsInvestigationId && c.IsReviewCase && c.UserRoleActionedTo == companyUser.ClientCompany.Email)
-                    .OrderByDescending(o => o.HopCount)
-                    .FirstOrDefault()?.HopCount ?? 0;
+                var userHasReviewClaimLogs = _context.InvestigationTransaction.Where(c => c.ClaimsInvestigationId == claim.ClaimsInvestigationId && c.IsReviewCase && c.UserRoleActionedTo == $"{companyUser.ClientCompany.Email}")?.ToList();
 
-                var userHasClaimLog = userHasClaimLogsDict.ContainsKey(claim.ClaimsInvestigationId) && userHasClaimLogsDict[claim.ClaimsInvestigationId];
+                int? reviewLogCount = 0;
+                if (userHasReviewClaimLogs != null && userHasReviewClaimLogs.Count > 0)
+                {
+                    reviewLogCount = userHasReviewClaimLogs.OrderByDescending(o => o.HopCount).First().HopCount;
+                }
+                var userHasClaimLog = _context.InvestigationTransaction.Any(c => c.ClaimsInvestigationId == claim.ClaimsInvestigationId && c.UserEmailActioned == companyUser.Email && c.HopCount >= reviewLogCount);
 
                 if (userHasClaimLog)
                 {

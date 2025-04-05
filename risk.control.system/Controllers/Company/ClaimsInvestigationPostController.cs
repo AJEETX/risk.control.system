@@ -126,9 +126,9 @@ namespace risk.control.system.Controllers.Company
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 var distinctClaims = claims.Distinct().ToList();
-                await claimsInvestigationService.AssignToAssigner(HttpContext.User.Identity.Name, distinctClaims);
+                await claimsInvestigationService.AssignToAssigner(currentUserEmail, distinctClaims);
 
-                backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimAssignmentToAssigner(HttpContext.User.Identity.Name, distinctClaims));
+                backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimAssignmentToAssigner(currentUserEmail, distinctClaims));
 
                 notifyService.Custom($"{claims.Count}/{claims.Count} case(s) Assigned", 3, "green", "far fa-file-powerpoint");
             }

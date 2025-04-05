@@ -53,7 +53,22 @@
                 "targets": 4,   // ✅ Apply sorting to 'createdOn' column
                 "type": "date"  // ✅ Ensure it is treated as a date
             }
-        ]
+        ],
+        rowCallback: function (row, data) {
+            var $row = $(row);
+
+            if (data.status === "Processing") {
+               
+                // Disable the anchor tags for this row
+                $(row).find('a.disabled').on('click', function (e) {
+                    e.preventDefault();
+                });
+                $row.addClass('row-opacity-50 watermark-row'); // Make row semi-transparent with watermark
+                $row.append('<div class="watermark-text"> ...Processing...</div>');
+            } else {
+                $row.removeClass('row-opacity-50 watermark-row'); // Remove styling for other statuses
+            }
+        }
     });
     table.on('xhr.dt', function () {
         $('#refreshIcon').removeClass('fa-spin');
@@ -127,44 +142,44 @@
         }
         table.ajax.reload(null, false);
     });
-    function TrackProgress(uploadId) {
-        if (uploadId == null || uploadId == undefined || uploadId == "") {
-            uploadId = 0; // Default value if not set
-        }
-        var table = $('#customerTableAuto').DataTable();
+    //function TrackProgress(uploadId) {
+    //    if (uploadId == null || uploadId == undefined || uploadId == "") {
+    //        uploadId = 0; // Default value if not set
+    //    }
+    //    var table = $('#customerTableAuto').DataTable();
 
-        if (uploadId > 0) {
-            let progressBar = document.getElementById("progressBar");
-            let progressContainer = document.getElementById("progressContainer");
+    //    if (uploadId > 0) {
+    //        let progressBar = document.getElementById("progressBar");
+    //        let progressContainer = document.getElementById("progressContainer");
 
-            // Remove 'hidden' class to show progress bar
-            progressContainer.classList.remove("hidden");
+    //        // Remove 'hidden' class to show progress bar
+    //        progressContainer.classList.remove("hidden");
 
-            let interval = setInterval(() => {
-                fetch(`/CreatorPost/GetJobProgress?jobId=${uploadId}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        let progress = data.progress;
-                        progressBar.style.width = progress + "%";
-                        progressBar.innerText = progress + "%";
+    //        let interval = setInterval(() => {
+    //            fetch(`/CreatorPost/GetJobProgress?jobId=${uploadId}`)
+    //                .then(response => response.json())
+    //                .then(data => {
+    //                    let progress = data.progress;
+    //                    progressBar.style.width = progress + "%";
+    //                    progressBar.innerText = progress + "%";
 
-                        if (progress >= 100) {
-                            clearInterval(interval);
-                            setTimeout(() => {
-                                table.ajax.reload(function () {
-                                    var newCount = table.data().count(); // Get updated row count
-                                    if (newCount > 0 && !hasPendingRows()) {
-                                        console.log("No New records detected! Stopping refresh.");
-                                    }
-                                }, true);
-                                progressContainer.classList.add("hidden"); // Hide after 1 sec
-                            }, 1000);
-                        }
-                    });
-            }, 1000);
+    //                    if (progress >= 100) {
+    //                        clearInterval(interval);
+    //                        setTimeout(() => {
+    //                            table.ajax.reload(function () {
+    //                                var newCount = table.data().count(); // Get updated row count
+    //                                if (newCount > 0 && !hasPendingRows()) {
+    //                                    console.log("No New records detected! Stopping refresh.");
+    //                                }
+    //                            }, true);
+    //                            progressContainer.classList.add("hidden"); // Hide after 1 sec
+    //                        }, 1000);
+    //                    }
+    //                });
+    //        }, 1000);
 
-        }
-    }
+    //    }
+    //}
     var refreshInterval = 5000; // 3 seconds interval
     var maxAttempts = 5; // Prevent infinite loop
     var attempts = 0;

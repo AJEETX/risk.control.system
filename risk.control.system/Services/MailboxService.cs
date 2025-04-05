@@ -173,7 +173,7 @@ namespace risk.control.system.Services
                     //SEND SMS
                     if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
                     {
-                        
+
 
                         string message = $"Dear {userEmailToSend.Email}, ";
                         message += $"Case #{policy} : {claimsInvestigation.InvestigationCaseSubStatus.Name}, ";
@@ -197,46 +197,28 @@ namespace risk.control.system.Services
 
         public async Task NotifyClaimAssignmentToAssigner(string senderUserEmail, List<string> claims)
         {
-            var applicationUser = _context.ApplicationUser.Where(u => u.Email == senderUserEmail).FirstOrDefault();
-            List<ClientCompanyApplicationUser> userEmailsToSend = new List<ClientCompanyApplicationUser>();
-
-            var clientCompanyUser = _context.ClientCompanyApplicationUser.Include(i => i.ClientCompany).FirstOrDefault(c => c.Email == applicationUser.Email);
-
-            var creatorRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.CREATOR.ToString()));
-
-            //var assignerRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Assigner.ToString()));
-
-            var companyUsers = _context.ClientCompanyApplicationUser.Include(c => c.Country).Where(u => u.ClientCompanyId == clientCompanyUser.ClientCompanyId);
-
-            foreach (var companyUser in companyUsers)
+            try
             {
-                var isAssigner = await userManager.IsInRoleAsync(companyUser, creatorRole?.Name);
-                if (isAssigner)
-                {
-                    userEmailsToSend.Add(companyUser);
-                }
-            }
+                var applicationUser = _context.ClientCompanyApplicationUser.Include(i => i.ClientCompany).FirstOrDefault(c => c.Email == senderUserEmail);
 
-            var claimsInvestigations = _context.ClaimsInvestigation
-                .Include(i => i.PolicyDetail)
-                .Include(i => i.InvestigationCaseSubStatus)
-                .Where(v => claims.Contains(v.ClaimsInvestigationId));
+                var creatorRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.CREATOR.ToString()));
 
-            StreamReader str = new StreamReader(FilePath);
-            string MailText = str.ReadToEnd();
-            str.Close();
-            var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == clientCompanyUser.ClientCompanyId);
+                var claimsInvestigations = _context.ClaimsInvestigation
+                    .Include(i => i.PolicyDetail)
+                    .Include(i => i.InvestigationCaseSubStatus)
+                    .Where(v => claims.Contains(v.ClaimsInvestigationId));
 
-            foreach (var userEmailToSend in userEmailsToSend)
-            {
-                var recepientMailbox = _context.Mailbox.Include(m => m.Inbox).FirstOrDefault(c => c.Name == userEmailToSend.Email);
+                StreamReader str = new StreamReader(FilePath);
+                string MailText = str.ReadToEnd();
+                str.Close();
+                var recepientMailbox = _context.Mailbox.Include(m => m.Inbox).FirstOrDefault(c => c.Name == applicationUser.Email);
                 var contactMessage = new InboxMessage
                 {
                     //ReceipientEmail = userEmailToSend,
                     Message = "Case(s) assigned ",
                     Created = DateTime.Now,
                     Subject = "Case(s) assigned:",
-                    SenderEmail = clientCompanyUser?.Email ?? applicationUser.Email,
+                    SenderEmail = applicationUser?.Email ?? applicationUser.Email,
                     Priority = ContactMessagePriority.NORMAL,
                     SendDate = DateTime.Now,
                     Updated = DateTime.Now,
@@ -275,7 +257,7 @@ namespace risk.control.system.Services
                     var notification = new StatusNotification
                     {
                         Role = creatorRole,
-                        Company = clientCompanyUser.ClientCompany,
+                        Company = applicationUser.ClientCompany,
                         Symbol = "fa fa-info i-blue",
                         Message = $"Case #{claimsInvestigation.PolicyDetail.ContractNumber}",
                         Status = claimsInvestigation.InvestigationCaseSubStatus.Name,
@@ -287,13 +269,13 @@ namespace risk.control.system.Services
                     //SEND SMS
                     if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
                     {
-                        string message = $"Dear {userEmailToSend.Email}, ";
+                        string message = $"Dear {applicationUser.Email}, ";
                         message += $"Case #{claimsInvestigation.PolicyDetail.ContractNumber} : {claimsInvestigation.InvestigationCaseSubStatus.Name}. ";
                         message += $"Thanks, ";
                         message += $"{applicationUser.Email}, ";
                         message += $"{smsBaseUrl}";
-                        await smsService.DoSendSmsAsync(userEmailToSend.Country.ISDCode + userEmailToSend.PhoneNumber, message);
-                        claimsInvestigation.SmsNotifications.Add(new SmsNotification { RecepicientEmail = userEmailToSend.Email, RecepicientPhone = userEmailToSend.PhoneNumber, Message = message });
+                        await smsService.DoSendSmsAsync(applicationUser.Country.ISDCode + applicationUser.PhoneNumber, message);
+                        claimsInvestigation.SmsNotifications.Add(new SmsNotification { RecepicientEmail = applicationUser.Email, RecepicientPhone = applicationUser.PhoneNumber, Message = message });
                     }
                     //SMS ::END
                 }
@@ -301,9 +283,6 @@ namespace risk.control.system.Services
                 _context.Mailbox.Attach(recepientMailbox);
                 _context.Mailbox.Update(recepientMailbox);
 
-            }
-            try
-            {
                 var rows = await _context.SaveChangesAsync();
             }
             catch (Exception ex)
@@ -507,7 +486,7 @@ namespace risk.control.system.Services
                     message += $"Case #{claimsInvestigation.PolicyDetail.ContractNumber} : {claimsInvestigation.InvestigationCaseSubStatus.Name}, ";
                     message += $"Thanks, ";
                     message += $"{userEmail}";
-                        message += $"{smsBaseUrl}";
+                    message += $"{smsBaseUrl}";
                     await smsService.DoSendSmsAsync(recepientUser.Country.ISDCode + recepientUser.PhoneNumber, message);
                     claimsInvestigation.SmsNotifications.Add(new SmsNotification { RecepicientEmail = recepientUser.Email, RecepicientPhone = recepientUser.PhoneNumber, Message = message });
                 }
@@ -631,10 +610,10 @@ namespace risk.control.system.Services
                 var vendorRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.AGENCY_ADMIN.ToString()));
                 var vendorUsers = _context.VendorApplicationUser.Where(u => u.VendorId == claimsInvestigation.VendorId);
 
-                foreach(var agencyUser in vendorUsers)
+                foreach (var agencyUser in vendorUsers)
                 {
                     var isAgencyUser = await userVendorManager.IsInRoleAsync(agencyUser, vendorRole?.Name);
-                    if(isAgencyUser)
+                    if (isAgencyUser)
                     {
                         users.Add(agencyUser);
                     }
