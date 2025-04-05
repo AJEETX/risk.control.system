@@ -724,36 +724,6 @@ namespace risk.control.system.Services
             claim.SubmittedToSupervisorTime = DateTime.Now;
             var claimReport = claim.AgencyReport;
 
-            if(claim.PolicyDetail?.LineOfBusiness.Name.ToLower() == UNDERWRITING)
-            {
-                if (!string.IsNullOrWhiteSpace(answer1))
-                {
-                    DwellType question1Enum = (DwellType)Enum.Parse(typeof(DwellType), answer1, true);
-                    answer1 = question1Enum.GetEnumDisplayName();
-                }
-
-                if (!string.IsNullOrWhiteSpace(answer2))
-                {
-                    Income question2Enum = (Income)Enum.Parse(typeof(Income), answer2, true);
-                    answer2 = question2Enum.GetEnumDisplayName();
-                }
-            }
-
-            else
-            {
-                if (!string.IsNullOrWhiteSpace(answer1))
-                {
-                    YESNO question1Enum = (YESNO)Enum.Parse(typeof(YESNO), answer1, true);
-                    answer1 = question1Enum.GetEnumDisplayName();
-                }
-
-                if (!string.IsNullOrWhiteSpace(answer2))
-                {
-                    DURATION question2Enum = (DURATION)Enum.Parse(typeof(DURATION), answer2, true);
-                    answer2 = question2Enum.GetEnumDisplayName();
-                }
-            }
-
             claimReport.ReportQuestionaire.Answer1 = answer1;
             claimReport.ReportQuestionaire.Answer2 = answer2;
             claimReport.ReportQuestionaire.Answer3 = answer3;
