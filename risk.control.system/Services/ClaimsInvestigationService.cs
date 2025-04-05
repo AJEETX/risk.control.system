@@ -706,6 +706,7 @@ namespace risk.control.system.Services
 
             var claim = _context.ClaimsInvestigation
                 .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.LineOfBusiness)
                 .Include(c => c.AgencyReport)
                 .ThenInclude(c => c.ReportQuestionaire)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimsInvestigationId);
