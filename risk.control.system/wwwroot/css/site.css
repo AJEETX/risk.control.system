@@ -2380,7 +2380,6 @@ input#checkall {
     justify-content: space-between;
     align-items: center;
     padding: 8px 12px;
-    border-bottom: 1px solid #eee;
     position: relative;
 }
 
@@ -2393,8 +2392,14 @@ input#checkall {
     display: block;
     align-items: center;
     flex-grow: 1;
+    padding: 0 1em;
+    border-top: 1px solid #ddd;
 }
-
+.notification-action-content {
+    display: block;
+    flex-grow: 1;
+    padding: 0 1em;
+}
 
 /* Notification timestamp */
 .notification-time {
@@ -2550,6 +2555,7 @@ input#checkall {
 
 .watermark-row {
     position: relative;
+    content: "Pending";
     background-color: rgba(255, 255, 0, 0.2); /* Light yellow background */
 }
 

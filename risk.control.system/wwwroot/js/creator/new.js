@@ -279,6 +279,7 @@
                 showedit(id); // Call the getdetails function with the ID
                 window.location.href = $(this).attr('href'); // Navigate to the edit page
             });
+            //checkUploadJobStatus();
         },
         error: function (xhr, status, error) { alert('err ' + error) }
     });
@@ -680,9 +681,12 @@ function checkUploadJobStatus() {
                 setTimeout(function () {
                     checkUploadJobStatus();
                 }, 2000); // Check every 5 seconds
-            } else {
+            } else if (response.status === "Completed") {
                 console.log("Job Completed:", response.status);
                 $('#refreshTable').click(); // Refresh the table after completion
+            }
+            else {
+                console.error("Errored job status:", response.status);
             }
         },
         error: function (xhr, status, error) {

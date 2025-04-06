@@ -20,7 +20,7 @@ namespace risk.control.system.Services
     public interface IFtpService
     {
         Task<int> UploadFile(string userEmail, IFormFile postedFile, CREATEDBY autoOrManual,long lineOfBusinessId);
-        Task StartUpload(int uploadId);
+        Task StartUpload(string userEmail, int uploadId);
         Task<bool> UploadCaseFile(string userEmail, IFormFile postedFile, CREATEDBY autoOrManual);
 
         Task<bool> UploadFtpFile(string userEmail, IFormFile postedFile, CREATEDBY autoOrManual, long lineOfBusinessId);
@@ -34,16 +34,22 @@ namespace risk.control.system.Services
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly ICustomApiCLient customApiCLient;
+        private readonly IProgressService progressService;
         private readonly IUploadService uploadService;
         private static WebClient client = new WebClient
         {
             Credentials = new NetworkCredential(Applicationsettings.FTP_SITE_LOG, Applicationsettings.FTP_SITE_DATA),
         };
-        public FtpService(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, ICustomApiCLient customApiCLient, IUploadService uploadService)
+        public FtpService(ApplicationDbContext context,
+            IWebHostEnvironment webHostEnvironment, 
+            ICustomApiCLient customApiCLient,
+            IProgressService progressService,
+            IUploadService uploadService)
         {
             _context = context;
             this.webHostEnvironment = webHostEnvironment;
             this.customApiCLient = customApiCLient;
+            this.progressService = progressService;
             this.uploadService = uploadService;
         }
 
@@ -216,11 +222,11 @@ namespace risk.control.system.Services
             return uploadData.Entity.Id;
         }
 
-        public async Task StartUpload(int uploadId)
+        public async Task StartUpload(string userEmail, int uploadId)
         {
-            var uploadFileData = await _context.FilesOnFileSystem.FindAsync(uploadId);
+            var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(c => c.Email == userEmail);
+            var uploadFileData = await _context.FilesOnFileSystem.FirstOrDefaultAsync(f => f.Id == uploadId && f.CompanyId == companyUser.ClientCompanyId && f.UploadedBy == userEmail && !f.Deleted);
             var csvData = ReadFirstCsvFromZip(uploadFileData.ByteData);
-            var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(c => c.Email == uploadFileData.UploadedBy);
             var totalClaimsCreated = await _context.ClaimsInvestigation.CountAsync(c => !c.Deleted && c.ClientCompanyId == companyUser.ClientCompanyId);
             var totalIncludingUploaded = totalClaimsCreated + csvData.Count - 1;
             var userCanCreate = true;
@@ -253,7 +259,6 @@ namespace risk.control.system.Services
                     uploadFileData.Message = "Error uploading the file";
                 }
                 await _context.SaveChangesAsync();
-
             }
         }
 

@@ -80,8 +80,8 @@ namespace risk.control.system.Controllers
                 {
                     System.IO.File.Delete(file.FilePath); // Delete the file from storage
                 }
-
-                _context.FilesOnFileSystem.Remove(file); // Remove from database
+                file.Deleted = true; // Mark as deleted in the database
+                _context.FilesOnFileSystem.Update(file); // Remove from database
                 _context.SaveChanges();
 
                 return Ok(new { success = true, message = "File deleted successfully." });

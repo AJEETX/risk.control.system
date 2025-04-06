@@ -293,13 +293,15 @@ function loadNotifications(keepOpen = false) {
                             <i class="${item.symbol}"></i> 
                             <span class="notification-message text-muted text-xs">${item.message}</span>
                             <span class="badge badge-light text-muted text-xs">${item.status}</span>
-                            <div class="float-right">
-                                <span class="notification-time text-muted text-xs">
-                                    <i class="far fa-clock"></i> ${item.createdAt}
-                                </span>
-                                <span class="delete-notification" data-id="${item.id}">
-                                    <i class="fas fa-trash"></i>
-                                </span>
+                            <div class=".notification-action-content">
+                                <div class="float-right">
+                                    <span class="notification-time text-muted text-xs">
+                                        <i class="far fa-clock"></i> ${item.createdAt}
+                                    </span>
+                                    <span class="delete-notification" data-id="${item.id}">
+                                        <i class="fas fa-trash"></i>
+                                    </span>
+                                </div>
                             </div>
                         </div>
                         <!-- Second Row: User, Time, Delete Icon -->

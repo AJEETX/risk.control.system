@@ -28,7 +28,7 @@
                 "data": "message",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.message + '" class=badge badge-light" data-toggle="tooltip"> '+data +'</span>';
+                    return '<span title="' + row.message + '" class=badge badge-light" data-toggle="tooltip"> '+ data +'</span>';
                 }
             },
             {
@@ -57,19 +57,64 @@
         rowCallback: function (row, data) {
             var $row = $(row);
 
-            if (data.status === "Processing") {
-               
+            if (data.status === "Processing" && data.id == uploadId) {
                 // Disable the anchor tags for this row
-                $(row).find('a.disabled').on('click', function (e) {
+                $(row).find('a').on('click', function (e) {
                     e.preventDefault();
+                    $(this).addClass('disabled'); // Disable pointer events
+                });
+                $(row).find('button').on('click', function (e) {
+                    $(this).prop('disabled', true); // Disables the button
                 });
                 $row.addClass('row-opacity-50 watermark-row'); // Make row semi-transparent with watermark
-                $row.append('<div class="watermark-text"> ...Processing...</div>');
+
+                startPolling(data.id);  // Pass the uploadId or row ID
+
             } else {
                 $row.removeClass('row-opacity-50 watermark-row'); // Remove styling for other statuses
+
             }
         }
     });
+    var pollingTimer;
+
+    // Function to start polling the status
+    function startPolling(uploadId) {
+        pollingTimer = setInterval(function () {
+            $.ajax({
+                url: `/api/Creator/GetFileById/${uploadId}`, // Call the API to check status
+                type: 'GET',
+                success: function (updatedRowData) {
+                    // If status is Processing, keep polling
+                    if (updatedRowData.data.status === "Processing") {
+                        console.log("Status is still Processing, continuing to poll...");
+                    }
+                    // If status is Completed, stop polling and update the row
+                    else if (updatedRowData.data.status === "Completed") {
+                        console.log("Status is Completed, stopping polling and updating row.");
+                        clearInterval(pollingTimer); // Stop polling
+                        updateProcessingRow(uploadId, updatedRowData.data); // Update the row with completed data
+                    }
+                },
+                error: function (err) {
+                    console.error('Error fetching file data:', err);
+                    clearInterval(pollingTimer); // Stop polling on error
+                }
+            });
+        }, 1000); // Poll every 5 seconds
+    }
+
+    // Function to update the row with new data
+    function updateProcessingRow(uploadId, updatedRowData) {
+        let row = table.row(function (idx, data, node) {
+            return data.id === uploadId; // Find the row by ID
+        });
+
+        if (row) {
+            row.data(updatedRowData).draw(false); // Update the row with the new data
+        }
+    }
+
     table.on('xhr.dt', function () {
         $('#refreshIcon').removeClass('fa-spin');
     });
@@ -142,106 +187,69 @@
         }
         table.ajax.reload(null, false);
     });
-    //function TrackProgress(uploadId) {
-    //    if (uploadId == null || uploadId == undefined || uploadId == "") {
-    //        uploadId = 0; // Default value if not set
+    
+    //var refreshInterval = 5000; // 3 seconds interval
+    //var maxAttempts = 5; // Prevent infinite loop
+    //var attempts = 0;
+    //var initialCount = sessionStorage.getItem("InitialUploadCount");
+
+    //// Check if a refresh is needed after upload
+    //var refreshDatatble = sessionStorage.getItem("RefreshDataTableCount");
+    //if (sessionStorage.getItem("RefreshDataTableCount") == "RefreshDataTableCount") {
+    //    if (initialCount === null) {
+    //        initialCount = table.data().count(); // Save the current record count
+    //        sessionStorage.setItem("InitialUploadCount", initialCount);
+    //    } else {
+    //        initialCount = parseInt(initialCount, 10); // Convert to number
     //    }
-    //    var table = $('#customerTableAuto').DataTable();
-
-    //    if (uploadId > 0) {
-    //        let progressBar = document.getElementById("progressBar");
-    //        let progressContainer = document.getElementById("progressContainer");
-
-    //        // Remove 'hidden' class to show progress bar
-    //        progressContainer.classList.remove("hidden");
-
-    //        let interval = setInterval(() => {
-    //            fetch(`/CreatorPost/GetJobProgress?jobId=${uploadId}`)
-    //                .then(response => response.json())
-    //                .then(data => {
-    //                    let progress = data.progress;
-    //                    progressBar.style.width = progress + "%";
-    //                    progressBar.innerText = progress + "%";
-
-    //                    if (progress >= 100) {
-    //                        clearInterval(interval);
-    //                        setTimeout(() => {
-    //                            table.ajax.reload(function () {
-    //                                var newCount = table.data().count(); // Get updated row count
-    //                                if (newCount > 0 && !hasPendingRows()) {
-    //                                    console.log("No New records detected! Stopping refresh.");
-    //                                }
-    //                            }, true);
-    //                            progressContainer.classList.add("hidden"); // Hide after 1 sec
-    //                        }, 1000);
-    //                    }
-    //                });
-    //        }, 1000);
-
-    //    }
+    //    pollForNewData();
+    //    sessionStorage.removeItem("RefreshDataTableCount"); // Clear the refresh flag
     //}
-    var refreshInterval = 5000; // 3 seconds interval
-    var maxAttempts = 5; // Prevent infinite loop
-    var attempts = 0;
-    var initialCount = sessionStorage.getItem("InitialUploadCount");
 
-    // Check if a refresh is needed after upload
-    var refreshDatatble = sessionStorage.getItem("RefreshDataTableCount");
-    if (sessionStorage.getItem("RefreshDataTableCount") == "RefreshDataTableCount") {
-        if (initialCount === null) {
-            initialCount = table.data().count(); // Save the current record count
-            sessionStorage.setItem("InitialUploadCount", initialCount);
-        } else {
-            initialCount = parseInt(initialCount, 10); // Convert to number
-        }
-        pollForNewData();
-        sessionStorage.removeItem("RefreshDataTableCount"); // Clear the refresh flag
-    }
+    //// Function to check if there are any "Pending" rows
+    //function hasPendingRows() {
+    //    var pendingExists = false;
 
-    // Function to check if there are any "Pending" rows
-    function hasPendingRows() {
-        var pendingExists = false;
+    //    table.rows().every(function () {
+    //        var data = this.data();
+    //        var rowNode = this.node(); // Get the row element
 
-        table.rows().every(function () {
-            var data = this.data();
-            var rowNode = this.node(); // Get the row element
+    //        if (data.status === "Processing" && data.id == uploadId) {
+    //            // Apply watermark effect
+    //            $(rowNode).addClass("watermark-row");
 
-            if (data.status === "Processing" && data.id == uploadId) {
-                // Apply watermark effect
-                $(rowNode).addClass("watermark-row");
+    //            // You can also add an overlay text dynamically
+    //            //$(rowNode).append('<div class="watermark-text">Processing...</div>');
+    //            pendingExists = true;
+    //            return false; // Stop iterating once a "Pending" row is found
+    //        }
+    //    });
 
-                // You can also add an overlay text dynamically
-                $(rowNode).append('<div class="watermark-text">Processing...</div>');
-                pendingExists = true;
-                return false; // Stop iterating once a "Pending" row is found
-            }
-        });
+    //    return pendingExists;
+    //}
+    //function pollForNewData() {
+    //    attempts++;
 
-        return pendingExists;
-    }
-    function pollForNewData() {
-        attempts++;
+    //    if (attempts > maxAttempts) {
+    //        console.log("Max attempts reached, stopping refresh.");
+    //        sessionStorage.removeItem("InitialUploadCount"); // Clean up
+    //        return;
+    //    }
 
-        if (attempts > maxAttempts) {
-            console.log("Max attempts reached, stopping refresh.");
-            sessionStorage.removeItem("InitialUploadCount"); // Clean up
-            return;
-        }
+    //    console.log("Refreshing DataTable... Attempt: " + attempts);
 
-        console.log("Refreshing DataTable... Attempt: " + attempts);
+    //    table.ajax.reload(function () {
+    //        var newCount = table.data().count(); // Get updated row count
 
-        table.ajax.reload(function () {
-            var newCount = table.data().count(); // Get updated row count
-
-            if (newCount == initialCount && !hasPendingRows()) {
-                console.log("No New records detected! Stopping refresh.");
-                sessionStorage.removeItem("InitialUploadCount"); // Clean up
-            } else {
-                setTimeout(pollForNewData, refreshInterval);
-                initialCount= newCount;
-            }
-        }, false);
-    }
+    //        if (newCount == initialCount && !hasPendingRows()) {
+    //            console.log("No New records detected! Stopping refresh.");
+    //            sessionStorage.removeItem("InitialUploadCount"); // Clean up
+    //        } else {
+    //            setTimeout(pollForNewData, refreshInterval);
+    //            initialCount= newCount;
+    //        }
+    //    }, false);
+    //}
     $("#postedFile").on('change', function () {
         var MaxSizeInBytes = 1097152;
         //Get count of selected files
@@ -339,7 +347,7 @@
 
                                 $(buttonId).html("<i class='fas fa-sync fa-spin'></i> Uploading");
                                 disableAllInteractiveElements();
-                                setRefreshCountFlag();
+                                //setRefreshCountFlag();
                                 $(formId).submit();
 
                                 var article = document.getElementById("article");

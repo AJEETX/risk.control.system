@@ -114,7 +114,7 @@ namespace risk.control.system.Controllers.Company
                 {
                     //backgroundJobClient.Enqueue(() => ftpService.UploadFile(currentUserEmail, postedFile, model.CREATEDBY, lineOfBusinessId));
                     uploadId = await ftpService.UploadFile(currentUserEmail, postedFile, model.CREATEDBY, lineOfBusinessId);
-                    jobId = backgroundJobClient.Enqueue(() => ftpService.StartUpload(uploadId));
+                    jobId = backgroundJobClient.Enqueue(() => ftpService.StartUpload(currentUserEmail, uploadId));
                     progressService.AddUploadJob(jobId, currentUserEmail);
                 }
 
@@ -157,7 +157,7 @@ namespace risk.control.system.Controllers.Company
         [HttpGet]
         public IActionResult GetJobStatus()
         {
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
+            var currentUserEmail = HttpContext.User?.Identity?.Name;
             var jobIds = progressService.GetUploadJobIds(currentUserEmail);
 
             if (jobIds == null || jobIds.Count == 0)

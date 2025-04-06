@@ -638,7 +638,7 @@ namespace risk.control.system.Services
                 var notifications = context.Notifications.Where(n => n.Role == role && n.Company == company && (!n.IsReadByCreator || !n.IsReadByManager || !n.IsReadByAssessor));
                 if (role.Name == AppRoles.ASSESSOR.ToString())
                 {
-                    notifications = notifications.Where(n => n.Role == role && !n.IsReadByAssessor);
+                    notifications = notifications.Where(n => n.Role == role  && !n.IsReadByAssessor);
                 }
                 else if (role.Name == AppRoles.MANAGER.ToString())
                 {
@@ -647,7 +647,7 @@ namespace risk.control.system.Services
 
                 else if (role.Name == AppRoles.CREATOR.ToString())
                 {
-                    notifications = notifications.Where(n => n.Role == role && !n.IsReadByCreator);
+                    notifications = notifications.Where(n => n.Role == role && n.NotifierUserEmail == userEmail && !n.IsReadByCreator);
                 }
 
                 var activeNotifications = await notifications

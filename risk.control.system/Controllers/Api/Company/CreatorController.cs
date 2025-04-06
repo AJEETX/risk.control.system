@@ -450,7 +450,7 @@ namespace risk.control.system.Controllers.Api.Company
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == userEmail);
             var isManager = HttpContext.User.IsInRole(MANAGER.DISPLAY_NAME);
 
-            var files = await _context.FilesOnFileSystem.Where(f => f.CompanyId == companyUser.ClientCompanyId && (f.UploadedBy == userEmail || isManager)).ToListAsync();
+            var files = await _context.FilesOnFileSystem.Where(f => f.CompanyId == companyUser.ClientCompanyId && ((f.UploadedBy == userEmail && !f.Deleted) || isManager)).ToListAsync();
             var result = files.OrderBy(o=>o.CreatedOn).Select(file => new
             {
                 file.Id,
@@ -464,6 +464,35 @@ namespace risk.control.system.Controllers.Api.Company
                 file.Message,
                 Icon = file.Icon // or use some other status representation
             }).ToList();
+
+            return Ok(new { data = result });
+        }
+
+        [HttpGet("GetFileById/{uploadId}")]
+        public async Task<IActionResult> GetFileById(int uploadId)
+        {
+            var userEmail = HttpContext.User.Identity.Name;
+            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == userEmail);
+            var file =  await _context.FilesOnFileSystem.FirstOrDefaultAsync(f => f.Id == uploadId && f.CompanyId == companyUser.ClientCompanyId && f.UploadedBy == userEmail && !f.Deleted);
+            if (file == null)
+            {
+                return NotFound(new { success = false, message = "File not found." });
+            }
+
+            var isManager = HttpContext.User.IsInRole(MANAGER.DISPLAY_NAME);
+            var result =  new
+            {
+                file.Id,
+                SequenceNumber = isManager ? file.CompanySequenceNumber : file.UserSequenceNumber,
+                file.Name,
+                file.Description,
+                file.FileType,
+                CreatedOn = file.CreatedOn.GetValueOrDefault().ToString("dd-MMM-yyyy HH:mm:ss"),
+                file.UploadedBy,
+                Status = file.Status,
+                file.Message,
+                Icon = file.Icon // or use some other status representation
+            };
 
             return Ok(new { data = result });
         }

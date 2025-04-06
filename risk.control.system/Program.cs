@@ -56,6 +56,7 @@ using risk.control.system.Services;
 using SmartBreadcrumbs.Extensions;
 
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
+using Hangfire.SQLite;
 
 var builder = WebApplication.CreateBuilder(args);
 ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls13;
@@ -192,21 +193,24 @@ builder.Services.AddNotyf(config =>
     config.Position = NotyfPosition.TopCenter;
 });
 
-builder.Services.AddHangfire(config => config.UseMemoryStorage());
-builder.Services.AddHangfireServer();
-
+var connectionString = builder.Configuration.GetConnectionString("Database");
+var HangfireConnectionString = builder.Configuration.GetConnectionString("HangfireDatabase");
 var isProd = builder.Configuration.GetSection("IsProd").Value;
 var prod = bool.Parse(isProd);
 if (prod)
 {
     builder.Services.AddDbContext<ApplicationDbContext>(options =>
          options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    builder.Services.AddHangfire(config => config.UseSQLiteStorage(builder.Configuration.GetConnectionString("DefaultConnection")));
 }
 else
 {
     builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                        options.UseSqlite(builder.Configuration.GetConnectionString("Database")));
+                        options.UseSqlite(connectionString));
+    builder.Services.AddHangfire(config => config.UseMemoryStorage());
+    //builder.Services.AddHangfire(config => config.UseSQLiteStorage(HangfireConnectionString));
 }
+builder.Services.AddHangfireServer();
 
 builder.Services.Configure<CookiePolicyOptions>(options =>
 {

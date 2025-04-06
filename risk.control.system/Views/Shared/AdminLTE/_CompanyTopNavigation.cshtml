@@ -30,7 +30,7 @@
     <ul class="navbar-nav ml-auto">
         <li class="nav-item dropdown top-nav-logout-border">
             <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false" title="Info">
-                <i class="fa fa-info-circle i-blue"></i>
+                <i class="fa fa-info-circle text-primary fs-5"></i>
             </a>
 
             <div class="dropdown-menu dropdown-menu-right shadow-lg rounded-lg border-0 info-dropdown">
@@ -40,8 +40,8 @@
 
                 <!-- Country -->
                 <div class="dropdown-item d-flex align-items-center info-item">
-                    <img src="@img" class="flag-icon mr-2" />
-                    <span class="info-label">Country:</span>
+                    <img src="@img" class="flag-icon" />
+                    <span class="info-label text-secondary">Country:</span>
                     <span class="ml-auto font-weight-bold text-primary">@Model?.Country</span>
                 </div>
 
@@ -50,7 +50,7 @@
                 <!-- Currency -->
                 <div class="dropdown-item d-flex align-items-center info-item">
                     <i class="fa fa-money mr-2 text-success"></i>
-                    <span class="info-label">Currency:</span>
+                    <span class="info-label text-secondary">Currency:</span>
                     <span class="ml-auto font-weight-bold text-success">@Model?.CurrencyName</span>
                 </div>
 
@@ -59,7 +59,7 @@
                 <!-- ISD Code -->
                 <div class="dropdown-item d-flex align-items-center info-item">
                     <i class="fa fa-phone mr-2 text-dangez"></i>
-                    <span class="info-label">ISD Code:</span>
+                    <span class="info-label text-secondary">ISD Code:</span>
                     <span class="ml-auto font-weight-bold text-dangez">@Model?.IsdCode</span>
                 </div>
             </div>

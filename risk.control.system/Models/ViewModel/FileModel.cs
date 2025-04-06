@@ -21,6 +21,7 @@
         public bool? Saved { get; set; } = false;
         public int CompanySequenceNumber { get; set; } // Company-specific sequence number
         public int UserSequenceNumber { get; set; } // Company-specific sequence number
-        public List<ClaimsInvestigation> Cases { get; set; } =new();
+        public List<ClaimsInvestigation>? Cases { get; set; } = new();
+        public bool Deleted { get; set; } = false;
     }
 }
