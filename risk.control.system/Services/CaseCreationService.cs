@@ -14,10 +14,11 @@ namespace risk.control.system.Services
 {
     public interface ICaseCreationService
     {
-        Task<bool> PerformUpload(ClientCompanyApplicationUser companyUser, string row, FileOnFileSystemModel model, DataTable dt,long lineOfBusinessId);
+        Task<bool> PerformUpload(ClientCompanyApplicationUser companyUser, string row, FileOnFileSystemModel model, DataTable dt);
     }
     public class CaseCreationService : ICaseCreationService
     {
+        private const string CLAIMS = "claims";
         private readonly ApplicationDbContext _context;
         private readonly ICustomApiCLient customApiCLient;
         private readonly Regex regex = new Regex("\"(.*?)\"");
@@ -28,7 +29,7 @@ namespace risk.control.system.Services
             this.customApiCLient = customApiCLient;
         }
 
-        public async Task<bool> PerformUpload(ClientCompanyApplicationUser companyUser, string row, FileOnFileSystemModel model, DataTable dt, long lineOfBusinessId)
+        public async Task<bool> PerformUpload(ClientCompanyApplicationUser companyUser, string row, FileOnFileSystemModel model, DataTable dt)
         {
             try
             {
@@ -43,7 +44,7 @@ namespace risk.control.system.Services
                     i++;
                 }
 
-                var claimAdded = await CreateNewPolicy(rowData, companyUser, model, lineOfBusinessId);
+                var claimAdded = await CreateNewPolicy(rowData, companyUser, model);
 
                 if (!claimAdded)
                 {
@@ -58,9 +59,10 @@ namespace risk.control.system.Services
             }
         }
 
-        private async Task<bool> CreateNewPolicy(List<string> rowData, ClientCompanyApplicationUser companyUser, FileOnFileSystemModel model, long lineOfBusinessId)
+        private async Task<bool> CreateNewPolicy(List<string> rowData, ClientCompanyApplicationUser companyUser, FileOnFileSystemModel model)
         {
             //CREATE CLAIM
+            var lineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == CLAIMS).LineOfBusinessId;
             var status = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.INITIATED));
             var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
             var autoEnabled = companyUser.ClientCompany.AutoAllocation;
@@ -125,6 +127,7 @@ namespace risk.control.system.Services
             }
             claim.CustomerDetail = customer;
             claim.BeneficiaryDetail = beneficiary;
+            model.Cases.Add(claim);
             _context.ClaimsInvestigation.Add(claim);
             var log = new InvestigationTransaction
             {

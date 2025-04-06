@@ -29,6 +29,7 @@ namespace risk.control.system.Controllers.Company
         private readonly IEmpanelledAgencyService empanelledAgencyService;
         private readonly IClaimsInvestigationService claimsInvestigationService;
         private readonly ICreatorService creatorService;
+        private readonly IProgressService progressService;
         private readonly IFtpService ftpService;
         private readonly INotyfService notifyService;
         private readonly IInvestigationReportService investigationReportService;
@@ -38,6 +39,7 @@ namespace risk.control.system.Controllers.Company
             IEmpanelledAgencyService empanelledAgencyService,
             IClaimsInvestigationService claimsInvestigationService,
             ICreatorService creatorService,
+            IProgressService progressService,
             IFtpService ftpService,
             INotyfService notifyService,
             IInvestigationReportService investigationReportService,
@@ -48,6 +50,7 @@ namespace risk.control.system.Controllers.Company
             this.empanelledAgencyService = empanelledAgencyService;
             this.claimsInvestigationService = claimsInvestigationService;
             this.creatorService = creatorService;
+            this.progressService = progressService;
             this.ftpService = ftpService;
             this.notifyService = notifyService;
             this.investigationReportService = investigationReportService;
@@ -100,12 +103,12 @@ namespace risk.control.system.Controllers.Company
                 !c.Deleted &&
                 c.InvestigationCaseSubStatus == createdClaimsStatus);
                 var fileIdentifier = companyUser.ClientCompany.Country.Code.ToLower();
-                
                 return View(new CreateClaims { 
                     BulkUpload = companyUser.ClientCompany.BulkUpload, 
                     UserCanCreate = userCanCreate, 
                     HasClaims = hasClaim, 
-                    FileSampleIdentifier = fileIdentifier
+                    FileSampleIdentifier = fileIdentifier,
+
                 });
             }
             catch (Exception ex)

@@ -18,6 +18,7 @@ using SmartBreadcrumbs.Nodes;
 using risk.control.system.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Hangfire;
+using Amazon.Textract;
 
 namespace risk.control.system.Controllers.Company
 {
@@ -33,7 +34,7 @@ namespace risk.control.system.Controllers.Company
         private readonly IFtpService ftpService;
         private readonly INotyfService notifyService;
         private readonly IInvestigationReportService investigationReportService;
-        private readonly IUploadProgressService progressService;
+        private readonly IProgressService progressService;
         private readonly IBackgroundJobClient backgroundJobClient;
         private readonly IClaimPolicyService claimPolicyService;
 
@@ -45,7 +46,7 @@ namespace risk.control.system.Controllers.Company
             IFtpService ftpService,
             INotyfService notifyService,
             IInvestigationReportService investigationReportService,
-            IUploadProgressService progressService,
+            IProgressService progressService,
             IBackgroundJobClient backgroundJobClient,
             IClaimPolicyService claimPolicyService)
         {
@@ -108,11 +109,13 @@ namespace risk.control.system.Controllers.Company
                 //    processed = await ftpService.UploadFtpFile(currentUserEmail, postedFile, model.CREATEDBY, lineOfBusinessId);
                 //}
                 int uploadId = 0;
+                string jobId = "";
                 if (model.Uploadtype == UploadType.FILE)
                 {
                     //backgroundJobClient.Enqueue(() => ftpService.UploadFile(currentUserEmail, postedFile, model.CREATEDBY, lineOfBusinessId));
                     uploadId = await ftpService.UploadFile(currentUserEmail, postedFile, model.CREATEDBY, lineOfBusinessId);
-                    backgroundJobClient.Enqueue(() => ftpService.StartUpload(uploadId));
+                    jobId = backgroundJobClient.Enqueue(() => ftpService.StartUpload(uploadId));
+                    progressService.AddUploadJob(jobId, currentUserEmail);
                 }
 
                 notifyService.Custom($"{model.Uploadtype.GetEnumDisplayName()} in progress ", 3, "green", "fa fa-upload");
@@ -150,9 +153,46 @@ namespace risk.control.system.Controllers.Company
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
+
+        [HttpGet]
+        public IActionResult GetJobStatus()
+        {
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+            var jobIds = progressService.GetUploadJobIds(currentUserEmail);
+
+            if (jobIds == null || jobIds.Count == 0)
+            {
+                return Json(new { jobId = "", status = "Not Found" });
+            }
+
+            using (var connection = JobStorage.Current.GetConnection())
+            {
+                foreach (var jobId in jobIds)
+                {
+                    var state = connection.GetStateData(jobId);
+                    string jobStatus = state?.Name ?? "Not Found";
+
+                    // Return first active job (Processing or Enqueued)
+                    if (jobStatus == "Processing" || jobStatus == "Enqueued")
+                    {
+                        return Json(new { jobId, status = jobStatus });
+                    }
+                }
+            }
+
+            // If no active jobs are found, return the last completed job
+            return Json(new { jobId = jobIds.Last(), status = "Completed or Failed" });
+        }
+
         public IActionResult GetJobProgress(int jobId)
         {
             int progress = progressService.GetProgress(jobId);
+            return Json(new { progress });
+        }
+
+        public IActionResult GetAssignmentProgress(string jobId)
+        {
+            int progress = progressService.GetAssignmentProgress(jobId);
             return Json(new { progress });
         }
 

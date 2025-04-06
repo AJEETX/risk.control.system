@@ -467,6 +467,14 @@ namespace risk.control.system.Controllers.Api.Company
 
             return Ok(new { data = result });
         }
+
+        [HttpGet("GetPendingAllocations")]
+        public async Task<IActionResult> GetPendingAllocations()
+        {
+            var userEmail = HttpContext.User.Identity.Name;
+            var pendingCount = await _context.ClaimsInvestigation.CountAsync(c=>c.UpdatedBy == userEmail && c.STATUS == ALLOCATION_STATUS.PENDING);
+            return Ok(new { count = pendingCount });
+        }
         private byte[] GetOwner(ClaimsInvestigation a)
         {
             string ownerEmail = string.Empty;

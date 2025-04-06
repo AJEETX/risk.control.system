@@ -1,9 +1,13 @@
-﻿@{
+﻿@model JobStatus
+@{
     ViewData["Title"] = "Active ";
 }
 
 <section class="content">
     <div id="article" class="card shadow-lg border-1 rounded-lg">
+        <input type="hidden" id="pendingCount" value="@Model.PendingCount" />
+        <input type="hidden" id="jobId" value="@Model.JobId" />
+
         <div class="card-header bg-secondary text-white text-center">
             <h3 class="card-title">
                 <i class="fa fa-toggle-on"></i> Active
@@ -14,7 +18,7 @@
                             <i class='far fa-hand-point-right'></i> Active cases.
                         </li>
                         <li>
-                            <i class='far fa-thumbs-up'></i> See  <button class='badge badge-info xs'>
+                            <i class='far fa-thumbs-up'></i> <button class='badge badge-info xs'>
                                 <span class="badge badge-info"><i class='fas fa-search'></i> </span> DETAIL
                             </button>
                         </li>
@@ -27,7 +31,9 @@
         <div class="card shadow-lg border-1 rounded-lg">
             <button id="refreshTable" class="btn btn-default"> <i id="refreshIcon" class="fas fa-sync"></i> Refresh</button>
         </div>
-
+        <div id="progressContainer" class="hidden">
+            <div id="progressBar">0%</div>
+        </div>
         <div class="card-body">
             <div class="submit-progress hidden">
                 <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>

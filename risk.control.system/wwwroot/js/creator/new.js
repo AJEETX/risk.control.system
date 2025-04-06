@@ -242,19 +242,6 @@
                     $('td', row).removeClass('isNewAssigned');
                 }, 3000);
             }
-            var $row = $(row);
-
-            if (data.status === "PENDING") {
-                // Disable the anchor tags for this row
-                $(row).find('a.disabled').on('click', function (e) {
-                    e.preventDefault();
-                });
-                $row.addClass('row-opacity-50 watermarked'); // Make row semi-transparent with watermark
-            } else if (data.status === "COMPLETED") {
-                $row.remove(); // Remove the row if status is "COMPLETED"
-            } else {
-                $row.removeClass('row-opacity-50 watermarked'); // Remove styling for other statuses
-            }
         },
         "drawCallback": function (settings) {
             var api = this.api();
@@ -326,75 +313,6 @@
         return pendingExists;
     }
 
-    function refreshPendingRows() {
-        var table = $("#customerTableAuto").DataTable();
-        table.rows().every(function () {
-            var data = this.data();
-            if (data) {
-                console.log(data.status);
-                if (data.status === "PENDING") {
-                    var row = this.node();
-                    refreshRowData(data.id, row); // Refresh each pending row
-                }
-                else if (data.status === "COMPLETED") {
-                    this.remove(); // Remove the row
-                }
-            }
-        });
-    }
-    // Function to refresh data for a specific row
-    function refreshRowData(rowId, rowElement) {
-        $.ajax({
-            url: '/api/Creator/RefreshData', // URL for the refresh data endpoint
-            type: 'GET',
-            data: { id: rowId },
-            success: function (data) {
-                // Update the row's data with the refreshed data
-                var table = $("#customerTableAuto").DataTable();
-                if (data) {
-                    table.row(rowElement).data(data).draw();
-                }
-            },
-            error: function (xhr, status, error) {
-                console.error('Error refreshing row data:', error);
-            }
-        });
-    }
-
-    // Function to refresh data for a specific row
-    function refreshRowData(rowId, rowElement) {
-        $.ajax({
-            url: '/api/Creator/RefreshData', // URL for the refresh data endpoint
-            type: 'GET',
-            data: { id: rowId },
-            success: function (data) {
-                // Update the row's data with the refreshed data
-                var table = $("#customerTableAuto").DataTable();
-                if (data) {
-                    // Find the row in DataTable using rowId
-                    var row = table.row(`#row_${rowId}`); // Assuming row ID is set as `id="row_123"`
-
-                    if (row.any()) {  // Check if the row exists
-                        row.data(data).draw();
-                    } else {
-                        console.warn(`Row with ID ${rowId} not found in DataTable.`);
-                    }
-                }
-            },
-            error: function (xhr, status, error) {
-                console.error('Error refreshing row data:', error);
-            }
-        });
-    }
-    // Call refreshPendingRows() periodically but only if there are pending rows
-    var refreshInterval = setInterval(function () {
-        if (!hasPendingRows()) {
-            clearInterval(refreshInterval); // Stop refreshing if no rows are "Pending"
-        } else {
-            refreshPendingRows(); // Refresh pending rows
-        }
-    }, 5000); // Check every 5 seconds (adjust interval as needed)
-
     $('#refreshTable').click(function () {
         var $icon = $('#refreshIcon');
         if ($icon) {
@@ -406,46 +324,7 @@
     table.on('xhr.dt', function () {
         $('#refreshIcon').removeClass('fa-spin');
     });
-    var refreshInterval = 3000; // 3 seconds interval
-    var maxAttempts = 3; // Prevent infinite loop
-    var attempts = 0;
-    var initialCount = sessionStorage.getItem("InitialRecordCount");
-
-    // Check if a refresh is needed after upload
-    var refreshDatatble = sessionStorage.getItem("RefreshDataTable");
-    if (sessionStorage.getItem("RefreshDataTable") == "RefreshDataTable") {
-        if (initialCount === null) {
-            initialCount = table.data().count(); // Save the current record count
-            sessionStorage.setItem("InitialRecordCount", initialCount);
-        } else {
-            initialCount = parseInt(initialCount, 10); // Convert to number
-        }
-        pollForNewData();
-        sessionStorage.removeItem("RefreshDataTable"); // Clear the refresh flag
-    }
-
-    function pollForNewData() {
-        attempts++;
-
-        if (attempts > maxAttempts) {
-            console.log("Max attempts reached, stopping refresh.");
-            sessionStorage.removeItem("InitialRecordCount"); // Clean up
-            return;
-        }
-
-        console.log("Refreshing DataTable... Attempt: " + attempts);
-
-        table.ajax.reload(function () {
-            var newCount = table.data().count(); // Get updated row count
-
-            if (newCount > initialCount) {
-                console.log("New records detected! Stopping refresh.");
-                sessionStorage.removeItem("InitialRecordCount"); // Clean up
-            } else {
-                setTimeout(pollForNewData, refreshInterval);
-            }
-        }, false);
-    }
+    
     
     table.on('mouseenter', '.map-thumbnail', function () {
             const $this = $(this); // Cache the current element
@@ -765,7 +644,6 @@
 
                                 $(buttonId).html("<i class='fas fa-sync fa-spin'></i> Uploading");
                                 disableAllInteractiveElements();
-                                setRefreshFlag();
                                 $(formId).submit();
 
                                 var article = document.getElementById("article");
@@ -791,11 +669,26 @@
     handleUploadConfirmation("#upload-claims", "#UploadFileButton");
 });
 
-function setRefreshFlag() {
-    var table = $('#customerTableAuto').DataTable();
-    sessionStorage.setItem("InitialRecordCount", table.data().count()); // Save count before reload
-    sessionStorage.setItem("RefreshDataTable", 'RefreshDataTable');
-    console.log('stored data')
+function checkUploadJobStatus() {
+    $.ajax({
+        url: '/CreatorPost/GetJobStatus',
+        type: 'GET',
+        success: function (response) {
+            console.log("Job Status:", response.status);
+
+            if (response.status === "Processing" || response.status === "Enqueued") {
+                setTimeout(function () {
+                    checkUploadJobStatus();
+                }, 2000); // Check every 5 seconds
+            } else {
+                console.log("Job Completed:", response.status);
+                $('#refreshTable').click(); // Refresh the table after completion
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error("Error checking job status:", error);
+        }
+    });
 }
 function showedit(id) {
     $("body").addClass("submit-progress-bg");

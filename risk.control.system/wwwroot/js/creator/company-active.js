@@ -1,5 +1,6 @@
 ﻿$(document).ready(function () {
-
+    var jobId = $('#jobId').val(); // Get the job ID from the hidden input field
+    var pendingCount = $('#pendingCount').val(); // Get the pending allocations from the hidden input field
     var table = $("#customerTable").DataTable({
         ajax: {
             url: '/api/Creator/GetActive',
@@ -244,9 +245,64 @@
     $('#customerTable tbody').fadeIn(2000);
 
 
-    //initMap("/api/CompanyActiveClaims/GetActiveMap");
-});
+    function TrackProgress() {
+        let progressBar = document.getElementById("progressBar");
+                let progressContainer = document.getElementById("progressContainer");
 
+                // Remove 'hidden' class to show progress bar
+                progressContainer.classList.remove("hidden");
+
+                let interval = setInterval(() => {
+                    fetch(`/CreatorPost/GetAssignmentProgress?jobId=${uploadId}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            let progress = data.progress;
+                            progressBar.style.width = progress + "%";
+                            progressBar.innerText = progress + "%";
+
+                            if (progress >= 100) {
+                                clearInterval(interval);
+                                setTimeout(() => {
+                                    progressContainer.classList.add("hidden"); // Hide after 1 sec
+                                }, 1000);
+                            }
+                        });
+                }, 1000);
+    }
+    //checkAllocationStatus();
+    if (jobId) {
+        checkJobStatus(jobId);
+    }
+});
+let finalCheckAttempts = 0; // Counter for final checks
+function checkAllocationStatus() {
+    $.ajax({
+        url: '/api/Creator/GetPendingAllocations',
+        type: 'GET',
+        success: function (response) {
+            if (response.count > 0) {
+                console.log(`Tracking ${response.count} allocated cases.`);
+                $('#refreshTable').click(); // Refresh DataTable/UI
+                setTimeout(checkAllocationStatus, 5000); // Keep checking
+                finalCheckAttempts = 0; // Reset final check attempts
+            } else {
+                if (finalCheckAttempts < 3) {
+                    console.log(`No cases left, final attempt ${finalCheckAttempts + 1}...`);
+                    finalCheckAttempts++;
+
+                    $('#refreshTable').click(); // **Force UI refresh**
+                    setTimeout(checkAllocationStatus, 3000); // Retry after 3s
+                } else {
+                    console.log("All allocated cases fully processed.");
+                    $('#refreshTable').click(); // **Ensure final refresh**
+                }
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error("Error fetching allocation status: ", error);
+        }
+    });
+}
 function getdetails(id) {
     $("body").addClass("submit-progress-bg");
     // Wrap in setTimeout so the UI
@@ -277,5 +333,27 @@ function showedit(id) {
             nodes[i].disabled = true;
         }
     }
+}
+
+function checkJobStatus(jobId) {
+    $.ajax({
+        url: '/ClaimsActive/GetJobStatus?jobId=' + jobId,
+        type: 'GET',
+        success: function (response) {
+            console.log("Job Status:", response.status);
+
+            if (response.status === "Processing" || response.status === "Enqueued") {
+                setTimeout(function () {
+                    checkJobStatus(jobId);
+                }, 2000); // Check every 5 seconds
+            } else {
+                console.log("Job Completed:", response.status);
+                $('#refreshTable').click(); // Refresh the table after completion
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error("Error checking job status:", error);
+        }
+    });
 }
 

@@ -59,20 +59,23 @@ namespace risk.control.system.Services
         private readonly IHttpContextAccessor accessor;
         private readonly IPdfReportService reportService;
         private readonly IBackgroundJobClient backgroundJobClient;
+        private readonly IProgressService progressService;
         private readonly ICustomApiCLient customApiCLient;
 
         public ClaimsInvestigationService(ApplicationDbContext context,
             IHttpContextAccessor accessor,
             IPdfReportService reportService,
             IBackgroundJobClient backgroundJobClient,
+            IProgressService progressService,
             ICustomApiCLient customApiCLient,
-            IMailboxService mailboxService, 
+            IMailboxService mailboxService,
             IWebHostEnvironment webHostEnvironment)
         {
             this._context = context;
             this.accessor = accessor;
             this.reportService = reportService;
             this.backgroundJobClient = backgroundJobClient;
+            this.progressService = progressService;
             this.customApiCLient = customApiCLient;
             this.mailboxService = mailboxService;
             this.webHostEnvironment = webHostEnvironment;
@@ -81,18 +84,19 @@ namespace risk.control.system.Services
         {
             var autoAllocatedCases = await DoAutoAllocation(claimIds, userEmail); // Run all tasks in parallel
 
+            var notAutoAllocated = claimIds.Except(autoAllocatedCases)?.ToList();
+            
             if (claimIds.Count > autoAllocatedCases.Count)
             {
-                var notAutoAllocated = claimIds.Except(autoAllocatedCases)?.ToList();
-
                 await AssignToAssigner(userEmail, notAutoAllocated);
 
-                await mailboxService.NotifyClaimAssignmentToAssigner(userEmail, notAutoAllocated);
             }
+             await mailboxService.NotifyClaimAssignmentToAssigner(userEmail,autoAllocatedCases, notAutoAllocated);
         }
         async Task<List<string>> DoAutoAllocation(List<string> claims, string userEmail)
         {
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == userEmail);
+            var uploadedRecordsCount = 0;
 
             var company = _context.ClientCompany
                     .Include(c => c.EmpanelledVendors.Where(v => v.Status == VendorStatus.ACTIVE && !v.Deleted))
@@ -101,6 +105,9 @@ namespace risk.control.system.Services
                     .FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
             var claimTasks = claims.Select(async claim =>
             {
+                int progress = (int)(((uploadedRecordsCount + 1) / (double)claims.Count) * 100);
+                progressService.UpdateAssignmentProgress(claim, progress);
+
                 // 1. Fetch Claim Details & Pincode in Parallel
                 var claimsInvestigation = await _context.ClaimsInvestigation
                     .AsNoTracking()
@@ -111,6 +118,7 @@ namespace risk.control.system.Services
                     .Include(c => c.BeneficiaryDetail)
                         .ThenInclude(c => c.PinCode)
                     .FirstOrDefaultAsync(c => c.ClaimsInvestigationId == claim);
+
 
                 string pinCode2Verify = claimsInvestigation.PolicyDetail?.LineOfBusiness.Name.ToLower() == UNDERWRITING
                     ? claimsInvestigation.CustomerDetail?.PinCode?.Code
@@ -366,7 +374,7 @@ namespace risk.control.system.Services
             }
         }
 
-        public async Task<(ClientCompany,long)> WithdrawCaseByCompany(string userEmail, ClaimTransactionModel model, string claimId)
+        public async Task<(ClientCompany, long)> WithdrawCaseByCompany(string userEmail, ClaimTransactionModel model, string claimId)
         {
             var currentUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == userEmail);
             var claimsInvestigation = _context.ClaimsInvestigation
@@ -382,7 +390,7 @@ namespace risk.control.system.Services
             claimsInvestigation.Updated = DateTime.Now;
             claimsInvestigation.UpdatedBy = currentUser.FirstName + " " + currentUser.LastName + "( " + currentUser.Email + ")";
             claimsInvestigation.CurrentUserEmail = userEmail;
-                    claimsInvestigation.STATUS = ALLOCATION_STATUS.READY;
+            claimsInvestigation.STATUS = ALLOCATION_STATUS.READY;
             claimsInvestigation.AssignedToAgency = false;
             claimsInvestigation.CurrentClaimOwner = userEmail;
             claimsInvestigation.UserEmailActioned = userEmail;
@@ -502,7 +510,7 @@ namespace risk.control.system.Services
             return currentUser.Vendor;
         }
 
-        public async Task<(string,string)> AllocateToVendor(string userEmail, string claimsInvestigationId, long vendorId, bool autoAllocated = true)
+        public async Task<(string, string)> AllocateToVendor(string userEmail, string claimsInvestigationId, long vendorId, bool autoAllocated = true)
         {
             // Fetch vendor & user details
             var vendor = await _context.Vendor.FindAsync(vendorId);
@@ -510,7 +518,7 @@ namespace risk.control.system.Services
                 .Include(c => c.ClientCompany)
                 .FirstOrDefaultAsync(u => u.Email == userEmail);
 
-            if (vendor == null || currentUser == null) return (string.Empty,string.Empty); // Handle missing data
+            if (vendor == null || currentUser == null) return (string.Empty, string.Empty); // Handle missing data
 
             // Fetch case statuses in one query
             var caseStatuses = await _context.InvestigationCaseStatus
@@ -541,7 +549,7 @@ namespace risk.control.system.Services
             if (claimsCase == null) return (string.Empty, string.Empty); // Handle missing case
 
             // Update case details
-            claimsCase.STATUS = ALLOCATION_STATUS.COMPLETED ;
+            claimsCase.STATUS = ALLOCATION_STATUS.COMPLETED;
             claimsCase.AssignedToAgency = true;
             claimsCase.Updated = DateTime.Now;
             claimsCase.UpdatedBy = $"{currentUser.FirstName} {currentUser.LastName} ({currentUser.Email})";
@@ -610,7 +618,7 @@ namespace risk.control.system.Services
         {
             var inProgress = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS);
             var assignedToAgent = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
-            var claim = _context.ClaimsInvestigation.Include(c=>c.PolicyDetail).Include(c => c.AgencyReport)
+            var claim = _context.ClaimsInvestigation.Include(c => c.PolicyDetail).Include(c => c.AgencyReport)
                 .Include(c => c.CustomerDetail).ThenInclude(c => c.PinCode).Include(c => c.BeneficiaryDetail)
                 .Where(c => c.ClaimsInvestigationId == claimsInvestigationId).FirstOrDefault();
             var agentUser = _context.VendorApplicationUser.Include(u => u.Vendor).FirstOrDefault(u => u.Email == vendorAgentEmail);
@@ -866,7 +874,7 @@ namespace risk.control.system.Services
             }
             return (null!, string.Empty);
         }
-        
+
         private async Task<(ClientCompany, string)> ApproveCaseReport(string userEmail, string assessorRemarks, string claimsInvestigationId, AssessorRemarkType assessorRemarkType, string reportAiSummary)
         {
             var approved = _context.InvestigationCaseSubStatus
@@ -934,7 +942,7 @@ namespace risk.control.system.Services
             }
             return (null!, string.Empty);
         }
-        
+
         private async Task<(ClientCompany, string)> ReAssignToCreator(string userEmail, string claimsInvestigationId, string assessorRemarks, AssessorRemarkType assessorRemarkType, string reportAiSummary)
         {
             var currentUser = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
@@ -1043,7 +1051,7 @@ namespace risk.control.system.Services
             return await _context.SaveChangesAsync() > 0 ? (currentUser.ClientCompany, claimsCaseToReassign.PolicyDetail.ContractNumber) : (null!, string.Empty);
         }
 
-        private async Task<ClaimsInvestigation> ApproveAgentReport(string userEmail, string claimsInvestigationId,  string supervisorRemarks, SupervisorRemarkType reportUpdateStatus, IFormFile? claimDocument = null, string editRemarks = "")
+        private async Task<ClaimsInvestigation> ApproveAgentReport(string userEmail, string claimsInvestigationId, string supervisorRemarks, SupervisorRemarkType reportUpdateStatus, IFormFile? claimDocument = null, string editRemarks = "")
         {
             var claim = _context.ClaimsInvestigation
                 .Include(c => c.PolicyDetail)
@@ -1072,12 +1080,12 @@ namespace risk.control.system.Services
             claim.SubmittedToAssessorTime = DateTime.Now;
             var report = claim.AgencyReport;
             var edited = report.AgentRemarks.Trim() != editRemarks.Trim();
-            if(edited)
+            if (edited)
             {
                 report.AgentRemarksEdit = editRemarks;
                 report.AgentRemarksEditUpdated = DateTime.Now;
             }
-            
+
             report.SupervisorRemarkType = reportUpdateStatus;
             report.SupervisorRemarks = supervisorRemarks;
             report.SupervisorRemarksUpdated = DateTime.Now;
@@ -1393,7 +1401,7 @@ namespace risk.control.system.Services
         public async Task<List<string>> UpdateCaseAllocationStatus(string userEmail, List<string> claimsInvestigations)
         {
             var cases = new List<ClaimsInvestigation>();
-            foreach(var claimsInvestigationId in claimsInvestigations)
+            foreach (var claimsInvestigationId in claimsInvestigations)
             {
                 var claimsCase = await _context.ClaimsInvestigation
                 .FirstOrDefaultAsync(v => v.ClaimsInvestigationId == claimsInvestigationId);

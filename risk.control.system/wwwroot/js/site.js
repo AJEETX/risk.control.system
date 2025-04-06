@@ -287,24 +287,24 @@ function loadNotifications(keepOpen = false) {
         if (response.data.length > 0) {
             response.data.forEach(function (item) {
                 $("#notificationList").append(
-                    `<a href="#" class="dropdown-item notification-item" data-id="${item.id}">
-        <!-- First Row: Icon, Message, Status -->
-        <div class="notification-content">
-            <i class="${item.symbol}"></i> 
-            <span class="notification-message text-muted text-sm">${item.message}</span>
-            <span class="badge badge-light text-muted text-sm">${item.status}</span>
-            <span class="notification-time text-muted text-xs">
-                <i class="far fa-clock"></i> ${item.createdAt}
-            </span>
-        </div>
-        <br />
-        <!-- Second Row: User, Time, Delete Icon -->
-        <div class="notification-content">
-            <span class="delete-notification" data-id="${item.id}">
-                <i class="fas fa-trash"></i>
-            </span>
-        </div>
-    </a>`
+                    `<a href="#" class="notification-item" data-id="${item.id}">
+                        <!-- First Row: Icon, Message, Status -->
+                        <div class="notification-content">
+                            <i class="${item.symbol}"></i> 
+                            <span class="notification-message text-muted text-xs">${item.message}</span>
+                            <span class="badge badge-light text-muted text-xs">${item.status}</span>
+                            <div class="float-right">
+                                <span class="notification-time text-muted text-xs">
+                                    <i class="far fa-clock"></i> ${item.createdAt}
+                                </span>
+                                <span class="delete-notification" data-id="${item.id}">
+                                    <i class="fas fa-trash"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <!-- Second Row: User, Time, Delete Icon -->
+                        
+                    </a>`
                 );
             });
 

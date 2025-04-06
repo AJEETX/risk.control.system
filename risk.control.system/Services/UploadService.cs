@@ -15,19 +15,19 @@ namespace risk.control.system.Services
     public interface IUploadService
     {
         Task<bool> DoUpload(ClientCompanyApplicationUser companyUser, string[] dataRows, CREATEDBY autoOrManual, ZipArchive archive, ORIGIN fileOrFtp, long lineOfBusinessId);
-        Task<int> PerformUpload(ClientCompanyApplicationUser companyUser, string[] dataRows, FileOnFileSystemModel model, long lineOfBusinessId);
+        Task<int> PerformUpload(ClientCompanyApplicationUser companyUser, string[] dataRows, FileOnFileSystemModel model);
     }
     public class UploadService : IUploadService
     {
         private readonly ApplicationDbContext _context;
         private readonly ICustomApiCLient customApiCLient;
-        private readonly IUploadProgressService uploadProgressService;
+        private readonly IProgressService uploadProgressService;
         private readonly Regex regex = new Regex("\"(.*?)\"");
         private const string NO_DATA = "NO DATA";
         private readonly ICaseCreationService _caseCreationService;
 
         public UploadService(ICaseCreationService caseCreationService, ApplicationDbContext context, ICustomApiCLient customApiCLient,
-            IUploadProgressService uploadProgressService)
+            IProgressService uploadProgressService)
         {
             _context = context;
             _caseCreationService = caseCreationService;
@@ -311,7 +311,7 @@ namespace risk.control.system.Services
             return beneficairy;
         }
 
-        public async Task<int> PerformUpload(ClientCompanyApplicationUser companyUser, string[] dataRows, FileOnFileSystemModel model, long lineOfBusinessId)
+        public async Task<int> PerformUpload(ClientCompanyApplicationUser companyUser, string[] dataRows, FileOnFileSystemModel model)
         {
             try
             {
@@ -333,7 +333,7 @@ namespace risk.control.system.Services
                         }
                         else
                         {
-                            var allGood = await _caseCreationService.PerformUpload(companyUser, row, model, dt, lineOfBusinessId);
+                            var allGood = await _caseCreationService.PerformUpload(companyUser, row, model, dt);
                             if (!allGood)
                             {
                                 return 0;
@@ -341,7 +341,6 @@ namespace risk.control.system.Services
                             int progress = (int)(((uploadedRecordsCount + 1) / (double)totalCount) * 100);
                             uploadProgressService.UpdateProgress(model.Id, progress);
                             uploadedRecordsCount++;
-                            
                         }
                     }
                 }

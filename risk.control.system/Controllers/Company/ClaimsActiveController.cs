@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
-
+using Hangfire;
+using Hangfire.Storage;
 using AspNetCoreHero.ToastNotification.Abstractions;
 
 using CsvHelper;
@@ -86,19 +87,30 @@ namespace risk.control.system.Controllers.Company
             }
         }
 
+        [HttpGet]
+        public IActionResult GetJobStatus(string jobId)
+        {
+            if (string.IsNullOrEmpty(jobId))
+            {
+                return Json(new { status = "Invalid Job ID" });
+            }
 
+            using (var connection = JobStorage.Current.GetConnection())
+            {
+                var state = connection.GetStateData(jobId);
+                string jobStatus = state?.Name ?? "Not Found";
+
+                return Json(new { jobId, status = jobStatus });
+            }
+        }
         [Breadcrumb(title: "Active")]
-        public IActionResult Active()
+        public async Task<IActionResult> Active(string jobId = "")
         {
             try
             {
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-                if (string.IsNullOrWhiteSpace(currentUserEmail))
-                {
-                    notifyService.Error("OOPs !!!..Unauthenticated Access");
-                    return RedirectToAction(nameof(Index), "Dashboard");
-                }
-                return View();
+                var userEmail = HttpContext.User.Identity.Name;
+                var pendingCount = await _context.ClaimsInvestigation.CountAsync(c => c.UpdatedBy == userEmail && c.STATUS == ALLOCATION_STATUS.PENDING);
+                return View(new JobStatus { JobId = jobId, PendingCount = pendingCount });
             }
             catch (Exception ex)
             {
@@ -134,4 +146,5 @@ namespace risk.control.system.Controllers.Company
             }
         }
     }
+    
 }

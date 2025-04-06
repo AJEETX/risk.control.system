@@ -39,6 +39,7 @@ namespace risk.control.system.Controllers.Company
         private readonly ApplicationDbContext _context;
         private readonly IClaimsInvestigationService claimsInvestigationService;
         private readonly IMailboxService mailboxService;
+        private readonly IProgressService progressService;
         private readonly INotyfService notifyService;
         private readonly IBackgroundJobClient backgroundJobClient;
 
@@ -46,12 +47,14 @@ namespace risk.control.system.Controllers.Company
             IClaimsInvestigationService claimsInvestigationService,
             IBackgroundJobClient backgroundJobClient,
             IMailboxService mailboxService,
+            IProgressService progressService,
             INotyfService notifyService)
         {
             _context = context;
             this.claimsInvestigationService = claimsInvestigationService;
             this.backgroundJobClient = backgroundJobClient;
             this.mailboxService = mailboxService;
+            this.progressService = progressService;
             this.notifyService = notifyService;
         }
         
@@ -73,16 +76,20 @@ namespace risk.control.system.Controllers.Company
                 // AUTO ALLOCATION COUNT
                 var allocatedClaims = await claimsInvestigationService.UpdateCaseAllocationStatus( currentUserEmail, distinctClaims);
 
-                backgroundJobClient.Enqueue(() => claimsInvestigationService.BackgroundAutoAllocation(distinctClaims, currentUserEmail));
-                notifyService.Custom($"Case(s) Assigned(auto) started", 3, "green", "far fa-file-powerpoint");
+                var jobId = backgroundJobClient.Enqueue(() => claimsInvestigationService.BackgroundAutoAllocation(distinctClaims, currentUserEmail));
+                progressService.AddAssignmentJob(jobId, currentUserEmail);
+                notifyService.Custom($"Case(s) Assignment started", 3, "orange", "far fa-file-powerpoint");
+                return RedirectToAction(nameof(ClaimsActiveController.Active), "ClaimsActive",new { jobId });
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
             }
-            return RedirectToAction(nameof(ClaimsActiveController.Active), "ClaimsActive");
+            return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
         }
+
+
         [HttpPost]
         [Authorize(Roles = CREATOR.DISPLAY_NAME)]
         [ValidateAntiForgeryToken]
