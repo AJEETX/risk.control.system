@@ -57,6 +57,7 @@ using SmartBreadcrumbs.Extensions;
 
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 using Hangfire.SQLite;
+using Hangfire.Dashboard;
 
 var builder = WebApplication.CreateBuilder(args);
 ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls13;
@@ -362,7 +363,10 @@ builder.Services.AddMvcCore(config =>
 builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
-app.UseHangfireDashboard();
+app.UseHangfireDashboard("/hangfire", new DashboardOptions
+{
+    Authorization = new[] { new BasicAuthAuthorizationFilter() }
+});
 app.UseMiddleware<RequirePasswordChangeMiddleware>();
 app.UseMiddleware<UpdateUserLastActivityMiddleware>();
 //app.UseWebSockets();
@@ -420,8 +424,28 @@ int sessionTimeoutMinutes = int.Parse(builder.Configuration["SESSION_TIMEOUT_SEC
 //    $"*/{sessionTimeoutMinutes} * * * *"); // Check every 5 minutes
 
 app.Run();
-
-public partial class Program
+public class BasicAuthAuthorizationFilter : Hangfire.Dashboard.IDashboardAuthorizationFilter
 {
+    public bool Authorize(Hangfire.Dashboard.DashboardContext context)
+    {
+        var request = context.GetHttpContext().Request;
+        var authorization = request.Headers["Authorization"].ToString();
 
+        // Check if the Authorization header exists
+        if (string.IsNullOrEmpty(authorization))
+        {
+            return false; // Deny if no credentials are provided
+        }
+
+        // Decode the Authorization header (Base64 username:password)
+        var authHeader = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(authorization.Split(' ')[1]));
+        var credentials = authHeader.Split(':');
+
+        // Hardcoded username and password for Basic Authentication
+        var validUsername = "admin";
+        var validPassword = "password123";
+
+        // Check if credentials match
+        return credentials.Length == 2 && credentials[0] == validUsername && credentials[1] == validPassword;
+    }
 }
