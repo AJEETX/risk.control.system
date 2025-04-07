@@ -745,7 +745,7 @@ namespace risk.control.system.Controllers.Api
                     data.ClaimId,
                     data.Remarks, data.Question1, data.Question2, data.Question3, data.Question4);
 
-                backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimReportSubmitToVendorSupervisor(data.Email, data.ClaimId));
+                backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimReportSubmitToVendorSupervisor(data.Email, data.ClaimId, portal_base_url));
 
                 var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == data.Email && c.Role == AppRoles.AGENT);
 

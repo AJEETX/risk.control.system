@@ -318,7 +318,7 @@ namespace risk.control.system.Helpers
             var claim = a;
             if (claim is not null)
             {
-                var isReview = a.PreviousClaimReports.Count > 0;
+                var isReview = false;
                 var isEnquiry = a.IsQueryCase;
                 var status = a.InvestigationCaseSubStatus.Name.ToUpper();
                 var requireManualAssign = "Assign manually";

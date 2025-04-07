@@ -108,9 +108,6 @@ builder.Services.AddScoped<IProgressService, ProgressService>();
 builder.Services.AddScoped<ICaseCreationService, CaseCreationService>();
 builder.Services.AddScoped<IPdfReportService, PdfReportService>();
 builder.Services.AddScoped<IUploadService, UploadService>();
-builder.Services.AddScoped<IUnderwritingService, UnderwritingService>();
-builder.Services.AddScoped<ICaseInvestigationService,CaseInvestigationService>();
-builder.Services.AddScoped<IManageCaseService,ManageCaseService>();
 builder.Services.AddSingleton<IValidationService,ValidationService>();
 builder.Services.AddScoped<ITokenService,TokenService>();
 builder.Services.AddScoped<IUserService,UserService>();
@@ -141,7 +138,6 @@ builder.Services.AddScoped<IMailboxService, MailboxService>();
 builder.Services.AddScoped<IFaceMatchService, FaceMatchService>();
 builder.Services.AddScoped<IGoogleApi, GoogleApi>();
 builder.Services.AddScoped<IGoogleMaskHelper, GoogleMaskHelper>();
-builder.Services.AddScoped<IImageService, ImageService>();
 builder.Services.AddScoped<IChatSummarizer, OpenAISummarizer>();
 
 builder.Services.AddScoped<IInboxMailService, InboxMailService>();
@@ -181,6 +177,10 @@ builder.Services.AddControllersWithViews()
         Timeout = 1000,
         Modal = true,
         Type = Enums.NotificationTypesNoty.Info
+    })
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
     })
     .AddNewtonsoftJson(options =>
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore

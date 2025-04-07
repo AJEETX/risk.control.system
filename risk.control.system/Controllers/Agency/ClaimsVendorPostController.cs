@@ -35,11 +35,13 @@ namespace risk.control.system.Controllers.Agency
         private readonly IMailboxService mailboxService;
         private readonly ApplicationDbContext _context;
         private readonly IBackgroundJobClient backgroundJobClient;
+        private readonly IHttpContextAccessor httpContextAccessor;
 
         public ClaimsVendorPostController(
             IClaimsInvestigationService claimsInvestigationService,
             INotyfService notifyService,
             IBackgroundJobClient backgroundJobClient,
+            IHttpContextAccessor httpContextAccessor,
             IClaimsVendorService vendorService,
             IMailboxService mailboxService,
             ApplicationDbContext context)
@@ -49,6 +51,7 @@ namespace risk.control.system.Controllers.Agency
             this.vendorService = vendorService;
             this.mailboxService = mailboxService;
             this.backgroundJobClient = backgroundJobClient;
+            this.httpContextAccessor = httpContextAccessor;
             _context = context;
             UserList = new List<UsersViewModel>();
         }
@@ -84,8 +87,11 @@ namespace risk.control.system.Controllers.Agency
                     notifyService.Error("OOPs !!!..Error occurred.");
                     return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                
-                backgroundJobClient.Enqueue(()=> mailboxService.NotifyClaimAssignmentToVendorAgent(currentUserEmail, claimId, vendorAgent.Email, vendorAgent.VendorId.Value));
+                var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
+                var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
+                var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
+
+                backgroundJobClient.Enqueue(()=> mailboxService.NotifyClaimAssignmentToVendorAgent(currentUserEmail, claimId, vendorAgent.Email, vendorAgent.VendorId.Value, baseUrl));
 
                 notifyService.Custom($"Case #{claim.PolicyDetail.ContractNumber} tasked to {vendorAgent.Email}", 3, "green", "far fa-file-powerpoint");
 
@@ -136,8 +142,11 @@ namespace risk.control.system.Controllers.Agency
                     notifyService.Error("OOPs !!!..Error submitting.");
                     return RedirectToAction(nameof(AgentController.GetInvestigate), "Agent", new { selectedcase = claimId });
                 }
+                var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
+                var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
+                var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
 
-                backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimReportSubmitToVendorSupervisor(currentUserEmail, claimId));
+                backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimReportSubmitToVendorSupervisor(currentUserEmail, claimId, baseUrl));
 
                 notifyService.Custom($"Case #{contract} report submitted", 3, "green", "far fa-file-powerpoint");
 
@@ -178,8 +187,11 @@ namespace risk.control.system.Controllers.Agency
                 if (success != null)
                 {
                     var agencyUser = _context.VendorApplicationUser.Include(a => a.Vendor).FirstOrDefault(c => c.Email == userEmail);
+                    var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
+                    var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
+                    var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
 
-                    backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimReportSubmitToCompany(userEmail, claimId));
+                    backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimReportSubmitToCompany(userEmail, claimId, baseUrl));
                     //await mailboxService.NotifyClaimReportSubmitToCompany(userEmail, claimId);
 
                     notifyService.Custom($"Case #{success.PolicyDetail.ContractNumber}  report submitted to Company", 3, "green", "far fa-file-powerpoint");
@@ -220,7 +232,11 @@ namespace risk.control.system.Controllers.Agency
                 }
                 var agency = await claimsInvestigationService.WithdrawCase(userEmail, model, claimId);
 
-                backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimWithdrawlToCompany(userEmail, claimId, agency.VendorId));
+                var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
+                var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
+                var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
+
+                backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimWithdrawlToCompany(userEmail, claimId, agency.VendorId, baseUrl));
 
                 notifyService.Custom($"Case #{policyNumber}  declined successfully", 3, "red", "far fa-file-powerpoint");
 
@@ -263,8 +279,11 @@ namespace risk.control.system.Controllers.Agency
                 if (claim != null)
                 {
                     var agencyUser = _context.VendorApplicationUser.Include(a => a.Vendor).FirstOrDefault(c => c.Email == currentUserEmail);
+                    var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
+                    var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
+                    var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
 
-                    backgroundJobClient.Enqueue(() => mailboxService.NotifySubmitReplyToCompany(currentUserEmail, claimId));
+                    backgroundJobClient.Enqueue(() => mailboxService.NotifySubmitReplyToCompany(currentUserEmail, claimId, baseUrl));
 
                     notifyService.Success("Enquiry Reply Sent to Company");
                     return RedirectToAction(nameof(SupervisorController.Allocate), "Supervisor");

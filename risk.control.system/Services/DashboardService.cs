@@ -875,7 +875,6 @@ namespace risk.control.system.Services
                .Include(c => c.CustomerDetail)
                .ThenInclude(c => c.State)
                .Include(c => c.Vendor)
-               .Include(c => c.PreviousClaimReports)
                 .Where(c => !c.Deleted);
             return applicationDbContext.OrderBy(o => o.Created);
         }
@@ -909,7 +908,6 @@ namespace risk.control.system.Services
                .Include(c => c.CustomerDetail)
                .ThenInclude(c => c.State)
                .Include(c => c.Vendor)
-               .Include(c => c.PreviousClaimReports)
                 .Where(c => !c.Deleted);
             return applicationDbContext.OrderBy(o => o.Created);
         }

@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 using risk.control.system.Helpers;
 
@@ -51,13 +52,12 @@ namespace risk.control.system.Models
         public string? CurrentUserEmail { get; set; }
         public AgencyReport? AgencyReport { get; set; } = new();
 
-        public List<PreviousClaimReport> PreviousClaimReports { get; set; } = new List<PreviousClaimReport>();
-
         public List<ClaimNote>? ClaimNotes { get; set; } = new();
         public string? CurrentClaimOwner { get; set; }
+        [JsonIgnore] 
         public List<ClaimMessage>? ClaimMessages { get; set; } = new();
-        public List<SmsNotification>? SmsNotifications { get; set; } = new();
-        public List<StatusNotification>? Notifications { get; set; } = new();
+        //public List<SmsNotification>? SmsNotifications { get; set; } = new();
+        //public List<StatusNotification>? Notifications { get; set; } = new();
         public CREATEDBY CREATEDBY { get; set; } = CREATEDBY.MANUAL;
         public ORIGIN ORIGIN { get; set; } = ORIGIN.USER;
 

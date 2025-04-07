@@ -269,40 +269,11 @@
                         });
                 }, 1000);
     }
-    //checkAllocationStatus();
     if (jobId) {
         checkJobStatus(jobId);
     }
 });
 let finalCheckAttempts = 0; // Counter for final checks
-function checkAllocationStatus() {
-    $.ajax({
-        url: '/api/Creator/GetPendingAllocations',
-        type: 'GET',
-        success: function (response) {
-            if (response.count > 0) {
-                console.log(`Tracking ${response.count} allocated cases.`);
-                $('#refreshTable').click(); // Refresh DataTable/UI
-                setTimeout(checkAllocationStatus, 5000); // Keep checking
-                finalCheckAttempts = 0; // Reset final check attempts
-            } else {
-                if (finalCheckAttempts < 3) {
-                    console.log(`No cases left, final attempt ${finalCheckAttempts + 1}...`);
-                    finalCheckAttempts++;
-
-                    $('#refreshTable').click(); // **Force UI refresh**
-                    setTimeout(checkAllocationStatus, 3000); // Retry after 3s
-                } else {
-                    console.log("All allocated cases fully processed.");
-                    $('#refreshTable').click(); // **Ensure final refresh**
-                }
-            }
-        },
-        error: function (xhr, status, error) {
-            console.error("Error fetching allocation status: ", error);
-        }
-    });
-}
 function getdetails(id) {
     $("body").addClass("submit-progress-bg");
     // Wrap in setTimeout so the UI
@@ -346,9 +317,12 @@ function checkJobStatus(jobId) {
                 setTimeout(function () {
                     checkJobStatus(jobId);
                 }, 2000); // Check every 5 seconds
-            } else {
+            } else if (response.status === "Completed") {
                 console.log("Job Completed:", response.status);
                 $('#refreshTable').click(); // Refresh the table after completion
+            }
+            else {
+                console.log("Job has Issue as neither completed nor Processing/Enqueued:", response.status);
             }
         },
         error: function (xhr, status, error) {

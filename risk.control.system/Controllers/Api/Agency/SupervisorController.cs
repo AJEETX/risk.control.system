@@ -498,14 +498,12 @@ namespace risk.control.system.Controllers.Api.Agency
                 var reviewClaimIds = reviewCases.Select(r => r.ClaimsInvestigationId).ToList();
                 foreach (var claim in applicationDbContext)
                 {
-                    var previousReport = await _context.PreviousClaimReport
-                        .AnyAsync(r => r.VendorId == claim.VendorId && claim.ClaimsInvestigationId == r.ClaimsInvestigationId);
 
                     if ((claim.InvestigationCaseStatusId == finishedStatus.InvestigationCaseStatusId &&
                          claim.VendorId == agencyUser.VendorId &&
                          claim.InvestigationCaseSubStatusId == approvedStatus.InvestigationCaseSubStatusId ||
                          claim.InvestigationCaseSubStatusId == rejectedStatus.InvestigationCaseSubStatusId) ||
-                        (reviewClaimIds.Contains(claim.ClaimsInvestigationId)) && claim.ReviewCount == 1 && claim.IsReviewCase && previousReport)
+                        (reviewClaimIds.Contains(claim.ClaimsInvestigationId)) && claim.ReviewCount == 1 && claim.IsReviewCase)
                     {
                         claimsSubmitted.Add(claim);
                     }
@@ -523,9 +521,6 @@ namespace risk.control.system.Controllers.Api.Agency
 
                 foreach (var claim in applicationDbContext)
                 {
-                    var previousReport = await _context.PreviousClaimReport
-                        .AnyAsync(r => r.ClaimsInvestigationId == claim.ClaimsInvestigationId);
-
                     var isReview = reviewCases.Any(i => i.IsReviewCase &&
                                                         claim.ReviewCount == 1 &&
                                                         i.ClaimsInvestigationId == claim.ClaimsInvestigationId &&
@@ -537,7 +532,7 @@ namespace risk.control.system.Controllers.Api.Agency
                          claim.VendorId == agencyUser.VendorId &&
                          claim.InvestigationCaseSubStatus.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR) ||
                         (claim.InvestigationCaseSubStatus.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR) ||
-                        (isReview && previousReport))
+                        (isReview))
                     {
                         if (userAttendedClaims.Contains(claim.ClaimsInvestigationId))
                         {

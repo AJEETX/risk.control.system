@@ -82,7 +82,6 @@ namespace risk.control.system.Models
 
         public string? AddressLocationInfo { get; set; }
 
-        public List<PreviousClaimReport> PreviousClaimReports { get; set; } = new List<PreviousClaimReport>();
         public string? ClaimsInvestigationId { get; set; }
         public ClaimsInvestigation? ClaimsInvestigation { get; set; }
 

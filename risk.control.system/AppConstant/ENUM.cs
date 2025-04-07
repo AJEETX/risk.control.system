@@ -76,6 +76,10 @@ namespace risk.control.system.Models
 
     public enum Education
     {
+        [Display(Name = "UNKNOWN")]
+        [Description("Education is not specified or unknown")]
+        UNKNOWN,
+
         [Display(Name = "PRIMARY SCHOOL")]
         [Description("Completed primary school education")]
         PRIMARY_SCHOOL,
@@ -137,6 +141,9 @@ namespace risk.control.system.Models
 
     public enum Gender
     {
+        [Display(Name = "UNKNOWN")]
+        UNKNOWN,
+
         [Display(Name = "Male")]
         MALE,
 
@@ -149,6 +156,8 @@ namespace risk.control.system.Models
 
     public enum CustomerType
     {
+        [Display(Name = "UNKNOWN")]
+        UNKNOWN,
         [Display(Name = "HNI")]
         [Description("High Net Worth Individual")]
         HNI,

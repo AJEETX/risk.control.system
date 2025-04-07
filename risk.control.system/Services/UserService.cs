@@ -289,18 +289,14 @@ namespace risk.control.system.Services
 
             var companyUser = await context.ClientCompanyApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
 
-            var company = await context.ClientCompany
-                .Include(c => c.CompanyApplicationUser)
-                .ThenInclude(u => u.PinCode)
-                .Include(c => c.CompanyApplicationUser)
+            var companyUsers = context.ClientCompanyApplicationUser
+                .Include(u => u.PinCode)
+                .Include(c => c.District)
+                .Include(c => c.State)
                 .ThenInclude(u => u.Country)
-                .Include(c => c.CompanyApplicationUser)
-                .ThenInclude(u => u.District)
-                .Include(c => c.CompanyApplicationUser)
-                .ThenInclude(u => u.State)
-                .FirstOrDefaultAsync(c => c.ClientCompanyId == companyUser.ClientCompanyId);
+                .Where(c => c.ClientCompanyId == companyUser.ClientCompanyId);
 
-            var users = company.CompanyApplicationUser
+            var users = companyUsers
                 .Where(u => !u.Deleted && u.Email != userEmail);
 
             var allUsers = users?
@@ -395,18 +391,14 @@ namespace risk.control.system.Services
 
             var companyUser = await context.ClientCompanyApplicationUser.FirstOrDefaultAsync(c => c.Email == userEmail);
 
-            var company = await context.ClientCompany
-                .Include(c => c.CompanyApplicationUser)
-                .ThenInclude(u => u.PinCode)
-                .Include(c => c.CompanyApplicationUser)
-                .ThenInclude(u => u.Country)
-                .Include(c => c.CompanyApplicationUser)
-                .ThenInclude(u => u.District)
-                .Include(c => c.CompanyApplicationUser)
-                .ThenInclude(u => u.State)
-                .FirstOrDefaultAsync(c => c.ClientCompanyId == id);
+            var companyUsers = context.ClientCompanyApplicationUser
+                .Include(c => c.PinCode)
+                .Include(u => u.District)
+                .Include(u => u.State)
+                .Include(u => u.Country)
+                .Where(c => c.ClientCompanyId == id);
 
-            var users = company.CompanyApplicationUser
+            var users = companyUsers
                 .Where(u => !u.Deleted && u.Email != userEmail);
 
             var allUsers = users?

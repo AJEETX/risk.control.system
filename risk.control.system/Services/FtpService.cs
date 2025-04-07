@@ -1,4 +1,9 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using CsvHelper;
+using CsvHelper.Configuration;
+
+using Hangfire;
+
+using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 
 using risk.control.system.AppConstant;
@@ -9,6 +14,7 @@ using risk.control.system.Models.ViewModel;
 
 using System.ComponentModel.Design;
 using System.Data;
+using System.Globalization;
 using System.IO.Compression;
 using System.Net;
 using System.Reflection;
@@ -20,8 +26,7 @@ namespace risk.control.system.Services
     public interface IFtpService
     {
         Task<int> UploadFile(string userEmail, IFormFile postedFile, CREATEDBY autoOrManual,long lineOfBusinessId);
-        Task StartUpload(string userEmail, int uploadId);
-        Task<bool> UploadCaseFile(string userEmail, IFormFile postedFile, CREATEDBY autoOrManual);
+        Task StartUpload(string userEmail, int uploadId, string url);
 
         Task<bool> UploadFtpFile(string userEmail, IFormFile postedFile, CREATEDBY autoOrManual, long lineOfBusinessId);
     }
@@ -34,6 +39,8 @@ namespace risk.control.system.Services
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly ICustomApiCLient customApiCLient;
+        private readonly IMailboxService mailboxService;
+        private readonly IBackgroundJobClient backgroundJobClient;
         private readonly IProgressService progressService;
         private readonly IUploadService uploadService;
         private static WebClient client = new WebClient
@@ -43,12 +50,16 @@ namespace risk.control.system.Services
         public FtpService(ApplicationDbContext context,
             IWebHostEnvironment webHostEnvironment, 
             ICustomApiCLient customApiCLient,
+            IMailboxService mailboxService,
+            IBackgroundJobClient backgroundJobClient,
             IProgressService progressService,
             IUploadService uploadService)
         {
             _context = context;
             this.webHostEnvironment = webHostEnvironment;
             this.customApiCLient = customApiCLient;
+            this.mailboxService = mailboxService;
+            this.backgroundJobClient = backgroundJobClient;
             this.progressService = progressService;
             this.uploadService = uploadService;
         }
@@ -222,13 +233,13 @@ namespace risk.control.system.Services
             return uploadData.Entity.Id;
         }
 
-        public async Task StartUpload(string userEmail, int uploadId)
+        public async Task StartUpload(string userEmail, int uploadId, string url)
         {
             var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(c => c.Email == userEmail);
             var uploadFileData = await _context.FilesOnFileSystem.FirstOrDefaultAsync(f => f.Id == uploadId && f.CompanyId == companyUser.ClientCompanyId && f.UploadedBy == userEmail && !f.Deleted);
-            var csvData = ReadFirstCsvFromZip(uploadFileData.ByteData);
+            var customData = ReadFirstCsvFromZipToObject(uploadFileData.ByteData); // Read the first CSV file from the ZIP archive
             var totalClaimsCreated = await _context.ClaimsInvestigation.CountAsync(c => !c.Deleted && c.ClientCompanyId == companyUser.ClientCompanyId);
-            var totalIncludingUploaded = totalClaimsCreated + csvData.Count - 1;
+            var totalIncludingUploaded = totalClaimsCreated + customData.Count - 1;
             var userCanCreate = true;
             if (companyUser.ClientCompany.LicenseType == Standard.Licensing.LicenseType.Trial)
             {
@@ -242,7 +253,7 @@ namespace risk.control.system.Services
             }
             if (userCanCreate)
             {
-                var uploadedCount = await uploadService.PerformUpload(companyUser, csvData.ToArray(), uploadFileData);
+                var uploadedCount = await uploadService.PerformCustomUpload(companyUser, customData, uploadFileData);
                 if(uploadedCount > 0)
                 {
                     uploadFileData.Completed = true;
@@ -258,10 +269,37 @@ namespace risk.control.system.Services
                     uploadFileData.Status = "Error";
                     uploadFileData.Message = "Error uploading the file";
                 }
+                var jobId = backgroundJobClient.Enqueue(() => mailboxService.NotifyFileUpload(userEmail, uploadFileData, url));
+
                 await _context.SaveChangesAsync();
             }
         }
 
+        private static List<UploadCase>? ReadFirstCsvFromZipToObject(byte[] zipData)
+        {
+            using (MemoryStream zipStream = new MemoryStream(zipData))
+            using (ZipArchive archive = new ZipArchive(zipStream, ZipArchiveMode.Read))
+            {
+                // Find the first CSV file in the ZIP archive
+                ZipArchiveEntry? csvEntry = archive.Entries.FirstOrDefault(e =>
+                    e.FullName.EndsWith(".csv", StringComparison.OrdinalIgnoreCase));
+
+                if (csvEntry != null)
+                {
+                    using (StreamReader reader = new StreamReader(csvEntry.Open()))
+                    using (var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture)
+                    {
+                        TrimOptions = TrimOptions.Trim,
+                        HeaderValidated = null,  // Disables header validation errors
+                        MissingFieldFound = null // Prevents missing field errors
+                    }))
+                    {
+                        return csv.GetRecords<UploadCase>().ToList(); // Convert CSV rows to objects
+                    }
+                }
+            }
+            return null; // Return null if no CSV is found
+        }
         public static List<string>? ReadFirstCsvFromZip(byte[] zipData)
         {
             using (MemoryStream zipStream = new MemoryStream(zipData))
@@ -363,262 +401,6 @@ namespace risk.control.system.Services
             }
 
             return files;
-        }
-
-        public async Task<bool> UploadCaseFile(string userEmail, IFormFile postedFile, CREATEDBY autoOrManual)
-        {
-            string path = Path.Combine(webHostEnvironment.WebRootPath, "upload-file");
-            if (!Directory.Exists(path))
-            {
-                Directory.CreateDirectory(path);
-            }
-
-            string filePath = Path.Combine(path, Path.GetTempFileName());
-
-            using (FileStream stream = new FileStream(filePath, FileMode.Create))
-            {
-                postedFile.CopyTo(stream);
-            }
-
-            var rows = _context.SaveChanges();
-            using (var stream = postedFile.OpenReadStream())
-            {
-                using (var archive = new ZipArchive(stream))
-                {
-                    var csvFileCount = archive.Entries.Count(e => Path.GetExtension(e.FullName).Equals(".csv"));
-                    var innerFile = archive.Entries.FirstOrDefault(e => Path.GetExtension(e.FullName).Equals(".csv"));
-                    if (innerFile == null || csvFileCount != 1)
-                    {
-                        return false;
-                    }
-                    var processed = await ProcessCaseFile(userEmail, archive, autoOrManual, ORIGIN.FILE);
-                    if (!processed)
-                    {
-                        return false;
-                    }
-
-                }
-            }
-            //await SaveUpload(postedFile, filePath, "File upload", userEmail);
-            return true;
-        }
-
-        private async Task<bool> ProcessCaseFile(string userEmail, ZipArchive archive, CREATEDBY autoOrManual, ORIGIN fileOrFtp)
-        {
-
-            var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(c => c.Email == userEmail);
-            bool userCanCreate = true;
-            var totalClaimsCreated = await _context.CaseVerification.CountAsync(c => !c.Deleted && c.ClientCompanyId == companyUser.ClientCompanyId);
-            if (companyUser.ClientCompany.LicenseType == Standard.Licensing.LicenseType.Trial)
-            {
-                if (totalClaimsCreated >= companyUser.ClientCompany.TotalCreatedClaimAllowed)
-                {
-                    userCanCreate = false;
-                }
-            }
-
-            if (!userCanCreate)
-            {
-                return userCanCreate;
-            }
-
-            var innerFile = archive.Entries.FirstOrDefault(e => Path.GetExtension(e.FullName).Equals(".csv"));
-            string csvData = string.Empty;
-            using (var ss = innerFile.Open())
-            {
-                using (var memoryStream = new MemoryStream())
-                {
-                    ss.CopyTo(memoryStream);
-                    var bytes = memoryStream.ToArray();
-                    csvData = Encoding.UTF8.GetString(bytes);
-                }
-            }
-            var dataRows = csvData.Split('\n');
-            var totalIncludingUploaded = totalClaimsCreated + dataRows.Length - 1;
-            var userCanUpload = true;
-            if (companyUser.ClientCompany.LicenseType == Standard.Licensing.LicenseType.Trial)
-            {
-                userCanUpload = companyUser.ClientCompany.TotalCreatedClaimAllowed >= totalIncludingUploaded;
-            }
-            if (userCanCreate && userCanUpload)
-            {
-
-                return await DoCaseUpload(companyUser, dataRows, autoOrManual, archive, fileOrFtp);
-            }
-            return false;
-
-        }
-        private async Task<bool> DoCaseUpload(ClientCompanyApplicationUser companyUser, string[] dataRows, CREATEDBY autoOrManual, ZipArchive archive, ORIGIN fileOrFtp)
-        {
-            var status = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.INITIATED));
-            var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
-            var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
-            var autoEnabled = companyUser.ClientCompany.AutoAllocation;
-            DataTable dt = new DataTable();
-            bool firstRow = true;
-
-            foreach (string row in dataRows)
-            {
-                if (!string.IsNullOrEmpty(row))
-                {
-                    if (firstRow)
-                    {
-                        foreach (string cell in row.Split(','))
-                        {
-                            dt.Columns.Add(cell.Trim());
-                        }
-                        firstRow = false;
-                    }
-                    else
-                    {
-                        try
-                        {
-                            dt.Rows.Add();
-                            int i = 0;
-                            var output = regex.Replace(row, m => m.Value.Replace(',', '@'));
-                            var rowData = output.Split(',').ToList();
-                            foreach (string cell in rowData)
-                            {
-                                dt.Rows[dt.Rows.Count - 1][i] = cell?.Trim() ?? NO_DATA;
-                                i++;
-                            }
-
-                            var pinCode = _context.PinCode
-                                .Include(p => p.District)
-                                .Include(p => p.State)
-                                .Include(p => p.Country)
-                                .FirstOrDefault(p => p.Code == rowData[19].Trim());
-                            if (pinCode.CountryId != companyUser.ClientCompany.CountryId)
-                            {
-                                continue;
-                            }
-                            //CREATE CLAIM
-                            var subStatus = companyUser.ClientCompany.AutoAllocation && autoOrManual == CREATEDBY.AUTO ? createdStatus : assignedStatus;
-                            var claim = new CaseVerification
-                            {
-                                InvestigationCaseStatusId = status.InvestigationCaseStatusId,
-                                InvestigationCaseStatus = status,
-                                InvestigationCaseSubStatusId = subStatus.InvestigationCaseSubStatusId,
-                                InvestigationCaseSubStatus = subStatus,
-                                Updated = DateTime.Now,
-                                UpdatedBy = companyUser.Email,
-                                CurrentUserEmail = companyUser.Email,
-                                CurrentClaimOwner = companyUser.Email,
-                                Deleted = false,
-                                HasClientCompany = true,
-                                AssignedToAgency = false,
-                                IsReady2Assign = true,
-                                IsReviewCase = false,
-                                UserEmailActioned = companyUser.Email,
-                                UserEmailActionedTo = companyUser.Email,
-                                CREATEDBY = autoOrManual,
-                                ORIGIN = fileOrFtp,
-                                ClientCompanyId = companyUser.ClientCompanyId,
-                                UserRoleActionedTo = $"{companyUser.ClientCompany.Email}",
-                                CreatorSla = companyUser.ClientCompany.CreatorSla
-                            };
-
-                            //CREATE POLICY
-                            var servicetype = _context.InvestigationServiceType.FirstOrDefault(s => s.Code.ToLower() == (rowData[4].Trim().ToLower()));
-                            
-                            claim.PolicyDetail = new PolicyDetail
-                            {
-                                ContractNumber = rowData[0]?.Trim(),
-                                SumAssuredValue = Convert.ToDecimal(rowData[1]?.Trim()),
-                                ContractIssueDate = DateTime.Now.AddDays(-20),
-                                ClaimType = (ClaimType)Enum.Parse(typeof(ClaimType), rowData[3]?.Trim()),
-                                InsuranceType = InsuranceType.LIFE,
-                                InvestigationServiceTypeId = servicetype?.InvestigationServiceTypeId,
-                                DateOfIncident = DateTime.Now.AddDays(-5),
-                                CauseOfLoss = rowData[6]?.Trim(),
-                                CaseEnablerId = _context.CaseEnabler.FirstOrDefault(c => c.Code.ToLower() == rowData[7].Trim().ToLower()).CaseEnablerId,
-                                LineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Code.ToLower() == "underwriting")?.LineOfBusinessId,
-                            };
-
-                            //CREATE CUSTOMER
-
-                            var district = _context.District.FirstOrDefault(c => c.DistrictId == pinCode.District.DistrictId);
-
-                            var state = _context.State.FirstOrDefault(s => s.StateId == pinCode.State.StateId);
-
-                            var country = _context.Country.FirstOrDefault(c => c.CountryId == pinCode.Country.CountryId);
-
-                            var customerImage = archive.Entries.FirstOrDefault(p => p.FullName.ToLower().EndsWith(rowData[0]?.Trim().ToLower() + "/customer.jpg"));
-                            byte[] customerNewImage = null;
-                            using (var cImage = customerImage.Open())
-                            {
-                                using (var cs = new MemoryStream())
-                                {
-                                    await cImage.CopyToAsync(cs);
-                                    customerNewImage = cs.ToArray();
-                                }
-                            }
-                            claim.CustomerDetail = new Claimant
-                            {
-                                Name = rowData[10]?.Trim(),
-                                CustomerType = (CustomerType)Enum.Parse(typeof(CustomerType), rowData[11]?.Trim()),
-                                Gender = (Gender)Enum.Parse(typeof(Gender), rowData[12]?.Trim()),
-                                DateOfBirth = DateTime.Now.AddYears(-20),
-                                ContactNumber = (rowData[14]?.Trim()),
-                                Education = (Education)Enum.Parse(typeof(Education), rowData[15]?.Trim()),
-                                Occupation = (Occupation)Enum.Parse(typeof(Occupation), rowData[16]?.Trim()),
-                                Income = (Income)Enum.Parse(typeof(Income), rowData[17]?.Trim()),
-                                Addressline = rowData[18]?.Trim(),
-                                CountryId = country.CountryId,
-                                PinCodeId = pinCode.PinCodeId,
-                                StateId = state.StateId,
-                                DistrictId = district.DistrictId,
-                                Description = rowData[20]?.Trim(),
-                                ProfilePicture = customerNewImage,
-                            };
-
-                            var address = claim.CustomerDetail.Addressline + ", " +
-                                pinCode.District.Name + ", " +
-                                pinCode.State.Name + ", " +
-                                pinCode.Country.Code + ", " +
-                                pinCode.Code;
-
-                            var coordinates = await customApiCLient.GetCoordinatesFromAddressAsync(address);
-                            claim.CustomerDetail.Latitude = coordinates.Latitude;
-                            claim.CustomerDetail.Longitude = coordinates.Longitude;
-                            var customerLatLong = claim.CustomerDetail.Latitude + "," + claim.CustomerDetail.Longitude;
-                            var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:A%7C{customerLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
-                            claim.CustomerDetail.CustomerLocationMap = url;
-
-                            
-                            var addedCase = _context.CaseVerification.Add(claim);
-
-                            var log = new CaseVerificationTransaction
-                            {
-                                CaseVerification = addedCase.Entity,
-                                UserEmailActioned = claim.UserEmailActioned,
-                                UserRoleActionedTo = claim.UserRoleActionedTo,
-                                CurrentClaimOwner = companyUser.Email,
-                                HopCount = 0,
-                                Time2Update = 0,
-                                InvestigationCaseStatusId = status.InvestigationCaseStatusId,
-                                InvestigationCaseSubStatusId = createdStatus.InvestigationCaseSubStatusId,
-                                UpdatedBy = companyUser.Email
-                            };
-                            _context.CaseVerificationTransaction.Add(log);
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine(ex.StackTrace);
-                            return false;
-                        }
-                    }
-                }
-            }
-            try
-            {
-                return _context.SaveChanges() > 0;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.StackTrace);
-                return false;
-            }
         }
     }
 }

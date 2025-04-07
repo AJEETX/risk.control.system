@@ -210,24 +210,16 @@
                     var spinClass = isPending ? "fa-spin" : ""; // Add spin class if pending
                     var buttons = "";
                     console.log(row.status);
-                    if (isPending) {
-                        buttons += '<button disabled class="btn btn-xs btn-info"><i class="fa fa-sync fa-spin"></i> ' + row.status+'</button>&nbsp;';
-                        buttons += '<button disabled class="btn btn-xs btn-warning"><i class="fa fa-sync fa-spin"></i> Edit</button>&nbsp;';
-                        buttons += '<button disabled class="btn btn-xs btn-danger"><i class="fa fa-sync fa-spin"></i> Delete</button>&nbsp;';
+                    if (row.ready2Assign) {
+                        buttons += '<a id="assign' + row.id + '" href="/CreatorAuto/EmpanelledVendors?Id=' + row.id + '" class="btn btn-xs btn-info refresh-btn ' + disabled + '" data-id="' + row.id + '">';
+                        buttons += '<i class="fas fa-external-link-alt ' + spinClass + '"></i> Assign</a>&nbsp;';
+                    } else {
+                        buttons += '<button disabled class="btn btn-xs btn-info"><i class="fas fa-external-link-alt"></i> Assign</button>&nbsp;';
                     }
 
-                    else {
-                        if (row.ready2Assign) {
-                            buttons += '<a id="assign' + row.id + '" href="/CreatorAuto/EmpanelledVendors?Id=' + row.id + '" class="btn btn-xs btn-info refresh-btn ' + disabled + '" data-id="' + row.id + '">';
-                            buttons += '<i class="fas fa-external-link-alt ' + spinClass + '"></i> Assign</a>&nbsp;';
-                        } else {
-                            buttons += '<button disabled class="btn btn-xs btn-info"><i class="fas fa-external-link-alt"></i> Assign</button>&nbsp;';
-                        }
+                    buttons += '<a id="edit' + row.id + '" href="Details?Id=' + row.id + '" class="btn btn-xs btn-warning ' + disabled + '"><i class="fas fa-pencil-alt ' + disabled + '"></i> Edit</a>&nbsp;';
 
-                        buttons += '<a id="edit' + row.id + '" href="Details?Id=' + row.id + '" class="btn btn-xs btn-warning ' + disabled + '"><i class="fas fa-pencil-alt ' + disabled + '"></i> Edit</a>&nbsp;';
-
-                        buttons += '<a id="details' + row.id + '" href="Delete?Id=' + row.id + '" class="btn btn-xs btn-danger ' + disabled + '"><i class="fa fa-trash ' + disabled + '"></i> Delete </a>';
-                    }
+                    buttons += '<a id="details' + row.id + '" href="Delete?Id=' + row.id + '" class="btn btn-xs btn-danger ' + disabled + '"><i class="fa fa-trash ' + disabled + '"></i> Delete </a>';
 
                     return buttons;
                 }
@@ -250,11 +242,11 @@
                 $('.top-info').prop('disabled', false);
                 $('#allocatedcase').prop('disabled', false);
                 $('#deletecase').prop('disabled', false);
-                var pendingRows = hasPendingRows();
-                if (pendingRows) {
-                    table.ajax.reload(null, false);
-                    $('#checkall').prop('checked', false);
-                }
+                //var pendingRows = hasPendingRows();
+                //if (pendingRows) {
+                //    table.ajax.reload(null, false);
+                //    $('#checkall').prop('checked', false);
+                //}
             }
             else {
                 $('.top-info').prop('disabled', true);

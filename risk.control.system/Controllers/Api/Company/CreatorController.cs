@@ -35,18 +35,15 @@ namespace risk.control.system.Controllers.Api.Company
 
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment webHostEnvironment;
-        private readonly IManageCaseService manageCaseService;
         private readonly IClaimsService claimsService;
 
         public CreatorController(ApplicationDbContext context, 
             IWebHostEnvironment webHostEnvironment,
-            IManageCaseService manageCaseService,
             IClaimsService claimsService)
         {
             hindiNFO.CurrencySymbol = string.Empty;
             _context = context;
             this.webHostEnvironment = webHostEnvironment;
-            this.manageCaseService = manageCaseService;
             this.claimsService = claimsService;
         }
         

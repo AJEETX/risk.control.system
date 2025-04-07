@@ -140,7 +140,6 @@ namespace risk.control.system.Controllers.Api.Company
 
             // Fetch the company with necessary relationships
             var company = await _context.ClientCompany
-                .Include(c => c.CompanyApplicationUser)
                 .Include(c => c.EmpanelledVendors)
                     .ThenInclude(v => v.State)
                 .Include(c => c.EmpanelledVendors)

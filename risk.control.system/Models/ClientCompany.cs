@@ -78,8 +78,6 @@ namespace risk.control.system.Models
         public string? AddressMapLocation { get; set; }
         public string? AddressLatitude { get; set; }
         public string? AddressLongitude { get; set; }
-        public List<ClientCompanyApplicationUser>? CompanyApplicationUser { get; set; }
-
         public List<Vendor>? EmpanelledVendors { get; set; } = new();
         public bool AutoAllocation { get; set; } = false;
         public bool VerifyPan { get; set; } = false;
@@ -136,7 +134,6 @@ namespace risk.control.system.Models
                 $"- Activated Date: {ActivatedDate}\n" +
                 $"- Status: {Status}\n" +
                 $"- Document URL: {DocumentUrl}\n" +
-                $"- Company Application User: {CompanyApplicationUser}\n" +
                 $"- Empanelled Vendors: {EmpanelledVendors}\n" +
                 $"- Auto Allocation: {AutoAllocation}\n" +
                 $"- Verify Pan: {VerifyPan}\n" +

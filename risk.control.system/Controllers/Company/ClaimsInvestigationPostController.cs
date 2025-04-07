@@ -39,6 +39,7 @@ namespace risk.control.system.Controllers.Company
         private readonly ApplicationDbContext _context;
         private readonly IClaimsInvestigationService claimsInvestigationService;
         private readonly IMailboxService mailboxService;
+        private readonly IHttpContextAccessor httpContextAccessor;
         private readonly IProgressService progressService;
         private readonly INotyfService notifyService;
         private readonly IBackgroundJobClient backgroundJobClient;
@@ -47,6 +48,7 @@ namespace risk.control.system.Controllers.Company
             IClaimsInvestigationService claimsInvestigationService,
             IBackgroundJobClient backgroundJobClient,
             IMailboxService mailboxService,
+            IHttpContextAccessor httpContextAccessor,
             IProgressService progressService,
             INotyfService notifyService)
         {
@@ -54,6 +56,7 @@ namespace risk.control.system.Controllers.Company
             this.claimsInvestigationService = claimsInvestigationService;
             this.backgroundJobClient = backgroundJobClient;
             this.mailboxService = mailboxService;
+            this.httpContextAccessor = httpContextAccessor;
             this.progressService = progressService;
             this.notifyService = notifyService;
         }
@@ -71,12 +74,17 @@ namespace risk.control.system.Controllers.Company
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
+                var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
+                var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
+                var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
+
+
                 var distinctClaims = claims.Distinct().ToList();
 
                 // AUTO ALLOCATION COUNT
                 var allocatedClaims = await claimsInvestigationService.UpdateCaseAllocationStatus( currentUserEmail, distinctClaims);
 
-                var jobId = backgroundJobClient.Enqueue(() => claimsInvestigationService.BackgroundAutoAllocation(distinctClaims, currentUserEmail));
+                var jobId = backgroundJobClient.Enqueue(() => claimsInvestigationService.BackgroundAutoAllocation(distinctClaims, currentUserEmail, baseUrl));
                 progressService.AddAssignmentJob(jobId, currentUserEmail);
                 notifyService.Custom($"Case(s) Assignment started", 3, "orange", "far fa-file-powerpoint");
                 return RedirectToAction(nameof(ClaimsActiveController.Active), "ClaimsActive",new { jobId });
@@ -103,7 +111,11 @@ namespace risk.control.system.Controllers.Company
             try
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-                var allocatedCaseNumber = await claimsInvestigationService.ProcessAutoAllocation(claims, currentUserEmail);
+                var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
+                var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
+                var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
+
+                var allocatedCaseNumber = await claimsInvestigationService.ProcessAutoAllocation(claims, currentUserEmail, baseUrl);
                 if(string.IsNullOrWhiteSpace(allocatedCaseNumber))
                 {
                     notifyService.Custom($"Case #:{allocatedCaseNumber} Not Assigned", 3, "orange", "far fa-file-powerpoint");
@@ -133,9 +145,13 @@ namespace risk.control.system.Controllers.Company
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 var distinctClaims = claims.Distinct().ToList();
-                await claimsInvestigationService.AssignToAssigner(currentUserEmail, distinctClaims);
+                var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
+                var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
+                var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
 
-                backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimAssignmentToAssigner(currentUserEmail, distinctClaims));
+                await claimsInvestigationService.AssignToAssigner(currentUserEmail, distinctClaims,baseUrl);
+
+                var jobId = backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimAssignmentToAssigner(currentUserEmail, distinctClaims,baseUrl));
 
                 notifyService.Custom($"{claims.Count}/{claims.Count} case(s) Assigned", 3, "green", "far fa-file-powerpoint");
             }
@@ -173,8 +189,11 @@ namespace risk.control.system.Controllers.Company
 
                 var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == selectedcase);
 
-                backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimAllocationToVendor(currentUserEmail, policy, caseId, selectedcase));
-                //await mailboxService.NotifyClaimAllocationToVendor(currentUserEmail, policy.PolicyDetail.ContractNumber, caseId, selectedcase);
+                var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
+                var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
+                var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
+
+                backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimAllocationToVendor(currentUserEmail, policy, caseId, selectedcase, baseUrl));
 
                 notifyService.Custom($"Case #{policy} {status} to {vendor.Name}", 3, "green", "far fa-file-powerpoint");
 
@@ -204,8 +223,11 @@ namespace risk.control.system.Controllers.Company
                 }
 
                 var (company, vendorId) = await claimsInvestigationService.WithdrawCaseByCompany(currentUserEmail, model, claimId);
-               
-                backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimWithdrawlToCompany(currentUserEmail, claimId, vendorId));
+                var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
+                var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
+                var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
+
+                backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimWithdrawlToCompany(currentUserEmail, claimId, vendorId, baseUrl));
                 //await mailboxService.NotifyClaimWithdrawlToCompany(currentUserEmail, claimId);
 
                 notifyService.Custom($"Case #{policyNumber}  withdrawn successfully", 3, "green", "far fa-file-powerpoint");
@@ -252,7 +274,12 @@ namespace risk.control.system.Controllers.Company
 
                 var (company, contract) = await claimsInvestigationService.ProcessCaseReport(currentUserEmail, assessorRemarks, claimId, reportUpdateStatus, reportAiSummary);
 
-                backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimReportProcess(currentUserEmail, claimId));
+                var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
+                var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
+                var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
+
+
+                backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimReportProcess(currentUserEmail, claimId, baseUrl));
 
                 if (reportUpdateStatus == AssessorRemarkType.OK)
                 {
@@ -295,8 +322,11 @@ namespace risk.control.system.Controllers.Company
                 var reportUpdateStatus = AssessorRemarkType.REVIEW;
 
                 var (company, contract) = await claimsInvestigationService.ProcessCaseReport(currentUserEmail, assessorRemarks, claimId, reportUpdateStatus, reportAiSummary);
+                var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
+                var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
+                var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
 
-                backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimReportProcess(currentUserEmail, claimId));
+                backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimReportProcess(currentUserEmail, claimId, baseUrl));
 
                 return RedirectToAction(nameof(AssessorController.Assessor), "Assessor");
             }
@@ -330,8 +360,11 @@ namespace risk.control.system.Controllers.Company
                 if (model != null)
                 {
                     var company = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == currentUserEmail);
+                    var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
+                    var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
+                    var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
 
-                    backgroundJobClient.Enqueue(() => mailboxService.NotifySubmitQueryToAgency(currentUserEmail, claimId));
+                    backgroundJobClient.Enqueue(() => mailboxService.NotifySubmitQueryToAgency(currentUserEmail, claimId, baseUrl));
 
                     notifyService.Success("Query Sent to Agency");
                     return RedirectToAction(nameof(AssessorController.Assessor), "Assessor");

@@ -12,6 +12,7 @@ using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 
+using System.Buffers.Text;
 using System.Collections.Concurrent;
 using System.Data;
 using System.Linq;
@@ -22,7 +23,7 @@ namespace risk.control.system.Services
 {
     public interface IClaimsInvestigationService
     {
-        Task AssignToAssigner(string userEmail, List<string> claimsInvestigations);
+        Task AssignToAssigner(string userEmail, List<string> claimsInvestigations, string url ="");
         Task<List<string>> UpdateCaseAllocationStatus(string userEmail, List<string> claimsInvestigations);
 
         Task<(string, string)> AllocateToVendor(string userEmail, string claimsInvestigationId, long vendorId, bool AutoAllocated = true);
@@ -40,13 +41,13 @@ namespace risk.control.system.Services
 
         Task<Vendor> WithdrawCase(string userEmail, ClaimTransactionModel model, string claimId);
 
-        Task<string> ProcessAutoAllocation(string claim, string userEmail);
+        Task<string> ProcessAutoAllocation(string claim, string userEmail, string url = "");
         Task<(ClientCompany, long)> WithdrawCaseByCompany(string userEmail, ClaimTransactionModel model, string claimId);
         Task<bool> SubmitNotes(string userEmail, string claimId, string notes);
 
         Task<ClaimsInvestigation> SubmitQueryToAgency(string userEmail, string claimId, EnquiryRequest request, IFormFile messageDocument);
         Task<ClaimsInvestigation> SubmitQueryReplyToCompany(string userEmail, string claimId, EnquiryRequest request, IFormFile messageDocument, List<string> flexRadioDefault);
-        Task BackgroundAutoAllocation(List<string> claims, string userEmail);
+        Task BackgroundAutoAllocation(List<string> claims, string userEmail, string url="");
     }
 
     public class ClaimsInvestigationService : IClaimsInvestigationService
@@ -80,20 +81,20 @@ namespace risk.control.system.Services
             this.mailboxService = mailboxService;
             this.webHostEnvironment = webHostEnvironment;
         }
-        public async Task BackgroundAutoAllocation(List<string> claimIds, string userEmail)
+        public async Task BackgroundAutoAllocation(List<string> claimIds, string userEmail, string url = "")
         {
-            var autoAllocatedCases = await DoAutoAllocation(claimIds, userEmail); // Run all tasks in parallel
+            var autoAllocatedCases = await DoAutoAllocation(claimIds, userEmail, url); // Run all tasks in parallel
 
             var notAutoAllocated = claimIds.Except(autoAllocatedCases)?.ToList();
             
             if (claimIds.Count > autoAllocatedCases.Count)
             {
-                await AssignToAssigner(userEmail, notAutoAllocated);
+                await AssignToAssigner(userEmail, notAutoAllocated, url);
 
             }
-             await mailboxService.NotifyClaimAssignmentToAssigner(userEmail,autoAllocatedCases, notAutoAllocated);
+            var jobId = backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimAssignmentToAssigner(userEmail,autoAllocatedCases, notAutoAllocated, url));
         }
-        async Task<List<string>> DoAutoAllocation(List<string> claims, string userEmail)
+        async Task<List<string>> DoAutoAllocation(List<string> claims, string userEmail, string url = "")
         {
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == userEmail);
             var uploadedRecordsCount = 0;
@@ -158,8 +159,8 @@ namespace risk.control.system.Services
                 {
                     return null;
                 }
-
-                await mailboxService.NotifyClaimAllocationToVendor(userEmail, policy, claimsInvestigation.ClaimsInvestigationId, selectedVendorId.VendorId);
+                var jobId = backgroundJobClient.Enqueue(() => 
+                    mailboxService.NotifyClaimAllocationToVendor(userEmail, policy, claimsInvestigation.ClaimsInvestigationId, selectedVendorId.VendorId, url));
 
                 return claim; // Return allocated claim
             });
@@ -167,7 +168,7 @@ namespace risk.control.system.Services
             var results = await Task.WhenAll(claimTasks); // Run all tasks in parallel
             return results.Where(r => r != null).ToList(); // Remove nulls and return allocated claims
         }
-        public async Task<string> ProcessAutoAllocation(string claim, string userEmail)
+        public async Task<string> ProcessAutoAllocation(string claim, string userEmail, string url = "")
         {
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == userEmail);
 
@@ -225,13 +226,13 @@ namespace risk.control.system.Services
             if (string.IsNullOrEmpty(policy) || string.IsNullOrEmpty(status))
             {
                 await AssignToAssigner(userEmail, new List<string> { claim });
-                await mailboxService.NotifyClaimAssignmentToAssigner(userEmail, new List<string> { claim });
+                var job = backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimAssignmentToAssigner(userEmail, new List<string> { claim },url));
                 return null;
             }
 
             // 4. Send Notification in Background
-            backgroundJobClient.Enqueue(() =>
-                mailboxService.NotifyClaimAllocationToVendor(userEmail, policy, claimsInvestigation.ClaimsInvestigationId, selectedVendorId.VendorId));
+            var jobId = backgroundJobClient.Enqueue(() =>
+                mailboxService.NotifyClaimAllocationToVendor(userEmail, policy, claimsInvestigation.ClaimsInvestigationId, selectedVendorId.VendorId, url));
 
             return claimsInvestigation.PolicyDetail.ContractNumber; // Return allocated claim
         }
@@ -307,7 +308,7 @@ namespace risk.control.system.Services
 
         }
 
-        public async Task AssignToAssigner(string userEmail, List<string> claims)
+        public async Task AssignToAssigner(string userEmail, List<string> claims, string url = "")
         {
             if (claims is not null && claims.Count > 0)
             {
@@ -948,7 +949,6 @@ namespace risk.control.system.Services
             var currentUser = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
 
             var claimsCaseToReassign = _context.ClaimsInvestigation
-                .Include(c => c.PreviousClaimReports)
                 .Include(c => c.AgencyReport)
                 .Include(c => c.AgencyReport.DigitalIdReport)
                 .Include(c => c.AgencyReport.PanIdReport)
@@ -965,30 +965,6 @@ namespace risk.control.system.Services
             claimsCaseToReassign.AgencyReport.AssessorEmail = userEmail;
             var reAssigned = _context.InvestigationCaseSubStatus.FirstOrDefault(
                     i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER);
-            var saveReport = new PreviousClaimReport
-            {
-                ClaimsInvestigationId = claimsInvestigationId,
-                AgentEmail = claimsCaseToReassign.AgencyReport.AgentEmail,
-                DigitalIdReport = claimsCaseToReassign.AgencyReport.DigitalIdReport,
-                PanIdReport = claimsCaseToReassign.AgencyReport.PanIdReport,
-                AudioReport = claimsCaseToReassign.AgencyReport.AudioReport,
-                VideoReport = claimsCaseToReassign.AgencyReport.VideoReport,
-                PassportIdReport = claimsCaseToReassign.AgencyReport.PassportIdReport,
-                AgentRemarks = claimsCaseToReassign.AgencyReport.AgentRemarks,
-                AgentRemarksUpdated = claimsCaseToReassign.AgencyReport.AssessorRemarksUpdated,
-                AssessorEmail = claimsCaseToReassign.AgencyReport.AssessorEmail,
-                AssessorRemarks = claimsCaseToReassign.AgencyReport.AssessorRemarks,
-                AssessorRemarkType = claimsCaseToReassign.AgencyReport.AssessorRemarkType,
-                AssessorRemarksUpdated = claimsCaseToReassign.AgencyReport.AssessorRemarksUpdated,
-                ReportQuestionaire = claimsCaseToReassign.AgencyReport.ReportQuestionaire,
-                SupervisorEmail = claimsCaseToReassign.AgencyReport.SupervisorEmail,
-                SupervisorRemarks = claimsCaseToReassign.AgencyReport.SupervisorRemarks,
-                SupervisorRemarksUpdated = claimsCaseToReassign.AgencyReport.SupervisorRemarksUpdated,
-                SupervisorRemarkType = claimsCaseToReassign.AgencyReport.SupervisorRemarkType,
-                Updated = DateTime.Now,
-                UpdatedBy = userEmail,
-            };
-            var currentSavedReport = _context.PreviousClaimReport.Add(saveReport);
 
             var newReport = new AgencyReport
             {
@@ -997,7 +973,6 @@ namespace risk.control.system.Services
                 PassportIdReport = new DocumentIdReport(),
                 DigitalIdReport = new DigitalIdReport()
             };
-            claimsCaseToReassign.PreviousClaimReports.Add(saveReport);
             claimsCaseToReassign.AgencyReport.DigitalIdReport = new DigitalIdReport();
             claimsCaseToReassign.AgencyReport.PanIdReport = new DocumentIdReport();
             claimsCaseToReassign.AgencyReport.PassportIdReport = new DocumentIdReport();

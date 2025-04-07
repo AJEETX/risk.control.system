@@ -15,19 +15,11 @@ namespace risk.control.system.Data
         {
             base.OnModelCreating(builder);
         }
-        public virtual DbSet<CaseVerificationTransaction> CaseVerificationTransaction { get; set; }
-        public virtual DbSet<CaseVerification> CaseVerification { get; set; }
-        public virtual DbSet<SmsNotification> SmsNotifications { get; set; }
         public virtual DbSet<StatusNotification> Notifications { get; set; }
         public virtual DbSet<RefreshTokenEntity> RefreshTokens { get; set; }
-
         public virtual DbSet<UserSessionAlive> UserSessionAlive { get; set; }
-        public virtual DbSet<AgentDrivingMap> AgentDrivingMap { get; set; }
-        public virtual DbSet<ChatMessage> ChatMessage { get; set; }
-        public virtual DbSet<ImageDetails> ImageDetails { get; set; }
         public virtual DbSet<GlobalSettings> GlobalSettings { get; set; }
         public virtual DbSet<NumberSequence> NumberSequence { get; set; }
-        public virtual DbSet<IpAddress> IpAddress { get; set; }
         public virtual DbSet<IpApiResponse> IpApiResponse { get; set; }
         public virtual DbSet<AgencyRating> Ratings { get; set; }
         public virtual DbSet<ServiceReportTemplate> ServiceReportTemplate { get; set; }
@@ -36,14 +28,11 @@ namespace risk.control.system.Data
         public virtual DbSet<VendorInvoice> VendorInvoice { get; set; }
         public virtual DbSet<PermissionModule> PermissionModule { get; set; }
         public virtual DbSet<PermissionType> PermissionType { get; set; }
-        public virtual DbSet<UploadClaim> UploadClaim { get; set; }
-        public virtual DbSet<ClaimNote> ClaimNote { get; set; }
         public virtual DbSet<ClaimMessage> ClaimMessage { get; set; }
         public virtual DbSet<ApplicationUser> ApplicationUser { get; set; }
         public virtual DbSet<InvestigationTransaction> InvestigationTransaction { get; set; }
         public virtual DbSet<ClientCompanyApplicationUser> ClientCompanyApplicationUser { get; set; }
         public virtual DbSet<ApplicationRole> ApplicationRole { get; set; }
-        public virtual DbSet<InvestigationCase> InvestigationCase { get; set; }
 
         public virtual DbSet<LineOfBusiness> LineOfBusiness { get; set; }
 
@@ -54,13 +43,6 @@ namespace risk.control.system.Data
         public virtual DbSet<CaseEnabler> CaseEnabler { get; set; }
         public virtual DbSet<BeneficiaryRelation> BeneficiaryRelation { get; set; }
         public virtual DbSet<Country> Country { get; set; }
-        public virtual DbSet<InboxMessage> InboxMessage { get; set; }
-        public virtual DbSet<OutboxMessage> OutboxMessage { get; set; }
-        public virtual DbSet<SentMessage> SentMessage { get; set; }
-        public virtual DbSet<DraftMessage> DraftMessage { get; set; }
-        public virtual DbSet<TrashMessage> TrashMessage { get; set; }
-        public virtual DbSet<DeletedMessage> DeletedMessage { get; set; }
-        public virtual DbSet<FileAttachment> FileAttachment { get; set; }
         public virtual DbSet<State> State { get; set; }
         public virtual DbSet<District> District { get; set; }
         public virtual DbSet<PinCode> PinCode { get; set; }
@@ -71,11 +53,7 @@ namespace risk.control.system.Data
         public virtual DbSet<VendorInvestigationServiceType> VendorInvestigationServiceType { get; set; } = default!;
         public virtual DbSet<VendorApplicationUser> VendorApplicationUser { get; set; } = default!;
         public virtual DbSet<Mailbox> Mailbox { get; set; } = default!;
-        public virtual DbSet<AgencyReport> ClaimReport { get; set; } = default!;
         public virtual DbSet<EnquiryRequest> QueryRequest { get; set; } = default!;
-        public virtual DbSet<PreviousClaimReport> PreviousClaimReport { get; set; } = default!;
-
-        public virtual DbSet<FileOnDatabaseModel> FilesOnDatabase { get; set; }
         public virtual DbSet<FileOnFileSystemModel> FilesOnFileSystem { get; set; }
         public DbSet<ClaimsInvestigation> ClaimsInvestigation { get; set; } = default!;
         public DbSet<PolicyDetail> PolicyDetail { get; set; } = default!;

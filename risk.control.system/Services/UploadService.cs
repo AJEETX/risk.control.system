@@ -3,6 +3,9 @@ using System.Globalization;
 using System.IO.Compression;
 using System.Text.RegularExpressions;
 
+using CsvHelper;
+using CsvHelper.Configuration;
+
 using Microsoft.EntityFrameworkCore;
 
 using risk.control.system.AppConstant;
@@ -15,7 +18,7 @@ namespace risk.control.system.Services
     public interface IUploadService
     {
         Task<bool> DoUpload(ClientCompanyApplicationUser companyUser, string[] dataRows, CREATEDBY autoOrManual, ZipArchive archive, ORIGIN fileOrFtp, long lineOfBusinessId);
-        Task<int> PerformUpload(ClientCompanyApplicationUser companyUser, string[] dataRows, FileOnFileSystemModel model);
+        Task<int> PerformCustomUpload(ClientCompanyApplicationUser companyUser, List<UploadCase> customData, FileOnFileSystemModel model);
     }
     public class UploadService : IUploadService
     {
@@ -311,38 +314,26 @@ namespace risk.control.system.Services
             return beneficairy;
         }
 
-        public async Task<int> PerformUpload(ClientCompanyApplicationUser companyUser, string[] dataRows, FileOnFileSystemModel model)
+        public async Task<int> PerformCustomUpload(ClientCompanyApplicationUser companyUser, List<UploadCase> customData, FileOnFileSystemModel model)
         {
             try
             {
-                var uploadedRecordsCount = 0;
-                DataTable dt = new DataTable();
-                bool firstRow = true;
-                int totalCount = firstRow ? dataRows.Length -1 : dataRows.Length; // remove count for header records
-                foreach (string row in dataRows)
+                if (customData == null || customData.Count == 0)
                 {
-                    if (!string.IsNullOrEmpty(row))
+                    return 0; // Return 0 if no CSV data is found
+                }
+                var uploadedRecordsCount = 0;
+                var totalCount = customData.Count - 1;
+                foreach (var row in customData)
+                {
+                    var allGood = await _caseCreationService.PerformUpload(companyUser, row, model);
+                    if (!allGood)
                     {
-                        if (firstRow)
-                        {
-                            foreach (string cell in row.Split(','))
-                            {
-                                dt.Columns.Add(cell.Trim());
-                            }
-                            firstRow = false;
-                        }
-                        else
-                        {
-                            var allGood = await _caseCreationService.PerformUpload(companyUser, row, model, dt);
-                            if (!allGood)
-                            {
-                                return 0;
-                            }
-                            int progress = (int)(((uploadedRecordsCount + 1) / (double)totalCount) * 100);
-                            uploadProgressService.UpdateProgress(model.Id, progress);
-                            uploadedRecordsCount++;
-                        }
+                        return 0;
                     }
+                    int progress = (int)(((uploadedRecordsCount + 1) / (double)totalCount) * 100);
+                    uploadProgressService.UpdateProgress(model.Id, progress);
+                    uploadedRecordsCount++;
                 }
                 var rowsSaved = _context.SaveChanges() > 0;
                 return rowsSaved ? uploadedRecordsCount : 0;
@@ -353,48 +344,5 @@ namespace risk.control.system.Services
                 return 0;
             }
         }
-        public static List<(string FileName, byte[] ImageData)> GetImagesWithDataInSubfolder(byte[] zipData, string subfolderName)
-        {
-            List<(string FileName, byte[] ImageData)> images = new List<(string, byte[])>();
-
-            using (MemoryStream zipStream = new MemoryStream(zipData))
-            using (ZipArchive archive = new ZipArchive(zipStream, ZipArchiveMode.Read))
-            {
-                // Loop through each entry in the archive
-                foreach (var entry in archive.Entries)
-                {
-                    // Convert path to standard format (Windows)
-                    string folderPath = entry.FullName.Replace("/", "\\");
-
-                    // Check if the entry is inside the desired subfolder and is an image file
-                    if (folderPath.ToLower().Contains("\\" + subfolderName + "\\") && IsImageFile(entry.FullName))
-                    {
-                        // Extract image data
-                        using (MemoryStream imageStream = new MemoryStream())
-                        {
-                            using (Stream entryStream = entry.Open())
-                            {
-                                entryStream.CopyTo(imageStream);
-                            }
-
-                            // Add file name and byte array to the result list
-                            images.Add((entry.Name, imageStream.ToArray()));
-                        }
-                    }
-                }
-            }
-
-            return images;
-        }
-
-        private static bool IsImageFile(string filePath)
-        {
-            // Check if the file is an image based on file extension
-            string[] imageExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tiff", ".webp" };
-            string extension = Path.GetExtension(filePath)?.ToLower();
-            return imageExtensions.Contains(extension);
-        }
-
-
     }
 }

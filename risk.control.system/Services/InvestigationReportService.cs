@@ -18,9 +18,7 @@ namespace risk.control.system.Services
         Task<ClaimsInvestigation> GetAssignDetails(string id);
         EnquiryRequest GetQueryReport(string currentUserEmail, string id);
 
-        PreviousClaimReport GetPreviousReport(long id);
     }
-
     public class InvestigationReportService : IInvestigationReportService
     {
         private const string CLAIMS = "claims";
@@ -50,7 +48,6 @@ namespace risk.control.system.Services
               .Include(c => c.ClientCompany)
               .Include(c => c.AgencyReport)
                     .ThenInclude(c => c.EnquiryRequest)
-              .Include(c => c.PreviousClaimReports)
               .Include(c => c.AgencyReport.AgentIdReport)
               .Include(c => c.AgencyReport.DigitalIdReport)
               .Include(c => c.AgencyReport.PanIdReport)
@@ -160,7 +157,6 @@ namespace risk.control.system.Services
                 .Include(c => c.ClientCompany)
                 .Include(c => c.AgencyReport)
                     .ThenInclude(c => c.EnquiryRequest)
-              .Include(c => c.PreviousClaimReports)
               .Include(c => c.AgencyReport.DigitalIdReport)
               .Include(c => c.AgencyReport.PanIdReport)
               .Include(c => c.AgencyReport.PassportIdReport)
@@ -221,7 +217,6 @@ namespace risk.control.system.Services
                 .Include(c => c.ClientCompany)
                 .Include(c => c.AgencyReport)
                     .ThenInclude(c => c.EnquiryRequest)
-                  .Include(c => c.PreviousClaimReports)
                   .Include(c => c.AgencyReport.DigitalIdReport)
                   .Include(c => c.AgencyReport.PanIdReport)
                   .Include(c => c.AgencyReport.PassportIdReport)
@@ -292,7 +287,6 @@ namespace risk.control.system.Services
         {
             var claim = _context.ClaimsInvestigation
                 .Include(c => c.ClientCompany)
-                .Include(c => c.PreviousClaimReports)
                 .Include(c => c.AgencyReport)
                 .ThenInclude(c => c.EnquiryRequest)
                 .Include(c => c.AgencyReport)
@@ -373,21 +367,6 @@ namespace risk.control.system.Services
             }
             return (new ClaimsInvestigationVendorsModel { AgencyReport = claim.AgencyReport, Location = claimCase, ClaimsInvestigation = claim, 
                 TrialVersion = companyUser?.ClientCompany?.LicenseType == Standard.Licensing.LicenseType.Trial });
-        }
-
-        public PreviousClaimReport GetPreviousReport(long id)
-        {
-            var report = _context.PreviousClaimReport
-                .Include(r=>r.Vendor)
-                .Include(r=>r.ClaimsInvestigation)
-                .Include(r=>r.DigitalIdReport)
-                .Include(r=>r.PanIdReport)
-                .Include(r=>r.AudioReport)
-                .Include(r=>r.VideoReport)
-                .Include(r=>r.PassportIdReport)
-                .Include(r=>r.ReportQuestionaire)
-                .FirstOrDefault(r => r.PreviousClaimReportId == id);
-            return report;
         }
 
         public EnquiryRequest GetQueryReport(string currentUserEmail, string id)

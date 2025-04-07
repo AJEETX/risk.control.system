@@ -19,6 +19,7 @@ using risk.control.system.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Hangfire;
 using Amazon.Textract;
+using Microsoft.AspNetCore.Http;
 
 namespace risk.control.system.Controllers.Company
 {
@@ -33,6 +34,7 @@ namespace risk.control.system.Controllers.Company
         private readonly ICreatorService creatorService;
         private readonly IFtpService ftpService;
         private readonly INotyfService notifyService;
+        private readonly IHttpContextAccessor httpContextAccessor;
         private readonly IInvestigationReportService investigationReportService;
         private readonly IProgressService progressService;
         private readonly IBackgroundJobClient backgroundJobClient;
@@ -45,6 +47,7 @@ namespace risk.control.system.Controllers.Company
             ICreatorService creatorService,
             IFtpService ftpService,
             INotyfService notifyService,
+            IHttpContextAccessor httpContextAccessor,
             IInvestigationReportService investigationReportService,
             IProgressService progressService,
             IBackgroundJobClient backgroundJobClient,
@@ -58,6 +61,7 @@ namespace risk.control.system.Controllers.Company
             this.creatorService = creatorService;
             this.ftpService = ftpService;
             this.notifyService = notifyService;
+            this.httpContextAccessor = httpContextAccessor;
             this.investigationReportService = investigationReportService;
             this.progressService = progressService;
             this.backgroundJobClient = backgroundJobClient;
@@ -112,9 +116,12 @@ namespace risk.control.system.Controllers.Company
                 string jobId = "";
                 if (model.Uploadtype == UploadType.FILE)
                 {
-                    //backgroundJobClient.Enqueue(() => ftpService.UploadFile(currentUserEmail, postedFile, model.CREATEDBY, lineOfBusinessId));
+                    var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
+                    var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
+                    var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
+
                     uploadId = await ftpService.UploadFile(currentUserEmail, postedFile, model.CREATEDBY, lineOfBusinessId);
-                    jobId = backgroundJobClient.Enqueue(() => ftpService.StartUpload(currentUserEmail, uploadId));
+                    jobId = backgroundJobClient.Enqueue(() => ftpService.StartUpload(currentUserEmail, uploadId, baseUrl));
                     progressService.AddUploadJob(jobId, currentUserEmail);
                 }
 
