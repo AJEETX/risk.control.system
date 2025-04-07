@@ -22,7 +22,11 @@
         {
             className: 'max-width-column-name', // Apply the CSS class,
             targets: 8                      // Index of the column to style
-        }],
+            },
+            {
+                'targets': 16, // Index for the "Case Type" column
+                'name': 'policy' // Name for the "Case Type" column
+            }],
         order: [[15, 'asc']],
         fixedHeader: true,
         processing: true,
@@ -180,7 +184,8 @@
                     return buttons;
                 }
             },
-            { "data":"timeElapsed", bVisible: false}
+            { "data": "timeElapsed", bVisible: false },
+            { "data": "policy", bVisible: false }
         ],
         "drawCallback": function (settings, start, end, max, total, pre) {
 
@@ -203,7 +208,10 @@
         },
         error: function (xhr, status, error) { alert('err ' + error) }
     });
-
+    // Case Type Filter
+    $('#caseTypeFilter').on('change', function () {
+        table.column('policy:name').search(this.value).draw(); // Column index 9 corresponds to "Case Type"
+    });
     $('#refreshTable').click(function () {
         var $icon = $('#refreshIcon');
         if ($icon) {

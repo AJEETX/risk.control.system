@@ -1,45 +1,32 @@
 ﻿@model CreateClaims
 
-<div class="row">
-    <div class="col-md-6">
-        <div class="form-group">
-            <span class="input-group-label"> Upload Type:</span>
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <span class="input-group-text"><i class="fa fa-file-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                </div>
-                @if (Model.BulkUpload && Model.UserCanCreate)
-                {
-                    <select asp-for="Uploadtype" data-toggle="tooltip" title="Select upload type" name="uploadtype" id="uploadtype" required class="form-control remarks" asp-items="Html.GetEnumSelectList<UploadType>()">
-                        <option value="" title="SELECT">--- SELECT---</option>
-                    </select>
-                }
-                else
-                {
-                    <select disabled data-toggle="tooltip" title=" --- DISABLED --- "  class="form-control remarks">
-                        <option value="">--- DISABLED---</option>
-                    </select>
-                }
-            </div>
-        </div>
-    </div>
+<div class="container mt-3">
+    <!-- Refresh Button (Outside Form) -->
 
-    <div class="col-md-6">
-        <div class="form-group">
-            <span class="input-group-label"> Perform Upload: </span>
-            <div class="input-group mb-3">
-                <img class="form-Image" id="ftpImage" src="/img/upload.png">
-                @if (Model.BulkUpload && Model.UserCanCreate)
-                {
-                    <input accept=".zip" type="file" class="form-control remarks" name="postedFile" id="postedFile" data-toggle="tooltip" title="Select file to upload" required/>
-                    <button id="UploadFileButton" type="submit" class="btn btn-info upload"><i class="nav-icon fa fa-upload"></i> Upload</button>
-                }
-                else
-                {
-                    <input disabled type="file" class="form-control remarks" name="postedFile" id="postedFile" data-toggle="tooltip" title="--- DISABLED --- " />
-                    <button disabled class="btn btn-info"><i class="nav-icon fa fa-upload"></i> Upload</button>
-                }
-            </div>
+    <div class="row">
+        <div class="col-md-12">
+            <form id="upload-claims" asp-controller="CreatorPost" asp-action="New" method="post" enctype="multipart/form-data">
+                <div class="card shadow-lg border-1 rounded-lg p-3">
+
+                    <h5 class="mb-3">Case(s) Upload</h5>
+
+                    <input type="hidden" asp-for="CREATEDBY" value="@CREATEDBY.AUTO" />
+
+                    <div class="input-group">
+                        <span class="input-group-text fw-bold">Upload File:</span>
+
+                        <input accept=".zip" type="file" class="form-control remarks" name="postedFile" id="postedFile"
+                               data-toggle="tooltip" title="Select a ZIP file to upload"
+                        @(Model.BulkUpload && Model.UserCanCreate ? "" : "disabled") />
+
+                        <button id="UploadFileButton" type="submit" class="btn btn-info"
+                        @(Model.BulkUpload && Model.UserCanCreate ? "" : "disabled")>
+                            <i class="nav-icon fa fa-upload"></i> Upload
+                        </button>
+                    </div>
+
+                </div>
+            </form>
         </div>
     </div>
 </div>

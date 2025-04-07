@@ -170,7 +170,7 @@ namespace risk.control.system.Services
                 //ClaimType = (ClaimType.DEATH)Enum.Parse(typeof(ClaimType), rowData[3]?.Trim()),
                 InvestigationServiceTypeId = servicetype?.InvestigationServiceTypeId,
                 DateOfIncident = DateTime.ParseExact(uploadCase.IncidentDate, "dd-MM-yyyy", CultureInfo.InvariantCulture),
-                CauseOfLoss = uploadCase.Cause ?? "UNKNOWN",
+                CauseOfLoss = !string.IsNullOrWhiteSpace(uploadCase.Cause.Trim()) ? uploadCase.Cause.Trim() : "UNKNOWN",
                 CaseEnablerId = caseEnabler.CaseEnablerId,
                 CostCentreId = department.CostCentreId,
                 LineOfBusinessId = lineOfBusinessId,
@@ -263,7 +263,7 @@ namespace risk.control.system.Services
             }
             else
             {
-                uploadCase.CustomerDob = DateTime.Now.ToString("dd-MM-yyyy");
+                uploadCase.CustomerDob = DateTime.Now.AddYears(-20).ToString("dd-MM-yyyy");
             }
 
             if(!string.IsNullOrWhiteSpace(uploadCase.CustomerType) && Enum.TryParse(typeof(CustomerType), uploadCase.CustomerType, out var customerTypeEnum))
@@ -340,7 +340,7 @@ namespace risk.control.system.Services
             }
             else
             {
-                uploadCase.BeneficiaryDob = DateTime.Now.ToString("dd-MM-yyyy");
+                uploadCase.BeneficiaryDob = DateTime.Now.AddYears(-20).ToString("dd-MM-yyyy");
             }
             string noImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", BENEFICIARY_IMAGE);
             var beneficairy = new BeneficiaryDetail

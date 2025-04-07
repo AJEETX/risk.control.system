@@ -2594,3 +2594,11 @@ input#checkall {
     border-radius: 5px;
     transition: width 0.3s ease-in-out;
 }
+.custom-file-select {
+    padding: 10px;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    background-color: #f8f9fa;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+    font-size: 1rem;
+}
