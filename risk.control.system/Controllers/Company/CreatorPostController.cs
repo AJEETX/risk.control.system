@@ -75,7 +75,6 @@ namespace risk.control.system.Controllers.Company
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(c => c.Email == currentUserEmail);
-                var lineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == CLAIMS).LineOfBusinessId;
 
                 if (postedFile == null || model == null ||
                 string.IsNullOrWhiteSpace(Path.GetFileName(postedFile.FileName)) ||
@@ -103,53 +102,18 @@ namespace risk.control.system.Controllers.Company
                     }
                 }
 
-
-
-                //bool processed = false;
-                //if (model.Uploadtype == UploadType.FTP)
-                //{
-                //    //backgroundJobClient.Enqueue(() => ftpService.UploadFtpFile(currentUserEmail, postedFile, model.CREATEDBY, lineOfBusinessId));
-
-                //    processed = await ftpService.UploadFtpFile(currentUserEmail, postedFile, model.CREATEDBY, lineOfBusinessId);
-                //}
                 int uploadId = 0;
                 string jobId = "";
-                if (model.Uploadtype == UploadType.FILE)
-                {
-                    var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
-                    var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
-                    var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
+                var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
+                var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
+                var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
 
-                    uploadId = await ftpService.UploadFile(currentUserEmail, postedFile, model.CREATEDBY, lineOfBusinessId);
-                    jobId = backgroundJobClient.Enqueue(() => ftpService.StartUpload(currentUserEmail, uploadId, baseUrl));
-                    progressService.AddUploadJob(jobId, currentUserEmail);
-                }
+                uploadId = await ftpService.UploadFile(currentUserEmail, postedFile, model.CREATEDBY);
+                jobId = backgroundJobClient.Enqueue(() => ftpService.StartUpload(currentUserEmail, uploadId, baseUrl));
+                progressService.AddUploadJob(jobId, currentUserEmail);
 
-                notifyService.Custom($"{model.Uploadtype.GetEnumDisplayName()} in progress ", 3, "green", "fa fa-upload");
+                notifyService.Custom($"Upload in progress ", 3, "green", "fa fa-upload");
 
-                //if (processed)
-                //{
-                //    notifyService.Custom($"{model.Uploadtype.GetEnumDisplayName()} complete ", 3, "green", "fa fa-upload");
-                //}
-                //else
-                //{
-                //    notifyService.Information($"{model.Uploadtype.GetEnumDisplayName()} Error. Check limit <i class='fa fa-upload' ></i>", 3);
-                //}
-                //if (companyUser.ClientCompany.AutoAllocation)
-                //{
-                //    if (model.CREATEDBY == CREATEDBY.MANUAL)
-                //    {
-                //        return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
-                //    }
-                //    else
-                //    {
-                //        return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto",new { uploadId = uploadId });
-                //    }
-                //}
-                //else
-                //{
-                //    return RedirectToAction(nameof(CreatorManualController.New), "CreatorManual");
-                //}
                 return RedirectToAction(nameof(ClaimsLogController.Uploads), "ClaimsLog", new { uploadId = uploadId });
 
             }

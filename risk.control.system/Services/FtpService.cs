@@ -25,7 +25,7 @@ namespace risk.control.system.Services
 {
     public interface IFtpService
     {
-        Task<int> UploadFile(string userEmail, IFormFile postedFile, CREATEDBY autoOrManual,long lineOfBusinessId);
+        Task<int> UploadFile(string userEmail, IFormFile postedFile, CREATEDBY autoOrManual);
         Task StartUpload(string userEmail, int uploadId, string url);
 
         Task<bool> UploadFtpFile(string userEmail, IFormFile postedFile, CREATEDBY autoOrManual, long lineOfBusinessId);
@@ -153,7 +153,7 @@ namespace risk.control.system.Services
             return true;
         }
 
-        public async Task<int> UploadFile(string userEmail, IFormFile postedFile, CREATEDBY autoOrManual, long lineOfBusinessId)
+        public async Task<int> UploadFile(string userEmail, IFormFile postedFile, CREATEDBY autoOrManual)
         {
             string path = Path.Combine(webHostEnvironment.WebRootPath, "upload-file");
 

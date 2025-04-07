@@ -63,7 +63,11 @@
         {
             className: 'max-width-column-name', // Apply the CSS class,
             targets: 9                      // Index of the column to style
-        }],
+            },
+            {
+                'targets': 15, // Index for the "Case Type" column
+                'name': 'policy' // Name for the "Case Type" column
+            }],
         order: [[14, 'asc']],
         fixedHeader: true,
         processing: true,
@@ -225,6 +229,7 @@
                 }
             },
             { "data": "timeElapsed", bVisible: false },
+            { "data": "policy", bVisible: false }
         ],
         rowCallback: function (row, data) {
             if (data.isNewAssigned) {
@@ -275,7 +280,7 @@
         },
         error: function (xhr, status, error) { alert('err ' + error) }
     });
-
+    
     function hasAssignedRows() {
         var table = $("#customerTableAuto").DataTable();
         var assignedExists = false;
