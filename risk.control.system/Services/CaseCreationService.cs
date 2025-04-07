@@ -19,21 +19,34 @@ namespace risk.control.system.Services
     public class CaseCreationService : ICaseCreationService
     {
         private const string UNDERWRITING = "underwriting";
+        private const string POLICY_IMAGE = "policy.jpg";
+        private const string CUSTOMER_IMAGE = "customer.jpg";
+        private const string BENEFICIARY_IMAGE = "beneficiary.jpg";
         private const string CLAIMS = "claims";
         private readonly ApplicationDbContext _context;
         private readonly ICustomApiCLient customApiCLient;
+        private readonly IWebHostEnvironment webHostEnvironment;
         private readonly Regex regex = new Regex("\"(.*?)\"");
         private const string NO_DATA = "NO DATA";
-        public CaseCreationService(ApplicationDbContext context, ICustomApiCLient customApiCLient)
+        public CaseCreationService(ApplicationDbContext context, ICustomApiCLient customApiCLient, IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
             this.customApiCLient = customApiCLient;
+            this.webHostEnvironment = webHostEnvironment;
         }
 
         public async Task<bool> PerformUpload(ClientCompanyApplicationUser companyUser, UploadCase uploadCase,  FileOnFileSystemModel model)
         {
             try
             {
+                if(companyUser is null || uploadCase is null || model is null)
+                {
+                    return false;
+                }
+                if (!ValidateDataCase(uploadCase))
+                {
+                    return false;
+                }
                 var claimAdded = await AddCase(uploadCase, companyUser, model);
                 if(!claimAdded)
                 {
@@ -47,7 +60,24 @@ namespace risk.control.system.Services
                 return false;
             }
         }
-
+        private bool ValidateDataCase(UploadCase uploadCase)
+        {
+            if(string.IsNullOrWhiteSpace(uploadCase.CaseId) ||
+                string.IsNullOrWhiteSpace(uploadCase.CustomerName) ||
+                string.IsNullOrWhiteSpace(uploadCase.CustomerDob) ||
+                string.IsNullOrWhiteSpace(uploadCase.CustomerContact) ||
+                string.IsNullOrWhiteSpace(uploadCase.CustomerAddressLine) ||
+                string.IsNullOrWhiteSpace(uploadCase.CustomerPincode) ||
+                string.IsNullOrWhiteSpace(uploadCase.BeneficiaryName) ||
+                string.IsNullOrWhiteSpace(uploadCase.BeneficiaryDob) ||
+                string.IsNullOrWhiteSpace(uploadCase.BeneficiaryContact) ||
+                string.IsNullOrWhiteSpace(uploadCase.BeneficiaryAddressLine) ||
+                string.IsNullOrWhiteSpace(uploadCase.BeneficiaryPincode))
+            {
+                return false;
+            }
+            return true;
+        }
         private async Task<bool> AddCase(UploadCase uploadCase, ClientCompanyApplicationUser companyUser, FileOnFileSystemModel model)
         {
             string caseType = CLAIMS;
@@ -92,9 +122,7 @@ namespace risk.control.system.Services
 
 
 
-            var imagesWithData = GetImagesWithDataInSubfolder(model.ByteData, uploadCase.CaseId.ToLower());
-
-            var savedNewImage = imagesWithData.FirstOrDefault(s => s.FileName.ToLower().EndsWith("policy.jpg"));
+            var savedNewImage = GetImagesWithDataInSubfolder(model.ByteData, uploadCase.CaseId.ToLower(),POLICY_IMAGE);
 
             if(!string.IsNullOrWhiteSpace(uploadCase.Amount) && decimal.TryParse(uploadCase.Amount, out var amount))
             {
@@ -131,6 +159,8 @@ namespace risk.control.system.Services
                _context.CostCentre.FirstOrDefault() :
                _context.CostCentre.FirstOrDefault(c => c.Code.ToLower() == uploadCase.Department.Trim().ToLower())
                ?? _context.CostCentre.FirstOrDefault();
+            
+            string noImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", POLICY_IMAGE);
 
             claim.PolicyDetail = new PolicyDetail
             {
@@ -140,11 +170,11 @@ namespace risk.control.system.Services
                 //ClaimType = (ClaimType.DEATH)Enum.Parse(typeof(ClaimType), rowData[3]?.Trim()),
                 InvestigationServiceTypeId = servicetype?.InvestigationServiceTypeId,
                 DateOfIncident = DateTime.ParseExact(uploadCase.IncidentDate, "dd-MM-yyyy", CultureInfo.InvariantCulture),
-                CauseOfLoss = uploadCase.Cause,
+                CauseOfLoss = uploadCase.Cause ?? "UNKNOWN",
                 CaseEnablerId = caseEnabler.CaseEnablerId,
                 CostCentreId = department.CostCentreId,
                 LineOfBusinessId = lineOfBusinessId,
-                DocumentImage = savedNewImage.ImageData,
+                DocumentImage = savedNewImage ?? File.ReadAllBytes(noImagePath),
                 Updated = DateTime.Now,
                 UpdatedBy = companyUser.Email
             };
@@ -192,8 +222,7 @@ namespace risk.control.system.Services
             {
                 return null;
             }
-            var imagesWithData = GetImagesWithDataInSubfolder(data, uploadCase.CaseId.ToLower());
-            var customerNewImage = imagesWithData.FirstOrDefault(s => s.FileName.ToLower().EndsWith("customer.jpg"));
+            var imagesWithData = GetImagesWithDataInSubfolder(data, uploadCase.CaseId.ToLower(), CUSTOMER_IMAGE);
             if (!string.IsNullOrWhiteSpace(uploadCase.Gender) && Enum.TryParse(typeof(Gender), uploadCase.Gender, out var gender)) 
             {
                 uploadCase.Gender = gender.ToString();
@@ -245,6 +274,7 @@ namespace risk.control.system.Services
             {
                 uploadCase.CustomerType = CustomerType.UNKNOWN.ToString();
             }
+            string noImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", CUSTOMER_IMAGE);
 
             var customerDetail = new CustomerDetail
             {
@@ -262,7 +292,7 @@ namespace risk.control.system.Services
                 StateId = pinCode.StateId,
                 DistrictId = pinCode.DistrictId,
                 //Description = rowData[20]?.Trim(),
-                ProfilePicture = customerNewImage.ImageData,
+                ProfilePicture = imagesWithData,
                 UpdatedBy = companyUser.Email,
                 Updated = DateTime.Now
             };
@@ -295,8 +325,7 @@ namespace risk.control.system.Services
                 ? _context.BeneficiaryRelation.FirstOrDefault()  // Get first record from the table
                 : _context.BeneficiaryRelation.FirstOrDefault(b => b.Code.ToLower() == uploadCase.Relation.ToLower())
                 ?? _context.BeneficiaryRelation.FirstOrDefault();  // Get matching record
-            var imagesWithData = GetImagesWithDataInSubfolder(data, uploadCase.CaseId.ToLower());
-            var beneficiaryNewImage = imagesWithData.FirstOrDefault(s => s.FileName.ToLower().EndsWith("beneficiary.jpg"));
+            var beneficiaryNewImage = GetImagesWithDataInSubfolder(data, uploadCase.CaseId.ToLower(), BENEFICIARY_IMAGE);
             if (!string.IsNullOrWhiteSpace(uploadCase.BeneficiaryIncome) && Enum.TryParse(typeof(Income), uploadCase.BeneficiaryIncome, out var incomeEnum))
             {
                 uploadCase.BeneficiaryIncome = incomeEnum.ToString();
@@ -313,6 +342,7 @@ namespace risk.control.system.Services
             {
                 uploadCase.BeneficiaryDob = DateTime.Now.ToString("dd-MM-yyyy");
             }
+            string noImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", BENEFICIARY_IMAGE);
             var beneficairy = new BeneficiaryDetail
             {
                 Name = uploadCase.BeneficiaryName,
@@ -325,7 +355,7 @@ namespace risk.control.system.Services
                 DistrictId = pinCode.District.DistrictId,
                 StateId = pinCode.State.StateId,
                 CountryId = pinCode.Country.CountryId,
-                ProfilePicture = beneficiaryNewImage.ImageData,
+                ProfilePicture = beneficiaryNewImage,
                 Updated = DateTime.Now,
                 UpdatedBy = companyUser.Email
             };
@@ -347,7 +377,7 @@ namespace risk.control.system.Services
             return beneficairy;
         }
 
-        public static List<(string FileName, byte[] ImageData)> GetImagesWithDataInSubfolder(byte[] zipData, string subfolderName)
+        public static  byte[] GetImagesWithDataInSubfolder(byte[] zipData, string subfolderName, string filename = "")
         {
             List<(string FileName, byte[] ImageData)> images = new List<(string, byte[])>();
 
@@ -378,7 +408,12 @@ namespace risk.control.system.Services
                 }
             }
 
-            return images;
+            var image =  images.FirstOrDefault(i=> i.FileName == filename);
+            if(image.ImageData != null)
+            {
+                return image.ImageData;
+            }
+            return null;
         }
 
         private static bool IsImageFile(string filePath)

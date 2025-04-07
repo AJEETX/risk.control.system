@@ -307,6 +307,10 @@ function showedit(id) {
 }
 
 function checkJobStatus(jobId) {
+    if (!jobId) {
+        console.error("Invalid jobId provided.");
+        return;
+    }
     $.ajax({
         url: '/ClaimsActive/GetJobStatus?jobId=' + jobId,
         type: 'GET',
@@ -315,14 +319,23 @@ function checkJobStatus(jobId) {
 
             if (response.status === "Processing" || response.status === "Enqueued") {
                 setTimeout(function () {
-                    checkJobStatus(jobId);
-                }, 2000); // Check every 5 seconds
-            } else if (response.status === "Completed") {
+                    checkJobStatus(jobId); // Continue polling every 2 sec
+                }, 2000);
+            } else if (response.status === "Completed" || response.status === "Succeeded") {
                 console.log("Job Completed:", response.status);
-                $('#refreshTable').click(); // Refresh the table after completion
-            }
-            else {
-                console.log("Job has Issue as neither completed nor Processing/Enqueued:", response.status);
+                    $('#refreshTable').click(); // Refresh the table after completion
+            } else {
+                console.warn("Job has an issue:", response.status);
+                $.confirm({
+                    title: 'Job Error',
+                    content: 'The job is in an unexpected state: ' + response.status + '. Refresh the table?',
+                    buttons: {
+                        OK: function () {
+                            // Refresh the table when OK is clicked
+                            $('#refreshTable').click();
+                        }
+                    }
+                });
             }
         },
         error: function (xhr, status, error) {
@@ -330,4 +343,15 @@ function checkJobStatus(jobId) {
         }
     });
 }
+
+window.addEventListener('beforeunload', function () {
+    // Check if there is a query string
+    if (window.location.search) {
+        // Create the URL without the query string
+        var newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+
+        // Replace the URL in the browser without the query string
+        window.history.replaceState({}, document.title, newUrl);
+    }
+});
 

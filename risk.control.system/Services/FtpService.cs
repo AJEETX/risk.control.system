@@ -233,6 +233,7 @@ namespace risk.control.system.Services
             return uploadData.Entity.Id;
         }
 
+        [AutomaticRetry(Attempts = 0)]
         public async Task StartUpload(string userEmail, int uploadId, string url)
         {
             var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(c => c.Email == userEmail);

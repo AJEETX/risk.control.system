@@ -32,6 +32,7 @@
         public static readonly string REVERRSE_GEOCODING = "f2a54c0ec9ba4dfdbd450116509c6313";
 
         public static readonly string IP_SITE = "http://ip-api.com/json/";
+        public static readonly string DEFAULT_POLICY_IMAGE = "policy-design.png";
         public static readonly string NO_POLICY_IMAGE = "/img/no-policy.jpg";
         public static readonly string POLICY_BLANK_IMAGE = "/img/blank-document.png";
         public static readonly string NO_PHOTO_IMAGE = "/img/no-photo.png";

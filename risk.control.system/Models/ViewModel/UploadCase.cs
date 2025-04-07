@@ -11,7 +11,6 @@
         public string IncidentDate { get; set; }
         public string? Cause { get; set; }
         public string? Department { get; set; }
-        public string? CaseDocument { get; set; }
         public string CustomerName { get; set; }
         public string? CustomerType { get; set; }
         public string? Gender { get; set; }

@@ -98,6 +98,7 @@ namespace risk.control.system.Controllers.Company
             using (var connection = JobStorage.Current.GetConnection())
             {
                 var state = connection.GetStateData(jobId);
+
                 string jobStatus = state?.Name ?? "Not Found";
 
                 return Json(new { jobId, status = jobStatus });

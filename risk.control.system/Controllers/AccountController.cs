@@ -113,6 +113,21 @@ namespace risk.control.system.Controllers
             }
         }
 
+        [HttpPost]
+        public async Task<IActionResult> KeepAlive()
+        {
+            var userId = _userManager.GetUserId(User);
+            if (userId != null)
+            {
+                var user = await _userManager.FindByIdAsync(userId);
+                if (user != null)
+                {
+                    user.LastActivityDate = DateTime.UtcNow;
+                    await _userManager.UpdateAsync(user);
+                }
+            }
+            return Ok();
+        }
         [HttpGet]
         public async Task StreamTypingUpdates(string email, CancellationToken cancellationToken)
         {

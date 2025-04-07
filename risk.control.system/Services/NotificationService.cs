@@ -635,7 +635,7 @@ namespace risk.control.system.Services
                 role = context.ApplicationRole.FirstOrDefault(r => r.Name == companyUser.Role.ToString());
                 company = context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
 
-                var notifications = context.Notifications.Where(n => n.Role == role && n.Company == company && (!n.IsReadByCreator || !n.IsReadByManager || !n.IsReadByAssessor));
+                var notifications = context.Notifications.Where(n => n.Company == company && (!n.IsReadByCreator || !n.IsReadByManager || !n.IsReadByAssessor));
                 if (role.Name == AppRoles.ASSESSOR.ToString())
                 {
                     notifications = notifications.Where(n => n.Role == role  && !n.IsReadByAssessor);
@@ -660,7 +660,6 @@ namespace risk.control.system.Services
                 agency = context.Vendor.FirstOrDefault(c => c.VendorId == vendorUser.VendorId);
                 
                 var notifications = context.Notifications.Where(n => n.Agency == agency && (!n.IsReadByVendor || !n.IsReadByVendorAgent));
-                var notificationsss = context.Notifications.Where(n => n.Agency == agency && (!n.IsReadByVendor || !n.IsReadByVendorAgent)).ToList();
 
                 if (role.Name == AppRoles.AGENT.ToString())
                 {

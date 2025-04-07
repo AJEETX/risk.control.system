@@ -90,7 +90,7 @@
                         console.log("Status is still Processing, continuing to poll...");
                     }
                     // If status is Completed, stop polling and update the row
-                    else if (updatedRowData.data.status === "Completed") {
+                    else if (updatedRowData.data.status === "Completed" || updatedRowData.data.status === "Failed") {
                         console.log("Status is Completed, stopping polling and updating row.");
                         clearInterval(pollingTimer); // Stop polling
                         updateProcessingRow(uploadId, updatedRowData.data); // Update the row with completed data

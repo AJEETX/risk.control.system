@@ -125,7 +125,7 @@ namespace risk.control.system.Controllers.Api.Company
                     Policy = a.PolicyDetail?.LineOfBusiness.Name,
                     Status = a.STATUS.GetEnumDisplayName(),
                     SubStatus = a.InvestigationCaseSubStatus.Name,
-                    Ready2Assign = a.IsReady2Assign,
+                    Ready2Assign = a.IsReady2Assign && a.CustomerDetail?.ProfilePicture != null && a.BeneficiaryDetail.ProfilePicture != null,
                     ServiceType = $"{a.PolicyDetail?.LineOfBusiness.Name} ( {a.PolicyDetail.InvestigationServiceType.Name})",
                     Service = a.PolicyDetail.InvestigationServiceType.Name,
                     Location = a.ORIGIN.GetEnumDisplayName(),

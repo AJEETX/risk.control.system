@@ -81,6 +81,7 @@ namespace risk.control.system.Services
             this.mailboxService = mailboxService;
             this.webHostEnvironment = webHostEnvironment;
         }
+        [AutomaticRetry(Attempts = 0)]
         public async Task BackgroundAutoAllocation(List<string> claimIds, string userEmail, string url = "")
         {
             var autoAllocatedCases = await DoAutoAllocation(claimIds, userEmail, url); // Run all tasks in parallel
