@@ -85,9 +85,9 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var isPending = row.status === "PENDING"; // Check if status is "READY"
-                    if (isPending) {
-                        return '<i class="fas fa-exclamation-triangle" data-toggle="tooltip" title="Processing ,,,"></i>';
-                    }
+                    //if (isPending) {
+                    //    return '<i class="fas fa-exclamation-triangle" data-toggle="tooltip" title="Processing ,,,"></i>';
+                    //}
                     if (row.ready2Assign && row.autoAllocated) {
                         var img = '<input class="vendors" name="claims" type="checkbox" id="' + row.id + '"  value="' + row.id + '"  data-toggle="tooltip" title="Ready to assign(auto)" />';
                         return img;

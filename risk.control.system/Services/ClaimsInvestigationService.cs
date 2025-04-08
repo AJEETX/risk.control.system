@@ -24,7 +24,7 @@ namespace risk.control.system.Services
     public interface IClaimsInvestigationService
     {
         Task AssignToAssigner(string userEmail, List<string> claimsInvestigations, string url ="");
-        Task<List<string>> UpdateCaseAllocationStatus(string userEmail, List<string> claimsInvestigations);
+        Task<int> UpdateCaseAllocationStatus(string userEmail, List<string> claimsInvestigations);
 
         Task<(string, string)> AllocateToVendor(string userEmail, string claimsInvestigationId, long vendorId, bool AutoAllocated = true);
 
@@ -1374,21 +1374,42 @@ namespace risk.control.system.Services
             return timeElapsed;
         }
 
-        public async Task<List<string>> UpdateCaseAllocationStatus(string userEmail, List<string> claimsInvestigations)
+        public async Task<int> UpdateCaseAllocationStatus(string userEmail, List<string> claimsInvestigations)
         {
-            var cases = new List<ClaimsInvestigation>();
-            foreach (var claimsInvestigationId in claimsInvestigations)
+            try
             {
-                var claimsCase = await _context.ClaimsInvestigation
-                .FirstOrDefaultAsync(v => v.ClaimsInvestigationId == claimsInvestigationId);
-                claimsCase.STATUS = ALLOCATION_STATUS.PENDING;
-                claimsCase.UpdatedBy = userEmail;
-                claimsCase.Updated = DateTime.Now;
-                cases.Add(claimsCase);
+                if (claimsInvestigations == null || !claimsInvestigations.Any())
+                    return 0; // No cases to update
+
+                // Fetch all matching cases in one query
+                var cases = await _context.ClaimsInvestigation
+                    .Where(v => claimsInvestigations.Contains(v.ClaimsInvestigationId))
+                    .ToListAsync();
+
+                if (!cases.Any())
+                    return 0; // No matching cases found
+
+                // Update the status only for cases that are not already PENDING
+                foreach (var claimsCase in cases)
+                {
+                    if (claimsCase.STATUS != ALLOCATION_STATUS.PENDING)
+                    {
+                        claimsCase.STATUS = ALLOCATION_STATUS.PENDING;
+                        claimsCase.UpdatedBy = userEmail;
+                        claimsCase.Updated = DateTime.Now;
+                    }
+                }
+
+                _context.ClaimsInvestigation.UpdateRange(cases);
+                return await _context.SaveChangesAsync();
             }
-            _context.ClaimsInvestigation.UpdateRange(cases);
-            await _context.SaveChangesAsync();
-            return claimsInvestigations;
+            catch (Exception ex)
+            {
+                // Log the error properly instead of just rethrowing
+                Console.WriteLine("Error updating case allocation status", ex);
+                throw;
+            }
         }
+
     }
 }

@@ -66,27 +66,31 @@ namespace risk.control.system.Controllers.Company
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AssignAuto(List<string> claims)
         {
-            if (claims == null || claims.Count == 0)
-            {
-                notifyService.Custom($"No Case selected!!!. Please select Case to be assigned.", 3, "red", "far fa-file-powerpoint");
-                return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
-            }
+            
             try
             {
+                if (claims == null || claims.Count == 0)
+                {
+                    notifyService.Custom($"No Case selected!!!. Please select Case to be assigned.", 3, "red", "far fa-file-powerpoint");
+                    return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
+                }
+                
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
                 var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
                 var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
                 var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
-
-
-                var distinctClaims = claims.Distinct().ToList();
-
+                
                 // AUTO ALLOCATION COUNT
-                var allocatedClaims = await claimsInvestigationService.UpdateCaseAllocationStatus( currentUserEmail, distinctClaims);
-
+                var distinctClaims = claims.Distinct().ToList();
+                var affectedRows = await claimsInvestigationService.UpdateCaseAllocationStatus( currentUserEmail, distinctClaims);
+                if(affectedRows <= distinctClaims.Count)
+                {
+                    notifyService.Custom($"Case(s) assignment error", 3, "orange", "far fa-file-powerpoint");
+                    return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
+                }
                 var jobId = backgroundJobClient.Enqueue(() => claimsInvestigationService.BackgroundAutoAllocation(distinctClaims, currentUserEmail, baseUrl));
                 progressService.AddAssignmentJob(jobId, currentUserEmail);
-                notifyService.Custom($"Case(s) Assignment started", 3, "orange", "far fa-file-powerpoint");
+                notifyService.Custom($"Assignment of {distinctClaims.Count} Case(s) started", 3, "orange", "far fa-file-powerpoint");
                 return RedirectToAction(nameof(ClaimsActiveController.Active), "ClaimsActive",new { jobId });
             }
             catch (Exception ex)
@@ -103,10 +107,10 @@ namespace risk.control.system.Controllers.Company
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AssignAutoSingle(string claims)
         {
-            if (claims == null)
+            if (claims == null || string.IsNullOrWhiteSpace(claims))
             {
                 notifyService.Custom($"No case selected!!!. Please select case to be assigned.", 3, "red", "far fa-file-powerpoint");
-                return RedirectToAction(nameof(CreatorManualController.New), "CreatorManual");
+                return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
             }
             try
             {
@@ -127,7 +131,7 @@ namespace risk.control.system.Controllers.Company
             {
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(CreatorManualController.New), "CreatorManual");
+                return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
             }
             return RedirectToAction(nameof(ClaimsActiveController.Active), "ClaimsActive");
         }
@@ -252,7 +256,7 @@ namespace risk.control.system.Controllers.Company
             {
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(CreatorManualController.New), "CreatorManual");
+                return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
             }
         }
 

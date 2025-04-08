@@ -73,46 +73,27 @@ namespace risk.control.system.Controllers.Company
         {
             try
             {
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-                var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(c => c.Email == currentUserEmail);
-
                 if (postedFile == null || model == null ||
                 string.IsNullOrWhiteSpace(Path.GetFileName(postedFile.FileName)) ||
                 string.IsNullOrWhiteSpace(Path.GetExtension(Path.GetFileName(postedFile.FileName))) ||
                 Path.GetExtension(Path.GetFileName(postedFile.FileName)) != ".zip"
                 )
                 {
-                    notifyService.Custom($"Upload Error. Contact Admin", 3, "red", "far fa-file-powerpoint");
-                        return RedirectToAction(nameof(Index), "Dashboard");
-
-                    if (companyUser.ClientCompany.AutoAllocation)
-                    {
-                        if(model.CREATEDBY == CREATEDBY.MANUAL)
-                        {
-                            return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
-                        }
-                        else
-                        {
-                            return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
-                        }
-                    }
-                    else
-                    {
-                        return RedirectToAction(nameof(CreatorManualController.New), "CreatorManual");
-                    }
+                    notifyService.Custom($"Invalid File Upload Error. ", 3, "red", "far fa-file-powerpoint");
+                    return RedirectToAction(nameof(ClaimsLogController.Uploads), "ClaimsLog");
                 }
 
-                int uploadId = 0;
-                string jobId = "";
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                
                 var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
                 var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
                 var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
 
-                uploadId = await ftpService.UploadFile(currentUserEmail, postedFile, model.CREATEDBY);
-                jobId = backgroundJobClient.Enqueue(() => ftpService.StartUpload(currentUserEmail, uploadId, baseUrl));
+                var uploadId = await ftpService.UploadFile(currentUserEmail, postedFile, model.CREATEDBY);
+                var jobId = backgroundJobClient.Enqueue(() => ftpService.StartUpload(currentUserEmail, uploadId, baseUrl));
                 progressService.AddUploadJob(jobId, currentUserEmail);
 
-                notifyService.Custom($"Upload in progress ", 3, "green", "fa fa-upload");
+                notifyService.Custom($"Upload in progress ", 3, "orange", "fa fa-upload");
 
                 return RedirectToAction(nameof(ClaimsLogController.Uploads), "ClaimsLog", new { uploadId = uploadId });
 
@@ -121,7 +102,7 @@ namespace risk.control.system.Controllers.Company
             {
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Custom($"File Upload Error.", 3, "red", "fa fa-upload");
-                return RedirectToAction(nameof(Index), "Dashboard");
+                return RedirectToAction(nameof(ClaimsLogController.Uploads), "ClaimsLog");
             }
         }
 
@@ -183,7 +164,7 @@ namespace risk.control.system.Controllers.Company
                 {
                     notifyService.Error("OOPs !!!..Incomplete/Invalid input");
 
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return RedirectToAction(nameof(CreatorAutoController.Create), "CreatorAuto");
                 }
                 var files = Request.Form?.Files;
                 if (files == null || files.Count == 0)
@@ -195,17 +176,21 @@ namespace risk.control.system.Controllers.Company
                 if (file == null)
                 {
                     notifyService.Warning("Image Uploaded Error !!! ");
-                    return RedirectToAction(nameof(Index), "Dashboard");
+                    return RedirectToAction(nameof(CreatorAutoController.Create), "CreatorAuto");
                 }
-                
+
                 var claim = await creationService.CreatePolicy(currentUserEmail, model, file);
                 if (claim == null)
                 {
-                    notifyService.Error("OOPs !!!..Error creating policy");
                     if (claim.ClientCompany.AutoAllocation)
-                    {
-                        return RedirectToAction(nameof(CreatorAutoController.Create), "CreatorAuto");
-                    }
+                        if (model.CREATEDBY == CREATEDBY.AUTO)
+                        {
+                            return RedirectToAction(nameof(CreatorAutoController.Create), "CreatorAuto");
+                        }
+                    else
+                        {
+                        return RedirectToAction(nameof(CreatorManualController.Create), "CreatorManual");
+                        }
                     else
                     {
                         return RedirectToAction(nameof(CreatorManualController.Create), "CreatorManual");

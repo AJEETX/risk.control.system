@@ -1,4 +1,15 @@
 ﻿$(document).ready(function () {
+    // Initially disable the upload button
+    $("#UploadFileButton").prop("disabled", true);
+
+    // Enable button only when a file is selected
+    $("#postedFile").on("change", function () {
+        if ($(this).val()) {
+            $("#UploadFileButton").prop("disabled", false);
+        } else {
+            $("#UploadFileButton").prop("disabled", true);
+        }
+    });
     var uploadId = $('#uploadId').val();
     var table = $('#customerTableAuto').DataTable({
         "ajax": {
@@ -90,7 +101,7 @@
                         console.log("Status is still Processing, continuing to poll...");
                     }
                     // If status is Completed, stop polling and update the row
-                    else if (updatedRowData.data.status === "Completed" || updatedRowData.data.status === "Failed") {
+                    else if (updatedRowData.data.status === "Completed" || updatedRowData.data.status === 'Error') {
                         console.log("Status is Completed, stopping polling and updating row.");
                         clearInterval(pollingTimer); // Stop polling
                         updateProcessingRow(uploadId, updatedRowData.data); // Update the row with completed data
@@ -188,68 +199,6 @@
         table.ajax.reload(null, false);
     });
     
-    //var refreshInterval = 5000; // 3 seconds interval
-    //var maxAttempts = 5; // Prevent infinite loop
-    //var attempts = 0;
-    //var initialCount = sessionStorage.getItem("InitialUploadCount");
-
-    //// Check if a refresh is needed after upload
-    //var refreshDatatble = sessionStorage.getItem("RefreshDataTableCount");
-    //if (sessionStorage.getItem("RefreshDataTableCount") == "RefreshDataTableCount") {
-    //    if (initialCount === null) {
-    //        initialCount = table.data().count(); // Save the current record count
-    //        sessionStorage.setItem("InitialUploadCount", initialCount);
-    //    } else {
-    //        initialCount = parseInt(initialCount, 10); // Convert to number
-    //    }
-    //    pollForNewData();
-    //    sessionStorage.removeItem("RefreshDataTableCount"); // Clear the refresh flag
-    //}
-
-    //// Function to check if there are any "Pending" rows
-    //function hasPendingRows() {
-    //    var pendingExists = false;
-
-    //    table.rows().every(function () {
-    //        var data = this.data();
-    //        var rowNode = this.node(); // Get the row element
-
-    //        if (data.status === "Processing" && data.id == uploadId) {
-    //            // Apply watermark effect
-    //            $(rowNode).addClass("watermark-row");
-
-    //            // You can also add an overlay text dynamically
-    //            //$(rowNode).append('<div class="watermark-text">Processing...</div>');
-    //            pendingExists = true;
-    //            return false; // Stop iterating once a "Pending" row is found
-    //        }
-    //    });
-
-    //    return pendingExists;
-    //}
-    //function pollForNewData() {
-    //    attempts++;
-
-    //    if (attempts > maxAttempts) {
-    //        console.log("Max attempts reached, stopping refresh.");
-    //        sessionStorage.removeItem("InitialUploadCount"); // Clean up
-    //        return;
-    //    }
-
-    //    console.log("Refreshing DataTable... Attempt: " + attempts);
-
-    //    table.ajax.reload(function () {
-    //        var newCount = table.data().count(); // Get updated row count
-
-    //        if (newCount == initialCount && !hasPendingRows()) {
-    //            console.log("No New records detected! Stopping refresh.");
-    //            sessionStorage.removeItem("InitialUploadCount"); // Clean up
-    //        } else {
-    //            setTimeout(pollForNewData, refreshInterval);
-    //            initialCount= newCount;
-    //        }
-    //    }, false);
-    //}
     $("#postedFile").on('change', function () {
         var MaxSizeInBytes = 1097152;
         //Get count of selected files
@@ -321,7 +270,6 @@
         }
     });
     let askFileUploadConfirmation = true;
-    let askConfirmation = false;
 
     function handleUploadConfirmation(formId, buttonId) {
         $(formId).on('submit', function (event) {
@@ -372,20 +320,3 @@
     // Apply confirmation to both forms
     handleUploadConfirmation("#upload-claims", "#UploadFileButton");
 });
-
-function setRefreshCountFlag() {
-    var table = $('#customerTableAuto').DataTable();
-    sessionStorage.setItem("InitialUploadCount", table.data().count()); // Save count before reload
-    sessionStorage.setItem("RefreshDataTableCount", 'RefreshDataTableCount');
-    console.log('stored data')
-}
-// Function to format time elapsed
-function formatTimeElapsed(seconds) {
-    if (seconds < 60) return `${seconds} sec ago`;
-    let minutes = Math.floor(seconds / 60);
-    if (minutes < 60) return `${minutes} min ago`;
-    let hours = Math.floor(minutes / 60);
-    if (hours < 24) return `${hours} hr ago`;
-    let days = Math.floor(hours / 24);
-    return `${days} day${days > 1 ? 's' : ''} ago`;
-}

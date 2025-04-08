@@ -125,7 +125,7 @@ namespace risk.control.system.Controllers.Api.Company
                     Policy = a.PolicyDetail?.LineOfBusiness.Name,
                     Status = a.STATUS.GetEnumDisplayName(),
                     SubStatus = a.InvestigationCaseSubStatus.Name,
-                    Ready2Assign = a.IsReady2Assign && a.CustomerDetail?.ProfilePicture != null && a.BeneficiaryDetail.ProfilePicture != null,
+                    Ready2Assign = IsValidCaseData(a),
                     ServiceType = $"{a.PolicyDetail?.LineOfBusiness.Name} ( {a.PolicyDetail.InvestigationServiceType.Name})",
                     Service = a.PolicyDetail.InvestigationServiceType.Name,
                     Location = a.ORIGIN.GetEnumDisplayName(),
@@ -145,6 +145,61 @@ namespace risk.control.system.Controllers.Api.Company
                 .ToList();
 
             return Ok(response);
+        }
+
+        private bool IsValidCaseData(ClaimsInvestigation claim)
+        {
+            var valiPolicy = IsValidCase(claim.PolicyDetail);
+            var valiCustomer = IsValidCustomer(claim.PolicyDetail, claim.CustomerDetail);
+            var valiBeneficiary = IsValidBeneficiary(claim.PolicyDetail, claim.BeneficiaryDetail);
+            return IsValidCase(claim.PolicyDetail) &&
+                IsValidCustomer(claim.PolicyDetail, claim.CustomerDetail) &&
+                IsValidBeneficiary(claim.PolicyDetail, claim.BeneficiaryDetail);
+        }
+        private bool IsValidCase(PolicyDetail policyDetail)
+        {
+            return policyDetail != null && policyDetail != null &&
+               !string.IsNullOrWhiteSpace(policyDetail.ContractNumber.Trim()) &&
+                policyDetail.LineOfBusiness != null &&
+                policyDetail.InvestigationServiceType != null &&
+               !string.IsNullOrWhiteSpace(policyDetail.CauseOfLoss) &&
+                policyDetail.SumAssuredValue != null &&
+                policyDetail.SumAssuredValue > 0 &&
+                DateTime.Now > policyDetail.ContractIssueDate &&
+                policyDetail.ContractIssueDate != null &&
+                policyDetail.DateOfIncident != null &&
+                policyDetail.DateOfIncident > policyDetail.ContractIssueDate &&
+                policyDetail.CaseEnabler != null &&
+                policyDetail.CostCentre != null ;
+        }
+        private bool IsValidCustomer(PolicyDetail policyDetail, CustomerDetail customerDetail)
+        {
+            return customerDetail != null && 
+               !string.IsNullOrWhiteSpace(customerDetail.Name) &&
+                customerDetail.DateOfBirth != null &&
+                policyDetail.ContractIssueDate > (customerDetail.DateOfBirth.GetValueOrDefault())&& 
+               !string.IsNullOrWhiteSpace(customerDetail.ContactNumber) &&
+                customerDetail.ContactNumber.Length == 10 &&
+                customerDetail.PinCode != null &&
+                customerDetail.District != null &&
+                customerDetail.State != null &&
+                customerDetail.Country != null &&
+                !string.IsNullOrWhiteSpace(customerDetail.Addressline) &&
+                customerDetail.ProfilePicture != null;
+        }
+        private bool IsValidBeneficiary(PolicyDetail policyDetail, BeneficiaryDetail beneficiaryDetail)
+        {
+            return beneficiaryDetail != null &&
+                !string.IsNullOrWhiteSpace(beneficiaryDetail.Name) &&
+                beneficiaryDetail.DateOfBirth != null &&
+                policyDetail.ContractIssueDate > (beneficiaryDetail.DateOfBirth.GetValueOrDefault()) &&
+                !string.IsNullOrWhiteSpace(beneficiaryDetail.ContactNumber) &&
+                beneficiaryDetail.ContactNumber.Length == 10 &&
+                beneficiaryDetail.PinCode != null &&
+                beneficiaryDetail.District != null &&
+                beneficiaryDetail.State != null &&
+                beneficiaryDetail.Country != null &&
+                !string.IsNullOrWhiteSpace(beneficiaryDetail.Addressline);
         }
 
         [Authorize(Roles = $"{CREATOR.DISPLAY_NAME}")]
