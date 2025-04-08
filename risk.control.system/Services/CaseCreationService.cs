@@ -191,7 +191,7 @@ namespace risk.control.system.Services
             // Get the results
             var customer = await customerTask;
             var beneficiary = await beneficiaryTask;
-            if (customer is null  || !policyDetail.IsValidCustomer(customer)|| beneficiary is null || !policyDetail.IsValidBeneficiary(beneficiary))
+            if (customer is null  || !policyDetail.IsValidCustomerForUpload(customer)|| beneficiary is null || !policyDetail.IsValidBeneficiaryForUpload(beneficiary))
             {
                 return false;
             }

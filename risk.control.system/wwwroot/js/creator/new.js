@@ -103,9 +103,9 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var isPending = row.status === "PENDING"; // Check if status is "READY"
-                    //if (isPending) {
-                    //    return '<i class="fas fa-exclamation-triangle" data-toggle="tooltip" title="Processing ,,,"></i>';
-                    //}
+                    if (isPending || !row.ready2Assign) {
+                        return '<i class="fas fa-exclamation-triangle" data-toggle="tooltip" title="Incomplete/ Or Any issue"></i>';
+                    }
                     if (row.ready2Assign && row.autoAllocated) {
                         var img = '<input class="vendors" name="claims" type="checkbox" id="' + row.id + '"  value="' + row.id + '"  data-toggle="tooltip" title="Ready to assign/delete" />';
                         return img;
@@ -267,17 +267,20 @@
             var rowCount = (this.fnSettings().fnRecordsTotal()); // total number of rows
             if (rowCount > 0 && hasAssignedRows()) {
                 $('.top-info').prop('disabled', false);
-                $('#allocatedcase').prop('disabled', false);
-                //var pendingRows = hasPendingRows();
-                //if (pendingRows) {
-                //    table.ajax.reload(null, false);
-                //    $('#checkall').prop('checked', false);
-                //}
+                var pendingRows = hasPendingRows();
+                if (!pendingRows) {
+                    $('#allocatedcase').prop('disabled', false);
+                }
+                else {
+                    $('.top-info').prop('disabled', true);
+                    $('#allocatedcase').prop('disabled', true);
+                }
             }
             else {
                 $('.top-info').prop('disabled', true);
                 $('#allocatedcase').prop('disabled', true);
             }
+            
             $('#customerTableAuto tbody').on('click', '.btn-info', function (e) {
                 e.preventDefault(); // Prevent the default anchor behavior
                 var id = $(this).attr('id').replace('assign', ''); // Extract the ID from the button's ID attribute

@@ -144,10 +144,7 @@ namespace risk.control.system.Services
             {
                 var claimsInvestigation = await context.ClaimsInvestigation.Include(c => c.PolicyDetail)
                    .FirstOrDefaultAsync(c => c.ClaimsInvestigationId == customerDetail.ClaimsInvestigationId);
-                if (!claimsInvestigation.PolicyDetail.IsValidCustomer(customerDetail))
-                {
-                    return null;
-                }
+                
                 var currentUser = context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
                 if (customerDocument is not null)
                 {
@@ -196,10 +193,7 @@ namespace risk.control.system.Services
             {
                 var claimsInvestigation = await context.ClaimsInvestigation.Include(c => c.PolicyDetail)
                     .FirstOrDefaultAsync(c => c.ClaimsInvestigationId == customerDetail.ClaimsInvestigationId);
-                if (!claimsInvestigation.PolicyDetail.IsValidCustomer(customerDetail))
-                {
-                    return null;
-                }
+                
                 var currentUser = context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
 
                 if (customerDocument is not null)
@@ -272,10 +266,7 @@ namespace risk.control.system.Services
                 }
                 var claimsInvestigation = await context.ClaimsInvestigation.Include(c => c.PolicyDetail)
                     .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == ClaimsInvestigationId);
-                if(!claimsInvestigation.PolicyDetail.IsValidBeneficiary(beneficiary))
-                {
-                    return null;
-                }
+               
                 claimsInvestigation.AutoNew = 0;
                 claimsInvestigation.Updated = DateTime.Now;
                 claimsInvestigation.IsReady2Assign = true;
@@ -317,10 +308,7 @@ namespace risk.control.system.Services
             {
                 var claimsInvestigation = await context.ClaimsInvestigation.Include(c => c.PolicyDetail)
                     .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == beneficiary.ClaimsInvestigationId);
-                if (!claimsInvestigation.PolicyDetail.IsValidBeneficiary(beneficiary))
-                {
-                    return null;
-                }
+                
                 var currentUser = context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
                 if (customerDocument is not null)
                 {

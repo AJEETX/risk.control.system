@@ -42,7 +42,51 @@ namespace risk.control.system.Helpers
                 !string.IsNullOrWhiteSpace(customerDetail.Addressline) &&
                 customerDetail.ProfilePicture != null;
         }
+        public static bool IsValidCustomerForUpload(this PolicyDetail policyDetail, CustomerDetail customerDetail)
+        {
+            return customerDetail != null &&
+               !string.IsNullOrWhiteSpace(customerDetail.Name) &&
+                customerDetail.DateOfBirth != null &&
+                policyDetail.ContractIssueDate > (customerDetail.DateOfBirth.GetValueOrDefault()) &&
+               !string.IsNullOrWhiteSpace(customerDetail.ContactNumber) &&
+                customerDetail.ContactNumber.Length >= 9 &&
+                customerDetail.PinCodeId > 0 &&
+                customerDetail.DistrictId > 0 &&
+                customerDetail.StateId > 0 &&
+                customerDetail.CountryId > 0 &&
+                !string.IsNullOrWhiteSpace(customerDetail.Addressline);
+        }
+        public static bool IsValidFormCustomer(this PolicyDetail policyDetail, CustomerDetail customerDetail)
+        {
+            return customerDetail != null &&
+               !string.IsNullOrWhiteSpace(customerDetail.Name) &&
+                customerDetail.DateOfBirth != null &&
+                policyDetail.ContractIssueDate > (customerDetail.DateOfBirth.GetValueOrDefault()) &&
+               !string.IsNullOrWhiteSpace(customerDetail.ContactNumber) &&
+                customerDetail.ContactNumber.Length >= 9 &&
+                customerDetail.SelectedPincodeId > 0 &&
+                customerDetail.SelectedDistrictId > 0 &&
+                customerDetail.SelectedCountryId > 0 &&
+                customerDetail.SelectedStateId > 0 &&
+                !string.IsNullOrWhiteSpace(customerDetail.Addressline) &&
+                customerDetail.ProfilePicture != null;
+        }
         public static bool IsValidBeneficiary(this PolicyDetail policyDetail, BeneficiaryDetail beneficiaryDetail)
+        {
+            return beneficiaryDetail != null &&
+                !string.IsNullOrWhiteSpace(beneficiaryDetail.Name) &&
+                beneficiaryDetail.DateOfBirth != null &&
+                policyDetail.ContractIssueDate > (beneficiaryDetail.DateOfBirth.GetValueOrDefault()) &&
+                !string.IsNullOrWhiteSpace(beneficiaryDetail.ContactNumber) &&
+                beneficiaryDetail.ContactNumber.Length >= 9 &&
+                beneficiaryDetail.PinCodeId > 0 &&
+                beneficiaryDetail.DistrictId > 0 &&
+                beneficiaryDetail.StateId > 0 &&
+                beneficiaryDetail.CountryId > 0 &&
+                !string.IsNullOrWhiteSpace(beneficiaryDetail.Addressline) &&
+                beneficiaryDetail.ProfilePicture != null;
+        }
+        public static bool IsValidBeneficiaryForUpload(this PolicyDetail policyDetail, BeneficiaryDetail beneficiaryDetail)
         {
             return beneficiaryDetail != null &&
                 !string.IsNullOrWhiteSpace(beneficiaryDetail.Name) &&
