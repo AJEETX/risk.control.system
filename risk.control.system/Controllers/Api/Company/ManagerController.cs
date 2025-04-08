@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Authorization;
 using static risk.control.system.AppConstant.Applicationsettings;
 using risk.control.system.Controllers.Api.Claims;
 using Microsoft.AspNetCore.Hosting;
+using System.Linq.Expressions;
 
 namespace risk.control.system.Controllers.Api.Company
 {
@@ -162,7 +163,7 @@ namespace risk.control.system.Controllers.Api.Company
 
 
         [HttpGet("GetActive")]
-        public async Task<IActionResult> GetActive()
+        public async Task<IActionResult> GetActive(int draw, int start, int length, string search = "", string caseType = "", int orderColumn = 0, string orderDir = "asc")
         {
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
             if (string.IsNullOrEmpty(userEmail))
@@ -203,44 +204,63 @@ namespace risk.control.system.Controllers.Api.Company
             if (createdStatus == null || assignedToAssignerStatus == null || replyToAssessorStatus == null || submittedToAssessorStatus == null)
                 return BadRequest("Some required case substatuses are missing.");
 
-            var claims = _context.ClaimsInvestigation
-                .Include(a => a.ClientCompany)
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(p => p.InvestigationServiceType)
-                .Include(a => a.PolicyDetail)
-                .ThenInclude(a => a.LineOfBusiness)
-                .Include(c => c.InvestigationCaseSubStatus)
-                .Include(c => c.InvestigationCaseStatus)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(p => p.PinCode)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(p => p.District)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(p => p.State)
-                .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(p => p.PinCode)
-                .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(p => p.District)
-                .Include(c => c.BeneficiaryDetail)
-                .ThenInclude(p => p.State)
+            var query = claimsService.GetClaims()
                 .Where(a => a.ClientCompanyId == companyUser.ClientCompanyId)
                 .Where(a => openStatusesIds.Contains(a.InvestigationCaseStatusId))
                 .Where(a => a.InvestigationCaseSubStatusId != createdStatus.InvestigationCaseSubStatusId)
                 .Where(a => a.InvestigationCaseSubStatusId != assignedToAssignerStatus.InvestigationCaseSubStatusId)
                 .Where(a => a.InvestigationCaseSubStatusId != replyToAssessorStatus.InvestigationCaseSubStatusId)
                 .Where(a => a.InvestigationCaseSubStatusId != submittedToAssessorStatus.InvestigationCaseSubStatusId);
+            // Search filtering
+            if (!string.IsNullOrEmpty(search))
+            {
+                search = search.ToLower();
+                query = query.Where(a =>
+                    a.PolicyDetail.ContractNumber.ToLower().Contains(search) ||
+                    a.CustomerDetail.DateOfBirth.ToString().ToLower().Contains(search) ||
+                    a.CustomerDetail.ContactNumber.ToLower().Contains(search) ||
+                    a.CustomerDetail.PinCode.Code.ToLower().Contains(search) ||
+                    a.CustomerDetail.PinCode.Name.ToLower().Contains(search) ||
+                    a.CustomerDetail.Addressline.ToLower().Contains(search) ||
+                    a.BeneficiaryDetail.Name.ToLower().Contains(search) ||
+                    a.BeneficiaryDetail.Addressline.ToLower().Contains(search) ||
+                    a.BeneficiaryDetail.ContactNumber.ToLower().Contains(search));
+            }
+            if (!string.IsNullOrEmpty(caseType))
+            {
+                query = query.Where(c => c.PolicyDetail.LineOfBusiness.Name.ToLower() == caseType);  // Assuming CaseType is the field in your data model
+            }
 
+            // Sorting
+            var columnMapping = new Dictionary<int, Expression<Func<ClaimsInvestigation, object>>>
+                {
+                    { 1, a => a.PolicyDetail.ContractNumber },
+                    { 2, a => a.PolicyDetail.SumAssuredValue },
+                    { 3, a => a.CustomerDetail.Name },
+                    { 4, a => a.InvestigationCaseSubStatus.Name },
+                    { 5, a => a.Created }
+                };
+
+            if (columnMapping.ContainsKey(orderColumn))
+            {
+                if (orderDir.ToLower() == "asc")
+                    query = query.OrderBy(columnMapping[orderColumn]);
+                else
+                    query = query.OrderByDescending(columnMapping[orderColumn]);
+            }
+            var data = query.ToList();
+            int totalRecords = query.Count(); // Get total count before pagination
+
+            var pagedData = query.Skip(start).Take(length).ToList();
             var newClaims = new List<ClaimsInvestigation>();
-            var claimsSubmitted = new List<ClaimsInvestigation>();
 
-            foreach (var claim in claims)
+            foreach (var claim in query)
             {
                 claim.ManagerActiveView += 1;
                 if (claim.ManagerActiveView <= 1)
                 {
                     newClaims.Add(claim);
                 }
-                claimsSubmitted.Add(claim);
             }
 
             if (newClaims.Any())
@@ -250,8 +270,13 @@ namespace risk.control.system.Controllers.Api.Company
             }
 
             var underWritingLineOfBusiness = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == UNDERWRITING).LineOfBusinessId;
-            var response = claimsSubmitted
-                .Select(a => new ClaimsInvestigationResponse
+
+            var response = new
+            {
+                draw = draw,
+                recordsTotal = totalRecords,
+                recordsFiltered = totalRecords,
+                data = pagedData.Select(a => new
                 {
                     Id = a.ClaimsInvestigationId,
                     AutoAllocated = a.AutoAllocated,
@@ -291,10 +316,11 @@ namespace risk.control.system.Controllers.Api.Company
                         : a.BeneficiaryDetail.Name,
                     TimeElapsed = DateTime.Now.Subtract(a.Created).TotalSeconds,
                     IsNewAssigned = a.ManagerActiveView <= 1,
-                    PersonMapAddressUrl = a.GetMapUrl(a.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness,a.InvestigationCaseSubStatus == assignedToAssignerStatus,
+                    PersonMapAddressUrl = a.GetMapUrl(a.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness, a.InvestigationCaseSubStatus == assignedToAssignerStatus,
                                                       a.InvestigationCaseSubStatus == submittedToAssessorStatus)
                 })
-                .ToList();
+            };
+            
 
             return Ok(response);
         }

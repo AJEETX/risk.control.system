@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
+using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 
@@ -162,7 +163,7 @@ namespace risk.control.system.Services
             
             string noImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", POLICY_IMAGE);
 
-            claim.PolicyDetail = new PolicyDetail
+            var policyDetail = new PolicyDetail
             {
                 ContractNumber = uploadCase.CaseId,
                 SumAssuredValue = Convert.ToDecimal(uploadCase.Amount),
@@ -178,6 +179,11 @@ namespace risk.control.system.Services
                 Updated = DateTime.Now,
                 UpdatedBy = companyUser.Email
             };
+            if(!policyDetail.IsValidPolicy())
+            {
+                return false;
+            }
+            claim.PolicyDetail = policyDetail;
             var customerTask = AddCustomer(companyUser, uploadCase, model.ByteData);
             var beneficiaryTask = AddBeneficiary(companyUser, uploadCase, model.ByteData);
             await Task.WhenAll(customerTask, beneficiaryTask);
@@ -185,15 +191,13 @@ namespace risk.control.system.Services
             // Get the results
             var customer = await customerTask;
             var beneficiary = await beneficiaryTask;
-            if (customer is null || beneficiary is null)
+            if (customer is null  || !policyDetail.IsValidCustomer(customer)|| beneficiary is null || !policyDetail.IsValidBeneficiary(beneficiary))
             {
                 return false;
             }
-            customer.ClaimsInvestigationId = claim.ClaimsInvestigationId;
-            beneficiary.ClaimsInvestigationId = claim.ClaimsInvestigationId;
+            claim.CustomerDetail = customer;
+            claim.BeneficiaryDetail = beneficiary;
 
-            _context.CustomerDetail.Add(customer);
-            _context.BeneficiaryDetail.Add(beneficiary);
             _context.ClaimsInvestigation.Add(claim);
             var log = new InvestigationTransaction
             {

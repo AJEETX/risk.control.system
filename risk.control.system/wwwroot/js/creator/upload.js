@@ -69,23 +69,13 @@
             var $row = $(row);
 
             if (data.status === "Processing" && data.id == uploadId) {
-                // Disable the anchor tags for this row
-                $(row).find('a').on('click', function (e) {
-                    e.preventDefault();
-                    $(this).addClass('disabled'); // Disable pointer events
-                });
-                $(row).find('button').on('click', function (e) {
-                    $(this).prop('disabled', true); // Disables the button
-                });
-                $row.addClass('row-opacity-50 watermark-row'); // Make row semi-transparent with watermark
-
-                startPolling(data.id);  // Pass the uploadId or row ID
-
+                // Start polling function
+                startPolling(data.id);
             } else {
-                $row.removeClass('row-opacity-50 watermark-row'); // Remove styling for other statuses
-
+               
             }
         }
+
     });
     var pollingTimer;
 

@@ -5,7 +5,25 @@ $(document).ready(function () {
     var table  = $("#customerTable").DataTable({
         ajax: {
             url: '/api/Manager/GetActive',
-            dataSrc: ''
+            type: 'GET',
+            dataType: 'json',
+            data: function (d) {
+                console.log("Data before sending:", d); // Debugging
+
+                return {
+                    draw: d.draw || 1,
+                    start: d.start || 0,
+                    length: d.length || 10,
+                    caseType: $('#caseTypeFilter').val() || "",  // Send selected filter value
+                    search: d.search?.value || "", // Instead of empty string, send "all"
+                    orderColumn: d.order?.[13]?.column ?? 0,
+                    orderDir: d.order?.[0]?.dir || "asc"
+                };
+            },
+            error: function (xhr, status, error) {
+                console.error("AJAX Error:", status, error);
+                console.error("Response:", xhr.responseText);
+            }
         },
         columnDefs: [
             {
@@ -28,9 +46,11 @@ $(document).ready(function () {
                 'targets': 15, // Index for the "Case Type" column
                 'name': 'policy' // Name for the "Case Type" column
             }],
-        order: [[12, 'desc']],
+        order: [[13, 'asc']],
+        responsive: true,
         fixedHeader: true,
         processing: true,
+        serverSide: true,
         paging: true,
         language: {
             loadingRecords: '&nbsp;',
@@ -194,7 +214,7 @@ $(document).ready(function () {
     });
 
     $('#caseTypeFilter').on('change', function () {
-        table.column('policy:name').search(this.value).draw(); // Column index 9 corresponds to "Case Type"
+        table.ajax.reload(); // Reload the table when the filter is changed
     });
     table.on('xhr.dt', function () {
         $('#refreshIcon').removeClass('fa-spin');

@@ -156,22 +156,12 @@ namespace risk.control.system.Services
         public async Task<int> UploadFile(string userEmail, IFormFile postedFile, CREATEDBY autoOrManual)
         {
             string path = Path.Combine(webHostEnvironment.WebRootPath, "upload-file");
-
-            // Ensure the directory exists
             if (!Directory.Exists(path))
             {
                 Directory.CreateDirectory(path);
             }
-
-            // Use the actual file name instead of a temp file name
             string filePath = Path.Combine(path, Path.GetFileName(postedFile.FileName));
 
-            //using (FileStream stream = new FileStream(filePath, FileMode.Create))
-            //{
-            //    postedFile.CopyTo(stream);
-            //}
-
-            // If you need the file as bytes:
             byte[] byteData;
             using (MemoryStream ms = new MemoryStream())
             {
@@ -179,26 +169,6 @@ namespace risk.control.system.Services
                 byteData = ms.ToArray();
             }
 
-            // filePath now contains the saved file location
-
-            //using (var stream = postedFile.OpenReadStream())
-            //{
-            //    using (var archive = new ZipArchive(stream))
-            //    {
-            //        var csvFileCount = archive.Entries.Count(e => Path.GetExtension(e.FullName).Equals(".csv"));
-            //        var innerFile = archive.Entries.FirstOrDefault(e => Path.GetExtension(e.FullName).Equals(".csv"));
-            //        if (innerFile == null || csvFileCount != 1)
-            //        {
-            //            return false;
-            //        }
-            //        var processed = await ProcessFile(userEmail, archive, autoOrManual, ORIGIN.FILE, lineOfBusinessId);
-            //        if (!processed)
-            //        {
-            //            return false;
-            //        }
-
-            //    }
-            //}
             var uploadId = await SaveUpload(postedFile, filePath, "File upload", userEmail, byteData, autoOrManual, ORIGIN.FILE);
             return uploadId;
         }
@@ -236,44 +206,50 @@ namespace risk.control.system.Services
         [AutomaticRetry(Attempts = 0)]
         public async Task StartUpload(string userEmail, int uploadId, string url)
         {
-            var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(c => c.Email == userEmail);
-            var uploadFileData = await _context.FilesOnFileSystem.FirstOrDefaultAsync(f => f.Id == uploadId && f.CompanyId == companyUser.ClientCompanyId && f.UploadedBy == userEmail && !f.Deleted);
-            var customData = ReadFirstCsvFromZipToObject(uploadFileData.ByteData); // Read the first CSV file from the ZIP archive
-            var totalClaimsCreated = await _context.ClaimsInvestigation.CountAsync(c => !c.Deleted && c.ClientCompanyId == companyUser.ClientCompanyId);
-            var totalIncludingUploaded = totalClaimsCreated + customData.Count - 1;
-            var userCanCreate = true;
-            if (companyUser.ClientCompany.LicenseType == Standard.Licensing.LicenseType.Trial)
+            try
             {
-                if (totalClaimsCreated >= companyUser.ClientCompany.TotalCreatedClaimAllowed)
+                var companyUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(c => c.Email == userEmail);
+                var uploadFileData = await _context.FilesOnFileSystem.FirstOrDefaultAsync(f => f.Id == uploadId && f.CompanyId == companyUser.ClientCompanyId && f.UploadedBy == userEmail && !f.Deleted);
+                var customData = ReadFirstCsvFromZipToObject(uploadFileData.ByteData); // Read the first CSV file from the ZIP archive
+                var totalClaimsCreated = await _context.ClaimsInvestigation.CountAsync(c => !c.Deleted && c.ClientCompanyId == companyUser.ClientCompanyId);
+                var totalIncludingUploaded = totalClaimsCreated + customData.Count - 1;
+                var userCanCreate = true;
+                if (companyUser.ClientCompany.LicenseType == Standard.Licensing.LicenseType.Trial)
                 {
-                    userCanCreate = false;
+                    if (totalClaimsCreated >= companyUser.ClientCompany.TotalCreatedClaimAllowed)
+                    {
+                        userCanCreate = false;
+                    }
                 }
-            }
-            else {
-                userCanCreate = companyUser.ClientCompany.TotalCreatedClaimAllowed >= totalIncludingUploaded;
-            }
-            if (userCanCreate)
-            {
-                var uploadedCount = await uploadService.PerformCustomUpload(companyUser, customData, uploadFileData);
-                if(uploadedCount > 0)
+                if (userCanCreate)
                 {
-                    uploadFileData.Completed = true;
-                    uploadFileData.Icon = "fas fa-check-circle i-green";
-                    uploadFileData.Status = "Completed";
-                    uploadFileData.Message = $"Total cases uploaded : {uploadedCount}";
-                    uploadFileData.RecordCount = uploadedCount;
-                }
-                else
-                {
-                    uploadFileData.Completed = false;
-                    uploadFileData.Icon = "fas fa-times-circle i-orangered";
-                    uploadFileData.Status = "Error";
-                    uploadFileData.Message = "Error uploading the file";
-                }
-                var jobId = backgroundJobClient.Enqueue(() => mailboxService.NotifyFileUpload(userEmail, uploadFileData, url));
+                    var uploadedCount = await uploadService.PerformCustomUpload(companyUser, customData, uploadFileData);
+                    if (uploadedCount > 0)
+                    {
+                        uploadFileData.Completed = true;
+                        uploadFileData.Icon = "fas fa-check-circle i-green";
+                        uploadFileData.Status = "Completed";
+                        uploadFileData.Message = $"Total cases uploaded : {uploadedCount}";
+                        uploadFileData.RecordCount = uploadedCount;
+                    }
+                    else
+                    {
+                        uploadFileData.Completed = false;
+                        uploadFileData.Icon = "fas fa-times-circle i-orangered";
+                        uploadFileData.Status = "Error";
+                        uploadFileData.Message = "Error uploading the file";
+                    }
+                    var jobId = backgroundJobClient.Enqueue(() => mailboxService.NotifyFileUpload(userEmail, uploadFileData, url));
 
-                await _context.SaveChangesAsync();
+                    await _context.SaveChangesAsync();
+                }
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                throw;
+            }
+            
         }
 
         private static List<UploadCase>? ReadFirstCsvFromZipToObject(byte[] zipData)

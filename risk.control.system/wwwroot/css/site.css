@@ -2555,10 +2555,24 @@ input#checkall {
 
 .watermark-row {
     position: relative;
-    content: "Pending";
-    background-color: rgba(255, 255, 0, 0.2); /* Light yellow background */
+    content: "Uploading...";
 }
-
+    .watermark-row::after {
+        content: "Processing"; /* Watermark text */
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 24px;
+        font-weight: bold;
+        color: rgba(200, 200, 200, 0.5); /* Light gray and semi-transparent */
+        pointer-events: none;
+        z-index: 10;
+        white-space: nowrap;
+    }
+    .watermark-row * {
+        opacity: 0.3; /* Fades the text in the background */
+    }
 .watermark-text {
     position: absolute;
     top: 50%;

@@ -32,9 +32,27 @@
     });
     var table = $("#customerTableAuto").DataTable({
         ajax: {
-            url: '/api/Creator/GetAuto',
-            dataSrc: ''
+            url: window.location.origin + '/api/Creator/GetAuto',
+            type: 'GET',
+            dataType: 'json',
+            data: function (d) {
+                console.log("Data before sending:", d); // Debugging
+
+                return {
+                    draw: d.draw || 1,
+                    start: d.start || 0,
+                    length: d.length || 10,
+                    search: d.search?.value || "", // Instead of empty string, send "all"
+                    orderColumn: d.order?.[14]?.column ?? 0,
+                    orderDir: d.order?.[0]?.dir || "desc"
+                };
+            },
+            error: function (xhr, status, error) {
+                console.error("AJAX Error:", status, error);
+                console.error("Response:", xhr.responseText);
+            }
         },
+        responsive: true,
         columnDefs: [{
             'targets': 0,
             'searchable': false,
@@ -68,9 +86,9 @@
                 'targets': 15, // Index for the "Case Type" column
                 'name': 'policy' // Name for the "Case Type" column
             }],
-        order: [[14, 'asc']],
         fixedHeader: true,
         processing: true,
+        serverSide: true,
         paging: true,
 
         language: {
@@ -89,10 +107,14 @@
                     //    return '<i class="fas fa-exclamation-triangle" data-toggle="tooltip" title="Processing ,,,"></i>';
                     //}
                     if (row.ready2Assign && row.autoAllocated) {
-                        var img = '<input class="vendors" name="claims" type="checkbox" id="' + row.id + '"  value="' + row.id + '"  data-toggle="tooltip" title="Ready to assign(auto)" />';
+                        var img = '<input class="vendors" name="claims" type="checkbox" id="' + row.id + '"  value="' + row.id + '"  data-toggle="tooltip" title="Ready to assign/delete" />';
                         return img;
                     } else if (row.ready2Assign && !row.autoAllocated) {
                         var img = '<input class="vendors" name="claims" type="checkbox" id="' + row.id + '"  value="' + row.id + '"  data-toggle="tooltip" title="Assign manually" />';
+                        return img;
+                    }
+                    else {
+                        var img = '<input class="vendors" name="claims" type="checkbox" id="' + row.id + '"  value="' + row.id + '"  data-toggle="tooltip" title="Delete" />';
                         return img;
                     }
                 }
@@ -246,7 +268,6 @@
             if (rowCount > 0 && hasAssignedRows()) {
                 $('.top-info').prop('disabled', false);
                 $('#allocatedcase').prop('disabled', false);
-                $('#deletecase').prop('disabled', false);
                 //var pendingRows = hasPendingRows();
                 //if (pendingRows) {
                 //    table.ajax.reload(null, false);
@@ -256,7 +277,6 @@
             else {
                 $('.top-info').prop('disabled', true);
                 $('#allocatedcase').prop('disabled', true);
-                $('#deletecase').prop('disabled', true);
             }
             $('#customerTableAuto tbody').on('click', '.btn-info', function (e) {
                 e.preventDefault(); // Prevent the default anchor behavior
@@ -280,7 +300,13 @@
         },
         error: function (xhr, status, error) { alert('err ' + error) }
     });
-    
+    table.on('preDraw.dt', function () {
+        $('input[name="select_all"]').prop('checked', false); // Uncheck checkboxes before rendering new data
+    });
+
+    table.on('length.dt', function () {
+        $('input[name="select_all"]').prop('checked', false);
+    });
     function hasAssignedRows() {
         var table = $("#customerTableAuto").DataTable();
         var assignedExists = false;
