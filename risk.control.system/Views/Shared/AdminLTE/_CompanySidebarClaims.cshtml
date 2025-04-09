@@ -12,7 +12,7 @@
     }
     else if (User.IsInRole(AppRoles.MANAGER.ToString()))
     {
-        <partial name="AdminLTE/_CompanySidebarClaimsManager" />
+        <partial name="AdminLTE/_CompanySidebarClaimsManager" model="@Model" />
     }
 
     else if (User.IsInRole(AppRoles.PORTAL_ADMIN.ToString()))

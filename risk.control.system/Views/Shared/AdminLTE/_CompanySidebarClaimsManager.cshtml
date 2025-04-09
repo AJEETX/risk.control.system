@@ -1,4 +1,5 @@
 ﻿@using risk.control.system.Helpers;
+@model ClientCompany
 
 @{
     <li class="nav-item">
@@ -58,4 +59,15 @@
            </p>
        </a>
     </li>
+    if (Model.BulkUpload)
+    {
+        <li class="nav-item">
+            <a is-active-page asp-controller="ClaimsLog" asp-action="Uploads" class="actual-link nav-link @Url.MakeActiveClass("ClaimsLog","Uploads")">
+                <i class="nav-icon fa fa-upload"></i>
+                <p>
+                    <span class="badge badge-secondary"> UPLOAD <sub>file</sub></span>
+                </p>
+            </a>
+        </li>
+    }
 }

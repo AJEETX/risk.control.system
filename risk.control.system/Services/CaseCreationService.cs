@@ -15,7 +15,7 @@ namespace risk.control.system.Services
 {
     public interface ICaseCreationService
     {
-        Task<bool> PerformUpload(ClientCompanyApplicationUser companyUser, UploadCase uploadCase, FileOnFileSystemModel model);
+        Task<ClaimsInvestigation> PerformUpload(ClientCompanyApplicationUser companyUser, UploadCase uploadCase, FileOnFileSystemModel model);
     }
     public class CaseCreationService : ICaseCreationService
     {
@@ -36,29 +36,25 @@ namespace risk.control.system.Services
             this.webHostEnvironment = webHostEnvironment;
         }
 
-        public async Task<bool> PerformUpload(ClientCompanyApplicationUser companyUser, UploadCase uploadCase,  FileOnFileSystemModel model)
+        public async Task<ClaimsInvestigation> PerformUpload(ClientCompanyApplicationUser companyUser, UploadCase uploadCase,  FileOnFileSystemModel model)
         {
             try
             {
-                if(companyUser is null || uploadCase is null || model is null)
+                if(companyUser is null || uploadCase is null || model is null || !ValidateDataCase(uploadCase))
                 {
-                    return false;
+                    return null;
                 }
-                if (!ValidateDataCase(uploadCase))
+                var claimUploaded = await AddCase(uploadCase, companyUser, model);
+                if(claimUploaded == null)
                 {
-                    return false;
+                    return null;
                 }
-                var claimAdded = await AddCase(uploadCase, companyUser, model);
-                if(!claimAdded)
-                {
-                    return false;
-                }
-                return true;
+                return claimUploaded;
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.StackTrace);
-                return false;
+                return null;
             }
         }
         private bool ValidateDataCase(UploadCase uploadCase)
@@ -79,7 +75,7 @@ namespace risk.control.system.Services
             }
             return true;
         }
-        private async Task<bool> AddCase(UploadCase uploadCase, ClientCompanyApplicationUser companyUser, FileOnFileSystemModel model)
+        private async Task<ClaimsInvestigation> AddCase(UploadCase uploadCase, ClientCompanyApplicationUser companyUser, FileOnFileSystemModel model)
         {
             string caseType = CLAIMS;
             if(uploadCase.CaseType != "0")
@@ -181,7 +177,7 @@ namespace risk.control.system.Services
             };
             if(!policyDetail.IsValidPolicy())
             {
-                return false;
+                return null;
             }
             claim.PolicyDetail = policyDetail;
             var customerTask = AddCustomer(companyUser, uploadCase, model.ByteData);
@@ -193,12 +189,12 @@ namespace risk.control.system.Services
             var beneficiary = await beneficiaryTask;
             if (customer is null  || !policyDetail.IsValidCustomerForUpload(customer)|| beneficiary is null || !policyDetail.IsValidBeneficiaryForUpload(beneficiary))
             {
-                return false;
+                return null;
             }
             claim.CustomerDetail = customer;
             claim.BeneficiaryDetail = beneficiary;
 
-            _context.ClaimsInvestigation.Add(claim);
+            var claimUploaded = _context.ClaimsInvestigation.Add(claim);
             var log = new InvestigationTransaction
             {
                 ClaimsInvestigationId = claim.ClaimsInvestigationId,
@@ -213,7 +209,7 @@ namespace risk.control.system.Services
             };
 
             _context.InvestigationTransaction.Add(log);
-            return true;
+            return claimUploaded.Entity;
         }
         private async Task<CustomerDetail> AddCustomer(ClientCompanyApplicationUser companyUser, UploadCase uploadCase, byte[] data)
         {

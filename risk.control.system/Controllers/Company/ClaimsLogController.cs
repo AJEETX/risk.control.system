@@ -115,6 +115,8 @@ namespace risk.control.system.Controllers.Company
                 c.InvestigationCaseSubStatus == createdClaimsStatus);
                 var fileIdentifier = companyUser.ClientCompany.Country.Code.ToLower();
                 var hasFileUploads = _context.FilesOnFileSystem.Any();
+                var isManager = HttpContext.User.IsInRole(MANAGER.DISPLAY_NAME);
+
                 return View(new CreateClaims
                 {
                     BulkUpload = companyUser.ClientCompany.BulkUpload,
@@ -122,7 +124,8 @@ namespace risk.control.system.Controllers.Company
                     HasClaims = hasClaim,
                     FileSampleIdentifier = fileIdentifier,
                     UploadId = uploadId,
-                    HasFileUploads = hasFileUploads
+                    HasFileUploads = hasFileUploads,
+                    IsManager = isManager
                 });
             }
             catch (Exception ex)

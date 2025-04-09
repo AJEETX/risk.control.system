@@ -803,11 +803,6 @@ footer {
     --warehouse-color: #558B2F;
 }
 
-.download-file {
-    border: 1px solid #ccc;
-    padding: 5px;
-}
-
 /*
      * Always set the map height explicitly to define the size of the div element
      * that contains the map.
@@ -1356,10 +1351,6 @@ a#back {
 
 a#back-button {
     min-width: 5rem;
-}
-
-.ziplink {
-    color: #007bff !important;
 }
 
 .remarks {

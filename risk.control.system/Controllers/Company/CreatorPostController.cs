@@ -90,10 +90,17 @@ namespace risk.control.system.Controllers.Company
                 var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
 
                 var uploadId = await ftpService.UploadFile(currentUserEmail, postedFile, model.CREATEDBY);
-                var jobId = backgroundJobClient.Enqueue(() => ftpService.StartUpload(currentUserEmail, uploadId, baseUrl));
+                var jobId = backgroundJobClient.Enqueue(() => ftpService.StartUpload(currentUserEmail, uploadId, baseUrl,model.UploadAndAssign));
                 progressService.AddUploadJob(jobId, currentUserEmail);
+                if(model.UploadAndAssign)
+                {
+                    notifyService.Custom($"Upload in progress ", 3, "orange", "fa fa-upload");
+                }
+                else
+                {
+                    notifyService.Custom($"Upload + Assign in progress ", 3, "orange", "fa fa-upload");
 
-                notifyService.Custom($"Upload in progress ", 3, "orange", "fa fa-upload");
+                }
 
                 return RedirectToAction(nameof(ClaimsLogController.Uploads), "ClaimsLog", new { uploadId = uploadId });
 
@@ -183,40 +190,13 @@ namespace risk.control.system.Controllers.Company
                 if (claim == null)
                 {
                     notifyService.Error("Error Creating Case detail");
-                    if (claim.ClientCompany.AutoAllocation)
-                        if (model.CREATEDBY == CREATEDBY.AUTO)
-                        {
-                            return RedirectToAction(nameof(CreatorAutoController.CreatePolicy), "CreatorAuto");
-                        }
-                    else
-                        {
-                        return RedirectToAction(nameof(CreatorManualController.Create), "CreatorManual");
-                        }
-                    else
-                    {
-                        return RedirectToAction(nameof(CreatorManualController.Create), "CreatorManual");
-                    }
+                    return RedirectToAction(nameof(CreatorAutoController.CreatePolicy), "CreatorAuto");
                 }
                 else
                 {
                     notifyService.Custom($"Policy #{claim.PolicyDetail.ContractNumber} created successfully", 3, "green", "far fa-file-powerpoint");
                 }
-
-                if (claim.ClientCompany.AutoAllocation)
-                {
-                    if (model.CREATEDBY == CREATEDBY.MANUAL)
-                    {
-                        return RedirectToAction(nameof(CreatorManualController.Details), "CreatorManual", new { id = claim.ClaimsInvestigationId });
-                    }
-                    else
-                    {
-                        return RedirectToAction(nameof(CreatorAutoController.Details), "CreatorAuto", new { id = claim.ClaimsInvestigationId });
-                    }
-                }
-                else
-                {
-                    return RedirectToAction(nameof(CreatorManualController.Details), "CreatorManual", new { id = claim.ClaimsInvestigationId });
-                }
+                return RedirectToAction(nameof(CreatorAutoController.Details), "CreatorAuto", new { id = claim.ClaimsInvestigationId });
             }
             catch (Exception ex)
             {
@@ -271,24 +251,7 @@ namespace risk.control.system.Controllers.Company
                     return RedirectToAction(nameof(CreatorAutoController.EditPolicy), "CreatorAuto", new { id  = claimsInvestigationId });
                 }
                 notifyService.Custom($"Policy #{claim.PolicyDetail.ContractNumber} edited successfully", 3, "orange", "far fa-file-powerpoint");
-                
-                if (claim.ClientCompany.AutoAllocation)
-                {
-                    if (model.CREATEDBY == CREATEDBY.MANUAL)
-                    {
-                        ViewBag.ActiveTab = "manual";
-                        return RedirectToAction(nameof(CreatorManualController.Details), "CreatorManual", new { id = claim.ClaimsInvestigationId });
-                    }
-                    else
-                    {
-                        return RedirectToAction(nameof(CreatorAutoController.Details), "CreatorAuto", new { id = claim.ClaimsInvestigationId });
-                    }
-
-                }
-                else
-                {
-                    return RedirectToAction(nameof(CreatorManualController.Details), "CreatorManual", new { id = claim.ClaimsInvestigationId });
-                }
+                return RedirectToAction(nameof(CreatorAutoController.Details), "CreatorAuto", new { id = claim.ClaimsInvestigationId });
             }
             catch (Exception ex)
             {
@@ -340,21 +303,7 @@ namespace risk.control.system.Controllers.Company
                     return RedirectToAction(nameof(CreatorAutoController.CreateCustomer), "CreatorAuto", new { id = customerDetail.ClaimsInvestigationId });
                 }
                 notifyService.Custom($"Customer {customerDetail.Name} added successfully", 3, "green", "fas fa-user-plus");
-                if(company.AutoAllocation)
-                {
-                    if (customerDetail.CREATEDBY == CREATEDBY.MANUAL)
-                    {
-                        return RedirectToAction(nameof(CreatorManualController.Details), "CreatorManual", new { id = customerDetail.ClaimsInvestigationId });
-                    }
-                    else
-                    {
-                        return RedirectToAction(nameof(CreatorAutoController.Details), "CreatorAuto", new { id = customerDetail.ClaimsInvestigationId });
-                    }
-                }
-                else
-                {
-                    return RedirectToAction(nameof(CreatorManualController.Details), "CreatorManual", new { id = customerDetail.ClaimsInvestigationId });
-                }
+                return RedirectToAction(nameof(CreatorAutoController.Details), "CreatorAuto", new { id = customerDetail.ClaimsInvestigationId });
             }
             catch (Exception ex)
             {
@@ -402,21 +351,7 @@ namespace risk.control.system.Controllers.Company
                     return RedirectToAction(nameof(CreatorAutoController.EditCustomer), "CreatorAuto", new { id = claimsInvestigationId });
                 }
                 notifyService.Custom($"Customer {customerDetail.Name} edited successfully", 3, "orange", "fas fa-user-plus");
-                if ( company.AutoAllocation)
-                {
-                    if (customerDetail.CREATEDBY == CREATEDBY.MANUAL)
-                    {
-                        return RedirectToAction(nameof(CreatorManualController.Details), "CreatorManual", new { id = customerDetail.ClaimsInvestigationId });
-                    }
-                    else
-                    {
-                        return RedirectToAction(nameof(CreatorAutoController.Details), "CreatorAuto", new { id = customerDetail.ClaimsInvestigationId });
-                    }
-                }
-                else
-                {
-                    return RedirectToAction(nameof(CreatorManualController.Details), "CreatorManual", new { id = customerDetail.ClaimsInvestigationId });
-                }
+                return RedirectToAction(nameof(CreatorAutoController.Details), "CreatorAuto", new { id = customerDetail.ClaimsInvestigationId });
             }
             catch (Exception ex)
             {
@@ -467,23 +402,7 @@ namespace risk.control.system.Controllers.Company
                     return RedirectToAction(nameof(CreatorAutoController.CreateBeneficiary), "CreatorAuto", new { id = beneficiary.ClaimsInvestigationId });
                 }
                 notifyService.Custom($"Beneficiary {beneficiary.Name} added successfully", 3, "green", "fas fa-user-tie");
-
-
-                if (company.AutoAllocation)
-                {
-                    if (beneficiary.CREATEDBY == CREATEDBY.MANUAL)
-                    {
-                        return RedirectToAction(nameof(CreatorManualController.Details), "CreatorManual", new { id = beneficiary.ClaimsInvestigationId });
-                    }
-                    else
-                    {
-                        return RedirectToAction(nameof(CreatorAutoController.Details), "CreatorAuto", new { id = beneficiary.ClaimsInvestigationId });
-                    }
-                }
-                else
-                {
-                    return RedirectToAction(nameof(CreatorManualController.Details), "CreatorManual", new { id = beneficiary.ClaimsInvestigationId });
-                }
+                return RedirectToAction(nameof(CreatorAutoController.Details), "CreatorAuto", new { id = beneficiary.ClaimsInvestigationId });
             }
             catch (Exception ex)
             {
@@ -536,22 +455,7 @@ namespace risk.control.system.Controllers.Company
                 {
                     notifyService.Custom($"Beneficiary {beneficiary.Name} edited successfully", 3, "orange", "fas fa-user-tie");
                 }
-
-                if (company.AutoAllocation)
-                {
-                    if (beneficiary.CREATEDBY == CREATEDBY.MANUAL)
-                    {
-                        return RedirectToAction(nameof(CreatorManualController.Details), "CreatorManual", new { id = beneficiary.ClaimsInvestigationId });
-                    }
-                    else
-                    {
-                        return RedirectToAction(nameof(CreatorAutoController.Details), "CreatorAuto", new { id = beneficiary.ClaimsInvestigationId });
-                    }
-                }
-                else
-                {
-                    return RedirectToAction(nameof(CreatorManualController.Details), "CreatorManual", new { id = beneficiary.ClaimsInvestigationId });
-                }
+                return RedirectToAction(nameof(CreatorAutoController.Details), "CreatorAuto", new { id = beneficiary.ClaimsInvestigationId });
             }
             catch (Exception ex)
             {
@@ -588,14 +492,7 @@ namespace risk.control.system.Controllers.Company
                 _context.ClaimsInvestigation.Update(claimsInvestigation);
                 await _context.SaveChangesAsync();
                 notifyService.Custom("Claim deleted", 3, "red", "far fa-file-powerpoint");
-                if(companyUser.ClientCompany.AutoAllocation)
-                {
-                    return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
-                }
-                else
-                {
-                    return RedirectToAction(nameof(CreatorManualController.New), "CreatorManual");
-                }
+                return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
             }
             catch (Exception ex)
             {

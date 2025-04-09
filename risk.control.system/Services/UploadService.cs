@@ -18,7 +18,7 @@ namespace risk.control.system.Services
     public interface IUploadService
     {
         Task<bool> DoUpload(ClientCompanyApplicationUser companyUser, string[] dataRows, CREATEDBY autoOrManual, ZipArchive archive, ORIGIN fileOrFtp, long lineOfBusinessId);
-        Task<int> PerformCustomUpload(ClientCompanyApplicationUser companyUser, List<UploadCase> customData, FileOnFileSystemModel model);
+        Task<List<ClaimsInvestigation>> PerformCustomUpload(ClientCompanyApplicationUser companyUser, List<UploadCase> customData, FileOnFileSystemModel model);
     }
     public class UploadService : IUploadService
     {
@@ -314,34 +314,36 @@ namespace risk.control.system.Services
             return beneficairy;
         }
 
-        public async Task<int> PerformCustomUpload(ClientCompanyApplicationUser companyUser, List<UploadCase> customData, FileOnFileSystemModel model)
+        public async Task<List<ClaimsInvestigation>> PerformCustomUpload(ClientCompanyApplicationUser companyUser, List<UploadCase> customData, FileOnFileSystemModel model)
         {
             try
             {
                 if (customData == null || customData.Count == 0)
                 {
-                    return 0; // Return 0 if no CSV data is found
+                    return null; // Return 0 if no CSV data is found
                 }
+                var uploadedClaims = new List<ClaimsInvestigation>();
                 var uploadedRecordsCount = 0;
-                var totalCount = customData.Count - 1;
+                var totalCount = customData.Count;
                 foreach (var row in customData)
                 {
-                    var allGood = await _caseCreationService.PerformUpload(companyUser, row, model);
-                    if (!allGood)
+                    var claimUploaded = await _caseCreationService.PerformUpload(companyUser, row, model);
+                    if (claimUploaded == null)
                     {
-                        return 0;
+                        return null;
                     }
+                    uploadedClaims.Add(claimUploaded);
                     int progress = (int)(((uploadedRecordsCount + 1) / (double)totalCount) * 100);
                     uploadProgressService.UpdateProgress(model.Id, progress);
                     uploadedRecordsCount++;
                 }
                 var rowsSaved = _context.SaveChanges() > 0;
-                return rowsSaved ? uploadedRecordsCount : 0;
+                return rowsSaved ? uploadedClaims : null;
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.StackTrace);
-                return 0;
+                return null;
             }
         }
     }

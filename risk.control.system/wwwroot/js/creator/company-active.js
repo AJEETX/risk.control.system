@@ -15,8 +15,8 @@
                     length: d.length || 10,
                     caseType: $('#caseTypeFilter').val() || "",  // Send selected filter value
                     search: d.search?.value || "", // Instead of empty string, send "all"
-                    orderColumn: d.order?.[15]?.column ?? 0,
-                    orderDir: d.order?.[0]?.dir || "asc"
+                    orderColumn: d.order?.[0]?.column ?? 15, // Default to column 15
+                    orderDir: d.order?.[0]?.dir || "asc" // Default to ascending
                 };
             },
             error: function (xhr, status, error) {

@@ -1,8 +1,8 @@
 ﻿@model CreateClaims
 
-<div class="card-header bg-light">
+<div class="card-header bg-secondary">
     <h3 class="card-title">
-        <span class="download-file badge badge-light">
+        <span class="download-file">
             <a class="ziplink" href="@Url.Content($"~/headers/single-{Model.FileSampleIdentifier}.zip")">
                 <i class="nav-icon fa fa-download"></i>  sample file
             </a>
@@ -20,10 +20,4 @@
             </span>
         </span>
     </h3>
-    <div class="card-tools">
-        <span data-toggle="tooltip" title="Click on + to Upload File"><span class="badge badge-light"><i class="fa fa-upload"></i> Upload File:</span>  <i class='far fa-hand-point-right'></i> </span>
-        <button type="button" class="btn btn-tool" data-card-widget="collapse">
-            <i class="fas fa-plus"></i>
-        </button>
-    </div>
 </div>

@@ -121,6 +121,7 @@ namespace risk.control.system.Services
                         .ThenInclude(c => c.PinCode)
                     .FirstOrDefaultAsync(c => c.ClaimsInvestigationId == claim);
 
+                if(claimsInvestigation == null || !claimsInvestigation.IsValidCaseData()) return null; // Handle missing claim
 
                 string pinCode2Verify = claimsInvestigation.PolicyDetail?.LineOfBusiness.Name.ToLower() == UNDERWRITING
                     ? claimsInvestigation.CustomerDetail?.PinCode?.Code

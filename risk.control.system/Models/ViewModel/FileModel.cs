@@ -14,6 +14,7 @@
         public string? Message { get; set; } = "Upload In progress";
         public byte[] ByteData { get; set; }
         public int RecordCount { get; set; } = 0;
+        public List<string>? ClaimsId { get; set; } = new();
         public CREATEDBY AutoOrManual { get; set; } = CREATEDBY.MANUAL;
         public ORIGIN FileOrFtp { get; set; } = ORIGIN.FILE;
         public string UploadedBy { get; set; }

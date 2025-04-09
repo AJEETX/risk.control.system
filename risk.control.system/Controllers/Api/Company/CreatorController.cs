@@ -60,7 +60,7 @@ namespace risk.control.system.Controllers.Api.Company
 
             if (companyUser == null)
                 return NotFound("User not found.");
-
+            var company = await _context.ClientCompany.FirstOrDefaultAsync(c => c.ClientCompanyId == companyUser.ClientCompanyId);
             // Fetching all relevant substatuses in a single query for efficiency
             var subStatuses = _context.InvestigationCaseSubStatus
                 .Where(i => new[]
@@ -148,6 +148,7 @@ namespace risk.control.system.Controllers.Api.Company
             {
                 draw = draw,
                 recordsTotal = totalRecords,
+                AutoAllocatopn = company.AutoAllocation,
                 recordsFiltered = totalRecords,
                 data = pagedData.Select(a => new
                 {
@@ -408,27 +409,11 @@ namespace risk.control.system.Controllers.Api.Company
             {
                 query = query.Where(c => c.PolicyDetail.LineOfBusiness.Name.ToLower() == caseType);  // Assuming CaseType is the field in your data model
             }
-            // Sorting
-            var columnMapping = new Dictionary<int, Expression<Func<ClaimsInvestigation, object>>>
-                {
-                    { 1, a => a.PolicyDetail.ContractNumber },
-                    { 2, a => a.PolicyDetail.SumAssuredValue },
-                    { 3, a => a.CustomerDetail.Name },
-                    { 4, a => a.InvestigationCaseSubStatus.Name },
-                    { 5, a => a.Created }
-                };
-
-            if (columnMapping.ContainsKey(orderColumn))
-            {
-                if (orderDir.ToLower() == "asc")
-                    query = query.OrderBy(columnMapping[orderColumn]);
-                else
-                    query = query.OrderByDescending(columnMapping[orderColumn]);
-            }
+            
             var data = query.ToList();
-            int totalRecords = query.Count(); // Get total count before pagination
+            //int totalRecords = query.Count(); // Get total count before pagination
 
-            var pagedData = query.Skip(start).Take(length).ToList();
+            //var pagedData = query.Skip(start).Take(length).ToList();
             var newClaims = new List<ClaimsInvestigation>();
 
             foreach (var claim in query)
@@ -459,45 +444,60 @@ namespace risk.control.system.Controllers.Api.Company
             }
 
             var underWritingLineOfBusiness = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == UNDERWRITING).LineOfBusinessId;
+            // Calculate TimeElapsed and Transform Data
+            var transformedData = data.Select(a => new
+            {
+                Id = a.ClaimsInvestigationId,
+                AutoAllocated = a.AutoAllocated,
+                CustomerFullName = a.CustomerDetail?.Name ?? "",
+                BeneficiaryFullName = a.BeneficiaryDetail?.Name ?? "",
+                PolicyId = a.PolicyDetail.ContractNumber,
+                Amount = string.Format(Extensions.GetCultureByCountry(companyUser.Country.Code.ToUpper()), "{0:c}", a.PolicyDetail.SumAssuredValue),
+                AssignedToAgency = a.AssignedToAgency,
+                Agent = !string.IsNullOrWhiteSpace(a.UserEmailActionedTo) ? a.UserEmailActionedTo : a.UserRoleActionedTo,
+                OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(GetOwner(a))),
+                CaseWithPerson = !string.IsNullOrWhiteSpace(a.UserEmailActionedTo),
+                Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness, a.CustomerDetail, a.BeneficiaryDetail),
+                PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness, a.CustomerDetail, a.BeneficiaryDetail),
+                Document = a.PolicyDetail?.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail?.DocumentImage)) : NO_POLICY_IMAGE,
+                Customer = a.CustomerDetail?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail?.ProfilePicture)) : NO_USER,
+                Name = a.CustomerDetail?.Name ?? "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>",
+                Policy = a.PolicyDetail?.LineOfBusiness.Name,
+                Status = a.ORIGIN.GetEnumDisplayName(),
+                SubStatus = a.InvestigationCaseSubStatus.Name,
+                Ready2Assign = a.IsReady2Assign,
+                ServiceType = $"{a.PolicyDetail.LineOfBusiness.Name} ({a.PolicyDetail.InvestigationServiceType.Name})",
+                Service = a.PolicyDetail.InvestigationServiceType.Name,
+                Location = a.InvestigationCaseSubStatus.Name,
+                Created = a.Created.ToString("dd-MM-yyyy"),
+                timePending = a.GetCreatorTimePending(true),
+                Withdrawable = !a.NotWithdrawable,
+                PolicyNum = a.GetPolicyNum(),
+                BeneficiaryPhoto = a.BeneficiaryDetail?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.BeneficiaryDetail.ProfilePicture)) : NO_USER,
+                BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.Name) ? "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>" : a.BeneficiaryDetail.Name,
+                TimeElapsed = DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).TotalSeconds, // Calculate here
+                IsNewAssigned = a.ActiveView <= 1,
+                PersonMapAddressUrl = a.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness ? a.CustomerDetail.CustomerLocationMap : a.BeneficiaryDetail.BeneficiaryLocationMap
+            }).ToList(); // Materialize the list
+
+            // **Apply Sorting on TimeElapsed** AFTER data transformation
+            if (orderColumn == 15)  // Assuming 15 is the index for TimeElapsed
+            {
+                transformedData = orderDir.ToLower() == "asc"
+                    ? transformedData.OrderBy(a => a.TimeElapsed).ToList()
+                    : transformedData.OrderByDescending(a => a.TimeElapsed).ToList();
+            }
+
+            // Apply Pagination
+            var pagedData = transformedData.Skip(start).Take(length).ToList();
+            var totalRecords = claimsService.GetClaims().Count(); // Get total count after pagination
+            // Prepare Response
             var response = new
             {
                 draw = draw,
                 recordsTotal = totalRecords,
-                recordsFiltered = totalRecords,
-                data = pagedData.Select(a => new
-                {
-                    Id = a.ClaimsInvestigationId,
-                    AutoAllocated = a.AutoAllocated,
-                    CustomerFullName = a.CustomerDetail?.Name ?? "",
-                    BeneficiaryFullName = a.BeneficiaryDetail?.Name ?? "",
-                    PolicyId = a.PolicyDetail.ContractNumber,
-                    Amount = string.Format(Extensions.GetCultureByCountry(companyUser.Country.Code.ToUpper()), "{0:c}", a.PolicyDetail.SumAssuredValue),
-                    AssignedToAgency = a.AssignedToAgency,
-                    Agent = !string.IsNullOrWhiteSpace(a.UserEmailActionedTo) ? a.UserEmailActionedTo : a.UserRoleActionedTo,
-                    OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(GetOwner(a))),
-                    CaseWithPerson = !string.IsNullOrWhiteSpace(a.UserEmailActionedTo),
-                    Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness, a.CustomerDetail, a.BeneficiaryDetail),
-                    PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness, a.CustomerDetail, a.BeneficiaryDetail),
-                    Document = a.PolicyDetail?.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail?.DocumentImage)) : NO_POLICY_IMAGE,
-                    Customer = a.CustomerDetail?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail?.ProfilePicture)) : NO_USER,
-                    Name = a.CustomerDetail?.Name ?? "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>",
-                    Policy = a.PolicyDetail?.LineOfBusiness.Name,
-                    Status = a.ORIGIN.GetEnumDisplayName(),
-                    SubStatus = a.InvestigationCaseSubStatus.Name,
-                    Ready2Assign = a.IsReady2Assign,
-                    ServiceType = $"{a.PolicyDetail.LineOfBusiness.Name} ({a.PolicyDetail.InvestigationServiceType.Name})",
-                    Service = a.PolicyDetail.InvestigationServiceType.Name,
-                    Location = a.InvestigationCaseSubStatus.Name,
-                    Created = a.Created.ToString("dd-MM-yyyy"),
-                    timePending = a.GetCreatorTimePending(true),
-                    Withdrawable = !a.NotWithdrawable,
-                    PolicyNum = a.GetPolicyNum(),
-                    BeneficiaryPhoto = a.BeneficiaryDetail?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.BeneficiaryDetail.ProfilePicture)) : NO_USER,
-                    BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.Name) ? "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>" : a.BeneficiaryDetail.Name,
-                    TimeElapsed = DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).TotalSeconds,
-                    IsNewAssigned = a.ActiveView <= 1,
-                    PersonMapAddressUrl = a.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness ? a.CustomerDetail.CustomerLocationMap : a.BeneficiaryDetail.BeneficiaryLocationMap
-                })
+                recordsFiltered = data.Count,
+                data = pagedData
             };
 
             return Ok(response);
@@ -523,10 +523,11 @@ namespace risk.control.system.Controllers.Api.Company
                 file.UploadedBy,
                 Status = file.Status,
                 file.Message,
-                Icon = file.Icon // or use some other status representation
+                Icon = file.Icon, // or use some other status representation
+                IsManager = isManager
             }).ToList();
 
-            return Ok(new { data = result });
+            return Ok(new { data = result});
         }
 
         [HttpGet("GetFileById/{uploadId}")]

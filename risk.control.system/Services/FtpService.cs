@@ -26,7 +26,7 @@ namespace risk.control.system.Services
     public interface IFtpService
     {
         Task<int> UploadFile(string userEmail, IFormFile postedFile, CREATEDBY autoOrManual);
-        Task StartUpload(string userEmail, int uploadId, string url);
+        Task StartUpload(string userEmail, int uploadId, string url, bool uploadAndAssign = false);
 
         Task<bool> UploadFtpFile(string userEmail, IFormFile postedFile, CREATEDBY autoOrManual, long lineOfBusinessId);
     }
@@ -41,6 +41,7 @@ namespace risk.control.system.Services
         private readonly ICustomApiCLient customApiCLient;
         private readonly IMailboxService mailboxService;
         private readonly IBackgroundJobClient backgroundJobClient;
+        private readonly IClaimsInvestigationService claimsInvestigationService;
         private readonly IProgressService progressService;
         private readonly IUploadService uploadService;
         private static WebClient client = new WebClient
@@ -48,10 +49,11 @@ namespace risk.control.system.Services
             Credentials = new NetworkCredential(Applicationsettings.FTP_SITE_LOG, Applicationsettings.FTP_SITE_DATA),
         };
         public FtpService(ApplicationDbContext context,
-            IWebHostEnvironment webHostEnvironment, 
+            IWebHostEnvironment webHostEnvironment,
             ICustomApiCLient customApiCLient,
             IMailboxService mailboxService,
             IBackgroundJobClient backgroundJobClient,
+            IClaimsInvestigationService claimsInvestigationService,
             IProgressService progressService,
             IUploadService uploadService)
         {
@@ -60,6 +62,7 @@ namespace risk.control.system.Services
             this.customApiCLient = customApiCLient;
             this.mailboxService = mailboxService;
             this.backgroundJobClient = backgroundJobClient;
+            this.claimsInvestigationService = claimsInvestigationService;
             this.progressService = progressService;
             this.uploadService = uploadService;
         }
@@ -132,7 +135,7 @@ namespace risk.control.system.Services
                     {
                         return false;
                     }
-                    var processed = await ProcessFile(userEmail, archive, autoOrManual, ORIGIN.FTP,lineOfBusinessId);
+                    var processed = await ProcessFile(userEmail, archive, autoOrManual, ORIGIN.FTP, lineOfBusinessId);
                     if (!processed)
                     {
                         return false;
@@ -204,7 +207,7 @@ namespace risk.control.system.Services
         }
 
         [AutomaticRetry(Attempts = 0)]
-        public async Task StartUpload(string userEmail, int uploadId, string url)
+        public async Task StartUpload(string userEmail, int uploadId, string url, bool uploadAndAssign = false)
         {
             try
             {
@@ -223,25 +226,34 @@ namespace risk.control.system.Services
                 }
                 if (userCanCreate)
                 {
-                    var uploadedCount = await uploadService.PerformCustomUpload(companyUser, customData, uploadFileData);
-                    if (uploadedCount > 0)
-                    {
-                        uploadFileData.Completed = true;
-                        uploadFileData.Icon = "fas fa-check-circle i-green";
-                        uploadFileData.Status = "Completed";
-                        uploadFileData.Message = $"Total cases uploaded : {uploadedCount}";
-                        uploadFileData.RecordCount = uploadedCount;
-                    }
-                    else
+                    var uploadedClaims = await uploadService.PerformCustomUpload(companyUser, customData, uploadFileData);
+                    if (uploadedClaims == null)
                     {
                         uploadFileData.Completed = false;
                         uploadFileData.Icon = "fas fa-times-circle i-orangered";
                         uploadFileData.Status = "Error";
                         uploadFileData.Message = "Error uploading the file";
                     }
-                    var jobId = backgroundJobClient.Enqueue(() => mailboxService.NotifyFileUpload(userEmail, uploadFileData, url));
+                    else
+                    {
+                        uploadFileData.Completed = true;
+                        uploadFileData.Icon = "fas fa-check-circle i-green";
+                        uploadFileData.Status = "Completed";
+                        uploadFileData.Message = $"Total cases uploaded : {uploadedClaims.Count}";
+                        uploadFileData.RecordCount = uploadedClaims.Count;
+                        uploadFileData.ClaimsId = uploadedClaims.Select(c=>c.ClaimsInvestigationId).ToList();
+                    }
+
+                    var notificationJobId = backgroundJobClient.Enqueue(() => mailboxService.NotifyFileUpload(userEmail, uploadFileData, url));
 
                     await _context.SaveChangesAsync();
+
+                    if (uploadedClaims != null && uploadedClaims.Count > 0  && uploadAndAssign)
+                    {
+                        var claims = uploadedClaims.Select(c => c.ClaimsInvestigationId).ToList();
+
+                        var directAssignJobId = backgroundJobClient.Enqueue(() => claimsInvestigationService.BackgroundAutoAllocation(claims, userEmail, url));
+                    }
                 }
             }
             catch (Exception ex)
@@ -249,7 +261,7 @@ namespace risk.control.system.Services
                 Console.WriteLine(ex.StackTrace);
                 throw;
             }
-            
+
         }
 
         private static List<UploadCase>? ReadFirstCsvFromZipToObject(byte[] zipData)

@@ -35,6 +35,16 @@
             url: window.location.origin + '/api/Creator/GetAuto',
             type: 'GET',
             dataType: 'json',
+            dataSrc: function (json) {
+                // Check extraField boolean value from server response
+                if (json.autoAllocatopn) {
+                    $('#allocatedcase').show();  // Show the button
+                } else {
+                    $('#allocatedcase').hide();  // Hide the button
+                }
+
+                return json.data; // Return table data
+            },
             data: function (d) {
                 console.log("Data before sending:", d); // Debugging
 
