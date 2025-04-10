@@ -26,6 +26,11 @@
             loadingRecords: '&nbsp;',
             processing: '<i class="fas fa-sync fa-spin fa-4x fa-fw"></i><span class="sr-only">Loading...</span>'
         },
+        columnDefs: [
+        {
+            className: 'max-width-column-name', // Apply the CSS class,
+            targets: 7                      // Index of the column to style
+        }],
         "columns": [
             { "data": "id", "bVisible": false },
             
@@ -41,7 +46,6 @@
             { "data": "name" },
             { "data": "fileType" },
             { "data": "createdOn" },
-            { "data": "uploadedBy" },
 
             {
                 "data": "message",

@@ -36,5 +36,10 @@
         public string? SixthBlockName { get; set; }
         public int? SixthBlockCount { get; set; }
         public string? SixthBlockUrl { get; set; } = string.Empty;
+
+        public int? UnderwritingCount { get; set; }
+        public int? ApprovedUnderwritingCount { get; set; }
+        public int? RejectedUnderwritingCount { get; set; }
+
     }
 }

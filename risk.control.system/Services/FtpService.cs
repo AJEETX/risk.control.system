@@ -34,6 +34,7 @@ namespace risk.control.system.Services
     public class FtpService : IFtpService
     {
         private const string CLAIMS = "claims";
+        private const string UNDERWRITING = "underwriting";
         private static string NO_DATA = " NO - DATA ";
         private static Regex regex = new Regex("\\\"(.*?)\\\"");
         private readonly ApplicationDbContext _context;
@@ -229,7 +230,7 @@ namespace risk.control.system.Services
                 }
                 
                 var uploadedClaims = await uploadService.PerformCustomUpload(companyUser, customData, uploadFileData);
-                if (uploadedClaims == null)
+                if (uploadedClaims == null || uploadedClaims.Count == 0)
                 {
                     SetUploadFailure(uploadFileData, "Error uploading the file");
                     await _context.SaveChangesAsync();
@@ -268,22 +269,24 @@ namespace risk.control.system.Services
                 _context.InvestigationTransaction.AddRange(logs);
                 await _context.SaveChangesAsync();
 
-                if (uploadAndAssign)
+                if (uploadAndAssign && uploadedClaims.Any())
                 {
                     // Auto-Assign Claims if Enabled
-                    if (uploadedClaims.Any() && uploadAndAssign)
-                    {
-                        var claimsIds = uploadedClaims.Select(c => c.ClaimsInvestigationId).ToList();
-                        await claimsInvestigationService.BackgroundAutoAllocation(claimsIds, userEmail, url);
-                    }
+                    var claimsIds = uploadedClaims.Select(c => c.ClaimsInvestigationId).ToList();
+                    var autoAllocated = await claimsInvestigationService.BackgroundUploadAutoAllocation(claimsIds, userEmail, url);
+                    SetUploadAssignSuccess(uploadFileData, uploadedClaims, autoAllocated);
+                    await _context.SaveChangesAsync();
+                    // Notify User
+                    await mailboxService.NotifyFileUpload(userEmail, uploadFileData, url);
                 }
-
-                // Upload Success
-                SetUploadSuccess(uploadFileData, uploadedClaims, uploadAndAssign);
-                await _context.SaveChangesAsync();
-                // Notify User
-                await mailboxService.NotifyFileUpload(userEmail, uploadFileData, url);
-
+                else
+                {
+                    // Upload Success
+                    SetUploadSuccess(uploadFileData, uploadedClaims);
+                    await _context.SaveChangesAsync();
+                    // Notify User
+                    await mailboxService.NotifyFileUpload(userEmail, uploadFileData, url);
+                }
             }
             catch (Exception ex)
             {
@@ -299,9 +302,34 @@ namespace risk.control.system.Services
             fileData.Message = message;
         }
 
-        void SetUploadSuccess(FileOnFileSystemModel fileData, List<ClaimsInvestigation> claims, bool uploadAndAssign = false)
+        void SetUploadAssignSuccess(FileOnFileSystemModel fileData, List<ClaimsInvestigation> claims, List<string> autoAllocated)
         {
-            string message = uploadAndAssign ? $"Total cases assigned: {claims.Count}" : $"Total cases uploaded: {claims.Count}";
+            var claimsLineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == CLAIMS).LineOfBusinessId;
+            var underWritingLineOfBusiness = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == UNDERWRITING).LineOfBusinessId;
+           
+            var uploadedClaimCount = claims.Count(c => c.PolicyDetail.LineOfBusinessId == claimsLineOfBusinessId);
+            
+            var assignedClaimCount = claims.Count(c => autoAllocated.Contains(c.ClaimsInvestigationId) && c.PolicyDetail.LineOfBusinessId == claimsLineOfBusinessId);
+            
+            var uploadedUnderWritingCount = claims.Count(c => c.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness);
+            var assignedUnderWritingCount = claims.Count(c => autoAllocated.Contains(c.ClaimsInvestigationId) && c.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness);
+
+            string message = $"Total Uploaded/Assigned Claims: {uploadedClaimCount}/{assignedClaimCount} & Total Uploaded/Assigned Underwritings: {uploadedUnderWritingCount}/{assignedUnderWritingCount})";
+            fileData.Completed = true;
+            fileData.Icon = "fas fa-check-circle i-green";
+            fileData.Status = "Completed";
+            fileData.Message = message;
+            fileData.RecordCount = claims.Count;
+            fileData.ClaimsId = claims.Select(c => c.ClaimsInvestigationId).ToList();
+        }
+        void SetUploadSuccess(FileOnFileSystemModel fileData, List<ClaimsInvestigation> claims)
+        {
+            var claimsLineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == CLAIMS).LineOfBusinessId;
+            var underWritingLineOfBusiness = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == UNDERWRITING).LineOfBusinessId;
+            var claimCount = claims.Count(c => c.PolicyDetail.LineOfBusinessId == claimsLineOfBusinessId);
+            var underWritingCount = claims.Count(c => c.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness);
+
+            string message = $"Total Uploaded Claims: {claimCount} & Underwritings: {underWritingCount}";
             fileData.Completed = true;
             fileData.Icon = "fas fa-check-circle i-green";
             fileData.Status = "Completed";

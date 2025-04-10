@@ -185,22 +185,29 @@ namespace risk.control.system.Services
         public DashboardData GetManagerCount(string userEmail, string role)
         {
 
-            var claimsAssessor = GetManagerAssess(userEmail);
+            var claimsAssessor = GetManagerAssess(userEmail, claimLineOfBusinessId);
+            var underwritingAssessor = GetManagerAssess(userEmail, underwritingLineOfBusinessId);
             //var claimsReview = GetManagerReview(userEmail);
-            var claimsReject = GetManagerReject(userEmail);
-            var claimsCompleted = GetCompanyManagerApproved(userEmail);
+            
+            var claimsReject = GetManagerReject(userEmail, claimLineOfBusinessId);
+            var undewrwritingReject = GetManagerReject(userEmail, underwritingLineOfBusinessId);
+            
+            var claimsCompleted = GetCompanyManagerApproved(userEmail, claimLineOfBusinessId);
+            var underwritingCompleted = GetCompanyManagerApproved(userEmail, underwritingLineOfBusinessId);
+            
             var activeClaims = GetManagerActive(userEmail, claimLineOfBusinessId);
             var activeUnderwritings = GetManagerActive(userEmail,underwritingLineOfBusinessId);
+            
             var empanelledAgenciesCount = GetEmpanelledAgencies(userEmail);
             var availableAgenciesCount = GetAvailableAgencies(userEmail);
 
             var data = new DashboardData();
-            data.FirstBlockName = "Assess(new)";
+            data.FirstBlockName = "Assess (new)";
             data.FirstBlockCount = claimsAssessor;
             data.FirstBlockUrl = "/Manager/Assessor";
 
             //data.SecondBlockName = "Review";
-            //data.SecondBlockCount = claimsReview.Count;
+            data.UnderwritingCount = underwritingAssessor;
             //data.SecondBlockUrl = "/ClaimsInvestigation/ManagerReview";
 
             data.SecondBBlockName = "Active";
@@ -211,10 +218,12 @@ namespace risk.control.system.Services
 
             data.ThirdBlockName = "Approved";
             data.ThirdBlockCount = claimsCompleted;
+            data.ApprovedUnderwritingCount = underwritingCompleted;
             data.ThirdBlockUrl = "/Manager/Approved";
 
             data.LastBlockName = "Rejected";
             data.LastBlockCount = claimsReject;
+            data.RejectedUnderwritingCount = undewrwritingReject;
             data.LastBlockUrl = "/Manager/Rejected";
 
             data.FifthBlockName = "Empanelled Agencies";
@@ -405,15 +414,15 @@ namespace risk.control.system.Services
             
             return count;
         }
-        private int GetManagerAssess(string userEmail)
+        private int GetManagerAssess(string userEmail, long lineOfBusinessId = 0)
         {
-            IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
+            IQueryable<ClaimsInvestigation> cases = lineOfBusinessId > 0 ? GetClaims().Where(c=>c.PolicyDetail.LineOfBusinessId == lineOfBusinessId) : GetClaims();
             var submittedToAssessorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
             var replyToAssessorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REPLY_TO_ASSESSOR);
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-            var count = applicationDbContext.Count(i => i.ClientCompanyId == companyUser.ClientCompanyId &&
+            var count = cases.Count(i => i.ClientCompanyId == companyUser.ClientCompanyId &&
             (i.InvestigationCaseSubStatusId == submittedToAssessorStatus.InvestigationCaseSubStatusId ||
             i.InvestigationCaseSubStatusId == replyToAssessorStatus.InvestigationCaseSubStatusId)
             );
@@ -464,9 +473,9 @@ namespace risk.control.system.Services
             }
             
         }
-        private int GetCompanyManagerApproved(string userEmail)
+        private int GetCompanyManagerApproved(string userEmail, long lineOfBusinessId = 0)
         {
-            IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
+            IQueryable<ClaimsInvestigation> cases = lineOfBusinessId > 0 ? GetClaims().Where(c => c.PolicyDetail.LineOfBusinessId == lineOfBusinessId) : GetClaims();
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
 
             var approvedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
@@ -475,7 +484,7 @@ namespace risk.control.system.Services
             var finishStatus = _context.InvestigationCaseStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.FINISHED);
 
-            var count = applicationDbContext.Count(c => c.ClientCompanyId == companyUser.ClientCompanyId &&
+            var count = cases.Count(c => c.ClientCompanyId == companyUser.ClientCompanyId &&
                 c.InvestigationCaseStatusId == finishStatus.InvestigationCaseStatusId &&
                 c.InvestigationCaseSubStatusId == approvedStatus.InvestigationCaseSubStatusId
                 );
@@ -573,9 +582,9 @@ namespace risk.control.system.Services
             }
             return count;
         }
-        private int GetManagerReject(string userEmail)
+        private int GetManagerReject(string userEmail, long lineOfBusinessId = 0)
         {
-            IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
+            IQueryable<ClaimsInvestigation> cases = lineOfBusinessId > 0 ? GetClaims().Where(c => c.PolicyDetail.LineOfBusinessId == lineOfBusinessId) : GetClaims();
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
 
             var rejectdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
@@ -584,7 +593,7 @@ namespace risk.control.system.Services
             var finishStatus = _context.InvestigationCaseStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.FINISHED);
 
-            var count = applicationDbContext.Count(c => c.ClientCompanyId == companyUser.ClientCompanyId &&
+            var count = cases.Count(c => c.ClientCompanyId == companyUser.ClientCompanyId &&
                 c.InvestigationCaseSubStatusId == rejectdStatus.InvestigationCaseSubStatusId && c.InvestigationCaseStatusId == finishStatus.InvestigationCaseStatusId);
             
             return count;

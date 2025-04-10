@@ -48,6 +48,7 @@ namespace risk.control.system.Services
         Task<ClaimsInvestigation> SubmitQueryToAgency(string userEmail, string claimId, EnquiryRequest request, IFormFile messageDocument);
         Task<ClaimsInvestigation> SubmitQueryReplyToCompany(string userEmail, string claimId, EnquiryRequest request, IFormFile messageDocument, List<string> flexRadioDefault);
         Task BackgroundAutoAllocation(List<string> claims, string userEmail, string url="");
+        Task<List<string>> BackgroundUploadAutoAllocation(List<string> claimIds, string userEmail, string url = "");
     }
 
     public class ClaimsInvestigationService : IClaimsInvestigationService
@@ -80,6 +81,22 @@ namespace risk.control.system.Services
             this.customApiCLient = customApiCLient;
             this.mailboxService = mailboxService;
             this.webHostEnvironment = webHostEnvironment;
+        }
+        [AutomaticRetry(Attempts = 0)]
+        public async Task<List<string>> BackgroundUploadAutoAllocation(List<string> claimIds, string userEmail, string url = "")
+        {
+            var autoAllocatedCases = await DoAutoAllocation(claimIds, userEmail, url); // Run all tasks in parallel
+
+            var notAutoAllocated = claimIds.Except(autoAllocatedCases)?.ToList();
+
+            if (claimIds.Count > autoAllocatedCases.Count)
+            {
+                await AssignToAssigner(userEmail, notAutoAllocated, url);
+
+            }
+            var jobId = backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimAssignmentToAssigner(userEmail, autoAllocatedCases, notAutoAllocated, url));
+
+            return (autoAllocatedCases);
         }
         [AutomaticRetry(Attempts = 0)]
         public async Task BackgroundAutoAllocation(List<string> claimIds, string userEmail, string url = "")
