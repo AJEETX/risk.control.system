@@ -6,8 +6,22 @@
     <div id="article" class="card shadow-lg border-1 rounded-lg">
         <partial name="Creator/_ClaimTitle" model="Model" />
         
-        <button id="refreshTable" class="btn btn-default"> <i id="refreshIcon" class="fas fa-sync"></i> Refresh</button>
+        <div class="filter-refresh-container shadow-lg border-1 rounded-lg">
+            <div class="filter-group">
+                <label for="caseTypeFilter" class="filter-label">
+                    <i class="bi bi-funnel"></i> Case Type:
+                </label>
+                <select id="caseTypeFilter" class="form-select custom-select">
+                    <option value="">All</option>
+                    <option value="claims">Claim</option>
+                    <option value="underwriting">Underwriting</option>
+                </select>
+            </div>
 
+            <button id="refreshTable" class="btn btn-light refresh-button">
+                <i id="refreshIcon" class="fas fa-sync"></i> Refresh
+            </button>
+        </div>
 
         <form id="checkboxes" asp-action="AssignAuto" asp-controller="ClaimsInvestigationPost" method="post">
             <div class="card-body">
@@ -51,10 +65,13 @@
                         {
                             <button disabled class="create-policy btn btn-success"><i class="far fa-edit"></i> @Applicationsettings.CREATE</button>
                         }
-
-                        <button disabled id="allocatedcase" type="submit" class="btn btn-warning">
-                            <i class="fas fa-random"></i> Assign<sub>auto</sub>
-                        </button>
+                        @if(Model.AutoAllocation)
+                        {
+                            <button disabled id="allocatedcase" type="submit" class="btn btn-warning">
+                                <i class="fas fa-random"></i> Assign<sub>auto</sub>
+                            </button>
+                        }
+                        
                         <button id="deletecase" type="submit" class="btn btn-danger">
                             <i class="fas fa-trash"></i> Delete
                         </button>

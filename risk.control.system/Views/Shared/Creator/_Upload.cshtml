@@ -7,27 +7,45 @@
         <div class="col-md-12">
             <form id="upload-claims" asp-controller="CreatorPost" asp-action="New" method="post" enctype="multipart/form-data">
                 <div class="card shadow-lg border-1 rounded-lg p-3">
-
                     <input type="hidden" asp-for="CREATEDBY" value="@CREATEDBY.AUTO" />
-                    <div class="form-check form-switch mb-3">
-                        <input class="form-check-input custom-checkbox-lg" type="checkbox" asp-for="UploadAndAssign" id="uploadAssignCheckbox" />
-                        <label class="form-check-label fw-bold ms-2 text-info" for="uploadAssignCheckbox">
-                            <span class="highlighted-text" title="Upload and Assign straight-away" data-toggle="tooltip"><i class="nav-icon fa fa-upload"></i>Upload</span> <span class="badge-light"> <i class="fas fa-arrow-right"></i></span><span class="highlighted-text-assign"><i class="fas fa-random"></i>Assign </span>
-                        </label>
-                    </div>
+                    @if (Model.AutoAllocation)
+                    {
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input custom-checkbox-lg" type="checkbox" asp-for="UploadAndAssign" id="uploadAssignCheckbox" />
+                            <label class="form-check-label fw-bold ms-2 text-info" for="uploadAssignCheckbox">
+                                <span class="highlighted-text" title="Upload and Assign straight-away" data-toggle="tooltip"><i class="nav-icon fa fa-upload"></i>Upload</span> <span class="badge-light"> <i class="fas fa-arrow-right"></i></span><span class="highlighted-text-assign"><i class="fas fa-random"></i>Assign </span>
+                            </label>
+                        </div>
+                    }
+                    else
 
-
+                    {
+                        <div class="form-check form-switch mb-3">
+                            <label class="form-check-label fw-bold ms-2 text-info" for="uploadAssignCheckbox">
+                                <span class="highlighted-text" title="Upload case" data-toggle="tooltip"><i class="nav-icon fa fa-upload"></i>Upload</span>
+                            </label>
+                        </div>
+                    }
                     <div class="input-group">
-                        <input accept=".zip" type="file" class="form-control remarks" name="postedFile" id="postedFile"
-                               data-toggle="tooltip" title="Select a ZIP file to upload"
-                        @(Model.BulkUpload && Model.UserCanCreate ? "" : "disabled") />
+                        @if(Model.BulkUpload && Model.UserCanCreate)
+                        {
+                            <input accept=".zip" type="file" class="form-control remarks" name="postedFile" id="postedFile"
+                                   data-toggle="tooltip" title="Select a ZIP file to upload" />
 
-                        <button id="UploadFileButton" type="submit" class="btn btn-info"
-                        @(Model.BulkUpload && Model.UserCanCreate ? "" : "disabled")>
-                            <i class="nav-icon fa fa-upload"></i> Upload
-                        </button>
+                            <button id="UploadFileButton" type="submit" class="btn btn-info">
+                                <i class="nav-icon fa fa-upload"></i> Upload
+                            </button>
+                        }
+                        else
+                        {
+                            <input type="file" class="form-control remarks" data-toggle="tooltip" title="Upload Disabled" disabled />
+
+                            <button type="submit" class="btn btn-info" disabled>
+                                <i class="nav-icon fa fa-upload"></i> Upload
+                            </button>
+                        }
+
                     </div>
-
                 </div>
             </form>
         </div>

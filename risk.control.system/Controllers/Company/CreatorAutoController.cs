@@ -75,7 +75,7 @@ namespace risk.control.system.Controllers.Company
             }
         }
         [Breadcrumb(" Add/Assign")]
-        public IActionResult New()
+        public async Task<IActionResult> New()
         {
             try
             {
@@ -93,22 +93,22 @@ namespace risk.control.system.Controllers.Company
                         userCanCreate = false;
                         notifyService.Information($"MAX Case limit = <b>{companyUser.ClientCompany.TotalCreatedClaimAllowed}</b> reached");
                     }
-                    else
-                    {
-                        notifyService.Information($"Limit available = <b>{availableCount}</b>");
-                    }
                 }
-                var createdClaimsStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(s => s.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
-                var hasClaim = _context.ClaimsInvestigation.Any(c => c.ClientCompanyId == companyUser.ClientCompany.ClientCompanyId &&
-                !c.Deleted &&
-                c.InvestigationCaseSubStatus == createdClaimsStatus);
+                var totalReadyToAssign = await creatorService.GetAutoCount(currentUserEmail);
+                var hasClaim = totalReadyToAssign > 0;
                 var fileIdentifier = companyUser.ClientCompany.Country.Code.ToLower();
+                userCanCreate = userCanCreate && companyUser.ClientCompany.TotalToAssignMaxAllowed > totalReadyToAssign;
+
+                if (!userCanCreate)
+                {
+                    notifyService.Custom($"MAX Assign Case limit = <b>{companyUser.ClientCompany.TotalToAssignMaxAllowed}</b> reached", 5, "#dc3545", "fa fa-upload");
+                }
                 return View(new CreateClaims { 
                     BulkUpload = companyUser.ClientCompany.BulkUpload, 
                     UserCanCreate = userCanCreate, 
                     HasClaims = hasClaim, 
                     FileSampleIdentifier = fileIdentifier,
-
+                    AutoAllocation = companyUser.ClientCompany.AutoAllocation
                 });
             }
             catch (Exception ex)

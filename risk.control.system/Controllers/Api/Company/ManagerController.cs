@@ -211,13 +211,20 @@ namespace risk.control.system.Controllers.Api.Company
                 .Where(a => a.InvestigationCaseSubStatusId != assignedToAssignerStatus.InvestigationCaseSubStatusId)
                 .Where(a => a.InvestigationCaseSubStatusId != replyToAssessorStatus.InvestigationCaseSubStatusId)
                 .Where(a => a.InvestigationCaseSubStatusId != submittedToAssessorStatus.InvestigationCaseSubStatusId);
+            
+            int totalRecords = query.Count(); // Get total count before pagination
+
             // Search filtering
             if (!string.IsNullOrEmpty(search))
             {
                 search = search.ToLower();
                 query = query.Where(a =>
                     a.PolicyDetail.ContractNumber.ToLower().Contains(search) ||
+                    a.PolicyDetail.CauseOfLoss.ToLower().Contains(search) ||
+                    a.PolicyDetail.LineOfBusiness.Name.ToLower().Contains(search) ||
+                    a.PolicyDetail.InvestigationServiceType.Name.ToLower().Contains(search) ||
                     a.CustomerDetail.DateOfBirth.ToString().ToLower().Contains(search) ||
+                    a.CustomerDetail.Name.ToLower().Contains(search) ||
                     a.CustomerDetail.ContactNumber.ToLower().Contains(search) ||
                     a.CustomerDetail.PinCode.Code.ToLower().Contains(search) ||
                     a.CustomerDetail.PinCode.Name.ToLower().Contains(search) ||
@@ -226,32 +233,15 @@ namespace risk.control.system.Controllers.Api.Company
                     a.BeneficiaryDetail.Addressline.ToLower().Contains(search) ||
                     a.BeneficiaryDetail.ContactNumber.ToLower().Contains(search));
             }
+
             if (!string.IsNullOrEmpty(caseType))
             {
                 query = query.Where(c => c.PolicyDetail.LineOfBusiness.Name.ToLower() == caseType);  // Assuming CaseType is the field in your data model
             }
 
-            // Sorting
-            var columnMapping = new Dictionary<int, Expression<Func<ClaimsInvestigation, object>>>
-                {
-                    { 1, a => a.PolicyDetail.ContractNumber },
-                    { 2, a => a.PolicyDetail.SumAssuredValue },
-                    { 3, a => a.CustomerDetail.Name },
-                    { 4, a => a.InvestigationCaseSubStatus.Name },
-                    { 5, a => a.Created }
-                };
+            var data = query.AsEnumerable();
+            int recordsFiltered = query.Count();
 
-            if (columnMapping.ContainsKey(orderColumn))
-            {
-                if (orderDir.ToLower() == "asc")
-                    query = query.OrderBy(columnMapping[orderColumn]);
-                else
-                    query = query.OrderByDescending(columnMapping[orderColumn]);
-            }
-            var data = query.ToList();
-            int totalRecords = query.Count(); // Get total count before pagination
-
-            var pagedData = query.Skip(start).Take(length).ToList();
             var newClaims = new List<ClaimsInvestigation>();
 
             foreach (var claim in query)
@@ -271,60 +261,161 @@ namespace risk.control.system.Controllers.Api.Company
 
             var underWritingLineOfBusiness = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == UNDERWRITING).LineOfBusinessId;
 
+            var transformedData = data.Select(a => new
+            {
+                Id = a.ClaimsInvestigationId,
+                AutoAllocated = a.AutoAllocated,
+                CustomerFullName = a.CustomerDetail?.Name ?? string.Empty,
+                BeneficiaryFullName = a.BeneficiaryDetail?.Name ?? string.Empty,
+                PolicyId = a.PolicyDetail.ContractNumber,
+                Amount = string.Format(Extensions.GetCultureByCountry(companyUser.Country.Code.ToUpper()), "{0:c}", a.PolicyDetail.SumAssuredValue),
+                AssignedToAgency = a.AssignedToAgency,
+                Agent = !string.IsNullOrWhiteSpace(a.UserEmailActionedTo) ? a.UserEmailActionedTo : a.UserRoleActionedTo,
+                OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(GetOwner(a))),
+                CaseWithPerson = !string.IsNullOrWhiteSpace(a.UserEmailActionedTo),
+                Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness, a.CustomerDetail, a.BeneficiaryDetail),
+                PincodeCode = ClaimsInvestigationExtension.GetPincodeCode(a.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness, a.CustomerDetail, a.BeneficiaryDetail),
+                PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness, a.CustomerDetail, a.BeneficiaryDetail),
+                Document = a.PolicyDetail?.DocumentImage != null
+                        ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage))
+                        : Applicationsettings.NO_POLICY_IMAGE,
+                Customer = a.CustomerDetail?.ProfilePicture != null
+                        ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail.ProfilePicture))
+                        : Applicationsettings.NO_USER,
+                Name = a.CustomerDetail?.Name ?? "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i> </span>",
+                Policy = a.PolicyDetail?.LineOfBusiness.Name,
+                Status = a.ORIGIN.GetEnumDisplayName(),
+                SubStatus = a.InvestigationCaseSubStatus.Name,
+                Ready2Assign = a.IsReady2Assign,
+                ServiceType = $"{a.PolicyDetail?.LineOfBusiness.Name} ({a.PolicyDetail.InvestigationServiceType.Name})",
+                Service = a.PolicyDetail.InvestigationServiceType.Name,
+                Location = a.InvestigationCaseSubStatus.Name,
+                Created = a.Created.ToString("dd-MM-yyyy"),
+                timePending = GetManagerActiveTimePending(a),
+                Withdrawable = !a.NotWithdrawable,
+                PolicyNum = a.GetPolicyNum(),
+                BeneficiaryPhoto = a.BeneficiaryDetail?.ProfilePicture != null
+                        ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.BeneficiaryDetail.ProfilePicture))
+                        : Applicationsettings.NO_USER,
+                BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.Name)
+                        ? "<span class=\"badge badge-danger\"><i class=\"fas fa-exclamation-triangle\"></i></span>"
+                        : a.BeneficiaryDetail.Name,
+                TimeElapsed = DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).TotalSeconds,
+                IsNewAssigned = a.ManagerActiveView <= 1,
+                PersonMapAddressUrl = a.GetMapUrl(a.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness, a.InvestigationCaseSubStatus == assignedToAssignerStatus,
+                                                      a.InvestigationCaseSubStatus == submittedToAssessorStatus)
+            });
+
+            // Apply Sorting AFTER Data Transformation
+            if (!string.IsNullOrEmpty(orderDir))
+            {
+                switch (orderColumn)
+                {
+                    case 1: // Sort by Policy Number
+                        transformedData = orderDir.ToLower() == "asc"
+                            ? transformedData.OrderBy(a => a.PolicyId)
+                            : transformedData.OrderByDescending(a => a.PolicyId);
+                        break;
+
+                    case 2: // Sort by Amount (Ensure proper sorting of numeric values)
+                        transformedData = orderDir.ToLower() == "asc"
+                            ? transformedData.OrderBy(a => a.Amount)
+                            : transformedData.OrderByDescending(a => a.Amount);
+                        break;
+
+                    case 3: // Sort by Amount (Ensure proper sorting of numeric values)
+                        transformedData = orderDir.ToLower() == "asc"
+                            ? transformedData.OrderBy(a => a.PincodeCode)
+                            : transformedData.OrderByDescending(a => a.PincodeCode);
+                        break;
+
+                    case 6: // Sort by Customer Full Name
+                        transformedData = orderDir.ToLower() == "asc"
+                            ? transformedData.OrderBy(a => a.CustomerFullName)
+                            : transformedData.OrderByDescending(a => a.CustomerFullName);
+                        break;
+
+                    case 8: // Sort by Beneficiary Full Name
+                        transformedData = orderDir.ToLower() == "asc"
+                            ? transformedData.OrderBy(a => a.BeneficiaryFullName)
+                            : transformedData.OrderByDescending(a => a.BeneficiaryFullName);
+                        break;
+
+
+                    case 9: // Sort by Status
+                        transformedData = orderDir.ToLower() == "asc"
+                            ? transformedData.OrderBy(a => a.ServiceType)
+                            : transformedData.OrderByDescending(a => a.ServiceType);
+                        break;
+
+                    case 10: // Sort by Status
+                        transformedData = orderDir.ToLower() == "asc"
+                            ? transformedData.OrderBy(a => a.Location)
+                            : transformedData.OrderByDescending(a => a.Location);
+                        break;
+
+                    case 11: // Sort by Created Date
+                        transformedData = orderDir.ToLower() == "asc"
+                            ? transformedData.OrderBy(a => DateTime.ParseExact(a.Created, "dd-MM-yyyy", null))
+                            : transformedData.OrderByDescending(a => DateTime.ParseExact(a.Created, "dd-MM-yyyy", null));
+                        break;
+
+                    case 12: // Sort by TimeElapsed
+                        transformedData = orderDir.ToLower() == "asc"
+                            ? transformedData.OrderBy(a => a.TimeElapsed)
+                            : transformedData.OrderByDescending(a => a.TimeElapsed);
+                        break;
+
+                    default: // Default Sorting (if needed)
+                        transformedData = orderDir.ToLower() == "asc"
+                            ? transformedData.OrderBy(a => a.TimeElapsed)
+                            : transformedData.OrderByDescending(a => a.TimeElapsed);
+                        break;
+                }
+            }
+            // Apply Pagination
+            var pagedData = transformedData.Skip(start).Take(length).ToList();
+            // Prepare Response
+
             var response = new
             {
                 draw = draw,
                 recordsTotal = totalRecords,
-                recordsFiltered = totalRecords,
-                data = pagedData.Select(a => new
-                {
-                    Id = a.ClaimsInvestigationId,
-                    AutoAllocated = a.AutoAllocated,
-                    CustomerFullName = a.CustomerDetail?.Name ?? string.Empty,
-                    BeneficiaryFullName = a.BeneficiaryDetail?.Name ?? string.Empty,
-                    PolicyId = a.PolicyDetail.ContractNumber,
-                    Amount = string.Format(Extensions.GetCultureByCountry(companyUser.Country.Code.ToUpper()), "{0:c}", a.PolicyDetail.SumAssuredValue),
-                    AssignedToAgency = a.AssignedToAgency,
-                    Agent = !string.IsNullOrWhiteSpace(a.UserEmailActionedTo) ? a.UserEmailActionedTo : a.UserRoleActionedTo,
-                    OwnerDetail = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(GetOwner(a))),
-                    CaseWithPerson = !string.IsNullOrWhiteSpace(a.UserEmailActionedTo),
-                    Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness, a.CustomerDetail, a.BeneficiaryDetail),
-                    PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness, a.CustomerDetail, a.BeneficiaryDetail),
-                    Document = a.PolicyDetail?.DocumentImage != null
-                        ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage))
-                        : Applicationsettings.NO_POLICY_IMAGE,
-                    Customer = a.CustomerDetail?.ProfilePicture != null
-                        ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail.ProfilePicture))
-                        : Applicationsettings.NO_USER,
-                    Name = a.CustomerDetail?.Name ?? "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i> </span>",
-                    Policy = a.PolicyDetail?.LineOfBusiness.Name,
-                    Status = a.ORIGIN.GetEnumDisplayName(),
-                    SubStatus = a.InvestigationCaseSubStatus.Name,
-                    Ready2Assign = a.IsReady2Assign,
-                    ServiceType = $"{a.PolicyDetail?.LineOfBusiness.Name} ({a.PolicyDetail.InvestigationServiceType.Name})",
-                    Service = a.PolicyDetail.InvestigationServiceType.Name,
-                    Location = a.InvestigationCaseSubStatus.Name,
-                    Created = a.Created.ToString("dd-MM-yyyy"),
-                    timePending = a.GetManagerTimePending(),
-                    Withdrawable = !a.NotWithdrawable,
-                    PolicyNum = a.GetPolicyNum(),
-                    BeneficiaryPhoto = a.BeneficiaryDetail?.ProfilePicture != null
-                        ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.BeneficiaryDetail.ProfilePicture))
-                        : Applicationsettings.NO_USER,
-                    BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail?.Name)
-                        ? "<span class=\"badge badge-danger\"><i class=\"fas fa-exclamation-triangle\"></i></span>"
-                        : a.BeneficiaryDetail.Name,
-                    TimeElapsed = DateTime.Now.Subtract(a.Created).TotalSeconds,
-                    IsNewAssigned = a.ManagerActiveView <= 1,
-                    PersonMapAddressUrl = a.GetMapUrl(a.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness, a.InvestigationCaseSubStatus == assignedToAssignerStatus,
-                                                      a.InvestigationCaseSubStatus == submittedToAssessorStatus)
-                })
+                recordsFiltered = recordsFiltered,
+                data = pagedData
             };
-            
 
             return Ok(response);
         }
+        private static string GetManagerActiveTimePending(ClaimsInvestigation a)
+        {
+            if (a.CreatorSla == 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Hurry up, {DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Days} days since created!\"></i>");
+            }
+            if (DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Days >= a.CreatorSla)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Days} day</span>");
 
+            else if (DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Days >= 3 || DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Days >= a.CreatorSla)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Days} day</span>");
+            if (DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Days >= 1)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Days} day</span>");
+
+            if (DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Hours < 24 &&
+                DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Hours > 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Hours} hr </span>");
+            }
+            if (DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Hours == 0 && DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Minutes > 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Minutes} min </span>");
+            }
+            if (DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Minutes == 0 && DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Seconds > 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.AllocatedToAgencyTime.GetValueOrDefault()).Seconds} sec </span>");
+            }
+            return string.Join("", "<span class='badge badge-light'>now</span>");
+        }
         [HttpGet("GetReport")]
         public async Task<IActionResult> GetReport()
         {
@@ -396,7 +487,7 @@ namespace risk.control.system.Controllers.Api.Company
                 Service = a.PolicyDetail.InvestigationServiceType.Name,
                 Location = a.InvestigationCaseSubStatus.Name,
                 Created = a.Created.ToString("dd-MM-yyyy"),
-                timePending = a.GetManagerTimePending(false, true),
+                timePending = GetManagerTimeCompleted(a),
                 PolicyNum = a.GetPolicyNum(),
                 BeneficiaryPhoto = a.BeneficiaryDetail?.ProfilePicture != null ?
                     $"data:image/*;base64,{Convert.ToBase64String(a.BeneficiaryDetail.ProfilePicture)}" :
@@ -415,6 +506,35 @@ namespace risk.control.system.Controllers.Api.Company
             return Ok(response);
         }
 
+        private static string GetManagerTimeCompleted(ClaimsInvestigation a)
+        {
+            if (a.CreatorSla == 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.ProcessedByAssessorTime.GetValueOrDefault()).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Hurry up, {DateTime.Now.Subtract(a.ProcessedByAssessorTime.GetValueOrDefault()).Days} days since created!\"></i>");
+            }
+            if (DateTime.Now.Subtract(a.ProcessedByAssessorTime.GetValueOrDefault()).Days >= a.CreatorSla)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.ProcessedByAssessorTime.GetValueOrDefault()).Days} day</span>");
+
+            else if (DateTime.Now.Subtract(a.ProcessedByAssessorTime.GetValueOrDefault()).Days >= 3 || DateTime.Now.Subtract(a.ProcessedByAssessorTime.GetValueOrDefault()).Days >= a.CreatorSla)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.ProcessedByAssessorTime.GetValueOrDefault()).Days} day</span>");
+            if (DateTime.Now.Subtract(a.ProcessedByAssessorTime.GetValueOrDefault()).Days >= 1)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.ProcessedByAssessorTime.GetValueOrDefault()).Days} day</span>");
+
+            if (DateTime.Now.Subtract(a.ProcessedByAssessorTime.GetValueOrDefault()).Hours < 24 &&
+                DateTime.Now.Subtract(a.ProcessedByAssessorTime.GetValueOrDefault()).Hours > 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.ProcessedByAssessorTime.GetValueOrDefault()).Hours} hr </span>");
+            }
+            if (DateTime.Now.Subtract(a.ProcessedByAssessorTime.GetValueOrDefault()).Hours == 0 && DateTime.Now.Subtract(a.ProcessedByAssessorTime.GetValueOrDefault()).Minutes > 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.ProcessedByAssessorTime.GetValueOrDefault()).Minutes} min </span>");
+            }
+            if (DateTime.Now.Subtract(a.ProcessedByAssessorTime.GetValueOrDefault()).Minutes == 0 && DateTime.Now.Subtract(a.ProcessedByAssessorTime.GetValueOrDefault()).Seconds > 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(a.ProcessedByAssessorTime.GetValueOrDefault()).Seconds} sec </span>");
+            }
+            return string.Join("", "<span class='badge badge-light'>now</span>");
+        }
         [HttpGet("GetReject")]
         public async Task<IActionResult> GetReject()
         {
@@ -478,7 +598,7 @@ namespace risk.control.system.Controllers.Api.Company
                 Service = a.PolicyDetail.InvestigationServiceType.Name,
                 Location = a.InvestigationCaseSubStatus.Name,
                 Created = a.Created.ToString("dd-MM-yyyy"),
-                timePending = a.GetManagerTimePending(false, true),
+                timePending = GetManagerTimeCompleted(a),
                 PolicyNum = a.GetPolicyNum(),
                 BeneficiaryPhoto = a.BeneficiaryDetail?.ProfilePicture != null ?
                     $"data:image/*;base64,{Convert.ToBase64String(a.BeneficiaryDetail.ProfilePicture)}" :

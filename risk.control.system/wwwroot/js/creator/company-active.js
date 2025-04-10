@@ -61,7 +61,6 @@
 
             {
                 "data": "policyNum",
-                "bSortable": false,
                 "mRender": function (data, type, row) {
                     return '<span title="' + row.policyId + '" data-toggle="tooltip">' + data + '</span>';
                 }
@@ -157,9 +156,9 @@
                 }
             },
             {
-                "data": "location",
+                "data": "subStatus",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + row.status + '" data-toggle="tooltip">' + data + '</span>'
+                    return '<span title="' + row.subStatus + '" data-toggle="tooltip">' + data + '</span>'
                 }
             },
             {

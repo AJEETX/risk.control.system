@@ -119,18 +119,23 @@
                     <div class="col-md-12">
                         @if(Model.ClaimsInvestigation.ClientCompany.AutoAllocation)
                         {
-                            if (!@Model.FromEditPage)
-                            {
-                                <a id="back" asp-controller="CreatorAuto" asp-action="New" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> Back</a>
-                            }
-                            else
-                            {
-                                <a id="back" asp-controller="CreatorAuto" asp-action="Details" asp-route-id="@Model.ClaimsInvestigation.ClaimsInvestigationId" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> Back</a>
-                            }
+                            <a id="back"
+                               asp-controller="CreatorAuto"
+                               asp-action="@(Model.FromEditPage ? "Details" : "New")"
+                               asp-route-id="@(Model.FromEditPage ? Model.ClaimsInvestigation.ClaimsInvestigationId : null)"
+                               class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left"></i> Back
+                            </a>
                         }
                         else
                         {
-                            <a id="back" asp-controller="CreatorAuto" asp-action="New" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> Back</a>
+                            <a id="back"
+                               asp-controller="CreatorAuto"
+                               asp-action="@(Model.FromEditPage ? "Details" : "New")"
+                               asp-route-id="@(Model.FromEditPage ? Model.ClaimsInvestigation.ClaimsInvestigationId : null)"
+                               class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left"></i> Back
+                            </a>
                         }
                         <button disabled="disabled" id="allocatedcase" type="submit" class="btn btn-info">
                             <i class="fas fa-external-link-alt" aria-hidden="true"></i> <b> Assign </b><sub>manual</sub>

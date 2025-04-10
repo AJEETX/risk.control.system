@@ -16,7 +16,7 @@ $(document).ready(function () {
                     length: d.length || 10,
                     caseType: $('#caseTypeFilter').val() || "",  // Send selected filter value
                     search: d.search?.value || "", // Instead of empty string, send "all"
-                    orderColumn: d.order?.[13]?.column ?? 0,
+                    orderColumn: d.order?.[0]?.column ?? 15,
                     orderDir: d.order?.[0]?.dir || "asc"
                 };
             },
@@ -43,10 +43,10 @@ $(document).ready(function () {
                 targets: 8                      // Index of the column to style
             },
             {
-                'targets': 15, // Index for the "Case Type" column
+                'targets': 16, // Index for the "Case Type" column
                 'name': 'policy' // Name for the "Case Type" column
             }],
-        order: [[13, 'asc']],
+        order: [[15, 'asc']],
         responsive: true,
         fixedHeader: true,
         processing: true,
@@ -193,6 +193,7 @@ $(document).ready(function () {
                     return buttons;
                 }
             },
+            { "data": "timeElapsed", bVisible: false },
             { "data": "policy", bVisible: false }
         ],
         "drawCallback": function (settings, start, end, max, total, pre) {

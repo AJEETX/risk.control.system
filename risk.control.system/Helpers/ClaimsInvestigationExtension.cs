@@ -269,19 +269,9 @@ namespace risk.control.system.Helpers
         }
         public static string GetManagerTimePending(this ClaimsInvestigation a, bool assess= false, bool completed = false)
         {
-            DateTime timeToCompare = a.Created;
-            if (assess)
-            {
-                timeToCompare = a.SubmittedToAssessorTime.Value;
-                if (DateTime.Now.Subtract(timeToCompare).Days >= a.AssessorSla)
-                    return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Hurry up, {DateTime.Now.Subtract(timeToCompare).Days} days since created!\"></i>");
-            }
-            else if(completed)
-            {
-                timeToCompare = a.ProcessedByAssessorTime.Value;
-                if (DateTime.Now.Subtract(timeToCompare).Days >= a.AssessorSla)
-                    return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Hurry up, {DateTime.Now.Subtract(timeToCompare).Days} days since created!\"></i>");
-            }
+            DateTime timeToCompare = a.SubmittedToAssessorTime.Value;
+            if (DateTime.Now.Subtract(timeToCompare).Days >= a.AssessorSla)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Hurry up, {DateTime.Now.Subtract(timeToCompare).Days} days since created!\"></i>");
 
             if (DateTime.Now.Subtract(timeToCompare).Days >= 3 || DateTime.Now.Subtract(timeToCompare).Days >= a.AssessorSla)
                 return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Days} day</span><i data-toggle='tooltip' class=\"fa fa-asterisk asterik-style\" title=\"Caution : {DateTime.Now.Subtract(a.Created).Days} day since created.\"></i>");
@@ -410,6 +400,21 @@ namespace risk.control.system.Helpers
                 if (location is null)
                     return "...";
                 return location.Addressline + "," + location.District.Name + ", " + location.State.Name + ", " + location.PinCode.Code;
+            }
+        }
+        public static string GetPincodeCode(bool claimType, CustomerDetail cdetail, BeneficiaryDetail location)
+        {
+            if (claimType)
+            {
+                if (cdetail is null)
+                    return "...";
+                return cdetail.PinCode.Code;
+            }
+            else
+            {
+                if (location is null)
+                    return "...";
+                return location.PinCode.Code;
             }
         }
 

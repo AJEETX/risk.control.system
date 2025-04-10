@@ -52,8 +52,9 @@
                     draw: d.draw || 1,
                     start: d.start || 0,
                     length: d.length || 10,
+                    caseType: $('#caseTypeFilter').val() || "",  // Send selected filter value
                     search: d.search?.value || "", // Instead of empty string, send "all"
-                    orderColumn: d.order?.[14]?.column ?? 0,
+                    orderColumn: d.order?.[0]?.column ?? 14, // Default to column 15
                     orderDir: d.order?.[0]?.dir || "desc"
                 };
             },
@@ -62,7 +63,7 @@
                 console.error("Response:", xhr.responseText);
             }
         },
-        responsive: true,
+        
         columnDefs: [{
             'targets': 0,
             'searchable': false,
@@ -96,11 +97,12 @@
                 'targets': 15, // Index for the "Case Type" column
                 'name': 'policy' // Name for the "Case Type" column
             }],
+        order: [[14, 'asc']],
+        responsive: true,
         fixedHeader: true,
         processing: true,
         serverSide: true,
         paging: true,
-
         language: {
             loadingRecords: '&nbsp;',
             processing: '<i class="fas fa-sync fa-spin fa-4x fa-fw"></i><span class="sr-only">Loading...</span>'
@@ -131,7 +133,6 @@
             },
             {
                 "data": "policyNum",
-                "bSortable": false,
                 "mRender": function (data, type, row) {
                     return '<span title="' + row.policyId + '" data-toggle="tooltip">' + data + '</span>';
                 }
@@ -144,7 +145,6 @@
             },
             {
                 "data": "pincode",
-                "bSortable": false,
                 "mRender": function (data, type, row) {
                     if (row.pincodeName != '...') {
                         var img = '<div class="map-thumbnail profile-image doc-profile-image">';
@@ -313,6 +313,11 @@
         },
         error: function (xhr, status, error) { alert('err ' + error) }
     });
+
+    $('#caseTypeFilter').on('change', function () {
+        table.ajax.reload(); // Reload the table when the filter is changed
+    });
+
     table.on('preDraw.dt', function () {
         $('input[name="select_all"]').prop('checked', false); // Uncheck checkboxes before rendering new data
     });

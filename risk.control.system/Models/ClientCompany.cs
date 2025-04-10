@@ -103,6 +103,7 @@ namespace risk.control.system.Models
         public DateTime? ExpiryDate { get; set; } = DateTime.Now.AddDays(10);
         [Range(10, 50)]
         public int TotalCreatedClaimAllowed { get; set; } = 50;
+        public int TotalToAssignMaxAllowed { get; set; } = 50;
         public bool Deleted { get; set; } = false;
         public bool HasClaims { get; set; } = false;
         public bool AiEnabled { get; set; } = false;
