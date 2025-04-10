@@ -89,16 +89,16 @@ namespace risk.control.system.Controllers.Company
                 var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
                 var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
 
-                var uploadId = await ftpService.UploadFile(currentUserEmail, postedFile, model.CREATEDBY);
+                var uploadId = await ftpService.UploadFile(currentUserEmail, postedFile, model.CREATEDBY, model.UploadAndAssign);
                 var jobId = backgroundJobClient.Enqueue(() => ftpService.StartUpload(currentUserEmail, uploadId, baseUrl,model.UploadAndAssign));
                 progressService.AddUploadJob(jobId, currentUserEmail);
-                if(model.UploadAndAssign)
+                if(!model.UploadAndAssign)
                 {
-                    notifyService.Custom($"Upload in progress ", 3, "orange", "fa fa-upload");
+                    notifyService.Custom($"Upload in progress ", 3, "#17a2b8", "fa fa-upload");
                 }
                 else
                 {
-                    notifyService.Custom($"Upload + Assign in progress ", 3, "orange", "fa fa-upload");
+                    notifyService.Custom($"Upload + Assign in progress ", 5, "#dc3545", "fa fa-upload");
 
                 }
 

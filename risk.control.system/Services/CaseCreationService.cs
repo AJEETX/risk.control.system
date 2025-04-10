@@ -194,22 +194,8 @@ namespace risk.control.system.Services
             claim.CustomerDetail = customer;
             claim.BeneficiaryDetail = beneficiary;
 
-            var claimUploaded = _context.ClaimsInvestigation.Add(claim);
-            var log = new InvestigationTransaction
-            {
-                ClaimsInvestigationId = claim.ClaimsInvestigationId,
-                UserEmailActioned = claim.UserEmailActioned,
-                UserRoleActionedTo = claim.UserRoleActionedTo,
-                CurrentClaimOwner = companyUser.Email,
-                HopCount = 0,
-                Time2Update = 0,
-                InvestigationCaseStatusId = status.InvestigationCaseStatusId,
-                InvestigationCaseSubStatusId = createdStatus.InvestigationCaseSubStatusId,
-                UpdatedBy = companyUser.Email
-            };
-
-            _context.InvestigationTransaction.Add(log);
-            return claimUploaded.Entity;
+            
+            return claim;
         }
         private async Task<CustomerDetail> AddCustomer(ClientCompanyApplicationUser companyUser, UploadCase uploadCase, byte[] data)
         {

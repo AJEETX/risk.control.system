@@ -337,8 +337,7 @@ namespace risk.control.system.Services
                     uploadProgressService.UpdateProgress(model.Id, progress);
                     uploadedRecordsCount++;
                 }
-                var rowsSaved = _context.SaveChanges() > 0;
-                return rowsSaved ? uploadedClaims : null;
+                return uploadedClaims;
             }
             catch (Exception ex)
             {

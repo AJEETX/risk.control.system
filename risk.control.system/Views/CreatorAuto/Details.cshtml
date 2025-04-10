@@ -152,9 +152,13 @@
                             <div>
 
                                 <a id="back" asp-action="New" class="btn btn-outline-secondary"><span class="badge badge-light"> <i class="fas fa-arrow-left"></i> </span> Back </a>
-                                <button disabled class="btn btn-warning disabled">
-                                    <span class="badge badge-warning"> <i class="fas fa-random"></i></span><b> Assign </b> <i class="small-suffix"> auto</i>
-                                </button>
+                                @if(Model.ClaimsInvestigation.ClientCompany.AutoAllocation)
+                                {
+                                    <button disabled class="btn btn-warning disabled">
+                                        <span class="badge badge-warning"> <i class="fas fa-random"></i></span><b> Assign </b> <i class="small-suffix"> auto</i>
+                                    </button>
+                                }
+                                
                                 <button disabled class="btn btn-info disabled">
                                     <span class="badge badge-info"> <i class="fas fa-external-link-alt"></i></span><b>Assign</b><sub>manual</sub>
                                 </button>
@@ -172,19 +176,27 @@
 
                                 @if (customerExist && beneficiaryExist)
                                 {
-
-                                    <button type="submit" id="assign-list" class="btn btn-warning">
-                                        <span class="badge badge-warning"> <i class="fas fa-random"></i></span><b> Assign</b><sub>auto</sub>
-                                    </button>
+                                    @if (Model.ClaimsInvestigation.ClientCompany.AutoAllocation)
+                                    {
+                                        <button type="submit" id="assign-list" class="btn btn-warning">
+                                            <span class="badge badge-warning"> <i class="fas fa-random"></i></span><b> Assign</b><sub>auto</sub>
+                                        </button>
+                                    }
+                                    
                                     <a id="assign-manual" href="/CreatorAuto/EmpanelledVendors?Id=@Model.ClaimsInvestigation.ClaimsInvestigationId&fromEditPage=true" class="btn btn-info">
                                         <span class="badge badge-info"> <i class="fas fa-external-link-alt"></i></span><b> Assign</b><sub>manual</sub>
                                     </a>
                                 }
                                 else
                                 {
-                                    <button disabled class="btn btn-warning disabled">
-                                        <span class="badge badge-warning"> <i class="fas fa-random"></i></span><b> Assign </b> <i class="small-suffix"> auto</i>
-                                    </button>
+                                    @if (Model.ClaimsInvestigation.ClientCompany.AutoAllocation)
+
+                                    {
+                                        <button disabled class="btn btn-warning disabled">
+                                            <span class="badge badge-warning"> <i class="fas fa-random"></i></span><b> Assign </b> <i class="small-suffix"> auto</i>
+                                        </button>
+                                    }
+                                   
                                     <button disabled class="btn btn-info disabled">
                                         <span class="badge badge-info"> <i class="fas fa-external-link-alt"></i></span><b>Assign</b><sub>manual</sub>
                                     </button>

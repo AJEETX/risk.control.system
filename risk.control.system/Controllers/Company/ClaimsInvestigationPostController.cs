@@ -176,7 +176,7 @@ namespace risk.control.system.Controllers.Company
             if (selectedcase < 1 || string.IsNullOrWhiteSpace(caseId))
             {
                 notifyService.Custom($"Error!!! Try again", 3, "red", "far fa-file-powerpoint");
-                return RedirectToAction(nameof(CreatorManualController.New), "CreatorManual");
+                return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
             }
             //set claim as manual assigned
             try
@@ -188,7 +188,7 @@ namespace risk.control.system.Controllers.Company
                 if(string.IsNullOrEmpty(policy) || string.IsNullOrEmpty(status))
                 {
                     notifyService.Custom($"Error!!! Try again", 3, "red", "far fa-file-powerpoint");
-                    return RedirectToAction(nameof(CreatorManualController.New), "CreatorManual");
+                    return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
                 }
 
                 var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == selectedcase);
@@ -207,7 +207,7 @@ namespace risk.control.system.Controllers.Company
             {
                 Console.WriteLine(ex.StackTrace);
                 notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(CreatorManualController.New), "CreatorManual");
+                return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
             }
         }
 
@@ -236,21 +236,8 @@ namespace risk.control.system.Controllers.Company
 
                 notifyService.Custom($"Case #{policyNumber}  withdrawn successfully", 3, "green", "far fa-file-powerpoint");
 
-                if (company.AutoAllocation)
-                {
-                    if (model.ClaimsInvestigation.CREATEDBY == CREATEDBY.MANUAL)
-                    {
-                        return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
-                    }
-                    else
-                    {
-                        return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
-                    }
-                }
-                else 
-                {
-                    return RedirectToAction(nameof(CreatorManualController.New), "CreatorManual");
-                }
+                    return RedirectToAction(nameof(CreatorAutoController.New), "CreatorAuto");
+
             }
             catch (Exception ex)
             {

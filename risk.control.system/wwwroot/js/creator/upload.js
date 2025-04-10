@@ -29,19 +29,8 @@
         "columns": [
             { "data": "id", "bVisible": false },
             
-            { "data": "sequenceNumber" },   
-            { "data": "name" },
-            { "data": "fileType" },
-            { "data": "createdOn" },
-            { "data": "uploadedBy" },
-            
-            {
-                "data": "message",
-                "bSortable": false,
-                "mRender": function (data, type, row) {
-                    return '<span title="' + row.message + '" class=badge badge-light" data-toggle="tooltip"> '+ data +'</span>';
-                }
-            },
+            { "data": "sequenceNumber" },  
+
             {
                 "data": "icon",
                 "bSortable": false,
@@ -49,19 +38,33 @@
                     return '<i title="' + row.message + '" class="' + data + '" data-toggle="tooltip"></i>';
                 }
             },
+            { "data": "name" },
+            { "data": "fileType" },
+            { "data": "createdOn" },
+            { "data": "uploadedBy" },
+
+            {
+                "data": "message",
+                "bSortable": false,
+                "mRender": function (data, type, row) {
+                    return '<span title="' + data + '" class="badge badge-light" data-toggle="tooltip"> ' + data + '</span>';
+                }
+            },
             {
                 "data": null,
                 "bSortable": false,
                 "render": function (data, type, row) {
                     var img = '<a href="/Uploads/DownloadLog/' + row.id + '" class="btn btn-xs btn-primary"><i class="nav-icon fa fa-download"></i> Download</a> ';
-                    if (row.isManager) {
-                       img += '<button class="btn btn-xs btn-danger delete-file" data-id="' + row.id + '"><i class="fas fa-trash"></i> Delete</button>';
+                    if (row.isManager || row.status != 'Completed') {
+                        img += '<button class="btn btn-xs btn-danger delete-file" data-id="' + row.id + '"><i class="fas fa-trash"></i> Delete</button>';
+                    } else {
+                        img += '<button class="btn btn-xs btn-danger disabled" disabled><i class="fas fa-trash"></i> Delete</button>';
                     }
                     return img;
                 }
             }
         ],
-        "order": [[4, "desc"]],  // ✅ Sort by 'createdOn' (5th column, index 4) in descending order
+        "order": [[5, "desc"]],  // ✅ Sort by 'createdOn' (5th column, index 4) in descending order
         "columnDefs": [
             {
                 "targets": 4,   // ✅ Apply sorting to 'createdOn' column
@@ -191,7 +194,17 @@
         }
         table.ajax.reload(null, false);
     });
-    
+
+    $('#uploadAssignCheckbox').on('change', function () {
+        let isChecked = $(this).is(':checked');
+        $('#UploadFileButton').toggleClass('btn-info btn-danger');
+// Toggle the button text (including HTML content)
+    if (isChecked) {
+        $('#UploadFileButton').html(' Upload & Assign');
+    } else {
+        $('#UploadFileButton').html('<i class="nav-icon fa fa-upload"></i> Upload');
+    }
+    });
     $("#postedFile").on('change', function () {
         var MaxSizeInBytes = 1097152;
         //Get count of selected files
@@ -264,20 +277,27 @@
     });
     let askFileUploadConfirmation = true;
 
-    function handleUploadConfirmation(formId, buttonId) {
+    function handleUploadConfirmation(formId, buttonId, checkboxId) {
         $(formId).on('submit', function (event) {
             if (askFileUploadConfirmation) {
                 event.preventDefault();
+
+                // Check the state of the checkbox
+                let isChecked = $(checkboxId).is(':checked');
+
+               
+
+                // Customize the confirm dialog dynamically
                 $.confirm({
-                    title: "Confirm File Upload",
-                    content: "Are you sure to Upload?",
-                    icon: 'fas fa-upload',
-                    type: 'green',
+                    title: isChecked ? "Confirm Direct Assign" : "Confirm File Upload",  // Dynamic title based on checkbox
+                    content: isChecked ? "Are you sure you want to Upload -> Assign?" : "Are you sure you want to Upload?",  // Dynamic content
+                    icon: isChecked ? 'fas fa-random' : 'fas fa-upload',  // Dynamic icon based on checkbox
+                    type: isChecked ? '#dc3545' : '#17a2b8',  // Dynamic color type ('blue' for Upload & Assign, 'green' for just Upload)
                     closeIcon: true,
                     buttons: {
                         confirm: {
-                            text: "File Upload",
-                            btnClass: 'btn-success',
+                            text: isChecked ? "Direct Assign" : "File Upload",  // Dynamic button text
+                            btnClass: isChecked ? 'btn-danger':'btn-success',  // Customize button class
                             action: function () {
                                 askFileUploadConfirmation = false;
 
@@ -286,11 +306,17 @@
                                     $(".submit-progress").removeClass("hidden");
                                 }, 1);
 
-                                $(buttonId).html("<i class='fas fa-sync fa-spin'></i> Uploading");
+                                // Update the button text while uploading (already set above dynamically)
                                 disableAllInteractiveElements();
-                                //setRefreshCountFlag();
+                                // Customize the button text before the submission
+                                if (isChecked) {
+                                    $(buttonId).html('<i class="fas fa-sync fa-spin"></i> Uploading & Assigning...');
+                                } else {
+                                    $(buttonId).html('<i class="fas fa-sync fa-spin"></i> Uploading...');
+                                }
                                 $(formId).submit();
 
+                                // Disable elements during progress (optional, you can modify this part as needed)
                                 var article = document.getElementById("article");
                                 if (article) {
                                     var nodes = article.getElementsByTagName('*');
@@ -302,7 +328,7 @@
                         },
                         cancel: {
                             text: "Cancel",
-                            btnClass: 'btn-default'
+                            btnClass: 'btn-default',  // Customize cancel button style
                         }
                     }
                 });
@@ -310,6 +336,7 @@
         });
     }
 
+
     // Apply confirmation to both forms
-    handleUploadConfirmation("#upload-claims", "#UploadFileButton");
+    handleUploadConfirmation("#upload-claims", "#UploadFileButton", "#uploadAssignCheckbox");
 });
