@@ -222,7 +222,7 @@ namespace risk.control.system.Services
                 {
                     if (totalClaimsCreated > companyUser.ClientCompany.TotalCreatedClaimAllowed)
                     {
-                        SetUploadFailure(uploadFileData, $"Case limit reached of {companyUser.ClientCompany.TotalCreatedClaimAllowed} case(s).");
+                        SetUploadFailure(uploadFileData, $"Case limit reached of {companyUser.ClientCompany.TotalCreatedClaimAllowed} case(s).", uploadAndAssign);
                         await _context.SaveChangesAsync();
                         await mailboxService.NotifyFileUpload(userEmail, uploadFileData, url);
                         return;
@@ -232,7 +232,7 @@ namespace risk.control.system.Services
                 var uploadedClaims = await uploadService.PerformCustomUpload(companyUser, customData, uploadFileData);
                 if (uploadedClaims == null || uploadedClaims.Count == 0)
                 {
-                    SetUploadFailure(uploadFileData, "Error uploading the file");
+                    SetUploadFailure(uploadFileData, "Error uploading the file", uploadAndAssign);
                     await _context.SaveChangesAsync();
                     await mailboxService.NotifyFileUpload(userEmail, uploadFileData, url);
                     return;
@@ -243,7 +243,7 @@ namespace risk.control.system.Services
                     var totalAddedAndExistingCount = uploadedClaims.Count + totalClaimsCreated;
                     if (totalAddedAndExistingCount > companyUser.ClientCompany.TotalCreatedClaimAllowed)
                     {
-                        SetUploadFailure(uploadFileData, $"Case limit exceeded of {companyUser.ClientCompany.TotalCreatedClaimAllowed} case(s).");
+                        SetUploadFailure(uploadFileData, $"Case limit exceeded of {companyUser.ClientCompany.TotalCreatedClaimAllowed} case(s).",uploadAndAssign);
                         await _context.SaveChangesAsync();
                         await mailboxService.NotifyFileUpload(userEmail, uploadFileData, url);
                         return;
@@ -294,12 +294,13 @@ namespace risk.control.system.Services
                 throw;
             }
         }
-        void SetUploadFailure(FileOnFileSystemModel fileData, string message)
+        void SetUploadFailure(FileOnFileSystemModel fileData, string message, bool uploadAndAssign)
         {
             fileData.Completed = false;
             fileData.Icon = "fas fa-times-circle i-orangered";
             fileData.Status = "Error";
             fileData.Message = message;
+            fileData.DirectAssign = uploadAndAssign;
         }
 
         void SetUploadAssignSuccess(FileOnFileSystemModel fileData, List<ClaimsInvestigation> claims, List<string> autoAllocated)
@@ -319,6 +320,7 @@ namespace risk.control.system.Services
             fileData.Icon = "fas fa-check-circle i-green";
             fileData.Status = "Completed";
             fileData.Message = message;
+            fileData.DirectAssign = true;
             fileData.RecordCount = claims.Count;
             fileData.ClaimsId = claims.Select(c => c.ClaimsInvestigationId).ToList();
         }

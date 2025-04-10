@@ -23,5 +23,6 @@
         public int CompanySequenceNumber { get; set; } // Company-specific sequence number
         public int UserSequenceNumber { get; set; } // Company-specific sequence number
         public bool Deleted { get; set; } = false;
+        public bool DirectAssign { get; set; } = false;
     }
 }

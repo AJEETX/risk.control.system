@@ -2657,27 +2657,25 @@ input#checkall {
 
 .custom-select {
     flex: 1;
-    max-width: 400px;
+    max-width: 150px;
 }
 
 .refresh-button {
     flex: 0.1;
     white-space: nowrap;
-    margin: 0.1rem 0.5rem 0.1rem 0.1rem;
+    margin: 0.1rem 1rem 0.1rem 0.1rem;
     font-weight: bold;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 0.2rem;
     border: 1px solid #ccc; /* Keep a subtle border */
-    background-color: transparent; /* No background */
     transition: all 0.3s ease;
 }
 
     .refresh-button:hover,
     .refresh-button:active,
     .refresh-button:focus {
-        background-color: transparent !important; /* Prevent Bootstrap's default hover effect */
         box-shadow: none; /* Removes any unwanted shadow */
         outline: none; /* Removes focus outline */
     }

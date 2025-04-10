@@ -26,16 +26,9 @@
             loadingRecords: '&nbsp;',
             processing: '<i class="fas fa-sync fa-spin fa-4x fa-fw"></i><span class="sr-only">Loading...</span>'
         },
-        columnDefs: [
-        {
-            className: 'max-width-column-name', // Apply the CSS class,
-            targets: 7                      // Index of the column to style
-        }],
         "columns": [
             { "data": "id", "bVisible": false },
-            
-            { "data": "sequenceNumber" },  
-
+            { "data": "sequenceNumber" },
             {
                 "data": "icon",
                 "bSortable": false,
@@ -46,7 +39,7 @@
             { "data": "name" },
             { "data": "fileType" },
             { "data": "createdOn" },
-
+            { "data": "uploadedBy" },
             {
                 "data": "message",
                 "bSortable": false,
@@ -66,27 +59,44 @@
                     }
                     return img;
                 }
-            }
+            },
+            { "data": "isManager", "bVisible": false }
         ],
-        "order": [[5, "desc"]],  // ✅ Sort by 'createdOn' (5th column, index 4) in descending order
+        "order": [[5, "desc"]],  // ✅ Sort by 'createdOn' (index 5) in descending order
         "columnDefs": [
             {
                 "targets": 4,   // ✅ Apply sorting to 'createdOn' column
-                "type": "date"  // ✅ Ensure it is treated as a date
+                "type": "date"
+            }, 
+            {
+                className: 'max-width-column-name', // ✅ Apply CSS class
+                targets: 5
+            },
+            {
+                className: 'max-width-column-name', // ✅ Apply CSS class
+                targets: 6
             }
         ],
         rowCallback: function (row, data) {
             var $row = $(row);
-
             if (data.status === "Processing" && data.id == uploadId) {
-                // Start polling function
                 startPolling(data.id);
-            } else {
-               
+            }
+        },  // ✅ Added missing comma before `initComplete`
+        initComplete: function () {
+            var api = this.api();
+
+            // ✅ Correct index for `isManager` column is `9`
+            var isManager = api.column(9).data().toArray().every(function (value) {
+                return value === true;
+            });
+
+            if (!isManager) {
+                api.column(6).visible(false); // ✅ Hide 'uploadedBy' if all are managers
             }
         }
-
     });
+
     var pollingTimer;
 
     // Function to start polling the status

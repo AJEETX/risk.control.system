@@ -5,7 +5,7 @@
 
         <div class="small-box bg-danger">
             <div class="inner">
-                <h3 id="new-claims">@Model.FirstBlockCount</h3>
+                <h4 id="new-claims" title="CLAIMS: @Model.FirstBlockCount | UNDERWRITINGS: @Model.UnderwritingCount" data-toggle="tooltip">@Model.FirstBlockCount | @Model.UnderwritingCount</h4>
                 <span>@Model.FirstBlockName</span>
             </div>
             <div class="icon">
@@ -19,7 +19,7 @@
 
         <div class="small-box bg-warning">
             <div class="inner">
-                <h3 id="active-claims">@Model.SecondBlockCount</h3>
+                <h4 id="active-claims" title="CLAIMS: @Model.SecondBlockCount, UNDERWRITINGS: @Model.SecondBBlockCount" data-toggle="tooltip">@Model.SecondBlockCount | @Model.SecondBBlockCount</h4>
                 <span>@Model.SecondBlockName</span>
             </div>
             <div class="icon">
@@ -33,7 +33,7 @@
 
         <div class="small-box bg-info">
             <div class="inner">
-                <h3 id="submit-claims">@Model.ThirdBlockCount</h3>
+                <h4 id="approve-claims" title="CLAIMS: @Model.ApprovedClaimgCount | UNDERWRITINGS: @Model.ApprovedUnderwritingCount" data-toggle="tooltip">@Model.ApprovedClaimgCount | @Model.ApprovedUnderwritingCount</h4>
                 <span>@Model.ThirdBlockName</span>
             </div>
             <div class="icon">
@@ -47,7 +47,7 @@
 
         <div class="small-box bg-secondary">
             <div class="inner">
-                <h3 id="approved-claims">@Model.LastBlockCount</h3>
+                <h4 id="reject-claims" title="CLAIMS: @Model.RejectedClaimCount| UNDERWRITINGS: @Model.RejectedUnderwritingCount" data-toggle="tooltip">@Model.RejectedClaimCount | @Model.RejectedUnderwritingCount</h4>
                 <span>@Model.LastBlockName</span>
             </div>
             <div class="icon">
