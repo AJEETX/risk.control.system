@@ -204,7 +204,8 @@ namespace risk.control.system.Services
                 ByteData = byteData,
                 AutoOrManual = autoOrManual,
                 Message = uploadAndAssign ? "Assign In progress": "Upload In progress",
-                FileOrFtp = fileOrFtp
+                FileOrFtp = fileOrFtp,
+                DirectAssign = uploadAndAssign
             };
             var uploadData = _context.FilesOnFileSystem.Add(fileModel);
             await _context.SaveChangesAsync();

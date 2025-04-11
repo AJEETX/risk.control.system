@@ -13,7 +13,7 @@
                         <div class="form-check form-switch mb-3">
                             <input class="form-check-input custom-checkbox-lg" type="checkbox" asp-for="UploadAndAssign" id="uploadAssignCheckbox" />
                             <label class="form-check-label fw-bold ms-2 text-info" for="uploadAssignCheckbox">
-                                <span class="highlighted-text" title="Upload and Assign straight-away" data-toggle="tooltip"><i class="nav-icon fa fa-upload"></i>Upload</span> <span class="badge-light"> <i class="fas fa-arrow-right"></i></span><span class="highlighted-text-assign"><i class="fas fa-random"></i>Assign </span>
+                                <span class="highlighted-text" title="Upload and Assign straight-away" data-toggle="tooltip"><span class="highlighted-text-assign"><i class="fas fa-random"></i>Assign Directly</span>
                             </label>
                         </div>
                     }
@@ -29,11 +29,10 @@
                     <div class="input-group">
                         @if(Model.BulkUpload && Model.UserCanCreate)
                         {
-                            <input accept=".zip" type="file" class="form-control remarks" name="postedFile" id="postedFile"
-                                   data-toggle="tooltip" title="Select a ZIP file to upload" />
+                            <input accept=".zip" type="file" class="form-control remarks" name="postedFile" id="postedFile" data-toggle="tooltip" title="Select a ZIP file to upload" />
 
                             <button id="UploadFileButton" type="submit" class="btn btn-info">
-                                <i class="nav-icon fa fa-upload"></i> Upload
+                                <i class="nav-icon fa fa-upload"></i> File Upload
                             </button>
                         }
                         else
@@ -41,7 +40,7 @@
                             <input type="file" class="form-control remarks" data-toggle="tooltip" title="Upload Disabled" disabled />
 
                             <button type="submit" class="btn btn-info" disabled>
-                                <i class="nav-icon fa fa-upload"></i> Upload
+                                <i class="nav-icon fa fa-upload"></i> File Upload
                             </button>
                         }
 

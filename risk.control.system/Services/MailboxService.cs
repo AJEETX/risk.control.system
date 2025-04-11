@@ -38,6 +38,7 @@ namespace risk.control.system.Services
         Task NotifySubmitQueryToAgency(string senderUserEmail, string claimId, string url = "");
         Task NotifySubmitReplyToCompany(string senderUserEmail, string claimId, string url = "");
         Task NotifyClaimAssignmentToAssigner(string senderUserEmail, List<string> autoAllocatedCases, List<string> notAutoAllocatedCases, string url = "");
+        Task NotifyClaimDirectAssignmentToAssigner(string senderUserEmail, int autoAllocatedCases, int notAutoAllocatedCases, string url = "");
         Task NotifyFileUpload(string senderUserEmail, FileOnFileSystemModel file, string url);
     }
 
@@ -271,7 +272,7 @@ namespace risk.control.system.Services
                 throw;
             }
         }
-        public async Task NotifyClaimAssignmentToAssigner(string senderUserEmail, List<string> autoAllocatedCases, List<string> notAutoAllocatedCases, string url = "")
+        public async Task NotifyClaimDirectAssignmentToAssigner(string senderUserEmail, int autoAllocatedCasesCount, int notAutoAllocatedCasesCount, string url = "")
         {
             try
             {
@@ -281,10 +282,45 @@ namespace risk.control.system.Services
 
                 var creatorRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.CREATOR.ToString()));
 
-                var autoAllocatedCasesData = _context.ClaimsInvestigation
-                    .Include(i => i.PolicyDetail)
-                    .Include(i => i.InvestigationCaseSubStatus)
-                    .Where(v => autoAllocatedCases.Contains(v.ClaimsInvestigationId));
+                var notification = new StatusNotification
+                {
+                    Role = creatorRole,
+                    Company = applicationUser.ClientCompany,
+                    Symbol = "fa fa-info i-blue",
+                    Message = $"Assigning of {autoAllocatedCasesCount + notAutoAllocatedCasesCount} cases finshed",
+                    Status = $"{assigned.Name}={autoAllocatedCasesCount}",
+                    NotifierUserEmail = senderUserEmail
+                };
+
+                _context.Notifications.Add(notification);
+                //SEND SMS
+                if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
+                {
+                    string message = $"Dear {applicationUser.Email}, ";
+                    message += $"Assigning finished of {autoAllocatedCasesCount + notAutoAllocatedCasesCount} cases, Auto-assigned count = {autoAllocatedCasesCount}. ";
+                    message += $"Thanks, ";
+                    message += $"{applicationUser.Email}, ";
+                    message += $"{url}";
+                    await smsService.DoSendSmsAsync(applicationUser.Country.ISDCode + applicationUser.PhoneNumber, message);
+                }
+
+                var rows = await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                throw;
+            }
+        }
+        public async Task NotifyClaimAssignmentToAssigner(string senderUserEmail, List<string> autoAllocatedCases, List<string> notAutoAllocatedCases, string url = "")
+        {
+            try
+            {
+                var assigned = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
+                var applicationUser = _context.ClientCompanyApplicationUser.Include(i => i.ClientCompany).Include(i => i.Country).FirstOrDefault(c => c.Email == senderUserEmail);
+
+                var creatorRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.CREATOR.ToString()));
 
                 var notification = new StatusNotification
                 {

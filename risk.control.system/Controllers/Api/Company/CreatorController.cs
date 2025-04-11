@@ -290,7 +290,8 @@ namespace risk.control.system.Controllers.Api.Company
                 Status = file.Status,
                 file.Message,
                 Icon = file.Icon, // or use some other status representation
-                IsManager = isManager
+                IsManager = isManager,
+                file.DirectAssign
             }).ToList();
 
             return Ok(new { data = result, maxAssignReadyAllowed = maxAssignReadyAllowedByCompany >= totalReadyToAssign });
@@ -323,7 +324,8 @@ namespace risk.control.system.Controllers.Api.Company
                 Status = file.Status,
                 file.Message,
                 Icon = file.Icon, // or use some other status representation
-                IsManager = isManager
+                IsManager = isManager,
+                file.DirectAssign
             };
 
             return Ok(new { data = result, maxAssignReadyAllowed = maxAssignReadyAllowedByCompany >= totalForAssign });

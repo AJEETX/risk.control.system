@@ -529,7 +529,7 @@
 
         $.confirm({
             title: "Confirm Delete",
-            content: "Are you sure you want to delete selected case(s) <span class='badge badge-light'>max 10 </span>?",
+            content: "Are you sure you want to <span class='badge badge-light'>delete</span> selected case(s) ?",
             icon: 'fas fa-trash',
             type: 'red',
             closeIcon: true,

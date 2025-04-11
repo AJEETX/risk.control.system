@@ -359,7 +359,6 @@ namespace risk.control.system.Services
 
             var beneUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={beneLatLong}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:A%7C{beneLatLong}&key={Environment.GetEnvironmentVariable("GOOGLE_MAP_KEY")}";
             beneficairy.BeneficiaryLocationMap = beneUrl;
-            _context.BeneficiaryDetail.Add(beneficairy);
             return beneficairy;
         }
 

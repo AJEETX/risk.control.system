@@ -121,11 +121,16 @@
             var hasError = tableData.some(function (row) {
                 return row.status === "Error" && row.id == uploadId;
             });
+            var errorRow = tableData.find(function (row) {
+                return row.status === "Error" && row.id == uploadId;
+            });
 
-            if (hasError) {
+            if (errorRow) {
+                var title = errorRow.directAssign ? "Upload & Assign" : "Upload"; // ✅ Dynamically set title
+
                 $.confirm({
-                    title: 'Init Information',
-                    content: 'Upload completed with error.',
+                    title: title,
+                    content: `${title} completed with error.`,
                     type: 'red',
                     buttons: {
                         ok: {
@@ -151,6 +156,7 @@
                 url: `/api/Creator/GetFileById/${uploadId}`, // Call the API to check status
                 type: 'GET',
                 success: function (updatedRowData) {
+                    var title = updatedRowData.directAssign ? "Upload & Assign" : "Upload";
 
                     if (!alerted && updatedRowData.data.status === 'Error') {
                         console.log("Status is Completed, stopping polling and updating row.");
@@ -174,10 +180,9 @@
                             });
                         }
                         else {
-                           
                             $.confirm({
-                                title: 'Upload Error',
-                                content: 'Upload completed with error',
+                                title: `${title} Error`,
+                                content: ` ${title} completed with error`,
                                 type: 'red',
                                 buttons: {
                                     ok: {
@@ -224,7 +229,7 @@
                         else {
                             $.confirm({
                                 title: 'Information',
-                                content: 'Upload completed .',
+                                content: `${title}  completed .`,
                                 type: 'green',
                                 buttons: {
                                     ok: {
@@ -337,9 +342,9 @@
         $('#UploadFileButton').toggleClass('btn-info btn-danger');
         // Toggle the button text (including HTML content)
         if (isChecked) {
-            $('#UploadFileButton').html(' Upload & Assign');
+            $('#UploadFileButton').html('<i class="fas fa-random"></i> Assign Directly');
         } else {
-            $('#UploadFileButton').html('<i class="nav-icon fa fa-upload"></i> Upload');
+            $('#UploadFileButton').html('<i class="nav-icon fa fa-upload"></i> File Upload');
         }
     });
     $("#postedFile").on('change', function () {
@@ -433,7 +438,7 @@
                     closeIcon: true,
                     buttons: {
                         confirm: {
-                            text: isChecked ? "Direct Assign" : "File Upload",  // Dynamic button text
+                            text: isChecked ? "Assign Directly" : "File Upload",  // Dynamic button text
                             btnClass: isChecked ? 'btn-danger' : 'btn-success',  // Customize button class
                             action: function () {
                                 askFileUploadConfirmation = false;
@@ -447,7 +452,7 @@
                                 disableAllInteractiveElements();
                                 // Customize the button text before the submission
                                 if (isChecked) {
-                                    $(buttonId).html('<i class="fas fa-sync fa-spin"></i> Uploading & Assigning...');
+                                    $(buttonId).html('<i class="fas fa-sync fa-spin"></i> Assigning...');
                                 } else {
                                     $(buttonId).html('<i class="fas fa-sync fa-spin"></i> Uploading...');
                                 }
