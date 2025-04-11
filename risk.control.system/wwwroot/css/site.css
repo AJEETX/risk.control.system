@@ -1879,6 +1879,49 @@ select#PinCodeId {
 #country-code-display {
     font-size: small;
 }
+/* Style the info icon */
+.info-toggle i {
+    font-size: 1.2rem;
+    color: #1E548D; /* Bootstrap primary blue */
+}
+
+/* Dropdown Styling */
+.info-dropdown {
+    width: 240px; /* Reduced width */
+    background: #f9fcff; /* Light blue background */
+    border: 1px solid #d1e3f8; /* Light blue border */
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 8px 0;
+}
+
+/* Dropdown items */
+.info-item-top {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    font-size: 12px;
+    color: #495057; /* Dark gray text */
+}
+
+/* Label Styling */
+.info-label-top {
+    flex-grow: 1;
+    font-weight: 500;
+    color: #6c757d; /* Muted text */
+}
+
+/* Value Styling */
+.info-value {
+    font-weight: bold;
+    color: #1E548D; /* Bootstrap primary blue */
+}
+
+/* Icons */
+.icon {
+    margin-right: 8px;
+    color: #28a745; /* Green */
+}
 
 .flag-icon {
     margin-right: 5px;
@@ -2679,3 +2722,24 @@ input#checkall {
         box-shadow: none; /* Removes any unwanted shadow */
         outline: none; /* Removes focus outline */
     }
+/* Edit Profile Button */
+.edit-profile-btn {
+    display: inline-block;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 6px 10px;
+    text-decoration: none;
+    border-radius: 20px;
+    transition: 0.3s;
+    background: white;
+    color: orange;
+}
+
+    /* Hover Effect */
+    .edit-profile-btn:hover {
+        color: white;
+    }
+.edit-profile-btn:active {
+    color: white;
+    transform: scale(0.96); /* Slight shrink effect */
+}

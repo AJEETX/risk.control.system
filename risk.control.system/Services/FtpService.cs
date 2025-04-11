@@ -40,6 +40,7 @@ namespace risk.control.system.Services
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly ICustomApiCLient customApiCLient;
+        private readonly ICreatorService creatorService;
         private readonly IMailboxService mailboxService;
         private readonly IBackgroundJobClient backgroundJobClient;
         private readonly IClaimsInvestigationService claimsInvestigationService;
@@ -52,6 +53,7 @@ namespace risk.control.system.Services
         public FtpService(ApplicationDbContext context,
             IWebHostEnvironment webHostEnvironment,
             ICustomApiCLient customApiCLient,
+            ICreatorService creatorService,
             IMailboxService mailboxService,
             IBackgroundJobClient backgroundJobClient,
             IClaimsInvestigationService claimsInvestigationService,
@@ -61,6 +63,7 @@ namespace risk.control.system.Services
             _context = context;
             this.webHostEnvironment = webHostEnvironment;
             this.customApiCLient = customApiCLient;
+            this.creatorService = creatorService;
             this.mailboxService = mailboxService;
             this.backgroundJobClient = backgroundJobClient;
             this.claimsInvestigationService = claimsInvestigationService;
@@ -217,6 +220,7 @@ namespace risk.control.system.Services
                 var uploadFileData = await _context.FilesOnFileSystem.FirstOrDefaultAsync(f => f.Id == uploadId && f.CompanyId == companyUser.ClientCompanyId && f.UploadedBy == userEmail && !f.Deleted);
                 var customData = ReadFirstCsvFromZipToObject(uploadFileData.ByteData); // Read the first CSV file from the ZIP archive
                 var totalClaimsCreated = await _context.ClaimsInvestigation.CountAsync(c => !c.Deleted && c.ClientCompanyId == companyUser.ClientCompanyId);
+                var totalClaimsReadyToAssign = await _context.ClaimsInvestigation.CountAsync(c => !c.Deleted && c.ClientCompanyId == companyUser.ClientCompanyId);
                 
                 if (companyUser.ClientCompany.LicenseType == Standard.Licensing.LicenseType.Trial)
                 {
@@ -237,10 +241,10 @@ namespace risk.control.system.Services
                     await mailboxService.NotifyFileUpload(userEmail, uploadFileData, url);
                     return;
                 }
+                    var totalAddedAndExistingCount = uploadedClaims.Count + totalClaimsCreated;
                 // License Check (if Trial)
                 if (companyUser.ClientCompany.LicenseType == Standard.Licensing.LicenseType.Trial)
                 {
-                    var totalAddedAndExistingCount = uploadedClaims.Count + totalClaimsCreated;
                     if (totalAddedAndExistingCount > companyUser.ClientCompany.TotalCreatedClaimAllowed)
                     {
                         SetUploadFailure(uploadFileData, $"Case limit exceeded of {companyUser.ClientCompany.TotalCreatedClaimAllowed} case(s).",uploadAndAssign);
@@ -249,6 +253,16 @@ namespace risk.control.system.Services
                         return;
                     }
                 }
+                var totalReadyToAssign = await creatorService.GetAutoCount(userEmail);
+
+                if (uploadedClaims.Count + totalReadyToAssign > companyUser.ClientCompany.TotalToAssignMaxAllowed)
+                {
+                    SetUploadFailure(uploadFileData, $"Max count of {companyUser.ClientCompany.TotalToAssignMaxAllowed} Assign-Ready Case(s) limit reached.", uploadAndAssign, uploadedClaims.Select(c=>c.ClaimsInvestigationId).ToList());
+                    await _context.SaveChangesAsync();
+                    await mailboxService.NotifyFileUpload(userEmail, uploadFileData, url);
+                    return;
+                }
+
                 _context.ClaimsInvestigation.AddRange(uploadedClaims);
                 var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
                 var status = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.INITIATED));
@@ -294,13 +308,14 @@ namespace risk.control.system.Services
                 throw;
             }
         }
-        void SetUploadFailure(FileOnFileSystemModel fileData, string message, bool uploadAndAssign)
+        void SetUploadFailure(FileOnFileSystemModel fileData, string message, bool uploadAndAssign, List<string> claimsIds = null)
         {
             fileData.Completed = false;
             fileData.Icon = "fas fa-times-circle i-orangered";
             fileData.Status = "Error";
             fileData.Message = message;
             fileData.DirectAssign = uploadAndAssign;
+            fileData.ClaimsId = claimsIds;
         }
 
         void SetUploadAssignSuccess(FileOnFileSystemModel fileData, List<ClaimsInvestigation> claims, List<string> autoAllocated)

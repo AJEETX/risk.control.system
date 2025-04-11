@@ -271,8 +271,11 @@ namespace risk.control.system.Controllers.Api.Company
         {
             var userEmail = HttpContext.User.Identity.Name;
 
-            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == userEmail);
+            var companyUser = _context.ClientCompanyApplicationUser.Include(c=>c.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
             var isManager = HttpContext.User.IsInRole(MANAGER.DISPLAY_NAME);
+            
+            var totalReadyToAssign = await creatorService.GetAutoCount(userEmail);
+            var maxAssignReadyAllowedByCompany = companyUser.ClientCompany.TotalToAssignMaxAllowed;
 
             var files = await _context.FilesOnFileSystem.Where(f => f.CompanyId == companyUser.ClientCompanyId && ((f.UploadedBy == userEmail && !f.Deleted) || isManager)).ToListAsync();
             var result = files.OrderBy(o=>o.CreatedOn).Select(file => new
@@ -290,19 +293,22 @@ namespace risk.control.system.Controllers.Api.Company
                 IsManager = isManager
             }).ToList();
 
-            return Ok(new { data = result});
+            return Ok(new { data = result, maxAssignReadyAllowed = maxAssignReadyAllowedByCompany >= totalReadyToAssign });
         }
 
         [HttpGet("GetFileById/{uploadId}")]
         public async Task<IActionResult> GetFileById(int uploadId)
         {
             var userEmail = HttpContext.User.Identity.Name;
-            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == userEmail);
+            var companyUser = _context.ClientCompanyApplicationUser.Include(c=>c.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
             var file =  await _context.FilesOnFileSystem.FirstOrDefaultAsync(f => f.Id == uploadId && f.CompanyId == companyUser.ClientCompanyId && f.UploadedBy == userEmail && !f.Deleted);
             if (file == null)
             {
                 return NotFound(new { success = false, message = "File not found." });
             }
+            var totalReadyToAssign = await creatorService.GetAutoCount(userEmail);
+            var totalForAssign = totalReadyToAssign + file.ClaimsId?.Count;
+            var maxAssignReadyAllowedByCompany = companyUser.ClientCompany.TotalToAssignMaxAllowed;
 
             var isManager = HttpContext.User.IsInRole(MANAGER.DISPLAY_NAME);
             var result =  new
@@ -316,10 +322,11 @@ namespace risk.control.system.Controllers.Api.Company
                 file.UploadedBy,
                 Status = file.Status,
                 file.Message,
-                Icon = file.Icon // or use some other status representation
+                Icon = file.Icon, // or use some other status representation
+                IsManager = isManager
             };
 
-            return Ok(new { data = result });
+            return Ok(new { data = result, maxAssignReadyAllowed = maxAssignReadyAllowedByCompany >= totalForAssign });
         }
 
         [HttpGet("GetPendingAllocations")]

@@ -29,41 +29,42 @@
     <!-- Right navbar links -->
     <ul class="navbar-nav ml-auto">
         <li class="nav-item dropdown top-nav-logout-border">
-            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false" title="Info">
-                <i class="fa fa-info-circle text-primary fs-5"></i>
+            <a class="nav-link dropdown-toggle info-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false" title="Info">
+                <i class="fa fa-info-circle"></i>
             </a>
 
-            <div class="dropdown-menu dropdown-menu-right shadow-lg rounded-lg border-0 info-dropdown">
+            <div class="dropdown-menu dropdown-menu-right info-dropdown">
                 @{
                     var img = "/flags/" + @Model.CountryCode.ToLower() + ".png";
                 }
 
                 <!-- Country -->
-                <div class="dropdown-item d-flex align-items-center info-item">
+                <div class="dropdown-item info-item-top">
                     <img src="@img" class="flag-icon" />
-                    <span class="info-label text-secondary">Country:</span>
-                    <span class="ml-auto font-weight-bold text-primary">@Model?.Country</span>
+                    <span class="info-label-top">Country:</span>
+                    <span class="info-value">@Model?.Country</span>
                 </div>
 
                 <div class="dropdown-divider"></div>
 
                 <!-- Currency -->
-                <div class="dropdown-item d-flex align-items-center info-item">
-                    <i class="fa fa-money mr-2 text-success"></i>
-                    <span class="info-label text-secondary">Currency:</span>
-                    <span class="ml-auto font-weight-bold text-success">@Model?.CurrencyName</span>
+                <div class="dropdown-item info-item-top">
+                    <i class="fa fa-money icon"></i>
+                    <span class="info-label-top">Currency:</span>
+                    <span class="info-value">@Model?.CurrencyName</span>
                 </div>
 
                 <div class="dropdown-divider"></div>
 
                 <!-- ISD Code -->
-                <div class="dropdown-item d-flex align-items-center info-item">
-                    <i class="fa fa-phone mr-2 text-dangez"></i>
-                    <span class="info-label text-secondary">ISD Code:</span>
-                    <span class="ml-auto font-weight-bold text-dangez">@Model?.IsdCode</span>
+                <div class="dropdown-item info-item-top">
+                    <i class="fa fa-phone icon"></i>
+                    <span class="info-label-top">ISD Code:</span>
+                    <span class="info-value">@Model?.IsdCode</span>
                 </div>
             </div>
         </li>
+
 
         <!-- Notifications Dropdown Menu -->
         <li class="nav-item dropdown top-nav-logout-border">
@@ -95,10 +96,16 @@
                          class="rounded-circle shadow-sm border sidebar-profile"
                          alt="User Profile" title="@Model.Email" data-toggle="tooltip" />
                     <p class="text-muted user-email">@Model.Email</p>
+                    @if(Model.CanChangePassword)
+                    {
+                        <a id="back" href="/AgencyUserProfile/Edit?userid=@Model.UserId" class="btn btn-sm btn-outline-warning edit-profile-btn">
+                            <i class="fas fa-user-edit"></i> Edit Profile
+                        </a>
+                    }
                 </div>
 
                 <!-- Logout Link -->
-                <a class="dropdown-item d-flex align-items-center text-danger font-weight-bold btn-outline-danger"
+                <a class="dropdown-item d-flex align-items-center text-danger font-weight-bold btn btn-outline-danger"
                    href="#" data-toggle="modal" data-target="#logoutModal">
                     <i class="fas fa-sign-out-alt mr-2"></i> Logout
                 </a>

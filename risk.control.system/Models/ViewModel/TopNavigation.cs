@@ -2,6 +2,7 @@
 {
     public class TopNavigation
     {
+        public long? UserId { get; set; }
         public string? Email { get; set; }
         public bool CanChangePassword { get; set; }
         public string Country { get; set; }

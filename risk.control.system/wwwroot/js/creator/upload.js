@@ -16,6 +16,26 @@
             "url": '/api/Creator/GetFilesData',
             "type": "GET",
             "dataSrc": function (json) {
+                if (!json.maxAssignReadyAllowed) {
+                    $("#uploadAssignCheckbox, #postedFile, #UploadFileButton").prop("disabled", true);
+                    $.confirm({
+                        title: 'Information',
+                        content: 'You have reached the maximum allowed assignments.',
+                        type: 'red',
+                        buttons: {
+                            ok: {
+                                text: 'OK',
+                                btnClass: 'btn-danger',
+                                action: function () {
+                                    // Do nothing, just close the alert
+                                }
+                            }
+                        }
+                    });
+                }
+                else {
+                    $("#uploadAssignCheckbox, #postedFile, #UploadFileButton").prop("disabled", false);
+                }
                 return json.data;
             }
         },
@@ -67,7 +87,7 @@
             {
                 "targets": 4,   // ✅ Apply sorting to 'createdOn' column
                 "type": "date"
-            }, 
+            },
             {
                 className: 'max-width-column-name', // ✅ Apply CSS class
                 targets: 5
@@ -94,10 +114,35 @@
             if (!isManager) {
                 api.column(6).visible(false); // ✅ Hide 'uploadedBy' if all are managers
             }
+
+            var tableData = api.rows().data().toArray(); // ✅ Get all rows' data
+
+            // ✅ Check if any row has status "Error" and matches uploadId
+            var hasError = tableData.some(function (row) {
+                return row.status === "Error" && row.id == uploadId;
+            });
+
+            if (hasError) {
+                $.confirm({
+                    title: 'Init Information',
+                    content: 'Upload completed with error.',
+                    type: 'red',
+                    buttons: {
+                        ok: {
+                            text: 'OK',
+                            btnClass: 'btn-danger',
+                            action: function () {
+                                // Do nothing, just close the alert
+                            }
+                        }
+                    }
+                });
+            }
         }
     });
 
     var pollingTimer;
+    var alerted = false;
 
     // Function to start polling the status
     function startPolling(uploadId) {
@@ -106,15 +151,93 @@
                 url: `/api/Creator/GetFileById/${uploadId}`, // Call the API to check status
                 type: 'GET',
                 success: function (updatedRowData) {
-                    // If status is Processing, keep polling
-                    if (updatedRowData.data.status === "Processing") {
-                        console.log("Status is still Processing, continuing to poll...");
-                    }
-                    // If status is Completed, stop polling and update the row
-                    else if (updatedRowData.data.status === "Completed" || updatedRowData.data.status === 'Error') {
+
+                    if (!alerted && updatedRowData.data.status === 'Error') {
                         console.log("Status is Completed, stopping polling and updating row.");
                         clearInterval(pollingTimer); // Stop polling
                         updateProcessingRow(uploadId, updatedRowData.data); // Update the row with completed data
+
+                        if (!updatedRowData.maxAssignReadyAllowed) {
+                            $.confirm({
+                                title: 'Max allowed Error',
+                                content: 'Maximum allowed assignments reached.',
+                                type: 'red',
+                                buttons: {
+                                    ok: {
+                                        text: 'OK',
+                                        btnClass: 'btn-danger',
+                                        action: function () {
+                                            // Do nothing, just close the alert
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                        else {
+                           
+                            $.confirm({
+                                title: 'Upload Error',
+                                content: 'Upload completed with error',
+                                type: 'red',
+                                buttons: {
+                                    ok: {
+                                        text: 'OK',
+                                        btnClass: 'btn-danger',
+                                        action: function () {
+                                            // Do nothing, just close the alert
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                        
+
+                    }
+                    // If status is Processing, keep polling
+                    else if (!alerted && updatedRowData.data.status === "Processing") {
+                        console.log("Status is still Processing, continuing to poll...");
+                    }
+
+                    // If status is Completed, stop polling and update the row
+                    else if (!alerted && updatedRowData.data.status === "Completed") {
+                        console.log("Status is Completed, stopping polling and updating row.");
+                        clearInterval(pollingTimer); // Stop polling
+                        updateProcessingRow(uploadId, updatedRowData.data); // Update the row with completed data
+                        if (!updatedRowData.maxAssignReadyAllowed) {
+                            $("#uploadAssignCheckbox, #postedFile, #UploadFileButton").prop("disabled", true);
+
+                            $.confirm({
+                                title: 'Max allowed reached',
+                                content: 'Maximum allowed assignments reached.',
+                                type: 'blue',
+                                buttons: {
+                                    ok: {
+                                        text: 'OK',
+                                        btnClass: 'btn-primary',
+                                        action: function () {
+                                            // Do nothing, just close the alert
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                        else {
+                            $.confirm({
+                                title: 'Information',
+                                content: 'Upload completed .',
+                                type: 'green',
+                                buttons: {
+                                    ok: {
+                                        text: 'OK',
+                                        btnClass: 'btn-success',
+                                        action: function () {
+                                            // Do nothing, just close the alert
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                        
                     }
                 },
                 error: function (err) {
@@ -212,12 +335,12 @@
     $('#uploadAssignCheckbox').on('change', function () {
         let isChecked = $(this).is(':checked');
         $('#UploadFileButton').toggleClass('btn-info btn-danger');
-// Toggle the button text (including HTML content)
-    if (isChecked) {
-        $('#UploadFileButton').html(' Upload & Assign');
-    } else {
-        $('#UploadFileButton').html('<i class="nav-icon fa fa-upload"></i> Upload');
-    }
+        // Toggle the button text (including HTML content)
+        if (isChecked) {
+            $('#UploadFileButton').html(' Upload & Assign');
+        } else {
+            $('#UploadFileButton').html('<i class="nav-icon fa fa-upload"></i> Upload');
+        }
     });
     $("#postedFile").on('change', function () {
         var MaxSizeInBytes = 1097152;
@@ -299,7 +422,7 @@
                 // Check the state of the checkbox
                 let isChecked = $(checkboxId).is(':checked');
 
-               
+
 
                 // Customize the confirm dialog dynamically
                 $.confirm({
@@ -311,7 +434,7 @@
                     buttons: {
                         confirm: {
                             text: isChecked ? "Direct Assign" : "File Upload",  // Dynamic button text
-                            btnClass: isChecked ? 'btn-danger':'btn-success',  // Customize button class
+                            btnClass: isChecked ? 'btn-danger' : 'btn-success',  // Customize button class
                             action: function () {
                                 askFileUploadConfirmation = false;
 

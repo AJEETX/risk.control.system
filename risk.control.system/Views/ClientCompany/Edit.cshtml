@@ -287,7 +287,7 @@
                             <div class="row">
                                 <div class="col-md-12">
 
-                                    <div class="form-group">
+                                    @* <div class="form-group">
                                         <span class="input-group-label"> Add Whitelist IP Address:</span>
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
@@ -296,7 +296,7 @@
                                             <input type="text" asp-for="WhitelistIpAddress" class="form-control remarks title-name ipaddress" required placeholder="Add Whitelist IP Address">
                                             <span asp-validation-for="WhitelistIpAddress" class="text-danger"></span>
                                         </div>
-                                    </div>
+                                    </div> *@
                                     <div class="form-group">
                                         <span class="input-group-label"> Mobile App Url:</span>
                                         <div class="input-group mb-3">
@@ -490,6 +490,17 @@
                                             </span>
                                         </div>
                                     </div>
+                                    <div class="form-group">
+
+                                        <span class="input-group-label"> Max Assign-Ready Case [ max 50]:</span>
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text" asp-for="TotalToAssignMaxAllowed"><i class="fas fa-coins"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
+                                            </div>
+                                            <input required asp-for="TotalToAssignMaxAllowed" class="form-control remarks" type="text" placeholder="Max Assign-Ready Cases"  min="5" maxlength="50" />
+                                            <span asp-validation-for="TotalToAssignMaxAllowed" class="text-danger"></span>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="col-md-3">
 
@@ -520,12 +531,12 @@
                                 <div class="col-md-3">
                                     <div class="form-group">
 
-                                        <span class="input-group-label"> Max Allowed Claim [ max 50]:</span>
+                                        <span class="input-group-label"> Max Allowed Case [ max 50]:</span>
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text" asp-for="SumAssuredValue"><i class="fas fa-coins"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
+                                                <span class="input-group-text" asp-for="TotalCreatedClaimAllowed"><i class="fas fa-coins"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
-                                            <input required asp-for="TotalCreatedClaimAllowed" class="form-control remarks" type="text" placeholder="Max Allowed Claim" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" min="5" maxlength="50" />
+                                            <input required asp-for="TotalCreatedClaimAllowed" class="form-control remarks" type="text" placeholder="Max Allowed Cases" min="5" maxlength="50" />
                                             <span asp-validation-for="TotalCreatedClaimAllowed" class="text-danger"></span>
                                         </div>
                                     </div>
@@ -597,35 +608,6 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <span class="input-group-label"> Enable Mailbox:</span>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text" id="EnableMailbox"><i class="far fa-comment-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                            </div>
-
-                                            <span class="checkbox">
-                                                <input asp-for="EnableMailbox" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-
-                                    <div class="form-group">
-                                        <span class="input-group-label"> Enable Report update(Supervisor):</span>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text" id="UpdateAgentReport"><i class="fas fa-crosshairs"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                            </div>
-
-                                            <span class="checkbox">
-                                                <input asp-for="UpdateAgentReport" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-lock-open'></i> Active " data-off="<i class='fas fa-lock'></i> Lock" data-onstyle="success" data-offstyle="danger" data-width="120">
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
                                 <div class="col-md-3">
 
                                     <div class="form-group">

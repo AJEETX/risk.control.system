@@ -92,16 +92,22 @@
                                                     <span class="fa-li">
                                                         <i class="fas fa-coins"></i>
                                                     </span>
-                                                    MAX Claims: <b>@Html.DisplayFor(model => model.TotalCreatedClaimAllowed)</b>
+                                                    MAX Cases: <b>@Html.DisplayFor(model => model.TotalCreatedClaimAllowed)</b>
                                                 </li>
                                             }
                                         }
                                         <li class="small">
                                             <span class="fa-li">
+                                                <i class="fas fa-coins"></i>
+                                            </span>
+                                            MAX Assign_ready: <b>@Html.DisplayFor(model => model.TotalToAssignMaxAllowed)</b>
+                                        </li>
+                                       @*  <li class="small">
+                                            <span class="fa-li">
                                                 <i class="fas fa-sitemap"></i>
                                             </span>
                                             Whitelist Ip Addresses : <b>  @Model.WhitelistIpAddress</b>
-                                        </li>
+                                        </li> *@
                                         <li class="small">
                                             <span class="fa-li">
                                                 <i class="fas fa-project-diagram"></i>
@@ -231,6 +237,45 @@
                                             </span>
                                             Auto-Allocation <b>@Html.DisplayFor(model => model.AutoAllocation)</b>
                                         </li>
+
+                                        <li class="small">
+                                            <span class="fa-li">
+                                                <i class="fa fa-upload"></i>
+                                            </span>
+                                            AI enabled: <b>@Html.DisplayFor(model => model.AiEnabled)</b>
+                                        </li>
+                                        <li class="small">
+                                            <span class="fa-li">
+                                                <i class="fas fa-key"></i>
+                                            </span>
+                                            Edit Profile <b>@Html.DisplayFor(model => model.CanChangePassword) </b>
+                                        </li>
+                                        @* <li class="small">
+                                            <span class="fa-li">
+                                                <i class="fas fa-comments"></i>
+                                            </span>
+                                            @{
+                                                var isSendSms = await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN);
+                                            }
+                                            Enable SMS: <b>@Html.DisplayFor(model => isSendSms) </b>
+                                        </li> *@
+                                        <li class="small">
+                                            <span class="fa-li">
+                                                <i class="fa fa-upload"></i>
+                                            </span>
+                                            Bulk Upload: <b>@Html.DisplayFor(model => model.BulkUpload)</b>
+                                        </li>
+                                        <li class="small">
+                                            <span class="fa-li">
+                                                <i class="fas fa-comments"></i>
+                                            </span>
+                                            Set Prefilled data: <b>@Html.DisplayFor(model => model.HasSampleData)</b>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="col-6">
+                                    ---
+                                    <ul class="ml-4 mb-0 fa-ul text-muted">
                                         <li class="small">
                                             <span class="fa-li">
                                                 <i class="fas fa-business-time"></i>
@@ -255,65 +300,21 @@
                                             </span>
                                             Enable Media: <b>  @Html.DisplayFor(model => model.EnableMedia)</b>
                                         </li>
-                                        @* <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fas fa-comments"></i>
-                                            </span>
-                                            @{
-                                                var isSendSms = await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN);
-                                            }
-                                            Enable SMS: <b>@Html.DisplayFor(model => isSendSms) </b>
-                                        </li> *@
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fa fa-upload"></i>
-                                            </span>
-                                            Bulk Upload: <b>@Html.DisplayFor(model => model.BulkUpload)</b>
-                                        </li>
-
-                                    </ul>
-                                </div>
-                                <div class="col-6">
-                                    ---
-                                    <ul class="ml-4 mb-0 fa-ul text-muted">
-
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fa fa-upload"></i>
-                                            </span>
-                                            AI enabled: <b>@Html.DisplayFor(model => model.AiEnabled)</b>
-                                        </li>
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fas fa-key"></i>
-                                            </span>
-                                            Edit Profile <b>@Html.DisplayFor(model => model.CanChangePassword) </b>
-                                        </li>
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="far fa-comment-alt"></i>
-                                            </span>
-                                            Enable mailbox <b>@Html.DisplayFor(model => model.EnableMailbox) </b>
-                                        </li>
-                                        
+                                       
+                                        @* 
                                         <li class="small">
                                             <span class="fa-li">
                                                 <i class="fas fa-comments"></i>
                                             </span>
                                             Edit Report(Supervisor): <b>@Html.DisplayFor(model => model.UpdateAgentReport)</b>
-                                        </li>
+                                        </li> *@
                                         <li class="small">
                                             <span class="fa-li">
                                                 <i class="fas fa-comments"></i>
                                             </span>
                                             Edit Answer(Supervisor): <b>@Html.DisplayFor(model => model.UpdateAgentAnswer)</b>
                                         </li>
-                                        <li class="small">
-                                            <span class="fa-li">
-                                                <i class="fas fa-comments"></i>
-                                            </span>
-                                            Set Prefilled data: <b>@Html.DisplayFor(model => model.HasSampleData)</b>
-                                        </li>
+                                        
                                     </ul>
                                 </div>
                             </div>
