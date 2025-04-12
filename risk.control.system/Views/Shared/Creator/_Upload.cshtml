@@ -9,7 +9,10 @@
                 <div class="form-check form-switch mb-3">
                     <input class="form-check-input custom-checkbox-lg" type="checkbox" asp-for="UploadAndAssign" id="uploadAssignCheckbox" />
                     <label class="form-check-label fw-bold ms-2 text-info" for="uploadAssignCheckbox">
-                        <span class="highlighted-text" title="Upload and Assign straight-away" data-toggle="tooltip"><span class="highlighted-text-assign"><i class="fas fa-random"></i>Assign Directly</span>
+                        <span class="highlighted-text" title="Upload and Assign straight-away" data-toggle="tooltip">
+                            <span class="highlighted-text-assign">
+                            <i class="fas fa-random"></i>Assign Directly</span>
+                        </span>
                     </label>
                 </div>
             }
@@ -27,7 +30,7 @@
                 {
                     <input accept=".zip" type="file" class="form-control remarks" name="postedFile" id="postedFile" data-toggle="tooltip" title="Select a ZIP file to upload" />
 
-                    <button id="UploadFileButton" type="submit" class="btn btn-info">
+                    <button id="UploadFileButton" type="submit" class="btn btn-info" disabled>
                         <i class="nav-icon fa fa-upload"></i> File Upload
                     </button>
                 }

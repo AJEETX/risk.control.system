@@ -1,5 +1,6 @@
 ﻿$(function () {
     var claimId = $('#claimId').val();
+    var vendorId = $('#vendorId').val();
     var table = $("#customerTable").DataTable({
         ajax: {
             url: '/api/Company/GetEmpanelledVendors',
@@ -124,7 +125,12 @@
                 }
             }],
         "drawCallback": function (settings, start, end, max, total, pre) {
-
+            // Preselect the radio button matching vendorId
+            var selectedVendorId = $('#vendorId').val();
+            if (selectedVendorId) {
+                $("input[type='radio'][name='selectedcase'][value='" + selectedVendorId + "']").prop('checked', true);
+                $('#allocatedcase').prop("disabled", false);
+            }
             $('#customerTable tbody').on('click', '.btn-info', function (e) {
                 e.preventDefault(); // Prevent the default anchor behavior
                 var id = $(this).attr('id').replace('details', ''); // Extract the ID from the button's ID attribute
@@ -135,9 +141,10 @@
         },
         "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
             if (aData.caseCount > 10) {
-                $('td', nRow).css('background-color', '#ffa');
+                //$('td', nRow).css('background-color', '#ffa');
             }
-        }, error: function (xhr, status, error) { alert('err ' + error) }
+        },
+        error: function (xhr, status, error) { alert('err ' + error) }
     });
     $('#refreshTable').click(function () {
         var $icon = $('#refreshIcon');
@@ -293,9 +300,12 @@
         if (askConfirmation) {
             e.preventDefault(); $.confirm({
                 title: "Confirm Assign", content: "Are you sure ?",
-                icon: 'fas fa-external-link-alt', type: 'blue', closeIcon: true, buttons: {
+                icon: 'fas fa-external-link-alt',
+                type: 'blue',
+                closeIcon: true, buttons: {
                     confirm: {
-                        text: "Assign <sub>manual</sub>", btnClass: 'btn-info', action: function () {
+                        text: "Assign <sub>manual</sub>",
+                        btnClass: 'btn-info', action: function () {
                             askConfirmation = false;
                             $("body").addClass("submit-progress-bg");
                             // Wrap in setTimeout so the UI
@@ -348,4 +358,9 @@ function getdetails(id) {
             nodes[i].disabled = true;
         }
     }
+}
+if (window.location.search.includes("vendorId")) {
+    const url = new URL(window.location);
+    url.searchParams.delete("vendorId");
+    window.history.replaceState({}, document.title, url.pathname);
 }

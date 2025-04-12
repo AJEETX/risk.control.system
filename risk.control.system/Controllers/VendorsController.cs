@@ -273,6 +273,9 @@ namespace risk.control.system.Controllers
                 var rejectedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR);
 
+                var vendorAllCases = await _context.ClaimsInvestigation.Where(c => c.VendorId == vendor.VendorId && c.InvestigationCaseSubStatusId == approvedStatus.InvestigationCaseSubStatusId ||
+                c.InvestigationCaseSubStatusId == rejectedStatus.InvestigationCaseSubStatusId).ToListAsync();
+
                 var vendorAllCasesCount = await _context.ClaimsInvestigation.CountAsync(c => c.VendorId == vendor.VendorId &&
                 c.InvestigationCaseSubStatusId == approvedStatus.InvestigationCaseSubStatusId ||
                 c.InvestigationCaseSubStatusId == rejectedStatus.InvestigationCaseSubStatusId);

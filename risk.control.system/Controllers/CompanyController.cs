@@ -617,10 +617,13 @@ namespace risk.control.system.Controllers
                 var rejectedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR);
 
-                var vendorAllCasesCount = await _context.ClaimsInvestigation.CountAsync(c => c.VendorId == vendor.VendorId &&
+                var vendorAllCasesCount = await _context.ClaimsInvestigation.CountAsync(c => c.VendorId == vendor.VendorId && !c.Deleted &&
                 c.InvestigationCaseSubStatusId == approvedStatus.InvestigationCaseSubStatusId ||
                 c.InvestigationCaseSubStatusId == rejectedStatus.InvestigationCaseSubStatusId);
 
+                var vendorAllCases = await _context.ClaimsInvestigation.Where(c => c.VendorId == vendor.VendorId && !c.Deleted &&
+                c.InvestigationCaseSubStatusId == approvedStatus.InvestigationCaseSubStatusId ||
+                c.InvestigationCaseSubStatusId == rejectedStatus.InvestigationCaseSubStatusId).ToListAsync();
                 // HACKY
                 var currentCases = claimsInvestigationService.GetAgencyIdsLoad(new List<long> {vendor.VendorId });
                 vendor.SelectedCountryId = vendorUserCount;

@@ -305,8 +305,9 @@ namespace risk.control.system.Controllers.Api.Company
                 file.Message,
                 Icon = file.Icon, // or use some other status representation
                 IsManager = isManager,
+                file.Completed,
                 file.DirectAssign,
-                UploadedType = file.DirectAssign ? "<i class='fas fa-random i-grey'></i>" : "<i class='fas fa-upload i-grey'></i>",
+                UploadedType = file.DirectAssign ? "<i class='fas fa-random i-assign'></i>" : "<i class='fas fa-upload i-upload'></i>",
                 TimeTaken = file.CompletedOn != null ? $" {Math.Round((file.CompletedOn.Value - file.CreatedOn.Value).TotalSeconds)} sec": "<i class='fas fa-sync fa-spin i-grey'></i>",
             }).ToList();
 
@@ -338,11 +339,12 @@ namespace risk.control.system.Controllers.Api.Company
                 CreatedOn = file.CreatedOn.GetValueOrDefault().ToString("dd-MMM-yyyy HH:mm:ss"),
                 file.UploadedBy,
                 Status = file.Status,
+                file.Completed,
                 file.Message,
                 Icon = file.Icon, // or use some other status representation
                 IsManager = isManager,
                 file.DirectAssign,
-                UploadedType = file.DirectAssign ? "<i class='fas fa-random i-grey'></i>" : "<i class='fas fa-upload i-grey'></i>",
+                UploadedType = file.DirectAssign ? "<i class='fas fa-random i-assign'></i>" : "<i class='fas fa-upload i-upload'></i>",
                 TimeTaken = file.CompletedOn != null ? $" {Math.Round((file.CompletedOn.Value - file.CreatedOn.Value).TotalSeconds)} sec": "<i class='fas fa-sync fa-spin i-grey'></i>",
             };//<i class='fas fa-sync fa-spin'></i>
 

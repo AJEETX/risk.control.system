@@ -114,11 +114,11 @@ namespace risk.control.system.Controllers.Api.Company
             // Fetch statuses in one batch to optimize performance
             var statusNames = new[]
             {
-        CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR,
-        CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT,
-        CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR,
-        CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR
-    };
+                CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR,
+                CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT,
+                CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR,
+                CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR
+            };
 
             var statuses = await _context.InvestigationCaseSubStatus
                 .Where(i => statusNames.Contains(i.Name.ToUpper()))
@@ -131,7 +131,7 @@ namespace risk.control.system.Controllers.Api.Company
 
             // Fetch claims only once and filter them based on status
             var claimsCases = await _context.ClaimsInvestigation
-                .Where(c => c.ClientCompanyId == companyUser.ClientCompanyId &&
+                .Where(c => c.AssignedToAgency && !c.Deleted && c.VendorId.HasValue &&
                     (c.InvestigationCaseSubStatusId == allocatedStatus.InvestigationCaseSubStatusId ||
                     c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId ||
                     c.InvestigationCaseSubStatusId == enquiryRequestStatus.InvestigationCaseSubStatusId ||

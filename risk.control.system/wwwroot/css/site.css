@@ -1992,8 +1992,17 @@ select#PinCodeId {
 .i-green {
     color: green;
 }
+.i-upload {
+    color: #17A2B8;
+}
+.i-assign {
+    color: #dc3545;
+}
 .i-blue {
     color: darkblue;
+}
+.i-red {
+    color: crimson;
 }
 .terms-condition {
     margin-top: 0.2em !important;

@@ -16,13 +16,13 @@
             "url": `/api/Creator/GetFilesData/${uploadId}`,
             "type": "GET",
             "dataSrc": function (json) {
-                if (!json.maxAssignReadyAllowed) {
+                if (uploadId > 0 && !json.maxAssignReadyAllowed) {
                     $("#uploadAssignCheckbox, #postedFile, #UploadFileButton").prop("disabled", true);
                     $.confirm({
                         title: 'Information',
                         content: 'You have reached the maximum allowed assignments.',
                         icon: 'fas fa-random',  // Dynamic icon based on checkbox
-                        type: '#dc3545',
+                        type: 'red',
                         buttons: {
                             ok: {
                                 text: 'OK',
@@ -33,9 +33,6 @@
                             }
                         }
                     });
-                }
-                else {
-                    $("#uploadAssignCheckbox, #postedFile, #UploadFileButton").prop("disabled", false);
                 }
                 return json.data;
             }
@@ -77,11 +74,18 @@
                 orderable: false,
                 render: function (data, type, row) {
                     if (!data) return "";
-
-                    return `
-                    <span class="custom-message-badge badge badge-light" title="${data}" data-toggle="tooltip">
-                        ${data}
-                    </span>`;
+                    if (row.completed) {
+                        return `
+                        <span class="custom-message-badge i-blue" title="${data}" data-toggle="tooltip">
+                            ${data}
+                        </span>`;
+                    } else {
+                        return `
+                        <span class="custom-message-badge i-red" title="${data}" data-toggle="tooltip">
+                            ${data}
+                        </span>`;
+                    }
+                    
                 }
             },
             {
@@ -203,7 +207,7 @@
                     var icon = updatedRowData.data.directAssign ? 'fas fa-random' : 'fas fa-upload';  // Dynamic icon based on checkbox
                     var popType = updatedRowData.data.directAssign ? 'red' : 'blue';  // Dynamic color type ('blue' for Upload & Assign, 'green' for just Upload)
                     var title = updatedRowData.data.directAssign ? "Direct Assign" : "Upload";
-                    var btnClass = updatedRowData.data.directAssign ? 'btn-danger' : 'btn-primary';
+                    var btnClass = updatedRowData.data.directAssign ? 'btn-danger' : 'btn-info';
                     if (updatedRowData.data.status === 'Error') {
                         console.log("Status is Completed, stopping polling and updating row.");
                         clearInterval(pollingTimer); // Stop polling
@@ -270,7 +274,7 @@
                                 buttons: {
                                     ok: {
                                         text: 'OK',
-                                        btnClass: 'btn-primary',
+                                        btnClass: 'btn-info',
                                         action: function () {
                                             // Do nothing, just close the alert
                                         }
@@ -493,7 +497,7 @@
                     buttons: {
                         confirm: {
                             text: isChecked ? "Assign Directly" : "File Upload",  // Dynamic button text
-                            btnClass: isChecked ? 'btn-danger' : 'btn-primary',  // Customize button class
+                            btnClass: isChecked ? 'btn-danger' : 'btn-info',  // Customize button class
                             action: function () {
                                 askFileUploadConfirmation = false;
 

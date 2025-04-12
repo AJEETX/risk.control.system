@@ -491,7 +491,7 @@ namespace risk.control.system.Controllers.Company
         }
         [HttpGet]
         [Breadcrumb(" Empanelled Agencies", FromAction = "New")]
-        public async Task<IActionResult> EmpanelledVendors(string id,bool fromEditPage = false)
+        public async Task<IActionResult> EmpanelledVendors(string id,long vendorId = 0, bool fromEditPage = false)
         {
             try
             {
@@ -507,6 +507,10 @@ namespace risk.control.system.Controllers.Company
                 model.FromEditPage = fromEditPage;
                 var currentUser = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).ThenInclude(c => c.Country).FirstOrDefault(c => c.Email == currentUserEmail);
                 ViewData["Currency"] = Extensions.GetCultureByCountry(currentUser.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;
+                if(vendorId > 0)
+                {
+                    model.VendorId = vendorId;
+                }
                 return View(model);
             }
             catch (Exception ex)
