@@ -9,7 +9,7 @@
         public string Description { get; set; }
         public long? CompanyId { get; set; }
         public bool? Completed { get; set; }
-        public string? Icon { get; set; } = "fas fa-sync fa-spin i-blue";
+        public string? Icon { get; set; } = "fas fa-sync fa-spin i-grey";
         public string? Status { get; set; } = "Processing";
         public string? Message { get; set; } = "Upload In progress";
         public byte[] ByteData { get; set; }
@@ -19,6 +19,7 @@
         public ORIGIN FileOrFtp { get; set; } = ORIGIN.FILE;
         public string UploadedBy { get; set; }
         public DateTime? CreatedOn { get; set; }
+        public DateTime? CompletedOn { get; set; }
         public bool? Saved { get; set; } = false;
         public int CompanySequenceNumber { get; set; } // Company-specific sequence number
         public int UserSequenceNumber { get; set; } // Company-specific sequence number

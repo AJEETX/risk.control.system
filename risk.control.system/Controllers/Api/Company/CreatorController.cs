@@ -266,16 +266,30 @@ namespace risk.control.system.Controllers.Api.Company
             return Ok(response);
         }
 
-        [HttpGet("GetFilesData")]
-        public async Task<IActionResult> GetFilesData()
+        [HttpGet("GetFilesData/{uploadId?}")]
+        public async Task<IActionResult> GetFilesData(int uploadId = 0)
         {
             var userEmail = HttpContext.User.Identity.Name;
 
             var companyUser = _context.ClientCompanyApplicationUser.Include(c=>c.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
             var isManager = HttpContext.User.IsInRole(MANAGER.DISPLAY_NAME);
-            
+
             var totalReadyToAssign = await creatorService.GetAutoCount(userEmail);
             var maxAssignReadyAllowedByCompany = companyUser.ClientCompany.TotalToAssignMaxAllowed;
+
+            if(uploadId > 0 )
+            {
+                var file = await _context.FilesOnFileSystem.FirstOrDefaultAsync(f => f.Id == uploadId && f.CompanyId == companyUser.ClientCompanyId && f.UploadedBy == userEmail && !f.Deleted);
+                if (file == null)
+                {
+                    return NotFound(new { success = false, message = "File not found." });
+                }
+                if(file.ClaimsId != null && file.ClaimsId.Count > 0)
+                {
+                    totalReadyToAssign = totalReadyToAssign + file.ClaimsId.Count;
+                }
+            }
+            
 
             var files = await _context.FilesOnFileSystem.Where(f => f.CompanyId == companyUser.ClientCompanyId && ((f.UploadedBy == userEmail && !f.Deleted) || isManager)).ToListAsync();
             var result = files.OrderBy(o=>o.CreatedOn).Select(file => new
@@ -291,7 +305,9 @@ namespace risk.control.system.Controllers.Api.Company
                 file.Message,
                 Icon = file.Icon, // or use some other status representation
                 IsManager = isManager,
-                file.DirectAssign
+                file.DirectAssign,
+                UploadedType = file.DirectAssign ? "<i class='fas fa-random i-grey'></i>" : "<i class='fas fa-upload i-grey'></i>",
+                TimeTaken = file.CompletedOn != null ? $" {Math.Round((file.CompletedOn.Value - file.CreatedOn.Value).TotalSeconds)} sec": "<i class='fas fa-sync fa-spin i-grey'></i>",
             }).ToList();
 
             return Ok(new { data = result, maxAssignReadyAllowed = maxAssignReadyAllowedByCompany >= totalReadyToAssign });
@@ -325,8 +341,10 @@ namespace risk.control.system.Controllers.Api.Company
                 file.Message,
                 Icon = file.Icon, // or use some other status representation
                 IsManager = isManager,
-                file.DirectAssign
-            };
+                file.DirectAssign,
+                UploadedType = file.DirectAssign ? "<i class='fas fa-random i-grey'></i>" : "<i class='fas fa-upload i-grey'></i>",
+                TimeTaken = file.CompletedOn != null ? $" {Math.Round((file.CompletedOn.Value - file.CreatedOn.Value).TotalSeconds)} sec": "<i class='fas fa-sync fa-spin i-grey'></i>",
+            };//<i class='fas fa-sync fa-spin'></i>
 
             return Ok(new { data = result, maxAssignReadyAllowed = maxAssignReadyAllowedByCompany >= totalForAssign });
         }

@@ -94,11 +94,11 @@ namespace risk.control.system.Controllers.Company
                 progressService.AddUploadJob(jobId, currentUserEmail);
                 if(!model.UploadAndAssign)
                 {
-                    notifyService.Custom($"Upload in progress ", 3, "#17a2b8", "fa fa-upload");
+                    notifyService.Custom($"Upload in progress ", 3, "#17A2B8", "fa fa-upload");
                 }
                 else
                 {
-                    notifyService.Custom($"Upload + Assign in progress ", 5, "#dc3545", "fa fa-upload");
+                    notifyService.Custom($"Direct Assign in progress ", 5, "#dc3545", "fa fa-upload");
 
                 }
 

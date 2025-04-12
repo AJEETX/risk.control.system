@@ -44,7 +44,7 @@
 
         </div>
         <div class="row">
-            <div class="col-6">
+            <div class="col-12 col-md-6">
                 @if (!string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.AgencyReport?.AgentRemarks))
                 {
                     var questionTime = @Model.ClaimsInvestigation.AgencyReport.AgentRemarksUpdated != null ?
@@ -83,7 +83,6 @@
                                 </div>
                             </div>
                             <div class="card-body">
-                                <partial name="_AgentChat" model="@Model" />
 
                                 <div class="row">
 
@@ -198,7 +197,7 @@
 
                 }
             </div>
-            <div class="col-6">
+            <div class="col-12 col-md-6">
                 @if (!string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.AgencyReport?.SupervisorRemarks))
                 {
                     <div class="card bg-light  border-success">
@@ -233,68 +232,74 @@
                             <i class="fas fa-user-shield"></i>  Supervisor :<span class="badge badge-light">  @Model?.ClaimsInvestigation.AgencyReport.SupervisorEmail </span>
                         </div>
                         <div class="card-body">
+
                             <div class="row">
                                 <div class="col-12">
                                     <p class="text-muted text-sm">
 
                                         <span>comments: </span>
                                     </p>
-                                    <table id="customerTable" class="table-bordered table-hover dt-responsive nowrap w-100">
-                                        <thead>
-                                            <tr>
-                                                <th>
-                                                    Time
-                                                </th>
-                                                <th>
-                                                    Supervisor Response
-                                                </th>
-                                                <th>
-                                                    Document
-                                                </th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>
-                                                    @{
-                                                        string displayTime = string.Empty;
-                                                        var time = @Model.ClaimsInvestigation.AgencyReport?.SupervisorRemarksUpdated;
-                                                        if (time is not null)
-                                                        {
-                                                            displayTime = time.Value.ToString("dd-MMM-yyy HH:mm");
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered table-sm table-hover align-middle text-center">
+                                            <thead class="thead-light">
+                                                <tr>
+                                                    <th class="w-25">Time</th>
+                                                    <th>Supervisor Response</th>
+                                                    <th class="w-25">Document</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>
+                                                        @{
+                                                            string displayTime = string.Empty;
+                                                            var time = @Model.ClaimsInvestigation.AgencyReport?.SupervisorRemarksUpdated;
+                                                            if (time is not null)
+                                                            {
+                                                                displayTime = time.Value.ToString("dd-MMM-yyy HH:mm");
+                                                            }
+                                                            if (time == null)
+                                                            {
+                                                                displayTime = @Model.ClaimsInvestigation.AgencyReport.Created.ToString("dd-MMM-yyy HH:mm");
+                                                            }
                                                         }
-                                                        if (time == null)
+                                                        <span class="badge badge-light">@displayTime</span>
+                                                    </td>
+                                                    <td class="text-start">
+                                                        <div class="bg-light rounded p-2 text-muted">
+
+                                                            @Model.ClaimsInvestigation.AgencyReport?.SupervisorRemarks
+                                                        </div>
+
+                                                    </td>
+                                                    <td>
+                                                        @if (Model.ClaimsInvestigation.AgencyReport?.SupervisorAttachment != null)
                                                         {
-                                                            displayTime = @Model.ClaimsInvestigation.AgencyReport.Created.ToString("dd-MMM-yyy HH:mm");
+                                                            <div class="d-flex flex-column gap-2 align-items-center">
+                                                                <img title="enquiry document" id="enquiryDocument" class="img-fluid doc-profile-image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.ClaimsInvestigation.AgencyReport?.SupervisorAttachment))">
+                                                                <a asp-controller="Download" asp-action="SupervisorFileAttachment" target="_blank"
+                                                                   asp-route-id="@Model.ClaimsInvestigation.AgencyReport.AgencyReportId"
+                                                                   class="mailbox-attachment-name">
+                                                                    <i class="fas fa-paperclip"></i>
+                                                                </a>
+                                                            </div>
                                                         }
-                                                    }
-                                                    <span class="badge badge-light">@displayTime</span>
-                                                </td>
-                                                <td>
-                                                    @Model.ClaimsInvestigation.AgencyReport?.SupervisorRemarks
+                                                        else
+                                                        {
+                                                            <img title="enquiry document" id="enquiryDocument" alt="face image" class="img-fluid doc-profile-image" src=@Applicationsettings.NO_IMAGE>
+                                                        }
+                                                    </td>
 
-                                                </td>
-                                                <td>
-                                                    @if (Model.ClaimsInvestigation.AgencyReport?.SupervisorAttachment != null)
-                                                    {
-                                                        <img title="enquiry document" id="enquiryDocument" class="img-fluid doc-profile-image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.ClaimsInvestigation.AgencyReport?.SupervisorAttachment))">
-                                                        <a asp-controller="Download" asp-action="SupervisorFileAttachment" target="_blank"
-                                                           asp-route-id="@Model.ClaimsInvestigation.AgencyReport.AgencyReportId" class="mailbox-attachment-name"><i class="fas fa-paperclip"></i> </a>
-                                                    }
-                                                    else
-                                                    {
-                                                        <img title="enquiry document" id="enquiryDocument" alt="face image" class="img-fluid doc-profile-image" src=@Applicationsettings.NO_IMAGE>
-                                                    }
-                                                </td>
-
-                                            </tr>
-                                        </tbody>
-                                    </table>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
 
                             </div>
                         </div>
                     </div>
+                    <partial name="_AgentChat" model="@Model" />
 
                 }
             </div>

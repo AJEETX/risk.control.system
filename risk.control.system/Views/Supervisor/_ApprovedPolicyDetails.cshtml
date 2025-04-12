@@ -370,162 +370,172 @@
 
         </div>
         <div class="row">
-        <div class="col-6">
+            <div class="col-12 col-md-6">
                 @if (!string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.AgencyReport?.AgentRemarks))
                 {
-                    var questionTime = @Model.ClaimsInvestigation.AgencyReport.AgentRemarksUpdated != null ? @Model.ClaimsInvestigation.AgencyReport.AgentRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt") : null;
+                    var questionTime = @Model.ClaimsInvestigation.AgencyReport.AgentRemarksUpdated != null ?
+                    @Model.ClaimsInvestigation.AgencyReport.AgentRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt") : null;
+                    <div class="card  border-success">
 
-                    <div class="card bg-light d-flex flex-fill border-success">
-                        <div class="card-header text-muted border-bottom-0">
-                            <h3 class="card-title">
-                                <i class="far fa-comment"></i> Questionnaire (@Model.ClaimsInvestigation?.PolicyDetail.LineOfBusiness.Name)
-                                <span class="hover-text">
-                                    <i class="fas fa-info-circle"></i>
-                                    <span class="tooltip-text" id="information">
-                                        <span>
-                                            <i class="far fa-comment"></i><b> Questionnaire (@Model.ClaimsInvestigation?.PolicyDetail.LineOfBusiness.Name)</b>
+                        <div class="card direct-chat-warning">
+                            <div class="card-header text-muted border-bottom-0">
+                                <h3 class="card-title">
+                                    <i class="far fa-comment"></i> Questionnaire (@Model.ClaimsInvestigation?.PolicyDetail.LineOfBusiness.Name)
+                                    <span class="hover-text">
+                                        <i class="fas fa-info-circle"></i>
+                                        <span class="tooltip-text" id="information">
+                                            <span>
+                                                <i class="far fa-comment"></i><b> Questionnaire (@Model.ClaimsInvestigation?.PolicyDetail.LineOfBusiness.Name)</b>
+                                            </span>
+
                                         </span>
-
                                     </span>
-                                </span>
-                            </h3>
-                            <div class="card-tools">
-                                <span data-toggle="tooltip" title="Claim #" class="badge badge-light">
-                                    <i class="nav-icon fas fa-clock"></i>
-                                    @Model.ClaimsInvestigation.AgencyReport?.AgentRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt")
-                                </span>
-                            </div>
-                        </div>
-                        <div class="card-footer text-muted border-bottom-0">
-                            <i class="fas fa-user-shield"></i>  Agent:<span class="badge badge-light">  @Model.ClaimsInvestigation.AgencyReport.AgentEmail </span>
-                        </div>
-                        <div class="progress">
-                            <i class="far fa-bookmark bookmark-green"></i>
-                            <div class="progress-bar progress-bar-green" role="progressbar">
-                                questionaaire (@Model.ClaimsInvestigation?.PolicyDetail.LineOfBusiness.Name)
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <partial name="_AgentChat" model="@Model" />
+                                </h3>
+                                <div class="card-tools">
+                                    <span data-toggle="tooltip" title="Agent report time" class="badge badge-light">
+                                        <i class="nav-icon fas fa-clock"></i>
+                                        @Model.ClaimsInvestigation.AgencyReport?.AgentRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt")
+                                    </span>
 
-                            <div class="row">
-                                <div class="col-7">
-                                    <p class="text-muted text-sm">
-                                        <span class="badge badge-light"><i class="fas fa-film"></i> Questions</span>:
-                                        <br />
-                                        <ul class="ml-4 mb-0 fa-ul text-muted">
-                                            <li class="small">
-                                                @Model.ClaimsInvestigation?.AgencyReport.ReportQuestionaire.Question1
-                                                <span class="fa-li">
-                                                    <i class="far fa-comment"></i>
-                                                </span>
-                                            </li>
-                                            <br />
-                                            <li class="small">
-                                                @Model.ClaimsInvestigation?.AgencyReport.ReportQuestionaire.Question2
-
-                                                <span class="fa-li">
-                                                    <i class="far fa-comment"></i>
-                                                </span>
-                                            </li>
-                                            <br />
-                                            <li class="small">
-                                                @Model.ClaimsInvestigation?.AgencyReport.ReportQuestionaire.Question3
-                                                <span class="fa-li">
-                                                    <i class="far fa-comment"></i>
-                                                </span>
-                                            </li>
-                                            <br />
-                                            <li class="small">
-                                                @Model.ClaimsInvestigation?.AgencyReport.ReportQuestionaire.Question4
-                                                <span class="fa-li">
-                                                    <i class="far fa-comment"></i>
-                                                </span>
-                                            </li>
-                                            <br />
-                                            <li class="small">
-                                                Remarks?
-                                                <span class="fa-li">
-                                                    <i class="far fa-comment"></i>
-                                                </span>
-                                            </li>
-                                        </ul>
-                                    </p>
-                                </div>
-
-                                <div class="col-5">
-                                    <p class="text-muted text-sm">
-                                        <span class="badge badge-light"><i class="fas fa-film"></i> Answers</span>:
-                                        <br />
-                                        <ul class="ml-4 mb-0 fa-ul text-muted">
-                                            <li class="small">
-                                                <span class="fa-li">
-                                                    <i class="far fa-comment"></i>
-                                                </span>
-                                                @Model.ClaimsInvestigation.AgencyReport?.ReportQuestionaire?.Answer1
-                                            </li>
-                                            <br />
-                                            <li class="small">
-
-                                                <span class="fa-li">
-                                                    <i class="far fa-comment"></i>
-                                                </span>
-                                                @Model.ClaimsInvestigation.AgencyReport?.ReportQuestionaire?.Answer2
-                                            </li>
-                                            <br />
-                                            <li class="small">
-                                                <span class="fa-li">
-                                                    <i class="far fa-comment"></i>
-                                                </span>
-                                                @Model.ClaimsInvestigation.AgencyReport?.ReportQuestionaire?.Answer3
-                                            </li>
-                                            <br />
-                                            <li class="small">
-                                                <span class="fa-li">
-                                                    <i class="far fa-comment"></i>
-                                                </span>
-                                                @Model.ClaimsInvestigation.AgencyReport?.ReportQuestionaire?.Answer4
-                                            </li>
-                                            <br />
-                                            <li class="small">
-                                                <span class="fa-li">
-                                                    <i class="far fa-comment"></i>
-                                                </span>
-                                                @{
-                                                    var remarks = Model.ClaimsInvestigation.AgencyReport?.AgentRemarks;
-                                                    if (Model.ClaimsInvestigation.UpdateAgentAnswer)
-                                                    {
-                                                        var edited = Model.ClaimsInvestigation.AgencyReport?.AgentRemarks != Model.ClaimsInvestigation.AgencyReport?.AgentRemarksEdit;
-                                                        if (edited)
-                                                        {
-                                                            remarks = Model.ClaimsInvestigation.AgencyReport?.AgentRemarksEdit; ;
-                                                        }
-                                                    }
-                                                }
-                                                @remarks
-                                            </li>
-                                        </ul>
-                                    </p>
                                 </div>
                             </div>
+                            <div class="card-footer text-muted border-bottom-0">
+                                <i class="fas fa-user-shield"></i>  Agent:<span class="badge badge-light">  @Model.ClaimsInvestigation.AgencyReport.AgentEmail </span>
+                            </div>
+                            <div class="progress">
+                                <i class="far fa-bookmark bookmark-green"></i>
+                                <div class="progress-bar progress-bar-green" role="progressbar">
+                                    questionaaire (@Model.ClaimsInvestigation?.PolicyDetail.LineOfBusiness.Name)
+                                </div>
+                            </div>
+                            <div class="card-body">
 
+                                <div class="row">
+
+                                    <div class="col-7">
+                                        <p class="text-muted text-sm">
+                                            <span class="badge badge-light"><i class="fas fa-film"></i> Questions</span>:
+                                            <br />
+                                            <ul class="ml-4 mb-0 fa-ul text-muted">
+                                                <li class="small">
+                                                    @Model.ClaimsInvestigation.AgencyReport.ReportQuestionaire.Question1
+                                                    <span class="fa-li">
+                                                        <i class="far fa-comment"></i>
+                                                    </span>
+                                                </li>
+                                                <br />
+                                                <li class="small">
+                                                    @Model.ClaimsInvestigation.AgencyReport.ReportQuestionaire.Question2
+                                                    <span class="fa-li">
+                                                        <i class="far fa-comment"></i>
+                                                    </span>
+                                                </li>
+                                                <br />
+                                                <li class="small">
+                                                    @Model.ClaimsInvestigation.AgencyReport.ReportQuestionaire.Question3
+                                                    <span class="fa-li">
+                                                        <i class="far fa-comment"></i>
+                                                    </span>
+                                                </li>
+                                                <br />
+                                                <li class="small">
+                                                    @Model.ClaimsInvestigation.AgencyReport.ReportQuestionaire.Question4
+                                                    <span class="fa-li">
+                                                        <i class="far fa-comment"></i>
+                                                    </span>
+                                                </li>
+                                                <br />
+                                                <li class="small">
+                                                    Remarks?
+                                                    <span class="fa-li">
+                                                        <i class="far fa-comment"></i>
+                                                    </span>
+                                                </li>
+                                                <br />
+                                                <li class="small">
+                                                    Edit Remarks?
+                                                    <span class="fa-li">
+                                                        <i class="far fa-comment"></i>
+                                                    </span>
+                                                </li>
+                                            </ul>
+                                        </p>
+                                    </div>
+
+                                    <div class="col-5">
+                                        <p class="text-muted text-sm">
+                                            <span class="badge badge-light"><i class="fas fa-film"></i> Answers</span>:
+                                            <br />
+                                            <ul class="ml-4 mb-0 fa-ul text-muted">
+                                                <li class="small">
+                                                    <span class="fa-li">
+                                                        <i class="far fa-comment"></i>
+                                                    </span>
+                                                    @Model.ClaimsInvestigation.AgencyReport?.ReportQuestionaire?.Answer1
+                                                </li>
+                                                <br />
+                                                <li class="small">
+
+                                                    <span class="fa-li">
+                                                        <i class="far fa-comment"></i>
+                                                    </span>
+                                                    @Model.ClaimsInvestigation.AgencyReport?.ReportQuestionaire?.Answer2
+                                                </li>
+                                                <br />
+                                                <li class="small">
+                                                    <span class="fa-li">
+                                                        <i class="far fa-comment"></i>
+                                                    </span>
+                                                    @Model.ClaimsInvestigation.AgencyReport?.ReportQuestionaire?.Answer3
+                                                </li>
+                                                <br />
+                                                <li class="small">
+                                                    <span class="fa-li">
+                                                        <i class="far fa-comment"></i>
+                                                    </span>
+                                                    @Model.ClaimsInvestigation.AgencyReport?.ReportQuestionaire?.Answer4
+                                                </li>
+                                                <br />
+                                                <li class="small">
+                                                    <span class="fa-li">
+                                                        <i class="far fa-comment"></i>
+                                                    </span>
+                                                    @Model.ClaimsInvestigation.AgencyReport?.AgentRemarks
+                                                </li>
+                                                <br />
+                                                <li class="small">
+                                                    <span class="fa-li">
+                                                        <i class="far fa-comment"></i>
+                                                    </span>
+                                                    @Model.ClaimsInvestigation.AgencyReport?.AgentRemarksEdit
+                                                </li>
+                                            </ul>
+                                        </p>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <i class='fas fa-check-circle i-green'></i>
                         </div>
                     </div>
+
                 }
-        </div>
-            <div class="col-6">
+            </div>
+            <div class="col-12 col-md-6">
                 @if (!string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.AgencyReport?.SupervisorRemarks))
                 {
                     <div class="card bg-light  border-success">
 
                         <div class="card-header">
                             <h3 class="card-title">
-                                <i class="fas fa-user-edit"></i> Supervisor : <span class="badge badge-light"> @Model?.ClaimsInvestigation.AgencyReport?.SupervisorEmail</span>
+                                <i class="fas fa-user-edit"></i> Supervisor comments:
                                 <span class="hover-text">
                                     <i class="fas fa-info-circle"></i>
                                     <span class="tooltip-text" id="information">
                                         <span>
-                                            <i class="fas fa-user-shield"></i><b> @Model?.ClaimsInvestigation.AgencyReport?.SupervisorEmail</b> remark.
+                                            <i class="fas fa-user-shield"></i><b> @Model?.ClaimsInvestigation.AgencyReport?.SupervisorEmail</b> comments.
                                         </span>
 
                                     </span>
@@ -538,75 +548,88 @@
                             </div>
 
                         </div>
-
+                        <div class="progress">
+                            <i class="far fa-bookmark bookmark-green"></i>
+                            <div class="progress-bar progress-bar-green" role="progressbar">
+                                supervisor comments
+                            </div>
+                        </div>
+                        <div class="card-footer text-muted border-bottom-0">
+                            <i class="fas fa-user-shield"></i>  Supervisor :<span class="badge badge-light">  @Model?.ClaimsInvestigation.AgencyReport.SupervisorEmail </span>
+                        </div>
                         <div class="card-body">
+
                             <div class="row">
                                 <div class="col-12">
                                     <p class="text-muted text-sm">
 
-                                        <span>Supervisor comments: </span>
+                                        <span>comments: </span>
                                     </p>
-                                    <table id="customerTable" class="table-bordered table-hover dt-responsive nowrap w-100">
-                                        <thead>
-                                            <tr>
-                                                <th>
-                                                    Time
-                                                </th>
-                                                <th>
-                                                    Supervisor Response
-                                                </th>
-                                                <th>
-                                                    Document
-                                                </th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>
-                                                    @{
-                                                        string displayTime = string.Empty;
-                                                        var time = @Model.ClaimsInvestigation.AgencyReport?.SupervisorRemarksUpdated;
-                                                        if (time is not null)
-                                                        {
-                                                            displayTime = time.Value.ToString("dd-MMM-yyy HH:mm");
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered table-sm table-hover align-middle text-center">
+                                            <thead class="thead-light">
+                                                <tr>
+                                                    <th class="w-25">Time</th>
+                                                    <th>Supervisor Response</th>
+                                                    <th class="w-25">Document</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>
+                                                        @{
+                                                            string displayTime = string.Empty;
+                                                            var time = @Model.ClaimsInvestigation.AgencyReport?.SupervisorRemarksUpdated;
+                                                            if (time is not null)
+                                                            {
+                                                                displayTime = time.Value.ToString("dd-MMM-yyy HH:mm");
+                                                            }
+                                                            if (time == null)
+                                                            {
+                                                                displayTime = @Model.ClaimsInvestigation.AgencyReport.Created.ToString("dd-MMM-yyy HH:mm");
+                                                            }
                                                         }
-                                                        if (time == null)
+                                                        <span class="badge badge-light">@displayTime</span>
+                                                    </td>
+                                                    <td class="text-start">
+                                                        <div class="bg-light rounded p-2 text-muted">
+
+                                                            @Model.ClaimsInvestigation.AgencyReport?.SupervisorRemarks
+                                                        </div>
+
+                                                    </td>
+                                                    <td>
+                                                        @if (Model.ClaimsInvestigation.AgencyReport?.SupervisorAttachment != null)
                                                         {
-                                                            displayTime = @Model.ClaimsInvestigation.AgencyReport.Created.ToString("dd-MMM-yyy HH:mm");
+                                                            <div class="d-flex flex-column gap-2 align-items-center">
+                                                                <img title="enquiry document" id="enquiryDocument" class="img-fluid doc-profile-image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.ClaimsInvestigation.AgencyReport?.SupervisorAttachment))">
+                                                                <a asp-controller="Download" asp-action="SupervisorFileAttachment" target="_blank"
+                                                                   asp-route-id="@Model.ClaimsInvestigation.AgencyReport.AgencyReportId"
+                                                                   class="mailbox-attachment-name">
+                                                                    <i class="fas fa-paperclip"></i>
+                                                                </a>
+                                                            </div>
                                                         }
-                                                    }
-                                                    <span class="badge badge-light">@displayTime</span>
-                                                </td>
-                                                <td>
-                                                    @Model.ClaimsInvestigation.AgencyReport?.SupervisorRemarks
+                                                        else
+                                                        {
+                                                            <img title="enquiry document" id="enquiryDocument" alt="face image" class="img-fluid doc-profile-image" src=@Applicationsettings.NO_IMAGE>
+                                                        }
+                                                    </td>
 
-                                                </td>
-                                                <td>
-                                                    @if (Model.ClaimsInvestigation.AgencyReport?.SupervisorAttachment != null)
-                                                    {
-                                                        <img title="enquiry document" id="enquiryDocument" class="img-fluid doc-profile-image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.ClaimsInvestigation.AgencyReport?.SupervisorAttachment))">
-                                                        <a asp-controller="Download" asp-action="SupervisorFileAttachment" target="_blank"
-                                                           asp-route-id="@Model.ClaimsInvestigation.AgencyReport.AgencyReportId" class="mailbox-attachment-name"><i class="fas fa-paperclip"></i> </a>
-                                                    }
-                                                    else
-                                                    {
-                                                        <img title="enquiry document" id="enquiryDocument" alt="face image" class="img-fluid doc-profile-image" src=@Applicationsettings.NO_IMAGE>
-                                                    }
-                                                </td>
-
-                                            </tr>
-                                        </tbody>
-                                    </table>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
 
                             </div>
                         </div>
                     </div>
+                    <partial name="_AgentChat" model="@Model" />
 
                 }
             </div>
         </div>
-        
 
         @if (@Model.ClaimsInvestigation.IsQueryCase && @Model.ClaimsInvestigation.AgencyReport.EnquiryRequest != null)
         {

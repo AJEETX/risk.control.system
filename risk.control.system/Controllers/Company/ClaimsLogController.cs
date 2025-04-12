@@ -110,14 +110,6 @@ namespace risk.control.system.Controllers.Company
                 }
                 var totalReadyToAssign = await creatorService.GetAutoCount(currentUserEmail);
                 var hasClaim = totalReadyToAssign > 0;
-                //if (uploadId > 0)
-                //{
-                //    var uploadedFile = _context.FilesOnFileSystem.FirstOrDefault(f => f.Id == uploadId);
-                //    if(uploadedFile != null && uploadedFile.ClaimsId != null)
-                //    {
-                //        totalReadyToAssign = totalReadyToAssign + uploadedFile.ClaimsId.Count;
-                //    }
-                //}
                 var fileIdentifier = companyUser.ClientCompany.Country.Code.ToLower();
                 var hasFileUploads = _context.FilesOnFileSystem.Any();
                 var isManager = HttpContext.User.IsInRole(MANAGER.DISPLAY_NAME);

@@ -316,6 +316,7 @@ namespace risk.control.system.Services
             fileData.Status = "Error";
             fileData.Message = message;
             fileData.DirectAssign = uploadAndAssign;
+            fileData.CompletedOn = DateTime.Now;
             fileData.ClaimsId = claimsIds;
         }
 
@@ -339,6 +340,7 @@ namespace risk.control.system.Services
             fileData.DirectAssign = true;
             fileData.RecordCount = claims.Count;
             fileData.ClaimsId = claims.Select(c => c.ClaimsInvestigationId).ToList();
+            fileData.CompletedOn = DateTime.Now;
         }
         void SetUploadSuccess(FileOnFileSystemModel fileData, List<ClaimsInvestigation> claims)
         {
@@ -354,6 +356,7 @@ namespace risk.control.system.Services
             fileData.Message = message;
             fileData.RecordCount = claims.Count;
             fileData.ClaimsId = claims.Select(c => c.ClaimsInvestigationId).ToList();
+            fileData.CompletedOn = DateTime.Now;
         }
         private static List<UploadCase>? ReadFirstCsvFromZipToObject(byte[] zipData)
         {

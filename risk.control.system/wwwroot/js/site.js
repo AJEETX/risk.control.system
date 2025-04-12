@@ -7,20 +7,8 @@ var showBeneficiaryMap = false;
 var showFaceMap = false;
 var showLocationMap = false;
 var showOcrMap = false;
-const image =
-    "/images/beachflag.png";
-
-// Function to trigger the print dialog
-//function printInvoice() {
-//    window.print();  // Opens the print dialog
-//    return false;
-//}
-
-//document.addEventListener("DOMContentLoaded", function () {
-//    // Apply blur effect dynamically
-//    document.getElementById("main-container").classList.add("blur-background");
-//});
-// Add event listener to the print button once the DOM is fully loaded
+const image = "/images/beachflag.png";
+const MaxSizeInBytes = 5242880; // 5MG for upload
 
 
 document.addEventListener("DOMContentLoaded", function () {

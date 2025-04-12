@@ -424,28 +424,52 @@ int sessionTimeoutMinutes = int.Parse(builder.Configuration["SESSION_TIMEOUT_SEC
 //    $"*/{sessionTimeoutMinutes} * * * *"); // Check every 5 minutes
 
 app.Run();
-public class BasicAuthAuthorizationFilter : Hangfire.Dashboard.IDashboardAuthorizationFilter
+public class BasicAuthAuthorizationFilter : IDashboardAuthorizationFilter
 {
-    public bool Authorize(Hangfire.Dashboard.DashboardContext context)
+    public bool Authorize(DashboardContext context)
     {
-        var request = context.GetHttpContext().Request;
+        var httpContext = context.GetHttpContext();
+        var request = httpContext.Request;
+        var response = httpContext.Response;
         var authorization = request.Headers["Authorization"].ToString();
 
-        // Check if the Authorization header exists
-        if (string.IsNullOrEmpty(authorization))
+        if (string.IsNullOrEmpty(authorization) || !authorization.StartsWith("Basic ", StringComparison.OrdinalIgnoreCase))
         {
-            return false; // Deny if no credentials are provided
+            // Send 401 response with WWW-Authenticate to trigger login popup
+            response.Headers["WWW-Authenticate"] = "Basic realm=\"Hangfire Dashboard\"";
+            response.StatusCode = StatusCodes.Status401Unauthorized;
+            return false;
         }
 
-        // Decode the Authorization header (Base64 username:password)
-        var authHeader = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(authorization.Split(' ')[1]));
-        var credentials = authHeader.Split(':');
+        try
+        {
+            // Decode Authorization header (Base64 username:password)
+            var encodedCredentials = authorization.Substring(6); // Remove "Basic "
+            var decodedAuthHeader = Encoding.UTF8.GetString(Convert.FromBase64String(encodedCredentials));
+            var credentials = decodedAuthHeader.Split(':');
 
-        // Hardcoded username and password for Basic Authentication
-        var validUsername = "admin";
-        var validPassword = "password123";
+            if (credentials.Length != 2)
+                return false;
 
-        // Check if credentials match
-        return credentials.Length == 2 && credentials[0] == validUsername && credentials[1] == validPassword;
+            string username = "admin", password = "admin";
+
+#if !DEBUG
+            username = Environment.GetEnvironmentVariable("SMS_User");
+            password = Environment.GetEnvironmentVariable("SMS_Pwd");
+
+            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
+            {
+                Console.WriteLine("Environment variables not set properly!");
+                return false;
+            }
+#endif
+
+            // Check if credentials match
+            return credentials[0] == username && credentials[1] == password;
+        }
+        catch
+        {
+            return false; // Handle malformed authorization header
+        }
     }
 }

@@ -15,8 +15,6 @@
         {
             <partial name="Creator/_UploadTitle" model="Model" />
         }
-        <button id="refreshTable" class="btn btn-default"> <i id="refreshIcon" class="fas fa-sync"></i> Refresh</button>
-
 
         <div class="card-body">
             <div class="submit-progress hidden">
@@ -36,8 +34,10 @@
                         <th>Status</th>
                         <th>Name</th>
                         <th>File Type</th>
-                        <th>UploadedOn</th>
-                        <th>UploadedBy</th>
+                        <th>ActionedBy</th>
+                        <th>ActionedOn</th>
+                        <th><img class="action-image" src="~/headers/timer.gif" data-toggle="tooltip" title="Time taken to action" /></th>
+                        <th title="Action type" data-toggle="tooltip"><span><i class="fa fa-exclamation-circle"></i></span></th>
                         <th>Detail</th>
                         <th>Actions</th>
                     </tr>

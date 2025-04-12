@@ -1614,9 +1614,9 @@ ul#messagesList {
 
 .max-width-column-picodes {
     max-width: 300px;
-    white-space: nowrap; /* Prevents text wrapping */
-    overflow: hidden; /* Ensures overflow is hidden */
-    text-overflow: ellipsis; /* Adds ellipsis if text overflows */
+    white-space: break-spaces; /* Prevents text wrapping */
+    overflow: auto; /* Ensures overflow is hidden */
+    text-overflow: clip; /* Adds ellipsis if text overflows */
 }
 
 .trash-icon {
@@ -2742,4 +2742,24 @@ input#checkall {
 .edit-profile-btn:active {
     color: white;
     transform: scale(0.96); /* Slight shrink effect */
+}
+.max-width-column-status {
+    max-width: 32em;
+    white-space: break-spaces; /* Prevents text wrapping */
+    overflow: auto; /* Ensures overflow is hidden */
+    text-overflow: clip; /* Adds ellipsis if text overflows */
+}
+.custom-message-badge {
+    max-width: 32em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
+}
+.doc-preview {
+    width: auto;
+    height: 100px;
+    max-width: 100%;
+    object-fit: contain;
+    border-radius: 0.25rem;
 }

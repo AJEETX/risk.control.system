@@ -8,7 +8,7 @@
 @if (!string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.AgencyReport.AgentRemarks))
 {
 
-    <div class="col-6 d-flex align-items-stretch flex-column">
+    <div class="col-12 col-md-6">
         <div class="card bg-light d-flex flex-fill border-success">
             <div class="card-header text-muted border-bottom-0">
                 <h3 class="card-title">
@@ -58,7 +58,7 @@
                                 </li>
                                 <br />
                                 <li class="small">
-                                     @Model.AgencyReport.ReportQuestionaire.Question3
+                                    @Model.AgencyReport.ReportQuestionaire.Question3
                                     <span class="fa-li">
                                         <i class="far fa-comment"></i>
                                     </span>
@@ -127,17 +127,17 @@
                                     </span>
                                     @Model.AgencyReport?.AgentRemarks
                                 </li>
-                                @if(Model.ClaimsInvestigation.UpdateAgentAnswer)
+                                @if (Model.ClaimsInvestigation.UpdateAgentAnswer)
                                 {
-                                  <br />
-                                <li class="small">
-                                    <span class="fa-li">
-                                        <i class="far fa-comment"></i>
-                                    </span>
-                                    @Model.AgencyReport?.AgentRemarksEdit
-                                </li>  
+                                    <br />
+                                    <li class="small">
+                                        <span class="fa-li">
+                                            <i class="far fa-comment"></i>
+                                        </span>
+                                        @Model.AgencyReport?.AgentRemarksEdit
+                                    </li>
                                 }
-                                
+
                             </ul>
                         </p>
                     </div>

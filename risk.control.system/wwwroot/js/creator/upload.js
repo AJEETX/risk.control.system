@@ -13,7 +13,7 @@
     var uploadId = $('#uploadId').val();
     var table = $('#customerTableAuto').DataTable({
         "ajax": {
-            "url": '/api/Creator/GetFilesData',
+            "url": `/api/Creator/GetFilesData/${uploadId}`,
             "type": "GET",
             "dataSrc": function (json) {
                 if (!json.maxAssignReadyAllowed) {
@@ -21,7 +21,8 @@
                     $.confirm({
                         title: 'Information',
                         content: 'You have reached the maximum allowed assignments.',
-                        type: 'red',
+                        icon: 'fas fa-random',  // Dynamic icon based on checkbox
+                        type: '#dc3545',
                         buttons: {
                             ok: {
                                 text: 'OK',
@@ -58,13 +59,29 @@
             },
             { "data": "name" },
             { "data": "fileType" },
-            { "data": "createdOn" },
             { "data": "uploadedBy" },
+            { "data": "createdOn" },
+            { "data": "timeTaken" },
             {
-                "data": "message",
-                "bSortable": false,
+                "data": "uploadedType",
                 "mRender": function (data, type, row) {
-                    return '<span title="' + data + '" class="badge badge-light" data-toggle="tooltip"> ' + data + '</span>';
+                    var title = row.directAssign ? "Direct Assign" : "Upload";
+                    return `
+                    <span class="custom-message-badge" title="${title}" data-toggle="tooltip">
+                        ${data}
+                    </span>`;
+                }
+            },
+            {
+                data: "message",
+                orderable: false,
+                render: function (data, type, row) {
+                    if (!data) return "";
+
+                    return `
+                    <span class="custom-message-badge badge badge-light" title="${data}" data-toggle="tooltip">
+                        ${data}
+                    </span>`;
                 }
             },
             {
@@ -82,19 +99,43 @@
             },
             { "data": "isManager", "bVisible": false }
         ],
-        "order": [[5, "desc"]],  // ✅ Sort by 'createdOn' (index 5) in descending order
+        "order": [[1, "desc"]],  // ✅ Sort by 'createdOn' (index 5) in descending order
         "columnDefs": [
             {
-                "targets": 4,   // ✅ Apply sorting to 'createdOn' column
-                "type": "date"
+                className: 'max-width-column-claim', // ✅ Apply CSS class
+                targets: 1
+            },
+            {
+                className: 'max-width-column-claim', // ✅ Apply CSS class
+                targets: 2
+            },
+            {
+                className: 'max-width-column-name', // ✅ Apply CSS class
+                targets: 3
+            },
+            {
+                className: 'max-width-column-name', // ✅ Apply CSS class
+                "targets": 4
             },
             {
                 className: 'max-width-column-name', // ✅ Apply CSS class
                 targets: 5
             },
             {
-                className: 'max-width-column-name', // ✅ Apply CSS class
+                className: 'max-width-column-email', // ✅ Apply CSS class
                 targets: 6
+            },
+            {
+                className: 'max-width-column-email', // Apply the CSS class,
+                targets: 7                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-name', // Apply the CSS class,
+                targets: 8                      // Index of the column to style
+            },
+            {
+                className: 'max-width-column-status', // Apply the CSS class,
+                targets: 9                      // Index of the column to style
             }
         ],
         rowCallback: function (row, data) {
@@ -111,9 +152,9 @@
                 return value === true;
             });
 
-            if (!isManager) {
-                api.column(6).visible(false); // ✅ Hide 'uploadedBy' if all are managers
-            }
+            //if (!isManager) {
+            //    api.column(7).visible(false); // ✅ Hide 'uploadedBy' if all are managers
+            //}
 
             var tableData = api.rows().data().toArray(); // ✅ Get all rows' data
 
@@ -126,10 +167,12 @@
             });
 
             if (errorRow) {
-                var title = errorRow.directAssign ? "Upload & Assign" : "Upload"; // ✅ Dynamically set title
+                var title = errorRow.directAssign ? "Direct Assign" : "Upload"; // ✅ Dynamically set title
+                var icon = errorRow.directAssign ? 'fas fa-random' : 'fas fa-upload';
 
                 $.confirm({
                     title: title,
+                    icon: icon,  // Dynamic icon based on checkbox
                     content: `${title} completed with error.`,
                     type: 'red',
                     buttons: {
@@ -156,17 +199,22 @@
                 url: `/api/Creator/GetFileById/${uploadId}`, // Call the API to check status
                 type: 'GET',
                 success: function (updatedRowData) {
-                    var title = updatedRowData.directAssign ? "Upload & Assign" : "Upload";
 
-                    if (!alerted && updatedRowData.data.status === 'Error') {
+                    var icon = updatedRowData.data.directAssign ? 'fas fa-random' : 'fas fa-upload';  // Dynamic icon based on checkbox
+                    var popType = updatedRowData.data.directAssign ? 'red' : 'blue';  // Dynamic color type ('blue' for Upload & Assign, 'green' for just Upload)
+                    var title = updatedRowData.data.directAssign ? "Direct Assign" : "Upload";
+                    var btnClass = updatedRowData.data.directAssign ? 'btn-danger' : 'btn-primary';
+                    if (updatedRowData.data.status === 'Error') {
                         console.log("Status is Completed, stopping polling and updating row.");
                         clearInterval(pollingTimer); // Stop polling
                         updateProcessingRow(uploadId, updatedRowData.data); // Update the row with completed data
 
-                        if (!updatedRowData.maxAssignReadyAllowed) {
+                        if (updatedRowData.directAssign && !updatedRowData.maxAssignReadyAllowed) {
                             $.confirm({
-                                title: 'Max allowed Error',
+                                title: `${title} Error`,
                                 content: 'Maximum allowed assignments reached.',
+                                icon: icon,
+                                closeIcon: true,
                                 type: 'red',
                                 buttons: {
                                     ok: {
@@ -183,7 +231,9 @@
                             $.confirm({
                                 title: `${title} Error`,
                                 content: ` ${title} completed with error`,
+                                icon: icon,
                                 type: 'red',
+                                closeIcon: true,
                                 buttons: {
                                     ok: {
                                         text: 'OK',
@@ -195,26 +245,28 @@
                                 }
                             });
                         }
-                        
+
 
                     }
                     // If status is Processing, keep polling
-                    else if (!alerted && updatedRowData.data.status === "Processing") {
+                    else if (updatedRowData.data.status === "Processing") {
                         console.log("Status is still Processing, continuing to poll...");
                     }
 
                     // If status is Completed, stop polling and update the row
-                    else if (!alerted && updatedRowData.data.status === "Completed") {
+                    else if (updatedRowData.data.status === "Completed") {
                         console.log("Status is Completed, stopping polling and updating row.");
                         clearInterval(pollingTimer); // Stop polling
                         updateProcessingRow(uploadId, updatedRowData.data); // Update the row with completed data
-                        if (!updatedRowData.maxAssignReadyAllowed) {
-                            $("#uploadAssignCheckbox, #postedFile, #UploadFileButton").prop("disabled", true);
+                        if (updatedRowData.data.directAssign && !updatedRowData.maxAssignReadyAllowed) {
 
+                            $("#uploadAssignCheckbox, #postedFile, #UploadFileButton").prop("disabled", true);
                             $.confirm({
-                                title: 'Max allowed reached',
-                                content: 'Maximum allowed assignments reached.',
-                                type: 'blue',
+                                title: `${title} completed .`,
+                                icon: icon,
+                                content: `${title} completed and Maximum allowed assignments reached.`,
+                                closeIcon: true,
+                                type: popType,
                                 buttons: {
                                     ok: {
                                         text: 'OK',
@@ -228,13 +280,15 @@
                         }
                         else {
                             $.confirm({
-                                title: 'Information',
-                                content: `${title}  completed .`,
-                                type: 'green',
+                                title: `${title} completed .`,
+                                icon: icon ,
+                                content: `${title} completed successfully.`,
+                                type: popType,
+                                closeIcon: true,
                                 buttons: {
                                     ok: {
                                         text: 'OK',
-                                        btnClass: 'btn-success',
+                                        btnClass: btnClass,
                                         action: function () {
                                             // Do nothing, just close the alert
                                         }
@@ -242,7 +296,7 @@
                                 }
                             });
                         }
-                        
+
                     }
                 },
                 error: function (err) {
@@ -432,14 +486,14 @@
                 // Customize the confirm dialog dynamically
                 $.confirm({
                     title: isChecked ? "Confirm Direct Assign" : "Confirm File Upload",  // Dynamic title based on checkbox
-                    content: isChecked ? "Are you sure you want to Upload -> Assign?" : "Are you sure you want to Upload?",  // Dynamic content
+                    content: isChecked ? "Are you sure you want to Assign Directly?" : "Are you sure you want to Upload?",  // Dynamic content
                     icon: isChecked ? 'fas fa-random' : 'fas fa-upload',  // Dynamic icon based on checkbox
-                    type: isChecked ? '#dc3545' : '#17a2b8',  // Dynamic color type ('blue' for Upload & Assign, 'green' for just Upload)
+                    type: isChecked ? 'red' : 'blue',  // Dynamic color type ('blue' for Upload & Assign, 'green' for just Upload)
                     closeIcon: true,
                     buttons: {
                         confirm: {
                             text: isChecked ? "Assign Directly" : "File Upload",  // Dynamic button text
-                            btnClass: isChecked ? 'btn-danger' : 'btn-success',  // Customize button class
+                            btnClass: isChecked ? 'btn-danger' : 'btn-primary',  // Customize button class
                             action: function () {
                                 askFileUploadConfirmation = false;
 
@@ -482,3 +536,9 @@
     // Apply confirmation to both forms
     handleUploadConfirmation("#upload-claims", "#UploadFileButton", "#uploadAssignCheckbox");
 });
+
+if (window.location.search.includes("uploadId")) {
+    const url = new URL(window.location);
+    url.searchParams.delete("uploadId");
+    window.history.replaceState({}, document.title, url.pathname);
+}
