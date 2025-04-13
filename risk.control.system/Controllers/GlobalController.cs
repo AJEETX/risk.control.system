@@ -62,7 +62,6 @@ namespace risk.control.system.Controllers
                 try
                 {
                     var globalSettings =await _context.GlobalSettings.FirstOrDefaultAsync(x => x.GlobalSettingsId == id);
-                    globalSettings.EnableMailbox = settings.EnableMailbox;
                     globalSettings.SendSMS = await manager.IsEnabledAsync(nameof(FeatureFlags.SMS4ADMIN));
                     globalSettings.CanChangePassword = settings.CanChangePassword;
                     globalSettings.ShowTimer = settings.ShowTimer;

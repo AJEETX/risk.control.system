@@ -16,10 +16,7 @@ namespace risk.control.system.Seeds
             UserManager<VendorApplicationUser> userManager,
             Vendor vendor, string pinCode, string photo, string firstName, string lastName, string addressLine= "")
         {
-            var faMailBox = new Mailbox
-            {
-                Name = agentEmailwithSuffix
-            };
+            
             var noUserImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", @Applicationsettings.NO_USER);
             string agentImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", Path.GetFileName(photo));
             var agentImage = File.ReadAllBytes(agentImagePath);
@@ -37,7 +34,6 @@ namespace risk.control.system.Seeds
 
             var vendorAgent = new VendorApplicationUser()
             {
-                Mailbox = faMailBox,
                 UserName = agentEmailwithSuffix,
                 Email = agentEmailwithSuffix,
                 FirstName = firstName,

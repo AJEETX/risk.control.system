@@ -228,9 +228,9 @@
                                     <div class="form-group">
                                         <label class="input-group-label"> Document: </label>
                                         <div class="input-group mb-3">
-                                            @if (Model?.DocumentUrl is not null)
+                                            @if (Model?.DocumentImage is not null)
                                             {
-                                                <img id="companyImage" class="form-Image" src="@Model?.DocumentUrl">
+                                                <img id="companyImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.DocumentImage))">
                                             }
                                             else
                                             {

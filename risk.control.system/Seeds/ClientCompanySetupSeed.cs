@@ -126,38 +126,6 @@ namespace risk.control.system.Seeds
 
             #endregion
 
-            #region CASE OUTCOMES
-
-            var postiveOutcome = new InvestigationCaseOutcome
-            {
-                Name = "SUCCESS",
-                Code = "SUCCESS",
-                Updated = DateTime.Now,
-            };
-
-            var postiveOutcomeEntity = await context.InvestigationCaseOutcome.AddAsync(postiveOutcome);
-
-            var negativeOutcome = new InvestigationCaseOutcome
-            {
-                Name = "FAILURE",
-                Code = "FAILURE",
-                Updated = DateTime.Now,
-            };
-
-            var negativeOutcomeEntity = await context.InvestigationCaseOutcome.AddAsync(negativeOutcome);
-
-            var unknownOutcome = new InvestigationCaseOutcome
-            {
-                Name = "UNKNOWN",
-                Code = "UNKNOWN",
-                Updated = DateTime.Now,
-            };
-
-            var unknownOutcomeEntity = await context.InvestigationCaseOutcome.AddAsync(unknownOutcome);
-
-
-            #endregion
-
         }
     }
 }

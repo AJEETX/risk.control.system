@@ -135,38 +135,6 @@ namespace risk.control.system.Controllers.Company
             }
             return RedirectToAction(nameof(ClaimsActiveController.Active), "ClaimsActive");
         }
-        [HttpPost]
-        [Authorize(Roles = CREATOR.DISPLAY_NAME)]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Assign(List<string> claims)
-        {
-            if (claims == null || claims.Count == 0)
-            {
-                notifyService.Custom($"No case selected!!!. Please select case to be assigned.", 3, "red", "far fa-file-powerpoint");
-                return RedirectToAction(nameof(CreatorManualController.New), "CreatorManual");
-            }
-            try
-            {
-                var currentUserEmail = HttpContext.User?.Identity?.Name;
-                var distinctClaims = claims.Distinct().ToList();
-                var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
-                var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
-                var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
-
-                await claimsInvestigationService.AssignToAssigner(currentUserEmail, distinctClaims,baseUrl);
-
-                var jobId = backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimAssignmentToAssigner(currentUserEmail, distinctClaims,baseUrl));
-
-                notifyService.Custom($"{claims.Count}/{claims.Count} case(s) Assigned", 3, "green", "far fa-file-powerpoint");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.StackTrace);
-                notifyService.Error("OOPs !!!..Contact Admin");
-                return RedirectToAction(nameof(CreatorManualController.New), "CreatorManual");
-            }
-            return RedirectToAction(nameof(ClaimsActiveController.Active), "ClaimsActive");
-        }
 
         [ValidateAntiForgeryToken]
         [HttpPost]

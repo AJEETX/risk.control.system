@@ -20,9 +20,9 @@
                                 Profile photo
                             </dt>
                             <dd class="col-sm-5">
-                                @if (Model?.ProfilePictureUrl is not null)
+                                @if (Model?.ProfilePicture is not null)
                                 {
-                                    <img id="ProfileImage" class="form-Image" src="@Model?.ProfilePictureUrl">
+                                    <img id="ProfileImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.ProfilePicture))">
                                 }
                                 else
                                 {

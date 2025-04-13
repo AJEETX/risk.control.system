@@ -2772,3 +2772,8 @@ input#checkall {
     object-fit: contain;
     border-radius: 0.25rem;
 }
+
+.processing-row {
+    background-color: #fff3cd !important; /* light yellow */
+    color: #6c757d !important;
+}

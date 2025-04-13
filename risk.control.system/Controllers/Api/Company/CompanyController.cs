@@ -164,7 +164,7 @@ namespace risk.control.system.Controllers.Api.Company
                 .Select(u => new
                 {
                     Id = u.VendorId,
-                    Document = string.IsNullOrWhiteSpace(u.DocumentUrl) ? Applicationsettings.NO_IMAGE : u.DocumentUrl,
+                    Document = u.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(u.DocumentImage)) : Applicationsettings.NO_IMAGE,
                     Domain = companyUser.Role == AppRoles.COMPANY_ADMIN ?
                         $"<a href='/Company/AgencyDetail?id={u.VendorId}'>{u.Email}</a>" :
                         u.Email,
@@ -225,7 +225,7 @@ namespace risk.control.system.Controllers.Api.Company
                 new
                 {
                     Id = u.VendorId,
-                    Document = string.IsNullOrWhiteSpace(u.DocumentUrl) ? Applicationsettings.NO_IMAGE : u.DocumentUrl,
+                    Document = u.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(u.DocumentImage)) : Applicationsettings.NO_IMAGE,
                     Domain = "<a href=/Vendors/Details?id=" + u.VendorId + ">" + u.Email + "</a>",
                     Name = u.Name,
                     Code = u.Code,

@@ -4,6 +4,5 @@
     {
         public List<FileOnFileSystemModel> FilesOnFileSystem { get; set; }
 
-        public List<FileOnDatabaseModel> FilesOnDatabase { get; set; }
     }
 }

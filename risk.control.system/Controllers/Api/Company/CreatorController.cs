@@ -308,7 +308,8 @@ namespace risk.control.system.Controllers.Api.Company
                 file.Completed,
                 file.DirectAssign,
                 UploadedType = file.DirectAssign ? "<i class='fas fa-random i-assign'></i>" : "<i class='fas fa-upload i-upload'></i>",
-                TimeTaken = file.CompletedOn != null ? $" {Math.Round((file.CompletedOn.Value - file.CreatedOn.Value).TotalSeconds)} sec": "<i class='fas fa-sync fa-spin i-grey'></i>",
+                TimeTaken = file.CompletedOn != null ? $" {(Math.Round((file.CompletedOn.Value - file.CreatedOn.Value).TotalSeconds) < 1 ? 1 :
+                Math.Round((file.CompletedOn.Value - file.CreatedOn.Value).TotalSeconds))} sec" : "<i class='fas fa-sync fa-spin i-grey'></i>",
             }).ToList();
 
             return Ok(new { data = result, maxAssignReadyAllowed = maxAssignReadyAllowedByCompany >= totalReadyToAssign });
@@ -345,7 +346,8 @@ namespace risk.control.system.Controllers.Api.Company
                 IsManager = isManager,
                 file.DirectAssign,
                 UploadedType = file.DirectAssign ? "<i class='fas fa-random i-assign'></i>" : "<i class='fas fa-upload i-upload'></i>",
-                TimeTaken = file.CompletedOn != null ? $" {Math.Round((file.CompletedOn.Value - file.CreatedOn.Value).TotalSeconds)} sec": "<i class='fas fa-sync fa-spin i-grey'></i>",
+                TimeTaken = file.CompletedOn != null ? $" {(Math.Round((file.CompletedOn.Value - file.CreatedOn.Value).TotalSeconds) < 1 ? 1 : 
+                Math.Round((file.CompletedOn.Value - file.CreatedOn.Value).TotalSeconds))} sec" : "<i class='fas fa-sync fa-spin i-grey'></i>",
             };//<i class='fas fa-sync fa-spin'></i>
 
             return Ok(new { data = result, maxAssignReadyAllowed = maxAssignReadyAllowedByCompany >= totalForAssign });

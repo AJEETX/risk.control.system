@@ -144,8 +144,12 @@
         ],
         rowCallback: function (row, data) {
             var $row = $(row);
+            
             if (data.status === "Processing" && data.id == uploadId) {
+                $row.addClass('processing-row');
                 startPolling(data.id);
+            } else {
+                $row.removeClass('processing-row');
             }
         },  // ✅ Added missing comma before `initComplete`
         initComplete: function () {

@@ -78,8 +78,6 @@
         @if (Model.SelectedByCompany)
         {
             <input asp-for="CanChangePassword" id="CanChangePassword" type="hidden" />
-            <input asp-for="EnableMailbox" id="EnableMailbox" type="hidden" />
-
         }
         else
         {
@@ -161,7 +159,7 @@
             <div class="input-group mb-3">
                 @if (Model?.DocumentUrl is not null)
                 {
-                    <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="@Model?.DocumentUrl" data-toggle="tooltip" title="Document" />
+                    <img id="createProfileImage" class="form-Image" data-preview-id="createProfileImage" src="data:image/*;base64,@(Convert.ToBase64String(Model?.DocumentImage))" data-toggle="tooltip" title="Document" />
                     <i class="fa fa-asterisk asterik-style"></i>
                     <input accept=".jpg,.jpeg,.png" asp-for="Document" type="file"
                            class="form-control remarks document-image-input" id="createImageInput" data-preview-id="createProfileImage" data-toggle="tooltip" title="Upload Document" data-default-image="@Applicationsettings.NO_IMAGE" />

@@ -142,10 +142,7 @@ builder.Services.AddScoped<IGoogleApi, GoogleApi>();
 builder.Services.AddScoped<IGoogleMaskHelper, GoogleMaskHelper>();
 builder.Services.AddScoped<IChatSummarizer, OpenAISummarizer>();
 
-builder.Services.AddScoped<IInboxMailService, InboxMailService>();
-builder.Services.AddScoped<ISentMailService, SentMailService>();
 builder.Services.AddScoped<IHttpClientService, HttpClientService>();
-builder.Services.AddScoped<ITrashMailService, TrashMailService>();
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
 builder.Services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();

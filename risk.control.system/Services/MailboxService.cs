@@ -434,7 +434,6 @@ namespace risk.control.system.Services
             {
                 var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.AGENT.ToString()));
 
-                var recepientMailbox = _context.Mailbox.Include(m => m.Inbox).FirstOrDefault(c => c.Name == agentEmail);
                 var recepientUser = _context.VendorApplicationUser.Include(c => c.Country).FirstOrDefault(c => c.Email == agentEmail);
 
                 var claimsInvestigation = _context.ClaimsInvestigation
@@ -500,44 +499,7 @@ namespace risk.control.system.Services
                     }
                 }
             }
-            string claimsUrl = $"<a href={BaseUrl + claimsInvestigation.ClaimsInvestigationId}>url</a>";
-            claimsUrl = "<html>" + Environment.NewLine + claimsUrl + Environment.NewLine + "</html>";
-
-            var contactMessage = new InboxMessage
-            {
-                //ReceipientEmail = userEmailToSend,
-                Message = "Claim created ",
-                Created = DateTime.Now,
-                RawMessage = claimsUrl,
-                Subject = $"Claim created: case Id = {claimsInvestigation.ClaimsInvestigationId}",
-                SenderEmail = clientCompanyUser?.Email ?? applicationUser.Email,
-                Priority = ContactMessagePriority.NORMAL,
-                SendDate = DateTime.Now,
-                Updated = DateTime.Now,
-                Read = false,
-                UpdatedBy = applicationUser.Email
-            };
-            if (claimsInvestigation.PolicyDetail.Document is not null)
-            {
-                var messageDocumentFileName = Path.GetFileNameWithoutExtension(claimsInvestigation.PolicyDetail.Document.FileName);
-                var extension = Path.GetExtension(claimsInvestigation.PolicyDetail.Document.FileName);
-                contactMessage.Document = claimsInvestigation.PolicyDetail.Document;
-                using var dataStream = new MemoryStream();
-                await contactMessage.Document.CopyToAsync(dataStream);
-                contactMessage.Attachment = dataStream.ToArray();
-                contactMessage.FileType = claimsInvestigation.PolicyDetail.Document.ContentType;
-                contactMessage.Extension = extension;
-                contactMessage.AttachmentName = messageDocumentFileName;
-            }
-
-            foreach (var userEmailToSend in userEmailsToSend)
-            {
-                var recepientMailbox = _context.Mailbox.FirstOrDefault(c => c.Name == userEmailToSend);
-                contactMessage.ReceipientEmail = recepientMailbox.Name;
-                recepientMailbox?.Inbox.Add(contactMessage);
-                _context.Mailbox.Attach(recepientMailbox);
-                _context.Mailbox.Update(recepientMailbox);
-            }
+            
             try
             {
                 var rows = await _context.SaveChangesAsync();

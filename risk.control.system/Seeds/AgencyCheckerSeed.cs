@@ -66,8 +66,6 @@ namespace risk.control.system.Seeds
                 DocumentImage = checkerImage,
                 Updated = DateTime.Now,
                 Status = VendorStatus.ACTIVE,
-                EnableMailbox = globalSettings.EnableMailbox,
-                MobileAppUrl = globalSettings.MobileAppUrl,
                 CanChangePassword = globalSettings.CanChangePassword,
                 AddressMapLocation = checkerUrl,
                 AddressLatitude = checkerCoordinates.Latitude,

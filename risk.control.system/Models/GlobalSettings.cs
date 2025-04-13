@@ -12,7 +12,6 @@ namespace risk.control.system.Models
         public long GlobalSettingsId { get; set; }
 
         // system wide settings
-        public bool EnableMailbox { get; set; } = false;
         public bool AutoAllocation { get; set; } = true;
 
         public bool SendSMS { get; set; } = false;
