@@ -128,8 +128,20 @@ public class ICheckifyService : IICheckifyService
             var weatherUrl = $"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current=temperature_2m,windspeed_10m&hourly=temperature_2m,relativehumidity_2m,windspeed_10m";
 
             byte[]? registeredImage = agent.ProfilePicture;
-            var expectedLat = agent.AddressLatitude;
-            var expectedLong = agent.AddressLongitude;
+
+            var expectedLat = string.Empty;
+            var expectedLong = string.Empty;
+            if (claim.PolicyDetail.LineOfBusinessId == claimsLineOfBusinessId)
+            {
+                expectedLat = claim.BeneficiaryDetail.Latitude;
+                expectedLong = claim.BeneficiaryDetail.Longitude;
+            }
+            else
+            {
+
+                expectedLat = claim.CustomerDetail.Latitude;
+                expectedLong = claim.CustomerDetail.Longitude;
+            }
 
             var mapTask = customApiCLient.GetMap(double.Parse(expectedLat), double.Parse(expectedLong), double.Parse(latitude), double.Parse(longitude), "A", "X", "300", "300", "green", "red");
 

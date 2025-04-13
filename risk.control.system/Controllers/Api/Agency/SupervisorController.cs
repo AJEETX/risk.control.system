@@ -141,7 +141,7 @@ namespace risk.control.system.Controllers.Api.Agency
                 Service = a.PolicyDetail.InvestigationServiceType.Name,
                 Location = a.InvestigationCaseSubStatus.Name,
                 Created = a.Created.ToString("dd-MM-yyyy"),
-                timePending = a.GetSupervisorTimePending(false, a.InvestigationCaseSubStatus == assignedToAgentStatus, false, a.InvestigationCaseSubStatus == submittedToAssessorStatus, a.InvestigationCaseSubStatus == replyStatus),
+                timePending = GetSupervisorOpenTimePending(a),
                 PolicyNum = a.PolicyDetail.ContractNumber,
                 BeneficiaryPhoto = a.BeneficiaryDetail.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.BeneficiaryDetail.ProfilePicture)) : Applicationsettings.NO_USER,
                 BeneficiaryName = string.IsNullOrWhiteSpace(a.BeneficiaryDetail.Name) ? "<span class=\"badge badge-danger\"><i class=\"fas fa-exclamation-triangle\"></i></span>" : a.BeneficiaryDetail.Name,
@@ -155,7 +155,45 @@ namespace risk.control.system.Controllers.Api.Agency
 
             return Ok(response);
         }
+        private string GetSupervisorOpenTimePending(ClaimsInvestigation a)
+        {
+            DateTime timeToCompare = a.TaskToAgentTime.Value;
 
+            var allocated2agent = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
+
+            var submitted2Company = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
+
+            //1. assigned case to agent
+            if (a.InvestigationCaseSubStatusId == allocated2agent.InvestigationCaseSubStatusId)
+            {
+                timeToCompare = a.TaskToAgentTime.GetValueOrDefault();
+
+            }
+            else if (a.InvestigationCaseSubStatusId == submitted2Company.InvestigationCaseSubStatusId)
+            {
+                timeToCompare = a.SubmittedToAssessorTime.GetValueOrDefault();
+            }
+
+            if (DateTime.Now.Subtract(timeToCompare).Days >= 1)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Days} day</span>");
+
+            if (DateTime.Now.Subtract(timeToCompare).Hours < 24 &&
+                DateTime.Now.Subtract(timeToCompare).Hours > 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Hours} hr </span>");
+            }
+            if (DateTime.Now.Subtract(timeToCompare).Hours == 0 && DateTime.Now.Subtract(timeToCompare).Minutes > 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Minutes} min </span>");
+            }
+            if (DateTime.Now.Subtract(timeToCompare).Minutes == 0 && DateTime.Now.Subtract(timeToCompare).Seconds > 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Seconds} sec </span>");
+            }
+            return string.Join("", "<span class='badge badge-light'>now</span>");
+        }
         private byte[] GetOwner(ClaimsInvestigation a)
         {
             string ownerEmail = string.Empty;
@@ -309,8 +347,8 @@ namespace risk.control.system.Controllers.Api.Agency
                 Service = a.PolicyDetail.InvestigationServiceType.Name,
                 Location = a.InvestigationCaseSubStatus.Name,
                 Created = a.Created.ToString("dd-MM-yyyy"),
-                timePending = a.GetSupervisorTimePending(!a.IsQueryCase, false, false, false, a.IsQueryCase),
-                PolicyNum = a.GetPolicyNumForAgency(statuses[CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR]),
+                timePending = GetSupervisorNewTimePending(a),
+                PolicyNum = GetPolicyNumForAgency(a, statuses[CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR], statuses[CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR]),
                 BeneficiaryPhoto = a.BeneficiaryDetail?.ProfilePicture != null ?
                     string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.BeneficiaryDetail.ProfilePicture)) :
                     Applicationsettings.NO_USER,
@@ -326,7 +364,64 @@ namespace risk.control.system.Controllers.Api.Agency
 
             return Ok(response);
         }
+        private string GetPolicyNumForAgency(ClaimsInvestigation a, string enquiryStatus, string allocatedStatus)
+        {
+            var claim = a;
+            if (claim is not null)
+            {
+                var isRequested = a.InvestigationCaseSubStatusId == enquiryStatus;
+                if (isRequested)
+                {
+                    return string.Join("", a.PolicyDetail?.ContractNumber + "<i class=\"fa fa-asterisk asterik-style\" title=\"ENQUIRY\"></i>");
+                }
 
+                if(a.InvestigationCaseSubStatusId == allocatedStatus && !string.IsNullOrWhiteSpace(a.AgencyWithdrawComment))
+                {
+                    return string.Join("", a.PolicyDetail?.ContractNumber + "<i class=\"fa fa-asterisk asterik-style\" title=\"WITHDRAWN\"></i>");
+                }
+            }
+            return string.Join("", a.PolicyDetail?.ContractNumber + "<i class=\"fa fa-asterisk asterik-style-none\"></i>");
+        }
+        private string GetSupervisorNewTimePending(ClaimsInvestigation a)
+        {
+            DateTime timeToCompare = a.AllocatedToAgencyTime.Value;
+            
+            var allocated2agency = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
+
+            var requested2agency = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REQUESTED_BY_ASSESSOR);
+            //1. All new case
+            if (a.InvestigationCaseSubStatusId == allocated2agency.InvestigationCaseSubStatusId)
+            {
+                if(a.AgencyWithdrawComment != null || !string.IsNullOrWhiteSpace(a.AgencyWithdrawComment))
+                {
+                    timeToCompare = a.Updated.GetValueOrDefault();
+                }
+            }
+            else if(a.InvestigationCaseSubStatusId == requested2agency.InvestigationCaseSubStatusId)
+            {
+                timeToCompare = a.EnquiredByAssessorTime.GetValueOrDefault();
+            }
+
+            if (DateTime.Now.Subtract(timeToCompare).Days >= 1)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Days} day</span>");
+
+            if (DateTime.Now.Subtract(timeToCompare).Hours < 24 &&
+                DateTime.Now.Subtract(timeToCompare).Hours > 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Hours} hr </span>");
+            }
+            if (DateTime.Now.Subtract(timeToCompare).Hours == 0 && DateTime.Now.Subtract(timeToCompare).Minutes > 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Minutes} min </span>");
+            }
+            if (DateTime.Now.Subtract(timeToCompare).Minutes == 0 && DateTime.Now.Subtract(timeToCompare).Seconds > 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Seconds} sec </span>");
+            }
+            return string.Join("", "<span class='badge badge-light'>now</span>");
+        }
         private async Task<string> UpdateWeatherDataAsync(double latitude, double longitude)
         {
             var weatherUrl = $"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current=temperature_2m,windspeed_10m&hourly=temperature_2m,relativehumidity_2m,windspeed_10m";
@@ -425,7 +520,7 @@ namespace risk.control.system.Controllers.Api.Agency
                     Location = a.InvestigationCaseSubStatus.Name,
                     RawStatus = a.InvestigationCaseSubStatus.Name,
                     Created = a.Created.ToString("dd-MM-yyyy"),
-                    timePending = a.GetSupervisorTimePending(false, false, true, false),
+                    timePending = GetSupervisorReportTimePending(a),
                     PolicyNum = a.PolicyDetail.ContractNumber,
                     BeneficiaryPhoto = a.BeneficiaryDetail?.ProfilePicture != null ?
                                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.BeneficiaryDetail.ProfilePicture)) :
@@ -449,7 +544,28 @@ namespace risk.control.system.Controllers.Api.Agency
 
             return Ok(claimsSubmitted);
         }
+        private string GetSupervisorReportTimePending(ClaimsInvestigation a)
+        {
+            DateTime timeToCompare = a.SubmittedToSupervisorTime.Value;
 
+            if (DateTime.Now.Subtract(timeToCompare).Days >= 1)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Days} day</span>");
+
+            if (DateTime.Now.Subtract(timeToCompare).Hours < 24 &&
+                DateTime.Now.Subtract(timeToCompare).Hours > 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Hours} hr </span>");
+            }
+            if (DateTime.Now.Subtract(timeToCompare).Hours == 0 && DateTime.Now.Subtract(timeToCompare).Minutes > 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Minutes} min </span>");
+            }
+            if (DateTime.Now.Subtract(timeToCompare).Minutes == 0 && DateTime.Now.Subtract(timeToCompare).Seconds > 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Seconds} sec </span>");
+            }
+            return string.Join("", "<span class='badge badge-light'>now</span>");
+        }
         [HttpGet("GetCompleted")]
         public async Task<IActionResult> GetCompleted()
         {
@@ -565,7 +681,7 @@ namespace risk.control.system.Controllers.Api.Agency
                     Service = a.PolicyDetail.InvestigationServiceType.Name,
                     Location = a.InvestigationCaseSubStatus.Name,
                     Created = a.Created.ToString("dd-MM-yyyy"),
-                    timePending = a.GetSupervisorTimePending(false, false, false, true),
+                    timePending = GetSupervisorCompletedTimePending(a),
                     PolicyNum = a.PolicyDetail.ContractNumber,
                     BeneficiaryPhoto = a.BeneficiaryDetail?.ProfilePicture != null ?
                                         string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.BeneficiaryDetail.ProfilePicture)) :
@@ -581,6 +697,29 @@ namespace risk.control.system.Controllers.Api.Agency
                 .ToList();
 
             return Ok(response);
+        }
+
+        private string GetSupervisorCompletedTimePending(ClaimsInvestigation a)
+        {
+            DateTime timeToCompare = a.ProcessedByAssessorTime.Value;
+
+            if (DateTime.Now.Subtract(timeToCompare).Days >= 1)
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Days} day</span>");
+
+            if (DateTime.Now.Subtract(timeToCompare).Hours < 24 &&
+                DateTime.Now.Subtract(timeToCompare).Hours > 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Hours} hr </span>");
+            }
+            if (DateTime.Now.Subtract(timeToCompare).Hours == 0 && DateTime.Now.Subtract(timeToCompare).Minutes > 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Minutes} min </span>");
+            }
+            if (DateTime.Now.Subtract(timeToCompare).Minutes == 0 && DateTime.Now.Subtract(timeToCompare).Seconds > 0)
+            {
+                return string.Join("", $"<span class='badge badge-light'>{DateTime.Now.Subtract(timeToCompare).Seconds} sec </span>");
+            }
+            return string.Join("", "<span class='badge badge-light'>now</span>");
         }
 
 

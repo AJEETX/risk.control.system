@@ -86,6 +86,7 @@ namespace risk.control.system.Controllers.Company
                 if(model != null && model.ClaimsInvestigation != null && model.ClaimsInvestigation.AiEnabled)
                 {
                     var investigationSummary = await chatSummarizer.SummarizeDataAsync(model.ClaimsInvestigation);
+                    model.AgencyReport.AiSummaryUpdated = DateTime.Now;
                     model.ReportAiSummary = investigationSummary;
                 }
                 ViewData["Currency"] = Extensions.GetCultureByCountry(model.ClaimsInvestigation.ClientCompany.Country.Code.ToUpper()).NumberFormat.CurrencySymbol;

@@ -24,8 +24,8 @@ namespace risk.control.system.Seeds
             var canara = new SeedInput { COUNTRY = "in", DOMAIN = "canara.com", NAME = "Allianz", PHOTO = "/img/chl.jpg" };
             
             var companies = new List<SeedInput> {
-                allianz
-                ,
+                //allianz
+                //,
                 insurer
                 ,
                 canara

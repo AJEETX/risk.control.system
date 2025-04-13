@@ -357,14 +357,19 @@
         </div>
     }
     <div class="card-footer">
-        <form id="withdraw-form">
-
+        <form id="withdraw-form" method="post" asp-action="WithdrawCaseFromAgent" asp-controller="ClaimsVendorPost">
+            <input type="hidden" name="claimId" asp-for="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
+            <input type="hidden" name="policyNumber" asp-for="@Model.ClaimsInvestigation.PolicyDetail.ContractNumber" />
             <div class="row">
                 <div class="col-md-12">
                     <a id="back" asp-action="Open" class="btn btn-outline-secondary">
                         <i class="fas fa-arrow-left"></i>
                         <span class="badge badge-light"> <i class="fa fa-toggle-on"></i> </span> Back
                     </a>
+                    @if (@Model.ClaimsInvestigation.AgencyReport.AgentRemarks == null)
+                    {
+                        <button id="withdraw-case" type="submit" class="btn btn-danger"><i class="fas fa-undo"></i> Withdraw</button>
+                    }
 
                 </div>
             </div>

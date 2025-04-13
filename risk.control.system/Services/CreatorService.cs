@@ -392,7 +392,7 @@ namespace risk.control.system.Services
                 Service = a.PolicyDetail.InvestigationServiceType.Name,
                 Location = a.InvestigationCaseSubStatus.Name,
                 Created = a.Created.ToString("dd-MM-yyyy"),
-                timePending = a.GetCreatorTimePending(true),
+                timePending = a.GetCreatorTimePending(),
                 Withdrawable = !a.NotWithdrawable,
                 PolicyNum = a.GetPolicyNum(),
                 BeneficiaryPhoto = a.BeneficiaryDetail?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.BeneficiaryDetail.ProfilePicture)) : NO_USER,

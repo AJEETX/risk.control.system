@@ -284,7 +284,7 @@ namespace risk.control.system.Controllers.Api.Agency
             List<VendorUserClaim> agents = new List<VendorUserClaim>();
             var onboardingEnabled = await featureManager.IsEnabledAsync(FeatureFlags.ONBOARDING_ENABLED);
 
-            var vendorUsersQuery = _context.VendorApplicationUser
+            var vendorAgentsQuery = _context.VendorApplicationUser
                 .Include(u => u.Country)
                 .Include(u => u.State)
                 .Include(u => u.District)
@@ -293,10 +293,10 @@ namespace risk.control.system.Controllers.Api.Agency
 
             if (onboardingEnabled)
             {
-                vendorUsersQuery = vendorUsersQuery.Where(c => !string.IsNullOrWhiteSpace(c.MobileUId));
+                vendorAgentsQuery = vendorAgentsQuery.Where(c => !string.IsNullOrWhiteSpace(c.MobileUId));
             }
 
-            var vendorUsers = await vendorUsersQuery
+            var vendorAgents = await vendorAgentsQuery
                 .OrderBy(u => u.FirstName)
                 .ThenBy(u => u.LastName)
                 .ToListAsync();
@@ -326,20 +326,20 @@ namespace risk.control.system.Controllers.Api.Agency
             // Use Parallel.ForEach to run agent processing in parallel
             var agentList = new ConcurrentBag<AgentData>(); // Using a thread-safe collection
 
-            await Task.WhenAll(vendorUsers.Select(async user =>
+            await Task.WhenAll(vendorAgents.Select(async agent =>
             {
-                int claimCount = result.GetValueOrDefault(user.Email, 0);
+                int claimCount = result.GetValueOrDefault(agent.Email, 0);
                 var agentData = new VendorUserClaim
                 {
-                    AgencyUser = user,
+                    AgencyUser = agent,
                     CurrentCaseCount = claimCount,
                 };
                 agents.Add(agentData);
 
                 // Get map data asynchronously
                 var (distance, distanceInMetre, duration, durationInSec, map) = await customApiCLient.GetMap(
-                    double.Parse(user.AddressLatitude),
-                    double.Parse(user.AddressLongitude),
+                    double.Parse(agent.AddressLatitude),
+                    double.Parse(agent.AddressLongitude),
                     double.Parse(LocationLatitude),
                     double.Parse(LocationLongitude));
 
@@ -347,30 +347,30 @@ namespace risk.control.system.Controllers.Api.Agency
 
                 var agentInfo = new AgentData
                 {
-                    Id = user.Id,
-                    Photo = user.ProfilePicture == null
+                    Id = agent.Id,
+                    Photo = agent.ProfilePicture == null
                         ? noUserImagefilePath
-                        : $"data:image/*;base64,{Convert.ToBase64String(user.ProfilePicture)}",
-                    Email = user.UserRole == AgencyRole.AGENT && !string.IsNullOrWhiteSpace(user.MobileUId)
-                        ? $"<a href='/Agency/EditUser?userId={user.Id}'>{user.Email}</a>"
-                        : $"<a href='/Agency/EditUser?userId={user.Id}'>{user.Email}</a><span title='Onboarding incomplete !!!' data-toggle='tooltip'><i class='fa fa-asterisk asterik-style'></i></span>",
-                    Name = $"{user.FirstName} {user.LastName}",
-                    Phone = $"(+{user.Country.ISDCode}) {user.PhoneNumber}",
-                    Addressline = $"{user.Addressline}, {user.District.Name}, {user.State.Code}, {user.Country.Code}",
-                    Country = user.Country.Code,
-                    Flag = $"/flags/{user.Country.Code.ToLower()}.png",
-                    Active = user.Active,
-                    Roles = user.UserRole != null
-                        ? $"<span class='badge badge-light'>{user.UserRole.GetEnumDisplayName()}</span>"
+                        : $"data:image/*;base64,{Convert.ToBase64String(agent.ProfilePicture)}",
+                    Email = agent.UserRole == AgencyRole.AGENT && !string.IsNullOrWhiteSpace(agent.MobileUId)
+                        ? $"<a href='/Agency/EditUser?agentId={agent.Id}'>{agent.Email}</a>"
+                        : $"<a href='/Agency/EditUser?agentId={agent.Id}'>{agent.Email}</a><span title='Onboarding incomplete !!!' data-toggle='tooltip'><i class='fa fa-asterisk asterik-style'></i></span>",
+                    Name = $"{agent.FirstName} {agent.LastName}",
+                    Phone = $"(+{agent.Country.ISDCode}) {agent.PhoneNumber}",
+                    Addressline = $"{agent.Addressline}, {agent.District.Name}, {agent.State.Code}, {agent.Country.Code}",
+                    Country = agent.Country.Code,
+                    Flag = $"/flags/{agent.Country.Code.ToLower()}.png",
+                    Active = agent.Active,
+                    Roles = agent.UserRole != null
+                        ? $"<span class='badge badge-light'>{agent.UserRole.GetEnumDisplayName()}</span>"
                         : "<span class='badge badge-light'>...</span>",
                     Count = claimCount,
-                    UpdateBy = user.UpdatedBy,
-                    Role = user.UserRole.GetEnumDisplayName(),
-                    AgentOnboarded = user.UserRole != AgencyRole.AGENT || !string.IsNullOrWhiteSpace(user.MobileUId),
-                    RawEmail = user.Email,
+                    UpdateBy = agent.UpdatedBy,
+                    Role = agent.UserRole.GetEnumDisplayName(),
+                    AgentOnboarded = agent.UserRole != AgencyRole.AGENT || !string.IsNullOrWhiteSpace(agent.MobileUId),
+                    RawEmail = agent.Email,
                     PersonMapAddressUrl = map,
                     MapDetails = mapDetails,
-                    PinCode = user.PinCode.Code,
+                    PinCode = agent.PinCode.Code,
                     Distance = distance,
                     DistanceInMetres = distanceInMetre,
                     Duration = duration,

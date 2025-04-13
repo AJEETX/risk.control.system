@@ -250,6 +250,46 @@ namespace risk.control.system.Controllers.Agency
 
             }
         }
+        [HttpPost]
+        [Authorize(Roles = $"{AGENCY_ADMIN.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME}")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> WithdrawCaseFromAgent(ClaimTransactionModel model, string claimId, string policyNumber)
+        {
+            try
+            {
+                if (model == null || string.IsNullOrWhiteSpace(claimId))
+                {
+                    notifyService.Error("OOPs !!!..Contact Admin");
+                    return RedirectToAction(nameof(SupervisorController.Allocate), "Supervisor");
+
+                }
+                string userEmail = HttpContext?.User?.Identity.Name;
+                if (string.IsNullOrWhiteSpace(userEmail))
+                {
+                    notifyService.Error("OOPs !!!..Unauthenticated Access");
+                    return RedirectToAction(nameof(SupervisorController.Allocate), "Supervisor");
+
+                }
+                var agency = await claimsInvestigationService.WithdrawCaseFromAgent(userEmail, model, claimId);
+
+                var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
+                var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
+                var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
+
+                var jobId = backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimWithdrawlToCompany(userEmail, claimId, agency.VendorId, baseUrl));
+
+                notifyService.Custom($"Case #{policyNumber} withdrawn from Agent successfully", 3, "green", "far fa-file-powerpoint");
+
+                return RedirectToAction(nameof(SupervisorController.Allocate), "Supervisor");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                notifyService.Error("OOPs !!!..Contact Admin");
+                return RedirectToAction(nameof(SupervisorController.Allocate), "Supervisor");
+
+            }
+        }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
