@@ -393,6 +393,7 @@ namespace risk.control.system.Controllers.Api
                 filePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "user.png");
 
                 var noCustomerimage = await System.IO.File.ReadAllBytesAsync(filePath);
+                var claimLineOfBusiness = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == CLAIM).LineOfBusinessId;
 
                 var claim2Agent = claimsAssigned
                     .Select(c =>
@@ -400,7 +401,7 @@ namespace risk.control.system.Controllers.Api
                 {
                     claimId = c.ClaimsInvestigationId,
                     Registered = vendorUser.Active && !string.IsNullOrWhiteSpace(vendorUser.MobileUId),
-                    claimType = c.PolicyDetail.ClaimType.GetEnumDisplayName(),
+                    claimType = c.PolicyDetail.LineOfBusinessId == claimLineOfBusiness ? ClaimType.DEATH : ClaimType.HEALTH,
                     DocumentPhoto = c.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(c.PolicyDetail.DocumentImage)) :
                     string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noDocumentimage)),
                     CustomerName = c.CustomerDetail.Name,
@@ -516,7 +517,7 @@ namespace risk.control.system.Controllers.Api
                     {
                         Lat = c.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness ?
                             decimal.Parse(c.CustomerDetail.Latitude) : decimal.Parse(c.BeneficiaryDetail.Latitude),
-                        Lng = c.PolicyDetail.LineOfBusinessId == claimLineOfBusiness ?
+                        Lng = c.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness ?
                              decimal.Parse(c.CustomerDetail.Longitude) : decimal.Parse(c.BeneficiaryDetail.Longitude)
                     },
                     Address = LocationDetail.GetAddress(c.PolicyDetail.LineOfBusinessId == underWritingLineOfBusiness, c.CustomerDetail, c.BeneficiaryDetail),
