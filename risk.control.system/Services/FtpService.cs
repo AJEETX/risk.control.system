@@ -292,7 +292,7 @@ namespace risk.control.system.Services
                     SetUploadAssignSuccess(uploadFileData, uploadedClaims, autoAllocated);
                     await _context.SaveChangesAsync();
                     // Notify User
-                    await mailboxService.NotifyFileUpload(userEmail, uploadFileData, url);
+                    //await mailboxService.NotifyFileUploadAutoAssign(userEmail, uploadFileData, url);
                 }
                 else
                 {

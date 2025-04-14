@@ -22,6 +22,7 @@ namespace risk.control.system.Services
     {
         Task NotifyClaimCreation(string userEmail, ClaimsInvestigation claimsInvestigation, string url = "");
 
+        Task NotifyClaimAllocationToVendorAndManager(string userEmail, string policy, string claimsInvestigationId, long vendorId, string url = "");
         Task NotifyClaimAllocationToVendor(string userEmail, string policy, string claimsInvestigationId, long vendorId, string url = "");
 
         Task NotifyClaimAssignmentToAssigner(string userEmail, List<string> claims, string url = "");
@@ -40,6 +41,7 @@ namespace risk.control.system.Services
         Task NotifyClaimAssignmentToAssigner(string senderUserEmail, List<string> autoAllocatedCases, List<string> notAutoAllocatedCases, string url = "");
         Task NotifyClaimDirectAssignmentToAssigner(string senderUserEmail, int autoAllocatedCases, int notAutoAllocatedCases, string url = "");
         Task NotifyFileUpload(string senderUserEmail, FileOnFileSystemModel file, string url);
+        Task NotifyFileUploadAutoAssign(string senderUserEmail, FileOnFileSystemModel file, string url);
     }
 
     public class MailboxService : IMailboxService
@@ -78,7 +80,72 @@ namespace risk.control.system.Services
             this.userManager = userManager;
             this.userVendorManager = userVendorManager;
         }
+        public async Task NotifyFileUploadAutoAssign(string senderUserEmail, FileOnFileSystemModel file, string url)
+        {
+            try
+            {
+                var created = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
+                var applicationUser = _context.ClientCompanyApplicationUser.Include(i => i.ClientCompany).Include(i => i.Country).FirstOrDefault(c => c.Email == senderUserEmail);
 
+                var creatorRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.CREATOR.ToString()));
+
+                if (file.Completed.GetValueOrDefault())
+                {
+                    var notification = new StatusNotification
+                    {
+                        Role = creatorRole,
+                        Company = applicationUser.ClientCompany,
+                        Symbol = "fa fa-info i-blue",
+                        Message = $"Assign of {file.RecordCount} cases finished",
+                        Status = $"{created.Name}",
+                        NotifierUserEmail = senderUserEmail
+                    };
+                    _context.Notifications.Add(notification);
+                    //SEND SMS
+                    if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
+                    {
+                        string message = $"Dear {applicationUser.Email}, ";
+                        message += $"Assign of {file.RecordCount} cases finished ";
+                        message += $"Thanks, ";
+                        message += $"{applicationUser.Email}, ";
+                        message += $"{url}";
+                        await smsService.DoSendSmsAsync(applicationUser.Country.ISDCode + applicationUser.PhoneNumber, message);
+                    }
+                }
+                else
+                {
+                    var notification = new StatusNotification
+                    {
+                        Role = creatorRole,
+                        Company = applicationUser.ClientCompany,
+                        Symbol = "fa fa-times i-orangered",
+                        Message = $"Assign Error",
+                        Status = $"{created.Name}",
+                        NotifierUserEmail = senderUserEmail
+                    };
+                    _context.Notifications.Add(notification);
+                    //SEND SMS
+                    if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
+                    {
+                        string message = $"Dear {applicationUser.Email}, ";
+                        message += $"JobId: {file.Id} Assign Error. ";
+                        message += $"Thanks, ";
+                        message += $"{applicationUser.Email}, ";
+                        message += $"{url}";
+                        await smsService.DoSendSmsAsync(applicationUser.Country.ISDCode + applicationUser.PhoneNumber, message);
+                    }
+                }
+
+                var rows = await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                throw;
+            }
+
+        }
         public async Task NotifyFileUpload(string senderUserEmail, FileOnFileSystemModel file, string url)
         {
             try
@@ -144,6 +211,91 @@ namespace risk.control.system.Services
                 throw;
             }
 
+        }
+
+        public async Task NotifyClaimAllocationToVendorAndManager(string userEmail, string policy, string claimsInvestigationId, long vendorId, string url = "")
+        {
+            try
+            {
+                var managerRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.MANAGER.ToString()));
+                var applicationUser = _context.ClientCompanyApplicationUser.Include(i => i.ClientCompany).Include(i => i.Country).FirstOrDefault(c => c.Email == userEmail);
+                var supervisorRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.SUPERVISOR.ToString()));
+                var agencyAdminRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.AGENCY_ADMIN.ToString()));
+
+                var vendorUsers = _context.VendorApplicationUser.Include(c => c.Country).Where(u => u.VendorId == vendorId);
+
+                List<VendorApplicationUser> userEmailsToSend = new();
+
+                foreach (var assignedUser in vendorUsers)
+                {
+                    var isAdmin = await userVendorManager.IsInRoleAsync(assignedUser, agencyAdminRole?.Name);
+                    if (isAdmin)
+                    {
+                        userEmailsToSend.Add(assignedUser);
+                    }
+                    var isSupervisor = await userVendorManager.IsInRoleAsync(assignedUser, supervisorRole?.Name);
+                    if (isSupervisor)
+                    {
+                        userEmailsToSend.Add(assignedUser);
+                    }
+                }
+
+                //string claimsUrl = $"{AgencyBaseUrl + claimsInvestigationId}";
+
+                var claimsInvestigation = _context.ClaimsInvestigation
+                    .Include(i => i.Vendor)
+                    .Include(i => i.PolicyDetail)
+                    .Include(i => i.InvestigationCaseSubStatus)
+                    .FirstOrDefault(v => v.ClaimsInvestigationId == claimsInvestigationId);
+
+                var notification = new StatusNotification
+                {
+                    Role = supervisorRole,
+                    Agency = claimsInvestigation.Vendor,
+                    Message = $"Case #{claimsInvestigation.PolicyDetail.ContractNumber}",
+                    Status = claimsInvestigation.InvestigationCaseSubStatus.Name,
+                    NotifierUserEmail = userEmail
+                };
+                _context.Notifications.Add(notification);
+                var managerNotification = new StatusNotification
+                {
+                    Role = managerRole,
+                    Company = applicationUser.ClientCompany,
+                    Symbol = "fa fa-info i-blue",
+                    Message = $"Case #{claimsInvestigation.PolicyDetail.ContractNumber}",
+                    Status = claimsInvestigation.InvestigationCaseSubStatus.Name,
+                    NotifierUserEmail = userEmail
+                };
+                _context.Notifications.Add(managerNotification);
+
+                var clientCompanyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+
+                var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == clientCompanyUser.ClientCompanyId);
+
+                foreach (var userEmailToSend in userEmailsToSend)
+                {
+
+                    //SEND SMS
+                    if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
+                    {
+                        string message = $"Dear {userEmailToSend.Email}, ";
+                        message += $"Case #{policy} : {claimsInvestigation.InvestigationCaseSubStatus.Name}, ";
+                        message += $"Thanks, ";
+                        message += $"{clientCompanyUser.Email}, ";
+                        message += $"{url}";
+                        await smsService.DoSendSmsAsync(userEmailToSend.Country.ISDCode + userEmailToSend.PhoneNumber, message);
+                        //claimsInvestigation.SmsNotifications.Add(new SmsNotification { RecepicientEmail = userEmailToSend.Email, RecepicientPhone = userEmailToSend.PhoneNumber, Message = message });
+                    }
+                    //SMS ::END
+                }
+
+                var rows = await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                throw;
+            }
         }
         public async Task NotifyClaimAllocationToVendor(string userEmail, string policy, string claimsInvestigationId, long vendorId, string url = "")
         {
@@ -566,6 +718,7 @@ namespace risk.control.system.Services
                     Message = $"Case #{claimsInvestigation.PolicyDetail.ContractNumber}",
                     Status = claimsInvestigation.InvestigationCaseSubStatus.Name
                 };
+                _context.Notifications.Add(vendorNotification);
 
                 var notification = new StatusNotification
                 {
@@ -576,10 +729,6 @@ namespace risk.control.system.Services
                     Status = claimsInvestigation.InvestigationCaseSubStatus.Name,
                     NotifierUserEmail = senderUserEmail
                 };
-
-                _context.Notifications.Add(vendorNotification);
-                //claimsInvestigation.Notifications.Add(vendorNotification);
-                _context.Notifications.Add(vendorNotification);
 
                 _context.Notifications.Add(notification);
 

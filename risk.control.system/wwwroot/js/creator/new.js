@@ -276,6 +276,7 @@
             var api = this.api();
             var rowCount = (this.fnSettings().fnRecordsTotal()); // total number of rows
             if (rowCount > 0 && hasAssignedRows()) {
+                $('#deletecase').prop('disabled', false);
                 $('.top-info').prop('disabled', false);
                 var pendingRows = hasPendingRows();
                 if (!pendingRows) {
@@ -288,6 +289,7 @@
             }
             else {
                 $('.top-info').prop('disabled', true);
+                $('#deletecase').prop('disabled', true);
                 $('#allocatedcase').prop('disabled', true);
             }
             

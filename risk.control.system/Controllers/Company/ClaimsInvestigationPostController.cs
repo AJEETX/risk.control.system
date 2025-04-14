@@ -119,7 +119,7 @@ namespace risk.control.system.Controllers.Company
                 var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
                 var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
 
-                var allocatedCaseNumber = await claimsInvestigationService.ProcessAutoAllocation(claims, currentUserEmail, baseUrl);
+                var allocatedCaseNumber = await claimsInvestigationService.ProcessAutoSingleAllocation(claims, currentUserEmail, baseUrl);
                 if(string.IsNullOrWhiteSpace(allocatedCaseNumber))
                 {
                     notifyService.Custom($"Case #:{allocatedCaseNumber} Not Assigned", 3, "orange", "far fa-file-powerpoint");
@@ -139,7 +139,7 @@ namespace risk.control.system.Controllers.Company
         [ValidateAntiForgeryToken]
         [HttpPost]
         [Authorize(Roles = CREATOR.DISPLAY_NAME)]
-        public async Task<IActionResult> CaseAllocatedToVendor(long selectedcase, string caseId)
+        public async Task<IActionResult> AllocateSingle2Vendor(long selectedcase, string caseId)
         {
             if (selectedcase < 1 || string.IsNullOrWhiteSpace(caseId))
             {
@@ -165,7 +165,7 @@ namespace risk.control.system.Controllers.Company
                 var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
                 var baseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}";
 
-                backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimAllocationToVendor(currentUserEmail, policy, caseId, selectedcase, baseUrl));
+                var jobId = backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimAllocationToVendorAndManager(currentUserEmail, policy, caseId, selectedcase, baseUrl));
 
                 notifyService.Custom($"Case #{policy} {status} to {vendor.Name}", 3, "green", "far fa-file-powerpoint");
 

@@ -668,7 +668,14 @@ namespace risk.control.system.Services
                 else
                 {
                     var superRole = context.ApplicationRole.FirstOrDefault(r => r.Name == AppRoles.SUPERVISOR.ToString());
-                    notifications = notifications.Where(n => n.Role == superRole && (!n.IsReadByVendor));
+                    if(role.Name == AppRoles.SUPERVISOR.ToString())
+                    {
+                        notifications = notifications.Where(n => n.NotifierUserEmail == userEmail && (!n.IsReadByVendor));
+                    }
+                    else
+                    {
+                        notifications = notifications.Where(n => (!n.IsReadByVendor));
+                    }
                 }
 
 

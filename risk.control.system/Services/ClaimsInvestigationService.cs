@@ -43,7 +43,7 @@ namespace risk.control.system.Services
         Task<Vendor> WithdrawCase(string userEmail, ClaimTransactionModel model, string claimId);
         Task<Vendor> WithdrawCaseFromAgent(string userEmail, ClaimTransactionModel model, string claimId);
 
-        Task<string> ProcessAutoAllocation(string claim, string userEmail, string url = "");
+        Task<string> ProcessAutoSingleAllocation(string claim, string userEmail, string url = "");
         Task<(ClientCompany, long)> WithdrawCaseByCompany(string userEmail, ClaimTransactionModel model, string claimId);
         Task<bool> SubmitNotes(string userEmail, string claimId, string notes);
 
@@ -189,7 +189,7 @@ namespace risk.control.system.Services
             var results = await Task.WhenAll(claimTasks); // Run all tasks in parallel
             return results.Where(r => r != null).ToList(); // Remove nulls and return allocated claims
         }
-        public async Task<string> ProcessAutoAllocation(string claim, string userEmail, string url = "")
+        public async Task<string> ProcessAutoSingleAllocation(string claim, string userEmail, string url = "")
         {
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == userEmail);
 
@@ -247,13 +247,12 @@ namespace risk.control.system.Services
             if (string.IsNullOrEmpty(policy) || string.IsNullOrEmpty(status))
             {
                 await AssignToAssigner(userEmail, new List<string> { claim });
-                var job = backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimAssignmentToAssigner(userEmail, new List<string> { claim }, url));
+                await mailboxService.NotifyClaimAssignmentToAssigner(userEmail, new List<string> { claim }, url);
                 return null;
             }
 
-            // 4. Send Notification in Background
-            var jobId = backgroundJobClient.Enqueue(() =>
-                mailboxService.NotifyClaimAllocationToVendor(userEmail, policy, claimsInvestigation.ClaimsInvestigationId, selectedVendorId.VendorId, url));
+            // 4. Send Notification
+            var jobId = backgroundJobClient.Enqueue(() => mailboxService.NotifyClaimAllocationToVendor(userEmail, policy, claimsInvestigation.ClaimsInvestigationId, selectedVendorId.VendorId, url));
 
             return claimsInvestigation.PolicyDetail.ContractNumber; // Return allocated claim
         }
