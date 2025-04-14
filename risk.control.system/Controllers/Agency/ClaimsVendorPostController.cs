@@ -108,7 +108,7 @@ namespace risk.control.system.Controllers.Agency
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = $"{AGENT.DISPLAY_NAME},{SUPERVISOR.DISPLAY_NAME}")]
-        public async Task<IActionResult> SubmitReport(string remarks, string question1, string question2, string question3, string question4, string claimId, long caseLocationId)
+        public async Task<IActionResult> SubmitReport(string remarks, string question1, string question2, string question3, string question4, string claimId, long caseLocationId, string caseType)
         {
             try
             {
@@ -129,6 +129,56 @@ namespace risk.control.system.Controllers.Agency
                 {
                     notifyService.Error($"No Agent remarks entered!!!. Please enter remarks.", 3);
                     return RedirectToAction(nameof(AgentController.GetInvestigate), "Agent", new { selectedcase = claimId });
+                }
+
+                if(caseType == "claim")
+                {
+                    if(int.TryParse(question1, out int intValue))
+                    {
+                        YESNO yesNo = (YESNO)intValue;
+
+                        // Optional: Validate if value is defined in the enum
+                        if (Enum.IsDefined(typeof(YESNO), yesNo))
+                        {
+                            question1 = yesNo.ToString();
+                        }
+                    }
+
+
+                    if (int.TryParse(question2, out int quest2))
+                    {
+                        DURATION duration = (DURATION)quest2;
+
+                        // Optional: Validate if value is defined in the enum
+                        if (Enum.IsDefined(typeof(DURATION), duration))
+                        {
+                            question2 = duration.ToString();
+                        }
+                    }
+                }
+                else
+                {
+                    if (int.TryParse(question1, out int intValue))
+                    {
+                        DwellType dwellType = (DwellType)intValue;
+
+                        // Optional: Validate if value is defined in the enum
+                        if (Enum.IsDefined(typeof(DwellType), dwellType))
+                        {
+                            question1 = dwellType.ToString();
+                        }
+                    }
+
+                    if (int.TryParse(question2, out int quest2))
+                    {
+                        Income income = (Income)quest2;
+
+                        // Optional: Validate if value is defined in the enum
+                        if (Enum.IsDefined(typeof(Income), income))
+                        {
+                            question2 = income.ToString();
+                        }
+                    }
                 }
 
                 var (vendor , contract )= await claimsInvestigationService.SubmitToVendorSupervisor(currentUserEmail, claimId,

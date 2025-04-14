@@ -8,7 +8,7 @@
 @if (!string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.AgencyReport.AgentRemarks))
 {
     <div class="card border-success">
-        <div class="card direct-chat-warning collapsed-card">
+        <div class="card border-success direct-chat-warning collapsed-card">
             <div class="card-header text-muted border-bottom-0">
                 <h3 class="card-title">
                     <i class="far fa-comment"></i> Questionnaire
@@ -39,7 +39,6 @@
                 </div>
             </div>
             <div class="card-body">
-                <partial name="_Chat" model="@Model" />
 
                 <div class="row">
                     <div class="col-7">
@@ -76,7 +75,7 @@
                                         <i class="far fa-comment"></i>
                                     </span>
                                 </li>
-                                
+
                             </ul>
                         </p>
                     </div>
@@ -113,7 +112,7 @@
                                     </span>
                                     @Model.AgencyReport?.ReportQuestionaire?.Answer4
                                 </li>
-                                
+
                             </ul>
                         </p>
                     </div>
@@ -127,8 +126,7 @@
 
                             @if (Model.ClaimsInvestigation.UpdateAgentAnswer)
                             {
-                                <input required name="remarks" asp-for="AgencyReport.AgentRemarks" class="form-control remarks" data-toggle="tooltip" title="Edit Agent Remarks"
-                                       type="text" placeholder="Remarks" maxlength="50" />
+                                <textarea asp-for="AgencyReport.AgentRemarks" class="form-control remarks" data-toggle="tooltip" title="Edit Agent Remarks" rows="2"></textarea>
                                 <span asp-validation-for="AgencyReport.AgentRemarks" class="text-danger"></span>
                             }
                             else

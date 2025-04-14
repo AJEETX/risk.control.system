@@ -46,9 +46,10 @@
                 <input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail.CustomerDetailId" />
                 <input type="hidden" id="beneficiaryId" value="@Model.Location?.BeneficiaryDetailId" />
                 <input type="hidden" id="usertype" value="@Applicationsettings.AGENT.DISPLAY_NAME" />
+                <input type="hidden" id="caseType" name="caseType" value="claim" />
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-6">
+                        <div class="col-12 col-md-6">
                             <div class="form-group">
                                 <span class="input-group-label"> @Model.ClaimsInvestigation.AgencyReport.ReportQuestionaire.Question1</span>
                                 <div class="input-group mb-3">
@@ -86,9 +87,6 @@
                                     <span asp-validation-for="AgencyReport.ReportQuestionaire.Answer3" class="text-danger"></span>
                                 </div>
                             </div>
-                            
-                        </div>
-                        <div class="col-6">
                             <div class="form-group">
                                 <span class="input-group-label"> @Model.ClaimsInvestigation.AgencyReport.ReportQuestionaire.Question4</span>
                                 <div class="input-group mb-3">
@@ -103,14 +101,17 @@
                                     <span asp-validation-for="AgencyReport.ReportQuestionaire.Answer4" class="text-danger"></span>
                                 </div>
                             </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            
                             <div class="form-group">
                                 <span class="input-group-label"> Remarks :</span>
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" asp-for="AgencyReport.AgentRemarks"><i class="fas fa-comment"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
                                     </div>
-                                    <input required name="remarks" id="remarks" asp-for="AgencyReport.AgentRemarks" class="form-control remarks" data-toggle="tooltip" title="Enter remarks"
-                                           type="text" placeholder="Remarks" maxlength="100" />
+                                    <textarea required name="remarks" id="remarks" asp-for="AgencyReport.AgentRemarks" class="form-control remarks" data-toggle="tooltip" title="Enter remarks"
+                                              type="text" placeholder="Remarks" rows="1"></textarea>
                                     <span asp-validation-for="AgencyReport.AgentRemarks" class="text-danger"></span>
                                 </div>
                             </div>

@@ -214,10 +214,10 @@ namespace risk.control.system.Services
 
             if (isClaim)
             {
-                claim.AgencyReport.ReportQuestionaire.Question1 = "Medical report question ?";
-                claim.AgencyReport.ReportQuestionaire.Question2 = "Detailed Diagnosis of death ?";
-                claim.AgencyReport.ReportQuestionaire.Question3 = "Name of Doctor met ?";
-                claim.AgencyReport.ReportQuestionaire.Question4 = "Date when met with Doctor ?";
+                claim.AgencyReport.ReportQuestionaire.Question1 = "Injury/Illness prior to commencement/revival ?";
+                claim.AgencyReport.ReportQuestionaire.Question2 = "Duration of treatment ?";
+                claim.AgencyReport.ReportQuestionaire.Question3 = "Name of person met at the cemetery ?";
+                claim.AgencyReport.ReportQuestionaire.Question4 = "Date and time of death ?";
             }
             else
             {

@@ -32,6 +32,8 @@
                     <div class="col-md-4">
                         <partial name="_AgencyAgentReport" model="@Model" />
                         <partial name="_AgencyDigitalReport" model="@Model" />
+                        <partial name="_AgencyDocumentReport" model="@Model" />
+                        <partial name="_Chat" model="@Model" />
 
 
                         @if (Model.ClaimsInvestigation.EnablePassport)
@@ -51,7 +53,6 @@
                         }
                     </div>
                     <div class="col-md-4">
-                        <partial name="_AgencyDocumentReport" model="@Model" />
                         <partial name="_AgencyAgentAnswer" model="@Model" />
 
                     </div>
