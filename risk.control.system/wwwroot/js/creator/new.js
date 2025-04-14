@@ -114,19 +114,11 @@
                 "sDefaultContent": "<i class='far fa-edit' data-toggle='tooltip' title='Incomplete'></i>",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    var isPending = row.status === "PENDING"; // Check if status is "READY"
-                    if (isPending || !row.ready2Assign) {
-                        return '<i class="fas fa-exclamation-triangle" data-toggle="tooltip" title="Incomplete/ Or Any issue"></i>';
-                    }
-                    if (row.ready2Assign && row.autoAllocated) {
-                        var img = '<input class="vendors" name="claims" type="checkbox" id="' + row.id + '"  value="' + row.id + '"  data-toggle="tooltip" title="Ready to assign/delete" />';
-                        return img;
-                    } else if (row.ready2Assign && !row.autoAllocated) {
-                        var img = '<input class="vendors" name="claims" type="checkbox" id="' + row.id + '"  value="' + row.id + '"  data-toggle="tooltip" title="Assign manually" />';
-                        return img;
+                    if (!row.ready2Assign) {
+                        return '<i class="fas fa-exclamation-triangle" data-toggle="tooltip" title="Incomplete"></i>';
                     }
                     else {
-                        var img = '<input class="vendors" name="claims" type="checkbox" id="' + row.id + '"  value="' + row.id + '"  data-toggle="tooltip" title="Delete" />';
+                        var img = '<input class="vendors" name="claims" type="checkbox" id="' + row.id + '"  value="' + row.id + '"  data-toggle="tooltip" title="Assign/delete" />';
                         return img;
                     }
                 }
@@ -247,15 +239,15 @@
                     var buttons = "";
                     console.log(row.status);
                     if (row.ready2Assign) {
-                        buttons += '<a id="assign' + row.id + '" href="/CreatorAuto/EmpanelledVendors?Id=' + row.id + '" class="btn btn-xs btn-info refresh-btn ' + disabled + '" data-id="' + row.id + '">';
-                        buttons += '<i class="fas fa-external-link-alt ' + spinClass + '"></i> Assign</a>&nbsp;';
+                        buttons += '<a id="assign' + row.id + '" href="/CreatorAuto/EmpanelledVendors?Id=' + row.id + '" class="btn btn-xs btn-info refresh-btn" data-id="' + row.id + '">';
+                        buttons += '<i class="fas fa-external-link-alt"></i> Assign</a>&nbsp;';
                     } else {
                         buttons += '<button disabled class="btn btn-xs btn-info"><i class="fas fa-external-link-alt"></i> Assign</button>&nbsp;';
                     }
 
-                    buttons += '<a id="edit' + row.id + '" href="Details?Id=' + row.id + '" class="btn btn-xs btn-warning ' + disabled + '"><i class="fas fa-pencil-alt ' + disabled + '"></i> Edit</a>&nbsp;';
+                    buttons += '<a id="edit' + row.id + '" href="Details?Id=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-pencil-alt"></i> Edit</a>&nbsp;';
 
-                    buttons += '<a id="details' + row.id + '" href="Delete?Id=' + row.id + '" class="btn btn-xs btn-danger ' + disabled + '"><i class="fa fa-trash ' + disabled + '"></i> Delete </a>';
+                    buttons += '<a id="details' + row.id + '" href="Delete?Id=' + row.id + '" class="btn btn-xs btn-danger"><i class="fa fa-trash "></i> Delete </a>';
 
                     return buttons;
                 }
@@ -278,14 +270,7 @@
             if (rowCount > 0 && hasAssignedRows()) {
                 $('#deletecase').prop('disabled', false);
                 $('.top-info').prop('disabled', false);
-                var pendingRows = hasPendingRows();
-                if (!pendingRows) {
                     $('#allocatedcase').prop('disabled', false);
-                }
-                else {
-                    $('.top-info').prop('disabled', true);
-                    $('#allocatedcase').prop('disabled', true);
-                }
             }
             else {
                 $('.top-info').prop('disabled', true);
@@ -348,7 +333,7 @@
 
         table.rows().every(function () {
             var data = this.data();
-            if (data.status === "PENDING") {
+            if (data.status != "PENDING") {
                 pendingExists = true;
                 return false; // Stop iterating once a "Pending" row is found
             }

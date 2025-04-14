@@ -350,8 +350,8 @@ namespace risk.control.system.Services
                     claimsInvestigation.UserRoleActionedTo = $"{currentUser.ClientCompany.Email}";
                     claimsInvestigation.CurrentClaimOwner = currentUser.Email;
                     claimsInvestigation.AssignedToAgency = false;
-                    claimsInvestigation.STATUS = ALLOCATION_STATUS.READY;
-                    claimsInvestigation.IsReady2Assign = true;
+                    claimsInvestigation.STATUS = claimsInvestigation.IsValidCaseData() ? ALLOCATION_STATUS.READY : ALLOCATION_STATUS.PENDING;
+                    claimsInvestigation.IsReady2Assign = claimsInvestigation.IsValidCaseData() ? true :false;
                     claimsInvestigation.CREATEDBY = CREATEDBY.MANUAL;
                     claimsInvestigation.AutoAllocated = false;
                     claimsInvestigation.ActiveView = 0;
@@ -598,6 +598,7 @@ namespace risk.control.system.Services
                     .FirstOrDefaultAsync(u => u.Email == userEmail);
 
                 if (vendor == null || currentUser == null) return (string.Empty, string.Empty); // Handle missing data
+                var inProgressStatus = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.INPROGRESS));
 
                 var subStatuses = await _context.InvestigationCaseSubStatus
                     .Where(i => new[]
@@ -644,7 +645,8 @@ namespace risk.control.system.Services
                 claimsCase.AgentSla = currentUser.ClientCompany.AgentSla;
                 claimsCase.UpdateAgentReport = currentUser.ClientCompany.UpdateAgentReport;
                 claimsCase.UpdateAgentAnswer = currentUser.ClientCompany.UpdateAgentAnswer;
-
+                claimsCase.InvestigationCaseStatus = inProgressStatus;
+                claimsCase.InvestigationCaseSubStatusId = subStatuses[CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR];
                 claimsCase.Vendors.Add(vendor); // Ensures relationship update
                 _context.ClaimsInvestigation.Update(claimsCase);
 

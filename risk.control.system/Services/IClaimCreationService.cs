@@ -329,7 +329,7 @@ namespace risk.control.system.Services
                 claimsInvestigation.AutoNew = 0;
                 claimsInvestigation.Updated = DateTime.Now;
                 claimsInvestigation.ORIGIN = ORIGIN.USER;
-
+                claimsInvestigation.IsReady2Assign = true;
                 beneficiary.CountryId = beneficiary.SelectedCountryId;
                 beneficiary.StateId = beneficiary.SelectedStateId;
                 beneficiary.DistrictId = beneficiary.SelectedDistrictId;

@@ -77,39 +77,21 @@ namespace risk.control.system.Services
         }
         private async Task<ClaimsInvestigation> AddCase(UploadCase uploadCase, ClientCompanyApplicationUser companyUser, FileOnFileSystemModel model)
         {
+            
+            var customerTask = AddCustomer(companyUser, uploadCase, model.ByteData);
+            var beneficiaryTask = AddBeneficiary(companyUser, uploadCase, model.ByteData);
+            await Task.WhenAll(customerTask, beneficiaryTask);
+
+            // Get the results
+            var customer = await customerTask;
+            var beneficiary = await beneficiaryTask;
             string caseType = CLAIMS;
-            if(uploadCase.CaseType != "0")
+            if (uploadCase.CaseType != "0")
             {
                 caseType = UNDERWRITING;
             }
             var lineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == caseType).LineOfBusinessId;
-            var status = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.INITIATED));
-            var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
-            var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
-            var subStatus = companyUser.ClientCompany.AutoAllocation && model.AutoOrManual == CREATEDBY.AUTO ? createdStatus : assignedStatus;
-            var claim = new ClaimsInvestigation
-            {
-                InvestigationCaseStatusId = status.InvestigationCaseStatusId,
-                InvestigationCaseStatus = status,
-                InvestigationCaseSubStatusId = subStatus.InvestigationCaseSubStatusId,
-                InvestigationCaseSubStatus = subStatus,
-                Updated = DateTime.Now,
-                UpdatedBy = companyUser.Email,
-                CurrentUserEmail = companyUser.Email,
-                CurrentClaimOwner = companyUser.Email,
-                Deleted = false,
-                HasClientCompany = true,
-                AssignedToAgency = false,
-                IsReady2Assign = true,
-                IsReviewCase = false,
-                UserEmailActioned = companyUser.Email,
-                UserEmailActionedTo = companyUser.Email,
-                CREATEDBY = model.AutoOrManual,
-                ORIGIN = model.FileOrFtp,
-                ClientCompanyId = companyUser.ClientCompanyId,
-                UserRoleActionedTo = $"{companyUser.ClientCompany.Email}",
-                CreatorSla = companyUser.ClientCompany.CreatorSla
-            };
+
             var servicetype = string.IsNullOrWhiteSpace(uploadCase.ServiceType)
                 ? _context.InvestigationServiceType.FirstOrDefault(i => i.LineOfBusinessId == lineOfBusinessId)  // Case 1: ServiceType is null, get first record matching LineOfBusinessId
                 : _context.InvestigationServiceType
@@ -119,9 +101,9 @@ namespace risk.control.system.Services
 
 
 
-            var savedNewImage = GetImagesWithDataInSubfolder(model.ByteData, uploadCase.CaseId.ToLower(),POLICY_IMAGE);
+            var savedNewImage = GetImagesWithDataInSubfolder(model.ByteData, uploadCase.CaseId.ToLower(), POLICY_IMAGE);
 
-            if(!string.IsNullOrWhiteSpace(uploadCase.Amount) && decimal.TryParse(uploadCase.Amount, out var amount))
+            if (!string.IsNullOrWhiteSpace(uploadCase.Amount) && decimal.TryParse(uploadCase.Amount, out var amount))
             {
                 uploadCase.Amount = amount.ToString();
             }
@@ -130,7 +112,7 @@ namespace risk.control.system.Services
                 uploadCase.Amount = "0";
             }
 
-            if(!string.IsNullOrWhiteSpace(uploadCase.IssueDate) && DateTime.TryParseExact(uploadCase.IssueDate, "dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out var issueDate))
+            if (!string.IsNullOrWhiteSpace(uploadCase.IssueDate) && DateTime.TryParseExact(uploadCase.IssueDate, "dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out var issueDate))
             {
                 uploadCase.IssueDate = issueDate.ToString("dd-MM-yyyy");
             }
@@ -138,7 +120,7 @@ namespace risk.control.system.Services
             {
                 uploadCase.IssueDate = DateTime.Now.ToString("dd-MM-yyyy");
             }
-            if(!string.IsNullOrWhiteSpace(uploadCase.IncidentDate) && DateTime.TryParseExact(uploadCase.IncidentDate, "dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateOfIncident))
+            if (!string.IsNullOrWhiteSpace(uploadCase.IncidentDate) && DateTime.TryParseExact(uploadCase.IncidentDate, "dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateOfIncident))
             {
                 uploadCase.IncidentDate = dateOfIncident.ToString("dd-MM-yyyy");
             }
@@ -148,7 +130,7 @@ namespace risk.control.system.Services
             }
 
             var caseEnabler = string.IsNullOrWhiteSpace(uploadCase.Reason) ?
-                _context.CaseEnabler.FirstOrDefault():
+                _context.CaseEnabler.FirstOrDefault() :
                 _context.CaseEnabler.FirstOrDefault(c => c.Code.ToLower() == uploadCase.Reason.Trim().ToLower())
                 ?? _context.CaseEnabler.FirstOrDefault();
 
@@ -156,7 +138,7 @@ namespace risk.control.system.Services
                _context.CostCentre.FirstOrDefault() :
                _context.CostCentre.FirstOrDefault(c => c.Code.ToLower() == uploadCase.Department.Trim().ToLower())
                ?? _context.CostCentre.FirstOrDefault();
-            
+
             string noImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", POLICY_IMAGE);
 
             var policyDetail = new PolicyDetail
@@ -175,26 +157,46 @@ namespace risk.control.system.Services
                 Updated = DateTime.Now,
                 UpdatedBy = companyUser.Email
             };
-            if(!policyDetail.IsValidPolicy())
+            if (!policyDetail.IsValidPolicy())
             {
                 return null;
             }
-            claim.PolicyDetail = policyDetail;
-            var customerTask = AddCustomer(companyUser, uploadCase, model.ByteData);
-            var beneficiaryTask = AddBeneficiary(companyUser, uploadCase, model.ByteData);
-            await Task.WhenAll(customerTask, beneficiaryTask);
-
-            // Get the results
-            var customer = await customerTask;
-            var beneficiary = await beneficiaryTask;
             if (customer is null  || !policyDetail.IsValidCustomerForUpload(customer)|| beneficiary is null || !policyDetail.IsValidBeneficiaryForUpload(beneficiary))
             {
                 return null;
             }
+            var status = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.INITIATED));
+            var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
+            var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
+            var subStatus = companyUser.ClientCompany.AutoAllocation && model.AutoOrManual == CREATEDBY.AUTO ? createdStatus : assignedStatus;
+            var claim = new ClaimsInvestigation
+            {
+                InvestigationCaseStatusId = status.InvestigationCaseStatusId,
+                InvestigationCaseStatus = status,
+                InvestigationCaseSubStatusId = subStatus.InvestigationCaseSubStatusId,
+                InvestigationCaseSubStatus = subStatus,
+                Updated = DateTime.Now,
+                UpdatedBy = companyUser.Email,
+                CurrentUserEmail = companyUser.Email,
+                CurrentClaimOwner = companyUser.Email,
+                Deleted = false,
+                HasClientCompany = true,
+                AssignedToAgency = false,
+                IsReady2Assign = ValidateDataCase(uploadCase),
+                IsReviewCase = false,
+                UserEmailActioned = companyUser.Email,
+                UserEmailActionedTo = companyUser.Email,
+                CREATEDBY = model.AutoOrManual,
+                ORIGIN = model.FileOrFtp,
+                ClientCompanyId = companyUser.ClientCompanyId,
+                UserRoleActionedTo = $"{companyUser.ClientCompany.Email}",
+                CreatorSla = companyUser.ClientCompany.CreatorSla
+            };
+            claim.PolicyDetail = policyDetail;
             claim.CustomerDetail = customer;
             claim.BeneficiaryDetail = beneficiary;
-
-            
+            claim.STATUS = claim.IsValidCaseData() ? ALLOCATION_STATUS.READY : ALLOCATION_STATUS.PENDING;
+            claim.IsReady2Assign = claim.IsValidCaseData();
             return claim;
         }
         private async Task<CustomerDetail> AddCustomer(ClientCompanyApplicationUser companyUser, UploadCase uploadCase, byte[] data)

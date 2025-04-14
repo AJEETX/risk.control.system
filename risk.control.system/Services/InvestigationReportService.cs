@@ -2,6 +2,7 @@
 
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
+using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 
@@ -274,6 +275,7 @@ namespace risk.control.system.Services
             var model = new ClaimTransactionModel
             {
                 ClaimsInvestigation = claim,
+                CaseIsValidToAssign = claim.IsValidCaseData(),
                 Log = caseLogs,
                 Location = location,
                 Assigned = claim.InvestigationCaseSubStatus == assignedStatus,
