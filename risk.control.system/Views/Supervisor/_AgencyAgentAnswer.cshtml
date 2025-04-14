@@ -42,7 +42,7 @@
                 <partial name="_Chat" model="@Model" />
 
                 <div class="row">
-                    <div class="col-6">
+                    <div class="col-7">
                         <p class="text-muted text-sm">
                             <span class="badge badge-light"><i class="fas fa-film"></i> Questions</span>:
                             <br />
@@ -76,17 +76,11 @@
                                         <i class="far fa-comment"></i>
                                     </span>
                                 </li>
-                                <br />
-                                <li class="small">
-                                    Remarks?
-                                    <span class="fa-li">
-                                        <i class="far fa-comment"></i>
-                                    </span>
-                                </li>
+                                
                             </ul>
                         </p>
                     </div>
-                    <div class="col-6">
+                    <div class="col-5">
                         <p class="text-muted text-sm">
                             <span class="badge badge-light"><i class="fas fa-film"></i> Answers</span>:
                             <br />
@@ -119,26 +113,29 @@
                                     </span>
                                     @Model.AgencyReport?.ReportQuestionaire?.Answer4
                                 </li>
-                                <br />
-                                <li class="small">
-                                    <span class="fa-li">
-                                        <i class="far fa-comment"></i>
-                                    </span>
-
-                                    @if (Model.ClaimsInvestigation.UpdateAgentAnswer)
-                                    {
-                                        <input required name="remarks" asp-for="AgencyReport.AgentRemarks" class="form-control remarks" data-toggle="tooltip" title="Edit Agent Remarks"
-                                               type="text" placeholder="Remarks" maxlength="50" />
-                                        <span asp-validation-for="AgencyReport.AgentRemarks" class="text-danger"></span>
-                                    }
-                                    else
-                                    {
-                                        @Model.AgencyReport?.AgentRemarks
-
-                                    }
-
-                                </li>
+                                
                             </ul>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12">
+                        <p class="text-muted text-sm">
+                            <span class="badge badge-light"><i class="fas fa-film"></i>Agent Remarks</span>:
+                            <br />
+
+                            @if (Model.ClaimsInvestigation.UpdateAgentAnswer)
+                            {
+                                <input required name="remarks" asp-for="AgencyReport.AgentRemarks" class="form-control remarks" data-toggle="tooltip" title="Edit Agent Remarks"
+                                       type="text" placeholder="Remarks" maxlength="50" />
+                                <span asp-validation-for="AgencyReport.AgentRemarks" class="text-danger"></span>
+                            }
+                            else
+                            {
+                                @Model.AgencyReport?.AgentRemarks
+
+                            }
                         </p>
                     </div>
                 </div>

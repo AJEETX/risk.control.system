@@ -219,14 +219,6 @@
                                                         </span>
                                                         @{
                                                             var remarks = Model.ClaimsInvestigation.AgencyReport?.AgentRemarks;
-                                                            if (Model.ClaimsInvestigation.UpdateAgentAnswer)
-                                                            {
-                                                                var edited = Model.ClaimsInvestigation.AgencyReport?.AgentRemarks != Model.ClaimsInvestigation.AgencyReport?.AgentRemarksEdit;
-                                                                if (edited)
-                                                                {
-                                                                    remarks = Model.ClaimsInvestigation.AgencyReport?.AgentRemarksEdit; ;
-                                                                }
-                                                            }
                                                         }
                                                         @remarks
                                                     </li>
