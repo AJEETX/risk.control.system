@@ -1,6 +1,29 @@
 services:
+  postgres:
+    image: postgres:15
+    container_name: pg_dotnet8
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: mydatabase
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
   risk.control.system:
     image: ${DOCKER_REGISTRY-}riskcontrolsystem
     build:
       context: .
       dockerfile: risk.control.system/Dockerfile
+    depends_on:
+      - postgres
+    ports:
+      - "5000:80"
+    volumes:
+      - ./risk.control.system:/app
+    working_dir: /app
+    command: ["dotnet", "ef", "database", "update", "--no-build", "--project", "./risk.control.system.csproj", "--context", "ApplicationDbContext", "--verbose"] # runs migration
+
+volumes:
+  pgdata:

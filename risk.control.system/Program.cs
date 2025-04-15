@@ -217,8 +217,12 @@ if (prod)
 }
 else
 {
+    //builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    //                    options.UseSqlite(connectionString));
+
     builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                        options.UseSqlite(connectionString));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("PostGresConnection")));
+
     builder.Services.AddHangfire(config => config.UseMemoryStorage());
     //builder.Services.AddHangfire(config => config.UseSQLiteStorage(HangfireConnectionString));
 }

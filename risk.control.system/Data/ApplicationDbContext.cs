@@ -2,15 +2,32 @@
 
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace risk.control.system.Data
 {
+
+    public class DateTimeUtcConverter : ValueConverter<DateTime, DateTime>
+    {
+        public DateTimeUtcConverter()
+            : base(
+                  v => v.ToUniversalTime(),                      // Convert to UTC when saving
+                  v => DateTime.SpecifyKind(v, DateTimeKind.Utc)) // Mark as UTC when reading
+        {
+        }
+    }
+
     public class ApplicationDbContext : AuditableIdentityContext
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IHttpContextAccessor context) : base(options, context)
         {
         }
-
+        protected override void ConfigureConventions(ModelConfigurationBuilder builder)
+        {
+            builder.Properties<DateTime>()
+                .HaveConversion<DateTimeUtcConverter>();
+        }
+       
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
