@@ -183,13 +183,7 @@ namespace risk.control.system.Helpers
                 var isReview = false;
                 var isEnquiry = a.IsQueryCase;
                 var status = a.InvestigationCaseSubStatus.Name.ToUpper();
-                var requireCaseCompletion = "Incomplete";
-                var requireManualAssign = "Assign manually";
                 
-                if (status == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER && a.CREATEDBY == CREATEDBY.MANUAL && a.IsValidCaseData())
-                {
-                    return string.Join("", a.PolicyDetail?.ContractNumber + $"<i class=\"fa fa-asterisk asterik-style\" title=\"{requireManualAssign}\"></i>");
-                }
                 if (status == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY)
                 {
                     return string.Join("", a.PolicyDetail?.ContractNumber + $"<i class=\"fa fa-asterisk asterik-style\" title=\"{a.CompanyWithdrawlComment}\"></i>");

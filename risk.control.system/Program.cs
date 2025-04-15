@@ -58,6 +58,7 @@ using SmartBreadcrumbs.Extensions;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 using Hangfire.SQLite;
 using Hangfire.Dashboard;
+using risk.control.system.WorkFlow;
 
 var builder = WebApplication.CreateBuilder(args);
 ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls13;
@@ -72,6 +73,18 @@ builder.Services.AddBreadcrumbs(Assembly.GetExecutingAssembly(), options =>
     options.ActiveLiClasses = "breadcrumb-item active";
     //options.SeparatorElement = "<li class=\"separator\">/</li>";
 });
+builder.Services.AddWorkflow();
+builder.Services.AddTransient<InvestigationTaskWorkflow>();
+builder.Services.AddTransient<CaseCreateStep>();
+builder.Services.AddTransient<CaseAssignToAgencyStep>();
+builder.Services.AddTransient<CaseWithdrawStep>();
+builder.Services.AddTransient<CaseDeclineStep>();
+builder.Services.AddTransient<CaseAssignToAgentStep>();
+builder.Services.AddTransient<CaseAgentReportSubmitted>();
+builder.Services.AddTransient<CaseReAssignedToAgentStep>();
+builder.Services.AddTransient<CaseAgencyReportSubmitted>();
+builder.Services.AddTransient<CaseApproved>();
+builder.Services.AddTransient<CaseRejected>();
 
 builder.Services.AddCors(opt =>
 {
